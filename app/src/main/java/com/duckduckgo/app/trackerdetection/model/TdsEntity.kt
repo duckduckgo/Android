@@ -23,5 +23,5 @@ import androidx.room.PrimaryKey
 data class TdsEntity(
     @PrimaryKey override val name: String,
     override val displayName: String,
-    override val prevalence: Double
+    override val prevalence: Double,
 ) : com.duckduckgo.app.trackerdetection.model.Entity

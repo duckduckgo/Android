@@ -33,7 +33,7 @@ abstract class DaggerFragment(@LayoutRes contentLayoutId: Int = 0) : Fragment(co
                 """
                 Could not find the dagger component for ${key.simpleName}.
                 You probably forgot to annotate your class with @InjectWith(Scope::class).
-                """.trimIndent()
+                """.trimIndent(),
             )
     }
 }

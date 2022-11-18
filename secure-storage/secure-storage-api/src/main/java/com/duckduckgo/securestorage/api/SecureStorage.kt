@@ -37,7 +37,7 @@ interface SecureStorage {
      */
     @Throws(SecureStorageException::class)
     suspend fun addWebsiteLoginDetailsWithCredentials(
-        websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials
+        websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials,
     ): WebsiteLoginDetailsWithCredentials?
 
     /**
@@ -102,7 +102,7 @@ interface SecureStorage {
      */
     @Throws(SecureStorageException::class)
     suspend fun updateWebsiteLoginDetailsWithCredentials(
-        websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials
+        websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials,
     ): WebsiteLoginDetailsWithCredentials?
 
     /**

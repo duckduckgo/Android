@@ -34,7 +34,7 @@ class QueryUrlConverter @Inject constructor(private val requestRewriter: Request
     override fun convertQueryToUrl(
         searchQuery: String,
         vertical: String?,
-        queryOrigin: QueryOrigin
+        queryOrigin: QueryOrigin,
     ): String {
         val isUrl = when (queryOrigin) {
             is QueryOrigin.FromAutocomplete -> queryOrigin.isNav

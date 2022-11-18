@@ -82,7 +82,8 @@ class DownloadsFileActions @Inject constructor(private val appBuildConfig: AppBu
                 putExtra(Intent.EXTRA_STREAM, fileUri)
             }
         return Intent.createChooser(
-            intent, applicationContext.getString(R.string.downloadsShareTitle)
+            intent,
+            applicationContext.getString(R.string.downloadsShareTitle),
         )
             .apply {
                 if (appBuildConfig.sdkInt >= Build.VERSION_CODES.Q) {

@@ -22,31 +22,31 @@ import android.graphics.BitmapFactory
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.sha256
+import java.io.File
+import java.io.FileOutputStream
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.io.File
-import java.io.FileOutputStream
 
 interface FaviconPersister {
     fun faviconFile(
         directory: String,
         subFolder: String,
-        domain: String
+        domain: String,
     ): File?
 
     suspend fun store(
         directory: String,
         subFolder: String,
         bitmap: Bitmap,
-        domain: String
+        domain: String,
     ): File?
 
     suspend fun copyToDirectory(
         file: File,
         directory: String,
         newSubfolder: String,
-        newFilename: String
+        newFilename: String,
     )
 
     suspend fun deleteAll(directory: String)
@@ -54,14 +54,14 @@ interface FaviconPersister {
     suspend fun deleteFaviconsForSubfolder(
         directory: String,
         subFolder: String,
-        domain: String?
+        domain: String?,
     )
 }
 
 class FileBasedFaviconPersister(
     val context: Context,
     private val fileDeleter: FileDeleter,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
 ) : FaviconPersister {
 
     override suspend fun deleteAll(directory: String) {
@@ -71,7 +71,7 @@ class FileBasedFaviconPersister(
     override fun faviconFile(
         directory: String,
         subFolder: String,
-        domain: String
+        domain: String,
     ): File? {
         val file = fileForFavicon(directory, subFolder, domain)
         return if (file.exists()) {
@@ -85,7 +85,7 @@ class FileBasedFaviconPersister(
         file: File,
         directory: String,
         newSubfolder: String,
-        newFilename: String
+        newFilename: String,
     ) {
         withContext(dispatcherProvider.io()) {
             val persistedFile = fileForFavicon(directory, newSubfolder, newFilename)
@@ -97,7 +97,7 @@ class FileBasedFaviconPersister(
         directory: String,
         subFolder: String,
         bitmap: Bitmap,
-        domain: String
+        domain: String,
     ): File? {
         return withContext(dispatcherProvider.io() + NonCancellable) {
             writeToDisk(directory, subFolder, bitmap, domain)
@@ -112,7 +112,7 @@ class FileBasedFaviconPersister(
     override suspend fun deleteFaviconsForSubfolder(
         directory: String,
         subFolder: String,
-        domain: String?
+        domain: String?,
     ) {
         val directoryToDelete = directoryForFavicon(directory, subFolder)
 
@@ -127,7 +127,7 @@ class FileBasedFaviconPersister(
     private fun fileForFavicon(
         directory: String,
         subFolder: String,
-        domain: String
+        domain: String,
     ): File {
         val tabFaviconDirectory = directoryForFavicon(directory, subFolder)
         return File(tabFaviconDirectory, filename(domain))
@@ -135,7 +135,7 @@ class FileBasedFaviconPersister(
 
     private fun directoryForFavicon(
         directory: String,
-        subFolder: String
+        subFolder: String,
     ): File {
         return File(faviconDirectory(directory), subFolder)
     }
@@ -143,7 +143,7 @@ class FileBasedFaviconPersister(
     private fun prepareDestinationFile(
         directory: String,
         tabId: String,
-        url: String
+        url: String,
     ): File {
         val fileDestination = directoryForFavicon(directory, tabId)
         fileDestination.mkdirs()
@@ -156,7 +156,7 @@ class FileBasedFaviconPersister(
         directory: String,
         subFolder: String,
         bitmap: Bitmap,
-        domain: String
+        domain: String,
     ): File? {
         val existingFile = fileForFavicon(directory, subFolder, domain)
 
@@ -184,7 +184,7 @@ class FileBasedFaviconPersister(
     @Synchronized
     private fun writeBytesToFile(
         file: File,
-        bitmap: Bitmap
+        bitmap: Bitmap,
     ) {
         runCatching {
             FileOutputStream(file).use { outputStream ->

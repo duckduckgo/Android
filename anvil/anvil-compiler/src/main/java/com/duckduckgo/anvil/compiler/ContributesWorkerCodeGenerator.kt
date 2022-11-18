@@ -40,12 +40,12 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.TypeVariableName
-import org.jetbrains.kotlin.descriptors.ModuleDescriptor
-import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.psi.KtFile
 import java.io.File
 import java.lang.StringBuilder
 import javax.inject.Inject
+import org.jetbrains.kotlin.descriptors.ModuleDescriptor
+import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.psi.KtFile
 
 /**
  * This Anvil code generator allows injection dependencies into the Workers (WorkerInjectorPlugin) without manually creating a WorkerInjectorPlugin
@@ -58,7 +58,7 @@ class ContributesWorkerCodeGenerator : CodeGenerator {
     override fun generateCode(
         codeGenDir: File,
         module: ModuleDescriptor,
-        projectFiles: Collection<KtFile>
+        projectFiles: Collection<KtFile>,
     ): Collection<GeneratedFile> = projectFiles.classAndInnerClassReferences(module)
         .toList()
         .filter { it.isAnnotatedWith(ContributesWorker::class.fqName) }
@@ -70,7 +70,7 @@ class ContributesWorkerCodeGenerator : CodeGenerator {
     private fun generateWorkedInjectorPlugin(
         vmClass: ClassReference.Psi,
         codeGenDir: File,
-        module: ModuleDescriptor
+        module: ModuleDescriptor,
     ): GeneratedFile {
         val generatedPackage = vmClass.packageFqName.toString()
         val workerPluginName = "${vmClass.shortName}_WorkerInjectorPlugin"
@@ -91,10 +91,9 @@ class ContributesWorkerCodeGenerator : CodeGenerator {
                                         annotation.arguments.forEach { argument ->
                                             argument.name?.let { name -> addMember("%N = %S", name, argument.value()) }
                                                 ?: addMember("%S", argument.value())
-
                                         }
                                     }
-                                    .build()
+                                    .build(),
                             )
                         }
                     }
@@ -107,7 +106,7 @@ class ContributesWorkerCodeGenerator : CodeGenerator {
                     .addAnnotation(
                         AnnotationSpec.builder(ContributesMultibinding::class)
                             .addMember("%T::class", scope!!.asClassName())
-                            .build()
+                            .build(),
                     )
                     .addSuperinterface(duckduckgoWorkerInjectorPluginFqName.asClassName(module))
                     .primaryConstructor(dependencies)
@@ -115,14 +114,14 @@ class ContributesWorkerCodeGenerator : CodeGenerator {
                         FunSpec.builder("inject")
                             .addParameter(
                                 "worker",
-                                listenableWorkerFqName.asClassName(module)
+                                listenableWorkerFqName.asClassName(module),
                             )
                             .addModifiers(KModifier.OVERRIDE)
                             .returns(TypeVariableName("Boolean"))
                             .addCode(generateCode(dependencies, workerName))
-                            .build()
+                            .build(),
                     )
-                    .build()
+                    .build(),
             )
         }
 
@@ -131,7 +130,7 @@ class ContributesWorkerCodeGenerator : CodeGenerator {
 
     private fun generateCode(
         properties: Array<PropertySpec>,
-        workerName: String
+        workerName: String,
     ): String {
         val builder = StringBuilder().appendLine("if (worker is $workerName) {")
         properties.forEach {
@@ -142,7 +141,7 @@ class ContributesWorkerCodeGenerator : CodeGenerator {
                    return true
                }
                return false
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         return builder.toString().trimIndent()

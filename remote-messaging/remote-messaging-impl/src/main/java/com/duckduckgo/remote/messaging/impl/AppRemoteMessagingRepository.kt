@@ -48,7 +48,7 @@ import kotlinx.coroutines.withContext
 class AppRemoteMessagingRepository(
     private val remoteMessagingConfigRepository: RemoteMessagingConfigRepository,
     private val remoteMessagesDao: RemoteMessagesDao,
-    private val dispatchers: DispatcherProvider
+    private val dispatchers: DispatcherProvider,
 ) : RemoteMessagingRepository {
 
     private val messageMapper = MessageMapper()
@@ -77,7 +77,8 @@ class AppRemoteMessagingRepository(
             RemoteMessage(
                 id = it.id,
                 content = message.content,
-                emptyList(), emptyList()
+                emptyList(),
+                emptyList(),
             )
         }
     }
@@ -112,14 +113,14 @@ class AppRemoteMessagingRepository(
                         .withSubtype(Small::class.java, MessageType.SMALL.name)
                         .withSubtype(Medium::class.java, MessageType.MEDIUM.name)
                         .withSubtype(BigSingleAction::class.java, MessageType.BIG_SINGLE_ACTION.name)
-                        .withSubtype(BigTwoActions::class.java, MessageType.BIG_TWO_ACTION.name)
+                        .withSubtype(BigTwoActions::class.java, MessageType.BIG_TWO_ACTION.name),
                 )
                 .add(
                     PolymorphicJsonAdapterFactory.of(Action::class.java, "actionType")
                         .withSubtype(PlayStore::class.java, ActionType.PLAYSTORE.name)
                         .withSubtype(Url::class.java, ActionType.URL.name)
                         .withSubtype(Dismiss::class.java, ActionType.DISMISS.name)
-                        .withSubtype(DefaultBrowser::class.java, ActionType.DEFAULT_BROWSER.name)
+                        .withSubtype(DefaultBrowser::class.java, ActionType.DEFAULT_BROWSER.name),
                 )
                 .add(KotlinJsonAdapterFactory())
                 .build()

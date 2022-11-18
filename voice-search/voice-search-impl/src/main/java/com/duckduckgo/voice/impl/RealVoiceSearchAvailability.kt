@@ -24,7 +24,7 @@ import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class RealVoiceSearchAvailability @Inject constructor(
-    private val configProvider: VoiceSearchAvailabilityConfigProvider
+    private val configProvider: VoiceSearchAvailabilityConfigProvider,
 ) : VoiceSearchAvailability {
     companion object {
         private const val LANGUAGE_TAG_ENG_US = "en-US"
@@ -46,7 +46,7 @@ class RealVoiceSearchAvailability @Inject constructor(
 
     override fun shouldShowVoiceSearch(
         isEditing: Boolean,
-        urlLoaded: String
+        urlLoaded: String,
     ): Boolean {
         // Show microphone icon only when:
         // - user is editing the address bar OR

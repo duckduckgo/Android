@@ -39,7 +39,7 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 class TwoLineListItem @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = R.attr.twoLineListItemStyle
+    defStyleAttr: Int = R.attr.twoLineListItemStyle,
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
     private val binding: ViewTwoLineItemBinding by viewBinding()
@@ -49,7 +49,7 @@ class TwoLineListItem @JvmOverloads constructor(
             attrs,
             R.styleable.TwoLineListItem,
             0,
-            R.style.Widget_DuckDuckGo_TwoLineListItem
+            R.style.Widget_DuckDuckGo_TwoLineListItem,
         ).apply {
 
             binding.primaryText.text = getString(R.styleable.TwoLineListItem_primaryText)
@@ -198,7 +198,7 @@ class TwoLineListItem @JvmOverloads constructor(
     /** Allows to set a new value to the switch, without triggering the onChangeListener */
     fun quietlySetIsChecked(
         newCheckedState: Boolean,
-        changeListener: CompoundButton.OnCheckedChangeListener?
+        changeListener: CompoundButton.OnCheckedChangeListener?,
     ) {
         binding.trailingSwitch.quietlySetIsChecked(newCheckedState, changeListener)
     }

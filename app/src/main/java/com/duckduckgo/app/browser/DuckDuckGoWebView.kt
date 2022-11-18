@@ -51,7 +51,7 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
     constructor(context: Context) : this(context, null)
     constructor(
         context: Context,
-        attrs: AttributeSet?
+        attrs: AttributeSet?,
     ) : super(context, attrs) {
         isNestedScrollingEnabled = true
     }
@@ -147,7 +147,7 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
         dyConsumed: Int,
         dxUnconsumed: Int,
         dyUnconsumed: Int,
-        offsetInWindow: IntArray?
+        offsetInWindow: IntArray?,
     ): Boolean =
         nestedScrollHelper.dispatchNestedScroll(dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed, offsetInWindow)
 
@@ -155,20 +155,20 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
         dx: Int,
         dy: Int,
         consumed: IntArray?,
-        offsetInWindow: IntArray?
+        offsetInWindow: IntArray?,
     ): Boolean =
         nestedScrollHelper.dispatchNestedPreScroll(dx, dy, consumed, offsetInWindow)
 
     override fun dispatchNestedFling(
         velocityX: Float,
         velocityY: Float,
-        consumed: Boolean
+        consumed: Boolean,
     ): Boolean =
         nestedScrollHelper.dispatchNestedFling(velocityX, velocityY, consumed)
 
     override fun dispatchNestedPreFling(
         velocityX: Float,
-        velocityY: Float
+        velocityY: Float,
     ): Boolean =
         nestedScrollHelper.dispatchNestedPreFling(velocityX, velocityY)
 
@@ -176,7 +176,7 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
         scrollX: Int,
         scrollY: Int,
         clampedX: Boolean,
-        clampedY: Boolean
+        clampedY: Boolean,
     ) {
         // taking into account lastDeltaY since we are only interested whether we clamped at the top
         lastClampedTopY = clampedY && lastDeltaY <= 0

@@ -22,7 +22,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "sites_visited")
 data class SitesVisitedEntity(
     @PrimaryKey val key: String = SINGLETON_KEY,
-    val count: Int
+    val count: Int,
 ) {
     companion object {
         const val SINGLETON_KEY = "SINGLETON_KEY"

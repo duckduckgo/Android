@@ -50,7 +50,7 @@ class SharedPreferencesVpnStoreTest {
     fun setup() {
         val prefs = InMemorySharedPreferences()
         whenever(
-            sharedPreferencesProvider.getSharedPreferences(eq("com.duckduckgo.android.atp.onboarding.store"), eq(true), eq(true))
+            sharedPreferencesProvider.getSharedPreferences(eq("com.duckduckgo.android.atp.onboarding.store"), eq(true), eq(true)),
         ).thenReturn(prefs)
 
         sharedPreferencesVpnStore = SharedPreferencesVpnStore(
@@ -101,7 +101,7 @@ class SharedPreferencesVpnStoreTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     fun whenVpnLastDisabledByAndroidAndVpnUnexpectedlyDisabledThenReturnTrue() = runTest {
         whenever(vpnServiceStateDao.getLastStateStats()).thenReturn(
-            VpnServiceStateStats(state = VpnServiceState.DISABLED)
+            VpnServiceStateStats(state = VpnServiceState.DISABLED),
         )
 
         assertTrue(sharedPreferencesVpnStore.vpnLastDisabledByAndroid())
@@ -111,7 +111,7 @@ class SharedPreferencesVpnStoreTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     fun whenVpnLastDisabledByAndroidAndVpnDisabledByUserThenReturnFalse() = runTest {
         whenever(vpnServiceStateDao.getLastStateStats()).thenReturn(
-            VpnServiceStateStats(state = VpnServiceState.DISABLED, stopReason = VpnStoppingReason.SELF_STOP)
+            VpnServiceStateStats(state = VpnServiceState.DISABLED, stopReason = VpnStoppingReason.SELF_STOP),
         )
 
         assertFalse(sharedPreferencesVpnStore.vpnLastDisabledByAndroid())
@@ -121,7 +121,7 @@ class SharedPreferencesVpnStoreTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     fun whenVpnLastDisabledByAndroidAndVpnEnabledThenReturnFalse() = runTest {
         whenever(vpnServiceStateDao.getLastStateStats()).thenReturn(
-            VpnServiceStateStats(state = VpnServiceState.ENABLED)
+            VpnServiceStateStats(state = VpnServiceState.ENABLED),
         )
 
         assertFalse(sharedPreferencesVpnStore.vpnLastDisabledByAndroid())

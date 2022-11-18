@@ -33,7 +33,7 @@ class OmnibarScrolling @Inject constructor() {
 
     private fun updateScrollFlag(
         flags: Int,
-        toolbarContainer: View
+        toolbarContainer: View,
     ) {
         val params = toolbarContainer.layoutParams as AppBarLayout.LayoutParams
         params.scrollFlags = flags

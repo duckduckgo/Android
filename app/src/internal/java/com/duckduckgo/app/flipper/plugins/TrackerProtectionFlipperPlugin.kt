@@ -25,19 +25,19 @@ import com.facebook.flipper.core.FlipperConnection
 import com.facebook.flipper.core.FlipperObject
 import com.facebook.flipper.core.FlipperPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
-import timber.log.Timber
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.Executors
 import javax.inject.Inject
 import kotlin.random.Random
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
+import timber.log.Timber
 
 @ContributesMultibinding(AppScope::class)
 class TrackerProtectionFlipperPlugin @Inject constructor(
     vpnDatabase: VpnDatabase,
     private val dispatchers: DispatcherProvider,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : FlipperPlugin {
 
     private var job = ConflatedJob()

@@ -28,11 +28,10 @@ import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
-import org.mockito.kotlin.*
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridActivity.Companion.RELOAD_RESULT_CODE
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -45,6 +44,7 @@ import org.mockito.ArgumentCaptor
 import org.mockito.Captor
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.*
 
 @ExperimentalCoroutinesApi
 class BrowserViewModelTest {
@@ -95,7 +95,7 @@ class BrowserViewModelTest {
             appEnjoymentPromptEmitter = mockAppEnjoymentPromptEmitter,
             appEnjoymentUserEventRecorder = mockAppEnjoymentUserEventRecorder,
             dispatchers = coroutinesTestRule.testDispatcherProvider,
-            pixel = mockPixel
+            pixel = mockPixel,
         )
 
         testee.command.observeForever(mockCommandObserver)
@@ -159,7 +159,7 @@ class BrowserViewModelTest {
 
     @Test
     fun whenReloadDashboardResultReceivedThenRefreshTriggered() {
-        testee.receivedDashboardResult(PrivacyDashboardActivity.RELOAD_RESULT_CODE)
+        testee.receivedDashboardResult(RELOAD_RESULT_CODE)
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         assertEquals(Command.Refresh, commandCaptor.lastValue)
     }

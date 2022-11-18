@@ -33,25 +33,25 @@ fun RemoteMessage.asMessage(): Message {
     return when (val content = this.content) {
         is Small -> Message(
             title = content.titleText,
-            subtitle = content.descriptionText
+            subtitle = content.descriptionText,
         )
         is BigSingleAction -> Message(
             illustration = content.placeholder.drawable(),
             title = content.titleText,
             subtitle = content.descriptionText,
-            action = content.primaryActionText
+            action = content.primaryActionText,
         )
         is BigTwoActions -> Message(
             illustration = content.placeholder.drawable(),
             title = content.titleText,
             subtitle = content.descriptionText,
             action = content.primaryActionText,
-            action2 = content.secondaryActionText
+            action2 = content.secondaryActionText,
         )
         is Medium -> Message(
             illustration = content.placeholder.drawable(),
             title = content.titleText,
-            subtitle = content.descriptionText
+            subtitle = content.descriptionText,
         )
     }
 }

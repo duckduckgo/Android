@@ -23,5 +23,5 @@ data class BookmarkFolder(
     val name: String,
     val parentId: Long,
     val numBookmarks: Int = 0,
-    val numFolders: Int = 0
+    val numFolders: Int = 0,
 ) : Serializable

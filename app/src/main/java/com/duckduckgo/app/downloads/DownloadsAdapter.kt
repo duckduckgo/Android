@@ -46,7 +46,7 @@ class DownloadsAdapter @Inject constructor(
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
-        viewType: Int
+        viewType: Int,
     ): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
@@ -56,7 +56,7 @@ class DownloadsAdapter @Inject constructor(
                 layoutInflater = inflater,
                 binding = RowTwoLineItemBinding.inflate(inflater, parent, false),
                 listener = downloadsItemListener,
-                formatter = dataSizeFormatter
+                formatter = dataSizeFormatter,
             )
 
             else -> throw IllegalArgumentException()
@@ -65,7 +65,7 @@ class DownloadsAdapter @Inject constructor(
 
     override fun onBindViewHolder(
         holder: RecyclerView.ViewHolder,
-        position: Int
+        position: Int,
     ) {
         when (getItemViewType(position)) {
             VIEW_TYPE_EMPTY -> (holder as EmptyViewHolder)
@@ -111,7 +111,7 @@ class DownloadsAdapter @Inject constructor(
         val layoutInflater: LayoutInflater,
         val binding: RowTwoLineItemBinding,
         val listener: DownloadsItemListener,
-        val formatter: DataSizeFormatter
+        val formatter: DataSizeFormatter,
     ) :
         RecyclerView.ViewHolder(binding.root) {
 
@@ -122,8 +122,8 @@ class DownloadsAdapter @Inject constructor(
             twoListItem.setLeadingIconContentDescription(
                 context.getString(
                     R.string.downloadsMoreOptionsContentDescription,
-                    item.downloadItem.fileName
-                )
+                    item.downloadItem.fileName,
+                ),
             )
             twoListItem.setPrimaryText(item.downloadItem.fileName)
             val subtitle = when {
@@ -147,7 +147,7 @@ class DownloadsAdapter @Inject constructor(
 
         private fun showPopupMenu(
             anchor: View,
-            item: Item
+            item: Item,
         ) {
             val popupMenu = PopupMenu(layoutInflater, layout.popup_window_download_item_menu)
             val view = popupMenu.contentView
@@ -171,12 +171,12 @@ class DownloadsAdapter @Inject constructor(
 
     class DiffCallback(
         private val old: List<DownloadViewItem>,
-        private val new: List<DownloadViewItem>
+        private val new: List<DownloadViewItem>,
     ) : DiffUtil.Callback() {
 
         override fun areItemsTheSame(
             oldItemPosition: Int,
-            newItemPosition: Int
+            newItemPosition: Int,
         ): Boolean {
             return old[oldItemPosition] == new[newItemPosition]
         }
@@ -191,7 +191,7 @@ class DownloadsAdapter @Inject constructor(
 
         override fun areContentsTheSame(
             oldItemPosition: Int,
-            newItemPosition: Int
+            newItemPosition: Int,
         ): Boolean {
             return old[oldItemPosition] == new[newItemPosition]
         }

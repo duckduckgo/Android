@@ -32,7 +32,7 @@ import javax.inject.Inject
 @ContributesMultibinding(AppScope::class)
 class AutoconsentFeaturePlugin @Inject constructor(
     private val autoconsentRepository: AutoconsentRepository,
-    private val autoconsentFeatureToggleRepository: AutoconsentFeatureToggleRepository
+    private val autoconsentFeatureToggleRepository: AutoconsentFeatureToggleRepository,
 ) : PrivacyFeaturePlugin {
 
     override fun store(featureName: String, jsonString: String): Boolean {
@@ -55,7 +55,7 @@ class AutoconsentFeaturePlugin @Inject constructor(
             autoconsentRepository.updateAll(exceptions, disabledCmps)
             val isEnabled = autoconsentFeature?.state == "enabled"
             autoconsentFeatureToggleRepository.insert(
-                AutoconsentFeatureToggles(autoconsentFeatureName, isEnabled, autoconsentFeature?.minSupportedVersion)
+                AutoconsentFeatureToggles(autoconsentFeatureName, isEnabled, autoconsentFeature?.minSupportedVersion),
             )
             return true
         }

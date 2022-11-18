@@ -29,7 +29,7 @@ interface AutofillClipboardInteractor {
 
 @ContributesBinding(ActivityScope::class)
 class RealAutofillClipboardInteractor @Inject constructor(
-    context: Context
+    context: Context,
 ) : AutofillClipboardInteractor {
     private val clipboardManager by lazy { context.getSystemService(ClipboardManager::class.java) }
 

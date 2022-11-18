@@ -27,7 +27,7 @@ class ReportBreakageContract : ActivityResultContract<ReportBreakageScreen, Issu
 
     override fun createIntent(
         context: Context,
-        input: ReportBreakageScreen
+        input: ReportBreakageScreen,
     ): Intent {
         return when (input) {
             ReportBreakageScreen.ListOfInstalledApps -> ReportBreakageAppListActivity.intent(context)
@@ -39,7 +39,7 @@ class ReportBreakageContract : ActivityResultContract<ReportBreakageScreen, Issu
 
     override fun parseResult(
         resultCode: Int,
-        intent: Intent?
+        intent: Intent?,
     ): IssueReport {
         if (resultCode == RESULT_OK) {
             return intent?.getParcelableExtra<IssueReport>(IssueReport::class.java.simpleName) as IssueReport
@@ -52,14 +52,14 @@ sealed class ReportBreakageScreen {
     object ListOfInstalledApps : ReportBreakageScreen()
     data class IssueDescriptionForm(
         val appName: String,
-        val appPackageId: String
+        val appPackageId: String,
     ) : ReportBreakageScreen()
 }
 
 @Parcelize
 data class BrokenApp(
     val appName: String,
-    val appPackageId: String
+    val appPackageId: String,
 ) : Parcelable
 
 @Parcelize

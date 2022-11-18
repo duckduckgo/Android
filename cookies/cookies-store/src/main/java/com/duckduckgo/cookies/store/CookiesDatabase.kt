@@ -25,8 +25,8 @@ import androidx.room.migration.Migration
     version = 1,
     entities = [
         FirstPartyCookiePolicyEntity::class,
-        CookieExceptionEntity::class
-    ]
+        CookieExceptionEntity::class,
+    ],
 )
 abstract class CookiesDatabase : RoomDatabase() {
     abstract fun cookiesDao(): CookiesDao

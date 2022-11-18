@@ -31,9 +31,8 @@ class DaggerWorkerFactory(
     override fun createWorker(
         appContext: Context,
         workerClassName: String,
-        workerParameters: WorkerParameters
+        workerParameters: WorkerParameters,
     ): ListenableWorker? {
-
         try {
             val workerClass = Class.forName(workerClassName).asSubclass(ListenableWorker::class.java)
             val constructor = workerClass.getDeclaredConstructor(Context::class.java, WorkerParameters::class.java)

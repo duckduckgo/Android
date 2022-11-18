@@ -30,28 +30,28 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.WEBVIEW_VERSION
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Provider
+import timber.log.Timber
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = LifecycleObserver::class
+    boundType = LifecycleObserver::class,
 )
 @SingleInstanceIn(AppScope::class)
 class EnqueuedPixelWorker @Inject constructor(
     private val workManager: WorkManager,
     private val pixel: Provider<Pixel>,
     private val unsentForgetAllPixelStore: UnsentForgetAllPixelStore,
-    private val webViewVersionProvider: WebViewVersionProvider
+    private val webViewVersionProvider: WebViewVersionProvider,
 ) : LifecycleEventObserver {
 
     private var launchedByFireAction: Boolean = false
 
     override fun onStateChanged(
         source: LifecycleOwner,
-        event: Lifecycle.Event
+        event: Lifecycle.Event,
     ) {
         if (event == Lifecycle.Event.ON_CREATE) {
             scheduleWorker(workManager)
@@ -66,7 +66,7 @@ class EnqueuedPixelWorker @Inject constructor(
             Timber.i("Sending app launch pixel")
             pixel.get().fire(
                 pixel = AppPixelName.APP_LAUNCH,
-                parameters = mapOf(WEBVIEW_VERSION to webViewVersionProvider.getMajorVersion())
+                parameters = mapOf(WEBVIEW_VERSION to webViewVersionProvider.getMajorVersion()),
             )
         }
     }
@@ -111,10 +111,11 @@ class EnqueuedPixelWorker @Inject constructor(
 @ContributesWorker(AppScope::class)
 class RealEnqueuedPixelWorker(
     val context: Context,
-    parameters: WorkerParameters
+    parameters: WorkerParameters,
 ) : CoroutineWorker(context, parameters) {
     @Inject
     lateinit var pixel: Pixel
+
     @Inject
     lateinit var enqueuedPixelWorker: EnqueuedPixelWorker
 

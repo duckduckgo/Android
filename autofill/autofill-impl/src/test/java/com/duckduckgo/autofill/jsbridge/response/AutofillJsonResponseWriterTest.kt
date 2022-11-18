@@ -41,9 +41,9 @@ class AutofillJsonResponseWriterTest {
             testee.generateResponseGetAutofillData(
                 JavascriptCredentials(
                     username = "test",
-                    password = "password"
-                )
-            )
+                    password = "password",
+                ),
+            ),
         )
     }
 
@@ -57,7 +57,7 @@ class AutofillJsonResponseWriterTest {
             "}"
         assertEquals(
             expectedJson,
-            testee.generateEmptyResponseGetAutofillData()
+            testee.generateEmptyResponseGetAutofillData(),
         )
     }
 }

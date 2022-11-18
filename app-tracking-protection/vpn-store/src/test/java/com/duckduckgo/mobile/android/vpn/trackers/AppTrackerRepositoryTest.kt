@@ -46,7 +46,7 @@ class AppTrackerRepositoryTest {
 
         vpnDatabase = Room.inMemoryDatabaseBuilder(
             context,
-            VpnDatabase::class.java
+            VpnDatabase::class.java,
         ).allowMainThreadQueries().build().apply {
             VpnDatabaseCallback(context, { this }, coroutineRule.testDispatcherProvider).prepopulateAppTrackerBlockingList()
         }

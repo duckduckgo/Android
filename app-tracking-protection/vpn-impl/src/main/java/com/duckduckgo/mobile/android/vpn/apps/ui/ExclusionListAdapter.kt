@@ -28,12 +28,12 @@ import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
-import com.duckduckgo.mobile.android.vpn.apps.BannerContent
 import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType
 import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.AppInfoType
 import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.FilterType
 import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.InfoPanelType
+import com.duckduckgo.mobile.android.vpn.apps.BannerContent
+import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
 import com.duckduckgo.mobile.android.vpn.apps.ViewState
 import com.duckduckgo.mobile.android.vpn.databinding.RowExclusionListAppBinding
 import com.duckduckgo.mobile.android.vpn.databinding.RowExclusionListFilterBinding
@@ -54,7 +54,7 @@ class ExclusionListAdapter(val listener: ExclusionListListener) :
 
     fun update(
         viewState: ViewState,
-        isListStateEnabled: Boolean = true
+        isListStateEnabled: Boolean = true,
     ) {
         isListEnabled = isListStateEnabled
         val oldData = exclusionListItems
@@ -78,7 +78,7 @@ class ExclusionListAdapter(val listener: ExclusionListListener) :
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
-        viewType: Int
+        viewType: Int,
     ): RecyclerView.ViewHolder {
         return when (viewType) {
             PANEL_TYPE -> {
@@ -95,7 +95,7 @@ class ExclusionListAdapter(val listener: ExclusionListListener) :
 
     override fun onBindViewHolder(
         holder: RecyclerView.ViewHolder,
-        position: Int
+        position: Int,
     ) {
         when (holder) {
             is InfoPanelViewHolder -> {
@@ -117,7 +117,7 @@ class ExclusionListAdapter(val listener: ExclusionListListener) :
 
     private class DiffCallback(
         private val oldList: List<AppsProtectionType>,
-        private val newList: List<AppsProtectionType>
+        private val newList: List<AppsProtectionType>,
     ) :
         DiffUtil.Callback() {
         override fun getOldListSize() = oldList.size
@@ -126,14 +126,14 @@ class ExclusionListAdapter(val listener: ExclusionListListener) :
 
         override fun areItemsTheSame(
             oldItemPosition: Int,
-            newItemPosition: Int
+            newItemPosition: Int,
         ): Boolean {
             return oldList[oldItemPosition] == newList[newItemPosition]
         }
 
         override fun areContentsTheSame(
             oldItemPosition: Int,
-            newItemPosition: Int
+            newItemPosition: Int,
         ): Boolean {
             return oldList[oldItemPosition] == newList[newItemPosition]
         }
@@ -143,7 +143,7 @@ class ExclusionListAdapter(val listener: ExclusionListListener) :
         fun onAppProtectionChanged(
             excludedAppInfo: TrackingProtectionAppInfo,
             enabled: Boolean,
-            position: Int
+            position: Int,
         )
 
         fun onLaunchFAQ()
@@ -162,14 +162,14 @@ class ExclusionListAdapter(val listener: ExclusionListListener) :
         fun bind(
             bannerContent: BannerContent,
             isListEnabled: Boolean,
-            listener: ExclusionListListener
+            listener: ExclusionListListener,
         ) {
             when (bannerContent) {
                 BannerContent.ALL_OR_PROTECTED_APPS -> binding.excludedAppsEnabledVPNLabel.apply {
                     setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_info_panel_info)
                     setClickableLink(
                         TrackingProtectionExclusionListActivity.LEARN_WHY_ANNOTATION,
-                        context.resources.getText(R.string.atp_ExcludedAppsEnabledLearnWhyLabel)
+                        context.resources.getText(R.string.atp_ExcludedAppsEnabledLearnWhyLabel),
                     ) { listener.onLaunchFAQ() }
                 }
 
@@ -177,7 +177,7 @@ class ExclusionListAdapter(val listener: ExclusionListListener) :
                     setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_info_panel_info)
                     setClickableLink(
                         TrackingProtectionExclusionListActivity.LEARN_WHY_ANNOTATION,
-                        context.resources.getText(R.string.atp_ExcludedAppsDisabledLearnWhyLabel)
+                        context.resources.getText(R.string.atp_ExcludedAppsDisabledLearnWhyLabel),
                     ) { listener.onLaunchFAQ() }
                 }
 
@@ -190,7 +190,7 @@ class ExclusionListAdapter(val listener: ExclusionListListener) :
             binding.excludedAppsDisabledVPNLabel.apply {
                 setClickableLink(
                     TrackingProtectionExclusionListActivity.REPORT_ISSUES_ANNOTATION,
-                    context.resources.getText(R.string.atp_ActivityDisabledLabel)
+                    context.resources.getText(R.string.atp_ActivityDisabledLabel),
                 ) { listener.onLaunchFeedback() }
             }
 
@@ -217,7 +217,7 @@ class ExclusionListAdapter(val listener: ExclusionListListener) :
         fun bind(
             filterResId: Int,
             appsFiltered: Int,
-            listener: ExclusionListListener
+            listener: ExclusionListListener,
         ) {
             binding.excludedAppsFilterText.text = context.resources.getString(filterResId, appsFiltered)
             binding.excludedAppsFilterText.setOnClickListener {
@@ -240,7 +240,7 @@ class ExclusionListAdapter(val listener: ExclusionListListener) :
             isListEnabled: Boolean,
             excludedAppInfo: TrackingProtectionAppInfo,
             position: Int,
-            listener: ExclusionListListener
+            listener: ExclusionListListener,
         ) {
             val appIcon = itemView.context.packageManager.safeGetApplicationIcon(excludedAppInfo.packageName)
             binding.deviceShieldAppEntryIcon.setImageDrawable(appIcon)
@@ -254,8 +254,8 @@ class ExclusionListAdapter(val listener: ExclusionListListener) :
                     binding.deviceShieldAppEntryWarningIcon.setImageDrawable(
                         ContextCompat.getDrawable(
                             context,
-                            getAppExcludingReasonIcon(excludedAppInfo.knownProblem)
-                        )
+                            getAppExcludingReasonIcon(excludedAppInfo.knownProblem),
+                        ),
                     )
                     binding.deviceShieldAppEntryWarningIcon.show()
                 } else {
@@ -264,8 +264,8 @@ class ExclusionListAdapter(val listener: ExclusionListListener) :
                     binding.deviceShieldAppEntryWarningIcon.setImageDrawable(
                         ContextCompat.getDrawable(
                             context,
-                            R.drawable.ic_apptp_link
-                        )
+                            R.drawable.ic_apptp_link,
+                        ),
                     )
                     binding.deviceShieldAppEntryWarningIcon.show()
                 }
@@ -276,8 +276,8 @@ class ExclusionListAdapter(val listener: ExclusionListListener) :
                     binding.deviceShieldAppEntryWarningIcon.setImageDrawable(
                         ContextCompat.getDrawable(
                             context,
-                            R.drawable.ic_apptp_link
-                        )
+                            R.drawable.ic_apptp_link,
+                        ),
                     )
                     binding.deviceShieldAppEntryWarningIcon.show()
                 } else {
@@ -298,7 +298,7 @@ class ExclusionListAdapter(val listener: ExclusionListListener) :
 
         private fun getAppExcludingReasonText(
             context: Context,
-            excludingReason: Int
+            excludingReason: Int,
         ): String {
             return when (excludingReason) {
                 TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON, TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON ->

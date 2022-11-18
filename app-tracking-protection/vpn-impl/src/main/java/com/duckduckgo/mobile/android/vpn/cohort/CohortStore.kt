@@ -25,10 +25,10 @@ import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import org.threeten.bp.LocalDate
 import org.threeten.bp.format.DateTimeFormatter
-import javax.inject.Inject
 
 interface CohortStore {
     /**
@@ -44,14 +44,14 @@ interface CohortStore {
 
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = CohortStore::class
+    boundType = CohortStore::class,
 )
 @ContributesMultibinding(
     scope = VpnScope::class,
-    boundType = VpnServiceCallbacks::class
+    boundType = VpnServiceCallbacks::class,
 )
 class RealCohortStore @Inject constructor(
-    private val sharedPreferencesProvider: VpnSharedPreferencesProvider
+    private val sharedPreferencesProvider: VpnSharedPreferencesProvider,
 ) : CohortStore, VpnServiceCallbacks {
 
     private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
@@ -78,7 +78,7 @@ class RealCohortStore @Inject constructor(
 
     override fun onVpnStopped(
         coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
+        vpnStopReason: VpnStopReason,
     ) {
         // noop
     }

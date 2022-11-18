@@ -19,7 +19,7 @@ plugins {
     id 'kotlin'
 }
 
-apply from: "$rootProject.projectDir/spotless.gradle"
+apply from: "$rootProject.projectDir/code-formatting.gradle"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8

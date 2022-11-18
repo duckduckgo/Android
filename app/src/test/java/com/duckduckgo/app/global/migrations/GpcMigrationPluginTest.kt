@@ -18,11 +18,11 @@ package com.duckduckgo.app.global.migrations
 
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.privacy.config.api.Gpc
+import org.junit.Before
+import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import org.junit.Before
-import org.junit.Test
 
 class GpcMigrationPluginTest {
 

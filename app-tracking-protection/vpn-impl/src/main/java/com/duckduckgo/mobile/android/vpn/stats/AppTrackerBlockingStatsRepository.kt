@@ -18,22 +18,22 @@ package com.duckduckgo.mobile.android.vpn.stats
 
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.mobile.android.vpn.dao.VpnPhoenixEntity
-import com.duckduckgo.mobile.android.vpn.model.*
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.dao.VpnPhoenixEntity
+import com.duckduckgo.mobile.android.vpn.model.*
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesBinding
-import kotlinx.coroutines.flow.*
-import org.threeten.bp.LocalDateTime
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlinx.coroutines.flow.*
+import org.threeten.bp.LocalDateTime
 
 interface AppTrackerBlockingStatsRepository {
 
     data class TimeWindow(
         val value: Long,
-        val unit: TimeUnit
+        val unit: TimeUnit,
     ) {
         fun asString(): String {
             return DatabaseDateFormatter.timestamp(LocalDateTime.now().minusSeconds(unit.toSeconds(value)))
@@ -50,38 +50,38 @@ interface AppTrackerBlockingStatsRepository {
 
     fun getVpnTrackers(
         startTime: () -> String,
-        endTime: String = noEndDate()
+        endTime: String = noEndDate(),
     ): Flow<List<VpnTracker>>
 
     fun getMostRecentVpnTrackers(startTime: () -> String): Flow<List<BucketizedVpnTracker>>
 
     fun getVpnTrackersSync(
         startTime: () -> String,
-        endTime: String = noEndDate()
+        endTime: String = noEndDate(),
     ): List<VpnTracker>
 
     fun getTrackersForAppFromDate(
         date: String,
-        packageName: String
+        packageName: String,
     ): Flow<List<VpnTrackerCompanySignal>>
 
     fun getVpnRestartHistory(): List<VpnPhoenixEntity>
     fun deleteVpnRestartHistory()
     fun getBlockedTrackersCountBetween(
         startTime: () -> String,
-        endTime: String = noEndDate()
+        endTime: String = noEndDate(),
     ): Flow<Int>
 
     fun getTrackingAppsCountBetween(
         startTime: () -> String,
-        endTime: String = noEndDate()
+        endTime: String = noEndDate(),
     ): Flow<Int>
 }
 
 @ContributesBinding(AppScope::class)
 class RealAppTrackerBlockingStatsRepository @Inject constructor(
     val vpnDatabase: VpnDatabase,
-    private val dispatchers: DispatcherProvider
+    private val dispatchers: DispatcherProvider,
 ) : AppTrackerBlockingStatsRepository {
 
     private val trackerDao = vpnDatabase.vpnTrackerDao()
@@ -89,7 +89,7 @@ class RealAppTrackerBlockingStatsRepository @Inject constructor(
 
     override fun getVpnTrackers(
         startTime: () -> String,
-        endTime: String
+        endTime: String,
     ): Flow<List<VpnTracker>> {
         return trackerDao.getTrackersBetween(startTime(), endTime)
             .conflate()
@@ -101,7 +101,7 @@ class RealAppTrackerBlockingStatsRepository @Inject constructor(
     @WorkerThread
     override fun getVpnTrackersSync(
         startTime: () -> String,
-        endTime: String
+        endTime: String,
     ): List<VpnTracker> {
         return trackerDao.getTrackersBetweenSync(startTime(), endTime)
             .filter { tracker -> tracker.timestamp >= startTime() }
@@ -117,7 +117,7 @@ class RealAppTrackerBlockingStatsRepository @Inject constructor(
     @WorkerThread
     override fun getTrackersForAppFromDate(
         date: String,
-        packageName: String
+        packageName: String,
     ): Flow<List<VpnTrackerCompanySignal>> {
         return trackerDao.getTrackersForAppFromDate(date, packageName)
             .conflate()
@@ -138,7 +138,7 @@ class RealAppTrackerBlockingStatsRepository @Inject constructor(
     @WorkerThread
     override fun getBlockedTrackersCountBetween(
         startTime: () -> String,
-        endTime: String
+        endTime: String,
     ): Flow<Int> {
         return trackerDao.getTrackersCountBetween(startTime(), endTime)
             .conflate()
@@ -148,7 +148,7 @@ class RealAppTrackerBlockingStatsRepository @Inject constructor(
     @WorkerThread
     override fun getTrackingAppsCountBetween(
         startTime: () -> String,
-        endTime: String
+        endTime: String,
     ): Flow<Int> {
         return trackerDao.getTrackingAppsCountBetween(startTime(), endTime)
             .conflate()

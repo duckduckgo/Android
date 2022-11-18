@@ -30,16 +30,16 @@ import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
 
 class BrowserPopupMenu(
     context: Context,
-    layoutInflater: LayoutInflater
+    layoutInflater: LayoutInflater,
 ) : PopupMenu(
     layoutInflater,
     resourceId = R.layout.popup_window_browser_menu,
-    width = getPopupMenuWidth(context)
+    width = getPopupMenuWidth(context),
 ) {
 
     fun renderState(
         browserShowing: Boolean,
-        viewState: BrowserViewState
+        viewState: BrowserViewState,
     ) {
         contentView.apply {
             backMenuItem.isEnabled = viewState.canGoBack
@@ -74,7 +74,7 @@ class BrowserPopupMenu(
                         R.string.fireproofWebsiteMenuTitleRemove
                     } else {
                         R.string.fireproofWebsiteMenuTitleAdd
-                    }
+                    },
                 )
             }
             fireproofWebsiteMenuItem?.setIcon(if (viewState.isFireproofWebsite) drawable.ic_fire_16 else drawable.ic_fireproofed_16)
@@ -88,11 +88,11 @@ class BrowserPopupMenu(
                         R.string.requestMobileSiteMenuTitle
                     } else {
                         R.string.requestDesktopSiteMenuTitle
-                    }
+                    },
                 )
             }
             changeBrowserModeMenuItem?.setIcon(
-                if (viewState.isDesktopBrowsingMode) drawable.ic_device_mobile_16 else drawable.ic_device_desktop_16
+                if (viewState.isDesktopBrowsingMode) drawable.ic_device_mobile_16 else drawable.ic_device_desktop_16,
             )
 
             openInAppMenuItem.isVisible = viewState.previousAppLink != null
@@ -105,11 +105,11 @@ class BrowserPopupMenu(
                         R.string.enablePrivacyProtection
                     } else {
                         R.string.disablePrivacyProtection
-                    }
+                    },
                 ).toString()
             }
             privacyProtectionMenuItem?.setIcon(
-                if (viewState.isPrivacyProtectionEnabled) drawable.ic_protections_16 else drawable.ic_protections_blocked_16
+                if (viewState.isPrivacyProtectionEnabled) drawable.ic_protections_16 else drawable.ic_protections_blocked_16,
             )
             brokenSiteMenuItem?.isVisible = viewState.canReportSite
 

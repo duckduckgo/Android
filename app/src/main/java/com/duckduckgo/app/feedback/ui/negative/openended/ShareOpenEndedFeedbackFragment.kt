@@ -38,7 +38,7 @@ class ShareOpenEndedFeedbackFragment : FeedbackFragment(R.layout.content_feedbac
         fun userProvidedNegativeOpenEndedFeedback(
             mainReason: MainReason,
             subReason: SubReason?,
-            feedback: String
+            feedback: String,
         )
 
         fun userProvidedPositiveOpenEndedFeedback(feedback: String)
@@ -149,7 +149,7 @@ class ShareOpenEndedFeedbackFragment : FeedbackFragment(R.layout.content_feedbac
 
         fun instanceNegativeFeedback(
             mainReason: MainReason,
-            subReason: SubReason?
+            subReason: SubReason?,
         ): ShareOpenEndedFeedbackFragment {
             val fragment = ShareOpenEndedFeedbackFragment()
             fragment.arguments = Bundle().also {

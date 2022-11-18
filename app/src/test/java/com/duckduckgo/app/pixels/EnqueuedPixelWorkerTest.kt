@@ -23,9 +23,9 @@ import androidx.work.WorkManager
 import com.duckduckgo.app.browser.WebViewVersionProvider
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import org.mockito.kotlin.*
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.*
 
 class EnqueuedPixelWorkerTest {
     private val workManager: WorkManager = mock()
@@ -42,7 +42,7 @@ class EnqueuedPixelWorkerTest {
             workManager,
             { pixel },
             unsentForgetAllPixelStore,
-            webViewVersionProvider
+            webViewVersionProvider,
         )
     }
 
@@ -54,7 +54,7 @@ class EnqueuedPixelWorkerTest {
         verify(workManager).enqueueUniquePeriodicWork(
             eq("com.duckduckgo.pixels.enqueued.worker"),
             eq(ExistingPeriodicWorkPolicy.KEEP),
-            any()
+            any(),
         )
     }
 
@@ -87,7 +87,7 @@ class EnqueuedPixelWorkerTest {
 
         verify(pixel).fire(
             AppPixelName.APP_LAUNCH,
-            mapOf(Pixel.PixelParameter.WEBVIEW_VERSION to "91")
+            mapOf(Pixel.PixelParameter.WEBVIEW_VERSION to "91"),
         )
     }
 
@@ -103,7 +103,7 @@ class EnqueuedPixelWorkerTest {
 
         verify(pixel).fire(
             AppPixelName.APP_LAUNCH,
-            mapOf(Pixel.PixelParameter.WEBVIEW_VERSION to "91")
+            mapOf(Pixel.PixelParameter.WEBVIEW_VERSION to "91"),
         )
     }
 }

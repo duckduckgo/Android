@@ -34,18 +34,18 @@ import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldAlertNotifi
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationFactory
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
+import javax.inject.Inject
+import kotlin.random.Random
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
-import kotlin.random.Random
 
 @ContributesMultibinding(
     scope = VpnScope::class,
-    boundType = VpnServiceCallbacks::class
+    boundType = VpnServiceCallbacks::class,
 )
 @SingleInstanceIn(VpnScope::class)
 class AlwaysOnLockDownDetector @Inject constructor(
@@ -100,7 +100,7 @@ class AlwaysOnLockDownDetector @Inject constructor(
     private class NotificationPressedHandler constructor() : ResultReceiver(Handler(Looper.getMainLooper())) {
         override fun onReceiveResult(
             resultCode: Int,
-            resultData: Bundle?
+            resultData: Bundle?,
         ) {
             Timber.v("Lockdown notification pressed")
         }

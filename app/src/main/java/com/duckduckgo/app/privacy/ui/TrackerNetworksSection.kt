@@ -24,5 +24,5 @@ data class TrackerNetworksSection(
     @StringRes val linkTextRes: Int? = null,
     @StringRes val linkUrlRes: Int? = null,
     val trackerStatus: TrackerStatus,
-    val domain: String? = null
+    val domain: String? = null,
 )

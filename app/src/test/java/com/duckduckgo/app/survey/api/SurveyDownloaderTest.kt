@@ -26,13 +26,13 @@ import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
 import com.duckduckgo.mobile.android.vpn.cohort.AtpCohortManager
 import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateRepository
 import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
-import org.mockito.kotlin.*
 import okhttp3.ResponseBody
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.*
 import retrofit2.Call
 import retrofit2.Response
 
@@ -205,7 +205,7 @@ class SurveyDownloaderTest {
     private fun surveyWithAllocation(id: String): SurveyGroup {
         val surveyOptions = listOf(
             SurveyGroup.SurveyOption(SURVEY_URL, 1, 0.0, null, null, null, emptyList()),
-            SurveyGroup.SurveyOption(SURVEY_URL, 7, 1.0, null, null, null, emptyList())
+            SurveyGroup.SurveyOption(SURVEY_URL, 7, 1.0, null, null, null, emptyList()),
         )
         return SurveyGroup(id, surveyOptions)
     }
@@ -213,7 +213,7 @@ class SurveyDownloaderTest {
     private fun surveyNoAllocation(id: String): SurveyGroup {
         val surveyOptions = listOf(
             SurveyGroup.SurveyOption(SURVEY_URL, 1, 0.0, null, null, null, emptyList()),
-            SurveyGroup.SurveyOption(SURVEY_URL, 7, 0.0, null, null, null, emptyList())
+            SurveyGroup.SurveyOption(SURVEY_URL, 7, 0.0, null, null, null, emptyList()),
         )
         return SurveyGroup(id, surveyOptions)
     }
@@ -226,8 +226,9 @@ class SurveyDownloaderTest {
                 1.0,
                 true,
                 null,
-                null, listOf(SurveyUrlParameter.EmailCohortParam.parameter)
-            )
+                null,
+                listOf(SurveyUrlParameter.EmailCohortParam.parameter),
+            ),
         )
         return SurveyGroup(id, surveyOptions)
     }
@@ -236,12 +237,13 @@ class SurveyDownloaderTest {
         val surveyOptions = listOf(
             SurveyGroup.SurveyOption(
                 SURVEY_URL,
-                -1, 1.0,
+                -1,
+                1.0,
                 null,
                 true,
                 null,
-                listOf(SurveyUrlParameter.AtpCohortParam.parameter)
-            )
+                listOf(SurveyUrlParameter.AtpCohortParam.parameter),
+            ),
         )
         return SurveyGroup(id, surveyOptions)
     }
@@ -255,8 +257,8 @@ class SurveyDownloaderTest {
                 null,
                 isAtpEverEnabledRequired = true,
                 isAtpWaitlistRequired = true,
-                urlParameters = emptyList()
-            )
+                urlParameters = emptyList(),
+            ),
         )
         return SurveyGroup(id, surveyOptions)
     }

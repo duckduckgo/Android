@@ -33,13 +33,13 @@ class BloomFilter constructor(context: Context, private val config: Config) {
 
     private external fun createBloomFilter(
         maxItems: Int,
-        targetProbability: Double
+        targetProbability: Double,
     ): Long
 
     private external fun createBloomFilterFromFile(
         path: String,
         bits: Int,
-        maxItems: Int
+        maxItems: Int,
     ): Long
 
     fun add(element: String) {
@@ -48,7 +48,7 @@ class BloomFilter constructor(context: Context, private val config: Config) {
 
     private external fun add(
         nativePointer: Long,
-        element: String
+        element: String,
     )
 
     fun contains(element: String): Boolean {
@@ -57,7 +57,7 @@ class BloomFilter constructor(context: Context, private val config: Config) {
 
     private external fun contains(
         nativePointer: Long,
-        element: String
+        element: String,
     ): Boolean
 
     @Suppress("unused", "protectedInFinal")

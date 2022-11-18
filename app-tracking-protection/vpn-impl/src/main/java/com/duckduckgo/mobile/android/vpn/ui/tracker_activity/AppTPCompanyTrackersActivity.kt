@@ -50,12 +50,12 @@ import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPCompanyTrackersViewModel.Command
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPCompanyTrackersViewModel.ViewState
 import com.google.android.material.snackbar.Snackbar
+import javax.inject.Inject
 import kotlinx.android.synthetic.main.include_company_trackers_toolbar.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
@@ -124,7 +124,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
         lifecycleScope.launch {
             viewModel.loadData(
                 getDate(),
-                getPackage()
+                getPackage(),
             )
         }
 
@@ -138,7 +138,8 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
         cachedState = viewState
         binding.trackingAttempts.text = resources.getQuantityString(
             R.plurals.atp_CompanyDetailsTrackingAttemptsTitle,
-            viewState.totalTrackingAttempts, viewState.totalTrackingAttempts
+            viewState.totalTrackingAttempts,
+            viewState.totalTrackingAttempts,
         )
         binding.includeToolbar.appTrackedAgo.text = viewState.lastTrackerBlockedAgo
 
@@ -149,7 +150,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
         binding.appDisabledInfoPanel.apply {
             setClickableLink(
                 InfoPanel.REPORT_ISSUES_ANNOTATION,
-                getText(R.string.atp_CompanyDetailsAppInfoPanel)
+                getText(R.string.atp_CompanyDetailsAppInfoPanel),
             ) { launchFeedback() }
             show()
         }
@@ -241,7 +242,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
             context: Context,
             packageName: String,
             appDisplayName: String,
-            bucket: String
+            bucket: String,
         ): Intent {
             val intent = Intent(context, AppTPCompanyTrackersActivity::class.java)
             intent.putExtra(EXTRA_PACKAGE_NAME, packageName)

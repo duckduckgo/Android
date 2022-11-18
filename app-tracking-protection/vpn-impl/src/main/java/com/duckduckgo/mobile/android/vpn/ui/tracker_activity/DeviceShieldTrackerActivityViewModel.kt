@@ -32,6 +32,9 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
+import java.util.*
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -43,9 +46,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.*
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class DeviceShieldTrackerActivityViewModel @Inject constructor(
@@ -55,7 +55,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     private val vpnDetector: VpnDetector,
     private val vpnFeatureRemover: VpnFeatureRemover,
     private val vpnStore: VpnStore,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
@@ -159,7 +159,6 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
             is ViewEvent.AlwaysOnInitialState -> onAlwaysOnInitialState(viewEvent.alwaysOnState)
             ViewEvent.LaunchTrackingProtectionExclusionListActivity -> sendCommand(Command.LaunchTrackingProtectionExclusionListActivity)
         }
-
     }
 
     private fun launchVpn() {
@@ -214,12 +213,12 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     internal data class TrackerActivityViewState(
         val trackerCountInfo: TrackerCountInfo,
         val runningState: VpnState,
-        val bannerState: BannerState
+        val bannerState: BannerState,
     )
 
     internal data class TrackerCountInfo(
         val trackers: TrackerCount,
-        val apps: TrackingAppCount
+        val apps: TrackingAppCount,
     ) {
         fun stringTrackerCount(): String {
             return String.format(Locale.US, "%,d", trackers.value)

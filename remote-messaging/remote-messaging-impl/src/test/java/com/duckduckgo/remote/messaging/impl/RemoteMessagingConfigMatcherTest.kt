@@ -28,13 +28,13 @@ import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute.EmailEnable
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute.Locale
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute.Unknown
 import com.duckduckgo.remote.messaging.impl.models.RemoteConfig
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 class RemoteMessagingConfigMatcherTest {
 
@@ -45,7 +45,7 @@ class RemoteMessagingConfigMatcherTest {
 
     private val testee = RemoteMessagingConfigMatcher(
         setOf(deviceAttributeMatcher, androidAppAttributeMatcher, userAttributeMatcher),
-        remoteMessagingRepository
+        remoteMessagingRepository,
     )
 
     @Test
@@ -71,9 +71,9 @@ class RemoteMessagingConfigMatcherTest {
         val noRulesRemoteConfig = RemoteConfig(
             messages = listOf(
                 aSmallMessage(matchingRules = rules(1)),
-                aMediumMessage()
+                aMediumMessage(),
             ),
-            rules = emptyMap()
+            rules = emptyMap(),
         )
 
         val message = testee.evaluate(noRulesRemoteConfig)
@@ -85,7 +85,7 @@ class RemoteMessagingConfigMatcherTest {
     fun whenNoMessagesThenReturnNull() = runBlocking {
         val noMessagesRemoteConfig = RemoteConfig(
             messages = emptyList(),
-            rules = mapOf(rule(1, Api(max = 19)))
+            rules = mapOf(rule(1, Api(max = 19))),
         )
 
         val message = testee.evaluate(noMessagesRemoteConfig)
@@ -101,10 +101,10 @@ class RemoteMessagingConfigMatcherTest {
             RemoteConfig(
                 messages = listOf(
                     aSmallMessage(matchingRules = rules(1)),
-                    aMediumMessage(matchingRules = rules(1))
+                    aMediumMessage(matchingRules = rules(1)),
                 ),
-                rules = mapOf(rule(1, Api(max = 19)))
-            )
+                rules = mapOf(rule(1, Api(max = 19))),
+            ),
         )
 
         assertNull(message)
@@ -118,14 +118,14 @@ class RemoteMessagingConfigMatcherTest {
             RemoteConfig(
                 messages = listOf(
                     aMediumMessage(matchingRules = emptyList(), exclusionRules = rules(2)),
-                    aMediumMessage(matchingRules = emptyList(), exclusionRules = rules(3))
+                    aMediumMessage(matchingRules = emptyList(), exclusionRules = rules(3)),
                 ),
                 rules = mapOf(
                     rule(1, Api(max = 19)),
                     rule(2, Locale(value = listOf("en-US"))),
-                    rule(3, EmailEnabled(value = false))
-                )
-            )
+                    rule(3, EmailEnabled(value = false)),
+                ),
+            ),
         )
 
         assertEquals(aMediumMessage(matchingRules = emptyList(), exclusionRules = rules(3)), message)
@@ -140,9 +140,9 @@ class RemoteMessagingConfigMatcherTest {
                 messages = listOf(aMediumMessage(matchingRules = rules(1), exclusionRules = rules(2))),
                 rules = mapOf(
                     rule(1, Api(max = 19)),
-                    rule(2, Locale(value = listOf("en-US")))
-                )
-            )
+                    rule(2, Locale(value = listOf("en-US"))),
+                ),
+            ),
         )
 
         assertNull(message)
@@ -159,16 +159,16 @@ class RemoteMessagingConfigMatcherTest {
                     aMediumMessage(matchingRules = rules(1), exclusionRules = rules(2, 3)),
                     aMediumMessage(matchingRules = rules(1), exclusionRules = rules(2, 3, 4)),
                     aMediumMessage(matchingRules = rules(1), exclusionRules = rules(2, 4)),
-                    aMediumMessage(matchingRules = rules(1), exclusionRules = rules(5))
+                    aMediumMessage(matchingRules = rules(1), exclusionRules = rules(5)),
                 ),
                 rules = mapOf(
                     rule(1, Api(max = 19)),
                     rule(2, EmailEnabled(value = true), Bookmarks(max = 10)),
                     rule(3, EmailEnabled(value = true), Bookmarks(max = 10)),
                     rule(4, Api(max = 19)),
-                    rule(5, EmailEnabled(value = true))
-                )
-            )
+                    rule(5, EmailEnabled(value = true)),
+                ),
+            ),
         )
 
         assertNull(message)
@@ -187,9 +187,9 @@ class RemoteMessagingConfigMatcherTest {
                 ),
                 rules = mapOf(
                     rule(1, Api(max = 19)),
-                    rule(2, Locale(value = listOf("en-US")))
-                )
-            )
+                    rule(2, Locale(value = listOf("en-US"))),
+                ),
+            ),
         )
 
         assertEquals(aMediumMessage(matchingRules = rules(1), exclusionRules = emptyList()), message)
@@ -206,9 +206,9 @@ class RemoteMessagingConfigMatcherTest {
                 ),
                 rules = mapOf(
                     rule(1, Api(max = 19)),
-                    rule(2, EmailEnabled(value = false))
-                )
-            )
+                    rule(2, EmailEnabled(value = false)),
+                ),
+            ),
         )
 
         assertEquals(aMediumMessage(matchingRules = rules(1), exclusionRules = rules(2)), message)
@@ -221,8 +221,8 @@ class RemoteMessagingConfigMatcherTest {
         val message = testee.evaluate(
             RemoteConfig(
                 messages = listOf(aMediumMessage(matchingRules = rules(1))),
-                rules = mapOf(rule(1, Api(max = 19)))
-            )
+                rules = mapOf(rule(1, Api(max = 19))),
+            ),
         )
 
         assertEquals(aMediumMessage(matchingRules = rules(1)), message)
@@ -236,10 +236,10 @@ class RemoteMessagingConfigMatcherTest {
             RemoteConfig(
                 messages = listOf(
                     aMediumMessage(matchingRules = rules(1)),
-                    aSmallMessage(matchingRules = rules(1))
+                    aSmallMessage(matchingRules = rules(1)),
                 ),
-                rules = mapOf(rule(1, Api(max = 19)))
-            )
+                rules = mapOf(rule(1, Api(max = 19))),
+            ),
         )
 
         assertEquals(aMediumMessage(matchingRules = rules(1)), message)
@@ -253,13 +253,13 @@ class RemoteMessagingConfigMatcherTest {
             RemoteConfig(
                 messages = listOf(
                     aSmallMessage(matchingRules = rules(2)),
-                    aMediumMessage(matchingRules = rules(1, 2))
+                    aMediumMessage(matchingRules = rules(1, 2)),
                 ),
                 rules = mapOf(
                     rule(1, Api(max = 19)),
-                    rule(2, EmailEnabled(value = false))
-                )
-            )
+                    rule(2, EmailEnabled(value = false)),
+                ),
+            ),
         )
 
         assertEquals(aMediumMessage(matchingRules = rules(1, 2)), message)
@@ -270,17 +270,17 @@ class RemoteMessagingConfigMatcherTest {
         givenDeviceMatches(Api(max = 19), EmailEnabled(value = true))
         givenUserDismissed("1")
         val rules = mapOf(
-            rule(1, Api(max = 19))
+            rule(1, Api(max = 19)),
         )
 
         val message = testee.evaluate(
             RemoteConfig(
                 messages = listOf(
                     aSmallMessage(id = "1", matchingRules = rules(1)),
-                    aMediumMessage(id = "2", matchingRules = rules(1))
+                    aMediumMessage(id = "2", matchingRules = rules(1)),
                 ),
-                rules = rules
-            )
+                rules = rules,
+            ),
         )
 
         assertEquals(aMediumMessage(id = "2", matchingRules = rules(1)), message)
@@ -295,9 +295,9 @@ class RemoteMessagingConfigMatcherTest {
                 messages = listOf(aMediumMessage(matchingRules = rules(1, 2))),
                 rules = mapOf(
                     rule(1, Locale(value = listOf("en-US"))),
-                    rule(2, Api(max = 15))
-                )
-            )
+                    rule(2, Api(max = 15)),
+                ),
+            ),
         )
 
         assertEquals(aMediumMessage(matchingRules = rules(1, 2)), message)
@@ -311,13 +311,13 @@ class RemoteMessagingConfigMatcherTest {
             RemoteConfig(
                 messages = listOf(
                     aMediumMessage(matchingRules = rules(1, 2)),
-                    aSmallMessage(matchingRules = rules(1, 2))
+                    aSmallMessage(matchingRules = rules(1, 2)),
                 ),
                 rules = mapOf(
                     rule(1, Api(max = 15)),
-                    rule(2, Api(max = 15))
-                )
-            )
+                    rule(2, Api(max = 15)),
+                ),
+            ),
         )
 
         assertNull(message)
@@ -329,12 +329,12 @@ class RemoteMessagingConfigMatcherTest {
             RemoteConfig(
                 messages = listOf(
                     aSmallMessage(matchingRules = rules(1)),
-                    aMediumMessage(matchingRules = rules(1))
+                    aMediumMessage(matchingRules = rules(1)),
                 ),
                 rules = mapOf(
-                    rule(1, Unknown(fallback = false))
-                )
-            )
+                    rule(1, Unknown(fallback = false)),
+                ),
+            ),
         )
 
         assertNull(message)
@@ -346,19 +346,19 @@ class RemoteMessagingConfigMatcherTest {
             RemoteConfig(
                 messages = listOf(
                     aSmallMessage(matchingRules = rules(1)),
-                    aMediumMessage(matchingRules = rules(1))
+                    aMediumMessage(matchingRules = rules(1)),
                 ),
                 rules = mapOf(
-                    rule(1, Unknown(fallback = true))
-                )
-            )
+                    rule(1, Unknown(fallback = true)),
+                ),
+            ),
         )
 
         assertEquals(aSmallMessage(matchingRules = rules(1)), message)
     }
 
     private suspend fun givenDeviceMatches(
-        vararg matchingAttributes: MatchingAttribute
+        vararg matchingAttributes: MatchingAttribute,
     ) {
         whenever(deviceAttributeMatcher.evaluate(any())).thenReturn(EvaluationResult.Fail)
         whenever(androidAppAttributeMatcher.evaluate(any())).thenReturn(EvaluationResult.Fail)
@@ -377,7 +377,7 @@ class RemoteMessagingConfigMatcherTest {
 
     private fun rule(
         id: Int,
-        vararg matchingAttributes: MatchingAttribute
+        vararg matchingAttributes: MatchingAttribute,
     ) = Pair(id, matchingAttributes.asList())
 
     private fun rules(vararg ids: Int) = ids.asList()

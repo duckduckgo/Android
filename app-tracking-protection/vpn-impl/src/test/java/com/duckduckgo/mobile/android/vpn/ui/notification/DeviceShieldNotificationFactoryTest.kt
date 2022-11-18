@@ -20,11 +20,11 @@ import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerDao
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationFactory.DeviceShieldNotification
@@ -88,7 +88,7 @@ class DeviceShieldNotificationFactoryTest {
     fun createTrackersCountDeviceShieldNotificationWhenTrackersFoundInTwoApps() {
         val trackers = listOf(
             aTrackerAndCompany(appContainingTracker = trackingApp1()),
-            aTrackerAndCompany(appContainingTracker = trackingApp2())
+            aTrackerAndCompany(appContainingTracker = trackingApp2()),
         )
         val notification = factory.createNotificationNewTrackerFound(trackers)
 
@@ -102,7 +102,7 @@ class DeviceShieldNotificationFactoryTest {
             aTrackerAndCompany(appContainingTracker = trackingApp1()),
             aTrackerAndCompany(appContainingTracker = trackingApp1()),
             aTrackerAndCompany(appContainingTracker = trackingApp1()),
-            aTrackerAndCompany(appContainingTracker = trackingApp2())
+            aTrackerAndCompany(appContainingTracker = trackingApp2()),
         )
         val notification = factory.createNotificationNewTrackerFound(trackers)
         notification.assertTitleEquals("Tracking attempts blocked across 2 apps (past hour).")
@@ -119,7 +119,7 @@ class DeviceShieldNotificationFactoryTest {
         trackerCompanyName: String = "Tracking LLC",
         trackerCompanyId: Int = -1,
         appContainingTracker: TrackingApp = defaultApp(),
-        timestamp: String = DatabaseDateFormatter.bucketByHour()
+        timestamp: String = DatabaseDateFormatter.bucketByHour(),
     ): VpnTracker {
         return VpnTracker(
             trackerCompanyId = trackerCompanyId,
@@ -127,7 +127,7 @@ class DeviceShieldNotificationFactoryTest {
             timestamp = timestamp,
             company = trackerCompanyName,
             companyDisplayName = trackerCompanyName,
-            trackingApp = appContainingTracker
+            trackingApp = appContainingTracker,
         )
     }
 

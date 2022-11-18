@@ -29,7 +29,7 @@ import com.duckduckgo.mobile.android.ui.view.toPx
 
 class TabGridItemDecorator(
     context: Context,
-    var selectedTabId: String?
+    var selectedTabId: String?,
 ) : RecyclerView.ItemDecoration() {
 
     private val borderStroke: Paint = Paint().apply {
@@ -45,7 +45,7 @@ class TabGridItemDecorator(
     override fun onDrawOver(
         canvas: Canvas,
         recyclerView: RecyclerView,
-        state: RecyclerView.State
+        state: RecyclerView.State,
     ) {
         val adapter = recyclerView.adapter as TabSwitcherAdapter? ?: return
 
@@ -69,7 +69,7 @@ class TabGridItemDecorator(
 
     private fun drawSelectedTabDecoration(
         child: View,
-        c: Canvas
+        c: Canvas,
     ) {
         borderStroke.alpha = (child.alpha * 255).toInt()
         c.drawRoundRect(child.getBounds(), BORDER_RADIUS, BORDER_RADIUS, borderStroke)

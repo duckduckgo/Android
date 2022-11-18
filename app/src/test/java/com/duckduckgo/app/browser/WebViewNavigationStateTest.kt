@@ -85,7 +85,7 @@ private class TestBackForwardList : WebBackForwardList() {
 }
 
 private class TestHistoryItem(
-    private val url: String
+    private val url: String,
 ) : WebHistoryItem() {
 
     override fun getUrl(): String = url

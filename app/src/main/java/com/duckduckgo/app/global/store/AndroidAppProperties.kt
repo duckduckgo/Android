@@ -28,7 +28,7 @@ class AndroidAppProperties(
     private val appContext: Context,
     private val variantManager: VariantManager,
     private val playStoreUtils: PlayStoreUtils,
-    private val statisticsStore: StatisticsDataStore
+    private val statisticsStore: StatisticsDataStore,
 ) : AppProperties {
 
     override fun atb(): String {

@@ -30,10 +30,10 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.di.VpnCoroutineScope
 import com.duckduckgo.mobile.android.vpn.ui.notification.*
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 /**
  * This receiver allows to trigger appTP notifications, to do so, in the command line:
@@ -46,7 +46,7 @@ import javax.inject.Inject
 class DeviceShieldNotificationsDebugReceiver(
     context: Context,
     intentAction: String = "notify",
-    private val receiver: (Intent) -> Unit
+    private val receiver: (Intent) -> Unit,
 ) : BroadcastReceiver() {
 
     init {
@@ -55,7 +55,7 @@ class DeviceShieldNotificationsDebugReceiver(
 
     override fun onReceive(
         context: Context,
-        intent: Intent
+        intent: Intent,
     ) {
         receiver(intent)
     }
@@ -63,7 +63,7 @@ class DeviceShieldNotificationsDebugReceiver(
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = LifecycleObserver::class
+    boundType = LifecycleObserver::class,
 )
 class DeviceShieldNotificationsDebugReceiverRegister @Inject constructor(
     private val context: Context,
@@ -74,7 +74,7 @@ class DeviceShieldNotificationsDebugReceiverRegister @Inject constructor(
     private val dailyNotificationPressedHandler: DailyNotificationPressedHandler,
     private val deviceShieldAlertNotificationBuilder: DeviceShieldAlertNotificationBuilder,
     @VpnCoroutineScope private val vpnCoroutineScope: CoroutineScope,
-    private val dispatchers: DispatcherProvider
+    private val dispatchers: DispatcherProvider,
 ) : DefaultLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -99,7 +99,7 @@ class DeviceShieldNotificationsDebugReceiverRegister @Inject constructor(
                     deviceShieldAlertNotificationBuilder.buildStatusNotification(
                         context,
                         deviceShieldNotification,
-                        weeklyNotificationPressedHandler
+                        weeklyNotificationPressedHandler,
                     )
                 } else if (daily != null) {
                     Timber.v("Debug - Sending daily notification $daily")
@@ -107,7 +107,9 @@ class DeviceShieldNotificationsDebugReceiverRegister @Inject constructor(
                     val deviceShieldNotification = deviceShieldNotificationFactory.dailyNotificationFactory.createDailyDeviceShieldNotification(daily)
 
                     deviceShieldAlertNotificationBuilder.buildStatusNotification(
-                        context, deviceShieldNotification, dailyNotificationPressedHandler
+                        context,
+                        deviceShieldNotification,
+                        dailyNotificationPressedHandler,
                     )
                 } else {
                     Timber.v("Debug - invalid notification type")

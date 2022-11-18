@@ -23,17 +23,17 @@ import android.os.Bundle
 import android.webkit.*
 import androidx.core.content.ContextCompat
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.browser.databinding.ActivityUserSurveyBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.app.pixels.AppPixelName.SURVEY_SURVEY_DISMISSED
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.ui.SurveyViewModel.Command
 import com.duckduckgo.app.survey.ui.SurveyViewModel.Command.*
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.R as CommonR
+import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
 
@@ -145,7 +145,7 @@ class SurveyActivity : DuckDuckGoActivity() {
 
         fun intent(
             context: Context,
-            survey: Survey
+            survey: Survey,
         ): Intent {
             val intent = Intent(context, SurveyActivity::class.java)
             intent.putExtra(SURVEY_EXTRA, survey)
@@ -159,7 +159,7 @@ class SurveyActivity : DuckDuckGoActivity() {
 
         override fun onPageFinished(
             view: WebView?,
-            url: String?
+            url: String?,
         ) {
             super.onPageFinished(view, url)
             viewModel.onSurveyLoaded()
@@ -167,7 +167,7 @@ class SurveyActivity : DuckDuckGoActivity() {
 
         override fun shouldInterceptRequest(
             view: WebView,
-            request: WebResourceRequest
+            request: WebResourceRequest,
         ): WebResourceResponse? {
             if (request.url.host == "duckduckgo.com") {
                 runOnUiThread {
@@ -182,7 +182,7 @@ class SurveyActivity : DuckDuckGoActivity() {
             view: WebView,
             errorCode: Int,
             description: String,
-            failingUrl: String
+            failingUrl: String,
         ) {
             viewModel.onSurveyFailedToLoad()
         }
@@ -190,7 +190,7 @@ class SurveyActivity : DuckDuckGoActivity() {
         override fun onReceivedError(
             view: WebView,
             request: WebResourceRequest,
-            error: WebResourceError
+            error: WebResourceError,
         ) {
             if (request.isForMainFrame) {
                 viewModel.onSurveyFailedToLoad()
@@ -199,7 +199,7 @@ class SurveyActivity : DuckDuckGoActivity() {
 
         override fun onRenderProcessGone(
             view: WebView?,
-            detail: RenderProcessGoneDetail?
+            detail: RenderProcessGoneDetail?,
         ): Boolean {
             viewModel.onSurveyFailedToLoad()
             return true

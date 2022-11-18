@@ -34,7 +34,7 @@ class LottieFireAnimationLoader constructor(
     private val context: Context,
     private val settingsDataStore: SettingsDataStore,
     private val dispatchers: DispatcherProvider,
-    private val appCoroutineScope: CoroutineScope
+    private val appCoroutineScope: CoroutineScope,
 ) : FireAnimationLoader {
 
     override fun onCreate(owner: LifecycleOwner) {

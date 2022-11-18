@@ -30,7 +30,7 @@ constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-    defStyleRes: Int = R.style.Widget_DuckDuckGo_MenuItemView
+    defStyleRes: Int = R.style.Widget_DuckDuckGo_MenuItemView,
 ) : LinearLayout(context, attrs, defStyleAttr, defStyleRes) {
 
     private val binding: ViewMenuItemBinding by viewBinding()
@@ -44,14 +44,14 @@ constructor(
             attrs,
             R.styleable.MenuItemView,
             0,
-            R.style.Widget_DuckDuckGo_MenuItemView
+            R.style.Widget_DuckDuckGo_MenuItemView,
         )
         binding.label.text = attributes.getString(R.styleable.MenuItemView_labelText) ?: ""
         binding.icon.setImageResource(
             attributes.getResourceId(
                 R.styleable.MenuItemView_iconDrawable,
-                R.drawable.ic_globe_gray_16dp
-            )
+                R.drawable.ic_globe_gray_16dp,
+            ),
         )
         updateContentDescription()
         attributes.recycle()

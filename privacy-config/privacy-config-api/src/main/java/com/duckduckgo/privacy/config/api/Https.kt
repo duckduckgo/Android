@@ -30,5 +30,5 @@ interface Https {
 /** Public data class for Https Exceptions */
 data class HttpsException(
     val domain: String,
-    val reason: String
+    val reason: String,
 )

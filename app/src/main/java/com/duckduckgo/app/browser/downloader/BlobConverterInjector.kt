@@ -25,13 +25,13 @@ import com.duckduckgo.app.browser.downloader.BlobConverterJavascriptInterface.Co
 interface BlobConverterInjector {
     fun addJsInterface(
         webView: WebView,
-        onBlobTransformed: (url: String, mimeType: String) -> Unit
+        onBlobTransformed: (url: String, mimeType: String) -> Unit,
     )
 
     fun convertBlobIntoDataUriAndDownload(
         webView: WebView,
         blobUrl: String,
-        contentType: String?
+        contentType: String?,
     )
 }
 
@@ -40,7 +40,7 @@ class BlobConverterInjectorJs : BlobConverterInjector {
 
     override fun addJsInterface(
         webView: WebView,
-        onBlobTransformed: (url: String, mimeType: String) -> Unit
+        onBlobTransformed: (url: String, mimeType: String) -> Unit,
     ) {
         webView.addJavascriptInterface(BlobConverterJavascriptInterface(onBlobTransformed), JAVASCRIPT_INTERFACE_NAME)
     }
@@ -49,7 +49,7 @@ class BlobConverterInjectorJs : BlobConverterInjector {
     override fun convertBlobIntoDataUriAndDownload(
         webView: WebView,
         blobUrl: String,
-        contentType: String?
+        contentType: String?,
     ) {
         webView.evaluateJavascript("javascript:${javaScriptInjector.getFunctionsJS(webView.context, blobUrl, contentType)}", null)
     }
@@ -60,7 +60,7 @@ class BlobConverterInjectorJs : BlobConverterInjector {
         fun getFunctionsJS(
             context: Context,
             blobUrl: String,
-            contentType: String?
+            contentType: String?,
         ): String {
             if (!this::functions.isInitialized) {
                 functions = context.resources.openRawResource(R.raw.blob_converter).bufferedReader().use { it.readText() }

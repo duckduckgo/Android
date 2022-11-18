@@ -25,7 +25,7 @@ interface RemoteMessagingConfigDownloader {
 
 class RealRemoteMessagingConfigDownloader constructor(
     private val remoteConfig: RemoteMessagingService,
-    private val remoteMessagingConfigProcessor: RemoteMessagingConfigProcessor
+    private val remoteMessagingConfigProcessor: RemoteMessagingConfigProcessor,
 ) : RemoteMessagingConfigDownloader {
     override suspend fun download(): Boolean {
         val response = kotlin.runCatching {

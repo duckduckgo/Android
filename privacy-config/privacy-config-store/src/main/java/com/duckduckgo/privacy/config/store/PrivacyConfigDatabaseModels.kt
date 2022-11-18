@@ -19,13 +19,13 @@ package com.duckduckgo.privacy.config.store
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
+import com.duckduckgo.privacy.config.api.AmpLinkException
 import com.duckduckgo.privacy.config.api.AutofillException
 import com.duckduckgo.privacy.config.api.ContentBlockingException
 import com.duckduckgo.privacy.config.api.DrmException
 import com.duckduckgo.privacy.config.api.GpcException
 import com.duckduckgo.privacy.config.api.GpcHeaderEnabledSite
 import com.duckduckgo.privacy.config.api.HttpsException
-import com.duckduckgo.privacy.config.api.AmpLinkException
 import com.duckduckgo.privacy.config.api.TrackingParameterException
 import com.duckduckgo.privacy.config.api.UnprotectedTemporaryException
 import com.duckduckgo.privacy.config.api.UserAgentException
@@ -36,13 +36,13 @@ import com.squareup.moshi.Types
 @Entity(tableName = "tracker_allowlist")
 data class TrackerAllowlistEntity(
     @PrimaryKey val domain: String,
-    val rules: List<AllowlistRuleEntity>
+    val rules: List<AllowlistRuleEntity>,
 )
 
 class AllowlistRuleEntity(
     val rule: String,
     val domains: List<String>,
-    val reason: String
+    val reason: String,
 )
 
 class RuleTypeConverter {
@@ -61,7 +61,7 @@ class RuleTypeConverter {
 @Entity(tableName = "drm_exceptions")
 data class DrmExceptionEntity(
     @PrimaryKey val domain: String,
-    val reason: String
+    val reason: String,
 )
 
 fun DrmExceptionEntity.toDrmException(): DrmException {
@@ -71,13 +71,13 @@ fun DrmExceptionEntity.toDrmException(): DrmException {
 @Entity(tableName = "unprotected_temporary")
 data class UnprotectedTemporaryEntity(
     @PrimaryKey val domain: String,
-    val reason: String
+    val reason: String,
 )
 
 @Entity(tableName = "https_exceptions")
 data class HttpsExceptionEntity(
     @PrimaryKey val domain: String,
-    val reason: String
+    val reason: String,
 )
 
 fun HttpsExceptionEntity.toHttpsException(): HttpsException {
@@ -87,7 +87,7 @@ fun HttpsExceptionEntity.toHttpsException(): HttpsException {
 @Entity(tableName = "autofill_exceptions")
 data class AutofillExceptionEntity(
     @PrimaryKey val domain: String,
-    val reason: String
+    val reason: String,
 )
 
 fun AutofillExceptionEntity.toAutofillException(): AutofillException {
@@ -111,13 +111,13 @@ fun GpcExceptionEntity.toGpcException(): GpcException {
 @Entity(tableName = "gpc_content_scope_config")
 data class GpcContentScopeConfigEntity(
     @PrimaryKey val id: Int = 1,
-    val config: String
+    val config: String,
 )
 
 @Entity(tableName = "content_blocking_exceptions")
 data class ContentBlockingExceptionEntity(
     @PrimaryKey val domain: String,
-    val reason: String
+    val reason: String,
 )
 
 fun ContentBlockingExceptionEntity.toContentBlockingException(): ContentBlockingException {
@@ -129,7 +129,7 @@ data class UserAgentExceptionEntity(
     @PrimaryKey val domain: String,
     val reason: String,
     val omitApplication: Boolean,
-    val omitVersion: Boolean
+    val omitVersion: Boolean,
 )
 
 fun UserAgentExceptionEntity.toUserAgentException(): UserAgentException {
@@ -140,34 +140,34 @@ fun UserAgentExceptionEntity.toUserAgentException(): UserAgentException {
 data class PrivacyConfig(
     @PrimaryKey val id: Int = 1,
     val version: Long,
-    val readme: String
+    val readme: String,
 )
 
 @Entity(tableName = "amp_link_formats")
 data class AmpLinkFormatEntity(
-    @PrimaryKey val format: String
+    @PrimaryKey val format: String,
 )
 
 @Entity(tableName = "amp_keywords")
 data class AmpKeywordEntity(
-    @PrimaryKey val keyword: String
+    @PrimaryKey val keyword: String,
 )
 
 @Entity(tableName = "amp_exceptions")
 data class AmpLinkExceptionEntity(
     @PrimaryKey val domain: String,
-    val reason: String
+    val reason: String,
 )
 
 @Entity(tableName = "tracking_parameters")
 data class TrackingParameterEntity(
-    @PrimaryKey val parameter: String
+    @PrimaryKey val parameter: String,
 )
 
 @Entity(tableName = "tracking_parameter_exceptions")
 data class TrackingParameterExceptionEntity(
     @PrimaryKey val domain: String,
-    val reason: String
+    val reason: String,
 )
 
 fun AmpLinkExceptionEntity.toAmpLinkException(): AmpLinkException {

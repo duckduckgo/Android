@@ -42,10 +42,10 @@ import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewMode
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_autofill_management_edit_mode), MenuProvider {
@@ -82,7 +82,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
 
     override fun onCreateMenu(
         menu: Menu,
-        menuInflater: MenuInflater
+        menuInflater: MenuInflater,
     ) {
         menuInflater.inflate(R.menu.autofill_view_mode_menu, menu)
     }
@@ -112,7 +112,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
 
     override fun onViewCreated(
         view: View,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
         requireActivity().addMenuProvider(this)
@@ -160,7 +160,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
             password = binding.passwordEditText.text.convertBlankToNull(),
             domain = binding.domainEditText.text.convertBlankToNull(),
             domainTitle = binding.domainTitleEditText.text.convertBlankToNull(),
-            notes = binding.notesEditText.text.convertBlankToNull()
+            notes = binding.notesEditText.text.convertBlankToNull(),
         )
         viewModel.updateCredentials(updatedCredentials)
     }
@@ -260,8 +260,8 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
                             width = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.toolbarIconSize),
                             height = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.toolbarIconSize),
                             cornerRadius = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_0),
-                        )
-                    )
+                        ),
+                    ),
                 )
             }
         }

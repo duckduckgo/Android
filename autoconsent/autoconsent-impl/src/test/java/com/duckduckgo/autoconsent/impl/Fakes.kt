@@ -40,7 +40,7 @@ class FakeMessageHandlerPlugin : MessageHandlerPlugin {
         messageType: String,
         jsonString: String,
         webView: WebView,
-        autoconsentCallback: AutoconsentCallback
+        autoconsentCallback: AutoconsentCallback,
     ) {
         count++
     }

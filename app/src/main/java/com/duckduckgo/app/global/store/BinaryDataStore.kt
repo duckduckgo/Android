@@ -29,7 +29,7 @@ class BinaryDataStore @Inject constructor(private val context: Context) {
 
     fun saveData(
         name: String,
-        byteArray: ByteArray
+        byteArray: ByteArray,
     ) {
         context.openFileOutput(name, Context.MODE_PRIVATE).use { it.write(byteArray) }
     }
@@ -44,7 +44,7 @@ class BinaryDataStore @Inject constructor(private val context: Context) {
 
     fun verifyCheckSum(
         name: String,
-        sha256: String
+        sha256: String,
     ): Boolean {
         if (context.fileExists(name)) {
             return verifyCheckSum(loadData(name), sha256)
@@ -54,7 +54,7 @@ class BinaryDataStore @Inject constructor(private val context: Context) {
 
     fun verifyCheckSum(
         bytes: ByteArray,
-        sha256: String
+        sha256: String,
     ): Boolean {
         return bytes.verifySha256(sha256)
     }

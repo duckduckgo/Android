@@ -35,12 +35,11 @@ class InitialPromptTypeDecider(
     private val initialPromptDecider: ShowPromptDecider,
     private val secondaryPromptDecider: ShowPromptDecider,
     private val dispatchers: DispatcherProvider,
-    private val appBuildConfig: AppBuildConfig
+    private val appBuildConfig: AppBuildConfig,
 ) : PromptTypeDecider {
 
     override suspend fun determineInitialPromptType(): AppEnjoymentPromptOptions {
         return withContext(dispatchers.io()) {
-
             if (!isPlayStoreInstalled()) return@withContext ShowNothing
             if (!wasInstalledThroughPlayStore()) return@withContext ShowNothing
             if (!enoughSearchesMade()) return@withContext ShowNothing

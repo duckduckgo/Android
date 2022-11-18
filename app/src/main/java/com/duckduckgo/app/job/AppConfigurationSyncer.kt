@@ -46,7 +46,7 @@ class AppConfigurationSyncerModule {
     fun provideAppConfigurationSyncer(
         appConfigurationSyncWorkRequestBuilder: AppConfigurationSyncWorkRequestBuilder,
         workManager: WorkManager,
-        appConfigurationDownloader: ConfigurationDownloader
+        appConfigurationDownloader: ConfigurationDownloader,
     ): LifecycleObserver {
         return AppConfigurationSyncer(appConfigurationSyncWorkRequestBuilder, workManager, appConfigurationDownloader)
     }
@@ -56,7 +56,7 @@ class AppConfigurationSyncerModule {
 class AppConfigurationSyncer(
     private val appConfigurationSyncWorkRequestBuilder: AppConfigurationSyncWorkRequestBuilder,
     private val workManager: WorkManager,
-    private val appConfigurationDownloader: ConfigurationDownloader
+    private val appConfigurationDownloader: ConfigurationDownloader,
 ) : DefaultLifecycleObserver {
 
     @SuppressLint("CheckResult")

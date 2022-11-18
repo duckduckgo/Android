@@ -21,9 +21,6 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.app.bookmarks.model.*
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -34,6 +31,9 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 class SavedSitesParserTest {
@@ -138,7 +138,7 @@ class SavedSitesParserTest {
         val firstBookmark = bookmarks.first()
         assertEquals(
             "https://www.theguardian.com/international",
-            firstBookmark.url
+            firstBookmark.url,
         )
         assertEquals("News, sport and opinion from the Guardian's global edition | The Guardian", firstBookmark.title)
 
@@ -159,7 +159,7 @@ class SavedSitesParserTest {
         val firstBookmark = bookmarks.first()
         assertEquals(
             "https://www.theguardian.com/international",
-            firstBookmark.url
+            firstBookmark.url,
         )
         assertEquals("News, sport and opinion from the Guardian's global edition | The Guardian", firstBookmark.title)
 
@@ -180,7 +180,7 @@ class SavedSitesParserTest {
         val firstBookmark = bookmarks.first()
         assertEquals(
             "https://www.theguardian.com/international",
-            firstBookmark.url
+            firstBookmark.url,
         )
         assertEquals("News, sport and opinion from the Guardian's global edition | The Guardian", firstBookmark.title)
 
@@ -202,7 +202,7 @@ class SavedSitesParserTest {
         val firstBookmark = bookmarks.first()
         assertEquals(
             "https://www.theguardian.com/international",
-            firstBookmark.url
+            firstBookmark.url,
         )
         assertEquals("News, sport and opinion from the Guardian's global edition | The Guardian", firstBookmark.title)
 
@@ -223,7 +223,7 @@ class SavedSitesParserTest {
         val firstBookmark = bookmarks.first()
         assertEquals(
             "https://www.apple.com/uk",
-            firstBookmark.url
+            firstBookmark.url,
         )
         assertEquals("Apple", firstBookmark.title)
 

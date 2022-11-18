@@ -23,9 +23,9 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import timber.log.Timber
 
 interface AppInstallStore : DefaultLifecycleObserver {
     var installTimestamp: Long

@@ -18,24 +18,23 @@ package com.duckduckgo.app.httpsupgrade.api
 
 import com.duckduckgo.app.global.api.isCached
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
-import com.duckduckgo.app.httpsupgrade.store.HttpsFalsePositivesDao
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
 import com.duckduckgo.app.httpsupgrade.store.HttpsDataPersister
+import com.duckduckgo.app.httpsupgrade.store.HttpsFalsePositivesDao
 import io.reactivex.Completable
 import io.reactivex.Completable.fromAction
-import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
+import timber.log.Timber
 
 class HttpsUpgradeDataDownloader @Inject constructor(
     private val service: HttpsUpgradeService,
     private val httpsUpgrader: HttpsUpgrader,
     private val dataPersister: HttpsDataPersister,
-    private val bloomFalsePositivesDao: HttpsFalsePositivesDao
+    private val bloomFalsePositivesDao: HttpsFalsePositivesDao,
 ) {
 
     fun download(): Completable {
-
         val filter = service.httpsBloomFilterSpec()
             .flatMapCompletable {
                 downloadBloomFilter(it)
@@ -50,7 +49,6 @@ class HttpsUpgradeDataDownloader @Inject constructor(
 
     private fun downloadBloomFilter(specification: HttpsBloomFilterSpec): Completable {
         return fromAction {
-
             Timber.d("Downloading https bloom filter binary")
 
             if (dataPersister.isPersisted(specification)) {
@@ -71,10 +69,8 @@ class HttpsUpgradeDataDownloader @Inject constructor(
     }
 
     private fun downloadFalsePositives(): Completable {
-
         Timber.d("Downloading HTTPS false positives")
         return fromAction {
-
             val call = service.falsePositives()
             val response = call.execute()
 

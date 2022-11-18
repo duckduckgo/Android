@@ -36,12 +36,12 @@ import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
 @SingleInstanceIn(VpnScope::class)
 @ContributesMultibinding(VpnScope::class)
@@ -52,7 +52,7 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
     private val deviceShieldAlertNotificationBuilder: DeviceShieldAlertNotificationBuilder,
     private val vpnFeatureRemover: VpnFeatureRemover,
     private val dispatchers: DispatcherProvider,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : VpnServiceCallbacks {
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
@@ -64,7 +64,7 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
 
     override fun onVpnStopped(
         coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
+        vpnStopReason: VpnStopReason,
     ) {
         when (vpnStopReason) {
             VpnStopReason.RESTART -> {} // no-op
@@ -110,7 +110,7 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
         workManager.enqueueUniquePeriodicWork(
             VpnReminderNotificationWorker.WORKER_VPN_REMINDER_UNDESIRED_TAG,
             ExistingPeriodicWorkPolicy.KEEP,
-            request
+            request,
         )
     }
 
@@ -152,7 +152,7 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
         context.packageManager.setComponentEnabledSetting(
             receiver,
             PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-            PackageManager.DONT_KILL_APP
+            PackageManager.DONT_KILL_APP,
         )
     }
 }

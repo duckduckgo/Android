@@ -19,14 +19,14 @@ package com.duckduckgo.app.fire
 import android.os.SystemClock
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption.*
+import java.util.*
+import java.util.concurrent.TimeUnit.MINUTES
+import java.util.concurrent.TimeUnit.SECONDS
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.junit.runners.Parameterized.Parameters
-import java.util.*
-import java.util.concurrent.TimeUnit.MINUTES
-import java.util.concurrent.TimeUnit.SECONDS
 
 @RunWith(Parameterized::class)
 class DataClearerTimeKeeperTest(private val testCase: TestCase) {
@@ -38,7 +38,6 @@ class DataClearerTimeKeeperTest(private val testCase: TestCase) {
         @JvmStatic
         @Parameters(name = "Test case: {index} - {0}")
         fun testData(): Array<TestCase> {
-
             fun timeNow(): () -> Long = { SystemClock.elapsedRealtime() }
 
             return arrayOf(
@@ -70,7 +69,7 @@ class DataClearerTimeKeeperTest(private val testCase: TestCase) {
                 // will return true when duration is >= 60 mins
                 TestCase(false, APP_EXIT_OR_60_MINS, MINUTES.toMillis(59), timeNow()),
                 TestCase(true, APP_EXIT_OR_60_MINS, MINUTES.toMillis(60), timeNow()),
-                TestCase(true, APP_EXIT_OR_60_MINS, MINUTES.toMillis(61), timeNow())
+                TestCase(true, APP_EXIT_OR_60_MINS, MINUTES.toMillis(61), timeNow()),
             )
         }
     }
@@ -83,7 +82,7 @@ class DataClearerTimeKeeperTest(private val testCase: TestCase) {
 
     private fun getPastTimestamp(
         millisPreviously: Long,
-        timeNow: Long
+        timeNow: Long,
     ): Long {
         return Calendar.getInstance().also {
             it.timeInMillis = timeNow
@@ -95,6 +94,6 @@ class DataClearerTimeKeeperTest(private val testCase: TestCase) {
         val expected: Boolean,
         val clearWhenOption: ClearWhenOption,
         val durationBackgrounded: Long,
-        val timeNow: () -> Long
+        val timeNow: () -> Long,
     )
 }

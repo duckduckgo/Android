@@ -42,7 +42,7 @@ abstract class AdClickDao {
         linkFormats: List<AdClickAttributionLinkFormatEntity>,
         allowList: List<AdClickAttributionAllowlistEntity>,
         expirations: List<AdClickAttributionExpirationEntity>,
-        detections: List<AdClickAttributionDetectionEntity>
+        detections: List<AdClickAttributionDetectionEntity>,
     ) {
         deleteLinkFormats()
         insertLinkFormats(linkFormats)

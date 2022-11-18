@@ -54,7 +54,7 @@ class RealAutoconsentTest {
             mockAutoconsentRepository,
             mockFeatureToggle,
             userAllowlist,
-            unprotected
+            unprotected,
         )
     }
 

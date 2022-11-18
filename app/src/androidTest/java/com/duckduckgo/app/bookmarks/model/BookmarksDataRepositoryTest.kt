@@ -22,7 +22,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.bookmarks.db.*
 import com.duckduckgo.app.global.db.AppDatabase
-import org.mockito.kotlin.mock
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -31,6 +30,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.verify
+import org.mockito.kotlin.mock
 
 @ExperimentalCoroutinesApi
 class BookmarksDataRepositoryTest {
@@ -127,8 +127,8 @@ class BookmarksDataRepositoryTest {
             BookmarkFolderEntity(
                 id = bookmarkFolder.id,
                 name = bookmarkFolder.name,
-                parentId = bookmarkFolder.parentId
-            )
+                parentId = bookmarkFolder.parentId,
+            ),
         )
 
         val anotherBookmarkFolder = repository.getBookmarkFolderByParentId(11)
@@ -145,8 +145,8 @@ class BookmarksDataRepositoryTest {
             BookmarkFolderEntity(
                 id = bookmarkFolder.id,
                 name = bookmarkFolder.name,
-                parentId = bookmarkFolder.parentId
-            )
+                parentId = bookmarkFolder.parentId,
+            ),
         )
     }
 
@@ -207,7 +207,7 @@ class BookmarksDataRepositoryTest {
 
         assertEquals(
             listOf(SavedSite.Bookmark(bookmark.id, bookmark.title ?: "", bookmark.url, bookmark.parentId)),
-            bookmarksAndFolders.first().first
+            bookmarksAndFolders.first().first,
         )
         assertEquals(listOf(BookmarkFolder(folder.id, folder.name, folder.parentId, numBookmarks = 1)), bookmarksAndFolders.first().second)
     }
@@ -227,7 +227,7 @@ class BookmarksDataRepositoryTest {
 
         assertEquals(
             listOf(SavedSite.Bookmark(anotherBookmark.id, anotherBookmark.title ?: "", anotherBookmark.url, anotherBookmark.parentId)),
-            bookmarksAndFolders.first().first
+            bookmarksAndFolders.first().first,
         )
         assertEquals(listOf(BookmarkFolder(childFolder.id, childFolder.name, childFolder.parentId)), bookmarksAndFolders.first().second)
     }
@@ -242,8 +242,8 @@ class BookmarksDataRepositoryTest {
             listOf(
                 BookmarkFolderEntity(parentFolder.id, parentFolder.name, parentFolder.parentId),
                 BookmarkFolderEntity(childFolder.id, childFolder.name, childFolder.parentId),
-                BookmarkFolderEntity(folder.id, folder.name, folder.parentId)
-            )
+                BookmarkFolderEntity(folder.id, folder.name, folder.parentId),
+            ),
         )
 
         val flatStructure = repository.getFlatFolderStructure(3, null, "Bookmarks")
@@ -252,7 +252,7 @@ class BookmarksDataRepositoryTest {
             BookmarkFolderItem(0, BookmarkFolder(0, "Bookmarks", -1), false),
             BookmarkFolderItem(1, parentFolder, false),
             BookmarkFolderItem(2, childFolder, false),
-            BookmarkFolderItem(1, folder, true)
+            BookmarkFolderItem(1, folder, true),
         )
 
         assertEquals(items, flatStructure)
@@ -268,15 +268,15 @@ class BookmarksDataRepositoryTest {
             listOf(
                 BookmarkFolderEntity(parentFolder.id, parentFolder.name, parentFolder.parentId),
                 BookmarkFolderEntity(childFolder.id, childFolder.name, childFolder.parentId),
-                BookmarkFolderEntity(folder.id, folder.name, folder.parentId)
-            )
+                BookmarkFolderEntity(folder.id, folder.name, folder.parentId),
+            ),
         )
 
         val flatStructure = repository.getFlatFolderStructure(3, parentFolder, "Bookmarks")
 
         val items = listOf(
             BookmarkFolderItem(0, BookmarkFolder(0, "Bookmarks", -1), false),
-            BookmarkFolderItem(1, folder, true)
+            BookmarkFolderItem(1, folder, true),
         )
 
         assertEquals(items, flatStructure)

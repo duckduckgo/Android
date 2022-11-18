@@ -38,17 +38,17 @@ class MessageCta : FrameLayout {
 
     constructor(
         context: Context,
-        attrs: AttributeSet?
+        attrs: AttributeSet?,
     ) : this(
         context,
         attrs,
-        0
+        0,
     )
 
     constructor(
         context: Context,
         attrs: AttributeSet?,
-        defStyle: Int
+        defStyle: Int,
     ) : super(context, attrs, defStyle) {
 
         layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
@@ -110,6 +110,6 @@ class MessageCta : FrameLayout {
         val title: String = "",
         val subtitle: String = "",
         val action: String = "",
-        val action2: String = ""
+        val action2: String = "",
     )
 }

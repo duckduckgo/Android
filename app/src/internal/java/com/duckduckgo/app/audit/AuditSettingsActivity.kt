@@ -23,8 +23,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.browser.BrowserActivity
-import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.audit.AuditSettingsViewModel.Command
 import com.duckduckgo.app.audit.AuditSettingsViewModel.Companion.COOKIES_3P_RETRIEVE
 import com.duckduckgo.app.audit.AuditSettingsViewModel.Companion.COOKIES_3P_STORE
@@ -38,7 +36,9 @@ import com.duckduckgo.app.audit.AuditSettingsViewModel.Companion.STEP_1
 import com.duckduckgo.app.audit.AuditSettingsViewModel.Companion.STEP_2
 import com.duckduckgo.app.audit.AuditSettingsViewModel.Companion.STEP_3
 import com.duckduckgo.app.audit.AuditSettingsViewModel.Companion.SURROGATES
+import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.databinding.ActivityAuditSettingsBinding
+import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import kotlinx.coroutines.flow.launchIn

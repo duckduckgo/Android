@@ -34,7 +34,7 @@ val String.sha1: String
 
 private fun sha(
     algorithm: String,
-    bytes: ByteArray
+    bytes: ByteArray,
 ): String {
     val md = MessageDigest.getInstance(algorithm)
     val digest = md.digest(bytes)

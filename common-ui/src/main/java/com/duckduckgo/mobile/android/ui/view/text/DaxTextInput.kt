@@ -61,7 +61,7 @@ interface OutlinedTextInput {
 class DaxTextInput @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyleAttr), OutlinedTextInput {
     private val binding: ViewDaxTextInputBinding by viewBinding()
     private val transformationMethod by lazy {
@@ -75,7 +75,7 @@ class DaxTextInput @JvmOverloads constructor(
             attrs,
             R.styleable.DaxTextInput,
             0,
-            com.google.android.material.R.style.Widget_MaterialComponents_TextInputEditText_OutlinedBox
+            com.google.android.material.R.style.Widget_MaterialComponents_TextInputEditText_OutlinedBox,
         ).apply {
             text = getString(R.styleable.DaxTextInput_android_text).orEmpty()
             getDrawable(R.styleable.DaxTextInput_endIcon)?.let {
@@ -149,7 +149,7 @@ class DaxTextInput @JvmOverloads constructor(
 
     private fun setupEndIcon(
         drawable: Drawable,
-        contentDescription: String
+        contentDescription: String,
     ) {
         binding.internalInputLayout.apply {
             endIconMode = END_ICON_CUSTOM
@@ -241,7 +241,7 @@ class DaxTextInput @JvmOverloads constructor(
     enum class Type(val value: Int) {
         INPUT_TYPE_MULTI_LINE(0),
         INPUT_TYPE_SINGLE_LINE(1),
-        INPUT_TYPE_PASSWORD(2)
+        INPUT_TYPE_PASSWORD(2),
     }
 
     internal class SavedState : BaseSavedState {
@@ -250,14 +250,14 @@ class DaxTextInput @JvmOverloads constructor(
         constructor(superState: Parcelable?) : super(superState)
         private constructor(
             parcel: Parcel,
-            classLoader: ClassLoader?
+            classLoader: ClassLoader?,
         ) : super(parcel) {
             childrenStates = parcel.readSparseArray(classLoader)
         }
 
         override fun writeToParcel(
             out: Parcel,
-            flags: Int
+            flags: Int,
         ) {
             super.writeToParcel(out, flags)
             out.writeSparseArray(childrenStates)
@@ -268,7 +268,7 @@ class DaxTextInput @JvmOverloads constructor(
             val CREATOR: ClassLoaderCreator<SavedState> = object : ClassLoaderCreator<SavedState> {
                 override fun createFromParcel(
                     source: Parcel,
-                    loader: ClassLoader?
+                    loader: ClassLoader?,
                 ): SavedState {
                     return SavedState(source, loader)
                 }

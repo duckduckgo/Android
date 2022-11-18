@@ -22,15 +22,15 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
 class TabsDbSanitizer @Inject constructor(
     private val tabRepository: TabRepository,
-    private val dispatchers: DispatcherProvider
+    private val dispatchers: DispatcherProvider,
 ) : DefaultLifecycleObserver {
 
     override fun onStart(owner: LifecycleOwner) {

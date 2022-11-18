@@ -29,9 +29,9 @@ import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import org.threeten.bp.Instant
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import org.threeten.bp.Instant
 
 interface VpnStore {
     fun onboardingDidShow()

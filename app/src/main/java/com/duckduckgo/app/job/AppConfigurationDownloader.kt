@@ -31,7 +31,7 @@ class AppConfigurationDownloader(
     private val trackerDataDownloader: TrackerDataDownloader,
     private val httpsUpgradeDataDownloader: HttpsUpgradeDataDownloader,
     private val resourceSurrogateDownloader: ResourceSurrogateListDownloader,
-    private val surveyDownloader: SurveyDownloader
+    private val surveyDownloader: SurveyDownloader,
 ) : ConfigurationDownloader {
 
     override fun downloadTask(): Completable {
@@ -47,8 +47,8 @@ class AppConfigurationDownloader(
                 clearLegacyLists,
                 surrogatesDownload,
                 httpsUpgradeDownload,
-                surveyDownload
-            )
+                surveyDownload,
+            ),
         ).doOnComplete {
             Timber.i("Download task completed successfully")
         }

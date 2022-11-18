@@ -36,13 +36,12 @@ import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.CloakedCnameDetector
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
-import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.trackerdetection.model.TrackerType
+import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.UserAgent
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
-import org.mockito.kotlin.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -50,6 +49,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
+import org.mockito.kotlin.*
 
 @ExperimentalCoroutinesApi
 class WebViewRequestInterceptorTest {
@@ -79,7 +79,7 @@ class WebViewRequestInterceptorTest {
         fakeUserAgent,
         fakeToggle,
         fakeUserAllowListRepository,
-        coroutinesTestRule.testDispatcherProvider
+        coroutinesTestRule.testDispatcherProvider,
     )
 
     private var webView: WebView = mock()
@@ -98,7 +98,7 @@ class WebViewRequestInterceptorTest {
             gpc = mockGpc,
             userAgentProvider = userAgentProvider,
             adClickManager = mockAdClickManager,
-            cloakedCnameDetector = mockCloakedCnameDetector
+            cloakedCnameDetector = mockCloakedCnameDetector,
         )
     }
 
@@ -109,7 +109,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUrl = null,
             webView = webView,
-            webViewClientListener = null
+            webViewClientListener = null,
         )
 
         verify(mockHttpsUpgrader).upgrade(any())
@@ -122,7 +122,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUrl = null,
             webView = webView,
-            webViewClientListener = null
+            webViewClientListener = null,
         )
 
         assertCancelledResponse(response)
@@ -136,7 +136,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUrl = null,
             webView = webView,
-            webViewClientListener = null
+            webViewClientListener = null,
         )
 
         verify(mockHttpsUpgrader, never()).upgrade(any())
@@ -150,7 +150,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUrl = null,
             webView = webView,
-            webViewClientListener = null
+            webViewClientListener = null,
         )
 
         verify(mockHttpsUpgrader, never()).upgrade(any())
@@ -163,7 +163,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUrl = null,
             webView = webView,
-            webViewClientListener = null
+            webViewClientListener = null,
         )
 
         verify(mockHttpsUpgrader, never()).upgrade(any())
@@ -176,7 +176,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUrl = null,
             webView = webView,
-            webViewClientListener = null
+            webViewClientListener = null,
         )
         assertRequestCanContinueToLoad(response)
     }
@@ -188,7 +188,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUrl = "duckduckgo.com/a/b/c?q=123",
             webView = webView,
-            webViewClientListener = null
+            webViewClientListener = null,
         )
 
         assertRequestCanContinueToLoad(response)
@@ -201,7 +201,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUrl = "donttrack.us/a/b/c?q=123",
             webView = webView,
-            webViewClientListener = null
+            webViewClientListener = null,
         )
 
         assertRequestCanContinueToLoad(response)
@@ -214,7 +214,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUrl = "spreadprivacy.com/a/b/c?q=123",
             webView = webView,
-            webViewClientListener = null
+            webViewClientListener = null,
         )
 
         assertRequestCanContinueToLoad(response)
@@ -227,7 +227,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUrl = "duckduckhack.com/a/b/c?q=123",
             webView = webView,
-            webViewClientListener = null
+            webViewClientListener = null,
         )
 
         assertRequestCanContinueToLoad(response)
@@ -240,7 +240,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUrl = "privatebrowsingmyths.com/a/b/c?q=123",
             webView = webView,
-            webViewClientListener = null
+            webViewClientListener = null,
         )
 
         assertRequestCanContinueToLoad(response)
@@ -253,7 +253,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUrl = "duck.co/a/b/c?q=123",
             webView = webView,
-            webViewClientListener = null
+            webViewClientListener = null,
         )
 
         assertRequestCanContinueToLoad(response)
@@ -269,7 +269,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUrl = "foo.com",
             webView = webView,
-            webViewClientListener = mockListener
+            webViewClientListener = mockListener,
         )
 
         verify(mockListener).pageHasHttpResources(anyString())
@@ -286,7 +286,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUrl = "foo.com",
             webView = webView,
-            webViewClientListener = mockListener
+            webViewClientListener = mockListener,
         )
 
         verify(mockListener, never()).pageHasHttpResources(anyString())
@@ -303,7 +303,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUrl = "foo.com",
             webView = webView,
-            webViewClientListener = null
+            webViewClientListener = null,
         )
 
         assertCancelledResponse(response)
@@ -315,7 +315,7 @@ class WebViewRequestInterceptorTest {
             scriptId = "testId",
             responseAvailable = true,
             mimeType = "application/javascript",
-            jsFunction = "javascript replacement function goes here"
+            jsFunction = "javascript replacement function goes here",
         )
         whenever(mockResourceSurrogates.get(any())).thenReturn(availableSurrogate)
 
@@ -325,7 +325,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUrl = "foo.com",
             webView = webView,
-            webViewClientListener = null
+            webViewClientListener = null,
         )
 
         assertEquals(availableSurrogate.jsFunction.byteInputStream().read(), response!!.data.read())
@@ -337,7 +337,7 @@ class WebViewRequestInterceptorTest {
             scriptId = "testId",
             responseAvailable = true,
             mimeType = "application/javascript",
-            jsFunction = "javascript replacement function goes here"
+            jsFunction = "javascript replacement function goes here",
         )
         val mockWebViewClientListener: WebViewClientListener = mock()
         whenever(mockResourceSurrogates.get(any())).thenReturn(availableSurrogate)
@@ -348,7 +348,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUrl = "foo.com",
             webView = webView,
-            webViewClientListener = mockWebViewClientListener
+            webViewClientListener = mockWebViewClientListener,
         )
 
         verify(mockWebViewClientListener).surrogateDetected(availableSurrogate)
@@ -362,7 +362,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUrl = null,
             webView = webView,
-            webViewClientListener = mockWebViewClientListener
+            webViewClientListener = mockWebViewClientListener,
         )
 
         verify(mockWebViewClientListener).upgradedToHttps()
@@ -378,7 +378,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUrl = null,
             webView = webView,
-            webViewClientListener = mockWebViewClientListener
+            webViewClientListener = mockWebViewClientListener,
         )
 
         verify(webView).loadUrl(validHttpsUri().toString(), mockGpc.getHeaders(validHttpsUri().toString()))
@@ -395,7 +395,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUrl = null,
             webView = webView,
-            webViewClientListener = mockWebViewClientListener
+            webViewClientListener = mockWebViewClientListener,
         )
 
         verify(mockWebViewClientListener).redirectTriggeredByGpc()
@@ -412,7 +412,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUrl = null,
             webView = webView,
-            webViewClientListener = mockWebViewClientListener
+            webViewClientListener = mockWebViewClientListener,
         )
 
         verify(webView).loadUrl(validUri().toString(), mockGpc.getHeaders(validUri().toString()))
@@ -429,7 +429,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUrl = null,
             webView = webView,
-            webViewClientListener = mockWebViewClientListener
+            webViewClientListener = mockWebViewClientListener,
         )
 
         verify(webView, never()).loadUrl(any(), any())
@@ -446,7 +446,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUrl = null,
             webView = webView,
-            webViewClientListener = mockWebViewClientListener
+            webViewClientListener = mockWebViewClientListener,
         )
 
         verify(webView, never()).loadUrl(any(), any())
@@ -462,7 +462,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUrl = null,
             webView = webView,
-            webViewClientListener = mockWebViewClientListener
+            webViewClientListener = mockWebViewClientListener,
         )
 
         verify(webView, never()).loadUrl(any(), any())
@@ -478,7 +478,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUrl = null,
             webView = webView,
-            webViewClientListener = mockWebViewClientListener
+            webViewClientListener = mockWebViewClientListener,
         )
 
         verify(webView).loadUrl(any(), any())
@@ -494,7 +494,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUrl = null,
             webView = webView,
-            webViewClientListener = mockWebViewClientListener
+            webViewClientListener = mockWebViewClientListener,
         )
 
         verify(webView, never()).loadUrl(any(), any())
@@ -510,7 +510,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUrl = null,
             webView = webView,
-            webViewClientListener = mockWebViewClientListener
+            webViewClientListener = mockWebViewClientListener,
         )
 
         verify(webView, never()).loadUrl(any(), any())
@@ -524,7 +524,7 @@ class WebViewRequestInterceptorTest {
         configureShouldBlock()
         val response = testee.shouldInterceptFromServiceWorker(
             request = mockRequest,
-            documentUrl = "foo.com"
+            documentUrl = "foo.com",
         )
 
         assertCancelledResponse(response)
@@ -536,7 +536,7 @@ class WebViewRequestInterceptorTest {
             scriptId = "testId",
             responseAvailable = true,
             mimeType = "application/javascript",
-            jsFunction = "javascript replacement function goes here"
+            jsFunction = "javascript replacement function goes here",
         )
         whenever(mockResourceSurrogates.get(any())).thenReturn(availableSurrogate)
 
@@ -544,7 +544,7 @@ class WebViewRequestInterceptorTest {
         configureShouldBlock()
         val response = testee.shouldInterceptFromServiceWorker(
             request = mockRequest,
-            documentUrl = "foo.com"
+            documentUrl = "foo.com",
         )
 
         assertEquals(availableSurrogate.jsFunction.byteInputStream().read(), response!!.data.read())
@@ -563,13 +563,13 @@ class WebViewRequestInterceptorTest {
     @Test
     fun whenIsAppUrlPixelThenShouldContinueToLoad() = runTest {
         whenever(mockRequest.url).thenReturn(
-            "https://improving.duckduckgo.com/t/m_nav_nt_p_android_phone?atb=v336-7&appVersion=5.131.0&test=1".toUri()
+            "https://improving.duckduckgo.com/t/m_nav_nt_p_android_phone?atb=v336-7&appVersion=5.131.0&test=1".toUri(),
         )
         val response = testee.shouldIntercept(
             request = mockRequest,
             documentUrl = "foo.com",
             webView = webView,
-            webViewClientListener = null
+            webViewClientListener = null,
         )
 
         assertRequestCanContinueToLoad(response)
@@ -607,7 +607,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUrl = "foo.com",
             webView = webView,
-            webViewClientListener = null
+            webViewClientListener = null,
         )
 
         verify(mockCloakedCnameDetector).detectCnameCloakedHost(uri)
@@ -628,7 +628,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUrl = "foo.com",
             webView = webView,
-            webViewClientListener = null
+            webViewClientListener = null,
         )
 
         verify(mockCloakedCnameDetector).detectCnameCloakedHost(uri)
@@ -647,7 +647,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUrl = "foo.com",
             webView = webView,
-            webViewClientListener = null
+            webViewClientListener = null,
         )
 
         verify(mockCloakedCnameDetector).detectCnameCloakedHost(uri)
@@ -678,7 +678,7 @@ class WebViewRequestInterceptorTest {
             trackerUrl = "",
             entity = null,
             categories = null,
-            surrogateId = "testId"
+            surrogateId = "testId",
         )
         whenever(mockRequest.isForMainFrame).thenReturn(false)
         whenever(mockTrackerDetector.evaluate(any(), any(), eq(true))).thenReturn(trackingEvent)
@@ -705,7 +705,7 @@ class WebViewRequestInterceptorTest {
             trackerUrl = "",
             entity = null,
             categories = null,
-            surrogateId = null
+            surrogateId = null,
         )
         whenever(mockRequest.isForMainFrame).thenReturn(false)
         whenever(mockTrackerDetector.evaluate(any(), any(), eq(false))).thenReturn(trackingEvent)
@@ -733,7 +733,6 @@ class WebViewRequestInterceptorTest {
         whenever(mockGpc.isEnabled()).thenReturn(true)
         whenever(mockRequest.method).thenReturn("GET")
         whenever(mockRequest.requestHeaders).thenReturn(mapOf(GPC_HEADER to "test"))
-
     }
 
     private fun configureShouldAddGpcHeader() = runTest {

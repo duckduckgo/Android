@@ -22,7 +22,7 @@ import com.duckduckgo.di.scopes.AppScope
 
 @ContributesPluginPoint(
     scope = AppScope::class,
-    boundType = ContentScopeConfigPlugin::class
+    boundType = ContentScopeConfigPlugin::class,
 )
 @Suppress("unused")
 interface ContentScopeConfigPluginPoint

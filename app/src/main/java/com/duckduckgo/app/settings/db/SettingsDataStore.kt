@@ -41,6 +41,7 @@ interface SettingsDataStore {
     var selectedFireAnimation: FireAnimation
     val fireAnimationEnabled: Boolean
     var appIconChanged: Boolean
+
     @Deprecated(message = "Not used anymore after adding automatic fireproof", replaceWith = ReplaceWith(expression = "automaticFireproofSetting"))
     var appLoginDetection: Boolean
     var automaticFireproofSetting: AutomaticFireproofSetting
@@ -73,7 +74,7 @@ interface SettingsDataStore {
 @ContributesBinding(AppScope::class)
 class SettingsSharedPreferences @Inject constructor(
     private val context: Context,
-    private val appBuildConfig: AppBuildConfig
+    private val appBuildConfig: AppBuildConfig,
 ) : SettingsDataStore {
 
     private val fireAnimationMapper = FireAnimationPrefsMapper()
@@ -82,8 +83,11 @@ class SettingsSharedPreferences @Inject constructor(
         get() = preferences.getString(KEY_BACKGROUND_JOB_ID, null)
         set(value) {
             preferences.edit(commit = true) {
-                if (value == null) remove(KEY_BACKGROUND_JOB_ID)
-                else putString(KEY_BACKGROUND_JOB_ID, value)
+                if (value == null) {
+                    remove(KEY_BACKGROUND_JOB_ID)
+                } else {
+                    putString(KEY_BACKGROUND_JOB_ID, value)
+                }
             }
         }
 
@@ -250,7 +254,7 @@ class SettingsSharedPreferences @Inject constructor(
 
         fun fireAnimationFrom(
             value: String?,
-            defValue: FireAnimation
+            defValue: FireAnimation,
         ) = when (value) {
             HERO_FIRE_PREFS_VALUE -> FireAnimation.HeroFire
             HERO_WATER_PREFS_VALUE -> FireAnimation.HeroWater
@@ -264,7 +268,7 @@ class SettingsSharedPreferences @Inject constructor(
         enum class AutomaticFireproofSetting(val stringRes: Int) {
             ASK_EVERY_TIME(R.string.fireproofWebsiteSettingsSelectionDialogAskEveryTime),
             ALWAYS(R.string.fireproofWebsiteSettingsSelectionDialogAlways),
-            NEVER(R.string.fireproofWebsiteSettingsSelectionDialogNever)
+            NEVER(R.string.fireproofWebsiteSettingsSelectionDialogNever),
         }
 
         fun mapToAutomaticFireproofSetting(oldLoginDetectorValue: Boolean): AutomaticFireproofSetting {

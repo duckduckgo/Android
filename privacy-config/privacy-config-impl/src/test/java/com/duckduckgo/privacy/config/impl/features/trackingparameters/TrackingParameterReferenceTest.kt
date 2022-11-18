@@ -26,6 +26,7 @@ import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.trackingparameters.TrackingParametersRepository
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import java.util.concurrent.CopyOnWriteArrayList
 import junit.framework.TestCase.*
 import org.json.JSONObject
 import org.junit.Before
@@ -35,7 +36,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.robolectric.ParameterizedRobolectricTestRunner
-import java.util.concurrent.CopyOnWriteArrayList
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
 class TrackingParameterReferenceTest(private val testCase: TestCase) {
@@ -65,8 +65,8 @@ class TrackingParameterReferenceTest(private val testCase: TestCase) {
             val test = adapter.fromJson(
                 FileUtilities.loadText(
                     TrackingParameterReferenceTest::class.java.classLoader!!,
-                    "reference_tests/trackingparameters/tests.json"
-                )
+                    "reference_tests/trackingparameters/tests.json",
+                ),
             )
             return test?.trackingParameters?.tests ?: emptyList()
         }
@@ -88,7 +88,7 @@ class TrackingParameterReferenceTest(private val testCase: TestCase) {
         val trackingParameters = CopyOnWriteArrayList<Regex>()
         val jsonObject: JSONObject = FileUtilities.getJsonObjectFromFile(
             TrackingParameterReferenceTest::class.java.classLoader!!,
-            "reference_tests/trackingparameters/config_reference.json"
+            "reference_tests/trackingparameters/config_reference.json",
         )
 
         val features: JSONObject = jsonObject.getJSONObject("features")
@@ -107,17 +107,17 @@ class TrackingParameterReferenceTest(private val testCase: TestCase) {
         val testURL: String,
         val initiatorURL: String,
         val expectURL: String,
-        val exceptPlatforms: List<String>
+        val exceptPlatforms: List<String>,
     )
 
     data class TrackingParameterTest(
         val name: String,
         val desc: String,
         val referenceConfig: String,
-        val tests: List<TestCase>
+        val tests: List<TestCase>,
     )
 
     data class ReferenceTest(
-        val trackingParameters: TrackingParameterTest
+        val trackingParameters: TrackingParameterTest,
     )
 }

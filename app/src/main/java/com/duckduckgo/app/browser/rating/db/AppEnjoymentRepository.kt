@@ -17,11 +17,11 @@
 package com.duckduckgo.app.browser.rating.db
 
 import com.duckduckgo.app.global.rating.PromptCount
+import java.util.*
+import java.util.concurrent.Executors
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.util.*
-import java.util.concurrent.Executors
 
 interface AppEnjoymentRepository {
 
@@ -61,7 +61,6 @@ class AppEnjoymentDatabaseRepository(private val appEnjoymentDao: AppEnjoymentDa
 
     override suspend fun canUserBeShownFirstPrompt(): Boolean {
         return withContext(singleThreadedDispatcher) {
-
             if (appEnjoymentDao.hasUserProvidedRating()) {
                 Timber.d("User has given a rating previously")
                 return@withContext false
@@ -96,7 +95,6 @@ class AppEnjoymentDatabaseRepository(private val appEnjoymentDao: AppEnjoymentDa
 
     override suspend fun canUserBeShownSecondPrompt(): Boolean {
         return withContext(singleThreadedDispatcher) {
-
             if (appEnjoymentDao.hasUserProvidedRating()) {
                 Timber.d("User has given a rating previously")
                 return@withContext false

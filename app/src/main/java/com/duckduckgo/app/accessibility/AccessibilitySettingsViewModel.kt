@@ -21,21 +21,21 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.di.scopes.ActivityScope
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class AccessibilitySettingsViewModel @Inject constructor(
-    private val accessibilitySettings: AccessibilitySettingsDataStore
+    private val accessibilitySettings: AccessibilitySettingsDataStore,
 ) : ViewModel() {
 
     data class ViewState(
         val overrideSystemFontSize: Boolean = false,
         val appFontSize: Float = 100f,
-        val forceZoom: Boolean = false
+        val forceZoom: Boolean = false,
     )
 
     private val viewState = MutableStateFlow(ViewState())
@@ -48,8 +48,8 @@ class AccessibilitySettingsViewModel @Inject constructor(
                 currentViewState().copy(
                     overrideSystemFontSize = accessibilitySettings.overrideSystemFontSize,
                     appFontSize = accessibilitySettings.appFontSize,
-                    forceZoom = accessibilitySettings.forceZoom
-                )
+                    forceZoom = accessibilitySettings.forceZoom,
+                ),
             )
         }
     }
@@ -60,8 +60,8 @@ class AccessibilitySettingsViewModel @Inject constructor(
         viewModelScope.launch {
             viewState.emit(
                 currentViewState().copy(
-                    forceZoom = accessibilitySettings.forceZoom
-                )
+                    forceZoom = accessibilitySettings.forceZoom,
+                ),
             )
         }
     }
@@ -72,8 +72,8 @@ class AccessibilitySettingsViewModel @Inject constructor(
         viewModelScope.launch {
             viewState.emit(
                 currentViewState().copy(
-                    overrideSystemFontSize = accessibilitySettings.overrideSystemFontSize
-                )
+                    overrideSystemFontSize = accessibilitySettings.overrideSystemFontSize,
+                ),
             )
         }
     }
@@ -84,8 +84,8 @@ class AccessibilitySettingsViewModel @Inject constructor(
         viewModelScope.launch {
             viewState.emit(
                 currentViewState().copy(
-                    appFontSize = accessibilitySettings.appFontSize
-                )
+                    appFontSize = accessibilitySettings.appFontSize,
+                ),
             )
         }
     }

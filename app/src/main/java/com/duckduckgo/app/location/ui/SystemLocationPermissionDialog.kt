@@ -48,7 +48,7 @@ class SystemLocationPermissionDialog : DialogFragment() {
         configureListeners(
             binding.allowLocationPermission,
             binding.denyLocationPermission,
-            binding.neverAllowLocationPermission
+            binding.neverAllowLocationPermission,
         )
 
         return alertBuilder.create()
@@ -73,7 +73,7 @@ class SystemLocationPermissionDialog : DialogFragment() {
     private fun configureListeners(
         allowLocationPermission: TextView,
         denyLocationPermission: TextView,
-        neverAllowLocationPermission: TextView
+        neverAllowLocationPermission: TextView,
     ) {
         allowLocationPermission.setOnClickListener {
             dismiss()

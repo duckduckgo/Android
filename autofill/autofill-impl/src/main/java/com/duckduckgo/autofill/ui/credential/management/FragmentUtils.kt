@@ -33,7 +33,7 @@ fun FragmentManager.forceExitFragment(tag: String) {
 fun FragmentManager.showFragment(
     fragment: Fragment,
     tag: String,
-    shouldAddToBackStack: Boolean
+    shouldAddToBackStack: Boolean,
 ) {
     if (findFragmentByTag(tag) == null) {
         commit {

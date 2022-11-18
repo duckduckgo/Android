@@ -26,11 +26,11 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.logindetection.LoginDetectionJavascriptInterface.Companion.JAVASCRIPT_INTERFACE_NAME
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting
-import org.mockito.kotlin.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.*
 
 @ExperimentalCoroutinesApi
 class JsLoginDetectorTest {
@@ -117,7 +117,7 @@ class JsLoginDetectorTest {
 
     private fun aWebResourceRequest(
         httpMethod: String = "POST",
-        path: String = "login"
+        path: String = "login",
     ): WebResourceRequest {
         return object : WebResourceRequest {
             override fun getUrl(): Uri = Uri.parse("https://example.com/$path")

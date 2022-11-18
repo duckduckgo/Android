@@ -33,14 +33,14 @@ interface VoiceSearchBackgroundBlurRenderer {
 
 @ContributesBinding(ActivityScope::class)
 class RealVoiceSearchBackgroundBlurRenderer @Inject constructor(
-    private val appBuildConfig: AppBuildConfig
+    private val appBuildConfig: AppBuildConfig,
 ) : VoiceSearchBackgroundBlurRenderer {
 
     @SuppressLint("NewApi")
     override fun addBlur(view: View) {
         if (appBuildConfig.sdkInt >= Build.VERSION_CODES.S) {
             view.setRenderEffect(
-                RenderEffect.createBlurEffect(70f, 70f, Shader.TileMode.MIRROR)
+                RenderEffect.createBlurEffect(70f, 70f, Shader.TileMode.MIRROR),
             )
         }
     }

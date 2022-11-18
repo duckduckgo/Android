@@ -21,13 +21,13 @@ import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 interface AutofillRuntimeConfigProvider {
     suspend fun getRuntimeConfiguration(
         rawJs: String,
-        url: String?
+        url: String?,
     ): String
 }
 
@@ -36,11 +36,11 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
     private val emailManager: EmailManager,
     private val deviceAuthenticator: DeviceAuthenticator,
     private val autofillStore: AutofillStore,
-    private val runtimeConfigurationWriter: RuntimeConfigurationWriter
+    private val runtimeConfigurationWriter: RuntimeConfigurationWriter,
 ) : AutofillRuntimeConfigProvider {
     override suspend fun getRuntimeConfiguration(
         rawJs: String,
-        url: String?
+        url: String?,
     ): String {
         Timber.v("BrowserAutofill: getRuntimeConfiguration called")
 
@@ -48,7 +48,7 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
         val userUnprotectedDomains = runtimeConfigurationWriter.generateUserUnprotectedDomains()
         val userPreferences = runtimeConfigurationWriter.generateUserPreferences(
             autofillCredentials = determineIfAutofillEnabled(),
-            showInlineKeyIcon = true
+            showInlineKeyIcon = true,
         )
         val availableInputTypes = generateAvailableInputTypes(url)
 

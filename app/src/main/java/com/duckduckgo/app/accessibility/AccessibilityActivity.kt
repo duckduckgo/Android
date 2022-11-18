@@ -31,10 +31,10 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.quietlySetValue
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.slider.Slider
+import java.text.NumberFormat
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
-import java.text.NumberFormat
 
 @InjectWith(ActivityScope::class)
 class AccessibilityActivity : DuckDuckGoActivity() {
@@ -82,7 +82,7 @@ class AccessibilityActivity : DuckDuckGoActivity() {
 
     private fun renderFontSize(
         fontSize: Float,
-        overrideSystemFontSize: Boolean
+        overrideSystemFontSize: Boolean,
     ) {
         Timber.v("AccessibilityActSettings: renderFontSize $fontSize")
 

@@ -181,7 +181,6 @@ class VoiceSearchViewModelTest {
             assertEquals(ViewState("First", ""), expectMostRecentItem())
             cancelAndConsumeRemainingEvents()
         }
-
     }
 
     @Test

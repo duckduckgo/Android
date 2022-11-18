@@ -34,7 +34,7 @@ interface SecureStorageKeyGenerator {
     fun generateKeyFromKeyMaterial(keyMaterial: ByteArray): Key
     fun generateKeyFromPassword(
         password: String,
-        salt: ByteArray
+        salt: ByteArray,
     ): Key
 }
 
@@ -54,12 +54,12 @@ class RealSecureStorageKeyGenerator @Inject constructor(
 
     override fun generateKeyFromKeyMaterial(keyMaterial: ByteArray): Key = SecretKeySpec(
         keyMaterial,
-        KeyProperties.KEY_ALGORITHM_AES
+        KeyProperties.KEY_ALGORITHM_AES,
     )
 
     override fun generateKeyFromPassword(
         password: String,
-        salt: ByteArray
+        salt: ByteArray,
     ): Key =
         if (appBuildConfig.sdkInt >= Build.VERSION_CODES.O) {
             derivedKeySecretFactory.get().getKey(
@@ -67,8 +67,8 @@ class RealSecureStorageKeyGenerator @Inject constructor(
                     password.toCharArray(),
                     salt,
                     ITERATIONS_26_UP,
-                    SIZE
-                )
+                    SIZE,
+                ),
             )
         } else {
             legacyDerivedKeySecretFactory.get().getKey(
@@ -76,8 +76,8 @@ class RealSecureStorageKeyGenerator @Inject constructor(
                     password.toCharArray(),
                     salt,
                     ITERATIONS_LEGACY,
-                    SIZE
-                )
+                    SIZE,
+                ),
             )
         }.run {
             SecretKeySpec(this.encoded, KeyProperties.KEY_ALGORITHM_AES)

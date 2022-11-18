@@ -34,13 +34,13 @@ interface PixelSender : DefaultLifecycleObserver {
     fun sendPixel(
         pixelName: String,
         parameters: Map<String, String>,
-        encodedParameters: Map<String, String>
+        encodedParameters: Map<String, String>,
     ): Completable
 
     fun enqueuePixel(
         pixelName: String,
         parameters: Map<String, String>,
-        encodedParameters: Map<String, String>
+        encodedParameters: Map<String, String>,
     ): Completable
 }
 
@@ -50,7 +50,7 @@ class RxPixelSender constructor(
     private val statisticsDataStore: StatisticsDataStore,
     private val variantManager: VariantManager,
     private val deviceInfo: DeviceInfo,
-    private val statisticsLibraryConfig: StatisticsLibraryConfig?
+    private val statisticsLibraryConfig: StatisticsLibraryConfig?,
 ) : PixelSender {
 
     private val compositeDisposable = CompositeDisposable()
@@ -67,8 +67,8 @@ class RxPixelSender constructor(
                 .subscribeOn(Schedulers.io())
                 .subscribe(
                     { Timber.v("Pixel finished sync") },
-                    { Timber.w(it, "Pixel failed to sync") }
-                )
+                    { Timber.w(it, "Pixel failed to sync") },
+                ),
         )
     }
 
@@ -94,7 +94,7 @@ class RxPixelSender constructor(
     override fun sendPixel(
         pixelName: String,
         parameters: Map<String, String>,
-        encodedParameters: Map<String, String>
+        encodedParameters: Map<String, String>,
     ): Completable {
         return api.fire(
             pixelName,
@@ -102,21 +102,21 @@ class RxPixelSender constructor(
             getAtbInfo(),
             addDeviceParametersTo(parameters),
             encodedParameters,
-            devMode = shouldFirePixelsAsDev
+            devMode = shouldFirePixelsAsDev,
         )
     }
 
     override fun enqueuePixel(
         pixelName: String,
         parameters: Map<String, String>,
-        encodedParameters: Map<String, String>
+        encodedParameters: Map<String, String>,
     ): Completable {
         return Completable.fromCallable {
             val pixelEntity = PixelEntity(
                 pixelName = pixelName,
                 atb = getAtbInfo(),
                 additionalQueryParams = addDeviceParametersTo(parameters),
-                encodedQueryParams = encodedParameters
+                encodedQueryParams = encodedParameters,
             )
             pendingPixelDao.insert(pixelEntity)
         }
@@ -130,7 +130,7 @@ class RxPixelSender constructor(
                 this.atb,
                 this.additionalQueryParams,
                 this.encodedQueryParams,
-                devMode = shouldFirePixelsAsDev
+                devMode = shouldFirePixelsAsDev,
             )
         }
     }

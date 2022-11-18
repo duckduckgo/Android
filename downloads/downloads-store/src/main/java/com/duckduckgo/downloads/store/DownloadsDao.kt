@@ -36,7 +36,7 @@ interface DownloadsDao {
 
     @Query(
         """update downloads set downloadStatus = :downloadStatus, contentLength = :contentLength where id =
-        (select id from downloads where downloadId = 0 and fileName = :fileName order by createdAt desc limit 1)"""
+        (select id from downloads where downloadId = 0 and fileName = :fileName order by createdAt desc limit 1)""",
     )
     suspend fun update(fileName: String, downloadStatus: Int, contentLength: Long)
 

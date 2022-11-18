@@ -77,11 +77,11 @@ class AppRemoteMessagingRepositoryTest {
                 content = Medium(
                     titleText = "titleText",
                     descriptionText = "descriptionText",
-                    placeholder = ANNOUNCE
+                    placeholder = ANNOUNCE,
                 ),
                 matchingRules = emptyList(),
-                exclusionRules = emptyList()
-            )
+                exclusionRules = emptyList(),
+            ),
         )
 
         testee.messageFlow().test {
@@ -93,12 +93,12 @@ class AppRemoteMessagingRepositoryTest {
                     content = Medium(
                         titleText = "titleText",
                         descriptionText = "descriptionText",
-                        placeholder = ANNOUNCE
+                        placeholder = ANNOUNCE,
                     ),
                     matchingRules = emptyList(),
-                    exclusionRules = emptyList()
+                    exclusionRules = emptyList(),
                 ),
-                message
+                message,
             )
             cancelAndConsumeRemainingEvents()
         }
@@ -111,11 +111,11 @@ class AppRemoteMessagingRepositoryTest {
                 id = "id",
                 content = Small(
                     titleText = "titleText",
-                    descriptionText = "descriptionText"
+                    descriptionText = "descriptionText",
                 ),
                 matchingRules = emptyList(),
-                exclusionRules = emptyList()
-            )
+                exclusionRules = emptyList(),
+            ),
         )
 
         testee.messageFlow().test {
@@ -126,12 +126,12 @@ class AppRemoteMessagingRepositoryTest {
                     id = "id",
                     content = Small(
                         titleText = "titleText",
-                        descriptionText = "descriptionText"
+                        descriptionText = "descriptionText",
                     ),
                     matchingRules = emptyList(),
-                    exclusionRules = emptyList()
+                    exclusionRules = emptyList(),
                 ),
-                message
+                message,
             )
             cancelAndConsumeRemainingEvents()
         }
@@ -147,11 +147,11 @@ class AppRemoteMessagingRepositoryTest {
                     descriptionText = "descriptionText",
                     placeholder = ANNOUNCE,
                     primaryAction = Action.PlayStore(value = "com.duckduckgo.com"),
-                    primaryActionText = "actionText"
+                    primaryActionText = "actionText",
                 ),
                 matchingRules = emptyList(),
-                exclusionRules = emptyList()
-            )
+                exclusionRules = emptyList(),
+            ),
         )
 
         testee.messageFlow().test {
@@ -165,12 +165,12 @@ class AppRemoteMessagingRepositoryTest {
                         descriptionText = "descriptionText",
                         placeholder = ANNOUNCE,
                         primaryAction = Action.PlayStore(value = "com.duckduckgo.com"),
-                        primaryActionText = "actionText"
+                        primaryActionText = "actionText",
                     ),
                     matchingRules = emptyList(),
-                    exclusionRules = emptyList()
+                    exclusionRules = emptyList(),
                 ),
-                message
+                message,
             )
             cancelAndConsumeRemainingEvents()
         }
@@ -188,11 +188,11 @@ class AppRemoteMessagingRepositoryTest {
                     primaryAction = Action.PlayStore(value = "com.duckduckgo.com"),
                     primaryActionText = "actionText",
                     secondaryActionText = "actionText",
-                    secondaryAction = Action.Dismiss()
+                    secondaryAction = Action.Dismiss(),
                 ),
                 matchingRules = emptyList(),
-                exclusionRules = emptyList()
-            )
+                exclusionRules = emptyList(),
+            ),
         )
 
         testee.messageFlow().test {
@@ -208,12 +208,12 @@ class AppRemoteMessagingRepositoryTest {
                         primaryAction = Action.PlayStore(value = "com.duckduckgo.com"),
                         primaryActionText = "actionText",
                         secondaryActionText = "actionText",
-                        secondaryAction = Action.Dismiss()
+                        secondaryAction = Action.Dismiss(),
                     ),
                     matchingRules = emptyList(),
-                    exclusionRules = emptyList()
+                    exclusionRules = emptyList(),
                 ),
-                message
+                message,
             )
             cancelAndConsumeRemainingEvents()
         }
@@ -231,11 +231,11 @@ class AppRemoteMessagingRepositoryTest {
                     primaryAction = Action.PlayStore(value = "com.duckduckgo.com"),
                     primaryActionText = "actionText",
                     secondaryActionText = "actionText",
-                    secondaryAction = Action.Dismiss()
+                    secondaryAction = Action.Dismiss(),
                 ),
                 matchingRules = emptyList(),
-                exclusionRules = emptyList()
-            )
+                exclusionRules = emptyList(),
+            ),
         )
         testee.messageFlow().test {
             var message = awaitItem()
@@ -260,11 +260,11 @@ class AppRemoteMessagingRepositoryTest {
                     primaryAction = Action.PlayStore(value = "com.duckduckgo.com"),
                     primaryActionText = "actionText",
                     secondaryActionText = "actionText",
-                    secondaryAction = Action.Dismiss()
+                    secondaryAction = Action.Dismiss(),
                 ),
                 matchingRules = emptyList(),
-                exclusionRules = emptyList()
-            )
+                exclusionRules = emptyList(),
+            ),
         )
         testee.dismissMessage("id")
 
@@ -279,8 +279,8 @@ class AppRemoteMessagingRepositoryTest {
             RemoteMessageEntity(
                 id = "id",
                 message = "",
-                status = Status.SCHEDULED
-            )
+                status = Status.SCHEDULED,
+            ),
         )
 
         testee.activeMessage(
@@ -293,11 +293,11 @@ class AppRemoteMessagingRepositoryTest {
                     primaryAction = Action.PlayStore(value = "com.duckduckgo.com"),
                     primaryActionText = "actionText",
                     secondaryActionText = "actionText",
-                    secondaryAction = Action.Dismiss()
+                    secondaryAction = Action.Dismiss(),
                 ),
                 matchingRules = emptyList(),
-                exclusionRules = emptyList()
-            )
+                exclusionRules = emptyList(),
+            ),
         )
 
         testee.messageFlow().test {

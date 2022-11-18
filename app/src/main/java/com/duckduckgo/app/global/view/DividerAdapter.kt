@@ -27,14 +27,14 @@ class DividerAdapter : RecyclerView.Adapter<DividerAdapter.DividerViewHolder>() 
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
-        viewType: Int
+        viewType: Int,
     ): DividerViewHolder {
         return DividerViewHolder(HorizontalDivider(parent.context))
     }
 
     override fun onBindViewHolder(
         holder: DividerViewHolder,
-        position: Int
+        position: Int,
     ) {
         // noop
     }

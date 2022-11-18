@@ -18,8 +18,8 @@ package com.duckduckgo.downloads.impl
 
 import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 class NetworkFileDownloader @Inject constructor(
     private val filenameExtractor: FilenameExtractor,
@@ -32,7 +32,7 @@ class NetworkFileDownloader @Inject constructor(
 
         Timber.d(
             "Content-Disposition is ${pendingDownload.contentDisposition} and " +
-                "Content-Type is ${pendingDownload.mimeType} for ${pendingDownload.url}."
+                "Content-Type is ${pendingDownload.mimeType} for ${pendingDownload.url}.",
         )
 
         if (pendingDownload.contentDisposition != null && pendingDownload.mimeType != null) {
@@ -56,7 +56,7 @@ class NetworkFileDownloader @Inject constructor(
 
                     Timber.d(
                         "Retrieved new values from the HEAD request. " +
-                            "Content-Disposition is $contentDisposition and Content-Type is $contentType."
+                            "Content-Disposition is $contentDisposition and Content-Type is $contentType.",
                     )
 
                     if (contentType != null) {
@@ -70,7 +70,7 @@ class NetworkFileDownloader @Inject constructor(
                     // This is a non-[200..300) response code. Proceed with download using the Download Manager.
                     Timber.d(
                         "HEAD request unsuccessful. " +
-                            "Got a non-[200..300) response code for ${pendingDownload.url}. Error body: ${response.errorBody()}"
+                            "Got a non-[200..300) response code for ${pendingDownload.url}. Error body: ${response.errorBody()}",
                     )
                 }
 
@@ -92,9 +92,8 @@ class NetworkFileDownloader @Inject constructor(
     private fun downloadFile(
         pendingDownload: PendingFileDownload,
         guessedFileName: String,
-        callback: DownloadCallback
+        callback: DownloadCallback,
     ) {
-
         urlFileDownloader.downloadFile(pendingDownload, guessedFileName, callback)
     }
 }

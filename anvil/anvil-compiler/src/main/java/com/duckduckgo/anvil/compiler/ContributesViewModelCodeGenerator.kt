@@ -27,11 +27,11 @@ import com.squareup.anvil.compiler.internal.reference.asClassName
 import com.squareup.anvil.compiler.internal.reference.classAndInnerClassReferences
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import java.io.File
+import javax.inject.Inject
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtFile
-import java.io.File
-import javax.inject.Inject
 
 /**
  * This Anvil code generator allows inject ViewModel without manually creating the ViewModel factory
@@ -84,25 +84,25 @@ class ContributesViewModelCodeGenerator : CodeGenerator {
                     .addAnnotation(
                         AnnotationSpec.builder(ContributesMultibinding::class)
                             .addMember("%T::class", scope!!.asClassName())
-                            .build()
+                            .build(),
                     )
                     .primaryConstructor(
                         PropertySpec
                             .builder("viewModelProvider", ClassName("javax.inject", "Provider").parameterizedBy(vmClass.asClassName()))
                             .addModifiers(KModifier.PRIVATE)
-                            .build()
+                            .build(),
                     )
                     .addFunction(
                         FunSpec.builder("create")
                             .addModifiers(KModifier.OVERRIDE)
                             .addTypeVariable(
-                                TypeVariableName("T", ClassName("androidx.lifecycle", "ViewModel").copy(nullable = true))
+                                TypeVariableName("T", ClassName("androidx.lifecycle", "ViewModel").copy(nullable = true)),
                             )
                             .addParameter(
                                 ParameterSpec.builder(
                                     "modelClass",
-                                    ClassName("java.lang", "Class").parameterizedBy(TypeVariableName("T"))
-                                ).build()
+                                    ClassName("java.lang", "Class").parameterizedBy(TypeVariableName("T")),
+                                ).build(),
                             )
                             .returns(TypeVariableName("T").copy(nullable = true))
                             .addCode(
@@ -114,11 +114,11 @@ class ContributesViewModelCodeGenerator : CodeGenerator {
                                         }
                                     }
                                 """.trimIndent(),
-                                vmClass.asClassName()
+                                vmClass.asClassName(),
                             )
-                            .build()
+                            .build(),
                     )
-                    .build()
+                    .build(),
             ).build()
         }
 

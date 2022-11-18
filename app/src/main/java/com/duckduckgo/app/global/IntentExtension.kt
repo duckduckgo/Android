@@ -27,7 +27,6 @@ val Intent.intentText: String?
     }
 
 fun Intent.sanitize() {
-
     try {
         // The strings are empty to force unparcel() call in BaseBundle
         getStringExtra("")

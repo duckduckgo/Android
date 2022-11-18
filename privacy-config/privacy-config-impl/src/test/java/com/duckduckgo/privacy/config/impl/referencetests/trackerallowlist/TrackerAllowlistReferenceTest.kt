@@ -22,8 +22,6 @@ import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.impl.features.trackerallowlist.RealTrackerAllowlist
 import com.duckduckgo.privacy.config.store.TrackerAllowlistEntity
 import com.duckduckgo.privacy.config.store.features.trackerallowlist.TrackerAllowlistRepository
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -33,6 +31,8 @@ import org.json.JSONObject
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import org.robolectric.ParameterizedRobolectricTestRunner
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
@@ -53,8 +53,8 @@ class TrackerAllowlistReferenceTest(private val testCase: TestCase) {
             return adapter.fromJson(
                 FileUtilities.loadText(
                     TrackerAllowlistReferenceTest::class.java.classLoader!!,
-                    "reference_tests/trackerallowlist/tracker_allowlist_matching_tests.json"
-                )
+                    "reference_tests/trackerallowlist/tracker_allowlist_matching_tests.json",
+                ),
             )
                 ?: emptyList()
         }
@@ -64,8 +64,9 @@ class TrackerAllowlistReferenceTest(private val testCase: TestCase) {
     fun whenIsAnExceptionAnFeatureEnableThenReturnCorrectValues() {
         whenever(
             mockFeatureToggle.isFeatureEnabled(
-                PrivacyFeatureName.TrackerAllowlistFeatureName.value, true
-            )
+                PrivacyFeatureName.TrackerAllowlistFeatureName.value,
+                true,
+            ),
         )
             .thenReturn(true)
         mockAllowlist()
@@ -79,8 +80,9 @@ class TrackerAllowlistReferenceTest(private val testCase: TestCase) {
     fun whenIsAnExceptionAnFeatureDisabledThenReturnCorrectValues() {
         whenever(
             mockFeatureToggle.isFeatureEnabled(
-                PrivacyFeatureName.TrackerAllowlistFeatureName.value, true
-            )
+                PrivacyFeatureName.TrackerAllowlistFeatureName.value,
+                true,
+            ),
         )
             .thenReturn(false)
         mockAllowlist()
@@ -97,7 +99,7 @@ class TrackerAllowlistReferenceTest(private val testCase: TestCase) {
         val jsonObject: JSONObject =
             FileUtilities.getJsonObjectFromFile(
                 javaClass.classLoader!!,
-                "reference_tests/trackerallowlist/tracker_allowlist_reference.json"
+                "reference_tests/trackerallowlist/tracker_allowlist_reference.json",
             )
 
         jsonObject.keys().forEach {
@@ -111,6 +113,6 @@ class TrackerAllowlistReferenceTest(private val testCase: TestCase) {
         val description: String,
         val site: String,
         val request: String,
-        val isAllowlisted: Boolean
+        val isAllowlisted: Boolean,
     )
 }

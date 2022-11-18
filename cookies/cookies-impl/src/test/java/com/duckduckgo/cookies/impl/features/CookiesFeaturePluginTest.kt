@@ -67,7 +67,7 @@ class CookiesFeaturePluginTest {
     fun whenFeatureNameMatchesCookiesAndIsNotEnabledThenStoreFeatureDisabled() {
         val jsonString = FileUtilities.loadText(
             CookiesFeaturePluginTest::class.java.classLoader!!,
-            "json/cookies_disabled.json"
+            "json/cookies_disabled.json",
         )
 
         testee.store(FEATURE_NAME_VALUE, jsonString)
@@ -95,7 +95,7 @@ class CookiesFeaturePluginTest {
 
         verify(mockCookiesRepository).updateAll(
             exceptionArgumentCaptor.capture(),
-            policyArgumentCaptor.capture()
+            policyArgumentCaptor.capture(),
         )
 
         val cookieExceptionEntityList = exceptionArgumentCaptor.firstValue
@@ -108,7 +108,6 @@ class CookiesFeaturePluginTest {
 
         assertEquals(1, cookiePolicyEntity.threshold)
         assertEquals(2, cookiePolicyEntity.maxAge)
-
     }
 
     companion object {

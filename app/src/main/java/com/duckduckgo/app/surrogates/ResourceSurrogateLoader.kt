@@ -25,21 +25,21 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.surrogates.store.ResourceSurrogateDataStore
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
+import java.io.ByteArrayInputStream
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.io.ByteArrayInputStream
-import javax.inject.Inject
 
 @WorkerThread
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = LifecycleObserver::class
+    boundType = LifecycleObserver::class,
 )
 class ResourceSurrogateLoader @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val resourceSurrogates: ResourceSurrogates,
-    private val surrogatesDataStore: ResourceSurrogateDataStore
+    private val surrogatesDataStore: ResourceSurrogateDataStore,
 ) : DefaultLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -76,13 +76,11 @@ class ResourceSurrogateLoader @Inject constructor(
         val functionBuilder = StringBuilder()
 
         existingLines.forEach {
-
             if (it.startsWith("#")) {
                 return@forEach
             }
 
             if (nextLineIsNewRule) {
-
                 with(it.split(" ")) {
                     ruleName = this[0]
                     mimeType = this[1]
@@ -101,8 +99,8 @@ class ResourceSurrogateLoader @Inject constructor(
                         scriptId = scriptId,
                         name = ruleName,
                         mimeType = mimeType,
-                        jsFunction = functionBuilder.toString()
-                    )
+                        jsFunction = functionBuilder.toString(),
+                    ),
                 )
 
                 functionBuilder.setLength(0)

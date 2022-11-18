@@ -18,14 +18,15 @@ package com.duckduckgo.privacy.config.impl.features.amplinks
 
 import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.feature.toggles.api.FeatureToggle
-import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.AmpLinkException
 import com.duckduckgo.privacy.config.api.AmpLinkType
+import com.duckduckgo.privacy.config.api.AmpLinks
+import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.amplinks.AmpLinksRepository
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import java.util.concurrent.CopyOnWriteArrayList
 import junit.framework.TestCase.assertEquals
 import org.json.JSONObject
 import org.junit.Before
@@ -35,7 +36,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.robolectric.ParameterizedRobolectricTestRunner
-import java.util.concurrent.CopyOnWriteArrayList
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
 class AmpFormatReferenceTest(private val testCase: TestCase) {
@@ -64,8 +64,8 @@ class AmpFormatReferenceTest(private val testCase: TestCase) {
             val test = adapter.fromJson(
                 FileUtilities.loadText(
                     AmpFormatReferenceTest::class.java.classLoader!!,
-                    "reference_tests/amplinks/tests.json"
-                )
+                    "reference_tests/amplinks/tests.json",
+                ),
             )
             return test?.ampFormats?.tests ?: emptyList()
         }
@@ -88,7 +88,7 @@ class AmpFormatReferenceTest(private val testCase: TestCase) {
         val ampLinkFormats = CopyOnWriteArrayList<Regex>()
         val jsonObject: JSONObject = FileUtilities.getJsonObjectFromFile(
             AmpFormatReferenceTest::class.java.classLoader!!,
-            "reference_tests/amplinks/config_reference.json"
+            "reference_tests/amplinks/config_reference.json",
         )
         val features: JSONObject = jsonObject.getJSONObject("features")
 
@@ -105,21 +105,21 @@ class AmpFormatReferenceTest(private val testCase: TestCase) {
         val name: String,
         val ampURL: String,
         val expectURL: String,
-        val exceptPlatforms: List<String>
+        val exceptPlatforms: List<String>,
     )
 
     data class AmpFormatTest(
         val name: String,
         val desc: String,
         val referenceConfig: String,
-        val tests: List<TestCase>
+        val tests: List<TestCase>,
     )
 
     data class ReferenceTest(
-        val ampFormats: AmpFormatTest
+        val ampFormats: AmpFormatTest,
     )
 
     data class Features(
-        val ampLink: JSONObject
+        val ampLink: JSONObject,
     )
 }

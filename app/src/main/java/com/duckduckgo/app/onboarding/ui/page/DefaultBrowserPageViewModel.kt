@@ -31,7 +31,7 @@ import javax.inject.Inject
 class DefaultBrowserPageViewModel @Inject constructor(
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val pixel: Pixel,
-    private val installStore: AppInstallStore
+    private val installStore: AppInstallStore,
 ) : ViewModel() {
 
     sealed class ViewState {
@@ -95,7 +95,7 @@ class DefaultBrowserPageViewModel @Inject constructor(
             viewState.value = currentState.copy(showInstructionsCard = true)
         }
         val params = mapOf(
-            Pixel.PixelParameter.DEFAULT_BROWSER_BEHAVIOUR_TRIGGERED to behaviourTriggered
+            Pixel.PixelParameter.DEFAULT_BROWSER_BEHAVIOUR_TRIGGERED to behaviourTriggered,
         )
         pixel.fire(AppPixelName.ONBOARDING_DEFAULT_BROWSER_LAUNCHED, params)
     }
@@ -123,7 +123,7 @@ class DefaultBrowserPageViewModel @Inject constructor(
 
     private fun reduceToNewState(
         origin: Origin,
-        navigateToBrowser: Boolean = false
+        navigateToBrowser: Boolean = false,
     ) {
         val newViewState = nextViewState(origin)
 
@@ -170,13 +170,13 @@ class DefaultBrowserPageViewModel @Inject constructor(
             installStore.defaultBrowser = true
             val params = mapOf(
                 Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString(),
-                Pixel.PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to originValue
+                Pixel.PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to originValue,
             )
             pixel.fire(AppPixelName.DEFAULT_BROWSER_SET, params)
         } else {
             installStore.defaultBrowser = false
             val params = mapOf(
-                Pixel.PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to originValue
+                Pixel.PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to originValue,
             )
             pixel.fire(AppPixelName.DEFAULT_BROWSER_NOT_SET, params)
         }

@@ -31,7 +31,7 @@ class AppUpdateReceiver : BroadcastReceiver() {
     @SuppressLint("UnsafeProtectedBroadcastReceiver")
     override fun onReceive(
         context: Context?,
-        intent: Intent?
+        intent: Intent?,
     ) {
         Timber.i("Notified of app update")
     }

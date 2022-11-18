@@ -22,16 +22,16 @@ import com.duckduckgo.app.global.extractDomain
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.site.permissions.store.SitePermissionsPreferences
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
-import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsDao
+import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionAllowedEntity
 import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionsAllowedDao
 import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 interface SitePermissionsRepository {
     var askCameraEnabled: Boolean
@@ -55,7 +55,7 @@ class SitePermissionsRepositoryImpl @Inject constructor(
     private val sitePermissionsAllowedDao: SitePermissionsAllowedDao,
     private val sitePermissionsPreferences: SitePermissionsPreferences,
     private val appCoroutineScope: CoroutineScope,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
 ) : SitePermissionsRepository {
 
     override var askCameraEnabled: Boolean
@@ -119,7 +119,7 @@ class SitePermissionsRepositoryImpl @Inject constructor(
                 domain,
                 tabId,
                 permission,
-                System.currentTimeMillis()
+                System.currentTimeMillis(),
             )
             sitePermissionsAllowedDao.insert(sitePermissionAllowed)
         }

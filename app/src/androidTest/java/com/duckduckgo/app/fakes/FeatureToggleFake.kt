@@ -21,6 +21,6 @@ import com.duckduckgo.feature.toggles.api.FeatureToggle
 class FeatureToggleFake : FeatureToggle {
     override fun isFeatureEnabled(
         featureName: String,
-        defaultValue: Boolean
+        defaultValue: Boolean,
     ): Boolean = true
 }

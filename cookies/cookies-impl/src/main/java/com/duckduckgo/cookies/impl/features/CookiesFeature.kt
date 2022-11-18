@@ -31,5 +31,5 @@ data class Settings(
 
 data class FirstPartyCookiePolicy(
     val threshold: Int,
-    val maxAge: Int
+    val maxAge: Int,
 )

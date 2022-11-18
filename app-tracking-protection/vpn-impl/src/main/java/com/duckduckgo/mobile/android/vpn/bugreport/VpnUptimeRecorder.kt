@@ -22,10 +22,10 @@ import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.CoroutineScope
+import dagger.SingleInstanceIn
 import java.util.concurrent.atomic.AtomicLong
 import javax.inject.Inject
-import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
 
 @SingleInstanceIn(AppScope::class)
@@ -40,7 +40,7 @@ class VpnUptimeRecorder @Inject constructor(val pixels: DeviceShieldPixels) : Vp
 
     override fun onVpnStopped(
         coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
+        vpnStopReason: VpnStopReason,
     ) {
         Timber.d("VpnUptimeRecorder: vpn was up for ${getVpnUpTime()} ms")
         pixels.reportVpnUptime(getVpnUpTime())

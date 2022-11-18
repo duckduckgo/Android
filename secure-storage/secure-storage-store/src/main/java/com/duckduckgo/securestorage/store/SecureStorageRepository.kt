@@ -42,7 +42,7 @@ interface SecureStorageRepository {
 }
 
 class RealSecureStorageRepository constructor(
-    private val websiteLoginCredentialsDao: WebsiteLoginCredentialsDao
+    private val websiteLoginCredentialsDao: WebsiteLoginCredentialsDao,
 ) : SecureStorageRepository {
     override suspend fun addWebsiteLoginCredential(websiteLoginCredentials: WebsiteLoginCredentialsEntity): WebsiteLoginCredentialsEntity? {
         val newCredentialId = websiteLoginCredentialsDao.insert(websiteLoginCredentials)

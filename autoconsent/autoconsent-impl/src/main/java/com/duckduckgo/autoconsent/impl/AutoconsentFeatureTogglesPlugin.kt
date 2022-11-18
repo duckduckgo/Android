@@ -26,7 +26,7 @@ import javax.inject.Inject
 @ContributesMultibinding(AppScope::class)
 class AutoconsentFeatureTogglesPlugin @Inject constructor(
     private val autoconsentFeatureToggleRepository: AutoconsentFeatureToggleRepository,
-    private val appBuildConfig: AppBuildConfig
+    private val appBuildConfig: AppBuildConfig,
 ) : FeatureTogglesPlugin {
     override fun isEnabled(featureName: String, defaultValue: Boolean): Boolean? {
         val autoconsentFeature = autoconsentFeatureValueOf(featureName) ?: return null

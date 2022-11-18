@@ -42,7 +42,7 @@ class BookmarksAdapter(
     private val viewModel: BookmarksViewModel,
     private val lifecycleOwner: LifecycleOwner,
     private val faviconManager: FaviconManager,
-    private val dispatchers: DispatcherProvider
+    private val dispatchers: DispatcherProvider,
 ) : RecyclerView.Adapter<BookmarkScreenViewHolders>() {
 
     companion object {
@@ -72,7 +72,7 @@ class BookmarksAdapter(
     fun setItems(
         bookmarkItems: List<BookmarkItem>,
         showEmptyHint: Boolean,
-        filteringMode: Boolean = false
+        filteringMode: Boolean = false,
     ) {
         val generatedList = generateNewList(bookmarkItems, showEmptyHint)
         val diffCallback = DiffCallback(old = this.bookmarkItems, new = generatedList)
@@ -93,7 +93,7 @@ class BookmarksAdapter(
 
     private fun generateNewList(
         value: List<BookmarksItemTypes>,
-        showEmptyHint: Boolean
+        showEmptyHint: Boolean,
     ): List<BookmarksItemTypes> {
         if (!showEmptyHint) {
             return value
@@ -103,7 +103,7 @@ class BookmarksAdapter(
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
-        viewType: Int
+        viewType: Int,
     ): BookmarkScreenViewHolders {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
@@ -114,7 +114,7 @@ class BookmarksAdapter(
                     binding,
                     viewModel,
                     lifecycleOwner,
-                    faviconManager
+                    faviconManager,
                 )
             }
             EMPTY_STATE_TYPE -> {
@@ -127,7 +127,7 @@ class BookmarksAdapter(
 
     override fun onBindViewHolder(
         holder: BookmarkScreenViewHolders,
-        position: Int
+        position: Int,
     ) {
         when (holder) {
             is BookmarkScreenViewHolders.BookmarksViewHolder -> {
@@ -152,7 +152,7 @@ class BookmarksAdapter(
 
     class DiffCallback(
         private val old: List<BookmarksItemTypes>,
-        private val new: List<BookmarksItemTypes>
+        private val new: List<BookmarksItemTypes>,
     ) : DiffUtil.Callback() {
 
         override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
@@ -197,8 +197,8 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
             twoListItem.setLeadingIconContentDescription(
                 context.getString(
                     R.string.bookmarkOverflowContentDescription,
-                    bookmark.title
-                )
+                    bookmark.title,
+                ),
             )
             twoListItem.setPrimaryText(bookmark.title)
             twoListItem.setSecondaryText(parseDisplayUrl(bookmark.url))
@@ -228,7 +228,7 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
 
         private fun showOverFlowMenu(
             anchor: View,
-            bookmark: SavedSite.Bookmark
+            bookmark: SavedSite.Bookmark,
         ) {
             val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_delete_menu)
             val view = popupMenu.contentView

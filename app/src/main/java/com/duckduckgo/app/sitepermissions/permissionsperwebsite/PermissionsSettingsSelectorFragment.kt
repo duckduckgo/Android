@@ -73,7 +73,7 @@ class PermissionsSettingsSelectorFragment : DialogFragment() {
 
     private fun updateCurrentSelection(
         currentOption: WebsitePermissionSettingType,
-        radioGroup: RadioGroup
+        radioGroup: RadioGroup,
     ) {
         val selectedId = currentOption.radioButtonId()
         radioGroup.check(selectedId)
