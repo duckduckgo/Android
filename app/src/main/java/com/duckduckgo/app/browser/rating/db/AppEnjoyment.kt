@@ -50,7 +50,7 @@ interface AppEnjoymentDao {
     @Query(
         "SELECT timestamp FROM app_enjoyment " +
             "WHERE eventType=$TYPE_DECLINED_RATING OR eventType=$TYPE_DECLINED_FEEDBACK OR eventType=$TYPE_DECLINED_TO_PARTICIPATE " +
-            "ORDER BY timestamp DESC LIMIT 1"
+            "ORDER BY timestamp DESC LIMIT 1",
     )
     fun latestDateUserDeclinedRatingOrFeedback(): Long?
 }
@@ -60,7 +60,7 @@ data class AppEnjoymentEntity(
     val eventType: AppEnjoymentEventType,
     val promptCount: PromptCount,
     val timestamp: Long = System.currentTimeMillis(),
-    @PrimaryKey(autoGenerate = true) val primaryKey: Int = 0
+    @PrimaryKey(autoGenerate = true) val primaryKey: Int = 0,
 )
 
 enum class AppEnjoymentEventType(val value: Int) {
@@ -69,7 +69,8 @@ enum class AppEnjoymentEventType(val value: Int) {
     USER_DECLINED_RATING(TYPE_DECLINED_RATING),
     USER_PROVIDED_FEEDBACK(TYPE_PROVIDED_FEEDBACK),
     USER_DECLINED_FEEDBACK(TYPE_DECLINED_FEEDBACK),
-    USER_DECLINED_TO_SAY_WHETHER_ENJOYING(TYPE_DECLINED_TO_PARTICIPATE);
+    USER_DECLINED_TO_SAY_WHETHER_ENJOYING(TYPE_DECLINED_TO_PARTICIPATE),
+    ;
 
     companion object {
         private val map = values().associateBy(AppEnjoymentEventType::value)

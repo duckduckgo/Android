@@ -27,14 +27,12 @@ class InstantSchedulersRule : TestRule {
 
     override fun apply(
         base: Statement,
-        description: Description
+        description: Description,
     ): Statement {
-
         return object : Statement() {
 
             @Throws(Throwable::class)
             override fun evaluate() {
-
                 RxJavaPlugins.reset()
                 RxAndroidPlugins.reset()
 

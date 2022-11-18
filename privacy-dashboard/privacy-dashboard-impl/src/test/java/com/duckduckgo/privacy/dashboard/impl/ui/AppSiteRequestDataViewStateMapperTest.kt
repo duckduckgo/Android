@@ -59,7 +59,7 @@ class AppSiteRequestDataViewStateMapperTest {
                 TrackingEvent("test.com", "test.com", null, MAJOR_ENTITY_A, null, BLOCKED, AD),
                 TrackingEvent("test2.com", "test2.com", null, MAJOR_ENTITY_A, null, BLOCKED, AD),
                 TrackingEvent("test3.com", "test3.com", null, null, null, BLOCKED, AD),
-            )
+            ),
         )
 
         val viewState = testee.mapFromSite(site)
@@ -79,8 +79,8 @@ class AppSiteRequestDataViewStateMapperTest {
                 TrackingEvent("test.com", "test3.com", null, MAJOR_ENTITY_A, null, AD_ALLOWED, AD),
                 TrackingEvent("test.com", "test4.com", null, MAJOR_ENTITY_A, null, SITE_BREAKAGE_ALLOWED, AD),
                 TrackingEvent("test.com", "test5.com", null, MAJOR_ENTITY_A, null, SAME_ENTITY_ALLOWED, AD),
-                TrackingEvent("test.com", "test6.com", null, MAJOR_ENTITY_A, null, ALLOWED, AD)
-            )
+                TrackingEvent("test.com", "test6.com", null, MAJOR_ENTITY_A, null, ALLOWED, AD),
+            ),
         )
 
         val viewState = testee.mapFromSite(site)
@@ -99,7 +99,7 @@ class AppSiteRequestDataViewStateMapperTest {
         val site = site(
             events = listOf(
                 TrackingEvent("test.com", "test.com", null, MAJOR_ENTITY_A, null, BLOCKED, AD),
-            )
+            ),
         )
 
         val viewState = testee.mapFromSite(site)
@@ -112,7 +112,7 @@ class AppSiteRequestDataViewStateMapperTest {
         val site = site(
             events = listOf(
                 TrackingEvent("test.com", "test.com", listOf("Advertising", "unknown"), MAJOR_ENTITY_A, null, BLOCKED, AD),
-            )
+            ),
         )
 
         val viewState = testee.mapFromSite(site)
@@ -125,7 +125,7 @@ class AppSiteRequestDataViewStateMapperTest {
         val site = site(
             events = listOf(
                 TrackingEvent("test.com", "test.com", listOf("unknown"), MAJOR_ENTITY_A, null, BLOCKED, AD),
-            )
+            ),
         )
 
         val viewState = testee.mapFromSite(site)
@@ -138,7 +138,7 @@ class AppSiteRequestDataViewStateMapperTest {
         val site = site(
             events = listOf(
                 TrackingEvent("test.com", "test.co.uk", null, MAJOR_ENTITY_A, null, BLOCKED, AD),
-            )
+            ),
         )
 
         val viewState = testee.mapFromSite(site)
@@ -158,8 +158,8 @@ class AppSiteRequestDataViewStateMapperTest {
         val site = site(
             events = listOf(
                 TrackingEvent("test.com", "test.com/a.js", null, MAJOR_ENTITY_A, null, BLOCKED, AD),
-                TrackingEvent("test.com", "test.com/b.js", null, MAJOR_ENTITY_A, null, BLOCKED, AD)
-            )
+                TrackingEvent("test.com", "test.com/b.js", null, MAJOR_ENTITY_A, null, BLOCKED, AD),
+            ),
         )
 
         val viewState = testee.mapFromSite(site)
@@ -173,8 +173,8 @@ class AppSiteRequestDataViewStateMapperTest {
         val site = site(
             events = listOf(
                 TrackingEvent("test.com", "test.com/a.js", null, MINOR_ENTITY_A, null, BLOCKED, AD),
-                TrackingEvent("test.com", "test.com/b.js", null, MAJOR_ENTITY_A, null, BLOCKED, AD)
-            )
+                TrackingEvent("test.com", "test.com/b.js", null, MAJOR_ENTITY_A, null, BLOCKED, AD),
+            ),
         )
 
         val viewState = testee.mapFromSite(site)
@@ -189,8 +189,8 @@ class AppSiteRequestDataViewStateMapperTest {
         val site = site(
             events = listOf(
                 TrackingEvent("test.com", "test.com/a.js", null, MAJOR_ENTITY_A, null, BLOCKED, AD),
-                TrackingEvent("test.com", "test.com/b.js", null, MAJOR_ENTITY_A, null, SAME_ENTITY_ALLOWED, AD)
-            )
+                TrackingEvent("test.com", "test.com/b.js", null, MAJOR_ENTITY_A, null, SAME_ENTITY_ALLOWED, AD),
+            ),
         )
 
         val viewState = testee.mapFromSite(site)
@@ -205,7 +205,7 @@ class AppSiteRequestDataViewStateMapperTest {
         uri: Uri? = Uri.parse(url),
         events: List<TrackingEvent> = emptyList(),
         entity: Entity? = null,
-        certificate: TestCertificateInfo? = null
+        certificate: TestCertificateInfo? = null,
     ): Site {
         val site: Site = mock()
         whenever(site.url).thenReturn(url)
@@ -230,5 +230,4 @@ class AppSiteRequestDataViewStateMapperTest {
         val MINOR_ENTITY_A = TestEntity("Minor A", "Minor A", 0.0)
         val MAJOR_ENTITY_A = TestEntity("Major A", "Major A", Entity.MAJOR_NETWORK_PREVALENCE)
     }
-
 }

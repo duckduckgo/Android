@@ -43,9 +43,12 @@ import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.duckduckgo.privacy.config.store.toUnprotectedTemporaryException
-import org.mockito.kotlin.mock
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import java.util.Locale
+import java.util.concurrent.CopyOnWriteArrayList
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -56,14 +59,11 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.threeten.bp.Instant
 import org.threeten.bp.ZoneOffset
 import org.threeten.bp.temporal.ChronoUnit
-import java.util.Locale
-import java.util.concurrent.CopyOnWriteArrayList
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 @ExperimentalCoroutinesApi
 @RunWith(Parameterized::class)
@@ -90,8 +90,8 @@ class FirstPartyCookiesReferenceTest(private val testCase: TestCase) {
             val referenceTest = adapter.fromJson(
                 FileUtilities.loadText(
                     FirstPartyCookiesReferenceTest::class.java.classLoader!!,
-                    "reference_tests/firstpartycookies/tests.json"
-                )
+                    "reference_tests/firstpartycookies/tests.json",
+                ),
             )
             return referenceTest?.expireFirstPartyTrackingCookies?.tests?.filterNot { it.exceptPlatforms.contains("android-browser") } ?: emptyList()
         }
@@ -107,7 +107,7 @@ class FirstPartyCookiesReferenceTest(private val testCase: TestCase) {
             userAllowListRepository,
             webViewDatabaseLocator,
             ExceptionPixel(mockPixel, RootExceptionFinder()),
-            DefaultDispatcherProvider()
+            DefaultDispatcherProvider(),
         )
         val host = testCase.siteURL.toUri().host
 
@@ -133,7 +133,6 @@ class FirstPartyCookiesReferenceTest(private val testCase: TestCase) {
         }
 
         withContext(Dispatchers.Main) {
-
             val expectedValue: Long = (
                 (
                     Instant.now()
@@ -152,7 +151,10 @@ class FirstPartyCookiesReferenceTest(private val testCase: TestCase) {
                         SQLCookieRemover.COOKIES_TABLE_NAME,
                         arrayOf("expires_utc"),
                         "host_key ='$host'",
-                        null, null, null, null
+                        null,
+                        null,
+                        null,
+                        null,
                     ).use { cursor ->
                         if (testCase.expectCookieSet) {
                             assertTrue(cursor.count == 1)
@@ -197,8 +199,8 @@ class FirstPartyCookiesReferenceTest(private val testCase: TestCase) {
         val config: JsonPrivacyConfig? = jsonAdapter.fromJson(
             FileUtilities.loadText(
                 javaClass.classLoader!!,
-                "reference_tests/firstpartycookies/config_reference.json"
-            )
+                "reference_tests/firstpartycookies/config_reference.json",
+            ),
         )
         val cookieAdapter: JsonAdapter<CookiesFeature> = moshi.adapter(CookiesFeature::class.java)
         val cookieFeature: CookiesFeature? = cookieAdapter.fromJson(config?.features?.get("cookie").toString())
@@ -209,7 +211,7 @@ class FirstPartyCookiesReferenceTest(private val testCase: TestCase) {
 
         val policy = FirstPartyCookiePolicyEntity(
             threshold = cookieFeature!!.settings.firstPartyCookiePolicy.threshold,
-            maxAge = cookieFeature.settings.firstPartyCookiePolicy.maxAge
+            maxAge = cookieFeature.settings.firstPartyCookiePolicy.maxAge,
         )
 
         val unprotectedTemporaryExceptions = config?.unprotectedTemporary?.map {
@@ -227,16 +229,16 @@ class FirstPartyCookiesReferenceTest(private val testCase: TestCase) {
         val setDocumentCookie: String,
         val expectCookieSet: Boolean,
         val expectExpiryToBe: Int,
-        val exceptPlatforms: List<String>
+        val exceptPlatforms: List<String>,
     )
 
     data class ExpireFirstPartyCookiesTest(
         val name: String,
         val desc: String,
-        val tests: List<TestCase>
+        val tests: List<TestCase>,
     )
 
     data class ReferenceTest(
-        val expireFirstPartyTrackingCookies: ExpireFirstPartyCookiesTest
+        val expireFirstPartyTrackingCookies: ExpireFirstPartyCookiesTest,
     )
 }

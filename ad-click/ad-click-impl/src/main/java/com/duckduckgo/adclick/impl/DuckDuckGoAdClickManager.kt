@@ -23,16 +23,16 @@ import com.duckduckgo.app.global.UriString
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 import okhttp3.internal.publicsuffix.PublicSuffixDatabase
 import timber.log.Timber
-import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class DuckDuckGoAdClickManager @Inject constructor(
     private val adClickData: AdClickData,
     private val adClickAttribution: AdClickAttribution,
-    private val adClickPixels: AdClickPixels
+    private val adClickPixels: AdClickPixels,
 ) : AdClickManager {
 
     private val publicSuffixDatabase = PublicSuffixDatabase()
@@ -147,8 +147,8 @@ class DuckDuckGoAdClickManager @Inject constructor(
                 // navigation to another domain, add expiry
                 adClickData.addExemption(
                     exemption.copy(
-                        navigationExemptionDeadline = System.currentTimeMillis() + adClickAttribution.getNavigationExpirationMillis()
-                    )
+                        navigationExemptionDeadline = System.currentTimeMillis() + adClickAttribution.getNavigationExpirationMillis(),
+                    ),
                 )
             } else {
                 // navigation back to an existing domain, remove expiry
@@ -188,8 +188,8 @@ class DuckDuckGoAdClickManager @Inject constructor(
                     tabId,
                     sourceTabExemption.copy(
                         navigationExemptionDeadline = Exemption.NO_EXPIRY,
-                        adClickActivePixelFired = false
-                    )
+                        adClickActivePixelFired = false,
+                    ),
                 )
                 adClickPixels.updateCountPixel(AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION)
             }
@@ -201,8 +201,8 @@ class DuckDuckGoAdClickManager @Inject constructor(
                 sourceTabExemption.copy(
                     hostTldPlusOne = sourceTabHostTldPLusOne,
                     navigationExemptionDeadline = System.currentTimeMillis() + adClickAttribution.getNavigationExpirationMillis(),
-                    adClickActivePixelFired = false
-                )
+                    adClickActivePixelFired = false,
+                ),
             )
             adClickPixels.updateCountPixel(AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION)
         }
@@ -214,14 +214,14 @@ class DuckDuckGoAdClickManager @Inject constructor(
                 Exemption(
                     hostTldPlusOne = savedAdDomain.ifEmpty { urlAdDomain },
                     navigationExemptionDeadline = Exemption.NO_EXPIRY,
-                    exemptionDeadline = System.currentTimeMillis() + adClickAttribution.getTotalExpirationMillis()
-                )
+                    exemptionDeadline = System.currentTimeMillis() + adClickAttribution.getTotalExpirationMillis(),
+                ),
             )
             adClickPixels.fireAdClickDetectedPixel(
                 savedAdDomain = savedAdDomain,
                 urlAdDomain = urlAdDomain,
                 heuristicEnabled = adClickAttribution.isHeuristicDetectionEnabled(),
-                domainEnabled = adClickAttribution.isDomainDetectionEnabled()
+                domainEnabled = adClickAttribution.isDomainDetectionEnabled(),
             )
             adClickPixels.updateCountPixel(AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION)
         }

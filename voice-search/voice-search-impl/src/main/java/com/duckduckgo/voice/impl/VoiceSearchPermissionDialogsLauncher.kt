@@ -26,13 +26,13 @@ interface VoiceSearchPermissionDialogsLauncher {
     fun showNoMicAccessDialog(
         context: Context,
         onSettingsLaunchSelected: () -> Unit = {},
-        onSettingsLaunchDeclined: () -> Unit = {}
+        onSettingsLaunchDeclined: () -> Unit = {},
     )
 
     fun showPermissionRationale(
         context: Context,
         onRationaleAccepted: () -> Unit = {},
-        onRationaleDeclined: () -> Unit = {}
+        onRationaleDeclined: () -> Unit = {},
     )
 }
 
@@ -41,7 +41,7 @@ class RealVoiceSearchPermissionDialogsLauncher @Inject constructor() : VoiceSear
     override fun showNoMicAccessDialog(
         context: Context,
         onSettingsLaunchSelected: () -> Unit,
-        onSettingsLaunchDeclined: () -> Unit
+        onSettingsLaunchDeclined: () -> Unit,
     ) {
         AlertDialog.Builder(context)
             .setTitle(R.string.voiceSearchPermissionRejectedDialogTitle)
@@ -58,9 +58,8 @@ class RealVoiceSearchPermissionDialogsLauncher @Inject constructor() : VoiceSear
     override fun showPermissionRationale(
         context: Context,
         onRationaleAccepted: () -> Unit,
-        onRationaleDeclined: () -> Unit
+        onRationaleDeclined: () -> Unit,
     ) {
-
         AlertDialog.Builder(context)
             .setTitle(R.string.voiceSearchPermissionRationaleTitle)
             .setMessage(R.string.voiceSearchPermissionRationaleDescription)

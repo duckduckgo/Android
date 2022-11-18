@@ -22,9 +22,9 @@ import com.duckduckgo.securestorage.impl.encryption.EncryptionHelper.EncryptedBy
 import com.duckduckgo.securestorage.impl.encryption.RandomBytesGenerator
 import com.duckduckgo.securestorage.store.SecureStorageKeyRepository
 import com.squareup.anvil.annotations.ContributesBinding
-import okio.ByteString.Companion.toByteString
 import java.security.Key
 import javax.inject.Inject
+import okio.ByteString.Companion.toByteString
 
 /**
  * This class provides the usable decrypted keys to be used in various levels on encryption
@@ -48,7 +48,7 @@ class RealSecureStorageKeyProvider @Inject constructor(
     private val randomBytesGenerator: RandomBytesGenerator,
     private val secureStorageKeyRepository: SecureStorageKeyRepository,
     private val encryptionHelper: EncryptionHelper,
-    private val secureStorageKeyGenerator: SecureStorageKeyGenerator
+    private val secureStorageKeyGenerator: SecureStorageKeyGenerator,
 ) : SecureStorageKeyProvider {
 
     override fun canAccessKeyStore(): Boolean = secureStorageKeyRepository.canUseEncryption()
@@ -87,9 +87,9 @@ class RealSecureStorageKeyProvider @Inject constructor(
             encryptionHelper.decrypt(
                 EncryptedBytes(
                     secureStorageKeyRepository.encryptedL2Key!!,
-                    secureStorageKeyRepository.encryptedL2KeyIV!!
+                    secureStorageKeyRepository.encryptedL2KeyIV!!,
                 ),
-                deriveKeyFromPassword(password)
+                deriveKeyFromPassword(password),
             )
         }
         return secureStorageKeyGenerator.generateKeyFromKeyMaterial(keyMaterial)
@@ -97,11 +97,11 @@ class RealSecureStorageKeyProvider @Inject constructor(
 
     private fun encryptAndStoreL2Key(
         keyBytes: ByteArray,
-        password: String
+        password: String,
     ): ByteArray =
         encryptionHelper.encrypt(
             keyBytes,
-            deriveKeyFromPassword(password)
+            deriveKeyFromPassword(password),
         ).also {
             secureStorageKeyRepository.encryptedL2Key = it.data
             secureStorageKeyRepository.encryptedL2KeyIV = it.iv

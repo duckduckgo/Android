@@ -33,7 +33,7 @@ class RealRemoteMessagingConfigProcessor(
     private val remoteMessagingConfigJsonMapper: RemoteMessagingConfigJsonMapper,
     private val remoteMessagingConfigRepository: RemoteMessagingConfigRepository,
     private val remoteMessagingRepository: RemoteMessagingRepository,
-    private val remoteMessagingConfigMatcher: RemoteMessagingConfigMatcher
+    private val remoteMessagingConfigMatcher: RemoteMessagingConfigMatcher,
 ) : RemoteMessagingConfigProcessor {
 
     override suspend fun process(jsonRemoteMessagingConfig: JsonRemoteMessagingConfig) {

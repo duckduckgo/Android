@@ -31,11 +31,11 @@ import com.duckduckgo.privacy.config.api.Https
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
-import timber.log.Timber
+import dagger.SingleInstanceIn
 import java.util.concurrent.locks.ReentrantLock
 import javax.inject.Inject
-import dagger.SingleInstanceIn
 import kotlin.concurrent.thread
+import timber.log.Timber
 
 interface HttpsUpgrader {
 
@@ -53,18 +53,18 @@ interface HttpsUpgrader {
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = HttpsUpgrader::class
+    boundType = HttpsUpgrader::class,
 )
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = LifecycleObserver::class
+    boundType = LifecycleObserver::class,
 )
 class HttpsUpgraderImpl @Inject constructor(
     private val bloomFactory: HttpsBloomFilterFactory,
     private val bloomFalsePositiveDao: HttpsFalsePositivesDao,
     private val userAllowListDao: UserWhitelistDao,
     private val toggle: FeatureToggle,
-    private val https: Https
+    private val https: Https,
 ) : HttpsUpgrader, DefaultLifecycleObserver {
 
     private var bloomFilter: BloomFilter? = null

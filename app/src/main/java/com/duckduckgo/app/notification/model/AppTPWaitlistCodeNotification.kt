@@ -18,19 +18,19 @@ package com.duckduckgo.app.notification.model
 
 import android.content.Context
 import android.os.Bundle
-import com.duckduckgo.mobile.android.vpn.R as VpnR
-import com.duckduckgo.mobile.android.R as CommonR
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.APPTP_WAITLIST_CODE
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.db.NotificationDao
+import com.duckduckgo.mobile.android.R as CommonR
+import com.duckduckgo.mobile.android.vpn.R as VpnR
 import com.duckduckgo.mobile.android.vpn.waitlist.AppTrackingProtectionWaitlistDataStore
 import timber.log.Timber
 
 class AppTPWaitlistCodeNotification(
     private val context: Context,
     private val notificationDao: NotificationDao,
-    private val dataStore: AppTrackingProtectionWaitlistDataStore
+    private val dataStore: AppTrackingProtectionWaitlistDataStore,
 ) : SchedulableNotification {
 
     override val id = "com.duckduckgo.vpn.waitlist"
@@ -38,7 +38,6 @@ class AppTPWaitlistCodeNotification(
     override val cancelIntent = CANCEL
 
     override suspend fun canShow(): Boolean {
-
         if (notificationDao.exists(id) || !dataStore.sendNotification) {
             Timber.v("Notification already seen")
             return false

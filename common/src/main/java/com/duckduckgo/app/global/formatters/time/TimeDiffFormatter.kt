@@ -21,29 +21,28 @@ import com.duckduckgo.app.global.R
 import com.duckduckgo.app.global.formatters.time.model.TimePassed
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import org.threeten.bp.Duration
-import org.threeten.bp.LocalDateTime
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import org.threeten.bp.Duration
+import org.threeten.bp.LocalDateTime
 
 interface TimeDiffFormatter {
     fun formatTimePassedInDaysWeeksMonthsYears(
         endLocalDateTime: LocalDateTime = LocalDateTime.now(),
-        startLocalDateTime: LocalDateTime
+        startLocalDateTime: LocalDateTime,
     ): String
 
     fun formatTimePassedInDays(
         endLocalDateTime: LocalDateTime = LocalDateTime.now(),
-        startLocalDateTime: LocalDateTime
+        startLocalDateTime: LocalDateTime,
     ): String
 
     fun formatTimePassed(
         endLocalDateTime: LocalDateTime = LocalDateTime.now(),
-        startLocalDateTime: LocalDateTime
+        startLocalDateTime: LocalDateTime,
     ): String
-
 }
 
 @ContributesBinding(AppScope::class)
@@ -51,9 +50,8 @@ class RealTimeDiffFormatter @Inject constructor(private val context: Context) : 
 
     override fun formatTimePassedInDaysWeeksMonthsYears(
         endLocalDateTime: LocalDateTime,
-        startLocalDateTime: LocalDateTime
+        startLocalDateTime: LocalDateTime,
     ): String {
-
         val startYear = startLocalDateTime.year
         val endYear = endLocalDateTime.year
 
@@ -81,7 +79,7 @@ class RealTimeDiffFormatter @Inject constructor(private val context: Context) : 
 
     override fun formatTimePassedInDays(
         endLocalDateTime: LocalDateTime,
-        startLocalDateTime: LocalDateTime
+        startLocalDateTime: LocalDateTime,
     ): String {
         val startDate = DatabaseDateFormatter.timestamp(startLocalDateTime).substringBefore("T")
             .run { SimpleDateFormat(PATTERN_FORMATTER_DAYS).parse(this) }
@@ -99,7 +97,7 @@ class RealTimeDiffFormatter @Inject constructor(private val context: Context) : 
 
     override fun formatTimePassed(
         endLocalDateTime: LocalDateTime,
-        startLocalDateTime: LocalDateTime
+        startLocalDateTime: LocalDateTime,
     ): String {
         val timeDifferenceMillis = Duration.between(startLocalDateTime, endLocalDateTime).toMillis()
         val startDate = DatabaseDateFormatter.timestamp(startLocalDateTime).substringBefore("T")

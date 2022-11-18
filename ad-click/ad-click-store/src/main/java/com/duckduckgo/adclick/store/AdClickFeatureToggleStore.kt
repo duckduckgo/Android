@@ -26,7 +26,7 @@ interface AdClickFeatureToggleStore {
 
     fun get(
         featureName: AdClickFeatureName,
-        defaultValue: Boolean
+        defaultValue: Boolean,
     ): Boolean
 
     fun getMinSupportedVersion(featureName: AdClickFeatureName): Int
@@ -68,5 +68,5 @@ internal class RealAdClickFeatureToggleStore(private val context: Context) : AdC
 data class AdClickFeatureToggles(
     val featureName: AdClickFeatureName,
     val enabled: Boolean,
-    val minSupportedVersion: Int?
+    val minSupportedVersion: Int?,
 )

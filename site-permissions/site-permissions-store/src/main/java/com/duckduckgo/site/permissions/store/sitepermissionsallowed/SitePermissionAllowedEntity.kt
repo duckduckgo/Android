@@ -21,13 +21,13 @@ import kotlin.math.abs
 
 @Entity(
     tableName = "site_permission_allowed",
-    primaryKeys = ["domain", "tabId", "permissionAllowed"]
+    primaryKeys = ["domain", "tabId", "permissionAllowed"],
 )
 data class SitePermissionAllowedEntity(
     val domain: String,
     val tabId: String,
     val permissionAllowed: String,
-    val allowedAt: Long
+    val allowedAt: Long,
 ) {
 
     fun allowedWithin24h(): Boolean {

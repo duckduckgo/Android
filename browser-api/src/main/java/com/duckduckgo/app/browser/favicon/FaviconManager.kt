@@ -23,38 +23,38 @@ import java.io.File
 interface FaviconManager {
     suspend fun storeFavicon(
         tabId: String,
-        faviconSource: FaviconSource
+        faviconSource: FaviconSource,
     ): File?
 
     suspend fun tryFetchFaviconForUrl(
         tabId: String,
-        url: String
+        url: String,
     ): File?
 
     suspend fun saveFaviconForUrl(
-        url: String
+        url: String,
     )
 
     suspend fun persistCachedFavicon(
         tabId: String,
-        url: String
+        url: String,
     )
 
     suspend fun loadToViewFromLocalOrFallback(
         tabId: String? = null,
         url: String,
-        view: ImageView
+        view: ImageView,
     )
 
     suspend fun loadToViewFromLocalWithPlaceholder(
         tabId: String? = null,
         url: String,
-        view: ImageView
+        view: ImageView,
     )
 
     suspend fun loadFromDisk(
         tabId: String?,
-        url: String
+        url: String,
     ): Bitmap?
 
     suspend fun loadFromDiskWithParams(
@@ -62,13 +62,13 @@ interface FaviconManager {
         url: String,
         cornerRadius: Int,
         width: Int,
-        height: Int
+        height: Int,
     ): Bitmap?
 
     suspend fun deletePersistedFavicon(url: String)
     suspend fun deleteOldTempFavicon(
         tabId: String,
-        path: String?
+        path: String?,
     )
 
     suspend fun deleteAllTemp()
@@ -77,11 +77,11 @@ interface FaviconManager {
 sealed class FaviconSource {
     data class ImageFavicon(
         val icon: Bitmap,
-        val url: String
+        val url: String,
     ) : FaviconSource()
 
     data class UrlFavicon(
         val faviconUrl: String,
-        val url: String
+        val url: String,
     ) : FaviconSource()
 }

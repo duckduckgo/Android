@@ -35,7 +35,7 @@ data class BrokenSite(
 
 sealed class BrokenSiteCategory(
     @StringRes val category: Int,
-    val key: String
+    val key: String,
 ) {
     object ImagesCategory : BrokenSiteCategory(R.string.brokenSiteCategoryImages, IMAGES_CATEGORY_KEY)
     object PaywallCategory : BrokenSiteCategory(R.string.brokenSiteCategoryPaywall, PAYWALL_CATEGORY_KEY)

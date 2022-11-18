@@ -26,7 +26,7 @@ data class WebTrackerBlocked(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val trackerUrl: String,
     val trackerCompany: String,
-    val timestamp: String = timestamp()
+    val timestamp: String = timestamp(),
 ) {
 
     companion object {

@@ -58,7 +58,7 @@ class SitePermissionsViewModelTest {
         locationPermissionsRepository = mockLocationPermissionsRepository,
         geolocationPermissions = mockGeoLocationPermissions,
         settingsDataStore = mockSettingsDataStore,
-        dispatcherProvider = coroutineRule.testDispatcherProvider
+        dispatcherProvider = coroutineRule.testDispatcherProvider,
     )
 
     @Before
@@ -189,5 +189,4 @@ class SitePermissionsViewModelTest {
         whenever(mockSitePermissionsRepository.askMicEnabled).thenReturn(micEnabled)
         whenever(mockSitePermissionsRepository.askCameraEnabled).thenReturn(cameraEnabled)
     }
-
 }

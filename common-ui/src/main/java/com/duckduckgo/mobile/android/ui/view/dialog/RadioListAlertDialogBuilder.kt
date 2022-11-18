@@ -76,7 +76,7 @@ class RadioListAlertDialogBuilder(val context: Context) {
 
     fun setOptions(
         @StringRes stackedButtonTextId: List<Int>,
-        selectedItem: Int = 0
+        selectedItem: Int = 0,
     ): RadioListAlertDialogBuilder {
         stackedButtonTextId.forEach {
             optionList.add(context.getText(it))
@@ -120,7 +120,7 @@ class RadioListAlertDialogBuilder(val context: Context) {
 
     private fun setViews(
         binding: DialogSingleChoiceAlertBinding,
-        dialog: AlertDialog
+        dialog: AlertDialog,
     ) {
         binding.radioListDialogTitle.text = titleText
 

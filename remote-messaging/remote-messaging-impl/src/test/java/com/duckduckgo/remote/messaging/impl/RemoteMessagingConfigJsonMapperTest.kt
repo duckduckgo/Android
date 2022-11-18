@@ -31,17 +31,17 @@ import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute.DefaultBrow
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute.Locale
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute.Unknown
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute.WebView
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import com.squareup.moshi.Moshi
+import java.io.BufferedReader
+import java.util.Locale.US
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
-import java.io.BufferedReader
-import java.util.Locale.US
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 class RemoteMessagingConfigJsonMapperTest {
@@ -70,11 +70,11 @@ class RemoteMessagingConfigJsonMapperTest {
                 placeholder = ANNOUNCE,
                 primaryActionText = "Ok",
                 primaryAction = Action.Url(
-                    value = "https://duckduckgo.com"
-                )
+                    value = "https://duckduckgo.com",
+                ),
             ),
             matchingRules = emptyList(),
-            exclusionRules = emptyList()
+            exclusionRules = emptyList(),
         )
         assertEquals(bigSingleActionMessage, config.messages[0])
 
@@ -82,10 +82,10 @@ class RemoteMessagingConfigJsonMapperTest {
             id = "26780792-49fe-4e25-ae27-aa6a2e6f013b",
             content = Content.Small(
                 titleText = "Here goes a title",
-                descriptionText = "description"
+                descriptionText = "description",
             ),
             matchingRules = listOf(5, 6),
-            exclusionRules = listOf(7, 8, 9)
+            exclusionRules = listOf(7, 8, 9),
         )
         assertEquals(smallMessage, config.messages[2])
 
@@ -94,10 +94,10 @@ class RemoteMessagingConfigJsonMapperTest {
             content = Content.Medium(
                 titleText = "Here goes a title",
                 descriptionText = "description",
-                placeholder = CRITICAL_UPDATE
+                placeholder = CRITICAL_UPDATE,
             ),
             matchingRules = emptyList(),
-            exclusionRules = emptyList()
+            exclusionRules = emptyList(),
         )
         assertEquals(mediumMessage, config.messages[3])
 
@@ -109,13 +109,13 @@ class RemoteMessagingConfigJsonMapperTest {
                 placeholder = APP_UPDATE,
                 primaryActionText = "Ok",
                 primaryAction = Action.PlayStore(
-                    value = "com.duckduckgo.mobile.android"
+                    value = "com.duckduckgo.mobile.android",
                 ),
                 secondaryActionText = "Cancel",
                 secondaryAction = Action.Dismiss(),
             ),
             matchingRules = emptyList(),
-            exclusionRules = emptyList()
+            exclusionRules = emptyList(),
         )
         assertEquals(bigTwoActions, config.messages[4])
     }
@@ -185,10 +185,10 @@ class RemoteMessagingConfigJsonMapperTest {
             id = "26780792-49fe-4e25-ae27-aa6a2e6f013b",
             content = Content.Small(
                 titleText = "Here goes a title",
-                descriptionText = "description"
+                descriptionText = "description",
             ),
             matchingRules = listOf(5, 6),
-            exclusionRules = listOf(7, 8, 9)
+            exclusionRules = listOf(7, 8, 9),
         )
         assertEquals(smallMessage, config.messages[0])
     }

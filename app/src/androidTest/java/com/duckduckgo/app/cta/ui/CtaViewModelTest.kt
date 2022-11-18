@@ -47,11 +47,12 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
-import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.trackerdetection.model.TrackerType
+import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.mobile.android.ui.store.AppTheme
-import org.mockito.kotlin.*
+import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.drop
@@ -65,8 +66,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import java.util.*
-import java.util.concurrent.TimeUnit
+import org.mockito.kotlin.*
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -125,7 +125,7 @@ class CtaViewModelTest {
         CtaId.DAX_DIALOG_TRACKERS_FOUND,
         CtaId.DAX_DIALOG_NETWORK,
         CtaId.DAX_FIRE_BUTTON,
-        CtaId.DAX_END
+        CtaId.DAX_END,
     )
 
     private lateinit var testee: CtaViewModel
@@ -395,7 +395,7 @@ class CtaViewModelTest {
             R.string.daxMainNetworkCtaText,
             "Facebook",
             "facebook.com",
-            "Facebook"
+            "Facebook",
         )
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site) as DaxDialogCta
@@ -414,7 +414,7 @@ class CtaViewModelTest {
             R.string.daxMainNetworkOwnedCtaText,
             "Facebook",
             "instagram.com",
-            "Facebook"
+            "Facebook",
         )
 
         assertTrue(value is DaxDialogCta.DaxMainNetworkCta)
@@ -432,7 +432,7 @@ class CtaViewModelTest {
             entity = TestEntity("test", "test", 9.0),
             surrogateId = null,
             status = TrackerStatus.BLOCKED,
-            type = TrackerType.OTHER
+            type = TrackerType.OTHER,
         )
         val site = site(url = "http://www.cnn.com", trackerCount = 1, events = listOf(trackingEvent))
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
@@ -450,7 +450,7 @@ class CtaViewModelTest {
             entity = TestEntity("test", "test", 0.123),
             surrogateId = null,
             status = TrackerStatus.BLOCKED,
-            type = TrackerType.OTHER
+            type = TrackerType.OTHER,
         )
         val site = site(url = "http://www.cnn.com", trackerCount = 1, events = listOf(trackingEvent))
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
@@ -736,7 +736,7 @@ class CtaViewModelTest {
         events: List<TrackingEvent> = emptyList(),
         majorNetworkCount: Int = 0,
         allTrackersBlocked: Boolean = true,
-        entity: Entity? = null
+        entity: Entity? = null,
     ): Site {
         val site: Site = mock()
         whenever(site.url).thenReturn(url)

@@ -22,8 +22,6 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.privacy.dashboard.impl.ui.PublicKeyInfoMapper.PublicKeyInfo
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import org.junit.Assert.*
-import org.junit.Test
 import java.math.BigInteger
 import java.security.cert.X509Certificate
 import java.security.interfaces.DSAParams
@@ -32,6 +30,8 @@ import java.security.interfaces.ECPublicKey
 import java.security.interfaces.RSAPublicKey
 import java.security.spec.ECParameterSpec
 import java.util.*
+import org.junit.Assert.*
+import org.junit.Test
 
 class PublicKeyInfoMapperTest {
 
@@ -43,7 +43,7 @@ class PublicKeyInfoMapperTest {
     fun whenRSASslCertificateThenReturnRsaPublicKeyInfo() {
         val expected = PublicKeyInfo(
             type = "rsa",
-            bitSize = 1
+            bitSize = 1,
         )
         val testee = PublicKeyInfoMapper(androidQAppBuildConfig)
         val publicKeyInfo = testee.mapFrom(aRSASslCertificate())
@@ -55,7 +55,7 @@ class PublicKeyInfoMapperTest {
     fun whenDSASslCertificateThenReturnDSAPublicKeyInfo() {
         val expected = PublicKeyInfo(
             type = "dsa",
-            bitSize = 1
+            bitSize = 1,
         )
         val testee = PublicKeyInfoMapper(androidQAppBuildConfig)
 
@@ -68,7 +68,7 @@ class PublicKeyInfoMapperTest {
     fun whenDSAWithParamsSslCertificateThenReturnDSAPublicKeyInfo() {
         val expected = PublicKeyInfo(
             type = "dsa",
-            bitSize = 1
+            bitSize = 1,
         )
         val testee = PublicKeyInfoMapper(androidQAppBuildConfig)
 
@@ -81,7 +81,7 @@ class PublicKeyInfoMapperTest {
     fun whenECSslCertificateThenReturnECPublicKeyInfo() {
         val expected = PublicKeyInfo(
             type = "ec",
-            bitSize = 1
+            bitSize = 1,
         )
         val testee = PublicKeyInfoMapper(androidQAppBuildConfig)
 
@@ -105,7 +105,7 @@ fun aRSASslCertificate(): SslCertificate {
 }
 
 fun aDSASslCertificate(
-    hasParams: Boolean = false
+    hasParams: Boolean = false,
 ): SslCertificate {
     val certificate = mock<X509Certificate>().apply {
         val key = mock<DSAPublicKey>().apply {

@@ -21,7 +21,7 @@ import com.squareup.moshi.Json
 data class AutofillDataRequest(
     val mainType: SupportedAutofillInputMainType,
     val subType: SupportedAutofillInputSubType,
-    val trigger: SupportedAutofillTriggerType
+    val trigger: SupportedAutofillTriggerType,
 ) {
 
     data class InputType(
@@ -32,17 +32,28 @@ data class AutofillDataRequest(
 }
 
 enum class SupportedAutofillInputMainType {
-    @Json(name = "credentials") CREDENTIALS,
-    @Json(name = "identities") IDENTITIES,
-    @Json(name = "creditCards") CREDIT_CARDS,
+    @Json(name = "credentials")
+    CREDENTIALS,
+
+    @Json(name = "identities")
+    IDENTITIES,
+
+    @Json(name = "creditCards")
+    CREDIT_CARDS,
 }
 
 enum class SupportedAutofillInputSubType {
-    @Json(name = "username") USERNAME,
-    @Json(name = "password") PASSWORD,
+    @Json(name = "username")
+    USERNAME,
+
+    @Json(name = "password")
+    PASSWORD,
 }
 
 enum class SupportedAutofillTriggerType {
-    @Json(name = "userInitiated") USER_INITIATED,
-    @Json(name = "autoprompt") AUTOPROMPT,
+    @Json(name = "userInitiated")
+    USER_INITIATED,
+
+    @Json(name = "autoprompt")
+    AUTOPROMPT,
 }

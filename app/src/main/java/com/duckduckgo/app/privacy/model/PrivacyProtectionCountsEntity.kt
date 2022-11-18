@@ -28,7 +28,7 @@ data class PrivacyProtectionCountsEntity(
     val blockedTrackerCount: Long,
 
     @ColumnInfo(name = "upgrade_count")
-    val upgradeCount: Long
+    val upgradeCount: Long,
 
 ) {
     companion object {

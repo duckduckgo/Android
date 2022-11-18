@@ -30,7 +30,7 @@ interface CredentialListSorter {
 
 @ContributesBinding(FragmentScope::class)
 class CredentialListSorterByTitleAndDomain @Inject constructor(
-    private val domainFormatter: AutofillDomainFormatter
+    private val domainFormatter: AutofillDomainFormatter,
 ) : CredentialListSorter {
 
     override fun sort(credentials: List<LoginCredentials>): List<LoginCredentials> {

@@ -23,12 +23,12 @@ data class TrackingEvent(
     val entity: Entity?,
     val surrogateId: String?,
     val status: TrackerStatus,
-    val type: TrackerType
+    val type: TrackerType,
 )
 
 enum class TrackerType {
     AD,
-    OTHER
+    OTHER,
 }
 
 enum class TrackerStatus {
@@ -37,5 +37,5 @@ enum class TrackerStatus {
     AD_ALLOWED,
     SITE_BREAKAGE_ALLOWED,
     SAME_ENTITY_ALLOWED,
-    ALLOWED
+    ALLOWED,
 }

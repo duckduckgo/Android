@@ -42,7 +42,7 @@ object DatabaseModule {
     @SingleInstanceIn(AppScope::class)
     fun provideAppDatabase(
         context: Context,
-        migrationsProvider: MigrationsProvider
+        migrationsProvider: MigrationsProvider,
     ): AppDatabase {
         return Room.databaseBuilder(context, AppDatabase::class.java, "app.db")
             .addMigrations(*migrationsProvider.ALL_MIGRATIONS.toTypedArray())
@@ -55,7 +55,7 @@ object DatabaseModule {
     @Provides
     fun provideDatabaseMigrations(
         context: Context,
-        settingsDataStore: SettingsDataStore
+        settingsDataStore: SettingsDataStore,
     ): MigrationsProvider {
         return MigrationsProvider(context, settingsDataStore)
     }

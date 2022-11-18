@@ -25,6 +25,6 @@ interface FeatureToggle {
      */
     fun isFeatureEnabled(
         featureName: String,
-        defaultValue: Boolean = true
+        defaultValue: Boolean = true,
     ): Boolean
 }

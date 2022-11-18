@@ -44,5 +44,4 @@ class AutofillJsonResponseWriter @Inject constructor(val moshi: Moshi) : Autofil
         val topLevelResponse = EmptyResponse(success = credentialsResponse)
         return autofillDataAdapterCredentialsUnavailable.toJson(topLevelResponse)
     }
-
 }

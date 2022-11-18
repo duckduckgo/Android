@@ -30,7 +30,7 @@ import javax.inject.Inject
 class AppBrowserNav @Inject constructor() : BrowserNav {
     override fun openInNewTab(
         context: Context,
-        url: String
+        url: String,
     ): Intent {
         return BrowserActivity.intent(context, url)
     }

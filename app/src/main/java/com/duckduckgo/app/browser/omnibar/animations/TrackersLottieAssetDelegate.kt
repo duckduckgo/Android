@@ -29,15 +29,15 @@ import androidx.core.graphics.drawable.toBitmap
 import com.airbnb.lottie.ImageAssetDelegate
 import com.airbnb.lottie.LottieImageAsset
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.mobile.android.ui.view.getColorFromAttr
-import com.duckduckgo.mobile.android.ui.view.toPx
 import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo.ImageLogo
 import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo.LetterLogo
 import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo.StackedLogo
+import com.duckduckgo.mobile.android.ui.view.getColorFromAttr
+import com.duckduckgo.mobile.android.ui.view.toPx
 
 internal class TrackersLottieAssetDelegate(
     val context: Context,
-    val logos: List<TrackerLogo>
+    val logos: List<TrackerLogo>,
 ) : ImageAssetDelegate {
 
     override fun fetchBitmap(asset: LottieImageAsset?): Bitmap? {
@@ -45,21 +45,21 @@ internal class TrackersLottieAssetDelegate(
             "image_0" -> {
                 kotlin.runCatching { logos[0].asDrawable(context) }
                     .getOrDefault(
-                        ContextCompat.getDrawable(context, R.drawable.network_logo_blank)!!.toBitmap()
+                        ContextCompat.getDrawable(context, R.drawable.network_logo_blank)!!.toBitmap(),
                     )
             }
 
             "image_1" -> {
                 kotlin.runCatching { logos[1].asDrawable(context) }
                     .getOrDefault(
-                        ContextCompat.getDrawable(context, R.drawable.network_logo_blank)!!.toBitmap()
+                        ContextCompat.getDrawable(context, R.drawable.network_logo_blank)!!.toBitmap(),
                     )
             }
 
             "image_2" -> {
                 kotlin.runCatching { logos[2].asDrawable(context) }
                     .getOrDefault(
-                        ContextCompat.getDrawable(context, R.drawable.network_logo_blank)!!.toBitmap()
+                        ContextCompat.getDrawable(context, R.drawable.network_logo_blank)!!.toBitmap(),
                     )
             }
 
@@ -83,9 +83,8 @@ internal class TrackersLottieAssetDelegate(
 
     private fun generateDefaultDrawable(
         context: Context,
-        letter: String
+        letter: String,
     ): Drawable {
-
         return object : Drawable() {
 
             private val backgroundPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {

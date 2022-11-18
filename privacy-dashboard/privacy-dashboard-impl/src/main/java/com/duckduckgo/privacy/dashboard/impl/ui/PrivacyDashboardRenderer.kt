@@ -32,7 +32,7 @@ class PrivacyDashboardRenderer(
     private val onBrokenSiteClicked: () -> Unit,
     private val onPrivacyProtectionsClicked: (Boolean) -> Unit,
     private val onUrlClicked: (String) -> Unit,
-    private val onClose: () -> Unit
+    private val onClose: () -> Unit,
 ) {
 
     private var lastSeenPrivacyDashboardViewState: ViewState? = null
@@ -47,9 +47,9 @@ class PrivacyDashboardRenderer(
                 onUrlClicked = {
                     onUrlClicked(it)
                 },
-                onClose = { onClose() }
+                onClose = { onClose() },
             ),
-            PrivacyDashboardJavascriptInterface.JAVASCRIPT_INTERFACE_NAME
+            PrivacyDashboardJavascriptInterface.JAVASCRIPT_INTERFACE_NAME,
         )
         webView.loadUrl("file:///android_asset/html/android.html")
     }

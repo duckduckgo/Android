@@ -25,23 +25,23 @@ import com.duckduckgo.app.trackerdetection.Client.ClientType.BLOCKING
 import com.duckduckgo.app.trackerdetection.db.WebTrackerBlocked
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
-import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.trackerdetection.model.TrackerType
+import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
-import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import timber.log.Timber
+import dagger.SingleInstanceIn
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
-import dagger.SingleInstanceIn
+import timber.log.Timber
 
 interface TrackerDetector {
     fun addClient(client: Client)
     fun evaluate(
         url: String,
         documentUrl: String,
-        checkFirstParty: Boolean = true
+        checkFirstParty: Boolean = true,
     ): TrackingEvent?
 }
 
@@ -53,7 +53,7 @@ class TrackerDetectorImpl @Inject constructor(
     private val contentBlocking: ContentBlocking,
     private val trackerAllowlist: TrackerAllowlist,
     private val webTrackersBlockedDao: WebTrackersBlockedDao,
-    private val adClickManager: AdClickManager
+    private val adClickManager: AdClickManager,
 ) : TrackerDetector {
 
     private val clients = CopyOnWriteArrayList<Client>()
@@ -69,9 +69,8 @@ class TrackerDetectorImpl @Inject constructor(
     override fun evaluate(
         url: String,
         documentUrl: String,
-        checkFirstParty: Boolean
+        checkFirstParty: Boolean,
     ): TrackingEvent? {
-
         if (checkFirstParty && firstParty(url, documentUrl)) {
             Timber.v("$url is a first party url")
             return null
@@ -113,13 +112,13 @@ class TrackerDetectorImpl @Inject constructor(
 
     private fun firstParty(
         firstUrl: String,
-        secondUrl: String
+        secondUrl: String,
     ): Boolean =
         sameOrSubdomain(firstUrl, secondUrl) || sameOrSubdomain(secondUrl, firstUrl)
 
     private fun sameNetworkName(
         url: String,
-        documentUrl: String
+        documentUrl: String,
     ): Boolean {
         val firstNetwork = entityLookup.entityForUrl(url) ?: return false
         val secondNetwork = entityLookup.entityForUrl(documentUrl) ?: return false

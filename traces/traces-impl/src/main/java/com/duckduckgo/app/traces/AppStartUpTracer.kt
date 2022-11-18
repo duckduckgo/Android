@@ -35,7 +35,7 @@ import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = LifecycleObserver::class
+    boundType = LifecycleObserver::class,
 )
 class AppStartUpTracer @Inject constructor() : ContentProvider(), LifecycleEventObserver {
 
@@ -44,7 +44,7 @@ class AppStartUpTracer @Inject constructor() : ContentProvider(), LifecycleEvent
 
     override fun onStateChanged(
         source: LifecycleOwner,
-        event: Lifecycle.Event
+        event: Lifecycle.Event,
     ) {
         if (event == Lifecycle.Event.ON_START) {
             Debug.stopMethodTracing()
@@ -56,7 +56,7 @@ class AppStartUpTracer @Inject constructor() : ContentProvider(), LifecycleEvent
             val tracesDirPath = context!!.applicationInfo.dataDir
             val fileNameFormat = SimpleDateFormat(
                 "yyyy-MM-dd_HH-mm-ss_SSS'.trace'",
-                Locale.US
+                Locale.US,
             )
             val fileName = fileNameFormat.format(Date())
             val traceFilePath = "$tracesDirPath/$fileName"
@@ -67,7 +67,7 @@ class AppStartUpTracer @Inject constructor() : ContentProvider(), LifecycleEvent
             Debug.startMethodTracingSampling(
                 traceFilePath,
                 maxBufferSize,
-                samplingIntervalUs
+                samplingIntervalUs,
             )
         }
 
@@ -78,14 +78,14 @@ class AppStartUpTracer @Inject constructor() : ContentProvider(), LifecycleEvent
         p0: Uri,
         p1: ContentValues?,
         p2: String?,
-        p3: Array<out String>?
+        p3: Array<out String>?,
     ): Int {
         TODO("Not yet implemented")
     }
 
     override fun insert(
         p0: Uri,
-        p1: ContentValues?
+        p1: ContentValues?,
     ): Uri? {
         TODO("Not yet implemented")
     }
@@ -93,7 +93,7 @@ class AppStartUpTracer @Inject constructor() : ContentProvider(), LifecycleEvent
     override fun delete(
         p0: Uri,
         p1: String?,
-        p2: Array<out String>?
+        p2: Array<out String>?,
     ): Int {
         TODO("Not yet implemented")
     }
@@ -107,7 +107,7 @@ class AppStartUpTracer @Inject constructor() : ContentProvider(), LifecycleEvent
         p1: Array<out String>?,
         p2: String?,
         p3: Array<out String>?,
-        p4: String?
+        p4: String?,
     ): Cursor? {
         TODO("Not yet implemented")
     }

@@ -28,9 +28,11 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.statistics.store.StatisticsSharedPreferences
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import com.squareup.moshi.Moshi
+import java.net.InetAddress
+import java.net.InetSocketAddress
+import java.net.Proxy
+import java.util.concurrent.TimeUnit
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -40,13 +42,11 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
-import java.net.InetAddress
-import java.net.InetSocketAddress
-import java.net.Proxy
-import java.util.concurrent.TimeUnit
 
 class StatisticsRequesterJsonTest {
 
@@ -316,7 +316,7 @@ class StatisticsRequesterJsonTest {
 
     private fun queueResponseFromFile(
         filename: String,
-        responseCode: Int = 200
+        responseCode: Int = 200,
     ) {
         val response = MockResponse()
             .setBody(loadText(StatisticsRequesterJsonTest::class.java.classLoader!!, "$JSON_DIR/$filename"))
@@ -328,7 +328,7 @@ class StatisticsRequesterJsonTest {
     @Suppress("SameParameterValue")
     private fun queueResponseFromString(
         responseBody: String,
-        responseCode: Int = 200
+        responseCode: Int = 200,
     ) {
         val response = MockResponse()
             .setBody(responseBody)

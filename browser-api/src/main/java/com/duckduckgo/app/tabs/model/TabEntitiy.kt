@@ -29,12 +29,12 @@ import androidx.room.PrimaryKey
             parentColumns = ["tabId"],
             childColumns = ["sourceTabId"],
             onDelete = ForeignKey.SET_NULL,
-            onUpdate = ForeignKey.SET_NULL
-        )
+            onUpdate = ForeignKey.SET_NULL,
+        ),
     ],
     indices = [
-        Index("tabId")
-    ]
+        Index("tabId"),
+    ],
 )
 data class TabEntity(
     @PrimaryKey var tabId: String,
@@ -45,7 +45,7 @@ data class TabEntity(
     var position: Int,
     var tabPreviewFile: String? = null,
     var sourceTabId: String? = null,
-    var deletable: Boolean = false
+    var deletable: Boolean = false,
 )
 
 val TabEntity.isBlank: Boolean

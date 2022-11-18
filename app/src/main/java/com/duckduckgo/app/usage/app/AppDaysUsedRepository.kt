@@ -18,11 +18,11 @@ package com.duckduckgo.app.usage.app
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executors
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.withContext
 
 private val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.US)
 
@@ -57,5 +57,5 @@ class AppDaysUsedDatabaseRepository(private val appDaysUsedDao: AppDaysUsedDao) 
 
 @Entity(tableName = "app_days_used")
 data class AppDaysUsedEntity(
-    @PrimaryKey val date: String = formatter.format((Date()))
+    @PrimaryKey val date: String = formatter.format((Date())),
 )

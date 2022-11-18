@@ -35,6 +35,8 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.downloads.api.DownloadsRepository
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus
+import java.io.File
+import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -43,8 +45,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import org.threeten.bp.LocalDateTime
-import java.io.File
-import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class DownloadsViewModel @Inject constructor(
@@ -56,7 +56,7 @@ class DownloadsViewModel @Inject constructor(
     data class ViewState(
         val enableSearch: Boolean = false,
         val downloadItems: List<DownloadViewItem> = emptyList(),
-        val filteredItems: List<DownloadViewItem> = emptyList()
+        val filteredItems: List<DownloadViewItem> = emptyList(),
     )
 
     sealed class Command {
@@ -75,7 +75,7 @@ class DownloadsViewModel @Inject constructor(
             downloadsRepository.getDownloadsAsFlow().collect {
                 val itemsList = it.mapToDownloadViewItems()
                 viewState.emit(
-                    currentViewState().copy(downloadItems = itemsList, filteredItems = itemsList)
+                    currentViewState().copy(downloadItems = itemsList, filteredItems = itemsList),
                 )
             }
         }
@@ -130,7 +130,6 @@ class DownloadsViewModel @Inject constructor(
     fun onQueryTextChange(newText: String) {
         val filtered = LinkedHashMap<Header, List<Item>>()
         viewModelScope.launch(dispatcher.io()) {
-
             currentViewState().downloadItems.forEach { item ->
                 if (item is Header) {
                     filtered[item] = mutableListOf()
@@ -157,8 +156,8 @@ class DownloadsViewModel @Inject constructor(
 
             viewState.emit(
                 currentViewState().copy(
-                    filteredItems = list
-                )
+                    filteredItems = list,
+                ),
             )
         }
     }
@@ -192,7 +191,7 @@ class DownloadsViewModel @Inject constructor(
 
         val itemViews = mutableListOf<DownloadViewItem>()
         var previousDate = timeDiffFormatter.formatTimePassedInDaysWeeksMonthsYears(
-            startLocalDateTime = LocalDateTime.parse(this[0].createdAt)
+            startLocalDateTime = LocalDateTime.parse(this[0].createdAt),
         )
 
         this.forEachIndexed { index, downloadItem ->
@@ -201,7 +200,7 @@ class DownloadsViewModel @Inject constructor(
                 itemViews.add(downloadItem.mapToDownloadViewItem())
             } else {
                 val thisDate = timeDiffFormatter.formatTimePassedInDaysWeeksMonthsYears(
-                    startLocalDateTime = LocalDateTime.parse(downloadItem.createdAt)
+                    startLocalDateTime = LocalDateTime.parse(downloadItem.createdAt),
                 )
                 if (previousDate == thisDate) {
                     itemViews.add(downloadItem.mapToDownloadViewItem())

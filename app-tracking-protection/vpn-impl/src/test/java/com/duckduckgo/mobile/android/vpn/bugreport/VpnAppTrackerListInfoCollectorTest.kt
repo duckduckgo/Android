@@ -59,7 +59,6 @@ class VpnAppTrackerListInfoCollectorTest {
         val jsonObject = collector.collectVpnRelatedState(PACKAGE_ID)
 
         assertEquals("", jsonObject.get("appTrackerListEtag"))
-
     }
 
     @Test
@@ -68,7 +67,6 @@ class VpnAppTrackerListInfoCollectorTest {
         val jsonObject = collector.collectVpnRelatedState(PACKAGE_ID)
 
         assertEquals("etag", jsonObject.get("appTrackerListEtag"))
-
     }
 
     @Test
@@ -76,7 +74,6 @@ class VpnAppTrackerListInfoCollectorTest {
         val jsonObject = collector.collectVpnRelatedState(PACKAGE_ID)
 
         assertEquals("", jsonObject.get("appExclusionListEtag"))
-
     }
 
     @Test
@@ -85,7 +82,6 @@ class VpnAppTrackerListInfoCollectorTest {
         val jsonObject = collector.collectVpnRelatedState(PACKAGE_ID)
 
         assertEquals("etag", jsonObject.get("appExclusionListEtag"))
-
     }
 
     @Test
@@ -93,7 +89,6 @@ class VpnAppTrackerListInfoCollectorTest {
         val jsonObject = collector.collectVpnRelatedState(PACKAGE_ID)
 
         assertEquals("", jsonObject.get("appExceptionRuleListEtag"))
-
     }
 
     @Test
@@ -102,7 +97,6 @@ class VpnAppTrackerListInfoCollectorTest {
         val jsonObject = collector.collectVpnRelatedState(PACKAGE_ID)
 
         assertEquals("etag", jsonObject.get("appExceptionRuleListEtag"))
-
     }
 
     @Test

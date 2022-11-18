@@ -40,14 +40,14 @@ class DialogsFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         return inflater.inflate(R.layout.fragment_components_dialogs, container, false)
     }
 
     override fun onViewCreated(
         view: View,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -59,14 +59,17 @@ class DialogsFragment : Fragment() {
                     .setMessage(R.string.text_dialog_message)
                     .setPositiveButton(R.string.text_dialog_positive)
                     .setNegativeButton(R.string.text_dialog_negative)
-                    .addEventListener(object : TextAlertDialogBuilder.EventListener() {
-                        override fun onPositiveButtonClicked() {
-                            Snackbar.make(it, "Negative Button Clicked", Snackbar.LENGTH_SHORT).show()
-                        }
-                        override fun onNegativeButtonClicked() {
-                            Snackbar.make(it, "Negative Button Clicked", Snackbar.LENGTH_SHORT).show()
-                        }
-                    })
+                    .addEventListener(
+                        object : TextAlertDialogBuilder.EventListener() {
+                            override fun onPositiveButtonClicked() {
+                                Snackbar.make(it, "Negative Button Clicked", Snackbar.LENGTH_SHORT).show()
+                            }
+
+                            override fun onNegativeButtonClicked() {
+                                Snackbar.make(it, "Negative Button Clicked", Snackbar.LENGTH_SHORT).show()
+                            }
+                        },
+                    )
                     .show()
             }
         }
@@ -79,11 +82,13 @@ class DialogsFragment : Fragment() {
                     .setPositiveButton(R.string.text_dialog_positive)
                     .setNegativeButton(R.string.text_dialog_negative)
                     .setOptions(listOf(R.string.text_dialog_option, R.string.text_dialog_option, R.string.text_dialog_option))
-                    .addEventListener(object : RadioListAlertDialogBuilder.EventListener() {
-                        override fun onRadioItemSelected(selectedItem: Int) {
-                            Snackbar.make(it, "Radio Button $selectedItem selected", Snackbar.LENGTH_SHORT).show()
-                        }
-                    })
+                    .addEventListener(
+                        object : RadioListAlertDialogBuilder.EventListener() {
+                            override fun onRadioItemSelected(selectedItem: Int) {
+                                Snackbar.make(it, "Radio Button $selectedItem selected", Snackbar.LENGTH_SHORT).show()
+                            }
+                        },
+                    )
                     .show()
             }
         }
@@ -95,14 +100,17 @@ class DialogsFragment : Fragment() {
                     .setMessage(R.string.text_dialog_message)
                     .setPositiveButton(R.string.text_dialog_positive)
                     .setNegativeButton(R.string.text_dialog_negative)
-                    .addEventListener(object : TextAlertDialogBuilder.EventListener() {
-                        override fun onPositiveButtonClicked() {
-                            Snackbar.make(it, "Positive Button Clicked", Snackbar.LENGTH_SHORT).show()
-                        }
-                        override fun onNegativeButtonClicked() {
-                            Snackbar.make(it, "Negative Button Clicked", Snackbar.LENGTH_SHORT).show()
-                        }
-                    })
+                    .addEventListener(
+                        object : TextAlertDialogBuilder.EventListener() {
+                            override fun onPositiveButtonClicked() {
+                                Snackbar.make(it, "Positive Button Clicked", Snackbar.LENGTH_SHORT).show()
+                            }
+
+                            override fun onNegativeButtonClicked() {
+                                Snackbar.make(it, "Negative Button Clicked", Snackbar.LENGTH_SHORT).show()
+                            }
+                        },
+                    )
                     .show()
             }
         }
@@ -116,14 +124,16 @@ class DialogsFragment : Fragment() {
                         listOf(
                             R.string.text_dialog_positive,
                             R.string.text_dialog_positive,
-                            R.string.text_dialog_positive
-                        )
+                            R.string.text_dialog_positive,
+                        ),
                     )
-                    .addEventListener(object : StackedAlertDialogBuilder.EventListener() {
-                        override fun onButtonClicked(position: Int) {
-                            Snackbar.make(it, "Button $position Clicked", Snackbar.LENGTH_SHORT).show()
-                        }
-                    })
+                    .addEventListener(
+                        object : StackedAlertDialogBuilder.EventListener() {
+                            override fun onButtonClicked(position: Int) {
+                                Snackbar.make(it, "Button $position Clicked", Snackbar.LENGTH_SHORT).show()
+                            }
+                        },
+                    )
                     .show()
             }
 
@@ -137,14 +147,16 @@ class DialogsFragment : Fragment() {
                                 R.string.text_dialog_positive,
                                 R.string.text_dialog_positive,
                                 R.string.text_dialog_positive,
-                                R.string.text_dialog_positive
-                            )
+                                R.string.text_dialog_positive,
+                            ),
                         )
-                        .addEventListener(object : StackedAlertDialogBuilder.EventListener() {
-                            override fun onButtonClicked(position: Int) {
-                                Snackbar.make(it, "Button $position Clicked", Snackbar.LENGTH_SHORT).show()
-                            }
-                        })
+                        .addEventListener(
+                            object : StackedAlertDialogBuilder.EventListener() {
+                                override fun onButtonClicked(position: Int) {
+                                    Snackbar.make(it, "Button $position Clicked", Snackbar.LENGTH_SHORT).show()
+                                }
+                            },
+                        )
                         .show()
                 }
 
@@ -153,14 +165,17 @@ class DialogsFragment : Fragment() {
                         ActionBottomSheetDialog.Builder(requireContext())
                             .setPrimaryItem("Primary Item")
                             .setSecondaryItem("Secondary Item")
-                            .addEventListener(object : ActionBottomSheetDialog.EventListener() {
-                                override fun onPrimaryItemClicked() {
-                                    Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
-                                }
-                                override fun onSecondaryItemClicked() {
-                                    Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
-                                }
-                            })
+                            .addEventListener(
+                                object : ActionBottomSheetDialog.EventListener() {
+                                    override fun onPrimaryItemClicked() {
+                                        Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
+                                    }
+
+                                    override fun onSecondaryItemClicked() {
+                                        Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
+                                    }
+                                },
+                            )
                             .show()
                     }
                 }
@@ -171,14 +186,17 @@ class DialogsFragment : Fragment() {
                             .setTitle("Title")
                             .setPrimaryItem("Primary Item", R.drawable.ic_add_16)
                             .setSecondaryItem("Secondary Item", R.drawable.ic_add_16)
-                            .addEventListener(object : ActionBottomSheetDialog.EventListener() {
-                                override fun onPrimaryItemClicked() {
-                                    Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
-                                }
-                                override fun onSecondaryItemClicked() {
-                                    Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
-                                }
-                            })
+                            .addEventListener(
+                                object : ActionBottomSheetDialog.EventListener() {
+                                    override fun onPrimaryItemClicked() {
+                                        Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
+                                    }
+
+                                    override fun onSecondaryItemClicked() {
+                                        Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
+                                    }
+                                },
+                            )
                             .show()
                     }
                 }
@@ -189,16 +207,19 @@ class DialogsFragment : Fragment() {
                             .setContent("Add our search widget to your home screen for quick, easy access.")
                             .setPrimaryButton("Button")
                             .setSecondaryButton("Button")
-                            .addEventListener(object : PromoBottomSheetDialog.EventListener() {
-                                override fun onPrimaryButtonClicked() {
-                                    super.onPrimaryButtonClicked()
-                                    Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
-                                }
-                                override fun onSecondaryButtonClicked() {
-                                    super.onSecondaryButtonClicked()
-                                    Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
-                                }
-                            })
+                            .addEventListener(
+                                object : PromoBottomSheetDialog.EventListener() {
+                                    override fun onPrimaryButtonClicked() {
+                                        super.onPrimaryButtonClicked()
+                                        Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
+                                    }
+
+                                    override fun onSecondaryButtonClicked() {
+                                        super.onSecondaryButtonClicked()
+                                        Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
+                                    }
+                                },
+                            )
                             .show()
                     }
                 }
@@ -210,16 +231,19 @@ class DialogsFragment : Fragment() {
                             .setContent("Add our search widget to your home screen for quick, easy access.")
                             .setPrimaryButton("Button")
                             .setSecondaryButton("Button")
-                            .addEventListener(object : PromoBottomSheetDialog.EventListener() {
-                                override fun onPrimaryButtonClicked() {
-                                    super.onPrimaryButtonClicked()
-                                    Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
-                                }
-                                override fun onSecondaryButtonClicked() {
-                                    super.onSecondaryButtonClicked()
-                                    Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
-                                }
-                            })
+                            .addEventListener(
+                                object : PromoBottomSheetDialog.EventListener() {
+                                    override fun onPrimaryButtonClicked() {
+                                        super.onPrimaryButtonClicked()
+                                        Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
+                                    }
+
+                                    override fun onSecondaryButtonClicked() {
+                                        super.onSecondaryButtonClicked()
+                                        Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
+                                    }
+                                },
+                            )
                             .show()
                     }
                 }
@@ -232,16 +256,19 @@ class DialogsFragment : Fragment() {
                             .setContent("Add our search widget to your home screen for quick, easy access.")
                             .setPrimaryButton("Button")
                             .setSecondaryButton("Button")
-                            .addEventListener(object : PromoBottomSheetDialog.EventListener() {
-                                override fun onPrimaryButtonClicked() {
-                                    super.onPrimaryButtonClicked()
-                                    Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
-                                }
-                                override fun onSecondaryButtonClicked() {
-                                    super.onSecondaryButtonClicked()
-                                    Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
-                                }
-                            })
+                            .addEventListener(
+                                object : PromoBottomSheetDialog.EventListener() {
+                                    override fun onPrimaryButtonClicked() {
+                                        super.onPrimaryButtonClicked()
+                                        Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
+                                    }
+
+                                    override fun onSecondaryButtonClicked() {
+                                        super.onSecondaryButtonClicked()
+                                        Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
+                                    }
+                                },
+                            )
                             .show()
                     }
                 }
@@ -254,7 +281,7 @@ class DialogsFragment : Fragment() {
                                 primaryButtonText = "Primary CTA",
                                 secondaryButtonText = "Secondary CTA",
                                 hideButtonText = "Hide",
-                                toolbarDimmed = true
+                                toolbarDimmed = true,
                             ).show(fragmentManager, "dialog")
                         }
                     }
@@ -283,7 +310,7 @@ class DialogsFragment : Fragment() {
                                 secondaryButtonText = "Secondary CTA",
                                 hideButtonText = "Hide",
                                 toolbarDimmed = true,
-                                dismissible = true
+                                dismissible = true,
                             ).show(fragmentManager, "dialog")
                         }
                     }
@@ -313,7 +340,7 @@ class DialogsFragment : Fragment() {
                                 secondaryButtonText = "Secondary CTA",
                                 hideButtonText = "Hide",
                                 toolbarDimmed = true,
-                                typingDelayInMs = 200L
+                                typingDelayInMs = 200L,
                             ).show(fragmentManager, "dialog")
                         }
                     }

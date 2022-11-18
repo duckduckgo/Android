@@ -26,14 +26,14 @@ class ComponentAdapter : ListAdapter<Component, ComponentViewHolder>(DIFF_CALLBA
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
-        viewType: Int
+        viewType: Int,
     ): ComponentViewHolder {
         return ComponentViewHolder.create(parent, viewType)
     }
 
     override fun onBindViewHolder(
         holder: ComponentViewHolder,
-        position: Int
+        position: Int,
     ) {
         holder.bind(getItem(position))
     }
@@ -43,14 +43,14 @@ class ComponentAdapter : ListAdapter<Component, ComponentViewHolder>(DIFF_CALLBA
             object : DiffUtil.ItemCallback<Component>() {
                 override fun areItemsTheSame(
                     oldItem: Component,
-                    newItem: Component
+                    newItem: Component,
                 ): Boolean {
                     return oldItem == newItem
                 }
 
                 override fun areContentsTheSame(
                     oldItem: Component,
-                    newItem: Component
+                    newItem: Component,
                 ): Boolean {
                     return oldItem == newItem
                 }

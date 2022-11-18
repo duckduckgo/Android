@@ -24,7 +24,7 @@ import androidx.room.TypeConverter
 data class UserEventEntity(
     @PrimaryKey val id: UserEventKey,
     val timestamp: Long = System.currentTimeMillis(),
-    val payload: String = ""
+    val payload: String = "",
 )
 
 enum class UserEventKey {
@@ -32,7 +32,7 @@ enum class UserEventKey {
     FIRE_BUTTON_EXECUTED,
     FIREPROOF_LOGIN_DIALOG_DISMISSED,
     FIREPROOF_DISABLE_DIALOG_DISMISSED,
-    USER_ENABLED_FIREPROOF_LOGIN
+    USER_ENABLED_FIREPROOF_LOGIN,
 }
 
 class UserEventTypeConverter {

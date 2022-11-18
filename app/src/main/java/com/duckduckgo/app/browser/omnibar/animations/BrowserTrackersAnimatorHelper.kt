@@ -42,7 +42,7 @@ interface BrowserTrackersAnimatorHelper {
         shieldAnimationView: LottieAnimationView,
         trackersAnimationView: LottieAnimationView,
         omnibarViews: List<View>,
-        entities: List<Entity>?
+        entities: List<Entity>?,
     )
 
     /**
@@ -58,7 +58,7 @@ interface BrowserTrackersAnimatorHelper {
         omnibarViews: List<View>,
         cookieBackground: View,
         cookieAnimationView: LottieAnimationView,
-        cookieScene: ViewGroup
+        cookieScene: ViewGroup,
     )
 
     /**
@@ -67,7 +67,7 @@ interface BrowserTrackersAnimatorHelper {
      * @param omnibarViews are the views that should become visible after canceling the running animation.
      */
     fun cancelAnimations(
-        omnibarViews: List<View>
+        omnibarViews: List<View>,
     )
 
     /**

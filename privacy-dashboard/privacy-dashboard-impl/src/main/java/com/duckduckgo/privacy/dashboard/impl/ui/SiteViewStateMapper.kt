@@ -33,14 +33,14 @@ interface SiteViewStateMapper {
 
 @ContributesBinding(AppScope::class)
 class AppSiteViewStateMapper @Inject constructor(
-    private val publicKeyInfoMapper: PublicKeyInfoMapper
+    private val publicKeyInfoMapper: PublicKeyInfoMapper,
 ) : SiteViewStateMapper {
 
     override fun mapFromSite(site: Site): SiteViewState {
         val entityViewState = site.entity?.let {
             EntityViewState(
                 displayName = it.displayName,
-                prevalence = site.entity?.prevalence ?: 0.toDouble()
+                prevalence = site.entity?.prevalence ?: 0.toDouble(),
             )
         }
 
@@ -49,7 +49,7 @@ class AppSiteViewStateMapper @Inject constructor(
             domain = site.domain!!,
             upgradedHttps = site.upgradedHttps,
             parentEntity = entityViewState,
-            secCertificateViewModels = site.certificate?.let { listOf(it.map()) } ?: emptyList()
+            secCertificateViewModels = site.certificate?.let { listOf(it.map()) } ?: emptyList(),
         )
     }
 
@@ -74,9 +74,9 @@ class AppSiteViewStateMapper @Inject constructor(
                     isPermanent = publicKeyInfo.isPermanent,
                     type = publicKeyInfo.type,
                     externalRepresentation = publicKeyInfo.externalRepresentation,
-                    keyId = publicKeyInfo.keyId
+                    keyId = publicKeyInfo.keyId,
                 )
-            }
+            },
         )
     }
 }

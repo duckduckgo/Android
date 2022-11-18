@@ -22,7 +22,7 @@ class PrivacyDashboardJavascriptInterface constructor(
     val onBrokenSiteClicked: () -> Unit,
     val onPrivacyProtectionsClicked: (Boolean) -> Unit,
     val onUrlClicked: (String) -> Unit,
-    val onClose: () -> Unit
+    val onClose: () -> Unit,
 ) {
     @JavascriptInterface
     fun toggleAllowlist(newValue: String) {

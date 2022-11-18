@@ -27,7 +27,7 @@ class ComponentInteractiveElementsFragment : ComponentFragment() {
             Component.RADIO_BUTTON,
             Component.CHECKBOX,
             Component.SEARCH_BAR,
-            Component.OUTLINED_TEXT_INPUT
+            Component.OUTLINED_TEXT_INPUT,
         )
     }
 }

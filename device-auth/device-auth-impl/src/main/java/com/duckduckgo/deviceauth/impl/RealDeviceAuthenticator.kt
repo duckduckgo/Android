@@ -31,7 +31,7 @@ import javax.inject.Inject
 class RealDeviceAuthenticator @Inject constructor(
     private val deviceAuthChecker: SupportedDeviceAuthChecker,
     private val appBuildConfig: AppBuildConfig,
-    private val authLauncher: AuthLauncher
+    private val authLauncher: AuthLauncher,
 ) : DeviceAuthenticator {
 
     override fun hasValidDeviceAuthentication(): Boolean {
@@ -47,7 +47,7 @@ class RealDeviceAuthenticator @Inject constructor(
     override fun authenticate(
         featureToAuth: Features,
         fragment: Fragment,
-        onResult: (AuthResult) -> Unit
+        onResult: (AuthResult) -> Unit,
     ) {
         authLauncher.launch(getAuthText(featureToAuth), fragment, onResult)
     }
@@ -55,13 +55,13 @@ class RealDeviceAuthenticator @Inject constructor(
     override fun authenticate(
         featureToAuth: Features,
         fragmentActivity: FragmentActivity,
-        onResult: (AuthResult) -> Unit
+        onResult: (AuthResult) -> Unit,
     ) {
         authLauncher.launch(getAuthText(featureToAuth), fragmentActivity, onResult)
     }
 
     private fun getAuthText(
-        feature: Features
+        feature: Features,
     ): Int = when (feature) {
         Features.AUTOFILL -> R.string.autofill_auth_text
     }

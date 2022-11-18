@@ -20,7 +20,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
-import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
@@ -31,14 +30,15 @@ import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
-import org.mockito.kotlin.mock
 import dagger.Lazy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.mock
 
 @ExperimentalCoroutinesApi
 class GeoLocationPermissionsTest {
@@ -76,7 +76,7 @@ class GeoLocationPermissionsTest {
             InstrumentationRegistry.getInstrumentation().targetContext,
             LocationPermissionsRepository(locationPermissionsDao, lazyFaviconManager, coroutineRule.testDispatcherProvider),
             FireproofWebsiteRepository(fireproofWebsiteDao, coroutineRule.testDispatcherProvider, lazyFaviconManager),
-            coroutineRule.testDispatcherProvider
+            coroutineRule.testDispatcherProvider,
         )
     }
 
@@ -159,7 +159,7 @@ class GeoLocationPermissionsTest {
 
     private fun givenLocationPermissionsDomain(
         domain: String,
-        permissionType: LocationPermissionType = LocationPermissionType.ALLOW_ALWAYS
+        permissionType: LocationPermissionType = LocationPermissionType.ALLOW_ALWAYS,
     ) {
         locationPermissionsDao.insert(LocationPermissionEntity(domain = domain, permission = permissionType))
     }

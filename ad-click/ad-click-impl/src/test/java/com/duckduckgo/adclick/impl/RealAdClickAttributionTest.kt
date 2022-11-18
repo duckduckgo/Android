@@ -43,7 +43,7 @@ class RealAdClickAttributionTest {
         givenFeatureNotEnabled()
         testee = RealAdClickAttribution(
             mockAdClickAttributionRepository,
-            mockFeatureToggle
+            mockFeatureToggle,
         )
 
         val result = testee.isAllowed("https://example.com")
@@ -57,7 +57,7 @@ class RealAdClickAttributionTest {
         givenDetectionsEnabled(domainEnabled = false, heuristicEnabled = false)
         testee = RealAdClickAttribution(
             mockAdClickAttributionRepository,
-            mockFeatureToggle
+            mockFeatureToggle,
         )
 
         val result = testee.isAllowed("https://example.com")
@@ -71,7 +71,7 @@ class RealAdClickAttributionTest {
         givenDetectionsEnabled(domainEnabled = true, heuristicEnabled = true)
         testee = RealAdClickAttribution(
             mockAdClickAttributionRepository,
-            mockFeatureToggle
+            mockFeatureToggle,
         )
 
         val result = testee.isAllowed("/example")
@@ -87,13 +87,13 @@ class RealAdClickAttributionTest {
             listOf(
                 AdClickAttributionAllowlistEntity(
                     blocklistEntry = "host.com",
-                    host = "some.host.com"
-                )
-            )
+                    host = "some.host.com",
+                ),
+            ),
         )
         testee = RealAdClickAttribution(
             mockAdClickAttributionRepository,
-            mockFeatureToggle
+            mockFeatureToggle,
         )
 
         val result = testee.isAllowed("https://example.com")
@@ -109,13 +109,13 @@ class RealAdClickAttributionTest {
             listOf(
                 AdClickAttributionAllowlistEntity(
                     blocklistEntry = "example.com",
-                    host = "other.example.com"
-                )
-            )
+                    host = "other.example.com",
+                ),
+            ),
         )
         testee = RealAdClickAttribution(
             mockAdClickAttributionRepository,
-            mockFeatureToggle
+            mockFeatureToggle,
         )
 
         val result = testee.isAllowed("https://some.other.example.com")
@@ -128,7 +128,7 @@ class RealAdClickAttributionTest {
         givenFeatureNotEnabled()
         testee = RealAdClickAttribution(
             mockAdClickAttributionRepository,
-            mockFeatureToggle
+            mockFeatureToggle,
         )
 
         val result = testee.isAdClick("https://example.com")
@@ -142,7 +142,7 @@ class RealAdClickAttributionTest {
         givenDetectionsEnabled(domainEnabled = false, heuristicEnabled = false)
         testee = RealAdClickAttribution(
             mockAdClickAttributionRepository,
-            mockFeatureToggle
+            mockFeatureToggle,
         )
 
         val result = testee.isAdClick("https://example.com")
@@ -158,13 +158,13 @@ class RealAdClickAttributionTest {
             listOf(
                 AdClickAttributionLinkFormatEntity(
                     url = "https://example.com",
-                    adDomainParameterName = ""
-                )
-            )
+                    adDomainParameterName = "",
+                ),
+            ),
         )
         testee = RealAdClickAttribution(
             mockAdClickAttributionRepository,
-            mockFeatureToggle
+            mockFeatureToggle,
         )
 
         val result = testee.isAdClick("https://other-example.com")
@@ -180,13 +180,13 @@ class RealAdClickAttributionTest {
             listOf(
                 AdClickAttributionLinkFormatEntity(
                     url = "https://example.com",
-                    adDomainParameterName = ""
-                )
-            )
+                    adDomainParameterName = "",
+                ),
+            ),
         )
         testee = RealAdClickAttribution(
             mockAdClickAttributionRepository,
-            mockFeatureToggle
+            mockFeatureToggle,
         )
 
         val result = testee.isAdClick("https://example.com")
@@ -202,13 +202,13 @@ class RealAdClickAttributionTest {
             listOf(
                 AdClickAttributionLinkFormatEntity(
                     url = "https://example.com",
-                    adDomainParameterName = "ad_domain"
-                )
-            )
+                    adDomainParameterName = "ad_domain",
+                ),
+            ),
         )
         testee = RealAdClickAttribution(
             mockAdClickAttributionRepository,
-            mockFeatureToggle
+            mockFeatureToggle,
         )
 
         val result = testee.isAdClick("https://example.com?ad_domain=nike.com")
@@ -225,13 +225,13 @@ class RealAdClickAttributionTest {
             listOf(
                 AdClickAttributionLinkFormatEntity(
                     url = "https://example.com",
-                    adDomainParameterName = ""
-                )
-            )
+                    adDomainParameterName = "",
+                ),
+            ),
         )
         testee = RealAdClickAttribution(
             mockAdClickAttributionRepository,
-            mockFeatureToggle
+            mockFeatureToggle,
         )
 
         val result = testee.isAdClick("https://example.com")
@@ -247,13 +247,13 @@ class RealAdClickAttributionTest {
             listOf(
                 AdClickAttributionLinkFormatEntity(
                     url = "https://example.com",
-                    adDomainParameterName = ""
-                )
-            )
+                    adDomainParameterName = "",
+                ),
+            ),
         )
         testee = RealAdClickAttribution(
             mockAdClickAttributionRepository,
-            mockFeatureToggle
+            mockFeatureToggle,
         )
 
         val result = testee.isAdClick("https://example.com")
@@ -275,9 +275,9 @@ class RealAdClickAttributionTest {
                 AdClickAttributionDetectionEntity(
                     id = 1,
                     heuristicDetection = if (heuristicEnabled) "enabled" else "disabled",
-                    domainDetection = if (domainEnabled) "enabled" else "disabled"
-                )
-            )
+                    domainDetection = if (domainEnabled) "enabled" else "disabled",
+                ),
+            ),
         )
     }
 }

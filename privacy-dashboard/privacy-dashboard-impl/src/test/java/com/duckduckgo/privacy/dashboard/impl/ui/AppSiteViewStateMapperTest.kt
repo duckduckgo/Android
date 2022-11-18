@@ -95,7 +95,7 @@ class AppSiteViewStateMapperTest {
         url: String = "http://www.test.com",
         uri: Uri? = Uri.parse(url),
         entity: Entity? = null,
-        certificate: TestCertificateInfo? = null
+        certificate: TestCertificateInfo? = null,
     ): Site {
         val site: Site = mock()
         whenever(site.url).thenReturn(url)
@@ -121,12 +121,12 @@ class AppSiteViewStateMapperTest {
     }
 
     data class TestCertificateInfo(
-        val cName: String
+        val cName: String,
     )
 
     data class TestEntity(
         override val name: String,
         override val displayName: String,
-        override val prevalence: Double
+        override val prevalence: Double,
     ) : Entity
 }

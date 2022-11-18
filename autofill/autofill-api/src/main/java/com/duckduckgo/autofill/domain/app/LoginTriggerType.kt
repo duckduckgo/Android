@@ -18,5 +18,5 @@ package com.duckduckgo.autofill.domain.app
 
 enum class LoginTriggerType {
     USER_INITIATED,
-    AUTOPROMPT
+    AUTOPROMPT,
 }

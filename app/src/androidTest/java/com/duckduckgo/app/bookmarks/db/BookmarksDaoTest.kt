@@ -70,7 +70,7 @@ class BookmarksDaoTest {
     fun whenBookmarksDeletedThenTheyAreNoLongerInTheList() = runTest {
         val bookmarks = listOf(
             BookmarkEntity(id = 1, title = "title", url = "www.example.com", parentId = 0),
-            BookmarkEntity(id = 2, title = "another title", url = "www.foo.example.com", parentId = 0)
+            BookmarkEntity(id = 2, title = "another title", url = "www.foo.example.com", parentId = 0),
         )
         dao.insertList(bookmarks)
         dao.deleteList(bookmarks)
@@ -90,7 +90,7 @@ class BookmarksDaoTest {
     fun whenBookmarksAddedThenTheyAreInTheList() = runTest {
         val bookmarks = listOf(
             BookmarkEntity(id = 1, title = "title", url = "www.example.com", parentId = 0),
-            BookmarkEntity(id = 2, title = "another title", url = "www.foo.example.com", parentId = 0)
+            BookmarkEntity(id = 2, title = "another title", url = "www.foo.example.com", parentId = 0),
         )
         dao.insertList(bookmarks)
         val list = dao.getBookmarks().first()
@@ -101,7 +101,7 @@ class BookmarksDaoTest {
     fun whenBookmarksAddedThenTheyAreInTheListByParentId() = runTest {
         val bookmarks = listOf(
             BookmarkEntity(id = 1, title = "title", url = "www.example.com", parentId = 1),
-            BookmarkEntity(id = 2, title = "another title", url = "www.foo.example.com", parentId = 1)
+            BookmarkEntity(id = 2, title = "another title", url = "www.foo.example.com", parentId = 1),
         )
         dao.insertList(bookmarks)
         val list = dao.getBookmarksByParentId(1).first()
@@ -177,7 +177,7 @@ class BookmarksDaoTest {
     fun whenAllBookmarksDeletedThenDeleteAllBookmarks() = runTest {
         val bookmarks = listOf(
             BookmarkEntity(id = 1, title = "title", url = "www.example.com", parentId = 1),
-            BookmarkEntity(id = 2, title = "another title", url = "www.foo.example.com", parentId = 1)
+            BookmarkEntity(id = 2, title = "another title", url = "www.foo.example.com", parentId = 1),
         )
         dao.insertList(bookmarks)
         dao.deleteAll()

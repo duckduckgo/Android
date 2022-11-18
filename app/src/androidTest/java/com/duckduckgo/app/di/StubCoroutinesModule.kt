@@ -29,7 +29,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 @Module
 @ContributesTo(
     scope = AppScope::class,
-    replaces = [CoroutinesModule::class]
+    replaces = [CoroutinesModule::class],
 )
 class StubCoroutinesModule {
 

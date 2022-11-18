@@ -32,7 +32,7 @@ interface AppEnjoymentUserEventRecorder {
 
 class AppEnjoymentUserEventDatabaseRecorder(
     private val appEnjoymentRepository: AppEnjoymentRepository,
-    private val appEnjoymentPromptEmitter: AppEnjoymentPromptEmitter
+    private val appEnjoymentPromptEmitter: AppEnjoymentPromptEmitter,
 ) : AppEnjoymentUserEventRecorder {
 
     override fun onUserEnjoyingApp(promptCount: PromptCount) {

@@ -34,14 +34,14 @@ import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecycl
 import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter.ContextMenuAction.Delete
 import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter.ContextMenuAction.Edit
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel
-import com.duckduckgo.autofill.ui.credential.management.sorting.CredentialGrouper
 import com.duckduckgo.autofill.ui.credential.management.LoginCredentialTitleExtractor
+import com.duckduckgo.autofill.ui.credential.management.sorting.CredentialGrouper
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import javax.inject.Inject
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill_management_list_mode) {
@@ -130,7 +130,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
                     is Edit -> viewModel.onEditCredentials(it.credentials, false)
                     is Delete -> viewModel.onDeleteCredentials(it.credentials)
                 }
-            }
+            },
         )
 
         binding.logins.adapter = adapter

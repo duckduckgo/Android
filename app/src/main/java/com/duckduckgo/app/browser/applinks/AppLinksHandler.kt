@@ -29,7 +29,7 @@ interface AppLinksHandler {
         urlString: String,
         appLinksEnabled: Boolean,
         shouldHaltWebNavigation: Boolean,
-        launchAppLink: () -> Unit
+        launchAppLink: () -> Unit,
     ): Boolean
 
     fun updatePreviousUrl(urlString: String?)
@@ -50,9 +50,8 @@ class DuckDuckGoAppLinksHandler @Inject constructor(
         urlString: String,
         appLinksEnabled: Boolean,
         shouldHaltWebNavigation: Boolean,
-        launchAppLink: () -> Unit
+        launchAppLink: () -> Unit,
     ): Boolean {
-
         if (!appLinksEnabled || appBuildConfig.sdkInt < Build.VERSION_CODES.N || !isForMainFrame) {
             return false
         }

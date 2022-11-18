@@ -20,9 +20,9 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "notification"
+    tableName = "notification",
 )
 data class Notification(
     @PrimaryKey
-    val notificationId: String
+    val notificationId: String,
 )

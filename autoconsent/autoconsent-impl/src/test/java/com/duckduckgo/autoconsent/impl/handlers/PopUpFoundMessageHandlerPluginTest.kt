@@ -75,5 +75,4 @@ class PopUpFoundMessageHandlerPluginTest {
             {"type":"${popupFoundHandler.supportedTypes.first()}", "cmp": "$cmp", "url": "http://example.com"}
         """.trimIndent()
     }
-
 }

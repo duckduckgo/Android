@@ -28,7 +28,7 @@ interface AppCacheClearer {
 
 class AndroidAppCacheClearer(
     private val context: Context,
-    private val fileDeleter: FileDeleter
+    private val fileDeleter: FileDeleter,
 ) : AppCacheClearer {
 
     override suspend fun clearCache() {
@@ -56,7 +56,7 @@ class AndroidAppCacheClearer(
             WEBVIEW_CACHE_DIR,
             WEBVIEW_CACHE_DIR_LEGACY,
             NETWORK_CACHE_DIR,
-            FAVICON_PERSISTED_DIR
+            FAVICON_PERSISTED_DIR,
         )
     }
 }

@@ -21,13 +21,13 @@ import androidx.lifecycle.LifecycleObserver
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.fire.AndroidAppCacheClearer
 import com.duckduckgo.app.fire.AppCacheClearer
 import com.duckduckgo.app.fire.BackgroundTimeKeeper
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
 import com.duckduckgo.app.fire.DataClearerTimeKeeper
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
-import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryAPI
 import com.duckduckgo.app.global.DispatcherProvider
@@ -61,7 +61,7 @@ object PrivacyModule {
     @SingleInstanceIn(AppScope::class)
     fun entityLookup(
         entityDao: TdsEntityDao,
-        domainEntityDao: TdsDomainEntityDao
+        domainEntityDao: TdsDomainEntityDao,
     ): EntityLookup =
         TdsEntityLookup(entityDao, domainEntityDao)
 
@@ -79,7 +79,7 @@ object PrivacyModule {
         adClickManager: AdClickManager,
         fireproofWebsiteRepository: FireproofWebsiteRepositoryAPI,
         sitePermissionsManager: SitePermissionsManager,
-        dispatcherProvider: DispatcherProvider
+        dispatcherProvider: DispatcherProvider,
     ): ClearDataAction {
         return ClearPersonalDataAction(
             context,
@@ -94,7 +94,7 @@ object PrivacyModule {
             adClickManager,
             fireproofWebsiteRepository,
             sitePermissionsManager,
-            dispatcherProvider
+            dispatcherProvider,
         )
     }
 
@@ -107,14 +107,14 @@ object PrivacyModule {
     @SingleInstanceIn(AppScope::class)
     @IntoSet
     fun dataClearerForegroundAppRestartPixelObserver(
-        dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel
+        dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel,
     ): LifecycleObserver = dataClearerForegroundAppRestartPixel
 
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun appCacheCleaner(
         context: Context,
-        fileDeleter: FileDeleter
+        fileDeleter: FileDeleter,
     ): AppCacheClearer {
         return AndroidAppCacheClearer(context, fileDeleter)
     }
@@ -125,7 +125,7 @@ object PrivacyModule {
         context: Context,
         locationPermissionsRepository: LocationPermissionsRepository,
         fireproofWebsiteRepository: FireproofWebsiteRepository,
-        dispatcherProvider: DispatcherProvider
+        dispatcherProvider: DispatcherProvider,
     ): GeoLocationPermissions {
         return GeoLocationPermissionsManager(context, locationPermissionsRepository, fireproofWebsiteRepository, dispatcherProvider)
     }
@@ -134,7 +134,7 @@ object PrivacyModule {
     fun providesLocationPermissionsRepository(
         locationPermissionsDao: LocationPermissionsDao,
         faviconManager: Lazy<FaviconManager>,
-        dispatchers: DispatcherProvider
+        dispatchers: DispatcherProvider,
     ): LocationPermissionsRepositoryAPI {
         return LocationPermissionsRepository(locationPermissionsDao, faviconManager, dispatchers)
     }

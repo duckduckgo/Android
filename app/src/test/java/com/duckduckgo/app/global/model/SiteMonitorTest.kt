@@ -17,20 +17,20 @@
 package com.duckduckgo.app.global.model
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
+import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
+import com.duckduckgo.app.global.model.PrivacyShield.UNPROTECTED
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.TestingEntity
 import com.duckduckgo.app.surrogates.SurrogateResponse
-import com.duckduckgo.app.trackerdetection.model.TrackerType
-import com.duckduckgo.app.trackerdetection.model.TrackerStatus
-import com.duckduckgo.app.trackerdetection.model.TrackingEvent
-import org.junit.Assert
-import com.duckduckgo.privacy.config.api.ContentBlocking
-import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
-import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
-import com.duckduckgo.app.global.model.PrivacyShield.UNPROTECTED
 import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.app.trackerdetection.model.TrackerStatus
+import com.duckduckgo.app.trackerdetection.model.TrackerType
+import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.privacy.config.api.ContentBlocking
 import kotlinx.coroutines.test.TestScope
+import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -72,7 +72,7 @@ class SiteMonitorTest {
             title = null,
             userWhitelistDao = mockWhitelistDao,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope()
+            appCoroutineScope = TestScope(),
         )
         assertEquals(HttpsStatus.SECURE, testee.https)
     }
@@ -84,7 +84,7 @@ class SiteMonitorTest {
             title = null,
             userWhitelistDao = mockWhitelistDao,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope()
+            appCoroutineScope = TestScope(),
         )
         assertEquals(HttpsStatus.NONE, testee.https)
     }
@@ -96,7 +96,7 @@ class SiteMonitorTest {
             title = null,
             userWhitelistDao = mockWhitelistDao,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope()
+            appCoroutineScope = TestScope(),
         )
         testee.hasHttpResources = true
         assertEquals(HttpsStatus.MIXED, testee.https)
@@ -109,7 +109,7 @@ class SiteMonitorTest {
             title = null,
             userWhitelistDao = mockWhitelistDao,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope()
+            appCoroutineScope = TestScope(),
         )
         assertEquals(HttpsStatus.NONE, testee.https)
     }
@@ -121,7 +121,7 @@ class SiteMonitorTest {
             title = null,
             userWhitelistDao = mockWhitelistDao,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope()
+            appCoroutineScope = TestScope(),
         )
         assertEquals(document, testee.url)
     }
@@ -133,7 +133,7 @@ class SiteMonitorTest {
             title = null,
             userWhitelistDao = mockWhitelistDao,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope()
+            appCoroutineScope = TestScope(),
         )
         assertEquals(0, testee.trackerCount)
     }
@@ -145,7 +145,7 @@ class SiteMonitorTest {
             title = null,
             userWhitelistDao = mockWhitelistDao,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope()
+            appCoroutineScope = TestScope(),
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -155,8 +155,8 @@ class SiteMonitorTest {
                 entity = null,
                 surrogateId = null,
                 status = TrackerStatus.BLOCKED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -166,8 +166,8 @@ class SiteMonitorTest {
                 entity = null,
                 surrogateId = null,
                 status = TrackerStatus.USER_ALLOWED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -177,8 +177,8 @@ class SiteMonitorTest {
                 entity = null,
                 surrogateId = null,
                 status = TrackerStatus.ALLOWED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         assertEquals(1, testee.trackerCount)
     }
@@ -190,7 +190,7 @@ class SiteMonitorTest {
             title = null,
             userWhitelistDao = mockWhitelistDao,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope()
+            appCoroutineScope = TestScope(),
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -200,8 +200,8 @@ class SiteMonitorTest {
                 entity = null,
                 surrogateId = null,
                 status = TrackerStatus.BLOCKED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -211,8 +211,8 @@ class SiteMonitorTest {
                 entity = null,
                 surrogateId = null,
                 status = TrackerStatus.BLOCKED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -222,8 +222,8 @@ class SiteMonitorTest {
                 entity = null,
                 surrogateId = null,
                 status = TrackerStatus.ALLOWED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         Assert.assertTrue(testee.allTrackersBlocked)
     }
@@ -235,7 +235,7 @@ class SiteMonitorTest {
             title = null,
             userWhitelistDao = mockWhitelistDao,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope()
+            appCoroutineScope = TestScope(),
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -245,8 +245,8 @@ class SiteMonitorTest {
                 entity = null,
                 surrogateId = null,
                 status = TrackerStatus.BLOCKED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -256,8 +256,8 @@ class SiteMonitorTest {
                 entity = null,
                 surrogateId = null,
                 status = TrackerStatus.USER_ALLOWED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -267,8 +267,8 @@ class SiteMonitorTest {
                 entity = null,
                 surrogateId = null,
                 status = TrackerStatus.ALLOWED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         assertFalse(testee.allTrackersBlocked)
     }
@@ -280,7 +280,7 @@ class SiteMonitorTest {
             title = null,
             userWhitelistDao = mockWhitelistDao,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope()
+            appCoroutineScope = TestScope(),
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -290,8 +290,8 @@ class SiteMonitorTest {
                 entity = network,
                 surrogateId = null,
                 status = TrackerStatus.BLOCKED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         assertEquals(0, testee.majorNetworkCount)
     }
@@ -303,7 +303,7 @@ class SiteMonitorTest {
             title = null,
             userWhitelistDao = mockWhitelistDao,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope()
+            appCoroutineScope = TestScope(),
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -313,8 +313,8 @@ class SiteMonitorTest {
                 entity = majorNetwork,
                 surrogateId = null,
                 status = TrackerStatus.BLOCKED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         assertEquals(1, testee.majorNetworkCount)
     }
@@ -326,7 +326,7 @@ class SiteMonitorTest {
             title = null,
             userWhitelistDao = mockWhitelistDao,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope()
+            appCoroutineScope = TestScope(),
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -336,8 +336,8 @@ class SiteMonitorTest {
                 entity = majorNetwork,
                 surrogateId = null,
                 status = TrackerStatus.BLOCKED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -347,8 +347,8 @@ class SiteMonitorTest {
                 entity = majorNetwork,
                 surrogateId = null,
                 status = TrackerStatus.BLOCKED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         assertEquals(1, testee.majorNetworkCount)
     }
@@ -360,7 +360,7 @@ class SiteMonitorTest {
             title = null,
             userWhitelistDao = mockWhitelistDao,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope()
+            appCoroutineScope = TestScope(),
         )
         assertFalse(testee.upgradedHttps)
     }
@@ -372,7 +372,7 @@ class SiteMonitorTest {
             title = null,
             userWhitelistDao = mockWhitelistDao,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope()
+            appCoroutineScope = TestScope(),
         )
         assertEquals(0, testee.surrogates.size)
     }
@@ -384,7 +384,7 @@ class SiteMonitorTest {
             title = null,
             userWhitelistDao = mockWhitelistDao,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope()
+            appCoroutineScope = TestScope(),
         )
         testee.surrogateDetected(SurrogateResponse())
         assertEquals(1, testee.surrogates.size)
@@ -397,7 +397,7 @@ class SiteMonitorTest {
             title = null,
             userWhitelistDao = mockWhitelistDao,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope()
+            appCoroutineScope = TestScope(),
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -407,8 +407,8 @@ class SiteMonitorTest {
                 entity = null,
                 surrogateId = null,
                 status = TrackerStatus.ALLOWED,
-                type = TrackerType.AD
-            )
+                type = TrackerType.AD,
+            ),
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -418,8 +418,8 @@ class SiteMonitorTest {
                 entity = null,
                 surrogateId = null,
                 status = TrackerStatus.ALLOWED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -429,8 +429,8 @@ class SiteMonitorTest {
                 entity = null,
                 surrogateId = null,
                 status = TrackerStatus.BLOCKED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         assertEquals(2, testee.otherDomainsLoadedCount)
     }
@@ -442,7 +442,7 @@ class SiteMonitorTest {
             title = null,
             userWhitelistDao = mockWhitelistDao,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope()
+            appCoroutineScope = TestScope(),
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -452,8 +452,8 @@ class SiteMonitorTest {
                 entity = null,
                 surrogateId = null,
                 status = TrackerStatus.AD_ALLOWED,
-                type = TrackerType.AD
-            )
+                type = TrackerType.AD,
+            ),
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -463,8 +463,8 @@ class SiteMonitorTest {
                 entity = null,
                 surrogateId = null,
                 status = TrackerStatus.SITE_BREAKAGE_ALLOWED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -474,8 +474,8 @@ class SiteMonitorTest {
                 entity = null,
                 surrogateId = null,
                 status = TrackerStatus.SAME_ENTITY_ALLOWED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -485,8 +485,8 @@ class SiteMonitorTest {
                 entity = null,
                 surrogateId = null,
                 status = TrackerStatus.USER_ALLOWED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -496,8 +496,8 @@ class SiteMonitorTest {
                 entity = null,
                 surrogateId = null,
                 status = TrackerStatus.BLOCKED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -507,8 +507,8 @@ class SiteMonitorTest {
                 entity = null,
                 surrogateId = null,
                 status = TrackerStatus.ALLOWED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         assertEquals(4, testee.specialDomainsLoadedCount)
     }
@@ -556,23 +556,23 @@ class SiteMonitorTest {
     fun givenASiteMonitor(
         url: String = document,
         title: String? = null,
-        upgradedHttps: Boolean = false
+        upgradedHttps: Boolean = false,
     ) = SiteMonitor(
         url = url,
         title = title,
         upgradedHttps = upgradedHttps,
         userWhitelistDao = mockWhitelistDao,
         contentBlocking = mockContentBlocking,
-        appCoroutineScope = TestScope()
+        appCoroutineScope = TestScope(),
     )
 
     fun givenSitePrivacyData(
         url: String = document,
         entity: Entity? = null,
-        prevalence: Double? = null
+        prevalence: Double? = null,
     ) = SitePrivacyData(
         url = url,
         entity = entity,
-        prevalence = null
+        prevalence = null,
     )
 }

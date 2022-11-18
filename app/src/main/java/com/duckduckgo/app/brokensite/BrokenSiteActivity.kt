@@ -38,6 +38,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
 
     private val binding: ActivityBrokenSiteBinding by viewBinding()
     private val viewModel: BrokenSiteViewModel by bindViewModel()
+
     @Inject lateinit var webViewVersionProvider: WebViewVersionProvider
 
     private val toolbar
@@ -145,7 +146,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
 
         fun intent(
             context: Context,
-            data: BrokenSiteData
+            data: BrokenSiteData,
         ): Intent {
             val intent = Intent(context, BrokenSiteActivity::class.java)
             intent.putExtra(URL_EXTRA, data.url)

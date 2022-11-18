@@ -36,7 +36,6 @@ import com.duckduckgo.app.global.exception.UncaughtExceptionSource
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.privacy.config.api.Drm
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
-import org.mockito.kotlin.*
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
@@ -46,6 +45,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.ArgumentMatchers.anyString
+import org.mockito.kotlin.*
 
 @ExperimentalCoroutinesApi
 class BrowserChromeClientTest {
@@ -78,7 +78,7 @@ class BrowserChromeClientTest {
             mockAppBuildConfig,
             TestScope(),
             coroutineTestRule.testDispatcherProvider,
-            mockSitePermissionsManager
+            mockSitePermissionsManager,
         )
         mockWebViewClientListener = mock()
         mockFilePathCallback = mock()

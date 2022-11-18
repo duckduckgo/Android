@@ -29,10 +29,10 @@ import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.EMAIL_MAX_LEN
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.PHONE_MAX_LENGTH
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.SMS_MAX_LENGTH
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.AmpLinkType
+import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.TrackingParameters
-import org.mockito.kotlin.*
+import java.net.URISyntaxException
 import junit.framework.TestCase.assertNull
 import junit.framework.TestCase.assertTrue
 import org.junit.Assert.assertEquals
@@ -43,7 +43,7 @@ import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import java.net.URISyntaxException
+import org.mockito.kotlin.*
 
 @RunWith(AndroidJUnit4::class)
 class SpecialUrlDetectorImplTest {
@@ -69,7 +69,7 @@ class SpecialUrlDetectorImplTest {
             packageManager = mockPackageManager,
             ampLinks = mockAmpLinks,
             trackingParameters = mockTrackingParameters,
-            appBuildConfig = appBuildConfig
+            appBuildConfig = appBuildConfig,
         )
         whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(emptyList())
     }
@@ -121,13 +121,13 @@ class SpecialUrlDetectorImplTest {
                 listOf(
                     buildAppResolveInfo(),
                     buildBrowserResolveInfo(),
-                    ResolveInfo()
-                )
+                    ResolveInfo(),
+                ),
             )
             val type = testee.determineType("https://example.com")
             verify(mockPackageManager).queryIntentActivities(
                 argThat { hasCategory(Intent.CATEGORY_BROWSABLE) },
-                eq(PackageManager.GET_RESOLVED_FILTER)
+                eq(PackageManager.GET_RESOLVED_FILTER),
             )
             assertTrue(type is AppLink)
             val appLinkType = type as AppLink
@@ -146,13 +146,13 @@ class SpecialUrlDetectorImplTest {
                     buildAppResolveInfo(),
                     buildAppResolveInfo(),
                     buildBrowserResolveInfo(),
-                    ResolveInfo()
-                )
+                    ResolveInfo(),
+                ),
             )
             val type = testee.determineType("https://example.com")
             verify(mockPackageManager).queryIntentActivities(
                 argThat { hasCategory(Intent.CATEGORY_BROWSABLE) },
-                eq(PackageManager.GET_RESOLVED_FILTER)
+                eq(PackageManager.GET_RESOLVED_FILTER),
             )
             assertTrue(type is AppLink)
             val appLinkType = type as AppLink

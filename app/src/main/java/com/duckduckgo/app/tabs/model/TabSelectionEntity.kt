@@ -28,14 +28,14 @@ import androidx.room.PrimaryKey
             entity = TabEntity::class,
             parentColumns = ["tabId"],
             childColumns = ["tabId"],
-            onDelete = ForeignKey.SET_NULL
-        )
+            onDelete = ForeignKey.SET_NULL,
+        ),
     ],
     indices = [
-        Index("tabId")
-    ]
+        Index("tabId"),
+    ],
 )
 data class TabSelectionEntity(
     @PrimaryKey var id: Int = 1,
-    var tabId: String?
+    var tabId: String?,
 )

@@ -44,9 +44,9 @@ import com.duckduckgo.privacy.dashboard.impl.databinding.ActivityPrivacyHybridDa
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenURL
+import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
@@ -86,8 +86,8 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                     viewModel.onUrlClicked(payload)
                 },
                 onBrokenSiteClicked = { viewModel.onReportBrokenSiteSelected() },
-                onClose = { this@PrivacyDashboardHybridActivity.finish() }
-            )
+                onClose = { this@PrivacyDashboardHybridActivity.finish() },
+            ),
         )
     }
 
@@ -103,7 +103,7 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
 
     private fun configureObservers() {
         repository.retrieveSiteData(intent.tabId!!).observe(
-            this
+            this,
         ) {
             viewModel.onSiteChanged(it)
         }
@@ -141,21 +141,21 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
             @Deprecated("Deprecated in Java")
             override fun shouldOverrideUrlLoading(
                 view: WebView?,
-                url: String?
+                url: String?,
             ): Boolean {
                 return false
             }
 
             override fun shouldOverrideUrlLoading(
                 view: WebView?,
-                request: WebResourceRequest?
+                request: WebResourceRequest?,
             ): Boolean {
                 return false
             }
 
             override fun onPageFinished(
                 view: WebView?,
-                url: String?
+                url: String?,
             ) {
                 super.onPageFinished(view, url)
                 configViewStateObserver()
@@ -204,7 +204,7 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
 
         fun intent(
             context: Context,
-            tabId: String
+            tabId: String,
         ): Intent {
             val intent = Intent(context, PrivacyDashboardHybridActivity::class.java)
             intent.tabId = tabId

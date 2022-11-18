@@ -17,20 +17,19 @@
 package com.duckduckgo.privacy.config.store
 
 import androidx.room.Database
-
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.duckduckgo.privacy.config.store.features.amplinks.AmpLinksDao
 import com.duckduckgo.privacy.config.store.features.autofill.AutofillDao
 import com.duckduckgo.privacy.config.store.features.contentblocking.ContentBlockingDao
 import com.duckduckgo.privacy.config.store.features.drm.DrmDao
+import com.duckduckgo.privacy.config.store.features.gpc.GpcContentScopeConfigDao
 import com.duckduckgo.privacy.config.store.features.gpc.GpcExceptionsDao
 import com.duckduckgo.privacy.config.store.features.gpc.GpcHeadersDao
 import com.duckduckgo.privacy.config.store.features.https.HttpsDao
 import com.duckduckgo.privacy.config.store.features.trackerallowlist.TrackerAllowlistDao
-import com.duckduckgo.privacy.config.store.features.amplinks.AmpLinksDao
-import com.duckduckgo.privacy.config.store.features.gpc.GpcContentScopeConfigDao
 import com.duckduckgo.privacy.config.store.features.trackingparameters.TrackingParametersDao
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryDao
 import com.duckduckgo.privacy.config.store.features.useragent.UserAgentDao
@@ -39,7 +38,8 @@ import com.duckduckgo.privacy.config.store.features.useragent.UserAgentDao
     RuleTypeConverter::class,
 )
 @Database(
-    exportSchema = true, version = 10,
+    exportSchema = true,
+    version = 10,
     entities = [
         TrackerAllowlistEntity::class,
         UnprotectedTemporaryEntity::class,
@@ -57,7 +57,7 @@ import com.duckduckgo.privacy.config.store.features.useragent.UserAgentDao
         TrackingParameterExceptionEntity::class,
         AutofillExceptionEntity::class,
         UserAgentExceptionEntity::class,
-    ]
+    ],
 )
 abstract class PrivacyConfigDatabase : RoomDatabase() {
     abstract fun trackerAllowlistDao(): TrackerAllowlistDao

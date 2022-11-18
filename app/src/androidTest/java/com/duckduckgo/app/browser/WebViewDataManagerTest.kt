@@ -24,14 +24,14 @@ import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 
 @ExperimentalCoroutinesApi
 @Suppress("RemoveExplicitTypeArguments")

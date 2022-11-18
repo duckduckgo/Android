@@ -35,7 +35,6 @@ class SettingsThemeSelectorFragment : DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-
         val currentOption: DuckDuckGoTheme =
             arguments?.getSerializable(DEFAULT_OPTION_EXTRA) as DuckDuckGoTheme? ?: LIGHT
 
@@ -71,7 +70,7 @@ class SettingsThemeSelectorFragment : DialogFragment() {
 
     private fun updateCurrentSelect(
         currentOption: DuckDuckGoTheme,
-        radioGroup: RadioGroup
+        radioGroup: RadioGroup,
     ) {
         val selectedId = currentOption.radioButtonId()
         radioGroup.check(selectedId)

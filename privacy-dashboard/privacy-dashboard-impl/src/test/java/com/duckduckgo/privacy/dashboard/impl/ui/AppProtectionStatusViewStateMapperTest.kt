@@ -90,7 +90,7 @@ internal class AppProtectionStatusViewStateMapperTest {
         uri: Uri? = Uri.parse(url),
         entity: Entity? = null,
         certificate: TestCertificateInfo? = null,
-        allowListed: Boolean? = false
+        allowListed: Boolean? = false,
     ): Site {
         val site: Site = com.nhaarman.mockitokotlin2.mock()
         whenever(site.url).thenReturn(url)
@@ -110,5 +110,4 @@ internal class AppProtectionStatusViewStateMapperTest {
 
         return site
     }
-
 }

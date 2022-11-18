@@ -28,7 +28,7 @@ interface PrivacyDashboardPayloadAdapter {
 
 @ContributesBinding(AppScope::class)
 class AppPrivacyDashboardPayloadAdapter @Inject constructor(
-    @Named("privacyDashboard") private val moshi: Moshi
+    @Named("privacyDashboard") private val moshi: Moshi,
 ) : PrivacyDashboardPayloadAdapter {
     override fun onUrlClicked(payload: String): String {
         val payloadAdapter = moshi.adapter(Payload::class.java)

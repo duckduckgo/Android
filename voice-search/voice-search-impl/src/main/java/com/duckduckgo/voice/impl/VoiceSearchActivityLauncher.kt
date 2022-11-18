@@ -33,7 +33,7 @@ interface VoiceSearchActivityLauncher {
         caller: ActivityResultCaller,
         activity: Activity,
         source: Source,
-        onEvent: (Event) -> Unit
+        onEvent: (Event) -> Unit,
     )
 
     fun launch(activity: Activity)
@@ -43,7 +43,7 @@ interface VoiceSearchActivityLauncher {
 class RealVoiceSearchActivityLauncher @Inject constructor(
     private val blurRenderer: VoiceSearchBackgroundBlurRenderer,
     private val pixel: Pixel,
-    private val activityResultLauncherWrapper: ActivityResultLauncherWrapper
+    private val activityResultLauncherWrapper: ActivityResultLauncherWrapper,
 ) : VoiceSearchActivityLauncher {
 
     companion object {
@@ -56,7 +56,7 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
         caller: ActivityResultCaller,
         activity: Activity,
         source: Source,
-        onEvent: (Event) -> Unit
+        onEvent: (Event) -> Unit,
     ) {
         _source = source
         activityResultLauncherWrapper.register(
@@ -66,7 +66,7 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
                     if (data.isNotEmpty()) {
                         pixel.fire(
                             pixel = VoiceSearchPixelNames.VOICE_SEARCH_DONE,
-                            parameters = mapOf(KEY_PARAM_SOURCE to _source.paramValueName)
+                            parameters = mapOf(KEY_PARAM_SOURCE to _source.paramValueName),
                         )
                         onEvent(Event.VoiceRecognitionSuccess(data))
                     } else {
@@ -79,7 +79,7 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
                 activity.window?.decorView?.rootView?.let {
                     blurRenderer.removeBlur(it)
                 }
-            }
+            },
         )
     }
 
@@ -93,7 +93,7 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
         }
         pixel.fire(
             pixel = VoiceSearchPixelNames.VOICE_SEARCH_STARTED,
-            parameters = mapOf(KEY_PARAM_SOURCE to _source.paramValueName)
+            parameters = mapOf(KEY_PARAM_SOURCE to _source.paramValueName),
         )
         activityResultLauncherWrapper.launch(LaunchVoiceSearch)
     }

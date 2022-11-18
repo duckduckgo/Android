@@ -32,7 +32,7 @@ interface ProtectionStatusViewStateMapper {
 @ContributesBinding(AppScope::class)
 class AppProtectionStatusViewStateMapper @Inject constructor(
     private val contentBlocking: ContentBlocking,
-    private val unprotectedTemporary: UnprotectedTemporary
+    private val unprotectedTemporary: UnprotectedTemporary,
 ) : ProtectionStatusViewStateMapper {
 
     override fun mapFromSite(site: Site): ProtectionStatusViewState {
@@ -49,7 +49,7 @@ class AppProtectionStatusViewStateMapper @Inject constructor(
             allowlisted = site.userAllowList,
             denylisted = false,
             enabledFeatures = enabledFeatures,
-            unprotectedTemporary = unprotectedTemporary.isAnException(site.url)
+            unprotectedTemporary = unprotectedTemporary.isAnException(site.url),
         )
     }
 }

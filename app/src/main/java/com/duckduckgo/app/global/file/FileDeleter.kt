@@ -17,8 +17,8 @@
 package com.duckduckgo.app.global.file
 
 import com.duckduckgo.app.global.DispatcherProvider
-import kotlinx.coroutines.withContext
 import java.io.File
+import kotlinx.coroutines.withContext
 
 interface FileDeleter {
 
@@ -30,7 +30,7 @@ interface FileDeleter {
      */
     suspend fun deleteContents(
         parentDirectory: File,
-        excludedFiles: List<String> = emptyList()
+        excludedFiles: List<String> = emptyList(),
     )
 
     /**
@@ -43,14 +43,14 @@ interface FileDeleter {
      */
     suspend fun deleteFilesFromDirectory(
         parentDirectory: File,
-        files: List<String>
+        files: List<String>,
     )
 }
 
 class AndroidFileDeleter(private val dispatchers: DispatcherProvider) : FileDeleter {
     override suspend fun deleteContents(
         parentDirectory: File,
-        excludedFiles: List<String>
+        excludedFiles: List<String>,
     ) {
         withContext(dispatchers.io()) {
             val files = parentDirectory.listFiles() ?: return@withContext
@@ -67,7 +67,7 @@ class AndroidFileDeleter(private val dispatchers: DispatcherProvider) : FileDele
 
     override suspend fun deleteFilesFromDirectory(
         parentDirectory: File,
-        files: List<String>
+        files: List<String>,
     ) {
         withContext(dispatchers.io()) {
             val allFiles = parentDirectory.listFiles() ?: return@withContext

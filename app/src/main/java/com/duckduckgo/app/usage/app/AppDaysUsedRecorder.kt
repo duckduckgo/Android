@@ -24,7 +24,7 @@ import timber.log.Timber
 
 class AppDaysUsedRecorder(
     private val appDaysUsedRepository: AppDaysUsedRepository,
-    private val appCoroutineScope: CoroutineScope
+    private val appCoroutineScope: CoroutineScope,
 ) : DefaultLifecycleObserver {
 
     override fun onStart(owner: LifecycleOwner) {

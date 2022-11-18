@@ -20,8 +20,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
 
 @ContributesMultibinding(AppScope::class)
 class AppHealthMonitorManager @Inject constructor(private val appHealthMonitor: AppHealthMonitor) : VpnServiceCallbacks {
@@ -32,7 +32,7 @@ class AppHealthMonitorManager @Inject constructor(private val appHealthMonitor: 
 
     override fun onVpnStopped(
         coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
+        vpnStopReason: VpnStopReason,
     ) {
         appHealthMonitor.stopMonitoring()
     }

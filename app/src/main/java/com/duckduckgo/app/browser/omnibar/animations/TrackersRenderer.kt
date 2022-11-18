@@ -24,7 +24,7 @@ class TrackersRenderer {
     @DrawableRes
     fun networkLogoIcon(
         context: Context,
-        networkName: String
+        networkName: String,
     ): Int? {
         return networkIcon(context, networkName, "network_logo_")
     }
@@ -32,7 +32,7 @@ class TrackersRenderer {
     private fun networkIcon(
         context: Context,
         networkName: String,
-        prefix: String
+        prefix: String,
     ): Int? {
         val drawable = "$prefix$networkName"
             .replace(" ", "_")

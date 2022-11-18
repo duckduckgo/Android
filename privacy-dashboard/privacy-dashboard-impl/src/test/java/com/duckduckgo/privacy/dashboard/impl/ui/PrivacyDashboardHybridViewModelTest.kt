@@ -69,7 +69,7 @@ class PrivacyDashboardHybridViewModelTest {
         siteViewStateMapper = AppSiteViewStateMapper(PublicKeyInfoMapper(androidQAppBuildConfig)),
         requestDataViewStateMapper = AppSiteRequestDataViewStateMapper(),
         protectionStatusViewStateMapper = AppProtectionStatusViewStateMapper(contentBlocking, unprotectedTemporary),
-        privacyDashboardPayloadAdapter = mock()
+        privacyDashboardPayloadAdapter = mock(),
     )
 
     @Test
@@ -117,7 +117,7 @@ class PrivacyDashboardHybridViewModelTest {
 
     private fun site(
         url: String = "https://example.com",
-        siteAllowed: Boolean = false
+        siteAllowed: Boolean = false,
     ): Site {
         val site: Site = mock()
         whenever(site.uri).thenReturn(url.toUri())
@@ -125,5 +125,4 @@ class PrivacyDashboardHybridViewModelTest {
         whenever(site.userAllowList).thenReturn(siteAllowed)
         return site
     }
-
 }

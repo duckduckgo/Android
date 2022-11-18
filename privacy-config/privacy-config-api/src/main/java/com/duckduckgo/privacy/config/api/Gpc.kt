@@ -41,7 +41,7 @@ interface Gpc {
      */
     fun canUrlAddHeaders(
         url: String,
-        existingHeaders: Map<String, String>
+        existingHeaders: Map<String, String>,
     ): Boolean
 
     /**

@@ -32,7 +32,7 @@ abstract class OnboardingPageFragment : DuckDuckGoFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? =
         inflater.inflate(layoutResource(), container, false)
 

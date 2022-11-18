@@ -30,7 +30,7 @@ interface SearchBar {
 
     enum class Event {
         DismissSearchBar,
-        ShowSearchBar
+        ShowSearchBar,
     }
 
     sealed class Action {
@@ -42,7 +42,7 @@ interface SearchBar {
 class SearchBarView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = R.style.Widget_DuckDuckGo_SearchBarView
+    defStyleAttr: Int = R.style.Widget_DuckDuckGo_SearchBarView,
 ) : ConstraintLayout(context, attrs, defStyleAttr), SearchBar {
     private val binding: ViewSearchBarBinding by viewBinding()
 
@@ -51,7 +51,7 @@ class SearchBarView @JvmOverloads constructor(
             attrs,
             R.styleable.SearchBarView,
             0,
-            R.style.Widget_DuckDuckGo_SearchBarView
+            R.style.Widget_DuckDuckGo_SearchBarView,
         ).apply {
             binding.root.background = getDrawable(R.styleable.SearchBarView_android_background)
             binding.omnibarTextInput.hint = getString(R.styleable.SearchBarView_searchHint)

@@ -23,10 +23,10 @@ import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAcc
 
 class QuickAccessDragTouchItemListener(
     private val favoritesQuickAccessAdapter: FavoritesQuickAccessAdapter,
-    private val dragDropListener: DragDropListener
+    private val dragDropListener: DragDropListener,
 ) : ItemTouchHelper.SimpleCallback(
     ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.START or ItemTouchHelper.END,
-    0
+    0,
 ) {
     interface DragDropListener {
         fun onListChanged(listElements: List<QuickAccessFavorite>)
@@ -39,7 +39,7 @@ class QuickAccessDragTouchItemListener(
     override fun onMove(
         recyclerView: RecyclerView,
         viewHolder: RecyclerView.ViewHolder,
-        target: RecyclerView.ViewHolder
+        target: RecyclerView.ViewHolder,
     ): Boolean {
         val items = favoritesQuickAccessAdapter.currentList.toMutableList()
         val quickAccessFavorite = items[viewHolder.bindingAdapterPosition]
@@ -51,14 +51,14 @@ class QuickAccessDragTouchItemListener(
 
     override fun onSwiped(
         viewHolder: RecyclerView.ViewHolder,
-        direction: Int
+        direction: Int,
     ) {
         // noop
     }
 
     override fun clearView(
         recyclerView: RecyclerView,
-        viewHolder: RecyclerView.ViewHolder
+        viewHolder: RecyclerView.ViewHolder,
     ) {
         super.clearView(recyclerView, viewHolder)
         dragDropListener.onListChanged(favoritesQuickAccessAdapter.currentList)
@@ -67,7 +67,7 @@ class QuickAccessDragTouchItemListener(
 
     override fun onSelectedChanged(
         viewHolder: RecyclerView.ViewHolder?,
-        actionState: Int
+        actionState: Int,
     ) {
         super.onSelectedChanged(viewHolder, actionState)
         val listener = viewHolder as? DragDropViewHolderListener ?: return
@@ -83,7 +83,7 @@ class QuickAccessDragTouchItemListener(
         dX: Float,
         dY: Float,
         actionState: Int,
-        isCurrentlyActive: Boolean
+        isCurrentlyActive: Boolean,
     ) {
         super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
         val listener = viewHolder as? DragDropViewHolderListener ?: return

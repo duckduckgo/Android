@@ -24,18 +24,18 @@ import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class AutofillDisablingDeclineCounter @Inject constructor(
     private val autofillStore: AutofillStore,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
+    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
 ) : AutofillDeclineCounter {
 
     @VisibleForTesting
@@ -87,13 +87,12 @@ class AutofillDisablingDeclineCounter @Inject constructor(
         if (!isActive) return false
 
         return withContext(dispatchers.io()) {
-
             val shouldOffer = autofillStore.autofillDeclineCount >= GLOBAL_DECLINE_COUNT_THRESHOLD
 
             Timber.v(
                 "User declined to save credentials %d times globally from all sessions. Should prompt to disable: %s",
                 autofillStore.autofillDeclineCount,
-                shouldOffer
+                shouldOffer,
             )
 
             return@withContext shouldOffer

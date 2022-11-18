@@ -64,7 +64,7 @@ interface AppTpFeatureConfig {
  * ```
  */
 inline fun AppTpFeatureConfig.edit(
-    action: AppTpFeatureConfig.Editor.() -> Unit
+    action: AppTpFeatureConfig.Editor.() -> Unit,
 ) {
     val editor = edit()
     action(editor)

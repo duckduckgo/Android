@@ -29,24 +29,25 @@ data class TdsTracker(
     val defaultAction: Action,
     val ownerName: String,
     val categories: List<String>,
-    val rules: List<Rule>
+    val rules: List<Rule>,
 )
 
 enum class Action {
     BLOCK,
-    IGNORE;
+    IGNORE,
+    ;
 }
 
 class Rule(
     val rule: String,
     val action: Action?,
     val exceptions: RuleExceptions?,
-    val surrogate: String?
+    val surrogate: String?,
 )
 
 class RuleExceptions(
     val domains: List<String>?,
-    val types: List<String>?
+    val types: List<String>?,
 )
 
 class ActionTypeConverter {

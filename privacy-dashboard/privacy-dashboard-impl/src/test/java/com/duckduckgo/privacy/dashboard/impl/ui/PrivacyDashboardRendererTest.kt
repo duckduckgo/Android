@@ -27,8 +27,8 @@ import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.EntityViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.ProtectionStatusViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.RequestDataViewState
-import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.SiteViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.RequestState.Blocked
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.SiteViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.ViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardJavascriptInterface.Companion.JAVASCRIPT_INTERFACE_NAME
 import com.nhaarman.mockitokotlin2.any
@@ -36,12 +36,12 @@ import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.verify
 import com.squareup.moshi.Moshi
+import java.util.*
 import org.junit.Assert.assertNotNull
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.times
-import java.util.*
 
 @RunWith(AndroidJUnit4::class)
 class PrivacyDashboardRendererTest {
@@ -56,7 +56,7 @@ class PrivacyDashboardRendererTest {
         {},
         {},
         {},
-        {}
+        {},
     )
 
     @Test
@@ -65,7 +65,7 @@ class PrivacyDashboardRendererTest {
 
         verify(spyWebView).addJavascriptInterface(
             any<PrivacyDashboardJavascriptInterface>(),
-            eq(JAVASCRIPT_INTERFACE_NAME)
+            eq(JAVASCRIPT_INTERFACE_NAME),
         )
     }
 
@@ -99,10 +99,10 @@ class PrivacyDashboardRendererTest {
             upgradedHttps = true,
             parentEntity = EntityViewState(
                 displayName = "displayName",
-                prevalence = 12.0
+                prevalence = 12.0,
             ),
             secCertificateViewModels = emptyList(),
-            locale = Locale.getDefault().language
+            locale = Locale.getDefault().language,
         ),
         userChangedValues = false,
         requestData = RequestDataViewState(
@@ -116,11 +116,11 @@ class PrivacyDashboardRendererTest {
                     pageUrl = "test.com",
                     prevalence = 10.0,
                     state = Blocked(),
-                    url = "tracker.com"
-                )
-            )
+                    url = "tracker.com",
+                ),
+            ),
         ),
-        protectionStatus = ProtectionStatusViewState(true, true, emptyList(), true)
+        protectionStatus = ProtectionStatusViewState(true, true, emptyList(), true),
     )
 
     private fun getMoshiPD(): Moshi = JsonModule.moshi(Moshi.Builder().build())

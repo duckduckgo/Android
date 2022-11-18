@@ -24,7 +24,7 @@ interface SiteFactory {
     fun buildSite(
         url: String,
         title: String? = null,
-        httpUpgraded: Boolean = false
+        httpUpgraded: Boolean = false,
     ): Site
 
     /**

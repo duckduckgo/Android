@@ -19,20 +19,20 @@ package com.duckduckgo.app.bookmarks.ui.bookmarkfolders
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.CoroutineTestRule
-import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.model.BookmarkFolderItem
 import com.duckduckgo.app.bookmarks.model.BookmarksRepository
-import org.mockito.kotlin.*
 import junit.framework.TestCase.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.ArgumentMatchers.anyString
+import org.mockito.kotlin.*
 
 @ExperimentalCoroutinesApi
 class BookmarkFoldersViewModelTest {
@@ -61,7 +61,7 @@ class BookmarkFoldersViewModelTest {
 
     private val folderStructure = mutableListOf(
         BookmarkFolderItem(1, BookmarkFolder(1, "folder", 0), true),
-        BookmarkFolderItem(1, BookmarkFolder(2, "a folder", 0), false)
+        BookmarkFolderItem(1, BookmarkFolder(2, "a folder", 0), false),
     )
 
     private val testee: BookmarkFoldersViewModel by lazy {

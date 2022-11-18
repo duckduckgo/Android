@@ -24,11 +24,11 @@ data class RemoteMessageEntity(
     @PrimaryKey val id: String,
     val message: String,
     val status: Status,
-    val shown: Boolean = false
+    val shown: Boolean = false,
 ) {
     enum class Status {
         SCHEDULED,
         DISMISSED,
-        DONE
+        DONE,
     }
 }

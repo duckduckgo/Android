@@ -22,13 +22,13 @@ import androidx.annotation.StringRes
 sealed class DownloadCommand(@StringRes val messageId: Int) {
     class ShowDownloadStartedMessage(
         @StringRes messageId: Int,
-        val fileName: String
+        val fileName: String,
     ) : DownloadCommand(messageId)
     class ShowDownloadSuccessMessage(
         @StringRes messageId: Int,
         val fileName: String,
         val filePath: String,
-        val mimeType: String? = null
+        val mimeType: String? = null,
     ) : DownloadCommand(messageId)
     class ShowDownloadFailedMessage(
         @StringRes messageId: Int,

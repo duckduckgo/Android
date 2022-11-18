@@ -30,6 +30,8 @@ import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVA
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_OPENED
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenURL
+import java.util.*
+import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -40,8 +42,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.util.*
-import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class PrivacyDashboardHybridViewModel @Inject constructor(
@@ -51,7 +51,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     private val siteViewStateMapper: SiteViewStateMapper,
     private val requestDataViewStateMapper: RequestDataViewStateMapper,
     private val protectionStatusViewStateMapper: ProtectionStatusViewStateMapper,
-    private val privacyDashboardPayloadAdapter: PrivacyDashboardPayloadAdapter
+    private val privacyDashboardPayloadAdapter: PrivacyDashboardPayloadAdapter,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -65,19 +65,19 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         val siteViewState: SiteViewState,
         val userChangedValues: Boolean = false,
         val requestData: RequestDataViewState,
-        val protectionStatus: ProtectionStatusViewState
+        val protectionStatus: ProtectionStatusViewState,
     )
 
     data class ProtectionStatusViewState(
         val allowlisted: Boolean,
         val denylisted: Boolean,
         val enabledFeatures: List<String>,
-        val unprotectedTemporary: Boolean
+        val unprotectedTemporary: Boolean,
     )
 
     data class RequestDataViewState(
         val installedSurrogates: List<String>? = null,
-        val requests: List<DetectedRequest>
+        val requests: List<DetectedRequest>,
     )
 
     data class DetectedRequest(
@@ -88,7 +88,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         val pageUrl: String,
         val prevalence: Double?,
         val state: RequestState,
-        val url: String
+        val url: String,
     )
 
     sealed class RequestState {
@@ -114,14 +114,14 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         val upgradedHttps: Boolean,
         val parentEntity: EntityViewState?,
         val secCertificateViewModels: List<CertificateViewState?> = emptyList(),
-        val locale: String = Locale.getDefault().language
+        val locale: String = Locale.getDefault().language,
     )
 
     data class CertificateViewState(
         val commonName: String,
         val publicKey: PublicKeyViewState? = null,
         val emails: List<String> = emptyList(),
-        val summary: String? = null
+        val summary: String? = null,
     )
 
     data class PublicKeyViewState(
@@ -138,12 +138,12 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         val type: String?,
         val externalRepresentation: String?,
         val canVerify: Boolean?,
-        val keyId: String?
+        val keyId: String?,
     )
 
     data class EntityViewState(
         val displayName: String,
-        val prevalence: Double
+        val prevalence: Double,
     )
 
     val viewState = MutableStateFlow<ViewState?>(null)
@@ -181,8 +181,8 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                 ViewState(
                     siteViewState = siteViewStateMapper.mapFromSite(site),
                     requestData = requestDataViewStateMapper.mapFromSite(site),
-                    protectionStatus = protectionStatusViewStateMapper.mapFromSite(site)
-                )
+                    protectionStatus = protectionStatusViewStateMapper.mapFromSite(site),
+                ),
             )
         }
     }
@@ -202,7 +202,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
             withContext(dispatcher.main()) {
                 viewState.value = currentViewState().copy(
                     protectionStatus = currentViewState().protectionStatus.copy(allowlisted = enabled),
-                    userChangedValues = true
+                    userChangedValues = true,
                 )
             }
         }

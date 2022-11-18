@@ -21,8 +21,8 @@ import com.duckduckgo.app.referral.ParsedReferrerResult.EuAuctionReferrerFound
 import com.duckduckgo.app.referral.ParsedReferrerResult.ReferrerNotFound
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 interface AppInstallationReferrerParser {
 
@@ -48,7 +48,6 @@ class QueryParamReferrerParser @Inject constructor() : AppInstallationReferrerPa
     private fun extractEuAuctionReferrer(referrerParts: List<String>): ParsedReferrerResult {
         Timber.d("Looking for Google EU Auction referrer data")
         for (part in referrerParts) {
-
             Timber.v("Analysing query param part: $part")
             if (part.startsWith(INSTALLATION_SOURCE_KEY) && part.endsWith(INSTALLATION_SOURCE_EU_AUCTION_VALUE)) {
                 Timber.i("App installed as a result of the EU auction")
@@ -63,7 +62,6 @@ class QueryParamReferrerParser @Inject constructor() : AppInstallationReferrerPa
     private fun extractCampaignReferrer(referrerParts: List<String>): ParsedReferrerResult {
         Timber.d("Looking for regular referrer data")
         for (part in referrerParts) {
-
             Timber.v("Analysing query param part: $part")
             if (part.contains(CAMPAIGN_NAME_PREFIX)) {
                 return extractCampaignNameSuffix(part, CAMPAIGN_NAME_PREFIX)
@@ -76,7 +74,7 @@ class QueryParamReferrerParser @Inject constructor() : AppInstallationReferrerPa
 
     private fun extractCampaignNameSuffix(
         part: String,
-        prefix: String
+        prefix: String,
     ): ParsedReferrerResult {
         Timber.i("Found target campaign name prefix $prefix in $part")
         val suffix = stripCampaignName(part, prefix)
@@ -93,7 +91,7 @@ class QueryParamReferrerParser @Inject constructor() : AppInstallationReferrerPa
 
     private fun stripCampaignName(
         fullCampaignName: String,
-        prefix: String
+        prefix: String,
     ): String {
         return fullCampaignName.substringAfter(prefix, "")
     }
@@ -114,7 +112,7 @@ sealed class ParsedReferrerResult(open val fromCache: Boolean = false) {
     data class EuAuctionReferrerFound(override val fromCache: Boolean = false) : ParsedReferrerResult(fromCache)
     data class CampaignReferrerFound(
         val campaignSuffix: String,
-        override val fromCache: Boolean = false
+        override val fromCache: Boolean = false,
     ) : ParsedReferrerResult(fromCache)
 
     data class ReferrerNotFound(override val fromCache: Boolean = false) : ParsedReferrerResult(fromCache)

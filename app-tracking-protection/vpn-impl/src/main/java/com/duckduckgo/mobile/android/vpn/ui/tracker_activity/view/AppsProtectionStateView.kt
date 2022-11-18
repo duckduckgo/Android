@@ -20,7 +20,6 @@ import android.content.Context
 import android.util.AttributeSet
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.duckduckgo.app.global.extensions.safeGetApplicationIcon
-
 import com.duckduckgo.mobile.android.ui.view.hide
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
@@ -40,13 +39,12 @@ class AppsProtectionStateView @JvmOverloads constructor(
 
     fun bind(
         item: AppsData,
-        onAppsFilterClick: (AppsFilter) -> Unit
+        onAppsFilterClick: (AppsFilter) -> Unit,
     ) {
-
         binding.activityApps.text = context.resources.getQuantityString(
             if (item.isProtected) R.plurals.atp_ActivityProtectedApps else R.plurals.atp_ActivityUnprotectedApps,
             item.appsCount,
-            item.appsCount
+            item.appsCount,
         )
 
         binding.activityAppsImage.setIcons(item.packageNames.mapNotNull { context.packageManager.safeGetApplicationIcon(it) })

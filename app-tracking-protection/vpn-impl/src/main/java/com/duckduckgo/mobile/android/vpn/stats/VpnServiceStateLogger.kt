@@ -36,18 +36,18 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
+import java.util.concurrent.Executors
+import javax.inject.Inject
+import javax.inject.Provider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.concurrent.Executors
-import javax.inject.Inject
-import javax.inject.Provider
 
 @ContributesMultibinding(
     scope = VpnScope::class,
-    boundType = VpnServiceCallbacks::class
+    boundType = VpnServiceCallbacks::class,
 )
 @SingleInstanceIn(VpnScope::class)
 class VpnServiceStateLogger @Inject constructor(
@@ -76,10 +76,10 @@ class VpnServiceStateLogger @Inject constructor(
                     vpnDatabase.vpnServiceStateDao().insert(
                         VpnServiceStateStats(
                             state = VpnServiceState.ENABLED,
-                            alwaysOnState = AlwaysOnState(isAlwaysOnEnabled, isLockdownEnabled)
+                            alwaysOnState = AlwaysOnState(isAlwaysOnEnabled, isLockdownEnabled),
                         ).also {
                             Timber.d("VpnServiceStateLogger, state: $it")
-                        }
+                        },
                     )
                 }
             }
@@ -89,7 +89,7 @@ class VpnServiceStateLogger @Inject constructor(
     @SuppressLint("NewApi") // IDE doesn't get we use appBuildConfig
     override fun onVpnStopped(
         coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
+        vpnStopReason: VpnStopReason,
     ) {
         job.cancel()
 
@@ -107,8 +107,8 @@ class VpnServiceStateLogger @Inject constructor(
                 VpnServiceStateStats(
                     state = VpnServiceState.DISABLED,
                     stopReason = mapStopReason(vpnStopReason),
-                    alwaysOnState = alwaysOnState
-                )
+                    alwaysOnState = alwaysOnState,
+                ),
             )
         }
     }
@@ -128,7 +128,7 @@ class VpnServiceStateLogger @Inject constructor(
         initialDelay: Long = 500, // 0.5 second
         maxDelay: Long = 300_000, // 5 minutes
         factor: Double = 1.05, // 5% increase
-        block: suspend () -> Unit
+        block: suspend () -> Unit,
     ) {
         var currentDelay = initialDelay
         repeat(times - 1) {

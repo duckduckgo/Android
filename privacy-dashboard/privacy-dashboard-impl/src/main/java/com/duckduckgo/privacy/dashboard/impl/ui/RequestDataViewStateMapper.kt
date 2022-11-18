@@ -38,8 +38,8 @@ import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.RequestState.Allowed
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.RequestState.Blocked
 import com.squareup.anvil.annotations.ContributesBinding
-import okhttp3.internal.publicsuffix.PublicSuffixDatabase
 import javax.inject.Inject
+import okhttp3.internal.publicsuffix.PublicSuffixDatabase
 
 interface RequestDataViewStateMapper {
     fun mapFromSite(site: Site): RequestDataViewState
@@ -54,7 +54,7 @@ class AppSiteRequestDataViewStateMapper @Inject constructor() : RequestDataViewS
         "Advertising",
         "Social Network",
         "Content Delivery",
-        "Embedded Content"
+        "Embedded Content",
     )
 
     override fun mapFromSite(site: Site): RequestDataViewState {
@@ -79,13 +79,13 @@ class AppSiteRequestDataViewStateMapper @Inject constructor() : RequestDataViewS
                 entityName = trackerEvent.entity?.displayName,
                 ownerName = trackerEvent.entity?.name,
                 prevalence = trackerEvent.entity?.prevalence,
-                state = trackerEvent.status.mapToViewState()
+                state = trackerEvent.status.mapToViewState(),
             )
         }.filterNotNull()
 
         return RequestDataViewState(
             installedSurrogates = installedSurrogates,
-            requests = requests
+            requests = requests,
         )
     }
 
@@ -99,8 +99,9 @@ class AppSiteRequestDataViewStateMapper @Inject constructor() : RequestDataViewS
         if (mappedTrackerEvent == null) {
             this[hash] = listOf(trackerStatus)
         } else {
-            if (mappedTrackerEvent.contains(trackerStatus)) return true
-            else {
+            if (mappedTrackerEvent.contains(trackerStatus)) {
+                return true
+            } else {
                 this[hash] = this[hash]!! + listOf(trackerStatus)
             }
         }

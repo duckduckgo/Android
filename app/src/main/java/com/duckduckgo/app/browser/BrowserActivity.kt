@@ -61,7 +61,6 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CANCEL
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_PROMOTED_CANCEL
 import com.duckduckgo.app.playstore.PlayStoreUtils
-import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridActivity
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.sitepermissions.SitePermissionsActivity
@@ -72,13 +71,14 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridActivity
+import javax.inject.Inject
+import kotlin.collections.ArrayList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
-import kotlin.collections.ArrayList
 
 // open class so that we can test BrowserApplicationStateInfo
 @InjectWith(ActivityScope::class)
@@ -199,7 +199,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
     private fun openNewTab(
         tabId: String,
         url: String? = null,
-        skipHome: Boolean
+        skipHome: Boolean,
     ): BrowserTabFragment {
         Timber.i("Opening new tab, url: $url, tabId: $tabId")
         val fragment = BrowserTabFragment.newInstance(tabId, url, skipHome)
@@ -218,7 +218,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
 
     private fun addOrReplaceNewTab(
         fragment: BrowserTabFragment,
-        tabId: String
+        tabId: String,
     ) {
         val transaction = supportFragmentManager.beginTransaction()
         val tab = currentTab
@@ -273,7 +273,6 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
     }
 
     private fun launchNewSearchOrQuery(intent: Intent?) {
-
         Timber.i("launchNewSearchOrQuery: $intent")
 
         if (intent == null) {
@@ -287,7 +286,6 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         }
 
         if (intent.getBooleanExtra(PERFORM_FIRE_ON_ENTRY_EXTRA, false)) {
-
             Timber.i("Clearing everything as a result of $PERFORM_FIRE_ON_ENTRY_EXTRA flag being set")
             appCoroutineScope.launch {
                 clearPersonalDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
@@ -415,7 +413,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
             pixel = pixel,
             settingsDataStore = settingsDataStore,
             userEventsStore = userEventsStore,
-            appCoroutineScope = appCoroutineScope
+            appCoroutineScope = appCoroutineScope,
         )
         dialog.clearStarted = {
             removeObservers()
@@ -434,7 +432,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
 
     fun openInNewTab(
         query: String,
-        sourceTabId: String?
+        sourceTabId: String?,
     ) {
         launch {
             viewModel.onOpenInNewTabRequested(query = query, sourceTabId = sourceTabId)
@@ -443,7 +441,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
 
     fun openMessageInNewTab(
         message: Message,
-        sourceTabId: String?
+        sourceTabId: String?,
     ) {
         openMessageInNewTabJob = launch {
             val tabId = viewModel.onNewTabRequested(sourceTabId = sourceTabId)
@@ -471,7 +469,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
     override fun onActivityResult(
         requestCode: Int,
         resultCode: Int,
-        data: Intent?
+        data: Intent?,
     ) {
         if (requestCode == DASHBOARD_REQUEST_CODE) {
             viewModel.receivedDashboardResult(resultCode)
@@ -502,7 +500,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
                     toolbarMockupBinding.appBarLayoutMockup.visibility = View.GONE
                 }
             },
-            300
+            300,
         )
     }
 
@@ -512,7 +510,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
             context: Context,
             queryExtra: String? = null,
             newSearch: Boolean = false,
-            notifyDataCleared: Boolean = false
+            notifyDataCleared: Boolean = false,
         ): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
             intent.putExtra(EXTRA_TEXT, queryExtra)
@@ -591,7 +589,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
 
     private data class CombinedInstanceState(
         val originalInstanceState: Bundle?,
-        val newInstanceState: Bundle?
+        val newInstanceState: Bundle?,
     )
 }
 

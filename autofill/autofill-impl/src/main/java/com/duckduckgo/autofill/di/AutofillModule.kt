@@ -43,13 +43,13 @@ class AutofillModule {
     fun autofillStore(
         secureStorage: SecureStorage,
         context: Context,
-        internalTestUserChecker: InternalTestUserChecker
+        internalTestUserChecker: InternalTestUserChecker,
     ): AutofillStore {
         return SecureStoreBackedAutofillStore(
             secureStorage,
             internalTestUserChecker,
             RealLastUpdatedTimeProvider(),
-            RealAutofillPrefsStore(context, internalTestUserChecker)
+            RealAutofillPrefsStore(context, internalTestUserChecker),
         )
     }
 }

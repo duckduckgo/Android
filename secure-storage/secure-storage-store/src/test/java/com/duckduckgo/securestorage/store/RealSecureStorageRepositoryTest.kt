@@ -44,7 +44,7 @@ class RealSecureStorageRepositoryTest {
         notes = "my notes",
         notesIv = "notesIv",
         domainTitle = "test",
-        lastUpdatedInMillis = 0L
+        lastUpdatedInMillis = 0L,
     )
 
     @Before
@@ -65,7 +65,7 @@ class RealSecureStorageRepositoryTest {
     @Test
     fun whenGetWebsiteLoginCredentialsWithDomainThenCallGetWithDomainFromDao() = runTest {
         whenever(dao.websiteLoginCredentialsByDomain("test")).thenReturn(
-            MutableStateFlow(listOf(testEntity))
+            MutableStateFlow(listOf(testEntity)),
         )
 
         val result: List<WebsiteLoginCredentialsEntity> =
@@ -77,7 +77,7 @@ class RealSecureStorageRepositoryTest {
     @Test
     fun whenGetAllWebsiteLoginCredentialsThenCallGetAllFromDao() = runTest {
         whenever(dao.websiteLoginCredentials()).thenReturn(
-            MutableStateFlow(listOf(testEntity))
+            MutableStateFlow(listOf(testEntity)),
         )
 
         val result: List<WebsiteLoginCredentialsEntity> =

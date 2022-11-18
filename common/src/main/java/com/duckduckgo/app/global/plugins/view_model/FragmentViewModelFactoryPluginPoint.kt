@@ -24,7 +24,7 @@ import javax.inject.Inject
 
 @SingleInstanceIn(FragmentScope::class)
 class FragmentViewModelFactoryPluginPoint @Inject constructor(
-    private val injectorPlugins: DaggerSet<ViewModelFactoryPlugin>
+    private val injectorPlugins: DaggerSet<ViewModelFactoryPlugin>,
 ) : PluginPoint<ViewModelFactoryPlugin> {
     override fun getPlugins(): List<ViewModelFactoryPlugin> {
         return injectorPlugins.toList()

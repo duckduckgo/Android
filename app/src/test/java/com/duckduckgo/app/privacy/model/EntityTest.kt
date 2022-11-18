@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.privacy.model
 
-import com.duckduckgo.app.trackerdetection.model.TdsEntity
 import com.duckduckgo.app.trackerdetection.model.Entity.Companion.MAJOR_NETWORK_PREVALENCE
+import com.duckduckgo.app.trackerdetection.model.TdsEntity
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test

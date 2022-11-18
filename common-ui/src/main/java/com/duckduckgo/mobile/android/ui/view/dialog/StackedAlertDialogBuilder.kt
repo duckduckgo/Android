@@ -105,7 +105,7 @@ class StackedAlertDialogBuilder(val context: Context) {
 
     private fun setViews(
         binding: DialogStackedAlertBinding,
-        dialog: AlertDialog
+        dialog: AlertDialog,
     ) {
         if (headerImageDrawableId > 0) {
             binding.stackedAlertDialogImage.setImageResource(headerImageDrawableId)
@@ -123,7 +123,7 @@ class StackedAlertDialogBuilder(val context: Context) {
 
         val buttonParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.WRAP_CONTENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
+            LinearLayout.LayoutParams.WRAP_CONTENT,
         )
 
         stackedButtonList.forEachIndexed { index, text ->

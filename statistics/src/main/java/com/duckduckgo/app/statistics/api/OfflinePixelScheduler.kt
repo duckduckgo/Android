@@ -25,21 +25,21 @@ import androidx.work.*
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import timber.log.Timber
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = LifecycleObserver::class
+    boundType = LifecycleObserver::class,
 )
 class OfflinePixelScheduler @Inject constructor(
-    private val workManager: WorkManager
+    private val workManager: WorkManager,
 ) : LifecycleEventObserver {
 
     override fun onStateChanged(
         source: LifecycleOwner,
-        event: Lifecycle.Event
+        event: Lifecycle.Event,
     ) {
         if (event == Lifecycle.Event.ON_CREATE) {
             scheduleOfflinePixels()
@@ -47,7 +47,6 @@ class OfflinePixelScheduler @Inject constructor(
     }
 
     private fun scheduleOfflinePixels() {
-
         Timber.v("Scheduling offline pixels to be sent")
 
         val constraints = Constraints.Builder()
@@ -75,7 +74,7 @@ class OfflinePixelScheduler @Inject constructor(
 @ContributesWorker(AppScope::class)
 open class OfflinePixelWorker(
     val context: Context,
-    params: WorkerParameters
+    params: WorkerParameters,
 ) : CoroutineWorker(context, params) {
     @Inject
     lateinit var offlinePixelSender: OfflinePixelSender

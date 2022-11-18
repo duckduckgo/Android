@@ -40,7 +40,7 @@ interface AdClickAttribution {
 @ContributesBinding(AppScope::class)
 class RealAdClickAttribution @Inject constructor(
     private val adClickAttributionRepository: AdClickAttributionRepository,
-    private val featureToggle: FeatureToggle
+    private val featureToggle: FeatureToggle,
 ) : AdClickAttribution {
 
     override fun isAllowed(url: String): Boolean {

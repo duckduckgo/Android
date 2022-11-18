@@ -44,11 +44,11 @@ private const val SUMMARY_ID = 0
 @AnyThread
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = FileDownloadNotificationManager::class
+    boundType = FileDownloadNotificationManager::class,
 )
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = BrowserLifecycleObserver::class
+    boundType = BrowserLifecycleObserver::class,
 )
 @SingleInstanceIn(AppScope::class)
 class DefaultFileDownloadNotificationManager @Inject constructor(
@@ -59,6 +59,7 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
 
     // Group notifications are not automatically cleared when the last notification in the group is removed. So we need to do this manually.
     private val groupNotificationsCounter = AtomicReference<Map<Long, String>>(mapOf())
+
     // This is not great but didn't find any other way to do it. When the user closes the app all the downloads are cancelled
     // but the in progress notifications are not dismissed however they should.
     // This will flag when the application is closing so that we don't post any more notifications.
@@ -70,7 +71,7 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
             applicationContext,
             downloadId.toInt(),
             FileDownloadNotificationActionReceiver.cancelDownloadIntent(downloadId),
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
         val notification = NotificationCompat.Builder(applicationContext, FileDownloadNotificationChannelType.FILE_DOWNLOADING.id)
             .setPriority(FileDownloadNotificationChannelType.FILE_DOWNLOADING.priority)
@@ -143,7 +144,7 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
                         applicationContext,
                         downloadId.toInt(),
                         FileDownloadNotificationActionReceiver.retryDownloadIntent(downloadId, fileUrl),
-                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
                     )
                     addAction(R.drawable.ic_file_download_white_24dp, applicationContext.getString(R.string.downloadsRetry), pendingIntent)
                 }

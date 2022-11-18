@@ -46,7 +46,7 @@ import javax.inject.Inject
 
 @ContributesBinding(FragmentScope::class)
 class BrowserLottieTrackersAnimatorHelper @Inject constructor(
-    private val theme: AppTheme
+    private val theme: AppTheme,
 ) : BrowserTrackersAnimatorHelper {
 
     private var listener: TrackersAnimatorListener? = null
@@ -72,7 +72,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         shieldAnimationView: LottieAnimationView,
         trackersAnimationView: LottieAnimationView,
         omnibarViews: List<View>,
-        entities: List<Entity>?
+        entities: List<Entity>?,
     ) {
         if (isCookiesAnimationRunning) return // If cookies animation is running let it finish to avoid weird glitches with the other animations
         if (trackersAnimationView.isAnimating || this.runPartialAnimation) return
@@ -99,27 +99,29 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
             this.maintainOriginalImageBounds = true
             this.setImageAssetDelegate(TrackersLottieAssetDelegate(context, logos))
             this.removeAllAnimatorListeners()
-            this.addAnimatorListener(object : AnimatorListener {
-                override fun onAnimationStart(animation: Animator) {
-                    if (completePartialAnimation) return
-                    animateOmnibarOut(omnibarViews).start()
-                }
-
-                override fun onAnimationEnd(animation: Animator) {
-                    if (!runPartialAnimation) {
-                        animateOmnibarIn(omnibarViews).start()
-                        completePartialAnimation = false
-                        tryToStartCookiesAnimation(context, omnibarViews)
-                        listener?.onAnimationFinished()
+            this.addAnimatorListener(
+                object : AnimatorListener {
+                    override fun onAnimationStart(animation: Animator) {
+                        if (completePartialAnimation) return
+                        animateOmnibarOut(omnibarViews).start()
                     }
-                }
 
-                override fun onAnimationCancel(animation: Animator) {
-                }
+                    override fun onAnimationEnd(animation: Animator) {
+                        if (!runPartialAnimation) {
+                            animateOmnibarIn(omnibarViews).start()
+                            completePartialAnimation = false
+                            tryToStartCookiesAnimation(context, omnibarViews)
+                            listener?.onAnimationFinished()
+                        }
+                    }
 
-                override fun onAnimationRepeat(animation: Animator) {
-                }
-            })
+                    override fun onAnimationCancel(animation: Animator) {
+                    }
+
+                    override fun onAnimationRepeat(animation: Animator) {
+                    }
+                },
+            )
 
             if (runPartialAnimation) {
                 this.setMaxProgress(0.5f)
@@ -138,7 +140,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         omnibarViews: List<View>,
         cookieBackground: View,
         cookieAnimationView: LottieAnimationView,
-        cookieScene: ViewGroup
+        cookieScene: ViewGroup,
     ) {
         this.cookieScene = cookieScene
         this.cookieViewBackground = cookieBackground
@@ -160,7 +162,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     }
 
     override fun cancelAnimations(
-        omnibarViews: List<View>
+        omnibarViews: List<View>,
     ) {
         stopTrackersAnimation()
         stopCookiesAnimation()
@@ -180,14 +182,20 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         shieldAnimation.playAnimation()
     }
 
-    private fun tryToStartCookiesAnimation(context: Context, omnibarViews: List<View>) {
+    private fun tryToStartCookiesAnimation(
+        context: Context,
+        omnibarViews: List<View>,
+    ) {
         if (enqueueCookiesAnimation) {
             startCookiesAnimation(context, omnibarViews)
             enqueueCookiesAnimation = false
         }
     }
 
-    private fun startCookiesAnimation(context: Context, omnibarViews: List<View>) {
+    private fun startCookiesAnimation(
+        context: Context,
+        omnibarViews: List<View>,
+    ) {
         isCookiesAnimationRunning = true
         firstScene = Scene.getSceneForLayout(cookieScene, R.layout.cookie_scene_1, context)
         secondScene = Scene.getSceneForLayout(cookieScene, R.layout.cookie_scene_2, context)
@@ -207,80 +215,91 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         val slideOutCookiesTransition: Transition = createSlideTransition()
 
         // After the slide in transitions, wait 1s and then begin slide out + fade out animation views
-        slideInCookiesTransition.addListener(object : TransitionListener {
-            override fun onTransitionEnd(transition: Transition) {
-                AnimatorSet().apply {
-                    play(animateFadeIn(cookieView, 0L)) // Fake animation because the delay doesn't really work
-                    startDelay = COOKIES_ANIMATION_DELAY
-                    addListener(
-                        doOnEnd {
-                            if (!hasCookiesAnimationBeenCanceled) {
-                                AnimatorSet().apply {
-                                    TransitionManager.go(firstScene, slideOutCookiesTransition)
-                                    play(animateFadeOut(cookieView, COOKIES_ANIMATION_FADE_OUT_DURATION))
-                                        .with(animateFadeOut(cookieViewBackground, COOKIES_ANIMATION_FADE_OUT_DURATION))
-                                    addListener(
-                                        doOnEnd {
-                                            cookieView.gone()
-                                            isCookiesAnimationRunning = false
-                                            listener?.onAnimationFinished()
-                                        }
-                                    )
-                                    start()
-                                }
-                            } else {
-                                isCookiesAnimationRunning = false
-                                listener?.onAnimationFinished()
-                            }
-                        }
-                    )
-                    start()
-                }
-            }
-            override fun onTransitionStart(transition: Transition) {}
-            override fun onTransitionCancel(transition: Transition) {}
-            override fun onTransitionPause(transition: Transition) {}
-            override fun onTransitionResume(transition: Transition) {}
-        })
-
-        // After slide out finished, hide view and fade in omnibar views
-        slideOutCookiesTransition.addListener(object : TransitionListener {
-            override fun onTransitionEnd(transition: Transition) {
-                if (!hasCookiesAnimationBeenCanceled) {
+        slideInCookiesTransition.addListener(
+            object : TransitionListener {
+                override fun onTransitionEnd(transition: Transition) {
                     AnimatorSet().apply {
-                        play(animateOmnibarIn(allOmnibarViews))
+                        play(animateFadeIn(cookieView, 0L)) // Fake animation because the delay doesn't really work
+                        startDelay = COOKIES_ANIMATION_DELAY
+                        addListener(
+                            doOnEnd {
+                                if (!hasCookiesAnimationBeenCanceled) {
+                                    AnimatorSet().apply {
+                                        TransitionManager.go(firstScene, slideOutCookiesTransition)
+                                        play(animateFadeOut(cookieView, COOKIES_ANIMATION_FADE_OUT_DURATION))
+                                            .with(animateFadeOut(cookieViewBackground, COOKIES_ANIMATION_FADE_OUT_DURATION))
+                                        addListener(
+                                            doOnEnd {
+                                                cookieView.gone()
+                                                isCookiesAnimationRunning = false
+                                                listener?.onAnimationFinished()
+                                            },
+                                        )
+                                        start()
+                                    }
+                                } else {
+                                    isCookiesAnimationRunning = false
+                                    listener?.onAnimationFinished()
+                                }
+                            },
+                        )
                         start()
                     }
-                    cookieScene.gone()
-                } else {
-                    isCookiesAnimationRunning = false
-                    listener?.onAnimationFinished()
                 }
-            }
-            override fun onTransitionStart(transition: Transition) {}
-            override fun onTransitionCancel(transition: Transition) {}
-            override fun onTransitionPause(transition: Transition) {}
-            override fun onTransitionResume(transition: Transition) {}
-        })
+
+                override fun onTransitionStart(transition: Transition) {}
+                override fun onTransitionCancel(transition: Transition) {}
+                override fun onTransitionPause(transition: Transition) {}
+                override fun onTransitionResume(transition: Transition) {}
+            },
+        )
+
+        // After slide out finished, hide view and fade in omnibar views
+        slideOutCookiesTransition.addListener(
+            object : TransitionListener {
+                override fun onTransitionEnd(transition: Transition) {
+                    if (!hasCookiesAnimationBeenCanceled) {
+                        AnimatorSet().apply {
+                            play(animateOmnibarIn(allOmnibarViews))
+                            start()
+                        }
+                        cookieScene.gone()
+                    } else {
+                        isCookiesAnimationRunning = false
+                        listener?.onAnimationFinished()
+                    }
+                }
+
+                override fun onTransitionStart(transition: Transition) {}
+                override fun onTransitionCancel(transition: Transition) {}
+                override fun onTransitionPause(transition: Transition) {}
+                override fun onTransitionResume(transition: Transition) {}
+            },
+        )
 
         // When lottie animation begins, begin the transition to slide in the text
-        cookieView.addAnimatorListener(object : AnimatorListener {
-            override fun onAnimationStart(p0: Animator) {
-                TransitionManager.go(secondScene, slideInCookiesTransition)
-            }
-            override fun onAnimationEnd(p0: Animator) {}
-            override fun onAnimationCancel(p0: Animator) {}
-            override fun onAnimationRepeat(p0: Animator) {}
-        })
+        cookieView.addAnimatorListener(
+            object : AnimatorListener {
+                override fun onAnimationStart(p0: Animator) {
+                    TransitionManager.go(secondScene, slideInCookiesTransition)
+                }
+
+                override fun onAnimationEnd(p0: Animator) {}
+                override fun onAnimationCancel(p0: Animator) {}
+                override fun onAnimationRepeat(p0: Animator) {}
+            },
+        )
 
         // Here the animations begins. Fade out omnibar, fade in dummy view and after that start lottie animation
         AnimatorSet().apply {
             play(animateOmnibarOut(allOmnibarViews)).with(animateFadeIn(cookieViewBackground)).with(animateFadeIn(cookieView))
-            addListener(onEnd = {
-                cookieScene.show()
-                cookieScene.alpha = 1F
-                cookieView.playAnimation()
-            })
+            addListener(
+                onEnd = {
+                    cookieScene.show()
+                    cookieScene.alpha = 1F
+                    cookieView.playAnimation()
+                },
+            )
             start()
         }
     }
@@ -293,7 +312,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
 
     private fun getAnimationRawRes(
         logos: List<TrackerLogo>,
-        theme: AppTheme
+        theme: AppTheme,
     ): Int {
         val trackers = logos.size
         return when {
@@ -306,7 +325,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
 
     private fun getLogos(
         context: Context,
-        entities: List<Entity>
+        entities: List<Entity>,
     ): List<TrackerLogo> {
         if (context.packageName == null) return emptyList()
         val trackerLogoList = entities
@@ -360,7 +379,6 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     }
 
     private fun animateOmnibarOut(views: List<View>): AnimatorSet {
-
         val animators = views.map {
             animateFadeOut(it)
         }
@@ -370,7 +388,6 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     }
 
     private fun animateOmnibarIn(views: List<View>): AnimatorSet {
-
         val animators = views.map {
             animateFadeIn(it)
         }
@@ -381,9 +398,8 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
 
     private fun animateFadeOut(
         view: View,
-        durationInMs: Long = DEFAULT_ANIMATION_DURATION
+        durationInMs: Long = DEFAULT_ANIMATION_DURATION,
     ): ObjectAnimator {
-
         return ObjectAnimator.ofFloat(view, "alpha", 1f, 0f).apply {
             duration = durationInMs
         }
@@ -391,7 +407,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
 
     private fun animateFadeIn(
         view: View,
-        durationInMs: Long = DEFAULT_ANIMATION_DURATION
+        durationInMs: Long = DEFAULT_ANIMATION_DURATION,
     ): ObjectAnimator {
         if (view.alpha == 1f) {
             return ObjectAnimator.ofFloat(view, "alpha", 1f, 1f).apply {
@@ -420,7 +436,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
 internal sealed class TrackerLogo() {
     class ImageLogo(val resId: Int) : TrackerLogo()
     class LetterLogo(
-        val trackerLetter: String = ""
+        val trackerLetter: String = "",
     ) : TrackerLogo()
 
     class StackedLogo(val resId: Int = R.drawable.network_logo_more) : TrackerLogo()

@@ -27,7 +27,7 @@ inline fun <reified T : ViewBinding> ViewGroup.viewBinding() =
 
 class ViewBindingDelegate<T : ViewBinding>(
     bindingClass: Class<T>,
-    view: ViewGroup
+    view: ViewGroup,
 ) :
     ReadOnlyProperty<ViewGroup, T> {
     private val binding: T =
@@ -37,7 +37,7 @@ class ViewBindingDelegate<T : ViewBinding>(
                     "inflate",
                     LayoutInflater::class.java,
                     ViewGroup::class.java,
-                    Boolean::class.javaPrimitiveType
+                    Boolean::class.javaPrimitiveType,
                 )
             inflateMethod.invoke(null, LayoutInflater.from(view.context), view, true).cast()
         } catch (e: NoSuchMethodException) {
@@ -48,10 +48,11 @@ class ViewBindingDelegate<T : ViewBinding>(
 
     override fun getValue(
         thisRef: ViewGroup,
-        property: KProperty<*>
+        property: KProperty<*>,
     ): T {
         return binding
     }
 }
 
-@Suppress("UNCHECKED_CAST") private fun <T> Any.cast(): T = this as T
+@Suppress("UNCHECKED_CAST")
+private fun <T> Any.cast(): T = this as T

@@ -45,7 +45,7 @@ class FeedbackTypeDisplay {
         val titleDisplayResId: Int,
 
         @StringRes
-        val subtitleDisplayResId: Int
+        val subtitleDisplayResId: Int,
     )
 
     data class FeedbackTypeSubReasonDisplay(
@@ -55,7 +55,7 @@ class FeedbackTypeDisplay {
         val listDisplayResId: Int,
 
         @StringRes
-        val subtitleDisplayResId: Int = listDisplayResId
+        val subtitleDisplayResId: Int = listDisplayResId,
     )
 
     companion object {
@@ -66,7 +66,7 @@ class FeedbackTypeDisplay {
                     type,
                     listDisplayResId = R.string.missingBrowserFeaturesTitleLong,
                     titleDisplayResId = R.string.missingBrowserFeaturesTitleShort,
-                    subtitleDisplayResId = R.string.missingBrowserFeaturesSubtitle
+                    subtitleDisplayResId = R.string.missingBrowserFeaturesSubtitle,
                 )
             }
 
@@ -75,7 +75,7 @@ class FeedbackTypeDisplay {
                     type,
                     R.string.websiteNotLoadingTitleShort,
                     R.string.websiteNotLoadingTitleLong,
-                    R.string.websiteNotLoadingSubtitle
+                    R.string.websiteNotLoadingSubtitle,
                 )
             }
 
@@ -84,7 +84,7 @@ class FeedbackTypeDisplay {
                     type,
                     R.string.searchNotGoodEnoughTitleLong,
                     R.string.searchNotGoodEnoughTitleShort,
-                    R.string.searchNotGoodEnoughSubtitle
+                    R.string.searchNotGoodEnoughSubtitle,
                 )
             }
 
@@ -93,7 +93,7 @@ class FeedbackTypeDisplay {
                     type,
                     R.string.needMoreCustomizationTitleLong,
                     R.string.needMoreCustomizationTitleShort,
-                    R.string.needMoreCustomizationSubtitle
+                    R.string.needMoreCustomizationSubtitle,
                 )
             }
 
@@ -102,7 +102,7 @@ class FeedbackTypeDisplay {
                     type,
                     R.string.appIsSlowOrBuggyTitleLong,
                     R.string.appIsSlowOrBuggyTitleShort,
-                    R.string.appIsSlowOrBuggySubtitle
+                    R.string.appIsSlowOrBuggySubtitle,
                 )
             }
 
@@ -111,7 +111,7 @@ class FeedbackTypeDisplay {
                     type,
                     R.string.otherMainReasonTitleLong,
                     R.string.otherMainReasonTitleShort,
-                    R.string.tellUsHowToImprove
+                    R.string.tellUsHowToImprove,
                 )
             }
         }

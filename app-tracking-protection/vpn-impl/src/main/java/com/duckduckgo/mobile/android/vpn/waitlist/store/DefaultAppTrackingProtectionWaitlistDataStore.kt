@@ -33,7 +33,7 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class)
 class DefaultAppTrackingProtectionWaitlistDataStore @Inject constructor(
     private val context: Context,
-    private val pixel: Pixel
+    private val pixel: Pixel,
 ) : AppTrackingProtectionWaitlistDataStore {
 
     private val encryptedPreferences: SharedPreferences? by lazy {
@@ -50,7 +50,7 @@ class DefaultAppTrackingProtectionWaitlistDataStore @Inject constructor(
                     .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
                     .build(),
                 EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
             )
         } catch (e: IOException) {
             pixel.enqueueFire(DeviceShieldPixelNames.ATP_ENCRYPTED_IO_EXCEPTION)
@@ -72,8 +72,11 @@ class DefaultAppTrackingProtectionWaitlistDataStore @Inject constructor(
         get() = encryptedPreferences?.getString(KEY_WAITLIST_TOKEN, null)
         set(value) {
             encryptedPreferences?.edit(commit = true) {
-                if (value == null) remove(KEY_WAITLIST_TOKEN)
-                else putString(KEY_WAITLIST_TOKEN, value)
+                if (value == null) {
+                    remove(KEY_WAITLIST_TOKEN)
+                } else {
+                    putString(KEY_WAITLIST_TOKEN, value)
+                }
             }
         }
 
@@ -81,8 +84,11 @@ class DefaultAppTrackingProtectionWaitlistDataStore @Inject constructor(
         get() = encryptedPreferences?.getString(KEY_INVITE_CODE, null)
         set(value) {
             encryptedPreferences?.edit(commit = true) {
-                if (value == null) remove(KEY_INVITE_CODE)
-                else putString(KEY_INVITE_CODE, value)
+                if (value == null) {
+                    remove(KEY_INVITE_CODE)
+                } else {
+                    putString(KEY_INVITE_CODE, value)
+                }
             }
         }
 
@@ -98,8 +104,11 @@ class DefaultAppTrackingProtectionWaitlistDataStore @Inject constructor(
         get() = encryptedPreferences?.getString(KEY_LAST_USED_DATE, null)
         set(value) {
             encryptedPreferences?.edit(commit = true) {
-                if (value == null) remove(KEY_LAST_USED_DATE)
-                else putString(KEY_LAST_USED_DATE, value)
+                if (value == null) {
+                    remove(KEY_LAST_USED_DATE)
+                } else {
+                    putString(KEY_LAST_USED_DATE, value)
+                }
             }
         }
 

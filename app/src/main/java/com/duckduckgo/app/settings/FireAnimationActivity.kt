@@ -54,22 +54,24 @@ class FireAnimationActivity : DuckDuckGoActivity() {
 
     private fun configureFireAnimationView(
         fireAnimation: FireAnimation,
-        fireAnimationView: LottieAnimationView
+        fireAnimationView: LottieAnimationView,
     ) {
         fireAnimationView.setAnimation(fireAnimation.resId)
         fireAnimationView.setRenderMode(RenderMode.SOFTWARE)
         fireAnimationView.enableMergePathsForKitKatAndAbove(true)
         fireAnimationView.setAndPropagateUpFitsSystemWindows(false)
         fireAnimationView.addAnimatorUpdateListener(accelerateAnimatorUpdateListener)
-        fireAnimationView.addAnimatorListener(object : Animator.AnimatorListener {
-            override fun onAnimationRepeat(animation: Animator) {}
-            override fun onAnimationCancel(animation: Animator) {}
-            override fun onAnimationStart(animation: Animator) {}
-            override fun onAnimationEnd(animation: Animator) {
-                finish()
-                overridePendingTransition(0, R.anim.tab_anim_fade_out)
-            }
-        })
+        fireAnimationView.addAnimatorListener(
+            object : Animator.AnimatorListener {
+                override fun onAnimationRepeat(animation: Animator) {}
+                override fun onAnimationCancel(animation: Animator) {}
+                override fun onAnimationStart(animation: Animator) {}
+                override fun onAnimationEnd(animation: Animator) {
+                    finish()
+                    overridePendingTransition(0, R.anim.tab_anim_fade_out)
+                }
+            },
+        )
     }
 
     private val accelerateAnimatorUpdateListener = object : ValueAnimator.AnimatorUpdateListener {
@@ -89,7 +91,7 @@ class FireAnimationActivity : DuckDuckGoActivity() {
 
         fun intent(
             context: Context,
-            fireAnimation: FireAnimation
+            fireAnimation: FireAnimation,
         ): Intent {
             val intent = Intent(context, FireAnimationActivity::class.java)
             intent.putExtra(FIRE_ANIMATION_EXTRA, fireAnimation)

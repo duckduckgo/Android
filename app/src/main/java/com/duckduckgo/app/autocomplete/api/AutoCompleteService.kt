@@ -18,9 +18,9 @@ package com.duckduckgo.app.autocomplete.api
 
 import com.duckduckgo.app.global.AppUrl
 import io.reactivex.Observable
+import java.util.*
 import retrofit2.http.GET
 import retrofit2.http.Query
-import java.util.*
 
 interface AutoCompleteService {
 
@@ -28,11 +28,11 @@ interface AutoCompleteService {
     fun autoComplete(
         @Query("q") query: String,
         @Query("kl") languageCode: String = Locale.getDefault().language,
-        @Query("is_nav") nav: String = "1"
+        @Query("is_nav") nav: String = "1",
     ): Observable<List<AutoCompleteServiceRawResult>>
 }
 
 data class AutoCompleteServiceRawResult(
     val phrase: String,
-    val isNav: Boolean?
+    val isNav: Boolean?,
 )

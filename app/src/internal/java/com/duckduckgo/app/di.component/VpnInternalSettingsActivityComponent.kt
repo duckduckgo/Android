@@ -33,7 +33,7 @@ import dagger.multibindings.IntoMap
 )
 @SingleInstanceIn(VpnScope::class)
 @MergeSubcomponent(
-    scope = VpnScope::class
+    scope = VpnScope::class,
 )
 interface VpnInternalSettingsActivityComponent : AndroidInjector<VpnInternalSettingsActivity> {
     @Subcomponent.Factory

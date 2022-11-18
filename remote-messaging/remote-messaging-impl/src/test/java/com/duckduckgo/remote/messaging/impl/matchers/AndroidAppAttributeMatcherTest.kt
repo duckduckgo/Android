@@ -21,12 +21,12 @@ import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.appbuildconfig.api.BuildFlavor.INTERNAL
 import com.duckduckgo.browser.api.AppProperties
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 class AndroidAppAttributeMatcherTest {
@@ -41,7 +41,7 @@ class AndroidAppAttributeMatcherTest {
         givenDeviceProperties(flavor = INTERNAL)
 
         val result = testee.evaluate(
-            MatchingAttribute.Flavor(value = listOf("internal"))
+            MatchingAttribute.Flavor(value = listOf("internal")),
         )
 
         assertEquals(EvaluationResult.Match, result)
@@ -52,7 +52,7 @@ class AndroidAppAttributeMatcherTest {
         givenDeviceProperties(flavor = INTERNAL)
 
         val result = testee.evaluate(
-            MatchingAttribute.Flavor(value = listOf("play"))
+            MatchingAttribute.Flavor(value = listOf("play")),
         )
 
         assertEquals(EvaluationResult.Fail, result)
@@ -63,7 +63,7 @@ class AndroidAppAttributeMatcherTest {
         givenDeviceProperties(appId = "com.duckduckgo.mobile.android")
 
         val result = testee.evaluate(
-            MatchingAttribute.AppId(value = "com.duckduckgo.mobile.android")
+            MatchingAttribute.AppId(value = "com.duckduckgo.mobile.android"),
         )
 
         assertEquals(EvaluationResult.Match, result)
@@ -74,7 +74,7 @@ class AndroidAppAttributeMatcherTest {
         givenDeviceProperties(appId = "com.duckduckgo.mobile.android")
 
         val result = testee.evaluate(
-            MatchingAttribute.AppId(value = "com.duckduckgo.mobile.android.debug")
+            MatchingAttribute.AppId(value = "com.duckduckgo.mobile.android.debug"),
         )
 
         assertEquals(EvaluationResult.Fail, result)
@@ -85,7 +85,7 @@ class AndroidAppAttributeMatcherTest {
         givenDeviceProperties(appVersion = "5.100.0")
 
         val result = testee.evaluate(
-            MatchingAttribute.AppVersion(max = "5.100.0")
+            MatchingAttribute.AppVersion(max = "5.100.0"),
         )
 
         assertEquals(EvaluationResult.Match, result)
@@ -96,7 +96,7 @@ class AndroidAppAttributeMatcherTest {
         givenDeviceProperties(appVersion = "5.100.0")
 
         val result = testee.evaluate(
-            MatchingAttribute.AppVersion(max = "5.99.0")
+            MatchingAttribute.AppVersion(max = "5.99.0"),
         )
 
         assertEquals(EvaluationResult.Fail, result)
@@ -107,7 +107,7 @@ class AndroidAppAttributeMatcherTest {
         givenDeviceProperties(appVersion = "5.100.0")
 
         val result = testee.evaluate(
-            MatchingAttribute.AppVersion(min = "5.100.0")
+            MatchingAttribute.AppVersion(min = "5.100.0"),
         )
 
         assertEquals(EvaluationResult.Match, result)
@@ -118,7 +118,7 @@ class AndroidAppAttributeMatcherTest {
         givenDeviceProperties(appVersion = "5.99.0")
 
         val result = testee.evaluate(
-            MatchingAttribute.AppVersion(min = "5.100.0")
+            MatchingAttribute.AppVersion(min = "5.100.0"),
         )
 
         assertEquals(EvaluationResult.Fail, result)
@@ -129,7 +129,7 @@ class AndroidAppAttributeMatcherTest {
         givenDeviceProperties(appVersion = "5.150.0")
 
         val result = testee.evaluate(
-            MatchingAttribute.AppVersion(min = "5.99.0", max = "5.200.0")
+            MatchingAttribute.AppVersion(min = "5.99.0", max = "5.200.0"),
         )
 
         assertEquals(EvaluationResult.Match, result)
@@ -140,7 +140,7 @@ class AndroidAppAttributeMatcherTest {
         givenDeviceProperties(appVersion = "5.000.0")
 
         val result = testee.evaluate(
-            MatchingAttribute.AppVersion(min = "5.100.0", max = "5.200.0")
+            MatchingAttribute.AppVersion(min = "5.100.0", max = "5.200.0"),
         )
 
         assertEquals(EvaluationResult.Fail, result)
@@ -151,7 +151,7 @@ class AndroidAppAttributeMatcherTest {
         givenDeviceProperties(appVersion = "5.100.0")
 
         val result = testee.evaluate(
-            MatchingAttribute.AppVersion(value = "5.100.0")
+            MatchingAttribute.AppVersion(value = "5.100.0"),
         )
 
         assertEquals(EvaluationResult.Match, result)
@@ -162,7 +162,7 @@ class AndroidAppAttributeMatcherTest {
         givenDeviceProperties(appVersion = "5.99.0")
 
         val result = testee.evaluate(
-            MatchingAttribute.AppVersion(value = "5.100.0")
+            MatchingAttribute.AppVersion(value = "5.100.0"),
         )
 
         assertEquals(EvaluationResult.Fail, result)
@@ -173,7 +173,7 @@ class AndroidAppAttributeMatcherTest {
         givenDeviceProperties(atb = "v105-2")
 
         val result = testee.evaluate(
-            MatchingAttribute.Atb(value = "v105-2")
+            MatchingAttribute.Atb(value = "v105-2"),
         )
 
         assertEquals(EvaluationResult.Match, result)
@@ -184,7 +184,7 @@ class AndroidAppAttributeMatcherTest {
         givenDeviceProperties(atb = "v105-2")
 
         val result = testee.evaluate(
-            MatchingAttribute.Atb(value = "v105-0")
+            MatchingAttribute.Atb(value = "v105-0"),
         )
 
         assertEquals(EvaluationResult.Fail, result)
@@ -195,7 +195,7 @@ class AndroidAppAttributeMatcherTest {
         givenDeviceProperties(appAtb = "v105-2")
 
         val result = testee.evaluate(
-            MatchingAttribute.AppAtb(value = "v105-2")
+            MatchingAttribute.AppAtb(value = "v105-2"),
         )
 
         assertEquals(EvaluationResult.Match, result)
@@ -206,7 +206,7 @@ class AndroidAppAttributeMatcherTest {
         givenDeviceProperties(appAtb = "v105-2")
 
         val result = testee.evaluate(
-            MatchingAttribute.AppAtb(value = "v105-0")
+            MatchingAttribute.AppAtb(value = "v105-0"),
         )
 
         assertEquals(EvaluationResult.Fail, result)
@@ -217,7 +217,7 @@ class AndroidAppAttributeMatcherTest {
         givenDeviceProperties(searchAtb = "v105-2")
 
         val result = testee.evaluate(
-            MatchingAttribute.SearchAtb(value = "v105-2")
+            MatchingAttribute.SearchAtb(value = "v105-2"),
         )
 
         assertEquals(EvaluationResult.Match, result)
@@ -228,7 +228,7 @@ class AndroidAppAttributeMatcherTest {
         givenDeviceProperties(searchAtb = "v105-2")
 
         val result = testee.evaluate(
-            MatchingAttribute.SearchAtb(value = "v105-0")
+            MatchingAttribute.SearchAtb(value = "v105-0"),
         )
 
         assertEquals(EvaluationResult.Fail, result)
@@ -239,7 +239,7 @@ class AndroidAppAttributeMatcherTest {
         givenDeviceProperties(expVariant = "zo")
 
         val result = testee.evaluate(
-            MatchingAttribute.ExpVariant(value = "zo")
+            MatchingAttribute.ExpVariant(value = "zo"),
         )
 
         assertEquals(EvaluationResult.Match, result)
@@ -250,7 +250,7 @@ class AndroidAppAttributeMatcherTest {
         givenDeviceProperties(expVariant = "zo")
 
         val result = testee.evaluate(
-            MatchingAttribute.ExpVariant(value = "zz")
+            MatchingAttribute.ExpVariant(value = "zz"),
         )
 
         assertEquals(EvaluationResult.Fail, result)
@@ -261,7 +261,7 @@ class AndroidAppAttributeMatcherTest {
         givenDeviceProperties(installedGPlay = true)
 
         val result = testee.evaluate(
-            MatchingAttribute.InstalledGPlay(value = true)
+            MatchingAttribute.InstalledGPlay(value = true),
         )
 
         assertEquals(EvaluationResult.Match, result)
@@ -272,7 +272,7 @@ class AndroidAppAttributeMatcherTest {
         givenDeviceProperties(installedGPlay = false)
 
         val result = testee.evaluate(
-            MatchingAttribute.InstalledGPlay(value = true)
+            MatchingAttribute.InstalledGPlay(value = true),
         )
 
         assertEquals(EvaluationResult.Fail, result)
@@ -286,7 +286,7 @@ class AndroidAppAttributeMatcherTest {
         appAtb: String = "v105-2",
         searchAtb: String = "v105-2",
         expVariant: String = "zo",
-        installedGPlay: Boolean = true
+        installedGPlay: Boolean = true,
     ) {
         whenever(appBuildConfig.flavor).thenReturn(flavor)
         whenever(appBuildConfig.applicationId).thenReturn(appId)
@@ -297,5 +297,4 @@ class AndroidAppAttributeMatcherTest {
         whenever(appProperties.expVariant()).thenReturn(expVariant)
         whenever(appProperties.installedGPlay()).thenReturn(installedGPlay)
     }
-
 }

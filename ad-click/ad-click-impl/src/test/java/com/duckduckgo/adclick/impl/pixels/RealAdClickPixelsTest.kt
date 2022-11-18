@@ -22,6 +22,7 @@ import androidx.core.content.edit
 import com.duckduckgo.adclick.impl.Exemption
 import com.duckduckgo.app.global.api.InMemorySharedPreferences
 import com.duckduckgo.app.statistics.pixels.Pixel
+import java.util.concurrent.TimeUnit
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -37,7 +38,6 @@ import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.threeten.bp.Instant
-import java.util.concurrent.TimeUnit
 
 @RunWith(RobolectricTestRunner::class)
 @Config(manifest = Config.NONE)
@@ -71,7 +71,7 @@ class RealAdClickPixelsTest {
             hostTldPlusOne = "ad_domain",
             navigationExemptionDeadline = 0L,
             exemptionDeadline = 0L,
-            adClickActivePixelFired = true
+            adClickActivePixelFired = true,
         )
 
         val result = testee.fireAdClickActivePixel(exemption)
@@ -85,7 +85,7 @@ class RealAdClickPixelsTest {
             hostTldPlusOne = "ad_domain",
             navigationExemptionDeadline = 0L,
             exemptionDeadline = 0L,
-            adClickActivePixelFired = false
+            adClickActivePixelFired = false,
         )
 
         val result = testee.fireAdClickActivePixel(exemption)
@@ -108,8 +108,8 @@ class RealAdClickPixelsTest {
             mapOf(
                 AdClickPixelParameters.AD_CLICK_DOMAIN_DETECTION to AdClickPixelValues.AD_CLICK_DETECTED_MATCHED,
                 AdClickPixelParameters.AD_CLICK_HEURISTIC_DETECTION to "true",
-                AdClickPixelParameters.AD_CLICK_DOMAIN_DETECTION_ENABLED to "true"
-            )
+                AdClickPixelParameters.AD_CLICK_DOMAIN_DETECTION_ENABLED to "true",
+            ),
         )
     }
 
@@ -127,8 +127,8 @@ class RealAdClickPixelsTest {
             mapOf(
                 AdClickPixelParameters.AD_CLICK_DOMAIN_DETECTION to AdClickPixelValues.AD_CLICK_DETECTED_MISMATCH,
                 AdClickPixelParameters.AD_CLICK_HEURISTIC_DETECTION to "true",
-                AdClickPixelParameters.AD_CLICK_DOMAIN_DETECTION_ENABLED to "true"
-            )
+                AdClickPixelParameters.AD_CLICK_DOMAIN_DETECTION_ENABLED to "true",
+            ),
         )
     }
 
@@ -146,8 +146,8 @@ class RealAdClickPixelsTest {
             mapOf(
                 AdClickPixelParameters.AD_CLICK_DOMAIN_DETECTION to AdClickPixelValues.AD_CLICK_DETECTED_SERP_ONLY,
                 AdClickPixelParameters.AD_CLICK_HEURISTIC_DETECTION to "true",
-                AdClickPixelParameters.AD_CLICK_DOMAIN_DETECTION_ENABLED to "true"
-            )
+                AdClickPixelParameters.AD_CLICK_DOMAIN_DETECTION_ENABLED to "true",
+            ),
         )
     }
 
@@ -165,8 +165,8 @@ class RealAdClickPixelsTest {
             mapOf(
                 AdClickPixelParameters.AD_CLICK_DOMAIN_DETECTION to AdClickPixelValues.AD_CLICK_DETECTED_HEURISTIC_ONLY,
                 AdClickPixelParameters.AD_CLICK_HEURISTIC_DETECTION to "true",
-                AdClickPixelParameters.AD_CLICK_DOMAIN_DETECTION_ENABLED to "true"
-            )
+                AdClickPixelParameters.AD_CLICK_DOMAIN_DETECTION_ENABLED to "true",
+            ),
         )
     }
 
@@ -184,8 +184,8 @@ class RealAdClickPixelsTest {
             mapOf(
                 AdClickPixelParameters.AD_CLICK_DOMAIN_DETECTION to AdClickPixelValues.AD_CLICK_DETECTED_NONE,
                 AdClickPixelParameters.AD_CLICK_HEURISTIC_DETECTION to "true",
-                AdClickPixelParameters.AD_CLICK_DOMAIN_DETECTION_ENABLED to "true"
-            )
+                AdClickPixelParameters.AD_CLICK_DOMAIN_DETECTION_ENABLED to "true",
+            ),
         )
     }
 
@@ -203,8 +203,8 @@ class RealAdClickPixelsTest {
             mapOf(
                 AdClickPixelParameters.AD_CLICK_DOMAIN_DETECTION to AdClickPixelValues.AD_CLICK_DETECTED_NONE,
                 AdClickPixelParameters.AD_CLICK_HEURISTIC_DETECTION to "false",
-                AdClickPixelParameters.AD_CLICK_DOMAIN_DETECTION_ENABLED to "true"
-            )
+                AdClickPixelParameters.AD_CLICK_DOMAIN_DETECTION_ENABLED to "true",
+            ),
         )
     }
 
@@ -222,8 +222,8 @@ class RealAdClickPixelsTest {
             mapOf(
                 AdClickPixelParameters.AD_CLICK_DOMAIN_DETECTION to AdClickPixelValues.AD_CLICK_DETECTED_NONE,
                 AdClickPixelParameters.AD_CLICK_HEURISTIC_DETECTION to "true",
-                AdClickPixelParameters.AD_CLICK_DOMAIN_DETECTION_ENABLED to "false"
-            )
+                AdClickPixelParameters.AD_CLICK_DOMAIN_DETECTION_ENABLED to "false",
+            ),
         )
     }
 
@@ -248,7 +248,7 @@ class RealAdClickPixelsTest {
         verify(mockPixel, never()).fire(
             pixel = eq(AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION),
             parameters = any(),
-            encodedParameters = any()
+            encodedParameters = any(),
         )
     }
 
@@ -263,7 +263,7 @@ class RealAdClickPixelsTest {
         verify(mockPixel).fire(
             pixel = eq(AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION),
             parameters = eq(mapOf(AdClickPixelParameters.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION_COUNT to "1")),
-            encodedParameters = any()
+            encodedParameters = any(),
         )
     }
 
@@ -281,7 +281,7 @@ class RealAdClickPixelsTest {
         verify(mockPixel, never()).fire(
             pixel = eq(AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION),
             parameters = any(),
-            encodedParameters = any()
+            encodedParameters = any(),
         )
     }
 
@@ -299,7 +299,7 @@ class RealAdClickPixelsTest {
         verify(mockPixel).fire(
             pixel = eq(AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION),
             parameters = eq(mapOf(AdClickPixelParameters.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION_COUNT to "1")),
-            encodedParameters = any()
+            encodedParameters = any(),
         )
     }
 }

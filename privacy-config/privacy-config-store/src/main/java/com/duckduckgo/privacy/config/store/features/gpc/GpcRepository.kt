@@ -33,7 +33,7 @@ interface GpcRepository {
     fun updateAll(
         exceptions: List<GpcExceptionEntity>,
         headerEnabledSites: List<GpcHeaderEnabledSiteEntity>,
-        gpcContentScopeConfig: GpcContentScopeConfigEntity
+        gpcContentScopeConfig: GpcContentScopeConfigEntity,
     )
 
     fun enableGpc()
@@ -48,7 +48,7 @@ class RealGpcRepository(
     private val gpcDataStore: GpcDataStore,
     val database: PrivacyConfigDatabase,
     coroutineScope: CoroutineScope,
-    dispatcherProvider: DispatcherProvider
+    dispatcherProvider: DispatcherProvider,
 ) : GpcRepository {
 
     private val gpcExceptionsDao: GpcExceptionsDao = database.gpcExceptionsDao()
@@ -65,7 +65,7 @@ class RealGpcRepository(
     override fun updateAll(
         exceptions: List<GpcExceptionEntity>,
         headerEnabledSites: List<GpcHeaderEnabledSiteEntity>,
-        gpcContentScopeConfig: GpcContentScopeConfigEntity
+        gpcContentScopeConfig: GpcContentScopeConfigEntity,
     ) {
         gpcExceptionsDao.updateAll(exceptions)
         gpcHeadersDao.updateAll(headerEnabledSites)

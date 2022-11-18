@@ -49,7 +49,7 @@ class UncaughtExceptionModule {
         uncaughtExceptionRepository: UncaughtExceptionRepository,
         dispatcherProvider: DispatcherProvider,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
-        appBuildConfig: AppBuildConfig
+        appBuildConfig: AppBuildConfig,
     ): AlertingUncaughtExceptionHandler {
         val originalHandler = Thread.getDefaultUncaughtExceptionHandler()
         return AlertingUncaughtExceptionHandler(
@@ -58,7 +58,7 @@ class UncaughtExceptionModule {
             uncaughtExceptionRepository,
             dispatcherProvider,
             appCoroutineScope,
-            appBuildConfig
+            appBuildConfig,
         )
     }
 

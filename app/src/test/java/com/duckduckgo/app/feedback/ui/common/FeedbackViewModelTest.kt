@@ -30,10 +30,6 @@ import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason.*
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MissingBrowserFeaturesSubReasons.TAB_MANAGEMENT
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import org.mockito.kotlin.argumentCaptor
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -43,6 +39,10 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 @Suppress("RemoveExplicitTypeArguments")
@@ -218,7 +218,6 @@ class FeedbackViewModelTest {
     }
 
     @Test
-
     fun whenUserSelectsMainNegativeReasonAppIsSlowOrBuggyThenFragmentStateIsSubReasonSelection() {
         testee.userSelectedNegativeFeedbackMainReason(APP_IS_SLOW_OR_BUGGY)
         assertTrue(updateViewCommand is NegativeFeedbackSubReason)
@@ -264,7 +263,6 @@ class FeedbackViewModelTest {
     }
 
     @Test
-
     fun whenUserNavigatesBackFromOpenEndedFeedbackAndSubReasonNotAValidStepThenFragmentStateIsMainReasonSelection() {
         testee.userSelectedNegativeFeedbackMainReason(OTHER)
         testee.onBackPressed()

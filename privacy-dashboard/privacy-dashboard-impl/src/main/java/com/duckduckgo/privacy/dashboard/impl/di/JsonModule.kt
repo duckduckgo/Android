@@ -40,7 +40,7 @@ object JsonModule {
             .add(
                 PolymorphicJsonAdapterFactory.of(RequestState::class.java, "state")
                     .withSubtype(Blocked::class.java, "blocked")
-                    .withSubtype(Allowed::class.java, "allowed")
+                    .withSubtype(Allowed::class.java, "allowed"),
             )
             .build()
     }

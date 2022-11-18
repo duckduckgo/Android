@@ -23,10 +23,10 @@ interface JavascriptInjector {
 
     fun getAliasFunctions(
         context: Context,
-        alias: String?
+        alias: String?,
     ): String
 
     fun getSignOutFunctions(
-        context: Context
+        context: Context,
     ): String
 }

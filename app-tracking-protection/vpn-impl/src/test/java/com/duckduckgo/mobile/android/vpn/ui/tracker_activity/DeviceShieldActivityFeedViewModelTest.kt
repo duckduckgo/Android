@@ -46,6 +46,8 @@ import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerCompan
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem.TrackerLoadingSkeleton
 import com.jakewharton.threetenabp.AndroidThreeTen
+import java.util.concurrent.TimeUnit.DAYS
+import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
@@ -57,8 +59,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import java.util.concurrent.TimeUnit.DAYS
-import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
 @ExperimentalCoroutinesApi
@@ -86,7 +86,7 @@ class DeviceShieldActivityFeedViewModelTest {
             CoroutineTestRule().testDispatcherProvider,
             RealTimeDiffFormatter(InstrumentationRegistry.getInstrumentation().targetContext),
             mockExcludedApps,
-            mockVpnStateMonitor
+            mockVpnStateMonitor,
         )
     }
 
@@ -121,9 +121,9 @@ class DeviceShieldActivityFeedViewModelTest {
                         trackerFeedDataWithTwoTrackers,
                         trackerFeedDataWithOneTracker,
                     ),
-                    vpnState = VpnState(state = ENABLED, stopReason = UNKNOWN)
+                    vpnState = VpnState(state = ENABLED, stopReason = UNKNOWN),
                 ),
-                awaitItem()
+                awaitItem(),
             )
             expectNoEvents()
             cancelAndConsumeRemainingEvents()
@@ -138,9 +138,9 @@ class DeviceShieldActivityFeedViewModelTest {
             assertEquals(
                 TrackerFeedViewState(
                     listOf(TrackerLoadingSkeleton),
-                    vpnState = VpnState(state = DISABLED, stopReason = ERROR)
+                    vpnState = VpnState(state = DISABLED, stopReason = ERROR),
                 ),
-                awaitItem()
+                awaitItem(),
             )
             expectNoEvents()
             cancelAndConsumeRemainingEvents()
@@ -164,19 +164,19 @@ class DeviceShieldActivityFeedViewModelTest {
                                 protectedAppsData = AppsData(
                                     appsCount = 1,
                                     isProtected = true,
-                                    packageNames = listOf(app.packageName)
+                                    packageNames = listOf(app.packageName),
                                 ),
                                 unprotectedAppsData = AppsData(
                                     appsCount = 1,
                                     isProtected = false,
-                                    packageNames = listOf(excludedApp.packageName)
-                                )
-                            )
+                                    packageNames = listOf(excludedApp.packageName),
+                                ),
+                            ),
                         ),
                     ),
-                    vpnState = VpnState(state = ENABLED, stopReason = UNKNOWN)
+                    vpnState = VpnState(state = ENABLED, stopReason = UNKNOWN),
                 ),
-                awaitItem()
+                awaitItem(),
             )
             expectNoEvents()
             cancelAndConsumeRemainingEvents()
@@ -194,11 +194,11 @@ class DeviceShieldActivityFeedViewModelTest {
             assertEquals(
                 TrackerFeedViewState(
                     listOf(
-                        TrackerFeedItem.TrackerDescriptionFeed
+                        TrackerFeedItem.TrackerDescriptionFeed,
                     ),
-                    vpnState = VpnState(state = DISABLED, stopReason = UNKNOWN)
+                    vpnState = VpnState(state = DISABLED, stopReason = UNKNOWN),
                 ),
-                awaitItem()
+                awaitItem(),
             )
             expectNoEvents()
             cancelAndConsumeRemainingEvents()
@@ -224,9 +224,9 @@ class DeviceShieldActivityFeedViewModelTest {
                         trackerFeedDataWithTwoTrackers,
                         trackerFeedDataWithOneTracker,
                     ),
-                    vpnState = VpnState(state = ENABLED, stopReason = UNKNOWN)
+                    vpnState = VpnState(state = ENABLED, stopReason = UNKNOWN),
                 ),
-                awaitItem()
+                awaitItem(),
             )
             expectNoEvents()
             cancelAndConsumeRemainingEvents()
@@ -266,20 +266,20 @@ private val dummySignals = listOf(
         0,
         "Google",
         100,
-        emptyList()
+        emptyList(),
     ),
     AppTrackerEntity(
         1,
         "Segment",
         100,
-        emptyList()
+        emptyList(),
     ),
     AppTrackerEntity(
         2,
         "Facebook",
         100,
-        emptyList()
-    )
+        emptyList(),
+    ),
 )
 
 private val dummyTrackers = listOf(
@@ -291,8 +291,8 @@ private val dummyTrackers = listOf(
         companyDisplayName = "Facebook",
         trackingApp = TrackingApp(
             packageId = "foo.package.id",
-            appDisplayName = "Foo"
-        )
+            appDisplayName = "Foo",
+        ),
     ),
     VpnTracker(
         timestamp = TEST_TIMESTAMP,
@@ -302,8 +302,8 @@ private val dummyTrackers = listOf(
         companyDisplayName = "Segment",
         trackingApp = TrackingApp(
             packageId = "foo.package.id",
-            appDisplayName = "Foo"
-        )
+            appDisplayName = "Foo",
+        ),
     ),
     VpnTracker(
         timestamp = TEST_TIMESTAMP,
@@ -313,8 +313,8 @@ private val dummyTrackers = listOf(
         companyDisplayName = "Google",
         trackingApp = TrackingApp(
             packageId = "lion.package.id",
-            appDisplayName = "LION"
-        )
+            appDisplayName = "LION",
+        ),
     ),
     VpnTracker(
         timestamp = TEST_TIMESTAMP_IN_THE_PAST,
@@ -324,8 +324,8 @@ private val dummyTrackers = listOf(
         companyDisplayName = "Google",
         trackingApp = TrackingApp(
             packageId = "foo.package.id",
-            appDisplayName = "Foo"
-        )
+            appDisplayName = "Foo",
+        ),
     ),
     VpnTracker(
         timestamp = TEST_TIMESTAMP,
@@ -335,9 +335,9 @@ private val dummyTrackers = listOf(
         companyDisplayName = "Google",
         trackingApp = TrackingApp(
             packageId = "com.duckduckgo.mobile.android.vpn",
-            appDisplayName = "DuckDuckGo"
-        )
-    )
+            appDisplayName = "DuckDuckGo",
+        ),
+    ),
 )
 
 private val trackerFeedDataWithTwoTrackers = TrackerFeedItem.TrackerFeedData(
@@ -350,7 +350,7 @@ private val trackerFeedDataWithTwoTrackers = TrackerFeedItem.TrackerFeedData(
     ),
     timestamp = TEST_TIMESTAMP,
     displayTimestamp = "Just Now",
-    trackersTotalCount = 2
+    trackersTotalCount = 2,
 )
 
 private val trackerFeedDataWithOneTracker = TrackerFeedItem.TrackerFeedData(
@@ -362,14 +362,14 @@ private val trackerFeedDataWithOneTracker = TrackerFeedItem.TrackerFeedData(
     ),
     timestamp = TEST_TIMESTAMP,
     displayTimestamp = "Just Now",
-    trackersTotalCount = 1
+    trackersTotalCount = 1,
 )
 
 private val config = DeviceShieldActivityFeedFragment.ActivityFeedConfig(
     maxRows = Int.MAX_VALUE,
     timeWindow = 5,
     timeWindowUnits = DAYS,
-    showTimeWindowHeadings = false
+    showTimeWindowHeadings = false,
 )
 
 private val app = TrackingProtectionAppInfo(
@@ -379,7 +379,7 @@ private val app = TrackingProtectionAppInfo(
     category = AppCategory.Undefined,
     isExcluded = false,
     knownProblem = TrackingProtectionAppInfo.NO_ISSUES,
-    userModified = false
+    userModified = false,
 )
 
 private val excludedApp = TrackingProtectionAppInfo(
@@ -389,5 +389,5 @@ private val excludedApp = TrackingProtectionAppInfo(
     category = AppCategory.Undefined,
     isExcluded = true,
     knownProblem = TrackingProtectionAppInfo.NO_ISSUES,
-    userModified = false
+    userModified = false,
 )

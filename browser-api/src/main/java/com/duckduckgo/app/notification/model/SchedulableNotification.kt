@@ -50,5 +50,5 @@ interface NotificationSpec {
 data class Channel(
     val id: String,
     @StringRes val name: Int,
-    val priority: Int
+    val priority: Int,
 )

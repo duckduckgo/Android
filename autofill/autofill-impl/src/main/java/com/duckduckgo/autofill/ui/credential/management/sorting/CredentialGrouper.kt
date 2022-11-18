@@ -23,7 +23,7 @@ import javax.inject.Inject
 
 class CredentialGrouper @Inject constructor(
     private val initialExtractor: InitialExtractor,
-    private val sorter: CredentialListSorter
+    private val sorter: CredentialListSorter,
 ) {
 
     fun group(unsortedCredentials: List<LoginCredentials>): List<ListItem> {
@@ -59,5 +59,4 @@ class CredentialGrouper @Inject constructor(
         }
         return groups
     }
-
 }

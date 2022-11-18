@@ -53,5 +53,4 @@ class CredentialTextExtractorTest {
     private fun credentials(username: String? = "username", password: String? = "pw", domain: String? = "example.com"): LoginCredentials {
         return LoginCredentials(username = username, password = password, domain = domain)
     }
-
 }

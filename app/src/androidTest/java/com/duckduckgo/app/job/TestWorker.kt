@@ -22,7 +22,7 @@ import androidx.work.WorkerParameters
 
 class TestWorker(
     context: Context,
-    parameters: WorkerParameters
+    parameters: WorkerParameters,
 ) : Worker(context, parameters) {
     override fun doWork(): Result {
         return Result.success()

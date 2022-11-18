@@ -21,14 +21,14 @@ import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersAdapter
 import com.duckduckgo.app.utils.ConflatedJob
+import java.util.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.util.*
 
 class BookmarksEntityQueryListener(
     private val viewModel: BookmarksViewModel,
     private val bookmarksAdapter: BookmarksAdapter,
-    private val bookmarkFoldersAdapter: BookmarkFoldersAdapter
+    private val bookmarkFoldersAdapter: BookmarkFoldersAdapter,
 ) {
 
     private var searchJob = ConflatedJob()
@@ -52,7 +52,7 @@ class BookmarksEntityQueryListener(
 
     private fun filterBookmarks(
         query: String,
-        bookmarks: List<SavedSite.Bookmark>
+        bookmarks: List<SavedSite.Bookmark>,
     ): List<BookmarksAdapter.BookmarkItem> {
         val lowercaseQuery = query.lowercase(Locale.getDefault())
         return bookmarks.filter {
@@ -63,7 +63,7 @@ class BookmarksEntityQueryListener(
 
     private fun filterBookmarkFolders(
         query: String,
-        bookmarkFolders: List<BookmarkFolder>
+        bookmarkFolders: List<BookmarkFolder>,
     ): List<BookmarkFoldersAdapter.BookmarkFolderItem> {
         val lowercaseQuery = query.lowercase(Locale.getDefault())
         return bookmarkFolders.filter {

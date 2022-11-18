@@ -30,13 +30,13 @@ class PastWeekTrackerActivityContentView : FrameLayout {
     constructor(context: Context) : this(context, null)
     constructor(
         context: Context,
-        attrs: AttributeSet?
+        attrs: AttributeSet?,
     ) : this(context, attrs, 0)
 
     constructor(
         context: Context,
         attrs: AttributeSet?,
-        defStyle: Int
+        defStyle: Int,
     ) : super(context, attrs, defStyle) {
 
         val attributes = context.obtainStyledAttributes(attrs, R.styleable.PastWeekTrackerActivityContentView)

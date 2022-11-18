@@ -59,9 +59,9 @@ import com.google.android.material.snackbar.Snackbar
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
+import javax.inject.Inject
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class AutofillManagementActivity : DuckDuckGoActivity() {
@@ -189,7 +189,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
 
     private fun showCredentialMode(
         credentials: LoginCredentials?,
-        isLaunchedDirectly: Boolean
+        isLaunchedDirectly: Boolean,
     ) {
         if (credentials != null) {
             binding.includeToolbar.toolbar.apply {
@@ -201,7 +201,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
             supportFragmentManager.showFragment(
                 fragment = AutofillManagementCredentialsMode.instance(),
                 tag = TAG_CREDENTIAL,
-                shouldAddToBackStack = !isLaunchedDirectly
+                shouldAddToBackStack = !isLaunchedDirectly,
             )
         }
     }
@@ -249,7 +249,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
          */
         fun intent(
             context: Context,
-            loginCredentials: LoginCredentials? = null
+            loginCredentials: LoginCredentials? = null,
         ): Intent {
             return Intent(context, AutofillManagementActivity::class.java).apply {
                 if (loginCredentials != null) {
@@ -269,7 +269,7 @@ class AutofillSettingsModule {
         return object : AutofillSettingsActivityLauncher {
             override fun intent(
                 context: Context,
-                loginCredentials: LoginCredentials?
+                loginCredentials: LoginCredentials?,
             ): Intent {
                 return AutofillManagementActivity.intent(context, loginCredentials)
             }

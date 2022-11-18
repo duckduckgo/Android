@@ -28,7 +28,7 @@ import javax.inject.Inject
 class AppBrokenSiteNav @Inject constructor() : BrokenSiteNav {
     override fun navigate(
         context: Context,
-        data: BrokenSiteData
+        data: BrokenSiteData,
     ): Intent {
         return BrokenSiteActivity.intent(context, data)
     }

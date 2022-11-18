@@ -41,7 +41,7 @@ import javax.inject.Inject
 @SingleInstanceIn(FragmentScope::class)
 class SitePermissionsDialogActivityLauncher @Inject constructor(
     private val systemPermissionsHelper: SystemPermissionsHelper,
-    private val sitePermissionsRepository: SitePermissionsRepository
+    private val sitePermissionsRepository: SitePermissionsRepository,
 ) : SitePermissionsDialogLauncher {
 
     private lateinit var sitePermissionRequest: PermissionRequest
@@ -55,7 +55,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         systemPermissionsHelper.registerPermissionLaunchers(
             caller,
             this::onResultSystemPermissionRequest,
-            this::onResultMultipleSystemPermissionsRequest
+            this::onResultMultipleSystemPermissionsRequest,
         )
     }
 
@@ -65,7 +65,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         tabId: String,
         permissionsRequested: Array<String>,
         request: PermissionRequest,
-        permissionsGrantedListener: SitePermissionsGrantedListener
+        permissionsGrantedListener: SitePermissionsGrantedListener,
     ) {
         sitePermissionRequest = request
         siteURL = url
@@ -89,7 +89,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     private fun showSitePermissionsRationaleDialog(
         @StringRes titleRes: Int,
         url: String,
-        onPermissionAllowed: () -> Unit
+        onPermissionAllowed: () -> Unit,
     ) {
         AlertDialog.Builder(activity).apply {
             setTitle(String.format(activity.getString(titleRes), url.websiteFromGeoLocationsApiOrigin()))
@@ -117,8 +117,8 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                 systemPermissionsHelper.requestMultiplePermissions(
                     arrayOf(
                         Manifest.permission.RECORD_AUDIO,
-                        Manifest.permission.MODIFY_AUDIO_SETTINGS
-                    )
+                        Manifest.permission.MODIFY_AUDIO_SETTINGS,
+                    ),
                 )
             }
             else -> {
@@ -126,8 +126,8 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                     arrayOf(
                         Manifest.permission.RECORD_AUDIO,
                         Manifest.permission.MODIFY_AUDIO_SETTINGS,
-                        Manifest.permission.CAMERA
-                    )
+                        Manifest.permission.CAMERA,
+                    ),
                 )
             }
         }
@@ -274,5 +274,5 @@ fun String.websiteFromGeoLocationsApiOrigin(): String {
 enum class SitePermissionsRequestedType {
     CAMERA,
     AUDIO,
-    CAMERA_AND_AUDIO
+    CAMERA_AND_AUDIO,
 }

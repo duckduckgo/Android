@@ -20,10 +20,10 @@ import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter.Companion.bucketByHour
 import com.duckduckgo.mobile.android.vpn.dao.*
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter.Companion.bucketByHour
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -131,7 +131,7 @@ class AppTrackerBlockingStatsRepositoryTest {
     private fun trackerFound(
         domain: String = "example.com",
         trackerCompanyId: Int = -1,
-        timestamp: String = bucketByHour()
+        timestamp: String = bucketByHour(),
     ) {
         val defaultTrackingApp = TrackingApp("app.foo.com", "Foo App")
         val tracker = VpnTracker(
@@ -140,7 +140,7 @@ class AppTrackerBlockingStatsRepositoryTest {
             timestamp = timestamp,
             company = "",
             companyDisplayName = "",
-            trackingApp = defaultTrackingApp
+            trackingApp = defaultTrackingApp,
         )
         vpnTrackerDao.insert(tracker)
     }
@@ -158,7 +158,7 @@ class AppTrackerBlockingStatsRepositoryTest {
 
     private fun assertTrackerFound(
         vpnTrackers: List<VpnTracker>?,
-        trackerDomain: String
+        trackerDomain: String,
     ) {
         assertFalse(vpnTrackers.isNullOrEmpty())
         assertTrue(isTrackerInList(vpnTrackers, trackerDomain))
@@ -166,7 +166,7 @@ class AppTrackerBlockingStatsRepositoryTest {
 
     private fun isTrackerInList(
         vpnTrackers: List<VpnTracker>?,
-        trackerDomain: String
+        trackerDomain: String,
     ): Boolean {
         vpnTrackers!!.forEach {
             if (it.domain == trackerDomain) {

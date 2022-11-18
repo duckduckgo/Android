@@ -27,7 +27,7 @@ import java.security.interfaces.RSAPublicKey
 import javax.inject.Inject
 
 class PublicKeyInfoMapper @Inject constructor(
-    private val appBuildConfig: AppBuildConfig
+    private val appBuildConfig: AppBuildConfig,
 ) {
 
     fun mapFrom(sslCertificate: SslCertificate): PublicKeyInfo? {
@@ -42,7 +42,7 @@ class PublicKeyInfoMapper @Inject constructor(
             val bitSize = certificateBitSize(it)
             PublicKeyInfo(
                 type = it.publicKey.algorithm,
-                bitSize = bitSize
+                bitSize = bitSize,
             )
         }
     }
@@ -80,6 +80,6 @@ class PublicKeyInfoMapper @Inject constructor(
         val type: String? = null,
         val externalRepresentation: String? = null,
         val canVerify: Boolean? = null,
-        val keyId: String? = null
+        val keyId: String? = null,
     )
 }

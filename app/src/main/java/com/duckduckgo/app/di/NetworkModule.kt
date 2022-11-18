@@ -48,6 +48,8 @@ import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
+import java.io.File
+import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
 import okhttp3.Cache
 import okhttp3.Interceptor
@@ -57,8 +59,6 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import timber.log.Timber
-import java.io.File
-import javax.inject.Named
 
 @Module
 class NetworkModule {
@@ -69,7 +69,7 @@ class NetworkModule {
     fun apiOkHttpClient(
         context: Context,
         apiRequestInterceptor: ApiRequestInterceptor,
-        apiInterceptorPlugins: PluginPoint<ApiInterceptorPlugin>
+        apiInterceptorPlugins: PluginPoint<ApiInterceptorPlugin>,
     ): OkHttpClient {
         val cacheLocation = File(context.cacheDir, NetworkApiCache.FILE_NAME)
         val cache = Cache(cacheLocation, CACHE_SIZE)
@@ -110,7 +110,7 @@ class NetworkModule {
     @Named("api")
     fun apiRetrofit(
         @Named("api") okHttpClient: OkHttpClient,
-        moshi: Moshi
+        moshi: Moshi,
     ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(Url.API)
@@ -126,7 +126,7 @@ class NetworkModule {
     @Named("nonCaching")
     fun nonCachingRetrofit(
         @Named("nonCaching") okHttpClient: OkHttpClient,
-        moshi: Moshi
+        moshi: Moshi,
     ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(Url.API)
@@ -140,7 +140,7 @@ class NetworkModule {
     fun apiRequestInterceptor(
         context: Context,
         userAgentProvider: UserAgentProvider,
-        appBuildConfig: AppBuildConfig
+        appBuildConfig: AppBuildConfig,
     ): ApiRequestInterceptor {
         return ApiRequestInterceptor(context, userAgentProvider, appBuildConfig)
     }
@@ -184,11 +184,11 @@ class NetworkModule {
         featureToggle: FeatureToggle,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         appBuildConfig: AppBuildConfig,
-        dispatcherProvider: DispatcherProvider
+        dispatcherProvider: DispatcherProvider,
     ): BrokenSiteSender =
         BrokenSiteSubmitter(
             statisticsStore, variantManager, tdsMetadataDao, gpc, featureToggle,
-            pixel, appCoroutineScope, appBuildConfig, dispatcherProvider
+            pixel, appCoroutineScope, appBuildConfig, dispatcherProvider,
         )
 
     @Provides
@@ -203,7 +203,7 @@ class NetworkModule {
         statisticsStore: StatisticsDataStore,
         pixel: Pixel,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
-        appBuildConfig: AppBuildConfig
+        appBuildConfig: AppBuildConfig,
     ): FeedbackSubmitter =
         FireAndForgetFeedbackSubmitter(feedbackService, variantManager, apiKeyMapper, statisticsStore, pixel, appCoroutineScope, appBuildConfig)
 

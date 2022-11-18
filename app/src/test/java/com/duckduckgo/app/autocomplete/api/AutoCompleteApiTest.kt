@@ -25,7 +25,6 @@ import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
-import org.mockito.kotlin.whenever
 import io.reactivex.Observable
 import io.reactivex.Single
 import org.junit.Assert.*
@@ -34,6 +33,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class AutoCompleteApiTest {
@@ -96,9 +96,9 @@ class AutoCompleteApiTest {
                     BookmarkEntity(0, "title", "https://example.com", 0),
                     BookmarkEntity(0, "title", "https://foo.com", 0),
                     BookmarkEntity(0, "title", "https://bar.com", 0),
-                    BookmarkEntity(0, "title", "https://baz.com", 0)
-                )
-            )
+                    BookmarkEntity(0, "title", "https://baz.com", 0),
+                ),
+            ),
         )
         whenever(mockFavoritesRepository.favoritesObservable()).thenReturn(Single.just(emptyList()))
 
@@ -110,7 +110,7 @@ class AutoCompleteApiTest {
                 AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com"),
                 AutoCompleteBookmarkSuggestion(phrase = "foo.com", "title", "https://foo.com"),
             ),
-            value.suggestions
+            value.suggestions,
         )
     }
 
@@ -123,9 +123,9 @@ class AutoCompleteApiTest {
                     BookmarkEntity(0, "title", "https://example.com", 0),
                     BookmarkEntity(0, "title", "https://foo.com", 0),
                     BookmarkEntity(0, "title", "https://bar.com", 0),
-                    BookmarkEntity(0, "title", "https://baz.com", 0)
-                )
-            )
+                    BookmarkEntity(0, "title", "https://baz.com", 0),
+                ),
+            ),
         )
         whenever(mockFavoritesRepository.favoritesObservable()).thenReturn(
             Single.just(
@@ -133,9 +133,9 @@ class AutoCompleteApiTest {
                     favorite(title = "title", url = "https://favexample.com"),
                     favorite(title = "title", url = "https://favfoo.com"),
                     favorite(title = "title", url = "https://favbar.com"),
-                    favorite(title = "title", url = "https://favbaz.com")
-                )
-            )
+                    favorite(title = "title", url = "https://favbaz.com"),
+                ),
+            ),
         )
 
         val result = testee.autoComplete("title").test()
@@ -146,7 +146,7 @@ class AutoCompleteApiTest {
                 AutoCompleteBookmarkSuggestion(phrase = "favexample.com", "title", "https://favexample.com"),
                 AutoCompleteBookmarkSuggestion(phrase = "favfoo.com", "title", "https://favfoo.com"),
             ),
-            value.suggestions
+            value.suggestions,
         )
     }
 
@@ -158,9 +158,9 @@ class AutoCompleteApiTest {
                     AutoCompleteServiceRawResult("example.com", false),
                     AutoCompleteServiceRawResult("foo.com", true),
                     AutoCompleteServiceRawResult("bar.com", true),
-                    AutoCompleteServiceRawResult("baz.com", true)
-                )
-            )
+                    AutoCompleteServiceRawResult("baz.com", true),
+                ),
+            ),
         )
         whenever(mockBookmarksDao.bookmarksObservable()).thenReturn(
             Single.just(
@@ -168,9 +168,9 @@ class AutoCompleteApiTest {
                     BookmarkEntity(0, "title example", "https://example.com", 0),
                     BookmarkEntity(0, "title foo", "https://foo.com/path/to/foo", 0),
                     BookmarkEntity(0, "title foo", "https://foo.com", 0),
-                    BookmarkEntity(0, "title bar", "https://bar.com", 0)
-                )
-            )
+                    BookmarkEntity(0, "title bar", "https://bar.com", 0),
+                ),
+            ),
         )
         whenever(mockFavoritesRepository.favoritesObservable()).thenReturn(
             Single.just(
@@ -178,9 +178,9 @@ class AutoCompleteApiTest {
                     favorite(title = "title example", url = "https://example.com"),
                     favorite(title = "title foo", url = "https://foo.com/path/to/foo"),
                     favorite(title = "title foo", url = "https://foo.com"),
-                    favorite(title = "title bar", url = "https://bar.com")
-                )
-            )
+                    favorite(title = "title bar", url = "https://bar.com"),
+                ),
+            ),
         )
 
         val result = testee.autoComplete("title").test()
@@ -192,13 +192,13 @@ class AutoCompleteApiTest {
                 AutoCompleteBookmarkSuggestion(
                     phrase = "foo.com/path/to/foo",
                     "title foo",
-                    "https://foo.com/path/to/foo"
+                    "https://foo.com/path/to/foo",
                 ),
                 AutoCompleteSearchSuggestion(phrase = "foo.com", true),
                 AutoCompleteSearchSuggestion(phrase = "bar.com", true),
-                AutoCompleteSearchSuggestion(phrase = "baz.com", true)
+                AutoCompleteSearchSuggestion(phrase = "baz.com", true),
             ),
-            value.suggestions
+            value.suggestions,
         )
     }
 
@@ -214,9 +214,9 @@ class AutoCompleteApiTest {
         assertEquals(
             listOf(
                 AutoCompleteBookmarkSuggestion(phrase = "favexample.com", "title", "https://favexample.com"),
-                AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com")
+                AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com"),
             ),
-            value.suggestions
+            value.suggestions,
         )
     }
 
@@ -228,18 +228,18 @@ class AutoCompleteApiTest {
                     AutoCompleteServiceRawResult("example.com", false),
                     AutoCompleteServiceRawResult("foo.com", true),
                     AutoCompleteServiceRawResult("bar.com", true),
-                    AutoCompleteServiceRawResult("baz.com", true)
-                )
-            )
+                    AutoCompleteServiceRawResult("baz.com", true),
+                ),
+            ),
         )
         whenever(mockBookmarksDao.bookmarksObservable()).thenReturn(
             Single.just(
                 listOf(
                     BookmarkEntity(0, "title foo", "https://foo.com?key=value", 0),
                     BookmarkEntity(0, "title foo", "https://foo.com", 0),
-                    BookmarkEntity(0, "title bar", "https://bar.com", 0)
-                )
-            )
+                    BookmarkEntity(0, "title bar", "https://bar.com", 0),
+                ),
+            ),
         )
         whenever(mockFavoritesRepository.favoritesObservable()).thenReturn(Single.just(emptyList()))
 
@@ -251,14 +251,14 @@ class AutoCompleteApiTest {
                 AutoCompleteBookmarkSuggestion(
                     phrase = "foo.com?key=value",
                     "title foo",
-                    "https://foo.com?key=value"
+                    "https://foo.com?key=value",
                 ),
                 AutoCompleteBookmarkSuggestion(phrase = "foo.com", "title foo", "https://foo.com"),
                 AutoCompleteSearchSuggestion(phrase = "example.com", false),
                 AutoCompleteSearchSuggestion(phrase = "bar.com", true),
-                AutoCompleteSearchSuggestion(phrase = "baz.com", true)
+                AutoCompleteSearchSuggestion(phrase = "baz.com", true),
             ),
-            value.suggestions
+            value.suggestions,
         )
     }
 
@@ -272,8 +272,8 @@ class AutoCompleteApiTest {
                     BookmarkEntity(0, "the title foo", "https://foo.com/path/to/foo", 0),
                     BookmarkEntity(0, "title bar", "https://bar.com", 0),
                     BookmarkEntity(0, "the title foo", "https://foo.com", 0),
-                )
-            )
+                ),
+            ),
         )
         whenever(mockFavoritesRepository.favoritesObservable()).thenReturn(Single.just(emptyList()))
 
@@ -286,10 +286,10 @@ class AutoCompleteApiTest {
                 AutoCompleteBookmarkSuggestion(
                     phrase = "example.com",
                     "the title example",
-                    "https://example.com"
+                    "https://example.com",
                 ),
             ),
-            value.suggestions
+            value.suggestions,
         )
     }
 
@@ -303,8 +303,8 @@ class AutoCompleteApiTest {
                     BookmarkEntity(0, "title bar", "https://bar.com", 0),
                     BookmarkEntity(0, "title foo", "https://foo.com", 0),
                     BookmarkEntity(0, "title baz", "https://baz.com", 0),
-                )
-            )
+                ),
+            ),
         )
         whenever(mockFavoritesRepository.favoritesObservable()).thenReturn(Single.just(emptyList()))
 
@@ -315,7 +315,7 @@ class AutoCompleteApiTest {
             listOf(
                 AutoCompleteBookmarkSuggestion(phrase = "foo.com", "title foo", "https://foo.com"),
             ),
-            value.suggestions
+            value.suggestions,
         )
     }
 
@@ -328,8 +328,8 @@ class AutoCompleteApiTest {
                     BookmarkEntity(0, "CNN international", "https://cnn.com", 0),
                     BookmarkEntity(0, "CNN international", "https://cnn.com", 0),
                     BookmarkEntity(0, "CNN international - world", "https://cnn.com/world", 0),
-                )
-            )
+                ),
+            ),
         )
         whenever(mockFavoritesRepository.favoritesObservable()).thenReturn(Single.just(emptyList()))
 
@@ -342,10 +342,10 @@ class AutoCompleteApiTest {
                 AutoCompleteBookmarkSuggestion(
                     phrase = "cnn.com/world",
                     "CNN international - world",
-                    "https://cnn.com/world"
+                    "https://cnn.com/world",
                 ),
             ),
-            value.suggestions
+            value.suggestions,
         )
     }
 
@@ -357,8 +357,8 @@ class AutoCompleteApiTest {
                 listOf(
                     BookmarkEntity(0, "Reddit", "https://reddit.com", 0),
                     BookmarkEntity(0, "Reddit - duckduckgo", "https://reddit.com/r/duckduckgo", 0),
-                )
-            )
+                ),
+            ),
         )
         whenever(mockFavoritesRepository.favoritesObservable()).thenReturn(Single.just(emptyList()))
 
@@ -371,10 +371,10 @@ class AutoCompleteApiTest {
                 AutoCompleteBookmarkSuggestion(
                     phrase = "reddit.com/r/duckduckgo",
                     "Reddit - duckduckgo",
-                    "https://reddit.com/r/duckduckgo"
+                    "https://reddit.com/r/duckduckgo",
                 ),
             ),
-            value.suggestions
+            value.suggestions,
         )
     }
 
@@ -386,8 +386,8 @@ class AutoCompleteApiTest {
                 listOf(
                     BookmarkEntity(0, "Reddit", "https://reddit.com", 0),
                     BookmarkEntity(0, "Reddit - duckduckgo", "https://reddit.com/r/duckduckgo", 0),
-                )
-            )
+                ),
+            ),
         )
         whenever(mockFavoritesRepository.favoritesObservable()).thenReturn(Single.just(emptyList()))
 
@@ -400,10 +400,10 @@ class AutoCompleteApiTest {
                 AutoCompleteBookmarkSuggestion(
                     phrase = "reddit.com/r/duckduckgo",
                     "Reddit - duckduckgo",
-                    "https://reddit.com/r/duckduckgo"
+                    "https://reddit.com/r/duckduckgo",
                 ),
             ),
-            value.suggestions
+            value.suggestions,
         )
     }
 
@@ -415,8 +415,8 @@ class AutoCompleteApiTest {
                 listOf(
                     BookmarkEntity(0, "Reddit", "https://reddit.com", 0),
                     BookmarkEntity(0, "Reddit - duckduckgo", "https://reddit.com/r/duckduckgo", 0),
-                )
-            )
+                ),
+            ),
         )
         whenever(mockFavoritesRepository.favoritesObservable()).thenReturn(Single.just(emptyList()))
 
@@ -428,10 +428,10 @@ class AutoCompleteApiTest {
                 AutoCompleteBookmarkSuggestion(
                     phrase = "reddit.com/r/duckduckgo",
                     "Reddit - duckduckgo",
-                    "https://reddit.com/r/duckduckgo"
+                    "https://reddit.com/r/duckduckgo",
                 ),
             ),
-            value.suggestions
+            value.suggestions,
         )
     }
 
@@ -443,8 +443,8 @@ class AutoCompleteApiTest {
                 listOf(
                     BookmarkEntity(0, "Reddit", "https://www.reddit.com", 0),
                     BookmarkEntity(0, "duckduckgo", "https://www.reddit.com/r/duckduckgo", 0),
-                )
-            )
+                ),
+            ),
         )
         whenever(mockFavoritesRepository.favoritesObservable()).thenReturn(Single.just(emptyList()))
 
@@ -457,10 +457,10 @@ class AutoCompleteApiTest {
                 AutoCompleteBookmarkSuggestion(
                     phrase = "www.reddit.com/r/duckduckgo",
                     "duckduckgo",
-                    "https://www.reddit.com/r/duckduckgo"
+                    "https://www.reddit.com/r/duckduckgo",
                 ),
             ),
-            value.suggestions
+            value.suggestions,
         )
     }
 
@@ -475,8 +475,8 @@ class AutoCompleteApiTest {
                     BookmarkEntity(0, "title bar", "https://bar.com", 0),
                     BookmarkEntity(0, "the title foo", "https://foo.com", 0),
                     BookmarkEntity(0, "title baz", "https://baz.com", 0),
-                )
-            )
+                ),
+            ),
         )
         whenever(mockFavoritesRepository.favoritesObservable()).thenReturn(Single.just(emptyList()))
 
@@ -497,8 +497,8 @@ class AutoCompleteApiTest {
                     BookmarkEntity(0, "title bar", "https://bar.com", 0),
                     BookmarkEntity(0, "the title foo", "https://foo.com", 0),
                     BookmarkEntity(0, "title foo baz", "https://baz.com", 0),
-                )
-            )
+                ),
+            ),
         )
         whenever(mockFavoritesRepository.favoritesObservable()).thenReturn(Single.just(emptyList()))
 
@@ -510,7 +510,7 @@ class AutoCompleteApiTest {
                 AutoCompleteBookmarkSuggestion(phrase = "baz.com", "title foo baz", "https://baz.com"),
                 AutoCompleteBookmarkSuggestion(phrase = "foo.com", "the title foo", "https://foo.com"),
             ),
-            value.suggestions
+            value.suggestions,
         )
     }
 
@@ -518,6 +518,6 @@ class AutoCompleteApiTest {
         id: Long = 0,
         title: String = "title",
         url: String = "https://example.com",
-        position: Int = 1
+        position: Int = 1,
     ) = Favorite(id, title, url, position)
 }

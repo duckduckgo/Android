@@ -23,11 +23,11 @@ import com.facebook.flipper.core.FlipperPlugin
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.multibindings.Multibinds
 import dagger.SingleInstanceIn
+import dagger.multibindings.Multibinds
 
 private class FlipperPluginPluginPoint(
-    private val plugins: DaggerSet<FlipperPlugin>
+    private val plugins: DaggerSet<FlipperPlugin>,
 ) : PluginPoint<FlipperPlugin> {
     override fun getPlugins(): Collection<FlipperPlugin> {
         return plugins
@@ -46,7 +46,7 @@ abstract class FlipperPluginModule {
         @Provides
         @SingleInstanceIn(AppScope::class)
         fun provideSettingInternalFeaturePlugins(
-            plugins: DaggerSet<FlipperPlugin>
+            plugins: DaggerSet<FlipperPlugin>,
         ): PluginPoint<FlipperPlugin> {
             return FlipperPluginPluginPoint(plugins)
         }

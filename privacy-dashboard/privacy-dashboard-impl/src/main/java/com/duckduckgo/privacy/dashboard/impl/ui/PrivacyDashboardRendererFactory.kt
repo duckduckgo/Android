@@ -35,13 +35,13 @@ sealed class RendererViewHolder {
         val onBrokenSiteClicked: () -> Unit,
         val onPrivacyProtectionsClicked: (Boolean) -> Unit,
         val onUrlClicked: (String) -> Unit,
-        val onClose: () -> Unit
+        val onClose: () -> Unit,
     ) : RendererViewHolder()
 }
 
 @ContributesBinding(ActivityScope::class)
 class BrowserPrivacyDashboardRendererFactory @Inject constructor(
-    @Named("privacyDashboard") val moshi: Moshi
+    @Named("privacyDashboard") val moshi: Moshi,
 ) : PrivacyDashboardRendererFactory {
 
     override fun createRenderer(renderer: RendererViewHolder): PrivacyDashboardRenderer {
@@ -53,7 +53,7 @@ class BrowserPrivacyDashboardRendererFactory @Inject constructor(
                 renderer.onBrokenSiteClicked,
                 renderer.onPrivacyProtectionsClicked,
                 renderer.onUrlClicked,
-                renderer.onClose
+                renderer.onClose,
             )
         }
     }

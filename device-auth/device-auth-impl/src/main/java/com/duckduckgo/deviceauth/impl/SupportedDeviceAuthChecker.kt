@@ -32,7 +32,7 @@ interface SupportedDeviceAuthChecker {
 
 @ContributesBinding(AppScope::class)
 class RealSupportedDeviceAuthChecker @Inject constructor(
-    private val context: Context
+    private val context: Context,
 ) : SupportedDeviceAuthChecker {
     private val biometricManager: BiometricManager by lazy {
         BiometricManager.from(context)

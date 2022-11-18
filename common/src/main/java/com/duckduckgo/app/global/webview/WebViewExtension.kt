@@ -37,7 +37,7 @@ fun WebSettings.enableDarkMode() {
         // requires WebView v83
         WebSettingsCompat.setForceDarkStrategy(
             this,
-            WebSettingsCompat.DARK_STRATEGY_WEB_THEME_DARKENING_ONLY
+            WebSettingsCompat.DARK_STRATEGY_WEB_THEME_DARKENING_ONLY,
         )
     }
 }

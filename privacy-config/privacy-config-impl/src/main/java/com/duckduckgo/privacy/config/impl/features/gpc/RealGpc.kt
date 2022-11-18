@@ -25,15 +25,15 @@ import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class RealGpc @Inject constructor(
     private val featureToggle: FeatureToggle,
     val gpcRepository: GpcRepository,
-    private val unprotectedTemporary: UnprotectedTemporary
+    private val unprotectedTemporary: UnprotectedTemporary,
 ) : Gpc {
 
     override fun isEnabled(): Boolean {
@@ -50,7 +50,7 @@ class RealGpc @Inject constructor(
 
     override fun canUrlAddHeaders(
         url: String,
-        existingHeaders: Map<String, String>
+        existingHeaders: Map<String, String>,
     ): Boolean {
         return if (canGpcBeUsedByUrl(url) && !containsGpcHeader(existingHeaders)) {
             gpcRepository.headerEnabledSites.any { sameOrSubdomain(url, it.domain) }
