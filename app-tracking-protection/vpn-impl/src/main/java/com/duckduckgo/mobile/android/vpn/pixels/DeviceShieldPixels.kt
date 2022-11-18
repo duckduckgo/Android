@@ -367,9 +367,6 @@ interface DeviceShieldPixels {
     fun reportVpnConnectivityError()
     fun reportDeviceConnectivityError()
 
-    /** Will fire when the VPN is stopped */
-    fun reportVpnUptime(uptime: Long)
-
     /** Will fire when the user has VPN always-on setting enabled */
     fun reportAlwaysOnEnabledDaily()
 
@@ -802,10 +799,6 @@ class RealDeviceShieldPixels @Inject constructor(
 
     private fun suddenKill() {
         firePixel(DeviceShieldPixelNames.ATP_KILLED)
-    }
-
-    override fun reportVpnUptime(uptime: Long) {
-        firePixel(DeviceShieldPixelNames.ATP_UPTIME, mapOf("uptime" to uptime.toString()))
     }
 
     override fun reportAlwaysOnEnabledDaily() {
