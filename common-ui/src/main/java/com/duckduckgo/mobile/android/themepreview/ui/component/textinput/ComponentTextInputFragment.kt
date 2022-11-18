@@ -23,7 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.duckduckgo.mobile.android.databinding.ComponentTextInputViewBinding
-import com.duckduckgo.mobile.android.ui.view.text.OutlinedTextInput.Action
+import com.duckduckgo.mobile.android.ui.view.text.TextInput.Action
 import com.google.android.material.snackbar.Snackbar
 
 @SuppressLint("NoFragment") // we don't use DI here

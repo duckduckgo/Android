@@ -37,14 +37,14 @@ import com.duckduckgo.mobile.android.databinding.ViewDaxTextInputBinding
 import com.duckduckgo.mobile.android.ui.view.showKeyboard
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput.Type.INPUT_TYPE_MULTI_LINE
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput.Type.INPUT_TYPE_PASSWORD
-import com.duckduckgo.mobile.android.ui.view.text.OutlinedTextInput.Action
-import com.duckduckgo.mobile.android.ui.view.text.OutlinedTextInput.Action.PerformEndAction
+import com.duckduckgo.mobile.android.ui.view.text.TextInput.Action
+import com.duckduckgo.mobile.android.ui.view.text.TextInput.Action.PerformEndAction
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.textfield.TextInputLayout.END_ICON_CUSTOM
 import com.google.android.material.textfield.TextInputLayout.END_ICON_NONE
 
-interface OutlinedTextInput {
+interface TextInput {
     var text: String
     var isEditable: Boolean
 
@@ -62,7 +62,7 @@ class DaxTextInput @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : ConstraintLayout(context, attrs, defStyleAttr), OutlinedTextInput {
+) : ConstraintLayout(context, attrs, defStyleAttr), TextInput {
     private val binding: ViewDaxTextInputBinding by viewBinding()
     private val transformationMethod by lazy {
         PasswordTransformationMethod.getInstance()
