@@ -63,6 +63,7 @@ class VpnReminderReceiver : BroadcastReceiver() {
     }
 }
 
+@Suppress("NoHardcodedCoroutineDispatcher")
 fun goAsync(
     pendingResult: BroadcastReceiver.PendingResult?,
     coroutineScope: CoroutineScope = GlobalScope,
