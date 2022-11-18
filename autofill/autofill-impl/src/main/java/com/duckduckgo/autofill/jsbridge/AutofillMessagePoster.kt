@@ -22,24 +22,27 @@ import androidx.core.net.toUri
 import androidx.webkit.WebMessageCompat
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import javax.inject.Inject
 
 interface AutofillMessagePoster {
     suspend fun postMessage(webView: WebView?, message: String)
 }
 
 @ContributesBinding(FragmentScope::class)
-class AutofillWebViewMessagePoster @Inject constructor() : AutofillMessagePoster {
+class AutofillWebViewMessagePoster @Inject constructor(
+    private val dispatchers: DispatcherProvider
+) : AutofillMessagePoster {
 
     @SuppressLint("RequiresFeature")
     override suspend fun postMessage(webView: WebView?, message: String) {
+
         webView?.let { wv ->
-            withContext(Dispatchers.Main) {
+            withContext(dispatchers.main()) {
                 if (!WebViewFeature.isFeatureSupported(WebViewFeature.POST_WEB_MESSAGE)) {
                     Timber.e("Unable to post web message")
                     return@withContext

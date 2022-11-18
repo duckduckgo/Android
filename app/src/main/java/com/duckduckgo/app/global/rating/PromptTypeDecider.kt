@@ -16,13 +16,12 @@
 
 package com.duckduckgo.app.global.rating
 
-import android.content.Context
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions.ShowEnjoymentPrompt
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions.ShowNothing
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -35,12 +34,13 @@ class InitialPromptTypeDecider(
     private val searchCountDao: SearchCountDao,
     private val initialPromptDecider: ShowPromptDecider,
     private val secondaryPromptDecider: ShowPromptDecider,
-    private val context: Context,
-    private val appBuildConfig: AppBuildConfig,
+    private val dispatchers: DispatcherProvider,
+    private val appBuildConfig: AppBuildConfig
 ) : PromptTypeDecider {
 
     override suspend fun determineInitialPromptType(): AppEnjoymentPromptOptions {
-        return withContext(Dispatchers.IO) {
+        return withContext(dispatchers.io()) {
+
             if (!isPlayStoreInstalled()) return@withContext ShowNothing
             if (!wasInstalledThroughPlayStore()) return@withContext ShowNothing
             if (!enoughSearchesMade()) return@withContext ShowNothing

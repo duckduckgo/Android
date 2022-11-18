@@ -25,6 +25,7 @@ import android.view.View
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.di.scopes.ActivityScope
@@ -32,14 +33,13 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRule
 import com.duckduckgo.vpn.internal.databinding.ActivityExceptionRulesDebugBinding
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class ExceptionRulesDebugActivity : DuckDuckGoActivity(), RuleTrackerView.RuleTrackerListener {
@@ -49,6 +49,9 @@ class ExceptionRulesDebugActivity : DuckDuckGoActivity(), RuleTrackerView.RuleTr
 
     @Inject
     lateinit var exclusionRulesRepository: ExclusionRulesRepository
+
+    @Inject
+    lateinit var dispatchers: DispatcherProvider
 
     private val binding: ActivityExceptionRulesDebugBinding by viewBinding()
 
@@ -69,7 +72,7 @@ class ExceptionRulesDebugActivity : DuckDuckGoActivity(), RuleTrackerView.RuleTr
                 rules to getAppTrackers()
             }
             .onStart { startRefreshTicker() }
-            .flowOn(Dispatchers.IO)
+            .flowOn(dispatchers.io())
             .onEach {
                 val (rules, appTrackers) = it
 
@@ -95,8 +98,9 @@ class ExceptionRulesDebugActivity : DuckDuckGoActivity(), RuleTrackerView.RuleTr
                 }
                 binding.appRule.isVisible = true
                 binding.progress.isVisible = false
+
             }
-            .flowOn(Dispatchers.Main)
+            .flowOn(dispatchers.main())
             .launchIn(lifecycleScope)
     }
 
@@ -122,7 +126,7 @@ class ExceptionRulesDebugActivity : DuckDuckGoActivity(), RuleTrackerView.RuleTr
 
     private fun List<AppTrackerExceptionRule>.containsRule(
         packageName: String,
-        domain: String,
+        domain: String
     ): Boolean {
         forEach { exclusionRule ->
             if (exclusionRule.rule == domain && exclusionRule.packageNames.contains(packageName)) return true
@@ -148,9 +152,9 @@ class ExceptionRulesDebugActivity : DuckDuckGoActivity(), RuleTrackerView.RuleTr
 
     override fun onTrackerClicked(
         view: View,
-        enabled: Boolean,
+        enabled: Boolean
     ) {
-        lifecycleScope.launch(Dispatchers.IO) {
+        lifecycleScope.launch(dispatchers.io()) {
             val tag = (view.tag as String?).orEmpty()
             val (appPackageName, domain) = tag.split("_")
             Timber.v("$appPackageName / $domain enabled: $enabled")
@@ -177,5 +181,5 @@ private data class InstalledApp(
 private data class InstalledAppTrackers(
     val packageName: String,
     val name: String? = null,
-    val blockedDomains: Set<String>,
+    val blockedDomains: Set<String>
 )

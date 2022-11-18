@@ -35,17 +35,16 @@ import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity.Companion.RELOAD_RESULT_CODE
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.di.scopes.ActivityScope
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridActivity.Companion.RELOAD_RESULT_CODE
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
 @ContributesViewModel(ActivityScope::class)
 class BrowserViewModel @Inject constructor(
@@ -55,7 +54,7 @@ class BrowserViewModel @Inject constructor(
     private val appEnjoymentPromptEmitter: AppEnjoymentPromptEmitter,
     private val appEnjoymentUserEventRecorder: AppEnjoymentUserEventRecorder,
     private val dispatchers: DispatcherProvider,
-    private val pixel: Pixel,
+    private val pixel: Pixel
 ) : AppEnjoymentDialogFragment.Listener,
     RateAppDialogFragment.Listener,
     GiveFeedbackDialogFragment.Listener,
@@ -63,10 +62,10 @@ class BrowserViewModel @Inject constructor(
     CoroutineScope {
 
     override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main
+        get() = dispatchers.main()
 
     data class ViewState(
-        val hideWebContent: Boolean = true,
+        val hideWebContent: Boolean = true
     )
 
     sealed class Command {
@@ -137,18 +136,18 @@ class BrowserViewModel @Inject constructor(
     suspend fun onOpenInNewTabRequested(
         query: String,
         sourceTabId: String? = null,
-        skipHome: Boolean = false,
+        skipHome: Boolean = false
     ): String {
         return if (sourceTabId != null) {
             tabRepository.addFromSourceTab(
                 url = queryUrlConverter.convertQueryToUrl(query),
                 skipHome = skipHome,
-                sourceTabId = sourceTabId,
+                sourceTabId = sourceTabId
             )
         } else {
             tabRepository.add(
                 url = queryUrlConverter.convertQueryToUrl(query),
-                skipHome = skipHome,
+                skipHome = skipHome
             )
         }
     }

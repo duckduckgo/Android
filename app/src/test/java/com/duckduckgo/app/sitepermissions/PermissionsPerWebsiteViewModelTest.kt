@@ -28,7 +28,6 @@ import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWe
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command.ShowPermissionSettingSelectionDialog
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSetting
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSettingType
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.site.permissions.impl.SitePermissionsRepository
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
@@ -53,13 +52,11 @@ class PermissionsPerWebsiteViewModelTest {
     private val mockSitePermissionsRepository: SitePermissionsRepository = mock()
     private val mockLocationPermissionsRepository: LocationPermissionsRepositoryAPI = mock()
     private val mockSettingsDataStore: SettingsDataStore = mock()
-    private val mockPixel: Pixel = mock()
 
     private val viewModel = PermissionsPerWebsiteViewModel(
         sitePermissionsRepository = mockSitePermissionsRepository,
         locationPermissionsRepository = mockLocationPermissionsRepository,
-        settingsDataStore = mockSettingsDataStore,
-        pixel = mockPixel,
+        settingsDataStore = mockSettingsDataStore
     )
 
     private val domain = "domain.com"
@@ -156,7 +153,7 @@ class PermissionsPerWebsiteViewModelTest {
             SitePermissionsEntity(
                 domain,
                 websitePermissionSetting.setting.toSitePermissionSettingEntityType().name,
-                websitePermissionSetting.setting.toSitePermissionSettingEntityType().name,
+                websitePermissionSetting.setting.toSitePermissionSettingEntityType().name
             )
         viewModel.onPermissionSettingSelected(websitePermissionSetting, domain)
 
@@ -190,7 +187,7 @@ class PermissionsPerWebsiteViewModelTest {
     private fun loadAskForPermissionsPrefs(
         micEnabled: Boolean = true,
         cameraEnabled: Boolean = true,
-        locationEnabled: Boolean = true,
+        locationEnabled: Boolean = true
     ) {
         whenever(mockSettingsDataStore.appLocationPermission).thenReturn(locationEnabled)
         whenever(mockSitePermissionsRepository.askMicEnabled).thenReturn(micEnabled)
@@ -200,7 +197,7 @@ class PermissionsPerWebsiteViewModelTest {
     private fun loadWebsitePermissionsSettings(
         cameraSetting: String = SitePermissionAskSettingType.ASK_EVERY_TIME.name,
         micSetting: String = SitePermissionAskSettingType.ASK_EVERY_TIME.name,
-        locationSetting: LocationPermissionType = LocationPermissionType.ALLOW_ALWAYS,
+        locationSetting: LocationPermissionType = LocationPermissionType.ALLOW_ALWAYS
     ) {
         val testLocationEntity = LocationPermissionEntity(domain, locationSetting)
         val testSitePermissionEntity = SitePermissionsEntity(domain, cameraSetting, micSetting)

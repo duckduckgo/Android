@@ -32,6 +32,7 @@ class ResourceSurrogatesImpl : ResourceSurrogates {
     }
 
     override fun get(scriptId: String): SurrogateResponse {
+
         return surrogates.find { it.scriptId == scriptId }
             ?: return SurrogateResponse(responseAvailable = false)
     }
@@ -40,11 +41,3 @@ class ResourceSurrogatesImpl : ResourceSurrogates {
         return surrogates
     }
 }
-
-data class SurrogateResponse(
-    val scriptId: String = "",
-    val responseAvailable: Boolean = true,
-    val name: String = "",
-    val jsFunction: String = "",
-    val mimeType: String = "",
-)

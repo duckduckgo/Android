@@ -18,35 +18,36 @@ package com.duckduckgo.app.browser.tabpreview
 
 import android.content.Context
 import android.graphics.Bitmap
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.file.FileDeleter
-import java.io.File
-import java.io.FileOutputStream
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.io.File
+import java.io.FileOutputStream
 
 interface WebViewPreviewPersister {
 
     fun fullPathForFile(
         tabId: String,
-        previewName: String,
+        previewName: String
     ): String
 
     suspend fun save(
         bitmap: Bitmap,
-        tabId: String,
+        tabId: String
     ): String
 
     suspend fun deleteAll()
     suspend fun deletePreviewsForTab(
         tabId: String,
-        currentPreviewImage: String?,
+        currentPreviewImage: String?
     )
 }
 
 class FileBasedWebViewPreviewPersister(
     val context: Context,
     private val fileDeleter: FileDeleter,
+    private val dispatchers: DispatcherProvider
 ) : WebViewPreviewPersister {
 
     override suspend fun deleteAll() {
@@ -55,9 +56,10 @@ class FileBasedWebViewPreviewPersister(
 
     override suspend fun save(
         bitmap: Bitmap,
-        tabId: String,
+        tabId: String
     ): String {
-        return withContext(Dispatchers.IO) {
+        return withContext(dispatchers.io()) {
+
             val previewFile = prepareDestinationFile(tabId)
             writeBytesToFile(previewFile, bitmap)
 
@@ -68,7 +70,7 @@ class FileBasedWebViewPreviewPersister(
 
     override suspend fun deletePreviewsForTab(
         tabId: String,
-        currentPreviewImage: String?,
+        currentPreviewImage: String?
     ) {
         val directoryToDelete = directoryForTabPreviews(tabId)
 
@@ -76,6 +78,7 @@ class FileBasedWebViewPreviewPersister(
             Timber.i("Deleting all tab previews for $tabId")
             fileDeleter.deleteDirectory(directoryToDelete)
         } else {
+
             Timber.i("Keeping tab preview $currentPreviewImage but deleting the rest for $tabId")
             val exclusionList = listOf(currentPreviewImage)
             fileDeleter.deleteContents(directoryToDelete, exclusionList)
@@ -86,14 +89,14 @@ class FileBasedWebViewPreviewPersister(
 
     override fun fullPathForFile(
         tabId: String,
-        previewName: String,
+        previewName: String
     ): String {
         return fileForPreview(tabId, previewName).absolutePath
     }
 
     private fun fileForPreview(
         tabId: String,
-        previewName: String,
+        previewName: String
     ): File {
         val tabPreviewDirectory = directoryForTabPreviews(tabId)
         return File(tabPreviewDirectory, previewName)
@@ -113,7 +116,7 @@ class FileBasedWebViewPreviewPersister(
 
     private fun writeBytesToFile(
         previewFile: File,
-        bitmap: Bitmap,
+        bitmap: Bitmap
     ) {
         FileOutputStream(previewFile).use { outputStream ->
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)

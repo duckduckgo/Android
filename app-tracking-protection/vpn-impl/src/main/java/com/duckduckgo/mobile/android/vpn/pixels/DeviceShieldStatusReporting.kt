@@ -24,23 +24,18 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.*
 import com.duckduckgo.anvil.annotations.ContributesWorker
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
-import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
-import com.duckduckgo.mobile.android.vpn.model.VpnServiceState
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import org.threeten.bp.LocalDateTime
-import timber.log.Timber
 
 @Module
 @ContributesTo(AppScope::class)
@@ -58,7 +53,7 @@ object DeviceShieldStatusReportingModule {
 }
 
 class DeviceShieldStatusReporting(
-    private val workManager: WorkManager,
+    private val workManager: WorkManager
 ) : LifecycleEventObserver {
 
     override fun onStateChanged(source: LifecycleOwner, event: Event) {
@@ -84,14 +79,10 @@ class DeviceShieldStatusReporting(
 @ContributesWorker(AppScope::class)
 class DeviceShieldStatusReportingWorker(
     context: Context,
-    params: WorkerParameters,
+    params: WorkerParameters
 ) : CoroutineWorker(context, params) {
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels
-
-    @Inject
-    lateinit var vpnServiceStateStatsDao: VpnServiceStateStatsDao
-
     @Inject
     lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
@@ -102,23 +93,6 @@ class DeviceShieldStatusReportingWorker(
             deviceShieldPixels.reportDisabled()
         }
 
-        sendLastDayVpnEnableDisableCounts()
-
         return Result.success()
-    }
-
-    private suspend fun sendLastDayVpnEnableDisableCounts() = withContext(Dispatchers.IO) {
-        val startTime = LocalDateTime.now().minusDays(1).toLocalDate().atStartOfDay().run {
-            DatabaseDateFormatter.timestamp(this)
-        }
-
-        val lastDayVpnStats = vpnServiceStateStatsDao.getServiceStateStatsSince(startTime)
-            .groupBy { it.day }[startTime.substringBefore("T")]
-            ?.groupBy { it.vpnServiceStateStats.state }
-
-        lastDayVpnStats?.let { stats ->
-            deviceShieldPixels.reportLastDayEnableCount(stats[VpnServiceState.ENABLED].orEmpty().size)
-            deviceShieldPixels.reportLastDayDisableCount(stats[VpnServiceState.DISABLED].orEmpty().size)
-        }
     }
 }

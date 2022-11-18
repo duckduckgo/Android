@@ -19,25 +19,32 @@ package com.duckduckgo.mobile.android.vpn.ui.notification
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerDao
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationFactory.DeviceShieldNotification
 import com.jakewharton.threetenabp.AndroidThreeTen
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.threeten.bp.LocalDateTime
 
+@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class DeviceShieldWeeklyNotificationFactoryTest {
+
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private lateinit var db: VpnDatabase
     private lateinit var vpnTrackerDao: VpnTrackerDao
@@ -52,7 +59,7 @@ class DeviceShieldWeeklyNotificationFactoryTest {
             .allowMainThreadQueries()
             .build()
         vpnTrackerDao = db.vpnTrackerDao()
-        appTrackerBlockingStatsRepository = RealAppTrackerBlockingStatsRepository(db)
+        appTrackerBlockingStatsRepository = RealAppTrackerBlockingStatsRepository(db, coroutineTestRule.testDispatcherProvider)
 
         factory =
             DeviceShieldNotificationFactory(InstrumentationRegistry.getInstrumentation().targetContext.resources, appTrackerBlockingStatsRepository)
@@ -77,7 +84,11 @@ class DeviceShieldWeeklyNotificationFactoryTest {
     fun createsWeeklyReportNotificationWhenTrackersFoundInTwoApps() = runBlocking {
         val trackerDomain = "example.com"
         trackerFound(trackerDomain, appContainingTracker = trackingApp1())
-        trackerFound(trackerDomain, appContainingTracker = trackingApp2())
+        trackerFound(
+            trackerDomain,
+            appContainingTracker = trackingApp2(),
+            timestamp = DatabaseDateFormatter.bucketByHour(LocalDateTime.now().plusHours(1))
+        )
 
         val notification = factory.weeklyNotificationFactory.createWeeklyDeviceShieldNotification(0)
         notification.assertTitleEquals("App Tracking Protection blocked 2 tracking attempts in app2 and 1 other app (past week).")
@@ -89,7 +100,11 @@ class DeviceShieldWeeklyNotificationFactoryTest {
         val trackerDomain = "example.com"
         trackerFound(trackerDomain, appContainingTracker = trackingApp1())
         trackerFound(trackerDomain, appContainingTracker = trackingApp2())
-        trackerFound(trackerDomain, appContainingTracker = trackingApp3())
+        trackerFound(
+            trackerDomain,
+            appContainingTracker = trackingApp3(),
+            timestamp = DatabaseDateFormatter.bucketByHour(LocalDateTime.now().plusHours(1))
+        )
 
         val notification = factory.weeklyNotificationFactory.createWeeklyDeviceShieldNotification(0)
         notification.assertTitleEquals("App Tracking Protection blocked 3 tracking attempts in app3 and 2 other apps (past week).")
@@ -104,7 +119,11 @@ class DeviceShieldWeeklyNotificationFactoryTest {
         trackerFound(trackerDomain, appContainingTracker = trackingApp2())
         trackerFound(trackerDomain, appContainingTracker = trackingApp3())
         trackerFound(trackerDomain, appContainingTracker = trackingApp3())
-        trackerFound(trackerDomain, appContainingTracker = trackingApp3())
+        trackerFound(
+            trackerDomain,
+            appContainingTracker = trackingApp3(),
+            timestamp = DatabaseDateFormatter.bucketByHour(LocalDateTime.now().plusHours(1))
+        )
 
         val notification = factory.weeklyNotificationFactory.createWeeklyDeviceShieldNotification(0)
         notification.assertTitleEquals("App Tracking Protection blocked 6 tracking attempts in app3 and 2 other apps (past week).")
@@ -131,18 +150,16 @@ class DeviceShieldWeeklyNotificationFactoryTest {
     fun createsWeeklyTopTrackerCompanyNotificationWhenTrackersFoundInTwoApps() = runBlocking {
         val trackerDomain = "example.com"
 
-        trackerFound(trackerDomain, company = "Google", appContainingTracker = trackingApp1())
-        trackerFound(trackerDomain, company = "Google", appContainingTracker = trackingApp1())
-        trackerFound(trackerDomain, company = "Facebook", appContainingTracker = trackingApp2())
-        trackerFound(trackerDomain, company = "Google", appContainingTracker = trackingApp2())
-        trackerFound(trackerDomain, company = "Google", appContainingTracker = trackingApp2())
+        trackerFound("google.com", company = "Google", appContainingTracker = trackingApp1())
+        trackerFound("google.com", company = "Google", appContainingTracker = trackingApp1())
+        trackerFound("facebook.com", company = "Facebook", appContainingTracker = trackingApp2())
+        trackerFound("google.com", company = "Google", appContainingTracker = trackingApp2())
+        trackerFound("google.com", company = "Google", appContainingTracker = trackingApp2())
         trackerFound(
-            trackerDomain,
-            company = "Google",
-            appContainingTracker = trackingApp2(),
+            "google.com", company = "Google", appContainingTracker = trackingApp2(),
             timestamp = DatabaseDateFormatter.bucketByHour(
-                LocalDateTime.now().plusHours(2),
-            ),
+                LocalDateTime.now().plusHours(2)
+            )
         )
 
         val notification = factory.weeklyNotificationFactory.createWeeklyDeviceShieldNotification(1)
@@ -161,7 +178,7 @@ class DeviceShieldWeeklyNotificationFactoryTest {
         trackerCompanyId: Int = -1,
         company: String = "Tracking LLC",
         appContainingTracker: TrackingApp = defaultApp(),
-        timestamp: String = DatabaseDateFormatter.bucketByHour(),
+        timestamp: String = DatabaseDateFormatter.bucketByHour()
     ) {
         val tracker = VpnTracker(
             trackerCompanyId = trackerCompanyId,
@@ -169,7 +186,7 @@ class DeviceShieldWeeklyNotificationFactoryTest {
             timestamp = timestamp,
             company = company,
             companyDisplayName = company,
-            trackingApp = appContainingTracker,
+            trackingApp = appContainingTracker
         )
         vpnTrackerDao.insert(tracker)
     }

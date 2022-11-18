@@ -22,6 +22,7 @@ import com.duckduckgo.app.browser.rating.db.AppEnjoymentDao
 import com.duckduckgo.app.browser.rating.db.AppEnjoymentDatabaseRepository
 import com.duckduckgo.app.browser.rating.db.AppEnjoymentRepository
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.rating.*
 import com.duckduckgo.app.playstore.PlayStoreAndroidUtils
@@ -34,8 +35,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
-import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
+import javax.inject.Named
 
 @Module
 class RatingModule {
@@ -46,7 +47,7 @@ class RatingModule {
     fun appEnjoymentManagerObserver(
         appEnjoymentPromptEmitter: AppEnjoymentPromptEmitter,
         promptTypeDecider: PromptTypeDecider,
-        @AppCoroutineScope appCoroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope
     ): LifecycleObserver {
         return AppEnjoymentAppCreationObserver(appEnjoymentPromptEmitter, promptTypeDecider, appCoroutineScope)
     }
@@ -61,7 +62,7 @@ class RatingModule {
     @Provides
     fun appEnjoymentUserEventRecorder(
         appEnjoymentRepository: AppEnjoymentRepository,
-        appEnjoymentPromptEmitter: AppEnjoymentPromptEmitter,
+        appEnjoymentPromptEmitter: AppEnjoymentPromptEmitter
     ): AppEnjoymentUserEventRecorder {
         return AppEnjoymentUserEventDatabaseRecorder(appEnjoymentRepository, appEnjoymentPromptEmitter)
     }
@@ -72,16 +73,16 @@ class RatingModule {
         searchCountDao: SearchCountDao,
         @Named(INITIAL_PROMPT_DECIDER_NAME) initialPromptDecider: ShowPromptDecider,
         @Named(SECONDARY_PROMPT_DECIDER_NAME) secondaryPromptDecider: ShowPromptDecider,
-        context: Context,
         appBuildConfig: AppBuildConfig,
+        dispatchers: DispatcherProvider
     ): PromptTypeDecider {
         return InitialPromptTypeDecider(
             playStoreUtils,
             searchCountDao,
             initialPromptDecider,
             secondaryPromptDecider,
-            context,
-            appBuildConfig,
+            dispatchers,
+            appBuildConfig
         )
     }
 
@@ -106,7 +107,7 @@ class RatingModule {
     @Provides
     fun initialPromptDecider(
         appDaysUsedRepository: AppDaysUsedRepository,
-        appEnjoymentRepository: AppEnjoymentRepository,
+        appEnjoymentRepository: AppEnjoymentRepository
     ): ShowPromptDecider {
         return InitialPromptDecider(appDaysUsedRepository, appEnjoymentRepository)
     }
@@ -115,7 +116,7 @@ class RatingModule {
     @Provides
     fun secondaryPromptDecider(
         appDaysUsedRepository: AppDaysUsedRepository,
-        appEnjoymentRepository: AppEnjoymentRepository,
+        appEnjoymentRepository: AppEnjoymentRepository
     ): ShowPromptDecider {
         return SecondaryPromptDecider(appDaysUsedRepository, appEnjoymentRepository)
     }

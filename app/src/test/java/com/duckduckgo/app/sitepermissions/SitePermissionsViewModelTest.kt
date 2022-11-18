@@ -26,7 +26,6 @@ import com.duckduckgo.app.location.data.LocationPermissionsRepositoryAPI
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.sitepermissions.SitePermissionsViewModel.Command.LaunchWebsiteAllowed
 import com.duckduckgo.app.sitepermissions.SitePermissionsViewModel.Command.ShowRemovedAllConfirmationSnackbar
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.site.permissions.impl.SitePermissionsRepository
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -53,15 +52,13 @@ class SitePermissionsViewModelTest {
     private val mockLocationPermissionsRepository: LocationPermissionsRepositoryAPI = mock()
     private val mockGeoLocationPermissions: GeoLocationPermissions = mock()
     private val mockSettingsDataStore: SettingsDataStore = mock()
-    private val mockPixel: Pixel = mock()
 
     private val viewModel = SitePermissionsViewModel(
         sitePermissionsRepository = mockSitePermissionsRepository,
         locationPermissionsRepository = mockLocationPermissionsRepository,
         geolocationPermissions = mockGeoLocationPermissions,
         settingsDataStore = mockSettingsDataStore,
-        dispatcherProvider = coroutineRule.testDispatcherProvider,
-        pixel = mockPixel,
+        dispatcherProvider = coroutineRule.testDispatcherProvider
     )
 
     @Before
@@ -192,4 +189,5 @@ class SitePermissionsViewModelTest {
         whenever(mockSitePermissionsRepository.askMicEnabled).thenReturn(micEnabled)
         whenever(mockSitePermissionsRepository.askCameraEnabled).thenReturn(cameraEnabled)
     }
+
 }

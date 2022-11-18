@@ -21,15 +21,16 @@ import android.webkit.WebView
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.cookies.db.AuthCookieAllowedDomainEntity
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsRepository
+import com.duckduckgo.app.global.DefaultDispatcherProvider
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 interface ThirdPartyCookieManager {
     suspend fun processUriForThirdPartyCookies(
         webView: WebView,
-        uri: Uri,
+        uri: Uri
     )
 
     suspend fun clearAllData()
@@ -38,11 +39,12 @@ interface ThirdPartyCookieManager {
 class AppThirdPartyCookieManager(
     private val cookieManagerProvider: CookieManagerProvider,
     private val authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository,
+    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
 ) : ThirdPartyCookieManager {
 
     override suspend fun processUriForThirdPartyCookies(
         webView: WebView,
-        uri: Uri,
+        uri: Uri
     ) {
         if (uri.host == GOOGLE_ACCOUNTS_HOST) {
             addHostToList(uri)
@@ -57,11 +59,11 @@ class AppThirdPartyCookieManager(
 
     private suspend fun processThirdPartyCookiesSetting(
         webView: WebView,
-        uri: Uri,
+        uri: Uri
     ) {
         val host = uri.host ?: return
         val domain = authCookiesAllowedDomainsRepository.getDomain(host)
-        withContext(Dispatchers.Main) {
+        withContext(dispatchers.main()) {
             if (domain != null && hasUserIdCookie()) {
                 Timber.d("Cookies enabled for $uri")
                 cookieManagerProvider.get().setAcceptThirdPartyCookies(webView, true)

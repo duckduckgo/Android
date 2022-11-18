@@ -25,7 +25,6 @@ import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.fire.AppCacheClearer
-import com.duckduckgo.app.fire.ClearDataPixel
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryAPI
@@ -36,7 +35,6 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -47,7 +45,7 @@ interface ClearDataAction {
 
     suspend fun clearTabsAndAllDataAsync(
         appInForeground: Boolean,
-        shouldFireDataClearPixel: Boolean,
+        shouldFireDataClearPixel: Boolean
     ): Unit?
 
     suspend fun setAppUsedSinceLastClearFlag(appUsedSinceLastClear: Boolean)
@@ -68,8 +66,7 @@ class ClearPersonalDataAction(
     private val adClickManager: AdClickManager,
     private val fireproofWebsiteRepository: FireproofWebsiteRepositoryAPI,
     private val sitePermissionsManager: SitePermissionsManager,
-    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
-    private val clearDataPixel: ClearDataPixel,
+    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
 ) : ClearDataAction {
 
     override fun killAndRestartProcess(notifyDataCleared: Boolean) {
@@ -84,10 +81,9 @@ class ClearPersonalDataAction(
 
     override suspend fun clearTabsAndAllDataAsync(
         appInForeground: Boolean,
-        shouldFireDataClearPixel: Boolean,
+        shouldFireDataClearPixel: Boolean
     ) {
-        withContext(Dispatchers.IO) {
-            clearDataPixel.onDataCleared()
+        withContext(dispatchers.io()) {
             val fireproofDomains = fireproofWebsiteRepository.fireproofWebsitesSync().map { it.domain }
             cookieManager.flush()
             geoLocationPermissions.clearAllButFireproofed()
@@ -96,7 +92,7 @@ class ClearPersonalDataAction(
             clearTabsAsync(appInForeground)
         }
 
-        withContext(Dispatchers.Main) {
+        withContext(dispatchers.main()) {
             clearDataAsync(shouldFireDataClearPixel)
         }
 
@@ -106,7 +102,6 @@ class ClearPersonalDataAction(
     @WorkerThread
     override suspend fun clearTabsAsync(appInForeground: Boolean) {
         withContext(dispatchers.io()) {
-            clearDataPixel.onDataCleared()
             Timber.i("Clearing tabs")
             dataManager.clearWebViewSessions()
             tabRepository.deleteAll()

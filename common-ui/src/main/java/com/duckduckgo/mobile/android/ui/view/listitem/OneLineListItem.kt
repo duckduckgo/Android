@@ -18,9 +18,9 @@ package com.duckduckgo.mobile.android.ui.view.listitem
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.text.TextUtils.TruncateAt
 import android.util.AttributeSet
 import android.view.View
-import android.widget.CompoundButton
 import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.annotation.ColorRes
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -31,13 +31,14 @@ import com.duckduckgo.mobile.android.databinding.ViewOneLineListItemBinding
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.view.recursiveEnable
+import com.duckduckgo.mobile.android.ui.view.setEnabledOpacity
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class OneLineListItem @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = R.attr.oneLineListItemStyle,
+    defStyleAttr: Int = R.attr.oneLineListItemStyle
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
     private val binding: ViewOneLineListItemBinding by viewBinding()
@@ -47,13 +48,19 @@ class OneLineListItem @JvmOverloads constructor(
             attrs,
             R.styleable.OneLineListItem,
             0,
-            R.style.Widget_DuckDuckGo_OneLineListItem,
+            R.style.Widget_DuckDuckGo_OneLineListItem
         ).apply {
 
             binding.primaryText.text = getString(R.styleable.OneLineListItem_primaryText)
 
             if (hasValue(R.styleable.OneLineListItem_primaryTextColorOverlay)) {
                 binding.primaryText.setTextColor(getColorStateList(R.styleable.OneLineListItem_primaryTextColorOverlay))
+            }
+
+            val truncated = getBoolean(R.styleable.OneLineListItem_primaryTextTruncated, false)
+            if (truncated) {
+                binding.primaryText.maxLines = 1
+                binding.primaryText.ellipsize = TruncateAt.END
             }
 
             if (hasValue(R.styleable.OneLineListItem_leadingIcon)) {
@@ -181,6 +188,7 @@ class OneLineListItem @JvmOverloads constructor(
 
     /** Sets the switch as enabled or not */
     override fun setEnabled(enabled: Boolean) {
+        setEnabledOpacity(enabled)
         recursiveEnable(enabled)
         super.setEnabled(enabled)
     }
@@ -188,7 +196,7 @@ class OneLineListItem @JvmOverloads constructor(
     /** Allows to set a new value to the switch, without triggering the onChangeListener */
     fun quietlySetIsChecked(
         newCheckedState: Boolean,
-        changeListener: CompoundButton.OnCheckedChangeListener?,
+        changeListener: OnCheckedChangeListener?
     ) {
         binding.trailingSwitch.quietlySetIsChecked(newCheckedState, changeListener)
     }

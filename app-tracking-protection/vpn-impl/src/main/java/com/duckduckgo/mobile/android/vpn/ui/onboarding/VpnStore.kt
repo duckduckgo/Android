@@ -18,36 +18,42 @@ package com.duckduckgo.mobile.android.vpn.ui.onboarding
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.mobile.android.vpn.dao.VpnHeartBeatDao
+import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
+import com.duckduckgo.mobile.android.vpn.heartbeat.VpnServiceHeartbeatMonitor
+import com.duckduckgo.mobile.android.vpn.model.VpnServiceState
+import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import org.threeten.bp.Instant
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import kotlinx.coroutines.withContext
 
 interface VpnStore {
     fun onboardingDidShow()
     fun onboardingDidNotShow()
     fun didShowOnboarding(): Boolean
-    fun resetAppTPManuallyEnablesCounter()
-    fun onAppTPManuallyEnabled()
-    fun getAppTPManuallyEnables(): Int
-    fun onForgetPromoteAlwaysOn()
-    fun userAllowsShowPromoteAlwaysOn(): Boolean
-    suspend fun setAlwaysOn(enabled: Boolean)
-    fun isAlwaysOnEnabled(): Boolean
 
-    companion object {
-        const val ALWAYS_ON_PROMOTION_DELTA = 3
-    }
+    suspend fun isAlwaysOnEnabled(): Boolean
+    suspend fun vpnLastDisabledByAndroid(): Boolean
+
+    fun didShowAppTpEnabledCta(): Boolean
+    fun appTpEnabledCtaDidShow()
+    fun onOnboardingSessionSet()
+    fun isOnboardingSession(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class SharedPreferencesVpnStore @Inject constructor(
     private val sharedPreferencesProvider: VpnSharedPreferencesProvider,
-    private val dispatcherProvider: DispatcherProvider,
+    private val vpnHeartBeatDao: VpnHeartBeatDao,
+    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
+    private val vpnServiceStateDao: VpnServiceStateStatsDao,
 ) : VpnStore {
 
     private val preferences: SharedPreferences
@@ -65,41 +71,56 @@ class SharedPreferencesVpnStore @Inject constructor(
         return preferences.getBoolean(KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED, false)
     }
 
-    override fun resetAppTPManuallyEnablesCounter() {
-        preferences.edit(commit = true) { putInt(KEY_DEVICE_SHIELD_MANUALLY_ENABLED, 0) }
+    override suspend fun isAlwaysOnEnabled(): Boolean {
+        return vpnServiceStateDao.getLastStateStats()?.alwaysOnState?.alwaysOnEnabled ?: false
     }
 
-    override fun onAppTPManuallyEnabled() {
-        preferences.edit(commit = true) { putInt(KEY_DEVICE_SHIELD_MANUALLY_ENABLED, getAppTPManuallyEnables() + 1) }
+    override suspend fun vpnLastDisabledByAndroid(): Boolean {
+        fun vpnUnexpectedlyDisabled(): Boolean {
+            return vpnServiceStateDao.getLastStateStats()?.let {
+                (
+                    it.state == VpnServiceState.DISABLED &&
+                        it.stopReason != VpnStoppingReason.SELF_STOP &&
+                        it.stopReason != VpnStoppingReason.REVOKED
+                    )
+            } ?: false
+        }
+
+        fun vpnKilledBySystem(): Boolean {
+            val lastHeartBeat = vpnHeartBeatDao.hearBeats().maxByOrNull { it.timestamp }
+            return lastHeartBeat?.type == VpnServiceHeartbeatMonitor.DATA_HEART_BEAT_TYPE_ALIVE &&
+                !vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)
+        }
+
+        return vpnUnexpectedlyDisabled() || vpnKilledBySystem()
     }
 
-    override fun getAppTPManuallyEnables(): Int {
-        return preferences.getInt(KEY_DEVICE_SHIELD_MANUALLY_ENABLED, 0)
+    override fun didShowAppTpEnabledCta(): Boolean {
+        return preferences.getBoolean(KEY_APP_TP_ONBOARDING_VPN_ENABLED_CTA_SHOWN, false)
     }
 
-    override fun onForgetPromoteAlwaysOn() {
-        preferences.edit(commit = true) { putBoolean(KEY_PROMOTE_ALWAYS_ON_DIALOG_ALLOWED, false) }
+    override fun appTpEnabledCtaDidShow() {
+        preferences.edit { putBoolean(KEY_APP_TP_ONBOARDING_VPN_ENABLED_CTA_SHOWN, true) }
     }
 
-    override fun userAllowsShowPromoteAlwaysOn(): Boolean {
-        return preferences.getBoolean(KEY_PROMOTE_ALWAYS_ON_DIALOG_ALLOWED, true)
+    override fun onOnboardingSessionSet() {
+        val now = Instant.now().toEpochMilli()
+        val expiryTimestamp = now.plus(TimeUnit.HOURS.toMillis(WINDOW_INTERVAL_HOURS))
+        preferences.edit { putLong(KEY_APP_TP_ONBOARDING_BANNER_EXPIRY_TIMESTAMP, expiryTimestamp) }
     }
 
-    override suspend fun setAlwaysOn(enabled: Boolean) = withContext(dispatcherProvider.io()) {
-        preferences.edit(commit = true) { putBoolean(KEY_ALWAYS_ON_MODE_ENABLED, enabled) }
-    }
-
-    override fun isAlwaysOnEnabled(): Boolean {
-        return preferences.getBoolean(KEY_ALWAYS_ON_MODE_ENABLED, false)
+    override fun isOnboardingSession(): Boolean {
+        val expiryTimestamp = preferences.getLong(KEY_APP_TP_ONBOARDING_BANNER_EXPIRY_TIMESTAMP, -1)
+        return Instant.now().toEpochMilli() < expiryTimestamp
     }
 
     companion object {
         private const val DEVICE_SHIELD_ONBOARDING_STORE_PREFS = "com.duckduckgo.android.atp.onboarding.store"
 
         private const val KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED = "KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED"
-        private const val KEY_DEVICE_SHIELD_MANUALLY_ENABLED = "KEY_DEVICE_SHIELD_MANUALLY_ENABLED"
-        private const val KEY_PROMOTE_ALWAYS_ON_DIALOG_ALLOWED = "KEY_PROMOTE_ALWAYS_ON_DIALOG_ALLOWED"
+        private const val KEY_APP_TP_ONBOARDING_VPN_ENABLED_CTA_SHOWN = "KEY_APP_TP_ONBOARDING_VPN_ENABLED_CTA_SHOWN"
+        private const val KEY_APP_TP_ONBOARDING_BANNER_EXPIRY_TIMESTAMP = "KEY_APP_TP_ONBOARDING_BANNER_EXPIRY_TIMESTAMP"
 
-        private const val KEY_ALWAYS_ON_MODE_ENABLED = "KEY_ALWAYS_ON_MODE_ENABLED"
+        private const val WINDOW_INTERVAL_HOURS = 24L
     }
 }

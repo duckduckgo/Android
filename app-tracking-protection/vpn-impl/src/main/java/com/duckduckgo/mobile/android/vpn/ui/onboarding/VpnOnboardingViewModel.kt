@@ -30,13 +30,13 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.AppThemeAppTPOnboardingResourceHelper.AppTPOnboadingResource.TRACKERS_COUNT
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.AppThemeAppTPOnboardingResourceHelper.AppTPOnboadingResource.TRACKING_APPS
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.AppThemeAppTPOnboardingResourceHelper.AppTPOnboadingResource.VPN
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class VpnOnboardingViewModel @Inject constructor(
@@ -46,7 +46,7 @@ class VpnOnboardingViewModel @Inject constructor(
     private val vpnStateMonitor: VpnStateMonitor,
     private val appTPOnboardingAnimationHelper: AppTPOnboardingResourceHelper,
     private val appCoroutineScope: CoroutineScope,
-    private val dispatcherProvider: DispatcherProvider,
+    private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -57,34 +57,25 @@ class VpnOnboardingViewModel @Inject constructor(
     data class OnboardingPage(
         val imageHeader: Int,
         val title: Int,
-        val text: Int,
+        val text: Int
     )
 
     val pages = listOf(
         OnboardingPage(
             appTPOnboardingAnimationHelper.getHeaderRes(TRACKERS_COUNT),
-            R.string.atp_OnboardingLastPageOneTitle,
-            R.string.atp_OnboardingLatsPageOneSubtitle,
+            R.string.atp_OnboardingLastPageOneTitle, R.string.atp_OnboardingLatsPageOneSubtitle
         ),
         OnboardingPage(
             appTPOnboardingAnimationHelper.getHeaderRes(TRACKING_APPS),
-            R.string.atp_OnboardingLastPageTwoTitle,
-            R.string.atp_OnboardingLastPageTwoSubTitle,
+            R.string.atp_OnboardingLastPageTwoTitle, R.string.atp_OnboardingLastPageTwoSubTitle
         ),
         OnboardingPage(
             appTPOnboardingAnimationHelper.getHeaderRes(VPN),
-            R.string.atp_OnboardingLastPageThreeTitle,
-            R.string.atp_OnboardingLastPageThreeSubTitle,
-        ),
-        OnboardingPage(
-            appTPOnboardingAnimationHelper.getHeaderRes(TRACKING_APPS),
-            R.string.atp_EnabledTitle,
-            R.string.atp_EnabledMessage,
-        ),
+            R.string.atp_OnboardingLastPageThreeTitle, R.string.atp_OnboardingLastPageThreeSubTitle
+        )
     )
 
     fun onTurnAppTpOffOn() {
-        vpnStore.onboardingDidShow()
         if (vpnDetector.isVpnDetected()) {
             sendCommand(Command.ShowVpnConflictDialog)
         } else {
@@ -94,6 +85,7 @@ class VpnOnboardingViewModel @Inject constructor(
 
     fun onAppTpEnabled() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
+            vpnStore.onboardingDidShow()
             deviceShieldPixels.enableFromOnboarding()
         }
     }

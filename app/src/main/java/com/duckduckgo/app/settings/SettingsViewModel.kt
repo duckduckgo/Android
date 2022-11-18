@@ -49,8 +49,6 @@ import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateReposito
 import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import com.duckduckgo.site.permissions.impl.pixels.SitePermissionsPixel.SitePermissionsPixelName
-import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -62,6 +60,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class SettingsViewModel @Inject constructor(
@@ -97,6 +96,7 @@ class SettingsViewModel @Inject constructor(
         val globalPrivacyControlEnabled: Boolean = false,
         val appLinksSettingType: AppLinkSettingType = AppLinkSettingType.ASK_EVERYTIME,
         val appTrackingProtectionWaitlistState: WaitlistState = WaitlistState.NotJoinedQueue,
+        val appTrackingProtectionOnboardingShown: Boolean = false,
         val appTrackingProtectionEnabled: Boolean = false,
         val emailAddress: String? = null,
         val showAutofill: Boolean = false,
@@ -106,7 +106,7 @@ class SettingsViewModel @Inject constructor(
     data class AutomaticallyClearData(
         val clearWhatOption: ClearWhatOption,
         val clearWhenOption: ClearWhenOption,
-        val clearWhenOptionEnabled: Boolean = true,
+        val clearWhenOptionEnabled: Boolean = true
     )
 
     sealed class Command {
@@ -165,12 +165,13 @@ class SettingsViewModel @Inject constructor(
                     selectedFireAnimation = settingsDataStore.selectedFireAnimation,
                     globalPrivacyControlEnabled = gpc.isEnabled() && featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName.value),
                     appLinksSettingType = getAppLinksSettingsState(settingsDataStore.appLinksEnabled, settingsDataStore.showAppLinksPrompt),
+                    appTrackingProtectionOnboardingShown = vpnStore.didShowOnboarding(),
                     appTrackingProtectionEnabled = vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN),
                     appTrackingProtectionWaitlistState = atpRepository.getState(),
                     emailAddress = emailManager.getEmailAddress(),
                     showAutofill = autofillStore.autofillAvailable,
                     autoconsentEnabled = autoconsent.isSettingEnabled(),
-                ),
+                )
             )
         }
     }
@@ -185,7 +186,8 @@ class SettingsViewModel @Inject constructor(
                 val isDeviceShieldEnabled = vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)
                 if (currentViewState().appTrackingProtectionEnabled != isDeviceShieldEnabled) {
                     viewState.value = currentViewState().copy(
-                        appTrackingProtectionEnabled = isDeviceShieldEnabled,
+                        appTrackingProtectionOnboardingShown = vpnStore.didShowOnboarding(),
+                        appTrackingProtectionEnabled = isDeviceShieldEnabled
                     )
                 }
                 delay(1_000)
@@ -247,7 +249,6 @@ class SettingsViewModel @Inject constructor(
 
     fun onSitePermissionsClicked() {
         viewModelScope.launch { command.send(Command.LaunchLocation) }
-        pixel.fire(SitePermissionsPixelName.SITE_PERMISSIONS_SETTINGS_VISITED)
     }
 
     fun onAutomaticallyClearWhatClicked() {
@@ -337,7 +338,7 @@ class SettingsViewModel @Inject constructor(
 
     private fun getAppLinksSettingsState(
         appLinksEnabled: Boolean,
-        showAppLinksPrompt: Boolean,
+        showAppLinksPrompt: Boolean
     ): AppLinkSettingType {
         return if (appLinksEnabled) {
             if (showAppLinksPrompt) {
@@ -371,9 +372,9 @@ class SettingsViewModel @Inject constructor(
                     automaticallyClearData = AutomaticallyClearData(
                         clearWhatOption = clearWhatNewSetting,
                         clearWhenOption = settingsDataStore.automaticallyClearWhenOption,
-                        clearWhenOptionEnabled = isAutomaticallyClearingDataWhenSettingEnabled(clearWhatNewSetting),
-                    ),
-                ),
+                        clearWhenOptionEnabled = isAutomaticallyClearingDataWhenSettingEnabled(clearWhatNewSetting)
+                    )
+                )
             )
         }
     }
@@ -398,9 +399,9 @@ class SettingsViewModel @Inject constructor(
                 currentViewState().copy(
                     automaticallyClearData = AutomaticallyClearData(
                         settingsDataStore.automaticallyClearWhatOption,
-                        clearWhenNewSetting,
-                    ),
-                ),
+                        clearWhenNewSetting
+                    )
+                )
             )
         }
     }
@@ -475,5 +476,5 @@ class SettingsViewModel @Inject constructor(
 enum class AppLinkSettingType {
     ASK_EVERYTIME,
     ALWAYS,
-    NEVER,
+    NEVER
 }

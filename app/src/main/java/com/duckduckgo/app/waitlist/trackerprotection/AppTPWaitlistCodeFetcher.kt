@@ -23,6 +23,8 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.notification.NotificationSender
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.waitlist.trackerprotection.AppTPWaitlistWorkRequestBuilder.Companion.APP_TP_WAITLIST_SYNC_WORK_TAG
+import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
+import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.waitlist.AppTPWaitlistManager
 import com.duckduckgo.mobile.android.vpn.waitlist.FetchCodeResult
 import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateRepository
@@ -43,9 +45,15 @@ class AppTrackingProtectionWaitlistCodeFetcher(
     private val notificationSender: NotificationSender,
     private val dispatcherProvider: DispatcherProvider,
     private val appCoroutineScope: CoroutineScope,
+    private val appTpFeatureConfig: AppTpFeatureConfig,
 ) : TrackingProtectionWaitlistCodeFetcher {
 
     override fun onStart(owner: LifecycleOwner) {
+        if (appTpFeatureConfig.isEnabled(AppTpSetting.OpenBeta)) {
+            workManager.cancelAllWorkByTag(APP_TP_WAITLIST_SYNC_WORK_TAG)
+            return
+        }
+
         appCoroutineScope.launch {
             if (atpRepository.getState() is WaitlistState.JoinedWaitlist) {
                 fetchInviteCode()

@@ -17,17 +17,17 @@
 package com.duckduckgo.app.statistics.pixels
 
 import com.duckduckgo.app.InstantSchedulersRule
-import com.duckduckgo.app.pixels.AppPixelName.PRIVACY_DASHBOARD_OPENED
 import com.duckduckgo.app.statistics.api.PixelSender
-import io.reactivex.Completable
-import java.util.concurrent.TimeoutException
-import org.junit.Rule
-import org.junit.Test
-import org.mockito.Mock
+import com.duckduckgo.app.statistics.pixels.RxBasedPixelTest.TestPixels.TEST
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import io.reactivex.Completable
+import org.junit.Rule
+import org.junit.Test
+import org.mockito.Mock
+import java.util.concurrent.TimeoutException
 
 class RxBasedPixelTest {
 
@@ -43,9 +43,9 @@ class RxBasedPixelTest {
         givenSendPixelSucceeds()
 
         val pixel = RxBasedPixel(mockPixelSender)
-        pixel.fire(PRIVACY_DASHBOARD_OPENED)
+        pixel.fire(TEST)
 
-        verify(mockPixelSender).sendPixel("mp", emptyMap(), emptyMap())
+        verify(mockPixelSender).sendPixel("test", emptyMap(), emptyMap())
     }
 
     @Test
@@ -53,9 +53,9 @@ class RxBasedPixelTest {
         givenSendPixelFails()
 
         val pixel = RxBasedPixel(mockPixelSender)
-        pixel.fire(PRIVACY_DASHBOARD_OPENED)
+        pixel.fire(TEST)
 
-        verify(mockPixelSender).sendPixel("mp", emptyMap(), emptyMap())
+        verify(mockPixelSender).sendPixel("test", emptyMap(), emptyMap())
     }
 
     @Test
@@ -65,8 +65,8 @@ class RxBasedPixelTest {
         val pixel = RxBasedPixel(mockPixelSender)
         val params = mapOf("param1" to "value1", "param2" to "value2")
 
-        pixel.fire(PRIVACY_DASHBOARD_OPENED, params)
-        verify(mockPixelSender).sendPixel("mp", params, emptyMap())
+        pixel.fire(TEST, params)
+        verify(mockPixelSender).sendPixel("test", params, emptyMap())
     }
 
     @Test
@@ -74,9 +74,9 @@ class RxBasedPixelTest {
         givenEnqueuePixelSucceeds()
 
         val pixel = RxBasedPixel(mockPixelSender)
-        pixel.enqueueFire(PRIVACY_DASHBOARD_OPENED)
+        pixel.enqueueFire(TEST)
 
-        verify(mockPixelSender).enqueuePixel("mp", emptyMap(), emptyMap())
+        verify(mockPixelSender).enqueuePixel("test", emptyMap(), emptyMap())
     }
 
     @Test
@@ -84,9 +84,9 @@ class RxBasedPixelTest {
         givenEnqueuePixelFails()
 
         val pixel = RxBasedPixel(mockPixelSender)
-        pixel.enqueueFire(PRIVACY_DASHBOARD_OPENED)
+        pixel.enqueueFire(TEST)
 
-        verify(mockPixelSender).enqueuePixel("mp", emptyMap(), emptyMap())
+        verify(mockPixelSender).enqueuePixel("test", emptyMap(), emptyMap())
     }
 
     @Test
@@ -95,9 +95,9 @@ class RxBasedPixelTest {
 
         val pixel = RxBasedPixel(mockPixelSender)
         val params = mapOf("param1" to "value1", "param2" to "value2")
-        pixel.enqueueFire(PRIVACY_DASHBOARD_OPENED, params)
+        pixel.enqueueFire(TEST, params)
 
-        verify(mockPixelSender).enqueuePixel("mp", params, emptyMap())
+        verify(mockPixelSender).enqueuePixel("test", params, emptyMap())
     }
 
     private fun givenEnqueuePixelSucceeds() {
@@ -114,5 +114,9 @@ class RxBasedPixelTest {
 
     private fun givenSendPixelFails() {
         whenever(mockPixelSender.sendPixel(any(), any(), any())).thenReturn(Completable.error(TimeoutException()))
+    }
+
+    enum class TestPixels(override val pixelName: String, val enqueue: Boolean = false) : Pixel.PixelName {
+        TEST("test")
     }
 }

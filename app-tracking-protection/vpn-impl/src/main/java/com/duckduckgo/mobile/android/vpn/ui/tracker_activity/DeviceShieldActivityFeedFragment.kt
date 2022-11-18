@@ -22,20 +22,33 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.*
-import androidx.recyclerview.widget.RecyclerView
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoFragment
 import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.recyclerviewext.StickyHeadersLinearLayoutManager
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity
+import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity.Companion.AppsFilter
+import com.duckduckgo.mobile.android.vpn.databinding.ViewDeviceShieldActivityFeedBinding
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.TimeWindow
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldActivityFeedViewModel.Command
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldActivityFeedViewModel.Command.ShowProtectedAppsList
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldActivityFeedViewModel.Command.ShowUnprotectedAppsList
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldActivityFeedViewModel.Command.TrackerListDisplayed
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldActivityFeedViewModel.TrackerFeedViewState
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import kotlinx.coroutines.launch
 
 @InjectWith(FragmentScope::class)
 class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
@@ -46,7 +59,8 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
     @Inject
     lateinit var trackerFeedAdapter: TrackerFeedAdapter
 
-    private val activityFeedViewModel: DeviceShieldActivityFeedViewModel by bindViewModel()
+    private val viewModel: DeviceShieldActivityFeedViewModel by bindViewModel()
+    private lateinit var binding: ViewDeviceShieldActivityFeedBinding
 
     private var config: ActivityFeedConfig = defaultConfig
 
@@ -55,53 +69,108 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.view_device_shield_activity_feed, container, false)
+        savedInstanceState: Bundle?
+    ): View {
+        binding = ViewDeviceShieldActivityFeedBinding.inflate(layoutInflater)
+        return binding.root
     }
 
     override fun onViewCreated(
         view: View,
-        savedInstanceState: Bundle?,
+        savedInstanceState: Bundle?
     ) {
-        with(view.findViewById<RecyclerView>(R.id.activity_recycler_view)) {
-            val stickyHeadersLayoutManager =
-                StickyHeadersLinearLayoutManager<TrackerFeedAdapter>(this@DeviceShieldActivityFeedFragment.requireContext())
-            layoutManager = stickyHeadersLayoutManager
+        with(binding.activityRecyclerView) {
+            layoutManager = StickyHeadersLinearLayoutManager<TrackerFeedAdapter>(this@DeviceShieldActivityFeedFragment.requireContext())
             adapter = trackerFeedAdapter
         }
 
         lifecycleScope.launch {
-            activityFeedViewModel.getMostRecentTrackers(
+            viewModel.getMostRecentTrackers(
                 TimeWindow(
                     config.timeWindow.toLong(),
-                    config.timeWindowUnits,
+                    config.timeWindowUnits
                 ),
-                config.showTimeWindowHeadings,
-            )
-                .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
-                .collect {
-                    feedListener?.onTrackerListShowed(it.size)
-                    trackerFeedAdapter.updateData(if (config.unboundedRows()) it else it.take(config.maxRows)) { trackerFeedData ->
-                        if (trackerFeedData.isAppInstalled()) {
-                            startActivity(
-                                AppTPCompanyTrackersActivity.intent(
-                                    requireContext(),
-                                    trackerFeedData.trackingApp.packageId,
-                                    trackerFeedData.trackingApp.appDisplayName,
-                                    trackerFeedData.bucket,
-                                ),
-                            )
-                        } else {
-                            Snackbar.make(
-                                requireView(),
-                                getString(R.string.atp_CompanyDetailsNotAvailableForUninstalledApps),
-                                Snackbar.LENGTH_SHORT,
-                            ).show()
-                        }
-                    }
+                config
+            ).flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
+                .collect { viewState ->
+                    renderViewState(viewState)
                 }
         }
+
+        lifecycleScope.launch {
+            viewModel.commands()
+                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .collectLatest { processCommands(it) }
+        }
+    }
+
+    private suspend fun renderViewState(viewState: TrackerFeedViewState) {
+        renderTrackerList(viewState)
+
+        viewModel.trackerListDisplayed(viewState)
+    }
+
+    private suspend fun renderTrackerList(viewState: TrackerFeedViewState) {
+        trackerFeedAdapter.updateData(
+            if (config.unboundedRows()) viewState.trackers else viewState.trackers.take(config.maxRows)
+        ) { trackerFeedItem ->
+            when (trackerFeedItem) {
+                is TrackerFeedItem.TrackerFeedData -> {
+                    if (trackerFeedItem.isAppInstalled()) {
+                        startActivity(
+                            AppTPCompanyTrackersActivity.intent(
+                                requireContext(),
+                                trackerFeedItem.trackingApp.packageId,
+                                trackerFeedItem.trackingApp.appDisplayName,
+                                trackerFeedItem.bucket
+                            )
+                        )
+                    } else {
+                        Snackbar.make(
+                            requireView(),
+                            getString(R.string.atp_CompanyDetailsNotAvailableForUninstalledApps),
+                            Snackbar.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+                is TrackerFeedItem.TrackerTrackerAppsProtection -> {
+                    viewModel.showAppsList(viewState.vpnState, trackerFeedItem)
+                }
+                else -> { } // no-op
+            }
+        }
+    }
+
+    private fun processCommands(command: Command) {
+        when (command) {
+            is ShowProtectedAppsList -> showProtectedAppsList(command)
+            is ShowUnprotectedAppsList -> showUnprotectedAppsList(command)
+            is TrackerListDisplayed -> onTrackerListDisplayed(command)
+        }
+    }
+
+    private fun showProtectedAppsList(command: ShowProtectedAppsList) {
+        startActivity(
+            TrackingProtectionExclusionListActivity.intent(
+                requireContext(),
+                command.vpnState.state == VpnRunningState.ENABLED,
+                AppsFilter.PROTECTED_ONLY
+            )
+        )
+    }
+
+    private fun showUnprotectedAppsList(command: ShowUnprotectedAppsList) {
+        startActivity(
+            TrackingProtectionExclusionListActivity.intent(
+                requireContext(),
+                command.vpnState.state == VpnRunningState.ENABLED,
+                AppsFilter.UNPROTECTED_ONLY
+            )
+        )
+    }
+
+    private fun onTrackerListDisplayed(command: TrackerListDisplayed) {
+        feedListener?.onTrackerListShowed(command.trackersListSize)
     }
 
     override fun onAttach(context: Context) {
@@ -133,7 +202,7 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
             maxRows = Int.MAX_VALUE,
             timeWindow = 5,
             timeWindowUnits = TimeUnit.DAYS,
-            showTimeWindowHeadings = true,
+            showTimeWindowHeadings = true
         )
 
         fun newInstance(config: ActivityFeedConfig): DeviceShieldActivityFeedFragment {
@@ -147,7 +216,7 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
         val maxRows: Int,
         val timeWindow: Int,
         val timeWindowUnits: TimeUnit,
-        val showTimeWindowHeadings: Boolean,
+        val showTimeWindowHeadings: Boolean
     ) {
         fun unboundedRows(): Boolean = maxRows == Int.MAX_VALUE
     }

@@ -17,15 +17,16 @@
 package com.duckduckgo.app.global.exception
 
 import androidx.annotation.VisibleForTesting
+import com.duckduckgo.app.global.DefaultDispatcherProvider
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.device.DeviceInfo
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 interface UncaughtExceptionRepository {
     suspend fun recordUncaughtException(
         e: Throwable?,
-        exceptionSource: UncaughtExceptionSource,
+        exceptionSource: UncaughtExceptionSource
     )
 
     suspend fun getExceptions(): List<UncaughtExceptionEntity>
@@ -36,15 +37,16 @@ class UncaughtExceptionRepositoryDb(
     private val uncaughtExceptionDao: UncaughtExceptionDao,
     private val rootExceptionFinder: RootExceptionFinder,
     private val deviceInfo: DeviceInfo,
+    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
 ) : UncaughtExceptionRepository {
 
     private var lastSeenException: Throwable? = null
 
     override suspend fun recordUncaughtException(
         e: Throwable?,
-        exceptionSource: UncaughtExceptionSource,
+        exceptionSource: UncaughtExceptionSource
     ) {
-        return withContext(Dispatchers.IO) {
+        return withContext(dispatchers.io()) {
             if (e == lastSeenException) {
                 return@withContext
             }
@@ -55,7 +57,7 @@ class UncaughtExceptionRepositoryDb(
             val exceptionEntity = UncaughtExceptionEntity(
                 message = rootCause.extractExceptionCause(),
                 exceptionSource = exceptionSource,
-                version = deviceInfo.appVersion,
+                version = deviceInfo.appVersion
             )
 
             if (isNotDuplicate(exceptionEntity)) {
@@ -68,12 +70,14 @@ class UncaughtExceptionRepositoryDb(
 
     @VisibleForTesting
     fun isNotDuplicate(incomingException: UncaughtExceptionEntity): Boolean {
+
         val lastRecordedException = uncaughtExceptionDao.getLatestException() ?: return true
 
         if (incomingException.message == lastRecordedException.message &&
             incomingException.exceptionSource == lastRecordedException.exceptionSource &&
             incomingException.version == lastRecordedException.version
         ) {
+
             val timeDiff = incomingException.timestamp - lastRecordedException.timestamp
 
             return if (timeDiff > TIME_THRESHOLD_MILLIS) {
@@ -87,13 +91,13 @@ class UncaughtExceptionRepositoryDb(
     }
 
     override suspend fun getExceptions(): List<UncaughtExceptionEntity> {
-        return withContext(Dispatchers.IO) {
+        return withContext(dispatchers.io()) {
             uncaughtExceptionDao.all()
         }
     }
 
     override suspend fun deleteException(id: Long) {
-        return withContext(Dispatchers.IO) {
+        return withContext(dispatchers.io()) {
             uncaughtExceptionDao.delete(id)
         }
     }

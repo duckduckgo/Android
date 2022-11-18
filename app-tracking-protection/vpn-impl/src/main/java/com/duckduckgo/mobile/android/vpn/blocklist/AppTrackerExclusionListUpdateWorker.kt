@@ -22,6 +22,7 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.*
 import com.duckduckgo.anvil.annotations.ContributesWorker
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
@@ -29,27 +30,27 @@ import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExclusionListMetadata
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerSystemAppOverrideListMetadata
 import com.squareup.anvil.annotations.ContributesMultibinding
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 @ContributesWorker(AppScope::class)
 class AppTrackerExclusionListUpdateWorker(
     context: Context,
-    workerParameters: WorkerParameters,
+    workerParameters: WorkerParameters
 ) : CoroutineWorker(context, workerParameters) {
     @Inject
     lateinit var appTrackerListDownloader: AppTrackerListDownloader
-
     @Inject
     lateinit var vpnDatabase: VpnDatabase
-
-    @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
+    @Inject
+    lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
+    @Inject
+    lateinit var dispatchers: DispatcherProvider
 
     override suspend fun doWork(): Result {
-        return withContext(Dispatchers.IO) {
+        return withContext(dispatchers.io()) {
             val exclusionListResult = updateExclusionList()
             val sysAppOverridesListResult = updateSystemAppOverrides()
 
@@ -80,8 +81,7 @@ class AppTrackerExclusionListUpdateWorker(
 
                 Timber.d("Updating the app tracker system app overrides, eTag: ${sysAppsOverrides.etag.value}")
                 vpnDatabase.vpnSystemAppsOverridesDao().upsertSystemAppOverrides(
-                    sysAppsOverrides.overridePackages,
-                    AppTrackerSystemAppOverrideListMetadata(eTag = updatedEtag),
+                    sysAppsOverrides.overridePackages, AppTrackerSystemAppOverrideListMetadata(eTag = updatedEtag)
                 )
 
                 vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
@@ -127,10 +127,10 @@ class AppTrackerExclusionListUpdateWorker(
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = LifecycleObserver::class,
+    boundType = LifecycleObserver::class
 )
 class AppTrackerExclusionListUpdateWorkerScheduler @Inject constructor(
-    private val workManager: WorkManager,
+    private val workManager: WorkManager
 ) : DefaultLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {

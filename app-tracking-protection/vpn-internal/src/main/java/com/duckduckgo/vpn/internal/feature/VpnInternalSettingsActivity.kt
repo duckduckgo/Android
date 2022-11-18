@@ -26,6 +26,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
@@ -43,10 +44,9 @@ import com.duckduckgo.vpn.internal.feature.remote.VpnRemoteFeatureReceiver
 import com.duckduckgo.vpn.internal.feature.rules.ExceptionRulesDebugActivity
 import com.duckduckgo.vpn.internal.feature.trackers.DeleteTrackersDebugReceiver
 import com.google.android.material.snackbar.Snackbar
-import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 class VpnInternalSettingsActivity : DuckDuckGoActivity() {
 
@@ -68,6 +68,8 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
     @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
     @Inject lateinit var workManager: WorkManager
+
+    @Inject lateinit var dispatchers: DispatcherProvider
 
     private val binding: ActivityVpnInternalSettingsBinding by viewBinding()
     private var debugLoggingReceiver: DebugLoggingReceiver? = null
@@ -124,7 +126,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
 
                 canProtect to canRestoreDefaults
             }
-            .flowOn(Dispatchers.IO)
+            .flowOn(dispatchers.io())
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach {
                 val canProtect = it.first
@@ -133,11 +135,11 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
                 binding.restoreDefaultAppProtections.isEnabled = canRestoreDefaults
                 binding.protectAllApps.isEnabled = canProtect
             }
-            .flowOn(Dispatchers.Main)
+            .flowOn(dispatchers.main())
             .launchIn(lifecycleScope)
 
         binding.protectAllApps.setOnClickListener {
-            lifecycleScope.launch(Dispatchers.IO) {
+            lifecycleScope.launch(dispatchers.io()) {
                 for (excludedPackage in appTrackerRepository.getAppExclusionList()) {
                     appTrackerRepository.manuallyEnabledApp(excludedPackage.packageId)
                 }
@@ -146,7 +148,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         }
 
         binding.restoreDefaultAppProtections.setOnClickListener {
-            lifecycleScope.launch(Dispatchers.IO) {
+            lifecycleScope.launch(dispatchers.io()) {
                 appTrackerRepository.restoreDefaultProtectedList()
                 vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
             }
@@ -167,6 +169,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
                 binding.vpnConnectivityChecksToggle.isEnabled = isEnabled
                 binding.debugLoggingToggle.isEnabled = isEnabled
                 binding.settingsInfo.isVisible = !isEnabled
+                binding.openBetaToggle.isVisible = !appTpConfig.isEnabled(AppTpSetting.OpenBeta)
             }
             .launchIn(lifecycleScope)
     }
@@ -274,6 +277,21 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
                     sendBroadcast(VpnRemoteFeatureReceiver.enableIntent(this))
                 } else {
                     sendBroadcast(VpnRemoteFeatureReceiver.disableIntent(this))
+                }
+            }
+        }
+
+        with(AppTpSetting.OpenBeta) {
+            binding.openBetaToggle.setIsChecked(appTpConfig.isEnabled(this))
+            binding.openBetaToggle.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) {
+                    lifecycleScope.launch(dispatchers.io()) {
+                        appTpConfig.edit().setEnabled(this@with, true)
+                    }
+                } else {
+                    lifecycleScope.launch(dispatchers.io()) {
+                        appTpConfig.edit().setEnabled(this@with, false)
+                    }
                 }
             }
         }
