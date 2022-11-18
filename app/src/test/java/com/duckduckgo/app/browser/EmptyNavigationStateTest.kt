@@ -45,7 +45,7 @@ class EmptyNavigationStateTest {
     private fun buildState(
         originalUrl: String?,
         currentUrl: String?,
-        title: String? = null
+        title: String? = null,
     ): WebNavigationState {
         return TestNavigationState(
             originalUrl = originalUrl,
@@ -55,7 +55,7 @@ class EmptyNavigationStateTest {
             canGoBack = true,
             canGoForward = true,
             hasNavigationHistory = true,
-            progress = null
+            progress = null,
         )
     }
 }

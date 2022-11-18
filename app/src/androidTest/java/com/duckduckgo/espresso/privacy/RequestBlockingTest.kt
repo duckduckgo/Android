@@ -23,23 +23,23 @@ import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.espresso.web.model.Atoms.script
 import androidx.test.espresso.web.sugar.Web.onWebView
 import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
-import org.junit.Rule
-import org.junit.Test
-import java.util.concurrent.TimeUnit
-import androidx.test.espresso.web.model.Atoms.script
 import com.duckduckgo.espresso.PrivacyTest
 import com.duckduckgo.espresso.WebViewIdlingResource
 import com.duckduckgo.espresso.waitForView
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import java.util.concurrent.TimeUnit
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Rule
+import org.junit.Test
 
 class RequestBlockingTest {
 
@@ -47,8 +47,8 @@ class RequestBlockingTest {
     var activityScenarioRule = activityScenarioRule<BrowserActivity>(
         BrowserActivity.intent(
             InstrumentationRegistry.getInstrumentation().targetContext,
-            "https://privacy-test-pages.glitch.me/privacy-protections/request-blocking/?run"
-        )
+            "https://privacy-test-pages.glitch.me/privacy-protections/request-blocking/?run",
+        ),
     )
 
     @Test @PrivacyTest

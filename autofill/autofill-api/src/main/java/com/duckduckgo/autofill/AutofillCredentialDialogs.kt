@@ -91,25 +91,24 @@ interface CredentialAutofillDialogFactory {
         url: String,
         credentials: List<LoginCredentials>,
         triggerType: LoginTriggerType,
-        tabId: String
+        tabId: String,
     ): DialogFragment
 
     fun autofillSavingCredentialsDialog(
         url: String,
         credentials: LoginCredentials,
-        tabId: String
+        tabId: String,
     ): DialogFragment
 
     fun autofillSavingUpdatePasswordDialog(
         url: String,
         credentials: LoginCredentials,
-        tabId: String
+        tabId: String,
     ): DialogFragment
 
     fun autofillSavingUpdateUsernameDialog(
         url: String,
         credentials: LoginCredentials,
-        tabId: String
+        tabId: String,
     ): DialogFragment
-
 }

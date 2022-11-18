@@ -35,10 +35,10 @@ import dagger.BindsInstance
 import dagger.Subcomponent
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
+import java.io.File
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtFile
-import java.io.File
 
 /**
  * This Anvil code generator allows inject ViewModel without manually creating the ViewModel factory
@@ -73,7 +73,7 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
                     .addAnnotation(
                         AnnotationSpec
                             .builder(singleInstanceAnnotationFqName.asClassName(module)).addMember("scope = %T::class", scope.asClassName())
-                            .build()
+                            .build(),
                     )
                     .addAnnotation(scope.fqName.subComponentAnnotation(module))
                     .addSuperinterface(duckduckgoAndroidInjectorFqName.asClassName(module).parameterizedBy(vmClass.asClassName()))
@@ -82,7 +82,7 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
                             .addSuperinterface(
                                 duckduckgoAndroidInjectorFqName.asClassName(module)
                                     .nestedClass("Factory")
-                                    .parameterizedBy(vmClass.asClassName(), FqName(subcomponentFactoryClassName).asClassName(module))
+                                    .parameterizedBy(vmClass.asClassName(), FqName(subcomponentFactoryClassName).asClassName(module)),
                             )
                             .addAnnotation(scope.fqName.subComponentFactoryAnnotation(module))
                             .addFunction(
@@ -91,15 +91,15 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
                                     .addModifiers(KModifier.OVERRIDE)
                                     .addModifiers(KModifier.ABSTRACT)
                                     .addParameter(
-                                        ParameterSpec.builder("instance", vmClass.asClassName()).addAnnotation(BindsInstance::class).build()
+                                        ParameterSpec.builder("instance", vmClass.asClassName()).addAnnotation(BindsInstance::class).build(),
                                     )
                                     .returns(FqName(subcomponentFactoryClassName).asClassName(module))
-                                    .build()
+                                    .build(),
                             )
-                            .build()
+                            .build(),
                     )
                     .addType(generateParentComponentInterface(vmClass, codeGenDir, module))
-                    .build()
+                    .build(),
             ).build()
         }
 
@@ -115,18 +115,17 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
             .addAnnotation(
                 AnnotationSpec
                     .builder(ContributesTo::class).addMember("scope = %T::class", scope.fqName.getParentScope(module).asClassName(module))
-                    .build()
+                    .build(),
             )
             .addFunction(
                 FunSpec.builder("provide${vmClass.shortName}ComponentFactory")
                     .addModifiers(KModifier.ABSTRACT)
                     .returns(
-                        FqName("$generatedPackage.$componentClassNAme").asClassName(module).nestedClass("Factory")
+                        FqName("$generatedPackage.$componentClassNAme").asClassName(module).nestedClass("Factory"),
                     )
-                    .build()
+                    .build(),
             )
             .build()
-
     }
 
     private fun generateSubcomponentFactoryBindingModule(vmClass: ClassReference.Psi, codeGenDir: File, module: ModuleDescriptor): GeneratedFile {
@@ -142,30 +141,29 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
                     .addAnnotation(
                         AnnotationSpec
                             .builder(ContributesTo::class).addMember("scope = %T::class", scope.fqName.getParentScope(module).asClassName(module))
-                            .build()
+                            .build(),
                     )
                     .addModifiers(KModifier.ABSTRACT)
                     .addFunction(
                         FunSpec.builder("bind${vmClass.subComponentName()}Factory")
                             .addParameter(
                                 "factory",
-                                FqName("$generatedPackage.${vmClass.subComponentName()}").asClassName(module).nestedClass("Factory")
+                                FqName("$generatedPackage.${vmClass.subComponentName()}").asClassName(module).nestedClass("Factory"),
                             )
                             .addAnnotation(AnnotationSpec.builder(Binds::class).build())
                             .addAnnotation(AnnotationSpec.builder(IntoMap::class).build())
                             .addAnnotation(
-                                AnnotationSpec.builder(ClassKey::class).addMember("%T::class", bindingClassKey.asClassName(module)).build()
+                                AnnotationSpec.builder(ClassKey::class).addMember("%T::class", bindingClassKey.asClassName(module)).build(),
                             )
                             .addModifiers(KModifier.ABSTRACT)
                             .returns(duckduckgoAndroidInjectorFqName.asClassName(module).nestedClass("Factory").parameterizedBy(STAR, STAR))
-                            .build()
+                            .build(),
                     )
-                    .build()
+                    .build(),
             ).build()
         }
 
         return createGeneratedFile(codeGenDir, generatedPackage, moduleClassName, content)
-
     }
 
     private fun FqName.subComponentAnnotation(module: ModuleDescriptor): AnnotationSpec {

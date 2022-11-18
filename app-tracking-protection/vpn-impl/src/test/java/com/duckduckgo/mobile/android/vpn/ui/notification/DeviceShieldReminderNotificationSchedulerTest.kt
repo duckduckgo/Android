@@ -33,15 +33,15 @@ import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationWorker
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderReceiverManager
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REVOKED
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.*
 import org.junit.runner.RunWith
-import java.util.concurrent.TimeUnit
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
@@ -72,7 +72,7 @@ class DeviceShieldReminderNotificationSchedulerTest {
                 notificationBuilder,
                 vpnFeatureRemover,
                 coroutinesTestRule.testDispatcherProvider,
-                TestScope()
+                TestScope(),
             )
         configureMockNotifications()
     }
@@ -192,12 +192,12 @@ class DeviceShieldReminderNotificationSchedulerTest {
         whenever(notificationBuilder.buildReminderNotification(any(), any())).thenReturn(
             NotificationCompat.Builder(context, "")
                 .setSmallIcon(R.drawable.ic_device_shield_notification_logo)
-                .build()
+                .build(),
         )
         whenever(notificationBuilder.buildRevokedNotification(any())).thenReturn(
             NotificationCompat.Builder(context, "")
                 .setSmallIcon(R.drawable.ic_device_shield_notification_logo)
-                .build()
+                .build(),
         )
     }
 
@@ -219,7 +219,7 @@ class DeviceShieldReminderNotificationSchedulerTest {
         workManager.enqueueUniquePeriodicWork(
             VpnReminderNotificationWorker.WORKER_VPN_REMINDER_UNDESIRED_TAG,
             ExistingPeriodicWorkPolicy.KEEP,
-            request
+            request,
         )
     }
 
@@ -245,7 +245,7 @@ class DeviceShieldReminderNotificationSchedulerTest {
             override fun createWorker(
                 appContext: Context,
                 workerClassName: String,
-                workerParameters: WorkerParameters
+                workerParameters: WorkerParameters,
             ): ListenableWorker? {
                 return VpnReminderNotificationWorker(appContext, workerParameters).also {
                     it.vpnReminderReceiverManager = mockVpnReminderReceiverManager

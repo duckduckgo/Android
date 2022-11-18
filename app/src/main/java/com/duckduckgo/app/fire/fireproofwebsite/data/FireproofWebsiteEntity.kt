@@ -23,7 +23,7 @@ private const val WWW_PREFIX = "www."
 
 @Entity(tableName = "fireproofWebsites")
 data class FireproofWebsiteEntity(
-    @PrimaryKey val domain: String
+    @PrimaryKey val domain: String,
 )
 
 fun FireproofWebsiteEntity.website(): String {

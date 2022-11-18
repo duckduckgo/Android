@@ -34,7 +34,7 @@ class ShortcutBuilder @Inject constructor() {
 
     private fun buildPinnedPageShortcut(
         context: Context,
-        homeShortcut: BrowserTabViewModel.Command.AddHomeShortcut
+        homeShortcut: BrowserTabViewModel.Command.AddHomeShortcut,
     ): ShortcutInfoCompat {
         val intent = Intent(context, BrowserActivity::class.java)
         intent.action = Intent.ACTION_VIEW
@@ -56,7 +56,7 @@ class ShortcutBuilder @Inject constructor() {
     private fun buildPendingIntent(
         context: Context,
         url: String,
-        title: String
+        title: String,
     ): PendingIntent? {
         val pinnedShortcutCallbackIntent = Intent(context, ShortcutReceiver::class.java)
         pinnedShortcutCallbackIntent.putExtra(SHORTCUT_URL_ARG, url)
@@ -66,7 +66,7 @@ class ShortcutBuilder @Inject constructor() {
 
     fun requestPinShortcut(
         context: Context,
-        homeShortcut: BrowserTabViewModel.Command.AddHomeShortcut
+        homeShortcut: BrowserTabViewModel.Command.AddHomeShortcut,
     ) {
         val shortcutInfo = buildPinnedPageShortcut(context, homeShortcut)
         val pendingIntent = buildPendingIntent(context, homeShortcut.url, homeShortcut.title)

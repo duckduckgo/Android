@@ -82,7 +82,7 @@ class AutoconsentSettingsViewModelTest {
 
         override fun addJsInterface(
             webView: WebView,
-            autoconsentCallback: AutoconsentCallback
+            autoconsentCallback: AutoconsentCallback,
         ) {
             // NO OP
         }

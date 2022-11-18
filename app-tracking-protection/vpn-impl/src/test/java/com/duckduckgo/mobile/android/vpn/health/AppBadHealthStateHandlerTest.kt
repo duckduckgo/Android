@@ -54,10 +54,14 @@ import org.threeten.bp.ZoneOffset
 @RunWith(AndroidJUnit4::class)
 class AppBadHealthStateHandlerTest {
 
-    @get:Rule @Suppress("unused") val coroutineRule = CoroutineTestRule()
+    @get:Rule
+    @Suppress("unused")
+    val coroutineRule = CoroutineTestRule()
 
     @Mock private lateinit var deviceShieldPixels: DeviceShieldPixels
+
     @Mock private lateinit var appBuildConfig: AppBuildConfig
+
     @Mock private lateinit var appTpConfig: AppTpFeatureConfig
     private val context = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext
 
@@ -78,7 +82,13 @@ class AppBadHealthStateHandlerTest {
         whenever(appTpConfig.isEnabled(AppTpSetting.BadHealthMitigation)).thenReturn(true)
 
         appBadHealthStateHandler = AppBadHealthStateHandler(
-            context, appBuildConfig, db, appTpConfig, deviceShieldPixels, coroutineRule.testDispatcherProvider, coroutineRule.testScope
+            context,
+            appBuildConfig,
+            db,
+            appTpConfig,
+            deviceShieldPixels,
+            coroutineRule.testDispatcherProvider,
+            coroutineRule.testScope,
         )
     }
 
@@ -105,7 +115,7 @@ class AppBadHealthStateHandlerTest {
             "{\"alerts\":[\"alert\"],\"systemHealth\":{\"isBadHealth\":true,\"rawMetrics\"" +
                 ":[{\"informational\":false,\"metrics\":{\"metric\":{\"isBadState\":true,\"isCritical\":false,\"value\":\"value\"}}" +
                 ",\"name\":\"rawMetric\",\"redacted\":false}]}}",
-            state?.healthDataJsonString
+            state?.healthDataJsonString,
         )
 
         verify(deviceShieldPixels).sendHealthMonitorReport(any())
@@ -120,7 +130,7 @@ class AppBadHealthStateHandlerTest {
         assertEquals(listOf("alert"), state?.alerts)
         assertEquals(
             "{\"alerts\":[\"alert\"],\"systemHealth\":{\"isBadHealth\":true,\"rawMetrics\":[]}}",
-            state?.healthDataJsonString
+            state?.healthDataJsonString,
         )
 
         verify(deviceShieldPixels).sendHealthMonitorReport(any())
@@ -155,8 +165,8 @@ class AppBadHealthStateHandlerTest {
                 type = BAD_HEALTH,
                 alerts = listOf("alert"),
                 healthDataJsonString = "",
-                restartedAtEpochSeconds = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC) - 30
-            )
+                restartedAtEpochSeconds = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC) - 30,
+            ),
         )
 
         assertFalse(appBadHealthStateHandler.onAppHealthUpdate(EMPTY_HEALTH_DATA))
@@ -175,8 +185,8 @@ class AppBadHealthStateHandlerTest {
                 type = BAD_HEALTH,
                 alerts = listOf("alert"),
                 healthDataJsonString = "",
-                restartedAtEpochSeconds = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC) - 60
-            )
+                restartedAtEpochSeconds = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC) - 60,
+            ),
         )
 
         assertFalse(appBadHealthStateHandler.onAppHealthUpdate(EMPTY_HEALTH_DATA))
@@ -200,10 +210,10 @@ class AppBadHealthStateHandlerTest {
                         RawMetricsSubmission(
                             "rawMetric",
                             metrics = mapOf("metric" to Metric("value", isBadState = true)),
-                            redacted = false
-                        )
-                    )
-                )
+                            redacted = false,
+                        ),
+                    ),
+                ),
             )
 
         private val REDACTED_BAD_HEALTH_DATA =
@@ -215,10 +225,10 @@ class AppBadHealthStateHandlerTest {
                         RawMetricsSubmission(
                             "rawMetric",
                             metrics = mapOf("metric" to Metric("value", isBadState = true)),
-                            redacted = true
-                        )
-                    )
-                )
+                            redacted = true,
+                        ),
+                    ),
+                ),
             )
 
         private val BAD_HEALTH_DATA_NO_ALERT =
@@ -230,10 +240,10 @@ class AppBadHealthStateHandlerTest {
                         RawMetricsSubmission(
                             "rawMetric",
                             metrics = mapOf("metric" to Metric("value", isBadState = true)),
-                            redacted = false
-                        )
-                    )
-                )
+                            redacted = false,
+                        ),
+                    ),
+                ),
             )
     }
 }

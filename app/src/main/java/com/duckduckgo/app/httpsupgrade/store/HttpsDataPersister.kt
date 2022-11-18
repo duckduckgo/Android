@@ -20,21 +20,21 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.store.BinaryDataStore
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
 import com.duckduckgo.app.httpsupgrade.model.HttpsFalsePositiveDomain
-import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
+import timber.log.Timber
 
 class HttpsDataPersister @Inject constructor(
     private val binaryDataStore: BinaryDataStore,
     private val httpsBloomSpecDao: HttpsBloomFilterSpecDao,
     private val httpsFalsePositivesDao: HttpsFalsePositivesDao,
-    private val appDatabase: AppDatabase
+    private val appDatabase: AppDatabase,
 ) {
 
     fun persistBloomFilter(
         specification: HttpsBloomFilterSpec,
         bytes: ByteArray,
-        falsePositives: List<HttpsFalsePositiveDomain>
+        falsePositives: List<HttpsFalsePositiveDomain>,
     ) {
         appDatabase.runInTransaction {
             persistBloomFilter(specification, bytes)
@@ -44,7 +44,7 @@ class HttpsDataPersister @Inject constructor(
 
     fun persistBloomFilter(
         specification: HttpsBloomFilterSpec,
-        bytes: ByteArray
+        bytes: ByteArray,
     ) {
         if (!binaryDataStore.verifyCheckSum(bytes, specification.sha256)) {
             throw IOException("Https binary has incorrect sha, throwing away file")
@@ -64,7 +64,7 @@ class HttpsDataPersister @Inject constructor(
     fun isPersisted(specification: HttpsBloomFilterSpec): Boolean {
         return specification == httpsBloomSpecDao.get() && binaryDataStore.verifyCheckSum(
             HttpsBloomFilterSpec.HTTPS_BINARY_FILE,
-            specification.sha256
+            specification.sha256,
         )
     }
 }

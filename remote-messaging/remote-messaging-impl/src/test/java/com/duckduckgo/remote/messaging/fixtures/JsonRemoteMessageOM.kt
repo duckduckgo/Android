@@ -26,30 +26,30 @@ import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessagingConfig
 object JsonRemoteMessageOM {
     private fun jsonMessageAction(
         type: String = "url",
-        value: String = "http://example.com"
+        value: String = "http://example.com",
     ) = JsonMessageAction(
         type = type,
-        value = value
+        value = value,
     )
 
     fun smallJsonContent(
         titleText: String = "title",
-        descriptionText: String = "description"
+        descriptionText: String = "description",
     ) = JsonContent(
         messageType = "small",
         titleText = titleText,
-        descriptionText = descriptionText
+        descriptionText = descriptionText,
     )
 
     fun mediumJsonContent(
         titleText: String = "title",
         descriptionText: String = "description",
-        placeholder: String = "Announce"
+        placeholder: String = "Announce",
     ) = JsonContent(
         messageType = "medium",
         titleText = titleText,
         descriptionText = descriptionText,
-        placeholder = placeholder
+        placeholder = placeholder,
     )
 
     fun bigSingleActionJsonContent(
@@ -57,7 +57,7 @@ object JsonRemoteMessageOM {
         descriptionText: String = "description",
         placeholder: String = "Announce",
         primaryActionText: String = "Action1",
-        primaryAction: JsonMessageAction = jsonMessageAction()
+        primaryAction: JsonMessageAction = jsonMessageAction(),
     ) = JsonContent(
         messageType = "big_single_action",
         titleText = titleText,
@@ -74,7 +74,7 @@ object JsonRemoteMessageOM {
         primaryActionText: String = "Action1",
         primaryAction: JsonMessageAction = jsonMessageAction(),
         secondaryActionText: String = "Action2",
-        secondaryAction: JsonMessageAction = jsonMessageAction()
+        secondaryAction: JsonMessageAction = jsonMessageAction(),
     ) = JsonContent(
         messageType = "big_two_action",
         titleText = titleText,
@@ -83,7 +83,7 @@ object JsonRemoteMessageOM {
         primaryActionText = primaryActionText,
         primaryAction = primaryAction,
         secondaryActionText = secondaryActionText,
-        secondaryAction = secondaryAction
+        secondaryAction = secondaryAction,
     )
 
     fun emptyJsonContent(messageType: String = "") = JsonContent(messageType = messageType)
@@ -93,22 +93,22 @@ object JsonRemoteMessageOM {
         content: JsonContent? = emptyJsonContent(),
         exclusionRules: List<Int> = emptyList(),
         matchingRules: List<Int> = emptyList(),
-        translations: Map<String, JsonContentTranslations> = emptyMap()
+        translations: Map<String, JsonContentTranslations> = emptyMap(),
     ) = JsonRemoteMessage(
         id = id,
         content = content,
         exclusionRules = exclusionRules,
         matchingRules = matchingRules,
-        translations = translations
+        translations = translations,
     )
 
     fun aJsonRemoteMessagingConfig(
         version: Long = 0L,
         messages: List<JsonRemoteMessage> = emptyList(),
-        rules: List<JsonMatchingRule> = emptyList()
+        rules: List<JsonMatchingRule> = emptyList(),
     ) = JsonRemoteMessagingConfig(
         version = version,
         messages = messages,
-        rules = rules
+        rules = rules,
     )
 }

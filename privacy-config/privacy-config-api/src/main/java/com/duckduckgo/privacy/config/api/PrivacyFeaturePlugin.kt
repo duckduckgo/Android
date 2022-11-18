@@ -34,7 +34,7 @@ interface PrivacyFeaturePlugin {
      */
     fun store(
         featureName: String,
-        jsonString: String
+        jsonString: String,
     ): Boolean
 
     /**

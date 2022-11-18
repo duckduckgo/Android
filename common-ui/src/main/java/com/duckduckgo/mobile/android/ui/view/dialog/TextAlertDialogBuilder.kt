@@ -111,7 +111,7 @@ class TextAlertDialogBuilder(val context: Context) {
 
     private fun setViews(
         binding: DialogTextAlertBinding,
-        dialog: AlertDialog
+        dialog: AlertDialog,
     ) {
         if (headerImageDrawableId > 0) {
             binding.textAlertDialogImage.setImageResource(headerImageDrawableId)

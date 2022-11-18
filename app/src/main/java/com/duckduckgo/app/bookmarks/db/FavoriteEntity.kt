@@ -22,11 +22,11 @@ import androidx.room.PrimaryKey
 
 @Entity(
     tableName = "favorites",
-    indices = [Index(value = ["title", "url"], unique = true)]
+    indices = [Index(value = ["title", "url"], unique = true)],
 )
 data class FavoriteEntity(
     @PrimaryKey(autoGenerate = true) var id: Long = 0,
     var title: String,
     var url: String,
-    var position: Int
+    var position: Int,
 )

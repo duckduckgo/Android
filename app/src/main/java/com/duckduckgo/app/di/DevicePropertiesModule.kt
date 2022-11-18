@@ -48,13 +48,13 @@ object DevicePropertiesModule {
         appContext: Context,
         variantManager: VariantManager,
         playStoreUtils: PlayStoreUtils,
-        statisticsStore: StatisticsDataStore
+        statisticsStore: StatisticsDataStore,
     ): AppProperties {
         return AndroidAppProperties(
             appContext,
             variantManager,
             playStoreUtils,
-            statisticsStore
+            statisticsStore,
         )
     }
 
@@ -68,7 +68,7 @@ object DevicePropertiesModule {
         widgetCapabilities: WidgetCapabilities,
         emailManager: EmailManager,
         searchCountDao: SearchCountDao,
-        appDaysUsedRepository: AppDaysUsedRepository
+        appDaysUsedRepository: AppDaysUsedRepository,
     ): UserBrowserProperties {
         return AndroidUserBrowserProperties(
             themingDataStore,
@@ -78,7 +78,7 @@ object DevicePropertiesModule {
             widgetCapabilities,
             emailManager,
             searchCountDao,
-            appDaysUsedRepository
+            appDaysUsedRepository,
         )
     }
 }

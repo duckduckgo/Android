@@ -25,8 +25,8 @@ import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
-import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
+import com.duckduckgo.cookies.api.CookieManagerProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -67,7 +67,7 @@ class UrlExtractingWebViewClientTest {
             TestScope(),
             coroutinesTestRule.testDispatcherProvider,
             urlExtractor,
-            contentScopeScripts
+            contentScopeScripts,
         )
         whenever(cookieManagerProvider.get()).thenReturn(cookieManager)
     }

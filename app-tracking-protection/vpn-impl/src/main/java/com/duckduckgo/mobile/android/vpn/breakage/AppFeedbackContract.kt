@@ -24,7 +24,7 @@ import androidx.activity.result.contract.ActivityResultContract
 class AppFeedbackContract : ActivityResultContract<Void?, Boolean>() {
     override fun createIntent(
         context: Context,
-        input: Void?
+        input: Void?,
     ): Intent {
         // TODO Class.forName is not great but required to unblock ATP for now
         // We need to make bigger refactors to extract features into its own gradle modules
@@ -34,7 +34,7 @@ class AppFeedbackContract : ActivityResultContract<Void?, Boolean>() {
 
     override fun parseResult(
         resultCode: Int,
-        intent: Intent?
+        intent: Intent?,
     ): Boolean {
         return resultCode == RESULT_OK
     }

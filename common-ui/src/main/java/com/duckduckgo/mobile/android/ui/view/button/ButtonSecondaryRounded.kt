@@ -25,9 +25,9 @@ import com.google.android.material.button.MaterialButton
 class ButtonSecondaryRounded @JvmOverloads constructor(
     ctx: Context,
     attrs: AttributeSet,
-    defStyleAttr: Int = R.attr.secondaryButtonRoundedStyle
+    defStyleAttr: Int = R.attr.secondaryButtonRoundedStyle,
 ) : MaterialButton(
     ctx,
     attrs,
-    defStyleAttr
+    defStyleAttr,
 )

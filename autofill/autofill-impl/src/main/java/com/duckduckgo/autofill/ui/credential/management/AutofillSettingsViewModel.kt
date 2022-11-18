@@ -27,18 +27,18 @@ import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.*
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.*
 import com.duckduckgo.di.scopes.ActivityScope
+import java.util.*
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.*
-import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class AutofillSettingsViewModel @Inject constructor(
     private val autofillStore: AutofillStore,
     private val clipboardInteractor: AutofillClipboardInteractor,
-    private val pixel: Pixel
+    private val pixel: Pixel,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -59,7 +59,7 @@ class AutofillSettingsViewModel @Inject constructor(
 
     fun onViewCredentials(
         credentials: LoginCredentials,
-        isLaunchedDirectly: Boolean
+        isLaunchedDirectly: Boolean,
     ) {
         addCommand(ShowCredentialMode(credentials = credentials, isLaunchedDirectly = isLaunchedDirectly))
         _viewState.value = viewState.value.copy(credentialMode = Viewing(credentialsViewed = credentials))
@@ -67,7 +67,7 @@ class AutofillSettingsViewModel @Inject constructor(
 
     fun onEditCredentials(
         credentials: LoginCredentials,
-        isFromViewMode: Boolean
+        isFromViewMode: Boolean,
     ) {
         // if edit is opened but not from view mode, it means that we should show the credentials view and we need to set hasPopulatedFields to false
         // to force credential view to prefill the fields.
@@ -76,21 +76,21 @@ class AutofillSettingsViewModel @Inject constructor(
                 ShowCredentialMode(
                     credentials = credentials,
                     isLaunchedDirectly = false,
-                )
+                ),
             )
             _viewState.value = viewState.value.copy(
                 credentialMode = Editing(
                     credentialsViewed = credentials,
                     startedCredentialModeWithEdit = !isFromViewMode,
-                    hasPopulatedFields = false
-                )
+                    hasPopulatedFields = false,
+                ),
             )
         } else {
             _viewState.value = viewState.value.copy(
                 credentialMode = Editing(
                     credentialsViewed = credentials,
-                    startedCredentialModeWithEdit = !isFromViewMode
-                )
+                    startedCredentialModeWithEdit = !isFromViewMode,
+                ),
             )
         }
     }
@@ -180,7 +180,7 @@ class AutofillSettingsViewModel @Inject constructor(
 
             autofillStore.getAllCredentials().collect { credentials ->
                 _viewState.value = _viewState.value.copy(
-                    logins = credentials
+                    logins = credentials,
                 )
             }
         }
@@ -201,8 +201,8 @@ class AutofillSettingsViewModel @Inject constructor(
                 autofillStore.getCredentialsWithId(originalCredentials.id!!)?.let { credentialsWithLastUpdatedTimeUpdated ->
                     _viewState.value = viewState.value.copy(
                         credentialMode = Viewing(
-                            credentialsViewed = credentialsWithLastUpdatedTimeUpdated
-                        )
+                            credentialsViewed = credentialsWithLastUpdatedTimeUpdated,
+                        ),
                     )
                 }
             }
@@ -232,7 +232,7 @@ class AutofillSettingsViewModel @Inject constructor(
         val logins: List<LoginCredentials> = emptyList(),
         val credentialMode: CredentialMode = NotInCredentialMode,
         val isAuthenticating: Boolean = false,
-        val isLocked: Boolean = false
+        val isLocked: Boolean = false,
     )
 
     sealed class CredentialMode(open val credentialsViewed: LoginCredentials?) {
@@ -241,7 +241,7 @@ class AutofillSettingsViewModel @Inject constructor(
             override val credentialsViewed: LoginCredentials,
             val saveable: Boolean = true,
             val startedCredentialModeWithEdit: Boolean,
-            val hasPopulatedFields: Boolean = true
+            val hasPopulatedFields: Boolean = true,
         ) : CredentialMode(credentialsViewed)
 
         object NotInCredentialMode : CredentialMode(null)
@@ -257,7 +257,7 @@ class AutofillSettingsViewModel @Inject constructor(
          */
         data class ShowCredentialMode(
             val credentials: LoginCredentials,
-            val isLaunchedDirectly: Boolean
+            val isLaunchedDirectly: Boolean,
         ) : Command()
 
         object ShowDisabledMode : Command()

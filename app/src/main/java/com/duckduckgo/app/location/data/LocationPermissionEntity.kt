@@ -22,7 +22,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "locationPermissions")
 data class LocationPermissionEntity(
     @PrimaryKey val domain: String,
-    val permission: LocationPermissionType
+    val permission: LocationPermissionType,
 )
 
 private const val HTTPS_HOST_PREFIX = "https://"
@@ -43,7 +43,8 @@ enum class LocationPermissionType(val value: Int) {
     ALLOW_ALWAYS(TYPE_ALLOW_ALWAYS),
     ALLOW_ONCE(TYPE_ALLOW_ONCE),
     DENY_ALWAYS(TYPE_DENY_ALWAYS),
-    DENY_ONCE(TYPE_DENY_ONCE);
+    DENY_ONCE(TYPE_DENY_ONCE),
+    ;
 
     companion object {
         private val map = values().associateBy(LocationPermissionType::value)

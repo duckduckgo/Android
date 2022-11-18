@@ -33,7 +33,7 @@ interface AutofillRepository {
 class RealAutofillRepository(
     val database: PrivacyConfigDatabase,
     coroutineScope: CoroutineScope,
-    dispatcherProvider: DispatcherProvider
+    dispatcherProvider: DispatcherProvider,
 ) : AutofillRepository {
 
     private val autofillDao: AutofillDao = database.autofillDao()

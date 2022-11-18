@@ -22,7 +22,7 @@ import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
 
 class PagerAdapter(
     fragmentManager: FragmentManager,
-    private val viewModel: OnboardingViewModel
+    private val viewModel: OnboardingViewModel,
 ) :
     FragmentPagerAdapter(fragmentManager) {
 

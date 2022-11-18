@@ -25,14 +25,14 @@ import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
 
 @SingleInstanceIn(FragmentScope::class)
 class RemoteMessagingModel @Inject constructor(
     private val remoteMessagingRepository: RemoteMessagingRepository,
     private val pixel: Pixel,
-    private val dispatchers: DispatcherProvider
+    private val dispatchers: DispatcherProvider,
 ) {
 
     val activeMessages = remoteMessagingRepository.messageFlow()

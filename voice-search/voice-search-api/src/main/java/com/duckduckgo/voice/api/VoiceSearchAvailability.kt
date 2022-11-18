@@ -20,6 +20,6 @@ interface VoiceSearchAvailability {
     val isVoiceSearchSupported: Boolean
     fun shouldShowVoiceSearch(
         isEditing: Boolean = false,
-        urlLoaded: String = ""
+        urlLoaded: String = "",
     ): Boolean
 }

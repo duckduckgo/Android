@@ -18,26 +18,26 @@ package com.duckduckgo.privacy.config.impl.features.autofill
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import com.duckduckgo.privacy.config.impl.features.privacyFeatureValueOf
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
+import com.duckduckgo.privacy.config.impl.features.privacyFeatureValueOf
 import com.duckduckgo.privacy.config.store.AutofillExceptionEntity
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.features.autofill.AutofillRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class AutofillPlugin @Inject constructor(
     private val autofillRepository: AutofillRepository,
-    private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository
+    private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository,
 ) : PrivacyFeaturePlugin {
 
     override fun store(
         featureName: String,
-        jsonString: String
+        jsonString: String,
     ): Boolean {
         @Suppress("NAME_SHADOWING")
         val privacyFeature = privacyFeatureValueOf(featureName) ?: return false

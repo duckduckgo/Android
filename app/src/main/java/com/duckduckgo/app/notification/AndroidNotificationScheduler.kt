@@ -24,9 +24,9 @@ import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.di.scopes.AppScope
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import timber.log.Timber
 
 // Please don't rename any Worker class name or class path
 // More information: https://craigrussell.io/2019/04/a-workmanager-pitfall-modifying-a-scheduled-worker/
@@ -38,7 +38,7 @@ interface AndroidNotificationScheduler {
 class NotificationScheduler(
     private val workManager: WorkManager,
     private val clearDataNotification: SchedulableNotification,
-    private val privacyNotification: SchedulableNotification
+    private val privacyNotification: SchedulableNotification,
 ) : AndroidNotificationScheduler {
 
     override suspend fun scheduleNextNotification() {
@@ -54,7 +54,7 @@ class NotificationScheduler(
                     OneTimeWorkRequestBuilder<PrivacyNotificationWorker>(),
                     PRIVACY_DELAY_DURATION_IN_DAYS,
                     TimeUnit.DAYS,
-                    UNUSED_APP_WORK_REQUEST_TAG
+                    UNUSED_APP_WORK_REQUEST_TAG,
                 )
             }
             clearDataNotification.canShow() -> {
@@ -62,7 +62,7 @@ class NotificationScheduler(
                     OneTimeWorkRequestBuilder<ClearDataNotificationWorker>(),
                     CLEAR_DATA_DELAY_DURATION_IN_DAYS,
                     TimeUnit.DAYS,
-                    UNUSED_APP_WORK_REQUEST_TAG
+                    UNUSED_APP_WORK_REQUEST_TAG,
                 )
             }
             else -> Timber.v("Notifications not enabled for this variant")
@@ -73,7 +73,7 @@ class NotificationScheduler(
         builder: OneTimeWorkRequest.Builder,
         duration: Long,
         unit: TimeUnit,
-        tag: String
+        tag: String,
     ) {
         Timber.v("Scheduling notification for $duration")
         val request = builder
@@ -96,7 +96,7 @@ class NotificationScheduler(
 @ContributesWorker(AppScope::class)
 class ShowClearDataNotification(
     context: Context,
-    params: WorkerParameters
+    params: WorkerParameters,
 ) : SchedulableNotificationWorker<ClearDataNotification>(context, params) {
     @Inject
     override lateinit var notificationSender: NotificationSender
@@ -108,7 +108,7 @@ class ShowClearDataNotification(
 @ContributesWorker(AppScope::class)
 open class ClearDataNotificationWorker(
     context: Context,
-    params: WorkerParameters
+    params: WorkerParameters,
 ) : SchedulableNotificationWorker<ClearDataNotification>(context, params) {
     @Inject
     override lateinit var notificationSender: NotificationSender
@@ -120,7 +120,7 @@ open class ClearDataNotificationWorker(
 @ContributesWorker(AppScope::class)
 class PrivacyNotificationWorker(
     context: Context,
-    params: WorkerParameters
+    params: WorkerParameters,
 ) : SchedulableNotificationWorker<PrivacyProtectionNotification>(context, params) {
     @Inject
     override lateinit var notificationSender: NotificationSender
@@ -131,7 +131,7 @@ class PrivacyNotificationWorker(
 
 open class SchedulableNotificationWorker<T : SchedulableNotification>(
     val context: Context,
-    params: WorkerParameters
+    params: WorkerParameters,
 ) : CoroutineWorker(context, params) {
     open lateinit var notificationSender: NotificationSender
     open lateinit var notification: T

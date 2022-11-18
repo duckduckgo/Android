@@ -41,7 +41,7 @@ class FaviconModule {
         favoritesRepository: FavoritesRepository,
         faviconDownloader: FaviconDownloader,
         dispatcherProvider: DispatcherProvider,
-        autofillStore: AutofillStore
+        autofillStore: AutofillStore,
     ): FaviconManager {
         return DuckDuckGoFaviconManager(
             faviconPersister,
@@ -51,7 +51,7 @@ class FaviconModule {
             favoritesRepository,
             faviconDownloader,
             dispatcherProvider,
-            autofillStore
+            autofillStore,
         )
     }
 
@@ -59,7 +59,7 @@ class FaviconModule {
     @SingleInstanceIn(AppScope::class)
     fun faviconDownloader(
         context: Context,
-        dispatcherProvider: DispatcherProvider
+        dispatcherProvider: DispatcherProvider,
     ): FaviconDownloader {
         return GlideFaviconDownloader(context, dispatcherProvider)
     }

@@ -23,14 +23,14 @@ import androidx.core.content.edit
 import com.duckduckgo.di.scopes.AppScope
 import com.frybits.harmony.getHarmonySharedPreferences
 import com.squareup.anvil.annotations.ContributesBinding
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 private const val MIGRATED_TO_HARMONY = "migrated_to_harmony"
 
 @ContributesBinding(AppScope::class)
 class VpnSharedPreferencesProviderImpl @Inject constructor(
-    private val context: Context
+    private val context: Context,
 ) : VpnSharedPreferencesProvider {
     override fun getSharedPreferences(name: String, multiprocess: Boolean, migrate: Boolean): SharedPreferences {
         return if (multiprocess) {

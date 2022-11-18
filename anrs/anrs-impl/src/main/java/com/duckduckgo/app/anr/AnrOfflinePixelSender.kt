@@ -41,7 +41,7 @@ class AnrOfflinePixelSender @Inject constructor(
                 return@defer pixelSender.sendPixel(
                     AnrPixelName.ANR_PIXEL.pixelName,
                     mapOf("stackTrace" to ss),
-                    mapOf()
+                    mapOf(),
                 ).doOnComplete {
                     anrRepository.removeMostRecentAnr()
                 }
@@ -52,5 +52,5 @@ class AnrOfflinePixelSender @Inject constructor(
 }
 
 enum class AnrPixelName(override val pixelName: String) : Pixel.PixelName {
-    ANR_PIXEL("m_anr_exception")
+    ANR_PIXEL("m_anr_exception"),
 }

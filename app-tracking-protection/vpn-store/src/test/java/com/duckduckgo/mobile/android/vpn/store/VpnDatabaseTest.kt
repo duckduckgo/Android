@@ -43,7 +43,7 @@ class VpnDatabaseTest {
         Room.databaseBuilder(
             InstrumentationRegistry.getInstrumentation().targetContext,
             VpnDatabase::class.java,
-            TEST_DB_NAME
+            TEST_DB_NAME,
         ).addMigrations(*VpnDatabase.ALL_MIGRATIONS.toTypedArray()).build().apply {
             openHelper.writableDatabase.close()
         }

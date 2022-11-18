@@ -20,10 +20,10 @@ import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.global.ValidUrl
 import com.duckduckgo.app.global.getValidUrl
+import java.lang.IllegalArgumentException
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.lang.IllegalArgumentException
 
 @RunWith(AndroidJUnit4::class)
 class UriAuthExtensionKtTest {

@@ -47,11 +47,13 @@ class MainReasonNegativeFeedbackFragment : FeedbackFragment(R.layout.content_fee
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        recyclerAdapter = MainReasonAdapter(object : (FeedbackTypeMainReasonDisplay) -> Unit {
-            override fun invoke(reason: FeedbackTypeMainReasonDisplay) {
-                listener?.userSelectedNegativeFeedbackMainReason(reason.mainReason)
-            }
-        })
+        recyclerAdapter = MainReasonAdapter(
+            object : (FeedbackTypeMainReasonDisplay) -> Unit {
+                override fun invoke(reason: FeedbackTypeMainReasonDisplay) {
+                    listener?.userSelectedNegativeFeedbackMainReason(reason.mainReason)
+                }
+            },
+        )
 
         activity?.let {
             binding.recyclerView.layoutManager = LinearLayoutManager(it)

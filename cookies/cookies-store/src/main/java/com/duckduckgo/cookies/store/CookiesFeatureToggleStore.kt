@@ -26,7 +26,7 @@ interface CookiesFeatureToggleStore {
 
     fun get(
         featureName: CookiesFeatureName,
-        defaultValue: Boolean
+        defaultValue: Boolean,
     ): Boolean
 
     fun getMinSupportedVersion(featureName: CookiesFeatureName): Int
@@ -68,5 +68,5 @@ class RealCookiesFeatureToggleStore(private val context: Context) : CookiesFeatu
 data class CookiesFeatureToggles(
     val featureName: CookiesFeatureName,
     val enabled: Boolean,
-    val minSupportedVersion: Int?
+    val minSupportedVersion: Int?,
 )

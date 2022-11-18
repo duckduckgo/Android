@@ -29,7 +29,7 @@ data class PixelEntity(
     val pixelName: String,
     val atb: String,
     val additionalQueryParams: Map<String, String> = emptyMap(),
-    val encodedQueryParams: Map<String, String> = emptyMap()
+    val encodedQueryParams: Map<String, String> = emptyMap(),
 )
 
 class QueryParamsTypeConverter {

@@ -24,9 +24,9 @@ import com.google.android.material.button.MaterialButton
 class ButtonGhostSmall @JvmOverloads constructor(
     ctx: Context,
     attrs: AttributeSet,
-    defStyleAttr: Int = R.attr.ghostButtonSmallStyle
+    defStyleAttr: Int = R.attr.ghostButtonSmallStyle,
 ) : MaterialButton(
     ctx,
     attrs,
-    defStyleAttr
+    defStyleAttr,
 )

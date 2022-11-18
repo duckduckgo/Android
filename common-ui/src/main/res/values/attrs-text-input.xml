@@ -15,7 +15,7 @@
   -->
 
 <resources>
-    <declare-styleable name="TextInputView">
+    <declare-styleable name="DaxTextInput">
         <attr name="android:hint" />
         <attr name="android:text" />
         <attr name="editable" format="boolean" />

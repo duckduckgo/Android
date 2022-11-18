@@ -33,18 +33,19 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeUnit.DAYS
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
 
 @ContributesWorker(AppScope::class)
 class FirstPartyCookiesModifierWorker(
     context: Context,
-    workerParameters: WorkerParameters
+    workerParameters: WorkerParameters,
 ) : CoroutineWorker(context, workerParameters) {
     @Inject
     lateinit var firstPartyCookiesModifier: FirstPartyCookiesModifier
+
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
 
@@ -62,12 +63,12 @@ class FirstPartyCookiesModifierWorker(
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = LifecycleObserver::class
+    boundType = LifecycleObserver::class,
 )
 @SingleInstanceIn(AppScope::class)
 class FirstPartyCookiesModifierWorkerScheduler @Inject constructor(
     private val workManager: WorkManager,
-    private val toggle: FeatureToggle
+    private val toggle: FeatureToggle,
 ) : DefaultLifecycleObserver {
 
     private val workerRequest = PeriodicWorkRequestBuilder<FirstPartyCookiesModifierWorker>(1, DAYS)

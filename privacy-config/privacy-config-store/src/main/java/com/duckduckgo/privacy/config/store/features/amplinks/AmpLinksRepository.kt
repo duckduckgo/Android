@@ -19,9 +19,9 @@ package com.duckduckgo.privacy.config.store.features.amplinks
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.privacy.config.api.AmpLinkException
 import com.duckduckgo.privacy.config.store.*
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.util.concurrent.CopyOnWriteArrayList
 
 interface AmpLinksRepository {
     fun updateAll(exceptions: List<AmpLinkExceptionEntity>, ampLinkFormats: List<AmpLinkFormatEntity>, ampKeywords: List<AmpKeywordEntity>)
@@ -33,7 +33,7 @@ interface AmpLinksRepository {
 class RealAmpLinksRepository(
     val database: PrivacyConfigDatabase,
     coroutineScope: CoroutineScope,
-    dispatcherProvider: DispatcherProvider
+    dispatcherProvider: DispatcherProvider,
 ) : AmpLinksRepository {
 
     private val ampLinksDao: AmpLinksDao = database.ampLinksDao()
@@ -51,7 +51,7 @@ class RealAmpLinksRepository(
     override fun updateAll(
         exceptions: List<AmpLinkExceptionEntity>,
         ampLinkFormats: List<AmpLinkFormatEntity>,
-        ampKeywords: List<AmpKeywordEntity>
+        ampKeywords: List<AmpKeywordEntity>,
     ) {
         ampLinksDao.updateAll(exceptions, ampLinkFormats, ampKeywords)
         loadToMemory()

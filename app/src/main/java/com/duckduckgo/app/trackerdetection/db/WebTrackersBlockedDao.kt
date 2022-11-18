@@ -34,6 +34,6 @@ interface WebTrackersBlockedDao {
     @Query("SELECT * FROM web_trackers_blocked WHERE timestamp >= :startTime AND timestamp < :endTime ORDER BY timestamp DESC")
     fun getTrackersBetween(
         startTime: String,
-        endTime: String
+        endTime: String,
     ): Flow<List<WebTrackerBlocked>>
 }

@@ -29,5 +29,5 @@ data class DownloadEntity(
     val fileName: String,
     val contentLength: Long = 0,
     val filePath: String,
-    val createdAt: String = DatabaseDateFormatter.timestamp()
+    val createdAt: String = DatabaseDateFormatter.timestamp(),
 )

@@ -29,7 +29,6 @@ import androidx.core.view.doOnDetach
 import androidx.core.view.isVisible
 import com.airbnb.lottie.RenderMode
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.browser.databinding.IncludeDaxDialogCtaBinding
 import com.duckduckgo.app.browser.databinding.SheetFireClearDataBinding
 import com.duckduckgo.app.cta.ui.CtaViewModel
@@ -38,11 +37,12 @@ import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.view.FireDialog.FireDialogClearAllEvent.AnimationFinished
 import com.duckduckgo.app.global.view.FireDialog.FireDialogClearAllEvent.ClearAllDataFinished
+import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.settings.clear.getPixelValue
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.setAndPropagateUpFitsSystemWindows
 import com.duckduckgo.mobile.android.ui.view.show
@@ -63,7 +63,7 @@ class FireDialog(
     private val pixel: Pixel,
     private val settingsDataStore: SettingsDataStore,
     private val userEventsStore: UserEventsStore,
-    private val appCoroutineScope: CoroutineScope
+    private val appCoroutineScope: CoroutineScope,
 ) : BottomSheetDialog(context, R.style.FireDialog), CoroutineScope by MainScope() {
 
     private lateinit var binding: SheetFireClearDataBinding
@@ -143,7 +143,7 @@ class FireDialog(
         pixel.enqueueFire(if (ctaVisible) FIRE_DIALOG_PROMOTED_CLEAR_PRESSED else FIRE_DIALOG_CLEAR_PRESSED)
         pixel.enqueueFire(
             pixel = FIRE_DIALOG_ANIMATION,
-            parameters = mapOf(FIRE_ANIMATION to settingsDataStore.selectedFireAnimation.getPixelValue())
+            parameters = mapOf(FIRE_ANIMATION to settingsDataStore.selectedFireAnimation.getPixelValue()),
         )
         hideClearDataOptions()
         if (animationEnabled()) {
@@ -172,14 +172,16 @@ class FireDialog(
         setCanceledOnTouchOutside(false)
         binding.fireAnimationView.show()
         binding.fireAnimationView.playAnimation()
-        binding.fireAnimationView.addAnimatorListener(object : Animator.AnimatorListener {
-            override fun onAnimationRepeat(animation: Animator) {}
-            override fun onAnimationCancel(animation: Animator) {}
-            override fun onAnimationStart(animation: Animator) {}
-            override fun onAnimationEnd(animation: Animator) {
-                onFireDialogClearAllEvent(AnimationFinished)
-            }
-        })
+        binding.fireAnimationView.addAnimatorListener(
+            object : Animator.AnimatorListener {
+                override fun onAnimationRepeat(animation: Animator) {}
+                override fun onAnimationCancel(animation: Animator) {}
+                override fun onAnimationStart(animation: Animator) {}
+                override fun onAnimationEnd(animation: Animator) {
+                    onFireDialogClearAllEvent(AnimationFinished)
+                }
+            },
+        )
     }
 
     private fun hideClearDataOptions() {

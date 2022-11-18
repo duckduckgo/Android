@@ -31,6 +31,6 @@ object StatisticsLibraryConfigModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun provideStatisticsLibraryConfig(
-        appBuildConfig: AppBuildConfig
+        appBuildConfig: AppBuildConfig,
     ): StatisticsLibraryConfig = DefaultStatisticsLibraryConfig(appBuildConfig)
 }

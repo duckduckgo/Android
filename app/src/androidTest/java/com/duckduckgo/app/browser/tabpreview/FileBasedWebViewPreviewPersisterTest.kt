@@ -21,10 +21,7 @@ package com.duckduckgo.app.browser.tabpreview
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.file.FileDeleter
-import org.mockito.kotlin.any
-import org.mockito.kotlin.argumentCaptor
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
+import java.io.File
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -32,7 +29,10 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.io.File
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 
 @ExperimentalCoroutinesApi
 class FileBasedWebViewPreviewPersisterTest {
@@ -101,7 +101,7 @@ class FileBasedWebViewPreviewPersisterTest {
 
     private fun verifyExistingPreviewExcludedFromDeletion(
         exclusionList: List<String>,
-        newTabPreviewFilename: String
+        newTabPreviewFilename: String,
     ) {
         assertEquals(1, exclusionList.size)
         assertTrue(exclusionList.contains(newTabPreviewFilename))
@@ -109,7 +109,7 @@ class FileBasedWebViewPreviewPersisterTest {
 
     private fun verifyTabIdUsedAsDirectory(
         tabId: String,
-        path: File
+        path: File,
     ) {
         assertTrue(path.parent.endsWith(tabId))
     }

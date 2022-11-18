@@ -21,7 +21,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.global.R as CommonR
 import com.duckduckgo.app.downloads.DownloadViewItem.Empty
 import com.duckduckgo.app.downloads.DownloadViewItem.Header
 import com.duckduckgo.app.downloads.DownloadViewItem.Item
@@ -30,6 +29,7 @@ import com.duckduckgo.app.downloads.DownloadsViewModel.Command.DisplayMessage
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.DisplayUndoMessage
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.OpenFile
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.ShareFile
+import com.duckduckgo.app.global.R as CommonR
 import com.duckduckgo.app.global.formatters.time.RealTimeDiffFormatter
 import com.duckduckgo.downloads.api.DownloadsRepository
 import com.duckduckgo.downloads.api.model.DownloadItem
@@ -42,8 +42,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.annotation.Config
 import org.threeten.bp.LocalDateTime
@@ -116,7 +116,7 @@ class DownloadsViewModelTest {
             oneItem().copy(downloadId = 3L, createdAt = sometimeDuringPastWeek.toString()),
             oneItem().copy(downloadId = 4L, createdAt = sometimeDuringPastMonth.toString()),
             oneItem().copy(downloadId = 5L, createdAt = sometimeBeforePastMonth.toString()),
-            oneItem().copy(downloadId = 6L, createdAt = sometimeInThePreviousYear.toString())
+            oneItem().copy(downloadId = 6L, createdAt = sometimeInThePreviousYear.toString()),
         )
 
         whenever(mockDownloadsRepository.getDownloadsAsFlow()).thenReturn(flowOf(downloadList))
@@ -175,7 +175,7 @@ class DownloadsViewModelTest {
         testee.commands().test {
             assertEquals(
                 DisplayUndoMessage(messageId = R.string.downloadsAllFilesDeletedMessage, items = itemsToDelete),
-                awaitItem()
+                awaitItem(),
             )
         }
     }
@@ -190,7 +190,7 @@ class DownloadsViewModelTest {
         testee.commands().test {
             assertEquals(
                 DisplayMessage(R.string.downloadsFileNotFoundErrorMessage),
-                awaitItem()
+                awaitItem(),
             )
         }
     }
@@ -248,7 +248,7 @@ class DownloadsViewModelTest {
         testee.commands().test {
             assertEquals(
                 OpenFile(item),
-                awaitItem()
+                awaitItem(),
             )
         }
     }
@@ -262,7 +262,7 @@ class DownloadsViewModelTest {
         testee.commands().test {
             assertEquals(
                 ShareFile(item),
-                awaitItem()
+                awaitItem(),
             )
         }
     }
@@ -279,9 +279,9 @@ class DownloadsViewModelTest {
                 DisplayUndoMessage(
                     messageId = R.string.downloadsFileDeletedMessage,
                     arg = item.fileName,
-                    items = listOf(item)
+                    items = listOf(item),
                 ),
-                awaitItem()
+                awaitItem(),
             )
         }
     }
@@ -296,7 +296,7 @@ class DownloadsViewModelTest {
         testee.commands().test {
             assertEquals(
                 CancelDownload(item),
-                awaitItem()
+                awaitItem(),
             )
         }
     }
@@ -317,7 +317,7 @@ class DownloadsViewModelTest {
             fileName = "file.jpg",
             contentLength = 100L,
             createdAt = "2022-02-21T10:56:22",
-            filePath = "/"
+            filePath = "/",
         )
 
     private fun otherItem() =
@@ -327,6 +327,6 @@ class DownloadsViewModelTest {
             fileName = "other-file.jpg",
             contentLength = 120L,
             createdAt = "2022-02-21T10:56:22",
-            filePath = "/"
+            filePath = "/",
         )
 }

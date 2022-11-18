@@ -36,7 +36,7 @@ interface AppBuildConfig {
 enum class BuildFlavor {
     INTERNAL,
     FDROID,
-    PLAY
+    PLAY,
 }
 
 /**

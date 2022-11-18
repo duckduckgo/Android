@@ -34,7 +34,7 @@ interface DefaultBrowserDetector {
 
 class AndroidDefaultBrowserDetector(
     private val context: Context,
-    private val appBuildConfig: AppBuildConfig
+    private val appBuildConfig: AppBuildConfig,
 ) : DefaultBrowserDetector {
 
     override fun deviceSupportsDefaultBrowserConfiguration(): Boolean {

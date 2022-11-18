@@ -40,7 +40,7 @@ class HttpAuthenticationDialogFragment : DialogFragment() {
     interface HttpAuthenticationListener {
         fun handleAuthentication(
             request: BasicAuthenticationRequest,
-            credentials: BasicAuthenticationCredentials
+            credentials: BasicAuthenticationCredentials,
         )
 
         fun cancelAuthentication(request: BasicAuthenticationRequest)
@@ -63,7 +63,7 @@ class HttpAuthenticationDialogFragment : DialogFragment() {
             .setPositiveButton(R.string.authenticationDialogPositiveButton) { _, _ ->
                 listener?.handleAuthentication(
                     request,
-                    BasicAuthenticationCredentials(username = usernameInput.text.toString(), password = passwordInput.text.toString())
+                    BasicAuthenticationCredentials(username = usernameInput.text.toString(), password = passwordInput.text.toString()),
                 )
                 didUserCompleteAuthentication = true
             }.setNegativeButton(R.string.authenticationDialogNegativeButton) { _, _ ->
@@ -95,7 +95,7 @@ class HttpAuthenticationDialogFragment : DialogFragment() {
 
     private fun showKeyboard(
         editText: EditText,
-        alert: AlertDialog
+        alert: AlertDialog,
     ) {
         editText.showKeyboard()
         alert.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)

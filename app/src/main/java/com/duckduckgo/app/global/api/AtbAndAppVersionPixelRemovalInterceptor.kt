@@ -23,13 +23,13 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 import okhttp3.Interceptor
 import okhttp3.Response
-import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = PixelInterceptorPlugin::class
+    boundType = PixelInterceptorPlugin::class,
 )
 class AtbAndAppVersionPixelRemovalInterceptor @Inject constructor() : Interceptor, PixelInterceptorPlugin {
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -63,7 +63,7 @@ class AtbAndAppVersionPixelRemovalInterceptor @Inject constructor() : Intercepto
             AppPixelName.EMAIL_USE_ALIAS.pixelName,
             AppPixelName.EMAIL_USE_ADDRESS.pixelName,
             AppPixelName.EMAIL_COPIED_TO_CLIPBOARD.pixelName,
-            "m_atp_unprotected_apps_bucket_"
+            "m_atp_unprotected_apps_bucket_",
         )
     }
 }

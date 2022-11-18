@@ -19,11 +19,11 @@ package com.duckduckgo.app.notification.model
 import android.content.Context
 import android.os.Bundle
 import androidx.annotation.StringRes
-import com.duckduckgo.mobile.android.R as CommonR
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.WEBSITE
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.WEBSITE
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.db.NotificationDao
+import com.duckduckgo.mobile.android.R as CommonR
 
 class WebsiteNotification(
     private val context: Context,
@@ -31,7 +31,7 @@ class WebsiteNotification(
     private val url: String,
     @StringRes private val title: Int,
     @StringRes private val description: Int,
-    private val pixelSuffix: String
+    private val pixelSuffix: String,
 ) : SchedulableNotification {
 
     override val id = "com.duckduckgo.privacy.website.$pixelSuffix"
@@ -54,7 +54,7 @@ open class WebsiteNotificationSpecification(
     url: String,
     @StringRes titleRes: Int,
     @StringRes descriptionRes: Int,
-    override val pixelSuffix: String
+    override val pixelSuffix: String,
 ) :
     NotificationSpec {
     override val bundle: Bundle = Bundle().apply { putString(WEBSITE_KEY, url) }

@@ -28,7 +28,7 @@ class DaxTextView @JvmOverloads
 constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : MaterialTextView(context, attrs, defStyleAttr) {
 
     init {
@@ -37,7 +37,7 @@ constructor(
                 attrs,
                 R.styleable.DaxTextView,
                 0,
-                0
+                0,
             )
 
         val typographyType = if (typedArray.hasValue(R.styleable.DaxTextView_typography)) {
@@ -76,7 +76,8 @@ constructor(
         Body1,
         Body2,
         Button,
-        Caption;
+        Caption,
+        ;
 
         companion object {
             fun from(type: Int): Type {
@@ -115,7 +116,8 @@ constructor(
 
     enum class TextColor {
         Primary,
-        Secondary;
+        Secondary,
+        ;
 
         companion object {
             fun from(type: Int): TextColor {

@@ -203,7 +203,10 @@ class SecureStoreBackedAutofillStoreTest {
         storeCredentials(2, url, "username2", "password456")
         storeCredentials(3, url, "username3", "password789")
         val credentials = LoginCredentials(
-            domain = url, username = "username1", password = "newpassword", id = 1
+            domain = url,
+            username = "username1",
+            password = "newpassword",
+            id = 1,
         )
 
         testee.updateCredentials(url, credentials, CredentialUpdateType.Password)
@@ -223,7 +226,10 @@ class SecureStoreBackedAutofillStoreTest {
         storeCredentials(2, url, "username2", "password456")
         storeCredentials(3, url, "username3", "password789")
         val credentials = LoginCredentials(
-            domain = url, username = "username1", password = "newpassword", id = 1
+            domain = url,
+            username = "username1",
+            password = "newpassword",
+            id = 1,
         )
 
         testee.updateCredentials(credentials)
@@ -243,7 +249,10 @@ class SecureStoreBackedAutofillStoreTest {
         storeCredentials(2, url, "username2", "password456")
         storeCredentials(3, url, "username3", "password789")
         val credentials = LoginCredentials(
-            domain = url, username = "username1", password = "password123", id = 1
+            domain = url,
+            username = "username1",
+            password = "password123",
+            id = 1,
         )
 
         testee.updateCredentials(url, credentials, CredentialUpdateType.Username)
@@ -276,7 +285,9 @@ class SecureStoreBackedAutofillStoreTest {
         setupTesteeWithAutofillAvailable()
         val url = "https://example.com"
         val credentials = LoginCredentials(
-            domain = url, username = "username1", password = "password"
+            domain = url,
+            username = "username1",
+            password = "password",
         )
         testee.saveCredentials(url, credentials)
 
@@ -288,7 +299,9 @@ class SecureStoreBackedAutofillStoreTest {
         setupTesteeWithAutofillAvailable()
         val url = "https://example.com"
         val credentials = LoginCredentials(
-            domain = url, username = "username1", password = "password"
+            domain = url,
+            username = "username1",
+            password = "password",
         )
         testee.saveCredentials(url, credentials)
         verify(autofillPrefsStore).showOnboardingWhenOfferingToSaveLogin = false
@@ -324,9 +337,9 @@ class SecureStoreBackedAutofillStoreTest {
                 username = "username1",
                 password = "password123",
                 lastUpdatedMillis = DEFAULT_INITIAL_LAST_UPDATED,
-                notes = "notes"
+                notes = "notes",
             ),
-            testee.getCredentialsWithId(1)
+            testee.getCredentialsWithId(1),
         )
     }
 
@@ -340,7 +353,7 @@ class SecureStoreBackedAutofillStoreTest {
         url: String,
         username: String,
         password: String,
-        lastUpdatedTimeMillis: Long = DEFAULT_INITIAL_LAST_UPDATED
+        lastUpdatedTimeMillis: Long = DEFAULT_INITIAL_LAST_UPDATED,
     ) {
         val result = this.filter {
             it.domain == url && it.username == username && it.password == password && it.lastUpdatedMillis == lastUpdatedTimeMillis
@@ -352,7 +365,7 @@ class SecureStoreBackedAutofillStoreTest {
         url: String,
         username: String?,
         password: String,
-        lastUpdatedTimeMillis: Long = DEFAULT_INITIAL_LAST_UPDATED
+        lastUpdatedTimeMillis: Long = DEFAULT_INITIAL_LAST_UPDATED,
     ) {
         val result = this.filter {
             it.domain == url && it.username == username && it.password == password && it.lastUpdatedMillis == lastUpdatedTimeMillis
@@ -368,7 +381,7 @@ class SecureStoreBackedAutofillStoreTest {
 
     private fun setupTestee(
         isInternalUser: Boolean,
-        canAccessSecureStorage: Boolean
+        canAccessSecureStorage: Boolean,
     ) {
         internalTestUserChecker = FakeInternalTestUserChecker(isInternalUser)
         secureStore = FakeSecureStore(canAccessSecureStorage)
@@ -377,7 +390,7 @@ class SecureStoreBackedAutofillStoreTest {
             internalTestUserChecker,
             lastUpdatedTimeProvider,
             autofillPrefsStore,
-            dispatcherProvider = coroutineTestRule.testDispatcherProvider
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
         )
     }
 
@@ -407,7 +420,7 @@ class SecureStoreBackedAutofillStoreTest {
         username: String?,
         password: String,
         lastUpdatedTimeMillis: Long = DEFAULT_INITIAL_LAST_UPDATED,
-        notes: String = "notes"
+        notes: String = "notes",
     ) {
         val details = WebsiteLoginDetails(domain = domain, username = username, id = id, lastUpdatedMillis = lastUpdatedTimeMillis)
         val credentials = WebsiteLoginDetailsWithCredentials(details, password, notes)
@@ -419,7 +432,7 @@ class SecureStoreBackedAutofillStoreTest {
         private val credentials = mutableListOf<WebsiteLoginDetailsWithCredentials>()
 
         override suspend fun addWebsiteLoginDetailsWithCredentials(
-            websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials
+            websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials,
         ): WebsiteLoginDetailsWithCredentials {
             credentials.add(websiteLoginDetailsWithCredentials)
             return websiteLoginDetailsWithCredentials
@@ -432,7 +445,7 @@ class SecureStoreBackedAutofillStoreTest {
                         it.details.domain == domain
                     }.map {
                         it.details
-                    }
+                    },
                 )
             }
         }
@@ -452,7 +465,7 @@ class SecureStoreBackedAutofillStoreTest {
                 emit(
                     credentials.filter {
                         it.details.domain == domain
-                    }
+                    },
                 )
             }
         }
@@ -464,7 +477,7 @@ class SecureStoreBackedAutofillStoreTest {
         }
 
         override suspend fun updateWebsiteLoginDetailsWithCredentials(
-            websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials
+            websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials,
         ): WebsiteLoginDetailsWithCredentials {
             credentials.indexOfFirst { it.details.id == websiteLoginDetailsWithCredentials.details.id }.also {
                 credentials[it] = websiteLoginDetailsWithCredentials

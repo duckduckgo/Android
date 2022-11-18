@@ -36,7 +36,6 @@ import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.databinding.ActivitySystemSearchBinding
 import com.duckduckgo.app.browser.databinding.IncludeQuickAccessItemsBinding
@@ -47,14 +46,15 @@ import com.duckduckgo.app.browser.favorites.QuickAccessDragTouchItemListener
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.app.global.extensions.html
-import com.duckduckgo.mobile.android.ui.view.*
+import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.*
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.R as CommonR
+import com.duckduckgo.mobile.android.ui.view.*
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchLauncher
@@ -164,7 +164,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             this,
             {
                 it?.let { renderOnboardingViewState(it) }
-            }
+            },
         )
         viewModel.resultsViewState.observe(
             this,
@@ -177,13 +177,13 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                         renderQuickAccessItems(it)
                     }
                 }
-            }
+            },
         )
         viewModel.command.observe(
             this,
             {
                 processCommand(it)
-            }
+            },
         )
     }
 
@@ -204,7 +204,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             },
             editableSearchClickListener = {
                 viewModel.onUserSelectedToEditQuery(it.phrase)
-            }
+            },
         )
         binding.autocompleteSuggestions.adapter = autocompleteSuggestionsAdapter
     }
@@ -223,11 +223,12 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         val layoutManager = GridLayoutManager(this, numOfColumns)
         quickAccessRecyclerView.layoutManager = layoutManager
         quickAccessAdapter = FavoritesQuickAccessAdapter(
-            this, faviconManager,
+            this,
+            faviconManager,
             { viewHolder -> itemTouchHelper.startDrag(viewHolder) },
             { viewModel.onQuickAccessItemClicked(it) },
             { viewModel.onEditQuickAccessItemRequested(it) },
-            { viewModel.onDeleteQuickAccessItemRequested(it) }
+            { viewModel.onDeleteQuickAccessItemRequested(it) },
         )
         itemTouchHelper = ItemTouchHelper(
             QuickAccessDragTouchItemListener(
@@ -236,8 +237,8 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                     override fun onListChanged(listElements: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
                         viewModel.onQuickAccessListChanged(listElements)
                     }
-                }
-            )
+                },
+            ),
         )
 
         itemTouchHelper.attachToRecyclerView(quickAccessRecyclerView)
@@ -298,7 +299,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                     return@OnEditorActionListener true
                 }
                 false
-            }
+            },
         )
 
         omnibarTextInput.removeTextChangedListener(textChangeWatcher)
@@ -377,7 +378,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         Snackbar.make(
             binding.root,
             message,
-            Snackbar.LENGTH_LONG
+            Snackbar.LENGTH_LONG,
         ).setAction(R.string.fireproofWebsiteSnackbarAction) {
             viewModel.insertQuickAccessItem(savedSite)
         }.show()
@@ -441,7 +442,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
         fun fromWidget(
             context: Context,
-            launchVoice: Boolean = false
+            launchVoice: Boolean = false,
         ): Intent {
             val intent = Intent(context, SystemSearchActivity::class.java)
             intent.putExtra(WIDGET_SEARCH_EXTRA, true)
@@ -452,7 +453,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
         fun fromFavWidget(
             context: Context,
-            launchVoice: Boolean = false
+            launchVoice: Boolean = false,
         ): Intent {
             val intent = Intent(context, SystemSearchActivity::class.java)
             intent.putExtra(WIDGET_SEARCH_WITH_FAVS_EXTRA, true)

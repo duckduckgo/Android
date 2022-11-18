@@ -42,14 +42,14 @@ class AutofillManagementRecyclerAdapter(
     val onCredentialSelected: (credentials: LoginCredentials) -> Unit,
     val onContextMenuItemClicked: (ContextMenuAction) -> Unit,
     val onCopyUsername: (credentials: LoginCredentials) -> Unit,
-    val onCopyPassword: (credentials: LoginCredentials) -> Unit
+    val onCopyPassword: (credentials: LoginCredentials) -> Unit,
 ) : Adapter<RecyclerView.ViewHolder>() {
 
     private var listItems = listOf<ListItem>()
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
-        viewType: Int
+        viewType: Int,
     ): RecyclerView.ViewHolder {
         return when (viewType) {
             ITEM_VIEW_TYPE_HEADER -> {

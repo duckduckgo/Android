@@ -36,7 +36,7 @@ interface FeedbackService {
         @Field("os") api: Int,
         @Field("manufacturer") manufacturer: String,
         @Field("model") model: String,
-        @Field("atb") atb: String
+        @Field("atb") atb: String,
     )
 
     companion object {

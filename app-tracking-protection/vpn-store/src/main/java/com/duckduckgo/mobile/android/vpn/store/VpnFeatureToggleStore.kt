@@ -27,7 +27,7 @@ interface VpnFeatureToggleStore {
 
     fun get(
         featureName: AppTpFeatureName,
-        defaultValue: Boolean
+        defaultValue: Boolean,
     ): Boolean
 
     fun getMinSupportedVersion(featureName: AppTpFeatureName): Int
@@ -69,5 +69,5 @@ internal class RealVpnFeatureToggleStore(private val context: Context) : VpnFeat
 data class VpnFeatureToggles(
     val featureName: AppTpFeatureName,
     val enabled: Boolean,
-    val minSupportedVersion: Int?
+    val minSupportedVersion: Int?,
 )

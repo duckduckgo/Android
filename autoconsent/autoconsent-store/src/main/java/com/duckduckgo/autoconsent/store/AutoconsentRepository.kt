@@ -17,9 +17,9 @@
 package com.duckduckgo.autoconsent.store
 
 import com.duckduckgo.app.global.DispatcherProvider
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.util.concurrent.CopyOnWriteArrayList
 
 interface AutoconsentRepository {
     fun updateAll(exceptions: List<AutoconsentExceptionEntity>, disabledCmps: List<DisabledCmpsEntity>)
@@ -30,7 +30,7 @@ interface AutoconsentRepository {
 class RealAutoconsentRepository constructor(
     val database: AutoconsentDatabase,
     coroutineScope: CoroutineScope,
-    dispatcherProvider: DispatcherProvider
+    dispatcherProvider: DispatcherProvider,
 ) : AutoconsentRepository {
 
     private val autoconsentDao: AutoconsentDao = database.autoconsentDao()

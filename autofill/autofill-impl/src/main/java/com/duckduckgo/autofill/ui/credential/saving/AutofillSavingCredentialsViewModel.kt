@@ -25,12 +25,12 @@ import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.di.scopes.ActivityScope
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
 class AutofillSavingCredentialsViewModel @Inject constructor(
-    private val dispatchers: DispatcherProvider
+    private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
     @Inject
@@ -46,7 +46,7 @@ class AutofillSavingCredentialsViewModel @Inject constructor(
 
         return DisplayStringResourceIds(
             title = title,
-            ctaButton = ctaButton
+            ctaButton = ctaButton,
         )
     }
 
@@ -84,6 +84,6 @@ class AutofillSavingCredentialsViewModel @Inject constructor(
 
     data class DisplayStringResourceIds(
         @StringRes val title: Int,
-        @StringRes val ctaButton: Int
+        @StringRes val ctaButton: Int,
     )
 }

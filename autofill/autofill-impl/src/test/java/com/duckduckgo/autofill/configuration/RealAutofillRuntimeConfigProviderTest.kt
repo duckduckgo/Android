@@ -53,7 +53,7 @@ class RealAutofillRuntimeConfigProviderTest {
             emailManager,
             deviceAuthenticator,
             autofillStore,
-            runtimeConfigurationWriter
+            runtimeConfigurationWriter,
         )
 
         whenever(runtimeConfigurationWriter.generateContentScope()).thenReturn("")
@@ -146,9 +146,9 @@ class RealAutofillRuntimeConfigProviderTest {
                     id = 1,
                     domain = url,
                     username = "username",
-                    password = "password"
-                )
-            )
+                    password = "password",
+                ),
+            ),
         )
 
         testee.getRuntimeConfiguration("", url)
@@ -168,9 +168,9 @@ class RealAutofillRuntimeConfigProviderTest {
                     id = 1,
                     domain = url,
                     username = "username",
-                    password = "password"
-                )
-            )
+                    password = "password",
+                ),
+            ),
         )
 
         testee.getRuntimeConfiguration("", url)
@@ -190,9 +190,9 @@ class RealAutofillRuntimeConfigProviderTest {
                     id = 1,
                     domain = url,
                     username = "username",
-                    password = "password"
-                )
-            )
+                    password = "password",
+                ),
+            ),
         )
 
         testee.getRuntimeConfiguration("", url)
@@ -212,9 +212,9 @@ class RealAutofillRuntimeConfigProviderTest {
                     id = 1,
                     domain = url,
                     username = "username",
-                    password = "password"
-                )
-            )
+                    password = "password",
+                ),
+            ),
         )
 
         testee.getRuntimeConfiguration("", url)

@@ -22,7 +22,7 @@ data class GpcFeature(
     val state: String,
     val minSupportedVersion: Int?,
     val exceptions: List<GpcExceptionEntity>,
-    val settings: GpcSettings
+    val settings: GpcSettings,
 )
 
 data class GpcSettings(val gpcHeaderEnabledSites: List<String>)

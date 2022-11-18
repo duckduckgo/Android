@@ -40,7 +40,7 @@ class HealthClassifierTest {
     @Test
     fun whenNoNetworkConnectivityAlertsBelowRemoteThresholdThenGoodHealth() {
         whenever(thresholds.triggers()).thenReturn(
-            listOf(HealthTriggerEntity("noNetworkConnectivityAlert", true, 10))
+            listOf(HealthTriggerEntity("noNetworkConnectivityAlert", true, 10)),
         )
         testee.determineHealthVpnConnectivity(5, "noNetworkConnectivityAlert").assertGoodHealth()
     }
@@ -58,7 +58,7 @@ class HealthClassifierTest {
     @Test
     fun whenNoNetworkConnectivityAlertsAboveRemoteThresholdThenGoodHealth() {
         whenever(thresholds.triggers()).thenReturn(
-            listOf(HealthTriggerEntity("noNetworkConnectivityAlert", true))
+            listOf(HealthTriggerEntity("noNetworkConnectivityAlert", true)),
         )
         testee.determineHealthVpnConnectivity(10, "noNetworkConnectivityAlert").assertBadHealth()
     }
@@ -66,7 +66,7 @@ class HealthClassifierTest {
     @Test
     fun whenNoNetworkConnectivityDisabledAlwaysReturnGoodHealth() {
         whenever(thresholds.triggers()).thenReturn(
-            listOf(HealthTriggerEntity("noNetworkConnectivityAlert", false, 5))
+            listOf(HealthTriggerEntity("noNetworkConnectivityAlert", false, 5)),
         )
         testee.determineHealthVpnConnectivity(10, "noNetworkConnectivityAlert").assertGoodHealth()
     }

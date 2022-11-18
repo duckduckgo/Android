@@ -32,8 +32,8 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 private enum class FragmentType {
     ALWAYS_ON,
@@ -44,6 +44,7 @@ private enum class FragmentType {
 class AlwaysOnAlertDialogFragment private constructor() : BottomSheetDialogFragment() {
 
     @Inject lateinit var appBuildConfig: AppBuildConfig
+
     @Inject lateinit var appTheme: AppTheme
     private lateinit var listener: Listener
     private lateinit var fragmentType: FragmentType
@@ -107,7 +108,7 @@ class AlwaysOnAlertDialogFragment private constructor() : BottomSheetDialogFragm
                     } else {
                         R.raw.always_on_lockdown_dark
                     }
-                }
+                },
             )
         }
 

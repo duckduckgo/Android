@@ -23,23 +23,21 @@ import com.duckduckgo.app.trackerdetection.Client.ClientName.*
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import io.reactivex.Completable
-import okhttp3.Headers
-import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
+import okhttp3.Headers
+import timber.log.Timber
 
 class TrackerDataDownloader @Inject constructor(
     private val trackerListService: TrackerListService,
     private val binaryDataStore: BinaryDataStore,
     private val trackerDataLoader: TrackerDataLoader,
     private val appDatabase: AppDatabase,
-    private val metadataDao: TdsMetadataDao
+    private val metadataDao: TdsMetadataDao,
 ) {
 
     fun downloadTds(): Completable {
-
         return Completable.fromAction {
-
             Timber.d("Downloading tds.json")
 
             val call = trackerListService.tds()

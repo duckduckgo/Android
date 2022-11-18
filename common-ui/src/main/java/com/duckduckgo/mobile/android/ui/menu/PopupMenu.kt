@@ -27,7 +27,7 @@ open class PopupMenu(
     resourceId: Int,
     view: View = inflate(layoutInflater, resourceId),
     width: Int = WRAP_CONTENT,
-    height: Int = WRAP_CONTENT
+    height: Int = WRAP_CONTENT,
 ) : PopupWindow(view, width, height, true) {
 
     init {
@@ -37,7 +37,7 @@ open class PopupMenu(
 
     fun onMenuItemClicked(
         menuView: View,
-        onClick: () -> Unit
+        onClick: () -> Unit,
     ) {
         menuView.setOnClickListener {
             onClick()
@@ -47,7 +47,7 @@ open class PopupMenu(
 
     fun onMenuItemLongClicked(
         menuView: View,
-        onClick: () -> Unit
+        onClick: () -> Unit,
     ) {
         menuView.setOnLongClickListener {
             onClick()
@@ -58,7 +58,7 @@ open class PopupMenu(
 
     fun show(
         rootView: View,
-        anchorView: View
+        anchorView: View,
     ) {
         val anchorLocation = IntArray(2)
         anchorView.getLocationOnScreen(anchorLocation)
@@ -70,7 +70,7 @@ open class PopupMenu(
     fun show(
         rootView: View,
         anchorView: View,
-        onDismiss: () -> Unit
+        onDismiss: () -> Unit,
     ) {
         show(rootView, anchorView)
         setOnDismissListener(onDismiss)
@@ -78,7 +78,7 @@ open class PopupMenu(
 
     fun showAnchoredToView(
         rootView: View,
-        anchorView: View
+        anchorView: View,
     ) {
         val anchorLocation = IntArray(2)
         anchorView.getLocationOnScreen(anchorLocation)
@@ -94,7 +94,7 @@ open class PopupMenu(
 
         fun inflate(
             layoutInflater: LayoutInflater,
-            resourceId: Int
+            resourceId: Int,
         ): View {
             return layoutInflater.inflate(resourceId, null)
         }

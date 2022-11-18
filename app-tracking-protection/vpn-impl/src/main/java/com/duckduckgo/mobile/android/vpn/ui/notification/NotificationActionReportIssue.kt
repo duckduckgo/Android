@@ -34,7 +34,7 @@ class NotificationActionReportIssue {
             return NotificationCompat.Action(
                 R.drawable.ic_baseline_feedback_24,
                 context.getString(R.string.atp_ReportIssue),
-                PendingIntent.getActivity(context, 0, launchIntent, PendingIntent.FLAG_IMMUTABLE)
+                PendingIntent.getActivity(context, 0, launchIntent, PendingIntent.FLAG_IMMUTABLE),
             )
         }
 
@@ -45,7 +45,7 @@ class NotificationActionReportIssue {
             return NotificationCompat.Action(
                 R.drawable.ic_baseline_feedback_24,
                 context.getString(R.string.atp_ReportIssue),
-                PendingIntent.getActivity(context, 0, launchIntent, PendingIntent.FLAG_IMMUTABLE)
+                PendingIntent.getActivity(context, 0, launchIntent, PendingIntent.FLAG_IMMUTABLE),
             )
         }
     }

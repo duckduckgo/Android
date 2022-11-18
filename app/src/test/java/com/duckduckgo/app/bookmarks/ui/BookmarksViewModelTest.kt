@@ -19,7 +19,6 @@ package com.duckduckgo.app.bookmarks.ui
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.CoroutineTestRule
-import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarkFolderEntity
@@ -28,10 +27,10 @@ import com.duckduckgo.app.bookmarks.service.SavedSitesManager
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import org.mockito.kotlin.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -39,6 +38,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.anyLong
+import org.mockito.kotlin.*
 
 @ExperimentalCoroutinesApi
 class BookmarksViewModelTest {
@@ -79,7 +79,7 @@ class BookmarksViewModelTest {
             faviconManager,
             savedSitesManager,
             pixel,
-            coroutineRule.testDispatcherProvider
+            coroutineRule.testDispatcherProvider,
         )
         model.viewState.observeForever(viewStateObserver)
         model.command.observeForever(commandObserver)
@@ -94,9 +94,9 @@ class BookmarksViewModelTest {
             flowOf(
                 Pair(
                     listOf(bookmark),
-                    listOf(bookmarkFolder, bookmarkFolder, bookmarkFolder)
-                )
-            )
+                    listOf(bookmarkFolder, bookmarkFolder, bookmarkFolder),
+                ),
+            ),
         )
     }
 
@@ -188,7 +188,7 @@ class BookmarksViewModelTest {
             flow {
                 emit(emptyList())
                 emit(listOf(favorite))
-            }
+            },
         )
         testee
         verify(viewStateObserver).onChanged(viewStateCaptor.capture())
@@ -249,7 +249,7 @@ class BookmarksViewModelTest {
     fun whenDeleteEmptyBookmarkFolderRequestedThenDeleteFolderAndIssueConfirmDeleteBookmarkFolderCommand() = runTest {
         val bookmarkFolderBranch = BookmarkFolderBranch(
             listOf(bookmarkEntity),
-            listOf(BookmarkFolderEntity(bookmarkFolder.id, bookmarkFolder.name, bookmarkFolder.parentId))
+            listOf(BookmarkFolderEntity(bookmarkFolder.id, bookmarkFolder.name, bookmarkFolder.parentId)),
         )
         whenever(bookmarksRepository.deleteFolderBranch(any())).thenReturn(bookmarkFolderBranch)
 
@@ -266,7 +266,7 @@ class BookmarksViewModelTest {
     fun whenDeleteNonEmptyBookmarkFolderRequestedThenIssueDeleteBookmarkFolderCommand() = runTest {
         val bookmarkFolderBranch = BookmarkFolderBranch(
             listOf(bookmarkEntity),
-            listOf(BookmarkFolderEntity(bookmarkFolder.id, bookmarkFolder.name, bookmarkFolder.parentId))
+            listOf(BookmarkFolderEntity(bookmarkFolder.id, bookmarkFolder.name, bookmarkFolder.parentId)),
         )
         whenever(bookmarksRepository.deleteFolderBranch(any())).thenReturn(bookmarkFolderBranch)
 
@@ -281,7 +281,7 @@ class BookmarksViewModelTest {
     fun whenInsertRecentlyDeletedBookmarksAndFoldersThenInsertCachedFolderBranch() = runTest {
         val bookmarkFolderBranch = BookmarkFolderBranch(
             listOf(bookmarkEntity),
-            listOf(BookmarkFolderEntity(bookmarkFolder.id, bookmarkFolder.name, bookmarkFolder.parentId))
+            listOf(BookmarkFolderEntity(bookmarkFolder.id, bookmarkFolder.name, bookmarkFolder.parentId)),
         )
 
         testee.insertDeletedFolderBranch(bookmarkFolderBranch)

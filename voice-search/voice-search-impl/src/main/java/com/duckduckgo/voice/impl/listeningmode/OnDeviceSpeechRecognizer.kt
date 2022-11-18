@@ -24,11 +24,11 @@ import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import androidx.annotation.RequiresApi
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event
 import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Companion
+import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event
 import com.squareup.anvil.annotations.ContributesBinding
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 interface OnDeviceSpeechRecognizer {
     companion object {
@@ -49,7 +49,7 @@ interface OnDeviceSpeechRecognizer {
 
 @ContributesBinding(ActivityScope::class)
 class DefaultOnDeviceSpeechRecognizer @Inject constructor(
-    private val context: Context
+    private val context: Context,
 ) : OnDeviceSpeechRecognizer {
 
     private var speechRecognizer: SpeechRecognizer? = null
@@ -70,7 +70,7 @@ class DefaultOnDeviceSpeechRecognizer @Inject constructor(
 
         override fun onRmsChanged(rmsdB: Float) {
             _eventHandler(
-                Event.VolumeUpdateReceived(rmsdB.clean())
+                Event.VolumeUpdateReceived(rmsdB.clean()),
             )
         }
 
@@ -90,22 +90,22 @@ class DefaultOnDeviceSpeechRecognizer @Inject constructor(
         override fun onResults(results: Bundle?) {
             _eventHandler(
                 Event.RecognitionSuccess(
-                    results?.extractResult() ?: ""
-                )
+                    results?.extractResult() ?: "",
+                ),
             )
         }
 
         override fun onPartialResults(partialResults: Bundle?) {
             _eventHandler(
                 Event.PartialResultReceived(
-                    partialResults?.extractResult() ?: ""
-                )
+                    partialResults?.extractResult() ?: "",
+                ),
             )
         }
 
         override fun onEvent(
             eventType: Int,
-            params: Bundle?
+            params: Bundle?,
         ) {
         }
     }

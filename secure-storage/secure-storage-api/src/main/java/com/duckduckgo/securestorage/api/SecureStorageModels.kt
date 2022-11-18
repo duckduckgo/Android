@@ -44,5 +44,5 @@ data class WebsiteLoginDetails(
     val username: String?,
     val id: Long? = null,
     val domainTitle: String? = null,
-    val lastUpdatedMillis: Long? = null
+    val lastUpdatedMillis: Long? = null,
 )

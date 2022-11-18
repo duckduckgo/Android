@@ -37,7 +37,7 @@ class PermissionSettingAdapter(private val viewModel: PermissionsPerWebsiteViewM
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
         ViewHolder(
             ItemSitePermissionSettingSelectionBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-            viewModel
+            viewModel,
         )
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -48,7 +48,7 @@ class PermissionSettingAdapter(private val viewModel: PermissionsPerWebsiteViewM
 
     class ViewHolder(
         private val binding: ItemSitePermissionSettingSelectionBinding,
-        private val viewModel: PermissionsPerWebsiteViewModel
+        private val viewModel: PermissionsPerWebsiteViewModel,
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(setting: WebsitePermissionSetting) {
             binding.permissionSettingIcon.setImageResource(setting.icon)
@@ -64,7 +64,7 @@ class PermissionSettingAdapter(private val viewModel: PermissionsPerWebsiteViewM
 data class WebsitePermissionSetting(
     val icon: Int,
     val title: Int,
-    val setting: WebsitePermissionSettingType
+    val setting: WebsitePermissionSettingType,
 ) : Serializable
 
 enum class WebsitePermissionSettingType {

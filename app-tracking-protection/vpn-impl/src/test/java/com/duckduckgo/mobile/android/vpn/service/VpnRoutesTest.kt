@@ -18,9 +18,9 @@
 
 package com.duckduckgo.mobile.android.vpn.service
 
+import java.net.InetAddress
 import org.junit.Assert.*
 import org.junit.Test
-import java.net.InetAddress
 
 class VpnRoutesTest {
 
@@ -264,21 +264,21 @@ class VpnRoutesTest {
 
     private fun assertIpLesserOrEqualTo(
         ipAddress: String,
-        compareTo: String
+        compareTo: String,
     ) {
         assertTrue("$ipAddress needs to be <= $compareTo", ipAddress.normalizeIpAddress() <= compareTo.normalizeIpAddress())
     }
 
     private fun assertIpGreaterOrEqualTo(
         ipAddress: String,
-        compareTo: String
+        compareTo: String,
     ) {
         assertTrue("$ipAddress needs to be >= $compareTo", ipAddress.normalizeIpAddress() >= compareTo.normalizeIpAddress())
     }
 
     private fun findRoutes(
         lowest: String,
-        highest: String
+        highest: String,
     ): List<Route> {
         return VpnRoutes.includedRoutes
             .filter { it.lowAddress.normalizeIpAddress() <= highest.normalizeIpAddress() }
@@ -319,7 +319,7 @@ class VpnRoutesTest {
             split(".")[0].padStart(3, '0'),
             split(".")[1].padStart(3, '0'),
             split(".")[2].padStart(3, '0'),
-            split(".")[3].padStart(3, '0')
+            split(".")[3].padStart(3, '0'),
         )
     }
 

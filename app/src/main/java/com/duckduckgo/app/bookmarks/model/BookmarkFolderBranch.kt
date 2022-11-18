@@ -21,5 +21,5 @@ import com.duckduckgo.app.bookmarks.db.BookmarkFolderEntity
 
 data class BookmarkFolderBranch(
     val bookmarkEntities: List<BookmarkEntity>,
-    val bookmarkFolderEntities: List<BookmarkFolderEntity>
+    val bookmarkFolderEntities: List<BookmarkFolderEntity>,
 )

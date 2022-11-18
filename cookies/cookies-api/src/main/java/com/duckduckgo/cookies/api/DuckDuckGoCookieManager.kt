@@ -26,6 +26,7 @@ interface DuckDuckGoCookieManager {
      * More info in https://duckduckgo.com/privacy
      */
     suspend fun removeExternalCookies()
+
     /**
      * This method calls the flush method from the Cookie Manager
      */

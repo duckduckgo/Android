@@ -21,7 +21,7 @@ import kotlinx.coroutines.delay
 
 class StubAppReferrerFoundStateListener(
     private val referrer: String,
-    private val mockDelayMs: Long = 0
+    private val mockDelayMs: Long = 0,
 ) : AppInstallationReferrerStateListener, AtbInitializerListener {
     override suspend fun waitForReferrerCode(): ParsedReferrerResult {
         if (mockDelayMs > 0) delay(mockDelayMs)

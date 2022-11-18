@@ -34,7 +34,7 @@ class WelcomePageModule {
         appInstallStore: AppInstallStore,
         context: Context,
         pixel: Pixel,
-        defaultRoleBrowserDialog: DefaultRoleBrowserDialog
+        defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
     ) = WelcomePageViewModelFactory(appInstallStore, context, pixel, defaultRoleBrowserDialog)
 
     @Provides

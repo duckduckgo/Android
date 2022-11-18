@@ -24,7 +24,7 @@ import androidx.viewpager.widget.ViewPager
 
 class SwipeRestrictingViewPager(
     context: Context,
-    attrs: AttributeSet
+    attrs: AttributeSet,
 ) : ViewPager(context, attrs) {
 
     private var swipingEnabled: Boolean = true

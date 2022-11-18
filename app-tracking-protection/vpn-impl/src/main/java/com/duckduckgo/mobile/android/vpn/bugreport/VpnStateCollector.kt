@@ -24,10 +24,10 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateCollector
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import timber.log.Timber
-import javax.inject.Inject
 
 @ContributesBinding(VpnScope::class)
 @SingleInstanceIn(VpnScope::class)
@@ -52,7 +52,7 @@ class RealVpnStateCollector @Inject constructor(
 
 @ContributesPluginPoint(
     scope = VpnScope::class,
-    boundType = VpnStateCollectorPlugin::class
+    boundType = VpnStateCollectorPlugin::class,
 )
 @Suppress("unused")
 interface VpnStateCollectorPluginPoint

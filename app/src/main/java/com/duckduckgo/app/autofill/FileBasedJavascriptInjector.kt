@@ -43,7 +43,7 @@ class FileBasedJavascriptInjector @Inject constructor() : JavascriptInjector {
 
     override fun getAliasFunctions(
         context: Context,
-        alias: String?
+        alias: String?,
     ): String {
         if (!this::aliasFunctions.isInitialized) {
             aliasFunctions = context.resources.openRawResource(R.raw.inject_alias).bufferedReader().use { it.readText() }
@@ -52,7 +52,7 @@ class FileBasedJavascriptInjector @Inject constructor() : JavascriptInjector {
     }
 
     override fun getSignOutFunctions(
-        context: Context
+        context: Context,
     ): String {
         if (!this::signOutFunctions.isInitialized) {
             signOutFunctions = context.resources.openRawResource(R.raw.signout_autofill).bufferedReader().use { it.readText() }

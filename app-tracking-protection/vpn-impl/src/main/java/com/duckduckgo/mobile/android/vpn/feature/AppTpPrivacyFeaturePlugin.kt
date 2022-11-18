@@ -60,7 +60,7 @@ class AppTpPrivacyFeaturePlugin @Inject constructor(
 interface AppTpSettingPlugin {
     fun store(
         name: SettingName,
-        jsonString: String
+        jsonString: String,
     ): Boolean
 
     val settingName: SettingName

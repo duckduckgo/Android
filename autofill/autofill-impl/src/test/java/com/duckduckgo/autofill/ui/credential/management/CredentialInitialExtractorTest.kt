@@ -95,8 +95,7 @@ class CredentialInitialExtractorTest {
             domainTitle = title,
             domain = domain,
             username = "",
-            password = ""
+            password = "",
         )
     }
-
 }

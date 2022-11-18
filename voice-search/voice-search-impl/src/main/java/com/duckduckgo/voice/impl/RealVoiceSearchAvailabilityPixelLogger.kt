@@ -26,7 +26,7 @@ import javax.inject.Inject
 @ContributesBinding(ActivityScope::class)
 class RealVoiceSearchAvailabilityPixelLogger @Inject constructor(
     private val pixel: Pixel,
-    private val voiceSearchRepository: VoiceSearchRepository
+    private val voiceSearchRepository: VoiceSearchRepository,
 ) : VoiceSearchAvailabilityPixelLogger {
 
     override fun log() {

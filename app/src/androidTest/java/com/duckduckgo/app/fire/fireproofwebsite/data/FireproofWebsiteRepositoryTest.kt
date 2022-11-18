@@ -20,14 +20,12 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
-import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.blockingObserve
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.db.AppDatabase
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
 import dagger.Lazy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -35,6 +33,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 
 @ExperimentalCoroutinesApi
 class FireproofWebsiteRepositoryTest {
@@ -142,7 +142,7 @@ class FireproofWebsiteRepositoryTest {
             ".mobile.twitter.com",
             "mobile.twitter.com",
             ".twitter.com",
-            ".com"
+            ".com",
         )
 
         val hostsToPreserve = fireproofWebsiteRepository.fireproofWebsites()
@@ -169,7 +169,7 @@ class FireproofWebsiteRepositoryTest {
             "example.com",
             "twitter.com",
             ".twitter.com",
-            ".com"
+            ".com",
         )
 
         val hostsToPreserve = fireproofWebsiteRepository.fireproofWebsites()

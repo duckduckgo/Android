@@ -109,77 +109,7 @@
     <string name="tabClosedUndo">Отменить</string>
     <string name="downloadsMenuItemTitle">Загрузки</string>
 
-    <!-- Privacy Dashboard Activities -->
-    <string name="privacyProtectionToggle">Защита конфиденциальности сайта</string>
-    <string name="privacyProtectionEnabled">ЗАЩИТА САЙТА ВКЛЮЧЕНА</string>
-    <string name="privacyProtectionDisabled">ЗАЩИТА САЙТА ОТКЛЮЧЕНА</string>
-    <string name="privacyDashboardActivityTitle">Панель конфиденциальности</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes" instruction="Both placeholders are resource ids (integers) for two images">УРОВЕНЬ ЗАЩИТЫ ПОВЫШЕН С &lt;img src=\"%1$d\" /&gt; ДО &lt;img src=\"%2$d\" /&gt;</string>
-    <string name="privacyGradeContentDescription">Рейтинг конфиденциальности</string>
-    <string name="privacyProtectionTemporarilyDisabled">Мы временно отключили функцию защиты конфиденциальности, так как она мешала работе сайта.</string>
-
-    <string name="httpsGood">Зашифрованное соединение</string>
-    <string name="httpsMixed">Соединение со смешанным шифрованием</string>
-    <string name="httpsBad">Незашифрованное соединение</string>
-
-    <string name="scorecardActivityTitle">Рейтинг конфиденциальности</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">Этот сайт — крупная сеть трекеров</string>
-    <string name="scorecardPrivacyGrade">Рейтинг конфиденциальности</string>
-    <string name="scorecardEnhancedGrade">Повышенный рейтинг конфиденциальности</string>
-
-    <string name="privacyTermsActivityTitle">Уровень конфиденциальности</string>
-    <string name="practicesGood">Высокий уровень конфиденциальности</string>
-    <string name="practicesMixed">Средний уровень конфиденциальности</string>
-    <string name="practicesBad">Низкий уровень конфиденциальности</string>
-    <string name="practicesUnknown">Уровень конфиденциальности неизвестен</string>
-    <string name="practicesOverview">Уровень конфиденциальности показывает, насколько защищены персональные данные, которые вы передаёте сайту.</string>
-    <string name="practicesTosdrLink">Стандарты конфиденциальности<b><u>ToS;DR</u></b>.</string>
-    <string name="practicesIconContentGood">Значок высокого уровня конфиденциальности</string>
-    <string name="practicesIconContentBad">Значок низкого уровня конфиденциальности</string>
-
-    <string name="networkTrackerSummaryHeader">ОСНОВНЫЕ СЕТИ ТРЕКЕРОВ, ПРЕДСТАВЛЯЮЩИЕ УГРОЗУ КОНФИДЕНЦИАЛЬНОСТИ</string>
-    <string name="networkTrackerSummaryNotReady">Мы все еще собираем данные о количестве заблокированных трекеров.</string>
-
-    <string name="trackersActivityTitle">Запросы на отслеживание заблокированы</string>
-    <string name="trackersContentDescription">Запросы на отслеживание заблокированы</string>
-    <string name="trackersOverview">Мы заблокировали загрузку следующих запросов сторонних доменов, так как распознали в них трекинг-запросы. Загруженные запросы позволяют компаниям вас профилировать.</string>
-    <string name="trackersOverviewProtectionsOff">Мы не заблокировали ни одного трекинг-запроса, так как защита на этом сайте отключена. Загруженные запросы позволяют компаниям вас профилировать.</string>
-
-    <string name="domainsLoadedActivityTitle">Загружены сторонние запросы</string>
-    <string name="domainsLoadedContentDescription">Загружены сторонние запросы</string>
-    <string name="domainsLoadedOverview">Ниже приведен список загруженных запросов сторонних доменов. Благодаря этим запросам компании могут вас профилировать, однако мы по-прежнему защищаем вас от отслеживания в Сети другими способами.</string>
-    <string name="domainsLoadedOverviewProtectionsOff">Мы не заблокировали ни одной загрузки сторонних запросов, так как защита на этом сайте отключена. Загруженные запросы позволяют компаниям вас профилировать.</string>
-    <string name="domainsLoadedOverviewEmpty">Запросов от сторонних доменов не обнаружено.</string>
-    <string name="domainsLoadedHeadingText">Не загружено ни одного стороннего домена</string>
-
-    <string name="webTrackingProtectionsText"><annotation type="learn_more_link">О защите от веб-слежки</annotation></string>
-    <string name="webTrackingProtectionsUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
-
-    <string name="trackersBlockedNoSectionDescription">Загружены запросы следующих доменов.</string>
-
-    <string name="adLoadedSectionDescription" instruction="Placeholder is the name of the company who owns the ad">Запросы этого домена были загружены в результате недавнего нажатия на рекламу %1$s в DuckDuckGo. Такие запросы помогают оценить эффективность рекламы. Рекламные объявления в DuckDuckGo не профилируют пользователей.</string>
-    <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Как реклама при поиске влияет на защиту</annotation></string>
-    <string name="adLoadedSectionUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
-
-    <string name="domainsLoadedSectionDescription">Также загружены запросы следующего домена.</string>
-    <string name="domainsLoadedSectionSingleSectionDescription">Загружены трекинг-запросы следующих доменов.</string>
-    <string name="domainsLoadedSectionEmptyListDescription">Запросов от сторонних доменов не обнаружено.</string>
-
-    <string name="domainsLoadedBreakageSectionDescription">Запросы этого домена были загружены для предотвращения неполадок в работе сайта.</string>
-    <string name="domainsLoadedAssociatedSectionDescription" instruction="Placeholder is the name of a company">Мы загрузили запросы этого домена, так как они связаны с %1$s.</string>
-
-    <string name="trackersBlockedText">Заблокирована загрузка запросов</string>
-    <string name="trackersNotBlockedText">Трекинг-запросы не заблокированы</string>
-    <string name="trackersNoFoundText">Трекинг-запросы не обнаружены</string>
-    <string name="trackersFoundText">Обнаружены трекинг-запросы</string>
-
-    <string name="domainsLoadedText">Загружены сторонние запросы</string>
-    <string name="domainsNotLoadedText">Не загружено ни одного стороннего запроса</string>
-
-    <string name="majorNetworksNoFound">Не обнаружено ни одной крупной сети трекеров</string>
-    <string name="majorNetworksFound">Обнаружены крупные сети трекеров</string>
-
-    <!-- Fire -->
+   <!-- Fire -->
     <string name="fireMenu">Сбросить данные</string>
     <string name="fireClearAll">Закрыть вкладки и удалить данные</string>
     <string name="fireCancel">Отменить</string>

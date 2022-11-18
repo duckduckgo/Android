@@ -19,10 +19,10 @@ package com.duckduckgo.privacy.config.impl.features.amplinks
 import com.duckduckgo.app.global.UriString
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
-import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.AmpLinkInfo
 import com.duckduckgo.privacy.config.api.AmpLinkType
+import com.duckduckgo.privacy.config.api.AmpLinks
+import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.amplinks.AmpLinksRepository
 import com.squareup.anvil.annotations.ContributesBinding
@@ -34,7 +34,7 @@ import javax.inject.Inject
 class RealAmpLinks @Inject constructor(
     private val ampLinksRepository: AmpLinksRepository,
     private val featureToggle: FeatureToggle,
-    private val unprotectedTemporary: UnprotectedTemporary
+    private val unprotectedTemporary: UnprotectedTemporary,
 ) : AmpLinks {
 
     private var lastExtractedUrl: String? = null

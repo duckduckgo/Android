@@ -50,7 +50,7 @@ class UnprotectedAppsBucketPixelSenderTest {
         testee = UnprotectedAppsBucketPixelSender(
             mockTrackingProtectionAppsRepository,
             mockDeviceShieldPixels,
-            coroutineRule.testDispatcherProvider
+            coroutineRule.testDispatcherProvider,
         )
     }
 
@@ -138,7 +138,7 @@ class UnprotectedAppsBucketPixelSenderTest {
         category = AppCategory.Undefined,
         isExcluded = false,
         knownProblem = TrackingProtectionAppInfo.NO_ISSUES,
-        userModified = false
+        userModified = false,
     )
 
     private val excludedApp = TrackingProtectionAppInfo(
@@ -148,6 +148,6 @@ class UnprotectedAppsBucketPixelSenderTest {
         category = AppCategory.Undefined,
         isExcluded = true,
         knownProblem = TrackingProtectionAppInfo.NO_ISSUES,
-        userModified = false
+        userModified = false,
     )
 }

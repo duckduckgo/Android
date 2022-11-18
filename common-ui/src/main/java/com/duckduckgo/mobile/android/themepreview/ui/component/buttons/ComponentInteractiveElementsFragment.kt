@@ -26,7 +26,7 @@ class ComponentInteractiveElementsFragment : ComponentFragment() {
             Component.SWITCH,
             Component.RADIO_BUTTON,
             Component.CHECKBOX,
-            Component.SEARCH_BAR
+            Component.SEARCH_BAR,
         )
     }
 }

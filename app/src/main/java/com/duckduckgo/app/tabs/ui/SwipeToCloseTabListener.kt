@@ -26,7 +26,7 @@ import kotlin.math.abs
 class SwipeToCloseTabListener(
     private val tabSwitcherAdapter: TabSwitcherAdapter,
     private val numberGridColumns: Int,
-    private val tabSwipedListener: OnTabSwipedListener
+    private val tabSwipedListener: OnTabSwipedListener,
 ) :
     ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
 
@@ -36,7 +36,7 @@ class SwipeToCloseTabListener(
 
     override fun onSwiped(
         viewHolder: RecyclerView.ViewHolder,
-        direction: Int
+        direction: Int,
     ) {
         val tab = tabSwitcherAdapter.getTab(viewHolder.adapterPosition)
         tabSwipedListener.onSwiped(tab)
@@ -49,7 +49,7 @@ class SwipeToCloseTabListener(
         dX: Float,
         dY: Float,
         actionState: Int,
-        isCurrentlyActive: Boolean
+        isCurrentlyActive: Boolean,
     ) {
         if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
             val alpha = 1 - (abs(dX) / (recyclerView.width / numberGridColumns))
@@ -61,7 +61,7 @@ class SwipeToCloseTabListener(
     override fun onMove(
         recyclerView: RecyclerView,
         viewHolder: RecyclerView.ViewHolder,
-        target: RecyclerView.ViewHolder
+        target: RecyclerView.ViewHolder,
     ): Boolean {
         return false
     }

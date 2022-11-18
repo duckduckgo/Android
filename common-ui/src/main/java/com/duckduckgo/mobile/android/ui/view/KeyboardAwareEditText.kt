@@ -36,13 +36,13 @@ class KeyboardAwareEditText : AppCompatEditText {
     constructor(context: Context) : this(context, null)
     constructor(
         context: Context,
-        attrs: AttributeSet?
+        attrs: AttributeSet?,
     ) : this(context, attrs, 0)
 
     constructor(
         context: Context,
         attrs: AttributeSet?,
-        defStyleAttr: Int
+        defStyleAttr: Int,
     ) : super(context, attrs, defStyleAttr)
 
     private var didSelectQueryFirstTime = false
@@ -54,7 +54,7 @@ class KeyboardAwareEditText : AppCompatEditText {
     override fun onFocusChanged(
         focused: Boolean,
         direction: Int,
-        previouslyFocusedRect: Rect?
+        previouslyFocusedRect: Rect?,
     ) {
         super.onFocusChanged(focused, direction, previouslyFocusedRect)
         if (focused) {
@@ -82,9 +82,8 @@ class KeyboardAwareEditText : AppCompatEditText {
 
     override fun onKeyPreIme(
         keyCode: Int,
-        event: KeyEvent
+        event: KeyEvent,
     ): Boolean {
-
         if (keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_UP) {
             return onBackKeyListener?.onBackKey() ?: false
         }
@@ -97,7 +96,7 @@ class KeyboardAwareEditText : AppCompatEditText {
         left: Int,
         top: Int,
         right: Int,
-        bottom: Int
+        bottom: Int,
     ) {
         super.onLayout(changed, left, top, right, bottom)
         if (isFocused) {

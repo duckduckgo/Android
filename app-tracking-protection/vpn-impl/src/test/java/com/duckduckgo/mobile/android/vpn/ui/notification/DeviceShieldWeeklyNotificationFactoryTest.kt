@@ -20,11 +20,11 @@ import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerDao
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationFactory.DeviceShieldNotification
@@ -87,7 +87,7 @@ class DeviceShieldWeeklyNotificationFactoryTest {
         trackerFound(
             trackerDomain,
             appContainingTracker = trackingApp2(),
-            timestamp = DatabaseDateFormatter.bucketByHour(LocalDateTime.now().plusHours(1))
+            timestamp = DatabaseDateFormatter.bucketByHour(LocalDateTime.now().plusHours(1)),
         )
 
         val notification = factory.weeklyNotificationFactory.createWeeklyDeviceShieldNotification(0)
@@ -103,7 +103,7 @@ class DeviceShieldWeeklyNotificationFactoryTest {
         trackerFound(
             trackerDomain,
             appContainingTracker = trackingApp3(),
-            timestamp = DatabaseDateFormatter.bucketByHour(LocalDateTime.now().plusHours(1))
+            timestamp = DatabaseDateFormatter.bucketByHour(LocalDateTime.now().plusHours(1)),
         )
 
         val notification = factory.weeklyNotificationFactory.createWeeklyDeviceShieldNotification(0)
@@ -122,7 +122,7 @@ class DeviceShieldWeeklyNotificationFactoryTest {
         trackerFound(
             trackerDomain,
             appContainingTracker = trackingApp3(),
-            timestamp = DatabaseDateFormatter.bucketByHour(LocalDateTime.now().plusHours(1))
+            timestamp = DatabaseDateFormatter.bucketByHour(LocalDateTime.now().plusHours(1)),
         )
 
         val notification = factory.weeklyNotificationFactory.createWeeklyDeviceShieldNotification(0)
@@ -156,10 +156,12 @@ class DeviceShieldWeeklyNotificationFactoryTest {
         trackerFound("google.com", company = "Google", appContainingTracker = trackingApp2())
         trackerFound("google.com", company = "Google", appContainingTracker = trackingApp2())
         trackerFound(
-            "google.com", company = "Google", appContainingTracker = trackingApp2(),
+            "google.com",
+            company = "Google",
+            appContainingTracker = trackingApp2(),
             timestamp = DatabaseDateFormatter.bucketByHour(
-                LocalDateTime.now().plusHours(2)
-            )
+                LocalDateTime.now().plusHours(2),
+            ),
         )
 
         val notification = factory.weeklyNotificationFactory.createWeeklyDeviceShieldNotification(1)
@@ -178,7 +180,7 @@ class DeviceShieldWeeklyNotificationFactoryTest {
         trackerCompanyId: Int = -1,
         company: String = "Tracking LLC",
         appContainingTracker: TrackingApp = defaultApp(),
-        timestamp: String = DatabaseDateFormatter.bucketByHour()
+        timestamp: String = DatabaseDateFormatter.bucketByHour(),
     ) {
         val tracker = VpnTracker(
             trackerCompanyId = trackerCompanyId,
@@ -186,7 +188,7 @@ class DeviceShieldWeeklyNotificationFactoryTest {
             timestamp = timestamp,
             company = company,
             companyDisplayName = company,
-            trackingApp = appContainingTracker
+            trackingApp = appContainingTracker,
         )
         vpnTrackerDao.insert(tracker)
     }

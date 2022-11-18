@@ -27,7 +27,7 @@ interface VoiceSearchDataStore {
 }
 
 class SharedPreferencesVoiceSearchDataStore constructor(
-    private val context: Context
+    private val context: Context,
 ) : VoiceSearchDataStore {
     companion object {
         const val FILENAME = "com.duckduckgo.app.voice"
@@ -59,7 +59,7 @@ class SharedPreferencesVoiceSearchDataStore constructor(
 
     private fun updateValue(
         key: String,
-        value: Boolean
+        value: Boolean,
     ) {
         preferences.edit(true) {
             putBoolean(key, value)

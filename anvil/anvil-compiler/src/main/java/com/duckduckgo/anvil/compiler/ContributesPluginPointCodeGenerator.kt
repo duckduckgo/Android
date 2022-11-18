@@ -30,11 +30,11 @@ import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import dagger.Binds
 import dagger.multibindings.Multibinds
+import java.io.File
+import javax.inject.Inject
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtFile
-import java.io.File
-import javax.inject.Inject
 
 /**
  * This Anvil code generator allows inject ViewModel without manually creating the ViewModel factory
@@ -78,10 +78,10 @@ class ContributesPluginPointCodeGenerator : CodeGenerator {
                         PropertySpec
                             .builder(
                                 "plugins",
-                                ClassName("com.duckduckgo.di", "DaggerSet").parameterizedBy(pluginClassName)
+                                ClassName("com.duckduckgo.di", "DaggerSet").parameterizedBy(pluginClassName),
                             )
                             .addModifiers(KModifier.PRIVATE)
-                            .build()
+                            .build(),
                     )
                     .addFunction(
                         FunSpec.builder("getPlugins")
@@ -91,11 +91,11 @@ class ContributesPluginPointCodeGenerator : CodeGenerator {
                             .addCode(
                                 """
                                     return plugins.toList().sortedBy { it.javaClass.name }
-                                """.trimIndent()
+                                """.trimIndent(),
                             )
-                            .build()
+                            .build(),
                     )
-                    .build()
+                    .build(),
             )
         }
 
@@ -115,7 +115,7 @@ class ContributesPluginPointCodeGenerator : CodeGenerator {
                     .addAnnotation(
                         AnnotationSpec
                             .builder(ContributesTo::class).addMember("scope = %T::class", scope.asClassName())
-                            .build()
+                            .build(),
                     )
                     .addModifiers(KModifier.ABSTRACT)
                     .addFunction(
@@ -123,25 +123,24 @@ class ContributesPluginPointCodeGenerator : CodeGenerator {
                             .addAnnotation(AnnotationSpec.builder(Multibinds::class).build())
                             .addModifiers(KModifier.ABSTRACT)
                             .returns(daggerSetFqName.asClassName(module).parameterizedBy(pluginClassName))
-                            .build()
+                            .build(),
                     )
                     .addFunction(
                         FunSpec.builder("bind${vmClass.shortName}_PluginPoint")
                             .addParameter(
                                 "pluginPoint",
-                                FqName("$generatedPackage.${vmClass.shortName}_PluginPoint").asClassName(module)
+                                FqName("$generatedPackage.${vmClass.shortName}_PluginPoint").asClassName(module),
                             )
                             .addAnnotation(AnnotationSpec.builder(Binds::class).build())
                             .addModifiers(KModifier.ABSTRACT)
                             .returns(pluginPointFqName.asClassName(module).parameterizedBy(pluginClassName))
-                            .build()
+                            .build(),
                     )
-                    .build()
+                    .build(),
             ).build()
         }
 
         return createGeneratedFile(codeGenDir, generatedPackage, moduleClassName, content)
-
     }
 
     companion object {

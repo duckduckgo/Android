@@ -20,11 +20,11 @@ import android.net.Uri
 import androidx.lifecycle.*
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.bookmarks.model.*
+import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
+import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.bookmarks.service.ExportSavedSitesResult
 import com.duckduckgo.app.bookmarks.service.ImportSavedSitesResult
 import com.duckduckgo.app.bookmarks.service.SavedSitesManager
-import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
-import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.*
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.EditSavedSiteListener
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment.AddBookmarkFolderListener
@@ -36,10 +36,10 @@ import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
+import javax.inject.Inject
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class BookmarksViewModel @Inject constructor(
@@ -48,7 +48,7 @@ class BookmarksViewModel @Inject constructor(
     private val faviconManager: FaviconManager,
     private val savedSitesManager: SavedSitesManager,
     private val pixel: Pixel,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
 ) : EditSavedSiteListener, AddBookmarkFolderListener, EditBookmarkFolderListener, DeleteBookmarkFolderListener, ViewModel() {
 
     data class ViewState(
@@ -67,7 +67,7 @@ class BookmarksViewModel @Inject constructor(
         class DeleteBookmarkFolder(val bookmarkFolder: BookmarkFolder) : Command()
         class ConfirmDeleteBookmarkFolder(
             val bookmarkFolder: BookmarkFolder,
-            val folderBranch: BookmarkFolderBranch
+            val folderBranch: BookmarkFolderBranch,
         ) : Command()
 
         data class ImportedSavedSites(val importSavedSitesResult: ImportSavedSitesResult) : Command()
@@ -231,12 +231,12 @@ class BookmarksViewModel @Inject constructor(
 
     private fun onBookmarkItemsChanged(
         bookmarks: List<Bookmark>,
-        bookmarkFolders: List<BookmarkFolder>
+        bookmarkFolders: List<BookmarkFolder>,
     ) {
         viewState.value = viewState.value?.copy(
             bookmarks = bookmarks,
             bookmarkFolders = bookmarkFolders,
-            enableSearch = bookmarks.size + bookmarkFolders.size >= MIN_ITEMS_FOR_SEARCH
+            enableSearch = bookmarks.size + bookmarkFolders.size >= MIN_ITEMS_FOR_SEARCH,
         )
     }
 

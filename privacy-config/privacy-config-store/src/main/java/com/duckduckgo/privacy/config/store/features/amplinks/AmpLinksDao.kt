@@ -22,8 +22,8 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import com.duckduckgo.privacy.config.store.AmpKeywordEntity
-import com.duckduckgo.privacy.config.store.AmpLinkFormatEntity
 import com.duckduckgo.privacy.config.store.AmpLinkExceptionEntity
+import com.duckduckgo.privacy.config.store.AmpLinkFormatEntity
 
 @Dao
 abstract class AmpLinksDao {

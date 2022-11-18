@@ -21,7 +21,7 @@ import com.duckduckgo.di.scopes.VpnScope
 
 @ContributesPluginPoint(
     scope = VpnScope::class,
-    boundType = VpnServiceCallbacks::class
+    boundType = VpnServiceCallbacks::class,
 )
 @Suppress("unused")
 interface VpnServiceCallbacksPluginPoint

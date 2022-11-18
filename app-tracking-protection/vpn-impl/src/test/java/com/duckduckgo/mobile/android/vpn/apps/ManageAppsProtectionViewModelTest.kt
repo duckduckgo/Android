@@ -31,6 +31,7 @@ import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionList
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
+import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -44,7 +45,6 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
 @ExperimentalCoroutinesApi
@@ -69,7 +69,7 @@ class ManageAppsProtectionViewModelTest {
             trackingProtectionAppsRepository,
             appTrackersRepository,
             deviceShieldPixels,
-            coroutineRule.testDispatcherProvider
+            coroutineRule.testDispatcherProvider,
         )
     }
 
@@ -285,14 +285,14 @@ class ManageAppsProtectionViewModelTest {
                 appInfoWithoutIssues,
                 appInfoWithKnownIssues,
                 appInfoLoadsWebsites,
-                appInfoManuallyExcluded
-            )
+                appInfoManuallyExcluded,
+            ),
         )
 
         whenever(trackingProtectionAppsRepository.getAppsAndProtectionInfo()).thenReturn(
             flowOf(
-                allApps
-            )
+                allApps,
+            ),
         )
         viewModel.applyAppsFilter(TrackingProtectionExclusionListActivity.Companion.AppsFilter.ALL)
 
@@ -311,21 +311,21 @@ class ManageAppsProtectionViewModelTest {
         val filterType = FilterType(string.atp_ExcludedAppsFilterProtectedLabel, protectedApps.size)
         val appsList = listOf(panelType, filterType).plus(
             listOf(
-                appInfoWithoutIssues
-            )
+                appInfoWithoutIssues,
+            ),
         )
 
         whenever(trackingProtectionAppsRepository.getAppsAndProtectionInfo()).thenReturn(
             flowOf(
-                allApps
-            )
+                allApps,
+            ),
         )
         viewModel.applyAppsFilter(TrackingProtectionExclusionListActivity.Companion.AppsFilter.PROTECTED_ONLY)
 
         viewModel.getProtectedApps().test {
             assertEquals(
                 ViewState(appsList),
-                awaitItem()
+                awaitItem(),
             )
         }
     }
@@ -341,8 +341,8 @@ class ManageAppsProtectionViewModelTest {
 
         whenever(trackingProtectionAppsRepository.getAppsAndProtectionInfo()).thenReturn(
             flowOf(
-                allApps
-            )
+                allApps,
+            ),
         )
         viewModel.applyAppsFilter(TrackingProtectionExclusionListActivity.Companion.AppsFilter.PROTECTED_ONLY)
 
@@ -362,15 +362,15 @@ class ManageAppsProtectionViewModelTest {
 
         whenever(trackingProtectionAppsRepository.getAppsAndProtectionInfo()).thenReturn(
             flowOf(
-                allApps
-            )
+                allApps,
+            ),
         )
         viewModel.applyAppsFilter(TrackingProtectionExclusionListActivity.Companion.AppsFilter.UNPROTECTED_ONLY)
 
         viewModel.getProtectedApps().test {
             assertEquals(
                 ViewState(appsList),
-                awaitItem()
+                awaitItem(),
             )
         }
     }
@@ -387,15 +387,15 @@ class ManageAppsProtectionViewModelTest {
 
             whenever(trackingProtectionAppsRepository.getAppsAndProtectionInfo()).thenReturn(
                 flowOf(
-                    allApps
-                )
+                    allApps,
+                ),
             )
             viewModel.applyAppsFilter(TrackingProtectionExclusionListActivity.Companion.AppsFilter.UNPROTECTED_ONLY)
 
             viewModel.getProtectedApps().test {
                 assertEquals(
                     ViewState(appsList),
-                    awaitItem()
+                    awaitItem(),
                 )
             }
         }
@@ -409,8 +409,8 @@ class ManageAppsProtectionViewModelTest {
 
         whenever(trackingProtectionAppsRepository.getAppsAndProtectionInfo()).thenReturn(
             flowOf(
-                allApps
-            )
+                allApps,
+            ),
         )
         viewModel.applyAppsFilter(TrackingProtectionExclusionListActivity.Companion.AppsFilter.ALL)
 
@@ -429,8 +429,8 @@ class ManageAppsProtectionViewModelTest {
 
         whenever(trackingProtectionAppsRepository.getAppsAndProtectionInfo()).thenReturn(
             flowOf(
-                allApps
-            )
+                allApps,
+            ),
         )
         viewModel.applyAppsFilter(TrackingProtectionExclusionListActivity.Companion.AppsFilter.ALL)
 
@@ -447,7 +447,7 @@ class ManageAppsProtectionViewModelTest {
             category = AppCategory.Undefined,
             isExcluded = true,
             knownProblem = TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON,
-            userModified = false
+            userModified = false,
         )
     private val appInfoWithKnownIssues = AppInfoType(appWithKnownIssues)
 
@@ -459,7 +459,7 @@ class ManageAppsProtectionViewModelTest {
             category = AppCategory.Undefined,
             isExcluded = true,
             knownProblem = TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON,
-            userModified = false
+            userModified = false,
         )
     private val appInfoLoadsWebsites = AppInfoType(appLoadsWebsites)
 
@@ -471,7 +471,7 @@ class ManageAppsProtectionViewModelTest {
             category = Undefined,
             isExcluded = true,
             knownProblem = TrackingProtectionAppInfo.NO_ISSUES,
-            userModified = true
+            userModified = true,
         )
     private val appInfoManuallyExcluded = AppInfoType(appManuallyExcluded)
 
@@ -483,7 +483,7 @@ class ManageAppsProtectionViewModelTest {
             category = AppCategory.Undefined,
             isExcluded = false,
             knownProblem = TrackingProtectionAppInfo.NO_ISSUES,
-            userModified = false
+            userModified = false,
         )
     private val appInfoWithoutIssues = AppInfoType(appWithoutIssues)
 
@@ -495,7 +495,7 @@ class ManageAppsProtectionViewModelTest {
             category = AppCategory.Undefined,
             isExcluded = false,
             knownProblem = TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON,
-            userModified = true
+            userModified = true,
         )
     private val appInfoProblematicNotExcluded = AppInfoType(appProblematicNotExcluded)
 }

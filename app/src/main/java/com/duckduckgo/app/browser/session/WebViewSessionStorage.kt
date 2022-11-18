@@ -25,12 +25,12 @@ import timber.log.Timber
 interface WebViewSessionStorage {
     fun saveSession(
         webView: WebView?,
-        tabId: String
+        tabId: String,
     )
 
     fun restoreSession(
         webView: WebView?,
-        tabId: String
+        tabId: String,
     ): Boolean
 
     fun deleteSession(tabId: String)
@@ -47,14 +47,14 @@ class WebViewSessionInMemoryStorage : WebViewSessionStorage {
          */
         override fun sizeOf(
             key: String,
-            bundle: Bundle
+            bundle: Bundle,
         ) = bundle.sizeInBytes()
 
         override fun entryRemoved(
             evicted: Boolean,
             key: String?,
             oldValue: Bundle?,
-            newValue: Bundle?
+            newValue: Bundle?,
         ) {
             if (evicted) {
                 Timber.v("Evicted $key from WebView session storage")
@@ -64,7 +64,7 @@ class WebViewSessionInMemoryStorage : WebViewSessionStorage {
 
     override fun saveSession(
         webView: WebView?,
-        tabId: String
+        tabId: String,
     ) {
         if (webView == null) {
             Timber.w("WebView is null; cannot save session")
@@ -92,7 +92,7 @@ class WebViewSessionInMemoryStorage : WebViewSessionStorage {
 
     override fun restoreSession(
         webView: WebView?,
-        tabId: String
+        tabId: String,
     ): Boolean {
         if (webView == null) {
             Timber.w("WebView is null; cannot restore session")

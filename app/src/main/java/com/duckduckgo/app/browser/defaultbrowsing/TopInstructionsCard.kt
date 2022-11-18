@@ -24,7 +24,7 @@ import com.duckduckgo.app.browser.R
 
 class TopInstructionsCard(
     context: Context,
-    duration: Int = LENGTH_LONG
+    duration: Int = LENGTH_LONG,
 ) : Toast(context) {
 
     init {

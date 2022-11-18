@@ -30,7 +30,7 @@ data class FirstPartyCookiePolicyEntity(
 @Entity(tableName = "cookie_exceptions")
 data class CookieExceptionEntity(
     @PrimaryKey val domain: String,
-    val reason: String
+    val reason: String,
 )
 
 fun CookieExceptionEntity.toCookieException(): CookieException {

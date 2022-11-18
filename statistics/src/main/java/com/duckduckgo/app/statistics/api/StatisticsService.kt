@@ -29,25 +29,25 @@ interface StatisticsService {
     @GET("/exti/")
     fun exti(
         @Query(ParamKey.ATB) atb: String,
-        @Query(ParamKey.DEV_MODE) devMode: Int? = if (BuildConfig.DEBUG) 1 else null
+        @Query(ParamKey.DEV_MODE) devMode: Int? = if (BuildConfig.DEBUG) 1 else null,
     ): Observable<ResponseBody>
 
     @GET("/atb.js")
     fun atb(
-        @Query(ParamKey.DEV_MODE) devMode: Int? = if (BuildConfig.DEBUG) 1 else null
+        @Query(ParamKey.DEV_MODE) devMode: Int? = if (BuildConfig.DEBUG) 1 else null,
     ): Observable<Atb>
 
     @GET("/atb.js")
     fun updateSearchAtb(
         @Query(ParamKey.ATB) atb: String,
         @Query(ParamKey.RETENTION_ATB) retentionAtb: String,
-        @Query(ParamKey.DEV_MODE) devMode: Int? = if (BuildConfig.DEBUG) 1 else null
+        @Query(ParamKey.DEV_MODE) devMode: Int? = if (BuildConfig.DEBUG) 1 else null,
     ): Observable<Atb>
 
     @GET("/atb.js?at=app_use")
     fun updateAppAtb(
         @Query(ParamKey.ATB) atb: String,
         @Query(ParamKey.RETENTION_ATB) retentionAtb: String,
-        @Query(ParamKey.DEV_MODE) devMode: Int? = if (BuildConfig.DEBUG) 1 else null
+        @Query(ParamKey.DEV_MODE) devMode: Int? = if (BuildConfig.DEBUG) 1 else null,
     ): Observable<Atb>
 }

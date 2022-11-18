@@ -62,7 +62,7 @@ class FileBasedWebViewPreviewGenerator(private val dispatchers: DispatcherProvid
                 bitmap,
                 (bitmap.width * COMPRESSION_RATIO).toInt(),
                 (bitmap.height * COMPRESSION_RATIO).toInt(),
-                false
+                false,
             )
         }
     }

@@ -24,7 +24,7 @@ data class VpnPhoenixEntity(
     @PrimaryKey(autoGenerate = true) var id: Long = 0,
     val reason: String = "Reason not available",
     val timestamp: Long = System.currentTimeMillis(),
-    val formattedTimestamp: String = DatabaseDateFormatter.timestamp()
+    val formattedTimestamp: String = DatabaseDateFormatter.timestamp(),
 )
 
 @Dao

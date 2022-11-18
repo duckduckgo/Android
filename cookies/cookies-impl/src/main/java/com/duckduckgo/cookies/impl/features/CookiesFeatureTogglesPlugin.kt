@@ -27,7 +27,7 @@ import javax.inject.Inject
 @ContributesMultibinding(AppScope::class)
 class CookiesFeatureTogglesPlugin @Inject constructor(
     private val cookiesFeatureToggleRepository: CookiesFeatureToggleRepository,
-    private val appBuildConfig: AppBuildConfig
+    private val appBuildConfig: AppBuildConfig,
 ) : FeatureTogglesPlugin {
     override fun isEnabled(featureName: String, defaultValue: Boolean): Boolean? {
         val cookiesFeature = cookiesFeatureValueOf(featureName) ?: return null

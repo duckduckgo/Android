@@ -175,9 +175,9 @@ class BadHealthMitigationSettingPluginTest {
         assertEquals(
             listOf(
                 HealthTriggerEntity(name = "socketReadExceptionAlerts", enabled = false),
-                HealthTriggerEntity(name = "socketWriteExceptionAlerts", enabled = false, threshold = null)
+                HealthTriggerEntity(name = "socketWriteExceptionAlerts", enabled = false, threshold = null),
             ),
-            triggers.filter { !it.enabled }
+            triggers.filter { !it.enabled },
         )
         assertTrue(result)
     }

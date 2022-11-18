@@ -17,10 +17,10 @@
 package com.duckduckgo.mobile.android.vpn.dao
 
 import androidx.room.*
+import com.duckduckgo.mobile.android.vpn.trackers.*
 import com.duckduckgo.mobile.android.vpn.trackers.AppTracker
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerMetadata
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerPackage
-import com.duckduckgo.mobile.android.vpn.trackers.*
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -61,7 +61,7 @@ interface VpnAppTrackerBlockingDao {
         blocklist: List<AppTracker>,
         appPackages: List<AppTrackerPackage>,
         metadata: AppTrackerMetadata,
-        entities: List<AppTrackerEntity>
+        entities: List<AppTrackerEntity>,
     ) {
         setTrackerBlocklistMetadata(metadata)
 
@@ -99,7 +99,7 @@ interface VpnAppTrackerBlockingDao {
     @Transaction
     fun updateExclusionList(
         exclusionList: List<AppTrackerExcludedPackage>,
-        metadata: AppTrackerExclusionListMetadata
+        metadata: AppTrackerExclusionListMetadata,
     ) {
         setExclusionListMetadata(metadata)
         deleteExclusionList()
@@ -130,7 +130,7 @@ interface VpnAppTrackerBlockingDao {
     @Transaction
     fun updateTrackerExceptionRules(
         exceptionRules: List<AppTrackerExceptionRule>,
-        metadata: AppTrackerExceptionRuleMetadata
+        metadata: AppTrackerExceptionRuleMetadata,
     ) {
         setTrackerExceptionRulesMetadata(metadata)
         deleteTrackerExceptionRules()
@@ -148,5 +148,4 @@ interface VpnAppTrackerBlockingDao {
 
     @Query("DELETE from vpn_app_tracker_manual_exclusion_list")
     fun deleteManualAppExclusionList()
-
 }

@@ -20,15 +20,13 @@ import androidx.room.Room
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.app.global.api.InMemorySharedPreferences
-import com.duckduckgo.privacy.config.impl.features.privacyFeatureValueOf
 import com.duckduckgo.privacy.config.impl.RealPrivacyConfigPersister
 import com.duckduckgo.privacy.config.impl.ReferenceTestUtilities
+import com.duckduckgo.privacy.config.impl.features.privacyFeatureValueOf
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
-import org.mockito.kotlin.never
-import org.mockito.kotlin.verify
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -39,6 +37,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.robolectric.ParameterizedRobolectricTestRunner
 
 @ExperimentalCoroutinesApi
@@ -65,8 +65,8 @@ class PrivacyConfigMissingReferenceTest(private val testCase: TestCase) {
             val referenceTest = adapter.fromJson(
                 FileUtilities.loadText(
                     PrivacyConfigMissingReferenceTest::class.java.classLoader!!,
-                    "reference_tests/privacyconfig/tests.json"
-                )
+                    "reference_tests/privacyconfig/tests.json",
+                ),
             )
             referenceJsonFile = referenceTest?.missingFeature?.referenceConfig!!
             return referenceTest.missingFeature.tests.filterNot { it.exceptPlatforms.contains("android-browser") }
@@ -84,7 +84,7 @@ class PrivacyConfigMissingReferenceTest(private val testCase: TestCase) {
             referenceTestUtilities.unprotectedTemporaryRepository,
             referenceTestUtilities.privacyRepository,
             db,
-            InMemorySharedPreferences()
+            InMemorySharedPreferences(),
         )
     }
 
@@ -113,17 +113,17 @@ class PrivacyConfigMissingReferenceTest(private val testCase: TestCase) {
         val featureName: String,
         val siteURL: String,
         val expectFeatureEnabled: Boolean,
-        val exceptPlatforms: List<String>
+        val exceptPlatforms: List<String>,
     )
 
     data class MissingTest(
         val name: String,
         val desc: String,
         val referenceConfig: String,
-        val tests: List<TestCase>
+        val tests: List<TestCase>,
     )
 
     data class ReferenceTest(
-        val missingFeature: MissingTest
+        val missingFeature: MissingTest,
     )
 }

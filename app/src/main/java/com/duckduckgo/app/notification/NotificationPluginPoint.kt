@@ -22,7 +22,7 @@ import com.duckduckgo.di.scopes.AppScope
 
 @ContributesPluginPoint(
     scope = AppScope::class,
-    boundType = NotificationPlugin::class
+    boundType = NotificationPlugin::class,
 )
 @Suppress("unused")
 interface NotificationPluginPoint

@@ -22,7 +22,7 @@ import com.duckduckgo.mobile.android.themepreview.ui.component.ComponentFragment
 class ComponentButtonsFragment : ComponentFragment() {
     override fun getComponents(): List<Component> {
         return listOf(
-            Component.BUTTON
+            Component.BUTTON,
         )
     }
 }

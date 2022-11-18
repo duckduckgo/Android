@@ -51,19 +51,19 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         ComponentViewHolder(inflate(parent, R.layout.component_checkbox))
 
     class InfoPanelComponentViewHolder(
-        parent: ViewGroup
+        parent: ViewGroup,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_info_panel))
 
     class SearchBarComponentViewHolder(
-        parent: ViewGroup
+        parent: ViewGroup,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_search_bar))
 
     class MenuItemComponentViewHolder(
-        parent: ViewGroup
+        parent: ViewGroup,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_menu_item))
 
     class HeaderSectionComponentViewHolder(
-        parent: ViewGroup
+        parent: ViewGroup,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_section_header_item)) {
         override fun bind(component: Component) {
             view.findViewById<SectionHeaderListItem>(R.id.sectionHeaderItemTitle).apply {
@@ -77,7 +77,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
     }
 
     class OneLineListItemComponentViewHolder(
-        parent: ViewGroup
+        parent: ViewGroup,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_one_line_item)) {
         override fun bind(component: Component) {
             view.findViewById<OneLineListItem>(R.id.oneLineListItem).apply {
@@ -120,12 +120,11 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             view.findViewById<OneLineListItem>(R.id.oneLineListItemCustomTextColor).apply {
                 setClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
             }
-
         }
     }
 
     class TwoLineItemComponentViewHolder(
-        parent: ViewGroup
+        parent: ViewGroup,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_two_line_item)) {
         override fun bind(component: Component) {
             view.findViewById<TwoLineListItem>(R.id.twoLineListItemWithoutImage).apply {
@@ -179,7 +178,6 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 quietlySetIsChecked(true, null)
                 isEnabled = false
             }
-
         }
     }
 
@@ -204,7 +202,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
     companion object {
         fun create(
             parent: ViewGroup,
-            viewType: Int
+            viewType: Int,
         ): ComponentViewHolder {
             return when (Component.values()[viewType]) {
                 Component.BUTTON -> ButtonComponentViewHolder(parent)
@@ -228,7 +226,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
         private fun inflate(
             parent: ViewGroup,
-            layout: Int
+            layout: Int,
         ): View {
             return LayoutInflater.from(parent.context).inflate(layout, parent, false)
         }

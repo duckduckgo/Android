@@ -26,10 +26,8 @@ import com.duckduckgo.app.brokensite.api.BrokenSiteSender
 import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.AmpLinkInfo
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
+import com.duckduckgo.privacy.config.api.AmpLinks
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -38,6 +36,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.never
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)

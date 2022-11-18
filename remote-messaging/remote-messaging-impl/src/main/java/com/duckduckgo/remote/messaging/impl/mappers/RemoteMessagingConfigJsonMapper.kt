@@ -28,7 +28,7 @@ class RemoteMessagingConfigJsonMapper(private val appBuildConfig: AppBuildConfig
         val rules = jsonRemoteMessagingConfig.rules.mapToMatchingRules()
         return RemoteConfig(
             messages = messages,
-            rules = rules
+            rules = rules,
         )
     }
 }

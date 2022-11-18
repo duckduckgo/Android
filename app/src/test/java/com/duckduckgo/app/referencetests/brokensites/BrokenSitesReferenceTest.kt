@@ -32,11 +32,9 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import java.net.URLEncoder
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import org.junit.After
@@ -46,11 +44,13 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import org.robolectric.ParameterizedRobolectricTestRunner
-import java.net.URLEncoder
 
 @ExperimentalCoroutinesApi
 @RunWith(ParameterizedRobolectricTestRunner::class)
@@ -87,8 +87,8 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             val referenceTest = adapter.fromJson(
                 FileUtilities.loadText(
                     BrokenSitesReferenceTest::class.java.classLoader!!,
-                    "reference_tests/brokensites/tests.json"
-                )
+                    "reference_tests/brokensites/tests.json",
+                ),
             )
             return referenceTest?.reportURL?.tests?.filterNot { it.exceptPlatforms.contains("android-browser") } ?: emptyList()
         }
@@ -99,7 +99,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
         MockitoAnnotations.openMocks(this)
         testee = BrokenSiteSubmitter(
             mockStatisticsDataStore, mockVariantManager, mockTdsMetadataDao, mockGpc, mockFeatureToggle, mockPixel,
-            TestScope(), mockAppBuildConfig, coroutineRule.testDispatcherProvider
+            TestScope(), mockAppBuildConfig, coroutineRule.testDispatcherProvider,
         )
     }
 
@@ -181,15 +181,15 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
 
     data class UrlParam(
         val name: String,
-        val value: String
+        val value: String,
     )
 
     data class BrokenSiteTest(
         val name: String,
-        val tests: List<TestCase>
+        val tests: List<TestCase>,
     )
 
     data class ReferenceTest(
-        val reportURL: BrokenSiteTest
+        val reportURL: BrokenSiteTest,
     )
 }

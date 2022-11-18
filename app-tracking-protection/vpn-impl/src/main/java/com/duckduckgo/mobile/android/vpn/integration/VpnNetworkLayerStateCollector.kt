@@ -20,8 +20,8 @@ import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
-import org.json.JSONObject
 import javax.inject.Inject
+import org.json.JSONObject
 
 @ContributesMultibinding(VpnScope::class)
 class VpnNetworkLayerStateCollector @Inject constructor(

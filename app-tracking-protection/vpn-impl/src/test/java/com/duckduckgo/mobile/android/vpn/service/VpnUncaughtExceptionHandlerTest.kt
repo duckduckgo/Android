@@ -90,6 +90,5 @@ class VpnUncaughtExceptionHandlerTest {
         override var cookieDatabaseDeleteErrorCount: Int
             get() = TODO("Not yet implemented")
             set(value) {}
-
     }
 }

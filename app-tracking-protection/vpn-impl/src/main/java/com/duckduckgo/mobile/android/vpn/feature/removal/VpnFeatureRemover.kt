@@ -30,10 +30,10 @@ import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificatio
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationScheduler.Companion.VPN_WEEKLY_NOTIFICATION_ID
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.squareup.anvil.annotations.ContributesBinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Provider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 interface VpnFeatureRemover {
     fun manuallyRemoveFeature()
@@ -49,7 +49,7 @@ class DefaultVpnFeatureRemover @Inject constructor(
     // we use the Provider to avoid a cycle dependency
     private val workManagerProvider: Provider<WorkManager>,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
 ) : VpnFeatureRemover {
 
     override fun manuallyRemoveFeature() {

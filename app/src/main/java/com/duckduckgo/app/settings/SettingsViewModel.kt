@@ -49,6 +49,7 @@ import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateReposito
 import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
+import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -60,7 +61,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class SettingsViewModel @Inject constructor(
@@ -106,7 +106,7 @@ class SettingsViewModel @Inject constructor(
     data class AutomaticallyClearData(
         val clearWhatOption: ClearWhatOption,
         val clearWhenOption: ClearWhenOption,
-        val clearWhenOptionEnabled: Boolean = true
+        val clearWhenOptionEnabled: Boolean = true,
     )
 
     sealed class Command {
@@ -171,7 +171,7 @@ class SettingsViewModel @Inject constructor(
                     emailAddress = emailManager.getEmailAddress(),
                     showAutofill = autofillStore.autofillAvailable,
                     autoconsentEnabled = autoconsent.isSettingEnabled(),
-                )
+                ),
             )
         }
     }
@@ -187,7 +187,7 @@ class SettingsViewModel @Inject constructor(
                 if (currentViewState().appTrackingProtectionEnabled != isDeviceShieldEnabled) {
                     viewState.value = currentViewState().copy(
                         appTrackingProtectionOnboardingShown = vpnStore.didShowOnboarding(),
-                        appTrackingProtectionEnabled = isDeviceShieldEnabled
+                        appTrackingProtectionEnabled = isDeviceShieldEnabled,
                     )
                 }
                 delay(1_000)
@@ -338,7 +338,7 @@ class SettingsViewModel @Inject constructor(
 
     private fun getAppLinksSettingsState(
         appLinksEnabled: Boolean,
-        showAppLinksPrompt: Boolean
+        showAppLinksPrompt: Boolean,
     ): AppLinkSettingType {
         return if (appLinksEnabled) {
             if (showAppLinksPrompt) {
@@ -372,9 +372,9 @@ class SettingsViewModel @Inject constructor(
                     automaticallyClearData = AutomaticallyClearData(
                         clearWhatOption = clearWhatNewSetting,
                         clearWhenOption = settingsDataStore.automaticallyClearWhenOption,
-                        clearWhenOptionEnabled = isAutomaticallyClearingDataWhenSettingEnabled(clearWhatNewSetting)
-                    )
-                )
+                        clearWhenOptionEnabled = isAutomaticallyClearingDataWhenSettingEnabled(clearWhatNewSetting),
+                    ),
+                ),
             )
         }
     }
@@ -399,9 +399,9 @@ class SettingsViewModel @Inject constructor(
                 currentViewState().copy(
                     automaticallyClearData = AutomaticallyClearData(
                         settingsDataStore.automaticallyClearWhatOption,
-                        clearWhenNewSetting
-                    )
-                )
+                        clearWhenNewSetting,
+                    ),
+                ),
             )
         }
     }
@@ -476,5 +476,5 @@ class SettingsViewModel @Inject constructor(
 enum class AppLinkSettingType {
     ASK_EVERYTIME,
     ALWAYS,
-    NEVER
+    NEVER,
 }

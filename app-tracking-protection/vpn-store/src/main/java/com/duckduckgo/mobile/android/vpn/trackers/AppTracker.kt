@@ -28,60 +28,60 @@ data class AppTracker(
     val trackerCompanyId: Int,
     @Embedded val owner: TrackerOwner,
     @Embedded val app: TrackerApp,
-    val isCdn: Boolean
+    val isCdn: Boolean,
 )
 
 @Entity(tableName = "vpn_app_tracker_blocking_list_metadata")
 data class AppTrackerMetadata(
     @PrimaryKey(autoGenerate = true) var id: Long = 0,
-    val eTag: String?
+    val eTag: String?,
 )
 
 @Entity(tableName = "vpn_app_tracker_blocking_app_packages")
 data class AppTrackerPackage(
     @PrimaryKey val packageName: String,
-    val entityName: String
+    val entityName: String,
 )
 
 @Entity(tableName = "vpn_app_tracker_exclusion_list")
 data class AppTrackerExcludedPackage(
-    @PrimaryKey val packageId: String
+    @PrimaryKey val packageId: String,
 )
 
 @Entity(tableName = "vpn_app_tracker_exclusion_list_metadata")
 data class AppTrackerExclusionListMetadata(
     @PrimaryKey(autoGenerate = true) var id: Long = 0,
-    val eTag: String?
+    val eTag: String?,
 )
 
 @Entity(tableName = "vpn_app_tracker_system_app_override_list")
 data class AppTrackerSystemAppOverridePackage(
-    @PrimaryKey val packageId: String
+    @PrimaryKey val packageId: String,
 )
 
 @Entity(tableName = "vpn_app_tracker_system_app_override_list_metadata")
 data class AppTrackerSystemAppOverrideListMetadata(
     @PrimaryKey(autoGenerate = true) var id: Long = 0,
-    val eTag: String?
+    val eTag: String?,
 )
 
 @Entity(tableName = "vpn_app_tracker_exception_rules")
 data class AppTrackerExceptionRule(
     @PrimaryKey
     val rule: String,
-    val packageNames: List<String>
+    val packageNames: List<String>,
 )
 
 @Entity(tableName = "vpn_app_tracker_exception_rules_metadata")
 data class AppTrackerExceptionRuleMetadata(
     @PrimaryKey(autoGenerate = true) var id: Long = 0,
-    val eTag: String?
+    val eTag: String?,
 )
 
 @Entity(tableName = "vpn_app_tracker_manual_exclusion_list")
 data class AppTrackerManualExcludedApp(
     @PrimaryKey val packageId: String,
-    val isProtected: Boolean
+    val isProtected: Boolean,
 )
 
 @Entity(tableName = "vpn_app_tracker_entities")
@@ -89,7 +89,7 @@ data class AppTrackerEntity(
     @PrimaryKey val trackerCompanyId: Int,
     val entityName: String,
     val score: Int,
-    val signals: List<String>
+    val signals: List<String>,
 )
 
 data class JsonAppBlockingList(
@@ -103,22 +103,22 @@ class JsonAppTracker(
     val owner: TrackerOwner,
     val app: TrackerApp,
     @field:Json(name = "CDN")
-    val isCdn: Boolean
+    val isCdn: Boolean,
 )
 
 class JsonTrackingSignal(
     val score: Int,
-    val signals: List<String>
+    val signals: List<String>,
 )
 
 data class TrackerOwner(
     val name: String,
-    val displayName: String
+    val displayName: String,
 )
 
 data class TrackerApp(
     val score: Int,
-    val prevalence: Double
+    val prevalence: Double,
 )
 
 sealed class AppTrackerType {
@@ -131,20 +131,20 @@ data class AppTrackerBlocklist(
     val version: String,
     val trackers: List<AppTracker>,
     val packages: List<AppTrackerPackage>,
-    val entities: List<AppTrackerEntity>
+    val entities: List<AppTrackerEntity>,
 )
 
 /** JSON Model that represents the app exclusion list */
 data class JsonAppTrackerExclusionList(
-    val rules: List<String>
+    val rules: List<String>,
 )
 
 /** JSON Model that represents the system app overrides */
 data class JsonAppTrackerSystemAppOverrides(
-    val rules: List<String>
+    val rules: List<String>,
 )
 
 /** JSON Model that represents the app tracker rule list */
 data class JsonAppTrackerExceptionRules(
-    val rules: List<AppTrackerExceptionRule>
+    val rules: List<AppTrackerExceptionRule>,
 )

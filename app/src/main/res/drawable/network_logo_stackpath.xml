@@ -1,0 +1,29 @@
+<!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+  <path
+      android:pathData="M12,12m-11,0a11,11 0,1 1,22 0a11,11 0,1 1,-22 0"
+      android:fillColor="?attr/omnibarRoundedFieldBackgroundColor"/>
+  <path
+      android:pathData="M24,12C24,18.6274 18.6274,24 12,24C5.3726,24 0,18.6274 0,12C0,5.3726 5.3726,0 12,0C18.6274,0 24,5.3726 24,12ZM3.7782,12.6749C3.8165,13.478 4.3135,13.7361 5.0688,13.7361C5.6042,13.7361 6.1587,13.5449 6.1587,13.0382C6.1587,12.5438 5.5016,12.378 4.7216,12.1811C4.5514,12.1381 4.3753,12.0936 4.1989,12.044C3.2237,11.7667 2.2008,11.3269 2.2008,10.0746C2.2008,8.5832 3.7017,8 4.9828,8C6.3403,8 7.7074,8.6597 7.717,10.1988H5.9388C5.9675,9.5774 5.3843,9.3767 4.8394,9.3767C4.457,9.3767 3.9789,9.5105 3.9789,9.9598C3.9789,10.3742 4.5906,10.5214 5.3365,10.7009L5.3365,10.7009L5.3366,10.7009L5.3367,10.7009C5.5372,10.7492 5.7473,10.7998 5.9579,10.8585C6.9426,11.1357 7.9369,11.5946 7.9369,12.8279C7.9369,14.5583 6.4646,15.1128 4.9637,15.1128C3.3958,15.1128 2.0096,14.4245 2,12.6749H3.7782ZM10.3556,11.3174H11.5506C12.1051,11.3174 12.5067,11.0879 12.5067,10.4665C12.5067,9.826 12.0955,9.5679 11.5506,9.5679H10.3556V11.3174ZM8.5774,8.1434H11.8183C13.0898,8.1434 14.2849,8.7266 14.2849,10.3423C14.2849,12.0344 13.3193,12.694 11.8183,12.694H10.3556V14.9694H8.5774V8.1434ZM18.3002,8H16.8088L14.2371,15.1128H15.7285L18.3002,8ZM20.5086,8H22L19.4283,15.1128H17.937L20.5086,8Z"
+      android:fillColor="?attr/toolbarIconColor"
+      android:fillType="evenOdd"/>
+</vector>

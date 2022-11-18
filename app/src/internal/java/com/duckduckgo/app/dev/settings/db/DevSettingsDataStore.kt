@@ -65,5 +65,5 @@ enum class UAOverride {
     CHROME,
     FIREFOX,
     DDG,
-    WEBVIEW
+    WEBVIEW,
 }

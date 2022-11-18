@@ -24,14 +24,14 @@ interface VoiceSearchLauncher {
         caller: ActivityResultCaller,
         activity: Activity,
         source: Source,
-        onEvent: (Event) -> Unit
+        onEvent: (Event) -> Unit,
     )
 
     fun launch(activity: Activity)
 
     enum class Source(val paramValueName: String) {
         BROWSER("browser"),
-        WIDGET("widget")
+        WIDGET("widget"),
     }
 
     sealed class Event {

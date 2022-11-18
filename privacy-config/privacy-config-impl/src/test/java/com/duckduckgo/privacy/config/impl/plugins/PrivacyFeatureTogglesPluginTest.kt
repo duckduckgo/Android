@@ -20,8 +20,6 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -31,6 +29,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 class PrivacyFeatureTogglesPluginTest {
@@ -119,32 +119,35 @@ class PrivacyFeatureTogglesPluginTest {
     private fun givenPrivacyFeatureIsEnabled() {
         whenever(
             mockFeatureTogglesRepository.get(
-                PrivacyFeatureName.ContentBlockingFeatureName, true
-            )
+                PrivacyFeatureName.ContentBlockingFeatureName,
+                true,
+            ),
         ).thenReturn(true)
     }
 
     private fun givenPrivacyFeatureIsDisabled() {
         whenever(
             mockFeatureTogglesRepository.get(
-                PrivacyFeatureName.ContentBlockingFeatureName, true
-            )
+                PrivacyFeatureName.ContentBlockingFeatureName,
+                true,
+            ),
         ).thenReturn(false)
     }
 
     private fun givenPrivacyFeatureReturnsDefaultValue(defaultValue: Boolean) {
         whenever(
             mockFeatureTogglesRepository.get(
-                PrivacyFeatureName.ContentBlockingFeatureName, defaultValue
-            )
+                PrivacyFeatureName.ContentBlockingFeatureName,
+                defaultValue,
+            ),
         ).thenReturn(defaultValue)
     }
 
     private fun givenAppVersionIsEqualToMinSupportedVersion() {
         whenever(
             mockFeatureTogglesRepository.getMinSupportedVersion(
-                PrivacyFeatureName.ContentBlockingFeatureName
-            )
+                PrivacyFeatureName.ContentBlockingFeatureName,
+            ),
         ).thenReturn(1234)
 
         whenever(mockAppBuildConfig.versionCode).thenReturn(1234)
@@ -153,8 +156,8 @@ class PrivacyFeatureTogglesPluginTest {
     private fun givenAppVersionIsGreaterThanMinSupportedVersion() {
         whenever(
             mockFeatureTogglesRepository.getMinSupportedVersion(
-                PrivacyFeatureName.ContentBlockingFeatureName
-            )
+                PrivacyFeatureName.ContentBlockingFeatureName,
+            ),
         ).thenReturn(1234)
 
         whenever(mockAppBuildConfig.versionCode).thenReturn(5678)
@@ -163,8 +166,8 @@ class PrivacyFeatureTogglesPluginTest {
     private fun givenAppVersionIsSmallerThanMinSupportedVersion() {
         whenever(
             mockFeatureTogglesRepository.getMinSupportedVersion(
-                PrivacyFeatureName.ContentBlockingFeatureName
-            )
+                PrivacyFeatureName.ContentBlockingFeatureName,
+            ),
         ).thenReturn(1234)
 
         whenever(mockAppBuildConfig.versionCode).thenReturn(123)

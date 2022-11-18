@@ -18,19 +18,19 @@ package com.duckduckgo.privacy.config.impl.features.amplinks
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import com.duckduckgo.privacy.config.impl.features.privacyFeatureValueOf
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
+import com.duckduckgo.privacy.config.impl.features.privacyFeatureValueOf
 import com.duckduckgo.privacy.config.store.*
 import com.duckduckgo.privacy.config.store.features.amplinks.AmpLinksRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class AmpLinksPlugin @Inject constructor(
     private val ampLinksRepository: AmpLinksRepository,
-    private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository
+    private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository,
 ) : PrivacyFeaturePlugin {
 
     override fun store(featureName: String, jsonString: String): Boolean {

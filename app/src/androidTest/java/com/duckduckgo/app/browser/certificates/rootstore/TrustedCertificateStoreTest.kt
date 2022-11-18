@@ -94,65 +94,65 @@ class TrustedCertificateStoreTest {
     @Test
     fun whenValidateSslCertificateChainWithX3TrustedChainThenSuccess() {
         val letsEncryptCertificateProvider: LetsEncryptCertificateProvider = LetsEncryptCertificateProviderImpl(
-            setOf(isrgRootX1, letsEncryptR3)
+            setOf(isrgRootX1, letsEncryptR3),
         )
         val trustedCertificateStore = TrustedCertificateStoreImpl(letsEncryptCertificateProvider)
 
         assertEquals(
             CertificateValidationState.UntrustedChain,
-            trustedCertificateStore.validateSslCertificateChain(subscriberCertificateX3!!)
+            trustedCertificateStore.validateSslCertificateChain(subscriberCertificateX3!!),
         )
     }
 
     @Test
     fun whenValidateSslCertificateChainWithX3UnTrustedChainThenError() {
         val letsEncryptCertificateProvider: LetsEncryptCertificateProvider = LetsEncryptCertificateProviderImpl(
-            setOf(isrgRootX1, letsEncryptR3)
+            setOf(isrgRootX1, letsEncryptR3),
         )
         val trustedCertificateStore = TrustedCertificateStoreImpl(letsEncryptCertificateProvider)
 
         assertEquals(
             CertificateValidationState.UntrustedChain,
-            trustedCertificateStore.validateSslCertificateChain(subscriberCertificateX3!!)
+            trustedCertificateStore.validateSslCertificateChain(subscriberCertificateX3!!),
         )
     }
 
     @Test
     fun whenValidateSslCertificateChainWithR3TrustedChainThenSuccess() {
         val letsEncryptCertificateProvider: LetsEncryptCertificateProvider = LetsEncryptCertificateProviderImpl(
-            setOf(isrgRootX1, letsEncryptR3)
+            setOf(isrgRootX1, letsEncryptR3),
         )
         val trustedCertificateStore = TrustedCertificateStoreImpl(letsEncryptCertificateProvider)
 
         assertEquals(
             CertificateValidationState.TrustedChain,
-            trustedCertificateStore.validateSslCertificateChain(subscriberCertificateR3!!)
+            trustedCertificateStore.validateSslCertificateChain(subscriberCertificateR3!!),
         )
     }
 
     @Test
     fun whenValidateSslCertificateChainWithR3UnTrustedChainThenError() {
         val letsEncryptCertificateProvider: LetsEncryptCertificateProvider = LetsEncryptCertificateProviderImpl(
-            setOf(isrgRootX1)
+            setOf(isrgRootX1),
         )
         val trustedCertificateStore = TrustedCertificateStoreImpl(letsEncryptCertificateProvider)
 
         assertEquals(
             CertificateValidationState.UntrustedChain,
-            trustedCertificateStore.validateSslCertificateChain(subscriberCertificateR3!!)
+            trustedCertificateStore.validateSslCertificateChain(subscriberCertificateR3!!),
         )
     }
 
     @Test
     fun whenValidateSslCertificateChainWithMissingRootThenError() {
         val letsEncryptCertificateProvider: LetsEncryptCertificateProvider = LetsEncryptCertificateProviderImpl(
-            setOf(letsEncryptR3)
+            setOf(letsEncryptR3),
         )
         val trustedCertificateStore = TrustedCertificateStoreImpl(letsEncryptCertificateProvider)
 
         assertEquals(
             CertificateValidationState.UntrustedChain,
-            trustedCertificateStore.validateSslCertificateChain(subscriberCertificateR3!!)
+            trustedCertificateStore.validateSslCertificateChain(subscriberCertificateR3!!),
         )
     }
 }

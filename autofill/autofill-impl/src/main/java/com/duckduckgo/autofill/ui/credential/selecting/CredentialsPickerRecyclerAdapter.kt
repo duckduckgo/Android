@@ -35,7 +35,7 @@ class CredentialsPickerRecyclerAdapter(
     val faviconManager: FaviconManager,
     val credentialTextExtractor: CredentialTextExtractor,
     private val credentials: List<LoginCredentials>,
-    private val onCredentialSelected: (credentials: LoginCredentials) -> Unit
+    private val onCredentialSelected: (credentials: LoginCredentials) -> Unit,
 ) : Adapter<CredentialsViewHolder>() {
 
     var showExpandedView = false
@@ -54,9 +54,8 @@ class CredentialsPickerRecyclerAdapter(
     private fun ItemRowAutofillCredentialsPickerBinding.configureCallToActionButton(
         position: Int,
         credentials: LoginCredentials,
-        fullCredentialListSize: Int
+        fullCredentialListSize: Int,
     ) {
-
         val buttonType = buttonTypeDecider.determineButtonType(position, fullCredentialListSize, showExpandedView)
 
         val button = when (buttonType) {
@@ -86,13 +85,12 @@ class CredentialsPickerRecyclerAdapter(
         val hideableButtons = mutableListOf(
             useCredentialPrimaryButton,
             useCredentialSecondaryButton,
-            moreOptionsButton
+            moreOptionsButton,
         )
 
         hideableButtons
             .filterNot { it.id == buttonToKeep?.id }
             .forEach { it.gone() }
-
     }
 
     override fun getItemCount(): Int {

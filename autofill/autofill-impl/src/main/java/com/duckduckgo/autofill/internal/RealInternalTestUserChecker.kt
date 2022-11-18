@@ -35,7 +35,7 @@ import javax.inject.Inject
 @SingleInstanceIn(AppScope::class)
 class RealInternalTestUserChecker @Inject constructor(
     private val internalTestUserStore: InternalTestUserStore,
-    private val appBuildConfig: AppBuildConfig
+    private val appBuildConfig: AppBuildConfig,
 ) : InternalTestUserChecker {
 
     private var verificationErrorDetected = false

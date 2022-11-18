@@ -27,15 +27,14 @@ import javax.inject.Inject
 
 class NotificationFactory @Inject constructor(
     val context: Context,
-    val manager: NotificationManagerCompat
+    val manager: NotificationManagerCompat,
 ) {
 
     fun createNotification(
         specification: NotificationSpec,
         launchIntent: PendingIntent,
-        cancelIntent: PendingIntent
+        cancelIntent: PendingIntent,
     ): Notification {
-
         val builder = NotificationCompat.Builder(context, specification.channel.id)
             .setPriority(specification.channel.priority)
             .setSmallIcon(specification.icon)

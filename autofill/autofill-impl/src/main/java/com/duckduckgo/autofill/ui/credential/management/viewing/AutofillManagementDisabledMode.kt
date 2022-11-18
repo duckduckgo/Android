@@ -41,7 +41,7 @@ class AutofillManagementDisabledMode : DuckDuckGoFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentAutofillManagementDisabledBinding.inflate(inflater, container, false)
         return binding.root
@@ -49,7 +49,7 @@ class AutofillManagementDisabledMode : DuckDuckGoFragment() {
 
     override fun onViewCreated(
         view: View,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
         binding.disabledCta.setOnClickListener {
