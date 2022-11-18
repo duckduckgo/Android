@@ -47,3 +47,9 @@ data class FingerprintingTemporaryStorageEntity(
     @PrimaryKey val id: Int = 1,
     val json: String,
 )
+
+@Entity(tableName = "fingerprint_protection_seed")
+data class FingerprintProtectionSeedEntity(
+    @PrimaryKey val id: Int = 1,
+    val seed: String,
+)

@@ -22,6 +22,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
 import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.fingerprintprotection.api.FingerprintProtectionManager
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.api.UnprotectedTemporaryException
 import com.squareup.anvil.annotations.ContributesBinding
@@ -40,6 +41,7 @@ class RealContentScopeScripts @Inject constructor(
     private val contentScopeJSReader: ContentScopeJSReader,
     private val appBuildConfig: AppBuildConfig,
     private val unprotectedTemporary: UnprotectedTemporary,
+    private val fingerprintProtectionManager: FingerprintProtectionManager,
 ) : ContentScopeScripts {
 
     private var cachedContentScopeJson: String = getContentScopeJson("", emptyList())
@@ -151,7 +153,7 @@ class RealContentScopeScripts @Inject constructor(
     }
 
     private fun getUserPreferencesJson(userPreferences: String): String {
-        val defaultParameters = "${getVersionNumberKeyValuePair()},${getPlatformKeyValuePair()}"
+        val defaultParameters = "${getVersionNumberKeyValuePair()},${getPlatformKeyValuePair()},${getSessionKeyValuePair()}"
         if (userPreferences.isEmpty()) {
             return "{$defaultParameters}"
         }
@@ -161,6 +163,7 @@ class RealContentScopeScripts @Inject constructor(
     private fun getVersionNumberKeyValuePair() = "\"versionNumber\":${appBuildConfig.versionCode}"
 
     private fun getPlatformKeyValuePair() = "\"platform\":{\"name\":\"android\"}"
+    private fun getSessionKeyValuePair() = "\"sessionKey\":\"${fingerprintProtectionManager.getSeed()}\""
 
     private fun getContentScopeJson(config: String, unprotectedTemporaryExceptions: List<UnprotectedTemporaryException>): String = (
         "{\"features\":{$config},\"unprotectedTemporary\":${getUnprotectedTemporaryJson(unprotectedTemporaryExceptions)}}"

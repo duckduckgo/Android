@@ -21,6 +21,7 @@ import com.duckduckgo.app.userwhitelist.api.UserWhiteListRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
 import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
+import com.duckduckgo.fingerprintprotection.api.FingerprintProtectionManager
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.api.UnprotectedTemporaryException
 import junit.framework.TestCase.assertEquals
@@ -41,12 +42,20 @@ class RealContentScopeScriptsTest {
     private val mockPlugin2: ContentScopeConfigPlugin = mock()
     private val mockAppBuildConfig: AppBuildConfig = mock()
     private val mockUnprotectedTemporary: UnprotectedTemporary = mock()
+    private val mockFingerprintProtectionManager: FingerprintProtectionManager = mock()
 
     lateinit var testee: ContentScopeScripts
 
     @Before
     fun setup() {
-        testee = RealContentScopeScripts(mockPluginPoint, mockAllowList, mockContentScopeJsReader, mockAppBuildConfig, mockUnprotectedTemporary)
+        testee = RealContentScopeScripts(
+            mockPluginPoint,
+            mockAllowList,
+            mockContentScopeJsReader,
+            mockAppBuildConfig,
+            mockUnprotectedTemporary,
+            mockFingerprintProtectionManager,
+        )
         whenever(mockPlugin1.config()).thenReturn(config1)
         whenever(mockPlugin2.config()).thenReturn(config2)
         whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(mockPlugin1, mockPlugin2))
@@ -55,6 +64,7 @@ class RealContentScopeScriptsTest {
         whenever(mockAppBuildConfig.versionCode).thenReturn(versionCode)
         whenever(mockUnprotectedTemporary.unprotectedTemporaryExceptions)
             .thenReturn(listOf(unprotectedTemporaryException, unprotectedTemporaryException2))
+        whenever(mockFingerprintProtectionManager.getSeed()).thenReturn(sessionKey)
     }
 
     @Test
@@ -88,7 +98,7 @@ class RealContentScopeScriptsTest {
                 "\"config1\":{\"state\":\"enabled\"}," +
                 "\"config2\":{\"state\":\"disabled\"}}," +
                 "\"unprotectedTemporary\":[{\"domain\":\"example.com\",\"reason\":\"reason\"},{\"domain\":\"foo.com\",\"reason\":\"reason2\"}]}," +
-                " [\"foo.com\"], {\"versionNumber\":1234,\"platform\":{\"name\":\"android\"}})",
+                " [\"foo.com\"], {\"versionNumber\":1234,\"platform\":{\"name\":\"android\"},\"sessionKey\":\"5678\"})",
             js,
         )
 
@@ -113,7 +123,8 @@ class RealContentScopeScriptsTest {
                 "\"config1\":{\"state\":\"enabled\"}," +
                 "\"config2\":{\"state\":\"disabled\"}}," +
                 "\"unprotectedTemporary\":[{\"domain\":\"example.com\",\"reason\":\"reason\"},{\"domain\":\"foo.com\",\"reason\":\"reason2\"}]}," +
-                " [\"example.com\"], {\"globalPrivacyControlValue\":false,\"versionNumber\":1234,\"platform\":{\"name\":\"android\"}})",
+                " [\"example.com\"], {\"globalPrivacyControlValue\":false,\"versionNumber\":1234,\"platform\":{\"name\":\"android\"}," +
+                "\"sessionKey\":\"5678\"})",
             js,
         )
 
@@ -139,7 +150,8 @@ class RealContentScopeScriptsTest {
                 "{\"features\":{" +
                 "\"config1\":{\"state\":\"enabled\"}}," +
                 "\"unprotectedTemporary\":[{\"domain\":\"example.com\",\"reason\":\"reason\"},{\"domain\":\"foo.com\",\"reason\":\"reason2\"}]}," +
-                " [\"example.com\"], {\"globalPrivacyControlValue\":true,\"versionNumber\":1234,\"platform\":{\"name\":\"android\"}})",
+                " [\"example.com\"], {\"globalPrivacyControlValue\":true,\"versionNumber\":1234,\"platform\":{\"name\":\"android\"}," +
+                "\"sessionKey\":\"5678\"})",
             js,
         )
 
@@ -164,7 +176,7 @@ class RealContentScopeScriptsTest {
                 "\"config1\":{\"state\":\"enabled\"}," +
                 "\"config2\":{\"state\":\"disabled\"}}," +
                 "\"unprotectedTemporary\":[{\"domain\":\"example.com\",\"reason\":\"reason\"}]}," +
-                " [\"example.com\"], {\"versionNumber\":1234,\"platform\":{\"name\":\"android\"}})",
+                " [\"example.com\"], {\"versionNumber\":1234,\"platform\":{\"name\":\"android\"},\"sessionKey\":\"5678\"})",
             js,
         )
 
@@ -184,8 +196,9 @@ class RealContentScopeScriptsTest {
             "\"config1\":{\"state\":\"enabled\"}," +
             "\"config2\":{\"state\":\"disabled\"}}," +
             "\"unprotectedTemporary\":[{\"domain\":\"example.com\",\"reason\":\"reason\"},{\"domain\":\"foo.com\",\"reason\":\"reason2\"}]}, " +
-            "[\"example.com\"], {\"versionNumber\":1234,\"platform\":{\"name\":\"android\"}})"
+            "[\"example.com\"], {\"versionNumber\":1234,\"platform\":{\"name\":\"android\"},\"sessionKey\":\"5678\"})"
         const val versionCode = 1234
+        const val sessionKey = "5678"
         val unprotectedTemporaryException = UnprotectedTemporaryException(domain = "example.com", reason = "reason")
         val unprotectedTemporaryException2 = UnprotectedTemporaryException(domain = "foo.com", reason = "reason2")
     }
