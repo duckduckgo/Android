@@ -24,7 +24,7 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/internal_input_layout"
-        style="@style/Widget.DuckDuckGo.OutlinedTextInputView.TextInputLayout"
+        style="@style/Widget.DuckDuckGo.TextInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:endIconMode="none">

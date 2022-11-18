@@ -128,6 +128,10 @@
 
         <!--controls the ripple coloring-->
         <item name="colorControlHighlight">?attr/daxColorRipple</item>
+
+        <!--Design System Colors theme independent-->
+        <item name="daxColorDim">@color/gray95</item>
+        <item name="daxColorWhite">@color/white</item>
     </style>
 
     <!-- The app theme will mostly contain values for colour attributes -->
@@ -355,7 +359,7 @@
         <item name="emailButtonRippleColor">@color/subtleGrayTwo</item>
         <item name="quickAccessItemTitleTextColor">@color/brownishGrayTwo</item>
 
-        <item name="savedSiteEditTextUnderlineColor">@color/dimmed</item>
+        <item name="savedSiteEditTextUnderlineColor">@color/black60</item>
         <item name="lightContainerBackground">@color/whiteThree</item>
 
         <item name="listItemPrimaryTextColor">@color/almostBlackDark</item>
