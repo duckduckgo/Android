@@ -322,7 +322,7 @@ class AutofillStoredBackJavascriptInterfaceTest {
         // for saving
         var credentialsToSave: LoginCredentials? = null
 
-        override suspend fun onCredentialsAvailableToInject(credentials: List<LoginCredentials>, triggerType: LoginTriggerType) {
+        override suspend fun onCredentialsAvailableToInject(originalUrl: String, credentials: List<LoginCredentials>, triggerType: LoginTriggerType) {
             credentialsAvailableToInject = true
             this.credentialsToInject = credentials
         }

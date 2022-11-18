@@ -30,9 +30,9 @@ import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateReposito
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
+import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
 import kotlinx.coroutines.CoroutineScope
-import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(AppScope::class)
@@ -58,7 +58,7 @@ object AppTrackingProtectionModule {
             notificationSender,
             dispatcherProvider,
             appCoroutineScope,
-            appTpFeatureConfig
+            appTpFeatureConfig,
         )
     }
 

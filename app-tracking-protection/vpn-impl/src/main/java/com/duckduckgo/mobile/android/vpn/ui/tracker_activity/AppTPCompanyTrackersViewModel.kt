@@ -28,7 +28,6 @@ import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackingSignal
 import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -65,7 +64,7 @@ constructor(
             statsRepository
                 .getTrackersForAppFromDate(date, packageName)
                 .map { aggregateDataPerApp(it, packageName) }
-                .flowOn(Dispatchers.Default)
+                .flowOn(dispatchers.default())
                 .collectLatest { state ->
                     viewStateFlow.emit(state)
                 }
@@ -112,7 +111,7 @@ constructor(
                 CompanyTrackingDetails(
                     companyName = trackerCompanyName,
                     companyDisplayName = trackerCompanyDisplayName,
-                    trackingAttempts = data.value.size,
+                    trackingAttempts = data.value.sumOf { it.tracker.count },
                     timestamp = timestamp,
                     trackingSignals = trackingSignals,
                 ),
@@ -120,7 +119,7 @@ constructor(
         }
 
         return viewStateFlow.value.copy(
-            totalTrackingAttempts = trackerData.size,
+            totalTrackingAttempts = sourceData.sumOf { it.trackingAttempts },
             lastTrackerBlockedAgo = lastTrackerBlockedAgo,
             trackingCompanies = sourceData,
             protectionEnabled = excludedAppsRepository.isAppProtectionEnabled(packageName),

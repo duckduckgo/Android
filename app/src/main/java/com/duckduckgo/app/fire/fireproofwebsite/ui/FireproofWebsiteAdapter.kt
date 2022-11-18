@@ -201,8 +201,9 @@ sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolde
                 entity.website(),
             )
 
-            listItem.setPrimaryText(entity.website())
             loadFavicon(entity.domain, listItem.leadingIcon())
+            listItem.setPrimaryText(entity.website())
+            listItem.showTrailingIcon()
             listItem.setTrailingIconClickListener { anchor ->
                 showOverFlowMenu(anchor, entity)
             }

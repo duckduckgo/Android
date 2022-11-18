@@ -20,5 +20,5 @@ enum class PrivacyShield {
     PROTECTED,
     UNPROTECTED,
     WARNING,
-    UNKNOWN
+    UNKNOWN,
 }

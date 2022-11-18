@@ -48,11 +48,11 @@ import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_LONG
 import com.google.android.material.snackbar.Snackbar
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class TrackingProtectionExclusionListActivity :
@@ -144,7 +144,7 @@ class TrackingProtectionExclusionListActivity :
             override fun onAppProtectionChanged(
                 excludedAppInfo: TrackingProtectionAppInfo,
                 enabled: Boolean,
-                position: Int
+                position: Int,
             ) {
                 viewModel.onAppProtectionChanged(excludedAppInfo, position, enabled)
             }
@@ -160,7 +160,7 @@ class TrackingProtectionExclusionListActivity :
             override fun onFilterClick(anchorView: View) {
                 showFilterPopupMenu(anchorView)
             }
-        })
+        },)
 
         val recyclerView = binding.excludedAppsRecycler
         val isListEnabled = intent.getBooleanExtra(KEY_LIST_ENABLED, false)
@@ -196,11 +196,11 @@ class TrackingProtectionExclusionListActivity :
         when (command) {
             is Command.RestartVpn -> restartVpn()
             is Command.ShowDisableProtectionDialog -> showDisableProtectionDialog(
-                command.excludingReason
+                command.excludingReason,
             )
             is Command.ShowEnableProtectionDialog -> showEnableProtectionDialog(
                 command.excludingReason,
-                command.position
+                command.position,
             )
             is Command.LaunchFeedback -> reportBreakage.launch(command.reportBreakageScreen)
             else -> { /* noop */ }
@@ -218,18 +218,18 @@ class TrackingProtectionExclusionListActivity :
         val dialog = ManuallyDisableAppProtectionDialog.instance(excludedAppInfo)
         dialog.show(
             supportFragmentManager,
-            ManuallyDisableAppProtectionDialog.TAG_MANUALLY_EXCLUDE_APPS_DISABLE
+            ManuallyDisableAppProtectionDialog.TAG_MANUALLY_EXCLUDE_APPS_DISABLE,
         )
     }
 
     private fun showEnableProtectionDialog(
         excludedAppInfo: TrackingProtectionAppInfo,
-        position: Int
+        position: Int,
     ) {
         val dialog = ManuallyEnableAppProtectionDialog.instance(excludedAppInfo, position)
         dialog.show(
             supportFragmentManager,
-            ManuallyEnableAppProtectionDialog.TAG_MANUALLY_EXCLUDE_APPS_ENABLE
+            ManuallyEnableAppProtectionDialog.TAG_MANUALLY_EXCLUDE_APPS_ENABLE,
         )
     }
 
@@ -290,13 +290,13 @@ class TrackingProtectionExclusionListActivity :
         enum class AppsFilter {
             ALL,
             PROTECTED_ONLY,
-            UNPROTECTED_ONLY
+            UNPROTECTED_ONLY,
         }
 
         fun intent(
             context: Context,
             isRunning: Boolean = true,
-            filter: AppsFilter = AppsFilter.ALL
+            filter: AppsFilter = AppsFilter.ALL,
         ): Intent {
             val intent = Intent(context, TrackingProtectionExclusionListActivity::class.java)
             intent.putExtra(KEY_LIST_ENABLED, isRunning)

@@ -146,6 +146,8 @@ class ManageRecentAppsProtectionActivity :
             adapter.update(viewState.excludedApps)
             binding.manageRecentAppsRecycler.show()
         }
+        binding.manageRecentAppsShowAll.show()
+        binding.manageRecentAppsDivider.show()
         shimmerLayout.gone()
     }
 
@@ -155,10 +157,12 @@ class ManageRecentAppsProtectionActivity :
             is Command.ShowDisableProtectionDialog -> showDisableProtectionDialog(
                 command.excludingReason,
             )
+
             is Command.ShowEnableProtectionDialog -> showEnableProtectionDialog(
                 command.excludingReason,
                 command.position,
             )
+
             is Command.LaunchFeedback -> reportBreakage.launch(command.reportBreakageScreen)
             is Command.LaunchAllAppsProtection -> startActivity(TrackingProtectionExclusionListActivity.intent(this))
         }

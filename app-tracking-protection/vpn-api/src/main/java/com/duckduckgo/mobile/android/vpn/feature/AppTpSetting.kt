@@ -25,6 +25,7 @@ enum class AppTpSetting(override val value: String, override val defaultValue: B
     AlwaysSetDNS("alwaysSetDNS"),
     CPUMonitoring("cpuMonitoring"),
     ProtectGames("protectGames"),
+    OpenBeta("openBeta"),
 }
 
 interface SettingName {

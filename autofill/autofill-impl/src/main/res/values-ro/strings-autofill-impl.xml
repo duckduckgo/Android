@@ -42,6 +42,9 @@
     <string name="updateLoginDialogButtonUpdatePassword">Actualizează parola</string>
     <string name="updateLoginDialogButtonNotNow">Nu acum</string>
 
+    <string name="updateLoginDialogTitleUpdateUsername">Actualizezi numele de utilizator?</string>
+    <string name="updateLoginDialogButtonUpdateUsername">Actualizează numele de utilizator</string>
+
     <string name="autofillDialogCloseButtonContentDescription">Închide dialogul de completare automată</string>
 
     <string name="credentialManagementEditLoginTitleHint">Titlu autentificare</string>

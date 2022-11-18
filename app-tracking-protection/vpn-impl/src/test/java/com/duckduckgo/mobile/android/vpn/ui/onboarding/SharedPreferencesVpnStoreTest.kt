@@ -16,14 +16,22 @@
 
 package com.duckduckgo.mobile.android.vpn.ui.onboarding
 
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.api.InMemorySharedPreferences
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.mobile.android.vpn.dao.HeartBeatEntity
+import com.duckduckgo.mobile.android.vpn.dao.VpnHeartBeatDao
+import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
+import com.duckduckgo.mobile.android.vpn.heartbeat.VpnServiceHeartbeatMonitor
+import com.duckduckgo.mobile.android.vpn.model.VpnServiceState
+import com.duckduckgo.mobile.android.vpn.model.VpnServiceStateStats
+import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -31,11 +39,10 @@ import org.mockito.kotlin.whenever
 
 class SharedPreferencesVpnStoreTest {
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @get:Rule
-    var coroutineRule = CoroutineTestRule()
-
     private val sharedPreferencesProvider = mock<VpnSharedPreferencesProvider>()
+    private val vpnHeartBeatDao = mock<VpnHeartBeatDao>()
+    private val vpnFeaturesRegistry = mock<VpnFeaturesRegistry>()
+    private val vpnServiceStateDao = mock<VpnServiceStateStatsDao>()
 
     private lateinit var sharedPreferencesVpnStore: SharedPreferencesVpnStore
 
@@ -46,7 +53,12 @@ class SharedPreferencesVpnStoreTest {
             sharedPreferencesProvider.getSharedPreferences(eq("com.duckduckgo.android.atp.onboarding.store"), eq(true), eq(true)),
         ).thenReturn(prefs)
 
-        sharedPreferencesVpnStore = SharedPreferencesVpnStore(sharedPreferencesProvider, coroutineRule.testDispatcherProvider)
+        sharedPreferencesVpnStore = SharedPreferencesVpnStore(
+            sharedPreferencesProvider,
+            vpnHeartBeatDao,
+            vpnFeaturesRegistry,
+            vpnServiceStateDao,
+        )
     }
 
     @Test
@@ -70,48 +82,71 @@ class SharedPreferencesVpnStoreTest {
     }
 
     @Test
-    fun whenOnAppTpManuallyEnabledThenSetToTrueAndIncrementCounter() {
-        sharedPreferencesVpnStore.onAppTPManuallyEnabled()
-        sharedPreferencesVpnStore.onAppTPManuallyEnabled()
-
-        assertEquals(2, sharedPreferencesVpnStore.getAppTPManuallyEnables())
-    }
-
-    @Test
-    fun whenResetAppTpManuallyEnablesCounterThenResetCounter() {
-        sharedPreferencesVpnStore.onAppTPManuallyEnabled()
-
-        sharedPreferencesVpnStore.resetAppTPManuallyEnablesCounter()
-
-        assertEquals(0, sharedPreferencesVpnStore.getAppTPManuallyEnables())
-    }
-
-    @Test
-    fun whenUserAllowsShowPromoteAlwaysOnThenReturnDefaultValueTrue() {
-        assertTrue(sharedPreferencesVpnStore.userAllowsShowPromoteAlwaysOn())
-    }
-
-    @Test
-    fun whenOnForgetPromoteAlwaysOnThenSetUserAllowsShowPromoteAlwaysOnToTrue() {
-        sharedPreferencesVpnStore.onForgetPromoteAlwaysOn()
-
-        assertFalse(sharedPreferencesVpnStore.userAllowsShowPromoteAlwaysOn())
-    }
-
-    @Test
-    fun whenIsAllaysOnEnabledThenReturnDefaultValueFalse() {
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun whenIsAllaysOnEnabledThenReturnDefaultValueFalse() = runTest {
         assertFalse(sharedPreferencesVpnStore.isAlwaysOnEnabled())
     }
 
     @Test
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun whenSetAlwaysOnThenSetAlwaysOnValue() = runTest {
-        sharedPreferencesVpnStore.setAlwaysOn(true)
+    fun whenVpnLastDisabledByAndroidAndVpnKilledBySystemThenReturnTrue() = runTest {
+        whenever(vpnServiceStateDao.getLastStateStats()).thenReturn(null)
+        whenever(vpnHeartBeatDao.hearBeats()).thenReturn(listOf(HeartBeatEntity(type = VpnServiceHeartbeatMonitor.DATA_HEART_BEAT_TYPE_ALIVE)))
+        whenever(vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)).thenReturn(false)
 
-        assertTrue(sharedPreferencesVpnStore.isAlwaysOnEnabled())
+        assertTrue(sharedPreferencesVpnStore.vpnLastDisabledByAndroid())
+    }
 
-        sharedPreferencesVpnStore.setAlwaysOn(false)
+    @Test
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun whenVpnLastDisabledByAndroidAndVpnUnexpectedlyDisabledThenReturnTrue() = runTest {
+        whenever(vpnServiceStateDao.getLastStateStats()).thenReturn(
+            VpnServiceStateStats(state = VpnServiceState.DISABLED),
+        )
 
-        assertFalse(sharedPreferencesVpnStore.isAlwaysOnEnabled())
+        assertTrue(sharedPreferencesVpnStore.vpnLastDisabledByAndroid())
+    }
+
+    @Test
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun whenVpnLastDisabledByAndroidAndVpnDisabledByUserThenReturnFalse() = runTest {
+        whenever(vpnServiceStateDao.getLastStateStats()).thenReturn(
+            VpnServiceStateStats(state = VpnServiceState.DISABLED, stopReason = VpnStoppingReason.SELF_STOP),
+        )
+
+        assertFalse(sharedPreferencesVpnStore.vpnLastDisabledByAndroid())
+    }
+
+    @Test
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun whenVpnLastDisabledByAndroidAndVpnEnabledThenReturnFalse() = runTest {
+        whenever(vpnServiceStateDao.getLastStateStats()).thenReturn(
+            VpnServiceStateStats(state = VpnServiceState.ENABLED),
+        )
+
+        assertFalse(sharedPreferencesVpnStore.vpnLastDisabledByAndroid())
+    }
+
+    @Test
+    fun whenAppTpEnabledCtaDidShowThenSetPreferenceValueToTrue() {
+        assertFalse(sharedPreferencesVpnStore.didShowAppTpEnabledCta())
+
+        sharedPreferencesVpnStore.appTpEnabledCtaDidShow()
+
+        assertTrue(sharedPreferencesVpnStore.didShowAppTpEnabledCta())
+    }
+
+    @Test
+    fun whenIsOnboardingSessionCalledWithoutBeingSetThenReturnFalse() {
+        assertFalse(sharedPreferencesVpnStore.isOnboardingSession())
+    }
+
+    @Test
+    fun whenOnOnboardingSessionSetCalledThenSetValueAndReturnTrueWhenAsked() {
+        assertFalse(sharedPreferencesVpnStore.isOnboardingSession())
+
+        sharedPreferencesVpnStore.onOnboardingSessionSet()
+
+        assertTrue(sharedPreferencesVpnStore.isOnboardingSession())
     }
 }

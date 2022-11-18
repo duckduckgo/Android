@@ -81,7 +81,7 @@
     <string name="previousSearchTermDescription">Arată rezultatul anterior</string>
     <string name="closeFindInPageButtonDescription">Închide vizualizarea „caută în pagină”</string>
     <string name="findInPageHint">Căutare în pagină</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Editare interogare înainte de căutare</string>
@@ -108,76 +108,6 @@
     <string name="tabClosed">Filă închisă</string>
     <string name="tabClosedUndo">Anulează</string>
     <string name="downloadsMenuItemTitle">Descărcări</string>
-
-    <!-- Privacy Dashboard Activities -->
-    <string name="privacyProtectionToggle">Protecția confidențialității site-ului</string>
-    <string name="privacyProtectionEnabled">PROTECȚIE SITE ACTIVATĂ</string>
-    <string name="privacyProtectionDisabled">PROTECȚIE SITE DEZACTIVATĂ</string>
-    <string name="privacyDashboardActivityTitle">Tabloul de bord privind confidențialitatea</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">MĂRIT DE LA &lt;img src=\"%1$d\" /&gt; LA &lt;img src=\"%2$d\" /&gt;</string>
-    <string name="privacyGradeContentDescription">Grad de confidențialitate</string>
-    <string name="privacyProtectionTemporarilyDisabled">Am dezactivat temporar protecția confidențialității, deoarece pare să strice acest site.</string>
-
-    <string name="httpsGood">Conexiune criptată</string>
-    <string name="httpsMixed">Conexiune cu criptare mixtă</string>
-    <string name="httpsBad">Conexiune necriptată</string>
-
-    <string name="scorecardActivityTitle">Grad de confidențialitate</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">Site-ul este o rețea mare de instrumente de urmărire</string>
-    <string name="scorecardPrivacyGrade">Grad de confidențialitate</string>
-    <string name="scorecardEnhancedGrade">Grad mărit</string>
-
-    <string name="privacyTermsActivityTitle">Practici privind confidențialitatea</string>
-    <string name="practicesGood">Bune practici privind confidențialitatea</string>
-    <string name="practicesMixed">Practici mixte privind confidențialitatea</string>
-    <string name="practicesBad">Practici inadecvate privind confidențialitatea</string>
-    <string name="practicesUnknown">Practici necunoscute privind confidențialitatea</string>
-    <string name="practicesOverview">Practicile privind confidențialitatea indică în ce măsură datele cu caracter personal pe care le partajați cu un site web sunt protejate.</string>
-    <string name="practicesTosdrLink">Practici de confidențialitate de la<b><u>ToS;DR</u></b>.</string>
-    <string name="practicesIconContentGood">Pictogramă „Bune practici”</string>
-    <string name="practicesIconContentBad">Pictogramă „Practici inadecvate”</string>
-
-    <string name="networkTrackerSummaryHeader">CEI MAI MARI INFRACTORI PRIVIND REȚELELE DE COOKIE-URI DE URMĂRIRE</string>
-    <string name="networkTrackerSummaryNotReady">Continuă să colectăm date pentru a arăta câte cookie-uri de urmărire am blocat.</string>
-
-    <string name="trackersActivityTitle">Solicitări de urmărire blocate</string>
-    <string name="trackersContentDescription">Solicitări de urmărire blocate</string>
-    <string name="trackersOverview">Încărcarea cererilor următoarelor domenii terțe a fost blocată, deoarece au fost identificate ca fiind cereri de urmărire. În cazul în care cererile unei societăți sunt încărcate, aceasta îi poate permite să îți creeze un profil.</string>
-    <string name="trackersOverviewProtectionsOff">Nu a fost blocată încărcarea niciunei cereri de urmărire, deoarece protecțiile sunt dezactivate pentru acest site. În cazul în care cererile unei societăți sunt încărcate, aceasta îi poate permite să îți creeze un profil.</string>
-
-    <string name="domainsLoadedActivityTitle">Solicitări de la terți încărcate</string>
-    <string name="domainsLoadedContentDescription">Solicitări de la terți încărcate</string>
-    <string name="domainsLoadedOverview">Au fost încărcate următoarele solicitări ale domeniilor terțe. În cazul în care solicitările unei societăți sunt încărcate, aceasta îi poate permite să îți creeze un profil, deși celelalte măsuri de protecție ale noastre împotriva urmăririi pe internet se aplică în continuare.</string>
-    <string name="domainsLoadedOverviewProtectionsOff">Nu a fost blocată încărcarea niciunei cereri de la terți, deoarece protecțiile sunt dezactivate pentru acest site. În cazul în care cererile unei societăți sunt încărcate, aceasta îi poate permite să îți creeze un profil.</string>
-    <string name="domainsLoadedOverviewEmpty">Nu am detectat solicitări de la niciun domeniu terț.</string>
-    <string name="domainsLoadedHeadingText">Nu au fost încărcate domenii terțe</string>
-
-    <string name="webTrackingProtectionsText"><annotation type="learn_more_link">Despre protecțiile noastre împotriva urmăririi pe web</annotation></string>
-    <string name="webTrackingProtectionsUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
-
-    <string name="trackersBlockedNoSectionDescription">Au fost încărcate solicitările următoarelor domenii.</string>
-
-    <string name="adLoadedSectionDescription" instruction="Placeholder is the name of the company who owns the ad">Solicitările următorului domeniu au fost încărcate deoarece s-a făcut clic recent pe o reclamă %1$s de pe DuckDuckGo. Aceste solicitări ajută la evaluarea eficienței anunțurilor. Nicio reclamă de pe DuckDuckGo nu creează profiluri.</string>
-    <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Cum influențează protecțiile anunțurile noastre de căutare</annotation></string>
-    <string name="adLoadedSectionUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
-
-    <string name="domainsLoadedSectionDescription">Au fost încărcate și solicitările următorului domeniu.</string>
-    <string name="domainsLoadedSectionSingleSectionDescription">Au fost încărcate solicitările de urmărire ale următoarelor domenii.</string>
-    <string name="domainsLoadedSectionEmptyListDescription">Nu am detectat solicitări de la niciun domeniu terț.</string>
-
-    <string name="domainsLoadedBreakageSectionDescription">Solicitările următoarelor domenii au fost încărcate pentru a preveni întreruperea site-ului.</string>
-    <string name="domainsLoadedAssociatedSectionDescription" instruction="Placeholder is the name of a company">Solicitările următorului domeniu au fost încărcate deoarece sunt asociate cu %1$s.</string>
-
-    <string name="trackersBlockedText">Solicitări a căror încărcare a fost blocată</string>
-    <string name="trackersNotBlockedText">Nu a fost blocată nicio solicitare de urmărire</string>
-    <string name="trackersNoFoundText">Nu au fost găsite solicitări de urmărire</string>
-    <string name="trackersFoundText">S-au găsit solicitări de urmărire</string>
-
-    <string name="domainsLoadedText">Solicitări de la terți încărcate</string>
-    <string name="domainsNotLoadedText">Nu au fost încărcate solicitări terță parte</string>
-
-    <string name="majorNetworksNoFound">Nu s-a găsit nicio rețea de urmărire majoră</string>
-    <string name="majorNetworksFound">S-au găsit rețele de urmărire majore</string>
 
     <!-- Fire -->
     <string name="fireMenu">Ștergere date</string>
@@ -267,7 +197,7 @@
     <string name="importBookmarksFileTitle">Selectați un fișier cu marcaje de importat</string>
     <string name="importBookmarksError">Nu s-au putut importa marcajele, a apărut o eroare</string>
     <string name="importBookmarksEmpty">Fișierul nu are marcaje de importat</string>
-    <string name="importBookmarksSuccess">%1$d marcaje importate cu succes</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">%1$d marcaje importate cu succes</string>
     <string name="savedSiteDialogTitleHint">Titlu</string>
     <string name="savedSiteDialogUrlHint">URL</string>
     <string name="savedSiteDialogTitleEdit">Editare</string>
@@ -659,9 +589,9 @@
     <string name="bookmarkFolderEmpty">Gol</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s și %1$d element?</item>
-        <item quantity="few">%1$s%2$s și %1$d elemente?</item>
-        <item quantity="other">%1$s%2$s și %1$d elemente?</item>
+        <item quantity="one">%1$s%2$s și %3$d element?</item>
+        <item quantity="few">%1$s%2$s și %3$d elemente?</item>
+        <item quantity="other">%1$s%2$s și %3$d elemente?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">

@@ -67,6 +67,7 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
         vpnStopReason: VpnStopReason,
     ) {
         when (vpnStopReason) {
+            VpnStopReason.RESTART -> {} // no-op
             VpnStopReason.SELF_STOP -> onVPNManuallyStopped()
             VpnStopReason.REVOKED -> onVPNRevoked()
             else -> onVPNUndesiredStop()

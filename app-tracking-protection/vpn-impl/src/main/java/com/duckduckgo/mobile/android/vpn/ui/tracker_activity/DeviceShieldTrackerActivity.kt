@@ -63,17 +63,17 @@ import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTracker
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.ViewEvent
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.ViewEvent.StartVpn
 import com.google.android.material.snackbar.Snackbar
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import nl.dionsegijn.konfetti.models.Shape
 import nl.dionsegijn.konfetti.models.Size
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class DeviceShieldTrackerActivity :
@@ -103,7 +103,7 @@ class DeviceShieldTrackerActivity :
         maxRows = MIN_ROWS_FOR_ALL_ACTIVITY,
         timeWindow = 5,
         timeWindowUnits = TimeUnit.DAYS,
-        showTimeWindowHeadings = false
+        showTimeWindowHeadings = false,
     )
 
     private val viewModel: DeviceShieldTrackerActivityViewModel by bindViewModel()
@@ -160,7 +160,7 @@ class DeviceShieldTrackerActivity :
     override fun onActivityResult(
         requestCode: Int,
         resultCode: Int,
-        data: Intent?
+        data: Intent?,
     ) {
         if (requestCode == REQUEST_ASK_VPN_PERMISSION) {
             viewModel.onVPNPermissionResult(resultCode)
@@ -181,7 +181,7 @@ class DeviceShieldTrackerActivity :
         supportFragmentManager.beginTransaction()
             .replace(
                 R.id.activity_list,
-                DeviceShieldActivityFeedFragment.newInstance(feedConfig)
+                DeviceShieldActivityFeedFragment.newInstance(feedConfig),
             )
             .commitNow()
     }
@@ -276,7 +276,7 @@ class DeviceShieldTrackerActivity :
         val dialog = AppTPDisableConfirmationDialog.instance(this)
         dialog.show(
             supportFragmentManager,
-            AppTPDisableConfirmationDialog.TAG_APPTP_DISABLE_DIALOG
+            AppTPDisableConfirmationDialog.TAG_APPTP_DISABLE_DIALOG,
         )
     }
 
@@ -285,7 +285,7 @@ class DeviceShieldTrackerActivity :
         val dialog = VpnRemoveFeatureConfirmationDialog.instance(this)
         dialog.show(
             supportFragmentManager,
-            VpnRemoveFeatureConfirmationDialog.TAG_VPN_REMOVE_FEATURE_DIALOG
+            VpnRemoveFeatureConfirmationDialog.TAG_VPN_REMOVE_FEATURE_DIALOG,
         )
     }
 
@@ -295,7 +295,7 @@ class DeviceShieldTrackerActivity :
         val dialog = AppTPVpnConflictDialog.instance(this, isAlwaysOn)
         dialog.show(
             supportFragmentManager,
-            AppTPVpnConflictDialog.TAG_VPN_CONFLICT_DIALOG
+            AppTPVpnConflictDialog.TAG_VPN_CONFLICT_DIALOG,
         )
     }
 
@@ -312,7 +312,7 @@ class DeviceShieldTrackerActivity :
                 override fun onCanceled() {
                     viewModel.onViewEvent(ViewEvent.PromoteAlwaysOnCancelled)
                 }
-            }
+            },
         ).show(supportFragmentManager, TAG_APPTP_PROMOTE_ALWAYS_ON_DIALOG)
     }
 
@@ -329,7 +329,7 @@ class DeviceShieldTrackerActivity :
                 override fun onCanceled() {
                     viewModel.onViewEvent(ViewEvent.PromoteAlwaysOnCancelled)
                 }
-            }
+            },
         ).show(supportFragmentManager, TAG_APPTP_PROMOTE_ALWAYS_ON_DIALOG)
     }
 
@@ -453,7 +453,7 @@ class DeviceShieldTrackerActivity :
 
     private fun updateRunningState(
         runningState: VpnState,
-        bannerState: BannerState
+        bannerState: BannerState,
     ) {
         if (runningState.state == VpnRunningState.ENABLED) {
             if (runningState.alwaysOnState.isAlwaysOnLockedDown()) {
@@ -462,7 +462,7 @@ class DeviceShieldTrackerActivity :
                 binding.deviceShieldTrackerLabelDisabled.apply {
                     setClickableLink(
                         OPEN_SETTINGS_ANNOTATION,
-                        getText(R.string.atp_AlwaysOnLockDownEnabled)
+                        getText(R.string.atp_AlwaysOnLockDownEnabled),
                     ) { launchAlwaysOnLockdownEnabledDialog() }
                     show()
                 }
@@ -473,12 +473,12 @@ class DeviceShieldTrackerActivity :
                     if (bannerState is BannerState.OnboardingBanner) {
                         setClickableLink(
                             APPTP_SETTINGS_ANNOTATION,
-                            getText(R.string.atp_ActivityEnabledBannerLabel)
+                            getText(R.string.atp_ActivityEnabledBannerLabel),
                         ) { launchTrackingProtectionExclusionListActivity() }
                     } else {
                         setClickableLink(
                             APPTP_SETTINGS_ANNOTATION,
-                            getText(R.string.atp_ActivityEnabledMoreThanADayLabel)
+                            getText(R.string.atp_ActivityEnabledMoreThanADayLabel),
                         ) { launchManageAppsProtection() }
                     }
                     show()
@@ -497,7 +497,7 @@ class DeviceShieldTrackerActivity :
             binding.deviceShieldTrackerLabelDisabled.apply {
                 setClickableLink(
                     annotation,
-                    getText(disabledLabel)
+                    getText(disabledLabel),
                 ) {
                     if (annotation == REPORT_ISSUES_ANNOTATION) {
                         launchFeedback()
@@ -576,7 +576,7 @@ class DeviceShieldTrackerActivity :
             override fun onDaxDialogHideClick() {
                 // NO OP
             }
-        })
+        },)
 
         dialog.show(supportFragmentManager, TAG_APPTP_ENABLED_CTA_DIALOG)
     }
@@ -615,7 +615,7 @@ class DeviceShieldTrackerActivity :
 
         fun intent(
             context: Context,
-            onLaunchCallback: ResultReceiver? = null
+            onLaunchCallback: ResultReceiver? = null,
         ): Intent {
             return Intent(context, DeviceShieldTrackerActivity::class.java).apply {
                 putExtra(RESULT_RECEIVER_EXTRA, onLaunchCallback)

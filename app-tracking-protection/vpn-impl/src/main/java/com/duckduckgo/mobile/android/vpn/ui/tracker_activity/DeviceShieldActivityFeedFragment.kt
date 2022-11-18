@@ -45,10 +45,10 @@ import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldActivit
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldActivityFeedViewModel.TrackerFeedViewState
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @InjectWith(FragmentScope::class)
 class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
@@ -69,7 +69,7 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = ViewDeviceShieldActivityFeedBinding.inflate(layoutInflater)
         return binding.root
@@ -77,7 +77,7 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
 
     override fun onViewCreated(
         view: View,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ) {
         with(binding.activityRecyclerView) {
             layoutManager = StickyHeadersLinearLayoutManager<TrackerFeedAdapter>(this@DeviceShieldActivityFeedFragment.requireContext())
@@ -88,9 +88,9 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
             viewModel.getMostRecentTrackers(
                 TimeWindow(
                     config.timeWindow.toLong(),
-                    config.timeWindowUnits
+                    config.timeWindowUnits,
                 ),
-                config
+                config,
             ).flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
                 .collect { viewState ->
                     renderViewState(viewState)
@@ -112,7 +112,7 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
 
     private suspend fun renderTrackerList(viewState: TrackerFeedViewState) {
         trackerFeedAdapter.updateData(
-            if (config.unboundedRows()) viewState.trackers else viewState.trackers.take(config.maxRows)
+            if (config.unboundedRows()) viewState.trackers else viewState.trackers.take(config.maxRows),
         ) { trackerFeedItem ->
             when (trackerFeedItem) {
                 is TrackerFeedItem.TrackerFeedData -> {
@@ -122,14 +122,14 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
                                 requireContext(),
                                 trackerFeedItem.trackingApp.packageId,
                                 trackerFeedItem.trackingApp.appDisplayName,
-                                trackerFeedItem.bucket
-                            )
+                                trackerFeedItem.bucket,
+                            ),
                         )
                     } else {
                         Snackbar.make(
                             requireView(),
                             getString(R.string.atp_CompanyDetailsNotAvailableForUninstalledApps),
-                            Snackbar.LENGTH_SHORT
+                            Snackbar.LENGTH_SHORT,
                         ).show()
                     }
                 }
@@ -154,8 +154,8 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
             TrackingProtectionExclusionListActivity.intent(
                 requireContext(),
                 command.vpnState.state == VpnRunningState.ENABLED,
-                AppsFilter.PROTECTED_ONLY
-            )
+                AppsFilter.PROTECTED_ONLY,
+            ),
         )
     }
 
@@ -164,8 +164,8 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
             TrackingProtectionExclusionListActivity.intent(
                 requireContext(),
                 command.vpnState.state == VpnRunningState.ENABLED,
-                AppsFilter.UNPROTECTED_ONLY
-            )
+                AppsFilter.UNPROTECTED_ONLY,
+            ),
         )
     }
 
@@ -202,7 +202,7 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
             maxRows = Int.MAX_VALUE,
             timeWindow = 5,
             timeWindowUnits = TimeUnit.DAYS,
-            showTimeWindowHeadings = true
+            showTimeWindowHeadings = true,
         )
 
         fun newInstance(config: ActivityFeedConfig): DeviceShieldActivityFeedFragment {
@@ -216,7 +216,7 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
         val maxRows: Int,
         val timeWindow: Int,
         val timeWindowUnits: TimeUnit,
-        val showTimeWindowHeadings: Boolean
+        val showTimeWindowHeadings: Boolean,
     ) {
         fun unboundedRows(): Boolean = maxRows == Int.MAX_VALUE
     }

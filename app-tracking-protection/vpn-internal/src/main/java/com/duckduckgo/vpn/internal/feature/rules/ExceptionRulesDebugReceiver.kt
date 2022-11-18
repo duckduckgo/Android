@@ -20,6 +20,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
@@ -27,7 +28,6 @@ import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRule
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -76,6 +76,7 @@ class ExceptionRulesDebugReceiver(
 class ExceptionRulesDebugReceiverRegister @Inject constructor(
     private val context: Context,
     private val exclusionRulesRepository: ExclusionRulesRepository,
+    private val dispatchers: DispatcherProvider,
 ) : VpnServiceCallbacks {
 
     private val exceptionRulesSavedState = mutableListOf<AppTrackerExceptionRule>()
@@ -92,7 +93,7 @@ class ExceptionRulesDebugReceiverRegister @Inject constructor(
             Timber.i("Excluding %s for app %s", domain, appId)
 
             if (appId != null && domain != null) {
-                coroutineScope.launch(Dispatchers.IO) {
+                coroutineScope.launch(dispatchers.io()) {
                     exclusionRulesRepository.upsertRule(appId, domain)
                 }
             }
@@ -105,7 +106,7 @@ class ExceptionRulesDebugReceiverRegister @Inject constructor(
     ) {
         Timber.i("Debug receiver ExceptionRulesDebugReceiver restoring exception rules")
 
-        coroutineScope.launch(Dispatchers.IO) {
+        coroutineScope.launch(dispatchers.io()) {
             exclusionRulesRepository.deleteAllTrackerRules()
             exclusionRulesRepository.insertTrackerRules(exceptionRulesSavedState).also {
                 exceptionRulesSavedState.clear()
@@ -114,7 +115,7 @@ class ExceptionRulesDebugReceiverRegister @Inject constructor(
     }
 
     private fun saveExceptionRulesState(coroutineScope: CoroutineScope) {
-        coroutineScope.launch(Dispatchers.IO) {
+        coroutineScope.launch(dispatchers.io()) {
             exceptionRulesSavedState.clear()
             exceptionRulesSavedState.addAll(exclusionRulesRepository.getAllTrackerRules())
         }

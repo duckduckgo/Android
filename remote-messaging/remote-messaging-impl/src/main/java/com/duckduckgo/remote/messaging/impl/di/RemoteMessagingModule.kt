@@ -171,7 +171,6 @@ object DataSourceModule {
     @SingleInstanceIn(AppScope::class)
     fun providesRemoteMessagingDatabase(context: Context): RemoteMessagingDatabase {
         return Room.databaseBuilder(context, RemoteMessagingDatabase::class.java, "remote_messaging.db")
-            .enableMultiInstanceInvalidation()
             .fallbackToDestructiveMigration()
             .addMigrations(*ALL_MIGRATIONS)
             .build()

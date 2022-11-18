@@ -38,7 +38,7 @@ import kotlin.math.min
  * Adds sticky headers capabilities to your [RecyclerView.Adapter]. It must implement [StickyHeaders] to
  * indicate which items are headers.
  */
-class StickyHeadersLinearLayoutManager<T>(
+open class StickyHeadersLinearLayoutManager<T>(
     context: Context,
     @RecyclerView.Orientation orientation: Int = RecyclerView.VERTICAL,
     reverseLayout: Boolean = false,

@@ -26,11 +26,11 @@
   android:paddingStart="@dimen/keyline_4"
   android:paddingEnd="@dimen/keyline_4">
 
-    <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
         android:id="@+id/label"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:text="Info Panel"
+        app:primaryText="Info Panel"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
@@ -40,7 +40,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/keyline_4"
         app:panelBackground="@drawable/info_panel_tooltip_background"
-        app:panelDrawable="@drawable/ic_link_color_24"
+        app:panelDrawable="@drawable/ic_info_panel_link"
         app:panelText="This is a Tooltip Info Panel, interesting information can be shown here"
         app:layout_constraintTop_toBottomOf="@+id/label"
         tools:layout_editor_absoluteX="@dimen/keyline_4"/>
@@ -52,7 +52,7 @@
         android:layout_margin="@dimen/keyline_4"
         app:layout_constraintTop_toBottomOf="@+id/info_panel_tooltip"
         app:panelBackground="@drawable/info_panel_alert_background"
-        app:panelDrawable="@drawable/ic_alert_color_24"
+        app:panelDrawable="@drawable/ic_info_panel_alert"
         app:panelText="This is an Alert Info Panel, warning information can be shown here"
         tools:layout_editor_absoluteX="@dimen/keyline_4"/>
 

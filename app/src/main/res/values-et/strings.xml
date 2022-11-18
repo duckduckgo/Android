@@ -81,7 +81,7 @@
     <string name="previousSearchTermDescription">Otsi eelmine</string>
     <string name="closeFindInPageButtonDescription">Sulge lehe vaates otsimine</string>
     <string name="findInPageHint">Otsi lehel</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Enne otsimist muutke päringut</string>
@@ -109,77 +109,7 @@
     <string name="tabClosedUndo">Võta tagasi</string>
     <string name="downloadsMenuItemTitle">Allalaadimised</string>
 
-    <!-- Privacy Dashboard Activities -->
-    <string name="privacyProtectionToggle">Saidi privaatsuse kaitse</string>
-    <string name="privacyProtectionEnabled">SAIDI KAITSE ON LUBATUD</string>
-    <string name="privacyProtectionDisabled">SAIDI KAITSE ON KEELATUD</string>
-    <string name="privacyDashboardActivityTitle">Privaatsuse juhtpaneel</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">TÄIUSTATUD &lt;img src=\"%1$d\" /&gt; - &lt;img src=\"%2$d\" /&gt;</string>
-    <string name="privacyGradeContentDescription">Privaatsusaste</string>
-    <string name="privacyProtectionTemporarilyDisabled">Keelasime ajutiselt privaatsuse kaitse, kuna näib, et see kahjustab seda saiti.</string>
-
-    <string name="httpsGood">Krüptitud ühendus</string>
-    <string name="httpsMixed">Erinevate krüpteeringutega ühendus</string>
-    <string name="httpsBad">Krüptimata ühendus</string>
-
-    <string name="scorecardActivityTitle">Privaatsusaste</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">Sait on peamine jälgimisvõrk</string>
-    <string name="scorecardPrivacyGrade">Privaatsusaste</string>
-    <string name="scorecardEnhancedGrade">Täiustatud aste</string>
-
-    <string name="privacyTermsActivityTitle">Privaatsuspraktikad</string>
-    <string name="practicesGood">Hea privaatsustava</string>
-    <string name="practicesMixed">Erinevad privaatsustavad</string>
-    <string name="practicesBad">Kehv privaatsustava</string>
-    <string name="practicesUnknown">Teadmata privaatsustava</string>
-    <string name="practicesOverview">Privaatsustavad näitavad, kui palju on veebisaidiga jagatav isiklik teave kaitstud.</string>
-    <string name="practicesTosdrLink">Privaatsustava: <b><u>ToS;DR</u></b>.</string>
-    <string name="practicesIconContentGood">Hea tava ikoon</string>
-    <string name="practicesIconContentBad">Halva tava ikoon</string>
-
-    <string name="networkTrackerSummaryHeader">JÄLGIMISVÕRGU SUURIMAD RIKKUJAD</string>
-    <string name="networkTrackerSummaryNotReady">Kogume endiselt andmeid, et näidata, kui palju jälgijaid oleme blokeerinud.</string>
-
-    <string name="trackersActivityTitle">Blokeeritud jälgimispäringud</string>
-    <string name="trackersContentDescription">Blokeeritud jälgimispäringud</string>
-    <string name="trackersOverview">Järgmiste kolmanda poole domeenide päringute laadimine blokeeriti, sest need tuvastati jälgimispäringutena. Kui ettevõtte päringud laaditakse, võib see võimaldada neil sind profileerida.</string>
-    <string name="trackersOverviewProtectionsOff">Jälgimispäringute laadimist ei blokeeritud, sest selle saidi jaoks on kaitsed välja lülitatud. Kui ettevõtte päringud laaditakse, võib see võimaldada neil sind profileerida.</string>
-
-    <string name="domainsLoadedActivityTitle">Kolmanda poole päringud on laaditud</string>
-    <string name="domainsLoadedContentDescription">Kolmanda poole päringud on laaditud</string>
-    <string name="domainsLoadedOverview">Laaditi järgmiste kolmanda poole domeenide päringud. Kui ettevõtte päringud laaditakse, võib see võimaldada neil sind profileerida, kuigi meie teised veebi jälgimise kaitsemeetmed kehtivad endiselt.</string>
-    <string name="domainsLoadedOverviewProtectionsOff">Kolmandate poolte päringute laadimist ei blokeeritud, sest selle saidi jaoks on kaitsed välja lülitatud. Kui ettevõtte päringud laaditakse, võib see võimaldada neil sind profileerida.</string>
-    <string name="domainsLoadedOverviewEmpty">Me ei tuvastanud kolmanda poole domeenide päringuid.</string>
-    <string name="domainsLoadedHeadingText">Kolmanda poole domeene pole laaditud</string>
-
-    <string name="webTrackingProtectionsText"><annotation type="learn_more_link">Meie veebijälgimise kaitsete teave</annotation></string>
-    <string name="webTrackingProtectionsUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
-
-    <string name="trackersBlockedNoSectionDescription">Laaditi järgmiste domeenide päringud.</string>
-
-    <string name="adLoadedSectionDescription" instruction="Placeholder is the name of the company who owns the ad">Järgmise domeeni päringud laaditi, sest hiljuti klõpsati DuckDuckGo kaudu %1$s reklaamil. Need päringud aitavad hinnata reklaamide tõhusust. Kõik DuckDuckGo reklaamid on mitteprofileerivad.</string>
-    <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Kuidas meie otsingu reklaamid meie kaitset mõjutavad?</annotation></string>
-    <string name="adLoadedSectionUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
-
-    <string name="domainsLoadedSectionDescription">Laaditi ka järgmise domeeni päringud.</string>
-    <string name="domainsLoadedSectionSingleSectionDescription">Laaditi järgmiste domeenide jälgimispäringud.</string>
-    <string name="domainsLoadedSectionEmptyListDescription">Me ei tuvastanud kolmanda poole domeenide päringuid.</string>
-
-    <string name="domainsLoadedBreakageSectionDescription">Laaditi järgmise domeeni päringud, et vältida saidi töö häirimist.</string>
-    <string name="domainsLoadedAssociatedSectionDescription" instruction="Placeholder is the name of a company">Laaditi järgmise domeeni päringud, sest nendega on seotud %1$s.</string>
-
-    <string name="trackersBlockedText">Päringute laadimine on blokeeritud</string>
-    <string name="trackersNotBlockedText">Ühtegi jälgimispäringut pole blokeeritud</string>
-    <string name="trackersNoFoundText">Jälgimispäringuid ei leitud</string>
-    <string name="trackersFoundText">Leitud jälgimispäringud</string>
-
-    <string name="domainsLoadedText">Kolmanda poole päringud on laaditud</string>
-    <string name="domainsNotLoadedText">Kolmanda poole päringud pole laaditud</string>
-
-    <string name="majorNetworksNoFound">Ühtegi peamist jälgimisvõrku ei leitud</string>
-    <string name="majorNetworksFound">Leitud peamised jälgimisvõrgud</string>
-
-    <!-- Fire -->
+   <!-- Fire -->
     <string name="fireMenu">Kustuta andmed</string>
     <string name="fireClearAll">Kustuta kõik vahekaardid ja andmed</string>
     <string name="fireCancel">Tühista</string>
@@ -267,7 +197,7 @@
     <string name="importBookmarksFileTitle">Valige järjehoidja fail, mida importida</string>
     <string name="importBookmarksError">Ühtegi järjehoidjat ei saanud importida, midagi läks valesti</string>
     <string name="importBookmarksEmpty">Failil pole järjehoidjaid, mida importida</string>
-    <string name="importBookmarksSuccess">%1$d järjehoidjat on edukalt imporditud</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">%1$d järjehoidjat on edukalt imporditud</string>
     <string name="savedSiteDialogTitleHint">Pealkiri</string>
     <string name="savedSiteDialogUrlHint">URL</string>
     <string name="savedSiteDialogTitleEdit">Redigeeri</string>
@@ -657,8 +587,8 @@
     <string name="bookmarkFolderEmpty">Tühi</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s ja %1$d üksuse?</item>
-        <item quantity="other">%1$s%2$s ja %1$d üksust?</item>
+        <item quantity="one">%1$s%2$s ja %3$d üksuse?</item>
+        <item quantity="other">%1$s%2$s ja %3$d üksust?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">

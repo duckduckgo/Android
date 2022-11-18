@@ -82,9 +82,9 @@ class RealTimeDiffFormatter @Inject constructor(private val context: Context) : 
         startLocalDateTime: LocalDateTime,
     ): String {
         val startDate = DatabaseDateFormatter.timestamp(startLocalDateTime).substringBefore("T")
-            .run { FORMATTER_DAYS.parse(this) }
+            .run { SimpleDateFormat(PATTERN_FORMATTER_DAYS).parse(this) }
         val endDate = DatabaseDateFormatter.timestamp(endLocalDateTime).substringBefore("T")
-            .run { FORMATTER_DAYS.parse(this) }
+            .run { SimpleDateFormat(PATTERN_FORMATTER_DAYS).parse(this) }
 
         val diff = (endDate.time - startDate.time).run { TimeUnit.DAYS.convert(this, TimeUnit.MILLISECONDS) }
 
@@ -101,9 +101,9 @@ class RealTimeDiffFormatter @Inject constructor(private val context: Context) : 
     ): String {
         val timeDifferenceMillis = Duration.between(startLocalDateTime, endLocalDateTime).toMillis()
         val startDate = DatabaseDateFormatter.timestamp(startLocalDateTime).substringBefore("T")
-            .run { FORMATTER_DAYS.parse(this) }
+            .run { SimpleDateFormat(PATTERN_FORMATTER_DAYS).parse(this) }
         val endDate = DatabaseDateFormatter.timestamp(endLocalDateTime).substringBefore("T")
-            .run { FORMATTER_DAYS.parse(this) }
+            .run { SimpleDateFormat(PATTERN_FORMATTER_DAYS).parse(this) }
 
         val timeDifferenceDate = (endDate.time - startDate.time).run { TimeUnit.DAYS.convert(this, TimeUnit.MILLISECONDS) }
 
@@ -115,6 +115,7 @@ class RealTimeDiffFormatter @Inject constructor(private val context: Context) : 
 
     companion object {
         private val FORMATTER_DAYS = SimpleDateFormat("yyyy-MM-dd")
+        private const val PATTERN_FORMATTER_DAYS = "yyyy-MM-dd"
         private const val PATTERN_MONTH_NAME = "MMMM"
     }
 }

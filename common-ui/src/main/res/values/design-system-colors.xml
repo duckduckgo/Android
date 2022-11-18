@@ -16,7 +16,7 @@
 
 <resources>
 
-    <!-- Design System References Colors
+    <!-- Design System Reference Colors
         daxColorBackground - Bottom Layer - Background of the screen
         daxColorSurface - First layer on top (Toolbar, Navigation Bar, Dialogs)
         daxColorContainer - Object container (Favicon rounded background)
@@ -27,12 +27,14 @@
         daxColorLines - Dividers between elements
         daxColorAccentBlue - Main accent color (Button primary)
         daxColorAccentYellow
-        daxColorDisabled - Disabled color applied to all elements (text, buttons, etc...)
+        daxColorContainerDisabled - Disabled color applied to background elements like buttons
+        daxColorTextDisabled - Disabled color applied to text elements
     -->
     <attr name="daxColorBackground" format="color"/>
     <attr name="daxColorBackgroundInverted" format="color"/>
     <attr name="daxColorSurface" format="color"/>
     <attr name="daxColorContainer" format="color"/>
+    <attr name="daxColorWindow" format="color"/>
     <attr name="daxColorPrimaryText" format="color"/>
     <attr name="daxColorSecondaryText" format="color"/>
     <attr name="daxColorPrimaryIcon" format="color"/>
@@ -40,18 +42,47 @@
     <attr name="daxColorLines" format="color"/>
     <attr name="daxColorAccentBlue" format="color"/>
     <attr name="daxColorAccentYellow" format="color"/>
-    <attr name="daxColorDisabled" format="color"/>
+    <attr name="daxColorContainerDisabled" format="color"/>
+    <attr name="daxColorTextDisabled" format="color"/>
+    <attr name="daxColorRipple" format="color"/>
+
+    <!-- Component Specific Colors -->
+    <attr name="daxColorButtonPrimaryContainer" format="color"/>
+    <attr name="daxColorButtonPrimaryContainerPressed" format="color"/>
+    <attr name="daxColorButtonSecondaryContainer" format="color"/>
+    <attr name="daxColorButtonSecondaryContainerPressed" format="color"/>
+    <attr name="daxColorButtonDestructiveContainer" format="color"/>
+    <attr name="daxColorButtonDestructiveContainerPressed" format="color"/>
+    <attr name="daxColorButtonDestructiveGhostContainer" format="color"/>
+    <attr name="daxColorButtonDestructiveGhostContainerPressed" format="color"/>
+
+    <attr name="daxColorButtonPrimaryText" format="color"/>
+    <attr name="daxColorButtonPrimaryTextPressed" format="color"/>
+    <attr name="daxColorButtonSecondaryText" format="color"/>
+    <attr name="daxColorButtonSecondaryTextPressed" format="color"/>
+    <attr name="daxColorButtonDestructiveGhostText" format="color"/>
+    <attr name="daxColorButtonDestructiveGhostTextPressed" format="color"/>
+
+    <attr name="daxColorSwitchTrackOn" format="color"/>
+    <attr name="daxColorSwitchTrackOff" format="color"/>
+    <attr name="daxColorSwitchThumbOn" format="color"/>
+    <attr name="daxColorSwitchThumbOff" format="color"/>
 
     <!-- Design System Brand Colors -->
     <color name="disabledColor">#59000000</color>
-    <color name="destructiveRedLight">#EE1025</color>
-    <color name="destructiveRedDark">#FF5454</color>
 
     <!-- Design System Raw Colors -->
-
+    <color name="red20">#F2A18A</color>
+    <color name="red30">#EB876C</color>
+    <color name="red30_18">#2EEB876C</color>
     <color name="red50">#DE5833</color>
+    <color name="red60">#BC4726</color>
+    <color name="red60_12">#1FBC4726</color>
+    <color name="red70">#9A3216</color>
+
     <color name="purple50">#5132A9</color>
 
+    <color name="yellow50_14">#24FFCC33</color>
     <color name="yellow50">#FFCC33</color>
     <color name="yellow10">#FFF0C2</color>
 
@@ -66,13 +97,18 @@
     <color name="gray60">#888888</color>
     <color name="gray50">#ABABAB</color>
     <color name="gray40">#CCCCCC</color>
+    <color name="gray40_40">#66CCCCCC</color>
     <color name="gray30">#DDDDDD</color>
     <color name="gray25">#E5E5E5</color>
     <color name="gray20">#EEEEEE</color>
     <color name="gray0">#FAFAFA</color>
 
+    <color name="blue0">#CCDAFF</color>
+    <color name="blue0_50">#80CCDAFF</color>
+    <color name="blue20">#8FABF9</color>
     <color name="blue30">#7295F6</color>
     <color name="blue50">#3969EF</color>
+    <color name="blue50_14">#243969EF</color>
     <color name="blue60">#2B55CA</color>
     <color name="blue70">#1E42A4</color>
 
@@ -87,6 +123,7 @@
 
     <color name="white84">#D6FFFFFF</color>
     <color name="white60">#99FFFFFF</color>
+    <color name="white36">#5CFFFFFF</color>
     <color name="white18">#2EFFFFFF</color>
     <color name="white12">#1FFFFFFF</color>
     <color name="white">#FFFFFF</color>

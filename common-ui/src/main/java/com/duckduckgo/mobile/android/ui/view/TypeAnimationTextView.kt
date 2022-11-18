@@ -26,6 +26,7 @@ import java.text.StringCharacterIterator
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.*
 
+@Suppress("NoHardcodedCoroutineDispatcher")
 class TypeAnimationTextView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,

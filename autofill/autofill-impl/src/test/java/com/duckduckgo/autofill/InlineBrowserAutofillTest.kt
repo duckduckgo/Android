@@ -41,6 +41,7 @@ class InlineBrowserAutofillTest {
     private lateinit var testWebView: WebView
     private val testCallback = object : Callback {
         override suspend fun onCredentialsAvailableToInject(
+            originalUrl: String,
             credentials: List<LoginCredentials>,
             triggerType: LoginTriggerType,
         ) {
@@ -114,6 +115,9 @@ class InlineBrowserAutofillTest {
 
         override fun injectNoCredentials() {
             lastAction = NoCredentialsInjected
+        }
+
+        override fun cancelRetrievingStoredLogins() {
         }
 
         override var callback: Callback? = null

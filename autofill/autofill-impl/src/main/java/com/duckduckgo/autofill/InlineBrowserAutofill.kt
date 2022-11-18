@@ -50,4 +50,8 @@ class InlineBrowserAutofill @Inject constructor(
             autofillInterface.injectCredentials(credentials)
         }
     }
+
+    override fun cancelPendingAutofillRequestToChooseCredentials() {
+        autofillInterface.cancelRetrievingStoredLogins()
+    }
 }

@@ -81,7 +81,7 @@ class PrivacyReportViewModelTest {
     fun before() {
         prepareDb()
 
-        repository = RealAppTrackerBlockingStatsRepository(db)
+        repository = RealAppTrackerBlockingStatsRepository(db, coroutineRule.testDispatcherProvider)
 
         context.getSharedPreferences(PREFS_FILENAME, Context.MODE_PRIVATE).edit { clear() }
         vpnPreferences = RealVpnPreferences(context)

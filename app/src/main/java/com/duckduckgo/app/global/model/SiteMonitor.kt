@@ -32,10 +32,10 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.privacy.config.api.ContentBlocking
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.concurrent.CopyOnWriteArrayList
 
 class SiteMonitor(
     url: String,
@@ -43,7 +43,7 @@ class SiteMonitor(
     override var upgradedHttps: Boolean = false,
     private val userWhitelistDao: UserWhitelistDao,
     private val contentBlocking: ContentBlocking,
-    private val appCoroutineScope: CoroutineScope
+    private val appCoroutineScope: CoroutineScope,
 ) : Site {
 
     override var url: String = url
@@ -172,12 +172,12 @@ class SiteMonitor(
             TrackerStatus.AD_ALLOWED,
             TrackerStatus.SITE_BREAKAGE_ALLOWED,
             TrackerStatus.SAME_ENTITY_ALLOWED,
-            TrackerStatus.USER_ALLOWED
+            TrackerStatus.USER_ALLOWED,
         )
 
         private val allowedDomainTypes = setOf(
             TrackerStatus.USER_ALLOWED,
-            TrackerStatus.SAME_ENTITY_ALLOWED
+            TrackerStatus.SAME_ENTITY_ALLOWED,
         )
     }
 }

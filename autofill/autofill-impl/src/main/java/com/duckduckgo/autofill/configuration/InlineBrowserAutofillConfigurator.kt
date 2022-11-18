@@ -18,12 +18,13 @@ package com.duckduckgo.autofill.configuration
 import android.webkit.WebView
 import com.duckduckgo.app.autofill.JavascriptInjector
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DefaultDispatcherProvider
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autofill.BrowserAutofill.Configurator
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -32,6 +33,7 @@ class InlineBrowserAutofillConfigurator @Inject constructor(
     private val autofillRuntimeConfigProvider: AutofillRuntimeConfigProvider,
     private val javascriptInjector: JavascriptInjector,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
 ) : Configurator {
     override fun configureAutofillForCurrentPage(
         webView: WebView,
@@ -41,7 +43,7 @@ class InlineBrowserAutofillConfigurator @Inject constructor(
             val rawJs = javascriptInjector.getFunctionsJS()
             val formatted = autofillRuntimeConfigProvider.getRuntimeConfiguration(rawJs, url)
 
-            withContext(Dispatchers.Main) {
+            withContext(dispatchers.main()) {
                 webView.evaluateJavascript("javascript:$formatted", null)
             }
         }

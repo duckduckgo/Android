@@ -23,9 +23,17 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
     implementation project(path: ':common-ui')
+    implementation project(path: ':common')
     implementation Kotlin.stdlib.jdk7
     implementation AndroidX.core.ktx
     implementation KotlinX.coroutines.core
+
+    implementation JakeWharton.timber
+    // Room
+    implementation AndroidX.room.runtime
+
+    // LiveData
+    implementation AndroidX.lifecycle.liveDataKtx
 }
 android {
   namespace 'com.duckduckgo.browser.api'

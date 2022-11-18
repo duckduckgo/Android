@@ -81,7 +81,7 @@
     <string name="previousSearchTermDescription">Najít předchozí</string>
     <string name="closeFindInPageButtonDescription">Zavřít vyhledání v zobrazení stránky</string>
     <string name="findInPageHint">Vyhledávání na stránce</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Upravit dotaz před vyhledáváním</string>
@@ -109,77 +109,7 @@
     <string name="tabClosedUndo">Vrátit</string>
     <string name="downloadsMenuItemTitle">Stahování</string>
 
-    <!-- Privacy Dashboard Activities -->
-    <string name="privacyProtectionToggle">Ochrana osobních údajů na webových stránkách</string>
-    <string name="privacyProtectionEnabled">OCHRANA STRÁNKY ZAPNUTÁ</string>
-    <string name="privacyProtectionDisabled">OCHRANA STRÁNKY VYPNUTA</string>
-    <string name="privacyDashboardActivityTitle">Deska ochrany soukromí</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">VYLEPŠENO Z &lt;img src=\"%1$d\" /&gt; NA &lt;img src=\"%2$d\" /&gt;</string>
-    <string name="privacyGradeContentDescription">Hodnocení ochrany soukromí</string>
-    <string name="privacyProtectionTemporarilyDisabled">Dočasně jsme zakázali ochranu osobních údajů, protože se zdá, že porušuje podmínky této stránky.</string>
-
-    <string name="httpsGood">Šifrované připojení</string>
-    <string name="httpsMixed">Smíšené šifrovací připojení</string>
-    <string name="httpsBad">Nešifrované připojení</string>
-
-    <string name="scorecardActivityTitle">Hodnocení ochrany soukromí</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">Stránky jsou hlavní sledovací sítí</string>
-    <string name="scorecardPrivacyGrade">Hodnocení ochrany soukromí</string>
-    <string name="scorecardEnhancedGrade">Rozšířené hodnocení</string>
-
-    <string name="privacyTermsActivityTitle">Zásady ochrany soukromí</string>
-    <string name="practicesGood">Správné postupy ochrany soukromí</string>
-    <string name="practicesMixed">Smíšené postupy ochrany soukromí</string>
-    <string name="practicesBad">Nesprávné postupy ochrany soukromí</string>
-    <string name="practicesUnknown">Neznámé postupy ochrany soukromí</string>
-    <string name="practicesOverview">Postupy ochrany soukromí ukazují, do jaké míry jsou osobní údaje, které sdílíte s webovými stránkami, chráněny.</string>
-    <string name="practicesTosdrLink">Zásady ochrany osobních údajů z <b><u>ToS;DR</u></b>.</string>
-    <string name="practicesIconContentGood">Ikona správného postupu</string>
-    <string name="practicesIconContentBad">Ikona nesprávného postupu</string>
-
-    <string name="networkTrackerSummaryHeader">NEJČASTĚJŠÍ DELIKVENTI SLEDOVACÍ SÍTĚ</string>
-    <string name="networkTrackerSummaryNotReady">Stále shromažďujeme data, abychom zjistili, kolik sledovacích zařízení jsme zablokovali.</string>
-
-    <string name="trackersActivityTitle">Blokované požadavky na sledování</string>
-    <string name="trackersContentDescription">Blokované požadavky na sledování</string>
-    <string name="trackersOverview">Byly zablokovány následující požadavky domén třetích stran, které byly identifikovány jako požadavky na sledování. Pokud se požadavky služby načtou, může jim to umožnit vytvořit si tvůj profil.</string>
-    <string name="trackersOverviewProtectionsOff">Žádné požadavky na sledování nebyly zablokovány, protože ochrana je pro tento web vypnutá. Pokud se načtou požadavky služby, může jim to umožnit vytvořit si tvůj profil.</string>
-
-    <string name="domainsLoadedActivityTitle">Načteny požadavky třetích stran</string>
-    <string name="domainsLoadedContentDescription">Načteny požadavky třetích stran</string>
-    <string name="domainsLoadedOverview">Načetly se následující požadavky domén třetích stran. Pokud se požadavky služby načtou, může jim to umožnit vytvořit si tvůj profil, i když jsou naše ostatní mechanismy na ochranu proti sledování na webu stále aktivní.</string>
-    <string name="domainsLoadedOverviewProtectionsOff">Nebyly zablokovány žádné požadavky třetích stran, protože pro tento web je vypnutá ochrana. Pokud se načtou požadavky služby, může jim to umožnit vytvořit si tvůj profil.</string>
-    <string name="domainsLoadedOverviewEmpty">Neodhalili jsme žádné požadavky domén třetích stran.</string>
-    <string name="domainsLoadedHeadingText">Nejsou načteny žádné domény třetích stran</string>
-
-    <string name="webTrackingProtectionsText"><annotation type="learn_more_link">O našich mechanismech na ochranu proti sledování na webu</annotation></string>
-    <string name="webTrackingProtectionsUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
-
-    <string name="trackersBlockedNoSectionDescription">Načetly se požadavky následujících domén.</string>
-
-    <string name="adLoadedSectionDescription" instruction="Placeholder is the name of the company who owns the ad">Načetly se následující požadavky domény, protože se nedávno kliknulo na reklamu %1$s na DuckDuckGo. Tyto požadavky pomáhají vyhodnotit účinnost reklamy. Žádná reklama na DuckDuckGo nevytváří tvůj profil.</string>
-    <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Jak naše reklamy ve vyhledávání ovlivňují naši ochranu</annotation></string>
-    <string name="adLoadedSectionUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
-
-    <string name="domainsLoadedSectionDescription">Načetly se také následující požadavky domény.</string>
-    <string name="domainsLoadedSectionSingleSectionDescription">Načetly se následující požadavky domén na sledování.</string>
-    <string name="domainsLoadedSectionEmptyListDescription">Neodhalili jsme žádné požadavky domén třetích stran.</string>
-
-    <string name="domainsLoadedBreakageSectionDescription">Následující požadavky domény byly načteny, aby se zabránilo narušení funkčnosti webové stránky.</string>
-    <string name="domainsLoadedAssociatedSectionDescription" instruction="Placeholder is the name of a company">Následující požadavky domény se načetly, protože souvisí se společností %1$s.</string>
-
-    <string name="trackersBlockedText">Načítání požadavků bylo zablokováno</string>
-    <string name="trackersNotBlockedText">Nejsou blokovány žádné požadavky na sledování</string>
-    <string name="trackersNoFoundText">Nebyly nalezeny žádné požadavky na sledování</string>
-    <string name="trackersFoundText">Byly nalezeny požadavky na sledování</string>
-
-    <string name="domainsLoadedText">Načteny požadavky třetích stran</string>
-    <string name="domainsNotLoadedText">Nebyly načteny žádné požadavky třetích stran</string>
-
-    <string name="majorNetworksNoFound">Nebyla nalezena žádná velká sledovací síť</string>
-    <string name="majorNetworksFound">Zjištěny velké sítě trackerů</string>
-
-    <!-- Fire -->
+   <!-- Fire -->
     <string name="fireMenu">Vymazat data</string>
     <string name="fireClearAll">Vymazat všechny karty a data</string>
     <string name="fireCancel">Zrušit</string>
@@ -267,7 +197,7 @@
     <string name="importBookmarksFileTitle">Vyberte soubor se záložkami, který chcete importovat</string>
     <string name="importBookmarksError">Nepodařilo se importovat žádné záložky, něco se pokazilo</string>
     <string name="importBookmarksEmpty">Soubor nemá žádné záložky k importování</string>
-    <string name="importBookmarksSuccess">Úspěšně importovaných %1$d záložek</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">Úspěšně importovaných %1$d záložek</string>
     <string name="savedSiteDialogTitleHint">Název</string>
     <string name="savedSiteDialogUrlHint">URL adresa</string>
     <string name="savedSiteDialogTitleEdit">Upravit</string>
@@ -661,10 +591,10 @@
     <string name="bookmarkFolderEmpty">Prázdné</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s a %1$d položka?</item>
-        <item quantity="few">%1$s%2$s a %1$d položky?</item>
-        <item quantity="many">%1$s%2$s a %1$d položek?</item>
-        <item quantity="other">%1$s%2$s a %1$d položek?</item>
+        <item quantity="one">%1$s%2$s a %3$d položka?</item>
+        <item quantity="few">%1$s%2$s a %3$d položky?</item>
+        <item quantity="many">%1$s%2$s a %3$d položek?</item>
+        <item quantity="other">%1$s%2$s a %3$d položek?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">

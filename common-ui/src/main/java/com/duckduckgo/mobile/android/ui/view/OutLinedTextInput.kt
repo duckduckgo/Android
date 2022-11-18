@@ -17,6 +17,7 @@
 package com.duckduckgo.mobile.android.ui.view
 
 import android.content.Context
+import android.content.res.TypedArray
 import android.graphics.drawable.Drawable
 import android.os.Parcel
 import android.os.Parcelable
@@ -32,7 +33,10 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.doOnNextLayout
 import androidx.core.view.updateLayoutParams
 import com.duckduckgo.mobile.android.R
+import com.duckduckgo.mobile.android.R.styleable
 import com.duckduckgo.mobile.android.databinding.ViewOutlinedTextInputBinding
+import com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView.Type.INPUT_TYPE_MULTI_LINE
+import com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView.Type.INPUT_TYPE_PASSWORD
 import com.duckduckgo.mobile.android.ui.view.OutlinedTextInput.Action
 import com.duckduckgo.mobile.android.ui.view.OutlinedTextInput.Action.PerformEndAction
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
@@ -81,11 +85,14 @@ class OutLinedTextInputView @JvmOverloads constructor(
             // This needs to be done after we know that the view has the end icon set
             isEditable = getBoolean(R.styleable.OutLinedTextInputView_editable, true)
             binding.internalInputLayout.setHintWithoutAnimation(getString(R.styleable.OutLinedTextInputView_android_hint))
-            isPassword = getBoolean(R.styleable.OutLinedTextInputView_isPassword, false)
+
+            val inputType = getInputType()
+
+            isPassword = inputType == INPUT_TYPE_PASSWORD
             if (isPassword) {
                 setupPasswordMode()
             } else {
-                setupTextMode()
+                setupTextMode(inputType)
             }
 
             binding.internalEditText.onFocusChangeListener = OnFocusChangeListener { _, hasFocus ->
@@ -93,6 +100,7 @@ class OutLinedTextInputView @JvmOverloads constructor(
                     showKeyboard()
                 }
             }
+
             recycle()
         }
     }
@@ -153,9 +161,7 @@ class OutLinedTextInputView @JvmOverloads constructor(
 
     private fun setupPasswordMode() {
         binding.internalPasswordIcon.visibility = VISIBLE
-        binding.internalEditText.inputType = EditorInfo.TYPE_TEXT_VARIATION_PASSWORD or EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE
-        // This has to be set before the transformationMethod. Else, it will force the password to be visible.
-        binding.internalEditText.isSingleLine = false
+        binding.internalEditText.inputType = EditorInfo.TYPE_TEXT_VARIATION_PASSWORD
         binding.internalEditText.transformationMethod = transformationMethod
         // We are using the suffix text to make space for the password icon. We can't modify the suffix textview enough to be able to use it
         // as the password show/hide icon. SuffixTextView seems to be anchored to the top of the TextInputLayout.
@@ -179,9 +185,14 @@ class OutLinedTextInputView @JvmOverloads constructor(
         }
     }
 
-    private fun setupTextMode() {
+    private fun setupTextMode(inputType: Type) {
         binding.internalPasswordIcon.visibility = View.GONE
-        binding.internalEditText.inputType = EditorInfo.TYPE_CLASS_TEXT or EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE
+
+        if (inputType == INPUT_TYPE_MULTI_LINE) {
+            binding.internalEditText.inputType = EditorInfo.TYPE_CLASS_TEXT or EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE
+        } else {
+            binding.internalEditText.inputType = EditorInfo.TYPE_CLASS_TEXT
+        }
     }
 
     override fun onSaveInstanceState(): Parcelable {
@@ -218,6 +229,17 @@ class OutLinedTextInputView @JvmOverloads constructor(
         isHintAnimationEnabled = false
         this.hint = hint
         doOnNextLayout { isHintAnimationEnabled = hintAnimationEnabledSnapshot }
+    }
+
+    private fun TypedArray.getInputType(): Type {
+        val inputTypeInt = getInt(styleable.OutLinedTextInputView_type, INPUT_TYPE_MULTI_LINE.value)
+        return Type.values().firstOrNull { it.value == inputTypeInt } ?: INPUT_TYPE_MULTI_LINE
+    }
+
+    enum class Type(val value: Int) {
+        INPUT_TYPE_MULTI_LINE(0),
+        INPUT_TYPE_SINGLE_LINE(1),
+        INPUT_TYPE_PASSWORD(2),
     }
 
     internal class SavedState : BaseSavedState {

@@ -67,6 +67,22 @@ subprojects {
             }
         }
     }
+
+    String[] allowStringsIn = ["app"]
+    if (!allowStringsIn.contains(project.name)) {
+        project.projectDir.eachDirRecurse { File parent ->
+            if (parent.name == "values") {
+                parent.eachFile(groovy.io.FileType.FILES) { child ->
+                    if (child.name == "strings.xml") {
+                        throw new GradleException("Duplicate strings.xml file found in $project. " +
+                                "Only :app should contain the strings.xml file. " +
+                                "Rename file to strings-<feature>.xml instead.")
+                    }
+                }
+            }
+        }
+    }
+
     def projectPath = path
     configurations.all {
         if (name == "compileClasspath" || name.endsWith("CompileClasspath")) {

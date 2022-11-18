@@ -312,8 +312,8 @@ class BrowserWebViewClient(
     ): WebResourceResponse? {
         return runBlocking {
             try {
-                val documentUrl = withContext(Dispatchers.Main) { webView.url }
-                withContext(Dispatchers.Main) {
+                val documentUrl = withContext(dispatcherProvider.main()) { webView.url }
+                withContext(dispatcherProvider.main()) {
                     loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
                 }
                 Timber.v("Intercepting resource ${request.url} type:${request.method} on page $documentUrl")

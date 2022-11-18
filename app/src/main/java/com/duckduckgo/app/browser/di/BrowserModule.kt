@@ -45,10 +45,10 @@ import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewPersister
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
-import com.duckduckgo.app.browser.useragent.UserAgentInterceptor
 import com.duckduckgo.app.browser.urlextraction.DOMUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.JsUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
+import com.duckduckgo.app.browser.useragent.UserAgentInterceptor
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.*
@@ -77,9 +77,9 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.BrowserAutofill
 import com.duckduckgo.autofill.InternalTestUserChecker
+import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
-import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.impl.AndroidFileDownloader
@@ -87,18 +87,18 @@ import com.duckduckgo.downloads.impl.DataUriDownloader
 import com.duckduckgo.downloads.impl.DownloadFileService
 import com.duckduckgo.downloads.impl.FileDownloadCallback
 import com.duckduckgo.feature.toggles.api.FeatureToggle
-import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.AmpLinks
+import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.privacy.config.api.UserAgent
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
-import kotlinx.coroutines.CoroutineScope
-import retrofit2.Retrofit
 import javax.inject.Named
 import javax.inject.Provider
+import kotlinx.coroutines.CoroutineScope
+import retrofit2.Retrofit
 
 @Module
 class BrowserModule {
@@ -108,7 +108,7 @@ class BrowserModule {
         urlDetector: DuckDuckGoUrlDetector,
         statisticsStore: StatisticsDataStore,
         variantManager: VariantManager,
-        appReferrerDataStore: AppReferrerDataStore
+        appReferrerDataStore: AppReferrerDataStore,
     ): RequestRewriter {
         return DuckDuckGoRequestRewriter(urlDetector, statisticsStore, variantManager, appReferrerDataStore)
     }
@@ -135,7 +135,7 @@ class BrowserModule {
         internalTestUserChecker: InternalTestUserChecker,
         adClickManager: AdClickManager,
         autoconsent: Autoconsent,
-        contentScopeScripts: ContentScopeScripts
+        contentScopeScripts: ContentScopeScripts,
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
             webViewHttpAuthStore,
@@ -158,7 +158,7 @@ class BrowserModule {
             internalTestUserChecker,
             adClickManager,
             autoconsent,
-            contentScopeScripts
+            contentScopeScripts,
         )
     }
 
@@ -172,7 +172,7 @@ class BrowserModule {
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
         urlExtractor: DOMUrlExtractor,
-        contentScopeScripts: ContentScopeScripts
+        contentScopeScripts: ContentScopeScripts,
     ): UrlExtractingWebViewClient {
         return UrlExtractingWebViewClient(
             webViewHttpAuthStore,
@@ -183,14 +183,14 @@ class BrowserModule {
             appCoroutineScope,
             dispatcherProvider,
             urlExtractor,
-            contentScopeScripts
+            contentScopeScripts,
         )
     }
 
     @Provides
     fun webViewLongPressHandler(
         context: Context,
-        pixel: Pixel
+        pixel: Pixel,
     ): LongPressHandler {
         return WebViewLongPressHandler(context, pixel)
     }
@@ -198,7 +198,7 @@ class BrowserModule {
     @Provides
     fun defaultWebBrowserCapability(
         context: Context,
-        appBuildConfig: AppBuildConfig
+        appBuildConfig: AppBuildConfig,
     ): DefaultBrowserDetector {
         return AndroidDefaultBrowserDetector(context, appBuildConfig)
     }
@@ -209,7 +209,7 @@ class BrowserModule {
     fun defaultBrowserObserver(
         defaultBrowserDetector: DefaultBrowserDetector,
         appInstallStore: AppInstallStore,
-        pixel: Pixel
+        pixel: Pixel,
     ): LifecycleObserver {
         return DefaultBrowserObserver(defaultBrowserDetector, appInstallStore, pixel)
     }
@@ -225,7 +225,7 @@ class BrowserModule {
         webViewSessionStorage: WebViewSessionStorage,
         cookieManager: DuckDuckGoCookieManager,
         fileDeleter: FileDeleter,
-        webViewHttpAuthStore: WebViewHttpAuthStore
+        webViewHttpAuthStore: WebViewHttpAuthStore,
     ): WebDataManager =
         WebViewDataManager(context, webViewSessionStorage, cookieManager, fileDeleter, webViewHttpAuthStore)
 
@@ -265,7 +265,7 @@ class BrowserModule {
             userAgent,
             toggle,
             userAllowListRepository,
-            dispatcher
+            dispatcher,
         )
     }
 
@@ -278,7 +278,7 @@ class BrowserModule {
         gpc: Gpc,
         userAgentProvider: UserAgentProvider,
         adClickManager: AdClickManager,
-        cloakedCnameDetector: CloakedCnameDetector
+        cloakedCnameDetector: CloakedCnameDetector,
     ): RequestInterceptor =
         WebViewRequestInterceptor(
             resourceSurrogates,
@@ -288,7 +288,7 @@ class BrowserModule {
             gpc,
             userAgentProvider,
             adClickManager,
-            cloakedCnameDetector
+            cloakedCnameDetector,
         )
 
     @Provides
@@ -313,7 +313,7 @@ class BrowserModule {
     fun webViewPreviewPersister(
         context: Context,
         fileDeleter: FileDeleter,
-        dispatchers: DispatcherProvider
+        dispatchers: DispatcherProvider,
     ): WebViewPreviewPersister {
         return FileBasedWebViewPreviewPersister(context, fileDeleter, dispatchers)
     }
@@ -323,7 +323,7 @@ class BrowserModule {
     fun faviconPersister(
         context: Context,
         fileDeleter: FileDeleter,
-        dispatcherProvider: DispatcherProvider
+        dispatcherProvider: DispatcherProvider,
     ): FaviconPersister {
         return FileBasedFaviconPersister(context, fileDeleter, dispatcherProvider)
     }
@@ -351,14 +351,14 @@ class BrowserModule {
     @Provides
     fun navigationAwareLoginDetector(
         settingsDataStore: SettingsDataStore,
-        @AppCoroutineScope appCoroutineScope: CoroutineScope
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
     ): NavigationAwareLoginDetector {
         return NextPageLoginDetection(settingsDataStore, appCoroutineScope)
     }
 
     @Provides
     fun downloadFileService(@Named("api") retrofit: Retrofit): DownloadFileService = retrofit.create(
-        DownloadFileService::class.java
+        DownloadFileService::class.java,
     )
 
     @Provides
@@ -378,14 +378,14 @@ class BrowserModule {
         pixel: Pixel,
         fireproofWebsiteRepository: FireproofWebsiteRepository,
         appSettingsPreferencesStore: SettingsDataStore,
-        dispatchers: DispatcherProvider
+        dispatchers: DispatcherProvider,
     ): FireproofDialogsEventHandler {
         return BrowserTabFireproofDialogsEventHandler(
             userEventsStore,
             pixel,
             fireproofWebsiteRepository,
             appSettingsPreferencesStore,
-            dispatchers
+            dispatchers,
         )
     }
 
@@ -393,7 +393,7 @@ class BrowserModule {
     @Provides
     fun thirdPartyCookieManager(
         cookieManagerProvider: CookieManagerProvider,
-        authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository
+        authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository,
     ): ThirdPartyCookieManager {
         return AppThirdPartyCookieManager(cookieManagerProvider, authCookiesAllowedDomainsRepository)
     }

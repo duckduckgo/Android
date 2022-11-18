@@ -41,7 +41,6 @@ class AdClickModule {
     fun provideAdClickDatabase(context: Context): AdClickDatabase {
         return Room.databaseBuilder(context, AdClickDatabase::class.java, "adclick.db")
             .addMigrations(*ALL_MIGRATIONS)
-            .enableMultiInstanceInvalidation()
             .fallbackToDestructiveMigration()
             .build()
     }

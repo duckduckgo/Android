@@ -31,7 +31,7 @@ interface VpnStateMonitor {
     data class VpnState(
         val state: VpnRunningState,
         val stopReason: VpnStopReason? = null,
-        val alwaysOnState: AlwaysOnState = DEFAULT
+        val alwaysOnState: AlwaysOnState = DEFAULT,
     )
 
     data class AlwaysOnState(val enabled: Boolean, val lockedDown: Boolean) {
@@ -47,7 +47,7 @@ interface VpnStateMonitor {
     enum class VpnRunningState {
         ENABLED,
         DISABLED,
-        INVALID
+        INVALID,
     }
 
     enum class VpnStopReason {
@@ -55,6 +55,6 @@ interface VpnStateMonitor {
         ERROR,
         REVOKED,
         UNKNOWN,
-        RESTART
+        RESTART,
     }
 }

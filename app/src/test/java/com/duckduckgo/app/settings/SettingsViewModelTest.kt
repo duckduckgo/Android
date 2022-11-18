@@ -40,6 +40,8 @@ import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
+import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.duckduckgo.mobile.android.vpn.waitlist.AppTrackingProtectionWaitlistDataStore
 import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateRepository
@@ -111,6 +113,9 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var autoconsent: Autoconsent
 
+    @Mock
+    private lateinit var appTpFeatureConfig: AppTpFeatureConfig
+
     private lateinit var appTrackingProtectionWaitlistDataStore: FakeAppTrackingProtectionWaitlistDataStore
 
     @get:Rule
@@ -121,8 +126,9 @@ class SettingsViewModelTest {
         MockitoAnnotations.openMocks(this)
 
         appTrackingProtectionWaitlistDataStore = FakeAppTrackingProtectionWaitlistDataStore()
-        appTPRepository = WaitlistStateRepository(appTrackingProtectionWaitlistDataStore)
+        appTPRepository = WaitlistStateRepository(appTrackingProtectionWaitlistDataStore, appTpFeatureConfig)
 
+        whenever(appTpFeatureConfig.isEnabled(AppTpSetting.OpenBeta)).thenReturn(false)
         whenever(mockAppSettingsDataStore.automaticallyClearWhenOption).thenReturn(APP_EXIT_ONLY)
         whenever(mockAppSettingsDataStore.automaticallyClearWhatOption).thenReturn(CLEAR_NONE)
         whenever(mockAppSettingsDataStore.appIcon).thenReturn(AppIcon.DEFAULT)
@@ -691,6 +697,26 @@ class SettingsViewModelTest {
 
         testee.viewState().test {
             assertFalse(awaitItem().autoconsentEnabled)
+        }
+    }
+
+    @Test
+    fun whenAppTPOnboardingNotShownThenViewStateIsCorrect() = runTest {
+        whenever(mockDeviceShieldOnboarding.didShowOnboarding()).thenReturn(false)
+        testee.start()
+
+        testee.viewState().test {
+            assertFalse(awaitItem().appTrackingProtectionOnboardingShown)
+        }
+    }
+
+    @Test
+    fun whenAppTPOnboardingShownThenViewStateIsCorrect() = runTest {
+        whenever(mockDeviceShieldOnboarding.didShowOnboarding()).thenReturn(true)
+        testee.start()
+
+        testee.viewState().test {
+            assertTrue(awaitItem().appTrackingProtectionOnboardingShown)
         }
     }
 

@@ -19,15 +19,15 @@ package com.duckduckgo.app.statistics.pixels
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.statistics.api.PixelSender
 import com.duckduckgo.app.statistics.pixels.RxBasedPixelTest.TestPixels.TEST
+import io.reactivex.Completable
+import java.util.concurrent.TimeoutException
+import org.junit.Rule
+import org.junit.Test
+import org.mockito.Mock
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import io.reactivex.Completable
-import org.junit.Rule
-import org.junit.Test
-import org.mockito.Mock
-import java.util.concurrent.TimeoutException
 
 class RxBasedPixelTest {
 
@@ -117,6 +117,6 @@ class RxBasedPixelTest {
     }
 
     enum class TestPixels(override val pixelName: String, val enqueue: Boolean = false) : Pixel.PixelName {
-        TEST("test")
+        TEST("test"),
     }
 }

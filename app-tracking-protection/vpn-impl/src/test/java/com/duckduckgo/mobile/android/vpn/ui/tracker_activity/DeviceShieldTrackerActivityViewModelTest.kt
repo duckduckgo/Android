@@ -34,6 +34,7 @@ import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.BannerState
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.ViewEvent
 import com.jakewharton.threetenabp.AndroidThreeTen
+import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
@@ -47,7 +48,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
 @ExperimentalCoroutinesApi
@@ -79,14 +79,14 @@ class DeviceShieldTrackerActivityViewModelTest {
             vpnDetector,
             vpnFeatureRemover,
             vpnStore,
-            coroutineRule.testDispatcherProvider
+            coroutineRule.testDispatcherProvider,
         )
     }
 
     @Test
     fun whenGetRunningStateThenReturnRunningState() = runTest {
         whenever(vpnStateMonitor.getStateFlow(AppTpVpnFeature.APPTP_VPN)).thenReturn(
-            flow { emit(VpnStateMonitor.VpnState(VpnStateMonitor.VpnRunningState.ENABLED)) }
+            flow { emit(VpnStateMonitor.VpnState(VpnStateMonitor.VpnRunningState.ENABLED)) },
         )
 
         viewModel.getRunningState().test {
@@ -350,7 +350,7 @@ class DeviceShieldTrackerActivityViewModelTest {
         AndroidThreeTen.init(InstrumentationRegistry.getInstrumentation().targetContext)
         return Room.inMemoryDatabaseBuilder(
             InstrumentationRegistry.getInstrumentation().targetContext,
-            VpnDatabase::class.java
+            VpnDatabase::class.java,
         )
             .allowMainThreadQueries()
             .build()

@@ -29,7 +29,8 @@ import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatter
 
 @Database(
-    exportSchema = true, version = 30,
+    exportSchema = true,
+    version = 30,
     entities = [
         VpnState::class,
         VpnTracker::class,
@@ -49,7 +50,7 @@ import org.threeten.bp.format.DateTimeFormatter
         AppTrackerSystemAppOverrideListMetadata::class,
         AppTrackerEntity::class,
         VpnFeatureRemoverState::class,
-    ]
+    ],
 )
 
 @TypeConverters(VpnTypeConverters::class)
@@ -70,11 +71,11 @@ abstract class VpnDatabase : RoomDatabase() {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL(
                     "CREATE TABLE IF NOT EXISTS `vpn_app_tracker_system_app_override_list`" +
-                        " (`packageId` TEXT NOT NULL, PRIMARY KEY (`packageId`))"
+                        " (`packageId` TEXT NOT NULL, PRIMARY KEY (`packageId`))",
                 )
                 database.execSQL(
                     "CREATE TABLE IF NOT EXISTS `vpn_app_tracker_system_app_override_list_metadata`" +
-                        " (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `eTag` TEXT)"
+                        " (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `eTag` TEXT)",
                 )
             }
         }
@@ -84,7 +85,7 @@ abstract class VpnDatabase : RoomDatabase() {
                 database.execSQL(
                     "CREATE TABLE IF NOT EXISTS `vpn_app_tracker_entities`" +
                         " (`trackerCompanyId` INTEGER PRIMARY KEY NOT NULL, `entityName` TEXT NOT NULL, " +
-                        "`score` INTEGER NOT NULL, `signals` TEXT NOT NULL)"
+                        "`score` INTEGER NOT NULL, `signals` TEXT NOT NULL)",
                 )
             }
         }
@@ -100,7 +101,7 @@ abstract class VpnDatabase : RoomDatabase() {
                 database.execSQL(
                     "CREATE TABLE IF NOT EXISTS `vpn_feature_remover`" +
                         " (`id` INTEGER PRIMARY KEY NOT NULL, " +
-                        "`isFeatureRemoved` INTEGER NOT NULL)"
+                        "`isFeatureRemoved` INTEGER NOT NULL)",
                 )
             }
         }
@@ -110,7 +111,7 @@ abstract class VpnDatabase : RoomDatabase() {
                 database.execSQL(
                     "CREATE TABLE IF NOT EXISTS `vpn_prefs`" +
                         " (`preference` TEXT PRIMARY KEY NOT NULL, " +
-                        "`value` INTEGER NOT NULL)"
+                        "`value` INTEGER NOT NULL)",
                 )
             }
         }
@@ -126,7 +127,7 @@ abstract class VpnDatabase : RoomDatabase() {
                 database.execSQL(
                     "CREATE TABLE IF NOT EXISTS `vpn_address_lookup`" +
                         " (`address` TEXT PRIMARY KEY NOT NULL, " +
-                        "`domain` TEXT NOT NULL)"
+                        "`domain` TEXT NOT NULL)",
                 )
             }
         }
@@ -157,7 +158,7 @@ abstract class VpnDatabase : RoomDatabase() {
                     "CREATE TABLE IF NOT EXISTS `vpn_tracker`" +
                         "(trackerCompanyId INTEGER NOT NULL, domain TEXT NOT NULL, company TEXT NOT NULL," +
                         "companyDisplayName TEXT NOT NULL, packageId TEXT NOT NULL, appDisplayName TEXT NOT NULL," +
-                        "timestamp TEXT NOT NULL, bucket TEXT NOT NULL, count INTEGER NOT NULL, PRIMARY KEY(bucket, domain, packageId))"
+                        "timestamp TEXT NOT NULL, bucket TEXT NOT NULL, count INTEGER NOT NULL, PRIMARY KEY(bucket, domain, packageId))",
                 )
 
                 database.execSQL("CREATE INDEX IF NOT EXISTS `index_vpn_tracker_bucket` ON `vpn_tracker` (`bucket`)")

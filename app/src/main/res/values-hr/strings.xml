@@ -81,7 +81,7 @@
     <string name="previousSearchTermDescription">Pronađi prethodno</string>
     <string name="closeFindInPageButtonDescription">Zatvori prikaz „Pronađi na stranici”</string>
     <string name="findInPageHint">Pronađi na stranici</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Uredi upit prije pretraživanja</string>
@@ -108,76 +108,6 @@
     <string name="tabClosed">Kartica je zatvorena</string>
     <string name="tabClosedUndo">Poništi</string>
     <string name="downloadsMenuItemTitle">Preuzimanja</string>
-
-    <!-- Privacy Dashboard Activities -->
-    <string name="privacyProtectionToggle">Zaštita privatnosti web-mjesta</string>
-    <string name="privacyProtectionEnabled">ZAŠTITA WEB-MJESTA UKLJUČENA JE</string>
-    <string name="privacyProtectionDisabled">ZAŠTITA WEB-MJESTA ISKLJUČENA JE</string>
-    <string name="privacyDashboardActivityTitle">Nadzorna ploča zaštite privatnosti</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">POBOLJŠANO IZ &lt;img src=\"%1$d\" /&gt; U &lt;img src=\"%2$d\" /&gt;</string>
-    <string name="privacyGradeContentDescription">Ocjena zaštite privatnosti</string>
-    <string name="privacyProtectionTemporarilyDisabled">Privremeno smo onemogućili zaštitu privatnosti jer se čini da narušava ovo web-mjesto.</string>
-
-    <string name="httpsGood">Šifrirana veza</string>
-    <string name="httpsMixed">Veza s miješanim šifriranjem</string>
-    <string name="httpsBad">Nešifrirana veza</string>
-
-    <string name="scorecardActivityTitle">Ocjena zaštite privatnosti</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">Web-mjesto glavna je mreža za praćenje</string>
-    <string name="scorecardPrivacyGrade">Ocjena zaštite privatnosti</string>
-    <string name="scorecardEnhancedGrade">Poboljšana ocjena</string>
-
-    <string name="privacyTermsActivityTitle">Prakse zaštite privatnosti</string>
-    <string name="practicesGood">Dobre prakse zaštite privatnosti</string>
-    <string name="practicesMixed">Mješovite prakse zaštite privatnosti</string>
-    <string name="practicesBad">Loše prakse zaštite privatnosti</string>
-    <string name="practicesUnknown">Nepoznata praksa zaštite privatnosti</string>
-    <string name="practicesOverview">Prakse zaštite privatnosti pokazuju koliko su zaštićeni osobni podaci koje dijelite s web-mjestom.</string>
-    <string name="practicesTosdrLink">Praksa zaštite privatnosti iz<b><u>ToS;DR</u></b>.</string>
-    <string name="practicesIconContentGood">Ikona za dobru praksu</string>
-    <string name="practicesIconContentBad">Ikona za lošu praksu</string>
-
-    <string name="networkTrackerSummaryHeader">NAJČEŠĆI MREŽNI TRAGAČI</string>
-    <string name="networkTrackerSummaryNotReady">Još uvijek prikupljamo podatke kako bismo pokazali koliko smo alata za praćenje blokirali.</string>
-
-    <string name="trackersActivityTitle">Zahtjevi za praćenje blokirani su</string>
-    <string name="trackersContentDescription">Zahtjevi za praćenje blokirani su</string>
-    <string name="trackersOverview">Sljedećim zahtjevima domena trećih strana blokirano je učitavanje jer su identificirani kao zahtjevi za praćenje. Ako su zahtjevi tvrtke učitani, to im može omogućiti da te profiliraju.</string>
-    <string name="trackersOverviewProtectionsOff">Učitavanje zahtjeva za praćenje nije blokirano jer su zaštite isključene za ovu stranicu. Ako su zahtjevi tvrtke učitani, to im može omogućiti da te profiliraju.</string>
-
-    <string name="domainsLoadedActivityTitle">Učitani su zahtjevi trećih strana</string>
-    <string name="domainsLoadedContentDescription">Učitani su zahtjevi trećih strana</string>
-    <string name="domainsLoadedOverview">Učitani su sljedeći zahtjevi domena trećih strana. Ako su zahtjevi tvrtke učitani, to im može omogućiti da te profiliraju, iako se i dalje primjenjuju naše druge zaštite web praćenja.</string>
-    <string name="domainsLoadedOverviewProtectionsOff">Učitavanje zahtjeva trećih strana nije blokirano jer su zaštite isključene za ovu web-lokaciju. Ako su zahtjevi tvrtke učitani, to im može omogućiti da te profiliraju.</string>
-    <string name="domainsLoadedOverviewEmpty">Nismo otkrili zahtjeve s domena trećih strana.</string>
-    <string name="domainsLoadedHeadingText">Nema učitanih domena trećih strana</string>
-
-    <string name="webTrackingProtectionsText"><annotation type="learn_more_link">O našoj zaštiti od praćenja na internetu</annotation></string>
-    <string name="webTrackingProtectionsUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
-
-    <string name="trackersBlockedNoSectionDescription">Učitani su zahtjevi sljedećih domena.</string>
-
-    <string name="adLoadedSectionDescription" instruction="Placeholder is the name of the company who owns the ad">Sljedeći zahtjevi domene učitani su jer je nedavno kliknuto na %1$s oglas na DuckDuckGou. Ovi zahtjevi pomažu u procjeni učinkovitosti oglasa. Svi su oglasi na DuckDuckGou neprofilirajući.</string>
-    <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Kako naši pretraživački oglasi utječu na našu zaštitu</annotation></string>
-    <string name="adLoadedSectionUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
-
-    <string name="domainsLoadedSectionDescription">Učitani su i sljedeći zahtjevi domene.</string>
-    <string name="domainsLoadedSectionSingleSectionDescription">Učitani su zahtjevi za praćenje sljedećih domena.</string>
-    <string name="domainsLoadedSectionEmptyListDescription">Nismo otkrili zahtjeve s domena trećih strana.</string>
-
-    <string name="domainsLoadedBreakageSectionDescription">Sljedeći zahtjevi domene učitani su kako bi se spriječili problemi s web-lokacijom.</string>
-    <string name="domainsLoadedAssociatedSectionDescription" instruction="Placeholder is the name of a company">Zahtjevi sljedeće domene učitani su jer su povezani s tvrtkom [%1$s].</string>
-
-    <string name="trackersBlockedText">Zahtjevi su blokirani za učitavanje</string>
-    <string name="trackersNotBlockedText">Nema blokiranih zahtjeva za praćenje</string>
-    <string name="trackersNoFoundText">Nije pronađen nijedan zahtjev za praćenje</string>
-    <string name="trackersFoundText">Pronađeni su zahtjevi za praćenjem</string>
-
-    <string name="domainsLoadedText">Učitani su zahtjevi trećih strana</string>
-    <string name="domainsNotLoadedText">Nema učitanih zahtjeva trećih strana</string>
-
-    <string name="majorNetworksNoFound">Nije pronađena nijedna veća mreža za praćenje</string>
-    <string name="majorNetworksFound">Pronađene su veće mreže za praćenje</string>
 
     <!-- Fire -->
     <string name="fireMenu">Obriši podatke</string>
@@ -267,7 +197,7 @@
     <string name="importBookmarksFileTitle">Odaberite datoteku knjižne oznake za uvoz</string>
     <string name="importBookmarksError">Nije moguće uvesti nijednu knjižnu oznaku, došlo je do pogreške</string>
     <string name="importBookmarksEmpty">Datoteka nema knjižnih oznaka za uvoz</string>
-    <string name="importBookmarksSuccess">Uspješno uvezene knjižne oznake (njih %1$d)</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">Uspješno uvezene knjižne oznake (njih %1$d)</string>
     <string name="savedSiteDialogTitleHint">Naslov</string>
     <string name="savedSiteDialogUrlHint">URL</string>
     <string name="savedSiteDialogTitleEdit">Uredi</string>
@@ -661,10 +591,10 @@
     <string name="bookmarkFolderEmpty">Prazno</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s i %1$d stavka?</item>
-        <item quantity="few">%1$s%2$s i %1$d stavke?</item>
-        <item quantity="many">%1$s%2$s i %1$d stavki?</item>
-        <item quantity="other">%1$s%2$s i %1$d stavki?</item>
+        <item quantity="one">%1$s%2$s i %3$d stavka?</item>
+        <item quantity="few">%1$s%2$s i %3$d stavke?</item>
+        <item quantity="many">%1$s%2$s i %3$d stavki?</item>
+        <item quantity="other">%1$s%2$s i %3$d stavki?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">

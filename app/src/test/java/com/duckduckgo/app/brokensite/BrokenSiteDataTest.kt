@@ -22,8 +22,8 @@ import com.duckduckgo.app.global.model.SiteMonitor
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
-import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.trackerdetection.model.TrackerType
+import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import kotlinx.coroutines.test.TestScope
@@ -101,7 +101,7 @@ class BrokenSiteDataTest {
             entity = null,
             surrogateId = null,
             status = TrackerStatus.BLOCKED,
-            type = TrackerType.OTHER
+            type = TrackerType.OTHER,
         )
         val anotherEvent = TrackingEvent(
             documentUrl = "http://www.example.com/test",
@@ -110,7 +110,7 @@ class BrokenSiteDataTest {
             entity = null,
             surrogateId = null,
             status = TrackerStatus.ALLOWED,
-            type = TrackerType.OTHER
+            type = TrackerType.OTHER,
         )
         site.trackerDetected(event)
         site.trackerDetected(anotherEvent)
@@ -127,7 +127,7 @@ class BrokenSiteDataTest {
             entity = null,
             surrogateId = null,
             status = TrackerStatus.BLOCKED,
-            type = TrackerType.OTHER
+            type = TrackerType.OTHER,
         )
         val anotherEvent = TrackingEvent(
             documentUrl = "http://www.example.com/test",
@@ -136,7 +136,7 @@ class BrokenSiteDataTest {
             entity = null,
             surrogateId = null,
             status = TrackerStatus.BLOCKED,
-            type = TrackerType.OTHER
+            type = TrackerType.OTHER,
         )
         site.trackerDetected(event)
         site.trackerDetected(anotherEvent)
@@ -153,7 +153,7 @@ class BrokenSiteDataTest {
             entity = null,
             surrogateId = null,
             status = TrackerStatus.BLOCKED,
-            type = TrackerType.OTHER
+            type = TrackerType.OTHER,
         )
         site.trackerDetected(event)
         assertEquals(".tracker.com", BrokenSiteData.fromSite(site).blockedTrackers)
@@ -188,7 +188,7 @@ class BrokenSiteDataTest {
 
     private fun buildSite(
         url: String,
-        httpsUpgraded: Boolean = false
+        httpsUpgraded: Boolean = false,
     ): Site {
         return SiteMonitor(url, "", upgradedHttps = httpsUpgraded, mockWhitelistDao, mockContentBlocking, TestScope())
     }

@@ -67,6 +67,7 @@ report
 # Ignore everything in node_modules except
 # - autofill: dist, license and readme
 # - config-scope-scripts: contentScope.js, license and readme
+# - privacy-dashboard: js files from build
 # Info on the weird syntax here: https://stackoverflow.com/a/54870120/1948947
 !/node_modules/
 /node_modules/*
@@ -80,6 +81,12 @@ report
 !/node_modules/@duckduckgo/autofill/dist/
 /node_modules/@duckduckgo/autofill/dist/*
 !/node_modules/@duckduckgo/autofill/dist/*
+
+!/node_modules/@duckduckgo/privacy-dashboard/
+/node_modules/@duckduckgo/privacy-dashboard/*
+!/node_modules/@duckduckgo/privacy-dashboard/build/
+/node_modules/@duckduckgo/privacy-dashboard/build/*
+!/node_modules/@duckduckgo/privacy-dashboard/build/app
 
 !/node_modules/@duckduckgo/content-scope-scripts/
 /node_modules/@duckduckgo/content-scope-scripts/*

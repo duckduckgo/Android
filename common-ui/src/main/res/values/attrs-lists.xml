@@ -26,6 +26,7 @@
 
     <attr name="primaryText" format="string"/>
     <attr name="primaryTextColorOverlay" format="color"/>
+    <attr name="primaryTextTruncated" format="boolean"/>
     <attr name="secondaryText" format="string"/>
     <attr name="secondaryTextColorOverlay" format="color"/>
     <attr name="leadingIcon" format="integer"/>
@@ -41,11 +42,19 @@
         <enum name="rounded" value="2" />
     </attr>
     <attr name="textColorOverride" format="color"/>
+    <attr name="showOverflowMenu" format="boolean"/>
+
+    <!--Section Header Item view-->
+    <declare-styleable name="SectionHeaderListItem">
+        <attr name="primaryText"/>
+        <attr name="showOverflowMenu"/>
+    </declare-styleable>
 
     <!--One Line Item view-->
     <declare-styleable name="OneLineListItem">
         <attr name="primaryText"/>
         <attr name="primaryTextColorOverlay"/>
+        <attr name="primaryTextTruncated"/>
         <attr name="leadingIcon"/>
         <attr name="leadingIconBackground"/>
         <attr name="trailingIcon"/>
@@ -56,6 +65,7 @@
     <declare-styleable name="TwoLineListItem">
         <attr name="primaryText"/>
         <attr name="primaryTextColorOverlay"/>
+        <attr name="primaryTextTruncated"/>
         <attr name="secondaryText"/>
         <attr name="secondaryTextColorOverlay"/>
         <attr name="leadingIcon"/>

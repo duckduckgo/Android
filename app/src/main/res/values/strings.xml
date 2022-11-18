@@ -80,7 +80,7 @@
     <string name="previousSearchTermDescription">Find previous</string>
     <string name="closeFindInPageButtonDescription">Close find in page view</string>
     <string name="findInPageHint">Find in page</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Edit query before searching</string>
@@ -107,76 +107,6 @@
     <string name="tabClosed">Tab closed</string>
     <string name="tabClosedUndo">Undo</string>
     <string name="downloadsMenuItemTitle">Downloads</string>
-
-    <!-- Privacy Dashboard Activities -->
-    <string name="privacyProtectionToggle">Site Privacy Protection</string>
-    <string name="privacyProtectionEnabled">SITE PROTECTION ENABLED</string>
-    <string name="privacyProtectionDisabled">SITE PROTECTION DISABLED</string>
-    <string name="privacyDashboardActivityTitle">Privacy Dashboard</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">ENHANCED FROM &lt;img src="%d" /> TO &lt;img src="%d" /></string>
-    <string name="privacyGradeContentDescription">Privacy Grade</string>
-    <string name="privacyProtectionTemporarilyDisabled">We temporarily disabled Privacy Protection as it appears to be breaking this site.</string>
-
-    <string name="httpsGood">Encrypted Connection</string>
-    <string name="httpsMixed">Mixed Encryption Connection</string>
-    <string name="httpsBad">Unencrypted Connection</string>
-
-    <string name="scorecardActivityTitle">Privacy Grade</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">Site Is a Major Tracker Network</string>
-    <string name="scorecardPrivacyGrade">Privacy Grade</string>
-    <string name="scorecardEnhancedGrade">Enhanced Grade</string>
-
-    <string name="privacyTermsActivityTitle">Privacy Practices</string>
-    <string name="practicesGood">Good Privacy Practices</string>
-    <string name="practicesMixed">Mixed Privacy Practices</string>
-    <string name="practicesBad">Poor Privacy Practices</string>
-    <string name="practicesUnknown">Unknown Privacy Practices</string>
-    <string name="practicesOverview">Privacy practices indicate how much the personal information that you share with a website is protected.</string>
-    <string name="practicesTosdrLink">Privacy Practices from<b><u>ToS;DR</u></b>.</string>
-    <string name="practicesIconContentGood">Good Practice Icon</string>
-    <string name="practicesIconContentBad">Bad Practice Icon</string>
-
-    <string name="networkTrackerSummaryHeader">TRACKER NETWORK TOP OFFENDERS</string>
-    <string name="networkTrackerSummaryNotReady">We\'re still collecting data to show how many trackers we\'ve blocked.</string>
-
-    <string name="trackersActivityTitle">Tracking Requests Blocked</string>
-    <string name="trackersContentDescription">Tracking Requests Blocked</string>
-    <string name="trackersOverview">The following third-party domains\' requests were blocked from loading because they were identified as tracking requests. If a company\'s requests are loaded, it can allow them to profile you.</string>
-    <string name="trackersOverviewProtectionsOff">No tracking requests were blocked from loading because Protections are turned off for this site. If a company\'s requests are loaded, it can allow them to profile you.</string>
-
-    <string name="domainsLoadedActivityTitle">Third-Party Requests Loaded</string>
-    <string name="domainsLoadedContentDescription">Third-Party Requests Loaded</string>
-    <string name="domainsLoadedOverview">The following third-party domains\' requests were loaded. If a company\'s requests are loaded, it can allow them to profile you, though our other web tracking protections still apply.</string>
-    <string name="domainsLoadedOverviewProtectionsOff">No third-party requests were blocked from loading because Protections are turned off for this site. If a company\'s requests are loaded, it can allow them to profile you.</string>
-    <string name="domainsLoadedOverviewEmpty">We did not detect requests from any third-party domains.</string>
-    <string name="domainsLoadedHeadingText">No third-party domains loaded</string>
-
-    <string name="webTrackingProtectionsText"><annotation type="learn_more_link">About our Web Tracking Protections</annotation></string>
-    <string name="webTrackingProtectionsUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
-
-    <string name="trackersBlockedNoSectionDescription">The following domains\' requests were loaded.</string>
-
-    <string name="adLoadedSectionDescription" instruction="Placeholder is the name of the company who owns the ad">The following domain\'s requests were loaded because a %1$s ad on DuckDuckGo was recently clicked. These requests help evaluate ad effectiveness. All ads on DuckDuckGo are non-profiling.</string>
-    <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">How our search ads impact our protections</annotation></string>
-    <string name="adLoadedSectionUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
-
-    <string name="domainsLoadedSectionDescription">The following domain\'s requests were also loaded.</string>
-    <string name="domainsLoadedSectionSingleSectionDescription">The following domains\' tracking requests were loaded.</string>
-    <string name="domainsLoadedSectionEmptyListDescription">We did not detect requests from any third-party domains.</string>
-
-    <string name="domainsLoadedBreakageSectionDescription">The following domain\'s requests were loaded to prevent site breakage.</string>
-    <string name="domainsLoadedAssociatedSectionDescription" instruction="Placeholder is the name of a company">The following domain\'s requests were loaded because they\'re associated with %1$s.</string>
-
-    <string name="trackersBlockedText">Requests Blocked from Loading</string>
-    <string name="trackersNotBlockedText">No Tracking Requests Blocked</string>
-    <string name="trackersNoFoundText">No Tracking Requests Found</string>
-    <string name="trackersFoundText">Tracking Requests Found</string>
-
-    <string name="domainsLoadedText">Third-Party Requests Loaded</string>
-    <string name="domainsNotLoadedText">No Third-Party Requests Loaded</string>
-
-    <string name="majorNetworksNoFound">No Major Tracker Networks Found</string>
-    <string name="majorNetworksFound">Major Tracker Networks Found</string>
 
     <!-- Fire -->
     <string name="fireMenu">Clear Data</string>
@@ -268,7 +198,7 @@
     <string name="importBookmarksFileTitle">Select a bookmark file to import</string>
     <string name="importBookmarksError">Couldn\'t import any bookmarks, something went wrong</string>
     <string name="importBookmarksEmpty">The file has no bookmarks to import</string>
-    <string name="importBookmarksSuccess">Successfully imported %1$d bookmarks</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">Successfully imported %1$d bookmarks</string>
     <string name="savedSiteDialogTitleHint">Title</string>
     <string name="savedSiteDialogUrlHint">URL</string>
     <string name="savedSiteDialogTitleEdit">Edit</string>
@@ -658,8 +588,8 @@
     <string name="bookmarkFolderEmpty">Empty</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s%2$s and %1$d item?</item>
-        <item quantity="other" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s%2$s and %1$d items?</item>
+        <item quantity="one" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s%2$s and %3$d item?</item>
+        <item quantity="other" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s%2$s and %3$d items?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">

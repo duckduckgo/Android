@@ -21,9 +21,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.duckduckgo.app.global.extensions.safeGetApplicationIcon
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.apps.ui.safeGetApplicationIcon
 import com.duckduckgo.mobile.android.vpn.ui.notification.applyBoldSpanTo
 import kotlinx.android.synthetic.main.view_device_shield_report_app_breakage_entry.view.*
 
