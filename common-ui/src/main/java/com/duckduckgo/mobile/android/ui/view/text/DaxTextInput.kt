@@ -33,11 +33,10 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.doOnNextLayout
 import androidx.core.view.updateLayoutParams
 import com.duckduckgo.mobile.android.R
-import com.duckduckgo.mobile.android.R.styleable
-import com.duckduckgo.mobile.android.databinding.ViewTextInputBinding
+import com.duckduckgo.mobile.android.databinding.ViewDaxTextInputBinding
 import com.duckduckgo.mobile.android.ui.view.showKeyboard
-import com.duckduckgo.mobile.android.ui.view.text.TextInputView.Type.INPUT_TYPE_MULTI_LINE
-import com.duckduckgo.mobile.android.ui.view.text.TextInputView.Type.INPUT_TYPE_PASSWORD
+import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput.Type.INPUT_TYPE_MULTI_LINE
+import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput.Type.INPUT_TYPE_PASSWORD
 import com.duckduckgo.mobile.android.ui.view.text.OutlinedTextInput.Action
 import com.duckduckgo.mobile.android.ui.view.text.OutlinedTextInput.Action.PerformEndAction
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
@@ -59,12 +58,12 @@ interface OutlinedTextInput {
     }
 }
 
-class TextInputView @JvmOverloads constructor(
+class DaxTextInput @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr), OutlinedTextInput {
-    private val binding: ViewTextInputBinding by viewBinding()
+    private val binding: ViewDaxTextInputBinding by viewBinding()
     private val transformationMethod by lazy {
         PasswordTransformationMethod.getInstance()
     }
@@ -74,18 +73,18 @@ class TextInputView @JvmOverloads constructor(
     init {
         context.obtainStyledAttributes(
             attrs,
-            R.styleable.TextInputView,
+            R.styleable.DaxTextInput,
             0,
             com.google.android.material.R.style.Widget_MaterialComponents_TextInputEditText_OutlinedBox
         ).apply {
-            text = getString(R.styleable.TextInputView_android_text) ?: ""
-            getDrawable(R.styleable.TextInputView_endIcon)?.let {
-                setupEndIcon(it, getString(R.styleable.TextInputView_endIconContentDescription) ?: "")
+            text = getString(R.styleable.DaxTextInput_android_text).orEmpty()
+            getDrawable(R.styleable.DaxTextInput_endIcon)?.let {
+                setupEndIcon(it, getString(R.styleable.DaxTextInput_endIconContentDescription).orEmpty())
             }
 
             // This needs to be done after we know that the view has the end icon set
-            isEditable = getBoolean(R.styleable.TextInputView_editable, true)
-            binding.internalInputLayout.setHintWithoutAnimation(getString(R.styleable.TextInputView_android_hint))
+            isEditable = getBoolean(R.styleable.DaxTextInput_editable, true)
+            binding.internalInputLayout.setHintWithoutAnimation(getString(R.styleable.DaxTextInput_android_hint))
 
             val inputType = getInputType()
 
@@ -235,7 +234,7 @@ class TextInputView @JvmOverloads constructor(
     }
 
     private fun TypedArray.getInputType(): Type {
-        val inputTypeInt = getInt(styleable.TextInputView_type, INPUT_TYPE_MULTI_LINE.value)
+        val inputTypeInt = getInt(R.styleable.DaxTextInput_type, INPUT_TYPE_MULTI_LINE.value)
         return Type.values().firstOrNull { it.value == inputTypeInt } ?: INPUT_TYPE_MULTI_LINE
     }
 
