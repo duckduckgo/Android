@@ -592,7 +592,8 @@ class BrowserTabFragment :
                     updateOrDeleteWebViewPreview()
                 }
             }
-        },)
+        },
+        )
 
         childFragmentManager.findFragmentByTag(ADD_SAVED_SITE_FRAGMENT_TAG)?.let { dialog ->
             (dialog as EditSavedSiteDialogFragment).listener = viewModel
@@ -1204,7 +1205,8 @@ class BrowserTabFragment :
                 ) {
                     super.onDismissed(transientBottomBar, event)
                 }
-            },)
+            },
+            )
 
             appLinksSnackBar?.setDuration(6000)?.show()
         }

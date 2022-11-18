@@ -66,7 +66,8 @@ class DialogsFragment : Fragment() {
                         override fun onNegativeButtonClicked() {
                             Snackbar.make(it, "Negative Button Clicked", Snackbar.LENGTH_SHORT).show()
                         }
-                    },)
+                    },
+                    )
                     .show()
             }
         }
@@ -83,7 +84,8 @@ class DialogsFragment : Fragment() {
                         override fun onRadioItemSelected(selectedItem: Int) {
                             Snackbar.make(it, "Radio Button $selectedItem selected", Snackbar.LENGTH_SHORT).show()
                         }
-                    },)
+                    },
+                    )
                     .show()
             }
         }
@@ -102,7 +104,8 @@ class DialogsFragment : Fragment() {
                         override fun onNegativeButtonClicked() {
                             Snackbar.make(it, "Negative Button Clicked", Snackbar.LENGTH_SHORT).show()
                         }
-                    },)
+                    },
+                    )
                     .show()
             }
         }
@@ -123,7 +126,8 @@ class DialogsFragment : Fragment() {
                         override fun onButtonClicked(position: Int) {
                             Snackbar.make(it, "Button $position Clicked", Snackbar.LENGTH_SHORT).show()
                         }
-                    },)
+                    },
+                    )
                     .show()
             }
 
@@ -144,7 +148,8 @@ class DialogsFragment : Fragment() {
                             override fun onButtonClicked(position: Int) {
                                 Snackbar.make(it, "Button $position Clicked", Snackbar.LENGTH_SHORT).show()
                             }
-                        },)
+                        },
+                        )
                         .show()
                 }
 
@@ -160,7 +165,8 @@ class DialogsFragment : Fragment() {
                                 override fun onSecondaryItemClicked() {
                                     Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
                                 }
-                            },)
+                            },
+                            )
                             .show()
                     }
                 }
@@ -178,7 +184,8 @@ class DialogsFragment : Fragment() {
                                 override fun onSecondaryItemClicked() {
                                     Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
                                 }
-                            },)
+                            },
+                            )
                             .show()
                     }
                 }
@@ -198,7 +205,8 @@ class DialogsFragment : Fragment() {
                                     super.onSecondaryButtonClicked()
                                     Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
                                 }
-                            },)
+                            },
+                            )
                             .show()
                     }
                 }
@@ -219,7 +227,8 @@ class DialogsFragment : Fragment() {
                                     super.onSecondaryButtonClicked()
                                     Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
                                 }
-                            },)
+                            },
+                            )
                             .show()
                     }
                 }
@@ -241,7 +250,8 @@ class DialogsFragment : Fragment() {
                                     super.onSecondaryButtonClicked()
                                     Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
                                 }
-                            },)
+                            },
+                            )
                             .show()
                     }
                 }

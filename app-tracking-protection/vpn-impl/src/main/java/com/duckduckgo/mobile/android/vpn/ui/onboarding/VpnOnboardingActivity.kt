@@ -80,7 +80,8 @@ class VpnOnboardingActivity : DuckDuckGoActivity(), AppTPVpnConflictDialog.Liste
                 showOnboardingPage(position)
                 super.onPageSelected(position)
             }
-        },)
+        },
+        )
 
         binding.onboardingClose.setOnClickListener {
             close()

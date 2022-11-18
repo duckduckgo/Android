@@ -576,7 +576,8 @@ class DeviceShieldTrackerActivity :
             override fun onDaxDialogHideClick() {
                 // NO OP
             }
-        },)
+        },
+        )
 
         dialog.show(supportFragmentManager, TAG_APPTP_ENABLED_CTA_DIALOG)
     }
