@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.ui.view
+package com.duckduckgo.mobile.android.ui.view.text
 
 import android.content.Context
 import android.content.res.TypedArray
@@ -33,18 +33,18 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.doOnNextLayout
 import androidx.core.view.updateLayoutParams
 import com.duckduckgo.mobile.android.R
-import com.duckduckgo.mobile.android.R.styleable
-import com.duckduckgo.mobile.android.databinding.ViewOutlinedTextInputBinding
-import com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView.Type.INPUT_TYPE_MULTI_LINE
-import com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView.Type.INPUT_TYPE_PASSWORD
-import com.duckduckgo.mobile.android.ui.view.OutlinedTextInput.Action
-import com.duckduckgo.mobile.android.ui.view.OutlinedTextInput.Action.PerformEndAction
+import com.duckduckgo.mobile.android.databinding.ViewDaxTextInputBinding
+import com.duckduckgo.mobile.android.ui.view.showKeyboard
+import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput.Type.INPUT_TYPE_MULTI_LINE
+import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput.Type.INPUT_TYPE_PASSWORD
+import com.duckduckgo.mobile.android.ui.view.text.TextInput.Action
+import com.duckduckgo.mobile.android.ui.view.text.TextInput.Action.PerformEndAction
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.textfield.TextInputLayout.END_ICON_CUSTOM
 import com.google.android.material.textfield.TextInputLayout.END_ICON_NONE
 
-interface OutlinedTextInput {
+interface TextInput {
     var text: String
     var isEditable: Boolean
 
@@ -58,12 +58,12 @@ interface OutlinedTextInput {
     }
 }
 
-class OutLinedTextInputView @JvmOverloads constructor(
+class DaxTextInput @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : ConstraintLayout(context, attrs, defStyleAttr), OutlinedTextInput {
-    private val binding: ViewOutlinedTextInputBinding by viewBinding()
+) : ConstraintLayout(context, attrs, defStyleAttr), TextInput {
+    private val binding: ViewDaxTextInputBinding by viewBinding()
     private val transformationMethod by lazy {
         PasswordTransformationMethod.getInstance()
     }
@@ -73,18 +73,18 @@ class OutLinedTextInputView @JvmOverloads constructor(
     init {
         context.obtainStyledAttributes(
             attrs,
-            R.styleable.OutLinedTextInputView,
+            R.styleable.DaxTextInput,
             0,
             com.google.android.material.R.style.Widget_MaterialComponents_TextInputEditText_OutlinedBox,
         ).apply {
-            text = getString(R.styleable.OutLinedTextInputView_android_text) ?: ""
-            getDrawable(R.styleable.OutLinedTextInputView_endIcon)?.let {
-                setupEndIcon(it, getString(R.styleable.OutLinedTextInputView_endIconContentDescription) ?: "")
+            text = getString(R.styleable.DaxTextInput_android_text).orEmpty()
+            getDrawable(R.styleable.DaxTextInput_endIcon)?.let {
+                setupEndIcon(it, getString(R.styleable.DaxTextInput_endIconContentDescription).orEmpty())
             }
 
             // This needs to be done after we know that the view has the end icon set
-            isEditable = getBoolean(R.styleable.OutLinedTextInputView_editable, true)
-            binding.internalInputLayout.setHintWithoutAnimation(getString(R.styleable.OutLinedTextInputView_android_hint))
+            isEditable = getBoolean(R.styleable.DaxTextInput_editable, true)
+            binding.internalInputLayout.setHintWithoutAnimation(getString(R.styleable.DaxTextInput_android_hint))
 
             val inputType = getInputType()
 
@@ -177,9 +177,11 @@ class OutLinedTextInputView @JvmOverloads constructor(
             isPasswordShown = !isPasswordShown
             if (isPasswordShown) {
                 binding.internalPasswordIcon.setImageResource(R.drawable.ic_password_hide)
+                binding.internalEditText.inputType = EditorInfo.TYPE_CLASS_TEXT or EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE
                 binding.internalEditText.transformationMethod = null
             } else {
                 binding.internalPasswordIcon.setImageResource(R.drawable.ic_password_show)
+                binding.internalEditText.inputType = EditorInfo.TYPE_TEXT_VARIATION_PASSWORD
                 binding.internalEditText.transformationMethod = transformationMethod
             }
         }
@@ -232,7 +234,7 @@ class OutLinedTextInputView @JvmOverloads constructor(
     }
 
     private fun TypedArray.getInputType(): Type {
-        val inputTypeInt = getInt(styleable.OutLinedTextInputView_type, INPUT_TYPE_MULTI_LINE.value)
+        val inputTypeInt = getInt(R.styleable.DaxTextInput_type, INPUT_TYPE_MULTI_LINE.value)
         return Type.values().firstOrNull { it.value == inputTypeInt } ?: INPUT_TYPE_MULTI_LINE
     }
 

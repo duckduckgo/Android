@@ -15,6 +15,6 @@
   -->
 
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:color="?attr/textInputOutlinedBoxColorHighlight" android:state_focused="true"/>
-    <item android:color="?attr/secondaryIconColor"/>
+    <item android:color="?attr/daxColorAccentBlue" android:state_focused="true"/>
+    <item android:color="?attr/daxColorSecondaryText"/>
 </selector>
