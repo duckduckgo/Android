@@ -19,12 +19,14 @@ package com.duckduckgo.fingerprintprotection.impl.features.fingerprintingscreens
 import com.duckduckgo.fingerprintprotection.api.FingerprintProtectionFeatureName
 import com.duckduckgo.fingerprintprotection.store.FingerprintingScreenSizeEntity
 import com.duckduckgo.fingerprintprotection.store.features.fingerprintingscreensize.FingerprintingScreenSizeRepository
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 
 class FingerprintingScreenSizeFeaturePluginTest {
     lateinit var testee: FingerprintingScreenSizeFeaturePlugin

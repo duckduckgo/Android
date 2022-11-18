@@ -24,7 +24,7 @@ import kotlinx.coroutines.launch
 
 interface FingerprintingBatteryRepository {
     fun updateAll(
-        fingerprintingBatteryEntity: FingerprintingBatteryEntity
+        fingerprintingBatteryEntity: FingerprintingBatteryEntity,
     )
     var fingerprintingBatteryEntity: FingerprintingBatteryEntity
 }
@@ -32,7 +32,7 @@ interface FingerprintingBatteryRepository {
 class RealFingerprintingBatteryRepository constructor(
     val database: FingerprintProtectionDatabase,
     val coroutineScope: CoroutineScope,
-    val dispatcherProvider: DispatcherProvider
+    val dispatcherProvider: DispatcherProvider,
 ) : FingerprintingBatteryRepository {
 
     private val fingerprintingBatteryDao: FingerprintingBatteryDao = database.fingerprintingBatteryDao()

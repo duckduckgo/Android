@@ -24,7 +24,7 @@ import kotlinx.coroutines.launch
 
 interface FingerprintingScreenSizeRepository {
     fun updateAll(
-        fingerprintingScreenSizeEntity: FingerprintingScreenSizeEntity
+        fingerprintingScreenSizeEntity: FingerprintingScreenSizeEntity,
     )
     var fingerprintingScreenSizeEntity: FingerprintingScreenSizeEntity
 }
@@ -32,7 +32,7 @@ interface FingerprintingScreenSizeRepository {
 class RealFingerprintingScreenSizeRepository constructor(
     val database: FingerprintProtectionDatabase,
     val coroutineScope: CoroutineScope,
-    val dispatcherProvider: DispatcherProvider
+    val dispatcherProvider: DispatcherProvider,
 ) : FingerprintingScreenSizeRepository {
 
     private val fingerprintingScreenSizeDao: FingerprintingScreenSizeDao = database.fingerprintingScreenSizeDao()

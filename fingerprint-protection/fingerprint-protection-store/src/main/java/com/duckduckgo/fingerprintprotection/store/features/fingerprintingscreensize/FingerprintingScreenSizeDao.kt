@@ -31,7 +31,7 @@ abstract class FingerprintingScreenSizeDao {
 
     @Transaction
     open fun updateAll(
-        fingerprintingScreenSizeEntity: FingerprintingScreenSizeEntity
+        fingerprintingScreenSizeEntity: FingerprintingScreenSizeEntity,
     ) {
         delete()
         insert(fingerprintingScreenSizeEntity)

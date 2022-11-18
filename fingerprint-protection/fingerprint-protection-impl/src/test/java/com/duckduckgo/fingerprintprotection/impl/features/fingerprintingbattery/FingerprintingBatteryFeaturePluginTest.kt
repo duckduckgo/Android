@@ -19,12 +19,14 @@ package com.duckduckgo.fingerprintprotection.impl.features.fingerprintingbattery
 import com.duckduckgo.fingerprintprotection.api.FingerprintProtectionFeatureName
 import com.duckduckgo.fingerprintprotection.store.FingerprintingBatteryEntity
 import com.duckduckgo.fingerprintprotection.store.features.fingerprintingbattery.FingerprintingBatteryRepository
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 
 class FingerprintingBatteryFeaturePluginTest {
     lateinit var testee: FingerprintingBatteryFeaturePlugin

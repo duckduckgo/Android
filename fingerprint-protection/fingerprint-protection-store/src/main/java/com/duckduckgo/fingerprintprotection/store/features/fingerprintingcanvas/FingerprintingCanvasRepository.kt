@@ -24,7 +24,7 @@ import kotlinx.coroutines.launch
 
 interface FingerprintingCanvasRepository {
     fun updateAll(
-        fingerprintingCanvasEntity: FingerprintingCanvasEntity
+        fingerprintingCanvasEntity: FingerprintingCanvasEntity,
     )
     var fingerprintingCanvasEntity: FingerprintingCanvasEntity
 }
@@ -32,7 +32,7 @@ interface FingerprintingCanvasRepository {
 class RealFingerprintingCanvasRepository constructor(
     val database: FingerprintProtectionDatabase,
     val coroutineScope: CoroutineScope,
-    val dispatcherProvider: DispatcherProvider
+    val dispatcherProvider: DispatcherProvider,
 ) : FingerprintingCanvasRepository {
 
     private val fingerprintingCanvasDao: FingerprintingCanvasDao = database.fingerprintingCanvasDao()

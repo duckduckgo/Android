@@ -31,7 +31,7 @@ abstract class FingerprintingBatteryDao {
 
     @Transaction
     open fun updateAll(
-        fingerprintingBatteryEntity: FingerprintingBatteryEntity
+        fingerprintingBatteryEntity: FingerprintingBatteryEntity,
     ) {
         delete()
         insert(fingerprintingBatteryEntity)

@@ -31,7 +31,7 @@ abstract class FingerprintingHardwareDao {
 
     @Transaction
     open fun updateAll(
-        fingerprintingHardwareEntity: FingerprintingHardwareEntity
+        fingerprintingHardwareEntity: FingerprintingHardwareEntity,
     ) {
         delete()
         insert(fingerprintingHardwareEntity)

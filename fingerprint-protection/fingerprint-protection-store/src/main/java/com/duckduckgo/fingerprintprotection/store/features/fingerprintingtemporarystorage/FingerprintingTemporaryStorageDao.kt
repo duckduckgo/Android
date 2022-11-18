@@ -31,7 +31,7 @@ abstract class FingerprintingTemporaryStorageDao {
 
     @Transaction
     open fun updateAll(
-        fingerprintingTemporaryStorageEntity: FingerprintingTemporaryStorageEntity
+        fingerprintingTemporaryStorageEntity: FingerprintingTemporaryStorageEntity,
     ) {
         delete()
         insert(fingerprintingTemporaryStorageEntity)

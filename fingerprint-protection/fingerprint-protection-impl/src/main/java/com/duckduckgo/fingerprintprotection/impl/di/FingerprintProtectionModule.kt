@@ -57,7 +57,7 @@ object FingerprintProtectionModule {
     fun provideFingerprintingBatteryRepository(
         database: FingerprintProtectionDatabase,
         @AppCoroutineScope coroutineScope: CoroutineScope,
-        dispatcherProvider: DispatcherProvider
+        dispatcherProvider: DispatcherProvider,
     ): FingerprintingBatteryRepository {
         return RealFingerprintingBatteryRepository(database, coroutineScope, dispatcherProvider)
     }
@@ -67,7 +67,7 @@ object FingerprintProtectionModule {
     fun provideFingerprintingCanvasRepository(
         database: FingerprintProtectionDatabase,
         @AppCoroutineScope coroutineScope: CoroutineScope,
-        dispatcherProvider: DispatcherProvider
+        dispatcherProvider: DispatcherProvider,
     ): FingerprintingCanvasRepository {
         return RealFingerprintingCanvasRepository(database, coroutineScope, dispatcherProvider)
     }
@@ -77,7 +77,7 @@ object FingerprintProtectionModule {
     fun provideFingerprintingHardwareRepository(
         database: FingerprintProtectionDatabase,
         @AppCoroutineScope coroutineScope: CoroutineScope,
-        dispatcherProvider: DispatcherProvider
+        dispatcherProvider: DispatcherProvider,
     ): FingerprintingHardwareRepository {
         return RealFingerprintingHardwareRepository(database, coroutineScope, dispatcherProvider)
     }
@@ -87,7 +87,7 @@ object FingerprintProtectionModule {
     fun provideFingerprintingScreenSizeRepository(
         database: FingerprintProtectionDatabase,
         @AppCoroutineScope coroutineScope: CoroutineScope,
-        dispatcherProvider: DispatcherProvider
+        dispatcherProvider: DispatcherProvider,
     ): FingerprintingScreenSizeRepository {
         return RealFingerprintingScreenSizeRepository(database, coroutineScope, dispatcherProvider)
     }
@@ -97,7 +97,7 @@ object FingerprintProtectionModule {
     fun provideFingerprintingTemporaryStorageRepository(
         database: FingerprintProtectionDatabase,
         @AppCoroutineScope coroutineScope: CoroutineScope,
-        dispatcherProvider: DispatcherProvider
+        dispatcherProvider: DispatcherProvider,
     ): FingerprintingTemporaryStorageRepository {
         return RealFingerprintingTemporaryStorageRepository(database, coroutineScope, dispatcherProvider)
     }

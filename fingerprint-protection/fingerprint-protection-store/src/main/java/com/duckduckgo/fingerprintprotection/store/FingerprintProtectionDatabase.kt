@@ -34,7 +34,7 @@ import com.duckduckgo.fingerprintprotection.store.features.fingerprintingtempora
         FingerprintingHardwareEntity::class,
         FingerprintingScreenSizeEntity::class,
         FingerprintingTemporaryStorageEntity::class,
-    ]
+    ],
 )
 abstract class FingerprintProtectionDatabase : RoomDatabase() {
     abstract fun fingerprintingBatteryDao(): FingerprintingBatteryDao

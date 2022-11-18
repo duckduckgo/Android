@@ -24,7 +24,7 @@ import kotlinx.coroutines.launch
 
 interface FingerprintingTemporaryStorageRepository {
     fun updateAll(
-        fingerprintingTemporaryStorageEntity: FingerprintingTemporaryStorageEntity
+        fingerprintingTemporaryStorageEntity: FingerprintingTemporaryStorageEntity,
     )
     var fingerprintingTemporaryStorageEntity: FingerprintingTemporaryStorageEntity
 }
@@ -32,7 +32,7 @@ interface FingerprintingTemporaryStorageRepository {
 class RealFingerprintingTemporaryStorageRepository constructor(
     val database: FingerprintProtectionDatabase,
     val coroutineScope: CoroutineScope,
-    val dispatcherProvider: DispatcherProvider
+    val dispatcherProvider: DispatcherProvider,
 ) : FingerprintingTemporaryStorageRepository {
 
     private val fingerprintingTemporaryStorageDao: FingerprintingTemporaryStorageDao = database.fingerprintingTemporaryStorageDao()

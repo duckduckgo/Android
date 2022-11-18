@@ -19,9 +19,6 @@ package com.duckduckgo.fingerprintprotection.store.features.fingerprintinghardwa
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.fingerprintprotection.store.FingerprintProtectionDatabase
 import com.duckduckgo.fingerprintprotection.store.FingerprintingHardwareEntity
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -29,6 +26,9 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 class RealFingerprintingHardwareRepositoryTest {
@@ -52,7 +52,7 @@ class RealFingerprintingHardwareRepositoryTest {
                 RealFingerprintingHardwareRepository(
                     mockDatabase,
                     TestScope(),
-                    coroutineRule.testDispatcherProvider
+                    coroutineRule.testDispatcherProvider,
                 )
 
             verify(mockFingerprintingHardwareDao).get()
@@ -67,7 +67,7 @@ class RealFingerprintingHardwareRepositoryTest {
                 RealFingerprintingHardwareRepository(
                     mockDatabase,
                     TestScope(),
-                    coroutineRule.testDispatcherProvider
+                    coroutineRule.testDispatcherProvider,
                 )
 
             verify(mockFingerprintingHardwareDao).get()
@@ -81,7 +81,7 @@ class RealFingerprintingHardwareRepositoryTest {
                 RealFingerprintingHardwareRepository(
                     mockDatabase,
                     TestScope(),
-                    coroutineRule.testDispatcherProvider
+                    coroutineRule.testDispatcherProvider,
                 )
 
             testee.updateAll(fingerprintingHardwareEntity)

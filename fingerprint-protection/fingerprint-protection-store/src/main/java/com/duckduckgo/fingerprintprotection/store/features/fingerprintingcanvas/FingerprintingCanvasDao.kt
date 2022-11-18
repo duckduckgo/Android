@@ -31,7 +31,7 @@ abstract class FingerprintingCanvasDao {
 
     @Transaction
     open fun updateAll(
-        fingerprintingCanvasEntity: FingerprintingCanvasEntity
+        fingerprintingCanvasEntity: FingerprintingCanvasEntity,
     ) {
         delete()
         insert(fingerprintingCanvasEntity)

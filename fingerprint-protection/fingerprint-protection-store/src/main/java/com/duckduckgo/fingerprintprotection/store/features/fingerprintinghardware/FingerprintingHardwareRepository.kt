@@ -24,7 +24,7 @@ import kotlinx.coroutines.launch
 
 interface FingerprintingHardwareRepository {
     fun updateAll(
-        fingerprintingHardwareEntity: FingerprintingHardwareEntity
+        fingerprintingHardwareEntity: FingerprintingHardwareEntity,
     )
     var fingerprintingHardwareEntity: FingerprintingHardwareEntity
 }
@@ -32,7 +32,7 @@ interface FingerprintingHardwareRepository {
 class RealFingerprintingHardwareRepository constructor(
     val database: FingerprintProtectionDatabase,
     val coroutineScope: CoroutineScope,
-    val dispatcherProvider: DispatcherProvider
+    val dispatcherProvider: DispatcherProvider,
 ) : FingerprintingHardwareRepository {
 
     private val fingerprintingHardwareDao: FingerprintingHardwareDao = database.fingerprintingHardwareDao()
