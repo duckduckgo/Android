@@ -130,7 +130,7 @@
         <item name="colorControlHighlight">?attr/daxColorRipple</item>
 
         <!--Design System Colors theme independent-->
-        <item name="daxColorDim">@color/gray95</item>
+        <item name="daxColorDim">@color/black60</item>
         <item name="daxColorWhite">@color/white</item>
     </style>
 
