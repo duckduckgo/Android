@@ -2,34 +2,8 @@
   "formatVersion": 1,
   "database": {
     "version": 31,
-    "identityHash": "51041c0ed01006c70680a62462cb6c59",
+    "identityHash": "24abf56fbf6dd492ceebc3274feb55f6",
     "entities": [
-      {
-        "tableName": "vpn_state",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `uuid` TEXT NOT NULL, PRIMARY KEY(`id`))",
-        "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "uuid",
-            "columnName": "uuid",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "columnNames": [
-            "id"
-          ],
-          "autoGenerate": false
-        },
-        "indices": [],
-        "foreignKeys": []
-      },
       {
         "tableName": "vpn_tracker",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`trackerCompanyId` INTEGER NOT NULL, `domain` TEXT NOT NULL, `company` TEXT NOT NULL, `companyDisplayName` TEXT NOT NULL, `timestamp` TEXT NOT NULL, `bucket` TEXT NOT NULL, `count` INTEGER NOT NULL, `packageId` TEXT NOT NULL, `appDisplayName` TEXT NOT NULL, PRIMARY KEY(`bucket`, `domain`, `packageId`))",
@@ -176,44 +150,6 @@
             "type"
           ],
           "autoGenerate": false
-        },
-        "indices": [],
-        "foreignKeys": []
-      },
-      {
-        "tableName": "vpn_phoenix",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `reason` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, `formattedTimestamp` TEXT NOT NULL)",
-        "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "reason",
-            "columnName": "reason",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "timestamp",
-            "columnName": "timestamp",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "formattedTimestamp",
-            "columnName": "formattedTimestamp",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "columnNames": [
-            "id"
-          ],
-          "autoGenerate": true
         },
         "indices": [],
         "foreignKeys": []
@@ -590,7 +526,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '51041c0ed01006c70680a62462cb6c59')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '24abf56fbf6dd492ceebc3274feb55f6')"
     ]
   }
 }

@@ -43,12 +43,6 @@ data class BucketizedVpnTracker(
     @Embedded val trackerCompanySignal: VpnTrackerCompanySignal,
 )
 
-@Entity(tableName = "vpn_state")
-data class VpnState(
-    @PrimaryKey val id: Long = 1,
-    val uuid: String,
-)
-
 enum class VpnServiceState {
     ENABLED,
     DISABLED,

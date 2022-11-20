@@ -32,11 +32,9 @@ import org.threeten.bp.format.DateTimeFormatter
     exportSchema = true,
     version = 31,
     entities = [
-        VpnState::class,
         VpnTracker::class,
         VpnServiceStateStats::class,
         HeartBeatEntity::class,
-        VpnPhoenixEntity::class,
         VpnNotification::class,
         AppTracker::class,
         AppTrackerMetadata::class,
@@ -56,10 +54,8 @@ import org.threeten.bp.format.DateTimeFormatter
 @TypeConverters(VpnTypeConverters::class)
 abstract class VpnDatabase : RoomDatabase() {
 
-    abstract fun vpnStateDao(): VpnStateDao
     abstract fun vpnTrackerDao(): VpnTrackerDao
     abstract fun vpnHeartBeatDao(): VpnHeartBeatDao
-    abstract fun vpnPhoenixDao(): VpnPhoenixDao
     abstract fun vpnNotificationsDao(): VpnNotificationsDao
     abstract fun vpnAppTrackerBlockingDao(): VpnAppTrackerBlockingDao
     abstract fun vpnServiceStateDao(): VpnServiceStateStatsDao
@@ -179,6 +175,9 @@ abstract class VpnDatabase : RoomDatabase() {
 
         private val MIGRATION_30_TO_31: Migration = object : Migration(30, 31) {
             override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("DROP TABLE IF EXISTS `vpn_state`")
+                database.execSQL("DROP TABLE IF EXISTS `vpn_phoenix`")
+
                 database.execSQL(
                     """
                     CREATE TABLE `vpn_service_state_stats_new` (
@@ -188,7 +187,7 @@ abstract class VpnDatabase : RoomDatabase() {
                       `alwaysOnEnabled` INTEGER NOT NULL,
                       `alwaysOnLockedDown` INTEGER NOT NULL
                     )
-                    """.trimIndent()
+                    """.trimIndent(),
                 )
 
                 database.execSQL(
@@ -197,7 +196,7 @@ abstract class VpnDatabase : RoomDatabase() {
                     SELECT 1, state, stopReason, alwaysOnEnabled, alwaysOnLockedDown
                     FROM vpn_service_state_stats
                     ORDER BY id DESC limit 1
-                    """.trimIndent()
+                    """.trimIndent(),
                 )
 
                 database.execSQL("DROP TABLE IF EXISTS `vpn_service_state_stats`")
