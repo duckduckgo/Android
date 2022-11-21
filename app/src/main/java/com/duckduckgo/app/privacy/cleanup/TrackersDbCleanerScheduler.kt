@@ -29,7 +29,6 @@ import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
 import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerDao
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesTo
@@ -86,14 +85,10 @@ class TrackersDbCleanerWorker(
     @Inject
     lateinit var appTrackersDao: VpnTrackerDao
 
-    @Inject
-    lateinit var vpnServiceStateStatsDao: VpnServiceStateStatsDao
-
     @WorkerThread
     override suspend fun doWork(): Result {
         webTrackersBlockedDao.deleteOldDataUntil(dateOfLastWeek())
         appTrackersDao.deleteOldDataUntil(dateOfLastWeek())
-        vpnServiceStateStatsDao.deleteOldEntries()
 
         Timber.i("Clear trackers dao job finished; returning SUCCESS")
         return Result.success()

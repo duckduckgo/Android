@@ -43,12 +43,6 @@ data class BucketizedVpnTracker(
     @Embedded val trackerCompanySignal: VpnTrackerCompanySignal,
 )
 
-@Entity(tableName = "vpn_state")
-data class VpnState(
-    @PrimaryKey val id: Long = 1,
-    val uuid: String,
-)
-
 enum class VpnServiceState {
     ENABLED,
     DISABLED,
@@ -73,9 +67,8 @@ data class AlwaysOnState(val alwaysOnEnabled: Boolean, val alwaysOnLockedDown: B
 
 @Entity(tableName = "vpn_service_state_stats")
 data class VpnServiceStateStats(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val timestamp: String = DatabaseDateFormatter.timestamp(),
-    val state: VpnServiceState,
+    val timestamp: Long = System.currentTimeMillis(),
+    @PrimaryKey val state: VpnServiceState,
     val stopReason: VpnStoppingReason = UNKNOWN,
     @Embedded val alwaysOnState: AlwaysOnState = AlwaysOnState.ALWAYS_ON_DISABLED,
 )

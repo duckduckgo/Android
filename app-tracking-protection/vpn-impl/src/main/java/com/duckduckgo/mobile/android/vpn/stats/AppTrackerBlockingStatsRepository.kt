@@ -20,7 +20,6 @@ import androidx.annotation.WorkerThread
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.dao.VpnPhoenixEntity
 import com.duckduckgo.mobile.android.vpn.model.*
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesBinding
@@ -65,8 +64,6 @@ interface AppTrackerBlockingStatsRepository {
         packageName: String,
     ): Flow<List<VpnTrackerCompanySignal>>
 
-    fun getVpnRestartHistory(): List<VpnPhoenixEntity>
-    fun deleteVpnRestartHistory()
     fun getBlockedTrackersCountBetween(
         startTime: () -> String,
         endTime: String = noEndDate(),
@@ -85,7 +82,6 @@ class RealAppTrackerBlockingStatsRepository @Inject constructor(
 ) : AppTrackerBlockingStatsRepository {
 
     private val trackerDao = vpnDatabase.vpnTrackerDao()
-    private val phoenixDao = vpnDatabase.vpnPhoenixDao()
 
     override fun getVpnTrackers(
         startTime: () -> String,
@@ -122,17 +118,6 @@ class RealAppTrackerBlockingStatsRepository @Inject constructor(
         return trackerDao.getTrackersForAppFromDate(date, packageName)
             .conflate()
             .distinctUntilChanged()
-    }
-
-    @WorkerThread
-    override fun getVpnRestartHistory(): List<VpnPhoenixEntity> {
-        return phoenixDao.restarts()
-            .filter { it.timestamp >= System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1) }
-    }
-
-    @WorkerThread
-    override fun deleteVpnRestartHistory() {
-        phoenixDao.delete()
     }
 
     @WorkerThread
