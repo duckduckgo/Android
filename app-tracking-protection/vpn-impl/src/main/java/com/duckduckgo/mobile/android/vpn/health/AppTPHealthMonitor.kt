@@ -19,10 +19,10 @@ package com.duckduckgo.mobile.android.vpn.health
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.di.VpnCoroutineScope
 import com.duckduckgo.mobile.android.vpn.health.AppTPHealthMonitor.HealthState.BadHealth
 import com.duckduckgo.mobile.android.vpn.health.AppTPHealthMonitor.HealthState.GoodHealth
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.NO_VPN_CONNECTIVITY
+import com.duckduckgo.vpn.di.VpnCoroutineScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
