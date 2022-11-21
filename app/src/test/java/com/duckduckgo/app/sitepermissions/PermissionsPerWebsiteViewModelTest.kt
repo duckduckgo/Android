@@ -114,7 +114,7 @@ class PermissionsPerWebsiteViewModelTest {
     }
 
     @Test
-    fun whenAskForSitePermissionPrefsIsDisabledThenShowSettingAsDeny() = runTest {
+    fun whenAskForSitePermissionPrefsIsDisabledAndSettingIsAskThenShowSettingAsAskDisabled() = runTest {
         loadAskForPermissionsPrefs(cameraEnabled = false)
         loadWebsitePermissionsSettings()
 
@@ -122,7 +122,33 @@ class PermissionsPerWebsiteViewModelTest {
 
         viewModel.viewState.test {
             val cameraSetting = awaitItem().websitePermissions[1]
+            assertEquals(WebsitePermissionSettingType.ASK_DISABLED, cameraSetting.setting)
+        }
+    }
+
+    @Test
+    fun whenAskForSitePermissionPrefsIsDisabledAndSettingIsDenyThenShowSettingAsDeny() = runTest {
+        loadAskForPermissionsPrefs(cameraEnabled = false)
+        loadWebsitePermissionsSettings(cameraSetting = SitePermissionAskSettingType.DENY_ALWAYS.name)
+
+        viewModel.websitePermissionSettings(domain)
+
+        viewModel.viewState.test {
+            val cameraSetting = awaitItem().websitePermissions[1]
             assertEquals(WebsitePermissionSettingType.DENY, cameraSetting.setting)
+        }
+    }
+
+    @Test
+    fun whenAskForSitePermissionPrefsIsDisabledAndSettingIsAllowThenShowSettingAsAllow() = runTest {
+        loadAskForPermissionsPrefs(cameraEnabled = false)
+        loadWebsitePermissionsSettings(cameraSetting = SitePermissionAskSettingType.ALLOW_ALWAYS.name)
+
+        viewModel.websitePermissionSettings(domain)
+
+        viewModel.viewState.test {
+            val cameraSetting = awaitItem().websitePermissions[1]
+            assertEquals(WebsitePermissionSettingType.ALLOW, cameraSetting.setting)
         }
     }
 
