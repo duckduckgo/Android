@@ -45,10 +45,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:typography="body1"
-            app:textColorInverted="true"
+            app:textColor="?attr/daxColorWhite"
             android:layout_marginTop="52dp"
             android:layout_marginEnd="@dimen/keyline_4"
-            android:padding="10dp"
+            android:padding="@dimen/keyline_3"
             tools:text="HIDE"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
@@ -102,7 +102,7 @@
                         app:typography="body1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:textColor="?attr/daxColorDim"
+                        app:textColor="?attr/daxColorWhite"
                         android:visibility="invisible"/>
 
                     <com.duckduckgo.mobile.android.ui.view.TypeAnimationTextView

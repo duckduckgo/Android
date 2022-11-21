@@ -296,6 +296,10 @@
         <item name="cornerSize">@dimen/dialogBorderRadius</item>
     </style>
 
+    <style name="Widget.DuckDuckGo.DaxDialogFragment" parent="android:Theme.DeviceDefault.Light.NoActionBar">
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
     <!-- Text Input -->
     <style name="Widget.DuckDuckGo.TextInput"
            parent="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
