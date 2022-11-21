@@ -148,8 +148,6 @@ class WelcomePage : OnboardingPageFragment() {
             ctaText = it.getString(R.string.onboardingDaxText)
             hiddenTextCta.text = ctaText.html(it)
             dialogTextCta.textInDialog = ctaText.html(it)
-            dialogTextCta.setTextColor(ContextCompat.getColor(it, CommonR.color.grayishBrown))
-            cardView.backgroundTintList = ContextCompat.getColorStateList(it, CommonR.color.white)
         }
         triangle.setImageResource(R.drawable.ic_triangle_bubble_white)
     }

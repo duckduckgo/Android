@@ -201,7 +201,7 @@
         <item name="android:textAlignment">center</item>
         <item name="android:paddingStart">@dimen/keyline_3</item>
         <item name="android:paddingEnd">@dimen/keyline_3</item>
-        <item name="android:layout_height">@dimen/legacyButtonHeight</item>
+        <item name="android:layout_height">48dp</item>
     </style>
 
     <style name="Widget.DuckDuckGo.Button.Primary">
