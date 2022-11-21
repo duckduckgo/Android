@@ -105,7 +105,6 @@ class FingerprintProtectionTest {
             Pair("navigator.hardwareConcurrency", "8.0"),
             Pair("navigator.getBattery()", "{level=1.0, chargingTime=0.0, charging=true}"),
             Pair("navigator.webkitTemporaryStorage.queryUsageAndQuota", "{quota=4.294967296E9, usage=0.0}"),
-            Pair("navigator.webkitPersistentStorage.queryUsageAndQuota", "{quota=4.294967296E9, usage=0.0}"),
             Pair("screen.colorDepth", "24.0"),
             Pair("screen.pixelDepth", "24.0"),
             Pair("screen.availLeft", "0.0"),
