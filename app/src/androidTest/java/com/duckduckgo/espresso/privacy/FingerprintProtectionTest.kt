@@ -41,6 +41,7 @@ import com.squareup.moshi.Moshi
 import java.util.concurrent.TimeUnit
 import org.hamcrest.CoreMatchers.containsString
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
@@ -86,7 +87,11 @@ class FingerprintProtectionTest {
         val testJson: TestJson? = getTestJson(results.toJSONString())
         testJson?.value?.map {
             if (compatibleIds.contains(it.id)) {
-                assertEquals(compatibleIds[it.id], it.value.toString())
+                if (it.id == PERSISTENT_STORAGE_ID) {
+                    assertTrue(EXPECTED_PERSISTENT_STORAGE_VALUES.contains(it.value.toString()))
+                } else {
+                    assertEquals(compatibleIds[it.id], it.value.toString())
+                }
             }
         }
         IdlingRegistry.getInstance().unregister(idlingResourceForDisableProtections, idlingResourceForScript)
@@ -100,12 +105,14 @@ class FingerprintProtectionTest {
 
     companion object {
         const val SCRIPT = "return results.results;"
+        const val PERSISTENT_STORAGE_ID = "navigator.webkitPersistentStorage.queryUsageAndQuota"
+        // Querying persistent storage returns quota=0.0 on some devices
+        var EXPECTED_PERSISTENT_STORAGE_VALUES = arrayOf("{quota=4.294967296E9, usage=0.0}", "{quota=0.0, usage=0.0}")
         val compatibleIds = mapOf(
             Pair("navigator.deviceMemory", "4.0"),
             Pair("navigator.hardwareConcurrency", "8.0"),
             Pair("navigator.getBattery()", "{level=1.0, chargingTime=0.0, charging=true}"),
             Pair("navigator.webkitTemporaryStorage.queryUsageAndQuota", "{quota=4.294967296E9, usage=0.0}"),
-            Pair("navigator.webkitPersistentStorage.queryUsageAndQuota", "{quota=4.294967296E9, usage=0.0}"),
             Pair("screen.colorDepth", "24.0"),
             Pair("screen.pixelDepth", "24.0"),
             Pair("screen.availLeft", "0.0"),
