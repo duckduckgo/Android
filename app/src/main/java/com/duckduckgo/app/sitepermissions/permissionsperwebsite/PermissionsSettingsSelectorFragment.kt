@@ -23,6 +23,7 @@ import androidx.annotation.IdRes
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.DialogRadioGroupSelectorFragmentBinding
+import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSettingType.ASK_DISABLED
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class PermissionsSettingsSelectorFragment : DialogFragment() {
@@ -82,7 +83,7 @@ class PermissionsSettingsSelectorFragment : DialogFragment() {
     @IdRes
     private fun WebsitePermissionSettingType.radioButtonId(): Int {
         return when (this) {
-            WebsitePermissionSettingType.ASK -> R.id.selectorRadioButton1
+            WebsitePermissionSettingType.ASK, ASK_DISABLED -> R.id.selectorRadioButton1
             WebsitePermissionSettingType.DENY -> R.id.selectorRadioButton2
             WebsitePermissionSettingType.ALLOW -> R.id.selectorRadioButton3
         }
