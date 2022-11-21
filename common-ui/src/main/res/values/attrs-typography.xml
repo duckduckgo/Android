@@ -34,6 +34,7 @@
             <enum name="primary" value="0"/>
             <enum name="secondary" value="1"/>
         </attr>
+        <attr name="textColorInverted" format="boolean"/>
     </declare-styleable>
 
     <!-- Attributes for all Design System Text Appearances -->

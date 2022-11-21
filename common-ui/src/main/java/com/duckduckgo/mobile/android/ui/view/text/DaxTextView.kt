@@ -53,7 +53,9 @@ constructor(
         } else {
             TextColor.Primary
         }
-        setTextColorStateList(textColor)
+
+        val textColorInverted = typedArray.getBoolean(R.styleable.DaxTextView_textColorInverted, false)
+        setTextColorStateList(textColor, textColorInverted)
 
         typedArray.recycle()
     }
@@ -62,8 +64,8 @@ constructor(
         setTextAppearance(Type.getTextAppearanceStyle(type))
     }
 
-    fun setTextColorStateList(textColor: TextColor) {
-        setTextColor(ContextCompat.getColorStateList(context, TextColor.getTextColorStateList(textColor)))
+    fun setTextColorStateList(textColor: TextColor, textColorInverted: Boolean = false) {
+        setTextColor(ContextCompat.getColorStateList(context, TextColor.getTextColorStateList(textColor, textColorInverted)))
     }
 
     enum class Type {
@@ -128,10 +130,18 @@ constructor(
                 }
             }
 
-            fun getTextColorStateList(textColor: TextColor): Int {
+            fun getTextColorStateList(textColor: TextColor, textColorInverted: Boolean = false): Int {
                 return when (textColor) {
-                    Primary -> R.color.primary_text_color_selector
-                    Secondary -> R.color.secondary_text_color_selector
+                    Primary -> if (textColorInverted) {
+                        R.color.primary_text_color_inverted_selector
+                    } else {
+                        R.color.primary_text_color_selector
+                    }
+                    Secondary -> if (textColorInverted) {
+                         R.color.secondary_text_color_inverted_selector
+                    } else {
+                        R.color.secondary_text_color_selector
+                    }
                 }
             }
         }

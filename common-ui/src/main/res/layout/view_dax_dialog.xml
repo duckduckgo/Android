@@ -45,10 +45,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:typography="body1"
+            app:textColorInverted="true"
             android:layout_marginTop="52dp"
             android:layout_marginEnd="@dimen/keyline_4"
             android:padding="10dp"
-            android:textColor="?attr/daxColorWhite"
             tools:text="HIDE"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
