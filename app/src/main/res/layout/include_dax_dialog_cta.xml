@@ -37,7 +37,7 @@
         android:layout_marginStart="@dimen/keyline_4"
         android:layout_marginEnd="@dimen/keyline_4"
         android:layout_marginBottom="@dimen/keyline_4"
-        app:cardBackgroundColor="?attr/daxColorWhite"
+        app:cardBackgroundColor="?attr/daxColorSurface"
         app:cardCornerRadius="@dimen/largeShapeCornerRadius"
         app:layout_constraintTop_toBottomOf="@id/triangle"
         app:layout_constraintEnd_toEndOf="parent"
