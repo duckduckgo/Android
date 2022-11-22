@@ -51,7 +51,7 @@
                 app:typography="button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/keyline_4"
+                android:paddingBottom="@dimen/keyline_4"
                 android:visibility="invisible"
                 tools:visibility="visible"
                 tools:text="@string/onboardingDaxText"/>
