@@ -27,7 +27,7 @@
         android:orientation="vertical"
         android:paddingVertical="@dimen/keyline_5">
 
-        <com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
             android:id="@+id/domainTitleEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -38,7 +38,7 @@
             app:editable="true"
             app:endIconContentDescription="@string/credentialManagementEditButtonCopyUsername" />
 
-        <com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
             android:id="@+id/usernameEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -48,7 +48,7 @@
             app:endIcon="@drawable/ic_copy"
             app:endIconContentDescription="@string/credentialManagementEditButtonCopyUsername" />
 
-        <com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
             android:id="@+id/passwordEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -59,7 +59,7 @@
             app:endIconContentDescription="@string/credentialManagementEditButtonCopyPassword"
             app:type="password" />
 
-        <com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
             android:id="@+id/domainEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -68,7 +68,7 @@
             app:type="single_line"
             app:editable="false" />
 
-        <com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
             android:id="@+id/notesEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

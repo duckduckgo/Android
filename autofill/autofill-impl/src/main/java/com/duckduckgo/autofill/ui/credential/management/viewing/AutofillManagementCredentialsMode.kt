@@ -40,7 +40,7 @@ import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewMode
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Editing
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Viewing
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView
+import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
@@ -205,7 +205,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
         }
     }
 
-    private fun OutLinedTextInputView.setText(text: String?) {
+    private fun DaxTextInput.setText(text: String?) {
         this.text = text ?: ""
     }
 

@@ -48,6 +48,7 @@
 
             <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:id="@+id/hiddenTextCta"
+                app:typography="button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/keyline_4"

@@ -171,32 +171,6 @@
       ]
     },
     {
-      "name": "asus",
-      "detectCmp": [
-        {
-          "exists": "#cookie-policy-info"
-        }
-      ],
-      "detectPopup": [
-        {
-          "visible": "#cookie-policy-info"
-        }
-      ],
-      "optIn": [
-        {
-          "click": ".btn-read-ck"
-        }
-      ],
-      "optOut": [
-        {
-          "click": ".btn-setting"
-        },
-        {
-          "click": ".btn-save"
-        }
-      ]
-    },
-    {
       "name": "ausopen.com",
       "isHidingRule": true,
       "detectCmp": [
@@ -368,9 +342,6 @@
     },
     {
       "name": "borlabs",
-      "prehideSelectors": [
-        "#BorlabsCookieBox"
-      ],
       "detectCmp": [
         {
           "exists": "._brlbs-block-content"
@@ -388,7 +359,29 @@
       ],
       "optOut": [
         {
-          "click": "a[data-cookie-refuse]"
+          "click": "a[data-cookie-individual]"
+        },
+        {
+          "waitForVisible": ".cookie-preference"
+        },
+        {
+          "click": "input[data-borlabs-cookie-checkbox]:checked",
+          "all": true,
+          "optional": true
+        },
+        {
+          "click": "#CookiePrefSave"
+        },
+        {
+          "wait": 500
+        }
+      ],
+      "prehideSelectors": [
+        "#BorlabsCookieBox"
+      ],
+      "test": [
+        {
+          "eval": "!JSON.parse(decodeURIComponent(document.cookie.split(';').find(c => c.indexOf('borlabs-cookie') !== -1).split('=', 2)[1])).consents.statistics"
         }
       ]
     },
@@ -2266,26 +2259,26 @@
         "urlPattern": "^https://www\\.reddit\\.com/"
       },
       "prehideSelectors": [
-        "section:has(section > span > a[href^=\"https://www.reddit.com/policies/cookies\"])"
+        "section:has(a[href^=\"https://www.reddit.com/policies/cookies\"])"
       ],
       "detectCmp": [
         {
-          "exists": "section:has(> span > a[href^=\"https://www.reddit.com/policies/cookies\"])"
+          "exists": "section:has(a[href^=\"https://www.reddit.com/policies/cookies\"])"
         }
       ],
       "detectPopup": [
         {
-          "visible": "section:has(> span > a[href^=\"https://www.reddit.com/policies/cookies\"])"
+          "visible": "section:has(a[href^=\"https://www.reddit.com/policies/cookies\"])"
         }
       ],
       "optIn": [
         {
-          "waitForThenClick": "section:has(> span > a[href^=\"https://www.reddit.com/policies/cookies\"]) section form:last-child button"
+          "waitForThenClick": "section:has(a[href^=\"https://www.reddit.com/policies/cookies\"]) section[class^='_'] > section:first-child form button"
         }
       ],
       "optOut": [
         {
-          "waitForThenClick": "section:has(> span > a[href^=\"https://www.reddit.com/policies/cookies\"]) section form:first-child button"
+          "waitForThenClick": "section:has(a[href^=\"https://www.reddit.com/policies/cookies\"]) section[class^='_'] > section:last-child form button"
         }
       ],
       "test": [

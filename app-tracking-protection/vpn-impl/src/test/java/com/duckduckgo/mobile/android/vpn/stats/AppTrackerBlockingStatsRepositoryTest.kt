@@ -47,7 +47,6 @@ class AppTrackerBlockingStatsRepositoryTest {
 
     private lateinit var db: VpnDatabase
     private lateinit var vpnTrackerDao: VpnTrackerDao
-    private lateinit var vpnPhoenixDao: VpnPhoenixDao
     private lateinit var repository: AppTrackerBlockingStatsRepository
 
     @Before
@@ -57,7 +56,6 @@ class AppTrackerBlockingStatsRepositoryTest {
             .allowMainThreadQueries()
             .build()
         vpnTrackerDao = db.vpnTrackerDao()
-        vpnPhoenixDao = db.vpnPhoenixDao()
         repository = RealAppTrackerBlockingStatsRepository(db, coroutineRule.testDispatcherProvider)
     }
 
@@ -90,33 +88,6 @@ class AppTrackerBlockingStatsRepositoryTest {
         trackerFoundYesterday()
         val vpnTrackers = repository.getVpnTrackers({ dateOfPreviousMidnightAsString() }).firstOrNull()
         assertNoTrackers(vpnTrackers)
-    }
-
-    @Test
-    fun whenGetVpnRestartHistoryThenReturnHistory() {
-        val entity = VpnPhoenixEntity(id = 1, reason = "foo")
-        vpnPhoenixDao.insert(entity)
-
-        assertEquals(listOf(entity), repository.getVpnRestartHistory())
-    }
-
-    @Test
-    fun whenGetVpnRestartHistoryAndTableEmptyThenReturnEmptyList() {
-        assertEquals(0, repository.getVpnRestartHistory().size)
-    }
-
-    @Test
-    fun whenDeleteVpnRestartHistoryThenDeleteTableContents() {
-        val entity = VpnPhoenixEntity(reason = "foo")
-        vpnPhoenixDao.insert(entity)
-
-        repository.deleteVpnRestartHistory()
-
-        assertEquals(0, repository.getVpnRestartHistory().size)
-    }
-
-    private fun dateOfPreviousMidnight(): LocalDateTime {
-        return LocalDateTime.now().toLocalDate().atStartOfDay()
     }
 
     private fun dateOfPreviousMidnightAsString(): String {
