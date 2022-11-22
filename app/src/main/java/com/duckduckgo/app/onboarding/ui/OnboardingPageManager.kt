@@ -60,9 +60,10 @@ class OnboardingPageManagerWithTrackerBlocking(
     }
 
     private fun shouldShowDefaultBrowserPage(): Boolean {
-        return defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration() &&
-            !defaultWebBrowserCapability.isDefaultBrowser() &&
-            !defaultRoleBrowserDialog.shouldShowDialog()
+        return true
+        // return defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration() &&
+        //     !defaultWebBrowserCapability.isDefaultBrowser() &&
+        //     !defaultRoleBrowserDialog.shouldShowDialog()
     }
 
     private fun buildDefaultBrowserPage(): DefaultBrowserPage {
