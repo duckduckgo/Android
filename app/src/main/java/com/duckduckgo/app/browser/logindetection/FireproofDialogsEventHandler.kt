@@ -20,7 +20,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler.Event
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
-import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryAPI
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
@@ -51,7 +51,7 @@ interface FireproofDialogsEventHandler {
 class BrowserTabFireproofDialogsEventHandler(
     private val userEventsStore: UserEventsStore,
     private val pixel: Pixel,
-    private val fireproofWebsiteRepository: FireproofWebsiteRepository,
+    private val fireproofWebsiteRepository: FireproofWebsiteRepositoryAPI,
     private val appSettingsPreferencesStore: SettingsDataStore,
     private val dispatchers: DispatcherProvider,
 ) : FireproofDialogsEventHandler {

@@ -25,7 +25,7 @@ import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.FAVICON_PERSISTED_DIR
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.FAVICON_TEMP_DIR
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.NO_SUBFOLDER
-import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryAPI
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.global.faviconLocation
@@ -39,7 +39,7 @@ import kotlinx.coroutines.withContext
 class DuckDuckGoFaviconManager constructor(
     private val faviconPersister: FaviconPersister,
     private val bookmarksDao: BookmarksDao,
-    private val fireproofWebsiteRepository: FireproofWebsiteRepository,
+    private val fireproofWebsiteRepository: FireproofWebsiteRepositoryAPI,
     private val locationPermissionsRepository: LocationPermissionsRepository,
     private val favoritesRepository: FavoritesRepository,
     private val faviconDownloader: FaviconDownloader,

@@ -28,7 +28,6 @@ import com.duckduckgo.app.fire.BackgroundTimeKeeper
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
 import com.duckduckgo.app.fire.DataClearerTimeKeeper
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
-import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryAPI
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.file.FileDeleter
@@ -124,7 +123,7 @@ object PrivacyModule {
     fun geoLocationPermissions(
         context: Context,
         locationPermissionsRepository: LocationPermissionsRepository,
-        fireproofWebsiteRepository: FireproofWebsiteRepository,
+        fireproofWebsiteRepository: FireproofWebsiteRepositoryAPI,
         dispatcherProvider: DispatcherProvider,
     ): GeoLocationPermissions {
         return GeoLocationPermissionsManager(context, locationPermissionsRepository, fireproofWebsiteRepository, dispatcherProvider)

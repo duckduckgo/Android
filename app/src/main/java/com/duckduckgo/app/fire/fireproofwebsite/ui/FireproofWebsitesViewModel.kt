@@ -19,7 +19,7 @@ package com.duckduckgo.app.fire.fireproofwebsite.ui
 import androidx.lifecycle.*
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
-import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryAPI
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel.Command.ConfirmRemoveFireproofWebsite
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
@@ -36,7 +36,7 @@ import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
 class FireproofWebsitesViewModel @Inject constructor(
-    private val fireproofWebsiteRepository: FireproofWebsiteRepository,
+    private val fireproofWebsiteRepository: FireproofWebsiteRepositoryAPI,
     private val dispatcherProvider: DispatcherProvider,
     private val pixel: Pixel,
     private val settingsDataStore: SettingsDataStore,
