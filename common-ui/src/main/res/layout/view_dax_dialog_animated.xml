@@ -103,7 +103,7 @@
                     android:id="@+id/descriptionText"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginTop="@dimen/keyline_4"/>
+                    android:layout_marginTop="@dimen/daxDialogButtonSpacing"/>
 
                 <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
                     android:id="@+id/primaryCta"

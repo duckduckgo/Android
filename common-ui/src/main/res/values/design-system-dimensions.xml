@@ -91,4 +91,5 @@
     <dimen name="daxDialogContentPaddingBottom">20dp</dimen>
     <dimen name="daxDialogContentPaddingStart">@dimen/keyline_5</dimen>
     <dimen name="daxDialogContentPaddingEnd">@dimen/keyline_5</dimen>
+    <dimen name="daxDialogButtonSpacing">14dp</dimen>
 </resources>

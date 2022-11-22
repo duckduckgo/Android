@@ -116,7 +116,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:buttonSize="large"
-                    android:layout_marginTop="@dimen/keyline_4"/>
+                    android:layout_marginTop="@dimen/daxDialogButtonSpacing"/>
 
                 <com.duckduckgo.mobile.android.ui.view.button.DaxButtonSecondary
                     android:id="@+id/secondaryCta"
