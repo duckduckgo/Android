@@ -138,7 +138,7 @@ constructor(
                         R.color.primary_text_color_selector
                     }
                     Secondary -> if (textColorInverted) {
-                         R.color.secondary_text_color_inverted_selector
+                        R.color.secondary_text_color_inverted_selector
                     } else {
                         R.color.secondary_text_color_selector
                     }

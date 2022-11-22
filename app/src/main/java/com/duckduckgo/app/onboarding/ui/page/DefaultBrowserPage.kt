@@ -80,7 +80,7 @@ class DefaultBrowserPage : OnboardingPageFragment() {
 
     override fun onViewCreated(
         view: View,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -98,8 +98,6 @@ class DefaultBrowserPage : OnboardingPageFragment() {
         if (savedInstanceState != null) {
             userTriedToSetDDGAsDefault = savedInstanceState.getBoolean(SAVED_STATE_LAUNCHED_DEFAULT)
         }
-
-
 
         observeViewModel()
 

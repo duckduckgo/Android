@@ -175,7 +175,7 @@ class TypewriterDaxDialog : DialogFragment(R.layout.view_dax_dialog), DaxDialog 
         }
 
         context?.let {
-            val toolbarColor = if (toolbarDimmed)  it.getColorFromAttr(R.attr.daxColorDim) else getColor(it, android.R.color.transparent)
+            val toolbarColor = if (toolbarDimmed) it.getColorFromAttr(R.attr.daxColorDim) else getColor(it, android.R.color.transparent)
             with(binding) {
                 toolbarDialogLayout.setBackgroundColor(toolbarColor)
                 hideText.text = hideButtonText
