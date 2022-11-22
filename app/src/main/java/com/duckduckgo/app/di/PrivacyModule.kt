@@ -123,7 +123,7 @@ object PrivacyModule {
     @SingleInstanceIn(AppScope::class)
     fun geoLocationPermissions(
         context: Context,
-        locationPermissionsRepository: LocationPermissionsRepository,
+        locationPermissionsRepository: LocationPermissionsRepositoryAPI,
         fireproofWebsiteRepository: FireproofWebsiteRepository,
         dispatcherProvider: DispatcherProvider,
     ): GeoLocationPermissions {
