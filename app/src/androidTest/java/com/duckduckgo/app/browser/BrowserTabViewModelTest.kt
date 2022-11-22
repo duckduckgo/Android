@@ -98,7 +98,7 @@ import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsDao
-import com.duckduckgo.app.location.data.LocationPermissionsRepository
+import com.duckduckgo.app.location.data.LocationPermissionsRepositoryAPI
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -144,7 +144,7 @@ import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import dagger.Lazy
 import io.reactivex.Observable
 import java.io.File
-import java.util.Locale
+import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -247,6 +247,9 @@ class BrowserTabViewModelTest {
 
     @Mock
     private lateinit var mockPixel: Pixel
+
+    @Mock
+    private lateinit var mockLocationPermissionsRepository: LocationPermissionsRepositoryAPI
 
     @Mock
     private lateinit var mockOnboardingStore: OnboardingStore
@@ -388,7 +391,6 @@ class BrowserTabViewModelTest {
             .allowMainThreadQueries()
             .build()
         fireproofWebsiteDao = db.fireproofWebsiteDao()
-        locationPermissionsDao = db.locationPermissionsDao()
 
         mockAutoCompleteApi = AutoCompleteApi(mockAutoCompleteService, mockBookmarksDao, mockFavoritesRepository)
         val fireproofWebsiteRepository = FireproofWebsiteRepository(fireproofWebsiteDao, coroutineRule.testDispatcherProvider, lazyFaviconManager)
@@ -455,11 +457,7 @@ class BrowserTabViewModelTest {
             pixel = mockPixel,
             dispatchers = coroutineRule.testDispatcherProvider,
             fireproofWebsiteRepository = fireproofWebsiteRepository,
-            locationPermissionsRepository = LocationPermissionsRepository(
-                locationPermissionsDao,
-                lazyFaviconManager,
-                coroutineRule.testDispatcherProvider,
-            ),
+            locationPermissionsRepository = mockLocationPermissionsRepository,
             geoLocationPermissions = geoLocationPermissions,
             navigationAwareLoginDetector = mockNavigationAwareLoginDetector,
             userEventsStore = mockUserEventsStore,
