@@ -72,7 +72,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
-        android:elevation="6dp"
+        android:elevation="12dp"
         android:src="@drawable/ic_triangle_bubble"
         app:layout_constraintTop_toBottomOf="@id/logo"
         app:layout_constraintEnd_toEndOf="@id/logo"
