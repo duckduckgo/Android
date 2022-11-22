@@ -296,8 +296,26 @@
         <item name="cornerSize">@dimen/dialogBorderRadius</item>
     </style>
 
+    <!-- Dax Dialog -->
     <style name="Widget.DuckDuckGo.DaxDialogFragment" parent="android:Theme.DeviceDefault.Light.NoActionBar">
         <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.DaxDialog"/>
+
+    <style name="Widget.DuckDuckGo.DaxDialog.Outline">
+        <item name="cardCornerRadius">@dimen/largeShapeCornerRadius</item>
+        <item name="android:backgroundTint">?attr/daxColorSurface</item>
+        <item name="android:layout_marginStart">@dimen/keyline_4</item>
+        <item name="android:layout_marginEnd">@dimen/keyline_4</item>
+        <item name="android:layout_marginBottom">@dimen/keyline_4</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.DaxDialog.Content">
+        <item name="android:paddingTop">@dimen/daxDialogContentPaddingTop</item>
+        <item name="android:paddingBottom">@dimen/daxDialogContentPaddingBottom</item>
+        <item name="android:paddingStart">@dimen/daxDialogContentPaddingStart</item>
+        <item name="android:paddingEnd">@dimen/daxDialogContentPaddingEnd</item>
     </style>
 
     <!-- Text Input -->

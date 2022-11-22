@@ -63,17 +63,14 @@
             app:layout_constraintBottom_toTopOf="@+id/cardView"
             app:layout_constraintEnd_toEndOf="@id/logo"
             app:layout_constraintStart_toStartOf="@id/logo"
+            android:elevation="6dp"
             app:srcCompat="@drawable/ic_triangle_bubble" />
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/keyline_2"
-            android:layout_marginEnd="@dimen/keyline_2"
-            android:layout_marginBottom="@dimen/keyline_5"
-            android:backgroundTint="?attr/daxColorSurface"
-            app:cardCornerRadius="@dimen/largeShapeCornerRadius"
+            style="@style/Widget.DuckDuckGo.DaxDialog.Outline"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -81,7 +78,7 @@
 
             <LinearLayout
                 android:id="@+id/cardContainer"
-                android:padding="@dimen/keyline_4"
+                style="@style/Widget.DuckDuckGo.DaxDialog.Content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">

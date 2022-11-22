@@ -34,11 +34,7 @@
         android:id="@+id/cardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_4"
-        android:layout_marginEnd="@dimen/keyline_4"
-        android:layout_marginBottom="@dimen/keyline_4"
-        app:cardBackgroundColor="?attr/daxColorSurface"
-        app:cardCornerRadius="@dimen/largeShapeCornerRadius"
+        style="@style/Widget.DuckDuckGo.DaxDialog.Outline"
         app:layout_constraintTop_toBottomOf="@id/triangle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -46,7 +42,7 @@
 
         <FrameLayout
             android:id="@+id/cardContainer"
-            android:padding="@dimen/keyline_5"
+            style="@style/Widget.DuckDuckGo.DaxDialog.Content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 

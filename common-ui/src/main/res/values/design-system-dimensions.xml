@@ -85,4 +85,10 @@
 
     <!-- InfoPanel -->
     <dimen name="infoPanelIconSize">16dp</dimen>
+
+    <!-- Dax Dialog  -->
+    <dimen name="daxDialogContentPaddingTop">@dimen/keyline_5</dimen>
+    <dimen name="daxDialogContentPaddingBottom">18dp</dimen>
+    <dimen name="daxDialogContentPaddingStart">@dimen/keyline_5</dimen>
+    <dimen name="daxDialogContentPaddingEnd">@dimen/keyline_5</dimen>
 </resources>
