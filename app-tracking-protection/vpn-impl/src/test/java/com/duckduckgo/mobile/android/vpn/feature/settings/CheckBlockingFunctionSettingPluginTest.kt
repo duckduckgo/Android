@@ -16,6 +16,8 @@
 
 package com.duckduckgo.mobile.android.vpn.feature.settings
 
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.feature.FakeAppTpFeatureConfig
@@ -24,11 +26,13 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.*
 
-class Ipv6PrivacySettingPluginTest {
+class CheckBlockingFunctionSettingPluginTest {
 
-    private lateinit var featureConfig: Ipv6PrivacySettingPlugin
+    private lateinit var featureConfig: CheckBlockingFunctionSettingPlugin
     private lateinit var appTpFeatureConfig: AppTpFeatureConfig
+    private val appBuildConfig: AppBuildConfig = mock()
     private val jsonEnabled = """
         {
           "state": "enabled",
@@ -41,27 +45,52 @@ class Ipv6PrivacySettingPluginTest {
           "settings": {}
         }
     """.trimIndent()
+    private val jsonInternal = """
+        {
+          "state": "internal",
+          "settings": {}
+        }
+    """.trimIndent()
 
     @Before
     fun setup() {
+        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
         appTpFeatureConfig = FakeAppTpFeatureConfig()
-        featureConfig = Ipv6PrivacySettingPlugin(appTpFeatureConfig)
+        featureConfig = CheckBlockingFunctionSettingPlugin(appTpFeatureConfig, appBuildConfig)
     }
 
     @Test
     fun whenStoreWithCorrectSettingAndEnabledThenStoreAndReturnTrue() {
         val result = featureConfig.store(featureConfig.settingName, jsonEnabled)
 
+        assertTrue(appTpFeatureConfig.isEnabled(AppTpSetting.CheckBlockingFunction))
         assertTrue(result)
-        assertTrue(appTpFeatureConfig.isEnabled(AppTpSetting.Ipv6Support))
     }
 
     @Test
     fun whenStoreWithCorrectSettingAndDisabledThenStoreAndReturnTrue() {
         val result = featureConfig.store(featureConfig.settingName, jsonDisabled)
 
+        assertFalse(appTpFeatureConfig.isEnabled(AppTpSetting.CheckBlockingFunction))
         assertTrue(result)
-        assertFalse(appTpFeatureConfig.isEnabled(AppTpSetting.Ipv6Support))
+    }
+
+    @Test
+    fun whenStoreWithCorrectSettingAndInternalNotInternalBuildThenStoreAndReturnTrue() {
+        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
+        val result = featureConfig.store(featureConfig.settingName, jsonInternal)
+
+        assertFalse(appTpFeatureConfig.isEnabled(AppTpSetting.CheckBlockingFunction))
+        assertTrue(result)
+    }
+
+    @Test
+    fun whenStoreWithCorrectSettingAndInternalWithInternalBuildThenStoreAndReturnTrue() {
+        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
+        val result = featureConfig.store(featureConfig.settingName, jsonInternal)
+
+        assertTrue(appTpFeatureConfig.isEnabled(AppTpSetting.CheckBlockingFunction))
+        assertTrue(result)
     }
 
     @Test
@@ -69,7 +98,7 @@ class Ipv6PrivacySettingPluginTest {
         val settingName = SettingName { "wrongSettingName" }
         val result = featureConfig.store(settingName, jsonEnabled)
 
+        assertFalse(appTpFeatureConfig.isEnabled(AppTpSetting.CheckBlockingFunction))
         assertFalse(result)
-        assertFalse(appTpFeatureConfig.isEnabled(AppTpSetting.Ipv6Support))
     }
 }

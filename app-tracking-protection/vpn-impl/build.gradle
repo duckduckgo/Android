@@ -128,5 +128,6 @@ dependencies {
     testImplementation AndroidX.archCore.testing
     testImplementation 'app.cash.turbine:turbine:_'
     testImplementation Testing.robolectric
-    testImplementation project(path: ':common-test')
+    testImplementation project(':common-test')
+    testImplementation project(':vpn-api-test')
 }

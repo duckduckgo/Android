@@ -39,10 +39,6 @@ interface AppTrackerBlockingStatsRepository {
         }
     }
 
-    fun noStartDate(): String {
-        return DatabaseDateFormatter.timestamp(LocalDateTime.of(2000, 1, 1, 0, 0))
-    }
-
     private fun noEndDate(): String {
         return DatabaseDateFormatter.timestamp(LocalDateTime.of(9999, 1, 1, 0, 0))
     }
@@ -73,6 +69,8 @@ interface AppTrackerBlockingStatsRepository {
         startTime: () -> String,
         endTime: String = noEndDate(),
     ): Flow<Int>
+
+    suspend fun containsVpnTrackers(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -138,5 +136,9 @@ class RealAppTrackerBlockingStatsRepository @Inject constructor(
         return trackerDao.getTrackingAppsCountBetween(startTime(), endTime)
             .conflate()
             .distinctUntilChanged()
+    }
+
+    override suspend fun containsVpnTrackers(): Boolean {
+        return trackerDao.tableIsNotEmpty()
     }
 }
