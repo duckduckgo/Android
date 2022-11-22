@@ -322,7 +322,7 @@
     <style name="Widget.DuckDuckGo.TextInput"
            parent="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="shapeAppearance">@style/ShapeAppearance.DuckDuckGo.SmallComponent</item>
-        <item name="boxStrokeColor">@color/text_input_color_selector</item>
+        <item name="boxStrokeColor">@color/text_input_box_color_selector</item>
         <item name="endIconTint">?attr/daxColorPrimaryIcon</item>
         <item name="hintTextColor">@color/text_input_hint_color_selector</item>
         <item name="android:textColorHint">@color/text_input_hint_color_selector</item>

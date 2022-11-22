@@ -20,9 +20,9 @@ import android.content.Context
 import android.util.AttributeSet
 import androidx.core.content.ContextCompat
 import com.duckduckgo.mobile.android.R
-import com.duckduckgo.mobile.android.ui.view.text.DaxTextView.Type.Body1
+import com.duckduckgo.mobile.android.ui.view.getColorFromAttr
+import com.duckduckgo.mobile.android.ui.view.text.DaxTextView.Typography.Body1
 import com.google.android.material.textview.MaterialTextView
-import java.lang.reflect.Array.getInt
 
 class DaxTextView @JvmOverloads
 constructor(
@@ -40,35 +40,46 @@ constructor(
                 0,
             )
 
-        val typographyType = if (typedArray.hasValue(R.styleable.DaxTextView_typography)) {
-            Type.from(typedArray.getInt(R.styleable.DaxTextView_typography, 0))
+        val typographyTypography = if (typedArray.hasValue(R.styleable.DaxTextView_typography)) {
+            Typography.from(typedArray.getInt(R.styleable.DaxTextView_typography, 0))
         } else {
             Body1
         }
 
-        setTypography(typographyType)
+        setTypography(typographyTypography)
 
-        val textColor = if (typedArray.hasValue(R.styleable.DaxTextView_textColor)) {
-            TextColor.from(typedArray.getInt(R.styleable.DaxTextView_textColor, 0))
-        } else {
-            TextColor.Primary
+        val hasType = typedArray.hasValue(R.styleable.DaxTextView_textType)
+        val hasTextColor = typedArray.hasValue(R.styleable.DaxTextView_android_textColor)
+
+        when {
+            hasType -> {
+                val type = Type.from(typedArray.getInt(R.styleable.DaxTextView_textType, 0))
+                setTextColorStateList(type)
+            }
+            hasTextColor -> {
+                val colorStateList = typedArray.getColorStateList(R.styleable.DaxTextView_android_textColor)
+                if (colorStateList != null) {
+                    setTextColor(typedArray.getColorStateList(R.styleable.DaxTextView_android_textColor))
+                } else {
+                    val defaultColor = context.getColorFromAttr(R.attr.daxColorPrimaryText)
+                    setTextColor(typedArray.getColor(R.styleable.DaxTextView_android_textColor, defaultColor))
+                }
+            }
+            else -> setTextColorStateList(Type.Primary)
         }
-
-        val textColorInverted = typedArray.getBoolean(R.styleable.DaxTextView_textColorInverted, false)
-        setTextColorStateList(textColor, textColorInverted)
 
         typedArray.recycle()
     }
 
-    fun setTypography(type: Type) {
-        setTextAppearance(Type.getTextAppearanceStyle(type))
+    fun setTypography(typography: Typography) {
+        setTextAppearance(Typography.getTextAppearanceStyle(typography))
     }
 
-    fun setTextColorStateList(textColor: TextColor, textColorInverted: Boolean = false) {
-        setTextColor(ContextCompat.getColorStateList(context, TextColor.getTextColorStateList(textColor, textColorInverted)))
+    fun setTextColorStateList(type: Type) {
+        setTextColor(ContextCompat.getColorStateList(context, Type.getTextColorStateList(type)))
     }
 
-    enum class Type {
+    enum class Typography {
         Title,
         H1,
         H2,
@@ -82,7 +93,7 @@ constructor(
         ;
 
         companion object {
-            fun from(type: Int): Type {
+            fun from(type: Int): Typography {
                 // same order as attrs-typography.xml
                 return when (type) {
                     0 -> Title
@@ -99,8 +110,8 @@ constructor(
                 }
             }
 
-            fun getTextAppearanceStyle(type: Type): Int {
-                return when (type) {
+            fun getTextAppearanceStyle(typography: Typography): Int {
+                return when (typography) {
                     Title -> R.style.Typography_DuckDuckGo_Title
                     H1 -> R.style.Typography_DuckDuckGo_H1
                     H2 -> R.style.Typography_DuckDuckGo_H2
@@ -116,13 +127,13 @@ constructor(
         }
     }
 
-    enum class TextColor {
+    enum class Type {
         Primary,
         Secondary,
         ;
 
         companion object {
-            fun from(type: Int): TextColor {
+            fun from(type: Int): Type {
                 // same order as attrs-typography.xml
                 return when (type) {
                     0 -> Primary
@@ -130,18 +141,10 @@ constructor(
                 }
             }
 
-            fun getTextColorStateList(textColor: TextColor, textColorInverted: Boolean = false): Int {
-                return when (textColor) {
-                    Primary -> if (textColorInverted) {
-                        R.color.primary_text_color_inverted_selector
-                    } else {
-                        R.color.primary_text_color_selector
-                    }
-                    Secondary -> if (textColorInverted) {
-                        R.color.secondary_text_color_inverted_selector
-                    } else {
-                        R.color.secondary_text_color_selector
-                    }
+            fun getTextColorStateList(type: Type): Int {
+                return when (type) {
+                    Primary -> R.color.primary_text_color_selector
+                    Secondary -> R.color.secondary_text_color_selector
                 }
             }
         }
