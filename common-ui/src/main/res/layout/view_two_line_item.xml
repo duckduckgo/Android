@@ -80,7 +80,7 @@
         app:layout_constraintEnd_toStartOf="@+id/trailingContainer"
         app:layout_constraintStart_toStartOf="@id/primaryText"
         app:layout_constraintTop_toBottomOf="@id/primaryText"
-        app:textColor="secondary"
+        app:textType="secondary"
         app:typography="body2"
         tools:text="Secondary Text" />
 

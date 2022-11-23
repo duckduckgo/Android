@@ -87,7 +87,6 @@
 
     <style name="Typography"/>
     <style name="Typography.DuckDuckGo">
-        <item name="android:textColor">?attr/daxColorPrimaryText</item>
         <item name="android:textStyle">normal</item>
         <item name="android:fontFamily">sans-serif</item>
         <item name="android:letterSpacing">0.0</item>
