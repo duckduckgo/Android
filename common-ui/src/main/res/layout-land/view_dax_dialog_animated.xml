@@ -115,6 +115,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:visibility="visible"
+                        app:buttonSize="large"
                         tools:ignore="RtlHardcoded" />
 
                     <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
@@ -124,6 +125,7 @@
                         android:layout_marginStart="@dimen/keyline_2"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        app:buttonSize="large"
                         tools:ignore="RtlHardcoded" />
 
                 </LinearLayout>

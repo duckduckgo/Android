@@ -109,13 +109,15 @@
                     android:id="@+id/primaryCta"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/keyline_4" />
+                    app:buttonSize="large"
+                    android:layout_marginTop="@dimen/daxDialogButtonSpacing" />
 
                 <com.duckduckgo.mobile.android.ui.view.button.DaxButtonSecondary
                     android:id="@+id/secondaryCta"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/keyline_2"/>
+                    app:buttonSize="large"
+                    android:layout_marginTop="@dimen/keyline_1"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
     </androidx.constraintlayout.widget.ConstraintLayout>
