@@ -34,7 +34,7 @@
             <enum name="primary" value="0"/>
             <enum name="secondary" value="1"/>
         </attr>
-        <attr name="android:textColor"/>
+        <attr name="android:textColor" format="color"/>
     </declare-styleable>
 
     <!-- Attributes for all Design System Text Appearances -->
