@@ -17,8 +17,24 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:background="@drawable/popup_menu_bg">
+
+    <TextView
+        android:id="@+id/item_copy_username"
+        style="@style/Widget.DuckDuckGo.PopupMenuItem"
+        android:text="@string/credentialManagementEditButtonCopyUsername" />
+
+    <TextView
+        android:id="@+id/item_copy_password"
+        style="@style/Widget.DuckDuckGo.PopupMenuItem"
+        android:text="@string/credentialManagementEditButtonCopyPassword" />
+
+    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+        app:defaultPadding="false"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
     <TextView
         android:id="@+id/item_overflow_edit"
