@@ -89,4 +89,8 @@
 
     <!-- InfoPanel -->
     <dimen name="infoPanelIconSize">16dp</dimen>
+
+    <!-- Card -->
+    <dimen name="daxBubbleDialogDistanceFromEdge">40dp</dimen>
+    <dimen name="daxBubbleDialogEdge">9dp</dimen>
 </resources>
