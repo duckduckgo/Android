@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.di
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.lifecycle.LifecycleObserver
 import com.duckduckgo.app.global.db.AppDatabase
@@ -43,6 +44,7 @@ import retrofit2.Retrofit
 @ContributesTo(AppScope::class)
 object StatisticsModule {
 
+    @SuppressLint("NoRetrofitCreateMethodCallDetector")
     @Provides
     fun pixelService(@Named("nonCaching") retrofit: Retrofit): PixelService {
         return retrofit.create(PixelService::class.java)

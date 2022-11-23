@@ -24,6 +24,7 @@ import com.duckduckgo.lint.strings.MissingSmartlingRequiredDirectivesDetector.Co
 import com.duckduckgo.lint.NoFragmentDetector.Companion.NO_FRAGMENT_ISSUE
 import com.duckduckgo.lint.NoHardcodedCoroutineDispatcherDetector.Companion.NO_HARCODED_COROUTINE_DISPATCHER
 import com.duckduckgo.lint.NoLifecycleObserverDetector.Companion.NO_LIFECYCLE_OBSERVER_ISSUE
+import com.duckduckgo.lint.NoRetrofitCreateMethodCallDetector.Companion.NO_RETROFIT_CREATE_CALL
 import com.duckduckgo.lint.NoSingletonDetector.Companion.NO_SINGLETON_ISSUE
 import com.duckduckgo.lint.NoSystemLoadLibraryDetector.Companion.NO_SYSTEM_LOAD_LIBRARY
 import com.duckduckgo.lint.strings.MissingInstructionDetector.Companion.MISSING_INSTRUCTION
@@ -48,6 +49,7 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             MISSING_SMARTLING_REQUIRED_DIRECTIVES,
             MISSING_INSTRUCTION,
             PLACEHOLDER_MISSING_POSITION,
+            NO_RETROFIT_CREATE_CALL,
 
             // Android Design System
             DEPRECATED_BUTTON_IN_XML,
