@@ -63,4 +63,6 @@
     <string name="credentialManagementViewMenuEdit">Redigera</string>
     <string name="credentialManagementViewMenuDelete">Ta bort</string>
 
+    <string name="credentialManagementSuggestionsLabel">Förslag</string>
+
 </resources>
