@@ -30,7 +30,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:textColor="primary"
+        app:textType="primary"
         app:typography="h2" />
 
     <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
@@ -41,7 +41,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/radioListDialogTitle"
-        app:textColor="secondary"
+        app:textType="secondary"
         app:typography="body1" />
 
     <RadioGroup
