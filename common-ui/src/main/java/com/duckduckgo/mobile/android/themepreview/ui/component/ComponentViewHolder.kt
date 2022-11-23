@@ -27,6 +27,9 @@ import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
 import com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+import com.google.android.material.card.MaterialCardView
+import com.google.android.material.shape.ShapeAppearanceModel
+import com.google.android.material.shape.TriangleEdgeTreatment
 import com.google.android.material.snackbar.Snackbar
 
 sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
@@ -202,6 +205,23 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
     class DividerComponentViewHolder(parent: ViewGroup) : ComponentViewHolder(inflate(parent, R.layout.component_section_divider))
 
+    class CardComponentViewHolder(parent: ViewGroup) : ComponentViewHolder(inflate(parent, R.layout.component_card)) {
+        override fun bind(component: Component) {
+            view.findViewById<MaterialCardView>(R.id.ticketViewCard).apply {
+                val cornerSize = resources.getDimension(R.dimen.smallShapeCornerRadius)
+                val edgeTreatment = TriangleEdgeTreatment(cornerSize, true)
+                shapeAppearanceModel = ShapeAppearanceModel.Builder()
+                    .setLeftEdge(edgeTreatment)
+                    .setRightEdge(edgeTreatment)
+                    .setAllCornerSizes(cornerSize)
+                    .build()
+                elevation = 8f
+
+                setOnClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
+            }
+        }
+    }
+
     companion object {
         fun create(
             parent: ViewGroup,
@@ -222,6 +242,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.SINGLE_LINE_LIST_ITEM -> OneLineListItemComponentViewHolder(parent)
                 Component.TWO_LINE_LIST_ITEM -> TwoLineItemComponentViewHolder(parent)
                 Component.SECTION_DIVIDER -> DividerComponentViewHolder(parent)
+                Component.CARD -> CardComponentViewHolder(parent)
                 else -> {
                     TODO()
                 }
