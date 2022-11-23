@@ -99,4 +99,5 @@
     <!-- Card -->
     <dimen name="daxBubbleDialogDistanceFromEdge">22dp</dimen>
     <dimen name="daxBubbleDialogEdge">9dp</dimen>
+
 </resources>
