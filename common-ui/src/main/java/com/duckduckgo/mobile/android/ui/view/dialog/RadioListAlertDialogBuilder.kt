@@ -27,7 +27,7 @@ import com.duckduckgo.mobile.android.ui.view.button.RadioButton
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-class RadioListAlertDialogBuilder(val context: Context) {
+class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
 
     abstract class EventListener {
         open fun onDialogShown() {}
@@ -38,6 +38,8 @@ class RadioListAlertDialogBuilder(val context: Context) {
     }
 
     internal class DefaultEventListener : EventListener()
+
+    private var dialog: AlertDialog? = null
 
     var listener: EventListener = DefaultEventListener()
         private set
@@ -100,7 +102,7 @@ class RadioListAlertDialogBuilder(val context: Context) {
         return this
     }
 
-    fun show() {
+    override fun build(): DaxAlertDialog {
         checkRequiredFieldsSet()
         val binding: DialogSingleChoiceAlertBinding = DialogSingleChoiceAlertBinding.inflate(LayoutInflater.from(context))
 
@@ -110,12 +112,23 @@ class RadioListAlertDialogBuilder(val context: Context) {
                 setCancelable(false)
                 setOnDismissListener { listener.onDialogDismissed() }
             }
-        val dialog = dialogBuilder.create()
 
-        setViews(binding, dialog)
+        dialog = dialogBuilder.create()
+        setViews(binding, dialog!!)
 
-        dialog.show()
+        return this
+    }
+
+    override fun show() {
+        if (dialog == null) {
+            build()
+        }
+        dialog?.show()
         listener.onDialogShown()
+    }
+
+    override fun dismiss() {
+        dialog?.dismiss()
     }
 
     private fun setViews(
