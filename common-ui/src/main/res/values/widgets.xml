@@ -389,4 +389,11 @@
         <item name="android:layout_height">match_parent</item>
         <item name="android:background">?attr/sectionDividerColor</item>
     </style>
+
+    <!-- Cards -->
+    <style name="Widget.DuckDuckGo.CardView" parent="Widget.MaterialComponents.CardView">
+        <item name="cardBackgroundColor">?attr/daxColorSurface</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.DuckDuckGo.MediumComponent</item>
+    </style>
+
 </resources>
