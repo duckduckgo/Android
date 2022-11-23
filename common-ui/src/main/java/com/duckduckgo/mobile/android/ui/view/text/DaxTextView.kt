@@ -20,7 +20,7 @@ import android.content.Context
 import android.util.AttributeSet
 import androidx.core.content.ContextCompat
 import com.duckduckgo.mobile.android.R
-import com.duckduckgo.mobile.android.ui.view.getColorFromAttr
+import com.duckduckgo.mobile.android.ui.view.TypedArrayUtils
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextView.Typography.Body1
 import com.google.android.material.textview.MaterialTextView
 
@@ -56,15 +56,16 @@ constructor(
                 val textType = TextType.from(typedArray.getInt(R.styleable.DaxTextView_textType, 0))
                 setTextColorStateList(textType)
             }
+
             hasTextColor -> {
-                val colorStateList = typedArray.getColorStateList(R.styleable.DaxTextView_android_textColor)
+                val colorStateList = TypedArrayUtils.getColorStateList(context, typedArray, R.styleable.DaxTextView_android_textColor)
                 if (colorStateList != null) {
-                    setTextColor(typedArray.getColorStateList(R.styleable.DaxTextView_android_textColor))
+                    setTextColor(colorStateList)
                 } else {
-                    val defaultColor = context.getColorFromAttr(R.attr.daxColorPrimaryText)
-                    setTextColor(typedArray.getColor(R.styleable.DaxTextView_android_textColor, defaultColor))
+                    setTextColor(ContextCompat.getColorStateList(context, R.color.primary_text_color_selector))
                 }
             }
+
             else -> setTextColorStateList(TextType.Primary)
         }
 

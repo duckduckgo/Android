@@ -65,9 +65,9 @@ class DaxTextViewStylingDetector : LayoutDetector() {
 
     private fun reportIssue(context: XmlContext, element: Element, property: String){
         context.report(
-            issue = INVALID_DAX_BUTTON_PROPERTY,
+            issue = INVALID_DAX_TEXT_VIEW_PROPERTY,
             location = context.getNameLocation(element),
-            message = property + " " + INVALID_DAX_BUTTON_PROPERTY.getExplanation(TextFormat.RAW)
+            message = property + " " + INVALID_DAX_TEXT_VIEW_PROPERTY.getExplanation(TextFormat.RAW)
         )
     }
 
