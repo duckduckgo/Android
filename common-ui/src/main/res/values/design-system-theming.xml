@@ -80,6 +80,7 @@
         <item name="materialButtonStyle">@style/Widget.DuckDuckGo.DaxButton.TextButton.Primary</item>
         <item name="materialButtonOutlinedStyle">@style/Widget.DuckDuckGo.DaxButton.Secondary</item>
         <item name="borderlessButtonStyle">@style/Widget.DuckDuckGo.DaxButton.Ghost</item>
+        <item name="materialCardViewStyle">@style/Widget.DuckDuckGo.CardView</item>
 
         <!-- Design System Components -->
         <item name="daxButtonPrimary">@style/Widget.DuckDuckGo.DaxButton.TextButton.Primary</item>
@@ -97,8 +98,11 @@
         <item name="primaryButtonRoundedStyle">@style/Widget.DuckDuckGo.Button.Rounded</item>
         <item name="secondaryButtonRoundedStyle">@style/Widget.DuckDuckGo.Button.Secondary.Rounded</item>
         <item name="primaryButtonLowercaseStyle">@style/Widget.DuckDuckGo.Button.Primary.Lowercase</item>
+
         <item name="oneLineListItemStyle">@style/Widget.DuckDuckGo.OneLineListItem</item>
         <item name="twoLineListItemStyle">@style/Widget.DuckDuckGo.TwoLineListItem</item>
+
+        <item name="cardViewStyle">@style/Widget.DuckDuckGo.CardView</item>
     </style>
 
     <style name="Theme.DuckDuckGo" parent="Base.Theme.DuckDuckGo">
