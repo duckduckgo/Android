@@ -92,4 +92,8 @@
     <dimen name="daxDialogContentPaddingStart">@dimen/keyline_5</dimen>
     <dimen name="daxDialogContentPaddingEnd">@dimen/keyline_5</dimen>
     <dimen name="daxDialogButtonSpacing">14dp</dimen>
+
+    <!-- Card -->
+    <dimen name="daxBubbleDialogDistanceFromEdge">40dp</dimen>
+    <dimen name="daxBubbleDialogEdge">9dp</dimen>
 </resources>
