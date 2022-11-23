@@ -109,7 +109,7 @@
     <string name="tabClosedUndo">Отмяна</string>
     <string name="downloadsMenuItemTitle">Изтеглени файлове</string>
 
-   <!-- Fire -->
+    <!-- Fire -->
     <string name="fireMenu">Изчистване на данни</string>
     <string name="fireClearAll">Изчистване на всички раздели и данни</string>
     <string name="fireCancel">Отмени</string>

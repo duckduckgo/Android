@@ -109,7 +109,7 @@
     <string name="tabClosedUndo">Отменить</string>
     <string name="downloadsMenuItemTitle">Загрузки</string>
 
-   <!-- Fire -->
+    <!-- Fire -->
     <string name="fireMenu">Сбросить данные</string>
     <string name="fireClearAll">Закрыть вкладки и удалить данные</string>
     <string name="fireCancel">Отменить</string>

@@ -109,7 +109,7 @@
     <string name="tabClosedUndo">Rückgängig machen</string>
     <string name="downloadsMenuItemTitle">Downloads</string>
 
-   <!-- Fire -->
+    <!-- Fire -->
     <string name="fireMenu">Daten löschen</string>
     <string name="fireClearAll">Alle Tabs schließen und Daten löschen</string>
     <string name="fireCancel">Abbrechen</string>
