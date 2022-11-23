@@ -24,7 +24,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextView
-import com.duckduckgo.mobile.android.ui.view.text.DaxTextView.Type
+import com.duckduckgo.mobile.android.ui.view.text.DaxTextView.Typography
 
 /** Fragment to display a list of subsystems that show the values of this app's theme. */
 @SuppressLint("NoFragment") // we don't use DI here
@@ -43,6 +43,6 @@ class TypographyFragment : Fragment() {
         savedInstanceBundle: Bundle?,
     ) {
         val daxTextView = view.findViewById<DaxTextView>(R.id.typographyTitle)
-        daxTextView.setTypography(Type.Body1)
+        daxTextView.setTypography(Typography.Body1)
     }
 }
