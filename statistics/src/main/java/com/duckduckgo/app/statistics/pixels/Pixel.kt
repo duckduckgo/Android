@@ -18,6 +18,8 @@ package com.duckduckgo.app.statistics.pixels
 
 import android.annotation.SuppressLint
 import com.duckduckgo.app.statistics.api.PixelSender
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import timber.log.Timber
@@ -122,6 +124,7 @@ interface Pixel {
     )
 }
 
+@ContributesBinding(AppScope::class)
 class RxBasedPixel @Inject constructor(private val pixelSender: PixelSender) : Pixel {
 
     override fun fire(
