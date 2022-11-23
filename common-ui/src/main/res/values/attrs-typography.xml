@@ -30,10 +30,11 @@
             <enum name="button" value="8"/>
             <enum name="caption" value="9"/>
         </attr>
-        <attr name="textColor" format="enum" >
+        <attr name="textType" format="enum" >
             <enum name="primary" value="0"/>
             <enum name="secondary" value="1"/>
         </attr>
+        <attr name="android:textColor" format="color"/>
     </declare-styleable>
 
     <!-- Attributes for all Design System Text Appearances -->
