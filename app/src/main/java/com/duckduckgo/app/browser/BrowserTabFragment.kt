@@ -1042,7 +1042,7 @@ class BrowserTabFragment :
             is Command.ShowEmailTooltip -> showEmailTooltip(it.address)
             is Command.InjectCredentials -> injectAutofillCredentials(it.url, it.credentials)
             is Command.CancelIncomingAutofillRequest -> injectAutofillCredentials(it.url, null)
-            is Command.LaunchAutofillSettings -> startActivity(autofillSettingsLauncher.intent(requireContext()))
+            is Command.LaunchAutofillSettings -> launchAutofillManagementScreen()
             is Command.EditWithSelectedQuery -> {
                 omnibarTextInput.setText(it.query)
                 omnibarTextInput.setSelection(it.query.length)
@@ -1818,9 +1818,13 @@ class BrowserTabFragment :
         withContext(dispatchers.main()) {
             browserLayout.makeSnackbarWithNoBottomInset(messageResourceId, Snackbar.LENGTH_LONG)
                 .setAction(R.string.autofillSnackbarAction) {
-                    context?.let { startActivity(autofillSettingsActivityLauncher.intent(it, loginCredentials)) }
+                    context?.let { startActivity(autofillSettingsActivityLauncher.intentDirectlyViewCredentials(it, loginCredentials)) }
                 }.show()
         }
+    }
+
+    private fun launchAutofillManagementScreen() {
+        startActivity(autofillSettingsLauncher.intentAlsoShowSuggestionsForSite(requireContext(), webView?.url))
     }
 
     private fun showDialogHidingPrevious(

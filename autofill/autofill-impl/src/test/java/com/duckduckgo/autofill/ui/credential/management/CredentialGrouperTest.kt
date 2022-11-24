@@ -20,7 +20,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.autofill.AutofillDomainFormatterDomainNameOnly
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem
-import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem.Credential
+import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem.CredentialListItem.Credential
 import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem.GroupHeading
 import com.duckduckgo.autofill.ui.credential.management.sorting.CredentialGrouper
 import com.duckduckgo.autofill.ui.credential.management.sorting.CredentialInitialExtractor
@@ -242,7 +242,7 @@ class CredentialGrouperTest {
 
     private fun ListItem.assertIsGroupHeading(expectedInitial: String) {
         assertTrue(this is GroupHeading)
-        assertEquals(expectedInitial, (this as GroupHeading).initial)
+        assertEquals(expectedInitial, (this as GroupHeading).label)
     }
 
     private fun ListItem.assertIsCredentialWithDomain(expectedDomain: String?) {

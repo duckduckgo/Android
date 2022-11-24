@@ -35,6 +35,7 @@ class AppTpSettingTest {
                 AppTpSetting.ConnectivityChecks -> assertFalse(setting.defaultValue)
                 AppTpSetting.ProtectGames -> assertFalse(setting.defaultValue)
                 AppTpSetting.OpenBeta -> assertFalse(setting.defaultValue)
+                AppTpSetting.CheckBlockingFunction -> assertFalse(setting.defaultValue)
                 else -> throw java.lang.IllegalStateException("Missing AppTpSetting default checks")
             }
         }

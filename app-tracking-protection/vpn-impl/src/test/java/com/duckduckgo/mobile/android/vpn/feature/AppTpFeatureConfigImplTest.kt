@@ -67,6 +67,7 @@ class AppTpFeatureConfigImplTest {
                 AppTpSetting.ConnectivityChecks -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.ProtectGames -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.OpenBeta -> assertFalse(config.isEnabled(setting))
+                AppTpSetting.CheckBlockingFunction -> assertFalse(config.isEnabled(setting))
             }
         }
     }
