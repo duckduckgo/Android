@@ -53,13 +53,10 @@
                 android:orientation="vertical"
                 tools:ignore="Overdraw">
 
-                <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+                <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="@dimen/keyline_4"
-                    android:paddingStart="@dimen/keyline_4"
-                    android:paddingEnd="@dimen/keyline_4"
-                    android:text="@string/accessibilityFontSizeTitle"
+                    app:primaryText="@string/accessibilityFontSizeTitle"
                     tools:text="Text goes here" />
 
                 <LinearLayout
