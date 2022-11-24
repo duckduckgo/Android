@@ -154,79 +154,133 @@ platform :android do
     # This dependency could be removed with a little more time to tidy up this script to do the branching/merging manually.
 
     desc "Create new release"
-    lane :release do
+    lane :release do |options|
 
         ensure_git_status_clean
         ensure_git_branch( branch: 'develop' )
 
-        newVersion = determine_version_number()
-        releaseNotes = determine_release_notes()
+        options_release_number = options[:release_number]
+        options_release_notes = options[:release_notes]
+        options_notes_type = options[:notes_type]
 
-        if UI.confirm("Are you sure you're happy with this release?\n\nVersion=#{newVersion}\nRelease Notes:\n#{releaseNotes}\n")
-          UI.success "Creating release branch for release/#{newVersion}"
+        newVersion = determine_version_number(
+            release_number: options_release_number
+        )
+        releaseNotes = determine_release_notes(
+            release_notes: options_release_notes,
+            notes_type: options_notes_type
+        )
 
-          sh "git flow release start #{newVersion}"
+        isInteractiveMode = options_release_number == nil || (options_notes_type == nil && options_release_notes == nil) || (options_notes_type == "CUSTOM" && options_release_notes == nil)
 
-          File.open('../app/version/version.properties', 'w') do |file|
-            file.write("VERSION=#{newVersion}")
-          end
+        # For interactive flows, we want to confirm the data inputted by the user before proceeding
+        if !isInteractiveMode
+            UI.message("This are the release information:\n\nVersion=#{newVersion}\nRelease Notes:\n#{releaseNotes}\n")
+            do_create_release_branch(newVersion: newVersion, releaseNotes: releaseNotes)
+            do_create_and_push_tags(newVersion: newVersion)
+        else
+            if UI.confirm("Are you sure you're happy with this release?\n\nVersion=#{newVersion}\nRelease Notes:\n#{releaseNotes}\n")
+                UI.success "Creating release branch for release/#{newVersion}"
+                do_create_release_branch(newVersion: newVersion, releaseNotes: releaseNotes)
+                if UI.confirm(text:"If you have any other changes to make to the release branch, do them now. Enter `y` when ready to create and push tags")
+                    do_create_and_push_tags(newVersion: newVersion)
+                else
+                    UI.error errorMessageCancelled
+                end
+            else
+                UI.error errorMessageCancelled
+            end
+        end
+    end
 
-          File.open('../app/version/release-notes', 'w') do |file|
-            file.write("""#{releaseNotes}""")
-          end
+        private_lane :do_create_release_branch do |options|
+            newVersion = options[:newVersion]
+            releaseNotes = options[:releaseNotes]
+            sh "git flow release start #{newVersion}"
 
-          if UI.confirm(text:"If you have any other changes to make to the release branch, do them now. Enter `y` when ready to create and push tags")
+            File.open('../app/version/version.properties', 'w') do |file|
+                file.write("VERSION=#{newVersion}")
+            end
 
+            File.open('../app/version/release-notes', 'w') do |file|
+                file.write("""#{releaseNotes}""")
+            end
+        end
+
+        private_lane :do_create_and_push_tags do |options|
+            newVersion = options[:newVersion]
             git_commit(
                 message: "Updated release notes and version number for new release - #{newVersion}",
                 path: "*",
                 allow_nothing_to_commit: true,
                 skip_git_hooks: true
             )
-            
+
             sh "git flow release finish -mnFS '#{newVersion}' '#{newVersion}'"
             push_git_tags
             sh "git push origin main"
             sh "git push origin develop"
 
             UI.header("#{newVersion} tag has been successfully created. 🎉")
-
-          else
-            UI.error errorMessageCancelled
-          end
-
-        else
-          UI.error errorMessageCancelled
         end
 
+        private_lane :determine_release_notes do |options|
+            notes_type = options[:notes_type]
+            custom_release_notes = options[:release_notes]
+            existingReleaseNotes = File.read(releaseNotesFileBody)
+
+            # This handles the flow when no options were passed. We will prompt the user for input.
+            if notes_type == nil && custom_release_notes == nil then
+                commits = changelog_from_git_commits(
+                    between: [last_git_tag, "HEAD"],
+                    pretty: "- %s",
+                    date_format: "short",
+                    match_lightweight_tag: false,
+                    merge_commit_filtering: "exclude_merges"
+                )
+                    UI.important("Existing release notes:\n")
+                    UI.message("#{existingReleaseNotes}\n")
+                    choice = UI.select "What do you want to do for release notes?", ["KEEP EXISTING", "CUSTOM",
+                    "Bug fixes and other improvements",
+                    ]
+
+                rl = retrieve_notes_for_type(
+                    notes_type: choice,
+                    existingReleaseNotes: existingReleaseNotes
+                )
+            else
+                # Force notes_type to custom when custom_release_notes is present.
+                if custom_release_notes != nil
+                    retrieve_notes_for_type(
+                        notes_type: "CUSTOM",
+                        release_notes: custom_release_notes,
+                        existingReleaseNotes: existingReleaseNotes
+                    )
+                else
+                    retrieve_notes_for_type(
+                        notes_type: notes_type,
+                        release_notes: custom_release_notes,
+                        existingReleaseNotes: existingReleaseNotes
+                    )
+                end
+
+            end
         end
 
-
-
-
-        private_lane :determine_release_notes do
-            commits = changelog_from_git_commits(
-                between: [last_git_tag, "HEAD"],
-                pretty: "- %s",
-                date_format: "short",
-                match_lightweight_tag: false,
-                merge_commit_filtering: "exclude_merges"
-            )
-
-                existingReleaseNotes = File.read(releaseNotesFileBody)
-                UI.important("Existing release notes:\n")
-                UI.message("#{existingReleaseNotes}\n")
-                choice = UI.select "What do you want to do for release notes?", ["KEEP EXISTING", "CUSTOM",
-                  "Bug fixes and other improvements",
-                ]
-
-                rl = case choice
-                    when "KEEP EXISTING"
-                        existingReleaseNotes
-                    when "CUSTOM"
+        private_lane :retrieve_notes_for_type do |options|
+            notes_type = options[:notes_type]
+            custom_release_notes = options[:release_notes]
+            rl = case notes_type
+                when "KEEP EXISTING"
+                    options[:existingReleaseNotes]
+                when "CUSTOM"
+                    if custom_release_notes == nil then
                         prompt(text: "Release Notes: ", multi_line_end_keyword: "END")
                     else
-                        choice
+                        custom_release_notes
+                    end
+                else
+                     notes_type
                 end
         end
 
@@ -279,8 +333,13 @@ platform :android do
        end
 
        desc "Prompt for version number"
-       private_lane :"determine_version_number" do
-            prompt(text: "\nLast release was: #{last_git_tag}\nEnter New Version Number:")
+       private_lane :"determine_version_number" do |options|
+            release_number = options[:release_number]
+            if release_number == nil
+                prompt(text: "\nLast release was: #{last_git_tag}\nEnter New Version Number:")
+            else
+                release_number
+            end
        end
 
     desc "Prepares the Asana release board with a new release task, tags tasks waiting for release etc.."
