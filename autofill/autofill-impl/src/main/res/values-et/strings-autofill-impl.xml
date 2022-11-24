@@ -63,4 +63,6 @@
     <string name="credentialManagementViewMenuEdit">Redigeeri</string>
     <string name="credentialManagementViewMenuDelete">Kustuta</string>
 
+    <string name="credentialManagementSuggestionsLabel">Soovitatud</string>
+
 </resources>
