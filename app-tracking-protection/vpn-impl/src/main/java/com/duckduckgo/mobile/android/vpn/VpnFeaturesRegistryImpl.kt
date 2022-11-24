@@ -21,6 +21,7 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
+import com.duckduckgo.mobile.android.vpn.service.VpnServicePreStartupManager
 import java.util.UUID
 import kotlinx.coroutines.flow.*
 import timber.log.Timber
@@ -31,6 +32,7 @@ private const val IS_INITIALIZED = "IS_INITIALIZED"
 internal class VpnFeaturesRegistryImpl(
     private val vpnServiceWrapper: VpnServiceWrapper,
     private val sharedPreferencesProvider: VpnSharedPreferencesProvider,
+    private val vpnServicePreStartupManager: VpnServicePreStartupManager,
 ) : VpnFeaturesRegistry, SharedPreferences.OnSharedPreferenceChangeListener {
 
     private val preferences: SharedPreferences
@@ -56,9 +58,11 @@ internal class VpnFeaturesRegistryImpl(
         }
 
         if (!vpnServiceWrapper.isServiceRunning()) {
-            Timber.d("no features registered, start the service")
-            // there's not a registered feature, so we need to start the VPN too
-            vpnServiceWrapper.startService()
+            vpnServicePreStartupManager.initiatePreStartup(feature) {
+                Timber.d("no features registered, start the service")
+                // there's not a registered feature, so we need to start the VPN too
+                vpnServiceWrapper.startService()
+            }
         }
         Timber.d("(re)registering feature")
         preferences.edit(commit = true) {
@@ -126,7 +130,10 @@ internal class VpnFeaturesRegistryImpl(
             }
     }
 
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
+    override fun onSharedPreferenceChanged(
+        sharedPreferences: SharedPreferences,
+        key: String,
+    ) {
         Timber.d("onSharedPreferenceChanged($key)")
         _registry.update { Pair(key, sharedPreferences.contains(key)) }
     }
@@ -142,7 +149,9 @@ internal class VpnFeaturesRegistryImpl(
  *
  * The class is marked as open to be able to mock it in tests.
  */
-internal open class VpnServiceWrapper(private val context: Context) {
+internal open class VpnServiceWrapper(
+    private val context: Context,
+) {
     open suspend fun restartVpnService() {
         TrackerBlockingVpnService.restartVpnService(context)
     }
@@ -152,6 +161,7 @@ internal open class VpnServiceWrapper(private val context: Context) {
     }
 
     open fun startService() {
+        Timber.d("KL starting")
         TrackerBlockingVpnService.startService(context)
     }
 

@@ -26,6 +26,7 @@ import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistryImpl
 import com.duckduckgo.mobile.android.vpn.VpnServiceWrapper
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.mobile.android.vpn.remote_config.*
+import com.duckduckgo.mobile.android.vpn.service.VpnServicePreStartupManager
 import com.duckduckgo.mobile.android.vpn.store.*
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.duckduckgo.mobile.android.vpn.trackers.RealAppTrackerRepository
@@ -107,7 +108,12 @@ object VpnAppModule {
     fun provideVpnFeaturesRegistry(
         context: Context,
         sharedPreferencesProvider: VpnSharedPreferencesProvider,
+        vpnServicePreStartupManager: VpnServicePreStartupManager,
     ): VpnFeaturesRegistry {
-        return VpnFeaturesRegistryImpl(VpnServiceWrapper(context), sharedPreferencesProvider)
+        return VpnFeaturesRegistryImpl(
+            VpnServiceWrapper(context),
+            sharedPreferencesProvider,
+            vpnServicePreStartupManager,
+        )
     }
 }
