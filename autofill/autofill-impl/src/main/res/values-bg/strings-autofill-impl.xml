@@ -63,4 +63,6 @@
     <string name="credentialManagementViewMenuEdit">Редактиране</string>
     <string name="credentialManagementViewMenuDelete">Изтриване</string>
 
+    <string name="credentialManagementSuggestionsLabel">Предложения</string>
+
 </resources>
