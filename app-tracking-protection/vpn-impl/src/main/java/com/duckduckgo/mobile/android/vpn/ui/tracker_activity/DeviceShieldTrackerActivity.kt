@@ -432,7 +432,7 @@ class DeviceShieldTrackerActivity :
     private fun renderViewState(state: DeviceShieldTrackerActivityViewModel.TrackerActivityViewState) {
         vpnCachedState = state.runningState
         if (::deviceShieldSwitch.isInitialized) {
-            quietlyToggleAppTpSwitch(state.runningState.state == VpnRunningState.ENABLED)
+            quietlyToggleAppTpSwitch(state.runningState.state == VpnRunningState.ENABLED || state.runningState.state == VpnRunningState.CONNECTING)
         } else {
             Timber.v("switch view reference not yet initialized; cache value until menu populated")
         }
@@ -521,7 +521,10 @@ class DeviceShieldTrackerActivity :
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         vpnCachedState?.let { vpnState ->
-            deviceShieldSwitch.quietlySetIsChecked(vpnState.state == VpnRunningState.ENABLED, enableAppTPSwitchListener)
+            deviceShieldSwitch.quietlySetIsChecked(
+                vpnState.state == VpnRunningState.ENABLED || vpnState.state == VpnRunningState.CONNECTING,
+                enableAppTPSwitchListener,
+            )
             vpnCachedState = null
         }
 

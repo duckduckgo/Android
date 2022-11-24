@@ -21,6 +21,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.VpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.model.AlwaysOnState
+import com.duckduckgo.mobile.android.vpn.model.VpnServiceState.CONNECTING
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceState.DISABLED
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceState.ENABLED
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceStateStats
@@ -93,6 +94,7 @@ class RealVpnStateMonitor @Inject constructor(
             else -> VpnStopReason.UNKNOWN
         }
         val runningState = when (lastState?.state) {
+            CONNECTING -> VpnRunningState.CONNECTING
             ENABLED -> VpnRunningState.ENABLED
             DISABLED -> VpnRunningState.DISABLED
             else -> VpnRunningState.INVALID

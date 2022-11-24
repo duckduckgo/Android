@@ -20,12 +20,14 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.VpnFeature
+import com.duckduckgo.mobile.android.vpn.model.VpnServiceState
+import com.duckduckgo.mobile.android.vpn.model.VpnServiceStateStats
+import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.vpn.di.VpnCoroutineScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 interface VpnServicePreStartupManager {
     fun initiatePreStartup(
@@ -39,6 +41,7 @@ class RealVpnServicePreStartupManager @Inject constructor(
     @VpnCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val vpnServicePreStartupCallback: PluginPoint<VpnServicePreStartupCallback>,
+    private val vpnDatabase: VpnDatabase,
 ) : VpnServicePreStartupManager {
     override fun initiatePreStartup(
         feature: VpnFeature,
@@ -46,12 +49,11 @@ class RealVpnServicePreStartupManager @Inject constructor(
     ) {
         val plugins = vpnServicePreStartupCallback.getPlugins().filter { it.supportsFeature(feature) }
         if (plugins.isNotEmpty()) {
-            Timber.d("KL registerFeature with ${plugins.size} vpnServicePreStartupCallbacks")
             coroutineScope.launch(dispatcherProvider.io()) {
+                vpnDatabase.vpnServiceStateDao().insert(VpnServiceStateStats(state = VpnServiceState.CONNECTING))
                 plugins.forEach {
                     it.prepBeforeServiceStarts()
                 }
-                Timber.d("KL completed running all plugin")
                 onComplete()
             }
         } else {
