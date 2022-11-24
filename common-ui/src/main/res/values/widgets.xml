@@ -371,17 +371,10 @@
 
     <!-- Slider -->
     <style name="Widget.DuckDuckGo.Slider" parent="Widget.MaterialComponents.Slider">
-        <item name="materialThemeOverlay">@style/ThemeOverlay.DuckDuckGo.Slider</item>
-        <item name="trackHeight">6dp</item>
-        <item name="trackColorInactive">@color/slider_inactive_track</item>
-        <item name="trackColorActive">@color/accentBlue</item>
-        <item name="thumbColor">@color/accentBlue</item>
-    </style>
-
-    <style name="ThemeOverlay.DuckDuckGo.Slider" parent="">
-        <item name="colorPrimary">@color/accentBlue</item>
-        <item name="colorOnPrimary">@color/accentBlue</item>
-        <item name="colorOnSurface">@color/white</item>
+        <item name="trackHeight">@dimen/sliderTrackHeight</item>
+        <item name="trackColorInactive">?attr/daxColorSliderTrackInactive</item>
+        <item name="trackColorActive">?attr/daxColorSliderTrackActive</item>
+        <item name="thumbColor">?attr/daxColorSliderThumb</item>
     </style>
 
     <!-- Dividers -->
