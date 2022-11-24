@@ -147,7 +147,6 @@ class WelcomePage : OnboardingPageFragment() {
             hiddenTextCta.text = ctaText.html(it)
             dialogTextCta.textInDialog = ctaText.html(it)
         }
-        triangle.setImageResource(R.drawable.ic_triangle_bubble_white)
     }
 
     private fun setSkipAnimationListener() {

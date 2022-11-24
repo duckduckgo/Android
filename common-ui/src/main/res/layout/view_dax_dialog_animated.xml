@@ -20,7 +20,8 @@
     android:id="@+id/dialogContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:fitsSystemWindows="true"
+    android:clipChildren="false">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -56,21 +57,11 @@
             app:layout_constraintStart_toStartOf="@id/cardView"
             app:srcCompat="@drawable/ic_dax_icon" />
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/triangle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toTopOf="@+id/cardView"
-            app:layout_constraintEnd_toEndOf="@id/logo"
-            app:layout_constraintStart_toStartOf="@id/logo"
-            android:elevation="6dp"
-            app:srcCompat="@drawable/ic_triangle_bubble" />
-
-        <androidx.cardview.widget.CardView
+        <com.duckduckgo.mobile.android.ui.view.shape.DaxBubbleCardView
             android:id="@+id/cardView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            style="@style/Widget.DuckDuckGo.DaxDialog.Outline"
+            android:layout_margin="@dimen/keyline_4"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -120,6 +111,6 @@
                     android:layout_marginTop="@dimen/keyline_1"/>
 
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
+        </com.duckduckgo.mobile.android.ui.view.shape.DaxBubbleCardView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </RelativeLayout>
