@@ -14,114 +14,100 @@
   ~ limitations under the License.
   -->
 
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                                     xmlns:app="http://schemas.android.com/apk/res-auto"
-                                                     xmlns:tools="http://schemas.android.com/tools"
-                                                     android:layout_width="match_parent"
-                                                     android:layout_height="match_parent"
-                                                     tools:context="com.duckduckgo.app.accessibility.AccessibilityActivity">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <include
-            android:id="@+id/includeToolbar"
-            layout="@layout/include_default_toolbar"/>
+        android:id="@+id/includeToolbar"
+        layout="@layout/include_default_toolbar" />
 
     <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            tools:ignore="Overdraw">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:ignore="Overdraw">
 
         <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="@dimen/keyline_4"
-                android:paddingBottom="@dimen/keyline_4"
-                android:orientation="vertical">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/keyline_4">
 
             <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-                    android:id="@+id/appFontSizeToggle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:secondaryText="@string/accessibilityTextSizeOverrideSubtitle"
-                    app:primaryText="@string/accessibilityTextSizeOverrideTitle"
-                    app:showSwitch="true"/>
+                android:id="@+id/appFontSizeToggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/accessibilityTextSizeOverrideTitle"
+                app:secondaryText="@string/accessibilityTextSizeOverrideSubtitle"
+                app:showSwitch="true" />
 
             <LinearLayout
-                    android:id="@+id/fontSizeSettingsGroup"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    tools:ignore="Overdraw">
-
-                <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="@dimen/keyline_4"
-                    android:paddingStart="@dimen/keyline_4"
-                    android:paddingEnd="@dimen/keyline_4"
-                    android:text="@string/accessibilityFontSizeTitle"
-                    tools:text="Text goes here"/>
+                android:id="@+id/fontSizeSettingsGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                tools:ignore="Overdraw">
 
                 <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:paddingStart="@dimen/keyline_4"
-                        android:paddingEnd="@dimen/keyline_4">
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingStart="@dimen/keyline_4"
+                    android:paddingEnd="@dimen/keyline_4">
 
-                    <TextView
-                            android:id="@+id/accessibilitySliderValue"
-                            style="@style/TextAppearance.DuckDuckGo.Body1"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:gravity="center_vertical|start"
-                            android:minWidth="50dp"
-                            android:textColor="?attr/normalTextColor"/>
+                    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                        android:id="@+id/accessibilitySliderValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:minWidth="50dp"
+                        app:typography="body1" />
 
                     <com.google.android.material.slider.Slider
-                            android:id="@+id/accessibilitySlider"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:paddingTop="@dimen/keyline_4"
-                            android:paddingBottom="@dimen/keyline_4"
-                            android:stepSize="10"
-                            android:valueFrom="70"
-                            android:valueTo="170"
-                            app:labelBehavior="gone"
-                            app:tickVisible="false"/>
+                        android:id="@+id/accessibilitySlider"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:paddingTop="@dimen/keyline_4"
+                        android:paddingBottom="@dimen/keyline_4"
+                        android:stepSize="10"
+                        android:valueFrom="70"
+                        android:valueTo="170"
+                        app:labelBehavior="gone"
+                        app:tickVisible="false" />
                 </LinearLayout>
 
-                <TextView
-                        android:id="@+id/accessibilityHint"
-                        style="@style/TextAppearance.DuckDuckGo.Body1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="bottom"
-                        android:layout_marginStart="@dimen/keyline_4"
-                        android:layout_marginTop="@dimen/keyline_4"
-                        android:layout_marginEnd="@dimen/keyline_4"
-                        android:background="?lightContainerBackground"
-                        android:ellipsize="end"
-                        android:padding="@dimen/keyline_2"
-                        android:text="@string/accessibilityFontSizeHint"
-                        android:textColor="?attr/normalTextColor"/>
+                <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                    android:id="@+id/accessibilityHint"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/keyline_4"
+                    android:layout_marginTop="@dimen/keyline_4"
+                    android:layout_marginEnd="@dimen/keyline_4"
+                    android:layout_marginBottom="16dp"
+                    android:background="@drawable/background_text_view_container"
+                    android:padding="@dimen/keyline_4"
+                    android:text="@string/accessibilityFontSizeHint"
+                    app:typography="body1" />
             </LinearLayout>
 
             <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+                android:id="@+id/accessibilityDivider"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/accessibilityDivider"/>
+                android:layout_height="wrap_content" />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-                    android:id="@+id/forceZoomToggle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:secondaryText="@string/accessibilityForceZoomSubtitle"
-                    app:primaryText="@string/accessibilityForceZoomTitle"
-                    app:showSwitch="true"/>
+                android:id="@+id/forceZoomToggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/accessibilityForceZoomTitle"
+                app:secondaryText="@string/accessibilityForceZoomSubtitle"
+                app:showSwitch="true" />
 
         </LinearLayout>
     </ScrollView>
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</LinearLayout>
