@@ -63,4 +63,6 @@
     <string name="credentialManagementViewMenuEdit">Düzenle</string>
     <string name="credentialManagementViewMenuDelete">Sil</string>
 
+    <string name="credentialManagementSuggestionsLabel">Önerilen</string>
+
 </resources>
