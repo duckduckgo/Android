@@ -16,12 +16,21 @@
 
 <resources>
 
+    <!-- Design System Theme Agnostic Reference Colors
+        daxColorDim - Dim color behine some dialogs / Dax Dialog
+        daxColorWhite - Brand White
+        -->
+    <attr name="daxColorDim" format="color"/>
+    <attr name="daxColorWhite" format="color"/>
+
     <!-- Design System Reference Colors
         daxColorBackground - Bottom Layer - Background of the screen
         daxColorSurface - First layer on top (Toolbar, Navigation Bar, Dialogs)
         daxColorContainer - Object container (Favicon rounded background)
         daxColorPrimaryText - Primary text color
+        daxColorPrimaryInvertedText - Primary text color inverted
         daxColorSecondaryText - Secondary text color
+        daxColorSecondaryText - Secondary text color inverted
         daxColorPrimaryIcon - Primary color for icons
         daxColorDestructive - Destructive element (Destructive button)
         daxColorLines - Dividers between elements
@@ -36,7 +45,9 @@
     <attr name="daxColorContainer" format="color"/>
     <attr name="daxColorWindow" format="color"/>
     <attr name="daxColorPrimaryText" format="color"/>
+    <attr name="daxColorPrimaryInvertedText" format="color"/>
     <attr name="daxColorSecondaryText" format="color"/>
+    <attr name="daxColorSecondaryInvertedText" format="color"/>
     <attr name="daxColorPrimaryIcon" format="color"/>
     <attr name="daxColorDestructive" format="color"/>
     <attr name="daxColorLines" format="color"/>
