@@ -25,6 +25,8 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -35,10 +37,9 @@ import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.mobile.android.ui.view.button.DaxButton
 import com.duckduckgo.mobile.android.ui.view.show
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.content_onboarding_default_browser.*
-import kotlinx.android.synthetic.main.include_default_browser_buttons.*
 import timber.log.Timber
 
 @InjectWith(FragmentScope::class)
@@ -56,7 +57,13 @@ class DefaultBrowserPage : OnboardingPageFragment() {
     private var userTriedToSetDDGAsDefault = false
     private var userSelectedExternalBrowser = false
     private var toast: Toast? = null
+
     private var defaultCard: View? = null
+    private lateinit var headerImage: ImageView
+    private lateinit var title: TextView
+    private lateinit var subtitle: TextView
+    private lateinit var primaryButton: DaxButton
+    private lateinit var secondaryButton: DaxButton
 
     private val viewModel: DefaultBrowserPageViewModel by lazy {
         ViewModelProvider(this, viewModelFactory).get(DefaultBrowserPageViewModel::class.java)
@@ -69,6 +76,19 @@ class DefaultBrowserPage : OnboardingPageFragment() {
         if (isVisibleToUser) {
             viewModel.pageBecameVisible()
         }
+    }
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
+        super.onViewCreated(view, savedInstanceState)
+
+        headerImage = view.findViewById(R.id.defaultBrowserImage)
+        title = view.findViewById(R.id.browserProtectionTitle)
+        subtitle = view.findViewById(R.id.browserProtectionSubtitle)
+        primaryButton = view.findViewById(R.id.launchSettingsButton)
+        secondaryButton = view.findViewById(R.id.continueButton)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -132,26 +152,26 @@ class DefaultBrowserPage : OnboardingPageFragment() {
     }
 
     private fun setUiForDialog() {
-        defaultBrowserImage.setImageResource(R.drawable.set_as_default_browser_illustration_dialog)
-        browserProtectionSubtitle.setText(R.string.defaultBrowserDescriptionNoDefault)
-        browserProtectionTitle.setText(R.string.onboardingDefaultBrowserTitle)
-        launchSettingsButton.setText(R.string.defaultBrowserLetsDoIt)
+        headerImage.setImageResource(R.drawable.set_as_default_browser_illustration_dialog)
+        subtitle.setText(R.string.defaultBrowserDescriptionNoDefault)
+        title.setText(R.string.onboardingDefaultBrowserTitle)
+        primaryButton.setText(R.string.defaultBrowserLetsDoIt)
         setButtonsBehaviour()
     }
 
     private fun setUiForSettings() {
-        defaultBrowserImage.setImageResource(R.drawable.set_as_default_browser_illustration_settings)
-        browserProtectionSubtitle.setText(R.string.onboardingDefaultBrowserDescription)
-        browserProtectionTitle.setText(R.string.onboardingDefaultBrowserTitle)
-        launchSettingsButton.setText(R.string.defaultBrowserLetsDoIt)
+        headerImage.setImageResource(R.drawable.set_as_default_browser_illustration_settings)
+        subtitle.setText(R.string.onboardingDefaultBrowserDescription)
+        title.setText(R.string.onboardingDefaultBrowserTitle)
+        primaryButton.setText(R.string.defaultBrowserLetsDoIt)
         setButtonsBehaviour()
     }
 
     private fun setButtonsBehaviour() {
-        launchSettingsButton.setOnClickListener {
+        primaryButton.setOnClickListener {
             viewModel.onDefaultBrowserClicked()
         }
-        continueButton.setOnClickListener {
+        secondaryButton.setOnClickListener {
             viewModel.onContinueToBrowser(userTriedToSetDDGAsDefault)
         }
     }

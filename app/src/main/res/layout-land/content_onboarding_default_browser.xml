@@ -15,67 +15,68 @@
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/longDescriptionContainer"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:tag="onboardingDefaultBrowser"
-    tools:background="@color/white"
-    tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
-
-    <include layout="@layout/include_default_browser_buttons"/>
+               xmlns:app="http://schemas.android.com/apk/res-auto"
+               xmlns:tools="http://schemas.android.com/tools"
+               android:id="@+id/longDescriptionContainer"
+               android:layout_width="match_parent"
+               android:layout_height="match_parent"
+               android:tag="onboardingDefaultBrowser"
+               tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
 
     <ImageView
         android:id="@+id/defaultBrowserImage"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="42dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="42dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="40dp"
         android:importantForAccessibility="no"
         android:src="@drawable/set_as_default_browser_illustration_dialog"
-        app:layout_constraintBottom_toTopOf="@id/continueButton"
-        app:layout_constraintDimensionRatio="1"
-        app:layout_constraintEnd_toStartOf="@id/browserProtectionTitle"
-        app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintStart_toStartOf="@id/continueButton"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent"/>
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/browserProtectionTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:fontFamily="sans-serif"
-        android:lineSpacingExtra="3sp"
         android:text="@string/onboardingDefaultBrowserTitle"
-        android:textAlignment="center"
-        android:textColor="@color/almostBlack"
-        android:textSize="17sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@id/browserProtectionSubtitle"
-        app:layout_constraintEnd_toEndOf="@id/continueButton"
-        app:layout_constraintStart_toEndOf="@id/defaultBrowserImage"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed" />
+        android:textAlignment="center" app:layout_constraintBottom_toTopOf="@+id/browserProtectionSubtitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/defaultBrowserImage" app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:typography="h2"/>
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/browserProtectionSubtitle"
-        android:layout_width="0dp"
+        android:layout_width="282dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:fontFamily="sans-serif"
-        android:lineSpacingExtra="7sp"
+        android:layout_marginTop="16dp"
         android:text="@string/defaultBrowserDescriptionNoDefault"
         android:textAlignment="center"
-        android:textColor="@color/brownishGrayTwo"
-        android:textSize="15sp"
-        android:textStyle="normal"
-        app:layout_constraintBottom_toTopOf="@id/continueButton"
-        app:layout_constraintEnd_toEndOf="@id/browserProtectionTitle"
-        app:layout_constraintStart_toStartOf="@id/browserProtectionTitle"
-        app:layout_constraintTop_toBottomOf="@id/browserProtectionTitle"
-        app:layout_constraintWidth_max="500dp" />
+        app:layout_constraintBottom_toTopOf="@+id/launchSettingsButton"
+        app:layout_constraintEnd_toEndOf="@+id/browserProtectionTitle"
+        app:layout_constraintStart_toStartOf="@+id/browserProtectionTitle" app:layout_constraintTop_toBottomOf="@+id/browserProtectionTitle"
+        app:typography="body1"/>
+
+    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+        android:id="@+id/launchSettingsButton"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="@string/defaultBrowserLetsDoIt"
+        app:buttonSize="large"
+        app:layout_constraintBottom_toTopOf="@+id/continueButton"
+        app:layout_constraintEnd_toEndOf="@+id/browserProtectionSubtitle"
+        app:layout_constraintStart_toStartOf="@+id/browserProtectionSubtitle"
+        app:layout_constraintTop_toBottomOf="@+id/browserProtectionSubtitle"/>
+
+    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonSecondary
+        android:id="@+id/continueButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/defaultBrowserMaybeLater"
+        app:buttonSize="large" app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/launchSettingsButton"
+        app:layout_constraintStart_toStartOf="@+id/launchSettingsButton"
+        app:layout_constraintTop_toBottomOf="@+id/launchSettingsButton"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
