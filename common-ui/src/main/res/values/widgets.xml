@@ -336,6 +336,7 @@
         <item name="android:textCursorDrawable">@drawable/text_cursor</item>
     </style>
 
+    <!-- Text Input -->
     <style name="Widget.DuckDuckGo.TextInput"
            parent="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="shapeAppearance">@style/ShapeAppearance.DuckDuckGo.SmallComponent</item>
