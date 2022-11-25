@@ -89,7 +89,7 @@
                     android:layout_marginTop="@dimen/keyline_4"
                     android:layout_marginEnd="@dimen/keyline_4"
                     android:layout_marginBottom="16dp"
-                    android:background="?attr/daxColorContainer"
+                    android:background="@drawable/background_text_view_container"
                     android:padding="@dimen/keyline_4"
                     android:text="@string/accessibilityFontSizeHint"
                     app:typography="body1" />
