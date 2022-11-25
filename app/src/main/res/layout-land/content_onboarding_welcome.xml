@@ -41,20 +41,17 @@
             android:layout_marginTop="80dp"
             app:srcCompat="@drawable/ic_dax_icon" />
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/welcomeTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:typography="title"
             android:layout_marginStart="54dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="@dimen/keyline_4"
             android:layout_marginEnd="54dp"
-            android:fontFamily="sans-serif"
-            android:lineSpacingExtra="4sp"
             android:text="@string/onboardingWelcomeTitle"
-            android:textAlignment="center"
-            android:textColor="#303030"
-            android:textSize="32sp"
-            android:textStyle="bold" />
+            android:textAlignment="center"/>
+
     </LinearLayout>
 
     <include
