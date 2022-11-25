@@ -69,8 +69,7 @@
     <attr name="daxColorSwitchThumbOff" format="color"/>
 
     <attr name="daxColorSliderTrackInactive" format="color"/>
-    <attr name="daxColorSliderTrackActive" format="color"/>
-    <attr name="daxColorSliderThumb" format="color"/>
+    <attr name="daxColorSliderActive" format="color"/>
 
     <!-- Design System Brand Colors -->
     <color name="disabledColor">#59000000</color>

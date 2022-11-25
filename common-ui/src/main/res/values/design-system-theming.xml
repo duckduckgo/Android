@@ -279,8 +279,7 @@
 
         <!-- Slider -->
         <item name="daxColorSliderTrackInactive">@color/gray40_50</item>
-        <item name="daxColorSliderTrackActive">?attr/daxColorAccentBlue</item>
-        <item name="daxColorSliderThumb">?attr/daxColorAccentBlue</item>
+        <item name="daxColorSliderActive">?attr/daxColorAccentBlue</item>
 
     </style>
 
@@ -429,8 +428,7 @@
 
         <!-- Slider -->
         <item name="daxColorSliderTrackInactive">@color/gray60_50</item>
-        <item name="daxColorSliderTrackActive">?attr/daxColorAccentBlue</item>
-        <item name="daxColorSliderThumb">?attr/daxColorAccentBlue</item>
+        <item name="daxColorSliderActive">?attr/daxColorAccentBlue</item>
 
     </style>
 

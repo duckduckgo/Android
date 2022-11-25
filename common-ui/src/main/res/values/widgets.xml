@@ -373,8 +373,8 @@
     <style name="Widget.DuckDuckGo.Slider" parent="Widget.MaterialComponents.Slider">
         <item name="trackHeight">@dimen/sliderTrackHeight</item>
         <item name="trackColorInactive">?attr/daxColorSliderTrackInactive</item>
-        <item name="trackColorActive">?attr/daxColorSliderTrackActive</item>
-        <item name="thumbColor">?attr/daxColorSliderThumb</item>
+        <item name="trackColorActive">?attr/daxColorSliderActive</item>
+        <item name="thumbColor">?attr/daxColorSliderActive</item>
     </style>
 
     <!-- Dividers -->
