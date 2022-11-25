@@ -23,7 +23,7 @@ import com.duckduckgo.app.fire.DatabaseLocator
 import com.duckduckgo.app.fire.FireproofRepository
 import com.duckduckgo.app.fire.WebViewDatabaseLocator
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
-import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryImpl
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.db.AppDatabase
@@ -135,7 +135,7 @@ class SQLCookieRemoverTest {
 
     private fun givenSQLCookieRemover(
         databaseLocator: DatabaseLocator = webViewDatabaseLocator,
-        repository: FireproofRepository = FireproofWebsiteRepository(fireproofWebsiteDao, DefaultDispatcherProvider(), mock()),
+        repository: FireproofRepository = FireproofWebsiteRepositoryImpl(fireproofWebsiteDao, DefaultDispatcherProvider(), mock()),
         offlinePixelCountDataStore: OfflinePixelCountDataStore = mockOfflinePixelCountDataStore,
         exceptionPixel: ExceptionPixel = ExceptionPixel(mockPixel, RootExceptionFinder()),
         dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),

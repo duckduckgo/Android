@@ -52,7 +52,7 @@ import com.duckduckgo.app.browser.useragent.UserAgentInterceptor
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.*
-import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryAPI
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.events.db.UserEventsStore
@@ -376,7 +376,7 @@ class BrowserModule {
     fun fireproofLoginDialogEventHandler(
         userEventsStore: UserEventsStore,
         pixel: Pixel,
-        fireproofWebsiteRepository: FireproofWebsiteRepositoryAPI,
+        fireproofWebsiteRepository: FireproofWebsiteRepository,
         appSettingsPreferencesStore: SettingsDataStore,
         dispatchers: DispatcherProvider,
     ): FireproofDialogsEventHandler {
