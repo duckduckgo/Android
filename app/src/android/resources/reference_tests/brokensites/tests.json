@@ -70,7 +70,9 @@
                 ],
                 "exceptPlatforms": [
                     "web-extension",
-                    "safari-extension"
+                    "safari-extension",
+                    "macos-browser",
+                    "windows-browser"
                 ]
             }
         ]

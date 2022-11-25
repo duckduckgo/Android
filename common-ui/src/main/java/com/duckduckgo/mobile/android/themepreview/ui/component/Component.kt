@@ -28,6 +28,7 @@ enum class Component {
     SWITCH,
     RADIO_BUTTON,
     CHECKBOX,
+    SLIDER,
     BOTTOM_APP_BAR,
     TABS,
     SNACKBAR,

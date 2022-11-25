@@ -53,6 +53,9 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
     class CheckboxComponentViewHolder(parent: ViewGroup) :
         ComponentViewHolder(inflate(parent, R.layout.component_checkbox))
 
+    class SliderComponentViewHolder(parent: ViewGroup) :
+        ComponentViewHolder(inflate(parent, R.layout.component_slider))
+
     class InfoPanelComponentViewHolder(
         parent: ViewGroup,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_info_panel))
@@ -230,6 +233,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.SWITCH -> SwitchComponentViewHolder(parent)
                 Component.RADIO_BUTTON -> RadioButtonComponentViewHolder(parent)
                 Component.CHECKBOX -> CheckboxComponentViewHolder(parent)
+                Component.SLIDER -> SliderComponentViewHolder(parent)
                 Component.SNACKBAR -> SnackbarComponentViewHolder(parent)
                 Component.INFO_PANEL -> InfoPanelComponentViewHolder(parent)
                 Component.SEARCH_BAR -> SearchBarComponentViewHolder(parent)

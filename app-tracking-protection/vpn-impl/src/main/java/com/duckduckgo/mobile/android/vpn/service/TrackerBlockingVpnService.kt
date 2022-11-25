@@ -262,7 +262,16 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
                         }
                     }
                 }
-                vpnRoutes.forEach { addRoute(it.address, it.maskWidth) }
+                vpnRoutes.forEach { route ->
+                    // convert to InetAddress to later check if it's loopback
+                    kotlin.runCatching { InetAddress.getByName(route.address) }.getOrNull()?.let {
+                        if (!it.isLoopbackAddress) {
+                            addRoute(route.address, route.maskWidth)
+                        } else {
+                            Timber.w("Tried to add loopback address $it to VPN routes")
+                        }
+                    }
+                }
             }
 
             // Add the route for all Global Unicast Addresses. This is the IPv6 equivalent to

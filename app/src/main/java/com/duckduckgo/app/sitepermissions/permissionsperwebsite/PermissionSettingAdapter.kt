@@ -34,13 +34,19 @@ class PermissionSettingAdapter(private val viewModel: PermissionsPerWebsiteViewM
         notifyDataSetChanged()
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): ViewHolder =
         ViewHolder(
             ItemSitePermissionSettingSelectionBinding.inflate(LayoutInflater.from(parent.context), parent, false),
             viewModel,
         )
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: ViewHolder,
+        position: Int,
+    ) {
         holder.bind(items[position])
     }
 
@@ -68,18 +74,23 @@ data class WebsitePermissionSetting(
 ) : Serializable
 
 enum class WebsitePermissionSettingType {
-    ASK, ALLOW, DENY;
+    ASK,
+    ASK_DISABLED,
+    ALLOW,
+    DENY,
+    ;
 
     fun toPrettyStringRes(): Int =
         when (this) {
             ASK -> R.string.permissionsPerWebsiteAskSetting
+            ASK_DISABLED -> R.string.permissionsPerWebsiteAskDisabledSetting
             ALLOW -> R.string.permissionsPerWebsiteAllowSetting
             DENY -> R.string.permissionsPerWebsiteDenySetting
         }
 
     fun toSitePermissionSettingEntityType(): SitePermissionAskSettingType =
         when (this) {
-            ASK -> SitePermissionAskSettingType.ASK_EVERY_TIME
+            ASK, ASK_DISABLED -> SitePermissionAskSettingType.ASK_EVERY_TIME
             ALLOW -> SitePermissionAskSettingType.ALLOW_ALWAYS
             DENY -> SitePermissionAskSettingType.DENY_ALWAYS
         }

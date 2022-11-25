@@ -287,6 +287,10 @@
         <item name="daxColorSwitchThumbOn">?attr/daxColorAccentBlue</item>
         <item name="daxColorSwitchThumbOff">@color/gray40</item>
 
+        <!-- Slider -->
+        <item name="daxColorSliderTrackInactive">@color/gray40_50</item>
+        <item name="daxColorSliderActive">?attr/daxColorAccentBlue</item>
+
     </style>
 
     <style name="Theme.DuckDuckGo.Light" parent="Theme.DuckDuckGo">
@@ -433,6 +437,10 @@
         <item name="daxColorSwitchTrackOff">@color/gray60</item>
         <item name="daxColorSwitchThumbOn">?attr/daxColorAccentBlue</item>
         <item name="daxColorSwitchThumbOff">@color/white</item>
+
+        <!-- Slider -->
+        <item name="daxColorSliderTrackInactive">@color/gray60_50</item>
+        <item name="daxColorSliderActive">?attr/daxColorAccentBlue</item>
 
     </style>
 
