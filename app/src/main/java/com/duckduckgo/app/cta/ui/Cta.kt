@@ -340,10 +340,10 @@ sealed class BubbleCta(
 
     override fun showCta(view: View) {
         val daxText = view.context.getString(description)
+        view.primaryCta.hide()
+        view.hiddenTextCta.text = daxText.html(view.context)
         view.show()
         view.alpha = 1f
-        view.hiddenTextCta.text = daxText.html(view.context)
-        view.primaryCta.hide()
         view.dialogTextCta.startTypingAnimation(daxText, true)
     }
 
