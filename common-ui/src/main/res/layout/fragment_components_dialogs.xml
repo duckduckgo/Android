@@ -154,6 +154,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
+        <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryLarge
+            android:id="@+id/cookie_content"
+            android:text="Cookie Consent dialog with animation"
+            android:layout_marginTop="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
     </LinearLayout>
 
 </androidx.core.widget.NestedScrollView>
