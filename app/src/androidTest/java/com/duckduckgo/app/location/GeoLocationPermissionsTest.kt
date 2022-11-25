@@ -29,12 +29,12 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsDao
-import com.duckduckgo.app.location.data.LocationPermissionsRepositoryAPI
+import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import dagger.Lazy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.After
-import org.junit.Assert.assertEquals
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -63,18 +63,18 @@ class GeoLocationPermissionsTest {
 
     private val mockFaviconManager: FaviconManager = mock()
     private val lazyFaviconManager = Lazy { mockFaviconManager }
-    private val mockLocationPermissionsRepository: LocationPermissionsRepositoryAPI = mock()
 
     @Before
     fun before() {
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
+        locationPermissionsDao = db.locationPermissionsDao()
         fireproofWebsiteDao = db.fireproofWebsiteDao()
 
         geoLocationPermissions = GeoLocationPermissionsManager(
             InstrumentationRegistry.getInstrumentation().targetContext,
-            mockLocationPermissionsRepository,
+            LocationPermissionsRepository(locationPermissionsDao, lazyFaviconManager, coroutineRule.testDispatcherProvider),
             FireproofWebsiteRepository(fireproofWebsiteDao, coroutineRule.testDispatcherProvider, lazyFaviconManager),
             coroutineRule.testDispatcherProvider,
         )
