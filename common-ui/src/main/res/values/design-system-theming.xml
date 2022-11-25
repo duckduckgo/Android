@@ -132,6 +132,10 @@
 
         <!--controls the ripple coloring-->
         <item name="colorControlHighlight">?attr/daxColorRipple</item>
+
+        <!--Design System Colors theme independent-->
+        <item name="daxColorDim">@color/black60</item>
+        <item name="daxColorWhite">@color/white</item>
     </style>
 
     <!-- The app theme will mostly contain values for colour attributes -->
@@ -248,7 +252,9 @@
         <item name="daxColorSurface">@color/gray90</item>
         <item name="daxColorContainer">@color/white12</item>
         <item name="daxColorPrimaryText">@color/white84</item>
+        <item name="daxColorPrimaryInvertedText">@color/black84</item>
         <item name="daxColorSecondaryText">@color/white60</item>
+        <item name="daxColorSecondaryInvertedText">@color/black60</item>
         <item name="daxColorPrimaryIcon">@color/white84</item>
         <item name="daxColorDestructive">@color/red30</item>
         <item name="daxColorContainerDisabled">@color/white18</item>
@@ -363,7 +369,7 @@
         <item name="emailButtonRippleColor">@color/subtleGrayTwo</item>
         <item name="quickAccessItemTitleTextColor">@color/brownishGrayTwo</item>
 
-        <item name="savedSiteEditTextUnderlineColor">@color/dimmed</item>
+        <item name="savedSiteEditTextUnderlineColor">@color/black60</item>
         <item name="lightContainerBackground">@color/whiteThree</item>
 
         <item name="listItemPrimaryTextColor">@color/almostBlackDark</item>
@@ -397,7 +403,9 @@
         <item name="daxColorSurface">@color/white</item>
         <item name="daxColorContainer">@color/black6</item>
         <item name="daxColorPrimaryText">@color/black84</item>
+        <item name="daxColorPrimaryInvertedText">@color/white84</item>
         <item name="daxColorSecondaryText">@color/black60</item>
+        <item name="daxColorSecondaryInvertedText">@color/white60</item>
         <item name="daxColorPrimaryIcon">@color/black84</item>
         <item name="daxColorDestructive">@color/red50</item>
         <item name="daxColorContainerDisabled">@color/black6</item>

@@ -25,6 +25,7 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.duckduckgo.mobile.android.R
+import com.duckduckgo.mobile.android.ui.view.LottieDaxDialog
 import com.duckduckgo.mobile.android.ui.view.TypewriterDaxDialog
 import com.duckduckgo.mobile.android.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.mobile.android.ui.view.dialog.PromoBottomSheetDialog
@@ -341,6 +342,22 @@ class DialogsFragment : Fragment() {
                                 hideButtonText = "Hide",
                                 toolbarDimmed = true,
                                 typingDelayInMs = 200L,
+                            ).show(fragmentManager, "dialog")
+                        }
+                    }
+                }
+
+                view.findViewById<Button>(R.id.cookie_content)?.let {
+                    it.setOnClickListener {
+                        activity?.supportFragmentManager?.let { fragmentManager ->
+                            LottieDaxDialog.newInstance(
+                                titleText = "Cookie Prompt",
+                                descriptionText = "This is an example of a Dax dialog with a custom animation",
+                                lottieRes = R.raw.cookie_banner_dark,
+                                primaryButtonText = "Primary CTA",
+                                secondaryButtonText = "Secondary CTA",
+                                hideButtonText = "Hide",
+                                showHideButton = false,
                             ).show(fragmentManager, "dialog")
                         }
                     }
