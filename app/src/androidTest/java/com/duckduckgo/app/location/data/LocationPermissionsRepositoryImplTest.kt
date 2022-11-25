@@ -37,7 +37,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
 @ExperimentalCoroutinesApi
-class LocationPermissionsRepositoryTest {
+class LocationPermissionsRepositoryImplTest {
 
     @get:Rule
     @Suppress("unused")
@@ -49,7 +49,7 @@ class LocationPermissionsRepositoryTest {
 
     private lateinit var db: AppDatabase
     private lateinit var dao: LocationPermissionsDao
-    private lateinit var repository: LocationPermissionsRepository
+    private lateinit var repository: LocationPermissionsRepositoryImpl
     private val mockFaviconManager: FaviconManager = mock()
     private val lazyFaviconManager = Lazy { mockFaviconManager }
 
@@ -62,7 +62,7 @@ class LocationPermissionsRepositoryTest {
             .allowMainThreadQueries()
             .build()
         dao = db.locationPermissionsDao()
-        repository = LocationPermissionsRepository(db.locationPermissionsDao(), lazyFaviconManager, coroutineRule.testDispatcherProvider)
+        repository = LocationPermissionsRepositoryImpl(db.locationPermissionsDao(), lazyFaviconManager, coroutineRule.testDispatcherProvider)
     }
 
     @After

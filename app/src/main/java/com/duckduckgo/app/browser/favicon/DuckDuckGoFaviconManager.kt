@@ -31,7 +31,7 @@ import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.global.touchFaviconLocation
 import com.duckduckgo.app.global.view.loadFavicon
-import com.duckduckgo.app.location.data.LocationPermissionsRepositoryAPI
+import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.autofill.store.AutofillStore
 import java.io.File
 import kotlinx.coroutines.withContext
@@ -40,7 +40,7 @@ class DuckDuckGoFaviconManager constructor(
     private val faviconPersister: FaviconPersister,
     private val bookmarksDao: BookmarksDao,
     private val fireproofWebsiteRepository: FireproofWebsiteRepository,
-    private val locationPermissionsRepository: LocationPermissionsRepositoryAPI,
+    private val locationPermissionsRepository: LocationPermissionsRepository,
     private val favoritesRepository: FavoritesRepository,
     private val faviconDownloader: FaviconDownloader,
     private val dispatcherProvider: DispatcherProvider,

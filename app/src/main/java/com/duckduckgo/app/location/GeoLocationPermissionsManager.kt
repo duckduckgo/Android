@@ -23,7 +23,7 @@ import androidx.core.location.LocationManagerCompat
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.location.data.LocationPermissionEntity
-import com.duckduckgo.app.location.data.LocationPermissionsRepositoryAPI
+import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
 
@@ -38,7 +38,7 @@ interface GeoLocationPermissions {
 
 class GeoLocationPermissionsManager @Inject constructor(
     private val context: Context,
-    private val permissionsRepository: LocationPermissionsRepositoryAPI,
+    private val permissionsRepository: LocationPermissionsRepository,
     private val fireproofWebsiteRepository: FireproofWebsiteRepository,
     private val dispatchers: DispatcherProvider,
 ) : GeoLocationPermissions {
