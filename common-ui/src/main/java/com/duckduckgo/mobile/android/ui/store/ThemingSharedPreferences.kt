@@ -22,7 +22,9 @@ import androidx.core.content.edit
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import javax.inject.Inject
 
-class ThemingSharedPreferences @Inject constructor(private val context: Context) :
+class ThemingSharedPreferences @Inject constructor(
+    private val context: Context,
+) :
     ThemingDataStore {
 
     private val themePrefMapper = ThemePrefsMapper()
