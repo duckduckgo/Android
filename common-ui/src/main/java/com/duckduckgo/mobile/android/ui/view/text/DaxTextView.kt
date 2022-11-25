@@ -22,6 +22,9 @@ import androidx.core.content.ContextCompat
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.view.TypedArrayUtils
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextView.Typography.Body1
+import com.duckduckgo.mobile.android.ui.view.text.DaxTextView.Typography.Body1_Bold
+import com.duckduckgo.mobile.android.ui.view.text.DaxTextView.Typography.Body2_Bold
+import com.duckduckgo.mobile.android.ui.view.text.DaxTextView.Typography.Caption_AllCaps
 import com.google.android.material.textview.MaterialTextView
 
 class DaxTextView @JvmOverloads
