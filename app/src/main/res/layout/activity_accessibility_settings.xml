@@ -35,7 +35,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingTop="@dimen/keyline_4"
             android:paddingBottom="@dimen/keyline_4">
 
             <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
@@ -52,12 +51,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 tools:ignore="Overdraw">
-
-                <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:primaryText="@string/accessibilityFontSizeTitle"
-                    tools:text="Text goes here" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -95,8 +88,9 @@
                     android:layout_marginStart="@dimen/keyline_4"
                     android:layout_marginTop="@dimen/keyline_4"
                     android:layout_marginEnd="@dimen/keyline_4"
+                    android:layout_marginBottom="16dp"
                     android:background="?attr/daxColorContainer"
-                    android:padding="@dimen/keyline_2"
+                    android:padding="@dimen/keyline_4"
                     android:text="@string/accessibilityFontSizeHint"
                     app:typography="body1" />
             </LinearLayout>
