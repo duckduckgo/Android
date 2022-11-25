@@ -161,4 +161,8 @@
         <item name="android:lineSpacingExtra">4sp</item>
     </style>
 
+    <style name="Typography.DuckDuckGo.Caption.AllCaps">
+        <item name="android:textAllCaps">true</item>
+    </style>
+
 </resources>
