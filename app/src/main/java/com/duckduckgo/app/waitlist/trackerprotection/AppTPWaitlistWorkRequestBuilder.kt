@@ -25,8 +25,8 @@ import com.duckduckgo.app.waitlist.trackerprotection.AppTPWaitlistWorkRequestBui
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
-import com.duckduckgo.mobile.android.vpn.waitlist.FetchCodeResult
 import com.duckduckgo.mobile.android.vpn.waitlist.AppTPWaitlistManager
+import com.duckduckgo.mobile.android.vpn.waitlist.FetchCodeResult
 import com.squareup.anvil.annotations.ContributesBinding
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -62,7 +62,7 @@ class RealAppTPWaitlistWorkRequestBuilder @Inject constructor() : AppTPWaitlistW
 @ContributesWorker(AppScope::class)
 class AppTPWaitlistWorker(
     private val context: Context,
-    workerParams: WorkerParameters
+    workerParams: WorkerParameters,
 ) : CoroutineWorker(context, workerParams) {
 
     @Inject

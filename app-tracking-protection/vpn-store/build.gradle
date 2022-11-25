@@ -70,6 +70,7 @@ dependencies {
     // multi-process shared preferences
     implementation "com.frybits.harmony:harmony:_"
 
+    testImplementation project(':vpn-store-test')
     testImplementation Testing.junit4
     testImplementation project(path: ':common-test')
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"

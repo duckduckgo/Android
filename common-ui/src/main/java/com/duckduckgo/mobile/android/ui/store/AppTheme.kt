@@ -33,7 +33,7 @@ interface AppTheme {
 @SingleInstanceIn(AppScope::class)
 class BrowserAppTheme @Inject constructor(
     private val context: Context,
-    private val themeDataStore: ThemingDataStore
+    private val themeDataStore: ThemingDataStore,
 ) : AppTheme {
 
     override fun getAppTheme(): DuckDuckGoTheme {

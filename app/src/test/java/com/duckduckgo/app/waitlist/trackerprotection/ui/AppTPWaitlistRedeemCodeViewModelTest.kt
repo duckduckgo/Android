@@ -18,18 +18,18 @@ package com.duckduckgo.app.waitlist.trackerprotection.ui
 
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
-import kotlinx.coroutines.test.runTest
-import com.duckduckgo.mobile.android.vpn.waitlist.RedeemCodeResult
 import com.duckduckgo.mobile.android.vpn.waitlist.AppTPWaitlistManager
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
+import com.duckduckgo.mobile.android.vpn.waitlist.RedeemCodeResult
+import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import kotlin.time.ExperimentalTime
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 @ExperimentalTime
 @FlowPreview

@@ -34,12 +34,12 @@ class PixelReQueryInterceptorTest {
     fun whenRq0PixelIsSendThenRemoveDeviceAndFormFactor() {
         assertEquals(
             EXPECTED_RQ_0_URL.toHttpUrl(),
-            pixelReQueryInterceptor.intercept(FakeChain(RQ_0_PHONE_URL)).request.url
+            pixelReQueryInterceptor.intercept(FakeChain(RQ_0_PHONE_URL)).request.url,
         )
 
         assertEquals(
             EXPECTED_RQ_0_URL.toHttpUrl(),
-            pixelReQueryInterceptor.intercept(FakeChain(RQ_0_TABLET_URL)).request.url
+            pixelReQueryInterceptor.intercept(FakeChain(RQ_0_TABLET_URL)).request.url,
         )
     }
 
@@ -47,12 +47,12 @@ class PixelReQueryInterceptorTest {
     fun whenRq1PixelIsSendThenRemoveDeviceAndFormFactor() {
         assertEquals(
             EXPECTED_RQ_1_URL.toHttpUrl(),
-            pixelReQueryInterceptor.intercept(FakeChain(RQ_1_PHONE_URL)).request.url
+            pixelReQueryInterceptor.intercept(FakeChain(RQ_1_PHONE_URL)).request.url,
         )
 
         assertEquals(
             EXPECTED_RQ_1_URL.toHttpUrl(),
-            pixelReQueryInterceptor.intercept(FakeChain(RQ_1_TABLET_URL)).request.url
+            pixelReQueryInterceptor.intercept(FakeChain(RQ_1_TABLET_URL)).request.url,
         )
     }
 
@@ -60,12 +60,12 @@ class PixelReQueryInterceptorTest {
     fun whenPixelOtherThanRqIsSendThenDoNotModify() {
         assertEquals(
             EXPECTED_OTHER_PIXEL_PHONE_URL.toHttpUrl(),
-            pixelReQueryInterceptor.intercept(FakeChain(OTHER_PIXEL_PHONE_URL)).request.url
+            pixelReQueryInterceptor.intercept(FakeChain(OTHER_PIXEL_PHONE_URL)).request.url,
         )
 
         assertEquals(
             EXPECTED_OTHER_PIXEL_TABLET_URL.toHttpUrl(),
-            pixelReQueryInterceptor.intercept(FakeChain(OTHER_PIXEL_TABLET_URL)).request.url
+            pixelReQueryInterceptor.intercept(FakeChain(OTHER_PIXEL_TABLET_URL)).request.url,
         )
     }
 

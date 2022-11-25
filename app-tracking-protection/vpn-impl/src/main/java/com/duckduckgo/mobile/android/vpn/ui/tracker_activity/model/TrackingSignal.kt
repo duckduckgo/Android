@@ -24,7 +24,7 @@ import timber.log.Timber
 enum class TrackingSignal(
     val signaltag: String,
     @StringRes val signalDisplayName: Int,
-    @DrawableRes val signalIcon: Int
+    @DrawableRes val signalIcon: Int,
 ) {
     AAID("AAID", R.string.atp_TrackingSignalAAID, R.drawable.ic_signal_advertising_id),
     UNIQUE_IDENTIFIER("unique_identifier", R.string.atp_TrackingSignalUniqueIdentifier, R.drawable.ic_signal_advertising_id),
@@ -87,7 +87,8 @@ enum class TrackingSignal(
     BIRTHDAY("birthday", R.string.atp_TrackingSignalBirthday, R.drawable.ic_signal_person),
     GENDER("gender", R.string.atp_TrackingSignalGender, R.drawable.ic_signal_person),
     FIRST_NAME("first_name", R.string.atp_TrackingSignalFirstName, R.drawable.ic_signal_person),
-    LAST_NAME("last_name", R.string.atp_TrackingSignalLastName, R.drawable.ic_signal_person);
+    LAST_NAME("last_name", R.string.atp_TrackingSignalLastName, R.drawable.ic_signal_person),
+    ;
 
     companion object {
         fun fromTag(signalTag: String): TrackingSignal {

@@ -56,7 +56,7 @@ import kotlinx.coroutines.launch
 class SitePermissionsAdapter(
     private val viewModel: SitePermissionsViewModel,
     private val lifecycleOwner: LifecycleOwner,
-    private val faviconManager: FaviconManager
+    private val faviconManager: FaviconManager,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var items: List<SitePermissionListItem> = listOf()
@@ -134,7 +134,7 @@ class SitePermissionsAdapter(
     class SitePermissionsHeaderViewHolder(
         private val binding: ViewSitePermissionsTitleBinding,
         private val layoutInflater: LayoutInflater,
-        private val viewModel: SitePermissionsViewModel
+        private val viewModel: SitePermissionsViewModel,
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(title: Int, isListEmpty: Boolean) {
             when (title) {
@@ -163,22 +163,31 @@ class SitePermissionsAdapter(
     class SitePermissionToggleViewHolder(val binding: ViewSitePermissionsToggleBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(
             item: SitePermissionToggle,
-            listener: CompoundButton.OnCheckedChangeListener
+            listener: CompoundButton.OnCheckedChangeListener,
         ) {
             binding.sitePermissionsToggle.setText(item.text)
             binding.sitePermissionsToggle.quietlySetIsChecked(item.enable, listener)
             val iconRes = when (item.text) {
                 R.string.sitePermissionsSettingsLocation -> {
-                    if (item.enable) R.drawable.ic_location
-                    else R.drawable.ic_location_disabled
+                    if (item.enable) {
+                        R.drawable.ic_location
+                    } else {
+                        R.drawable.ic_location_disabled
+                    }
                 }
                 R.string.sitePermissionsSettingsCamera -> {
-                    if (item.enable) R.drawable.ic_camera
-                    else R.drawable.ic_camera_disabled
+                    if (item.enable) {
+                        R.drawable.ic_camera
+                    } else {
+                        R.drawable.ic_camera_disabled
+                    }
                 }
                 R.string.sitePermissionsSettingsMicrophone -> {
-                    if (item.enable) R.drawable.ic_microphone
-                    else R.drawable.ic_microphone_disabled
+                    if (item.enable) {
+                        R.drawable.ic_microphone
+                    } else {
+                        R.drawable.ic_microphone_disabled
+                    }
                 }
                 else -> null
             }
@@ -192,7 +201,7 @@ class SitePermissionsAdapter(
         private val binding: RowOneLineListItemBinding,
         private val viewModel: SitePermissionsViewModel,
         private val lifecycleOwner: LifecycleOwner,
-        private val faviconManager: FaviconManager
+        private val faviconManager: FaviconManager,
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: SiteAllowedItem) {
             val oneListItem = binding.root
@@ -225,5 +234,5 @@ enum class SitePermissionsListViewType {
     TOGGLE,
     DIVIDER,
     SITE_ALLOWED_ITEM,
-    SITES_EMPTY
+    SITES_EMPTY,
 }

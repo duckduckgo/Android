@@ -26,11 +26,11 @@ import android.net.Uri
 import android.os.Build
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.AmpLinkType
+import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.TrackingParameters
-import timber.log.Timber
 import java.net.URISyntaxException
+import timber.log.Timber
 
 interface SpecialUrlDetector {
     fun determineType(initiatingUrl: String?, uri: Uri): UrlType
@@ -45,14 +45,14 @@ interface SpecialUrlDetector {
         class AppLink(
             val appIntent: Intent? = null,
             val excludedComponents: List<ComponentName>? = null,
-            val uriString: String
+            val uriString: String,
         ) : UrlType()
 
         class NonHttpAppLink(
             val uriString: String,
             val intent: Intent,
             val fallbackUrl: String?,
-            val fallbackIntent: Intent? = null
+            val fallbackIntent: Intent? = null,
         ) : UrlType()
 
         class SearchQuery(val query: String) : UrlType()
@@ -67,7 +67,7 @@ class SpecialUrlDetectorImpl(
     private val packageManager: PackageManager,
     private val ampLinks: AmpLinks,
     private val trackingParameters: TrackingParameters,
-    private val appBuildConfig: AppBuildConfig
+    private val appBuildConfig: AppBuildConfig,
 ) : SpecialUrlDetector {
 
     override fun determineType(initiatingUrl: String?, uri: Uri): UrlType {
@@ -147,7 +147,7 @@ class SpecialUrlDetectorImpl(
     @Throws(URISyntaxException::class)
     private fun buildNonBrowserIntent(
         nonBrowserActivity: ResolveInfo,
-        uriString: String
+        uriString: String,
     ): Intent {
         val intent = Intent.parseUri(uriString, URI_ANDROID_APP_SCHEME)
         intent.component = ComponentName(nonBrowserActivity.activityInfo.packageName, nonBrowserActivity.activityInfo.name)
@@ -165,7 +165,7 @@ class SpecialUrlDetectorImpl(
 
     private fun checkForIntent(
         scheme: String,
-        uriString: String
+        uriString: String,
     ): UrlType {
         val validUriSchemeRegex = Regex("[a-z][a-zA-Z\\d+.-]+")
         if (scheme.matches(validUriSchemeRegex)) {

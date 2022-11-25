@@ -28,13 +28,13 @@ import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAda
 
 class BrowserAutoCompleteSuggestionsAdapter(
     private val immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
-    private val editableSearchClickListener: (AutoCompleteSuggestion) -> Unit
+    private val editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
 ) : RecyclerView.Adapter<AutoCompleteViewHolder>() {
 
     private val viewHolderFactoryMap: Map<Int, SuggestionViewHolderFactory> = mapOf(
         EMPTY_TYPE to EmptySuggestionViewHolderFactory(),
         SUGGESTION_TYPE to SearchSuggestionViewHolderFactory(),
-        BOOKMARK_TYPE to BookmarkSuggestionViewHolderFactory()
+        BOOKMARK_TYPE to BookmarkSuggestionViewHolderFactory(),
     )
 
     private var phrase = ""
@@ -42,7 +42,7 @@ class BrowserAutoCompleteSuggestionsAdapter(
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
-        viewType: Int
+        viewType: Int,
     ): AutoCompleteViewHolder =
         viewHolderFactoryMap.getValue(viewType).onCreateViewHolder(parent)
 
@@ -56,7 +56,7 @@ class BrowserAutoCompleteSuggestionsAdapter(
 
     override fun onBindViewHolder(
         holder: AutoCompleteViewHolder,
-        position: Int
+        position: Int,
     ) {
         if (holder is EmptySuggestionViewHolder) {
             // nothing required
@@ -65,7 +65,7 @@ class BrowserAutoCompleteSuggestionsAdapter(
                 holder,
                 suggestions[position],
                 immediateSearchClickListener,
-                editableSearchClickListener
+                editableSearchClickListener,
             )
         }
     }
@@ -80,7 +80,7 @@ class BrowserAutoCompleteSuggestionsAdapter(
     @UiThread
     fun updateData(
         newPhrase: String,
-        newSuggestions: List<AutoCompleteSuggestion>
+        newSuggestions: List<AutoCompleteSuggestion>,
     ) {
         if (phrase == newPhrase && suggestions == newSuggestions) return
         phrase = newPhrase

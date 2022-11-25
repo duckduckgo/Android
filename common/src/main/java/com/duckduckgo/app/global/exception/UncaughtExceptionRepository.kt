@@ -26,7 +26,7 @@ import timber.log.Timber
 interface UncaughtExceptionRepository {
     suspend fun recordUncaughtException(
         e: Throwable?,
-        exceptionSource: UncaughtExceptionSource
+        exceptionSource: UncaughtExceptionSource,
     )
 
     suspend fun getExceptions(): List<UncaughtExceptionEntity>
@@ -37,14 +37,14 @@ class UncaughtExceptionRepositoryDb(
     private val uncaughtExceptionDao: UncaughtExceptionDao,
     private val rootExceptionFinder: RootExceptionFinder,
     private val deviceInfo: DeviceInfo,
-    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
+    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
 ) : UncaughtExceptionRepository {
 
     private var lastSeenException: Throwable? = null
 
     override suspend fun recordUncaughtException(
         e: Throwable?,
-        exceptionSource: UncaughtExceptionSource
+        exceptionSource: UncaughtExceptionSource,
     ) {
         return withContext(dispatchers.io()) {
             if (e == lastSeenException) {
@@ -57,7 +57,7 @@ class UncaughtExceptionRepositoryDb(
             val exceptionEntity = UncaughtExceptionEntity(
                 message = rootCause.extractExceptionCause(),
                 exceptionSource = exceptionSource,
-                version = deviceInfo.appVersion
+                version = deviceInfo.appVersion,
             )
 
             if (isNotDuplicate(exceptionEntity)) {
@@ -70,14 +70,12 @@ class UncaughtExceptionRepositoryDb(
 
     @VisibleForTesting
     fun isNotDuplicate(incomingException: UncaughtExceptionEntity): Boolean {
-
         val lastRecordedException = uncaughtExceptionDao.getLatestException() ?: return true
 
         if (incomingException.message == lastRecordedException.message &&
             incomingException.exceptionSource == lastRecordedException.exceptionSource &&
             incomingException.version == lastRecordedException.version
         ) {
-
             val timeDiff = incomingException.timestamp - lastRecordedException.timestamp
 
             return if (timeDiff > TIME_THRESHOLD_MILLIS) {

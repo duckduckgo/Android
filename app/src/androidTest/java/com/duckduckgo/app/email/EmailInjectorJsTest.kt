@@ -28,10 +28,10 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Autofill
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName.AutofillFeatureName
-import org.mockito.kotlin.*
+import java.io.BufferedReader
 import org.junit.Before
 import org.junit.Test
-import java.io.BufferedReader
+import org.mockito.kotlin.*
 
 class EmailInjectorJsTest {
 

@@ -30,7 +30,7 @@ class TrustedSites {
             "spreadprivacy.com",
             "duckduckhack.com",
             "privatebrowsingmyths.com",
-            "duck.co"
+            "duck.co",
         )
 
         fun isTrusted(url: String): Boolean {

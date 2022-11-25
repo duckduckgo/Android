@@ -22,10 +22,10 @@ import com.duckduckgo.mobile.android.R
 
 class DaxButtonGhost @JvmOverloads constructor(
     ctx: Context,
-    attrs: AttributeSet,
-    defStyleAttr: Int = R.attr.daxButtonGhost
+    attrs: AttributeSet?,
+    defStyleAttr: Int = R.attr.daxButtonGhost,
 ) : DaxButton(
     ctx,
     attrs,
-    defStyleAttr
+    defStyleAttr,
 )

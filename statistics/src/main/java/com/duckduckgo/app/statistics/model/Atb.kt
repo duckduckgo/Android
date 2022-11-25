@@ -20,7 +20,7 @@ import com.duckduckgo.app.statistics.Variant
 
 data class Atb(
     val version: String,
-    val updateVersion: String? = null
+    val updateVersion: String? = null,
 ) {
 
     fun formatWithVariant(variant: Variant): String {

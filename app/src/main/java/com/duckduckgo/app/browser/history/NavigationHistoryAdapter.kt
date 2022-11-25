@@ -31,7 +31,7 @@ class NavigationHistoryAdapter(
     private val lifecycleOwner: LifecycleOwner,
     private val faviconManager: FaviconManager,
     private val tabId: String,
-    private val listener: NavigationHistoryListener
+    private val listener: NavigationHistoryListener,
 ) : RecyclerView.Adapter<NavigationViewHolder>() {
 
     interface NavigationHistoryListener {
@@ -42,7 +42,7 @@ class NavigationHistoryAdapter(
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
-        viewType: Int
+        viewType: Int,
     ): NavigationViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemNavigationHistoryPopupRowBinding.inflate(inflater, parent, false)
@@ -51,7 +51,7 @@ class NavigationHistoryAdapter(
 
     override fun onBindViewHolder(
         holder: NavigationViewHolder,
-        position: Int
+        position: Int,
     ) {
         val entry = navigationHistory[position]
 
@@ -72,7 +72,7 @@ class NavigationHistoryAdapter(
 
     private fun loadFavicon(
         historyEntry: NavigationHistoryEntry,
-        view: ImageView
+        view: ImageView,
     ) {
         lifecycleOwner.lifecycleScope.launch {
             faviconManager.loadToViewFromLocalOrFallback(url = historyEntry.url, tabId = tabId, view = view)
@@ -85,5 +85,5 @@ data class NavigationViewHolder(val binding: ItemNavigationHistoryPopupRowBindin
 
 data class NavigationHistoryEntry(
     val title: String? = null,
-    val url: String
+    val url: String,
 )

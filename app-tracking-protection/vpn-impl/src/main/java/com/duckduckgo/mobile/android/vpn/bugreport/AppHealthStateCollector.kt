@@ -16,21 +16,21 @@
 
 package com.duckduckgo.mobile.android.vpn.bugreport
 
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.model.AppHealthState
 import com.duckduckgo.mobile.android.vpn.model.HealthEventType.BAD_HEALTH
 import com.duckduckgo.mobile.android.vpn.model.HealthEventType.GOOD_HEALTH
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.duckduckgo.mobile.android.vpn.store.AppHealthDatabase
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 import org.json.JSONObject
 import timber.log.Timber
-import javax.inject.Inject
 
 @ContributesMultibinding(VpnScope::class)
 class AppHealthStateCollector @Inject constructor(
-    private val appHealthDatabase: AppHealthDatabase
+    private val appHealthDatabase: AppHealthDatabase,
 ) : VpnStateCollectorPlugin {
     override val collectorName: String = "latestAppBadHealth"
 
@@ -56,11 +56,11 @@ class AppHealthStateCollector @Inject constructor(
                     JSONObject().apply {
                         put(
                             SUSTAINED_BAD_HEALTH_SEC,
-                            calculatedSustainedBadHealthInSeconds(badHealth = latestBadHealth, goodHealth = latestGoodHealth)
+                            calculatedSustainedBadHealthInSeconds(badHealth = latestBadHealth, goodHealth = latestGoodHealth),
                         )
                         put(SECONDS_AGO, DatabaseDateFormatter.duration(state.localtime).seconds)
                         put(BAD_HEALTH_DATA, JSONObject(state.healthDataJsonString))
-                    }
+                    },
                 )
             }
         }
@@ -68,7 +68,7 @@ class AppHealthStateCollector @Inject constructor(
 
     private fun calculatedSustainedBadHealthInSeconds(
         badHealth: AppHealthState?,
-        goodHealth: AppHealthState?
+        goodHealth: AppHealthState?,
     ): Long? {
         if (badHealth == null || goodHealth == null) {
             return null

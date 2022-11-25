@@ -24,7 +24,7 @@ class BackKeyListener(private val onBackPressed: () -> Unit) : DialogInterface.O
     override fun onKey(
         dialog: DialogInterface?,
         keyCode: Int,
-        event: KeyEvent?
+        event: KeyEvent?,
     ): Boolean {
         if (isBackKey(keyCode, event)) {
             onBackPressed.invoke()
@@ -36,7 +36,7 @@ class BackKeyListener(private val onBackPressed: () -> Unit) : DialogInterface.O
 
     private fun isBackKey(
         keyCode: Int,
-        event: KeyEvent?
+        event: KeyEvent?,
     ): Boolean {
         return (keyCode == KeyEvent.KEYCODE_BACK && event?.action == KeyEvent.ACTION_UP)
     }

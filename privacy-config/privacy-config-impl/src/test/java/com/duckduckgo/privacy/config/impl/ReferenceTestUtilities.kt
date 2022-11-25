@@ -19,6 +19,7 @@ package com.duckduckgo.privacy.config.impl
 import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.impl.features.contentblocking.ContentBlockingPlugin
 import com.duckduckgo.privacy.config.impl.features.drm.DrmPlugin
 import com.duckduckgo.privacy.config.impl.features.gpc.GpcPlugin
@@ -26,7 +27,6 @@ import com.duckduckgo.privacy.config.impl.features.https.HttpsPlugin
 import com.duckduckgo.privacy.config.impl.features.trackerallowlist.TrackerAllowlistPlugin
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
-import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.PrivacyConfigRepository
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
@@ -43,16 +43,16 @@ import com.duckduckgo.privacy.config.store.features.trackerallowlist.RealTracker
 import com.duckduckgo.privacy.config.store.features.trackerallowlist.TrackerAllowlistRepository
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.RealUnprotectedTemporaryRepository
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
-import org.mockito.kotlin.mock
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
+import org.mockito.kotlin.mock
 
 @ExperimentalCoroutinesApi
 class ReferenceTestUtilities(
     db: PrivacyConfigDatabase,
-    val dispatcherProvider: DispatcherProvider
+    val dispatcherProvider: DispatcherProvider,
 ) {
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
@@ -72,13 +72,13 @@ class ReferenceTestUtilities(
             ContentBlockingPlugin(contentBlockingRepository, privacyFeatureTogglesRepository),
             DrmPlugin(drmRepository, privacyFeatureTogglesRepository),
             GpcPlugin(gpcRepository, privacyFeatureTogglesRepository),
-            TrackerAllowlistPlugin(trackerAllowlistRepository, privacyFeatureTogglesRepository)
+            TrackerAllowlistPlugin(trackerAllowlistRepository, privacyFeatureTogglesRepository),
         )
     }
 
     fun getJsonPrivacyConfig(jsonFileName: String): JsonPrivacyConfig {
         val jsonAdapter: JsonAdapter<JsonPrivacyConfig> = moshi.adapter(
-            JsonPrivacyConfig::class.java
+            JsonPrivacyConfig::class.java,
         )
         val config: JsonPrivacyConfig? = jsonAdapter.fromJson(FileUtilities.loadText(javaClass.classLoader!!, jsonFileName))
         return config!!

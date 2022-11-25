@@ -55,7 +55,7 @@ class AppEnjoymentDialogFragment : EnjoymentDialog() {
                 BackKeyListener {
                     firePixelWithPromptCount(APP_ENJOYMENT_DIALOG_USER_CANCELLED)
                     listener.onUserCancelledAppEnjoymentDialog(promptCount)
-                }
+                },
             )
             .create()
     }
@@ -63,7 +63,7 @@ class AppEnjoymentDialogFragment : EnjoymentDialog() {
     companion object {
         fun create(
             promptCount: PromptCount,
-            listener: Listener
+            listener: Listener,
         ): AppEnjoymentDialogFragment {
             return AppEnjoymentDialogFragment().also { fragment ->
                 val bundle = Bundle()

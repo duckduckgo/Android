@@ -26,11 +26,11 @@ import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.*
-import timber.log.Timber
 import java.util.concurrent.Executors
 import javax.inject.Inject
 import kotlin.random.Random
+import kotlinx.coroutines.*
+import timber.log.Timber
 
 interface AppTrackerRecorder {
     fun insertTracker(vpnTracker: VpnTracker)
@@ -65,7 +65,7 @@ class BatchedAppTrackerRecorder @Inject constructor(vpnDatabase: VpnDatabase) : 
 
     override fun onVpnStopped(
         coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
+        vpnStopReason: VpnStopReason,
     ) {
         Timber.i("Batched app tracker recorder stopped")
         periodicInsertionJob.cancel()

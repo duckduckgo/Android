@@ -18,5 +18,5 @@ package com.duckduckgo.autofill.domain.javascript
 
 data class JavascriptCredentials(
     val username: String?,
-    val password: String?
+    val password: String?,
 )

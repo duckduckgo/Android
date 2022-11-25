@@ -68,7 +68,7 @@ class AutomaticDataClearerTest {
             clearDataAction = mockClearAction,
             dataClearerTimeKeeper = mockTimeKeeper,
             dataClearerForegroundAppRestartPixel = dataClearerForegroundAppRestartPixel,
-            dispatchers = coroutineTestRule.testDispatcherProvider
+            dispatchers = coroutineTestRule.testDispatcherProvider,
         )
     }
 
@@ -539,7 +539,7 @@ class AutomaticDataClearerTest {
 
     private fun configureUserOptions(
         whatOption: ClearWhatOption,
-        whenOption: ClearWhenOption
+        whenOption: ClearWhenOption,
     ) {
         whenever(mockSettingsDataStore.automaticallyClearWhenOption).thenReturn(whenOption)
         whenever(mockSettingsDataStore.automaticallyClearWhatOption).thenReturn(whatOption)

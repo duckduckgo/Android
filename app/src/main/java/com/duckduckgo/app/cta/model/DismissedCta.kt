@@ -34,15 +34,15 @@ enum class CtaId {
     DAX_FAVORITES_ONBOARDING,
     DAX_FIRE_BUTTON_PULSE,
     DEVICE_SHIELD_CTA,
-    UNKNOWN
+    UNKNOWN,
 }
 
 @Entity(
-    tableName = "dismissed_cta"
+    tableName = "dismissed_cta",
 )
 data class DismissedCta(
     @PrimaryKey
-    var ctaId: CtaId
+    var ctaId: CtaId,
 ) {
 
     class IdTypeConverter {

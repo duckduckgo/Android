@@ -19,5 +19,5 @@ package com.duckduckgo.app.settings.clear
 enum class ClearWhatOption {
     CLEAR_NONE,
     CLEAR_TABS_ONLY,
-    CLEAR_TABS_AND_DATA
+    CLEAR_TABS_AND_DATA,
 }

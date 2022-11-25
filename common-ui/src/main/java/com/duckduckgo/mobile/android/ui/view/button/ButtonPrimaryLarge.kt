@@ -24,9 +24,9 @@ import com.google.android.material.button.MaterialButton
 class ButtonPrimaryLarge @JvmOverloads constructor(
     ctx: Context,
     attrs: AttributeSet,
-    defStyleAttr: Int = R.attr.primaryButtonLargeStyle
+    defStyleAttr: Int = R.attr.primaryButtonLargeStyle,
 ) : MaterialButton(
     ctx,
     attrs,
-    defStyleAttr
+    defStyleAttr,
 )

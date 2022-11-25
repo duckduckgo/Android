@@ -19,19 +19,19 @@ package com.duckduckgo.app.notification.model
 import android.content.Context
 import android.os.Bundle
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_LAUNCH
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.mobile.android.R as CommonR
 import timber.log.Timber
 
 class ClearDataNotification(
     private val context: Context,
     private val notificationDao: NotificationDao,
-    private val settingsDataStore: SettingsDataStore
+    private val settingsDataStore: SettingsDataStore,
 ) : SchedulableNotification {
 
     override val id = "com.duckduckgo.privacytips.autoclear"
@@ -39,7 +39,6 @@ class ClearDataNotification(
     override val cancelIntent = CANCEL
 
     override suspend fun canShow(): Boolean {
-
         if (notificationDao.exists(id)) {
             Timber.v("Notification already seen")
             return false

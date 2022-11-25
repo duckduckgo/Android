@@ -86,7 +86,7 @@ class AutofillJsonRequestParserTest {
     private fun String.loadJsonFile(): String {
         return FileUtilities.loadText(
             AutofillJsonRequestParserTest::class.java.classLoader!!,
-            "json/$this.json"
+            "json/$this.json",
         )
     }
 }

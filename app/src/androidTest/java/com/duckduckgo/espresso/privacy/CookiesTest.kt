@@ -22,27 +22,27 @@ import androidx.test.espresso.IdlingPolicies
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.espresso.web.assertion.WebViewAssertions.webMatches
-import androidx.test.espresso.web.sugar.Web.onWebView
-import androidx.test.ext.junit.rules.activityScenarioRule
-import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.browser.BrowserActivity
-import com.duckduckgo.app.browser.R
-import org.junit.Rule
-import org.junit.Test
-import java.util.concurrent.TimeUnit
 import androidx.test.espresso.web.model.Atoms.script
+import androidx.test.espresso.web.sugar.Web.onWebView
 import androidx.test.espresso.web.webdriver.DriverAtoms.findElement
 import androidx.test.espresso.web.webdriver.DriverAtoms.getText
 import androidx.test.espresso.web.webdriver.DriverAtoms.webClick
 import androidx.test.espresso.web.webdriver.Locator.ID
+import androidx.test.ext.junit.rules.activityScenarioRule
+import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.browser.BrowserActivity
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.espresso.PrivacyTest
 import com.duckduckgo.espresso.WebViewIdlingResource
 import com.duckduckgo.espresso.waitForView
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import java.util.concurrent.TimeUnit
 import org.hamcrest.CoreMatchers.containsString
 import org.junit.Assert.assertNull
+import org.junit.Rule
+import org.junit.Test
 
 class CookiesTest {
 
@@ -50,8 +50,8 @@ class CookiesTest {
     var activityScenarioRule = activityScenarioRule<BrowserActivity>(
         BrowserActivity.intent(
             InstrumentationRegistry.getInstrumentation().targetContext,
-            queryExtra = "https://privacy-test-pages.glitch.me/privacy-protections/storage-blocking/?store"
-        )
+            queryExtra = "https://privacy-test-pages.glitch.me/privacy-protections/storage-blocking/?store",
+        ),
     )
 
     @Test @PrivacyTest
@@ -105,7 +105,7 @@ class CookiesTest {
             "safe third party header cookie",
             "tracking third party header cookie",
             "safe third party iframe - JS cookie",
-            "tracking third party iframe - JS cookie"
+            "tracking third party iframe - JS cookie",
         )
     }
 

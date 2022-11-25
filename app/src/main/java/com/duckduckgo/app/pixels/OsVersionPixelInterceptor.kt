@@ -23,13 +23,13 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.impl.pixels.DownloadsPixelName
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 import okhttp3.Interceptor
 import okhttp3.Response
-import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = PixelInterceptorPlugin::class
+    boundType = PixelInterceptorPlugin::class,
 )
 class OsVersionPixelInterceptor @Inject constructor(private val appBuildConfig: AppBuildConfig) : PixelInterceptorPlugin, Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -59,7 +59,7 @@ class OsVersionPixelInterceptor @Inject constructor(private val appBuildConfig: 
             DownloadsPixelName.DOWNLOAD_REQUEST_CANCELLED_BY_USER.pixelName,
             DownloadsPixelName.DOWNLOAD_REQUEST_RETRIED.pixelName,
             StatisticsPixelName.APPLICATION_CRASH.pixelName,
-            StatisticsPixelName.APPLICATION_CRASH_GLOBAL.pixelName
+            StatisticsPixelName.APPLICATION_CRASH_GLOBAL.pixelName,
         )
     }
 }

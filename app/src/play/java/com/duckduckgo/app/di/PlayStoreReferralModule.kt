@@ -23,25 +23,25 @@ import com.duckduckgo.referral.PlayStoreAppReferrerStateListener
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.multibindings.IntoSet
 import dagger.SingleInstanceIn
+import dagger.multibindings.IntoSet
 
 @Module
 @ContributesTo(
     scope = AppScope::class,
-    replaces = [StoreReferralModule::class]
+    replaces = [StoreReferralModule::class],
 )
 class PlayStoreReferralModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun appInstallationReferrerStateListener(
-        playStoreAppReferrerStateListener: PlayStoreAppReferrerStateListener
+        playStoreAppReferrerStateListener: PlayStoreAppReferrerStateListener,
     ): AppInstallationReferrerStateListener = playStoreAppReferrerStateListener
 
     @Provides
     @IntoSet
     fun providedReferrerAtbInitializerListener(
-        playStoreAppReferrerStateListener: PlayStoreAppReferrerStateListener
+        playStoreAppReferrerStateListener: PlayStoreAppReferrerStateListener,
     ): AtbInitializerListener = playStoreAppReferrerStateListener
 }

@@ -22,11 +22,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.mobile.android.R
-import com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView
-import com.duckduckgo.mobile.android.ui.view.OutlinedTextInput.Action
 import com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
 import com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
@@ -53,20 +50,23 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
     class CheckboxComponentViewHolder(parent: ViewGroup) :
         ComponentViewHolder(inflate(parent, R.layout.component_checkbox))
 
+    class SliderComponentViewHolder(parent: ViewGroup) :
+        ComponentViewHolder(inflate(parent, R.layout.component_slider))
+
     class InfoPanelComponentViewHolder(
-        parent: ViewGroup
+        parent: ViewGroup,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_info_panel))
 
     class SearchBarComponentViewHolder(
-        parent: ViewGroup
+        parent: ViewGroup,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_search_bar))
 
     class MenuItemComponentViewHolder(
-        parent: ViewGroup
+        parent: ViewGroup,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_menu_item))
 
     class HeaderSectionComponentViewHolder(
-        parent: ViewGroup
+        parent: ViewGroup,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_section_header_item)) {
         override fun bind(component: Component) {
             view.findViewById<SectionHeaderListItem>(R.id.sectionHeaderItemTitle).apply {
@@ -80,11 +80,11 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
     }
 
     class OneLineListItemComponentViewHolder(
-        parent: ViewGroup
+        parent: ViewGroup,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_one_line_item)) {
         override fun bind(component: Component) {
             view.findViewById<OneLineListItem>(R.id.oneLineListItem).apply {
-                setClickListener { Snackbar.make(view.rootView, component.name, Snackbar.LENGTH_SHORT).show() }
+                setClickListener { Snackbar.make(view, component.name, Snackbar.LENGTH_SHORT).show() }
             }
 
             view.findViewById<OneLineListItem>(R.id.oneLineListItemWithImage).apply {
@@ -93,87 +93,92 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             }
 
             view.findViewById<OneLineListItem>(R.id.oneLineListItemWithTrailingIcon).apply {
-                setClickListener { Snackbar.make(this.rootView, component.name, Snackbar.LENGTH_SHORT).show() }
+                setClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
                 setTrailingIconClickListener { Snackbar.make(view, "Overflow menu clicked", Snackbar.LENGTH_SHORT).show() }
             }
 
             view.findViewById<OneLineListItem>(R.id.oneLineListItemWithLeadingAndTrailingIcons).apply {
-                setClickListener { Snackbar.make(this.rootView, component.name, Snackbar.LENGTH_SHORT).show() }
+                setClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
                 setLeadingIconClickListener { Snackbar.make(view, "Leading Icon clicked", Snackbar.LENGTH_SHORT).show() }
                 setTrailingIconClickListener { Snackbar.make(view, "Overflow menu clicked", Snackbar.LENGTH_SHORT).show() }
             }
 
             view.findViewById<OneLineListItem>(R.id.oneLineListItemSwitch).apply {
-                setClickListener { Snackbar.make(this.rootView, component.name, Snackbar.LENGTH_SHORT).show() }
+                setClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
                 setLeadingIconClickListener { Snackbar.make(view, "Leading Icon clicked", Snackbar.LENGTH_SHORT).show() }
                 setOnCheckedChangeListener { view, isChecked -> Snackbar.make(view, "Switch checked: $isChecked", Snackbar.LENGTH_SHORT).show() }
             }
 
             view.findViewById<OneLineListItem>(R.id.oneLineListSwitchItemWithLeadingIcon).apply {
-                setClickListener { Snackbar.make(this.rootView, component.name, Snackbar.LENGTH_SHORT).show() }
+                setClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
                 setLeadingIconClickListener { Snackbar.make(view, "Leading Icon clicked", Snackbar.LENGTH_SHORT).show() }
                 setOnCheckedChangeListener { view, isChecked -> Snackbar.make(view, "Switch checked: $isChecked", Snackbar.LENGTH_SHORT).show() }
             }
 
             view.findViewById<OneLineListItem>(R.id.oneLineListItemDisabled).apply {
-                setClickListener { Snackbar.make(this.rootView, component.name, Snackbar.LENGTH_SHORT).show() }
+                setClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
                 isEnabled = false
             }
 
             view.findViewById<OneLineListItem>(R.id.oneLineListItemCustomTextColor).apply {
-                setClickListener { Snackbar.make(this.rootView, component.name, Snackbar.LENGTH_SHORT).show() }
+                setClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
             }
-
         }
     }
 
     class TwoLineItemComponentViewHolder(
-        parent: ViewGroup
+        parent: ViewGroup,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_two_line_item)) {
         override fun bind(component: Component) {
             view.findViewById<TwoLineListItem>(R.id.twoLineListItemWithoutImage).apply {
-                setClickListener { Snackbar.make(this.rootView, component.name, Snackbar.LENGTH_SHORT).show() }
+                setClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
             }
 
             view.findViewById<TwoLineListItem>(R.id.twoLineListItemWithImage).apply {
-                setClickListener { Snackbar.make(this.rootView, component.name, Snackbar.LENGTH_SHORT).show() }
+                setClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
                 setLeadingIconClickListener { Snackbar.make(view, "Leading Icon clicked", Snackbar.LENGTH_SHORT).show() }
             }
 
             view.findViewById<TwoLineListItem>(R.id.twoLineListItemWithImageAndTrailingIcon).apply {
-                setClickListener { Snackbar.make(this.rootView, component.name, Snackbar.LENGTH_SHORT).show() }
+                setClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
                 setLeadingIconClickListener { Snackbar.make(view, "Leading Icon clicked", Snackbar.LENGTH_SHORT).show() }
                 setTrailingIconClickListener { Snackbar.make(view, "Overflow menu clicked", Snackbar.LENGTH_SHORT).show() }
             }
 
             view.findViewById<TwoLineListItem>(R.id.twoLineListItemWithTrailingIcon).apply {
-                setClickListener { Snackbar.make(this.rootView, component.name, Snackbar.LENGTH_SHORT).show() }
+                setClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
                 setTrailingIconClickListener { Snackbar.make(view, "Overflow menu clicked", Snackbar.LENGTH_SHORT).show() }
             }
 
             view.findViewById<TwoLineListItem>(R.id.twoLineListItemWithBetaPill).apply {
-                setClickListener { Snackbar.make(this.rootView, component.name, Snackbar.LENGTH_SHORT).show() }
+                setClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
                 setTrailingIconClickListener { Snackbar.make(view, "Overflow menu clicked", Snackbar.LENGTH_SHORT).show() }
             }
 
             view.findViewById<TwoLineListItem>(R.id.twoLineSwitchListItem).apply {
-                setClickListener { Snackbar.make(this.rootView, component.name, Snackbar.LENGTH_SHORT).show() }
+                setClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
                 setOnCheckedChangeListener { view, isChecked -> Snackbar.make(view, "Switch checked: $isChecked", Snackbar.LENGTH_SHORT).show() }
             }
 
             view.findViewById<TwoLineListItem>(R.id.twoLineSwitchListItemWithImage).apply {
-                setClickListener { Snackbar.make(this.rootView, component.name, Snackbar.LENGTH_SHORT).show() }
+                setClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
                 setLeadingIconClickListener { Snackbar.make(view, "Leading Icon clicked", Snackbar.LENGTH_SHORT).show() }
                 setOnCheckedChangeListener { view, isChecked -> Snackbar.make(view, "Switch checked: $isChecked", Snackbar.LENGTH_SHORT).show() }
             }
 
             view.findViewById<TwoLineListItem>(R.id.twoLineSwitchListItemWithPill).apply {
-                setClickListener { Snackbar.make(this.rootView, component.name, Snackbar.LENGTH_SHORT).show() }
+                setClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
                 setOnCheckedChangeListener { view, isChecked -> Snackbar.make(view, "Switch checked: $isChecked", Snackbar.LENGTH_SHORT).show() }
             }
 
             view.findViewById<TwoLineListItem>(R.id.twoLineSwitchListItemWithDisabledSwitch).apply {
-                setClickListener { Snackbar.make(this.rootView, component.name, Snackbar.LENGTH_SHORT).show() }
+                setClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
+                isEnabled = false
+            }
+
+            view.findViewById<TwoLineListItem>(R.id.twoLineSwitchListItemWithDisabledSwitchEnabled).apply {
+                setClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
+                quietlySetIsChecked(true, null)
                 isEnabled = false
             }
         }
@@ -197,28 +202,10 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
     class DividerComponentViewHolder(parent: ViewGroup) : ComponentViewHolder(inflate(parent, R.layout.component_section_divider))
 
-    class OutlinedTextInputComponentViewHolder(val parent: ViewGroup) :
-        ComponentViewHolder(inflate(parent, R.layout.component_outline_text_input)) {
-        init {
-            view.findViewById<OutLinedTextInputView>(R.id.outlinedinputtext1).onAction { toastOnClick(it) }
-            view.findViewById<OutLinedTextInputView>(R.id.outlinedinputtext4).onAction { toastOnClick(it) }
-            view.findViewById<OutLinedTextInputView>(R.id.outlinedinputtext6).onAction { toastOnClick(it) }
-            view.findViewById<OutLinedTextInputView>(R.id.outlinedinputtext8).onAction { toastOnClick(it) }
-        }
-
-        private fun toastOnClick(action: Action) = when (action) {
-            is Action.PerformEndAction -> Toast.makeText(
-                parent.context,
-                "End icon clicked!",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-    }
-
     companion object {
         fun create(
             parent: ViewGroup,
-            viewType: Int
+            viewType: Int,
         ): ComponentViewHolder {
             return when (Component.values()[viewType]) {
                 Component.BUTTON -> ButtonComponentViewHolder(parent)
@@ -226,6 +213,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.SWITCH -> SwitchComponentViewHolder(parent)
                 Component.RADIO_BUTTON -> RadioButtonComponentViewHolder(parent)
                 Component.CHECKBOX -> CheckboxComponentViewHolder(parent)
+                Component.SLIDER -> SliderComponentViewHolder(parent)
                 Component.SNACKBAR -> SnackbarComponentViewHolder(parent)
                 Component.INFO_PANEL -> InfoPanelComponentViewHolder(parent)
                 Component.SEARCH_BAR -> SearchBarComponentViewHolder(parent)
@@ -234,7 +222,6 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.SINGLE_LINE_LIST_ITEM -> OneLineListItemComponentViewHolder(parent)
                 Component.TWO_LINE_LIST_ITEM -> TwoLineItemComponentViewHolder(parent)
                 Component.SECTION_DIVIDER -> DividerComponentViewHolder(parent)
-                Component.OUTLINED_TEXT_INPUT -> OutlinedTextInputComponentViewHolder(parent)
                 else -> {
                     TODO()
                 }
@@ -243,7 +230,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
         private fun inflate(
             parent: ViewGroup,
-            layout: Int
+            layout: Int,
         ): View {
             return LayoutInflater.from(parent.context).inflate(layout, parent, false)
         }

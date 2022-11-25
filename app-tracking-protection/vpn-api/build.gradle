@@ -25,6 +25,9 @@ dependencies {
     implementation Kotlin.stdlib.jdk7
     implementation AndroidX.core.ktx
     implementation KotlinX.coroutines.core
+
+    testImplementation project(':vpn-api-test')
+    androidTestImplementation project(':vpn-api-test')
 }
 android {
   namespace 'com.duckduckgo.mobile.android.vpn.api'

@@ -17,6 +17,7 @@
 package com.duckduckgo.securestorage.impl
 
 import com.duckduckgo.securestorage.impl.encryption.RandomBytesGenerator
+import java.security.Key
 import okio.ByteString.Companion.toByteString
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -26,7 +27,6 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
-import java.security.Key
 
 class RealSecureStorageKeyProviderTest {
     private lateinit var testee: RealSecureStorageKeyProvider

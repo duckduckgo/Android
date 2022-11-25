@@ -26,6 +26,6 @@ sealed class SecureStorageException : Exception() {
     data class UserNotAuthenticatedException(override val message: String) : SecureStorageException()
     data class InternalSecureStorageException(
         override val message: String,
-        override val cause: Throwable? = null
+        override val cause: Throwable? = null,
     ) : SecureStorageException()
 }

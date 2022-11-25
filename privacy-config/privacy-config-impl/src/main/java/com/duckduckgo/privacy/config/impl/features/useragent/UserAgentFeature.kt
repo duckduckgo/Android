@@ -20,15 +20,15 @@ data class UserAgentFeature(
     val state: String,
     val minSupportedVersion: Int?,
     val exceptions: List<UserAgentExceptionJson>,
-    val settings: UserAgentSettings
+    val settings: UserAgentSettings,
 )
 
 data class UserAgentExceptionJson(
     val domain: String,
-    val reason: String
+    val reason: String,
 )
 
 data class UserAgentSettings(
     val omitApplicationSites: List<UserAgentExceptionJson>,
-    val omitVersionSites: List<UserAgentExceptionJson>
+    val omitVersionSites: List<UserAgentExceptionJson>,
 )

@@ -25,7 +25,6 @@ import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.fire.AppCacheClearer
-import com.duckduckgo.app.fire.ClearDataPixel
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryAPI
@@ -46,7 +45,7 @@ interface ClearDataAction {
 
     suspend fun clearTabsAndAllDataAsync(
         appInForeground: Boolean,
-        shouldFireDataClearPixel: Boolean
+        shouldFireDataClearPixel: Boolean,
     ): Unit?
 
     suspend fun setAppUsedSinceLastClearFlag(appUsedSinceLastClear: Boolean)
@@ -68,7 +67,6 @@ class ClearPersonalDataAction(
     private val fireproofWebsiteRepository: FireproofWebsiteRepositoryAPI,
     private val sitePermissionsManager: SitePermissionsManager,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
-    private val clearDataPixel: ClearDataPixel
 ) : ClearDataAction {
 
     override fun killAndRestartProcess(notifyDataCleared: Boolean) {
@@ -83,10 +81,9 @@ class ClearPersonalDataAction(
 
     override suspend fun clearTabsAndAllDataAsync(
         appInForeground: Boolean,
-        shouldFireDataClearPixel: Boolean
+        shouldFireDataClearPixel: Boolean,
     ) {
         withContext(dispatchers.io()) {
-            clearDataPixel.onDataCleared()
             val fireproofDomains = fireproofWebsiteRepository.fireproofWebsitesSync().map { it.domain }
             cookieManager.flush()
             geoLocationPermissions.clearAllButFireproofed()
@@ -105,7 +102,6 @@ class ClearPersonalDataAction(
     @WorkerThread
     override suspend fun clearTabsAsync(appInForeground: Boolean) {
         withContext(dispatchers.io()) {
-            clearDataPixel.onDataCleared()
             Timber.i("Clearing tabs")
             dataManager.clearWebViewSessions()
             tabRepository.deleteAll()

@@ -39,8 +39,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 @Module
 @ContributesTo(AppScope::class)
@@ -54,7 +54,7 @@ class AppShortcutCreatorModule {
 
 class AppShortcutCreatorLifecycleObserver(
     private val appShortcutCreator: AppShortcutCreator,
-    private val appBuildConfig: AppBuildConfig
+    private val appBuildConfig: AppBuildConfig,
 ) : DefaultLifecycleObserver {
     @UiThread
     @Suppress("NewApi") // we use appBuildConfig
@@ -90,7 +90,7 @@ class AppShortcutCreator @Inject constructor(private val context: Context) {
                 Intent(context, BrowserActivity::class.java).also {
                     it.action = Intent.ACTION_VIEW
                     it.putExtra(BrowserActivity.NEW_SEARCH_EXTRA, true)
-                }
+                },
             )
             .build().toShortcutInfo()
     }
@@ -104,7 +104,7 @@ class AppShortcutCreator @Inject constructor(private val context: Context) {
                 Intent(context, BrowserActivity::class.java).also {
                     it.action = Intent.ACTION_VIEW
                     it.putExtra(BrowserActivity.PERFORM_FIRE_ON_ENTRY_EXTRA, true)
-                }
+                },
             )
             .build().toShortcutInfo()
     }

@@ -57,7 +57,7 @@ class JsUrlExtractorTest {
         testee.addUrlExtraction(webView, onUrlExtracted)
         verify(webView).addJavascriptInterface(
             any<UrlExtractionJavascriptInterface>(),
-            eq(UrlExtractionJavascriptInterface.URL_EXTRACTION_JAVASCRIPT_INTERFACE_NAME)
+            eq(UrlExtractionJavascriptInterface.URL_EXTRACTION_JAVASCRIPT_INTERFACE_NAME),
         )
     }
 

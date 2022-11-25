@@ -74,7 +74,7 @@ class GlobalPrivacyControlActivity : DuckDuckGoActivity() {
                     clickableSpan,
                     gpcSpannableString.getSpanStart(it),
                     gpcSpannableString.getSpanEnd(it),
-                    gpcSpannableString.getSpanFlags(it)
+                    gpcSpannableString.getSpanFlags(it),
                 )
                 removeSpan(it)
             }
@@ -97,7 +97,7 @@ class GlobalPrivacyControlActivity : DuckDuckGoActivity() {
                     binding.globalPrivacyControlToggle.quietlySetIsChecked(it.globalPrivacyControlEnabled, globalPrivacyControlToggleListener)
                     binding.globalPrivacyControlToggle.isEnabled = it.globalPrivacyControlFeatureEnabled
                 }
-            }
+            },
         )
 
         viewModel.command.observe(
@@ -108,7 +108,7 @@ class GlobalPrivacyControlActivity : DuckDuckGoActivity() {
                         is GlobalPrivacyControlViewModel.Command.OpenLearnMore -> openLearnMoreSite(it.url)
                     }
                 }
-            }
+            },
         )
     }
 

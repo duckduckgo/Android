@@ -21,7 +21,7 @@ import com.duckduckgo.di.scopes.AppScope
 
 @ContributesPluginPoint(
     scope = AppScope::class,
-    boundType = AppHealthCallback::class
+    boundType = AppHealthCallback::class,
 )
 @Suppress("unused")
 interface AppHealthCallbackImpl

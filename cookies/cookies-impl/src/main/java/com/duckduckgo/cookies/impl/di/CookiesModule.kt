@@ -43,7 +43,6 @@ object CookiesModule {
     @Provides
     fun provideCookiesDatabase(context: Context): CookiesDatabase {
         return Room.databaseBuilder(context, CookiesDatabase::class.java, "cookies.db")
-            .enableMultiInstanceInvalidation()
             .fallbackToDestructiveMigration()
             .addMigrations(*ALL_MIGRATIONS)
             .build()
@@ -54,7 +53,7 @@ object CookiesModule {
     fun provideCookiesRepository(
         database: CookiesDatabase,
         @AppCoroutineScope coroutineScope: CoroutineScope,
-        dispatcherProvider: DispatcherProvider
+        dispatcherProvider: DispatcherProvider,
     ): CookiesRepository {
         return RealCookieRepository(database, coroutineScope, dispatcherProvider)
     }

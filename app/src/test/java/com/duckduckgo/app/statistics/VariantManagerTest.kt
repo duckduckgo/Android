@@ -55,7 +55,7 @@ class VariantManagerTest {
     @Suppress("SameParameterValue")
     private fun assertEqualsDouble(
         expected: Double,
-        actual: Double
+        actual: Double,
     ) {
         val comparison = expected.compareTo(actual)
         if (comparison != 0) {

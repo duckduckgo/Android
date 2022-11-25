@@ -28,12 +28,12 @@ import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = LifecycleObserver::class
+    boundType = LifecycleObserver::class,
 )
 @SingleInstanceIn(AppScope::class)
 class MigrationLifecycleObserver @Inject constructor(
     private val migrationPluginPoint: PluginPoint<MigrationPlugin>,
-    private val migrationStore: MigrationStore
+    private val migrationStore: MigrationStore,
 ) : DefaultLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {

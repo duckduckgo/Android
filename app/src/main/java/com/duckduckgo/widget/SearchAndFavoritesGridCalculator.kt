@@ -24,7 +24,7 @@ import timber.log.Timber
 class SearchAndFavoritesGridCalculator {
     fun calculateColumns(
         context: Context,
-        width: Int
+        width: Int,
     ): Int {
         val margins = context.resources.getDimension(CommonR.dimen.searchWidgetFavoritesSideMargin).toDp()
         val item = context.resources.getDimension(CommonR.dimen.searchWidgetFavoriteItemContainerWidth).toDp()
@@ -44,7 +44,7 @@ class SearchAndFavoritesGridCalculator {
 
     fun calculateRows(
         context: Context,
-        height: Int
+        height: Int,
     ): Int {
         val searchBar = context.resources.getDimension(CommonR.dimen.searchWidgetSearchBarHeight).toDp()
         val margins = context.resources.getDimension(CommonR.dimen.searchWidgetFavoritesTopMargin).toDp() +

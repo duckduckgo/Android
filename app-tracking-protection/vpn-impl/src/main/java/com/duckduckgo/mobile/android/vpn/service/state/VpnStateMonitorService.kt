@@ -32,10 +32,10 @@ import com.duckduckgo.mobile.android.vpn.model.VpnServiceStateStats
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import dagger.android.AndroidInjection
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @InjectWith(VpnScope::class)
 class VpnStateMonitorService : Service() {
@@ -43,7 +43,8 @@ class VpnStateMonitorService : Service() {
     @Inject lateinit var vpnDatabase: VpnDatabase
 
     @Inject
-    @AppCoroutineScope lateinit var coroutineScope: CoroutineScope
+    @AppCoroutineScope
+    lateinit var coroutineScope: CoroutineScope
 
     @Inject lateinit var dispatcherProvider: DispatcherProvider
 

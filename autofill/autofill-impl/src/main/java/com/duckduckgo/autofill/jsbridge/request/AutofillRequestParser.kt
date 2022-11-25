@@ -21,8 +21,8 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
 
 interface AutofillRequestParser {
     suspend fun parseAutofillDataRequest(request: String): AutofillDataRequest
@@ -32,7 +32,7 @@ interface AutofillRequestParser {
 @ContributesBinding(FragmentScope::class)
 class AutofillJsonRequestParser @Inject constructor(
     val moshi: Moshi,
-    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
+    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
 ) : AutofillRequestParser {
 
     private val autofillDataRequestParser by lazy { moshi.adapter(AutofillDataRequest::class.java) }
@@ -49,5 +49,4 @@ class AutofillJsonRequestParser @Inject constructor(
             autofillStoreFormDataRequestParser.fromJson(request) ?: throw IllegalArgumentException("Failed to parse autofill request")
         }
     }
-
 }

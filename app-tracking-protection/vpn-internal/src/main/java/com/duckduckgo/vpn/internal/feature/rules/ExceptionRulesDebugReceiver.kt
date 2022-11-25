@@ -26,10 +26,10 @@ import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRule
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 /**
  * This receiver allows to add exclusion rules to appTP
@@ -42,7 +42,7 @@ import javax.inject.Inject
 class ExceptionRulesDebugReceiver(
     context: Context,
     intentAction: String = ACTION,
-    private val receiver: (Intent) -> Unit
+    private val receiver: (Intent) -> Unit,
 ) : BroadcastReceiver() {
 
     init {
@@ -52,7 +52,7 @@ class ExceptionRulesDebugReceiver(
 
     override fun onReceive(
         context: Context,
-        intent: Intent
+        intent: Intent,
     ) {
         receiver(intent)
     }
@@ -62,7 +62,7 @@ class ExceptionRulesDebugReceiver(
 
         fun ruleIntent(
             packageId: String,
-            domain: String
+            domain: String,
         ): Intent {
             return Intent(ACTION).apply {
                 putExtra("app", packageId)
@@ -76,7 +76,7 @@ class ExceptionRulesDebugReceiver(
 class ExceptionRulesDebugReceiverRegister @Inject constructor(
     private val context: Context,
     private val exclusionRulesRepository: ExclusionRulesRepository,
-    private val dispatchers: DispatcherProvider
+    private val dispatchers: DispatcherProvider,
 ) : VpnServiceCallbacks {
 
     private val exceptionRulesSavedState = mutableListOf<AppTrackerExceptionRule>()
@@ -102,7 +102,7 @@ class ExceptionRulesDebugReceiverRegister @Inject constructor(
 
     override fun onVpnStopped(
         coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
+        vpnStopReason: VpnStopReason,
     ) {
         Timber.i("Debug receiver ExceptionRulesDebugReceiver restoring exception rules")
 

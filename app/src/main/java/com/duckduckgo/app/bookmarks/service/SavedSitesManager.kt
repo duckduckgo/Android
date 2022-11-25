@@ -29,7 +29,7 @@ interface SavedSitesManager {
 class RealSavedSitesManager constructor(
     private val savedSitesImporter: SavedSitesImporter,
     private val savedSitesExporter: SavedSitesExporter,
-    private val pixel: Pixel
+    private val pixel: Pixel,
 ) : SavedSitesManager {
 
     override suspend fun export(uri: Uri): ExportSavedSitesResult {

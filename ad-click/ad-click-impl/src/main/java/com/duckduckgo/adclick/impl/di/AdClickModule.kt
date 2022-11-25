@@ -41,7 +41,6 @@ class AdClickModule {
     fun provideAdClickDatabase(context: Context): AdClickDatabase {
         return Room.databaseBuilder(context, AdClickDatabase::class.java, "adclick.db")
             .addMigrations(*ALL_MIGRATIONS)
-            .enableMultiInstanceInvalidation()
             .fallbackToDestructiveMigration()
             .build()
     }
@@ -51,7 +50,7 @@ class AdClickModule {
     fun provideAdClickAttributionRepository(
         database: AdClickDatabase,
         @AppCoroutineScope coroutineScope: CoroutineScope,
-        dispatcherProvider: DispatcherProvider
+        dispatcherProvider: DispatcherProvider,
     ): AdClickAttributionRepository {
         return RealAdClickAttributionRepository(database, coroutineScope, dispatcherProvider)
     }

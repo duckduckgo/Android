@@ -55,5 +55,5 @@ data class HealthTriggerEntity(
 
 enum class HealthEventType {
     BAD_HEALTH,
-    GOOD_HEALTH
+    GOOD_HEALTH,
 }

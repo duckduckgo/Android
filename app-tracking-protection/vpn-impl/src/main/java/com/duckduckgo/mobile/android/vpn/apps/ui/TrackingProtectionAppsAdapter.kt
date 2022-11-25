@@ -41,7 +41,7 @@ class TrackingProtectionAppsAdapter(val listener: AppProtectionListener) :
 
     fun update(
         newList: List<AppsProtectionType>,
-        isListStateEnabled: Boolean = true
+        isListStateEnabled: Boolean = true,
     ) {
         isListEnabled = isListStateEnabled
         val oldData = excludedApps
@@ -57,7 +57,7 @@ class TrackingProtectionAppsAdapter(val listener: AppProtectionListener) :
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
-        viewType: Int
+        viewType: Int,
     ): TrackingProtectionAppViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.row_exclusion_list_app, parent, false)
@@ -66,7 +66,7 @@ class TrackingProtectionAppsAdapter(val listener: AppProtectionListener) :
 
     override fun onBindViewHolder(
         holder: TrackingProtectionAppViewHolder,
-        position: Int
+        position: Int,
     ) {
         val type = excludedApps[position] as AppInfoType
         holder.bind(isListEnabled, type.appInfo, position, listener)
@@ -82,7 +82,7 @@ class TrackingProtectionAppsAdapter(val listener: AppProtectionListener) :
 
     private class DiffCallback(
         private val oldList: List<AppsProtectionType>,
-        private val newList: List<AppsProtectionType>
+        private val newList: List<AppsProtectionType>,
     ) :
         DiffUtil.Callback() {
         override fun getOldListSize() = oldList.size
@@ -91,14 +91,14 @@ class TrackingProtectionAppsAdapter(val listener: AppProtectionListener) :
 
         override fun areItemsTheSame(
             oldItemPosition: Int,
-            newItemPosition: Int
+            newItemPosition: Int,
         ): Boolean {
             return oldList[oldItemPosition] == newList[newItemPosition]
         }
 
         override fun areContentsTheSame(
             oldItemPosition: Int,
-            newItemPosition: Int
+            newItemPosition: Int,
         ): Boolean {
             return oldList[oldItemPosition] == newList[newItemPosition]
         }
@@ -109,7 +109,7 @@ interface AppProtectionListener {
     fun onAppProtectionChanged(
         excludedAppInfo: TrackingProtectionAppInfo,
         enabled: Boolean,
-        position: Int
+        position: Int,
     )
 }
 
@@ -120,7 +120,7 @@ class TrackingProtectionAppViewHolder(itemView: View) : RecyclerView.ViewHolder(
         isListEnabled: Boolean,
         excludedAppInfo: TrackingProtectionAppInfo,
         position: Int,
-        listener: AppProtectionListener
+        listener: AppProtectionListener,
     ) {
         val appIcon = itemView.context.packageManager.safeGetApplicationIcon(excludedAppInfo.packageName)
         itemView.deviceShieldAppEntryIcon.setImageDrawable(appIcon)
@@ -134,8 +134,8 @@ class TrackingProtectionAppViewHolder(itemView: View) : RecyclerView.ViewHolder(
                 itemView.deviceShieldAppEntryWarningIcon.setImageDrawable(
                     ContextCompat.getDrawable(
                         context,
-                        getAppExcludingReasonIcon(excludedAppInfo.knownProblem)
-                    )
+                        getAppExcludingReasonIcon(excludedAppInfo.knownProblem),
+                    ),
                 )
                 itemView.deviceShieldAppEntryWarningIcon.show()
             } else {
@@ -144,8 +144,8 @@ class TrackingProtectionAppViewHolder(itemView: View) : RecyclerView.ViewHolder(
                 itemView.deviceShieldAppEntryWarningIcon.setImageDrawable(
                     ContextCompat.getDrawable(
                         context,
-                        R.drawable.ic_apptp_link
-                    )
+                        R.drawable.ic_apptp_link,
+                    ),
                 )
                 itemView.deviceShieldAppEntryWarningIcon.show()
             }
@@ -156,8 +156,8 @@ class TrackingProtectionAppViewHolder(itemView: View) : RecyclerView.ViewHolder(
                 itemView.deviceShieldAppEntryWarningIcon.setImageDrawable(
                     ContextCompat.getDrawable(
                         context,
-                        R.drawable.ic_apptp_link
-                    )
+                        R.drawable.ic_apptp_link,
+                    ),
                 )
                 itemView.deviceShieldAppEntryWarningIcon.show()
             } else {
@@ -178,7 +178,7 @@ class TrackingProtectionAppViewHolder(itemView: View) : RecyclerView.ViewHolder(
 
     private fun getAppExcludingReasonText(
         context: Context,
-        excludingReason: Int
+        excludingReason: Int,
     ): String {
         return when (excludingReason) {
             TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON, TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON ->

@@ -31,7 +31,7 @@ class AutofillManagementLockedMode : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentAutofillManagementLockedBinding.inflate(inflater, container, false)
         return binding.root

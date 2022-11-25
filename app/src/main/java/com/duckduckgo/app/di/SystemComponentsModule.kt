@@ -59,7 +59,7 @@ object SystemComponentsModule {
     fun appIconModifier(
         context: Context,
         appShortcutCreator: AppShortcutCreator,
-        appBuildConfig: AppBuildConfig
+        appBuildConfig: AppBuildConfig,
     ): IconModifier =
         AppIconModifier(context, appShortcutCreator, appBuildConfig)
 
@@ -68,7 +68,7 @@ object SystemComponentsModule {
         context: Context,
         settingsDataStore: SettingsDataStore,
         dispatcherProvider: DispatcherProvider,
-        @AppCoroutineScope appCoroutineScope: CoroutineScope
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
     ): FireAnimationLoader {
         return LottieFireAnimationLoader(context, settingsDataStore, dispatcherProvider, appCoroutineScope)
     }

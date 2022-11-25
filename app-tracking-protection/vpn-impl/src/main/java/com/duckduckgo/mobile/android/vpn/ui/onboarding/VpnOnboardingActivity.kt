@@ -27,11 +27,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
-import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
@@ -44,9 +44,9 @@ import com.duckduckgo.mobile.android.vpn.ui.onboarding.Command.ShowVpnAlwaysOnCo
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.Command.ShowVpnConflictDialog
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPVpnConflictDialog
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
+import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class VpnOnboardingActivity : DuckDuckGoActivity(), AppTPVpnConflictDialog.Listener {
@@ -75,12 +75,14 @@ class VpnOnboardingActivity : DuckDuckGoActivity(), AppTPVpnConflictDialog.Liste
         binding.onboardingPager.adapter = DeviceShieldOnboardingAdapter(viewModel.pages) {
             launchFAQ()
         }
-        binding.onboardingPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                showOnboardingPage(position)
-                super.onPageSelected(position)
-            }
-        })
+        binding.onboardingPager.registerOnPageChangeCallback(
+            object : ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    showOnboardingPage(position)
+                    super.onPageSelected(position)
+                }
+            },
+        )
 
         binding.onboardingClose.setOnClickListener {
             close()
@@ -103,14 +105,16 @@ class VpnOnboardingActivity : DuckDuckGoActivity(), AppTPVpnConflictDialog.Liste
             0 -> {
                 showNextPageCTA()
             }
+
             1 -> {
                 showNextPageCTA()
             }
+
             2 -> {
                 showEnableCTA()
             }
-            else -> {} // no-op
 
+            else -> {} // no-op
         }
     }
 
@@ -158,7 +162,7 @@ class VpnOnboardingActivity : DuckDuckGoActivity(), AppTPVpnConflictDialog.Liste
     override fun onActivityResult(
         requestCode: Int,
         resultCode: Int,
-        data: Intent?
+        data: Intent?,
     ) {
         if (requestCode == REQUEST_ASK_VPN_PERMISSION) {
             viewModel.onVPNPermissionResult(resultCode)
@@ -181,6 +185,7 @@ class VpnOnboardingActivity : DuckDuckGoActivity(), AppTPVpnConflictDialog.Liste
             is VpnPermissionStatus.Granted -> {
                 startVpn()
             }
+
             is VpnPermissionStatus.Denied -> {
                 viewModel.onVPNPermissionNeeded(permissionStatus.intent)
             }
@@ -221,7 +226,7 @@ class VpnOnboardingActivity : DuckDuckGoActivity(), AppTPVpnConflictDialog.Liste
         val dialog = AppTPVpnConflictDialog.instance(this, isAlwaysOn)
         dialog.show(
             supportFragmentManager,
-            AppTPVpnConflictDialog.TAG_VPN_CONFLICT_DIALOG
+            AppTPVpnConflictDialog.TAG_VPN_CONFLICT_DIALOG,
         )
     }
 

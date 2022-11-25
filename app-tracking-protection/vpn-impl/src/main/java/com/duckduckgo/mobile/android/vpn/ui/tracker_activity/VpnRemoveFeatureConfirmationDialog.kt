@@ -36,7 +36,6 @@ class VpnRemoveFeatureConfirmationDialog private constructor(private val listene
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-
         val rootView = layoutInflater.inflate(R.layout.dialog_tracking_protection_remove_feature_confirm_disable, null)
 
         val cancelCta = rootView.findViewById<Button>(R.id.vpnFeatureRemoveDialogCancel)
@@ -44,7 +43,7 @@ class VpnRemoveFeatureConfirmationDialog private constructor(private val listene
 
         val alertDialog = MaterialAlertDialogBuilder(
             requireActivity(),
-            com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_Dialog
+            com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_Dialog,
         )
             .setView(rootView)
 
@@ -57,7 +56,7 @@ class VpnRemoveFeatureConfirmationDialog private constructor(private val listene
 
     private fun configureListeners(
         cancelCta: Button,
-        removeCta: Button
+        removeCta: Button,
     ) {
         cancelCta.setOnClickListener {
             dismiss()

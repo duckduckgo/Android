@@ -30,7 +30,7 @@ import javax.inject.Inject
 @ContributesMultibinding(AppScope::class)
 class TrackingParametersPlugin @Inject constructor(
     private val trackingParametersRepository: TrackingParametersRepository,
-    private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository
+    private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository,
 ) : PrivacyFeaturePlugin {
 
     override fun store(featureName: String, jsonString: String): Boolean {

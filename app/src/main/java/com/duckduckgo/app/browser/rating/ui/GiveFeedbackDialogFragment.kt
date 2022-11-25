@@ -55,7 +55,7 @@ class GiveFeedbackDialogFragment : EnjoymentDialog() {
                 BackKeyListener {
                     firePixelWithPromptCount(APP_FEEDBACK_DIALOG_USER_CANCELLED)
                     listener.onUserCancelledGiveFeedbackDialog(promptCount)
-                }
+                },
             )
             .create()
     }
@@ -63,7 +63,7 @@ class GiveFeedbackDialogFragment : EnjoymentDialog() {
     companion object {
         fun create(
             promptCount: PromptCount,
-            listener: Listener
+            listener: Listener,
         ): GiveFeedbackDialogFragment {
             return GiveFeedbackDialogFragment().also { fragment ->
                 val bundle = Bundle()

@@ -26,7 +26,7 @@ import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerEntity
 @Entity(
     tableName = "vpn_tracker",
     indices = [Index(value = ["bucket"])],
-    primaryKeys = ["bucket", "domain", "packageId"]
+    primaryKeys = ["bucket", "domain", "packageId"],
 )
 data class VpnTracker(
     val trackerCompanyId: Int,
@@ -40,19 +40,13 @@ data class VpnTracker(
 )
 
 data class BucketizedVpnTracker(
-    @Embedded val trackerCompanySignal: VpnTrackerCompanySignal
-)
-
-@Entity(tableName = "vpn_state")
-data class VpnState(
-    @PrimaryKey val id: Long = 1,
-    val uuid: String
+    @Embedded val trackerCompanySignal: VpnTrackerCompanySignal,
 )
 
 enum class VpnServiceState {
     ENABLED,
     DISABLED,
-    INVALID
+    INVALID,
 }
 
 enum class VpnStoppingReason {
@@ -60,7 +54,7 @@ enum class VpnStoppingReason {
     ERROR,
     REVOKED,
     UNKNOWN,
-    RESTART
+    RESTART,
 }
 
 data class AlwaysOnState(val alwaysOnEnabled: Boolean, val alwaysOnLockedDown: Boolean) {
@@ -73,16 +67,15 @@ data class AlwaysOnState(val alwaysOnEnabled: Boolean, val alwaysOnLockedDown: B
 
 @Entity(tableName = "vpn_service_state_stats")
 data class VpnServiceStateStats(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val timestamp: String = DatabaseDateFormatter.timestamp(),
-    val state: VpnServiceState,
+    val timestamp: Long = System.currentTimeMillis(),
+    @PrimaryKey val state: VpnServiceState,
     val stopReason: VpnStoppingReason = UNKNOWN,
-    @Embedded val alwaysOnState: AlwaysOnState = AlwaysOnState.ALWAYS_ON_DISABLED
+    @Embedded val alwaysOnState: AlwaysOnState = AlwaysOnState.ALWAYS_ON_DISABLED,
 )
 
 data class TrackingApp(
     val packageId: String,
-    val appDisplayName: String
+    val appDisplayName: String,
 ) {
     override fun toString(): String = "package=$packageId ($appDisplayName)"
 }
@@ -91,7 +84,7 @@ data class VpnTrackerCompanySignal(
     @Embedded val tracker: VpnTracker,
     @Relation(
         parentColumn = "trackerCompanyId",
-        entityColumn = "trackerCompanyId"
+        entityColumn = "trackerCompanyId",
     )
-    val trackerEntity: AppTrackerEntity
+    val trackerEntity: AppTrackerEntity,
 )

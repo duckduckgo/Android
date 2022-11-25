@@ -25,7 +25,7 @@ interface InternalTestUserStore {
 }
 
 class RealInternalTestUserStore constructor(
-    private val context: Context
+    private val context: Context,
 ) : InternalTestUserStore {
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)

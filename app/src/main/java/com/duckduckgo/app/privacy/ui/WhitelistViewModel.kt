@@ -29,21 +29,21 @@ import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command.*
 import com.duckduckgo.di.scopes.ActivityScope
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class WhitelistViewModel @Inject constructor(
     private val dao: UserWhitelistDao,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val dispatchers: DispatcherProvider
+    private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
     data class ViewState(
         val showWhitelist: Boolean = true,
-        val whitelist: List<UserWhitelistedDomain> = emptyList()
+        val whitelist: List<UserWhitelistedDomain> = emptyList(),
     )
 
     sealed class Command {
@@ -72,7 +72,7 @@ class WhitelistViewModel @Inject constructor(
     private fun onUserWhitelistChanged(entries: List<UserWhitelistedDomain>) {
         viewState.value = viewState.value?.copy(
             showWhitelist = entries.isNotEmpty(),
-            whitelist = entries
+            whitelist = entries,
         )
     }
 
@@ -96,7 +96,7 @@ class WhitelistViewModel @Inject constructor(
 
     fun onEntryEdited(
         old: UserWhitelistedDomain,
-        new: UserWhitelistedDomain
+        new: UserWhitelistedDomain,
     ) {
         if (!UriString.isValidDomain(new.domain)) {
             command.value = ShowWhitelistFormatError

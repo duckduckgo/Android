@@ -26,11 +26,11 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption.*
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.mobile.android.ui.view.show
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
@@ -50,7 +50,6 @@ class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-
         val currentOption: ClearWhenOption = arguments?.getSerializable(DEFAULT_OPTION_EXTRA) as ClearWhenOption? ?: APP_EXIT_ONLY
 
         val rootView = View.inflate(activity, R.layout.settings_automatically_clear_when_fragment, null)
@@ -86,7 +85,7 @@ class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
 
     private fun updateCurrentSelect(
         currentOption: ClearWhenOption,
-        radioGroup: RadioGroup
+        radioGroup: RadioGroup,
     ) {
         val selectedId = currentOption.radioButtonId()
         radioGroup.check(selectedId)
@@ -118,7 +117,6 @@ class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
 
             fragment.arguments = Bundle().also {
                 it.putSerializable(DEFAULT_OPTION_EXTRA, clearWhenSetting)
-
             }
             return fragment
         }

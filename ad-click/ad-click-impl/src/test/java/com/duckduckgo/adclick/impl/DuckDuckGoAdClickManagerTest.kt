@@ -19,6 +19,7 @@ package com.duckduckgo.adclick.impl
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.adclick.impl.pixels.AdClickPixelName
 import com.duckduckgo.adclick.impl.pixels.AdClickPixels
+import java.util.concurrent.TimeUnit
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -32,7 +33,6 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import java.util.concurrent.TimeUnit
 
 @RunWith(RobolectricTestRunner::class)
 @Config(manifest = Config.NONE)
@@ -210,7 +210,7 @@ class DuckDuckGoAdClickManagerTest {
             savedAdDomain = "landing_page.com",
             urlAdDomain = "landing_page.com",
             heuristicEnabled = false,
-            domainEnabled = false
+            domainEnabled = false,
         )
     }
 
@@ -224,7 +224,7 @@ class DuckDuckGoAdClickManagerTest {
             savedAdDomain = "landing_page.com",
             urlAdDomain = "other_landing_page.com",
             heuristicEnabled = false,
-            domainEnabled = false
+            domainEnabled = false,
         )
     }
 
@@ -238,7 +238,7 @@ class DuckDuckGoAdClickManagerTest {
             savedAdDomain = "landing_page",
             urlAdDomain = "",
             heuristicEnabled = false,
-            domainEnabled = false
+            domainEnabled = false,
         )
     }
 
@@ -252,7 +252,7 @@ class DuckDuckGoAdClickManagerTest {
             savedAdDomain = "",
             urlAdDomain = "landing_page.com",
             heuristicEnabled = false,
-            domainEnabled = false
+            domainEnabled = false,
         )
     }
 
@@ -266,7 +266,7 @@ class DuckDuckGoAdClickManagerTest {
             savedAdDomain = "",
             urlAdDomain = "",
             heuristicEnabled = false,
-            domainEnabled = false
+            domainEnabled = false,
         )
     }
 
@@ -281,7 +281,7 @@ class DuckDuckGoAdClickManagerTest {
             savedAdDomain = "",
             urlAdDomain = "",
             heuristicEnabled = true,
-            domainEnabled = false
+            domainEnabled = false,
         )
     }
 
@@ -296,7 +296,7 @@ class DuckDuckGoAdClickManagerTest {
             savedAdDomain = "",
             urlAdDomain = "",
             heuristicEnabled = false,
-            domainEnabled = true
+            domainEnabled = true,
         )
     }
 
@@ -386,12 +386,12 @@ class DuckDuckGoAdClickManagerTest {
     private fun expired(hostTldPlusOne: String) = Exemption(
         hostTldPlusOne = hostTldPlusOne,
         navigationExemptionDeadline = 0L,
-        exemptionDeadline = 0L
+        exemptionDeadline = 0L,
     )
 
     private fun notExpired(hostTldPlusOne: String) = Exemption(
         hostTldPlusOne = hostTldPlusOne,
         navigationExemptionDeadline = Exemption.NO_EXPIRY,
-        exemptionDeadline = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(10)
+        exemptionDeadline = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(10),
     )
 }

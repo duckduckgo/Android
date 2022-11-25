@@ -32,9 +32,9 @@ import com.duckduckgo.privacy.config.store.features.trackingparameters.TrackingP
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import dagger.WrongScope
-import timber.log.Timber
 import java.lang.UnsupportedOperationException
 import javax.inject.Inject
+import timber.log.Timber
 
 @WrongScope("This should be one instance per BrowserTabFragment", FragmentScope::class)
 @ContributesBinding(AppScope::class)
@@ -43,7 +43,7 @@ class RealTrackingParameters @Inject constructor(
     private val trackingParametersRepository: TrackingParametersRepository,
     private val featureToggle: FeatureToggle,
     private val unprotectedTemporary: UnprotectedTemporary,
-    val userWhiteListRepository: UserWhiteListRepository
+    val userWhiteListRepository: UserWhiteListRepository,
 ) : TrackingParameters {
 
     override var lastCleanedUrl: String? = null
@@ -90,7 +90,7 @@ class RealTrackingParameters @Inject constructor(
 
     private fun getPreservedParameters(
         queryParameters: MutableSet<String>,
-        trackingParameters: List<Regex>
+        trackingParameters: List<Regex>,
     ) =
         queryParameters.filter { parameter ->
             var match = false

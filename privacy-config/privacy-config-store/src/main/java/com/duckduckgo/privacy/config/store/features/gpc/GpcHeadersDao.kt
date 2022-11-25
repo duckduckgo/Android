@@ -38,7 +38,9 @@ abstract class GpcHeadersDao {
     @Query("select * from gpc_header_enabled_sites where domain = :domain")
     abstract fun get(domain: String): GpcHeaderEnabledSiteEntity
 
-    @Query("select * from gpc_header_enabled_sites") abstract fun getAll(): List<GpcHeaderEnabledSiteEntity>
+    @Query("select * from gpc_header_enabled_sites")
+    abstract fun getAll(): List<GpcHeaderEnabledSiteEntity>
 
-    @Query("delete from gpc_header_enabled_sites") abstract fun deleteAll()
+    @Query("delete from gpc_header_enabled_sites")
+    abstract fun deleteAll()
 }

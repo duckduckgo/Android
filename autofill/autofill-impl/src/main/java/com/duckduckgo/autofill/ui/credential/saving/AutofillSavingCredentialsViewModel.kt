@@ -18,15 +18,20 @@ package com.duckduckgo.autofill.ui.credential.saving
 
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
-class AutofillSavingCredentialsViewModel @Inject constructor() : ViewModel() {
+class AutofillSavingCredentialsViewModel @Inject constructor(
+    private val dispatchers: DispatcherProvider,
+) : ViewModel() {
 
     @Inject
     lateinit var autofillStore: AutofillStore
@@ -41,7 +46,7 @@ class AutofillSavingCredentialsViewModel @Inject constructor() : ViewModel() {
 
         return DisplayStringResourceIds(
             title = title,
-            ctaButton = ctaButton
+            ctaButton = ctaButton,
         )
     }
 
@@ -71,8 +76,14 @@ class AutofillSavingCredentialsViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    fun userPromptedToSaveCredentials() {
+        viewModelScope.launch(dispatchers.io()) {
+            autofillStore.hasEverBeenPromptedToSaveLogin = true
+        }
+    }
+
     data class DisplayStringResourceIds(
         @StringRes val title: Int,
-        @StringRes val ctaButton: Int
+        @StringRes val ctaButton: Int,
     )
 }

@@ -26,7 +26,7 @@ import javax.inject.Inject
 @ContributesWorker(AppScope::class)
 class VpnReminderNotificationWorker(
     val context: Context,
-    params: WorkerParameters
+    params: WorkerParameters,
 ) : CoroutineWorker(context, params) {
     @Inject
     lateinit var vpnReminderReceiverManager: VpnReminderReceiverManager

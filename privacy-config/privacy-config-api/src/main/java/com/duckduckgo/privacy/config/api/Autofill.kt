@@ -30,5 +30,5 @@ interface Autofill {
 /** Public data class for Autofill Exceptions */
 data class AutofillException(
     val domain: String,
-    val reason: String
+    val reason: String,
 )

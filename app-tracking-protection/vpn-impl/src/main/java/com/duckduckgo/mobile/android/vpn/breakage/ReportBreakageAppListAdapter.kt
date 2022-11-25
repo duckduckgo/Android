@@ -41,7 +41,7 @@ class ReportBreakageAppListAdapter(private val listener: Listener) : RecyclerVie
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
-        viewType: Int
+        viewType: Int,
     ): ReportBreakageAppListViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.view_device_shield_report_app_breakage_entry, parent, false)
@@ -50,7 +50,7 @@ class ReportBreakageAppListAdapter(private val listener: Listener) : RecyclerVie
 
     override fun onBindViewHolder(
         holder: ReportBreakageAppListViewHolder,
-        position: Int
+        position: Int,
     ) {
         holder.bind(installedApps[position], position, listener)
     }
@@ -77,14 +77,14 @@ class ReportBreakageAppListAdapter(private val listener: Listener) : RecyclerVie
 
         override fun areItemsTheSame(
             oldItemPosition: Int,
-            newItemPosition: Int
+            newItemPosition: Int,
         ): Boolean {
             return oldList[oldItemPosition].packageName == newList[newItemPosition].packageName
         }
 
         override fun areContentsTheSame(
             oldItemPosition: Int,
-            newItemPosition: Int
+            newItemPosition: Int,
         ): Boolean {
             return oldList[oldItemPosition] == newList[newItemPosition]
         }
@@ -93,7 +93,7 @@ class ReportBreakageAppListAdapter(private val listener: Listener) : RecyclerVie
     interface Listener {
         fun onInstalledAppSelected(
             installedApp: InstalledApp,
-            position: Int
+            position: Int,
         )
     }
 }
@@ -102,7 +102,7 @@ class ReportBreakageAppListViewHolder(view: View) : RecyclerView.ViewHolder(view
     fun bind(
         installedApp: InstalledApp,
         position: Int,
-        listener: ReportBreakageAppListAdapter.Listener
+        listener: ReportBreakageAppListAdapter.Listener,
     ) {
         itemView.deviceShieldInstalledAppEntryName.text =
             String.format(itemView.context.resources.getString(R.string.atp_ReportBreakageAppEntry), installedApp.name)

@@ -35,7 +35,7 @@ interface UserAgentRepository {
 class RealUserAgentRepository(
     val database: PrivacyConfigDatabase,
     coroutineScope: CoroutineScope,
-    dispatcherProvider: DispatcherProvider
+    dispatcherProvider: DispatcherProvider,
 ) : UserAgentRepository {
 
     private val userAgentDao: UserAgentDao = database.userAgentDao()

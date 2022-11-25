@@ -22,9 +22,9 @@ data class TrackingParametersFeature(
     val state: String,
     val minSupportedVersion: Int?,
     val settings: TrackingParametersSettings,
-    val exceptions: List<TrackingParameterException>
+    val exceptions: List<TrackingParameterException>,
 )
 
 data class TrackingParametersSettings(
-    val parameters: List<String>
+    val parameters: List<String>,
 )

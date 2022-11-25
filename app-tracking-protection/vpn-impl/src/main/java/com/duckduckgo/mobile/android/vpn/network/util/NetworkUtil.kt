@@ -58,5 +58,4 @@ fun Inet4Address.asRoute(): Route? {
 
 fun Context.getActiveNetwork(): Network? {
     return (getSystemService(VpnService.CONNECTIVITY_SERVICE) as ConnectivityManager).activeNetwork
-
 }

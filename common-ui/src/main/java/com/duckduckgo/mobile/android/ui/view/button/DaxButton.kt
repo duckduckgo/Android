@@ -24,12 +24,12 @@ import com.google.android.material.button.MaterialButton
 
 open class DaxButton @JvmOverloads constructor(
     ctx: Context,
-    attrs: AttributeSet,
-    defStyleAttr: Int
+    attrs: AttributeSet?,
+    defStyleAttr: Int,
 ) : MaterialButton(
     ctx,
     attrs,
-    defStyleAttr
+    defStyleAttr,
 ) {
 
     init {
@@ -38,7 +38,7 @@ open class DaxButton @JvmOverloads constructor(
                 attrs,
                 R.styleable.DaxButton,
                 0,
-                0
+                0,
             )
 
         val buttonSize = if (typedArray.hasValue(R.styleable.DaxButton_buttonSize)) {
@@ -68,7 +68,8 @@ open class DaxButton @JvmOverloads constructor(
 
 enum class Size {
     Small,
-    Large;
+    Large,
+    ;
 
     companion object {
         fun from(size: Int): Size {

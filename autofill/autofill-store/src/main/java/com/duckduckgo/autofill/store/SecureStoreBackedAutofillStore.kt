@@ -40,7 +40,7 @@ class SecureStoreBackedAutofillStore(
     private val internalTestUserChecker: InternalTestUserChecker,
     private val lastUpdatedTimeProvider: LastUpdatedTimeProvider,
     private val autofillPrefsStore: AutofillPrefsStore,
-    private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider()
+    private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
 ) : AutofillStore {
 
     override val autofillAvailable: Boolean
@@ -56,6 +56,12 @@ class SecureStoreBackedAutofillStore(
         get() = autofillPrefsStore.showOnboardingWhenOfferingToSaveLogin
         set(value) {
             autofillPrefsStore.showOnboardingWhenOfferingToSaveLogin = value
+        }
+
+    override var hasEverBeenPromptedToSaveLogin: Boolean
+        get() = autofillPrefsStore.hasEverBeenPromptedToSaveLogin
+        set(value) {
+            autofillPrefsStore.hasEverBeenPromptedToSaveLogin = value
         }
 
     override var autofillDeclineCount: Int
@@ -91,7 +97,7 @@ class SecureStoreBackedAutofillStore(
 
     override suspend fun saveCredentials(
         rawUrl: String,
-        credentials: LoginCredentials
+        credentials: LoginCredentials,
     ): LoginCredentials? {
         val url = rawUrl.extractSchemeAndDomain()
         if (url == null) {
@@ -105,7 +111,7 @@ class SecureStoreBackedAutofillStore(
             domain = url,
             username = credentials.username,
             domainTitle = credentials.domainTitle,
-            lastUpdatedMillis = lastUpdatedTimeProvider.getInMillis()
+            lastUpdatedMillis = lastUpdatedTimeProvider.getInMillis(),
         )
         val webSiteLoginCredentials = WebsiteLoginDetailsWithCredentials(loginDetails, password = credentials.password)
 
@@ -119,7 +125,7 @@ class SecureStoreBackedAutofillStore(
     override suspend fun updateCredentials(
         rawUrl: String,
         credentials: LoginCredentials,
-        updateType: CredentialUpdateType
+        updateType: CredentialUpdateType,
     ): LoginCredentials? {
         val url = rawUrl.extractSchemeAndDomain()
         if (url == null) {
@@ -173,14 +179,14 @@ class SecureStoreBackedAutofillStore(
     override suspend fun updateCredentials(credentials: LoginCredentials): LoginCredentials? {
         return secureStorage.updateWebsiteLoginDetailsWithCredentials(
             credentials.copy(lastUpdatedMillis = lastUpdatedTimeProvider.getInMillis())
-                .toWebsiteLoginCredentials()
+                .toWebsiteLoginCredentials(),
         )?.toLoginCredentials()
     }
 
     override suspend fun containsCredentials(
         rawUrl: String,
         username: String?,
-        password: String?
+        password: String?,
     ): ContainsCredentialsResult {
         val url = rawUrl.extractSchemeAndDomain() ?: return NoMatch
         val credentials = secureStorage.websiteLoginDetailsWithCredentialsForDomain(url).firstOrNull() ?: return NoMatch
@@ -224,7 +230,7 @@ class SecureStoreBackedAutofillStore(
             password = password,
             domainTitle = details.domainTitle,
             notes = notes,
-            lastUpdatedMillis = details.lastUpdatedMillis
+            lastUpdatedMillis = details.lastUpdatedMillis,
         )
     }
 
@@ -235,10 +241,10 @@ class SecureStoreBackedAutofillStore(
                 username = username,
                 id = id,
                 domainTitle = domainTitle,
-                lastUpdatedMillis = lastUpdatedMillis
+                lastUpdatedMillis = lastUpdatedMillis,
             ),
             password = password,
-            notes = notes
+            notes = notes,
         )
     }
 }

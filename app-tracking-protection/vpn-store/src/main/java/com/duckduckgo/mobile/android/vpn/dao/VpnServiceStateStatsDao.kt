@@ -26,12 +26,9 @@ interface VpnServiceStateStatsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(stat: VpnServiceStateStats)
 
-    @Query("SELECT * FROM vpn_service_state_stats ORDER BY id DESC limit 1")
+    @Query("SELECT * FROM vpn_service_state_stats ORDER BY timestamp DESC limit 1")
     fun getLastStateStats(): VpnServiceStateStats?
 
-    @Query("SELECT * FROM vpn_service_state_stats ORDER BY id DESC limit 1")
+    @Query("SELECT * FROM vpn_service_state_stats ORDER BY timestamp DESC limit 1")
     fun getStateStats(): Flow<VpnServiceStateStats?>
-
-    @Query("DELETE FROM vpn_service_state_stats WHERE id NOT in (SELECT id FROM vpn_service_state_stats ORDER BY id DESC limit 10)")
-    fun deleteOldEntries()
 }

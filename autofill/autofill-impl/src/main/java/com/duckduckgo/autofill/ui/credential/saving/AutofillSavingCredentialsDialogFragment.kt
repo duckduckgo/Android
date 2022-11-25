@@ -60,10 +60,10 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), CredentialSavePickerDialog {
@@ -104,9 +104,10 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         pixelNameDialogEvent(Shown)?.let { pixel.fire(it) }
+        viewModel.userPromptedToSaveCredentials()
 
         val binding = ContentAutofillSaveNewCredentialsBinding.inflate(inflater, container, false)
         configureViews(binding, getCredentialsToSave())
@@ -115,7 +116,7 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
 
     private fun configureViews(
         binding: ContentAutofillSaveNewCredentialsBinding,
-        credentials: LoginCredentials
+        credentials: LoginCredentials,
     ) {
         (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_EXPANDED
         configureSiteDetails(binding)
@@ -171,7 +172,7 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
 
     private fun configureTitles(
         binding: ContentAutofillSaveNewCredentialsBinding,
-        credentials: LoginCredentials
+        credentials: LoginCredentials,
     ) {
         val resources = viewModel.determineTextResources(credentials)
 
@@ -227,9 +228,8 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         fun instance(
             url: String,
             credentials: LoginCredentials,
-            tabId: String
+            tabId: String,
         ): AutofillSavingCredentialsDialogFragment {
-
             val fragment = AutofillSavingCredentialsDialogFragment()
             fragment.arguments =
                 Bundle().also {

@@ -18,11 +18,11 @@ package com.duckduckgo.downloads.impl
 
 import android.net.Uri
 import android.webkit.MimeTypeMap
-import timber.log.Timber
 import java.lang.IllegalStateException
 import java.util.*
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+import timber.log.Timber
 
 object DownloaderUtil {
 
@@ -145,7 +145,9 @@ object DownloaderUtil {
 
         return if (!filename.endsWith("/")) {
             filename.substringAfterLast('/')
-        } else null
+        } else {
+            null
+        }
     }
 
     fun parseContentDisposition(contentDisposition: String): String? {

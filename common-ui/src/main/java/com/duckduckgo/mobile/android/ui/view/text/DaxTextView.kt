@@ -18,6 +18,7 @@ package com.duckduckgo.mobile.android.ui.view.text
 
 import android.content.Context
 import android.util.AttributeSet
+import androidx.core.content.ContextCompat
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextView.Type.Body1
 import com.google.android.material.textview.MaterialTextView
@@ -27,7 +28,7 @@ class DaxTextView @JvmOverloads
 constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : MaterialTextView(context, attrs, defStyleAttr) {
 
     init {
@@ -36,7 +37,7 @@ constructor(
                 attrs,
                 R.styleable.DaxTextView,
                 0,
-                0
+                0,
             )
 
         val typographyType = if (typedArray.hasValue(R.styleable.DaxTextView_typography)) {
@@ -47,11 +48,22 @@ constructor(
 
         setTypography(typographyType)
 
+        val textColor = if (typedArray.hasValue(R.styleable.DaxTextView_textColor)) {
+            TextColor.from(typedArray.getInt(R.styleable.DaxTextView_textColor, 0))
+        } else {
+            TextColor.Primary
+        }
+        setTextColorStateList(textColor)
+
         typedArray.recycle()
     }
 
     fun setTypography(type: Type) {
         setTextAppearance(Type.getTextAppearanceStyle(type))
+    }
+
+    fun setTextColorStateList(textColor: TextColor) {
+        setTextColor(ContextCompat.getColorStateList(context, TextColor.getTextColorStateList(textColor)))
     }
 
     enum class Type {
@@ -64,7 +76,8 @@ constructor(
         Body1,
         Body2,
         Button,
-        Caption;
+        Caption,
+        ;
 
         companion object {
             fun from(type: Int): Type {
@@ -96,6 +109,29 @@ constructor(
                     Body2 -> R.style.Typography_DuckDuckGo_Body2
                     Button -> R.style.Typography_DuckDuckGo_Button
                     Caption -> R.style.Typography_DuckDuckGo_Caption
+                }
+            }
+        }
+    }
+
+    enum class TextColor {
+        Primary,
+        Secondary,
+        ;
+
+        companion object {
+            fun from(type: Int): TextColor {
+                // same order as attrs-typography.xml
+                return when (type) {
+                    0 -> Primary
+                    else -> Secondary
+                }
+            }
+
+            fun getTextColorStateList(textColor: TextColor): Int {
+                return when (textColor) {
+                    Primary -> R.color.primary_text_color_selector
+                    Secondary -> R.color.secondary_text_color_selector
                 }
             }
         }

@@ -21,5 +21,5 @@ import com.duckduckgo.mobile.android.vpn.dao.AppHealthTriggersDao
 typealias AppHealthTriggersRepository = AppHealthTriggersDao
 
 internal class AppHealthTriggersRepositoryImpl constructor(
-    appHealthDatabase: AppHealthDatabase
+    appHealthDatabase: AppHealthDatabase,
 ) : AppHealthTriggersRepository by appHealthDatabase.appHealthTriggersDao()

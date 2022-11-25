@@ -24,10 +24,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import org.mockito.kotlin.eq
-import org.mockito.kotlin.never
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -37,6 +33,10 @@ import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 private const val HTTPS_IMAGE_URL = "https://example.com/1.img"
 private const val DATA_URI_IMAGE_URL = "data:image/png;base64,iVB23="
@@ -176,7 +176,7 @@ class WebViewLongPressHandlerTest {
             anyInt(),
             eq(WebViewLongPressHandler.CONTEXT_MENU_ID_OPEN_IN_NEW_BACKGROUND_TAB),
             anyInt(),
-            eq(R.string.openInNewBackgroundTab)
+            eq(R.string.openInNewBackgroundTab),
         )
     }
 

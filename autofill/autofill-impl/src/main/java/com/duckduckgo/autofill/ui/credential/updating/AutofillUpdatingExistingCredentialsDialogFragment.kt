@@ -48,9 +48,9 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
+import javax.inject.Inject
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragment(), CredentialUpdateExistingCredentialsDialog {
@@ -84,7 +84,7 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         pixelNameDialogEvent(Shown)?.let { pixel.fire(it) }
 
@@ -109,7 +109,7 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
 
     private fun configureDialogTitle(
         binding: ContentAutofillUpdateExistingCredentialsBinding,
-        updateType: CredentialUpdateType
+        updateType: CredentialUpdateType,
     ) {
         binding.dialogTitle.text = when (updateType) {
             CredentialUpdateType.Username -> getString(R.string.updateLoginDialogTitleUpdateUsername)
@@ -121,9 +121,8 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
         binding: ContentAutofillUpdateExistingCredentialsBinding,
         originalUrl: String,
         credentials: LoginCredentials,
-        updateType: CredentialUpdateType
+        updateType: CredentialUpdateType,
     ) {
-
         binding.updateCredentialsButton.text = when (updateType) {
             CredentialUpdateType.Username -> getString(R.string.updateLoginDialogButtonUpdateUsername)
             CredentialUpdateType.Password -> getString(R.string.updateLoginDialogButtonUpdatePassword)
@@ -147,7 +146,7 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
     private fun configureUpdatedFieldPreview(
         binding: ContentAutofillUpdateExistingCredentialsBinding,
         credentials: LoginCredentials,
-        updateType: CredentialUpdateType
+        updateType: CredentialUpdateType,
     ) {
         binding.updatedFieldPreview.text = when (updateType) {
             CredentialUpdateType.Username -> credentials.username
@@ -177,7 +176,7 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
 
     private fun configureSiteDetails(
         binding: ContentAutofillUpdateExistingCredentialsBinding,
-        originalUrl: String
+        originalUrl: String,
     ) {
         val url = originalUrl.extractDomain() ?: originalUrl
 
@@ -215,9 +214,8 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
             url: String,
             credentials: LoginCredentials,
             tabId: String,
-            credentialUpdateType: CredentialUpdateType
+            credentialUpdateType: CredentialUpdateType,
         ): AutofillUpdatingExistingCredentialsDialogFragment {
-
             val fragment = AutofillUpdatingExistingCredentialsDialogFragment()
             fragment.arguments =
                 Bundle().also {

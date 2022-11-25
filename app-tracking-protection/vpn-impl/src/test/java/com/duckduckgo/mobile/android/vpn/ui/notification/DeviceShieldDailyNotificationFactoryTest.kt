@@ -20,11 +20,11 @@ import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerDao
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationFactory.DeviceShieldNotification
@@ -88,7 +88,7 @@ class DeviceShieldDailyNotificationFactoryTest {
         trackerFound(
             trackerDomain,
             appContainingTracker = trackingApp2(),
-            timestamp = DatabaseDateFormatter.bucketByHour(LocalDateTime.now().plusHours(1))
+            timestamp = DatabaseDateFormatter.bucketByHour(LocalDateTime.now().plusHours(1)),
         )
 
         val notification = factory.dailyNotificationFactory.createDailyDeviceShieldNotification(0)
@@ -179,7 +179,7 @@ class DeviceShieldDailyNotificationFactoryTest {
         trackerFound(
             trackerDomain,
             appContainingTracker = trackingApp2(),
-            timestamp = DatabaseDateFormatter.bucketByHour(LocalDateTime.now().plusHours(1))
+            timestamp = DatabaseDateFormatter.bucketByHour(LocalDateTime.now().plusHours(1)),
         )
 
         val notification = factory.dailyNotificationFactory.createDailyDeviceShieldNotification(3)
@@ -198,14 +198,14 @@ class DeviceShieldDailyNotificationFactoryTest {
             trackerCompanyId = 1,
             company = "Google",
             appContainingTracker = trackingApp2(),
-            timestamp = DatabaseDateFormatter.bucketByHour(LocalDateTime.now().plusHours(3))
+            timestamp = DatabaseDateFormatter.bucketByHour(LocalDateTime.now().plusHours(3)),
         )
         trackerFound(
             "google.com",
             trackerCompanyId = 1,
             company = "Google",
             appContainingTracker = trackingApp3(),
-            timestamp = DatabaseDateFormatter.bucketByHour(LocalDateTime.now().plusHours(4))
+            timestamp = DatabaseDateFormatter.bucketByHour(LocalDateTime.now().plusHours(4)),
         )
 
         val notification = factory.dailyNotificationFactory.createDailyDeviceShieldNotification(3)
@@ -225,7 +225,7 @@ class DeviceShieldDailyNotificationFactoryTest {
         trackerCompanyId: Int = -1,
         company: String = "Tracking LLC",
         appContainingTracker: TrackingApp = defaultApp(),
-        timestamp: String = DatabaseDateFormatter.bucketByHour()
+        timestamp: String = DatabaseDateFormatter.bucketByHour(),
     ) {
         val tracker = VpnTracker(
             trackerCompanyId = trackerCompanyId,
@@ -233,7 +233,7 @@ class DeviceShieldDailyNotificationFactoryTest {
             timestamp = timestamp,
             companyDisplayName = company,
             company = company,
-            trackingApp = appContainingTracker
+            trackingApp = appContainingTracker,
         )
         vpnTrackerDao.insert(tracker)
     }
@@ -243,7 +243,7 @@ class DeviceShieldDailyNotificationFactoryTest {
         trackerCompanyName: String = "Tracking LLC",
         trackerCompanyId: Int = -1,
         appContainingTracker: TrackingApp = defaultApp(),
-        timestamp: String = DatabaseDateFormatter.bucketByHour()
+        timestamp: String = DatabaseDateFormatter.bucketByHour(),
     ): VpnTracker {
         return VpnTracker(
             trackerCompanyId = trackerCompanyId,
@@ -251,7 +251,7 @@ class DeviceShieldDailyNotificationFactoryTest {
             timestamp = timestamp,
             companyDisplayName = trackerCompanyName,
             company = trackerCompanyName,
-            trackingApp = appContainingTracker
+            trackingApp = appContainingTracker,
         )
     }
 

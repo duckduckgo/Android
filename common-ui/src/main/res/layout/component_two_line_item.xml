@@ -21,11 +21,11 @@
                                                    android:paddingTop="@dimen/keyline_5"
                                                    android:paddingBottom="@dimen/keyline_5">
 
-    <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
         android:id="@+id/label"
-        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Two Line Items"
+        android:layout_width="match_parent"
+        app:primaryText="Two Line Items"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
@@ -147,17 +147,44 @@
         app:layout_constraintTop_toBottomOf="@id/twoLineSwitchListItemWithImage"/>
 
     <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+        android:id="@+id/twoLineSwitchListItemWithTruncatedText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="Two Line Item Two Line Item Two Line Item Two Line Item "
+        app:secondaryText="In disabled state"
+        app:leadingIcon="@drawable/ic_globe_gray_16dp"
+        app:showBetaPill="true"
+        app:showSwitch="true"
+        app:primaryTextTruncated="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/twoLineSwitchListItemWithPill"/>
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
         android:id="@+id/twoLineSwitchListItemWithDisabledSwitch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="Two Line Item"
+        app:primaryText="Two Line Item Two Line Item Two Line Item Two Line Item "
         app:secondaryText="In disabled state"
         app:leadingIcon="@drawable/ic_globe_gray_16dp"
         app:showBetaPill="true"
         app:showSwitch="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/twoLineSwitchListItemWithPill"/>
+        app:layout_constraintTop_toBottomOf="@id/twoLineSwitchListItemWithTruncatedText"/>
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+        android:id="@+id/twoLineSwitchListItemWithDisabledSwitchEnabled"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="Two Line Item Two"
+        app:secondaryText="Checked in disabled state"
+        app:leadingIcon="@drawable/ic_globe_gray_16dp"
+        app:showBetaPill="true"
+        app:showSwitch="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/twoLineSwitchListItemWithDisabledSwitch"/>
 
     <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
             android:id="@+id/twoLineSwitchListItemWithPrimaryTextColorOverlay"
@@ -169,7 +196,7 @@
             app:primaryTextColorOverlay="@color/red_text_color_selector"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/twoLineSwitchListItemWithDisabledSwitch"/>
+            app:layout_constraintTop_toBottomOf="@id/twoLineSwitchListItemWithDisabledSwitchEnabled"/>
 
     <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
             android:id="@+id/twoLineSwitchListItemWithSecondaryTextColorOverlay"

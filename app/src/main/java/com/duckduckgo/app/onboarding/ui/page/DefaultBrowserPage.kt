@@ -32,14 +32,14 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
 import com.duckduckgo.app.global.FragmentViewModelFactory
-import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.mobile.android.ui.view.show
+import javax.inject.Inject
 import kotlinx.android.synthetic.main.content_onboarding_default_browser.*
 import kotlinx.android.synthetic.main.include_default_browser_buttons.*
 import timber.log.Timber
-import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class DefaultBrowserPage : OnboardingPageFragment() {
@@ -201,7 +201,7 @@ class DefaultBrowserPage : OnboardingPageFragment() {
     override fun onActivityResult(
         requestCode: Int,
         resultCode: Int,
-        data: Intent?
+        data: Intent?,
     ) {
         when (requestCode) {
             DEFAULT_BROWSER_REQUEST_CODE_SETTINGS -> {

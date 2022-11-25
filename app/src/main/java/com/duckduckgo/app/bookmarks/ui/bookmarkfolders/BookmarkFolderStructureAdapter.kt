@@ -24,12 +24,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.bookmarks.model.BookmarkFolderItem
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ItemBookmarkFolderBinding
-import com.duckduckgo.mobile.android.ui.view.toPx
 import com.duckduckgo.mobile.android.R as CommonR
+import com.duckduckgo.mobile.android.ui.view.toPx
 
 class BookmarkFolderStructureAdapter(
     private val viewModel: BookmarkFoldersViewModel,
-    viewWidth: Int
+    viewWidth: Int,
 ) : ListAdapter<BookmarkFolderItem, FolderViewHolder>(BookmarkFolderStructureDiffCallback()) {
 
     companion object {
@@ -46,7 +46,7 @@ class BookmarkFolderStructureAdapter(
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
-        viewType: Int
+        viewType: Int,
     ): FolderViewHolder {
         val binding = ItemBookmarkFolderBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return FolderViewHolder(binding, viewModel, paddingIncrementPx, maxPadding, verticalPaddingPx)
@@ -54,7 +54,7 @@ class BookmarkFolderStructureAdapter(
 
     override fun onBindViewHolder(
         holder: FolderViewHolder,
-        position: Int
+        position: Int,
     ) {
         holder.bind(getItem(position))
     }
@@ -65,7 +65,7 @@ class FolderViewHolder(
     private val viewModel: BookmarkFoldersViewModel,
     private val paddingIncrement: Int,
     private val maxPadding: Int,
-    private val verticalPadding: Int
+    private val verticalPadding: Int,
 ) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(item: BookmarkFolderItem) {
@@ -97,14 +97,14 @@ class FolderViewHolder(
 class BookmarkFolderStructureDiffCallback : DiffUtil.ItemCallback<BookmarkFolderItem>() {
     override fun areItemsTheSame(
         oldItem: BookmarkFolderItem,
-        newItem: BookmarkFolderItem
+        newItem: BookmarkFolderItem,
     ): Boolean {
         return oldItem.bookmarkFolder.id == newItem.bookmarkFolder.id
     }
 
     override fun areContentsTheSame(
         oldItem: BookmarkFolderItem,
-        newItem: BookmarkFolderItem
+        newItem: BookmarkFolderItem,
     ): Boolean {
         return oldItem == newItem
     }

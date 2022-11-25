@@ -119,7 +119,7 @@ class WidgetThemeConfiguration : DuckDuckGoActivity() {
 
     private fun storeAndSubmitConfiguration(
         widgetId: Int,
-        selectedTheme: WidgetTheme
+        selectedTheme: WidgetTheme,
     ) {
         widgetPrefs.saveWidgetSelectedTheme(widgetId, selectedTheme.toString())
         pixelSelectedTheme(selectedTheme)

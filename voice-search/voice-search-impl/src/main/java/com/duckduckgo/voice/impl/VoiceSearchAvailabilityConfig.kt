@@ -39,7 +39,7 @@ interface VoiceSearchAvailabilityConfigProvider {
 @ContributesBinding(AppScope::class)
 class DefaultVoiceSearchAvailabilityConfigProvider @Inject constructor(
     private val context: Context,
-    private val appBuildConfig: AppBuildConfig
+    private val appBuildConfig: AppBuildConfig,
 ) : VoiceSearchAvailabilityConfigProvider {
 
     @SuppressLint("NewApi")
@@ -49,6 +49,8 @@ class DefaultVoiceSearchAvailabilityConfigProvider @Inject constructor(
         languageTag = appBuildConfig.deviceLocale.toLanguageTag(),
         isOnDeviceSpeechRecognitionSupported = if (appBuildConfig.sdkInt >= VERSION_CODES.S) {
             SpeechRecognizer.isOnDeviceRecognitionAvailable(context)
-        } else false
+        } else {
+            false
+        },
     )
 }

@@ -17,12 +17,12 @@
 package com.duckduckgo.app.browser.certificates.rootstore
 
 import android.net.http.SslCertificate
-import com.duckduckgo.app.browser.certificates.toX509Certificate
 import com.duckduckgo.app.browser.certificates.CertificateType
 import com.duckduckgo.app.browser.certificates.CertificateTypes
 import com.duckduckgo.app.browser.certificates.LetsEncryptCertificateProvider
-import timber.log.Timber
+import com.duckduckgo.app.browser.certificates.toX509Certificate
 import java.security.cert.*
+import timber.log.Timber
 
 interface TrustedCertificateStore {
     fun validateSslCertificateChain(sslCertificate: SslCertificate): CertificateValidationState
@@ -36,7 +36,7 @@ sealed class CertificateValidationState {
 }
 
 class TrustedCertificateStoreImpl(
-    private val letsEncryptCertificateProvider: LetsEncryptCertificateProvider
+    private val letsEncryptCertificateProvider: LetsEncryptCertificateProvider,
 ) : TrustedCertificateStore {
 
     /**
@@ -85,7 +85,7 @@ class TrustedCertificateStoreImpl(
     @Throws(CertificateExpiredException::class, CertificateNotYetValidException::class)
     private fun validate(
         cert: Certificate,
-        issuerCertificate: Certificate
+        issuerCertificate: Certificate,
     ) {
         if (issuerCertificate.type == CertificateTypes.X509) {
             (issuerCertificate as X509Certificate).checkValidity()

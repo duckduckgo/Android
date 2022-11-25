@@ -24,6 +24,7 @@ import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
@@ -42,7 +43,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import kotlin.time.ExperimentalTime
 
 @ObsoleteCoroutinesApi
 @ExperimentalTime
@@ -78,7 +78,7 @@ class WelcomePageViewModelTest {
             appInstallStore = appInstallStore,
             context = mock(),
             pixel = pixel,
-            defaultRoleBrowserDialog = defaultRoleBrowserDialog
+            defaultRoleBrowserDialog = defaultRoleBrowserDialog,
         )
 
         viewEvents = events.asFlow().flatMapLatest { viewModel.reduce(it) }
@@ -135,7 +135,7 @@ class WelcomePageViewModelTest {
             verify(defaultRoleBrowserDialog).dialogShown()
             verify(pixel).fire(
                 AppPixelName.DEFAULT_BROWSER_SET,
-                mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString())
+                mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()),
             )
         }
     }
@@ -149,7 +149,7 @@ class WelcomePageViewModelTest {
             verify(defaultRoleBrowserDialog).dialogShown()
             verify(pixel).fire(
                 AppPixelName.DEFAULT_BROWSER_NOT_SET,
-                mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString())
+                mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()),
             )
         }
     }

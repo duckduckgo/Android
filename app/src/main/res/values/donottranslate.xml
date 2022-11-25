@@ -18,6 +18,7 @@
 
     <!-- Site Permissions Settings -->
     <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Permissions Removed for All Sites</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">\"Ask\" disabled for all sites</string>
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction">View</string>

@@ -18,7 +18,7 @@ class PlayHttpsEmbeddedDataPersister(
     private val binaryDataStore: BinaryDataStore,
     private val httpsBloomSpecDao: HttpsBloomFilterSpecDao,
     private val context: Context,
-    private val moshi: Moshi
+    private val moshi: Moshi,
 ) : HttpsEmbeddedDataPersister {
 
     override fun shouldPersistEmbeddedData(): Boolean {

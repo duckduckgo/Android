@@ -26,18 +26,18 @@ import com.duckduckgo.securestorage.store.SecureStorageRepository
 import com.duckduckgo.securestorage.store.db.WebsiteLoginCredentialsEntity
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class RealSecureStorage @Inject constructor(
     private val secureStorageRepositoryFactory: SecureStorageRepository.Factory,
     private val dispatchers: DispatcherProvider,
-    private val l2DataTransformer: L2DataTransformer
+    private val l2DataTransformer: L2DataTransformer,
 ) : SecureStorage {
 
     private val secureStorageRepository by lazy {
@@ -47,7 +47,7 @@ class RealSecureStorage @Inject constructor(
     override fun canAccessSecureStorage(): Boolean = l2DataTransformer.canProcessData() && secureStorageRepository != null
 
     override suspend fun addWebsiteLoginDetailsWithCredentials(
-        websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials
+        websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials,
     ): WebsiteLoginDetailsWithCredentials? {
         return withContext(dispatchers.io()) {
             val savedCredential = secureStorageRepository?.addWebsiteLoginCredential(websiteLoginDetailsWithCredentials.toDataEntity())
@@ -64,7 +64,9 @@ class RealSecureStorage @Inject constructor(
                     }
                 }
             }
-        } else emptyFlow()
+        } else {
+            emptyFlow()
+        }
     }
 
     override suspend fun websiteLoginDetails(): Flow<List<WebsiteLoginDetails>> =
@@ -76,7 +78,9 @@ class RealSecureStorage @Inject constructor(
                     }
                 }
             }
-        } else emptyFlow()
+        } else {
+            emptyFlow()
+        }
 
     override suspend fun getWebsiteLoginDetailsWithCredentials(id: Long): WebsiteLoginDetailsWithCredentials? =
         withContext(dispatchers.io()) {
@@ -92,7 +96,9 @@ class RealSecureStorage @Inject constructor(
                     }
                 }
             }
-        } else emptyFlow()
+        } else {
+            emptyFlow()
+        }
 
     override suspend fun websiteLoginDetailsWithCredentials(): Flow<List<WebsiteLoginDetailsWithCredentials>> =
         if (secureStorageRepository != null) {
@@ -103,10 +109,12 @@ class RealSecureStorage @Inject constructor(
                     }
                 }
             }
-        } else emptyFlow()
+        } else {
+            emptyFlow()
+        }
 
     override suspend fun updateWebsiteLoginDetailsWithCredentials(
-        websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials
+        websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials,
     ): WebsiteLoginDetailsWithCredentials? =
         withContext(dispatchers.io()) {
             secureStorageRepository?.updateWebsiteLoginCredentials(websiteLoginDetailsWithCredentials.toDataEntity())?.toCredentials()
@@ -129,7 +137,7 @@ class RealSecureStorage @Inject constructor(
             notes = encryptedNotes?.data,
             notesIv = encryptedNotes?.iv,
             domainTitle = details.domainTitle,
-            lastUpdatedInMillis = details.lastUpdatedMillis
+            lastUpdatedInMillis = details.lastUpdatedMillis,
         )
     }
 
@@ -137,7 +145,7 @@ class RealSecureStorage @Inject constructor(
         WebsiteLoginDetailsWithCredentials(
             details = toDetails(),
             password = decryptData(password, passwordIv),
-            notes = decryptData(notes, notesIv)
+            notes = decryptData(notes, notesIv),
         )
 
     private fun WebsiteLoginCredentialsEntity.toDetails(): WebsiteLoginDetails =
@@ -146,7 +154,7 @@ class RealSecureStorage @Inject constructor(
             username = username,
             id = id,
             domainTitle = domainTitle,
-            lastUpdatedMillis = lastUpdatedInMillis
+            lastUpdatedMillis = lastUpdatedInMillis,
         )
 
     // only encrypt when there's data
@@ -154,7 +162,7 @@ class RealSecureStorage @Inject constructor(
 
     private fun decryptData(
         data: String?,
-        iv: String?
+        iv: String?,
     ): String? {
         // only decrypt when there's data and iv
         return data?.let { _data ->

@@ -28,7 +28,7 @@ class AppEnjoymentAppCreationObserver(
     private val appEnjoymentPromptEmitter: AppEnjoymentPromptEmitter,
     private val promptTypeDecider: PromptTypeDecider,
     private val appCoroutineScope: CoroutineScope,
-    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
+    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
 ) : DefaultLifecycleObserver {
 
     @UiThread

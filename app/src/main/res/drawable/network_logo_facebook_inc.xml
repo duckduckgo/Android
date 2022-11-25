@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2020 DuckDuckGo
+  ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -15,14 +15,15 @@
   -->
 
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="22dp"
-    android:height="22dp"
-    android:viewportWidth="22"
-    android:viewportHeight="22">
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
   <path
-      android:pathData="M11,0C4.9249,0 0,4.9249 0,11C0,17.0751 4.9249,22 11,22C17.0751,22 22,17.0751 22,11C22,8.0826 20.8411,5.2847 18.7782,3.2218C16.7153,1.1589 13.9174,0 11,0ZM14.7559,6.1335L13.3855,6.1335C12.3094,6.1335 12.1,6.6477 12.1,7.3952L12.1,9.179L14.528,9.179L14.194,11.7687L12.1,11.7687L12.1,18.2892L9.4255,18.2892L9.4255,11.7687L7.2441,11.7687L7.2441,9.179L9.4255,9.179L9.4255,7.1381C9.4255,4.9222 10.78,3.7107 12.7573,3.7107C13.4249,3.7084 14.0921,3.7429 14.7559,3.8142L14.7559,6.1335Z"
-      android:strokeWidth="1"
+      android:pathData="M12,12m-11,0a11,11 0,1 1,22 0a11,11 0,1 1,-22 0"
+      android:fillColor="?attr/omnibarRoundedFieldBackgroundColor"/>
+  <path
+      android:pathData="M24,12C24,18.6274 18.6274,24 12,24C5.3726,24 0,18.6274 0,12C0,5.3726 5.3726,0 12,0C18.6274,0 24,5.3726 24,12ZM10.0973,12.7383V19H12.6676V12.7383H14.6801L15,10.25H12.6676V8.5356C12.6676,7.8164 12.8672,7.3242 13.9008,7.3242H15.2188V5.0984C14.9918,5.0684 14.2098,5 13.2992,5C11.3988,5 10.0973,6.1594 10.0973,8.2894V10.25H8V12.7383H10.0973Z"
       android:fillColor="?attr/toolbarIconColor"
-      android:fillType="nonZero"
-      android:strokeColor="#00000000"/>
+      android:fillType="evenOdd"/>
 </vector>

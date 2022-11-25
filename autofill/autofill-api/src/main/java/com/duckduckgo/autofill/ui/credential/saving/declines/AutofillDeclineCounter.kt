@@ -44,5 +44,4 @@ interface AutofillDeclineCounter {
      * Permanently disable the autofill decline counter
      */
     suspend fun disableDeclineCounter()
-
 }

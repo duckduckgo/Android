@@ -28,6 +28,7 @@ enum class Component {
     SWITCH,
     RADIO_BUTTON,
     CHECKBOX,
+    SLIDER,
     BOTTOM_APP_BAR,
     TABS,
     SNACKBAR,
@@ -41,5 +42,4 @@ enum class Component {
     SINGLE_LINE_LIST_ITEM,
     TWO_LINE_LIST_ITEM,
     SECTION_DIVIDER,
-    OUTLINED_TEXT_INPUT
 }

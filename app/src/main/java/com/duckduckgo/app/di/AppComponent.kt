@@ -36,11 +36,11 @@ import com.duckduckgo.widget.SearchWidget
 import com.squareup.anvil.annotations.MergeComponent
 import dagger.BindsInstance
 import dagger.Component
+import dagger.SingleInstanceIn
 import dagger.android.AndroidInjector
+import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
 import retrofit2.Retrofit
-import javax.inject.Named
-import dagger.SingleInstanceIn
 
 @SingleInstanceIn(AppScope::class)
 @MergeComponent(
@@ -72,7 +72,7 @@ import dagger.SingleInstanceIn
         WelcomePageModule::class,
         FormatterModule::class,
         EmailModule::class,
-    ]
+    ],
 )
 interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
 

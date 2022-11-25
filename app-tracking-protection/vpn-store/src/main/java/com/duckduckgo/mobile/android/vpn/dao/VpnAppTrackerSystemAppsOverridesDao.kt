@@ -32,7 +32,7 @@ interface VpnAppTrackerSystemAppsOverridesDao {
     @Transaction
     fun upsertSystemAppOverrides(
         systemAppOverrides: List<AppTrackerSystemAppOverridePackage>,
-        metadata: AppTrackerSystemAppOverrideListMetadata
+        metadata: AppTrackerSystemAppOverrideListMetadata,
     ) {
         setSystemAppOverridesMetadata(metadata)
         deleteSystemAppOverrides()

@@ -285,7 +285,7 @@ class UriUtilsFilenameExtractorTest {
     private fun buildPendingDownload(
         url: String,
         contentDisposition: String?,
-        mimeType: String?
+        mimeType: String?,
     ): PendingFileDownload {
         return PendingFileDownload(
             url = url,

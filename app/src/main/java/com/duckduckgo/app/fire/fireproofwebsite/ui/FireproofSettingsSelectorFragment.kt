@@ -36,7 +36,6 @@ class FireproofSettingsSelectorFragment : DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-
         val currentOption: AutomaticFireproofSetting =
             arguments?.getSerializable(DEFAULT_OPTION_EXTRA) as AutomaticFireproofSetting? ?: AutomaticFireproofSetting.ASK_EVERY_TIME
 
@@ -73,7 +72,7 @@ class FireproofSettingsSelectorFragment : DialogFragment() {
 
     private fun updateCurrentSelection(
         currentOption: AutomaticFireproofSetting,
-        radioGroup: RadioGroup
+        radioGroup: RadioGroup,
     ) {
         val selectedId = currentOption.radioButtonId()
         radioGroup.check(selectedId)

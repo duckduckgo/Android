@@ -23,6 +23,7 @@ import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.aJsonRemoteM
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessagingConfigOM.aRemoteMessagingConfig
 import com.duckduckgo.remote.messaging.impl.mappers.RemoteMessagingConfigJsonMapper
 import com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
+import java.util.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -35,7 +36,6 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
-import java.util.*
 
 @ExperimentalCoroutinesApi
 class RealRemoteMessagingConfigProcessorTest {
@@ -46,10 +46,13 @@ class RealRemoteMessagingConfigProcessorTest {
     private val remoteMessagingConfigJsonMapper = RemoteMessagingConfigJsonMapper(appBuildConfig)
     private val remoteMessagingConfigRepository = mock<RemoteMessagingConfigRepository>()
     private val remoteMessagingRepository = mock<RemoteMessagingRepository>()
-    private val remoteMessagingConfigMatcher = RemoteMessagingConfigMatcher(setOf(mock(), mock(), mock(),), mock(),)
+    private val remoteMessagingConfigMatcher = RemoteMessagingConfigMatcher(setOf(mock(), mock(), mock()), mock())
 
     private val testee = RealRemoteMessagingConfigProcessor(
-        remoteMessagingConfigJsonMapper, remoteMessagingConfigRepository, remoteMessagingRepository, remoteMessagingConfigMatcher
+        remoteMessagingConfigJsonMapper,
+        remoteMessagingConfigRepository,
+        remoteMessagingRepository,
+        remoteMessagingConfigMatcher,
     )
 
     @Before
@@ -60,7 +63,7 @@ class RealRemoteMessagingConfigProcessorTest {
     @Test
     fun whenNewVersionThenEvaluate() = runTest {
         whenever(remoteMessagingConfigRepository.get()).thenReturn(
-            aRemoteMessagingConfig(version = 0L)
+            aRemoteMessagingConfig(version = 0L),
         )
 
         testee.process(aJsonRemoteMessagingConfig(version = 1L))
@@ -74,8 +77,8 @@ class RealRemoteMessagingConfigProcessorTest {
         whenever(remoteMessagingConfigRepository.get()).thenReturn(
             aRemoteMessagingConfig(
                 version = 1L,
-                evaluationTimestamp = dateTimeFormatter.format(LocalDateTime.now())
-            )
+                evaluationTimestamp = dateTimeFormatter.format(LocalDateTime.now()),
+            ),
         )
 
         testee.process(aJsonRemoteMessagingConfig(version = 1L))
@@ -90,8 +93,8 @@ class RealRemoteMessagingConfigProcessorTest {
         whenever(remoteMessagingConfigRepository.get()).thenReturn(
             aRemoteMessagingConfig(
                 version = 0L,
-                evaluationTimestamp = dateTimeFormatter.format(LocalDateTime.now().minusDays(2L))
-            )
+                evaluationTimestamp = dateTimeFormatter.format(LocalDateTime.now().minusDays(2L)),
+            ),
         )
 
         testee.process(aJsonRemoteMessagingConfig(version = 1L))
@@ -104,8 +107,8 @@ class RealRemoteMessagingConfigProcessorTest {
         whenever(remoteMessagingConfigRepository.get()).thenReturn(
             aRemoteMessagingConfig(
                 version = 1L,
-                invalidate = true
-            )
+                invalidate = true,
+            ),
         )
 
         testee.process(aJsonRemoteMessagingConfig(version = 1L))

@@ -41,7 +41,7 @@ abstract class HealthStat(open val timestamp: Long = 0)
 data class SimpleEvent(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val type: String,
-    override val timestamp: Long
+    override val timestamp: Long,
 ) : HealthStat(timestamp) {
 
     @Suppress("FunctionName")
@@ -65,7 +65,7 @@ interface HealthStatDao {
     @Query("SELECT count(*) FROM SimpleEvent WHERE timestamp >= :timestamp AND type=:type")
     fun eventCount(
         type: String,
-        timestamp: Long
+        timestamp: Long,
     ): Long
 
     @Query(

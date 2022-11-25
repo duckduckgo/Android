@@ -35,16 +35,16 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import timber.log.Timber
-import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class RealVpnStateMonitor @Inject constructor(
     private val database: VpnDatabase,
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
 ) : VpnStateMonitor {
 
     override fun getStateFlow(vpnFeature: VpnFeature): Flow<VpnState> {
@@ -60,21 +60,25 @@ class RealVpnStateMonitor @Inject constructor(
                         delay(1000)
                         emit(vpnFeature.featureName to vpnFeaturesRegistry.isFeatureRegistered(vpnFeature))
                     }
-                    .onEach { Timber.v("feature $it") }
+                    .onEach { Timber.v("feature $it") },
             ) { vpnState, feature ->
                 val isFeatureEnabled = feature.second
                 val isVpnEnabled = vpnState.state == VpnRunningState.ENABLED
 
-                if (!isVpnEnabled) vpnState
-                else if (isFeatureEnabled) vpnState.copy(state = VpnRunningState.ENABLED)
-                else vpnState.copy(state = VpnRunningState.DISABLED)
+                if (!isVpnEnabled) {
+                    vpnState
+                } else if (isFeatureEnabled) {
+                    vpnState.copy(state = VpnRunningState.ENABLED)
+                } else {
+                    vpnState.copy(state = VpnRunningState.DISABLED)
+                }
             }
             .onStart {
                 val vpnState = mapState(database.vpnServiceStateDao().getLastStateStats())
                 VpnState(
                     state = if (vpnFeaturesRegistry.isFeatureRegistered(vpnFeature)) VpnRunningState.ENABLED else VpnRunningState.DISABLED,
                     alwaysOnState = vpnState.alwaysOnState,
-                    stopReason = vpnState.stopReason
+                    stopReason = vpnState.stopReason,
                 ).also { emit(it) }
             }.flowOn(dispatcherProvider.io())
             .distinctUntilChanged()

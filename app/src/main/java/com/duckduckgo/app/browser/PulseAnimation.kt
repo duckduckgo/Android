@@ -95,14 +95,14 @@ class PulseAnimation(private val lifecycleOwner: LifecycleOwner) : DefaultLifecy
                 view,
                 PropertyValuesHolder.ofFloat("scaleX", fromScaleSize, toScaleSize),
                 PropertyValuesHolder.ofFloat("scaleY", fromScaleSize, toScaleSize),
-                PropertyValuesHolder.ofFloat("alpha", 0f, 1f, 1f, 0.1f)
+                PropertyValuesHolder.ofFloat("alpha", 0f, 1f, 1f, 0.1f),
             )
         } else {
             ObjectAnimator.ofPropertyValuesHolder(
                 view,
                 PropertyValuesHolder.ofFloat("scaleX", ANIM_INITIAL_SCALE, ANIM_FINAL_SCALE),
                 PropertyValuesHolder.ofFloat("scaleY", ANIM_INITIAL_SCALE, ANIM_FINAL_SCALE),
-                PropertyValuesHolder.ofFloat("alpha", 0f, 1f, 1f, 0.1f)
+                PropertyValuesHolder.ofFloat("alpha", 0f, 1f, 1f, 0.1f),
             )
         }
     }

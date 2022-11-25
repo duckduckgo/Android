@@ -50,7 +50,7 @@ class SitePermissionsPreferencesImp @Inject constructor(private val context: Con
 @SuppressLint("ApplySharedPref")
 inline fun SharedPreferences.edit(
     commit: Boolean = false,
-    action: SharedPreferences.Editor.() -> Unit
+    action: SharedPreferences.Editor.() -> Unit,
 ) {
     val editor = edit()
     action(editor)

@@ -31,7 +31,7 @@ import dagger.Provides
 @Module
 @ContributesTo(
     scope = AppScope::class,
-    replaces = [HttpsPersisterModule::class]
+    replaces = [HttpsPersisterModule::class],
 )
 class PlayHttpsPersisterModule {
 
@@ -41,7 +41,7 @@ class PlayHttpsPersisterModule {
         binaryDataStore: BinaryDataStore,
         httpsBloomSpecDao: HttpsBloomFilterSpecDao,
         context: Context,
-        moshi: Moshi
+        moshi: Moshi,
     ): HttpsEmbeddedDataPersister {
         return PlayHttpsEmbeddedDataPersister(httpsDataPersister, binaryDataStore, httpsBloomSpecDao, context, moshi)
     }

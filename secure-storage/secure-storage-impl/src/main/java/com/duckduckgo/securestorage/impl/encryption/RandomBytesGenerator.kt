@@ -33,7 +33,7 @@ interface RandomBytesGenerator {
 
 @ContributesBinding(AppScope::class)
 class RealRandomBytesGenerator @Inject constructor(
-    private val appBuildConfig: AppBuildConfig
+    private val appBuildConfig: AppBuildConfig,
 ) : RandomBytesGenerator {
 
     @SuppressLint("NewApi")

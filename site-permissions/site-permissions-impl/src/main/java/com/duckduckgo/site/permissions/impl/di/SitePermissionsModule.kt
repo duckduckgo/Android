@@ -23,11 +23,11 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.impl.SitePermissionsManagerImpl
 import com.duckduckgo.site.permissions.impl.SitePermissionsRepositoryImpl
-import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionsAllowedDao
-import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsDao
 import com.duckduckgo.site.permissions.store.SitePermissionsDatabase
 import com.duckduckgo.site.permissions.store.SitePermissionsPreferences
 import com.duckduckgo.site.permissions.store.SitePermissionsPreferencesImp
+import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsDao
+import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionsAllowedDao
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -41,7 +41,6 @@ object SitePermissionsModule {
     @SingleInstanceIn(AppScope::class)
     fun providesSitePermissionsDatabase(context: Context): SitePermissionsDatabase {
         return Room.databaseBuilder(context, SitePermissionsDatabase::class.java, "site_permissions.db")
-            .enableMultiInstanceInvalidation()
             .fallbackToDestructiveMigration()
             .build()
     }
@@ -61,7 +60,7 @@ object SitePermissionsModule {
     @Provides
     fun providesSitePermissionsManager(
         sitePermissionsRepository: SitePermissionsRepositoryImpl,
-        packageManager: PackageManager
+        packageManager: PackageManager,
     ): SitePermissionsManager {
         return SitePermissionsManagerImpl(packageManager, sitePermissionsRepository)
     }

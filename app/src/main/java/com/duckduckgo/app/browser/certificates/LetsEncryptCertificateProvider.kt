@@ -26,7 +26,7 @@ interface LetsEncryptCertificateProvider {
 }
 
 class LetsEncryptCertificateProviderImpl constructor(
-    private val certificates: Set<LetsEncryptCertificate>
+    private val certificates: Set<LetsEncryptCertificate>,
 ) : LetsEncryptCertificateProvider {
     override fun certificates(): List<LetsEncryptCertificate> {
         return certificates.toList()

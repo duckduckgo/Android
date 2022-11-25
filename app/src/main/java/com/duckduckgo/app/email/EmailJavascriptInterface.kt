@@ -33,7 +33,7 @@ class EmailJavascriptInterface(
     private val dispatcherProvider: DispatcherProvider,
     private val featureToggle: FeatureToggle,
     private val autofill: Autofill,
-    private val showNativeTooltip: () -> Unit
+    private val showNativeTooltip: () -> Unit,
 ) {
 
     private fun getUrl(): String? {
@@ -84,7 +84,7 @@ class EmailJavascriptInterface(
     fun storeCredentials(
         token: String,
         username: String,
-        cohort: String
+        cohort: String,
     ) {
         if (isUrlFromDuckDuckGoEmail()) {
             emailManager.storeCredentials(token, username, cohort)

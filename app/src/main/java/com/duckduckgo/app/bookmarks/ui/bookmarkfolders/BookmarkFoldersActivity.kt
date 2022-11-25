@@ -51,7 +51,7 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
         viewModel.fetchBookmarkFolders(
             intent.extras?.getLong(KEY_BOOKMARK_FOLDER_ID) ?: 0,
             getString(R.string.bookmarksSectionTitle),
-            currentFolder as BookmarkFolder?
+            currentFolder as BookmarkFolder?,
         )
     }
 
@@ -67,7 +67,7 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
                 viewState?.let {
                     adapter.submitList(it.folderStructure)
                 }
-            }
+            },
         )
 
         viewModel.command.observe(
@@ -77,7 +77,7 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
                     is BookmarkFoldersViewModel.Command.SelectFolder -> setSelectedFolderResult(it.selectedBookmarkFolder)
                     is BookmarkFoldersViewModel.Command.NewFolderCreatedUpdateTheStructure -> setNewlyCreatedSelectedFolderResult()
                 }
-            }
+            },
         )
     }
 
@@ -92,7 +92,7 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
             R.id.action_add_folder -> {
                 val dialog = AddBookmarkFolderDialogFragment.instance(
                     ROOT_FOLDER_ID,
-                    getString(R.string.bookmarksActivityTitle)
+                    getString(R.string.bookmarksActivityTitle),
                 )
                 dialog.show(supportFragmentManager, ADD_BOOKMARK_FOLDER_FRAGMENT_TAG)
                 dialog.listener = viewModel
@@ -115,7 +115,7 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
         viewModel.newFolderAdded(
             rootFolderName = getString(R.string.bookmarksSectionTitle),
             selectedFolderId = intent.extras?.getLong(KEY_BOOKMARK_FOLDER_ID) ?: 0,
-            currentFolder = intent.extras?.getSerializable(KEY_CURRENT_FOLDER) as BookmarkFolder?
+            currentFolder = intent.extras?.getSerializable(KEY_CURRENT_FOLDER) as BookmarkFolder?,
         )
     }
 
@@ -132,7 +132,7 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
             context: Context,
             parentFolderId: Long,
             currentFolder: BookmarkFolder? = null,
-            showAddFolderMenu: Boolean = false
+            showAddFolderMenu: Boolean = false,
         ): Intent {
             val intent = Intent(context, BookmarkFoldersActivity::class.java)
             val bundle = Bundle()

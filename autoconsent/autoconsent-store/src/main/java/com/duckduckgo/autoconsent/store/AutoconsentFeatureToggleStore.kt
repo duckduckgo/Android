@@ -26,7 +26,7 @@ interface AutoconsentFeatureToggleStore {
 
     fun get(
         featureName: AutoconsentFeatureName,
-        defaultValue: Boolean
+        defaultValue: Boolean,
     ): Boolean
 
     fun getMinSupportedVersion(featureName: AutoconsentFeatureName): Int
@@ -68,5 +68,5 @@ internal class RealAutoconsentFeatureToggleStore(private val context: Context) :
 data class AutoconsentFeatureToggles(
     val featureName: AutoconsentFeatureName,
     val enabled: Boolean,
-    val minSupportedVersion: Int?
+    val minSupportedVersion: Int?,
 )

@@ -25,7 +25,7 @@ import java.util.*
 
 val IP_REGEX =
     Regex(
-        "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(:[0-9]+)?$"
+        "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(:[0-9]+)?$",
     )
 
 fun Uri.withScheme(): Uri {
@@ -122,7 +122,7 @@ fun Uri.getValidUrl(): ValidUrl? {
 data class ValidUrl(
     val baseHost: String,
     val host: String,
-    val path: String?
+    val path: String?,
 )
 
 fun Uri.replaceQueryParameters(queryParameters: List<String>): Uri {

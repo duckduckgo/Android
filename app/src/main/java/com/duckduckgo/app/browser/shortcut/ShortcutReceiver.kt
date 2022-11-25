@@ -32,9 +32,9 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ReceiverScope
 import dagger.android.AndroidInjection
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @InjectWith(ReceiverScope::class)
 class ShortcutReceiver : BroadcastReceiver(), DefaultLifecycleObserver {
@@ -44,11 +44,12 @@ class ShortcutReceiver : BroadcastReceiver(), DefaultLifecycleObserver {
 
     @Inject lateinit var dispatcher: DispatcherProvider
 
-    @Inject @AppCoroutineScope lateinit var appCoroutineScope: CoroutineScope
+    @Inject @AppCoroutineScope
+    lateinit var appCoroutineScope: CoroutineScope
 
     override fun onReceive(
         context: Context,
-        intent: Intent?
+        intent: Intent?,
     ) {
         AndroidInjection.inject(this, context)
         onShortcutAdded(context, intent)

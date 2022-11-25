@@ -35,19 +35,20 @@ import com.duckduckgo.vpn.network.api.*
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
-import timber.log.Timber
+import java.net.InetAddress
 import javax.inject.Inject
+import timber.log.Timber
 
 private const val LRU_CACHE_SIZE = 2048
 private const val EMFILE_ERRNO = 24
 
 @ContributesBinding(
     scope = VpnScope::class,
-    boundType = VpnNetworkStack::class
+    boundType = VpnNetworkStack::class,
 )
 @ContributesBinding(
     scope = VpnScope::class,
-    boundType = VpnNetworkCallback::class
+    boundType = VpnNetworkCallback::class,
 )
 @SingleInstanceIn(VpnScope::class)
 class NgVpnNetworkStack @Inject constructor(
@@ -68,6 +69,7 @@ class NgVpnNetworkStack @Inject constructor(
     private var jniContext = 0L
     private val jniLock = Any()
     private val addressLookupLruCache = LruCache<String, String>(LRU_CACHE_SIZE)
+
     // cache packageId -> app name
     private val appNamesCache = LruCache<String, AppNameResolver.OriginatingApp>(100)
 
@@ -84,7 +86,6 @@ class NgVpnNetworkStack @Inject constructor(
                 vpnNetwork.destroy(jniContext)
                 jniContext = 0
             }
-
         }
         jniContext = vpnNetwork.create()
 
@@ -114,6 +115,15 @@ class NgVpnNetworkStack @Inject constructor(
     override fun mtu(): Int {
         return vpnNetwork.get().mtu()
     }
+
+    override fun addresses(): Map<InetAddress, Int> = mapOf(
+        InetAddress.getByName("10.0.0.2") to 32,
+        InetAddress.getByName("fd00:1:fd00:1:fd00:1:fd00:1") to 128, // Add IPv6 Unique Local Address
+    )
+
+    override fun dns(): Set<InetAddress> = emptySet()
+
+    override fun routes(): Map<InetAddress, Int> = emptyMap()
 
     override fun onExit(reason: String) {
         Timber.w("Native exit reason=$reason")
@@ -177,7 +187,7 @@ class NgVpnNetworkStack @Inject constructor(
                 company = type.tracker.owner.name,
                 companyDisplayName = type.tracker.owner.displayName,
                 domain = type.tracker.hostname,
-                trackingApp = TrackingApp(trackingApp.packageId, trackingApp.appName)
+                trackingApp = TrackingApp(trackingApp.packageId, trackingApp.appName),
             ).run {
                 appTrackerRecorder.insertTracker(this)
             }

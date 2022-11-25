@@ -27,7 +27,7 @@ data class UncaughtExceptionEntity(
     val exceptionSource: UncaughtExceptionSource,
     val message: String,
     val version: String,
-    val timestamp: Long = System.currentTimeMillis()
+    val timestamp: Long = System.currentTimeMillis(),
 ) {
 
     fun formattedTimestamp(): String = formatter.format(Date(timestamp))

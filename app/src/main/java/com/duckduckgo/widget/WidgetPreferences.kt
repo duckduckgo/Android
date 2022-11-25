@@ -25,14 +25,14 @@ interface WidgetPreferences {
     fun widgetTheme(widgetId: Int): WidgetTheme
     fun saveWidgetSelectedTheme(
         widgetId: Int,
-        theme: String
+        theme: String,
     )
 
     fun widgetSize(widgetId: Int): Pair<Int, Int>
     fun storeWidgetSize(
         widgetId: Int,
         columns: Int,
-        rows: Int
+        rows: Int,
     )
 
     fun removeWidgetSettings(widgetId: Int)
@@ -45,13 +45,13 @@ class AppWidgetThemePreferences @Inject constructor(private val context: Context
 
     override fun widgetTheme(widgetId: Int): WidgetTheme {
         return WidgetTheme.valueOf(
-            preferences.getString(keyForWidgetTheme(widgetId), WidgetTheme.SYSTEM_DEFAULT.toString()) ?: WidgetTheme.SYSTEM_DEFAULT.toString()
+            preferences.getString(keyForWidgetTheme(widgetId), WidgetTheme.SYSTEM_DEFAULT.toString()) ?: WidgetTheme.SYSTEM_DEFAULT.toString(),
         )
     }
 
     override fun saveWidgetSelectedTheme(
         widgetId: Int,
-        theme: String
+        theme: String,
     ) {
         preferences.edit(true) {
             putString(keyForWidgetTheme(widgetId), theme)
@@ -61,14 +61,14 @@ class AppWidgetThemePreferences @Inject constructor(private val context: Context
     override fun widgetSize(widgetId: Int): Pair<Int, Int> {
         return Pair(
             preferences.getInt("$SHARED_PREFS_WIDTH_KEY-$widgetId", 2),
-            preferences.getInt("$SHARED_PREFS_HEIGHT_KEY-$widgetId", 2)
+            preferences.getInt("$SHARED_PREFS_HEIGHT_KEY-$widgetId", 2),
         )
     }
 
     override fun storeWidgetSize(
         widgetId: Int,
         columns: Int,
-        rows: Int
+        rows: Int,
     ) {
         preferences.edit(true) {
             putInt("$SHARED_PREFS_WIDTH_KEY-$widgetId", columns)

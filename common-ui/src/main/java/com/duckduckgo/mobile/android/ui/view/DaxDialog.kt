@@ -114,7 +114,7 @@ class TypewriterDaxDialog : DialogFragment(R.layout.view_dax_dialog), DaxDialog 
 
     override fun onViewCreated(
         view: View,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
         setDialogAndStartAnimation()
@@ -199,7 +199,7 @@ class TypewriterDaxDialog : DialogFragment(R.layout.view_dax_dialog), DaxDialog 
             toolbarDimmed: Boolean = true,
             dismissible: Boolean = false,
             typingDelayInMs: Long = DEFAULT_TYPING_DELAY,
-            showHideButton: Boolean = true
+            showHideButton: Boolean = true,
         ): TypewriterDaxDialog {
             return TypewriterDaxDialog().apply {
                 arguments = Bundle().apply {

@@ -28,8 +28,10 @@ class VpnRoutes {
          *
          * We exclude:
          *   - private local IP ranges
+         *   - special IP addresses 127.0.0.0 to 127.255.255.255
+         *   - not allocated to host (Class E) IP address - 240.0.0.0 to 255.255.255.255
          *   - link-local address range
-         *   - multicast address range
+         *   - multicast (Class D) address range - 224.0.0.0 to 239.255.255.255
          *   - broadcast address
          *   - T-mobile wi-fi calling
          *      - 66.94.2.0/24  -> 66.94.2.255
@@ -114,7 +116,11 @@ class VpnRoutes {
             Route(address = "98.0.0.0", maskWidth = 7, lowAddress = "98.0.0.0", highAddress = "99.255.255.255"),
             Route(address = "100.0.0.0", maskWidth = 6, lowAddress = "100.0.0.0", highAddress = "103.255.255.255"),
             Route(address = "104.0.0.0", maskWidth = 5, lowAddress = "104.0.0.0", highAddress = "111.255.255.255"),
-            Route(address = "112.0.0.0", maskWidth = 4, lowAddress = "112.0.0.0", highAddress = "127.255.255.255"),
+            Route(address = "112.0.0.0", maskWidth = 5, lowAddress = "112.0.0.0", highAddress = "119.255.255.255"),
+            Route(address = "120.0.0.0", maskWidth = 6, lowAddress = "120.0.0.0", highAddress = "123.255.255.255"),
+            Route(address = "124.0.0.0", maskWidth = 7, lowAddress = "124.0.0.0", highAddress = "125.255.255.255"),
+            Route(address = "126.0.0.0", maskWidth = 8, lowAddress = "126.0.0.0", highAddress = "126.255.255.255"),
+            // Excluded range: 127.0.0.0 -> 127.255.255.255
             Route(address = "128.0.0.0", maskWidth = 3, lowAddress = "128.0.0.0", highAddress = "159.255.255.255"),
             Route(address = "160.0.0.0", maskWidth = 5, lowAddress = "160.0.0.0", highAddress = "167.255.255.255"),
             Route(address = "168.0.0.0", maskWidth = 8, lowAddress = "168.0.0.0", highAddress = "168.255.255.255"),
@@ -166,35 +172,7 @@ class VpnRoutes {
             Route(address = "212.0.0.0", maskWidth = 6, lowAddress = "212.0.0.0", highAddress = "215.255.255.255"),
             Route(address = "216.0.0.0", maskWidth = 5, lowAddress = "216.0.0.0", highAddress = "223.255.255.255"),
             // Excluded range: 224.0.0.0 -> 239.255.255.255
-            Route(address = "240.0.0.0", maskWidth = 5, lowAddress = "240.0.0.0", highAddress = "247.255.255.255"),
-            Route(address = "248.0.0.0", maskWidth = 6, lowAddress = "248.0.0.0", highAddress = "251.255.255.255"),
-            Route(address = "252.0.0.0", maskWidth = 7, lowAddress = "252.0.0.0", highAddress = "253.255.255.255"),
-            Route(address = "254.0.0.0", maskWidth = 8, lowAddress = "254.0.0.0", highAddress = "254.255.255.255"),
-            Route(address = "255.0.0.0", maskWidth = 9, lowAddress = "255.0.0.0", highAddress = "255.127.255.255"),
-            Route(address = "255.128.0.0", maskWidth = 10, lowAddress = "255.128.0.0", highAddress = "255.191.255.255"),
-            Route(address = "255.192.0.0", maskWidth = 11, lowAddress = "255.192.0.0", highAddress = "255.223.255.255"),
-            Route(address = "255.224.0.0", maskWidth = 12, lowAddress = "255.224.0.0", highAddress = "255.239.255.255"),
-            Route(address = "255.240.0.0", maskWidth = 13, lowAddress = "255.240.0.0", highAddress = "255.247.255.255"),
-            Route(address = "255.248.0.0", maskWidth = 14, lowAddress = "255.248.0.0", highAddress = "255.251.255.255"),
-            Route(address = "255.252.0.0", maskWidth = 15, lowAddress = "255.252.0.0", highAddress = "255.253.255.255"),
-            Route(address = "255.254.0.0", maskWidth = 16, lowAddress = "255.254.0.0", highAddress = "255.254.255.255"),
-            Route(address = "255.255.0.0", maskWidth = 17, lowAddress = "255.255.0.0", highAddress = "255.255.127.255"),
-            Route(address = "255.255.128.0", maskWidth = 18, lowAddress = "255.255.128.0", highAddress = "255.255.191.255"),
-            Route(address = "255.255.192.0", maskWidth = 19, lowAddress = "255.255.192.0", highAddress = "255.255.223.255"),
-            Route(address = "255.255.224.0", maskWidth = 20, lowAddress = "255.255.224.0", highAddress = "255.255.239.255"),
-            Route(address = "255.255.240.0", maskWidth = 21, lowAddress = "255.255.240.0", highAddress = "255.255.247.255"),
-            Route(address = "255.255.248.0", maskWidth = 22, lowAddress = "255.255.248.0", highAddress = "255.255.251.255"),
-            Route(address = "255.255.252.0", maskWidth = 23, lowAddress = "255.255.252.0", highAddress = "255.255.253.255"),
-            Route(address = "255.255.254.0", maskWidth = 24, lowAddress = "255.255.254.0", highAddress = "255.255.254.255"),
-            Route(address = "255.255.255.0", maskWidth = 25, lowAddress = "255.255.255.0", highAddress = "255.255.255.127"),
-            Route(address = "255.255.255.128", maskWidth = 26, lowAddress = "255.255.255.128", highAddress = "255.255.255.191"),
-            Route(address = "255.255.255.192", maskWidth = 27, lowAddress = "255.255.255.192", highAddress = "255.255.255.223"),
-            Route(address = "255.255.255.224", maskWidth = 28, lowAddress = "255.255.255.224", highAddress = "255.255.255.239"),
-            Route(address = "255.255.255.240", maskWidth = 29, lowAddress = "255.255.255.240", highAddress = "255.255.255.247"),
-            Route(address = "255.255.255.248", maskWidth = 30, lowAddress = "255.255.255.248", highAddress = "255.255.255.251"),
-            Route(address = "255.255.255.252", maskWidth = 31, lowAddress = "255.255.255.252", highAddress = "255.255.255.253"),
-            Route(address = "255.255.255.254", maskWidth = 32, lowAddress = "255.255.255.254", highAddress = "255.255.255.254"),
-            // Excluded range: 255.255.255.255 -> 255.255.255.255
+            // Excluded range: 240.0.0.0 -> 255.255.255.255
         )
 
         /**
@@ -210,5 +188,5 @@ data class Route(
     val address: String,
     val maskWidth: Int,
     val lowAddress: String,
-    val highAddress: String
+    val highAddress: String,
 )

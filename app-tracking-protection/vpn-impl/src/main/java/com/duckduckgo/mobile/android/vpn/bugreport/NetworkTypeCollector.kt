@@ -28,33 +28,33 @@ import com.duckduckgo.app.global.extensions.isPrivateDnsActive
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
+import com.duckduckgo.mobile.android.vpn.prefs.VpnPreferences
+import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
+import com.frybits.harmony.getHarmonySharedPreferences
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
-import com.duckduckgo.mobile.android.vpn.prefs.VpnPreferences
-import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
-import com.frybits.harmony.getHarmonySharedPreferences
+import java.net.InetAddress
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import timber.log.Timber
-import java.net.InetAddress
-import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = VpnScope::class,
-    boundType = VpnStateCollectorPlugin::class
+    boundType = VpnStateCollectorPlugin::class,
 )
 @ContributesMultibinding(
     scope = VpnScope::class,
-    boundType = VpnServiceCallbacks::class
+    boundType = VpnServiceCallbacks::class,
 )
 @SingleInstanceIn(VpnScope::class)
 class NetworkTypeCollector @Inject constructor(
@@ -97,13 +97,13 @@ class NetworkTypeCollector @Inject constructor(
     private val cellularNetworkCallback = object : NetworkCallback() {
         override fun onAvailable(network: Network) {
             updateNetworkInfo(
-                Connection(network.networkHandle, NetworkType.CELLULAR, NetworkState.AVAILABLE, context.mobileNetworkCode(NetworkType.CELLULAR))
+                Connection(network.networkHandle, NetworkType.CELLULAR, NetworkState.AVAILABLE, context.mobileNetworkCode(NetworkType.CELLULAR)),
             )
         }
 
         override fun onLost(network: Network) {
             updateNetworkInfo(
-                Connection(network.networkHandle, NetworkType.CELLULAR, NetworkState.LOST, context.mobileNetworkCode(NetworkType.CELLULAR))
+                Connection(network.networkHandle, NetworkType.CELLULAR, NetworkState.LOST, context.mobileNetworkCode(NetworkType.CELLULAR)),
             )
         }
     }
@@ -118,7 +118,7 @@ class NetworkTypeCollector @Inject constructor(
                     "isPrivateDnsActive = %s, server = %s (%s)",
                     context.isPrivateDnsActive(),
                     context.getPrivateDnsServerName(),
-                    runCatching { InetAddress.getAllByName(context.getPrivateDnsServerName()) }.getOrNull()?.map { it.hostAddress }
+                    runCatching { InetAddress.getAllByName(context.getPrivateDnsServerName()) }.getOrNull()?.map { it.hostAddress },
                 )
                 true
             } else {
@@ -155,7 +155,7 @@ class NetworkTypeCollector @Inject constructor(
 
     override fun onVpnStopped(
         coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
+        vpnStopReason: VpnStopReason,
     ) {
         (context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?)?.let {
             it.safeUnregisterNetworkCallback(wifiNetworkCallback)
@@ -196,8 +196,8 @@ class NetworkTypeCollector @Inject constructor(
                             currentNetwork = connection,
                             previousNetwork = previousNetwork,
                             lastSwitchTimestampMillis = lastSwitchTimestampMillis,
-                            secondsSinceLastSwitch = secondsSinceLastSwitch
-                        )
+                            secondsSinceLastSwitch = secondsSinceLastSwitch,
+                        ),
                     )
                 currentNetworkInfo = jsonInfo
                 Timber.v("New network info $jsonInfo")
@@ -210,7 +210,7 @@ class NetworkTypeCollector @Inject constructor(
     private fun updateSecondsSinceLastSwitch() {
         val networkInfo: NetworkInfo = currentNetworkInfo?.let { adapter.fromJson(it) } ?: return
         networkInfo.copy(
-            secondsSinceLastSwitch = TimeUnit.MILLISECONDS.toSeconds(SystemClock.elapsedRealtime() - networkInfo.lastSwitchTimestampMillis)
+            secondsSinceLastSwitch = TimeUnit.MILLISECONDS.toSeconds(SystemClock.elapsedRealtime() - networkInfo.lastSwitchTimestampMillis),
         ).run {
             currentNetworkInfo = adapter.toJson(this)
         }
@@ -226,8 +226,8 @@ class NetworkTypeCollector @Inject constructor(
                 temp?.copy(
                     lastSwitchTimestampMillis = -999,
                     currentNetwork = temp.currentNetwork.copy(netId = -999),
-                    previousNetwork = temp.previousNetwork?.copy(netId = -999)
-                )
+                    previousNetwork = temp.previousNetwork?.copy(netId = -999),
+                ),
             )
         } ?: return JSONObject()
 

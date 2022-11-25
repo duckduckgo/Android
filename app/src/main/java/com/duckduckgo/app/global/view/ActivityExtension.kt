@@ -56,7 +56,6 @@ fun Context.fadeTransitionConfig(): Bundle? {
 }
 
 fun FragmentActivity.toggleFullScreen() {
-
     val newUiOptions = window.decorView.systemUiVisibility
         .xor(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
         .xor(View.SYSTEM_UI_FLAG_FULLSCREEN)

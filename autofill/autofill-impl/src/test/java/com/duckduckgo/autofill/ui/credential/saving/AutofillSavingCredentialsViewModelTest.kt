@@ -16,18 +16,27 @@
 
 package com.duckduckgo.autofill.ui.credential.saving
 
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.store.AutofillStore
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@ExperimentalCoroutinesApi
 class AutofillSavingCredentialsViewModelTest {
 
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
+
     private val mockStore: AutofillStore = mock()
-    private val testee = AutofillSavingCredentialsViewModel().also { it.autofillStore = mockStore }
+    private val testee = AutofillSavingCredentialsViewModel(coroutineTestRule.testDispatcherProvider).also { it.autofillStore = mockStore }
 
     @Test
     fun whenShowingOnboardingThenTitleResourceIsAlwaysOnboardingTitle() {
@@ -78,6 +87,12 @@ class AutofillSavingCredentialsViewModelTest {
         whenever(mockStore.showOnboardingWhenOfferingToSaveLogin).thenReturn(false)
         val expectedResource = R.string.saveLoginMissingUsernameDialogButtonSave
         assertEquals(expectedResource, testee.determineTextResources(usernameMissing()).ctaButton)
+    }
+
+    @Test
+    fun whenUserPromptedToSaveThenFlagSet() = runTest {
+        testee.userPromptedToSaveCredentials()
+        verify(mockStore).hasEverBeenPromptedToSaveLogin = true
     }
 
     private fun usernamePresent() = loginCredentialsWithUsername(username = "foo")

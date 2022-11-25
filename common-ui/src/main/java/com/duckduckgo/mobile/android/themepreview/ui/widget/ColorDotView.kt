@@ -30,7 +30,7 @@ class ColorDotView
 constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) :
     View(context, attrs, defStyleAttr) {
 
@@ -74,7 +74,7 @@ constructor(
         w: Int,
         h: Int,
         oldw: Int,
-        oldh: Int
+        oldh: Int,
     ) {
         super.onSizeChanged(w, h, oldw, oldh)
         cx = w / 2F
