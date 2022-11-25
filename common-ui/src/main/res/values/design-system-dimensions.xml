@@ -39,7 +39,6 @@
     <dimen name="toolbarOverflowPadding">10dp</dimen>
 
     <!-- Buttons -->
-    <dimen name="legacyButtonHeight">48dp</dimen>
     <dimen name="legacyButtonSmallHeight">36dp</dimen>
     <dimen name="buttonLargeHeight">60dp</dimen>
     <dimen name="buttonSmallHeight">48dp</dimen>
@@ -90,7 +89,14 @@
     <!-- InfoPanel -->
     <dimen name="infoPanelIconSize">16dp</dimen>
 
+    <!-- Dax Dialog  -->
+    <dimen name="daxDialogContentPaddingTop">20dp</dimen>
+    <dimen name="daxDialogContentPaddingBottom">20dp</dimen>
+    <dimen name="daxDialogContentPaddingStart">@dimen/keyline_5</dimen>
+    <dimen name="daxDialogContentPaddingEnd">@dimen/keyline_5</dimen>
+    <dimen name="daxDialogButtonSpacing">14dp</dimen>
+
     <!-- Card -->
-    <dimen name="daxBubbleDialogDistanceFromEdge">40dp</dimen>
+    <dimen name="daxBubbleDialogDistanceFromEdge">22dp</dimen>
     <dimen name="daxBubbleDialogEdge">9dp</dimen>
 </resources>
