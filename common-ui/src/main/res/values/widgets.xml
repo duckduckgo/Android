@@ -201,7 +201,7 @@
         <item name="android:textAlignment">center</item>
         <item name="android:paddingStart">@dimen/keyline_3</item>
         <item name="android:paddingEnd">@dimen/keyline_3</item>
-        <item name="android:layout_height">@dimen/legacyButtonHeight</item>
+        <item name="android:layout_height">48dp</item>
     </style>
 
     <style name="Widget.DuckDuckGo.Button.Primary">
@@ -296,21 +296,29 @@
         <item name="cornerSize">@dimen/dialogBorderRadius</item>
     </style>
 
-    <!-- Text Input -->
-    <style name="Widget.DuckDuckGo.TextInputView"
-           parent="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-        <item name="android:textColorHint">@color/text_input_hint_color_selector</item>
-        <item name="boxCornerRadiusBottomEnd">@dimen/keyline_2</item>
-        <item name="boxCornerRadiusBottomStart">@dimen/keyline_2</item>
-        <item name="boxCornerRadiusTopStart">@dimen/keyline_2</item>
-        <item name="boxCornerRadiusTopEnd">@dimen/keyline_2</item>
-        <item name="boxStrokeColor">@color/text_input_box_color_selector</item>
-        <item name="boxStrokeWidth">1dp</item>
-        <item name="endIconTint">?attr/daxColorPrimaryIcon</item>
-        <item name="hintTextColor">@color/text_input_hint_color_selector</item>
-        <item name="android:theme">@style/TextInputEditTextTheme</item>
+    <!-- Dax Dialog -->
+    <style name="Widget.DuckDuckGo.DaxDialogFragment" parent="android:Theme.DeviceDefault.Light.NoActionBar">
+        <item name="android:windowTranslucentStatus">true</item>
     </style>
 
+    <style name="Widget.DuckDuckGo.DaxDialog"/>
+
+    <style name="Widget.DuckDuckGo.DaxDialog.Outline">
+        <item name="cardCornerRadius">@dimen/largeShapeCornerRadius</item>
+        <item name="android:backgroundTint">?attr/daxColorSurface</item>
+        <item name="android:layout_marginStart">@dimen/keyline_4</item>
+        <item name="android:layout_marginEnd">@dimen/keyline_4</item>
+        <item name="android:layout_marginBottom">@dimen/keyline_4</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.DaxDialog.Content">
+        <item name="android:paddingTop">@dimen/daxDialogContentPaddingTop</item>
+        <item name="android:paddingBottom">@dimen/daxDialogContentPaddingBottom</item>
+        <item name="android:paddingStart">@dimen/daxDialogContentPaddingStart</item>
+        <item name="android:paddingEnd">@dimen/daxDialogContentPaddingEnd</item>
+    </style>
+
+    <!-- Text Input -->
     <style name="Widget.DuckDuckGo.TextInput"
            parent="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="shapeAppearance">@style/ShapeAppearance.DuckDuckGo.SmallComponent</item>

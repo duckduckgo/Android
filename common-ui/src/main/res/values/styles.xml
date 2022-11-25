@@ -40,10 +40,6 @@
         <item name="android:src">@drawable/ic_overflow</item>
     </style>
 
-    <style name="DaxDialogFragment" parent="android:Theme.DeviceDefault.Light.NoActionBar">
-        <item name="android:windowTranslucentStatus">true</item>
-    </style>
-
     <style name="PopUpMenuCheckBoxTheme">
         <item name="colorAccent">@color/cornflowerBlue</item>
         <item name="android:textColorSecondary">?attr/toolbarIconColor</item>
