@@ -83,6 +83,9 @@
     <dimen name="verticalDividerWidth">1dp</dimen>
     <dimen name="verticalDividerSidePadding">@dimen/keyline_4</dimen>
 
+    <!-- Slider -->
+    <dimen name="sliderTrackHeight">6dp</dimen>
+
     <!-- InfoPanel -->
     <dimen name="infoPanelIconSize">16dp</dimen>
 
