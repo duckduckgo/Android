@@ -29,7 +29,6 @@
     <color name="webViewScrollbarThumbColor">#ffababab</color>
 
     <!-- Legacy -->
-    <color name="dimmed">#99000000</color>
     <color name="whiteSemiTransparent">#d6ffffff</color>
     <color name="whiteTwo">#e4e4e4</color>
     <color name="whiteThree">#f5f5f5</color>

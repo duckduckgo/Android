@@ -15,8 +15,6 @@
   ~ limitations under the License.
   -->
 
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:color="?attr/daxColorAccentBlue" android:state_hovered="true" />
-    <item android:color="?attr/daxColorAccentBlue" android:state_focused="true" />
-    <item android:color="?attr/daxColorPrimaryText" />
-</selector>
+<bitmap
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:src="@drawable/onboarding_background_large"/>
