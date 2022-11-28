@@ -26,6 +26,7 @@ import com.duckduckgo.autofill.InternalTestUserChecker
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult
 import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult.NoMatch
+import com.duckduckgo.autofill.ui.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.securestorage.api.SecureStorage
 import com.duckduckgo.securestorage.api.WebsiteLoginDetails
 import com.duckduckgo.securestorage.api.WebsiteLoginDetailsWithCredentials
@@ -41,6 +42,7 @@ class SecureStoreBackedAutofillStore(
     private val lastUpdatedTimeProvider: LastUpdatedTimeProvider,
     private val autofillPrefsStore: AutofillPrefsStore,
     private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
+    private val autofillUrlMatcher: AutofillUrlMatcher,
 ) : AutofillStore {
 
     override val autofillAvailable: Boolean
@@ -79,13 +81,21 @@ class SecureStoreBackedAutofillStore(
     override suspend fun getCredentials(rawUrl: String): List<LoginCredentials> {
         return withContext(dispatcherProvider.io()) {
             return@withContext if (autofillEnabled && autofillAvailable) {
-                Timber.i("Querying secure store for stored credentials. rawUrl: %s, extractedDomain:%s", rawUrl, rawUrl.extractSchemeAndDomain())
-                val url = rawUrl.extractSchemeAndDomain() ?: return@withContext emptyList()
+                Timber.i("Querying secure store for stored credentials. rawUrl: %s", rawUrl)
 
-                val storedCredentials = secureStorage.websiteLoginDetailsWithCredentialsForDomain(url).firstOrNull() ?: emptyList()
-                Timber.v("Found %d credentials for %s", storedCredentials.size, url)
+                val visitedSite = autofillUrlMatcher.extractUrlPartsForAutofill(rawUrl)
+                if (visitedSite.eTldPlus1 == null) return@withContext emptyList()
 
-                storedCredentials.map { it.toLoginCredentials() }
+                // first part of domain matching happens at the DB level
+                val storedCredentials =
+                    secureStorage.websiteLoginDetailsWithCredentialsForDomain(visitedSite.eTldPlus1!!).firstOrNull() ?: emptyList()
+
+                // second part of domain matching requires filtering at code level
+                storedCredentials.filter {
+                    val storedDomain = it.details.domain ?: return@filter false
+                    val savedSite = autofillUrlMatcher.extractUrlPartsForAutofill(storedDomain)
+                    return@filter autofillUrlMatcher.matchingForAutofill(visitedSite, savedSite)
+                }.map { it.toLoginCredentials() }
             } else {
                 emptyList()
             }
