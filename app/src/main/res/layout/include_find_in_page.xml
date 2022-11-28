@@ -28,20 +28,18 @@
 
     <EditText
         android:id="@+id/findInPageInput"
+        style="@style/Typography.DuckDuckGo.Body2"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:layout_marginStart="12dp"
         android:layout_marginEnd="12dp"
-        android:background="?attr/colorPrimary"
-        android:fontFamily="sans-serif-medium"
         android:hint="@string/findInPageHint"
         android:imeOptions="flagNoExtractUi"
         android:inputType="text"
         android:selectAllOnFocus="true"
-        android:textColor="?attr/omnibarTextColor"
-        android:textColorHint="?attr/omnibarHintColor"
-        android:textSize="13sp"
+        android:textColor="?attr/daxColorPrimaryText"
+        android:textColorHint="?attr/daxColorSecondaryText"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/findInPageMatches"
         app:layout_constraintStart_toStartOf="parent"
@@ -49,12 +47,12 @@
         app:layout_constraintVertical_bias="0.5"
         tools:text="Search term" />
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        app:typography="body2"
         android:id="@+id/findInPageMatches"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="10dp"
-        android:textColor="?attr/omnibarTextColor"
         tools:text="1/10" />
 
     <ImageView
