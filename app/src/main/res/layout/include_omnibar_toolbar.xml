@@ -279,7 +279,7 @@
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/browserPopupMenu"
                     android:padding="3dp"
-                    android:src="@drawable/ic_overflow_12dp" />
+                    android:src="@drawable/ic_menu_vertical_24" />
 
             </FrameLayout>
 

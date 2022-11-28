@@ -39,7 +39,7 @@
         android:layout_height="@dimen/sectionHeaderListItemImageSize"
         android:layout_marginEnd="@dimen/sectionHeaderListItemImagePadding"
         android:background="?selectableItemBackgroundBorderless"
-        app:srcCompat="@drawable/ic_overflow"
+        app:srcCompat="@drawable/ic_tabs"
         tools:ignore="ContentDescription" />
 
 </LinearLayout>
