@@ -33,15 +33,18 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/globalPrivacyControlDescription"
-            app:typography="body2"
-            app:textType="secondary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
             android:layout_margin="16dp"
             android:paddingTop="12dp"
-            android:text="@string/globalPrivacyControlDescription"/>
+            android:lineSpacingExtra="4sp"
+            android:text="@string/globalPrivacyControlDescription"
+            android:textColor="?attr/settingsMinorTextColor"
+            android:textSize="14sp"
+            android:textStyle="normal" />
 
         <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
             android:id="@+id/globalPrivacyControlToggle"
