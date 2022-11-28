@@ -52,20 +52,19 @@
                 android:importantForAccessibility="no"
                 android:gravity="center"
                 android:padding="4dp"
-                android:src="@drawable/ic_loupe_24dp" />
+                android:src="@drawable/ic_find_search_20" />
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:id="@+id/omnibarTextInputMockup"
-                style="@style/Typography.DuckDuckGo.Body1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:hint="@string/omnibarInputHint"
                 android:maxLines="1"
+                android:gravity="start|center"
                 android:paddingStart="37dp"
                 android:paddingEnd="8dp"
                 android:textColor="?attr/daxColorPrimaryText"
-                android:textColorHint="?attr/daxColorSecondaryText"
-                android:textCursorDrawable="@drawable/text_cursor"/>
+                android:textColorHint="?attr/daxColorSecondaryText"/>
 
         </FrameLayout>
 
@@ -100,8 +99,6 @@
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:background="?selectableItemBackgroundBorderless"
-            android:paddingTop="6dp"
-            android:paddingBottom="6dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/browserMenuMockup"
             app:layout_constraintStart_toEndOf="@id/fireIconMenuMockup"

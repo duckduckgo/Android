@@ -79,6 +79,6 @@
         android:layout_height="match_parent"
         android:contentDescription="@string/closeFindInPageButtonDescription"
         android:padding="6dp"
-        android:src="@drawable/ic_close_24dp"/>
+        android:src="@drawable/ic_close_24"/>
 
 </LinearLayout>
