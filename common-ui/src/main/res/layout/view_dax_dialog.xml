@@ -47,7 +47,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:typography="button"
-            android:textColor="?attr/daxColorWhite"
+            android:textColor="?attr/axColorWhite"
             android:layout_marginTop="52dp"
             android:layout_marginEnd="@dimen/keyline_4"
             android:padding="@dimen/keyline_3"
