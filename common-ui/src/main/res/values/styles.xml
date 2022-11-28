@@ -309,7 +309,7 @@
     </style>
 
     <style name="LocationPermissionDialogSplitter">
-        <item name="android:background">?attr/daxColorLines</item>
+        <item name="android:background">?toolbarBgBorderColor</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">1dp</item>
     </style>
