@@ -36,7 +36,7 @@ interface WebsiteLoginCredentialsDao {
     @Query("select * from website_login_credentials")
     fun websiteLoginCredentials(): Flow<List<WebsiteLoginCredentialsEntity>>
 
-    @Query("select * from website_login_credentials where domain like '%' || :domain || '%'")
+    @Query("select * from website_login_credentials where domain = :domain")
     fun websiteLoginCredentialsByDomain(domain: String): Flow<List<WebsiteLoginCredentialsEntity>>
 
     @Query("select * from website_login_credentials where id = :id")
