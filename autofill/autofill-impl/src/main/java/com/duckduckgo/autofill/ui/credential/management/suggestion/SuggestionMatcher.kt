@@ -16,20 +16,24 @@
 
 package com.duckduckgo.autofill.ui.credential.management.suggestion
 
-import com.duckduckgo.app.global.extractSchemeAndDomain
 import com.duckduckgo.autofill.domain.app.LoginCredentials
+import com.duckduckgo.autofill.ui.urlmatcher.AutofillUrlMatcher
 import javax.inject.Inject
 
-class SuggestionMatcher @Inject constructor() {
+class SuggestionMatcher @Inject constructor(private val autofillUrlMatcher: AutofillUrlMatcher) {
 
     fun getSuggestions(
         currentUrl: String?,
         credentials: List<LoginCredentials>,
     ): List<LoginCredentials> {
         if (currentUrl == null) return emptyList()
+        val currentSite = autofillUrlMatcher.extractUrlPartsForAutofill(currentUrl)
+        if (currentSite.eTldPlus1 == null) return emptyList()
 
         return credentials.filter {
-            it.domain?.extractSchemeAndDomain() == currentUrl.extractSchemeAndDomain()
+            val storedDomain = it.domain ?: return@filter false
+            val savedSite = autofillUrlMatcher.extractUrlPartsForAutofill(storedDomain)
+            return@filter autofillUrlMatcher.matchingForAutofill(currentSite, savedSite)
         }
     }
 }
