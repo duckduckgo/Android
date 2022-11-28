@@ -1,0 +1,7 @@
+
+    #!/bin/bash
+    echo "Running spotless check"
+    ./gradlew spotlessApply
+    ./gradlew formatKotlin
+    git add `git diff --name-only --cached`
+    exit 0
