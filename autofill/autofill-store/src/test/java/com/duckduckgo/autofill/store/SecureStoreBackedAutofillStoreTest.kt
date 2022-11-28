@@ -27,8 +27,6 @@ import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult.NoM
 import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult.UrlOnlyMatch
 import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult.UsernameMatch
 import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult.UsernameMissing
-import com.duckduckgo.autofill.store.urlmatcher.AutofillDomainNameUrlMatcher
-import com.duckduckgo.autofill.ui.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.securestorage.api.SecureStorage
 import com.duckduckgo.securestorage.api.WebsiteLoginDetails
 import com.duckduckgo.securestorage.api.WebsiteLoginDetailsWithCredentials
@@ -66,8 +64,6 @@ class SecureStoreBackedAutofillStoreTest {
     private lateinit var testee: SecureStoreBackedAutofillStore
     private lateinit var internalTestUserChecker: FakeInternalTestUserChecker
     private lateinit var secureStore: FakeSecureStore
-
-    private val autofillUrlMatcher: AutofillUrlMatcher = AutofillDomainNameUrlMatcher()
 
     @Before
     fun setUp() {
@@ -353,75 +349,6 @@ class SecureStoreBackedAutofillStoreTest {
         assertNull(testee.getCredentialsWithId(1))
     }
 
-    @Test
-    fun whenExactUrlMatchesThenCredentialsReturned() = runTest {
-        setupTesteeWithAutofillAvailable()
-        val savedUrl = "https://example.com"
-        val visitedSite = "https://example.com"
-        storeCredentials(1, savedUrl, "username1", "password123")
-
-        val results = testee.getCredentials(visitedSite)
-        assertEquals(1, results.size)
-        assertEquals(1L, results[0].id)
-    }
-
-    @Test
-    fun whenExactSubdomainMatchesThenCredentialsReturned() = runTest {
-        setupTesteeWithAutofillAvailable()
-        val savedUrl = "https://subdomain.example.com"
-        val visitedSite = "https://subdomain.example.com"
-        storeCredentials(1, savedUrl, "username1", "password123")
-
-        val results = testee.getCredentials(visitedSite)
-        assertEquals(1, results.size)
-        assertEquals(1L, results[0].id)
-    }
-
-    @Test
-    fun whenExactWwwSubdomainMatchesThenCredentialsReturned() = runTest {
-        setupTesteeWithAutofillAvailable()
-        val savedUrl = "https://www.example.com"
-        val visitedSite = "https://www.example.com"
-        storeCredentials(1, savedUrl, "username1", "password123")
-
-        val results = testee.getCredentials(visitedSite)
-        assertEquals(1, results.size)
-        assertEquals(1L, results[0].id)
-    }
-
-    @Test
-    fun whenSavedCredentialHasSubdomainAndVisitedPageDoesNotThenCredentialNotMatched() = runTest {
-        setupTesteeWithAutofillAvailable()
-        val savedUrl = "https://test.example.com"
-        val visitedSite = "https://example.com"
-        storeCredentials(1, savedUrl, "username1", "password123")
-
-        val results = testee.getCredentials(visitedSite)
-        assertEquals(0, results.size)
-    }
-
-    @Test
-    fun whenSavedCredentialHasNoSubdomainAndVisitedPageDoesThenCredentialNotMatched() = runTest {
-        setupTesteeWithAutofillAvailable()
-        val savedUrl = "https://example.com"
-        val visitedSite = "https://test.example.com"
-        storeCredentials(1, savedUrl, "username1", "password123")
-
-        val results = testee.getCredentials(visitedSite)
-        assertEquals(1, results.size)
-    }
-
-    @Test
-    fun whenSavedCredentialHasDifferentSubdomainToVisitedPageSubdomainThenCredentialNotMatched() = runTest {
-        setupTesteeWithAutofillAvailable()
-        val savedUrl = "https://test.example.com"
-        val visitedSite = "https://different.example.com"
-        storeCredentials(1, savedUrl, "username1", "password123")
-
-        val results = testee.getCredentials(visitedSite)
-        assertEquals(0, results.size)
-    }
-
     private fun List<LoginCredentials>.assertHasNoLoginCredentials(
         url: String,
         username: String,
@@ -449,13 +376,7 @@ class SecureStoreBackedAutofillStoreTest {
     private fun setupTesteeWithAutofillAvailable() {
         internalTestUserChecker = FakeInternalTestUserChecker(true)
         secureStore = FakeSecureStore(true)
-        testee = SecureStoreBackedAutofillStore(
-            secureStorage = secureStore,
-            internalTestUserChecker = internalTestUserChecker,
-            lastUpdatedTimeProvider = lastUpdatedTimeProvider,
-            autofillPrefsStore = autofillPrefsStore,
-            autofillUrlMatcher = autofillUrlMatcher,
-        )
+        testee = SecureStoreBackedAutofillStore(secureStore, internalTestUserChecker, lastUpdatedTimeProvider, autofillPrefsStore)
     }
 
     private fun setupTestee(
@@ -465,12 +386,11 @@ class SecureStoreBackedAutofillStoreTest {
         internalTestUserChecker = FakeInternalTestUserChecker(isInternalUser)
         secureStore = FakeSecureStore(canAccessSecureStorage)
         testee = SecureStoreBackedAutofillStore(
-            secureStorage = secureStore,
-            internalTestUserChecker = internalTestUserChecker,
-            lastUpdatedTimeProvider = lastUpdatedTimeProvider,
-            autofillPrefsStore = autofillPrefsStore,
+            secureStore,
+            internalTestUserChecker,
+            lastUpdatedTimeProvider,
+            autofillPrefsStore,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
-            autofillUrlMatcher = autofillUrlMatcher,
         )
     }
 
@@ -522,7 +442,7 @@ class SecureStoreBackedAutofillStoreTest {
             return flow {
                 emit(
                     credentials.filter {
-                        it.details.domain?.contains(domain) == true
+                        it.details.domain == domain
                     }.map {
                         it.details
                     },
@@ -544,7 +464,7 @@ class SecureStoreBackedAutofillStoreTest {
             return flow {
                 emit(
                     credentials.filter {
-                        it.details.domain?.contains(domain) == true
+                        it.details.domain == domain
                     },
                 )
             }

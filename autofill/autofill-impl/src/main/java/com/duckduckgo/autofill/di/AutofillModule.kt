@@ -24,8 +24,6 @@ import com.duckduckgo.autofill.store.RealAutofillPrefsStore
 import com.duckduckgo.autofill.store.RealInternalTestUserStore
 import com.duckduckgo.autofill.store.RealLastUpdatedTimeProvider
 import com.duckduckgo.autofill.store.SecureStoreBackedAutofillStore
-import com.duckduckgo.autofill.store.urlmatcher.AutofillDomainNameUrlMatcher
-import com.duckduckgo.autofill.ui.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.securestorage.api.SecureStorage
 import com.squareup.anvil.annotations.ContributesTo
@@ -46,17 +44,12 @@ class AutofillModule {
         secureStorage: SecureStorage,
         context: Context,
         internalTestUserChecker: InternalTestUserChecker,
-        autofillUrlMatcher: AutofillUrlMatcher,
     ): AutofillStore {
         return SecureStoreBackedAutofillStore(
-            secureStorage = secureStorage,
-            internalTestUserChecker = internalTestUserChecker,
-            lastUpdatedTimeProvider = RealLastUpdatedTimeProvider(),
-            autofillPrefsStore = RealAutofillPrefsStore(context, internalTestUserChecker),
-            autofillUrlMatcher = autofillUrlMatcher,
+            secureStorage,
+            internalTestUserChecker,
+            RealLastUpdatedTimeProvider(),
+            RealAutofillPrefsStore(context, internalTestUserChecker),
         )
     }
-
-    @Provides
-    fun provideAutofillUrlMatcher(): AutofillUrlMatcher = AutofillDomainNameUrlMatcher()
 }
