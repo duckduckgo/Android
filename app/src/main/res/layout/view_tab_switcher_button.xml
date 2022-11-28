@@ -29,6 +29,7 @@
         android:fontFamily="sans-serif-black"
         android:textStyle="bold"
         android:gravity="center"
+        android:padding="3dp"
         android:background="@drawable/ic_tabs"
         tools:text="66" />
 
