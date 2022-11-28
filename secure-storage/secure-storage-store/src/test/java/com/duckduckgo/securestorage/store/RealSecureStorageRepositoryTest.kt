@@ -16,153 +16,97 @@
 
 package com.duckduckgo.securestorage.store
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.room.Room
-import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.securestorage.store.db.SecureStorageDatabase
 import com.duckduckgo.securestorage.store.db.WebsiteLoginCredentialsDao
 import com.duckduckgo.securestorage.store.db.WebsiteLoginCredentialsEntity
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
-import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
+import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.RuntimeEnvironment
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
-@RunWith(RobolectricTestRunner::class)
 class RealSecureStorageRepositoryTest {
-
-    @get:Rule
-    @Suppress("unused")
-    val coroutineRule = CoroutineTestRule()
-
-    @get:Rule
-    @Suppress("unused")
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
-
-    private lateinit var db: SecureStorageDatabase
-
+    @Mock
     private lateinit var dao: WebsiteLoginCredentialsDao
     private lateinit var testee: RealSecureStorageRepository
+    private val testEntity = WebsiteLoginCredentialsEntity(
+        id = 1,
+        domain = "test.com",
+        username = "test",
+        password = "pass123",
+        passwordIv = "iv",
+        notes = "my notes",
+        notesIv = "notesIv",
+        domainTitle = "test",
+        lastUpdatedInMillis = 0L,
+    )
 
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        db = Room.inMemoryDatabaseBuilder(RuntimeEnvironment.getApplication(), SecureStorageDatabase::class.java)
-            .allowMainThreadQueries()
-            .build()
-        dao = db.websiteLoginCredentialsDao()
         testee = RealSecureStorageRepository(dao)
     }
 
-    @After
-    fun after() {
-        db.close()
+    @Test
+    fun whenAddWebsiteLoginCredentialThenCallInsertToDao() {
+        runTest {
+            testee.addWebsiteLoginCredential(testEntity)
+        }
+
+        verify(dao).insert(testEntity)
     }
 
     @Test
-    fun whenRetrievingLoginCredentialByIdThenNullReturnedIfNotExists() = runTest {
-        assertNull(dao.getWebsiteLoginCredentialsById(entity().id))
-    }
+    fun whenGetWebsiteLoginCredentialsWithDomainThenCallGetWithDomainFromDao() = runTest {
+        whenever(dao.websiteLoginCredentialsByDomain("test")).thenReturn(
+            MutableStateFlow(listOf(testEntity)),
+        )
 
-    @Test
-    fun whenRetrievingLoginCredentialByIdThenReturnedIfExists() = runTest {
-        val testEntity = entity()
-        dao.insert(entity())
-        val result = testee.getWebsiteLoginCredentialsForId(testEntity.id)
-        assertEquals(testEntity, result)
-    }
+        val result: List<WebsiteLoginCredentialsEntity> =
+            testee.websiteLoginCredentialsForDomain("test").first()
 
-    @Test
-    fun whenRetrievingLoginCredentialByDomainThenReturnedIfDirectMatch() = runTest {
-        val testEntity = entity()
-        dao.insert(testEntity)
-        val result: List<WebsiteLoginCredentialsEntity> = testee.websiteLoginCredentialsForDomain("test.com").first()
         assertEquals(testEntity, result[0])
     }
 
     @Test
-    fun whenRetrievingLoginCredentialByDomainThenEmptyListReturnedIfNoMatches() = runTest {
-        val testEntity = entity()
-        dao.insert(testEntity)
-        val result: List<WebsiteLoginCredentialsEntity> = testee.websiteLoginCredentialsForDomain("no-matches.com").first()
-        assertTrue(result.isEmpty())
-    }
+    fun whenGetAllWebsiteLoginCredentialsThenCallGetAllFromDao() = runTest {
+        whenever(dao.websiteLoginCredentials()).thenReturn(
+            MutableStateFlow(listOf(testEntity)),
+        )
 
-    @Test
-    fun whenGetAllWebsiteLoginCredentialsWithSitesThenEmptyListReturned() = runTest {
-        val result: List<WebsiteLoginCredentialsEntity> = testee.websiteLoginCredentials().first()
-        assertTrue(result.isEmpty())
-    }
+        val result: List<WebsiteLoginCredentialsEntity> =
+            testee.websiteLoginCredentials().first()
 
-    @Test
-    fun whenGetAllWebsiteLoginCredentialsWithASingleSiteThenThatOneIsReturned() = runTest {
-        val testEntity = entity()
-        dao.insert(testEntity)
-        val result: List<WebsiteLoginCredentialsEntity> = testee.websiteLoginCredentials().first()
         assertEquals(listOf(testEntity), result)
     }
 
     @Test
-    fun whenGetAllWebsiteLoginCredentialsWithMultipleSitesThenThatAllReturned() = runTest {
-        val testEntity = entity()
-        val anotherEntity = entity(id = testEntity.id + 1)
-        dao.insert(testEntity)
-        dao.insert(anotherEntity)
-        val result: List<WebsiteLoginCredentialsEntity> = testee.websiteLoginCredentials().first()
-        assertEquals(listOf(testEntity, anotherEntity), result)
+    fun whenGetWebsiteLoginCredentialsWithIDThenCallGetWithIDFromDao() = runTest {
+        whenever(dao.getWebsiteLoginCredentialsById(1)).thenReturn(testEntity)
+
+        val result =
+            testee.getWebsiteLoginCredentialsForId(1)
+
+        assertEquals(testEntity, result)
     }
 
     @Test
     fun whenUpdateWebsiteLoginCredentialsThenCallUpdateToDao() = runTest {
-        val testEntity = entity()
-        dao.insert(testEntity)
-        testee.updateWebsiteLoginCredentials(testEntity.copy(username = "newUsername"))
-        val updated = testee.getWebsiteLoginCredentialsForId(testEntity.id)
-        assertNotNull(updated)
-        assertEquals("newUsername", updated!!.username)
+        testee.updateWebsiteLoginCredentials(testEntity)
+
+        verify(dao).update(testEntity)
     }
 
     @Test
-    fun whenDeleteWebsiteLoginCredentialsThenEntityRemoved() = runTest {
-        val testEntity = entity()
-        dao.insert(testEntity)
+    fun whenDeleteWebsiteLoginCredentialsThenCallDeleteToDao() = runTest {
         testee.deleteWebsiteLoginCredentials(1)
-        val nowDeleted = dao.getWebsiteLoginCredentialsById(testEntity.id)
-        assertNull(nowDeleted)
-    }
 
-    private fun entity(
-        id: Long = 1,
-        domain: String = "test.com",
-        username: String = "test",
-        password: String = "pass123",
-        passwordIv: String = "iv",
-        notes: String = "my notes",
-        notesIv: String = "notesIv",
-        domainTitle: String = "test",
-        lastUpdatedInMillis: Long = 0L,
-    ): WebsiteLoginCredentialsEntity {
-        return WebsiteLoginCredentialsEntity(
-            id = id,
-            domain = domain,
-            username = username,
-            password = password,
-            passwordIv = passwordIv,
-            notes = notes,
-            notesIv = notesIv,
-            domainTitle = domainTitle,
-            lastUpdatedInMillis = lastUpdatedInMillis,
-        )
+        verify(dao).delete(1)
     }
 }
