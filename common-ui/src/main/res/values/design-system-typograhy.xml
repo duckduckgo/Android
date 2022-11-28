@@ -171,8 +171,4 @@
         <item name="android:textAllCaps">true</item>
     </style>
 
-    <style name="Typography.DuckDuckGo.Caption.AllCaps">
-        <item name="android:textAllCaps">true</item>
-    </style>
-
 </resources>
