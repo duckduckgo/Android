@@ -65,7 +65,7 @@
 
     <style name="TextAppearance.DuckDuckGo.Body2">
         <item name="android:textSize">14sp</item>
-        <item name="android:lineSpacingExtra">3sp</item>
+        <item name="android:lineSpacingExtra">6sp</item>
     </style>
 
     <style name="TextAppearance.DuckDuckGo.Button1">
