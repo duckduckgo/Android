@@ -17,7 +17,6 @@
 package com.duckduckgo.autofill.ui.credential.management.suggestion
 
 import com.duckduckgo.autofill.domain.app.LoginCredentials
-import com.duckduckgo.autofill.store.urlmatcher.AutofillDomainNameUrlMatcher
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,7 +25,7 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 class SuggestionMatcherTest {
 
-    private val testee = SuggestionMatcher(AutofillDomainNameUrlMatcher())
+    private val testee = SuggestionMatcher()
 
     @Test
     fun whenUrlIsNullThenNoSuggestions() {
@@ -68,13 +67,6 @@ class SuggestionMatcherTest {
         )
         val suggestions = testee.getSuggestions("https://duckduckgo.com", creds)
         assertEquals(2, suggestions.size)
-    }
-
-    @Test
-    fun whenSubdomainIncludedInSavedSiteAndVisitingRootSiteThenSuggestionOffered() {
-        val creds = listOf(creds("https://duckduckgo.com"))
-        val suggestions = testee.getSuggestions("https://test.duckduckgo.com", creds)
-        assertEquals(1, suggestions.size)
     }
 
     private fun creds(domain: String): LoginCredentials {
