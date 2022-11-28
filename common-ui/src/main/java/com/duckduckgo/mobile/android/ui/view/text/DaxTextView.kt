@@ -20,9 +20,9 @@ import android.content.Context
 import android.util.AttributeSet
 import androidx.core.content.ContextCompat
 import com.duckduckgo.mobile.android.R
-import com.duckduckgo.mobile.android.ui.view.TypedArrayUtils
-import com.duckduckgo.mobile.android.ui.view.text.DaxTextView.Typography.Body1
+import com.duckduckgo.mobile.android.ui.view.text.DaxTextView.Type.Body1
 import com.google.android.material.textview.MaterialTextView
+import java.lang.reflect.Array.getInt
 
 class DaxTextView @JvmOverloads
 constructor(
@@ -68,6 +68,7 @@ constructor(
 
             else -> setTextColorStateList(TextType.Primary)
         }
+        setTextColorStateList(textColor)
 
         typedArray.recycle()
     }
@@ -88,9 +89,12 @@ constructor(
         H4,
         H5,
         Body1,
+        Body1_Bold,
         Body2,
+        Body2_Bold,
         Button,
         Caption,
+        Caption_AllCaps
         ;
 
         companion object {
@@ -104,9 +108,12 @@ constructor(
                     4 -> H4
                     5 -> H5
                     6 -> Body1
-                    7 -> Body2
-                    8 -> Button
-                    9 -> Caption
+                    7 -> Body1_Bold
+                    8 -> Body2
+                    9 -> Body2_Bold
+                    10 -> Button
+                    11 -> Caption
+                    12 -> Caption_AllCaps
                     else -> Body1
                 }
             }
@@ -120,9 +127,12 @@ constructor(
                     H4 -> R.style.Typography_DuckDuckGo_H4
                     H5 -> R.style.Typography_DuckDuckGo_H5
                     Body1 -> R.style.Typography_DuckDuckGo_Body1
+                    Body1_Bold -> R.style.Typography_DuckDuckGo_Body1_Bold
                     Body2 -> R.style.Typography_DuckDuckGo_Body2
+                    Body2_Bold -> R.style.Typography_DuckDuckGo_Body2_Bold
                     Button -> R.style.Typography_DuckDuckGo_Button
                     Caption -> R.style.Typography_DuckDuckGo_Caption
+                    Caption_AllCaps -> R.style.Typography_DuckDuckGo_Caption_AllCaps
                 }
             }
         }
