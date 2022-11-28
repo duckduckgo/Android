@@ -232,7 +232,8 @@
                 "requestURL": "https://surrogates.test/tracker?abc=2",
                 "requestType": "script",
                 "expectAction": "redirect",
-                "expectRedirect": "data:application/javascript;base64,KGZ1bmN0aW9uKCkge3ZhciB0cmFja2VyPXRydWV9KSgpOw=="
+                "expectRedirect": "data:application/javascript;base64,KGZ1bmN0aW9uKCkge3dpbmRvdy5zdXJyb2dhdGUxPXRydWV9KSgpOw==",
+                "expectExpression": "window.surrogate1 === true"
             },
             {
                 "name": "skip surrogates for same entity",
@@ -247,7 +248,8 @@
                 "requestURL": "https://surrogates.test/trackerNOT?abc=2",
                 "requestType": "script",
                 "expectAction": "redirect",
-                "expectRedirect": "data:application/javascript;base64,KGZ1bmN0aW9uKCkge3ZhciB0cmFja2VyPXRydWV9KSgpOw=="
+                "expectRedirect": "data:application/javascript;base64,KGZ1bmN0aW9uKCkge3dpbmRvdy5zdXJyb2dhdGUxPXRydWV9KSgpOw==",
+                "expectExpression": "window.surrogate1 === true"
             },
             {
                 "name": "require exact match for surrogates",
