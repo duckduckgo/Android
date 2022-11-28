@@ -136,19 +136,23 @@
         <!--Design System Colors theme independent-->
         <item name="daxColorDim">@color/black60</item>
         <item name="daxColorWhite">@color/white</item>
+        <item name="preferredStatusBarColor">?attr/daxColorSurface</item>
+        <item name="preferredNavigationBarColor">?attr/daxColorSurface</item>
+
+        <!--Refactoring colors (can be replaced once reviewed)-->
+        <item name="toolbarBgColor">?attr/daxColorSurface</item>
+        <item name="toolbarIconColor">?attr/daxColorPrimaryIcon</item>
+        <item name="omnibarTextColor">?attr/daxColorPrimaryText</item>
+        <item name="omnibarHintColor">?attr/daxColorSecondaryText</item>
     </style>
 
     <!-- The app theme will mostly contain values for colour attributes -->
     <style name="Theme.DuckDuckGo.Dark" parent="Theme.DuckDuckGo">
 
         <item name="preferDarkStatusBarIcons">false</item>
-        <item name="preferredStatusBarColor">?attr/toolbarBgColor</item>
         <item name="preferDarkNavigationBarIcons">false</item>
-        <item name="preferredNavigationBarColor">@color/black</item>
 
         <!-- Legacy colors to remove-->
-        <item name="colorPrimary">@color/darkThemePrimary</item>
-        <item name="colorPrimaryDark">@color/darkThemePrimaryDark</item>
         <item name="daxLogoTextColor">@color/white</item>
         <item name="normalTextColor">@color/white</item>
         <item name="secondaryTextColor">@color/gray50</item>
@@ -162,10 +166,6 @@
         <item name="listItemSecondaryTextColor">@color/grayishTwo</item>
         <item name="listItemDisabledColor">@color/warGreyTwo</item>
         <item name="subtitleTextColor">@color/grayishTwo</item>
-        <item name="toolbarIconColor">@color/white</item>
-        <item name="toolbarTextColor">@color/white</item>
-        <item name="toolbarBgColor">@color/newBlack</item>
-        <item name="toolbarBgBorderColor">@color/toolbarBorderColorDark</item>
         <item name="dialogBgColor">@color/almostBlackDark</item>
         <item name="browserIconColorSelector">@color/browser_icon_color_selector_dark</item>
         <item name="browserMenuTextColor">@color/white</item>
@@ -295,9 +295,7 @@
 
     <style name="Theme.DuckDuckGo.Light" parent="Theme.DuckDuckGo">
         <item name="preferDarkStatusBarIcons">true</item>
-        <item name="preferredStatusBarColor">@color/white</item>
         <item name="preferDarkNavigationBarIcons">true</item>
-        <item name="preferredNavigationBarColor">@color/white</item>
 
         <!-- Legacy colors to remove-->
         <item name="colorPrimary">@color/lightThemePrimary</item>
@@ -311,10 +309,6 @@
         <item name="secondaryIconColor">@color/gray40</item>
         <item name="accentIconColor">@color/gray30</item>
         <item name="chipBackgroundColor">@color/gray20</item>
-        <item name="toolbarIconColor">@color/almostBlackDark</item>
-        <item name="toolbarTextColor">@color/almostBlackDark</item>
-        <item name="toolbarBgColor">@color/white</item>
-        <item name="toolbarBgBorderColor">@color/toolbarBorderColorLight</item>
         <item name="dialogBgColor">@color/white</item>
         <item name="browserIconColorSelector">@color/browser_icon_color_selector_light</item>
         <item name="browserMenuTextColor">@color/almostBlackDark</item>
