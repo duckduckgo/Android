@@ -225,6 +225,8 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     FIRE_ANIMATION_NEW_SELECTED("m_fas_s"),
 
     EMAIL_TOOLTIP_DISMISSED("email_tooltip_dismissed"),
+    EMAIL_ENABLED("email_enabled"),
+    EMAIL_DISABLED("email_disabled"),
     EMAIL_USE_ALIAS("email_filled_random"),
     EMAIL_USE_ADDRESS("email_filled_main"),
     EMAIL_COPIED_TO_CLIPBOARD("email_generated_button"),
