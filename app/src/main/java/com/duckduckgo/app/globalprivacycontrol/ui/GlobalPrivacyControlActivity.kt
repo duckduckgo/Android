@@ -77,7 +77,6 @@ class GlobalPrivacyControlActivity : DuckDuckGoActivity() {
                     gpcSpannableString.getSpanFlags(it),
                 )
                 removeSpan(it)
-                trim()
             }
         }
         binding.globalPrivacyControlDescription.apply {
