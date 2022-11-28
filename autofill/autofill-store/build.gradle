@@ -18,7 +18,6 @@ dependencies {
     implementation KotlinX.coroutines.core
     implementation Google.android.material
     implementation project(path: ':secure-storage-api')
-    implementation Square.okHttp3.okHttp
 
     implementation Google.dagger
     implementation JakeWharton.timber
