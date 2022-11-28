@@ -36,8 +36,8 @@
     </style>
 
     <style name="PopUpOverflowButton" parent="@style/Widget.AppCompat.ActionButton.Overflow">
-        <item name="srcCompat">@drawable/ic_overflow</item>
-        <item name="android:src">@drawable/ic_overflow</item>
+        <item name="srcCompat">@drawable/ic_tabs</item>
+        <item name="android:src">@drawable/ic_tabs</item>
     </style>
 
     <style name="PopUpMenuCheckBoxTheme">

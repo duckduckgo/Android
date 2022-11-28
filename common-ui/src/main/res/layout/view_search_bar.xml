@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:padding="@dimen/keyline_2"
-            app:srcCompat="@drawable/ic_back_24"/>
+            app:srcCompat="@drawable/ic_arrow_left_24"/>
 
     </FrameLayout>
 

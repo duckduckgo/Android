@@ -241,7 +241,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
 
     private fun updateToolbarForView(credentials: LoginCredentials) {
         getActionBar()?.apply {
-            setHomeAsUpIndicator(com.duckduckgo.mobile.android.R.drawable.ic_back_24)
+            setHomeAsUpIndicator(com.duckduckgo.mobile.android.R.drawable.ic_arrow_left_24)
             title = credentials.domainTitle ?: credentials.domain
             setDisplayUseLogoEnabled(true)
         }
