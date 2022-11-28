@@ -25,7 +25,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:clipChildren="false">
 
         <View
             android:id="@+id/toolbarDialogLayout"
@@ -46,7 +47,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:typography="button"
-            android:textColor="?attr/axColorWhite"
+            android:textColor="?attr/daxColorWhite"
             android:layout_marginTop="52dp"
             android:layout_marginEnd="@dimen/keyline_4"
             android:padding="@dimen/keyline_3"
@@ -58,7 +59,7 @@
             android:id="@+id/logo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/keyline_5"
+            android:layout_marginStart="@dimen/keyline_2"
             android:layout_marginBottom="@dimen/keyline_4"
             app:layout_constraintBottom_toTopOf="@id/cardView"
             app:layout_constraintStart_toStartOf="@id/cardView"
