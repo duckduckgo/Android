@@ -33,19 +33,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/title"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="16dp"
         android:ellipsize="end"
-        android:fontFamily="sans-serif"
         android:gravity="center_vertical|start"
         android:includeFontPadding="false"
         android:maxLines="1"
         android:textAlignment="textStart"
-        android:textColor="?attr/autoCompleteTextColor"
-        android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="@id/icon"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/icon"
