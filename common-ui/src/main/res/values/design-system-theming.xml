@@ -136,6 +136,7 @@
         <!--Design System Colors theme independent-->
         <item name="daxColorDim">@color/black60</item>
         <item name="daxColorWhite">@color/white</item>
+        <item name="daxColorBlack">@color/black84</item>
         <item name="preferredStatusBarColor">?attr/daxColorSurface</item>
         <item name="preferredNavigationBarColor">?attr/daxColorSurface</item>
 
@@ -313,7 +314,6 @@
         <item name="browserMenuTextColor">@color/almostBlackDark</item>
         <item name="browserMenuTextColorDisabled">@color/pinkish_grey_two</item>
         <item name="cookiesRoundedFieldBackgroundColor">@color/whiteFive</item>
-        <item name="daxColorContainer">@color/whiteFour</item>
         <item name="omnibarTextColor">@color/almostBlackDark</item>
         <item name="omnibarHintColor">@color/brownishGrayTwo</item>
         <item name="omnibarLogoLetterTextColor">@color/whiteFour</item>
