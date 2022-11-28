@@ -58,13 +58,12 @@
                 android:id="@+id/omnibarTextInputMockup"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:hint="@string/omnibarInputHint"
+                android:text="@string/omnibarInputHint"
                 android:maxLines="1"
                 android:gravity="start|center"
                 android:paddingStart="37dp"
                 android:paddingEnd="8dp"
-                android:textColor="?attr/daxColorPrimaryText"
-                android:textColorHint="?attr/daxColorSecondaryText"/>
+                android:textColor="?attr/daxColorSecondaryText"/>
 
         </FrameLayout>
 
@@ -88,7 +87,7 @@
                 android:layout_gravity="center"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/browserPopupMenu"
-                android:padding="3dp"
+                android:padding="@dimen/toolbarIconPadding"
                 android:src="@drawable/ic_fire" />
         </FrameLayout>
 
@@ -108,7 +107,7 @@
             android:id="@+id/browserMenuMockup"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:paddingStart="9dp"
+            android:paddingStart="4dp"
             android:paddingEnd="13dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -121,7 +120,7 @@
                 android:layout_gravity="center"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/browserPopupMenu"
-                android:padding="3dp"
+                android:padding="@dimen/toolbarIconPadding"
                 android:src="@drawable/ic_menu_vertical_24" />
 
         </FrameLayout>

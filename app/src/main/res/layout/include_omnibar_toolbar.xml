@@ -242,7 +242,7 @@
                     android:layout_gravity="center"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/browserPopupMenu"
-                    android:padding="3dp"
+                    android:padding="@dimen/toolbarIconPadding"
                     android:src="@drawable/ic_fire" />
             </FrameLayout>
 
@@ -250,9 +250,10 @@
                 android:id="@+id/tabsMenu"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
+                android:layout_marginStart="@dimen/keyline_2"
+                android:layout_marginEnd="@dimen/keyline_2"
                 android:background="?selectableItemBackgroundBorderless"
+                android:padding="@dimen/toolbarIconPadding"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/browserMenu"
                 app:layout_constraintStart_toEndOf="@id/fireIconMenu"
@@ -262,7 +263,7 @@
                 android:id="@+id/browserMenu"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:paddingStart="9dp"
+                android:paddingStart="4dp"
                 android:paddingEnd="13dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -276,7 +277,7 @@
                     android:layout_gravity="center"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/browserPopupMenu"
-                    android:padding="3dp"
+                    android:padding="@dimen/toolbarIconPadding"
                     android:src="@drawable/ic_menu_vertical_24" />
 
             </FrameLayout>
