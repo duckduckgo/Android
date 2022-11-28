@@ -34,9 +34,13 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
+import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
+import com.duckduckgo.mobile.android.vpn.model.VpnServiceState.ENABLING
+import com.duckduckgo.mobile.android.vpn.model.VpnServiceStateStats
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
+import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack.VpnTunnelConfig
 import com.duckduckgo.mobile.android.vpn.network.util.asRoute
 import com.duckduckgo.mobile.android.vpn.network.util.getActiveNetwork
 import com.duckduckgo.mobile.android.vpn.network.util.getSystemActiveNetworkDefaultDns
@@ -91,6 +95,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
     @Inject lateinit var appTpFeatureConfig: AppTpFeatureConfig
 
     @Inject lateinit var vpnNetworkStack: VpnNetworkStack
+
+    @Inject lateinit var vpnServiceStateStatsDao: VpnServiceStateStatsDao
 
     private var restartRequested = false
 
@@ -207,7 +213,11 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
     private suspend fun startVpn() = withContext(Dispatchers.IO) {
         Timber.d("VPN log: Starting VPN")
 
-        establishVpnInterface()
+        // We need to rethink how to log this state. This will likely change.
+        vpnServiceStateStatsDao.insert(VpnServiceStateStats(state = ENABLING))
+        vpnNetworkStack.onPrepareVpn().getOrThrow().let {
+            createTunnelInterface(it)
+        }
 
         if (tunInterface == null) {
             Timber.e("Failed to establish the TUN interface")
@@ -236,15 +246,15 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         }
     }
 
-    private suspend fun establishVpnInterface() {
+    private suspend fun createTunnelInterface(tunnelConfig: VpnTunnelConfig) {
         tunInterface = Builder().run {
-            vpnNetworkStack.addresses().forEach { addAddress(it.key, it.value) }
+            tunnelConfig.addresses.forEach { addAddress(it.key, it.value) }
 
             // Allow IPv6 to go through the VPN
             // See https://developer.android.com/reference/android/net/VpnService.Builder#allowFamily(int) for more info as to why
             allowFamily(AF_INET6)
 
-            val dnsList = getDns()
+            val dnsList = getDns(tunnelConfig.dns)
 
             // TODO: eventually routes will be set by remote config
             if (appBuildConfig.isPerformanceTest && appBuildConfig.isInternalBuild()) {
@@ -278,14 +288,14 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             // IPv4 public IP addresses. They are addresses that routable in the internet
             addRoute("2000::", 3)
 
-            vpnNetworkStack.routes().forEach {
+            tunnelConfig.routes.forEach {
                 addRoute(it.key, it.value)
             }
 
             setBlocking(true)
             // Cap the max MTU value to avoid backpressure issues in the socket
             // This is effectively capping the max segment size too
-            setMtu(vpnNetworkStack.mtu())
+            setMtu(tunnelConfig.mtu)
             configureMeteredConnection()
 
             // Set DNS
@@ -330,7 +340,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         }
     }
 
-    private fun getDns(): Set<InetAddress> {
+    private fun getDns(configDns: Set<InetAddress>): Set<InetAddress> {
         // private extension function, this is purposely here to limit visibility
         fun Set<InetAddress>.containsIpv4(): Boolean {
             forEach {
@@ -342,7 +352,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         val dns = mutableSetOf<InetAddress>()
 
         // Add DNS specific to VPNetworkStack
-        vpnNetworkStack.dns().forEach { dns.add(it) }
+        configDns.forEach { dns.add(it) }
 
         // System DNS
         if (isInterceptDnsTrafficEnabled) {
