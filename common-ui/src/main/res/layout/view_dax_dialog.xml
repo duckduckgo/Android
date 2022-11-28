@@ -20,6 +20,7 @@
                 android:id="@+id/dialogContainer"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:clipChildren="false"
                 android:fitsSystemWindows="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
