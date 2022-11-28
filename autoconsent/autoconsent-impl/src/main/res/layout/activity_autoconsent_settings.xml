@@ -15,30 +15,34 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
 
     <include
         android:id="@+id/includeToolbar"
-        layout="@layout/include_default_toolbar" />
+        layout="@layout/include_default_toolbar"/>
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <TextView
         android:id="@+id/autoconsentDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/keyline_4"
+        style="@style/TextAppearance.AppCompat.Body2"
+        android:fontFamily="sans-serif"
+        android:layout_margin="16dp"
+        android:paddingTop="12dp"
+        android:lineSpacingExtra="4sp"
         android:text="@string/autoconsentDescription"
-        app:textType="secondary"
-        app:typography="body2" />
+        android:textColor="?attr/settingsMinorTextColor"
+        android:textSize="14sp"
+        android:textStyle="normal"/>
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/autoconsentToggle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         app:primaryText="@string/autoconsentToggle"
-        app:primaryTextTruncated="false"
-        app:showSwitch="true" />
+        app:showSwitch="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
 </LinearLayout>
