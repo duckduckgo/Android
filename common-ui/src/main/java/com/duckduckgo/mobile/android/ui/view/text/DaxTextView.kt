@@ -97,7 +97,7 @@ constructor(
         Button,
         Caption,
         Caption_AllCaps,
-        
+
         ;
 
         companion object {
