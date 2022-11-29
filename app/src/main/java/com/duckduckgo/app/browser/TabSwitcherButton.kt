@@ -21,7 +21,6 @@ import android.animation.AnimatorListenerAdapter
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
-import android.widget.RelativeLayout
 import com.duckduckgo.app.browser.databinding.ViewTabSwitcherButtonBinding
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
