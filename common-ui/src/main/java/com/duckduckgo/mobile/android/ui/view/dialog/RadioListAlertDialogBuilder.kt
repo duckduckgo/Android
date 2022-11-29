@@ -53,7 +53,7 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         private set
     var optionList: MutableList<CharSequence> = mutableListOf()
         private set
-    var selectedOption = 1
+    var selectedOption: Int? = null
         private set
 
     fun setTitle(@StringRes textId: Int): RadioListAlertDialogBuilder {
@@ -78,7 +78,7 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
 
     fun setOptions(
         @StringRes stackedButtonTextId: List<Int>,
-        selectedItem: Int = 1,
+        selectedItem: Int? = null,
     ): RadioListAlertDialogBuilder {
         stackedButtonTextId.forEach {
             optionList.add(context.getText(it))
@@ -153,9 +153,10 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         }
 
         with(binding.radioListDialogRadioGroup) {
-            check(selectedOption)
-            setOnCheckedChangeListener { group, checkedId ->
+            selectedOption?.let { check(it) }
+            setOnCheckedChangeListener { _, checkedId ->
                 listener.onRadioItemSelected(checkedId)
+                binding.radioListDialogPositiveButton.isEnabled = true
             }
         }
 
@@ -164,6 +165,7 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
             listener.onPositiveButtonClicked(binding.radioListDialogRadioGroup.checkedRadioButtonId)
             dialog.dismiss()
         }
+        binding.radioListDialogPositiveButton.isEnabled = selectedOption != null
 
         binding.radioListDialogNegativeButton.text = negativeButtonText
         binding.radioListDialogNegativeButton.setOnClickListener {
