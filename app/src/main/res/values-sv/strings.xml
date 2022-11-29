@@ -663,10 +663,12 @@
     <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
     <string name="sitePermissionsSettingsAllowedSitesTitle">Hantera webbplatser</string>
     <string name="sitePermissionsSettingsEmptyText">Inga webbplatser ännu</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Behörigheter har tagits bort för alla webbplatser</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Behörigheter för %1$s </string>
     <string name="permissionsPerWebsiteAskSetting">Fråga</string>
     <string name="permissionsPerWebsiteDenySetting">Neka</string>
     <string name="permissionsPerWebsiteAllowSetting">Tillåt</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">”Fråga” inaktiverat för alla webbplatser</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s-behörighet för %2$s</string>
 
     <!-- Autofill -->
