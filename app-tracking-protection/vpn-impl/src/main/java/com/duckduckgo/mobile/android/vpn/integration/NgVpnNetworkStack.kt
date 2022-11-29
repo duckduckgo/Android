@@ -26,6 +26,7 @@ import com.duckduckgo.mobile.android.vpn.apps.VpnExclusionList
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
+import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack.VpnTunnelConfig
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.AppTrackerRecorder
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
@@ -92,6 +93,18 @@ class NgVpnNetworkStack @Inject constructor(
         return Result.success(Unit)
     }
 
+    override fun onPrepareVpn(): Result<VpnTunnelConfig> = Result.success(
+        VpnTunnelConfig(
+            mtu = vpnNetwork.get().mtu(),
+            addresses = mapOf(
+                InetAddress.getByName("10.0.0.2") to 32,
+                InetAddress.getByName("fd00:1:fd00:1:fd00:1:fd00:1") to 128, // Add IPv6 Unique Local Address
+            ),
+            dns = emptySet(),
+            routes = emptyMap(),
+        ),
+    )
+
     override fun onStartVpn(tunfd: ParcelFileDescriptor): Result<Unit> {
         return startNative(tunfd.fd)
     }
@@ -112,19 +125,6 @@ class NgVpnNetworkStack @Inject constructor(
         return Result.success(Unit)
     }
 
-    override fun mtu(): Int {
-        return vpnNetwork.get().mtu()
-    }
-
-    override fun addresses(): Map<InetAddress, Int> = mapOf(
-        InetAddress.getByName("10.0.0.2") to 32,
-        InetAddress.getByName("fd00:1:fd00:1:fd00:1:fd00:1") to 128, // Add IPv6 Unique Local Address
-    )
-
-    override fun dns(): Set<InetAddress> = emptySet()
-
-    override fun routes(): Map<InetAddress, Int> = emptyMap()
-
     override fun onExit(reason: String) {
         Timber.w("Native exit reason=$reason")
 
@@ -135,7 +135,10 @@ class NgVpnNetworkStack @Inject constructor(
         killProcess()
     }
 
-    override fun onError(errorCode: Int, message: String) {
+    override fun onError(
+        errorCode: Int,
+        message: String,
+    ) {
         fun Int.isEmfile(): Boolean {
             return this == EMFILE_ERRNO
         }
@@ -164,7 +167,10 @@ class NgVpnNetworkStack @Inject constructor(
         return !domainAllowed
     }
 
-    private fun shouldAllowDomain(name: String, uid: Int): Boolean {
+    private fun shouldAllowDomain(
+        name: String,
+        uid: Int,
+    ): Boolean {
         val packageId = getPackageIdForUid(uid)
 
         if (VpnExclusionList.isDdgApp(packageId)) {
@@ -197,7 +203,10 @@ class NgVpnNetworkStack @Inject constructor(
         return true
     }
 
-    private fun isTrackerInExceptionRules(packageId: String, hostname: String): Boolean {
+    private fun isTrackerInExceptionRules(
+        packageId: String,
+        hostname: String,
+    ): Boolean {
         return vpnAppTrackerBlockingDao.getRuleByTrackerDomain(hostname)?.let { rule ->
             Timber.d("isTrackerInExceptionRules: found rule $rule for $hostname")
             return rule.packageNames.contains(packageId)

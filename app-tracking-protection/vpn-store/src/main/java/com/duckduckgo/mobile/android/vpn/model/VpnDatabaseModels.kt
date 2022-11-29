@@ -44,6 +44,7 @@ data class BucketizedVpnTracker(
 )
 
 enum class VpnServiceState {
+    ENABLING,
     ENABLED,
     DISABLED,
     INVALID,

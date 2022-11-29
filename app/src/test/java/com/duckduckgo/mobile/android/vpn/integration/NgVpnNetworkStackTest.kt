@@ -27,6 +27,7 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.AppTrackerRecorde
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.*
 import com.duckduckgo.vpn.network.api.*
+import java.net.InetAddress
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.*
 import org.junit.Before
@@ -106,10 +107,21 @@ class NgVpnNetworkStackTest {
     }
 
     @Test
-    fun whenMtuThenReturnMtu() {
-        val mtu = ngVpnNetworkStack.mtu()
+    fun whenOnPrepareVpnThenReturnCorrectVpnTunnelConfig() {
+        val configResult = ngVpnNetworkStack.onPrepareVpn()
+        assertTrue(configResult.isSuccess)
 
-        assertTrue(mtu == 1500)
+        val config = configResult.getOrThrow()
+        assertEquals(1500, config.mtu)
+        assertTrue(config.routes.isEmpty())
+        assertTrue(config.dns.isEmpty())
+        assertEquals(
+            mapOf(
+                InetAddress.getByName("10.0.0.2") to 32,
+                InetAddress.getByName("fd00:1:fd00:1:fd00:1:fd00:1") to 128, // Add IPv6 Unique Local Address
+            ),
+            config.addresses,
+        )
     }
 
     @Test
@@ -205,7 +217,10 @@ class NgVpnNetworkStackTest {
         assertFalse(ngVpnNetworkStack.isDomainBlocked(DomainRR(hostname, uid)))
     }
 
-    private fun createDnsRecord(domain: String, address: String): DnsRR {
+    private fun createDnsRecord(
+        domain: String,
+        address: String,
+    ): DnsRR {
         return DnsRR(
             time = 0,
             qName = domain,
