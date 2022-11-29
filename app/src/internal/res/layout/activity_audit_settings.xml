@@ -15,8 +15,8 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -33,14 +33,14 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:orientation="vertical"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-            <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/privacyAuditTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/auditSettingsScreenPrivacyAuditSection"/>
+                app:primaryText="@string/auditSettingsScreenPrivacyAuditSection" />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
                 android:id="@+id/step1"
@@ -63,11 +63,11 @@
                 app:primaryText="@string/auditStep3Title"
                 app:secondaryText="@string/auditStep3Subtitle" />
 
-            <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/refTestsTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/auditSettingsScreenRefTestsSection"/>
+                app:primaryText="@string/auditSettingsScreenRefTestsSection" />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
                 android:id="@+id/requestBlocking"
