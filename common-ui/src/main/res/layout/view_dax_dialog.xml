@@ -59,8 +59,8 @@
             android:id="@+id/logo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_marginBottom="16dp"
+            android:layout_marginStart="@dimen/keyline_5"
+            android:layout_marginBottom="@dimen/keyline_4"
             app:layout_constraintBottom_toTopOf="@id/cardView"
             app:layout_constraintStart_toStartOf="@id/cardView"
             app:srcCompat="@drawable/ic_dax_icon"/>
