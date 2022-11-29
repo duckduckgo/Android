@@ -309,8 +309,6 @@
         <item name="browserMenuTextColor">@color/almostBlackDark</item>
         <item name="browserMenuTextColorDisabled">@color/pinkish_grey_two</item>
         <item name="cookiesRoundedFieldBackgroundColor">@color/whiteFive</item>
-        <item name="omnibarTextColor">@color/almostBlackDark</item>
-        <item name="omnibarHintColor">@color/brownishGrayTwo</item>
         <item name="omnibarLogoLetterTextColor">@color/whiteFour</item>
         <item name="autoCompleteTextColor">@color/almostBlackDark</item>
         <item name="autoCompleteSubtitleTextColor">@color/warmerGray</item>

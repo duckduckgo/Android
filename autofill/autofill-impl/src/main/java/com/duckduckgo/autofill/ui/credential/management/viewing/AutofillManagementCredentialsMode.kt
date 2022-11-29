@@ -232,7 +232,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
 
     private fun updateToolbarForEdit() {
         getActionBar()?.apply {
-            setHomeAsUpIndicator(com.duckduckgo.mobile.android.R.drawable.ic_close)
+            setHomeAsUpIndicator(com.duckduckgo.mobile.android.R.drawable.ic_close_24)
             title = getString(R.string.credentialManagementEditTitle)
             setDisplayUseLogoEnabled(false)
         }

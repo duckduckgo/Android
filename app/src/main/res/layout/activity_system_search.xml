@@ -113,7 +113,7 @@
                         android:background="?selectableItemBackground"
                         android:contentDescription="@string/clearButtonContentDescription"
                         android:padding="3dp"
-                        android:src="@drawable/ic_close"
+                        android:src="@drawable/ic_close_24"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
