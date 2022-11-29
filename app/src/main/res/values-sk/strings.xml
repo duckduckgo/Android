@@ -671,10 +671,12 @@
     <string name="sitePermissionsSettingsMicrophone">Mikrofón</string>
     <string name="sitePermissionsSettingsAllowedSitesTitle">Správa lokalít</string>
     <string name="sitePermissionsSettingsEmptyText">Zatiaľ žiadne lokality</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Povolenia boli odstránené pre všetky lokality</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Povolenia pre „%1$s” </string>
     <string name="permissionsPerWebsiteAskSetting">Opýtať sa</string>
     <string name="permissionsPerWebsiteDenySetting">Odmietnuť</string>
     <string name="permissionsPerWebsiteAllowSetting">Povoliť</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Možnosť „Spýtať sa“ je pre všetky lokality vypnutá</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s povolenie pre %2$s</string>
 
     <!-- Autofill -->

@@ -663,10 +663,12 @@
     <string name="sitePermissionsSettingsMicrophone">Microfoon</string>
     <string name="sitePermissionsSettingsAllowedSitesTitle">Sites beheren</string>
     <string name="sitePermissionsSettingsEmptyText">Nog geen sites</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Toestemmingen verwijderd voor alle sites</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Toestemmingen voor \'%1$s\' </string>
     <string name="permissionsPerWebsiteAskSetting">Vragen</string>
     <string name="permissionsPerWebsiteDenySetting">Weigeren</string>
     <string name="permissionsPerWebsiteAllowSetting">Toestaan</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">\"Vragen\" uitgeschakeld voor alle sites</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Toestemming voor %1$s voor %2$s</string>
 
     <!-- Autofill -->
