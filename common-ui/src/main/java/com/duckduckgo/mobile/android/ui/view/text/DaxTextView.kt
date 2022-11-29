@@ -96,7 +96,8 @@ constructor(
         Body2_Bold,
         Button,
         Caption,
-        Caption_AllCaps
+        Caption_AllCaps,
+        
         ;
 
         companion object {
