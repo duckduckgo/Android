@@ -109,7 +109,7 @@
     <string name="tabClosedUndo">Отменить</string>
     <string name="downloadsMenuItemTitle">Загрузки</string>
 
-   <!-- Fire -->
+    <!-- Fire -->
     <string name="fireMenu">Сбросить данные</string>
     <string name="fireClearAll">Закрыть вкладки и удалить данные</string>
     <string name="fireCancel">Отменить</string>
@@ -671,10 +671,12 @@
     <string name="sitePermissionsSettingsMicrophone">Микрофон</string>
     <string name="sitePermissionsSettingsAllowedSitesTitle">Управление сайтами</string>
     <string name="sitePermissionsSettingsEmptyText">Пока нет сайтов</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Разрешения удалены для всех сайтов</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Разрешения для «%1$s» </string>
     <string name="permissionsPerWebsiteAskSetting">Запрашивать</string>
     <string name="permissionsPerWebsiteDenySetting">Отказать</string>
     <string name="permissionsPerWebsiteAllowSetting">Разрешить</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">«Запросить» отключено для всех сайтов</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Разрешение на доступ %2$s к %1$s</string>
 
     <!-- Autofill -->
