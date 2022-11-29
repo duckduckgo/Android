@@ -663,10 +663,12 @@
     <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
     <string name="sitePermissionsSettingsAllowedSitesTitle">Administrer websteder</string>
     <string name="sitePermissionsSettingsEmptyText">Ingen websteder endnu</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Tilladelser fjernet for alle websteder</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Tilladelser til \"%1$s\" </string>
     <string name="permissionsPerWebsiteAskSetting">Spørg</string>
     <string name="permissionsPerWebsiteDenySetting">Afvis</string>
     <string name="permissionsPerWebsiteAllowSetting">Tillad</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">\"Spørg\" er deaktiveret for alle websteder</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s tilladelse til %2$s</string>
 
     <!-- Autofill -->
