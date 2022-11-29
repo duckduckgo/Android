@@ -53,7 +53,7 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         private set
     var optionList: MutableList<CharSequence> = mutableListOf()
         private set
-    var selectedOption = 0
+    var selectedOption = 1
         private set
 
     fun setTitle(@StringRes textId: Int): RadioListAlertDialogBuilder {
@@ -78,7 +78,7 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
 
     fun setOptions(
         @StringRes stackedButtonTextId: List<Int>,
-        selectedItem: Int = 0,
+        selectedItem: Int = 1,
     ): RadioListAlertDialogBuilder {
         stackedButtonTextId.forEach {
             optionList.add(context.getText(it))
@@ -143,9 +143,10 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
             binding.radioListDialogMessage.text = messageText
         }
 
-        optionList.forEach {
+        optionList.forEachIndexed { index, option ->
             val radioButton = RadioButton(context, null)
-            radioButton.text = it
+            radioButton.id = index + 1
+            radioButton.text = option
             val params = RadioGroup.LayoutParams(RadioGroup.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT)
             radioButton.layoutParams = params
             binding.radioListDialogRadioGroup.addView(radioButton)
