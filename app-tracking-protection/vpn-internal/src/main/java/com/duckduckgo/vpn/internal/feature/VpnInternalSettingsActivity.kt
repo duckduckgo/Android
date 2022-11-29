@@ -101,7 +101,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        setupToolbar(binding.toolbar)
+        setupToolbar(binding.includeToolbar.toolbar)
 
         setupAppTrackerExceptionRules()
         setupDebugLogging()
