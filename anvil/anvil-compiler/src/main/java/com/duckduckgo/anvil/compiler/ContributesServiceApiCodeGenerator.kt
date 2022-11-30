@@ -16,6 +16,7 @@
 
 package com.duckduckgo.anvil.compiler
 
+import com.duckduckgo.anvil.annotations.ContributesNonCachingServiceApi
 import com.duckduckgo.anvil.annotations.ContributesServiceApi
 import com.google.auto.service.AutoService
 import com.squareup.anvil.annotations.ContributesTo
@@ -24,10 +25,7 @@ import com.squareup.anvil.compiler.api.*
 import com.squareup.anvil.compiler.internal.asClassName
 import com.squareup.anvil.compiler.internal.buildFile
 import com.squareup.anvil.compiler.internal.fqName
-import com.squareup.anvil.compiler.internal.reference.ClassReference
-import com.squareup.anvil.compiler.internal.reference.argumentAt
-import com.squareup.anvil.compiler.internal.reference.asClassName
-import com.squareup.anvil.compiler.internal.reference.classAndInnerClassReferences
+import com.squareup.anvil.compiler.internal.reference.*
 import com.squareup.kotlinpoet.*
 import dagger.Provides
 import java.io.File
@@ -41,12 +39,17 @@ import org.jetbrains.kotlin.psi.KtFile
 @AutoService(CodeGenerator::class)
 class ContributesServiceApiCodeGenerator : CodeGenerator {
 
+    private val serviceApiAnnotations = listOf(
+        ContributesServiceApi::class,
+        ContributesNonCachingServiceApi::class,
+    )
+
     override fun isApplicable(context: AnvilContext): Boolean = true
 
     override fun generateCode(codeGenDir: File, module: ModuleDescriptor, projectFiles: Collection<KtFile>): Collection<GeneratedFile> {
         return projectFiles.classAndInnerClassReferences(module)
             .toList()
-            .filter { it.isAnnotatedWith(ContributesServiceApi::class.fqName) }
+            .filter { reference -> reference.isAnnotatedWith(serviceApiAnnotations.map { it.fqName }) }
             .flatMap {
                 listOf(
                     generateServiceApiModule(it, codeGenDir, module),
@@ -58,8 +61,20 @@ class ContributesServiceApiCodeGenerator : CodeGenerator {
     private fun generateServiceApiModule(vmClass: ClassReference.Psi, codeGenDir: File, module: ModuleDescriptor): GeneratedFile {
         val generatedPackage = vmClass.packageFqName.toString()
         val moduleClassName = "${vmClass.shortName}_Module"
-        val scope = vmClass.annotations.first { it.fqName == ContributesServiceApi::class.fqName }.scopeOrNull(0)!!
-        val serviceClassName = vmClass.serviceApiClassName(ContributesServiceApi::class.fqName) ?: vmClass.asClassName()
+
+        // check only one service api annotation is present
+        val serviceAnnotations = vmClass.fqNameIntersect(serviceApiAnnotations.map { it.fqName })
+        if (serviceAnnotations.size > 1) {
+            throw AnvilCompilationException(
+                "Only one of ${serviceApiAnnotations.map { it.simpleName }} can be used on a class",
+                element = vmClass.clazz.identifyingElement,
+            )
+        }
+
+        val serviceAnnotation = serviceAnnotations.first()
+
+        val scope = vmClass.annotations.first { it.fqName == serviceAnnotation }.scopeOrNull(0)!!
+        val serviceClassName = vmClass.serviceApiClassName(serviceAnnotation) ?: vmClass.asClassName()
 
         if (!vmClass.isInterface()) {
             throw AnvilCompilationException(
@@ -85,7 +100,7 @@ class ContributesServiceApiCodeGenerator : CodeGenerator {
                                     .addAnnotation(
                                         AnnotationSpec
                                             .builder(Named::class)
-                                            .addMember("value = %S", "api")
+                                            .addMember("value = %S", serviceAnnotation.resolvedNamedApiType())
                                             .build(),
                                     )
                                     .build(),
@@ -115,6 +130,14 @@ class ContributesServiceApiCodeGenerator : CodeGenerator {
             ?.annotation
             ?.boundTypeOrNull()
             ?.asClassName()
+    }
+
+    private fun FqName.resolvedNamedApiType(): String {
+        return when (this) {
+            ContributesServiceApi::class.fqName -> "api"
+            ContributesNonCachingServiceApi::class.fqName -> "nonCaching"
+            else -> throw AnvilCompilationException("Unknown service api annotation: $this")
+        }
     }
 
     companion object {

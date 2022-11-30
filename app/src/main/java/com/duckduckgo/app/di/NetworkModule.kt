@@ -16,13 +16,10 @@
 
 package com.duckduckgo.app.di
 
-import android.annotation.SuppressLint
 import android.content.Context
-import com.duckduckgo.app.autocomplete.api.AutoCompleteService
 import com.duckduckgo.app.brokensite.api.BrokenSiteSender
 import com.duckduckgo.app.brokensite.api.BrokenSiteSubmitter
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
-import com.duckduckgo.app.email.api.EmailService
 import com.duckduckgo.app.feedback.api.FeedbackService
 import com.duckduckgo.app.feedback.api.FeedbackSubmitter
 import com.duckduckgo.app.feedback.api.FireAndForgetFeedbackSubmitter
@@ -145,16 +142,6 @@ class NetworkModule {
     fun pixelReQueryInterceptor(): PixelReQueryInterceptor {
         return PixelReQueryInterceptor()
     }
-
-    @SuppressLint("NoRetrofitCreateMethodCallDetector")
-    @Provides
-    fun autoCompleteService(@Named("nonCaching") retrofit: Retrofit): AutoCompleteService =
-        retrofit.create(AutoCompleteService::class.java)
-
-    @SuppressLint("NoRetrofitCreateMethodCallDetector")
-    @Provides
-    fun emailService(@Named("nonCaching") retrofit: Retrofit): EmailService =
-        retrofit.create(EmailService::class.java)
 
     @Provides
     fun brokenSiteSender(
