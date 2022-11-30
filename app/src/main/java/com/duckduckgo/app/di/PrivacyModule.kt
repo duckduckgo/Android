@@ -29,7 +29,6 @@ import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
 import com.duckduckgo.app.fire.DataClearerTimeKeeper
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
-import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryAPI
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.view.ClearDataAction
@@ -77,7 +76,7 @@ object PrivacyModule {
         geoLocationPermissions: GeoLocationPermissions,
         thirdPartyCookieManager: ThirdPartyCookieManager,
         adClickManager: AdClickManager,
-        fireproofWebsiteRepository: FireproofWebsiteRepositoryAPI,
+        fireproofWebsiteRepository: FireproofWebsiteRepository,
         sitePermissionsManager: SitePermissionsManager,
         dispatcherProvider: DispatcherProvider,
     ): ClearDataAction {

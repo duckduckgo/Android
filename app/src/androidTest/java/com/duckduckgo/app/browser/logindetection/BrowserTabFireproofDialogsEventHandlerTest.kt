@@ -24,7 +24,7 @@ import com.duckduckgo.app.blockingObserve
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler.Event
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler.Event.FireproofWebSiteSuccess
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
-import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryImpl
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.events.db.UserEventEntity
 import com.duckduckgo.app.global.events.db.UserEventKey.*
@@ -68,11 +68,11 @@ class BrowserTabFireproofDialogsEventHandlerTest {
             .allowMainThreadQueries()
             .build()
         fireproofWebsiteDao = db.fireproofWebsiteDao()
-        val fireproofWebsiteRepository = FireproofWebsiteRepository(fireproofWebsiteDao, coroutineRule.testDispatcherProvider, mock())
+        val fireproofWebsiteRepositoryImpl = FireproofWebsiteRepositoryImpl(fireproofWebsiteDao, coroutineRule.testDispatcherProvider, mock())
         testee = BrowserTabFireproofDialogsEventHandler(
             mockUserEventsStore,
             mockPixel,
-            fireproofWebsiteRepository,
+            fireproofWebsiteRepositoryImpl,
             mockAppSettingsPreferencesStore,
             coroutineRule.testDispatcherProvider,
         )
