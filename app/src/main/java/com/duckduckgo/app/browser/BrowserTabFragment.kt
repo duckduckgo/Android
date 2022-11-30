@@ -2624,9 +2624,6 @@ class BrowserTabFragment :
         private fun configureShowTabSwitcherListener() {
             tabsButton?.setOnClickListener {
                 launch { viewModel.userLaunchingTabSwitcher() }
-
-
-
             }
         }
 
