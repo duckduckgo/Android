@@ -663,10 +663,12 @@
     <string name="sitePermissionsSettingsMicrophone">Μικρόφωνο</string>
     <string name="sitePermissionsSettingsAllowedSitesTitle">Διαχείριση ιστότοπων</string>
     <string name="sitePermissionsSettingsEmptyText">Δεν υπάρχουν ακόμη ιστότοποι</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Τα δικαιώματα καταργήθηκαν για όλους τους ιστότοπους</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Δικαιώματα για «%1$s» </string>
     <string name="permissionsPerWebsiteAskSetting">Αιτηθείτε</string>
     <string name="permissionsPerWebsiteDenySetting">Απόρριψη</string>
     <string name="permissionsPerWebsiteAllowSetting">Αποδοχή</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Η επιλογή «Να γίνεται ερώτηση» είναι απενεργοποιημένη για όλους τους ιστότοπους</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s άδεια για %2$s</string>
 
     <!-- Autofill -->
