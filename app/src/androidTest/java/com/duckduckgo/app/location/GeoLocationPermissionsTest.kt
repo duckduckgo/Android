@@ -29,7 +29,7 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsDao
-import com.duckduckgo.app.location.data.LocationPermissionsRepository
+import com.duckduckgo.app.location.data.LocationPermissionsRepositoryImpl
 import dagger.Lazy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -74,7 +74,7 @@ class GeoLocationPermissionsTest {
 
         geoLocationPermissions = GeoLocationPermissionsManager(
             InstrumentationRegistry.getInstrumentation().targetContext,
-            LocationPermissionsRepository(locationPermissionsDao, lazyFaviconManager, coroutineRule.testDispatcherProvider),
+            LocationPermissionsRepositoryImpl(locationPermissionsDao, lazyFaviconManager, coroutineRule.testDispatcherProvider),
             FireproofWebsiteRepository(fireproofWebsiteDao, coroutineRule.testDispatcherProvider, lazyFaviconManager),
             coroutineRule.testDispatcherProvider,
         )

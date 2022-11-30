@@ -38,7 +38,7 @@ import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.GeoLocationPermissionsManager
 import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
-import com.duckduckgo.app.location.data.LocationPermissionsRepositoryAPI
+import com.duckduckgo.app.location.data.LocationPermissionsRepositoryImpl
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.EntityLookup
@@ -135,7 +135,7 @@ object PrivacyModule {
         locationPermissionsDao: LocationPermissionsDao,
         faviconManager: Lazy<FaviconManager>,
         dispatchers: DispatcherProvider,
-    ): LocationPermissionsRepositoryAPI {
-        return LocationPermissionsRepository(locationPermissionsDao, faviconManager, dispatchers)
+    ): LocationPermissionsRepository {
+        return LocationPermissionsRepositoryImpl(locationPermissionsDao, faviconManager, dispatchers)
     }
 }
