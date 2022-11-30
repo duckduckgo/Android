@@ -30,6 +30,7 @@ dependencies {
     implementation project(':di')
     implementation project(':vpn-api')
     implementation project(':network-protection-api')
+    implementation project(':network-protection-store')
     implementation project(':library-loader-api')
 
     implementation AndroidX.appCompat
@@ -39,6 +40,8 @@ dependencies {
     implementation Google.dagger
     implementation JakeWharton.timber
     implementation KotlinX.coroutines.core
+    implementation Square.retrofit2.retrofit
+    implementation Square.retrofit2.converter.moshi
 }
 android {
     namespace 'com.duckduckgo.networkprotection.impl'

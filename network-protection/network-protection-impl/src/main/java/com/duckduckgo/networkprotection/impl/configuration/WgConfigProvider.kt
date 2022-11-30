@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.networkprotection.impl
+package com.duckduckgo.networkprotection.impl.configuration
 
 import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.networkprotection.impl.configuration.DevicePrivateKey
-import com.duckduckgo.networkprotection.impl.configuration.WgServerDataProvider
 import com.squareup.anvil.annotations.ContributesBinding
 import com.wireguard.config.Config
 import com.wireguard.config.Interface
@@ -26,29 +24,31 @@ import com.wireguard.config.Peer
 import javax.inject.Inject
 
 interface WgConfigProvider {
-    fun get(): Config
+    suspend fun get(): Config
 }
+
 @ContributesBinding(VpnScope::class)
 class RealWgConfigProvider @Inject constructor(
-    private val devicePrivateKey: DevicePrivateKey,
-    wgServerDataProvider: WgServerDataProvider
-): WgConfigProvider {
-    private val serverData = wgServerDataProvider.get()
+    private val deviceKeys: DeviceKeys,
+    private val wgServerDataProvider: WgServerDataProvider
+) : WgConfigProvider {
 
-    override fun get(): Config  = Config.Builder()
-        .setInterface(
-            Interface.Builder()
-                .parsePrivateKey(devicePrivateKey.get())
-                .parseAddresses(serverData.ipAddress)
-                .parseDnsServers(serverData.dns)
-                .build()
-        )
-        .addPeer(
-            Peer.Builder()
-                .parsePublicKey(serverData.publicKey)
-                .parseAllowedIPs(serverData.allowedIPs)
-                .parseEndpoint(serverData.publicEndpoint)
-                .build()
-        )
-        .build()
+    override suspend fun get(): Config {
+        val serverData = wgServerDataProvider.get(deviceKeys.publicKey)
+        return Config.Builder()
+            .setInterface(
+                Interface.Builder()
+                    .parsePrivateKey(deviceKeys.privateKey)
+                    .parseAddresses(serverData.address)
+                    .build(),
+            )
+            .addPeer(
+                Peer.Builder()
+                    .parsePublicKey(serverData.publicKey)
+                    .parseAllowedIPs(serverData.allowedIPs)
+                    .parseEndpoint(serverData.publicEndpoint)
+                    .build(),
+            )
+            .build()
+    }
 }

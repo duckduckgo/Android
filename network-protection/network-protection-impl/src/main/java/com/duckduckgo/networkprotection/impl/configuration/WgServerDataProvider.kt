@@ -19,30 +19,33 @@ package com.duckduckgo.networkprotection.impl.configuration
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.networkprotection.impl.configuration.WgServerDataProvider.WgServerData
 import com.squareup.anvil.annotations.ContributesBinding
-import com.wireguard.config.InetAddresses
-import com.wireguard.config.InetNetwork
-import timber.log.Timber
-import java.net.Inet4Address
 import javax.inject.Inject
 
 interface WgServerDataProvider {
     data class WgServerData(
-        val ipAddress: String,
-        val dns: String,
         val publicKey: String,
         val publicEndpoint: String,
-        val allowedIPs: String = "0.0.0.0/0,::0/0,2000::",
+        val address: String,
+        val allowedIPs: String = "0.0.0.0/0,::0/0",
     )
 
-    fun get(): WgServerData
+    suspend fun get(publicKey: String): WgServerData
 }
 
 @ContributesBinding(VpnScope::class)
-class MullvadWgServerDataProvider @Inject constructor() : WgServerDataProvider {
-    override fun get(): WgServerData = WgServerData(
-        ipAddress = "10.66.171.196/32,fc00:bbbb:bbbb:bb01::3:abc3/128",
-        dns = "10.64.0.1",
-        publicKey = "4nOXEaCDYBV//nsVXk7MrnHpxLV9MbGjt+IGQY//p3k=",
-        publicEndpoint = "185.65.135.71:51820"
+class RealWgServerDataProvider @Inject constructor(
+    private val wgVpnControllerService: WgVpnControllerService
+) : WgServerDataProvider {
+    override suspend fun get(publicKey: String): WgServerData = wgVpnControllerService.registerKey(
+        RegisterKeyBody(
+            publicKey = publicKey,
+        ),
+    )[1].toWgServerData()
+
+    private fun EligibleServerInfo.toWgServerData(): WgServerData = WgServerData(
+        publicKey = server.publicKey,
+        publicEndpoint = server.hostnames[0] + ":" + server.port,
+        address = allowedIPs.joinToString(","),
     )
 }
+

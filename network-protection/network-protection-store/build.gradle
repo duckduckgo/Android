@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.networkprotection.impl.configuration
-
-import com.duckduckgo.di.scopes.VpnScope
-import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
-
-interface DevicePrivateKey {
-    fun get(): String
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
 }
 
-@ContributesBinding(VpnScope::class)
-class MockDevicePrivateKey @Inject constructor(): DevicePrivateKey {
-    override fun get(): String = "0C8K6rDPlbsfHUe17BGAUAf/vQj4WIiamSibd3HKk0I="
+apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+
+dependencies {
+    implementation project(':vpn-api')
+    implementation AndroidX.core.ktx
+}
+
+android {
+    namespace 'com.duckduckgo.networkprotection.store'
 }
