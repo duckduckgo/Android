@@ -15,60 +15,58 @@
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/settingsSectionOther"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+                                                   xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                   android:id="@+id/settingsSectionOther"
+                                                   android:layout_width="match_parent"
+                                                   android:layout_height="wrap_content">
 
     <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
-        android:id="@+id/settingsOtherDivider"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+            android:id="@+id/settingsOtherDivider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
 
-    <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
-        android:id="@+id/settingsOtherTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/settingsHeadingMore"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/settingsOtherDivider"/>
+    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            android:id="@+id/settingsOtherTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/settingsHeadingMore"
+            app:layout_constraintTop_toBottomOf="@id/settingsOtherDivider"/>
 
     <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-        android:id="@+id/macOsSetting"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/settingsOtherTitle"
-        app:showBetaPill="true"
-        app:secondaryText="@string/macos_settings_description"
-        app:primaryText="@string/macos_settings_title" />
+            android:id="@+id/macOsSetting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/settingsOtherTitle"
+            app:showBetaPill="true"
+            app:secondaryText="@string/macos_settings_description"
+            app:primaryText="@string/macos_settings_title"/>
 
     <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-        android:id="@+id/emailSetting"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/macOsSetting"
-        app:showBetaPill="true"
-        app:secondaryText="@string/settingsEmailProtectionSubtitle"
-        app:primaryText="@string/settingsEmailProtectionTitle" />
+            android:id="@+id/emailSetting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/macOsSetting"
+            app:showBetaPill="true"
+            app:secondaryText="@string/settingsEmailProtectionSubtitle"
+            app:primaryText="@string/settingsEmailProtectionTitle"/>
 
     <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-        android:id="@+id/vpnSetting"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/emailSetting"
-        app:showBetaPill="true"
-        app:secondaryText="@string/atp_SettingsDeviceShieldDisabled"
-        app:primaryText="@string/atp_SettingsTitle" />
+            android:id="@+id/vpnSetting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/emailSetting"
+            app:showBetaPill="true"
+            app:secondaryText="@string/atp_SettingsDeviceShieldDisabled"
+            app:primaryText="@string/atp_SettingsTitle"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
