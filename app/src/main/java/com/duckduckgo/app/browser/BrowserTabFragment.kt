@@ -190,7 +190,6 @@ import com.duckduckgo.mobile.android.ui.view.*
 import com.duckduckgo.mobile.android.ui.view.DaxDialog
 import com.duckduckgo.mobile.android.ui.view.DaxDialogListener
 import com.duckduckgo.mobile.android.ui.view.KeyboardAwareEditText
-import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
@@ -2622,7 +2621,6 @@ class BrowserTabFragment :
         private fun configureShowTabSwitcherListener() {
             tabsButton?.setOnClickListener {
                 launch { viewModel.userLaunchingTabSwitcher() }
-
             }
         }
 
