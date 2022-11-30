@@ -67,13 +67,24 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
-                    <EditText
+                    <androidx.appcompat.widget.AppCompatEditText
                         android:id="@+id/omnibarTextInput"
-                        style="@style/Widget.DuckDuckGo.SearchInput"
+                        style="@style/Base.V7.Widget.AppCompat.EditText"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         android:layout_marginStart="8dp"
+                        android:background="@null"
+                        android:fontFamily="sans-serif"
                         android:hint="@string/systemSearchOmnibarInputHint"
+                        android:imeOptions="flagNoExtractUi|actionGo|flagNoPersonalizedLearning"
+                        android:inputType="textUri|textNoSuggestions"
+                        android:maxLines="1"
+                        android:selectAllOnFocus="true"
+                        android:textColor="?attr/daxColorPrimaryText"
+                        android:textColorHint="?attr/daxColorSecondaryText"
+                        android:textCursorDrawable="@drawable/text_cursor"
+                        android:textSize="16sp"
+                        android:textStyle="normal"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@id/voiceSearchButton"
                         app:layout_constraintStart_toEndOf="@id/logo"
@@ -82,7 +93,7 @@
 
                         <requestFocus />
 
-                    </EditText>
+                    </androidx.appcompat.widget.AppCompatEditText>
 
                     <com.duckduckgo.mobile.android.ui.view.button.IconButton
                         android:id="@+id/voiceSearchButton"
@@ -99,7 +110,7 @@
                         android:id="@+id/clearTextButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="?selectableItemBackgroundBorderless"
+                        android:background="?selectableItemBackground"
                         android:contentDescription="@string/clearButtonContentDescription"
                         android:padding="3dp"
                         android:src="@drawable/ic_close_24"
@@ -155,9 +166,8 @@
                 android:paddingEnd="16dp"
                 android:paddingBottom="2dp"
                 android:text="@string/systemSearchDeviceAppLabel"
-                app:typography="h5"
+                app:typography="caption_allCaps"
                 android:visibility="gone"
-                app:textType="secondary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/autocompleteSuggestions"/>

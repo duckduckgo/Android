@@ -14,8 +14,7 @@
   ~ limitations under the License.
   -->
 
-<resources xmlns:tools="http://schemas.android.com/tools"
-           tools:ignore="NewApi">
+<resources>
 
     <style name="TextAppearance"/>
     <style name="TextAppearance.DuckDuckGo">
@@ -66,7 +65,7 @@
 
     <style name="TextAppearance.DuckDuckGo.Body2">
         <item name="android:textSize">14sp</item>
-        <item name="android:lineSpacingExtra">6sp</item>
+        <item name="android:lineSpacingExtra">3sp</item>
     </style>
 
     <style name="TextAppearance.DuckDuckGo.Button1">
@@ -94,7 +93,7 @@
 
     <style name="Typography.DuckDuckGo.Title">
         <item name="android:textSize">32sp</item>
-        <item name="android:lineSpacingExtra">4sp</item>
+        <item name="android:lineSpacingExtra">2sp</item>
         <item name="android:lineHeight">36sp</item>
         <item name="android:textStyle">bold</item>
     </style>
@@ -130,14 +129,14 @@
     <style name="Typography.DuckDuckGo.H5">
         <item name="android:textSize">13sp</item>
         <item name="android:lineSpacingExtra">3sp</item>
-        <item name="android:lineHeight">16sp</item>
+        <item name="android:lineHeight">36sp</item>
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
     <style name="Typography.DuckDuckGo.Body1">
         <item name="android:textSize">16sp</item>
         <item name="android:lineSpacingExtra">4sp</item>
-        <item name="android:lineHeight" >20sp</item>
+        <item name="android:lineHeight">20sp</item>
     </style>
 
     <style name="Typography.DuckDuckGo.Body1.Bold">
@@ -165,10 +164,6 @@
         <item name="android:textSize">12sp</item>
         <item name="android:lineSpacingExtra">4sp</item>
         <item name="android:lineHeight">16sp</item>
-    </style>
-
-    <style name="Typography.DuckDuckGo.Caption.AllCaps">
-        <item name="android:textAllCaps">true</item>
     </style>
 
     <style name="Typography.DuckDuckGo.Caption.AllCaps">
