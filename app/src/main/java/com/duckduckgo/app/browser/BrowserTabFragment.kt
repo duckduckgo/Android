@@ -190,6 +190,7 @@ import com.duckduckgo.mobile.android.ui.view.*
 import com.duckduckgo.mobile.android.ui.view.DaxDialog
 import com.duckduckgo.mobile.android.ui.view.DaxDialogListener
 import com.duckduckgo.mobile.android.ui.view.KeyboardAwareEditText
+import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
@@ -2376,18 +2377,20 @@ class BrowserTabFragment :
         context: Context,
         cta: Cta,
     ) {
-        AlertDialog.Builder(context)
+        TextAlertDialogBuilder(context)
             .setTitle(R.string.hideTipsTitle)
             .setMessage(getString(R.string.hideTipsText))
-            .setPositiveButton(R.string.hideTipsButton) { dialog, _ ->
-                dialog.dismiss()
-                launch {
-                    ctaViewModel.hideTipsForever(cta)
-                }
-            }
-            .setNegativeButton(android.R.string.no) { dialog, _ ->
-                dialog.dismiss()
-            }
+            .setPositiveButton(R.string.hideTipsButton)
+            .setNegativeButton(android.R.string.no)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        launch {
+                            ctaViewModel.hideTipsForever(cta)
+                        }
+                    }
+                },
+            )
             .show()
     }
 
@@ -2621,6 +2624,9 @@ class BrowserTabFragment :
         private fun configureShowTabSwitcherListener() {
             tabsButton?.setOnClickListener {
                 launch { viewModel.userLaunchingTabSwitcher() }
+
+
+
             }
         }
 
