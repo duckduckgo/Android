@@ -89,13 +89,12 @@ constructor(
         H4,
         H5,
         Body1,
-        Body1_Bold,
+        Body1Bold,
         Body2,
-        Body2_Bold,
+        Body2Bold,
         Button,
         Caption,
-        Caption_AllCaps,
-
+        CaptionAllCaps,
         ;
 
         companion object {
@@ -109,12 +108,12 @@ constructor(
                     4 -> H4
                     5 -> H5
                     6 -> Body1
-                    7 -> Body1_Bold
+                    7 -> Body1Bold
                     8 -> Body2
-                    9 -> Body2_Bold
+                    9 -> Body2Bold
                     10 -> Button
                     11 -> Caption
-                    12 -> Caption_AllCaps
+                    12 -> CaptionAllCaps
                     else -> Body1
                 }
             }
@@ -128,12 +127,12 @@ constructor(
                     H4 -> R.style.Typography_DuckDuckGo_H4
                     H5 -> R.style.Typography_DuckDuckGo_H5
                     Body1 -> R.style.Typography_DuckDuckGo_Body1
-                    Body1_Bold -> R.style.Typography_DuckDuckGo_Body1_Bold
+                    Body1Bold -> R.style.Typography_DuckDuckGo_Body1_Bold
                     Body2 -> R.style.Typography_DuckDuckGo_Body2
-                    Body2_Bold -> R.style.Typography_DuckDuckGo_Body2_Bold
+                    Body2Bold -> R.style.Typography_DuckDuckGo_Body2_Bold
                     Button -> R.style.Typography_DuckDuckGo_Button
                     Caption -> R.style.Typography_DuckDuckGo_Caption
-                    Caption_AllCaps -> R.style.Typography_DuckDuckGo_Caption_AllCaps
+                    CaptionAllCaps -> R.style.Typography_DuckDuckGo_Caption_AllCaps
                 }
             }
         }
