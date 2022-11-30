@@ -35,6 +35,14 @@ enum class DuckDuckGoTheme {
     DARK,
     LIGHT,
     ;
+
+    fun getOptionIndex(): Int {
+        return when (this) {
+            SYSTEM_DEFAULT -> 1
+            LIGHT -> 2
+            DARK -> 3
+        }
+    }
 }
 
 object Theming {
