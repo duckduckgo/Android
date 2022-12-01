@@ -419,5 +419,4 @@
         <item name="cardBackgroundColor">?attr/daxColorSurface</item>
         <item name="shapeAppearance">@style/ShapeAppearance.DuckDuckGo.MediumComponent</item>
     </style>
-
 </resources>

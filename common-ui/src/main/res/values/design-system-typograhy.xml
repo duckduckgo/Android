@@ -14,8 +14,7 @@
   ~ limitations under the License.
   -->
 
-<resources xmlns:tools="http://schemas.android.com/tools"
-           tools:ignore="NewApi">
+<resources>
 
     <style name="TextAppearance"/>
     <style name="TextAppearance.DuckDuckGo">
