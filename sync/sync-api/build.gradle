@@ -27,6 +27,7 @@ java {
 }
 
 dependencies {
+    implementation Google.dagger
     implementation Kotlin.stdlib.jdk7
 }
 
