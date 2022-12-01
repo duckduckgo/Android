@@ -74,7 +74,7 @@ class PermissionsPerWebsiteActivity : DuckDuckGoActivity(), PermissionsSettingsS
     private fun setViews() {
         setupToolbar(toolbar)
         supportActionBar?.title = url.websiteFromGeoLocationsApiOrigin()
-        binding.sitePermissionsSectionHeader.text = String.format(
+        binding.sitePermissionsSectionHeader.primaryText = String.format(
             getString(R.string.permissionPerWebsiteText),
             url.websiteFromGeoLocationsApiOrigin(),
         )
@@ -116,7 +116,10 @@ class PermissionsPerWebsiteActivity : DuckDuckGoActivity(), PermissionsSettingsS
         private const val EXTRA_URL = "URL"
         private const val PERMISSIONS_SETTING_SELECTOR_DIALOG_TAG = "PERMISSIONS_SETTING_SELECTOR_DIALOG_TAG"
 
-        fun intent(context: Context, url: String): Intent {
+        fun intent(
+            context: Context,
+            url: String
+        ): Intent {
             val intent = Intent(context, PermissionsPerWebsiteActivity::class.java)
             intent.putExtra(EXTRA_URL, url)
             return intent

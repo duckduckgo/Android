@@ -57,11 +57,12 @@ class PermissionSettingAdapter(private val viewModel: PermissionsPerWebsiteViewM
         private val viewModel: PermissionsPerWebsiteViewModel,
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(setting: WebsitePermissionSetting) {
-            binding.permissionSettingIcon.setImageResource(setting.icon)
-            binding.permissionSettingSelectionTitle.setText(setting.title)
-            binding.permissionSetting.setText(setting.setting.toPrettyStringRes())
-            binding.root.setOnClickListener {
-                viewModel.permissionSettingSelected(setting)
+            val context = binding.root.context
+            binding.permissionSettingListItem.apply {
+                setLeadingIcon(setting.icon)
+                setPrimaryText(context.getString(setting.title))
+                setSecondaryText(context.getString(setting.setting.toPrettyStringRes()))
+                setOnClickListener { viewModel.permissionSettingSelected(setting) }
             }
         }
     }
