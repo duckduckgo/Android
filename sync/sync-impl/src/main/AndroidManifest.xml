@@ -14,4 +14,14 @@
   ~ limitations under the License.
   -->
 
-<manifest package="com.duckduckgo.sync.impl"></manifest>
+<manifest package="com.duckduckgo.sync.impl"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application>
+        <activity
+            android:name=".ui.SyncInitialSetupActivity"
+            android:exported="false"
+            android:label="Sync initial setup"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"/>
+    </application>
+</manifest>
