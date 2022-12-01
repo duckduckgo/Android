@@ -663,10 +663,12 @@
     <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
     <string name="sitePermissionsSettingsAllowedSitesTitle">Saitide haldamine</string>
     <string name="sitePermissionsSettingsEmptyText">Saite pole veel</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Kõikide saitide load on eemaldatud</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Saidi „%1$s“ load </string>
     <string name="permissionsPerWebsiteAskSetting">Küsi</string>
     <string name="permissionsPerWebsiteDenySetting">Keela</string>
     <string name="permissionsPerWebsiteAllowSetting">Luba</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">„Küsi“ on kõigil saitidel keelatud</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Luba %1$s saidile %2$s</string>
 
     <!-- Autofill -->

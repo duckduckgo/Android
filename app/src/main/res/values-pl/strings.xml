@@ -671,10 +671,12 @@
     <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
     <string name="sitePermissionsSettingsAllowedSitesTitle">Zarządzaj witrynami</string>
     <string name="sitePermissionsSettingsEmptyText">Nie masz jeszcze witryn</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Usunięto uprawnienia wszystkich witryn</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Uprawnienia dla: „%1$s” </string>
     <string name="permissionsPerWebsiteAskSetting">Poproś</string>
     <string name="permissionsPerWebsiteDenySetting">Odmów</string>
     <string name="permissionsPerWebsiteAllowSetting">Zezwól</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Wyłączono opcję „Pytaj” dla wszystkich witryn</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Pozwolenie dla witryny %2$s na dostęp do urządzenia: %1$s</string>
 
     <!-- Autofill -->

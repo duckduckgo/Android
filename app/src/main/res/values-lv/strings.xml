@@ -667,10 +667,12 @@
     <string name="sitePermissionsSettingsMicrophone">Mikrofons</string>
     <string name="sitePermissionsSettingsAllowedSitesTitle">Pārvaldīt vietnes</string>
     <string name="sitePermissionsSettingsEmptyText">Vēl nav nevienas vietnes</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Atļaujas ir noņemtas visām vietnēm</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Atļaujas vietnei \"%1$s\" </string>
     <string name="permissionsPerWebsiteAskSetting">Jautāt</string>
     <string name="permissionsPerWebsiteDenySetting">Liegt</string>
     <string name="permissionsPerWebsiteAllowSetting">Atļaut</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">“Jautāt” ir atspējots visām vietnēm</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s – atļauja vietnei %2$s</string>
 
     <!-- Autofill -->

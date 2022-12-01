@@ -667,10 +667,12 @@
     <string name="sitePermissionsSettingsMicrophone">Microfon</string>
     <string name="sitePermissionsSettingsAllowedSitesTitle">Gestionează site-urile</string>
     <string name="sitePermissionsSettingsEmptyText">Niciun site încă</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Permisiuni eliminate pentru toate site-urile</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Permisiuni pentru „%1$s” </string>
     <string name="permissionsPerWebsiteAskSetting">Cere</string>
     <string name="permissionsPerWebsiteDenySetting">Refuză</string>
     <string name="permissionsPerWebsiteAllowSetting">Permite</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">„Întreabă” este dezactivat pentru toate site-urile</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Permisiune %1$s pentru %2$s</string>
 
     <!-- Autofill -->

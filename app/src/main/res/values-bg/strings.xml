@@ -663,10 +663,12 @@
     <string name="sitePermissionsSettingsMicrophone">Микрофон</string>
     <string name="sitePermissionsSettingsAllowedSitesTitle">Управление на сайтове</string>
     <string name="sitePermissionsSettingsEmptyText">Все още няма сайтове</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Разрешенията са премахнати за всички сайтове</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Разрешения за \"%1$s\" </string>
     <string name="permissionsPerWebsiteAskSetting">Питане</string>
     <string name="permissionsPerWebsiteDenySetting">Отказвам</string>
     <string name="permissionsPerWebsiteAllowSetting">Разрешавам</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Опцията „Питай“ е деактивирана за всички сайтове</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s разрешение за %2$s</string>
 
     <!-- Autofill -->

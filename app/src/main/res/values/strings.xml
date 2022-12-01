@@ -664,10 +664,12 @@
     <string name="sitePermissionsSettingsMicrophone">Microphone</string>
     <string name="sitePermissionsSettingsAllowedSitesTitle">Manage Sites</string>
     <string name="sitePermissionsSettingsEmptyText">No sites yet</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Permissions Removed for All Sites</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Permissions for \"%1$s\" </string>
     <string name="permissionsPerWebsiteAskSetting">Ask</string>
     <string name="permissionsPerWebsiteDenySetting">Deny</string>
     <string name="permissionsPerWebsiteAllowSetting">Allow</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">\"Ask\" disabled for all sites</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s permission for %2$s</string>
 
     <!-- Autofill -->
