@@ -42,7 +42,6 @@
         <item name="android:src">@drawable/ic_menu_vertical_24</item>
     </style>
 
-
     <!-- Tabs -->
     <style name="Widget.DuckDuckGo.TabLayout" parent="Widget.MaterialComponents.TabLayout">
         <item name="tabTextAppearance">@style/TextAppearance.MaterialComponents.Button</item>

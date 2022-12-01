@@ -27,7 +27,7 @@ import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.fire.AppCacheClearer
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
-import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryAPI
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.location.GeoLocationPermissions
@@ -64,7 +64,7 @@ class ClearPersonalDataAction(
     private val geoLocationPermissions: GeoLocationPermissions,
     private val thirdPartyCookieManager: ThirdPartyCookieManager,
     private val adClickManager: AdClickManager,
-    private val fireproofWebsiteRepository: FireproofWebsiteRepositoryAPI,
+    private val fireproofWebsiteRepository: FireproofWebsiteRepository,
     private val sitePermissionsManager: SitePermissionsManager,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
 ) : ClearDataAction {

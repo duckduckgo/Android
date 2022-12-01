@@ -133,7 +133,6 @@
         <!--controls the ripple coloring-->
         <item name="colorControlHighlight">?attr/daxColorRipple</item>
 
-
         <!--Design System Colors theme independent-->
         <item name="daxColorDim">@color/black60</item>
         <item name="daxColorWhite">@color/white</item>

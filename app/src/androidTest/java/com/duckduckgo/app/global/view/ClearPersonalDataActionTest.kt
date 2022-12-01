@@ -25,7 +25,7 @@ import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.fire.AppCacheClearer
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
-import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryAPI
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -56,7 +56,7 @@ class ClearPersonalDataActionTest {
     private val mockGeoLocationPermissions: GeoLocationPermissions = mock()
     private val mockThirdPartyCookieManager: ThirdPartyCookieManager = mock()
     private val mockAdClickManager: AdClickManager = mock()
-    private val mockFireproofWebsiteRepository: FireproofWebsiteRepositoryAPI = mock()
+    private val mockFireproofWebsiteRepository: FireproofWebsiteRepository = mock()
     private val mockSitePermissionsManager: SitePermissionsManager = mock()
 
     private val fireproofWebsites: LiveData<List<FireproofWebsiteEntity>> = MutableLiveData()

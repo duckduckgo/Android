@@ -23,7 +23,6 @@ import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.view.TypedArrayUtils
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextView.Typography.Body1
 import com.google.android.material.textview.MaterialTextView
-import java.lang.reflect.Array.getInt
 
 class DaxTextView @JvmOverloads
 constructor(
@@ -95,6 +94,7 @@ constructor(
         Button,
         Caption,
         CaptionAllCaps,
+
         ;
 
         companion object {

@@ -37,7 +37,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
 @ExperimentalCoroutinesApi
-class FireproofWebsiteRepositoryTest {
+class FireproofWebsiteRepositoryImplTest {
 
     @get:Rule
     @Suppress("unused")
@@ -49,7 +49,7 @@ class FireproofWebsiteRepositoryTest {
 
     private lateinit var db: AppDatabase
     private lateinit var fireproofWebsiteDao: FireproofWebsiteDao
-    private lateinit var fireproofWebsiteRepository: FireproofWebsiteRepository
+    private lateinit var fireproofWebsiteRepositoryImpl: FireproofWebsiteRepositoryImpl
     private val mockFaviconManager: FaviconManager = mock()
     private val lazyFaviconManager = Lazy { mockFaviconManager }
 
@@ -59,7 +59,11 @@ class FireproofWebsiteRepositoryTest {
             .allowMainThreadQueries()
             .build()
         fireproofWebsiteDao = db.fireproofWebsiteDao()
-        fireproofWebsiteRepository = FireproofWebsiteRepository(db.fireproofWebsiteDao(), coroutineRule.testDispatcherProvider, lazyFaviconManager)
+        fireproofWebsiteRepositoryImpl = FireproofWebsiteRepositoryImpl(
+            db.fireproofWebsiteDao(),
+            coroutineRule.testDispatcherProvider,
+            lazyFaviconManager,
+        )
     }
 
     @After
@@ -69,32 +73,32 @@ class FireproofWebsiteRepositoryTest {
 
     @Test
     fun whenFireproofWebsiteEmptyThenNoEntityIsCreated() = runTest {
-        val fireproofWebsiteEntity = fireproofWebsiteRepository.fireproofWebsite("")
+        val fireproofWebsiteEntity = fireproofWebsiteRepositoryImpl.fireproofWebsite("")
         assertNull(fireproofWebsiteEntity)
     }
 
     @Test
     fun whenFireproofWebsiteInvalidThenNoEntityIsCreated() = runTest {
-        val fireproofWebsiteEntity = fireproofWebsiteRepository.fireproofWebsite("aa1111")
+        val fireproofWebsiteEntity = fireproofWebsiteRepositoryImpl.fireproofWebsite("aa1111")
         assertNull(fireproofWebsiteEntity)
     }
 
     @Test
     fun whenFireproofWebsiteWithSchemaThenNoEntityIsCreated() = runTest {
-        val fireproofWebsiteEntity = fireproofWebsiteRepository.fireproofWebsite("https://aa1111.com")
+        val fireproofWebsiteEntity = fireproofWebsiteRepositoryImpl.fireproofWebsite("https://aa1111.com")
         assertNull(fireproofWebsiteEntity)
     }
 
     @Test
     fun whenFireproofWebsiteIsValidThenEntityCreated() = runTest {
-        val fireproofWebsiteEntity = fireproofWebsiteRepository.fireproofWebsite("example.com")
+        val fireproofWebsiteEntity = fireproofWebsiteRepositoryImpl.fireproofWebsite("example.com")
         assertEquals(FireproofWebsiteEntity("example.com"), fireproofWebsiteEntity)
     }
 
     @Test
     fun whenGetAllFireproofWebsitesThenReturnLiveDataWithAllItemsFromDatabase() = runTest {
         givenFireproofWebsiteDomain("example.com", "example2.com")
-        val fireproofWebsiteEntities = fireproofWebsiteRepository.getFireproofWebsites().blockingObserve()!!
+        val fireproofWebsiteEntities = fireproofWebsiteRepositoryImpl.getFireproofWebsites().blockingObserve()!!
         assertEquals(fireproofWebsiteEntities.size, 2)
     }
 
@@ -102,7 +106,7 @@ class FireproofWebsiteRepositoryTest {
     fun whenRemoveFireproofWebsiteThenItemRemovedFromDatabase() = runTest {
         givenFireproofWebsiteDomain("example.com", "example2.com")
 
-        fireproofWebsiteRepository.removeFireproofWebsite(FireproofWebsiteEntity("example.com"))
+        fireproofWebsiteRepositoryImpl.removeFireproofWebsite(FireproofWebsiteEntity("example.com"))
 
         val fireproofWebsiteEntities = fireproofWebsiteDao.fireproofWebsitesSync()
         assertEquals(fireproofWebsiteEntities.size, 1)
@@ -112,7 +116,7 @@ class FireproofWebsiteRepositoryTest {
     fun whenRemoveFireproofWebsiteThenDeletePersistedFavicon() = runTest {
         givenFireproofWebsiteDomain("example.com")
 
-        fireproofWebsiteRepository.removeFireproofWebsite(FireproofWebsiteEntity("example.com"))
+        fireproofWebsiteRepositoryImpl.removeFireproofWebsite(FireproofWebsiteEntity("example.com"))
 
         verify(mockFaviconManager).deletePersistedFavicon("example.com")
     }
@@ -121,7 +125,7 @@ class FireproofWebsiteRepositoryTest {
     fun whenFireproofWebsitesCountByDomainAndNoWebsitesMatchThenReturnZero() = runTest {
         givenFireproofWebsiteDomain("example.com")
 
-        val count = fireproofWebsiteRepository.fireproofWebsitesCountByDomain("test.com")
+        val count = fireproofWebsiteRepositoryImpl.fireproofWebsitesCountByDomain("test.com")
 
         assertEquals(0, count)
     }
@@ -130,7 +134,7 @@ class FireproofWebsiteRepositoryTest {
     fun whenFireproofWebsitesCountByDomainAndWebsitesMatchThenReturnCount() = runTest {
         givenFireproofWebsiteDomain("example.com")
 
-        val count = fireproofWebsiteRepository.fireproofWebsitesCountByDomain("example.com")
+        val count = fireproofWebsiteRepositoryImpl.fireproofWebsitesCountByDomain("example.com")
 
         assertEquals(1, count)
     }
@@ -145,7 +149,7 @@ class FireproofWebsiteRepositoryTest {
             ".com",
         )
 
-        val hostsToPreserve = fireproofWebsiteRepository.fireproofWebsites()
+        val hostsToPreserve = fireproofWebsiteRepositoryImpl.fireproofWebsites()
 
         assertTrue(expectedList.all { hostsToPreserve.contains(it) })
     }
@@ -155,7 +159,7 @@ class FireproofWebsiteRepositoryTest {
         givenFireproofWebsitesStored(FireproofWebsiteEntity("twitter.com"))
         val expectedList = listOf("twitter.com", ".twitter.com", ".com")
 
-        val hostsToPreserve = fireproofWebsiteRepository.fireproofWebsites()
+        val hostsToPreserve = fireproofWebsiteRepositoryImpl.fireproofWebsites()
 
         assertTrue(expectedList.all { hostsToPreserve.contains(it) })
     }
@@ -172,7 +176,7 @@ class FireproofWebsiteRepositoryTest {
             ".com",
         )
 
-        val hostsToPreserve = fireproofWebsiteRepository.fireproofWebsites()
+        val hostsToPreserve = fireproofWebsiteRepositoryImpl.fireproofWebsites()
 
         assertEquals(expectedList.size, hostsToPreserve.size)
         assertTrue(expectedList.all { hostsToPreserve.contains(it) })

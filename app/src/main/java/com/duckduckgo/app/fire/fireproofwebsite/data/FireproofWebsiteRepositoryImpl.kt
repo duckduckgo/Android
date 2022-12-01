@@ -29,7 +29,7 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
 
-interface FireproofWebsiteRepositoryAPI {
+interface FireproofWebsiteRepository {
     suspend fun fireproofWebsite(domain: String): FireproofWebsiteEntity?
     fun getFireproofWebsites(): LiveData<List<FireproofWebsiteEntity>>
     fun fireproofWebsitesSync(): List<FireproofWebsiteEntity>
@@ -45,14 +45,14 @@ interface FireproofWebsiteRepositoryAPI {
 )
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = FireproofWebsiteRepositoryAPI::class,
+    boundType = FireproofWebsiteRepository::class,
 )
 @SingleInstanceIn(AppScope::class)
-class FireproofWebsiteRepository @Inject constructor(
+class FireproofWebsiteRepositoryImpl @Inject constructor(
     private val fireproofWebsiteDao: FireproofWebsiteDao,
     private val dispatchers: DispatcherProvider,
     private val faviconManager: Lazy<FaviconManager>,
-) : FireproofRepository, FireproofWebsiteRepositoryAPI {
+) : FireproofRepository, FireproofWebsiteRepository {
 
     override fun fireproofWebsites(): List<String> {
         val fireproofWebsites = fireproofWebsiteDao.fireproofWebsitesSync()

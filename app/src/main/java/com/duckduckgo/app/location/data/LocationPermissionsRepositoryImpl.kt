@@ -24,7 +24,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
-interface LocationPermissionsRepositoryAPI {
+interface LocationPermissionsRepository {
     fun getLocationPermissionsSync(): List<LocationPermissionEntity>
     fun getLocationPermissionsAsync(): LiveData<List<LocationPermissionEntity>>
     fun getLocationPermissionsFlow(): Flow<List<LocationPermissionEntity>>
@@ -35,11 +35,11 @@ interface LocationPermissionsRepositoryAPI {
     fun savePermissionEntity(entity: LocationPermissionEntity)
 }
 
-class LocationPermissionsRepository @Inject constructor(
+class LocationPermissionsRepositoryImpl @Inject constructor(
     private val locationPermissionsDao: LocationPermissionsDao,
     private val faviconManager: Lazy<FaviconManager>,
     private val dispatchers: DispatcherProvider,
-) : LocationPermissionsRepositoryAPI {
+) : LocationPermissionsRepository {
 
     override fun getLocationPermissionsSync(): List<LocationPermissionEntity> = locationPermissionsDao.allPermissions()
     override fun getLocationPermissionsAsync(): LiveData<List<LocationPermissionEntity>> = locationPermissionsDao.allPermissionsEntities()
