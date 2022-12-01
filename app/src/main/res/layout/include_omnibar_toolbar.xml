@@ -103,7 +103,6 @@
                             android:importantForAccessibility="no"
                             android:gravity="center"
                             android:padding="6dp"
-                            android:alpha="0.5"
                             android:src="@drawable/ic_find_search_20" />
 
                         <FrameLayout
