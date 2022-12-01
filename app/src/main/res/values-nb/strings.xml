@@ -663,10 +663,12 @@
     <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
     <string name="sitePermissionsSettingsAllowedSitesTitle">Administrer nettsteder</string>
     <string name="sitePermissionsSettingsEmptyText">Ingen nettsteder ennå</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Tillatelser fjernet for alle nettsteder</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Tillatelser for «%1$s» </string>
     <string name="permissionsPerWebsiteAskSetting">Spør</string>
     <string name="permissionsPerWebsiteDenySetting">Avvis</string>
     <string name="permissionsPerWebsiteAllowSetting">Tillat</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">«Spør» er deaktivert for alle nettsteder</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$stillatelse for %2$s</string>
 
     <!-- Autofill -->

@@ -663,10 +663,12 @@
     <string name="sitePermissionsSettingsMicrophone">Microfono</string>
     <string name="sitePermissionsSettingsAllowedSitesTitle">Gestisci siti</string>
     <string name="sitePermissionsSettingsEmptyText">Non esistono ancora siti</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Autorizzazioni rimosse per tutti i siti</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Autorizzazioni per \"%1$s\" </string>
     <string name="permissionsPerWebsiteAskSetting">Chiedi</string>
     <string name="permissionsPerWebsiteDenySetting">Rifiuta</string>
     <string name="permissionsPerWebsiteAllowSetting">Consenti</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">\"Chiedi\" disattivato per tutti i siti</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Autorizzazione %1$s per %2$s</string>
 
     <!-- Autofill -->

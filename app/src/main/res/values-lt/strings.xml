@@ -671,10 +671,12 @@
     <string name="sitePermissionsSettingsMicrophone">Mikrofonas</string>
     <string name="sitePermissionsSettingsAllowedSitesTitle">Tvarkyti svetaines</string>
     <string name="sitePermissionsSettingsEmptyText">Svetainių dar nėra</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Pašalinti visų svetainių leidimai</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Leidimai „%1$s“ </string>
     <string name="permissionsPerWebsiteAskSetting">Klausti</string>
     <string name="permissionsPerWebsiteDenySetting">Atsisakyti</string>
     <string name="permissionsPerWebsiteAllowSetting">Leisti</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">„Klausti“ išjungta visose svetainėse</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s leidimas %2$s</string>
 
     <!-- Autofill -->
