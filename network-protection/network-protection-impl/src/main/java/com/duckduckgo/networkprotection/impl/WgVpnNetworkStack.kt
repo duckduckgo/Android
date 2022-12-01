@@ -17,7 +17,9 @@
 package com.duckduckgo.networkprotection.impl
 
 import android.os.ParcelFileDescriptor
+import android.util.Log
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack.VpnTunnelConfig
@@ -42,7 +44,8 @@ import javax.inject.Inject
 class WgVpnNetworkStack @Inject constructor(
     private val wgProtocol: Lazy<WgProtocol>,
     private val configProvider: Lazy<WgConfigProvider>,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
+    private val appBuildConfig: AppBuildConfig,
 ) : VpnNetworkStack {
     private var wgThread: Thread? = null
     private var config: Config? = null
@@ -92,6 +95,7 @@ class WgVpnNetworkStack @Inject constructor(
         if (wgThread == null) {
             Timber.d("turnOnNative wg")
 
+            val level = if (appBuildConfig.isDebug) Log.VERBOSE else Log.ASSERT
             wgThread = Thread {
                 Timber.d("Thread: Started turnOnNative")
                 wgProtocol.get().startWg(
@@ -99,6 +103,7 @@ class WgVpnNetworkStack @Inject constructor(
                     config!!.toWgUserspaceString().also {
                         Timber.d("WgUserspace config: $it")
                     },
+                    level
                 )
                 Timber.d("Thread: Completed turnOnNative")
                 wgThread = null

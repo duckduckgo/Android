@@ -25,10 +25,12 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 dependencies {
     anvil project(':anvil-compiler')
     implementation project(path: ':anvil-annotations')
+    implementation project(':app-build-config-api')
     implementation project(':common')
     implementation project(':common-ui')
     implementation project(':di')
     implementation project(':vpn-api')
+    implementation project(':vpn-store')
     implementation project(':network-protection-api')
     implementation project(':network-protection-store')
     implementation project(':library-loader-api')
@@ -37,6 +39,7 @@ dependencies {
     implementation AndroidX.constraintLayout
     implementation AndroidX.lifecycle.runtimeKtx
     implementation AndroidX.lifecycle.viewModelKtx
+    implementation AndroidX.room.runtime
     implementation Google.dagger
     implementation JakeWharton.timber
     implementation KotlinX.coroutines.core

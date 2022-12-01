@@ -28,7 +28,8 @@ import javax.inject.Inject
 interface WgProtocol {
     fun startWg(
         tunFd: Int,
-        configString: String
+        configString: String,
+        androidLogLevel: Int
     )
 
     fun stopWg()
@@ -44,9 +45,10 @@ class RealWgProtocol @Inject constructor(
 
     override fun startWg(
         tunFd: Int,
-        configString: String
+        configString: String,
+        androidLogLevel: Int
     ) {
-        wgTunnel = goBackend.wgTurnOn(INTERFACE_NAME, tunFd, configString)
+        wgTunnel = goBackend.wgTurnOn(INTERFACE_NAME, tunFd, configString, androidLogLevel)
         if (wgTunnel < 0) {
             Timber.e("Wireguard tunnel failed to start: check config / tunFd")
         }
