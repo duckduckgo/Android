@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2021 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,14 +14,7 @@
   ~ limitations under the License.
   -->
 
-<manifest package="com.duckduckgo.sync.impl"
-    xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <application>
-        <activity
-            android:name=".ui.SyncInitialSetupActivity"
-            android:exported="false"
-            android:label="@string/sync_internal_activity_label"
-            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"/>
-    </application>
-</manifest>
+<resources>
+    <!-- Internal Setting -->
+    <string name="sync_internal_activity_label">Sync Setup Internal</string>
+</resources>
