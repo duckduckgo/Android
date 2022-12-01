@@ -2,18 +2,15 @@ appId: com.duckduckgo.mobile.android
 ---
 - launchApp:
     clearState: true
-- takeScreenshot: LaunchScreenshot
-- extendedWaitUntil:
-    visible: ".*Not to worry! Searching and browsing privately.*"
-    timeout: 60000
 - assertVisible:
     text: ".*Not to worry! Searching and browsing privately.*"
-- takeScreenshot: Launch2Screenshot
 - tapOn: "let's do it!"
 - tapOn: "cancel"
 - assertVisible:
     text: ".*I'll also upgrade the security of your connection if possible.*"
 - inputText: "https://www.search-company.site/"
+- tapOn:
+      id: ".*key_pos_ime_action.*"
 - assertVisible:
     text: ".*Got It.*"
 - tapOn:
