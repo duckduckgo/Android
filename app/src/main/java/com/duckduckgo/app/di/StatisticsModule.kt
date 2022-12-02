@@ -18,6 +18,7 @@ package com.duckduckgo.app.di
 
 import android.content.Context
 import androidx.lifecycle.LifecycleObserver
+import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.device.ContextDeviceInfo
 import com.duckduckgo.app.global.device.DeviceInfo
@@ -57,12 +58,14 @@ object StatisticsModule {
         statisticsService: StatisticsService,
         variantManager: VariantManager,
         plugins: PluginPoint<RefreshRetentionAtbPlugin>,
+        emailManager: EmailManager,
     ): StatisticsUpdater {
         return StatisticsRequester(
             statisticsDataStore,
             statisticsService,
             variantManager,
             plugins,
+            emailManager,
         )
     }
 

@@ -19,6 +19,7 @@ package com.duckduckgo.app.integration
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.InstantSchedulersRule
+import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.getDaggerComponent
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.statistics.Variant
@@ -49,6 +50,7 @@ class AtbIntegrationTest {
     private lateinit var service: StatisticsService
     private lateinit var testee: StatisticsRequester
     private lateinit var statisticsStore: StatisticsDataStore
+    private var emailManager: EmailManager = mock()
 
     @get:Rule
     val schedulers = InstantSchedulersRule()
@@ -67,7 +69,7 @@ class AtbIntegrationTest {
                 return listOf()
             }
         }
-        testee = StatisticsRequester(statisticsStore, service, mockVariantManager, plugins)
+        testee = StatisticsRequester(statisticsStore, service, mockVariantManager, plugins, emailManager)
     }
 
     @Test

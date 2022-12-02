@@ -35,6 +35,7 @@ interface StatisticsService {
     @GET("/atb.js")
     fun atb(
         @Query(ParamKey.DEV_MODE) devMode: Int? = if (BuildConfig.DEBUG) 1 else null,
+        @Query(ParamKey.EMAIL) email: Int?,
     ): Observable<Atb>
 
     @GET("/atb.js")
@@ -42,6 +43,7 @@ interface StatisticsService {
         @Query(ParamKey.ATB) atb: String,
         @Query(ParamKey.RETENTION_ATB) retentionAtb: String,
         @Query(ParamKey.DEV_MODE) devMode: Int? = if (BuildConfig.DEBUG) 1 else null,
+        @Query(ParamKey.EMAIL) email: Int?,
     ): Observable<Atb>
 
     @GET("/atb.js?at=app_use")
@@ -49,5 +51,6 @@ interface StatisticsService {
         @Query(ParamKey.ATB) atb: String,
         @Query(ParamKey.RETENTION_ATB) retentionAtb: String,
         @Query(ParamKey.DEV_MODE) devMode: Int? = if (BuildConfig.DEBUG) 1 else null,
+        @Query(ParamKey.EMAIL) email: Int?,
     ): Observable<Atb>
 }

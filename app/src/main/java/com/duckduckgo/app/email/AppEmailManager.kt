@@ -19,6 +19,9 @@ package com.duckduckgo.app.email
 import com.duckduckgo.app.email.api.EmailService
 import com.duckduckgo.app.email.db.EmailDataStore
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.pixels.AppPixelName.EMAIL_DISABLED
+import com.duckduckgo.app.pixels.AppPixelName.EMAIL_ENABLED
+import com.duckduckgo.app.statistics.pixels.Pixel
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlinx.coroutines.CoroutineScope
@@ -34,6 +37,7 @@ class AppEmailManager(
     private val emailDataStore: EmailDataStore,
     private val dispatcherProvider: DispatcherProvider,
     private val appCoroutineScope: CoroutineScope,
+    private val pixel: Pixel,
 ) : EmailManager {
 
     private val isSignedInStateFlow = MutableStateFlow(isSignedIn())
@@ -56,6 +60,7 @@ class AppEmailManager(
         appCoroutineScope.launch(dispatcherProvider.io()) {
             isSignedInStateFlow.emit(isSignedIn())
             generateNewAlias()
+            pixel.fire(EMAIL_ENABLED)
         }
     }
 
@@ -63,6 +68,7 @@ class AppEmailManager(
         appCoroutineScope.launch(dispatcherProvider.io()) {
             emailDataStore.clearEmailData()
             isSignedInStateFlow.emit(false)
+            pixel.fire(EMAIL_DISABLED)
         }
     }
 
