@@ -16,10 +16,13 @@
 
 package com.duckduckgo.app.feedback.api
 
+import com.duckduckgo.anvil.annotations.ContributesServiceApi
+import com.duckduckgo.di.scopes.AppScope
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
 
+@ContributesServiceApi(AppScope::class)
 interface FeedbackService {
 
     @FormUrlEncoded

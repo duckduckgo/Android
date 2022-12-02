@@ -16,8 +16,11 @@
 
 package com.duckduckgo.mobile.android.vpn.waitlist.api
 
+import com.duckduckgo.anvil.annotations.ContributesServiceApi
+import com.duckduckgo.di.scopes.AppScope
 import retrofit2.http.*
 
+@ContributesServiceApi(AppScope::class)
 interface AppTrackingProtectionWaitlistService {
 
     @POST("https://quack.duckduckgo.com/api/auth/waitlist/apptp/join")

@@ -64,3 +64,10 @@ dependencies {
     androidTestImplementation AndroidX.test.runner
     androidTestImplementation AndroidX.test.rules
 }
+
+android {
+    anvil {
+        generateDaggerFactories = true // default is false
+    }
+    namespace 'com.duckduckgo.app.statistics'
+}

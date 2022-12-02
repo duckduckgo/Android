@@ -16,6 +16,8 @@
 
 package com.duckduckgo.mobile.android.vpn.blocklist
 
+import com.duckduckgo.anvil.annotations.ContributesServiceApi
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.trackers.JsonAppBlockingList
 import com.duckduckgo.mobile.android.vpn.trackers.JsonAppTrackerExceptionRules
 import com.duckduckgo.mobile.android.vpn.trackers.JsonAppTrackerExclusionList
@@ -23,6 +25,7 @@ import com.duckduckgo.mobile.android.vpn.trackers.JsonAppTrackerSystemAppOverrid
 import retrofit2.Call
 import retrofit2.http.GET
 
+@ContributesServiceApi(AppScope::class)
 interface AppTrackerListService {
     @GET("https://staticcdn.duckduckgo.com/trackerblocking/appTB/1.0/blocklist.json")
     fun appTrackerBlocklist(): Call<JsonAppBlockingList>

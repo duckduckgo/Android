@@ -22,7 +22,10 @@ import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
 import timber.log.Timber
 
 interface StatisticsUpdater {
@@ -31,7 +34,8 @@ interface StatisticsUpdater {
     fun refreshAppRetentionAtb()
 }
 
-class StatisticsRequester(
+@ContributesBinding(AppScope::class)
+class StatisticsRequester @Inject constructor(
     private val store: StatisticsDataStore,
     private val service: StatisticsService,
     private val variantManager: VariantManager,

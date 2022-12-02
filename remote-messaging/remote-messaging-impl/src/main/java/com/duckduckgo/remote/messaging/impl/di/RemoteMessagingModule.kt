@@ -18,7 +18,6 @@ package com.duckduckgo.remote.messaging.impl.di
 
 import android.content.Context
 import androidx.room.Room
-import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.AppProperties
@@ -41,15 +40,10 @@ import com.duckduckgo.remote.messaging.store.RemoteMessagesDao
 import com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
 import com.duckduckgo.remote.messaging.store.RemoteMessagingDatabase
 import com.squareup.anvil.annotations.ContributesTo
-import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
-import javax.inject.Named
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
 
 @Module
 @ContributesTo(AppScope::class)
@@ -61,24 +55,6 @@ object DomainModule {
         remoteMessagingConfigProcessor: RemoteMessagingConfigProcessor,
     ): RemoteMessagingConfigDownloader {
         return RealRemoteMessagingConfigDownloader(remoteConfig, remoteMessagingConfigProcessor)
-    }
-}
-
-@Module
-@ContributesTo(AppScope::class)
-object NetworkModule {
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun apiRetrofit(@Named("api") okHttpClient: OkHttpClient): RemoteMessagingService {
-        val moshi = Moshi.Builder().build()
-        val retrofit = Retrofit.Builder()
-            .baseUrl(AppUrl.Url.API)
-            .client(okHttpClient)
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .build()
-
-        return retrofit.create(RemoteMessagingService::class.java)
     }
 }
 

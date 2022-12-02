@@ -19,6 +19,7 @@ package com.duckduckgo.app.di
 import com.duckduckgo.app.httpsupgrade.api.HttpsFalsePositivesJsonAdapter
 import com.duckduckgo.app.trackerdetection.api.ActionJsonAdapter
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
@@ -32,5 +33,6 @@ object JsonModule {
     fun moshi(): Moshi = Moshi.Builder()
         .add(ActionJsonAdapter())
         .add(HttpsFalsePositivesJsonAdapter())
+        .add(JSONObjectAdapter())
         .build()
 }
