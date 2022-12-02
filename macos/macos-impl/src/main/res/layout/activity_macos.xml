@@ -48,7 +48,7 @@
 
             <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                     android:id="@+id/statusTitle"
-                    app:typography="h2"
+                    app:typography="h1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"

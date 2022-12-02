@@ -48,31 +48,31 @@
         <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:typography="h2"
             android:layout_marginTop="10dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="@dimen/keyline_4"
             android:text="@string/duckDuckGoPrivacySimplified"
-            android:textAlignment="center" />
+            android:textAlignment="center"
+            app:typography="h1" />
 
         <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:typography="h3"
-            android:layout_marginTop="10dp"
             android:text="@string/aboutDescription"
             android:textAlignment="center"
+            app:textType="secondary"
+            app:typography="body1"
             tools:text="Long description would go here\n\nLots and lots of words" />
 
         <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/learnMoreLink"
-            app:typography="body1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
             android:text="@string/aboutMoreLink"
             android:textAlignment="center"
-            android:textColor="?attr/colorAccent"/>
+            android:textColor="?attr/colorAccent"
+            app:typography="body1_bold" />
 
     </LinearLayout>
 </ScrollView>
