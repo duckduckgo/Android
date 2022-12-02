@@ -37,9 +37,9 @@ import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategorySingleCh
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityReportBreakageCategorySingleChoiceBinding
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import dagger.WrongScope
-import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @WrongScope(
     comment = "To use the right scope we first need to enable dagger component nesting",
@@ -151,7 +151,7 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
         val category =
             viewState.categorySelected?.let { getString(viewState.categorySelected.category) }.orEmpty()
         binding.categoriesSelection.setText(category)
-        binding.otherCategoryDescription.visibility = if (viewState.indexSelected == 8) View.VISIBLE else View.GONE
+        binding.otherCategoryDescription.visibility = if (viewState.indexSelected > -1) View.VISIBLE else View.GONE
         binding.ctaNextFormSubmit.isEnabled = viewState.submitAllowed
     }
 
