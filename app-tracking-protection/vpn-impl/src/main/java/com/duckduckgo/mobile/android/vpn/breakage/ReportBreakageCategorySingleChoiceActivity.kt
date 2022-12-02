@@ -37,9 +37,9 @@ import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategorySingleCh
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityReportBreakageCategorySingleChoiceBinding
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import dagger.WrongScope
+import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @WrongScope(
     comment = "To use the right scope we first need to enable dagger component nesting",
