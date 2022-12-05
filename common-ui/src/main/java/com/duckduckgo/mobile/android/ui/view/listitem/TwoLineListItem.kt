@@ -35,6 +35,7 @@ import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.view.setEnabledOpacity
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import kotlin.Int.Companion
 
 class TwoLineListItem @JvmOverloads constructor(
     context: Context,
@@ -59,10 +60,12 @@ class TwoLineListItem @JvmOverloads constructor(
                 binding.primaryText.setTextColor(getColorStateList(R.styleable.TwoLineListItem_primaryTextColorOverlay))
             }
 
-            val truncated = getBoolean(R.styleable.TwoLineListItem_primaryTextTruncated, false)
+            val truncated = getBoolean(R.styleable.TwoLineListItem_primaryTextTruncated, true)
             if (truncated) {
                 binding.primaryText.maxLines = 1
                 binding.primaryText.ellipsize = TruncateAt.END
+            } else {
+                binding.primaryText.maxLines = Int.MAX_VALUE
             }
 
             if (hasValue(R.styleable.TwoLineListItem_secondaryTextColorOverlay)) {
