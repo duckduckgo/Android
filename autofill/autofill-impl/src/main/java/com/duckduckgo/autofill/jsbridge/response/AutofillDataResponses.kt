@@ -40,6 +40,11 @@ data class EmptyResponse(
 }
 
 data class AvailableInputSuccessResponse(
-    val credentials: Boolean,
+    val credentials: AvailableInputTypeCredentials,
     val email: Boolean,
+)
+
+data class AvailableInputTypeCredentials(
+    val username: Boolean,
+    val password: Boolean,
 )
