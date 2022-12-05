@@ -24,6 +24,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -40,6 +41,7 @@ import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewMode
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Editing
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Viewing
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.mobile.android.R.dimen
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
@@ -61,6 +63,9 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
 
     @Inject
     lateinit var saveStateWatcher: SaveStateWatcher
+
+    // we need to revert the toolbar title when this fragment is destroyed, so will track its initial value
+    private var initialActionBarTitle: String? = null
 
     val viewModel by lazy {
         ViewModelProvider(requireActivity(), viewModelFactory)[AutofillSettingsViewModel::class.java]
@@ -95,6 +100,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
                 }
                 true
             }
+
             R.id.view_menu_delete -> {
                 viewModel.viewState.value.credentialMode.credentialsViewed?.let {
                     viewModel.onDeleteCredentials(it)
@@ -102,10 +108,12 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
                 viewModel.onExitCredentialMode()
                 true
             }
+
             R.id.view_menu_save -> {
                 saveCredentials()
                 true
             }
+
             else -> false
         }
     }
@@ -121,6 +129,15 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
             viewModel.allowSaveInEditMode(it)
         }
         configureUiEventHandlers()
+        initialiseToolbar()
+    }
+
+    private fun initialiseToolbar() {
+        activity?.findViewById<Toolbar>(com.duckduckgo.mobile.android.R.id.toolbar)?.apply {
+            initialActionBarTitle = title.toString()
+            titleMarginStart = resources.getDimensionPixelSize(dimen.keyline_2)
+            contentInsetStartWithNavigation = 0
+        }
     }
 
     override fun onDestroyView() {
@@ -138,7 +155,9 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
 
     private fun resetToolbarOnExit() {
         getActionBar()?.apply {
-            title = getString(R.string.managementScreenTitle)
+            if (initialActionBarTitle != null) {
+                title = initialActionBarTitle
+            }
             setDisplayUseLogoEnabled(false)
         }
 
@@ -176,6 +195,8 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
             credentials.lastUpdatedMillis?.let {
                 lastUpdatedView.text = getString(R.string.credentialManagementEditLastUpdated, lastUpdatedDateFormatter.format(it))
             }
+
+            getActionBar()?.title = credentials.domainTitle ?: credentials.domain
         }
     }
 
@@ -218,10 +239,12 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
                         populateFields(state.credentialMode.credentialsViewed)
                         showViewMode(state.credentialMode.credentialsViewed)
                     }
+
                     is Editing -> {
                         initializeEditStateIfNecessary(state.credentialMode)
                         showEditMode()
                     }
+
                     else -> {
                     }
                 }

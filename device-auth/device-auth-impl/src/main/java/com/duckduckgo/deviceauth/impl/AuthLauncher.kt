@@ -25,6 +25,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.deviceauth.api.AutofillAuthorizationGracePeriod
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.Error
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.Success
@@ -52,6 +53,7 @@ interface AuthLauncher {
 class RealAuthLauncher @Inject constructor(
     private val context: Context,
     private val appBuildConfig: AppBuildConfig,
+    private val autofillAuthorizationGracePeriod: AutofillAuthorizationGracePeriod,
 ) : AuthLauncher {
     private val biometricPromptInfoBuilder by lazy {
         BiometricPrompt.PromptInfo.Builder()
@@ -106,6 +108,7 @@ class RealAuthLauncher @Inject constructor(
         override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
             super.onAuthenticationSucceeded(result)
             Timber.d("onAuthenticationSucceeded ${result.authenticationType}")
+            autofillAuthorizationGracePeriod.recordSuccessfulAuthorization()
             onResult(Success)
         }
 

@@ -47,6 +47,9 @@ class AutofillSettingsViewModel @Inject constructor(
     private val _commands = MutableStateFlow<List<Command>>(emptyList())
     val commands: StateFlow<List<Command>> = _commands
 
+    // after unlocking, we want to initialise the view once (next unlock, the view stack will already exist)
+    private var initialStateAlreadyPresented: Boolean = false
+
     fun onCopyUsername(username: String?) {
         username?.let { clipboardInteractor.copyToClipboard(it) }
         addCommand(ShowUserUsernameCopied())
@@ -131,27 +134,24 @@ class AutofillSettingsViewModel @Inject constructor(
     }
 
     fun launchDeviceAuth() {
-        if (!viewState.value.isAuthenticating) {
-            _viewState.value = viewState.value.copy(isAuthenticating = true)
-            addCommand(LaunchDeviceAuth)
-        }
+        addCommand(LaunchDeviceAuth)
     }
 
     fun lock() {
-        if (!viewState.value.isLocked) {
-            _viewState.value = viewState.value.copy(isLocked = true)
-            addCommand(ShowLockedMode)
-        }
+        addCommand(ShowLockedMode)
     }
 
     fun unlock() {
         addCommand(ExitDisabledMode)
         addCommand(ExitLockedMode)
-        _viewState.value = viewState.value.copy(isLocked = false)
+
+        if (!initialStateAlreadyPresented) {
+            initialStateAlreadyPresented = true
+            addCommand(InitialiseViewAfterUnlock)
+        }
     }
 
     fun disabled() {
-        _viewState.value = viewState.value.copy(isLocked = true, isAuthenticating = false)
         // Remove backstack modes if they are present
         addCommand(ExitListMode)
         addCommand(ExitCredentialMode)
@@ -223,16 +223,10 @@ class AutofillSettingsViewModel @Inject constructor(
         pixel.fire(AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED)
     }
 
-    fun onAuthenticationEnded() {
-        _viewState.value = viewState.value.copy(isAuthenticating = false)
-    }
-
     data class ViewState(
         val autofillEnabled: Boolean = true,
         val logins: List<LoginCredentials> = emptyList(),
         val credentialMode: CredentialMode = NotInCredentialMode,
-        val isAuthenticating: Boolean = false,
-        val isLocked: Boolean = false,
     )
 
     sealed class CredentialMode(open val credentialsViewed: LoginCredentials?) {
@@ -266,6 +260,7 @@ class AutofillSettingsViewModel @Inject constructor(
         object ExitCredentialMode : Command()
         object ExitListMode : Command()
         object ExitLockedMode : Command()
+        object InitialiseViewAfterUnlock : Command()
         object ExitDisabledMode : Command()
     }
 }
