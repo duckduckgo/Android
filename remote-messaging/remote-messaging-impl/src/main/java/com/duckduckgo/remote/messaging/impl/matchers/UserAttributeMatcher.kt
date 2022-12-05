@@ -17,61 +17,45 @@
 package com.duckduckgo.remote.messaging.impl.matchers
 
 import com.duckduckgo.browser.api.UserBrowserProperties
-import com.duckduckgo.remote.messaging.impl.models.IntMatchingAttribute
-import com.duckduckgo.remote.messaging.impl.models.MATCHING_ATTR_INT_DEFAULT_VALUE
-import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
-import com.duckduckgo.remote.messaging.impl.models.RangeIntMatchingAttribute
-import com.duckduckgo.remote.messaging.impl.models.matches
+import com.duckduckgo.remote.messaging.api.AttributeMatcherPlugin
+import com.duckduckgo.remote.messaging.api.MatchingAttribute
+import com.duckduckgo.remote.messaging.impl.models.*
 
 class UserAttributeMatcher(
     private val userBrowserProperties: UserBrowserProperties,
-) : AttributeMatcher {
-    override suspend fun evaluate(matchingAttribute: MatchingAttribute): EvaluationResult? {
-        when (matchingAttribute) {
-            is MatchingAttribute.AppTheme -> {
-                return matchingAttribute.matches(userBrowserProperties.appTheme().toString())
+) : AttributeMatcherPlugin {
+    override suspend fun evaluate(matchingAttribute: MatchingAttribute<*>): Boolean? {
+        return when (matchingAttribute) {
+            is AppTheme -> {
+                matchingAttribute.matches(userBrowserProperties.appTheme().toString())
             }
-            is MatchingAttribute.Bookmarks -> {
-                if (matchingAttribute == MatchingAttribute.Bookmarks()) return EvaluationResult.Fail
-                if (matchingAttribute.value != MATCHING_ATTR_INT_DEFAULT_VALUE) {
-                    return (matchingAttribute as IntMatchingAttribute).matches(userBrowserProperties.bookmarks().toInt())
-                }
-                return (matchingAttribute as RangeIntMatchingAttribute).matches(userBrowserProperties.bookmarks().toInt())
+            is Bookmarks -> {
+                matchingAttribute.matches(userBrowserProperties.bookmarks().toInt())
             }
-            is MatchingAttribute.DaysSinceInstalled -> {
-                if (matchingAttribute == MatchingAttribute.DaysSinceInstalled()) return EvaluationResult.Fail
-
-                if (matchingAttribute.value != MATCHING_ATTR_INT_DEFAULT_VALUE) {
-                    return (matchingAttribute as IntMatchingAttribute).matches(userBrowserProperties.daysSinceInstalled().toInt())
-                }
-                return (matchingAttribute as RangeIntMatchingAttribute).matches(userBrowserProperties.daysSinceInstalled().toInt())
+            is DaysSinceInstalled -> {
+                matchingAttribute.matches(userBrowserProperties.daysSinceInstalled().toInt())
             }
-            is MatchingAttribute.DaysUsedSince -> {
+            is DaysUsedSince -> {
                 val daysUsedSince = userBrowserProperties.daysUsedSince(matchingAttribute.since)
-                return matchingAttribute.matches(daysUsedSince.toInt())
+                matchingAttribute.matches(daysUsedSince.toInt())
             }
-            is MatchingAttribute.DefaultBrowser -> {
-                return matchingAttribute.matches(userBrowserProperties.defaultBrowser())
+            is DefaultBrowser -> {
+                matchingAttribute.matches(userBrowserProperties.defaultBrowser())
             }
-            is MatchingAttribute.EmailEnabled -> {
-                return matchingAttribute.matches(userBrowserProperties.emailEnabled())
+            is EmailEnabled -> {
+                matchingAttribute.matches(userBrowserProperties.emailEnabled())
             }
-            is MatchingAttribute.Favorites -> {
-                if (matchingAttribute == MatchingAttribute.Favorites()) return EvaluationResult.Fail
-                if (matchingAttribute.value != MATCHING_ATTR_INT_DEFAULT_VALUE) {
-                    return (matchingAttribute as IntMatchingAttribute).matches(userBrowserProperties.favorites().toInt())
-                }
-                return (matchingAttribute as RangeIntMatchingAttribute).matches(userBrowserProperties.favorites().toInt())
+            is Favorites -> {
+                matchingAttribute.matches(userBrowserProperties.favorites().toInt())
             }
-            is MatchingAttribute.SearchCount -> {
-                if (matchingAttribute == MatchingAttribute.SearchCount()) return EvaluationResult.Fail
-                if (matchingAttribute.value != MATCHING_ATTR_INT_DEFAULT_VALUE) {
-                    return (matchingAttribute as IntMatchingAttribute).matches(userBrowserProperties.searchCount().toInt())
-                }
-                return (matchingAttribute as RangeIntMatchingAttribute).matches(userBrowserProperties.searchCount().toInt())
+            is SearchCount -> {
+                matchingAttribute.matches(userBrowserProperties.searchCount().toInt())
             }
-            is MatchingAttribute.WidgetAdded -> {
-                return matchingAttribute.matches(userBrowserProperties.widgetAdded())
+            is WidgetAdded -> {
+                matchingAttribute.matches(userBrowserProperties.widgetAdded())
+            }
+            is AppTpOnboarded -> {
+                matchingAttribute.matches(userBrowserProperties.appTpOnboarded())
             }
             else -> return null
         }

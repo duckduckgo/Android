@@ -25,6 +25,7 @@ import com.duckduckgo.app.usage.app.AppDaysUsedRepository
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import java.util.*
@@ -38,6 +39,7 @@ class AndroidUserBrowserProperties(
     private val emailManager: EmailManager,
     private val searchCountDao: SearchCountDao,
     private val appDaysUsedRepository: AppDaysUsedRepository,
+    private val appTrackingProtection: AppTrackingProtection,
 ) : UserBrowserProperties {
     override fun appTheme(): DuckDuckGoTheme {
         return themingDataStore.theme
@@ -73,5 +75,9 @@ class AndroidUserBrowserProperties(
 
     override fun widgetAdded(): Boolean {
         return widgetCapabilities.hasInstalledWidgets
+    }
+
+    override fun appTpOnboarded(): Boolean {
+        return appTrackingProtection.isOnboarded()
     }
 }

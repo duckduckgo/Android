@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,8 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.browser.api
+package com.duckduckgo.mobile.android.app.tracking
 
-import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
-import java.util.*
-
-interface UserBrowserProperties {
-    fun appTheme(): DuckDuckGoTheme
-    suspend fun bookmarks(): Long
-    suspend fun favorites(): Long
-    fun daysSinceInstalled(): Long
-    suspend fun daysUsedSince(since: Date): Long
-    fun defaultBrowser(): Boolean
-    fun emailEnabled(): Boolean
-    fun searchCount(): Long
-    fun widgetAdded(): Boolean
-    fun appTpOnboarded(): Boolean
+interface AppTrackingProtection {
+    fun isOnboarded(): Boolean
 }

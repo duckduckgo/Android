@@ -200,6 +200,7 @@ import com.duckduckgo.mobile.android.ui.view.dialog.CustomAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.dialog.DaxAlertDialog
 import com.duckduckgo.mobile.android.ui.view.dialog.StackedAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnOnboardingActivity
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
@@ -1023,6 +1024,7 @@ class BrowserTabFragment :
             is Command.SubmitUrl -> submitQuery(it.url)
             is Command.LaunchAddWidget -> addWidgetLauncher.launchAddWidget(activity)
             is Command.LaunchDefaultBrowser -> launchDefaultBrowser()
+            is Command.LaunchAppTPOnboarding -> launchAppTPOnboardingScreen()
             is Command.RequiresAuthentication -> showAuthenticationDialog(it.request)
             is Command.SaveCredentials -> saveBasicAuthCredentials(it.request, it.credentials)
             is Command.GenerateWebViewPreviewImage -> generateWebViewPreviewImage()
@@ -2460,6 +2462,10 @@ class BrowserTabFragment :
         if (appBuildConfig.sdkInt >= Build.VERSION_CODES.N) {
             requireActivity().launchDefaultAppActivity()
         }
+    }
+
+    private fun launchAppTPOnboardingScreen() {
+        startActivity(VpnOnboardingActivity.intent(requireContext()))
     }
 
     private fun launchSurvey(survey: Survey) {

@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.remote.messaging.impl.matchers
+package com.duckduckgo.remote.messaging.api
 
-import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
+interface AttributeMatcherPlugin {
+    suspend fun evaluate(matchingAttribute: MatchingAttribute<*>): Boolean?
+}
 
-interface AttributeMatcher {
-    suspend fun evaluate(matchingAttribute: MatchingAttribute): EvaluationResult?
+interface MatchingAttribute<T> {
+    fun matches(matchingValue: T): Boolean?
 }
