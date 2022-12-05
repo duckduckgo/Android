@@ -35,7 +35,6 @@ import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.view.setEnabledOpacity
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import kotlin.Int.Companion
 
 class TwoLineListItem @JvmOverloads constructor(
     context: Context,
