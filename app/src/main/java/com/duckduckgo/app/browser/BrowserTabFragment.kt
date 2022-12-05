@@ -65,7 +65,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
@@ -670,9 +669,6 @@ class BrowserTabFragment :
     }
 
     override fun onStop() {
-        // workaround for: https://app.asana.com/0/0/1202537960603388/f
-        renderer.cancelTrackersAnimation()
-        trackerAnimationContainer.removeAllViews()
         alertDialog?.dismiss()
         super.onStop()
     }
@@ -2765,22 +2761,12 @@ class BrowserTabFragment :
                 if (lastSeenOmnibarViewState?.isEditing != true) {
                     val site = viewModel.siteLiveData.value
                     val events = site?.orderedTrackerBlockedEntities()
-
-                    // workaround for: https://app.asana.com/0/0/1202537960603388/f
-                    val trackersAnimation = trackerAnimationContainer.findViewById<LottieAnimationView>(R.id.trackersAnimation)
-                    val trackerAnimationView = if (trackersAnimation?.isAttachedToWindow == true) {
-                        trackersAnimation
-                    } else {
-                        layoutInflater.inflate(R.layout.view_tracker_animation, trackerAnimationContainer, true)
-                            .findViewById<LottieAnimationView>(R.id.trackersAnimation)
-                    }
-
                     activity?.let { activity ->
                         animatorHelper.startTrackersAnimation(
                             context = activity,
                             shouldRunPartialAnimation = lastSeenCtaViewState?.cta is DaxTrackersBlockedCta,
                             shieldAnimationView = shieldIcon,
-                            trackersAnimationView = trackerAnimationView,
+                            trackersAnimationView = trackersAnimation,
                             omnibarViews = omnibarViews(),
                             entities = events,
                         )

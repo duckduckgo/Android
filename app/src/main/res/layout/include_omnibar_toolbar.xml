@@ -55,17 +55,18 @@
                     android:layout_margin="8dp"
                     android:background="@drawable/omnibar_field_background">
 
-                    <FrameLayout
-                        android:id="@+id/trackerAnimationContainer"
+                    <com.airbnb.lottie.LottieAnimationView
+                        android:id="@+id/trackersAnimation"
                         android:layout_width="wrap_content"
                         android:layout_height="0dp"
+                        android:importantForAccessibility="no"
+                        android:paddingStart="16dp"
+                        app:lottie_autoPlay="false"
+                        android:scaleType="centerCrop"
+                        android:saveEnabled="false"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="@id/omniBarContainer"
-                        app:layout_constraintTop_toTopOf="parent">
-
-                        <include layout="@layout/view_tracker_animation"/>
-
-                    </FrameLayout>
+                        app:layout_constraintTop_toTopOf="parent"/>
 
                     <com.airbnb.lottie.LottieAnimationView
                         android:id="@+id/shieldIcon"
