@@ -215,8 +215,13 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
 
         // We need to rethink how to log this state. This will likely change.
         vpnServiceStateStatsDao.insert(VpnServiceStateStats(state = ENABLING))
-        vpnNetworkStack.onPrepareVpn().getOrThrow().let {
-            createTunnelInterface(it)
+        vpnNetworkStack.onPrepareVpn().getOrNull().also {
+            if (it != null) {
+                createTunnelInterface(it)
+            } else {
+                Timber.e("Failed to obtain config needed to establish the TUN interface")
+                stopVpn(VpnStopReason.ERROR)
+            }
         }
 
         if (tunInterface == null) {
@@ -234,7 +239,11 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             Timber.v("NetworkSwitchHandling disabled...skip setting underlying network")
         }
 
-        vpnNetworkStack.onStartVpn(tunInterface!!).getOrThrow()
+        vpnNetworkStack.onStartVpn(tunInterface!!).getOrElse {
+            Timber.e("Failed to start VPN")
+            stopVpn(VpnStopReason.ERROR)
+            return@withContext
+        }
 
         vpnServiceCallbacksPluginPoint.getPlugins().forEach {
             Timber.v("VPN log: starting ${it.javaClass} callback")
