@@ -23,17 +23,17 @@ import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 interface NetworkProtectionPrefs {
     fun putString(
         key: String,
-        value: String
+        value: String,
     )
 
     fun getString(
         key: String,
-        default: String?
+        default: String?,
     ): String?
 }
 
 class RealNetworkProtectionPrefs constructor(
-    private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider
+    private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
 ) : NetworkProtectionPrefs {
     private val prefs: SharedPreferences by lazy {
         vpnSharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = true, migrate = true)
@@ -41,14 +41,14 @@ class RealNetworkProtectionPrefs constructor(
 
     override fun putString(
         key: String,
-        value: String
+        value: String,
     ) {
         prefs.edit { putString(key, value) }
     }
 
     override fun getString(
         key: String,
-        default: String?
+        default: String?,
     ): String? = prefs.getString(key, default)
 
     companion object {

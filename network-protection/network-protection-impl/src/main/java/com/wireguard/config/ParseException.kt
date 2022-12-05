@@ -13,5 +13,5 @@ class ParseException @JvmOverloads constructor(
     val parsingClass: Class<*>,
     val text: CharSequence,
     message: String? = null,
-    cause: Throwable? = null
+    cause: Throwable? = null,
 ) : Exception(message, cause)

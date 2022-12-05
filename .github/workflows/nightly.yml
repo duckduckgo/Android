@@ -77,6 +77,11 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
 
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.18.3'
+
       - name: Lint
         uses: gradle/gradle-build-action@v2
         with:
@@ -108,6 +113,11 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.18.3'
 
       - name: Decode secret
         env:

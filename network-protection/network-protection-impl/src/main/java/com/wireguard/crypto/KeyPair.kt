@@ -18,7 +18,7 @@ class KeyPair @JvmOverloads constructor(
      *
      * @return the private key
      */
-    val privateKey: Key = Key.generatePrivateKey()
+    val privateKey: Key = Key.generatePrivateKey(),
 ) {
     /**
      * Returns the public key from the key pair.

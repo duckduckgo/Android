@@ -45,7 +45,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
     private val viewModel: NetworkProtectionManagementViewModel by bindViewModel()
     private val vpnPermissionRequestActivityResult =
         registerForActivityResult(StartActivityForResult()) {
-            if(it.resultCode == RESULT_OK) {
+            if (it.resultCode == RESULT_OK) {
                 viewModel.onStartVpn()
             }
         }

@@ -19,7 +19,6 @@ package com.duckduckgo.networkprotection.impl.di
 import android.content.Context
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
-import com.duckduckgo.networkprotection.impl.configuration.WgVpnControllerService
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.store.RealNetworkProtectionPrefs
 import com.duckduckgo.networkprotection.store.RealNetworkProtectionRepository
@@ -27,8 +26,6 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
-import retrofit2.Retrofit
-import javax.inject.Named
 
 @Module
 @ContributesTo(VpnScope::class)
@@ -37,14 +34,6 @@ class DataModule {
     @SingleInstanceIn(VpnScope::class)
     fun provideNetworkProtectionRepository(
         context: Context,
-        vpnSharedPreferencesProvider: VpnSharedPreferencesProvider
+        vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
     ): NetworkProtectionRepository = RealNetworkProtectionRepository(RealNetworkProtectionPrefs(vpnSharedPreferencesProvider))
-}
-
-@Module
-@ContributesTo(VpnScope::class)
-class NetworkModule {
-    @Provides
-    fun provideWgVpnControllerService(@Named("api") retrofit: Retrofit): WgVpnControllerService =
-        retrofit.create(WgVpnControllerService::class.java)
 }

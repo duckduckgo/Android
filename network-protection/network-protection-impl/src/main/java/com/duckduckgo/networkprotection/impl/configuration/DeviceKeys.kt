@@ -30,7 +30,7 @@ interface DeviceKeys {
 
 @ContributesBinding(VpnScope::class)
 class RealDeviceKeys @Inject constructor(
-    private val networkProtectionRepository: NetworkProtectionRepository
+    private val networkProtectionRepository: NetworkProtectionRepository,
 ) : DeviceKeys {
     override val publicKey: String
         get() = KeyPair(Key.fromBase64(privateKey)).publicKey.toBase64()

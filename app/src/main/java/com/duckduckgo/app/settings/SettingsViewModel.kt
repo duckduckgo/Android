@@ -215,7 +215,7 @@ class SettingsViewModel @Inject constructor(
                 val isDeviceShieldEnabled = vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)
                 if (currentViewState().networkProtectionEnabled != isDeviceShieldEnabled) {
                     viewState.value = currentViewState().copy(
-                        networkProtectionEnabled = isDeviceShieldEnabled
+                        networkProtectionEnabled = isDeviceShieldEnabled,
                     )
                 }
                 delay(1_000)

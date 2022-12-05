@@ -4,8 +4,8 @@
  */
 package com.wireguard.config
 
-import com.wireguard.config.Attribute.Companion.parse
 import com.wireguard.config.Attribute.Companion.join
+import com.wireguard.config.Attribute.Companion.parse
 import com.wireguard.config.Attribute.Companion.split
 import com.wireguard.crypto.Key
 import com.wireguard.crypto.KeyFormatException
@@ -19,7 +19,7 @@ import java.lang.StringBuilder
  *
  * Instances of this class are immutable.
  */
-class Peer private constructor(builder: Builder) {// The collection is already immutable.
+class Peer private constructor(builder: Builder) { // The collection is already immutable.
     /**
      * Returns the peer's set of allowed IPs.
      *
@@ -158,12 +158,14 @@ class Peer private constructor(builder: Builder) {// The collection is already i
 
         @Throws(BadConfigException::class)
         fun build(): Peer {
-            if (publicKey == null) throw BadConfigException(
-                BadConfigException.Section.PEER,
-                BadConfigException.Location.PUBLIC_KEY,
-                BadConfigException.Reason.MISSING_ATTRIBUTE,
-                null
-            )
+            if (publicKey == null) {
+                throw BadConfigException(
+                    BadConfigException.Section.PEER,
+                    BadConfigException.Location.PUBLIC_KEY,
+                    BadConfigException.Reason.MISSING_ATTRIBUTE,
+                    null,
+                )
+            }
             return Peer(this)
         }
 
@@ -172,15 +174,15 @@ class Peer private constructor(builder: Builder) {// The collection is already i
             return try {
                 for (allowedIp in split(allowedIps)) addAllowedIp(
                     InetNetwork.parse(
-                        allowedIp
-                    )
+                        allowedIp,
+                    ),
                 )
                 this
             } catch (e: ParseException) {
                 throw BadConfigException(
                     BadConfigException.Section.PEER,
                     BadConfigException.Location.ALLOWED_IPS,
-                    e
+                    e,
                 )
             }
         }
@@ -193,7 +195,7 @@ class Peer private constructor(builder: Builder) {// The collection is already i
                 throw BadConfigException(
                     BadConfigException.Section.PEER,
                     BadConfigException.Location.ENDPOINT,
-                    e
+                    e,
                 )
             }
         }
@@ -207,7 +209,7 @@ class Peer private constructor(builder: Builder) {// The collection is already i
                     BadConfigException.Section.PEER,
                     BadConfigException.Location.PERSISTENT_KEEPALIVE,
                     persistentKeepalive,
-                    e
+                    e,
                 )
             }
         }
@@ -220,7 +222,7 @@ class Peer private constructor(builder: Builder) {// The collection is already i
                 throw BadConfigException(
                     BadConfigException.Section.PEER,
                     BadConfigException.Location.PRE_SHARED_KEY,
-                    e
+                    e,
                 )
             }
         }
@@ -233,7 +235,7 @@ class Peer private constructor(builder: Builder) {// The collection is already i
                 throw BadConfigException(
                     BadConfigException.Section.PEER,
                     BadConfigException.Location.PUBLIC_KEY,
-                    e
+                    e,
                 )
             }
         }
@@ -245,12 +247,14 @@ class Peer private constructor(builder: Builder) {// The collection is already i
 
         @Throws(BadConfigException::class)
         fun setPersistentKeepalive(persistentKeepalive: Int): Builder {
-            if (persistentKeepalive < 0 || persistentKeepalive > MAX_PERSISTENT_KEEPALIVE) throw BadConfigException(
-                BadConfigException.Section.PEER,
-                BadConfigException.Location.PERSISTENT_KEEPALIVE,
-                BadConfigException.Reason.INVALID_VALUE,
-                persistentKeepalive.toString()
-            )
+            if (persistentKeepalive < 0 || persistentKeepalive > MAX_PERSISTENT_KEEPALIVE) {
+                throw BadConfigException(
+                    BadConfigException.Section.PEER,
+                    BadConfigException.Location.PERSISTENT_KEEPALIVE,
+                    BadConfigException.Reason.INVALID_VALUE,
+                    persistentKeepalive.toString(),
+                )
+            }
             this.persistentKeepalive = if (persistentKeepalive == 0) null else persistentKeepalive
             return this
         }
@@ -284,10 +288,12 @@ class Peer private constructor(builder: Builder) {// The collection is already i
             val builder = Builder()
             for (line in lines) {
                 val attribute: Attribute = parse(
-                    line
+                    line,
                 ) ?: throw BadConfigException(
-                    BadConfigException.Section.PEER, BadConfigException.Location.TOP_LEVEL,
-                    BadConfigException.Reason.SYNTAX_ERROR, line
+                    BadConfigException.Section.PEER,
+                    BadConfigException.Location.TOP_LEVEL,
+                    BadConfigException.Reason.SYNTAX_ERROR,
+                    line,
                 )
 
                 when (attribute.key.lowercase()) {
@@ -297,13 +303,14 @@ class Peer private constructor(builder: Builder) {// The collection is already i
                     "presharedkey" -> builder.parsePreSharedKey(attribute.value)
                     "publickey" -> builder.parsePublicKey(attribute.value)
                     else -> throw BadConfigException(
-                        BadConfigException.Section.PEER, BadConfigException.Location.TOP_LEVEL,
-                        BadConfigException.Reason.UNKNOWN_ATTRIBUTE, attribute.key
+                        BadConfigException.Section.PEER,
+                        BadConfigException.Location.TOP_LEVEL,
+                        BadConfigException.Reason.UNKNOWN_ATTRIBUTE,
+                        attribute.key,
                     )
                 }
             }
             return builder.build()
         }
     }
-
 }

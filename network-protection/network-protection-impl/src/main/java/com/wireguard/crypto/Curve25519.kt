@@ -384,8 +384,10 @@ class Curve25519 private constructor() {
          */
         @JvmStatic
         fun eval(
-            result: ByteArray, offset: Int,
-            privateKey: ByteArray, publicKey: ByteArray?
+            result: ByteArray,
+            offset: Int,
+            privateKey: ByteArray,
+            publicKey: ByteArray?,
         ) {
             val state = Curve25519()
             try {
@@ -434,9 +436,13 @@ class Curve25519 private constructor() {
                 for (index in 0..31) {
                     val bit = index * 8 % 26
                     val word = index * 8 / 26
-                    if (bit <= 26 - 8) result[offset + index] =
-                        (state.x_2[word] shr bit).toByte() else result[offset + index] =
-                        (state.x_2[word] shr bit or (state.x_2[word + 1] shl 26 - bit)).toByte()
+                    if (bit <= 26 - 8) {
+                        result[offset + index] =
+                            (state.x_2[word] shr bit).toByte()
+                    } else {
+                        result[offset + index] =
+                            (state.x_2[word] shr bit or (state.x_2[word + 1] shl 26 - bit)).toByte()
+                    }
                 }
             } finally {
                 // Clean up all temporary state before we exit.

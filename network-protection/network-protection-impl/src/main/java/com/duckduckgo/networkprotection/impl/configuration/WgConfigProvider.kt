@@ -30,7 +30,7 @@ interface WgConfigProvider {
 @ContributesBinding(VpnScope::class)
 class RealWgConfigProvider @Inject constructor(
     private val deviceKeys: DeviceKeys,
-    private val wgServerDataProvider: WgServerDataProvider
+    private val wgServerDataProvider: WgServerDataProvider,
 ) : WgConfigProvider {
 
     override suspend fun get(): Config {

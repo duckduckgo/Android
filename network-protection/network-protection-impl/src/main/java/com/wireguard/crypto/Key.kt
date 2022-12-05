@@ -22,7 +22,7 @@ class Key private constructor(key: ByteArray) {
         if (obj == null || obj.javaClass != javaClass) return false
         val other = obj as Key
         return MessageDigest.isEqual(key, other.key)
-    }// Defensively copy to ensure immutability.
+    } // Defensively copy to ensure immutability.
 
     /**
      * Returns the key as an array of bytes.
@@ -30,7 +30,7 @@ class Key private constructor(key: ByteArray) {
      * @return an array of bytes containing the raw binary key
      */
     val bytes: ByteArray
-        get() =// Defensively copy to ensure immutability.
+        get() = // Defensively copy to ensure immutability.
             key.copyOf(key.size)
 
     override fun hashCode(): Int {
@@ -55,7 +55,7 @@ class Key private constructor(key: ByteArray) {
         val endSegment = byteArrayOf(
             key[i * 3],
             key[i * 3 + 1],
-            0
+            0,
         )
         encodeBase64(endSegment, 0, output, i * 4)
         output[Format.BASE64.length - 1] = '='
@@ -70,10 +70,14 @@ class Key private constructor(key: ByteArray) {
     fun toHex(): String {
         val output = CharArray(Format.HEX.length)
         for (i in key.indices) {
-            output[i * 2] = (87 + (key[i] shr 4 and 0xf)
-                    + ((key[i] shr 4 and 0xf) - 10 shr 8 and 38.inv())).toChar()
-            output[i * 2 + 1] = (87 + (key[i].and(0xf))
-                    + ((key[i].and(0xf)) - 10 shr 8 and 38.inv())).toChar()
+            output[i * 2] = (
+                87 + (key[i] shr 4 and 0xf) +
+                    ((key[i] shr 4 and 0xf) - 10 shr 8 and 38.inv())
+                ).toChar()
+            output[i * 2 + 1] = (
+                87 + (key[i].and(0xf)) +
+                    ((key[i].and(0xf)) - 10 shr 8 and 38.inv())
+                ).toChar()
         }
         return String(output)
     }
@@ -83,7 +87,6 @@ class Key private constructor(key: ByteArray) {
      */
     enum class Format(val length: Int) {
         BASE64(44), BINARY(32), HEX(64);
-
     }
 
     companion object {
@@ -99,12 +102,16 @@ class Key private constructor(key: ByteArray) {
             var `val` = 0
             for (i in 0..3) {
                 val c = src[i + srcOffset]
-                `val` = `val` or ((-1
-                        + ('A'.code - 1 - c.code and c.code - ('Z'.code + 1) ushr 8 and c.code - 64)
-                        + ('a'.code - 1 - c.code and c.code - ('z'.code + 1) ushr 8 and c.code - 70)
-                        + ('0'.code - 1 - c.code and c.code - ('9'.code + 1) ushr 8 and c.code + 5)
-                        + ('+'.code - 1 - c.code and c.code - ('+'.code + 1) ushr 8 and 63)
-                        + ('/'.code - 1 - c.code and c.code - ('/'.code + 1) ushr 8 and 64)) shl 18 - 6 * i)
+                `val` = `val` or (
+                    (
+                        -1 +
+                            ('A'.code - 1 - c.code and c.code - ('Z'.code + 1) ushr 8 and c.code - 64) +
+                            ('a'.code - 1 - c.code and c.code - ('z'.code + 1) ushr 8 and c.code - 70) +
+                            ('0'.code - 1 - c.code and c.code - ('9'.code + 1) ushr 8 and c.code + 5) +
+                            ('+'.code - 1 - c.code and c.code - ('+'.code + 1) ushr 8 and 63) +
+                            ('/'.code - 1 - c.code and c.code - ('/'.code + 1) ushr 8 and 64)
+                        ) shl 18 - 6 * i
+                    )
             }
             return `val`
         }
@@ -118,21 +125,29 @@ class Key private constructor(key: ByteArray) {
          * @param destOffset the offset of the beginning of the chunk in `dest`
          */
         private fun encodeBase64(
-            src: ByteArray, srcOffset: Int,
-            dest: CharArray, destOffset: Int
+            src: ByteArray,
+            srcOffset: Int,
+            dest: CharArray,
+            destOffset: Int,
         ) {
             val input = byteArrayOf(
                 (src[srcOffset] ushr 2 and 63).toByte(),
                 (src[srcOffset] shl 4 or (src[1 + srcOffset] and 0xff ushr 4) and 63).toByte(),
                 (src[1 + srcOffset] shl 2 or (src[2 + srcOffset] and 0xff ushr 6) and 63).toByte(),
-                (src[2 + srcOffset].and(63)).toByte()
+                (src[2 + srcOffset].and(63)).toByte(),
             )
             for (i in 0..3) {
-                dest[i + destOffset] = (((input[i] + 'A'.code
-                        + (25 - input[i] ushr 8 and 6))
-                        - (51 - input[i] ushr 8 and 75)
-                        - (61 - input[i] ushr 8 and 15))
-                        + (62 - input[i] ushr 8 and 3)).toChar()
+                dest[i + destOffset] = (
+                    (
+                        (
+                            input[i] + 'A'.code +
+                                (25 - input[i] ushr 8 and 6)
+                            ) -
+                            (51 - input[i] ushr 8 and 75) -
+                            (61 - input[i] ushr 8 and 15)
+                        ) +
+                        (62 - input[i] ushr 8 and 3)
+                    ).toChar()
             }
         }
 
@@ -146,9 +161,12 @@ class Key private constructor(key: ByteArray) {
         @Throws(KeyFormatException::class)
         fun fromBase64(str: String): Key {
             val input = str.toCharArray()
-            if (input.size != Format.BASE64.length || input[Format.BASE64.length - 1] != '=') throw KeyFormatException(
-                Format.BASE64, KeyFormatException.Type.LENGTH
-            )
+            if (input.size != Format.BASE64.length || input[Format.BASE64.length - 1] != '=') {
+                throw KeyFormatException(
+                    Format.BASE64,
+                    KeyFormatException.Type.LENGTH,
+                )
+            }
             val key = ByteArray(Format.BINARY.length)
             var i: Int
             var ret = 0
@@ -165,7 +183,7 @@ class Key private constructor(key: ByteArray) {
                 input[i * 4],
                 input[i * 4 + 1],
                 input[i * 4 + 2],
-                'A'
+                'A',
             )
             val `val` = decodeBase64(endSegment, 0)
             ret = ret or (`val` ushr 31 or (`val` and 0xff))
@@ -184,10 +202,12 @@ class Key private constructor(key: ByteArray) {
          */
         @Throws(KeyFormatException::class)
         fun fromBytes(bytes: ByteArray): Key {
-            if (bytes.size != Format.BINARY.length) throw KeyFormatException(
-                Format.BINARY,
-                KeyFormatException.Type.LENGTH
-            )
+            if (bytes.size != Format.BINARY.length) {
+                throw KeyFormatException(
+                    Format.BINARY,
+                    KeyFormatException.Type.LENGTH,
+                )
+            }
             return Key(bytes)
         }
 
@@ -201,10 +221,12 @@ class Key private constructor(key: ByteArray) {
         @Throws(KeyFormatException::class)
         fun fromHex(str: String): Key {
             val input = str.toCharArray()
-            if (input.size != Format.HEX.length) throw KeyFormatException(
-                Format.HEX,
-                KeyFormatException.Type.LENGTH
-            )
+            if (input.size != Format.HEX.length) {
+                throw KeyFormatException(
+                    Format.HEX,
+                    KeyFormatException.Type.LENGTH,
+                )
+            }
             val key = ByteArray(Format.BINARY.length)
             var ret = 0
             for (i in key.indices) {

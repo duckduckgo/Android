@@ -17,7 +17,7 @@ import java.util.regex.Pattern
 class InetEndpoint private constructor(
     val host: String,
     private val isResolved: Boolean,
-    val port: Int
+    val port: Int,
 ) {
     private val lock = Any()
     private var lastResolutionInMillis = 0L
@@ -37,13 +37,12 @@ class InetEndpoint private constructor(
     fun getResolved(): InetEndpoint? {
         if (isResolved) return this
         synchronized(lock) {
-
-            //TODO(zx2c4): Implement a real timeout mechanism using DNS TTL
+            // TODO(zx2c4): Implement a real timeout mechanism using DNS TTL
             if (System.currentTimeMillis() - lastResolutionInMillis > 1) {
                 try {
                     // Prefer v4 endpoints over v6 to work around DNS64 and IPv6 NAT issues.
                     val candidates = InetAddress.getAllByName(
-                        host
+                        host,
                     )
                     var address = candidates[0]
                     for (candidate in candidates) {
@@ -68,7 +67,7 @@ class InetEndpoint private constructor(
 
     override fun toString(): String {
         val isBareIpv6 = isResolved && BARE_IPV6.matcher(
-            host
+            host,
         ).matches()
         return (if (isBareIpv6) "[$host]" else host) + ':' + port
     }
@@ -80,17 +79,25 @@ class InetEndpoint private constructor(
         @JvmStatic
         @Throws(ParseException::class)
         fun parse(endpoint: String): InetEndpoint {
-            if (FORBIDDEN_CHARACTERS.matcher(endpoint).find()) throw ParseException(
-                InetEndpoint::class.java, endpoint, "Forbidden characters"
-            )
+            if (FORBIDDEN_CHARACTERS.matcher(endpoint).find()) {
+                throw ParseException(
+                    InetEndpoint::class.java,
+                    endpoint,
+                    "Forbidden characters",
+                )
+            }
             val uri: URI = try {
                 URI("wg://$endpoint")
             } catch (e: URISyntaxException) {
                 throw ParseException(InetEndpoint::class.java, endpoint, null, e)
             }
-            if (uri.port < 0 || uri.port > 65535) throw ParseException(
-                InetEndpoint::class.java, endpoint, "Missing/invalid port number"
-            )
+            if (uri.port < 0 || uri.port > 65535) {
+                throw ParseException(
+                    InetEndpoint::class.java,
+                    endpoint,
+                    "Missing/invalid port number",
+                )
+            }
             return try {
                 InetAddresses.parse(uri.host)
                 // Parsing ths host as a numeric address worked, so we don't need to do DNS lookups.

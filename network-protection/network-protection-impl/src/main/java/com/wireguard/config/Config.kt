@@ -36,7 +36,8 @@ class Config private constructor(builder: Builder) {
         this.addAll(builder.peers)
     }
 
-    @JvmName("getInterface1") fun getInterface(): Interface = `interface`
+    @JvmName("getInterface1")
+    fun getInterface(): Interface = `interface`
 
     override fun equals(obj: Any?): Boolean {
         if (obj !is Config) return false
@@ -174,7 +175,7 @@ class Config private constructor(builder: Builder) {
                             BadConfigException.Section.CONFIG,
                             BadConfigException.Location.TOP_LEVEL,
                             BadConfigException.Reason.UNKNOWN_SECTION,
-                            line
+                            line,
                         )
                     }
                 } else if (inInterfaceSection) {
@@ -183,16 +184,22 @@ class Config private constructor(builder: Builder) {
                     peerLines.add(line!!)
                 } else {
                     throw BadConfigException(
-                        BadConfigException.Section.CONFIG, BadConfigException.Location.TOP_LEVEL,
-                        BadConfigException.Reason.UNKNOWN_SECTION, line
+                        BadConfigException.Section.CONFIG,
+                        BadConfigException.Location.TOP_LEVEL,
+                        BadConfigException.Reason.UNKNOWN_SECTION,
+                        line,
                     )
                 }
             }
             if (inPeerSection) builder.parsePeer(peerLines)
-            if (!seenInterfaceSection) throw BadConfigException(
-                BadConfigException.Section.CONFIG, BadConfigException.Location.TOP_LEVEL,
-                BadConfigException.Reason.MISSING_SECTION, null
-            )
+            if (!seenInterfaceSection) {
+                throw BadConfigException(
+                    BadConfigException.Section.CONFIG,
+                    BadConfigException.Location.TOP_LEVEL,
+                    BadConfigException.Reason.MISSING_SECTION,
+                    null,
+                )
+            }
             // Combine all [Interface] sections in the file.
             builder.parseInterface(interfaceLines)
             return builder.build()

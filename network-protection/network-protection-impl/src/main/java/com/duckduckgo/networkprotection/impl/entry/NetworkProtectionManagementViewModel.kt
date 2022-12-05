@@ -31,6 +31,8 @@ import com.duckduckgo.networkprotection.impl.entry.NetworkProtectionManagementVi
 import com.duckduckgo.networkprotection.impl.entry.NetworkProtectionManagementViewModel.Command.RequestVPNPermission
 import com.duckduckgo.networkprotection.impl.entry.NetworkProtectionManagementViewModel.ConnectionState.Connected
 import com.duckduckgo.networkprotection.impl.entry.NetworkProtectionManagementViewModel.ConnectionState.Disconnected
+import java.util.concurrent.TimeUnit.SECONDS
+import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -41,14 +43,12 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.concurrent.TimeUnit.SECONDS
-import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class NetworkProtectionManagementViewModel @Inject constructor(
     private val vpnStateMonitor: VpnStateMonitor,
     private val featuresRegistry: VpnFeaturesRegistry,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
     private val refreshVpnRunningState = MutableStateFlow(System.currentTimeMillis())
@@ -60,7 +60,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     internal fun viewState(): Flow<ViewState> {
         return viewState.combine(getRunningState()) { viewState, vpnState ->
             viewState.copy(
-                connectionState = if (vpnState.state == VpnRunningState.ENABLED) Connected else Disconnected
+                connectionState = if (vpnState.state == VpnRunningState.ENABLED) Connected else Disconnected,
             )
         }
     }
@@ -69,8 +69,8 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         viewModelScope.launch {
             viewState.emit(
                 currentViewState().copy(
-                    connectionState = if (featuresRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)) Connected else Disconnected
-                )
+                    connectionState = if (featuresRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)) Connected else Disconnected,
+                ),
             )
         }
     }
@@ -126,11 +126,11 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     }
 
     data class ViewState(
-        val connectionState: ConnectionState = Disconnected
+        val connectionState: ConnectionState = Disconnected,
     )
 
     enum class ConnectionState {
         Connected,
-        Disconnected
+        Disconnected,
     }
 }

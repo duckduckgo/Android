@@ -4,8 +4,8 @@
  */
 package com.wireguard.config
 
-import com.wireguard.config.Attribute.Companion.parse
 import com.wireguard.config.Attribute.Companion.join
+import com.wireguard.config.Attribute.Companion.parse
 import com.wireguard.config.Attribute.Companion.split
 import com.wireguard.config.InetAddresses.isHostname
 import com.wireguard.crypto.Key
@@ -23,7 +23,7 @@ import java.net.InetAddress
  *
  * Instances of this class are immutable.
  */
-class Interface private constructor(builder: Builder) {// The collection is already immutable.
+class Interface private constructor(builder: Builder) { // The collection is already immutable.
     /**
      * Returns the set of IP addresses assigned to the interface.
      *
@@ -140,10 +140,14 @@ class Interface private constructor(builder: Builder) {// The collection is alre
             dnsServerStrings.addAll(dnsSearchDomains)
             sb.append("DNS = ").append(join(dnsServerStrings)).append('\n')
         }
-        if (!excludedApplications.isEmpty()) sb.append("ExcludedApplications = ")
-            .append(join(excludedApplications)).append('\n')
-        if (!includedApplications.isEmpty()) sb.append("IncludedApplications = ")
-            .append(join(includedApplications)).append('\n')
+        if (!excludedApplications.isEmpty()) {
+            sb.append("ExcludedApplications = ")
+                .append(join(excludedApplications)).append('\n')
+        }
+        if (!includedApplications.isEmpty()) {
+            sb.append("IncludedApplications = ")
+                .append(join(includedApplications)).append('\n')
+        }
         listenPort?.let { lp: Int? -> sb.append("ListenPort = ").append(lp).append('\n') }
         mtu?.let { m: Int? -> sb.append("MTU = ").append(m).append('\n') }
         sb.append("PrivateKey = ").append(keyPair.privateKey.toBase64()).append('\n')
@@ -219,16 +223,22 @@ class Interface private constructor(builder: Builder) {// The collection is alre
 
         @Throws(BadConfigException::class)
         fun build(): Interface {
-            if (keyPair == null) throw BadConfigException(
-                BadConfigException.Section.INTERFACE, BadConfigException.Location.PRIVATE_KEY,
-                BadConfigException.Reason.MISSING_ATTRIBUTE, null
-            )
-            if (includedApplications.isNotEmpty() && excludedApplications.isNotEmpty()) throw BadConfigException(
-                BadConfigException.Section.INTERFACE,
-                BadConfigException.Location.INCLUDED_APPLICATIONS,
-                BadConfigException.Reason.INVALID_KEY,
-                null
-            )
+            if (keyPair == null) {
+                throw BadConfigException(
+                    BadConfigException.Section.INTERFACE,
+                    BadConfigException.Location.PRIVATE_KEY,
+                    BadConfigException.Reason.MISSING_ATTRIBUTE,
+                    null,
+                )
+            }
+            if (includedApplications.isNotEmpty() && excludedApplications.isNotEmpty()) {
+                throw BadConfigException(
+                    BadConfigException.Section.INTERFACE,
+                    BadConfigException.Location.INCLUDED_APPLICATIONS,
+                    BadConfigException.Reason.INVALID_KEY,
+                    null,
+                )
+            }
             return Interface(this)
         }
 
@@ -257,15 +267,15 @@ class Interface private constructor(builder: Builder) {// The collection is alre
             return try {
                 for (address in split(addresses)) addAddress(
                     InetNetwork.parse(
-                        address
-                    )
+                        address,
+                    ),
                 )
                 this
             } catch (e: ParseException) {
                 throw BadConfigException(
                     BadConfigException.Section.INTERFACE,
                     BadConfigException.Location.ADDRESS,
-                    e
+                    e,
                 )
             }
         }
@@ -278,9 +288,11 @@ class Interface private constructor(builder: Builder) {// The collection is alre
                         addDnsServer(InetAddresses.parse(dnsServer))
                     } catch (e: ParseException) {
                         if (e.parsingClass != InetAddress::class.java || !isHostname(
-                                dnsServer
+                                dnsServer,
                             )
-                        ) throw e
+                        ) {
+                            throw e
+                        }
                         addDnsSearchDomain(dnsServer)
                     }
                 }
@@ -289,7 +301,7 @@ class Interface private constructor(builder: Builder) {// The collection is alre
                 throw BadConfigException(
                     BadConfigException.Section.INTERFACE,
                     BadConfigException.Location.DNS,
-                    e
+                    e,
                 )
             }
         }
@@ -298,9 +310,9 @@ class Interface private constructor(builder: Builder) {// The collection is alre
             return excludeApplications(
                 listOf(
                     *split(
-                        apps
-                    )
-                )
+                        apps,
+                    ),
+                ),
             )
         }
 
@@ -308,9 +320,9 @@ class Interface private constructor(builder: Builder) {// The collection is alre
             return includeApplications(
                 listOf(
                     *split(
-                        apps
-                    )
-                )
+                        apps,
+                    ),
+                ),
             )
         }
 
@@ -323,7 +335,7 @@ class Interface private constructor(builder: Builder) {// The collection is alre
                     BadConfigException.Section.INTERFACE,
                     BadConfigException.Location.LISTEN_PORT,
                     listenPort,
-                    e
+                    e,
                 )
             }
         }
@@ -337,7 +349,7 @@ class Interface private constructor(builder: Builder) {// The collection is alre
                     BadConfigException.Section.INTERFACE,
                     BadConfigException.Location.MTU,
                     mtu,
-                    e
+                    e,
                 )
             }
         }
@@ -350,7 +362,7 @@ class Interface private constructor(builder: Builder) {// The collection is alre
                 throw BadConfigException(
                     BadConfigException.Section.INTERFACE,
                     BadConfigException.Location.PRIVATE_KEY,
-                    e
+                    e,
                 )
             }
         }
@@ -362,20 +374,28 @@ class Interface private constructor(builder: Builder) {// The collection is alre
 
         @Throws(BadConfigException::class)
         fun setListenPort(listenPort: Int): Builder {
-            if (listenPort < MIN_UDP_PORT || listenPort > MAX_UDP_PORT) throw BadConfigException(
-                BadConfigException.Section.INTERFACE, BadConfigException.Location.LISTEN_PORT,
-                BadConfigException.Reason.INVALID_VALUE, listenPort.toString()
-            )
+            if (listenPort < MIN_UDP_PORT || listenPort > MAX_UDP_PORT) {
+                throw BadConfigException(
+                    BadConfigException.Section.INTERFACE,
+                    BadConfigException.Location.LISTEN_PORT,
+                    BadConfigException.Reason.INVALID_VALUE,
+                    listenPort.toString(),
+                )
+            }
             this.listenPort = if (listenPort == 0) null else listenPort
             return this
         }
 
         @Throws(BadConfigException::class)
         fun setMtu(mtu: Int): Builder {
-            if (mtu < 0) throw BadConfigException(
-                BadConfigException.Section.INTERFACE, BadConfigException.Location.LISTEN_PORT,
-                BadConfigException.Reason.INVALID_VALUE, mtu.toString()
-            )
+            if (mtu < 0) {
+                throw BadConfigException(
+                    BadConfigException.Section.INTERFACE,
+                    BadConfigException.Location.LISTEN_PORT,
+                    BadConfigException.Reason.INVALID_VALUE,
+                    mtu.toString(),
+                )
+            }
             this.mtu = if (mtu == 0) null else mtu
             return this
         }
@@ -397,10 +417,12 @@ class Interface private constructor(builder: Builder) {// The collection is alre
             val builder = Builder()
             for (line in lines) {
                 val attribute: Attribute = parse(
-                    line
+                    line,
                 ) ?: throw BadConfigException(
-                    BadConfigException.Section.INTERFACE, BadConfigException.Location.TOP_LEVEL,
-                    BadConfigException.Reason.SYNTAX_ERROR, line
+                    BadConfigException.Section.INTERFACE,
+                    BadConfigException.Location.TOP_LEVEL,
+                    BadConfigException.Reason.SYNTAX_ERROR,
+                    line,
                 )
                 when (attribute.key.lowercase()) {
                     "address" -> builder.parseAddresses(attribute.value)
@@ -411,8 +433,10 @@ class Interface private constructor(builder: Builder) {// The collection is alre
                     "mtu" -> builder.parseMtu(attribute.value)
                     "privatekey" -> builder.parsePrivateKey(attribute.value)
                     else -> throw BadConfigException(
-                        BadConfigException.Section.INTERFACE, BadConfigException.Location.TOP_LEVEL,
-                        BadConfigException.Reason.UNKNOWN_ATTRIBUTE, attribute.key
+                        BadConfigException.Section.INTERFACE,
+                        BadConfigException.Location.TOP_LEVEL,
+                        BadConfigException.Reason.UNKNOWN_ATTRIBUTE,
+                        attribute.key,
                     )
                 }
             }

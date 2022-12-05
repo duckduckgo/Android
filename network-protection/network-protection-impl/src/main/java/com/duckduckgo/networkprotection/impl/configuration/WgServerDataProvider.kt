@@ -34,7 +34,7 @@ interface WgServerDataProvider {
 
 @ContributesBinding(VpnScope::class)
 class RealWgServerDataProvider @Inject constructor(
-    private val wgVpnControllerService: WgVpnControllerService
+    private val wgVpnControllerService: WgVpnControllerService,
 ) : WgServerDataProvider {
     override suspend fun get(publicKey: String): WgServerData = wgVpnControllerService.registerKey(
         RegisterKeyBody(
@@ -48,4 +48,3 @@ class RealWgServerDataProvider @Inject constructor(
         address = allowedIPs.joinToString(","),
     )
 }
-

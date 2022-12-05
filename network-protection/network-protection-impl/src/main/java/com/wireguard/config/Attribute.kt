@@ -9,7 +9,7 @@ import java.util.regex.Pattern
 
 class Attribute private constructor(
     val key: String,
-    val value: String
+    val value: String,
 ) {
 
     companion object {

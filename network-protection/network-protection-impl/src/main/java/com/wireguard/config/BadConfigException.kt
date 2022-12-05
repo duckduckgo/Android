@@ -13,33 +13,33 @@ class BadConfigException private constructor(
     val location: Location,
     val reason: Reason,
     val text: CharSequence?,
-    cause: Throwable?
+    cause: Throwable?,
 ) : Exception(cause) {
 
     constructor(
         section: Section,
         location: Location,
         reason: Reason,
-        text: CharSequence?
+        text: CharSequence?,
     ) : this(section, location, reason, text, null)
 
     constructor(
         section: Section,
         location: Location,
-        cause: KeyFormatException?
+        cause: KeyFormatException?,
     ) : this(section, location, Reason.INVALID_KEY, null, cause)
 
     constructor(
         section: Section,
         location: Location,
         text: CharSequence?,
-        cause: NumberFormatException?
+        cause: NumberFormatException?,
     ) : this(section, location, Reason.INVALID_NUMBER, text, cause)
 
     constructor(
         section: Section,
         location: Location,
-        cause: ParseException
+        cause: ParseException,
     ) : this(section, location, Reason.INVALID_VALUE, cause.text, cause)
 
     enum class Location(val locationName: String) {
@@ -55,7 +55,8 @@ class BadConfigException private constructor(
         PERSISTENT_KEEPALIVE("PersistentKeepalive"),
         PRE_SHARED_KEY("PresharedKey"),
         PRIVATE_KEY("PrivateKey"),
-        PUBLIC_KEY("PublicKey");
+        PUBLIC_KEY("PublicKey"),
+        ;
     }
 
     enum class Reason {
@@ -66,12 +67,13 @@ class BadConfigException private constructor(
         MISSING_SECTION,
         SYNTAX_ERROR,
         UNKNOWN_ATTRIBUTE,
-        UNKNOWN_SECTION
+        UNKNOWN_SECTION,
     }
 
     enum class Section(val sectionName: String) {
         CONFIG("Config"),
         INTERFACE("Interface"),
-        PEER("Peer");
+        PEER("Peer"),
+        ;
     }
 }

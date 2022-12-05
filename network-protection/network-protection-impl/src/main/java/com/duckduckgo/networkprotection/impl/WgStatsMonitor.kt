@@ -22,12 +22,12 @@ import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = VpnScope::class,
@@ -36,7 +36,7 @@ import javax.inject.Inject
 @SingleInstanceIn(VpnScope::class)
 class WgStatsMonitor @Inject constructor(
     private val wgProtocol: WgProtocol,
-    private val dispactherProvider: DispatcherProvider
+    private val dispactherProvider: DispatcherProvider,
 ) : VpnServiceCallbacks {
     private var logConfigJob: Job? = null
     private var isRunning = false
@@ -53,7 +53,7 @@ class WgStatsMonitor @Inject constructor(
 
     override fun onVpnStopped(
         coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
+        vpnStopReason: VpnStopReason,
     ) {
         Timber.d("onVpnStopped called")
         isRunning = false

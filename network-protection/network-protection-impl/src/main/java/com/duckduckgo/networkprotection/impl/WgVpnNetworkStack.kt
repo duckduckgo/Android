@@ -32,9 +32,9 @@ import com.wireguard.config.BadConfigException.Section.CONFIG
 import com.wireguard.config.Config
 import dagger.Lazy
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
-import javax.inject.Inject
 
 @ContributesBinding(
     scope = VpnScope::class,
@@ -103,7 +103,7 @@ class WgVpnNetworkStack @Inject constructor(
                     config!!.toWgUserspaceString().also {
                         Timber.d("WgUserspace config: $it")
                     },
-                    level
+                    level,
                 )
                 Timber.d("Thread: Completed turnOnNative")
                 wgThread = null

@@ -16,11 +16,14 @@
 
 package com.duckduckgo.networkprotection.impl.configuration
 
+import com.duckduckgo.anvil.annotations.ContributesServiceApi
+import com.duckduckgo.di.scopes.VpnScope
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.POST
 
+@ContributesServiceApi(VpnScope::class)
 interface WgVpnControllerService {
     @GET("https://on-dev.goduckgo.com/servers")
     suspend fun getServers(): List<RegisteredServerInfo>
@@ -28,23 +31,23 @@ interface WgVpnControllerService {
     @Headers("Content-Type: application/json")
     @POST("https://on-dev.goduckgo.com/register")
     suspend fun registerKey(
-        @Body registerKeyBody: RegisterKeyBody
+        @Body registerKeyBody: RegisterKeyBody,
     ): List<EligibleServerInfo>
 }
 
 data class RegisteredServerInfo(
     val registeredAt: String,
-    val server: Server
+    val server: Server,
 )
 
 data class RegisterKeyBody(
-    val publicKey: String
+    val publicKey: String,
 )
 
 data class EligibleServerInfo(
     val publicKey: String, // client public key
     val allowedIPs: List<String>,
-    val server: Server
+    val server: Server,
 )
 
 data class Server(
@@ -53,5 +56,5 @@ data class Server(
     val publicKey: String,
     val hostnames: List<String>,
     val ips: List<String>,
-    val port: Long
+    val port: Long,
 )

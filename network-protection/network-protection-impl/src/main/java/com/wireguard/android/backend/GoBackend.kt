@@ -27,10 +27,10 @@ import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerType
 import dagger.SingleInstanceIn
-import timber.log.Timber
 import java.net.InetSocketAddress
 import javax.inject.Inject
 import kotlin.system.exitProcess
+import timber.log.Timber
 
 @SingleInstanceIn(VpnScope::class)
 class GoBackend @Inject constructor(
@@ -63,7 +63,7 @@ class GoBackend @Inject constructor(
         ifName: String,
         tunFd: Int,
         settings: String,
-        androidLogLevel: Int
+        androidLogLevel: Int,
     ): Int
 
     external fun wgVersion(): String
@@ -83,7 +83,7 @@ class GoBackend @Inject constructor(
               daddr=$daddr
               dport=$dport
               sni=$sni
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         if (protocol != 6 /* TCP */ && protocol != 17 /* UDP */) return true

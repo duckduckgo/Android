@@ -22,18 +22,18 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.wireguard.android.backend.GoBackend
 import com.wireguard.crypto.Key
 import dagger.SingleInstanceIn
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 interface WgProtocol {
     fun startWg(
         tunFd: Int,
         configString: String,
-        androidLogLevel: Int
+        androidLogLevel: Int,
     )
 
     fun stopWg()
-    fun getStatistics(): NetworkProtectionStatistics //TODO: Expose API to Make this consumable from activities
+    fun getStatistics(): NetworkProtectionStatistics // TODO: Expose API to Make this consumable from activities
 }
 
 @ContributesBinding(VpnScope::class)
@@ -46,7 +46,7 @@ class RealWgProtocol @Inject constructor(
     override fun startWg(
         tunFd: Int,
         configString: String,
-        androidLogLevel: Int
+        androidLogLevel: Int,
     ) {
         wgTunnel = goBackend.wgTurnOn(INTERFACE_NAME, tunFd, configString, androidLogLevel)
         if (wgTunnel < 0) {
@@ -91,7 +91,7 @@ class RealWgProtocol @Inject constructor(
             publicKey = publicKey,
             serverIP = serverIP,
             receivedBytes = rx,
-            transmittedBytes = tx
+            transmittedBytes = tx,
         )
     }
 

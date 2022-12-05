@@ -21,7 +21,7 @@ interface NetworkProtectionRepository {
 }
 
 class RealNetworkProtectionRepository constructor(
-    private val networkProtectionPrefs: NetworkProtectionPrefs
+    private val networkProtectionPrefs: NetworkProtectionPrefs,
 ) : NetworkProtectionRepository {
 
     override var privateKey: String?
