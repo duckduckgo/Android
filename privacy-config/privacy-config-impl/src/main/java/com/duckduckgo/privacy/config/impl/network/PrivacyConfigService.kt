@@ -23,6 +23,6 @@ import retrofit2.http.GET
 
 @ContributesServiceApi(AppScope::class)
 interface PrivacyConfigService {
-    @GET("https://raw.githubusercontent.com/duckduckgo/privacy-configuration/dharb/expanding-element-hiding/generated/v2/android-config.json")
+    @GET("https://staticcdn.duckduckgo.com/trackerblocking/config/v2/android-config.json")
     suspend fun privacyConfig(): JsonPrivacyConfig
 }
