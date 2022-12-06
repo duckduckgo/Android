@@ -103,8 +103,8 @@
                             android:layout_height="match_parent"
                             android:importantForAccessibility="no"
                             android:gravity="center"
-                            android:padding="4dp"
-                            android:src="@drawable/ic_loupe_24dp" />
+                            android:padding="6dp"
+                            android:src="@drawable/ic_find_search_20" />
 
                         <FrameLayout
                             android:layout_width="wrap_content"
@@ -122,8 +122,8 @@
                             android:id="@+id/placeholder"
                             android:layout_width="32dp"
                             android:layout_height="32dp"
-                            android:visibility="invisible"
-                            android:gravity="center"/>
+                            android:gravity="center"
+                            android:visibility="invisible"/>
 
                     </FrameLayout>
 
@@ -166,8 +166,8 @@
                         android:paddingStart="5dp"
                         android:paddingEnd="8dp"
                         android:selectAllOnFocus="true"
-                        android:textColor="?attr/omnibarTextColor"
-                        android:textColorHint="?attr/omnibarHintColor"
+                        android:textColor="?attr/daxColorPrimaryText"
+                        android:textColorHint="?attr/daxColorSecondaryText"
                         android:textCursorDrawable="@drawable/text_cursor"
                         android:textSize="16sp"
                         android:textStyle="normal"
@@ -197,10 +197,10 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
                         android:layout_marginEnd="6dp"
-                        android:background="?selectableItemBackground"
+                        android:background="?selectableItemBackgroundBorderless"
                         android:contentDescription="@string/clearButtonContentDescription"
                         android:padding="3dp"
-                        android:src="@drawable/ic_close"
+                        android:src="@drawable/ic_close_24"
                         android:visibility="gone"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -244,7 +244,7 @@
                     android:layout_gravity="center"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/browserPopupMenu"
-                    android:padding="3dp"
+                    android:padding="@dimen/toolbarIconPadding"
                     android:src="@drawable/ic_fire" />
             </FrameLayout>
 
@@ -252,11 +252,10 @@
                 android:id="@+id/tabsMenu"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
+                android:layout_marginStart="@dimen/keyline_2"
+                android:layout_marginEnd="@dimen/keyline_2"
                 android:background="?selectableItemBackgroundBorderless"
-                android:paddingTop="6dp"
-                android:paddingBottom="6dp"
+                android:padding="@dimen/toolbarIconPadding"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/browserMenu"
                 app:layout_constraintStart_toEndOf="@id/fireIconMenu"
@@ -266,8 +265,8 @@
                 android:id="@+id/browserMenu"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:paddingStart="9dp"
-                android:paddingEnd="13dp"
+                android:paddingStart="4dp"
+                android:paddingEnd="7dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -280,8 +279,8 @@
                     android:layout_gravity="center"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/browserPopupMenu"
-                    android:padding="3dp"
-                    android:src="@drawable/ic_overflow_12dp" />
+                    android:padding="@dimen/toolbarIconPadding"
+                    android:src="@drawable/ic_menu_vertical_24" />
 
             </FrameLayout>
 

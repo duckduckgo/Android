@@ -136,14 +136,13 @@
         <!--Design System Colors theme independent-->
         <item name="daxColorDim">@color/black60</item>
         <item name="daxColorWhite">@color/white</item>
+        <item name="daxColorBlack">@color/black84</item>
         <item name="preferredStatusBarColor">?attr/daxColorSurface</item>
         <item name="preferredNavigationBarColor">?attr/daxColorSurface</item>
 
         <!--Refactoring colors (can be replaced once reviewed)-->
         <item name="toolbarBgColor">?attr/daxColorSurface</item>
         <item name="toolbarIconColor">?attr/daxColorPrimaryIcon</item>
-        <item name="omnibarTextColor">?attr/daxColorPrimaryText</item>
-        <item name="omnibarHintColor">?attr/daxColorSecondaryText</item>
     </style>
 
     <!-- The app theme will mostly contain values for colour attributes -->
@@ -171,9 +170,6 @@
         <item name="browserMenuTextColor">@color/white</item>
         <item name="browserMenuTextColorDisabled">@color/warGreyTwo</item>
         <item name="cookiesRoundedFieldBackgroundColor">@color/almostBlackDark</item>
-        <item name="omnibarRoundedFieldBackgroundColor">@color/almostBlack</item>
-        <item name="omnibarTextColor">@color/white</item>
-        <item name="omnibarHintColor">@color/paleBrownishGray</item>
         <item name="omnibarLogoLetterTextColor">@color/midGray</item>
         <item name="autoCompleteTextColor">@color/white</item>
         <item name="autoCompleteSubtitleTextColor">@color/grayish</item>
@@ -218,7 +214,6 @@
         <item name="privacyDashboardLogoLetterTextColor">@color/subtleGray</item>
 
         <item name="emailButtonRippleColor">@color/white</item>
-        <item name="quickAccessItemTitleTextColor">@color/white</item>
 
         <item name="savedSiteEditTextUnderlineColor">@color/whiteSemiTransparent</item>
         <item name="android:textColorAlertDialogListItem">?attr/normalTextColor</item>
@@ -314,9 +309,6 @@
         <item name="browserMenuTextColor">@color/almostBlackDark</item>
         <item name="browserMenuTextColorDisabled">@color/pinkish_grey_two</item>
         <item name="cookiesRoundedFieldBackgroundColor">@color/whiteFive</item>
-        <item name="omnibarRoundedFieldBackgroundColor">@color/whiteFour</item>
-        <item name="omnibarTextColor">@color/almostBlackDark</item>
-        <item name="omnibarHintColor">@color/brownishGrayTwo</item>
         <item name="omnibarLogoLetterTextColor">@color/whiteFour</item>
         <item name="autoCompleteTextColor">@color/almostBlackDark</item>
         <item name="autoCompleteSubtitleTextColor">@color/warmerGray</item>
@@ -361,7 +353,6 @@
         <item name="privacyDashboardLogoLetterTextColor">@color/whiteFour</item>
 
         <item name="emailButtonRippleColor">@color/subtleGrayTwo</item>
-        <item name="quickAccessItemTitleTextColor">@color/brownishGrayTwo</item>
 
         <item name="savedSiteEditTextUnderlineColor">@color/black60</item>
         <item name="lightContainerBackground">@color/whiteThree</item>

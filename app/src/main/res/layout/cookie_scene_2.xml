@@ -31,7 +31,7 @@
         android:maxLines="1"
         android:gravity="center"
         android:visibility="visible"
-        android:textColor="?attr/omnibarTextColor"
+        android:textColor="?attr/daxColorPrimaryText"
         android:text="@string/autoconsentAnimationText"
         tools:ignore="RtlCompat" />
 </FrameLayout>
