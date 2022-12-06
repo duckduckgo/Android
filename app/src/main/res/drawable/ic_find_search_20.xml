@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2020 DuckDuckGo
+  ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -15,11 +15,13 @@
   -->
 
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="24dp"
-    android:height="24dp"
-    android:viewportWidth="24"
-    android:viewportHeight="24">
+    android:width="20dp"
+    android:height="20dp"
+    android:viewportWidth="20"
+    android:viewportHeight="20">
   <path
-      android:pathData="M18.3,5.71C17.91,5.32 17.28,5.32 16.89,5.71L12,10.59L7.11,5.7C6.72,5.31 6.09,5.31 5.7,5.7C5.31,6.09 5.31,6.72 5.7,7.11L10.59,12L5.7,16.89C5.31,17.28 5.31,17.91 5.7,18.3C6.09,18.69 6.72,18.69 7.11,18.3L12,13.41L16.89,18.3C17.28,18.69 17.91,18.69 18.3,18.3C18.69,17.91 18.69,17.28 18.3,16.89L13.41,12L18.3,7.11C18.68,6.73 18.68,6.09 18.3,5.71Z"
-      android:fillColor="?attr/toolbarIconColor"/>
+      android:pathData="M9,2C5.134,2 2,5.134 2,9C2,12.866 5.134,16 9,16C10.645,16 12.157,15.433 13.352,14.483L16.634,17.766C16.947,18.078 17.453,18.078 17.766,17.766C18.078,17.453 18.078,16.947 17.766,16.634L14.483,13.352C15.433,12.157 16,10.645 16,9C16,5.134 12.866,2 9,2ZM3.6,9C3.6,6.018 6.018,3.6 9,3.6C11.982,3.6 14.4,6.018 14.4,9C14.4,11.982 11.982,14.4 9,14.4C6.018,14.4 3.6,11.982 3.6,9Z"
+      android:fillColor="?attr/daxColorPrimaryIcon"
+      android:fillAlpha="0.5"
+      android:fillType="evenOdd"/>
 </vector>

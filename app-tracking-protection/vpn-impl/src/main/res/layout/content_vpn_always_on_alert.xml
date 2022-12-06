@@ -25,7 +25,7 @@
 
     <ImageView
         android:id="@+id/closeButton"
-        android:src="@drawable/ic_close_24dp"
+        android:src="@drawable/ic_close_24"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:layout_width="wrap_content"

@@ -27,7 +27,7 @@
 
     <style name="AutoCompleteTextViewStyle" parent="Widget.AppCompat.AutoCompleteTextView">
         <item name="android:textCursorDrawable">@drawable/text_cursor</item>
-        <item name="android:textColorHint">?attr/omnibarHintColor</item>
+        <item name="android:textColorHint">?attr/daxColorSecondaryText</item>
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
@@ -36,8 +36,8 @@
     </style>
 
     <style name="PopUpOverflowButton" parent="@style/Widget.AppCompat.ActionButton.Overflow">
-        <item name="srcCompat">@drawable/ic_overflow</item>
-        <item name="android:src">@drawable/ic_overflow</item>
+        <item name="srcCompat">@drawable/ic_menu_vertical_24</item>
+        <item name="android:src">@drawable/ic_menu_vertical_24</item>
     </style>
 
     <style name="PopUpMenuCheckBoxTheme">

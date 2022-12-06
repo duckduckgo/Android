@@ -50,10 +50,10 @@
 
             <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                     android:id="@+id/hiddenTextCta"
-                    app:typography="button"
+                    app:typography="body1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="@dimen/keyline_4"
+                    android:paddingBottom="@dimen/keyline_1"
                     android:visibility="invisible"
                     tools:visibility="visible"
                     tools:text="@string/onboardingDaxText"/>
