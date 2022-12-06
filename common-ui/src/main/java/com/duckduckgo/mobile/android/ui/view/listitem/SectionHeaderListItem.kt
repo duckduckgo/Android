@@ -31,7 +31,7 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 class SectionHeaderListItem @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
     private val binding: ViewSectionHeaderListItemBinding by viewBinding()
@@ -47,7 +47,7 @@ class SectionHeaderListItem @JvmOverloads constructor(
             attrs,
             R.styleable.SectionHeaderListItem,
             0,
-            defStyleAttr
+            defStyleAttr,
         ).apply {
             primaryText = getString(R.styleable.SectionHeaderListItem_primaryText).orEmpty()
             binding.sectionHeaderText.text = primaryText

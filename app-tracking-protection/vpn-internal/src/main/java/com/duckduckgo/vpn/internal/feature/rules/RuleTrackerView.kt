@@ -26,7 +26,7 @@ import com.duckduckgo.vpn.internal.databinding.ExceptionRuleDomainViewBinding
 class RuleTrackerView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     private val binding: ExceptionRuleDomainViewBinding by viewBinding()
@@ -60,7 +60,7 @@ class RuleTrackerView @JvmOverloads constructor(
     interface RuleTrackerListener {
         fun onTrackerClicked(
             view: View,
-            enabled: Boolean
+            enabled: Boolean,
         )
     }
 }

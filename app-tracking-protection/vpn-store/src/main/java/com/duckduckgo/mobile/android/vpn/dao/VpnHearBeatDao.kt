@@ -21,7 +21,7 @@ import androidx.room.*
 @Entity(tableName = "vpn_heartbeat")
 data class HeartBeatEntity(
     @PrimaryKey val type: String,
-    val timestamp: Long = System.currentTimeMillis()
+    val timestamp: Long = System.currentTimeMillis(),
 )
 
 @Dao

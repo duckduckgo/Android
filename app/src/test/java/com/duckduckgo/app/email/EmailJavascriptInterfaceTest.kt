@@ -23,10 +23,6 @@ import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Autofill
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName.AutofillFeatureName
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -34,6 +30,10 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
@@ -57,7 +57,7 @@ class EmailJavascriptInterfaceTest {
             DuckDuckGoUrlDetector(),
             coroutineRule.testDispatcherProvider,
             mockFeatureToggle,
-            mockAutofill
+            mockAutofill,
         ) { counter++ }
 
         whenever(mockFeatureToggle.isFeatureEnabled(AutofillFeatureName.value)).thenReturn(true)

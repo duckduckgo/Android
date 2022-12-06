@@ -18,123 +18,123 @@ package com.duckduckgo.remote.messaging.impl.models
 
 import com.duckduckgo.remote.messaging.impl.matchers.EvaluationResult
 import com.duckduckgo.remote.messaging.impl.matchers.toResult
-import timber.log.Timber
 import java.util.*
+import timber.log.Timber
 
 sealed class MatchingAttribute {
     data class Locale(
         override val value: List<String> = emptyList(),
-        val fallback: Boolean? = null
+        val fallback: Boolean? = null,
     ) : MatchingAttribute(), StringArrayMatchingAttribute
 
     data class Api(
         override val min: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
         override val max: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
         override val value: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
-        val fallback: Boolean? = null
+        val fallback: Boolean? = null,
     ) : MatchingAttribute(), RangeIntMatchingAttribute, IntMatchingAttribute
 
     data class WebView(
         override val min: String = MATCHING_ATTR_STRING_DEFAULT_VALUE,
         override val max: String = MATCHING_ATTR_STRING_DEFAULT_VALUE,
         override val value: String = MATCHING_ATTR_STRING_DEFAULT_VALUE,
-        val fallback: Boolean? = null
+        val fallback: Boolean? = null,
     ) : MatchingAttribute(), RangeStringMatchingAttribute, StringMatchingAttribute
 
     data class Flavor(
         override val value: List<String> = emptyList(),
-        val fallback: Boolean? = null
+        val fallback: Boolean? = null,
     ) : MatchingAttribute(), StringArrayMatchingAttribute
 
     data class AppId(
         override val value: String = MATCHING_ATTR_STRING_DEFAULT_VALUE,
-        val fallback: Boolean? = null
+        val fallback: Boolean? = null,
     ) : MatchingAttribute(), StringMatchingAttribute
 
     data class AppVersion(
         override val min: String = MATCHING_ATTR_STRING_DEFAULT_VALUE,
         override val max: String = MATCHING_ATTR_STRING_DEFAULT_VALUE,
         override val value: String = MATCHING_ATTR_STRING_DEFAULT_VALUE,
-        val fallback: Boolean? = null
+        val fallback: Boolean? = null,
     ) : MatchingAttribute(), RangeStringMatchingAttribute, StringMatchingAttribute
 
     data class Atb(
         override val value: String = MATCHING_ATTR_STRING_DEFAULT_VALUE,
-        val fallback: Boolean? = null
+        val fallback: Boolean? = null,
     ) : MatchingAttribute(), StringMatchingAttribute
 
     data class AppAtb(
         override val value: String = MATCHING_ATTR_STRING_DEFAULT_VALUE,
-        val fallback: Boolean? = null
+        val fallback: Boolean? = null,
     ) : MatchingAttribute(), StringMatchingAttribute
 
     data class SearchAtb(
         override val value: String = MATCHING_ATTR_STRING_DEFAULT_VALUE,
-        val fallback: Boolean? = null
+        val fallback: Boolean? = null,
     ) : MatchingAttribute(), StringMatchingAttribute
 
     data class ExpVariant(
         override val value: String = MATCHING_ATTR_STRING_DEFAULT_VALUE,
-        val fallback: Boolean? = null
+        val fallback: Boolean? = null,
     ) : MatchingAttribute(), StringMatchingAttribute
 
     data class InstalledGPlay(
         override val value: Boolean,
-        val fallback: Boolean? = null
+        val fallback: Boolean? = null,
     ) : MatchingAttribute(), BooleanMatchingAttribute
 
     data class DefaultBrowser(
         override val value: Boolean,
-        val fallback: Boolean? = null
+        val fallback: Boolean? = null,
     ) : MatchingAttribute(), BooleanMatchingAttribute
 
     data class EmailEnabled(
         override val value: Boolean,
-        val fallback: Boolean? = null
+        val fallback: Boolean? = null,
     ) : MatchingAttribute(), BooleanMatchingAttribute
 
     data class WidgetAdded(
         override val value: Boolean,
-        val fallback: Boolean? = null
+        val fallback: Boolean? = null,
     ) : MatchingAttribute(), BooleanMatchingAttribute
 
     data class SearchCount(
         override val min: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
         override val max: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
         override val value: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
-        val fallback: Boolean? = null
+        val fallback: Boolean? = null,
     ) : MatchingAttribute(), RangeIntMatchingAttribute, IntMatchingAttribute
 
     data class Bookmarks(
         override val min: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
         override val max: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
         override val value: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
-        val fallback: Boolean? = null
+        val fallback: Boolean? = null,
     ) : MatchingAttribute(), RangeIntMatchingAttribute, IntMatchingAttribute
 
     data class Favorites(
         override val min: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
         override val max: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
         override val value: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
-        val fallback: Boolean? = null
+        val fallback: Boolean? = null,
     ) : MatchingAttribute(), RangeIntMatchingAttribute, IntMatchingAttribute
 
     data class AppTheme(
         override val value: String = MATCHING_ATTR_STRING_DEFAULT_VALUE,
-        val fallback: Boolean? = null
+        val fallback: Boolean? = null,
     ) : MatchingAttribute(), StringMatchingAttribute
 
     data class DaysSinceInstalled(
         override val min: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
         override val max: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
         override val value: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
-        val fallback: Boolean? = null
+        val fallback: Boolean? = null,
     ) : MatchingAttribute(), RangeIntMatchingAttribute, IntMatchingAttribute
 
     data class DaysUsedSince(
         override val since: Date,
         override val value: Int,
-        val fallback: Boolean? = null
+        val fallback: Boolean? = null,
     ) : MatchingAttribute(), DateMatchingAttribute
 
     data class Unknown(val fallback: Boolean?) : MatchingAttribute()

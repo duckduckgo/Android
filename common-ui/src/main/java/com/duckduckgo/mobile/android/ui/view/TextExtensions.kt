@@ -38,7 +38,7 @@ import com.duckduckgo.mobile.android.ui.spans.DuckDuckGoClickableSpan
 fun Context.getColorFromAttr(
     @AttrRes attrColor: Int,
     typedValue: TypedValue = TypedValue(),
-    resolveRefs: Boolean = true
+    resolveRefs: Boolean = true,
 ): Int {
     theme.resolveAttribute(attrColor, typedValue, resolveRefs)
     return typedValue.data
@@ -46,7 +46,7 @@ fun Context.getColorFromAttr(
 
 fun Context.defaultSelectableItemBackground(
     typedValue: TypedValue = TypedValue(),
-    resolveRefs: Boolean = true
+    resolveRefs: Boolean = true,
 ): Int {
     theme.resolveAttribute(android.R.attr.selectableItemBackground, typedValue, resolveRefs)
     return typedValue.resourceId
@@ -55,7 +55,7 @@ fun Context.defaultSelectableItemBackground(
 fun TextView.addClickableLink(
     annotation: String,
     textSequence: CharSequence,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     val fullText = textSequence as SpannedString
     val spannableString = SpannableString(fullText)
@@ -72,21 +72,21 @@ fun TextView.addClickableLink(
                 clickableSpan,
                 fullText.getSpanStart(it),
                 fullText.getSpanEnd(it),
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
             )
             setSpan(
                 UnderlineSpan(),
                 fullText.getSpanStart(it),
                 fullText.getSpanEnd(it),
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
             )
             setSpan(
                 ForegroundColorSpan(
-                    ContextCompat.getColor(context, R.color.cornflowerBlue)
+                    ContextCompat.getColor(context, R.color.cornflowerBlue),
                 ),
                 fullText.getSpanStart(it),
                 fullText.getSpanEnd(it),
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
             )
         }
     }
@@ -97,7 +97,7 @@ fun TextView.addClickableLink(
 
 fun TextView.addClickableSpan(
     textSequence: CharSequence,
-    spans: List<Pair<String, DuckDuckGoClickableSpan>>
+    spans: List<Pair<String, DuckDuckGoClickableSpan>>,
 ) {
     val fullText = textSequence as SpannedString
     val spannableString = SpannableString(fullText)
@@ -110,15 +110,15 @@ fun TextView.addClickableSpan(
                     span.second,
                     fullText.getSpanStart(it),
                     fullText.getSpanEnd(it),
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
                 )
                 setSpan(
                     ForegroundColorSpan(
-                        ContextCompat.getColor(context, R.color.cornflowerBlue)
+                        ContextCompat.getColor(context, R.color.cornflowerBlue),
                     ),
                     fullText.getSpanStart(it),
                     fullText.getSpanEnd(it),
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
                 )
             }
         }

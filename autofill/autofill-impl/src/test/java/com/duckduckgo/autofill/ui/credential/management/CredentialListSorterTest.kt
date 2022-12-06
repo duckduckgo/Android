@@ -46,7 +46,7 @@ class CredentialListSorterTest {
                 it.add(credsWithTitle("A"))
                 it.add(credsWithTitle("2"))
                 it.add(credsWithTitle("B"))
-            }
+            },
         )
         sorted.assertTitleOrder("1", "2", "A", "B")
     }
@@ -59,7 +59,7 @@ class CredentialListSorterTest {
                 it.add(credsWithTitle("$"))
                 it.add(credsWithTitle("2"))
                 it.add(credsWithTitle("A"))
-            }
+            },
         )
         sorted.assertTitleOrder("$", "1", "2", "A")
     }
@@ -72,7 +72,7 @@ class CredentialListSorterTest {
                 it.add(credsWithTitle("B"))
                 it.add(credsWithTitle("C"))
                 it.add(credsWithTitle(null))
-            }
+            },
         )
         sorted.assertTitleOrder(null, "A", "B", "C")
     }
@@ -84,7 +84,7 @@ class CredentialListSorterTest {
                 it.add(credsWithDomain("a.com"))
                 it.add(credsWithDomain("c.com"))
                 it.add(credsWithDomain("b.com"))
-            }
+            },
         )
         sorted.assertDomainOrder("a.com", "b.com", "c.com")
     }
@@ -96,7 +96,7 @@ class CredentialListSorterTest {
                 it.add(creds("a.com", "Website"))
                 it.add(creds("c.com", "Website"))
                 it.add(creds("b.com", "Website"))
-            }
+            },
         )
         sorted.assertDomainOrder("a.com", "b.com", "c.com")
     }
@@ -108,7 +108,7 @@ class CredentialListSorterTest {
                 it.add(creds("a.com", "2. Website"))
                 it.add(creds("c.com", "1. Website"))
                 it.add(creds("b.com", "3. Website"))
-            }
+            },
         )
         sorted.assertTitleOrder("1. Website", "2. Website", "3. Website")
         sorted.assertDomainOrder("c.com", "a.com", "b.com")
@@ -120,7 +120,7 @@ class CredentialListSorterTest {
             list.also {
                 it.add(credsWithDomain("http://b.com"))
                 it.add(credsWithDomain("a.com"))
-            }
+            },
         )
         sorted.assertDomainOrder("a.com", "http://b.com")
     }
@@ -131,7 +131,7 @@ class CredentialListSorterTest {
             list.also {
                 it.add(credsWithDomain("https://b.com"))
                 it.add(credsWithDomain("a.com"))
-            }
+            },
         )
         sorted.assertDomainOrder("a.com", "https://b.com")
     }
@@ -143,7 +143,7 @@ class CredentialListSorterTest {
                 it.add(credsWithDomain("www.a.com"))
                 it.add(credsWithDomain("http://b.com"))
                 it.add(credsWithDomain("c.com"))
-            }
+            },
         )
         sorted.assertDomainOrder("www.a.com", "http://b.com", "c.com")
     }
@@ -155,7 +155,7 @@ class CredentialListSorterTest {
                 it.add(credsWithDomain("http://b.com"))
                 it.add(credsWithDomain("c.com"))
                 it.add(credsWithDomain(null))
-            }
+            },
         )
         sorted.assertDomainOrder(null, "http://b.com", "c.com")
     }
@@ -168,7 +168,7 @@ class CredentialListSorterTest {
                 it.add(credsWithDomain("c.com"))
                 it.add(credsWithDomain("an invalid domain"))
                 it.add(credsWithDomain("invalid domain"))
-            }
+            },
         )
         sorted.assertDomainOrder("an invalid domain", "http://b.com", "c.com", "invalid domain")
     }
@@ -196,7 +196,7 @@ class CredentialListSorterTest {
                 it.add(credsWithDomain("b.com"))
                 it.add(credsWithDomain("ç.com"))
                 it.add(credsWithDomain("c.com"))
-            }
+            },
         )
         sorted.assertDomainOrder("a.com", "b.com", "c.com", "ç.com")
     }
@@ -209,7 +209,7 @@ class CredentialListSorterTest {
                 it.add(credsWithTitle("c"))
                 it.add(credsWithTitle("b"))
                 it.add(credsWithTitle("ć"))
-            }
+            },
         )
         sorted.assertTitleOrder("a", "b", "c", "ć")
     }
@@ -224,7 +224,7 @@ class CredentialListSorterTest {
                 it.add(credsWithTitle("b"))
                 it.add(credsWithTitle("ć"))
                 it.add(credsWithTitle("d"))
-            }
+            },
         )
         sorted.assertTitleOrder("a", "b", "ć", "cello", "CNN", "d")
     }
@@ -239,7 +239,7 @@ class CredentialListSorterTest {
                 it.add(credsWithDomain("b"))
                 it.add(credsWithDomain("ć"))
                 it.add(credsWithDomain("d"))
-            }
+            },
         )
         sorted.assertDomainOrder("a", "b", "ć", "cello", "CNN", "d")
     }
@@ -269,5 +269,4 @@ class CredentialListSorterTest {
     private fun credsWithDomain(domain: String?): LoginCredentials {
         return LoginCredentials(domain = domain, domainTitle = null, username = null, password = null)
     }
-
 }

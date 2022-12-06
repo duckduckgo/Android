@@ -16,12 +16,11 @@
 
 package com.duckduckgo.app.global.formatters.data
 
-import org.junit.Assert.*
-
-import org.junit.Before
-import org.junit.Test
 import java.text.NumberFormat
 import java.util.*
+import org.junit.Assert.*
+import org.junit.Before
+import org.junit.Test
 
 class DataSizeFormatterTest {
 

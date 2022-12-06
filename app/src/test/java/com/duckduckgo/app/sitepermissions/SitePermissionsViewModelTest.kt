@@ -22,7 +22,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
-import com.duckduckgo.app.location.data.LocationPermissionsRepositoryAPI
+import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.sitepermissions.SitePermissionsViewModel.Command.LaunchWebsiteAllowed
 import com.duckduckgo.app.sitepermissions.SitePermissionsViewModel.Command.ShowRemovedAllConfirmationSnackbar
@@ -49,7 +49,7 @@ class SitePermissionsViewModelTest {
     var coroutineRule = CoroutineTestRule()
 
     private val mockSitePermissionsRepository: SitePermissionsRepository = mock()
-    private val mockLocationPermissionsRepository: LocationPermissionsRepositoryAPI = mock()
+    private val mockLocationPermissionsRepository: LocationPermissionsRepository = mock()
     private val mockGeoLocationPermissions: GeoLocationPermissions = mock()
     private val mockSettingsDataStore: SettingsDataStore = mock()
 
@@ -58,7 +58,7 @@ class SitePermissionsViewModelTest {
         locationPermissionsRepository = mockLocationPermissionsRepository,
         geolocationPermissions = mockGeoLocationPermissions,
         settingsDataStore = mockSettingsDataStore,
-        dispatcherProvider = coroutineRule.testDispatcherProvider
+        dispatcherProvider = coroutineRule.testDispatcherProvider,
     )
 
     @Before
@@ -189,5 +189,4 @@ class SitePermissionsViewModelTest {
         whenever(mockSitePermissionsRepository.askMicEnabled).thenReturn(micEnabled)
         whenever(mockSitePermissionsRepository.askCameraEnabled).thenReturn(cameraEnabled)
     }
-
 }

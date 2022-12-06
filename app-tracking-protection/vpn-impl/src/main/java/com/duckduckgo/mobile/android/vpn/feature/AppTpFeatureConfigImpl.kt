@@ -24,15 +24,15 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.remote_config.*
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import java.util.concurrent.ConcurrentHashMap
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.concurrent.ConcurrentHashMap
-import javax.inject.Inject
 
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = AppTpFeatureConfig::class
+    boundType = AppTpFeatureConfig::class,
 )
 @SingleInstanceIn(AppScope::class)
 class AppTpFeatureConfigImpl @Inject constructor(

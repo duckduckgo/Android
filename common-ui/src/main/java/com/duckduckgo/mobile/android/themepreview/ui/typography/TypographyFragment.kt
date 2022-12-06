@@ -33,14 +33,14 @@ class TypographyFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         return inflater.inflate(R.layout.fragment_components_typography, container, false)
     }
 
     override fun onViewCreated(
         view: View,
-        savedInstanceBundle: Bundle?
+        savedInstanceBundle: Bundle?,
     ) {
         val daxTextView = view.findViewById<DaxTextView>(R.id.typographyTitle)
         daxTextView.setTypography(Type.Body1)

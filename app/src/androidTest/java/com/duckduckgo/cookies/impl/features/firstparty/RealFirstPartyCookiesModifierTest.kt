@@ -34,6 +34,8 @@ import com.duckduckgo.cookies.store.CookiesRepository
 import com.duckduckgo.cookies.store.FirstPartyCookiePolicyEntity
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.api.UnprotectedTemporaryException
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -50,8 +52,6 @@ import org.threeten.bp.Instant
 import org.threeten.bp.ZoneOffset
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.temporal.ChronoUnit
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 @ExperimentalCoroutinesApi
 class RealFirstPartyCookiesModifierTest {
@@ -105,7 +105,6 @@ class RealFirstPartyCookiesModifierTest {
         assertNotNull(expires)
         val diff = (expires!! - expectedValue) / 1000000 // initially in microseconds
         assertTrue(diff > -5L && diff < 5L) // Diff within +- 5 seconds
-
     }
 
     @Test
@@ -196,7 +195,7 @@ class RealFirstPartyCookiesModifierTest {
 
         givenDatabaseWithCookies((THRESHOLD + 1).toLong())
         whenever(mockCookiesRepository.exceptions).thenReturn(
-            listOf(CookieException(domain = "example.com", reason = "test"))
+            listOf(CookieException(domain = "example.com", reason = "test")),
         )
         val sqlCookieRemover = givenRealFirstPartyCookiesModifier()
 
@@ -230,7 +229,10 @@ class RealFirstPartyCookiesModifierTest {
                     SQLCookieRemover.COOKIES_TABLE_NAME,
                     arrayOf("expires_utc"),
                     "host_key ='$host'",
-                    null, null, null, null
+                    null,
+                    null,
+                    null,
+                    null,
                 ).use { cursor ->
                     while (cursor.moveToNext()) {
                         value = cursor.getLong(cursor.getColumnIndex("expires_utc"))
@@ -273,7 +275,7 @@ class RealFirstPartyCookiesModifierTest {
             mockUserAllowListRepository,
             webViewDatabaseLocator,
             ExceptionPixel(mockPixel, RootExceptionFinder()),
-            DefaultDispatcherProvider()
+            DefaultDispatcherProvider(),
         )
     }
 

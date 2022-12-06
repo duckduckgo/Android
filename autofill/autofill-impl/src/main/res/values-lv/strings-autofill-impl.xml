@@ -63,4 +63,6 @@
     <string name="credentialManagementViewMenuEdit">Rediģēt</string>
     <string name="credentialManagementViewMenuDelete">Dzēst</string>
 
+    <string name="credentialManagementSuggestionsLabel">Ieteikts</string>
+
 </resources>

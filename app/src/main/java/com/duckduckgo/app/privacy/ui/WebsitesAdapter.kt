@@ -39,7 +39,7 @@ import timber.log.Timber
 class WebsitesAdapter(
     private val viewModel: WhitelistViewModel,
     private val lifecycleOwner: LifecycleOwner,
-    private val faviconManager: FaviconManager
+    private val faviconManager: FaviconManager,
 ) : RecyclerView.Adapter<WebsiteViewHolder>() {
 
     companion object {
@@ -96,7 +96,7 @@ class WebsitesAdapter(
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
-        viewType: Int
+        viewType: Int,
     ): WebsiteViewHolder {
         Timber.d("Whitelist: onCreateViewHolder $viewType ")
         val inflater = LayoutInflater.from(parent.context)
@@ -121,7 +121,7 @@ class WebsitesAdapter(
                     binding,
                     viewModel,
                     lifecycleOwner,
-                    faviconManager
+                    faviconManager,
                 )
             }
             EMPTY_STATE_TYPE -> {
@@ -135,7 +135,7 @@ class WebsitesAdapter(
 
     override fun onBindViewHolder(
         holder: WebsiteViewHolder,
-        position: Int
+        position: Int,
     ) {
         when (holder) {
             is WebsiteViewHolder.WebsiteItemViewHolder -> {
@@ -154,7 +154,7 @@ sealed class WebsiteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVie
         private val binding: RowOneLineListItemBinding,
         private val viewModel: WhitelistViewModel,
         private val lifecycleOwner: LifecycleOwner,
-        private val faviconManager: FaviconManager
+        private val faviconManager: FaviconManager,
     ) : WebsiteViewHolder(binding.root) {
 
         private val context: Context = binding.root.context
@@ -166,11 +166,12 @@ sealed class WebsiteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVie
 
             listItem.contentDescription = context.getString(
                 R.string.fireproofWebsiteOverflowContentDescription,
-                entity.domain
+                entity.domain,
             )
 
-            listItem.setPrimaryText(entity.domain)
             loadFavicon(entity.domain, listItem.leadingIcon())
+            listItem.setPrimaryText(entity.domain)
+            listItem.showTrailingIcon()
             listItem.setTrailingIconClickListener { anchor ->
                 showOverFlowMenu(anchor, entity)
             }
@@ -178,7 +179,7 @@ sealed class WebsiteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVie
 
         private fun loadFavicon(
             url: String,
-            leadingIcon: ImageView
+            leadingIcon: ImageView,
         ) {
             lifecycleOwner.lifecycleScope.launch {
                 faviconManager.loadToViewFromLocalOrFallback(url = url, view = leadingIcon)
@@ -187,7 +188,7 @@ sealed class WebsiteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVie
 
         private fun showOverFlowMenu(
             anchor: View,
-            entity: UserWhitelistedDomain
+            entity: UserWhitelistedDomain,
         ) {
             val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_delete_menu)
             val view = popupMenu.contentView

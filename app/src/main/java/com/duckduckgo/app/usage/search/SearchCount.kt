@@ -49,7 +49,7 @@ abstract class SearchCountDao {
 @Entity(tableName = "search_count")
 data class SearchCountEntity(
     @PrimaryKey val key: String = SINGLETON_KEY,
-    val count: Long
+    val count: Long,
 ) {
 
     companion object {

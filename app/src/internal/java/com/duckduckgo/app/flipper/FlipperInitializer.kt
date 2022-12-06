@@ -27,16 +27,16 @@ import com.facebook.flipper.core.FlipperPlugin
 import com.facebook.flipper.plugins.databases.DatabasesFlipperPlugin
 import com.facebook.soloader.SoLoader
 import com.squareup.anvil.annotations.ContributesMultibinding
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = LifecycleObserver::class
+    boundType = LifecycleObserver::class,
 )
 class FlipperInitializer @Inject constructor(
     private val context: Context,
-    private val flipperPluginPoint: PluginPoint<FlipperPlugin>
+    private val flipperPluginPoint: PluginPoint<FlipperPlugin>,
 ) : DefaultLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {

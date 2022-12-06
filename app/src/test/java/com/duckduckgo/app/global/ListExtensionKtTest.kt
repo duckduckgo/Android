@@ -52,12 +52,12 @@ class ListExtensionKtTest(private val testCase: TestListTestCase) {
             TestListTestCase(listOf("foo.bar", "ddg.com", ""), listOf("foo.bar", "ddg.com")),
             TestListTestCase(listOf("foo.bar", "ddg.com"), listOf("foo.bar", "ddg.com")),
             TestListTestCase(listOf("", "foo.bar", "ddg.com"), listOf("foo.bar", "ddg.com")),
-            TestListTestCase(listOf(" ", "foo.bar", "ddg.com"), listOf("foo.bar", "ddg.com"))
+            TestListTestCase(listOf(" ", "foo.bar", "ddg.com"), listOf("foo.bar", "ddg.com")),
         )
     }
 
     data class TestListTestCase(
         val inputList: List<String>,
-        val expected: List<String>
+        val expected: List<String>,
     )
 }

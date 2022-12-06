@@ -24,7 +24,7 @@ import timber.log.Timber
 inline fun renderIfChanged(
     newViewState: Any,
     lastSeenViewState: Any?,
-    block: () -> Unit
+    block: () -> Unit,
 ) {
     if (newViewState == lastSeenViewState) {
         Timber.v("view state identical to last seen state; skipping rendering for ${newViewState.javaClass.simpleName}")

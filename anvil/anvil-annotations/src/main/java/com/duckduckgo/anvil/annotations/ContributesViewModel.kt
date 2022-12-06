@@ -33,5 +33,5 @@ import kotlin.reflect.KClass
 @Retention(AnnotationRetention.RUNTIME)
 annotation class ContributesViewModel(
     /** The scope in which to include this contributed ViewModel */
-    val scope: KClass<*>
+    val scope: KClass<*>,
 )

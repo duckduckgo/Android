@@ -34,7 +34,7 @@ object WorkerModule {
     @SingleInstanceIn(AppScope::class)
     fun workManager(
         context: Context,
-        workerFactory: WorkerFactory
+        workerFactory: WorkerFactory,
     ): WorkManager {
         val config = Configuration.Builder()
             .setWorkerFactory(workerFactory)

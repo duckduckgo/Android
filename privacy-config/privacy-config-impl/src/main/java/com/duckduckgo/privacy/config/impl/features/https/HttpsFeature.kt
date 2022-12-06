@@ -21,5 +21,5 @@ import com.duckduckgo.privacy.config.store.HttpsExceptionEntity
 data class HttpsFeature(
     val state: String,
     val minSupportedVersion: Int?,
-    val exceptions: List<HttpsExceptionEntity>
+    val exceptions: List<HttpsExceptionEntity>,
 )

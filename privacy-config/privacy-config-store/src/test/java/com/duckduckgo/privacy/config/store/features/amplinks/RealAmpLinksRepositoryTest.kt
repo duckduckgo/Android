@@ -46,7 +46,7 @@ class RealAmpLinksRepositoryTest {
         testee = RealAmpLinksRepository(
             mockDatabase,
             TestScope(),
-            coroutineRule.testDispatcherProvider
+            coroutineRule.testDispatcherProvider,
         )
     }
 
@@ -57,7 +57,7 @@ class RealAmpLinksRepositoryTest {
         testee = RealAmpLinksRepository(
             mockDatabase,
             TestScope(),
-            coroutineRule.testDispatcherProvider
+            coroutineRule.testDispatcherProvider,
         )
 
         assertEquals(ampLinkExceptionEntity.toAmpLinkException(), testee.exceptions.first())
@@ -70,7 +70,7 @@ class RealAmpLinksRepositoryTest {
         testee = RealAmpLinksRepository(
             mockDatabase,
             TestScope(),
-            coroutineRule.testDispatcherProvider
+            coroutineRule.testDispatcherProvider,
         )
 
         testee.updateAll(listOf(), listOf(), listOf())
@@ -85,7 +85,7 @@ class RealAmpLinksRepositoryTest {
         testee = RealAmpLinksRepository(
             mockDatabase,
             TestScope(),
-            coroutineRule.testDispatcherProvider
+            coroutineRule.testDispatcherProvider,
         )
         assertEquals(1, testee.exceptions.size)
         assertEquals(1, testee.ampLinkFormats.size)
@@ -109,15 +109,15 @@ class RealAmpLinksRepositoryTest {
     companion object {
         val ampLinkExceptionEntity = AmpLinkExceptionEntity(
             domain = "https://www.example.com",
-            reason = "reason"
+            reason = "reason",
         )
 
         val ampLinkFormatEntity = AmpLinkFormatEntity(
-            format = "https?:\\/\\/(?:w{3}\\.)?google\\.\\w{2,}\\/amp\\/s\\/(\\S+)"
+            format = "https?:\\/\\/(?:w{3}\\.)?google\\.\\w{2,}\\/amp\\/s\\/(\\S+)",
         )
 
         val ampKeywordEntity = AmpKeywordEntity(
-            keyword = "keyword"
+            keyword = "keyword",
         )
     }
 }

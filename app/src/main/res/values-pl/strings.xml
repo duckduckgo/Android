@@ -109,76 +109,6 @@
     <string name="tabClosedUndo">Cofnij</string>
     <string name="downloadsMenuItemTitle">Pobrane</string>
 
-    <!-- Privacy Dashboard Activities -->
-    <string name="privacyProtectionToggle">Ochrona prywatności witryny</string>
-    <string name="privacyProtectionEnabled">WŁĄCZONA OCHRONA WITRYNY</string>
-    <string name="privacyProtectionDisabled">WYŁĄCZONA OCHRONA WITRYNY</string>
-    <string name="privacyDashboardActivityTitle">Panel zarządzania prywatnością</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes" instruction="Both placeholders are resource ids (integers) for two images">ULEPSZONY Z &lt;img src=\"%1$d\" /&gt; NA &lt;img src=\"%2$d\" /&gt;</string>
-    <string name="privacyGradeContentDescription">Poziom prywatności</string>
-    <string name="privacyProtectionTemporarilyDisabled">Tymczasowo wyłączyliśmy ochronę prywatności, ponieważ wygląda na to, że zniekształca tę witrynę.</string>
-
-    <string name="httpsGood">Połączenie zaszyfrowane</string>
-    <string name="httpsMixed">Połączenie częściowo zaszyfrowane</string>
-    <string name="httpsBad">Połączenie niezaszyfrowane</string>
-
-    <string name="scorecardActivityTitle">Poziom prywatności</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">Strona stanowi główną sieć skryptów śledzących</string>
-    <string name="scorecardPrivacyGrade">Poziom prywatności</string>
-    <string name="scorecardEnhancedGrade">Podwyższony poziom</string>
-
-    <string name="privacyTermsActivityTitle">Polityka prywatności</string>
-    <string name="practicesGood">Dobra polityka prywatności</string>
-    <string name="practicesMixed">Przeciętna polityka prywatności</string>
-    <string name="practicesBad">Słaba polityka prywatności</string>
-    <string name="practicesUnknown">Nieznana polityka prywatności</string>
-    <string name="practicesOverview">Polityka prywatności wskazuje, jak wiele informacji osobowych udostępnianych danej stronie podlega ochronie.</string>
-    <string name="practicesTosdrLink">Polityka prywatności od<b><u>ToS;DR</u></b>.</string>
-    <string name="practicesIconContentGood">Ikona dobrej polityki prywatności</string>
-    <string name="practicesIconContentBad">Ikona złej polityki prywatności</string>
-
-    <string name="networkTrackerSummaryHeader">SIECI SKRYPTÓW ŚLEDZĄCYCH – NAJWIĘKSI SPRAWCY</string>
-    <string name="networkTrackerSummaryNotReady">Nadal gromadzimy dane, aby pokazać, jak wiele skryptów śledzących zablokowaliśmy.</string>
-
-    <string name="trackersActivityTitle">Zablokowane żądania śledzenia</string>
-    <string name="trackersContentDescription">Zablokowane żądania śledzenia</string>
-    <string name="trackersOverview">Następujące żądania domen innych firm zostały zablokowane przed załadowaniem, ponieważ zostały zidentyfikowane jako żądania śledzenia. Załadowanie żądań firmy może umożliwić jej profilowanie użytkownika.</string>
-    <string name="trackersOverviewProtectionsOff">Żadne żądania śledzenia nie zostały zablokowane przed załadowaniem, ponieważ zabezpieczenia są wyłączone dla tej witryny. Załadowanie żądań firmy może umożliwić jej profilowanie użytkownika.</string>
-
-    <string name="domainsLoadedActivityTitle">Załadowano żądania innych firm</string>
-    <string name="domainsLoadedContentDescription">Załadowano żądania innych firm</string>
-    <string name="domainsLoadedOverview">Załadowano następujące żądania domen innych firm. Załadowanie żądań firmy może umożliwić jej profilowanie użytkownika, choć nadal mają zastosowanie nasze pozostałe zabezpieczenia dotyczące śledzenia w sieci.</string>
-    <string name="domainsLoadedOverviewProtectionsOff">Żadne żądania innych firm nie zostały zablokowane przed załadowaniem, ponieważ zabezpieczenia są wyłączone dla tej witryny. Załadowanie żądań firmy może umożliwić jej profilowanie użytkownika.</string>
-    <string name="domainsLoadedOverviewEmpty">Nie wykryliśmy żądań z żadnych domen innych firm.</string>
-    <string name="domainsLoadedHeadingText">Brak załadowanych domen innych firm</string>
-
-    <string name="webTrackingProtectionsText"><annotation type="learn_more_link">Informacje o zabezpieczeniach przed śledzeniem w sieci</annotation></string>
-    <string name="webTrackingProtectionsUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
-
-    <string name="trackersBlockedNoSectionDescription">Załadowano żądania następującej domeny.</string>
-
-    <string name="adLoadedSectionDescription" instruction="Placeholder is the name of the company who owns the ad">Następujące żądania domeny zostały załadowane, ponieważ niedawno została kliknięta reklama %1$s na DuckDuckGo. Te żądania pomagają ocenić skuteczność reklam. Wszystkie reklamy na DuckDuckGo są nieprofilowane.</string>
-    <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Jak reklamy w wyszukiwarce wpływają na zabezpieczenia</annotation></string>
-    <string name="adLoadedSectionUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
-
-    <string name="domainsLoadedSectionDescription">Załadowano również żądania następującej domeny.</string>
-    <string name="domainsLoadedSectionSingleSectionDescription">Załadowano żądania śledzenia następujących domen.</string>
-    <string name="domainsLoadedSectionEmptyListDescription">Nie wykryliśmy żądań z żadnych domen innych firm.</string>
-
-    <string name="domainsLoadedBreakageSectionDescription">Następujące żądania domeny zostały załadowane, aby zapobiec uszkodzeniu witryny.</string>
-    <string name="domainsLoadedAssociatedSectionDescription" instruction="Placeholder is the name of a company">Następujące żądania domeny zostały załadowane, ponieważ są powiązane z %1$s.</string>
-
-    <string name="trackersBlockedText">Żądania zablokowane przed załadowaniem</string>
-    <string name="trackersNotBlockedText">Brak zablokowanych żądań śledzenia</string>
-    <string name="trackersNoFoundText">Nie znaleziono żądań śledzenia</string>
-    <string name="trackersFoundText">Znaleziono żądania śledzenia</string>
-
-    <string name="domainsLoadedText">Załadowano żądania innych firm</string>
-    <string name="domainsNotLoadedText">Brak załadowanych żądań innych firm</string>
-
-    <string name="majorNetworksNoFound">Nie znaleziono dużych sieci skryptów śledzących</string>
-    <string name="majorNetworksFound">Znaleziono duże sieci skryptów śledzących</string>
-
     <!-- Fire -->
     <string name="fireMenu">Wyczyść dane</string>
     <string name="fireClearAll">Wyczyść wszystkie karty i dane</string>
@@ -741,10 +671,12 @@
     <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
     <string name="sitePermissionsSettingsAllowedSitesTitle">Zarządzaj witrynami</string>
     <string name="sitePermissionsSettingsEmptyText">Nie masz jeszcze witryn</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Usunięto uprawnienia wszystkich witryn</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Uprawnienia dla: „%1$s” </string>
     <string name="permissionsPerWebsiteAskSetting">Poproś</string>
     <string name="permissionsPerWebsiteDenySetting">Odmów</string>
     <string name="permissionsPerWebsiteAllowSetting">Zezwól</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Wyłączono opcję „Pytaj” dla wszystkich witryn</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Pozwolenie dla witryny %2$s na dostęp do urządzenia: %1$s</string>
 
     <!-- Autofill -->

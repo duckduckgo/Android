@@ -63,4 +63,6 @@
     <string name="credentialManagementViewMenuEdit">Szerkesztés</string>
     <string name="credentialManagementViewMenuDelete">Törlés</string>
 
+    <string name="credentialManagementSuggestionsLabel">Javasolt</string>
+
 </resources>

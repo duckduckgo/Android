@@ -30,10 +30,13 @@ class PromoBottomSheetDialog(builder: Builder) : BottomSheetDialog(builder.conte
     abstract class EventListener {
         /** Sets a listener to be invoked when the bottom sheet is shown */
         open fun onBottomSheetShown() {}
+
         /** Sets a listener to be invoked when the bottom sheet is dismiss */
         open fun onBottomSheetDismissed() {}
+
         /** Sets a listener to be invoked when primary button is clicked */
         open fun onPrimaryButtonClicked() {}
+
         /** Sets a listener to be invoked when secondary button is clicked */
         open fun onSecondaryButtonClicked() {}
     }

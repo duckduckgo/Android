@@ -28,7 +28,7 @@ class SmoothProgressAnimator(private val pageLoadingIndicator: ProgressBar) {
 
     fun onNewProgress(
         newProgress: Int,
-        onAnimationEnd: (Animator?) -> Unit
+        onAnimationEnd: (Animator?) -> Unit,
     ) {
         progressBarAnimation.pause()
         pageLoadingIndicator.apply {

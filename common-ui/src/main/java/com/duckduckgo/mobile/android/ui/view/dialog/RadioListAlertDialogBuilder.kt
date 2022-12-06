@@ -18,15 +18,16 @@ package com.duckduckgo.mobile.android.ui.view.dialog
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.widget.FrameLayout
+import android.widget.RadioGroup
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import com.duckduckgo.mobile.android.databinding.DialogSingleChoiceAlertBinding
 import com.duckduckgo.mobile.android.ui.view.button.RadioButton
 import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.view.toDp
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-class RadioListAlertDialogBuilder(val context: Context) {
+class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
 
     abstract class EventListener {
         open fun onDialogShown() {}
@@ -37,6 +38,8 @@ class RadioListAlertDialogBuilder(val context: Context) {
     }
 
     internal class DefaultEventListener : EventListener()
+
+    private var dialog: AlertDialog? = null
 
     var listener: EventListener = DefaultEventListener()
         private set
@@ -75,7 +78,7 @@ class RadioListAlertDialogBuilder(val context: Context) {
 
     fun setOptions(
         @StringRes stackedButtonTextId: List<Int>,
-        selectedItem: Int = 0
+        selectedItem: Int = 0,
     ): RadioListAlertDialogBuilder {
         stackedButtonTextId.forEach {
             optionList.add(context.getText(it))
@@ -99,7 +102,7 @@ class RadioListAlertDialogBuilder(val context: Context) {
         return this
     }
 
-    fun show() {
+    override fun build(): DaxAlertDialog {
         checkRequiredFieldsSet()
         val binding: DialogSingleChoiceAlertBinding = DialogSingleChoiceAlertBinding.inflate(LayoutInflater.from(context))
 
@@ -109,17 +112,28 @@ class RadioListAlertDialogBuilder(val context: Context) {
                 setCancelable(false)
                 setOnDismissListener { listener.onDialogDismissed() }
             }
-        val dialog = dialogBuilder.create()
 
-        setViews(binding, dialog)
+        dialog = dialogBuilder.create()
+        setViews(binding, dialog!!)
 
-        dialog.show()
+        return this
+    }
+
+    override fun show() {
+        if (dialog == null) {
+            build()
+        }
+        dialog?.show()
         listener.onDialogShown()
+    }
+
+    override fun dismiss() {
+        dialog?.dismiss()
     }
 
     private fun setViews(
         binding: DialogSingleChoiceAlertBinding,
-        dialog: AlertDialog
+        dialog: AlertDialog,
     ) {
         binding.radioListDialogTitle.text = titleText
 
@@ -131,8 +145,9 @@ class RadioListAlertDialogBuilder(val context: Context) {
 
         optionList.forEach {
             val radioButton = RadioButton(context, null)
-            radioButton.setPadding(30.toDp(), 0, 0, 0)
             radioButton.text = it
+            val params = RadioGroup.LayoutParams(RadioGroup.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT)
+            radioButton.layoutParams = params
             binding.radioListDialogRadioGroup.addView(radioButton)
         }
 

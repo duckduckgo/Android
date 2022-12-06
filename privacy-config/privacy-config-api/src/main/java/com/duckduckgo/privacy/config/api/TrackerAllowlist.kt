@@ -25,6 +25,6 @@ interface TrackerAllowlist {
      */
     fun isAnException(
         documentURL: String,
-        url: String
+        url: String,
     ): Boolean
 }

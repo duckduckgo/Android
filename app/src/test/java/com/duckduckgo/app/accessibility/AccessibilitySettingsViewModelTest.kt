@@ -18,16 +18,16 @@ package com.duckduckgo.app.accessibility
 
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
-import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
+import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
-import kotlin.time.ExperimentalTime
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 @ExperimentalTime
@@ -45,7 +45,7 @@ class AccessibilitySettingsViewModelTest {
         val viewState = AccessibilitySettingsViewModel.ViewState(
             overrideSystemFontSize = false,
             appFontSize = 100f,
-            forceZoom = false
+            forceZoom = false,
         )
         testee.viewState().test {
             assertEquals(viewState, awaitItem())
@@ -58,7 +58,7 @@ class AccessibilitySettingsViewModelTest {
         val viewState = AccessibilitySettingsViewModel.ViewState(
             overrideSystemFontSize = true,
             appFontSize = 150f,
-            forceZoom = true
+            forceZoom = true,
         )
         whenever(accessibilitySettings.overrideSystemFontSize).thenReturn(true)
         whenever(accessibilitySettings.appFontSize).thenReturn(150f)

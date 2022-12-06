@@ -30,17 +30,17 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.extensions.capitalizeFirstLetter
-import com.duckduckgo.voice.impl.listeningmode.VoiceSearchViewModel.Command
-import com.duckduckgo.voice.impl.listeningmode.ui.VoiceRecognizingIndicator.Action.INDICATOR_CLICKED
-import com.duckduckgo.voice.impl.listeningmode.ui.VoiceRecognizingIndicator.Model
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.voice.impl.R
 import com.duckduckgo.voice.impl.databinding.ActivityVoiceSearchBinding
+import com.duckduckgo.voice.impl.listeningmode.VoiceSearchViewModel.Command
+import com.duckduckgo.voice.impl.listeningmode.ui.VoiceRecognizingIndicator.Action.INDICATOR_CLICKED
+import com.duckduckgo.voice.impl.listeningmode.ui.VoiceRecognizingIndicator.Model
+import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class VoiceSearchActivity : DuckDuckGoActivity() {

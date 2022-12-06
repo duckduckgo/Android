@@ -28,11 +28,11 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.icon.ui.ChangeIconActivity
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.APPTP_WAITLIST_CODE
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.APP_LAUNCH
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CHANGE_ICON_FEATURE
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_LAUNCH
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.WEBSITE
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.APP_LAUNCH
 import com.duckduckgo.app.notification.model.NotificationSpec
 import com.duckduckgo.app.notification.model.SchedulableNotificationPlugin
 import com.duckduckgo.app.notification.model.WebsiteNotificationSpecification
@@ -43,8 +43,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.waitlist.trackerprotection.ui.AppTPWaitlistActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import dagger.android.AndroidInjection
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
 class NotificationHandlerService : IntentService("NotificationHandlerService") {
@@ -117,7 +117,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
 
     private fun onWebsiteNotification(
         intent: Intent,
-        pixelSuffix: String
+        pixelSuffix: String,
     ) {
         val url = intent.getStringExtra(WebsiteNotificationSpecification.WEBSITE_KEY)
         val newIntent = BrowserActivity.intent(context, queryExtra = url)
@@ -181,7 +181,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         fun pendingNotificationHandlerIntent(
             context: Context,
             eventType: String,
-            specification: NotificationSpec
+            specification: NotificationSpec,
         ): PendingIntent {
             val intent = Intent(context, NotificationHandlerService::class.java)
             intent.type = eventType

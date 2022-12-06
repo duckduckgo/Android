@@ -17,6 +17,7 @@
 package com.duckduckgo.app.statistics.api
 
 import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.statistics.VariantManager
@@ -25,32 +26,45 @@ import com.duckduckgo.app.statistics.model.PixelEntity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
 import timber.log.Timber
 
 interface PixelSender : DefaultLifecycleObserver {
     fun sendPixel(
         pixelName: String,
         parameters: Map<String, String>,
-        encodedParameters: Map<String, String>
+        encodedParameters: Map<String, String>,
     ): Completable
 
     fun enqueuePixel(
         pixelName: String,
         parameters: Map<String, String>,
-        encodedParameters: Map<String, String>
+        encodedParameters: Map<String, String>,
     ): Completable
 }
 
-class RxPixelSender constructor(
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = PixelSender::class,
+)
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = LifecycleObserver::class,
+)
+@SingleInstanceIn(AppScope::class)
+class RxPixelSender @Inject constructor(
     private val api: PixelService,
     private val pendingPixelDao: PendingPixelDao,
     private val statisticsDataStore: StatisticsDataStore,
     private val variantManager: VariantManager,
     private val deviceInfo: DeviceInfo,
-    private val statisticsLibraryConfig: StatisticsLibraryConfig?
+    private val statisticsLibraryConfig: StatisticsLibraryConfig?,
 ) : PixelSender {
 
     private val compositeDisposable = CompositeDisposable()
@@ -67,8 +81,8 @@ class RxPixelSender constructor(
                 .subscribeOn(Schedulers.io())
                 .subscribe(
                     { Timber.v("Pixel finished sync") },
-                    { Timber.w(it, "Pixel failed to sync") }
-                )
+                    { Timber.w(it, "Pixel failed to sync") },
+                ),
         )
     }
 
@@ -94,7 +108,7 @@ class RxPixelSender constructor(
     override fun sendPixel(
         pixelName: String,
         parameters: Map<String, String>,
-        encodedParameters: Map<String, String>
+        encodedParameters: Map<String, String>,
     ): Completable {
         return api.fire(
             pixelName,
@@ -102,21 +116,21 @@ class RxPixelSender constructor(
             getAtbInfo(),
             addDeviceParametersTo(parameters),
             encodedParameters,
-            devMode = shouldFirePixelsAsDev
+            devMode = shouldFirePixelsAsDev,
         )
     }
 
     override fun enqueuePixel(
         pixelName: String,
         parameters: Map<String, String>,
-        encodedParameters: Map<String, String>
+        encodedParameters: Map<String, String>,
     ): Completable {
         return Completable.fromCallable {
             val pixelEntity = PixelEntity(
                 pixelName = pixelName,
                 atb = getAtbInfo(),
                 additionalQueryParams = addDeviceParametersTo(parameters),
-                encodedQueryParams = encodedParameters
+                encodedQueryParams = encodedParameters,
             )
             pendingPixelDao.insert(pixelEntity)
         }
@@ -130,7 +144,7 @@ class RxPixelSender constructor(
                 this.atb,
                 this.additionalQueryParams,
                 this.encodedQueryParams,
-                devMode = shouldFirePixelsAsDev
+                devMode = shouldFirePixelsAsDev,
             )
         }
     }

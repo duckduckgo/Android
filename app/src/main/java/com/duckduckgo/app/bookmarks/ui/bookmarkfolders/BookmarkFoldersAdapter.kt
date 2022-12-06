@@ -26,16 +26,16 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel
-import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewBookmarkFolderEntryBinding
 import com.duckduckgo.mobile.android.databinding.ViewSectionHeaderBinding
+import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import timber.log.Timber
 
 class BookmarkFoldersAdapter(
     private val layoutInflater: LayoutInflater,
     private val viewModel: BookmarksViewModel,
-    private val parentId: Long
+    private val parentId: Long,
 ) : ListAdapter<BookmarkFoldersAdapter.BookmarkFoldersItemTypes, BookmarkFolderScreenViewHolders>(BookmarkFoldersDiffCallback()) {
 
     companion object {
@@ -64,7 +64,7 @@ class BookmarkFoldersAdapter(
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
-        viewType: Int
+        viewType: Int,
     ): BookmarkFolderScreenViewHolders {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
@@ -82,7 +82,7 @@ class BookmarkFoldersAdapter(
 
     override fun onBindViewHolder(
         holder: BookmarkFolderScreenViewHolders,
-        position: Int
+        position: Int,
     ) {
         when (holder) {
             is BookmarkFolderScreenViewHolders.BookmarkFoldersViewHolder -> {
@@ -114,7 +114,7 @@ sealed class BookmarkFolderScreenViewHolders(itemView: View) : RecyclerView.View
     class BookmarkFoldersViewHolder(
         private val layoutInflater: LayoutInflater,
         private val binding: ViewBookmarkFolderEntryBinding,
-        private val viewModel: BookmarksViewModel
+        private val viewModel: BookmarksViewModel,
     ) : BookmarkFolderScreenViewHolders(binding.root) {
 
         private val context: Context = binding.root.context
@@ -122,7 +122,7 @@ sealed class BookmarkFolderScreenViewHolders(itemView: View) : RecyclerView.View
         fun update(bookmarkFolder: BookmarkFolder) {
             binding.overflowMenu.contentDescription = context.getString(
                 R.string.bookmarkOverflowContentDescription,
-                bookmarkFolder.name
+                bookmarkFolder.name,
             )
 
             binding.title.text = bookmarkFolder.name
@@ -148,7 +148,7 @@ sealed class BookmarkFolderScreenViewHolders(itemView: View) : RecyclerView.View
 
         private fun showOverFlowMenu(
             anchor: ImageView,
-            bookmarkFolder: BookmarkFolder
+            bookmarkFolder: BookmarkFolder,
         ) {
             val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_delete_menu)
             val view = popupMenu.contentView
@@ -172,14 +172,14 @@ sealed class BookmarkFolderScreenViewHolders(itemView: View) : RecyclerView.View
 class BookmarkFoldersDiffCallback : DiffUtil.ItemCallback<BookmarkFoldersAdapter.BookmarkFoldersItemTypes>() {
     override fun areItemsTheSame(
         oldItem: BookmarkFoldersAdapter.BookmarkFoldersItemTypes,
-        newItem: BookmarkFoldersAdapter.BookmarkFoldersItemTypes
+        newItem: BookmarkFoldersAdapter.BookmarkFoldersItemTypes,
     ): Boolean {
         return oldItem == newItem
     }
 
     override fun areContentsTheSame(
         oldItem: BookmarkFoldersAdapter.BookmarkFoldersItemTypes,
-        newItem: BookmarkFoldersAdapter.BookmarkFoldersItemTypes
+        newItem: BookmarkFoldersAdapter.BookmarkFoldersItemTypes,
     ): Boolean {
         return oldItem == newItem
     }

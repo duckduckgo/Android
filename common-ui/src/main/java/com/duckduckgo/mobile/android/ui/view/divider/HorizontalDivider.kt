@@ -26,7 +26,7 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 class HorizontalDivider @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     private val binding: ViewHorizontalDividerBinding by viewBinding()
@@ -37,7 +37,7 @@ class HorizontalDivider @JvmOverloads constructor(
                 attrs,
                 R.styleable.HorizontalDivider,
                 0,
-                R.style.Widget_DuckDuckGo_HorizontalDivider
+                R.style.Widget_DuckDuckGo_HorizontalDivider,
             )
 
         val isFullWidth = typedArray.getBoolean(R.styleable.HorizontalDivider_fullWidth, true)

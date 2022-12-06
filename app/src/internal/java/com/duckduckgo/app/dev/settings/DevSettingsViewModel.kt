@@ -21,12 +21,13 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.bookmarks.model.BookmarksRepository
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
-import com.duckduckgo.app.dev.settings.db.UAOverride
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.dev.settings.db.DevSettingsDataStore
+import com.duckduckgo.app.dev.settings.db.UAOverride
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.traces.api.StartupTraces
 import com.duckduckgo.di.scopes.ActivityScope
+import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -35,7 +36,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class DevSettingsViewModel @Inject constructor(
@@ -44,14 +44,14 @@ class DevSettingsViewModel @Inject constructor(
     private val userAgentProvider: UserAgentProvider,
     private val bookmarksRepository: BookmarksRepository,
     private val favoritesRepository: FavoritesRepository,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
     data class ViewState(
         val nextTdsEnabled: Boolean = false,
         val startupTraceEnabled: Boolean = false,
         val overrideUA: Boolean = false,
-        val userAgent: String = ""
+        val userAgent: String = "",
     )
 
     sealed class Command {
@@ -70,8 +70,8 @@ class DevSettingsViewModel @Inject constructor(
                     nextTdsEnabled = devSettingsDataStore.nextTdsEnabled,
                     startupTraceEnabled = startupTraces.isTraceEnabled,
                     overrideUA = devSettingsDataStore.overrideUA,
-                    userAgent = userAgentProvider.userAgent("", false)
-                )
+                    userAgent = userAgentProvider.userAgent("", false),
+                ),
             )
         }
     }

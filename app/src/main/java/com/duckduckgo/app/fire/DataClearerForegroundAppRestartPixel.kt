@@ -30,8 +30,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 /**
  * Stores information about unsent automatic data clearer restart Pixels, detecting if user started the app from an external Intent.
@@ -42,7 +42,7 @@ import javax.inject.Inject
 @SingleInstanceIn(AppScope::class)
 class DataClearerForegroundAppRestartPixel @Inject constructor(
     private val context: Context,
-    private val pixel: Pixel
+    private val pixel: Pixel,
 ) : DefaultLifecycleObserver {
     private var detectedUserIntent: Boolean = false
 
@@ -86,7 +86,7 @@ class DataClearerForegroundAppRestartPixel @Inject constructor(
 
     private fun incrementCount(
         counter: Int,
-        sharedPrefKey: String
+        sharedPrefKey: String,
     ) {
         val updated = counter + 1
         preferences.edit(commit = true) {
@@ -96,7 +96,7 @@ class DataClearerForegroundAppRestartPixel @Inject constructor(
 
     private fun firePendingPixels(
         counter: Int,
-        pixelName: Pixel.PixelName
+        pixelName: Pixel.PixelName,
     ) {
         if (counter > 0) {
             for (i in 1..counter) {

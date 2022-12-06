@@ -56,7 +56,7 @@ class RealAutoconsent @Inject constructor(
     override fun addJsInterface(webView: WebView, autoconsentCallback: AutoconsentCallback) {
         webView.addJavascriptInterface(
             AutoconsentInterface(messageHandlerPlugins, webView, autoconsentCallback),
-            AUTOCONSENT_INTERFACE
+            AUTOCONSENT_INTERFACE,
         )
     }
 

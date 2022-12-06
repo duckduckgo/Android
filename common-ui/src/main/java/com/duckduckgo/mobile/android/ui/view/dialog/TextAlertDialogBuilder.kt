@@ -21,11 +21,12 @@ import android.view.LayoutInflater
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
+import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.DialogTextAlertBinding
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-class TextAlertDialogBuilder(val context: Context) {
+class TextAlertDialogBuilder(val context: Context) : DaxAlertDialog {
 
     abstract class EventListener {
         open fun onDialogShown() {}
@@ -35,6 +36,8 @@ class TextAlertDialogBuilder(val context: Context) {
     }
 
     internal class DefaultEventListener : EventListener()
+
+    private var dialog: AlertDialog? = null
 
     var listener: EventListener = DefaultEventListener()
         private set
@@ -89,27 +92,37 @@ class TextAlertDialogBuilder(val context: Context) {
         return this
     }
 
-    fun show() {
+    override fun build(): DaxAlertDialog {
         checkRequiredFieldsSet()
         val binding: DialogTextAlertBinding = DialogTextAlertBinding.inflate(LayoutInflater.from(context))
 
-        val dialogBuilder = MaterialAlertDialogBuilder(context, com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_Dialog)
+        val dialogBuilder = MaterialAlertDialogBuilder(context, R.style.Widget_DuckDuckGo_Dialog)
             .setView(binding.root)
             .apply {
                 setCancelable(false)
                 setOnDismissListener { listener.onDialogDismissed() }
             }
-        val dialog = dialogBuilder.create()
+        dialog = dialogBuilder.create()
+        setViews(binding, dialog!!)
 
-        setViews(binding, dialog)
+        return this
+    }
 
-        dialog.show()
+    override fun show() {
+        if (dialog == null) {
+            build()
+        }
+        dialog?.show()
         listener.onDialogShown()
+    }
+
+    override fun dismiss() {
+        dialog?.dismiss()
     }
 
     private fun setViews(
         binding: DialogTextAlertBinding,
-        dialog: AlertDialog
+        dialog: AlertDialog,
     ) {
         if (headerImageDrawableId > 0) {
             binding.textAlertDialogImage.setImageResource(headerImageDrawableId)

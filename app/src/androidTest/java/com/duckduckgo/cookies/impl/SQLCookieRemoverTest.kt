@@ -23,7 +23,7 @@ import com.duckduckgo.app.fire.DatabaseLocator
 import com.duckduckgo.app.fire.FireproofRepository
 import com.duckduckgo.app.fire.WebViewDatabaseLocator
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
-import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryImpl
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.db.AppDatabase
@@ -32,7 +32,8 @@ import com.duckduckgo.app.statistics.pixels.ExceptionPixel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.cookies.impl.CookiesPixelName.COOKIE_DATABASE_EXCEPTION_OPEN_ERROR
-import org.mockito.kotlin.*
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -41,8 +42,7 @@ import kotlinx.coroutines.withContext
 import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
+import org.mockito.kotlin.*
 
 @ExperimentalCoroutinesApi
 class SQLCookieRemoverTest {
@@ -135,17 +135,17 @@ class SQLCookieRemoverTest {
 
     private fun givenSQLCookieRemover(
         databaseLocator: DatabaseLocator = webViewDatabaseLocator,
-        repository: FireproofRepository = FireproofWebsiteRepository(fireproofWebsiteDao, DefaultDispatcherProvider(), mock()),
+        repository: FireproofRepository = FireproofWebsiteRepositoryImpl(fireproofWebsiteDao, DefaultDispatcherProvider(), mock()),
         offlinePixelCountDataStore: OfflinePixelCountDataStore = mockOfflinePixelCountDataStore,
         exceptionPixel: ExceptionPixel = ExceptionPixel(mockPixel, RootExceptionFinder()),
-        dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider()
+        dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
     ): SQLCookieRemover {
         return SQLCookieRemover(
             databaseLocator,
             repository,
             offlinePixelCountDataStore,
             exceptionPixel,
-            dispatcherProvider
+            dispatcherProvider,
         )
     }
 }

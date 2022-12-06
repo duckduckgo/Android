@@ -16,19 +16,19 @@
 
 package com.duckduckgo.downloads.impl
 
-import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.DownloadsRepository
+import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadEntity
 import com.duckduckgo.downloads.store.DownloadStatus
 import com.duckduckgo.downloads.store.DownloadsDatabase
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import java.io.File
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import java.io.File
-import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)

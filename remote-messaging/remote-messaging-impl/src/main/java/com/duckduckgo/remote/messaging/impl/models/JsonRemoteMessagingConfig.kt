@@ -19,7 +19,7 @@ package com.duckduckgo.remote.messaging.impl.models
 data class JsonRemoteMessagingConfig(
     val version: Long,
     val messages: List<JsonRemoteMessage>,
-    val rules: List<JsonMatchingRule>
+    val rules: List<JsonMatchingRule>,
 )
 
 data class JsonRemoteMessage(
@@ -27,7 +27,7 @@ data class JsonRemoteMessage(
     val content: JsonContent?,
     val exclusionRules: List<Int>,
     val matchingRules: List<Int>,
-    val translations: Map<String, JsonContentTranslations>
+    val translations: Map<String, JsonContentTranslations>,
 )
 
 data class JsonContent(
@@ -38,7 +38,7 @@ data class JsonContent(
     val primaryActionText: String = "",
     val primaryAction: JsonMessageAction? = null,
     val secondaryActionText: String = "",
-    val secondaryAction: JsonMessageAction? = null
+    val secondaryAction: JsonMessageAction? = null,
 )
 
 data class JsonContentTranslations(
@@ -51,7 +51,7 @@ data class JsonContentTranslations(
 
 data class JsonMatchingRule(
     val id: Int,
-    val attributes: Map<String, JsonMatchingAttribute>
+    val attributes: Map<String, JsonMatchingAttribute>,
 )
 
 data class JsonMatchingAttribute(
@@ -59,12 +59,12 @@ data class JsonMatchingAttribute(
     val min: Any? = null,
     val max: Any? = null,
     val since: Any? = null,
-    val fallback: Boolean? = null
+    val fallback: Boolean? = null,
 )
 
 data class JsonMessageAction(
     val type: String,
-    val value: String
+    val value: String,
 )
 
 sealed class JsonActionType(val jsonValue: String) {

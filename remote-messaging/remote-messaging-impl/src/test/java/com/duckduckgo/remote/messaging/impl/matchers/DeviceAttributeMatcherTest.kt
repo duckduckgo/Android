@@ -20,13 +20,13 @@ import android.os.Build
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.AppProperties
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
+import java.util.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Test
-import java.util.*
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 class DeviceAttributeMatcherTest {
@@ -41,7 +41,7 @@ class DeviceAttributeMatcherTest {
         givenDeviceProperties(locale = Locale.US)
 
         val result = testee.evaluate(
-            MatchingAttribute.Locale(value = listOf("en-US"))
+            MatchingAttribute.Locale(value = listOf("en-US")),
         )
 
         assertEquals(EvaluationResult.Match, result)
@@ -52,7 +52,7 @@ class DeviceAttributeMatcherTest {
         givenDeviceProperties(locale = Locale.US)
 
         val result = testee.evaluate(
-            MatchingAttribute.Locale(value = listOf("fr-FR", "fr-CA", "en-US"))
+            MatchingAttribute.Locale(value = listOf("fr-FR", "fr-CA", "en-US")),
         )
 
         assertEquals(EvaluationResult.Match, result)
@@ -63,7 +63,7 @@ class DeviceAttributeMatcherTest {
         givenDeviceProperties(locale = Locale.FRANCE)
 
         val result = testee.evaluate(
-            MatchingAttribute.Locale(value = listOf("en_US"))
+            MatchingAttribute.Locale(value = listOf("en_US")),
         )
 
         assertEquals(EvaluationResult.Fail, result)
@@ -74,7 +74,7 @@ class DeviceAttributeMatcherTest {
         givenDeviceProperties(locale = Locale.US)
 
         val result = testee.evaluate(
-            MatchingAttribute.Locale(value = listOf(""))
+            MatchingAttribute.Locale(value = listOf("")),
         )
 
         assertEquals(EvaluationResult.Fail, result)
@@ -299,7 +299,7 @@ class DeviceAttributeMatcherTest {
     private fun givenDeviceProperties(
         locale: Locale = Locale.getDefault(),
         apiLevel: Int = Build.VERSION.SDK_INT,
-        webView: String = ""
+        webView: String = "",
     ) {
         whenever(appBuildConfig.deviceLocale).thenReturn(locale)
         whenever(appBuildConfig.sdkInt).thenReturn(apiLevel)

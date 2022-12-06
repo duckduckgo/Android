@@ -17,19 +17,19 @@
 package com.duckduckgo.app.global
 
 import com.duckduckgo.app.CoroutineTestRule
-import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import org.mockito.kotlin.*
+import java.io.InterruptedIOException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.io.InterruptedIOException
+import org.mockito.kotlin.*
 
 @ExperimentalCoroutinesApi
 class AlertingUncaughtExceptionHandlerTest {
@@ -53,7 +53,7 @@ class AlertingUncaughtExceptionHandlerTest {
             mockUncaughtExceptionRepository,
             coroutineTestRule.testDispatcherProvider,
             TestScope(),
-            mockAppBuildConfig
+            mockAppBuildConfig,
         )
     }
 

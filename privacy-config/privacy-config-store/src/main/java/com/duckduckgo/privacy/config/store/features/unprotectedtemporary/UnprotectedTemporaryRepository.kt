@@ -33,7 +33,7 @@ interface UnprotectedTemporaryRepository {
 class RealUnprotectedTemporaryRepository(
     val database: PrivacyConfigDatabase,
     coroutineScope: CoroutineScope,
-    dispatcherProvider: DispatcherProvider
+    dispatcherProvider: DispatcherProvider,
 ) : UnprotectedTemporaryRepository {
 
     private val unprotectedTemporaryDao: UnprotectedTemporaryDao =

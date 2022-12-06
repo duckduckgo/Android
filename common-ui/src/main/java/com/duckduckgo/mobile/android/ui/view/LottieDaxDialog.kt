@@ -101,7 +101,7 @@ class LottieDaxDialog : DialogFragment(R.layout.view_dax_dialog_animated), DaxDi
 
     override fun onViewCreated(
         view: View,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
         setDialogAndStartAnimation()
@@ -187,7 +187,7 @@ class LottieDaxDialog : DialogFragment(R.layout.view_dax_dialog_animated), DaxDi
             secondaryButtonText: String? = "",
             hideButtonText: String,
             dismissible: Boolean = false,
-            showHideButton: Boolean = true
+            showHideButton: Boolean = true,
         ): LottieDaxDialog {
             return LottieDaxDialog().apply {
                 arguments = Bundle().apply {

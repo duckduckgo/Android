@@ -24,11 +24,11 @@ object RemoteMessagingConfigOM {
         id: Int = 1,
         version: Long = 0L,
         invalidate: Boolean = false,
-        evaluationTimestamp: String = ""
+        evaluationTimestamp: String = "",
     ) = RemoteMessagingConfig(
         id = id,
         version = version,
         invalidate = invalidate,
-        evaluationTimestamp = evaluationTimestamp
+        evaluationTimestamp = evaluationTimestamp,
     )
 }

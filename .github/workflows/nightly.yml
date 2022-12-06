@@ -10,8 +10,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  spotless:
-    name: Spotless
+  code_formatting:
+    name: Code Formatting
     runs-on: ubuntu-latest
 
     steps:
@@ -26,10 +26,10 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
 
-      - name: Spotless
+      - name: Run Code Formatting Checks
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: spotless
+          arguments: code_format_checks
 
   unit_tests:
     name: Unit tests

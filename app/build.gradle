@@ -5,7 +5,7 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'com.squareup.anvil'
 apply from: '../versioning.gradle'
-apply from: "$rootDir/spotless.gradle"
+apply from: "$rootDir/code-formatting.gradle"
 
 ext {
     USE_ORCHESTRATOR = project.hasProperty('orchestrator') ? project.property('orchestrator') : false
@@ -37,6 +37,9 @@ android {
                         srcDirs += files("$projectDir/../node_modules/@duckduckgo/autofill/dist/".toString())
                         srcDirs += files("$projectDir/../submodules/".toString())
                     }
+                }
+                assets {
+                    srcDirs += files("$projectDir/../node_modules/@duckduckgo/privacy-dashboard/build/app".toString())
                 }
             }
         }
@@ -189,6 +192,9 @@ dependencies {
     implementation project(':macos-api')
     implementation project(':macos-impl')
 
+    implementation project(':privacy-dashboard-api')
+    implementation project(':privacy-dashboard-impl')
+
     implementation project(':remote-messaging-api')
     implementation project(':remote-messaging-impl')
     implementation project(':remote-messaging-store')
@@ -229,8 +235,9 @@ dependencies {
     implementation project(':content-scope-scripts-api')
     implementation project(':content-scope-scripts-impl')
 
-    implementation project(':element-hiding-impl')
-    implementation project(':element-hiding-store')
+    implementation project(':fingerprint-protection-api')
+    implementation project(':fingerprint-protection-impl')
+    implementation project(':fingerprint-protection-store')
 
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
@@ -376,8 +383,8 @@ tasks.register('jvm_checks') {
     dependsOn 'spotlessCheck', 'lint', 'testPlayDebugUnitTest'
 }
 
-tasks.register('spotless') {
-    dependsOn 'spotlessCheck'
+tasks.register('code_format_checks') {
+    dependsOn 'spotlessCheck', 'lintKotlin'
 }
 
 tasks.register('lint_check') {

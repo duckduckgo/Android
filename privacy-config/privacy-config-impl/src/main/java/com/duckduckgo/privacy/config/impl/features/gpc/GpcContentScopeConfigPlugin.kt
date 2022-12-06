@@ -25,7 +25,7 @@ import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class GpcContentScopeConfigPlugin @Inject constructor(
-    private val gpcRepository: GpcRepository
+    private val gpcRepository: GpcRepository,
 ) : ContentScopeConfigPlugin {
 
     override fun config(): String {

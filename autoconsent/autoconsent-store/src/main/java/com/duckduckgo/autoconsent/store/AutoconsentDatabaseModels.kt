@@ -22,7 +22,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "autoconsent_exceptions")
 data class AutoconsentExceptionEntity(
     @PrimaryKey val domain: String,
-    val reason: String
+    val reason: String,
 )
 
 @Entity(tableName = "autoconsent_disabled_cmps")

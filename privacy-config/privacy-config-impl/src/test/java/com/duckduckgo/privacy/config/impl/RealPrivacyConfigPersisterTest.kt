@@ -24,8 +24,8 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.api.InMemorySharedPreferences
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
+import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.store.PrivacyConfig
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.PrivacyConfigRepository
@@ -34,9 +34,6 @@ import com.duckduckgo.privacy.config.store.RealPrivacyConfigRepository
 import com.duckduckgo.privacy.config.store.UnprotectedTemporaryEntity
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.RealUnprotectedTemporaryRepository
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
-import org.mockito.kotlin.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -48,6 +45,9 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
@@ -79,7 +79,7 @@ class RealPrivacyConfigPersisterTest {
                 unprotectedTemporaryRepository,
                 privacyRepository,
                 db,
-                sharedPreferences
+                sharedPreferences,
             )
     }
 
@@ -96,7 +96,9 @@ class RealPrivacyConfigPersisterTest {
         privacyRepository = RealPrivacyConfigRepository(db)
         unprotectedTemporaryRepository =
             RealUnprotectedTemporaryRepository(
-                db, TestScope(), coroutineRule.testDispatcherProvider
+                db,
+                TestScope(),
+                coroutineRule.testDispatcherProvider,
             )
     }
 
@@ -210,7 +212,7 @@ class RealPrivacyConfigPersisterTest {
             version = 2,
             readme = "readme",
             features = mapOf(FEATURE_NAME to JSONObject(FEATURE_JSON)),
-            unprotectedTemporaryList
+            unprotectedTemporaryList,
         )
     }
 
@@ -225,7 +227,7 @@ class RealPrivacyConfigPersisterTest {
 
         override fun store(
             featureName: String,
-            jsonString: String
+            jsonString: String,
         ): Boolean {
             count++
             return true

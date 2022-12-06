@@ -23,7 +23,7 @@ class BlobConverterJavascriptInterface(private val onBlobConverted: (url: String
     @JavascriptInterface
     fun convertBlobToDataUri(
         dataUrl: String,
-        contentType: String
+        contentType: String,
     ) {
         onBlobConverted(dataUrl, contentType)
     }

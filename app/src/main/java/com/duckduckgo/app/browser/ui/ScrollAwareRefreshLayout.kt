@@ -22,7 +22,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 
 class ScrollAwareRefreshLayout(
     context: Context,
-    attrs: AttributeSet?
+    attrs: AttributeSet?,
 ) : SwipeRefreshLayout(context, attrs) {
 
     private var canChildScrollUpCallback: (() -> Boolean)? = null

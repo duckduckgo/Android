@@ -27,7 +27,7 @@ import com.squareup.moshi.Types.newParameterizedType
 @Database(
     exportSchema = true,
     version = 1,
-    entities = [AnrEntity::class]
+    entities = [AnrEntity::class],
 )
 @TypeConverters(AnrTypeConverter::class)
 abstract class AnrsDatabase : RoomDatabase() {

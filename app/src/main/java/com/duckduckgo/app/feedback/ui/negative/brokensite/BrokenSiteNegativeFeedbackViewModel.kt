@@ -29,7 +29,7 @@ class BrokenSiteNegativeFeedbackViewModel @Inject constructor() : ViewModel() {
 
     fun userSubmittingFeedback(
         feedback: String,
-        brokenSite: String?
+        brokenSite: String?,
     ) {
         command.value = Command.ExitAndSubmitFeedback(feedback, brokenSite)
     }
@@ -37,7 +37,7 @@ class BrokenSiteNegativeFeedbackViewModel @Inject constructor() : ViewModel() {
     sealed class Command {
         data class ExitAndSubmitFeedback(
             val feedback: String,
-            val brokenSite: String?
+            val brokenSite: String?,
         ) : Command()
 
         object Exit : Command()

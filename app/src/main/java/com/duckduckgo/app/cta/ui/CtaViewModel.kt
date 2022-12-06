@@ -30,7 +30,7 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
-import com.duckduckgo.app.global.model.orderedTrackingEntities
+import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.onboarding.store.*
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
@@ -42,17 +42,17 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.ui.store.AppTheme
+import dagger.SingleInstanceIn
+import java.util.*
+import java.util.concurrent.atomic.AtomicBoolean
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.util.*
-import javax.inject.Inject
-import dagger.SingleInstanceIn
-import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.coroutines.CoroutineContext
 
 @SingleInstanceIn(AppScope::class)
 class CtaViewModel @Inject constructor(
@@ -97,7 +97,7 @@ class CtaViewModel @Inject constructor(
             CtaId.DAX_DIALOG_TRACKERS_FOUND,
             CtaId.DAX_DIALOG_NETWORK,
             CtaId.DAX_FIRE_BUTTON,
-            CtaId.DAX_END
+            CtaId.DAX_END,
         )
     }
 
@@ -176,7 +176,7 @@ class CtaViewModel @Inject constructor(
         isBrowserShowing: Boolean,
         site: Site? = null,
         favoritesOnboarding: Boolean = false,
-        locale: Locale = Locale.getDefault()
+        locale: Locale = Locale.getDefault(),
     ): Cta? {
         surveyCta(locale)?.let {
             return it
@@ -273,7 +273,6 @@ class CtaViewModel @Inject constructor(
         }
 
         nonNullSite.let {
-
             if (duckDuckGoUrlDetector.isDuckDuckGoEmailUrl(it.url)) {
                 return null
             }
@@ -289,8 +288,8 @@ class CtaViewModel @Inject constructor(
             if (!canShowDaxDialogCta()) return null
 
             // Trackers blocked
-            if (!daxDialogTrackersFoundShown() && !isSerpUrl(it.url) && it.orderedTrackingEntities().isNotEmpty()) {
-                return DaxDialogCta.DaxTrackersBlockedCta(onboardingStore, appInstallStore, it.orderedTrackingEntities(), host)
+            if (!daxDialogTrackersFoundShown() && !isSerpUrl(it.url) && it.orderedTrackerBlockedEntities().isNotEmpty()) {
+                return DaxDialogCta.DaxTrackersBlockedCta(onboardingStore, appInstallStore, it.orderedTrackerBlockedEntities(), host)
             }
 
             // Is major network

@@ -56,11 +56,10 @@ import com.duckduckgo.privacy.config.store.toUnprotectedTemporaryException
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -68,8 +67,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import timber.log.Timber
-import java.util.concurrent.CopyOnWriteArrayList
 
 @ExperimentalCoroutinesApi
 @RunWith(Parameterized::class)
@@ -120,7 +120,7 @@ class HttpsReferenceTest(private val testCase: TestCase) {
     data class HttpsTest(
         val name: String,
         val desc: String,
-        val tests: List<TestCase>
+        val tests: List<TestCase>,
     )
 
     data class TestCase(
@@ -129,7 +129,7 @@ class HttpsReferenceTest(private val testCase: TestCase) {
         val requestURL: String,
         val requestType: String,
         val expectURL: String,
-        val exceptPlatforms: List<String>?
+        val exceptPlatforms: List<String>?,
     )
 
     @UiThreadTest
@@ -169,7 +169,7 @@ class HttpsReferenceTest(private val testCase: TestCase) {
 
         val isEnabled = httpsFeature?.state == "enabled"
         val exceptionsUnprotectedTemporary = CopyOnWriteArrayList(
-            config?.unprotectedTemporary?.map { it.toUnprotectedTemporaryException() } ?: emptyList()
+            config?.unprotectedTemporary?.map { it.toUnprotectedTemporaryException() } ?: emptyList(),
         )
 
         whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.HttpsFeatureName.value, isEnabled)).thenReturn(isEnabled)
@@ -196,7 +196,7 @@ class HttpsReferenceTest(private val testCase: TestCase) {
             httpsDataPersister,
             binaryDataStore,
             httpsBloomFilterSpecDao,
-            moshi
+            moshi,
         )
 
         bloomFilterFactory = HttpsBloomFilterFactoryImpl(
@@ -213,7 +213,7 @@ class HttpsReferenceTest(private val testCase: TestCase) {
         private val httpsDataPersister: HttpsDataPersister,
         private val binaryDataStore: BinaryDataStore,
         private val httpsBloomSpecDao: HttpsBloomFilterSpecDao,
-        private val moshi: Moshi
+        private val moshi: Moshi,
     ) : HttpsEmbeddedDataPersister {
 
         override fun shouldPersistEmbeddedData(): Boolean {
@@ -225,13 +225,13 @@ class HttpsReferenceTest(private val testCase: TestCase) {
             Timber.d("Updating https data from embedded files")
             val specJson = FileUtilities.loadText(
                 javaClass.classLoader!!,
-                "reference_tests/https/https_bloomfilter_spec_reference.json"
+                "reference_tests/https/https_bloomfilter_spec_reference.json",
             )
             val specAdapter = moshi.adapter(HttpsBloomFilterSpec::class.java)
 
             val falsePositivesJson = FileUtilities.loadText(
                 javaClass.classLoader!!,
-                "reference_tests/https/https_allowlist_reference.json"
+                "reference_tests/https/https_allowlist_reference.json",
             )
             val falsePositivesType = Types.newParameterizedType(List::class.java, HttpsFalsePositiveDomain::class.java)
             val falsePositivesAdapter: JsonAdapter<List<HttpsFalsePositiveDomain>> = moshi.adapter(falsePositivesType)

@@ -33,12 +33,12 @@ import javax.inject.Inject
 class TabSwitcherViewModel @Inject constructor(
     private val tabRepository: TabRepository,
     private val webViewSessionStorage: WebViewSessionStorage,
-    private val adClickManager: AdClickManager
+    private val adClickManager: AdClickManager,
 ) : ViewModel() {
 
     var tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     var deletableTabs: LiveData<List<TabEntity>> = tabRepository.flowDeletableTabs.asLiveData(
-        context = viewModelScope.coroutineContext
+        context = viewModelScope.coroutineContext,
     )
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 

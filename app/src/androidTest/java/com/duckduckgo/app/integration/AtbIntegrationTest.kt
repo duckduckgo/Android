@@ -19,6 +19,7 @@ package com.duckduckgo.app.integration
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.InstantSchedulersRule
+import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.getDaggerComponent
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.statistics.Variant
@@ -29,12 +30,12 @@ import com.duckduckgo.app.statistics.api.StatisticsService
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.statistics.store.StatisticsSharedPreferences
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 /**
  * These tests communicate with the server and therefore will be slowed down if there is slow internet access.
@@ -49,6 +50,7 @@ class AtbIntegrationTest {
     private lateinit var service: StatisticsService
     private lateinit var testee: StatisticsRequester
     private lateinit var statisticsStore: StatisticsDataStore
+    private var emailManager: EmailManager = mock()
 
     @get:Rule
     val schedulers = InstantSchedulersRule()
@@ -67,7 +69,7 @@ class AtbIntegrationTest {
                 return listOf()
             }
         }
-        testee = StatisticsRequester(statisticsStore, service, mockVariantManager, plugins)
+        testee = StatisticsRequester(statisticsStore, service, mockVariantManager, plugins, emailManager)
     }
 
     @Test

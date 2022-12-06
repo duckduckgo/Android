@@ -55,8 +55,8 @@ class OfflinePixelSender constructor(
                 sendCookieDatabaseDeleteErrorPixel(),
                 sendCookieDatabaseCorruptedErrorPixel(),
                 sendUncaughtExceptionsPixel(),
-                *offlinePixels.map { it.send() }.toTypedArray()
-            )
+                *offlinePixels.map { it.send() }.toTypedArray(),
+            ),
         )
     }
 
@@ -66,39 +66,43 @@ class OfflinePixelSender constructor(
 
     private fun sendWebRendererCrashedPixel(): Completable {
         return sendPixelCount(
-            offlineCountCountDataStore::webRendererGoneCrashCount, WEB_RENDERER_GONE_CRASH
+            offlineCountCountDataStore::webRendererGoneCrashCount,
+            WEB_RENDERER_GONE_CRASH,
         )
     }
 
     private fun sendWebRendererKilledPixel(): Completable {
         return sendPixelCount(
-            offlineCountCountDataStore::webRendererGoneKilledCount, WEB_RENDERER_GONE_KILLED
+            offlineCountCountDataStore::webRendererGoneKilledCount,
+            WEB_RENDERER_GONE_KILLED,
         )
     }
 
     private fun sendCookieDatabaseDeleteErrorPixel(): Completable {
         return sendPixelCount(
             offlineCountCountDataStore::cookieDatabaseDeleteErrorCount,
-            COOKIE_DATABASE_DELETE_ERROR
+            COOKIE_DATABASE_DELETE_ERROR,
         )
     }
 
     private fun sendCookieDatabaseOpenErrorPixel(): Completable {
         return sendPixelCount(
-            offlineCountCountDataStore::cookieDatabaseOpenErrorCount, COOKIE_DATABASE_OPEN_ERROR
+            offlineCountCountDataStore::cookieDatabaseOpenErrorCount,
+            COOKIE_DATABASE_OPEN_ERROR,
         )
     }
 
     private fun sendCookieDatabaseNotFoundPixel(): Completable {
         return sendPixelCount(
-            offlineCountCountDataStore::cookieDatabaseNotFoundCount, COOKIE_DATABASE_NOT_FOUND
+            offlineCountCountDataStore::cookieDatabaseNotFoundCount,
+            COOKIE_DATABASE_NOT_FOUND,
         )
     }
 
     private fun sendCookieDatabaseCorruptedErrorPixel(): Completable {
         return sendPixelCount(
             offlineCountCountDataStore::cookieDatabaseCorruptedCount,
-            COOKIE_DATABASE_CORRUPTED_ERROR
+            COOKIE_DATABASE_CORRUPTED_ERROR,
         )
     }
 
@@ -114,13 +118,13 @@ class OfflinePixelSender constructor(
                     mapOf(
                         EXCEPTION_MESSAGE to exception.message,
                         EXCEPTION_APP_VERSION to exception.version,
-                        EXCEPTION_TIMESTAMP to exception.formattedTimestamp()
+                        EXCEPTION_TIMESTAMP to exception.formattedTimestamp(),
                     )
 
                 val pixel =
                     pixelSender.sendPixel(pixelName, params, emptyMap()).doOnComplete {
                         Timber.d(
-                            "Sent pixel with params: $params containing exception; deleting exception with id=${exception.id}"
+                            "Sent pixel with params: $params containing exception; deleting exception with id=${exception.id}",
                         )
                         runBlocking { uncaughtExceptionRepository.deleteException(exception.id) }
                     }
@@ -152,7 +156,7 @@ class OfflinePixelSender constructor(
 
     private fun sendPixelCount(
         counter: KMutableProperty0<Int>,
-        pixelName: Pixel.PixelName
+        pixelName: Pixel.PixelName,
     ): Completable {
         return defer {
             val count = counter.get()

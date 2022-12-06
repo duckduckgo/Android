@@ -27,12 +27,12 @@ import javax.inject.Inject
 @ContributesMultibinding(AppScope::class)
 class PrivacyFeatureTogglesPlugin @Inject constructor(
     private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository,
-    private val appBuildConfig: AppBuildConfig
+    private val appBuildConfig: AppBuildConfig,
 ) : FeatureTogglesPlugin {
 
     override fun isEnabled(
         featureName: String,
-        defaultValue: Boolean
+        defaultValue: Boolean,
     ): Boolean? {
         @Suppress("NAME_SHADOWING")
         val privacyFeatureName = privacyFeatureValueOf(featureName) ?: return null

@@ -26,7 +26,7 @@ sealed class FeedbackType {
         SEARCH_NOT_GOOD_ENOUGH,
         NOT_ENOUGH_CUSTOMIZATIONS,
         APP_IS_SLOW_OR_BUGGY,
-        OTHER
+        OTHER,
     }
 
     interface SubReason : Serializable
@@ -38,7 +38,7 @@ sealed class FeedbackType {
         WATCHING_VIDEOS,
         INTERACTING_IMAGES,
         BOOKMARK_MANAGEMENT,
-        OTHER
+        OTHER,
     }
 
     enum class SearchNotGoodEnoughSubReasons : SubReason {
@@ -47,7 +47,7 @@ sealed class FeedbackType {
         FASTER_LOAD_TIME,
         SEARCHING_IN_SPECIFIC_LANGUAGE,
         BETTER_AUTOCOMPLETE,
-        OTHER
+        OTHER,
     }
 
     enum class CustomizationSubReasons : SubReason {
@@ -57,13 +57,13 @@ sealed class FeedbackType {
         WHICH_DATA_IS_CLEARED,
         WHEN_DATA_IS_CLEARED,
         BOOKMARK_DISPLAY,
-        OTHER
+        OTHER,
     }
 
     enum class PerformanceSubReasons : SubReason {
         SLOW_WEB_PAGE_LOADS,
         APP_CRASHES_OR_FREEZES,
         MEDIA_PLAYBACK_BUGS,
-        OTHER
+        OTHER,
     }
 }

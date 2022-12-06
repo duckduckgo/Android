@@ -22,5 +22,5 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "tdsMetadata")
 data class TdsMetadata(
     @PrimaryKey val id: Int = 1,
-    val eTag: String
+    val eTag: String,
 )

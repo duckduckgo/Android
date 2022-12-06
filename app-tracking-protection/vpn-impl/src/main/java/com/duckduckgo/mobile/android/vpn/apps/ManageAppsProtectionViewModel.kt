@@ -31,21 +31,21 @@ import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.TimeWindow
+import java.util.concurrent.TimeUnit.DAYS
+import javax.inject.Inject
+import kotlin.coroutines.coroutineContext
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit.DAYS
-import javax.inject.Inject
-import kotlin.coroutines.coroutineContext
 
 @ContributesViewModel(ActivityScope::class)
 class ManageAppsProtectionViewModel @Inject constructor(
     private val excludedApps: TrackingProtectionAppsRepository,
     private val appTrackersRepository: AppTrackerBlockingStatsRepository,
     private val pixel: DeviceShieldPixels,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
@@ -133,7 +133,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
             .flowOn(dispatcherProvider.io())
 
     private suspend fun aggregateDataPerApp(
-        trackerData: List<BucketizedVpnTracker>
+        trackerData: List<BucketizedVpnTracker>,
     ): List<TrackingApp> {
         val sourceData = mutableListOf<TrackingApp>()
         val perSessionData = trackerData.groupBy { it.trackerCompanySignal.tracker.bucket }
@@ -155,7 +155,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
     fun onAppProtectionDisabled(
         appName: String,
         packageName: String,
-        report: Boolean
+        report: Boolean,
     ) {
         pixel.didDisableAppProtectionFromApps()
         viewModelScope.launch {
@@ -170,7 +170,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
     }
 
     fun onAppProtectionEnabled(
-        packageName: String
+        packageName: String,
     ) {
         pixel.didEnableAppProtectionFromApps()
         viewModelScope.launch {
@@ -228,7 +228,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
     fun onAppProtectionChanged(
         excludedAppInfo: TrackingProtectionAppInfo,
         position: Int,
-        enabled: Boolean
+        enabled: Boolean,
     ) {
         viewModelScope.launch {
             if (enabled) {
@@ -241,7 +241,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
 
     private suspend fun checkForAppProtectionEnabled(
         excludedAppInfo: TrackingProtectionAppInfo,
-        position: Int
+        position: Int,
     ) {
         if (!excludedAppInfo.isProblematic()) {
             onAppProtectionEnabled(excludedAppInfo.packageName)
@@ -275,18 +275,18 @@ class ManageAppsProtectionViewModel @Inject constructor(
 
 private data class ManualProtectionSnapshot(
     val timestamp: Long,
-    val snapshot: List<Pair<String, Boolean>>
+    val snapshot: List<Pair<String, Boolean>>,
 )
 
 data class ViewState(
-    val excludedApps: List<AppsProtectionType>
+    val excludedApps: List<AppsProtectionType>,
 )
 
 sealed class AppsProtectionType {
     data class InfoPanelType(val bannerContent: BannerContent) : AppsProtectionType()
     data class FilterType(
         val filterResId: Int,
-        val appsNumber: Int
+        val appsNumber: Int,
     ) : AppsProtectionType()
 
     data class AppInfoType(val appInfo: TrackingProtectionAppInfo) : AppsProtectionType()
@@ -295,7 +295,7 @@ sealed class AppsProtectionType {
 enum class BannerContent {
     ALL_OR_PROTECTED_APPS,
     UNPROTECTED_APPS,
-    CUSTOMISED_PROTECTION
+    CUSTOMISED_PROTECTION,
 }
 
 internal sealed class Command {
@@ -304,7 +304,7 @@ internal sealed class Command {
     object LaunchAllAppsProtection : Command()
     data class ShowEnableProtectionDialog(
         val excludingReason: TrackingProtectionAppInfo,
-        val position: Int
+        val position: Int,
     ) : Command()
 
     data class ShowDisableProtectionDialog(val excludingReason: TrackingProtectionAppInfo) : Command()

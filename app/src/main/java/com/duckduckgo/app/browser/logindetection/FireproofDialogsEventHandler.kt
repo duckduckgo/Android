@@ -53,7 +53,7 @@ class BrowserTabFireproofDialogsEventHandler(
     private val pixel: Pixel,
     private val fireproofWebsiteRepository: FireproofWebsiteRepository,
     private val appSettingsPreferencesStore: SettingsDataStore,
-    private val dispatchers: DispatcherProvider
+    private val dispatchers: DispatcherProvider,
 ) : FireproofDialogsEventHandler {
 
     override val event: MutableLiveData<Event> = MutableLiveData()
@@ -61,7 +61,7 @@ class BrowserTabFireproofDialogsEventHandler(
     override suspend fun onFireproofLoginDialogShown() {
         pixel.fire(
             pixel = AppPixelName.FIREPROOF_LOGIN_DIALOG_SHOWN,
-            parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to userTriedFireButton().toString())
+            parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to userTriedFireButton().toString()),
         )
     }
 
@@ -89,7 +89,7 @@ class BrowserTabFireproofDialogsEventHandler(
     override suspend fun onDisableLoginDetectionDialogShown() {
         pixel.fire(
             AppPixelName.FIREPROOF_LOGIN_DISABLE_DIALOG_SHOWN,
-            mapOf(Pixel.PixelParameter.FIRE_EXECUTED to userTriedFireButton().toString())
+            mapOf(Pixel.PixelParameter.FIRE_EXECUTED to userTriedFireButton().toString()),
         )
     }
 
@@ -97,7 +97,7 @@ class BrowserTabFireproofDialogsEventHandler(
         appSettingsPreferencesStore.automaticFireproofSetting = AutomaticFireproofSetting.NEVER
         pixel.fire(
             AppPixelName.FIREPROOF_LOGIN_DISABLE_DIALOG_DISABLE,
-            mapOf(Pixel.PixelParameter.FIRE_EXECUTED to userTriedFireButton().toString())
+            mapOf(Pixel.PixelParameter.FIRE_EXECUTED to userTriedFireButton().toString()),
         )
     }
 
@@ -115,7 +115,7 @@ class BrowserTabFireproofDialogsEventHandler(
             fireproofWebsiteRepository.fireproofWebsite(domain)?.let {
                 pixel.fire(
                     AppPixelName.FIREPROOF_AUTOMATIC_DIALOG_ALWAYS,
-                    mapOf(Pixel.PixelParameter.FIRE_EXECUTED to userTriedFireButton().toString())
+                    mapOf(Pixel.PixelParameter.FIRE_EXECUTED to userTriedFireButton().toString()),
                 )
                 emitEvent(Event.FireproofWebSiteSuccess(fireproofWebsiteEntity = it))
             }
@@ -129,7 +129,7 @@ class BrowserTabFireproofDialogsEventHandler(
             fireproofWebsiteRepository.fireproofWebsite(domain)?.let {
                 pixel.fire(
                     AppPixelName.FIREPROOF_AUTOMATIC_DIALOG_FIREPROOF_SITE,
-                    mapOf(Pixel.PixelParameter.FIRE_EXECUTED to userTriedFireButton().toString())
+                    mapOf(Pixel.PixelParameter.FIRE_EXECUTED to userTriedFireButton().toString()),
                 )
                 emitEvent(Event.FireproofWebSiteSuccess(fireproofWebsiteEntity = it))
             }

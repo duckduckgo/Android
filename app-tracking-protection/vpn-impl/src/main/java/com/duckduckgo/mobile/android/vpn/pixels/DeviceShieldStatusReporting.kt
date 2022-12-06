@@ -25,17 +25,17 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.work.*
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import timber.log.Timber
 
 @Module
 @ContributesTo(AppScope::class)
@@ -53,7 +53,7 @@ object DeviceShieldStatusReportingModule {
 }
 
 class DeviceShieldStatusReporting(
-    private val workManager: WorkManager
+    private val workManager: WorkManager,
 ) : LifecycleEventObserver {
 
     override fun onStateChanged(source: LifecycleOwner, event: Event) {
@@ -79,10 +79,11 @@ class DeviceShieldStatusReporting(
 @ContributesWorker(AppScope::class)
 class DeviceShieldStatusReportingWorker(
     context: Context,
-    params: WorkerParameters
+    params: WorkerParameters,
 ) : CoroutineWorker(context, params) {
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels
+
     @Inject
     lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 

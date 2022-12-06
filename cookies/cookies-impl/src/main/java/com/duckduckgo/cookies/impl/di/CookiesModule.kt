@@ -53,7 +53,7 @@ object CookiesModule {
     fun provideCookiesRepository(
         database: CookiesDatabase,
         @AppCoroutineScope coroutineScope: CoroutineScope,
-        dispatcherProvider: DispatcherProvider
+        dispatcherProvider: DispatcherProvider,
     ): CookiesRepository {
         return RealCookieRepository(database, coroutineScope, dispatcherProvider)
     }

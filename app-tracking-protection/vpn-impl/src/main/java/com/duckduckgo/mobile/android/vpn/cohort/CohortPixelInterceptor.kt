@@ -20,16 +20,16 @@ import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.global.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 import okhttp3.Interceptor
 import okhttp3.Protocol
 import okhttp3.Response
 import okhttp3.ResponseBody.Companion.toResponseBody
 import timber.log.Timber
-import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = PixelInterceptorPlugin::class
+    boundType = PixelInterceptorPlugin::class,
 )
 class CohortPixelInterceptor @Inject constructor(
     private val cohortCalculator: CohortCalculator,
@@ -75,7 +75,7 @@ class CohortPixelInterceptor @Inject constructor(
         private val EXCEPTIONS = listOf(
             "m_atp_ev_enabled_onboarding_",
             "m_atp_ev_cpu_usage_above_",
-            "m_atp_unprotected_apps_bucket_"
+            "m_atp_unprotected_apps_bucket_",
         )
     }
 }

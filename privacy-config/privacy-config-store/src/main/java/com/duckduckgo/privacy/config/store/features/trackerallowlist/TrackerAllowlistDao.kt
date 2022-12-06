@@ -38,7 +38,9 @@ abstract class TrackerAllowlistDao {
     @Query("select * from tracker_allowlist where domain = :domain")
     abstract fun get(domain: String): TrackerAllowlistEntity
 
-    @Query("select * from tracker_allowlist") abstract fun getAll(): List<TrackerAllowlistEntity>
+    @Query("select * from tracker_allowlist")
+    abstract fun getAll(): List<TrackerAllowlistEntity>
 
-    @Query("delete from tracker_allowlist") abstract fun deleteAll()
+    @Query("delete from tracker_allowlist")
+    abstract fun deleteAll()
 }

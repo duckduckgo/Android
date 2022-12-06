@@ -33,7 +33,7 @@ interface HttpsRepository {
 class RealHttpsRepository(
     val database: PrivacyConfigDatabase,
     coroutineScope: CoroutineScope,
-    dispatcherProvider: DispatcherProvider
+    dispatcherProvider: DispatcherProvider,
 ) : HttpsRepository {
 
     private val httpsDao: HttpsDao = database.httpsDao()

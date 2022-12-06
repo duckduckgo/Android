@@ -35,9 +35,9 @@ import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity.C
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity.Companion.KEY_CURRENT_FOLDER
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.EditBookmarkFolderDialogFragment
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.browser.databinding.DialogFragmentSavedSiteBinding
 import com.duckduckgo.app.global.view.TextChangedWatcher
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.mobile.android.ui.view.showKeyboard
 import kotlinx.android.synthetic.main.include_find_in_page.*
 
@@ -85,7 +85,7 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         _binding = DialogFragmentSavedSiteBinding.inflate(inflater, container, false)
         configureClickListeners()
@@ -118,7 +118,7 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
                     }
                 }
                 false
-            }
+            },
         )
     }
 
@@ -155,8 +155,8 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
                                 context,
                                 it,
                                 arguments?.getSerializable(KEY_CURRENT_FOLDER) as BookmarkFolder,
-                                showAddFolderMenu
-                            )
+                                showAddFolderMenu,
+                            ),
                         )
                     } else {
                         launcher.launch(BookmarkFoldersActivity.intent(context, it, showAddFolderMenu = showAddFolderMenu))
@@ -211,5 +211,5 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
 enum class ValidationState {
     CHANGED,
     UNCHANGED,
-    INVALID
+    INVALID,
 }

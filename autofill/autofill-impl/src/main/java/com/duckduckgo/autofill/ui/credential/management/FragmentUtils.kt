@@ -16,30 +16,13 @@
 
 package com.duckduckgo.autofill.ui.credential.management
 
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.commit
-import com.duckduckgo.autofill.impl.R
 
-fun FragmentManager.forceExitFragment(tag: String) {
+fun FragmentManager.removeFragment(tag: String) {
     commit {
         findFragmentByTag(tag)?.let {
             this.remove(it)
-            popBackStackImmediate()
-        }
-    }
-}
-
-fun FragmentManager.showFragment(
-    fragment: Fragment,
-    tag: String,
-    shouldAddToBackStack: Boolean
-) {
-    if (findFragmentByTag(tag) == null) {
-        commit {
-            setReorderingAllowed(true)
-            replace(R.id.fragment_container_view, fragment, tag)
-            if (shouldAddToBackStack) addToBackStack(tag)
         }
     }
 }

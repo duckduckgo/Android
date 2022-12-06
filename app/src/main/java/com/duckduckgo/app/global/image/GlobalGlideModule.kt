@@ -27,19 +27,19 @@ import com.bumptech.glide.module.AppGlideModule
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.certificates.rootstore.IsrgRootX1
 import com.duckduckgo.app.browser.certificates.rootstore.IsrgRootX2
+import java.io.InputStream
+import java.security.cert.X509Certificate
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.tls.HandshakeCertificates
 import timber.log.Timber
-import java.io.InputStream
-import java.security.cert.X509Certificate
 
 @GlideModule
 class GlobalGlideModule : AppGlideModule() {
     override fun registerComponents(
         context: Context,
         glide: Glide,
-        registry: Registry
+        registry: Registry,
     ) {
         val okHttpClientBuilder = OkHttpClient.Builder()
             .addInterceptor { chain: Interceptor.Chain ->
@@ -72,7 +72,7 @@ class GlobalGlideModule : AppGlideModule() {
                 registry.replace(
                     GlideUrl::class.java,
                     InputStream::class.java,
-                    OkHttpUrlLoader.Factory(okHttpClientBuilder.build())
+                    OkHttpUrlLoader.Factory(okHttpClientBuilder.build()),
                 )
             } catch (t: Throwable) {
                 Timber.d("Error registering GlideModule for GlideUrl: $t")
@@ -85,7 +85,7 @@ class GlobalGlideModule : AppGlideModule() {
         registry.replace(
             GlideUrl::class.java,
             InputStream::class.java,
-            OkHttpUrlLoader.Factory(okHttpClientBuilder.build())
+            OkHttpUrlLoader.Factory(okHttpClientBuilder.build()),
         )
     }
 

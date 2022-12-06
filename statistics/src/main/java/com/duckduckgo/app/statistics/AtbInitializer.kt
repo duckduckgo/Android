@@ -40,7 +40,7 @@ class AtbInitializer(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val statisticsDataStore: StatisticsDataStore,
     private val statisticsUpdater: StatisticsUpdater,
-    private val listeners: Set<AtbInitializerListener>
+    private val listeners: Set<AtbInitializerListener>,
 ) : DefaultLifecycleObserver {
 
     override fun onResume(owner: LifecycleOwner) {

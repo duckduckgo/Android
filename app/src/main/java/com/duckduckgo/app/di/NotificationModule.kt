@@ -62,7 +62,7 @@ object NotificationModule {
     fun provideClearDataNotification(
         context: Context,
         notificationDao: NotificationDao,
-        settingsDataStore: SettingsDataStore
+        settingsDataStore: SettingsDataStore,
     ): ClearDataNotification {
         return ClearDataNotification(context, notificationDao, settingsDataStore)
     }
@@ -71,7 +71,7 @@ object NotificationModule {
     fun providePrivacyProtectionNotification(
         context: Context,
         notificationDao: NotificationDao,
-        privacyProtectionCountDao: PrivacyProtectionCountDao
+        privacyProtectionCountDao: PrivacyProtectionCountDao,
     ): PrivacyProtectionNotification {
         return PrivacyProtectionNotification(context, notificationDao, privacyProtectionCountDao)
     }
@@ -81,12 +81,12 @@ object NotificationModule {
     fun providesNotificationScheduler(
         workManager: WorkManager,
         clearDataNotification: ClearDataNotification,
-        privacyProtectionNotification: PrivacyProtectionNotification
+        privacyProtectionNotification: PrivacyProtectionNotification,
     ): AndroidNotificationScheduler {
         return NotificationScheduler(
             workManager,
             clearDataNotification,
-            privacyProtectionNotification
+            privacyProtectionNotification,
         )
     }
 
@@ -94,7 +94,7 @@ object NotificationModule {
     @SingleInstanceIn(AppScope::class)
     fun providesNotificationFactory(
         context: Context,
-        manager: NotificationManagerCompat
+        manager: NotificationManagerCompat,
     ): NotificationFactory {
         return NotificationFactory(context, manager)
     }
@@ -107,7 +107,7 @@ object NotificationModule {
         manager: NotificationManagerCompat,
         factory: NotificationFactory,
         notificationDao: NotificationDao,
-        pluginPoint: PluginPoint<SchedulableNotificationPlugin>
+        pluginPoint: PluginPoint<SchedulableNotificationPlugin>,
     ): NotificationSender {
         return AppNotificationSender(context, pixel, manager, factory, notificationDao, pluginPoint)
     }
@@ -116,7 +116,7 @@ object NotificationModule {
     fun provideAppTpWaitlistCodeNotification(
         context: Context,
         notificationDao: NotificationDao,
-        dataStore: AppTrackingProtectionWaitlistDataStore
+        dataStore: AppTrackingProtectionWaitlistDataStore,
     ): AppTPWaitlistCodeNotification {
         return AppTPWaitlistCodeNotification(context, notificationDao, dataStore)
     }

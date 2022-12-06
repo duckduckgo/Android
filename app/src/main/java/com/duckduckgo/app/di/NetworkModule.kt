@@ -17,11 +17,9 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
-import com.duckduckgo.app.autocomplete.api.AutoCompleteService
 import com.duckduckgo.app.brokensite.api.BrokenSiteSender
 import com.duckduckgo.app.brokensite.api.BrokenSiteSubmitter
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
-import com.duckduckgo.app.email.api.EmailService
 import com.duckduckgo.app.feedback.api.FeedbackService
 import com.duckduckgo.app.feedback.api.FeedbackSubmitter
 import com.duckduckgo.app.feedback.api.FireAndForgetFeedbackSubmitter
@@ -31,23 +29,20 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.api.*
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.global.plugins.pixel.PixelInterceptorPlugin
-import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeService
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
-import com.duckduckgo.app.surrogates.api.ResourceSurrogateListService
-import com.duckduckgo.app.survey.api.SurveyService
-import com.duckduckgo.app.trackerdetection.api.TrackerListService
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
-import com.duckduckgo.mobile.android.vpn.waitlist.api.AppTrackingProtectionWaitlistService
 import com.duckduckgo.privacy.config.api.Gpc
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
+import java.io.File
+import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
 import okhttp3.Cache
 import okhttp3.Interceptor
@@ -57,8 +52,6 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import timber.log.Timber
-import java.io.File
-import javax.inject.Named
 
 @Module
 class NetworkModule {
@@ -69,7 +62,7 @@ class NetworkModule {
     fun apiOkHttpClient(
         context: Context,
         apiRequestInterceptor: ApiRequestInterceptor,
-        apiInterceptorPlugins: PluginPoint<ApiInterceptorPlugin>
+        apiInterceptorPlugins: PluginPoint<ApiInterceptorPlugin>,
     ): OkHttpClient {
         val cacheLocation = File(context.cacheDir, NetworkApiCache.FILE_NAME)
         val cache = Cache(cacheLocation, CACHE_SIZE)
@@ -110,7 +103,7 @@ class NetworkModule {
     @Named("api")
     fun apiRetrofit(
         @Named("api") okHttpClient: OkHttpClient,
-        moshi: Moshi
+        moshi: Moshi,
     ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(Url.API)
@@ -126,7 +119,7 @@ class NetworkModule {
     @Named("nonCaching")
     fun nonCachingRetrofit(
         @Named("nonCaching") okHttpClient: OkHttpClient,
-        moshi: Moshi
+        moshi: Moshi,
     ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(Url.API)
@@ -140,7 +133,7 @@ class NetworkModule {
     fun apiRequestInterceptor(
         context: Context,
         userAgentProvider: UserAgentProvider,
-        appBuildConfig: AppBuildConfig
+        appBuildConfig: AppBuildConfig,
     ): ApiRequestInterceptor {
         return ApiRequestInterceptor(context, userAgentProvider, appBuildConfig)
     }
@@ -149,30 +142,6 @@ class NetworkModule {
     fun pixelReQueryInterceptor(): PixelReQueryInterceptor {
         return PixelReQueryInterceptor()
     }
-
-    @Provides
-    fun trackerListService(@Named("api") retrofit: Retrofit): TrackerListService =
-        retrofit.create(TrackerListService::class.java)
-
-    @Provides
-    fun httpsUpgradeService(@Named("api") retrofit: Retrofit): HttpsUpgradeService =
-        retrofit.create(HttpsUpgradeService::class.java)
-
-    @Provides
-    fun autoCompleteService(@Named("nonCaching") retrofit: Retrofit): AutoCompleteService =
-        retrofit.create(AutoCompleteService::class.java)
-
-    @Provides
-    fun emailService(@Named("nonCaching") retrofit: Retrofit): EmailService =
-        retrofit.create(EmailService::class.java)
-
-    @Provides
-    fun surrogatesService(@Named("api") retrofit: Retrofit): ResourceSurrogateListService =
-        retrofit.create(ResourceSurrogateListService::class.java)
-
-    @Provides
-    fun appTrackingProtectionWaitlistService(@Named("api") retrofit: Retrofit): AppTrackingProtectionWaitlistService =
-        retrofit.create(AppTrackingProtectionWaitlistService::class.java)
 
     @Provides
     fun brokenSiteSender(
@@ -184,16 +153,12 @@ class NetworkModule {
         featureToggle: FeatureToggle,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         appBuildConfig: AppBuildConfig,
-        dispatcherProvider: DispatcherProvider
+        dispatcherProvider: DispatcherProvider,
     ): BrokenSiteSender =
         BrokenSiteSubmitter(
             statisticsStore, variantManager, tdsMetadataDao, gpc, featureToggle,
-            pixel, appCoroutineScope, appBuildConfig, dispatcherProvider
+            pixel, appCoroutineScope, appBuildConfig, dispatcherProvider,
         )
-
-    @Provides
-    fun surveyService(@Named("api") retrofit: Retrofit): SurveyService =
-        retrofit.create(SurveyService::class.java)
 
     @Provides
     fun feedbackSubmitter(
@@ -203,13 +168,9 @@ class NetworkModule {
         statisticsStore: StatisticsDataStore,
         pixel: Pixel,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
-        appBuildConfig: AppBuildConfig
+        appBuildConfig: AppBuildConfig,
     ): FeedbackSubmitter =
         FireAndForgetFeedbackSubmitter(feedbackService, variantManager, apiKeyMapper, statisticsStore, pixel, appCoroutineScope, appBuildConfig)
-
-    @Provides
-    fun feedbackService(@Named("api") retrofit: Retrofit): FeedbackService =
-        retrofit.create(FeedbackService::class.java)
 
     companion object {
         private const val CACHE_SIZE: Long = 10 * 1024 * 1024 // 10MB

@@ -55,8 +55,8 @@ class DeleteBookmarkFolderConfirmationFragment : DialogFragment() {
                 totalItems,
                 message,
                 bookmarkFolder.name,
-                totalItems
-            )
+                totalItems,
+            ),
         )
         string.setSpan(StyleSpan(Typeface.BOLD), message.length, message.length + bookmarkFolder.name.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         return string

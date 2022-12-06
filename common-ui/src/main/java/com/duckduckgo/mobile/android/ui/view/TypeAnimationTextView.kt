@@ -21,16 +21,16 @@ import android.text.Spanned
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatTextView
 import com.duckduckgo.app.global.extensions.html
-import kotlinx.coroutines.*
 import java.text.BreakIterator
 import java.text.StringCharacterIterator
 import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.*
 
 @Suppress("NoHardcodedCoroutineDispatcher")
 class TypeAnimationTextView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : AppCompatTextView(context, attrs, defStyleAttr), CoroutineScope {
 
     override val coroutineContext: CoroutineContext
@@ -46,7 +46,7 @@ class TypeAnimationTextView @JvmOverloads constructor(
     fun startTypingAnimation(
         textDialog: String,
         isCancellable: Boolean = true,
-        afterAnimation: () -> Unit = {}
+        afterAnimation: () -> Unit = {},
     ) {
         textInDialog = textDialog.html(context)
         if (isCancellable) {

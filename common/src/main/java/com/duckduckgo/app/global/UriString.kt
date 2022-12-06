@@ -34,7 +34,7 @@ class UriString {
 
         fun sameOrSubdomain(
             child: String,
-            parent: String
+            parent: String,
         ): Boolean {
             val childHost = host(child) ?: return false
             val parentHost = host(parent) ?: return false

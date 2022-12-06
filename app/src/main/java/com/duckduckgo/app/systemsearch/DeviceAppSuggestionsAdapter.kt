@@ -25,13 +25,13 @@ import com.duckduckgo.app.browser.databinding.ItemDeviceAppSuggestionBinding
 import com.duckduckgo.app.systemsearch.DeviceAppSuggestionsAdapter.DeviceAppViewHolder
 
 class DeviceAppSuggestionsAdapter(
-    private val clickListener: (DeviceApp) -> Unit
+    private val clickListener: (DeviceApp) -> Unit,
 ) : RecyclerView.Adapter<DeviceAppViewHolder>() {
     private var deviceApps: List<DeviceApp> = ArrayList()
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
-        viewType: Int
+        viewType: Int,
     ): DeviceAppViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemDeviceAppSuggestionBinding.inflate(inflater, parent, false)
@@ -40,7 +40,7 @@ class DeviceAppSuggestionsAdapter(
 
     override fun onBindViewHolder(
         holder: DeviceAppViewHolder,
-        position: Int
+        position: Int,
     ) {
         holder.apply {
             val app = deviceApps[position]
@@ -69,6 +69,6 @@ class DeviceAppSuggestionsAdapter(
     }
 
     class DeviceAppViewHolder(
-        val binding: ItemDeviceAppSuggestionBinding
+        val binding: ItemDeviceAppSuggestionBinding,
     ) : RecyclerView.ViewHolder(binding.root)
 }

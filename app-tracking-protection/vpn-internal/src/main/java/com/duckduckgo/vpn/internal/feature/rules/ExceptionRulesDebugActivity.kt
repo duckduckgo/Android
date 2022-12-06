@@ -33,13 +33,13 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRule
 import com.duckduckgo.vpn.internal.databinding.ActivityExceptionRulesDebugBinding
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class ExceptionRulesDebugActivity : DuckDuckGoActivity(), RuleTrackerView.RuleTrackerListener {
@@ -98,7 +98,6 @@ class ExceptionRulesDebugActivity : DuckDuckGoActivity(), RuleTrackerView.RuleTr
                 }
                 binding.appRule.isVisible = true
                 binding.progress.isVisible = false
-
             }
             .flowOn(dispatchers.main())
             .launchIn(lifecycleScope)
@@ -126,7 +125,7 @@ class ExceptionRulesDebugActivity : DuckDuckGoActivity(), RuleTrackerView.RuleTr
 
     private fun List<AppTrackerExceptionRule>.containsRule(
         packageName: String,
-        domain: String
+        domain: String,
     ): Boolean {
         forEach { exclusionRule ->
             if (exclusionRule.rule == domain && exclusionRule.packageNames.contains(packageName)) return true
@@ -152,7 +151,7 @@ class ExceptionRulesDebugActivity : DuckDuckGoActivity(), RuleTrackerView.RuleTr
 
     override fun onTrackerClicked(
         view: View,
-        enabled: Boolean
+        enabled: Boolean,
     ) {
         lifecycleScope.launch(dispatchers.io()) {
             val tag = (view.tag as String?).orEmpty()
@@ -181,5 +180,5 @@ private data class InstalledApp(
 private data class InstalledAppTrackers(
     val packageName: String,
     val name: String? = null,
-    val blockedDomains: Set<String>
+    val blockedDomains: Set<String>,
 )

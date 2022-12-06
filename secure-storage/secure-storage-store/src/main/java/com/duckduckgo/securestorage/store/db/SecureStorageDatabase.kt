@@ -23,7 +23,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
     version = 3,
-    entities = [WebsiteLoginCredentialsEntity::class]
+    entities = [WebsiteLoginCredentialsEntity::class],
 )
 abstract class SecureStorageDatabase : RoomDatabase() {
     abstract fun websiteLoginCredentialsDao(): WebsiteLoginCredentialsDao

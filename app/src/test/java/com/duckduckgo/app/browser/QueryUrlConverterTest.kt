@@ -23,13 +23,13 @@ import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class QueryUrlConverterTest {
@@ -137,7 +137,7 @@ class QueryUrlConverterTest {
 
     private fun assertDuckDuckGoSearchQuery(
         query: String,
-        url: String
+        url: String,
     ) {
         val uri = Uri.parse(url)
         assertEquals("duckduckgo.com", uri.host)

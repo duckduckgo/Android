@@ -28,11 +28,11 @@ import com.duckduckgo.mobile.android.vpn.cohort.AtpCohortManager
 import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateRepository
 import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
 import io.reactivex.Completable
-import retrofit2.Response
-import timber.log.Timber
 import java.io.IOException
 import java.util.*
 import javax.inject.Inject
+import retrofit2.Response
+import timber.log.Timber
 
 class SurveyDownloader @Inject constructor(
     private val service: SurveyService,
@@ -59,9 +59,7 @@ class SurveyDownloader @Inject constructor(
     }
 
     fun download(): Completable {
-
         return Completable.fromAction {
-
             Timber.d("Downloading user survey data")
 
             val response = getSurveyResponse()
@@ -95,7 +93,7 @@ class SurveyDownloader @Inject constructor(
                             surveyGroup.id,
                             calculateUrlWithParameters(surveyOption),
                             surveyOption.installationDay,
-                            SCHEDULED
+                            SCHEDULED,
                         )
                         else -> null
                     }

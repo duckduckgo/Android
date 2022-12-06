@@ -20,10 +20,10 @@ package com.duckduckgo.app.statistics
 
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import org.mockito.kotlin.*
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.*
 
 class ExperimentationVariantManagerTest {
 

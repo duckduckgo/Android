@@ -29,14 +29,14 @@ import javax.inject.Inject
 class PermissionAwareVoiceSearchLauncher @Inject constructor(
     private val permissionRequest: PermissionRequest,
     private val voiceSearchActivityLauncher: VoiceSearchActivityLauncher,
-    private val voiceSearchPermissionCheck: VoiceSearchPermissionCheck
+    private val voiceSearchPermissionCheck: VoiceSearchPermissionCheck,
 ) : VoiceSearchLauncher {
 
     override fun registerResultsCallback(
         caller: ActivityResultCaller,
         activity: Activity,
         source: Source,
-        onEvent: (Event) -> Unit
+        onEvent: (Event) -> Unit,
     ) {
         permissionRequest.registerResultsCallback(caller, activity) {
             voiceSearchActivityLauncher.launch(activity)

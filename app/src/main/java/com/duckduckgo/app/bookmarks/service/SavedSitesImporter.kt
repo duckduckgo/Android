@@ -40,7 +40,7 @@ class RealSavedSitesImporter(
     private val bookmarksDao: BookmarksDao,
     private val favoritesDao: FavoritesDao,
     private val bookmarksRepository: BookmarksRepository,
-    private val savedSitesParser: SavedSitesParser
+    private val savedSitesParser: SavedSitesParser,
 ) : SavedSitesImporter {
 
     companion object {

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.securestorage.impl
 
+import java.security.Key
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -25,7 +26,6 @@ import org.mockito.Mock
 import org.mockito.Mockito.mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
-import java.security.Key
 
 class RealL2DataTransformerTest {
     private lateinit var testee: RealL2DataTransformer

@@ -25,16 +25,16 @@ import com.google.android.material.switchmaterial.SwitchMaterial
 class SwitchView @JvmOverloads constructor(
     ctx: Context,
     attrs: AttributeSet,
-    defStyleAttr: Int = R.attr.switchStyle
+    defStyleAttr: Int = R.attr.switchStyle,
 ) : SwitchMaterial(
     ctx,
     attrs,
-    defStyleAttr
+    defStyleAttr,
 )
 
 fun SwitchView.quietlySetIsChecked(
     newCheckedState: Boolean,
-    changeListener: CompoundButton.OnCheckedChangeListener?
+    changeListener: CompoundButton.OnCheckedChangeListener?,
 ) {
     setOnCheckedChangeListener(null)
     isChecked = newCheckedState

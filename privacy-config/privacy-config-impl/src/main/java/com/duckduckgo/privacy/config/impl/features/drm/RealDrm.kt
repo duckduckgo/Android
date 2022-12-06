@@ -33,12 +33,12 @@ import javax.inject.Inject
 @SingleInstanceIn(AppScope::class)
 class RealDrm @Inject constructor(
     private val featureToggle: FeatureToggle,
-    private val drmRepository: DrmRepository
+    private val drmRepository: DrmRepository,
 ) : Drm {
 
     override fun getDrmPermissionsForRequest(
         url: String,
-        resources: Array<String>
+        resources: Array<String>,
     ): Array<String> {
         val perms = mutableSetOf<String>()
         if (shouldEnableDrmForUri(url.toUri())) {

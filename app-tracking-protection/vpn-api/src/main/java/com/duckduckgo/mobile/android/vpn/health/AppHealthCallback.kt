@@ -26,12 +26,12 @@ interface AppHealthCallback {
 
 data class AppHealthData(
     val alerts: List<String>,
-    val systemHealth: SystemHealthData
+    val systemHealth: SystemHealthData,
 )
 
 data class SystemHealthData(
     val isBadHealth: Boolean,
-    val rawMetrics: List<RawMetricsSubmission>
+    val rawMetrics: List<RawMetricsSubmission>,
 )
 
 data class RawMetricsSubmission(

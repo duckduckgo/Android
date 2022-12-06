@@ -25,8 +25,8 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
-import org.json.JSONObject
 import javax.inject.Inject
+import org.json.JSONObject
 
 @ContributesMultibinding(VpnScope::class)
 class VpnAppTrackerListInfoCollector @Inject constructor(

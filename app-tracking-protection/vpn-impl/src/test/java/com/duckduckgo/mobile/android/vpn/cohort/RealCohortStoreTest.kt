@@ -39,7 +39,7 @@ class RealCohortStoreTest {
     fun setup() {
         val prefs = InMemorySharedPreferences()
         whenever(
-            sharedPreferencesProvider.getSharedPreferences(eq("com.duckduckgo.mobile.atp.cohort.prefs"), eq(true), eq(true))
+            sharedPreferencesProvider.getSharedPreferences(eq("com.duckduckgo.mobile.atp.cohort.prefs"), eq(true), eq(true)),
         ).thenReturn(prefs)
 
         cohortStore = RealCohortStore(sharedPreferencesProvider)

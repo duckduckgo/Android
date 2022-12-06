@@ -16,13 +16,16 @@
 
 package com.duckduckgo.app.httpsupgrade.api
 
+import com.duckduckgo.anvil.annotations.ContributesServiceApi
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
 import com.duckduckgo.app.httpsupgrade.model.HttpsFalsePositiveDomain
+import com.duckduckgo.di.scopes.AppScope
 import io.reactivex.Observable
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.GET
 
+@ContributesServiceApi(AppScope::class)
 interface HttpsUpgradeService {
 
     @GET("https://staticcdn.duckduckgo.com/https/https-mobile-v2-bloom-spec.json")

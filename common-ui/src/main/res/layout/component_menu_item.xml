@@ -19,11 +19,11 @@
     android:layout_height="wrap_content"
     android:clipToPadding="false">
 
-    <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
         android:id="@+id/label"
-        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Overflow Menu Item"
+        android:layout_width="match_parent"
+        app:primaryText="Overflow Menu Item"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 

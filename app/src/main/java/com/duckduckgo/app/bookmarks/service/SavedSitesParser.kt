@@ -23,12 +23,12 @@ import org.jsoup.nodes.Element
 interface SavedSitesParser {
     fun generateHtml(
         folderTree: FolderTree,
-        favorites: List<SavedSite.Favorite>
+        favorites: List<SavedSite.Favorite>,
     ): String
 
     suspend fun parseHtml(
         document: Document,
-        bookmarksRepository: BookmarksRepository
+        bookmarksRepository: BookmarksRepository,
     ): List<SavedSite>
 }
 
@@ -41,9 +41,8 @@ class RealSavedSitesParser : SavedSitesParser {
 
     override fun generateHtml(
         folderTree: FolderTree,
-        favorites: List<SavedSite.Favorite>
+        favorites: List<SavedSite.Favorite>,
     ): String {
-
         if (folderTree.isEmpty() && favorites.isEmpty()) {
             return ""
         }
@@ -71,19 +70,19 @@ class RealSavedSitesParser : SavedSitesParser {
                         if (node.value.depth == 0) {
                             appendLine(
                                 "    <DT><H3 ADD_DATE=\"1618844074\" " +
-                                    "LAST_MODIFIED=\"1618844074\" PERSONAL_TOOLBAR_FOLDER=\"true\">${node.value.name}</H3>"
+                                    "LAST_MODIFIED=\"1618844074\" PERSONAL_TOOLBAR_FOLDER=\"true\">${node.value.name}</H3>",
                             )
                         } else {
                             appendLine(
                                 getTabString(node.value.depth) + "    <DT><H3 ADD_DATE=\"1618844074\" " +
-                                    "LAST_MODIFIED=\"1618844074\">${node.value.name}</H3>"
+                                    "LAST_MODIFIED=\"1618844074\">${node.value.name}</H3>",
                             )
                         }
                         appendLine(getTabString(node.value.depth) + "    <DL><p>")
                     } else {
                         appendLine(
                             getTabString(node.value.depth) + "    <DT><A HREF=\"${node.value.url}\" ADD_DATE=\"1618844074\" " +
-                                "LAST_MODIFIED=\"1618844074\">${node.value.name}</A>"
+                                "LAST_MODIFIED=\"1618844074\">${node.value.name}</A>",
                         )
                     }
                 },
@@ -91,7 +90,7 @@ class RealSavedSitesParser : SavedSitesParser {
                     if (node.value.url == null) {
                         appendLine(getTabString(node.value.depth) + "    </DL><p>")
                     }
-                }
+                },
             )
         }
     }
@@ -120,7 +119,7 @@ class RealSavedSitesParser : SavedSitesParser {
 
     override suspend fun parseHtml(
         document: Document,
-        bookmarksRepository: BookmarksRepository
+        bookmarksRepository: BookmarksRepository,
     ): List<SavedSite> {
         val body = document.select("body").first() ?: return emptyList()
         val children = body.childNodes()
@@ -140,9 +139,8 @@ class RealSavedSitesParser : SavedSitesParser {
         parentId: Long,
         bookmarksRepository: BookmarksRepository,
         savedSites: MutableList<SavedSite>,
-        inFavorite: Boolean
+        inFavorite: Boolean,
     ): List<SavedSite> {
-
         var favorites = 0
 
         documentElement.select("DL").first()?.let { itemBlock ->

@@ -56,7 +56,12 @@ class WebViewHttpAuthStoreTest {
 
     private val webViewHttpAuthStore =
         RealWebViewHttpAuthStore(
-            webViewDatabaseProvider, mockDatabaseCleaner, databaseLocator, coroutineRule.testDispatcherProvider, TestScope(), appBuildConfig
+            webViewDatabaseProvider,
+            mockDatabaseCleaner,
+            databaseLocator,
+            coroutineRule.testDispatcherProvider,
+            TestScope(),
+            appBuildConfig,
         )
 
     @Before

@@ -51,7 +51,7 @@ class RealCookieRepositoryTest {
         testee = RealCookieRepository(
             mockDatabase,
             TestScope(),
-            coroutineRule.testDispatcherProvider
+            coroutineRule.testDispatcherProvider,
         )
 
         assertEquals(cookieExceptionEntity.toCookieException(), testee.exceptions.first())
@@ -66,7 +66,7 @@ class RealCookieRepositoryTest {
         testee = RealCookieRepository(
             mockDatabase,
             TestScope(),
-            coroutineRule.testDispatcherProvider
+            coroutineRule.testDispatcherProvider,
         )
 
         assertEquals(DEFAULT_THRESHOLD, testee.firstPartyCookiePolicy.threshold)
@@ -80,7 +80,7 @@ class RealCookieRepositoryTest {
         testee = RealCookieRepository(
             mockDatabase,
             TestScope(),
-            coroutineRule.testDispatcherProvider
+            coroutineRule.testDispatcherProvider,
         )
 
         testee.updateAll(listOf(), policy)
@@ -95,7 +95,7 @@ class RealCookieRepositoryTest {
         testee = RealCookieRepository(
             mockDatabase,
             TestScope(),
-            coroutineRule.testDispatcherProvider
+            coroutineRule.testDispatcherProvider,
         )
         assertEquals(1, testee.exceptions.size)
         assertEquals(THRESHOLD, testee.firstPartyCookiePolicy.threshold)
@@ -116,7 +116,7 @@ class RealCookieRepositoryTest {
     companion object {
         val cookieExceptionEntity = CookieExceptionEntity(
             domain = "https://www.example.com",
-            reason = "reason"
+            reason = "reason",
         )
 
         const val THRESHOLD = 2

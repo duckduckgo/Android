@@ -18,8 +18,8 @@ package com.duckduckgo.adclick.impl
 
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 interface AdClickData {
 

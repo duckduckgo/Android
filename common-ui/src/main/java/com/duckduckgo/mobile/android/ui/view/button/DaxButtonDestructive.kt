@@ -23,9 +23,9 @@ import com.duckduckgo.mobile.android.R
 class DaxButtonDestructive @JvmOverloads constructor(
     ctx: Context,
     attrs: AttributeSet,
-    defStyleAttr: Int = R.attr.daxButtonDestructive
+    defStyleAttr: Int = R.attr.daxButtonDestructive,
 ) : DaxButton(
     ctx,
     attrs,
-    defStyleAttr
+    defStyleAttr,
 )

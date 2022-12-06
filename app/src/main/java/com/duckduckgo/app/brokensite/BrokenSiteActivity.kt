@@ -28,6 +28,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.WebViewVersionProvider
 import com.duckduckgo.app.browser.databinding.ActivityBrokenSiteBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
@@ -37,6 +38,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
 
     private val binding: ActivityBrokenSiteBinding by viewBinding()
     private val viewModel: BrokenSiteViewModel by bindViewModel()
+
     @Inject lateinit var webViewVersionProvider: WebViewVersionProvider
 
     private val toolbar
@@ -144,7 +146,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
 
         fun intent(
             context: Context,
-            data: BrokenSiteData
+            data: BrokenSiteData,
         ): Intent {
             val intent = Intent(context, BrokenSiteActivity::class.java)
             intent.putExtra(URL_EXTRA, data.url)

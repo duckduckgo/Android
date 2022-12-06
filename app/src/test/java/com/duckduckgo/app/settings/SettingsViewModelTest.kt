@@ -19,7 +19,6 @@ package com.duckduckgo.app.settings
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
-import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.fire.FireAnimationLoader
@@ -49,15 +48,16 @@ import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateReposito
 import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistStateRepository
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import org.mockito.kotlin.*
+import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import kotlin.time.ExperimentalTime
+import org.mockito.kotlin.*
 
 @ExperimentalCoroutinesApi
 @ExperimentalTime
@@ -373,7 +373,7 @@ class SettingsViewModelTest {
         verify(mockAppSettingsDataStore).showAppLinksPrompt = true
 
         verify(mockPixel).fire(
-            AppPixelName.SETTINGS_APP_LINKS_ASK_EVERY_TIME_SELECTED
+            AppPixelName.SETTINGS_APP_LINKS_ASK_EVERY_TIME_SELECTED,
         )
     }
 
@@ -384,7 +384,7 @@ class SettingsViewModelTest {
         verify(mockAppSettingsDataStore).showAppLinksPrompt = false
 
         verify(mockPixel).fire(
-            AppPixelName.SETTINGS_APP_LINKS_ALWAYS_SELECTED
+            AppPixelName.SETTINGS_APP_LINKS_ALWAYS_SELECTED,
         )
     }
 
@@ -395,7 +395,7 @@ class SettingsViewModelTest {
         verify(mockAppSettingsDataStore).showAppLinksPrompt = false
 
         verify(mockPixel).fire(
-            AppPixelName.SETTINGS_APP_LINKS_NEVER_SELECTED
+            AppPixelName.SETTINGS_APP_LINKS_NEVER_SELECTED,
         )
     }
 
@@ -532,7 +532,6 @@ class SettingsViewModelTest {
 
             cancelAndConsumeRemainingEvents()
         }
-
     }
 
     @Test
@@ -555,7 +554,7 @@ class SettingsViewModelTest {
 
         verify(mockPixel).fire(
             AppPixelName.FIRE_ANIMATION_NEW_SELECTED,
-            mapOf(Pixel.PixelParameter.FIRE_ANIMATION to Pixel.PixelValues.FIRE_ANIMATION_WHIRLPOOL)
+            mapOf(Pixel.PixelParameter.FIRE_ANIMATION to Pixel.PixelValues.FIRE_ANIMATION_WHIRLPOOL),
         )
     }
 
@@ -567,7 +566,7 @@ class SettingsViewModelTest {
 
         verify(mockPixel, times(0)).fire(
             AppPixelName.FIRE_ANIMATION_NEW_SELECTED,
-            mapOf(Pixel.PixelParameter.FIRE_ANIMATION to Pixel.PixelValues.FIRE_ANIMATION_INFERNO)
+            mapOf(Pixel.PixelParameter.FIRE_ANIMATION to Pixel.PixelValues.FIRE_ANIMATION_INFERNO),
         )
     }
 
@@ -742,5 +741,4 @@ private class FakeAppTrackingProtectionWaitlistDataStore : AppTrackingProtection
     override fun canUseEncryption(): Boolean {
         return false
     }
-
 }

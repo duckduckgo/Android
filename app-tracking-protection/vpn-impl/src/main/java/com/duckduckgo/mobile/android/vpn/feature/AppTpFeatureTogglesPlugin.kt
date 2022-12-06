@@ -26,7 +26,7 @@ import javax.inject.Inject
 @ContributesMultibinding(AppScope::class)
 class AppTpFeatureTogglesPlugin @Inject constructor(
     private val appTpFeatureToggleRepository: AppTpFeatureToggleRepository,
-    private val appBuildConfig: AppBuildConfig
+    private val appBuildConfig: AppBuildConfig,
 ) : FeatureTogglesPlugin {
     override fun isEnabled(featureName: String, defaultValue: Boolean): Boolean? {
         val appTpFeatureName = appTpFeatureValueOf(featureName) ?: return null

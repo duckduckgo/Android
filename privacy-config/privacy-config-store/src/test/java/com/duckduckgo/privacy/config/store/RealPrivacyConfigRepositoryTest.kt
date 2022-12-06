@@ -16,11 +16,11 @@
 
 package com.duckduckgo.privacy.config.store
 
+import org.junit.Before
+import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import org.junit.Before
-import org.junit.Test
 
 class RealPrivacyConfigRepositoryTest {
 

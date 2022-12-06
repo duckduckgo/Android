@@ -63,4 +63,6 @@
     <string name="credentialManagementViewMenuEdit">Rediger</string>
     <string name="credentialManagementViewMenuDelete">Slett</string>
 
+    <string name="credentialManagementSuggestionsLabel">Forslag</string>
+
 </resources>

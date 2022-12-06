@@ -30,7 +30,7 @@ import com.duckduckgo.remote.messaging.impl.models.matches
 
 class DeviceAttributeMatcher(
     private val appBuildConfig: AppBuildConfig,
-    private val appProperties: AppProperties
+    private val appProperties: AppProperties,
 ) : AttributeMatcher {
     override suspend fun evaluate(matchingAttribute: MatchingAttribute): EvaluationResult? {
         when (matchingAttribute) {

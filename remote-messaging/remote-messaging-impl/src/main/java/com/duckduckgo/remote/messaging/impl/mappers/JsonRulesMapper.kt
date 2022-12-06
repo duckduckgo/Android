@@ -24,8 +24,8 @@ import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.toIntOrDefault
 import com.duckduckgo.remote.messaging.impl.models.toStringList
 import com.duckduckgo.remote.messaging.impl.models.toStringOrDefault
-import timber.log.Timber
 import java.text.SimpleDateFormat
+import timber.log.Timber
 
 private val dateFormatter = SimpleDateFormat("yyyy-mm-dd")
 
@@ -33,7 +33,7 @@ private val dateFormatter = SimpleDateFormat("yyyy-mm-dd")
 private val localeMapper: (JsonMatchingAttribute) -> MatchingAttribute = { jsonMatchingAttribute ->
     MatchingAttribute.Locale(
         value = jsonMatchingAttribute.value.toStringList(),
-        fallback = jsonMatchingAttribute.fallback
+        fallback = jsonMatchingAttribute.fallback,
     )
 }
 
@@ -42,7 +42,7 @@ private val osApiMapper: (JsonMatchingAttribute) -> MatchingAttribute = { jsonMa
         value = jsonMatchingAttribute.value.toIntOrDefault(MATCHING_ATTR_INT_DEFAULT_VALUE),
         min = jsonMatchingAttribute.min.toIntOrDefault(MATCHING_ATTR_INT_DEFAULT_VALUE),
         max = jsonMatchingAttribute.max.toIntOrDefault(MATCHING_ATTR_INT_DEFAULT_VALUE),
-        fallback = jsonMatchingAttribute.fallback
+        fallback = jsonMatchingAttribute.fallback,
     )
 }
 
@@ -51,7 +51,7 @@ private val webViewMapper: (JsonMatchingAttribute) -> MatchingAttribute = { json
         value = jsonMatchingAttribute.value.toStringOrDefault(MATCHING_ATTR_STRING_DEFAULT_VALUE),
         min = jsonMatchingAttribute.min.toStringOrDefault(MATCHING_ATTR_STRING_DEFAULT_VALUE),
         max = jsonMatchingAttribute.max.toStringOrDefault(MATCHING_ATTR_STRING_DEFAULT_VALUE),
-        fallback = jsonMatchingAttribute.fallback
+        fallback = jsonMatchingAttribute.fallback,
     )
 }
 
@@ -59,14 +59,14 @@ private val webViewMapper: (JsonMatchingAttribute) -> MatchingAttribute = { json
 private val flavorMapper: (JsonMatchingAttribute) -> MatchingAttribute = { jsonMatchingAttribute ->
     MatchingAttribute.Flavor(
         value = jsonMatchingAttribute.value.toStringList(),
-        fallback = jsonMatchingAttribute.fallback
+        fallback = jsonMatchingAttribute.fallback,
     )
 }
 
 private val appIdMapper: (JsonMatchingAttribute) -> MatchingAttribute = { jsonMatchingAttribute ->
     MatchingAttribute.AppId(
         value = jsonMatchingAttribute.value.toStringOrDefault(MATCHING_ATTR_STRING_DEFAULT_VALUE),
-        fallback = jsonMatchingAttribute.fallback
+        fallback = jsonMatchingAttribute.fallback,
     )
 }
 
@@ -75,63 +75,63 @@ private val appVersionMapper: (JsonMatchingAttribute) -> MatchingAttribute = { j
         value = jsonMatchingAttribute.value.toStringOrDefault(MATCHING_ATTR_STRING_DEFAULT_VALUE),
         min = jsonMatchingAttribute.min.toStringOrDefault(MATCHING_ATTR_STRING_DEFAULT_VALUE),
         max = jsonMatchingAttribute.max.toStringOrDefault(MATCHING_ATTR_STRING_DEFAULT_VALUE),
-        fallback = jsonMatchingAttribute.fallback
+        fallback = jsonMatchingAttribute.fallback,
     )
 }
 
 private val atbMapper: (JsonMatchingAttribute) -> MatchingAttribute = { jsonMatchingAttribute ->
     MatchingAttribute.Atb(
         value = jsonMatchingAttribute.value.toStringOrDefault(MATCHING_ATTR_STRING_DEFAULT_VALUE),
-        fallback = jsonMatchingAttribute.fallback
+        fallback = jsonMatchingAttribute.fallback,
     )
 }
 
 private val appAtbMapper: (JsonMatchingAttribute) -> MatchingAttribute = { jsonMatchingAttribute ->
     MatchingAttribute.AppAtb(
         value = jsonMatchingAttribute.value.toStringOrDefault(MATCHING_ATTR_STRING_DEFAULT_VALUE),
-        fallback = jsonMatchingAttribute.fallback
+        fallback = jsonMatchingAttribute.fallback,
     )
 }
 
 private val searchAtbMapper: (JsonMatchingAttribute) -> MatchingAttribute = { jsonMatchingAttribute ->
     MatchingAttribute.SearchAtb(
         value = jsonMatchingAttribute.value.toStringOrDefault(MATCHING_ATTR_STRING_DEFAULT_VALUE),
-        fallback = jsonMatchingAttribute.fallback
+        fallback = jsonMatchingAttribute.fallback,
     )
 }
 
 private val expVariantMapper: (JsonMatchingAttribute) -> MatchingAttribute = { jsonMatchingAttribute ->
     MatchingAttribute.ExpVariant(
         value = jsonMatchingAttribute.value.toStringOrDefault(MATCHING_ATTR_STRING_DEFAULT_VALUE),
-        fallback = jsonMatchingAttribute.fallback
+        fallback = jsonMatchingAttribute.fallback,
     )
 }
 
 private val installedGPlayMapper: (JsonMatchingAttribute) -> MatchingAttribute = { jsonMatchingAttribute ->
     MatchingAttribute.InstalledGPlay(
         value = jsonMatchingAttribute.value as Boolean,
-        fallback = jsonMatchingAttribute.fallback
+        fallback = jsonMatchingAttribute.fallback,
     )
 }
 
 private val defaultBrowserMapper: (JsonMatchingAttribute) -> MatchingAttribute = { jsonMatchingAttribute ->
     MatchingAttribute.DefaultBrowser(
         value = jsonMatchingAttribute.value as Boolean,
-        fallback = jsonMatchingAttribute.fallback
+        fallback = jsonMatchingAttribute.fallback,
     )
 }
 
 private val emailEnabledMapper: (JsonMatchingAttribute) -> MatchingAttribute = { jsonMatchingAttribute ->
     MatchingAttribute.EmailEnabled(
         value = jsonMatchingAttribute.value as Boolean,
-        fallback = jsonMatchingAttribute.fallback
+        fallback = jsonMatchingAttribute.fallback,
     )
 }
 
 private val widgetAddedMapper: (JsonMatchingAttribute) -> MatchingAttribute = { jsonMatchingAttribute ->
     MatchingAttribute.WidgetAdded(
         value = jsonMatchingAttribute.value as Boolean,
-        fallback = jsonMatchingAttribute.fallback
+        fallback = jsonMatchingAttribute.fallback,
     )
 }
 
@@ -140,7 +140,7 @@ private val searchCountMapper: (JsonMatchingAttribute) -> MatchingAttribute = { 
         value = jsonMatchingAttribute.value.toIntOrDefault(MATCHING_ATTR_INT_DEFAULT_VALUE),
         min = jsonMatchingAttribute.min.toIntOrDefault(MATCHING_ATTR_INT_DEFAULT_VALUE),
         max = jsonMatchingAttribute.max.toIntOrDefault(MATCHING_ATTR_INT_DEFAULT_VALUE),
-        fallback = jsonMatchingAttribute.fallback
+        fallback = jsonMatchingAttribute.fallback,
     )
 }
 
@@ -149,7 +149,7 @@ private val bookmarksMapper: (JsonMatchingAttribute) -> MatchingAttribute = { js
         value = jsonMatchingAttribute.value.toIntOrDefault(MATCHING_ATTR_INT_DEFAULT_VALUE),
         min = jsonMatchingAttribute.min.toIntOrDefault(MATCHING_ATTR_INT_DEFAULT_VALUE),
         max = jsonMatchingAttribute.max.toIntOrDefault(MATCHING_ATTR_INT_DEFAULT_VALUE),
-        fallback = jsonMatchingAttribute.fallback
+        fallback = jsonMatchingAttribute.fallback,
     )
 }
 
@@ -158,14 +158,14 @@ private val favoritesMapper: (JsonMatchingAttribute) -> MatchingAttribute = { js
         value = jsonMatchingAttribute.value.toIntOrDefault(MATCHING_ATTR_INT_DEFAULT_VALUE),
         min = jsonMatchingAttribute.min.toIntOrDefault(MATCHING_ATTR_INT_DEFAULT_VALUE),
         max = jsonMatchingAttribute.max.toIntOrDefault(MATCHING_ATTR_INT_DEFAULT_VALUE),
-        fallback = jsonMatchingAttribute.fallback
+        fallback = jsonMatchingAttribute.fallback,
     )
 }
 
 private val appThemeMapper: (JsonMatchingAttribute) -> MatchingAttribute = { jsonMatchingAttribute ->
     MatchingAttribute.AppTheme(
         value = jsonMatchingAttribute.value.toStringOrDefault(MATCHING_ATTR_STRING_DEFAULT_VALUE),
-        fallback = jsonMatchingAttribute.fallback
+        fallback = jsonMatchingAttribute.fallback,
     )
 }
 
@@ -174,7 +174,7 @@ private val daysSinceInstalledMapper: (JsonMatchingAttribute) -> MatchingAttribu
         value = jsonMatchingAttribute.value.toIntOrDefault(MATCHING_ATTR_INT_DEFAULT_VALUE),
         min = jsonMatchingAttribute.min.toIntOrDefault(MATCHING_ATTR_INT_DEFAULT_VALUE),
         max = jsonMatchingAttribute.max.toIntOrDefault(MATCHING_ATTR_INT_DEFAULT_VALUE),
-        fallback = jsonMatchingAttribute.fallback
+        fallback = jsonMatchingAttribute.fallback,
     )
 }
 
@@ -182,7 +182,7 @@ private val daysUsedSinceMapper: (JsonMatchingAttribute) -> MatchingAttribute = 
     MatchingAttribute.DaysUsedSince(
         since = dateFormatter.parse(jsonMatchingAttribute.since as String)!!,
         value = jsonMatchingAttribute.value.toIntOrDefault(MATCHING_ATTR_INT_DEFAULT_VALUE),
-        fallback = jsonMatchingAttribute.fallback
+        fallback = jsonMatchingAttribute.fallback,
     )
 }
 
@@ -206,7 +206,7 @@ private val attributesMappers = mapOf(
     Pair("favorites", favoritesMapper),
     Pair("appTheme", appThemeMapper),
     Pair("daysSinceInstalled", daysSinceInstalledMapper),
-    Pair("daysUsedSince", daysUsedSinceMapper)
+    Pair("daysUsedSince", daysUsedSinceMapper),
 )
 
 fun List<JsonMatchingRule>.mapToMatchingRules(): Map<Int, List<MatchingAttribute>> = this.map {

@@ -28,7 +28,7 @@ interface WebViewVersionSource {
 
 @ContributesBinding(AppScope::class)
 class WebViewCompatWebViewVersionSource @Inject constructor(
-    private val context: Context
+    private val context: Context,
 ) : WebViewVersionSource {
     override fun get(): String =
         WebViewCompat.getCurrentWebViewPackage(context)?.versionName ?: ""

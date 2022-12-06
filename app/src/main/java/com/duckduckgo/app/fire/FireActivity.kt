@@ -56,14 +56,14 @@ class FireActivity : AppCompatActivity() {
 
         fun triggerRestart(
             context: Context,
-            notifyDataCleared: Boolean
+            notifyDataCleared: Boolean,
         ) {
             triggerRestart(context, getRestartIntent(context, notifyDataCleared))
         }
 
         private fun triggerRestart(
             context: Context,
-            nextIntent: Intent
+            nextIntent: Intent,
         ) {
             val intent = Intent(context, FireActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -79,7 +79,7 @@ class FireActivity : AppCompatActivity() {
 
         private fun getRestartIntent(
             context: Context,
-            notifyDataCleared: Boolean = false
+            notifyDataCleared: Boolean = false,
         ): Intent {
             val intent = BrowserActivity.intent(context, notifyDataCleared = notifyDataCleared)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)

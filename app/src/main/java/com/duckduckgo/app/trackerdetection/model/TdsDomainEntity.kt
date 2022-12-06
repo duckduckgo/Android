@@ -22,5 +22,5 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "tds_domain_entity")
 data class TdsDomainEntity(
     @PrimaryKey val domain: String,
-    val entityName: String
+    val entityName: String,
 )

@@ -25,25 +25,25 @@ import com.duckduckgo.remote.messaging.api.RemoteMessage
 @Suppress("MemberVisibilityCanBePrivate")
 object RemoteMessageOM {
     fun urlAction(
-        url: String = "http://example.com"
+        url: String = "http://example.com",
     ) = Action.Url(value = url)
 
     fun smallContent(
         titleText: String = "title",
-        descriptionText: String = "description"
+        descriptionText: String = "description",
     ) = Content.Small(
         titleText = titleText,
-        descriptionText = descriptionText
+        descriptionText = descriptionText,
     )
 
     fun mediumContent(
         titleText: String = "title",
         descriptionText: String = "description",
-        placeholder: Placeholder = ANNOUNCE
+        placeholder: Placeholder = ANNOUNCE,
     ) = Content.Medium(
         titleText = titleText,
         descriptionText = descriptionText,
-        placeholder = placeholder
+        placeholder = placeholder,
     )
 
     fun bigSingleActionContent(
@@ -51,13 +51,13 @@ object RemoteMessageOM {
         descriptionText: String = "description",
         placeholder: Placeholder = ANNOUNCE,
         primaryActionText: String = "Action1",
-        primaryAction: Action = urlAction()
+        primaryAction: Action = urlAction(),
     ) = Content.BigSingleAction(
         titleText = titleText,
         descriptionText = descriptionText,
         placeholder = placeholder,
         primaryActionText = primaryActionText,
-        primaryAction = primaryAction
+        primaryAction = primaryAction,
     )
 
     fun bigTwoActionsContent(
@@ -67,7 +67,7 @@ object RemoteMessageOM {
         primaryActionText: String = "Action1",
         primaryAction: Action = urlAction(),
         secondaryActionText: String = "Action2",
-        secondaryAction: Action = urlAction()
+        secondaryAction: Action = urlAction(),
     ) = Content.BigTwoActions(
         titleText = titleText,
         descriptionText = descriptionText,
@@ -75,20 +75,20 @@ object RemoteMessageOM {
         primaryActionText = primaryActionText,
         primaryAction = primaryAction,
         secondaryActionText = secondaryActionText,
-        secondaryAction = secondaryAction
+        secondaryAction = secondaryAction,
     )
 
     fun aSmallMessage(
         id: String = "id",
         content: Content = smallContent(),
         exclusionRules: List<Int> = emptyList(),
-        matchingRules: List<Int> = emptyList()
+        matchingRules: List<Int> = emptyList(),
     ): RemoteMessage {
         return RemoteMessage(
             id = id,
             content = content,
             exclusionRules = exclusionRules,
-            matchingRules = matchingRules
+            matchingRules = matchingRules,
         )
     }
 
@@ -96,13 +96,13 @@ object RemoteMessageOM {
         id: String = "id",
         content: Content = mediumContent(),
         exclusionRules: List<Int> = emptyList(),
-        matchingRules: List<Int> = emptyList()
+        matchingRules: List<Int> = emptyList(),
     ): RemoteMessage {
         return RemoteMessage(
             id = id,
             content = content,
             exclusionRules = exclusionRules,
-            matchingRules = matchingRules
+            matchingRules = matchingRules,
         )
     }
 
@@ -110,13 +110,13 @@ object RemoteMessageOM {
         id: String = "id",
         content: Content = bigSingleActionContent(),
         exclusionRules: List<Int> = emptyList(),
-        matchingRules: List<Int> = emptyList()
+        matchingRules: List<Int> = emptyList(),
     ): RemoteMessage {
         return RemoteMessage(
             id = id,
             content = content,
             exclusionRules = exclusionRules,
-            matchingRules = matchingRules
+            matchingRules = matchingRules,
         )
     }
 
@@ -124,13 +124,13 @@ object RemoteMessageOM {
         id: String = "id",
         content: Content = bigTwoActionsContent(),
         exclusionRules: List<Int> = emptyList(),
-        matchingRules: List<Int> = emptyList()
+        matchingRules: List<Int> = emptyList(),
     ): RemoteMessage {
         return RemoteMessage(
             id = id,
             content = content,
             exclusionRules = exclusionRules,
-            matchingRules = matchingRules
+            matchingRules = matchingRules,
         )
     }
 }

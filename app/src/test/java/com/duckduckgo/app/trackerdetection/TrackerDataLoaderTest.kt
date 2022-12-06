@@ -80,7 +80,7 @@ class TrackerDataLoaderTest {
             tdsMetadataDao = mockTdsMetadataDao,
             context = mockContext,
             appDatabase = mockAppDatabase,
-            moshi = Moshi.Builder().build()
+            moshi = Moshi.Builder().build(),
         )
     }
 

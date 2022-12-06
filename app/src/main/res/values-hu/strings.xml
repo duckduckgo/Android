@@ -109,76 +109,6 @@
     <string name="tabClosedUndo">Visszavonás</string>
     <string name="downloadsMenuItemTitle">Letöltések</string>
 
-    <!-- Privacy Dashboard Activities -->
-    <string name="privacyProtectionToggle">A weboldal adatvédelme</string>
-    <string name="privacyProtectionEnabled">WEBOLDAL VÉDELME ENGEDÉLYEZVE</string>
-    <string name="privacyProtectionDisabled">WEBOLDAL VÉDELME LETILTVA</string>
-    <string name="privacyDashboardActivityTitle">Adatvédelmi műszerfal</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes" instruction="Both placeholders are resource ids (integers) for two images">TOVÁBBFEJLESZTVE ERRŐL: &lt;img src=\"%1$d\" /&gt; ERRE: &lt;img src=\"%2$d\" /&gt;</string>
-    <string name="privacyGradeContentDescription">Adatvédelmi fokozat</string>
-    <string name="privacyProtectionTemporarilyDisabled">Ideiglenesen letiltottuk az adatvédelmet, mert úgy tűnik, hogy kárt okoz ezen a webhelyen.</string>
-
-    <string name="httpsGood">Titkosított kapcsolat</string>
-    <string name="httpsMixed">Vegyes titkosítású kapcsolat</string>
-    <string name="httpsBad">Titkosítatlan kapcsolat</string>
-
-    <string name="scorecardActivityTitle">Adatvédelmi fokozat</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">A weboldal egy nagy nyomkövető-hálózat</string>
-    <string name="scorecardPrivacyGrade">Adatvédelmi fokozat</string>
-    <string name="scorecardEnhancedGrade">Emelt fokozat</string>
-
-    <string name="privacyTermsActivityTitle">Adatvédelmi gyakorlatok</string>
-    <string name="practicesGood">Jó adatvédelmi gyakorlatok</string>
-    <string name="practicesMixed">Vegyes adatvédelmi gyakorlatok</string>
-    <string name="practicesBad">Rossz adatvédelmi gyakorlatok</string>
-    <string name="practicesUnknown">Ismeretlen adatvédelmi gyakorlatok</string>
-    <string name="practicesOverview">Az adatvédelmi gyakorlatok jelzik, hogy a weboldalakkal megosztott személyes adataid védelme mennyire garantált.</string>
-    <string name="practicesTosdrLink">Adatvédelmi gyakorlatok ettől: <b><u>eddigS;DR</u></b>.</string>
-    <string name="practicesIconContentGood">Jó gyakorlat ikon</string>
-    <string name="practicesIconContentBad">Hibás gyakorlat ikon</string>
-
-    <string name="networkTrackerSummaryHeader">A NYOMKÖVETŐ-HÁLÓZAT LEGNAGYOBB BŰNELKÖVETŐI</string>
-    <string name="networkTrackerSummaryNotReady">Folyamatosan gyűjtjük az adatokat, hogy bemutathassuk, hány követőt tiltottunk le.</string>
-
-    <string name="trackersActivityTitle">Nyomkövetési kérések blokkolva</string>
-    <string name="trackersContentDescription">Nyomkövetési kérések blokkolva</string>
-    <string name="trackersOverview">A következő harmadik fél tartományok kéréseinek betöltése blokkolva van, mivel nyomkövetési kérésként lettek beazonosítva. Ha egy cég kérései betöltődnek, az lehetővé teheti számukra, hogy profilokat készítsenek a felhasználóról.</string>
-    <string name="trackersOverviewProtectionsOff">A nyomkövető kérések betöltése nincs blokkolva, mert a végelem ki van kapcsolva ehhez a webhelyhez. Ha egy cég kérései betöltődnek, az lehetővé teheti számukra, hogy profilokat készítsenek a felhasználóról.</string>
-
-    <string name="domainsLoadedActivityTitle">A harmadik féltől származó kérések be lettek töltve</string>
-    <string name="domainsLoadedContentDescription">A harmadik féltől származó kérések be lettek töltve</string>
-    <string name="domainsLoadedOverview">A következő harmadik fél tartományok kérései kerültek betöltésre. Ha egy cég kérései betöltődnek, ez lehetővé teheti számukra, hogy profilokat készítsenek a felhasználóról, bár a többi webes nyomkövetési védelmünk továbbra is érvényben van.</string>
-    <string name="domainsLoadedOverviewProtectionsOff">A harmadik féltől származó kérések betöltése nincs blokkolva, mert a végelem ki van kapcsolva ehhez a webhelyhez. Ha egy cég kérései betöltődnek, az lehetővé teheti számukra, hogy profilokat készítsenek a felhasználóról.</string>
-    <string name="domainsLoadedOverviewEmpty">Nem észleltünk harmadik fél tartományából származó kéréseket.</string>
-    <string name="domainsLoadedHeadingText">Nincsenek betöltve harmadik fél tartományok</string>
-
-    <string name="webTrackingProtectionsText"><annotation type="learn_more_link">A webes nyomkövetés elleni védelemről</annotation></string>
-    <string name="webTrackingProtectionsUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
-
-    <string name="trackersBlockedNoSectionDescription">A következő tartomány kérései kerületek betöltésre.</string>
-
-    <string name="adLoadedSectionDescription" instruction="Placeholder is the name of the company who owns the ad">A következő tartomány kérései azért lettek betöltve, mert a DuckDuckGo-n nemrég rákattintottak egy %1$s hirdetésre. Ezek a kérések segítenek értékelni a hirdetések hatékonyságát. A DuckDuckGo összes hirdetése nem profilozó.</string>
-    <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Hogyan hatnak a keresési hirdetéseink a védelmünkre</annotation></string>
-    <string name="adLoadedSectionUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
-
-    <string name="domainsLoadedSectionDescription">A következő tartomány kérései is betöltésre kerültek.</string>
-    <string name="domainsLoadedSectionSingleSectionDescription">A következő tartományok követési kérelmei kerültek betöltésre.</string>
-    <string name="domainsLoadedSectionEmptyListDescription">Nem észleltünk harmadik fél tartományából származó kéréseket.</string>
-
-    <string name="domainsLoadedBreakageSectionDescription">A következő tartomány kérései a webhely összeomlásának megelőzése érdekében kerültek betöltésre.</string>
-    <string name="domainsLoadedAssociatedSectionDescription" instruction="Placeholder is the name of a company">A következő tartomány kérései azért lettek betöltve, mert a következőhöz vannak társítva: %1$s.</string>
-
-    <string name="trackersBlockedText">Kérések betöltése blokkolva</string>
-    <string name="trackersNotBlockedText">Nyomkövető kérések nincsenek blokkolva</string>
-    <string name="trackersNoFoundText">Nem találhatók nyomkövetési kérések</string>
-    <string name="trackersFoundText">Nyomkövető kérések találhatók</string>
-
-    <string name="domainsLoadedText">A harmadik féltől származó kérések be lettek töltve</string>
-    <string name="domainsNotLoadedText">Harmadik féltől származó kérések nincsenek betöltve</string>
-
-    <string name="majorNetworksNoFound">Nem található nagyobb nyomkövető hálózat</string>
-    <string name="majorNetworksFound">Nagy nyomkövető hálózatok találhatók</string>
-
     <!-- Fire -->
     <string name="fireMenu">Adatok törlése</string>
     <string name="fireClearAll">Összes lap és adat törlése</string>
@@ -733,10 +663,12 @@
     <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
     <string name="sitePermissionsSettingsAllowedSitesTitle">Webhelyek kezelése</string>
     <string name="sitePermissionsSettingsEmptyText">Még nincsenek oldalak</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Minden webhely engedélye eltávolítva</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Engedélyek a következőhöz: „%1$s” </string>
     <string name="permissionsPerWebsiteAskSetting">Rákérdezés</string>
     <string name="permissionsPerWebsiteDenySetting">Megtagadás</string>
     <string name="permissionsPerWebsiteAllowSetting">Engedélyezés</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">A „Rákérdezés” minden webhelyen letiltva</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s engedély a(z) %2$s számára</string>
 
     <!-- Autofill -->

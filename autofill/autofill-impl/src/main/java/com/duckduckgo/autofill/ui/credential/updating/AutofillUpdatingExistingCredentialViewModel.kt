@@ -28,5 +28,4 @@ class AutofillUpdatingExistingCredentialViewModel @Inject constructor() : ViewMo
     fun convertPasswordToMaskedView(credentials: LoginCredentials): String {
         return credentials.password?.toCharArray()?.joinToString(separator = "") { "•" } ?: ""
     }
-
 }

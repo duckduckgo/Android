@@ -34,13 +34,19 @@ class PermissionSettingAdapter(private val viewModel: PermissionsPerWebsiteViewM
         notifyDataSetChanged()
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): ViewHolder =
         ViewHolder(
             ItemSitePermissionSettingSelectionBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-            viewModel
+            viewModel,
         )
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: ViewHolder,
+        position: Int,
+    ) {
         holder.bind(items[position])
     }
 
@@ -48,7 +54,7 @@ class PermissionSettingAdapter(private val viewModel: PermissionsPerWebsiteViewM
 
     class ViewHolder(
         private val binding: ItemSitePermissionSettingSelectionBinding,
-        private val viewModel: PermissionsPerWebsiteViewModel
+        private val viewModel: PermissionsPerWebsiteViewModel,
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(setting: WebsitePermissionSetting) {
             binding.permissionSettingIcon.setImageResource(setting.icon)
@@ -64,22 +70,27 @@ class PermissionSettingAdapter(private val viewModel: PermissionsPerWebsiteViewM
 data class WebsitePermissionSetting(
     val icon: Int,
     val title: Int,
-    val setting: WebsitePermissionSettingType
+    val setting: WebsitePermissionSettingType,
 ) : Serializable
 
 enum class WebsitePermissionSettingType {
-    ASK, ALLOW, DENY;
+    ASK,
+    ASK_DISABLED,
+    ALLOW,
+    DENY,
+    ;
 
     fun toPrettyStringRes(): Int =
         when (this) {
             ASK -> R.string.permissionsPerWebsiteAskSetting
+            ASK_DISABLED -> R.string.permissionsPerWebsiteAskDisabledSetting
             ALLOW -> R.string.permissionsPerWebsiteAllowSetting
             DENY -> R.string.permissionsPerWebsiteDenySetting
         }
 
     fun toSitePermissionSettingEntityType(): SitePermissionAskSettingType =
         when (this) {
-            ASK -> SitePermissionAskSettingType.ASK_EVERY_TIME
+            ASK, ASK_DISABLED -> SitePermissionAskSettingType.ASK_EVERY_TIME
             ALLOW -> SitePermissionAskSettingType.ALLOW_ALWAYS
             DENY -> SitePermissionAskSettingType.DENY_ALWAYS
         }

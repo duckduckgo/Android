@@ -27,9 +27,9 @@ import android.widget.RemoteViews
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.AppPixelName.WIDGETS_ADDED
 import com.duckduckgo.app.pixels.AppPixelName.WIDGETS_DELETED
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import com.duckduckgo.app.widget.ui.AppWidgetCapabilities
 import javax.inject.Inject
@@ -52,7 +52,7 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget) : AppWidgetP
 
     override fun onReceive(
         context: Context,
-        intent: Intent?
+        intent: Intent?,
     ) {
         inject(context)
         super.onReceive(context, intent)
@@ -73,7 +73,7 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget) : AppWidgetP
     override fun onUpdate(
         context: Context,
         appWidgetManager: AppWidgetManager,
-        appWidgetIds: IntArray
+        appWidgetIds: IntArray,
     ) {
         // There may be multiple widgets active, so update all of them
         for (appWidgetId in appWidgetIds) {
@@ -85,7 +85,7 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget) : AppWidgetP
         context: Context,
         appWidgetManager: AppWidgetManager,
         appWidgetId: Int,
-        newOptions: Bundle?
+        newOptions: Bundle?,
     ) {
         updateAppWidget(context, appWidgetManager, appWidgetId, newOptions)
         super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
@@ -95,7 +95,7 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget) : AppWidgetP
         context: Context,
         appWidgetManager: AppWidgetManager,
         appWidgetId: Int,
-        newOptions: Bundle?
+        newOptions: Bundle?,
     ) {
         val appWidgetOptions = appWidgetManager.getAppWidgetOptions(appWidgetId)
         var portraitWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH)
@@ -125,7 +125,7 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget) : AppWidgetP
 
     override fun onDeleted(
         context: Context,
-        appWidgetIds: IntArray?
+        appWidgetIds: IntArray?,
     ) {
         if (appInstallStore.widgetInstalled && !widgetCapabilities.hasInstalledWidgets) {
             appInstallStore.widgetInstalled = false

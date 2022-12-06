@@ -54,20 +54,20 @@ interface VpnTrackerDao {
 
     @Query(
         "SELECT * FROM vpn_tracker " +
-            "WHERE timestamp >= :startTime AND timestamp < :endTime ORDER BY timestamp DESC limit $MAX_NUMBER_OF_TRACKERS_IN_QUERY_RESULTS"
+            "WHERE timestamp >= :startTime AND timestamp < :endTime ORDER BY timestamp DESC limit $MAX_NUMBER_OF_TRACKERS_IN_QUERY_RESULTS",
     )
     fun getTrackersBetween(
         startTime: String,
-        endTime: String
+        endTime: String,
     ): Flow<List<VpnTracker>>
 
     @Query(
         "SELECT * FROM vpn_tracker " +
-            "WHERE timestamp >= :startTime AND timestamp < :endTime ORDER BY timestamp DESC limit $MAX_NUMBER_OF_TRACKERS_IN_QUERY_RESULTS"
+            "WHERE timestamp >= :startTime AND timestamp < :endTime ORDER BY timestamp DESC limit $MAX_NUMBER_OF_TRACKERS_IN_QUERY_RESULTS",
     )
     fun getTrackersBetweenSync(
         startTime: String,
-        endTime: String
+        endTime: String,
     ): List<VpnTracker>
 
     @Query("DELETE FROM vpn_tracker WHERE timestamp < :startTime")
@@ -76,18 +76,18 @@ interface VpnTrackerDao {
     @Query("SELECT COALESCE(sum(count), 0) FROM vpn_tracker WHERE timestamp >= :startTime AND timestamp < :endTime")
     fun getTrackersCountBetween(
         startTime: String,
-        endTime: String
+        endTime: String,
     ): Flow<Int>
 
     @Query("SELECT COUNT(DISTINCT packageId) FROM vpn_tracker WHERE timestamp >= :startTime AND timestamp < :endTime")
     fun getTrackingAppsCountBetween(
         startTime: String,
-        endTime: String
+        endTime: String,
     ): Flow<Int>
 
     @Query(
         "SELECT * FROM vpn_tracker " +
-            "WHERE timestamp >= :startTime order by timestamp DESC limit $MAX_NUMBER_OF_TRACKERS_IN_QUERY_RESULTS"
+            "WHERE timestamp >= :startTime order by timestamp DESC limit $MAX_NUMBER_OF_TRACKERS_IN_QUERY_RESULTS",
     )
     fun getPagedTrackersSince(startTime: String): Flow<List<BucketizedVpnTracker>>
 
@@ -96,7 +96,7 @@ interface VpnTrackerDao {
         "SELECT * FROM vpn_tracker " +
             "WHERE timestamp LIKE :date || '%' AND packageId = :appPackage" +
             " order by timestamp" +
-            " DESC limit $MAX_NUMBER_OF_TRACKERS_IN_QUERY_RESULTS"
+            " DESC limit $MAX_NUMBER_OF_TRACKERS_IN_QUERY_RESULTS",
     )
     fun getTrackersForAppFromDate(
         date: String,
@@ -105,6 +105,9 @@ interface VpnTrackerDao {
 
     @Query("SELECT * from vpn_tracker WHERE packageId = :appPackage")
     fun getTrackersForApp(appPackage: String): List<VpnTracker>
+
+    @Query("select count(1) > 0 from vpn_tracker LIMIT 1")
+    fun tableIsNotEmpty(): Boolean
 
     companion object {
         private const val MAX_NUMBER_OF_TRACKERS_IN_QUERY_RESULTS = 10_000

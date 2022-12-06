@@ -34,7 +34,6 @@ class SettingsFireAnimationSelectorFragment : DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-
         val currentOption: FireAnimation = arguments?.getSerializable(DEFAULT_OPTION_EXTRA) as FireAnimation? ?: HeroFire
 
         val rootView = View.inflate(activity, R.layout.settings_fire_animation_selector_fragment, null)
@@ -80,7 +79,7 @@ class SettingsFireAnimationSelectorFragment : DialogFragment() {
 
     private fun updateCurrentSelect(
         currentOption: FireAnimation,
-        radioGroup: RadioGroup
+        radioGroup: RadioGroup,
     ) {
         val selectedId = currentOption.radioButtonId()
         radioGroup.check(selectedId)

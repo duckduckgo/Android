@@ -109,76 +109,6 @@
     <string name="tabClosedUndo">Отмяна</string>
     <string name="downloadsMenuItemTitle">Изтеглени файлове</string>
 
-    <!-- Privacy Dashboard Activities -->
-    <string name="privacyProtectionToggle">Защита на поверителността на сайта</string>
-    <string name="privacyProtectionEnabled">ЗАЩИТА НА САЙТА АКТИВИРАНА</string>
-    <string name="privacyProtectionDisabled">ЗАЩИТА НА САЙТА ДЕАКТИВИРАНА</string>
-    <string name="privacyDashboardActivityTitle">Табло за управление на поверителността</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes" instruction="Both placeholders are resource ids (integers) for two images">ПОДОБРЕН ОТ &lt;img src=\"%1$d\" /&gt; ДО &lt;img src=\"%2$d\" /&gt;</string>
-    <string name="privacyGradeContentDescription">Клас на поверителност</string>
-    <string name="privacyProtectionTemporarilyDisabled">Деактивирахме временно защитата на поверителността, защото изглежда, че пречи на зареждането на този сайт.</string>
-
-    <string name="httpsGood">Шифрована връзка</string>
-    <string name="httpsMixed">Смесена връзка за шифроване</string>
-    <string name="httpsBad">Нешифрована връзка</string>
-
-    <string name="scorecardActivityTitle">Клас на поверителност</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">Сайтът е основна проследяваща мрежа</string>
-    <string name="scorecardPrivacyGrade">Клас на поверителност</string>
-    <string name="scorecardEnhancedGrade">Засилена степен</string>
-
-    <string name="privacyTermsActivityTitle">Практики за защита на поверителността</string>
-    <string name="practicesGood">Добри практики за защита на поверителността</string>
-    <string name="practicesMixed">Смесени практики за защита на поверителността</string>
-    <string name="practicesBad">Лоши практики за защита на поверителността</string>
-    <string name="practicesUnknown">Неизвестни практики за защита на поверителността</string>
-    <string name="practicesOverview">Практиките за защита на поверителността показват каква част от личната информация, която споделяте с уебсайт, е защитена.</string>
-    <string name="practicesTosdrLink">Практики за защита на поверителността от<b><u>ToS;DR</u></b>.</string>
-    <string name="practicesIconContentGood">Иконка за добра практика</string>
-    <string name="practicesIconContentBad">Иконка за лоша практика</string>
-
-    <string name="networkTrackerSummaryHeader">ОСНОВНИ НАРУШИТЕЛИ В ПРОСЛЕДЯВАЩАТА МРЕЖА</string>
-    <string name="networkTrackerSummaryNotReady">Все още събираме данни, за да покажем колко проследяващи елемента сме блокирали.</string>
-
-    <string name="trackersActivityTitle">Блокирани заявки за проследяване</string>
-    <string name="trackersContentDescription">Блокирани заявки за проследяване</string>
-    <string name="trackersOverview">Блокирано е зареждането на заявки от следните домейни на трети страни, тъй като са идентифицирани като заявки за проследяване. Ако бъдат заредени заявки от дадена компания, те могат да ѝ позволят да Ви профилира.</string>
-    <string name="trackersOverviewProtectionsOff">Няма блокирано зареждане на заявки проследяване, тъй като защитите за този сайт са изключени. Ако бъдат заредени заявки от дадена компания, те могат да ѝ позволят да Ви профилира.</string>
-
-    <string name="domainsLoadedActivityTitle">Заредени заявки от трети страни</string>
-    <string name="domainsLoadedContentDescription">Заредени заявки от трети страни</string>
-    <string name="domainsLoadedOverview">Заредени са заявки от следните домейни на трети страни. Ако бъдат заредени заявки от дадена компания, те могат да ѝ позволят да Ви профилира, въпреки че останалите ни защити срещу проследяване в мрежата все още се прилагат.</string>
-    <string name="domainsLoadedOverviewProtectionsOff">Няма блокирано зареждане на заявки от трети страни, тъй като защитите за този сайт са изключени. Ако бъдат заредени заявки от дадена компания, те могат да ѝ позволят да Ви профилира.</string>
-    <string name="domainsLoadedOverviewEmpty">Не открихме заявки от домейни на трети страни.</string>
-    <string name="domainsLoadedHeadingText">Няма заредени домейни на трети страни</string>
-
-    <string name="webTrackingProtectionsText"><annotation type="learn_more_link">Относно нашите защити срещу проследяване в мрежата</annotation></string>
-    <string name="webTrackingProtectionsUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
-
-    <string name="trackersBlockedNoSectionDescription">Заредени са заявки от следните домейни.</string>
-
-    <string name="adLoadedSectionDescription" instruction="Placeholder is the name of the company who owns the ad">Заредени са заявки от следния домейн, защото наскоро сте щракнали върху реклама на %1$s в DuckDuckGo. Тези заявки помагат за оценка на ефективността на рекламата. Рекламите в DuckDuckGo не са профилиращи.</string>
-    <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Какво влияние оказват нашите реклами при търсене върху нашите защити</annotation></string>
-    <string name="adLoadedSectionUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
-
-    <string name="domainsLoadedSectionDescription">Заредени са също и заявки от следния домейн.</string>
-    <string name="domainsLoadedSectionSingleSectionDescription">Заредени са заявки за проследяване от следните домейни.</string>
-    <string name="domainsLoadedSectionEmptyListDescription">Не открихме заявки от домейни на трети страни.</string>
-
-    <string name="domainsLoadedBreakageSectionDescription">Заредени са заявки от следния домейн, за да се предотврати срив на сайта.</string>
-    <string name="domainsLoadedAssociatedSectionDescription" instruction="Placeholder is the name of a company">Заредени са заявки от следния домейн, защото са свързани с %1$s.</string>
-
-    <string name="trackersBlockedText">Блокирано зареждане на заявки</string>
-    <string name="trackersNotBlockedText">Няма блокирани заявки за проследяване</string>
-    <string name="trackersNoFoundText">Няма открити заявки за проследяване</string>
-    <string name="trackersFoundText">Открити заявки за проследяване</string>
-
-    <string name="domainsLoadedText">Заредени заявки от трети страни</string>
-    <string name="domainsNotLoadedText">Няма заредени заявки от трети страни</string>
-
-    <string name="majorNetworksNoFound">Не са открити основни проследяващи мрежи</string>
-    <string name="majorNetworksFound">Открити са основни проследяващи мрежи</string>
-
     <!-- Fire -->
     <string name="fireMenu">Изчистване на данни</string>
     <string name="fireClearAll">Изчистване на всички раздели и данни</string>
@@ -733,10 +663,12 @@
     <string name="sitePermissionsSettingsMicrophone">Микрофон</string>
     <string name="sitePermissionsSettingsAllowedSitesTitle">Управление на сайтове</string>
     <string name="sitePermissionsSettingsEmptyText">Все още няма сайтове</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Разрешенията са премахнати за всички сайтове</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Разрешения за \"%1$s\" </string>
     <string name="permissionsPerWebsiteAskSetting">Питане</string>
     <string name="permissionsPerWebsiteDenySetting">Отказвам</string>
     <string name="permissionsPerWebsiteAllowSetting">Разрешавам</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Опцията „Питай“ е деактивирана за всички сайтове</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s разрешение за %2$s</string>
 
     <!-- Autofill -->

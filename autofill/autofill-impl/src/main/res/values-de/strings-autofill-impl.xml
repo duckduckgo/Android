@@ -63,4 +63,6 @@
     <string name="credentialManagementViewMenuEdit">Bearbeiten</string>
     <string name="credentialManagementViewMenuDelete">Löschen</string>
 
+    <string name="credentialManagementSuggestionsLabel">Vorgeschlagen</string>
+
 </resources>

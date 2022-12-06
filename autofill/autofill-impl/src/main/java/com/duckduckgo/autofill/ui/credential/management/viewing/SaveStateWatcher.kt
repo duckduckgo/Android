@@ -23,7 +23,7 @@ import javax.inject.Inject
 
 fun FragmentAutofillManagementEditModeBinding.watchSaveState(
     saveStateWatcher: SaveStateWatcher,
-    saveStateUpdater: (Boolean) -> Unit = {}
+    saveStateUpdater: (Boolean) -> Unit = {},
 ) {
     saveStateWatcher.start(saveStateUpdater) {
         domainTitleEditText.text.isEmpty() && domainEditText.text.isEmpty() &&
@@ -48,7 +48,7 @@ class SaveStateWatcher @Inject constructor() : TextWatcher {
     private var _allTextInputIsEmpty: () -> Boolean = { false }
     fun start(
         saveStateUpdater: (Boolean) -> Unit,
-        allTextInputIsEmpty: () -> Boolean
+        allTextInputIsEmpty: () -> Boolean,
     ) {
         _saveStateUpdater = saveStateUpdater
         _allTextInputIsEmpty = allTextInputIsEmpty
@@ -58,7 +58,7 @@ class SaveStateWatcher @Inject constructor() : TextWatcher {
         s: CharSequence?,
         start: Int,
         count: Int,
-        after: Int
+        after: Int,
     ) {
     }
 
@@ -66,7 +66,7 @@ class SaveStateWatcher @Inject constructor() : TextWatcher {
         s: CharSequence?,
         start: Int,
         before: Int,
-        count: Int
+        count: Int,
     ) {
     }
 

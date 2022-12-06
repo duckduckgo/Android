@@ -75,7 +75,7 @@ class RootExceptionFinderTest {
 
     private fun buildNestedException(
         root: Throwable,
-        depthRequired: Int
+        depthRequired: Int,
     ): Throwable {
         var nested = root
         for (i in 0 until depthRequired) {

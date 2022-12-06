@@ -30,10 +30,10 @@ import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificatio
 import com.duckduckgo.mobile.android.vpn.ui.notification.OngoingNotificationPressedHandler
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 
 @ContributesMultibinding(VpnScope::class)
 @SingleInstanceIn(VpnScope::class)
@@ -43,7 +43,7 @@ class VpnTrackerNotificationUpdates @Inject constructor(
     private val repository: AppTrackerBlockingStatsRepository,
     private val deviceShieldNotificationFactory: DeviceShieldNotificationFactory,
     private val notificationManager: NotificationManagerCompat,
-    private val ongoingNotificationPressedHandler: OngoingNotificationPressedHandler
+    private val ongoingNotificationPressedHandler: OngoingNotificationPressedHandler,
 ) : VpnServiceCallbacks {
 
     private var notificationTickerChannel = MutableStateFlow(System.currentTimeMillis())
@@ -63,7 +63,7 @@ class VpnTrackerNotificationUpdates @Inject constructor(
 
     override fun onVpnStopped(
         coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
+        vpnStopReason: VpnStopReason,
     ) {
         notificationTickerJob.cancel()
         newTrackerObserverJob.cancel()

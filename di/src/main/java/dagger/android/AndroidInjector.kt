@@ -64,7 +64,7 @@ interface AndroidInjector<T> {
         inline fun <reified T, R : AndroidInjector<T>> inject(
             injector: Any,
             instance: T,
-            mapKey: Class<*>? = null
+            mapKey: Class<*>? = null,
         ) {
             if ((injector is HasDaggerInjector)) {
                 (injector.daggerFactoryFor(mapKey ?: instance!!::class.java) as Factory<T, R>)
@@ -88,21 +88,21 @@ class AndroidInjection {
     companion object {
         inline fun <reified T : Activity> inject(
             instance: T,
-            bindingKey: Class<*>? = null
+            bindingKey: Class<*>? = null,
         ) {
             AndroidInjector.inject(instance.applicationContext as Application, instance, bindingKey)
         }
 
         inline fun <reified T : Fragment> inject(
             instance: T,
-            bindingKey: Class<*>? = null
+            bindingKey: Class<*>? = null,
         ) {
             AndroidInjector.inject(findHasDaggerInjectorForFragment(instance), instance, bindingKey)
         }
 
         inline fun <reified T : Service> inject(
             instance: T,
-            bindingKey: Class<*>? = null
+            bindingKey: Class<*>? = null,
         ) {
             AndroidInjector.inject(instance.application, instance, bindingKey)
         }
@@ -110,7 +110,7 @@ class AndroidInjection {
         inline fun <reified T : BroadcastReceiver> inject(
             instance: T,
             context: Context,
-            bindingKey: Class<*>? = null
+            bindingKey: Class<*>? = null,
         ) {
             AndroidInjector.inject(context.applicationContext as Application, instance, bindingKey)
         }

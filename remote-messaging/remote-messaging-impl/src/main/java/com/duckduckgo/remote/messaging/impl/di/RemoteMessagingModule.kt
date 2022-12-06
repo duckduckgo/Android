@@ -18,17 +18,16 @@ package com.duckduckgo.remote.messaging.impl.di
 
 import android.content.Context
 import androidx.room.Room
-import com.duckduckgo.app.global.AppUrl
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.AppProperties
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.di.DaggerSet
-import com.duckduckgo.remote.messaging.impl.RealRemoteMessagingConfigDownloader
-import com.duckduckgo.remote.messaging.impl.RemoteMessagingConfigDownloader
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.impl.*
+import com.duckduckgo.remote.messaging.impl.RealRemoteMessagingConfigDownloader
+import com.duckduckgo.remote.messaging.impl.RemoteMessagingConfigDownloader
 import com.duckduckgo.remote.messaging.impl.mappers.RemoteMessagingConfigJsonMapper
 import com.duckduckgo.remote.messaging.impl.matchers.AndroidAppAttributeMatcher
 import com.duckduckgo.remote.messaging.impl.matchers.AttributeMatcher
@@ -41,15 +40,10 @@ import com.duckduckgo.remote.messaging.store.RemoteMessagesDao
 import com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
 import com.duckduckgo.remote.messaging.store.RemoteMessagingDatabase
 import com.squareup.anvil.annotations.ContributesTo
-import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
-import javax.inject.Named
 
 @Module
 @ContributesTo(AppScope::class)
@@ -58,27 +52,9 @@ object DomainModule {
     @Provides
     fun providesRemoteMessagingConfigDownloader(
         remoteConfig: RemoteMessagingService,
-        remoteMessagingConfigProcessor: RemoteMessagingConfigProcessor
+        remoteMessagingConfigProcessor: RemoteMessagingConfigProcessor,
     ): RemoteMessagingConfigDownloader {
         return RealRemoteMessagingConfigDownloader(remoteConfig, remoteMessagingConfigProcessor)
-    }
-}
-
-@Module
-@ContributesTo(AppScope::class)
-object NetworkModule {
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun apiRetrofit(@Named("api") okHttpClient: OkHttpClient): RemoteMessagingService {
-        val moshi = Moshi.Builder().build()
-        val retrofit = Retrofit.Builder()
-            .baseUrl(AppUrl.Url.API)
-            .client(okHttpClient)
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .build()
-
-        return retrofit.create(RemoteMessagingService::class.java)
     }
 }
 
@@ -92,13 +68,13 @@ object DataSourceModule {
         remoteMessagingConfigJsonMapper: RemoteMessagingConfigJsonMapper,
         remoteMessagingConfigRepository: RemoteMessagingConfigRepository,
         remoteMessagingRepository: RemoteMessagingRepository,
-        remoteMessagingConfigMatcher: RemoteMessagingConfigMatcher
+        remoteMessagingConfigMatcher: RemoteMessagingConfigMatcher,
     ): RemoteMessagingConfigProcessor {
         return RealRemoteMessagingConfigProcessor(
             remoteMessagingConfigJsonMapper,
             remoteMessagingConfigRepository,
             remoteMessagingRepository,
-            remoteMessagingConfigMatcher
+            remoteMessagingConfigMatcher,
         )
     }
 
@@ -106,7 +82,7 @@ object DataSourceModule {
     fun providesRemoteMessagingRepository(
         remoteMessagingConfigRepository: RemoteMessagingConfigRepository,
         remoteMessagesDao: RemoteMessagesDao,
-        dispatchers: DispatcherProvider
+        dispatchers: DispatcherProvider,
     ): RemoteMessagingRepository {
         return AppRemoteMessagingRepository(remoteMessagingConfigRepository, remoteMessagesDao, dispatchers)
     }
@@ -114,7 +90,7 @@ object DataSourceModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun providesRemoteMessagesDao(
-        remoteMessagingDatabase: RemoteMessagingDatabase
+        remoteMessagingDatabase: RemoteMessagingDatabase,
     ): RemoteMessagesDao {
         return remoteMessagingDatabase.remoteMessagesDao()
     }
@@ -122,7 +98,7 @@ object DataSourceModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun providesRemoteMessagingConfigJsonMapper(
-        appBuildConfig: AppBuildConfig
+        appBuildConfig: AppBuildConfig,
     ): RemoteMessagingConfigJsonMapper {
         return RemoteMessagingConfigJsonMapper(appBuildConfig)
     }
@@ -140,7 +116,7 @@ object DataSourceModule {
     @IntoSet
     fun providesAndroidAppAttributeMatcher(
         appProperties: AppProperties,
-        appBuildConfig: AppBuildConfig
+        appBuildConfig: AppBuildConfig,
     ): AttributeMatcher {
         return AndroidAppAttributeMatcher(appProperties, appBuildConfig)
     }
@@ -149,7 +125,7 @@ object DataSourceModule {
     @IntoSet
     fun providesDeviceAttributeMatcher(
         appBuildConfig: AppBuildConfig,
-        appProperties: AppProperties
+        appProperties: AppProperties,
     ): AttributeMatcher {
         return DeviceAttributeMatcher(appBuildConfig, appProperties)
     }
@@ -157,7 +133,7 @@ object DataSourceModule {
     @Provides
     @IntoSet
     fun providesUserAttributeMatcher(
-        userBrowserProperties: UserBrowserProperties
+        userBrowserProperties: UserBrowserProperties,
     ): AttributeMatcher {
         return UserAttributeMatcher(userBrowserProperties)
     }

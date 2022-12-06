@@ -21,8 +21,8 @@ import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.VariantManager.Companion.referrerVariant
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import timber.log.Timber
 import java.util.*
+import timber.log.Timber
 
 @WorkerThread
 interface VariantManager {
@@ -40,12 +40,12 @@ interface VariantManager {
         val ACTIVE_VARIANTS = listOf(
             // SERP variants. "sc" may also be used as a shared control for mobile experiments in
             // the future if we can filter by app version
-            Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
-            Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
+            Variant(key = "sc", weight = 1.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
+            Variant(key = "se", weight = 1.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
         )
 
         val REFERRER_VARIANTS = listOf(
-            Variant(RESERVED_EU_AUCTION_VARIANT, features = emptyList(), filterBy = { noFilter() })
+            Variant(RESERVED_EU_AUCTION_VARIANT, features = emptyList(), filterBy = { noFilter() }),
         )
 
         private val serpRegionToggleTargetCountries = listOf(
@@ -61,7 +61,7 @@ interface VariantManager {
             "NO",
             "ES",
             "SE",
-            "GB"
+            "GB",
         )
 
         fun referrerVariant(key: String): Variant {
@@ -140,7 +140,7 @@ class ExperimentationVariantManager(
 
     private fun lookupVariant(
         key: String?,
-        activeVariants: List<Variant>
+        activeVariants: List<Variant>,
     ): Variant? {
         val variant = activeVariants.firstOrNull { it.key == key }
 
@@ -181,7 +181,7 @@ data class Variant(
     val key: String,
     override val weight: Double = 0.0,
     val features: List<VariantManager.VariantFeature> = emptyList(),
-    val filterBy: (config: AppBuildConfig) -> Boolean
+    val filterBy: (config: AppBuildConfig) -> Boolean,
 ) : Probabilistic {
 
     fun hasFeature(feature: VariantManager.VariantFeature) = features.contains(feature)

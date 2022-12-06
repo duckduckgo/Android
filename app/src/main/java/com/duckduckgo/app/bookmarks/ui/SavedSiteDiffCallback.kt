@@ -21,14 +21,14 @@ import androidx.recyclerview.widget.DiffUtil
 class BookmarksDiffCallback : DiffUtil.ItemCallback<BookmarksAdapter.BookmarksItemTypes>() {
     override fun areItemsTheSame(
         oldItem: BookmarksAdapter.BookmarksItemTypes,
-        newItem: BookmarksAdapter.BookmarksItemTypes
+        newItem: BookmarksAdapter.BookmarksItemTypes,
     ): Boolean {
         return oldItem == newItem
     }
 
     override fun areContentsTheSame(
         oldItem: BookmarksAdapter.BookmarksItemTypes,
-        newItem: BookmarksAdapter.BookmarksItemTypes
+        newItem: BookmarksAdapter.BookmarksItemTypes,
     ): Boolean {
         return oldItem == newItem
     }
@@ -37,14 +37,14 @@ class BookmarksDiffCallback : DiffUtil.ItemCallback<BookmarksAdapter.BookmarksIt
 class FavoritesDiffCallback : DiffUtil.ItemCallback<FavoritesAdapter.FavoriteItemTypes>() {
     override fun areItemsTheSame(
         oldItem: FavoritesAdapter.FavoriteItemTypes,
-        newItem: FavoritesAdapter.FavoriteItemTypes
+        newItem: FavoritesAdapter.FavoriteItemTypes,
     ): Boolean {
         return oldItem == newItem
     }
 
     override fun areContentsTheSame(
         oldItem: FavoritesAdapter.FavoriteItemTypes,
-        newItem: FavoritesAdapter.FavoriteItemTypes
+        newItem: FavoritesAdapter.FavoriteItemTypes,
     ): Boolean {
         return oldItem == newItem
     }

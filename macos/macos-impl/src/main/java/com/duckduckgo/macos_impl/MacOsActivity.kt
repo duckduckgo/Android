@@ -77,9 +77,10 @@ class MacOsActivity : DuckDuckGoActivity() {
         }
 
         val pi = PendingIntent.getBroadcast(
-            this, 0,
+            this,
+            0,
             Intent(this, MacOsLinkShareBroadcastReceiver::class.java),
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
         try {
             startActivity(Intent.createChooser(share, getString(R.string.macos_share_title), pi.intentSender))

@@ -17,11 +17,15 @@
 package com.duckduckgo.app.statistics.api
 
 import android.annotation.SuppressLint
+import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
 import timber.log.Timber
 
 interface StatisticsUpdater {
@@ -30,11 +34,13 @@ interface StatisticsUpdater {
     fun refreshAppRetentionAtb()
 }
 
-class StatisticsRequester(
+@ContributesBinding(AppScope::class)
+class StatisticsRequester @Inject constructor(
     private val store: StatisticsDataStore,
     private val service: StatisticsService,
     private val variantManager: VariantManager,
     private val plugins: PluginPoint<RefreshRetentionAtbPlugin>,
+    private val emailManager: EmailManager,
 ) : StatisticsUpdater {
 
     /**
@@ -51,7 +57,7 @@ class StatisticsRequester(
             val storedAtb = store.atb
             if (storedAtb != null && storedAtbFormatNeedsCorrecting(storedAtb)) {
                 Timber.d(
-                    "Previous app version stored hardcoded `ma` variant in ATB param; we want to correct this behaviour"
+                    "Previous app version stored hardcoded `ma` variant in ATB param; we want to correct this behaviour",
                 )
                 store.atb = Atb(storedAtb.version.removeSuffix(LEGACY_ATB_FORMAT_SUFFIX))
                 store.variant = VariantManager.DEFAULT_VARIANT.key
@@ -60,7 +66,9 @@ class StatisticsRequester(
         }
 
         service
-            .atb()
+            .atb(
+                email = emailSignInState(),
+            )
             .subscribeOn(Schedulers.io())
             .flatMap {
                 val atb = Atb(it.version)
@@ -76,7 +84,7 @@ class StatisticsRequester(
                 {
                     store.clearAtb()
                     Timber.w("Atb initialization failed ${it.localizedMessage}")
-                }
+                },
             )
     }
 
@@ -85,7 +93,6 @@ class StatisticsRequester(
 
     @SuppressLint("CheckResult")
     override fun refreshSearchRetentionAtb() {
-
         val atb = store.atb
 
         if (atb == null) {
@@ -97,7 +104,11 @@ class StatisticsRequester(
         val retentionAtb = store.searchRetentionAtb ?: atb.version
 
         service
-            .updateSearchAtb(fullAtb, retentionAtb)
+            .updateSearchAtb(
+                atb = fullAtb,
+                retentionAtb = retentionAtb,
+                email = emailSignInState(),
+            )
             .subscribeOn(Schedulers.io())
             .subscribe(
                 {
@@ -106,7 +117,7 @@ class StatisticsRequester(
                     storeUpdateVersionIfPresent(it)
                     plugins.getPlugins().forEach { plugin -> plugin.onSearchRetentionAtbRefreshed() }
                 },
-                { Timber.v("Search atb refresh failed with error ${it.localizedMessage}") }
+                { Timber.v("Search atb refresh failed with error ${it.localizedMessage}") },
             )
     }
 
@@ -123,7 +134,11 @@ class StatisticsRequester(
         val retentionAtb = store.appRetentionAtb ?: atb.version
 
         service
-            .updateAppAtb(fullAtb, retentionAtb)
+            .updateAppAtb(
+                atb = fullAtb,
+                retentionAtb = retentionAtb,
+                email = emailSignInState(),
+            )
             .subscribeOn(Schedulers.io())
             .subscribe(
                 {
@@ -132,15 +147,20 @@ class StatisticsRequester(
                     storeUpdateVersionIfPresent(it)
                     plugins.getPlugins().forEach { plugin -> plugin.onAppRetentionAtbRefreshed() }
                 },
-                { Timber.v("App atb refresh failed with error ${it.localizedMessage}") }
+                { Timber.v("App atb refresh failed with error ${it.localizedMessage}") },
             )
     }
+
+    private fun emailSignInState(): Int =
+        kotlin.runCatching { emailManager.isSignedIn().asInt() }.getOrDefault(0)
 
     private fun storeUpdateVersionIfPresent(retrievedAtb: Atb) {
         if (retrievedAtb.updateVersion != null) {
             store.atb = Atb(retrievedAtb.updateVersion)
         }
     }
+
+    private fun Boolean.asInt() = if (this) 1 else 0
 
     companion object {
         private const val LEGACY_ATB_FORMAT_SUFFIX = "ma"

@@ -51,7 +51,7 @@ class PreferencesFlipperPlugin @Inject constructor(context: Context) : FlipperPl
                 .put("deleted", !sharedPreferences.contains(key))
                 .put("time", System.currentTimeMillis())
                 .put("value", sharedPreferences.all[key])
-                .build()
+                .build(),
         )
     }
 
@@ -75,7 +75,7 @@ class PreferencesFlipperPlugin @Inject constructor(context: Context) : FlipperPl
         this.connection = connection
 
         connection!!.receive(
-            "getAllSharedPreferences"
+            "getAllSharedPreferences",
         ) { _, responder ->
             val builder = FlipperObject.Builder()
             for ((key, value) in sharedPreferences.entries) {
@@ -91,7 +91,7 @@ class PreferencesFlipperPlugin @Inject constructor(context: Context) : FlipperPl
                 if (name != null) {
                     responder.success(getFlipperObjectFor(name))
                 }
-            }
+            },
         )
 
         connection.receive(
@@ -124,7 +124,7 @@ class PreferencesFlipperPlugin @Inject constructor(context: Context) : FlipperPl
                     }
                 }
                 responder.success(getFlipperObjectFor(sharedPreferencesName))
-            }
+            },
         )
 
         connection.receive(
@@ -136,9 +136,8 @@ class PreferencesFlipperPlugin @Inject constructor(context: Context) : FlipperPl
                     remove(preferenceName)
                 }
                 responder.success(getFlipperObjectFor(sharedPreferencesName))
-            }
+            },
         )
-
     }
 
     override fun onDisconnect() {
@@ -149,7 +148,7 @@ class PreferencesFlipperPlugin @Inject constructor(context: Context) : FlipperPl
 
     private data class SharedPreferencesDescriptor(
         val name: String,
-        val mode: Int
+        val mode: Int,
     ) {
         fun getSharedPreferences(context: Context): SharedPreferences {
             return if (mode == Context.MODE_MULTI_PROCESS) {

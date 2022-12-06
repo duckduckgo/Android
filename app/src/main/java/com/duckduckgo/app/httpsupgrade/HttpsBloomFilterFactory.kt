@@ -21,14 +21,14 @@ import androidx.annotation.WorkerThread
 import com.duckduckgo.app.global.store.BinaryDataStore
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec.Companion.HTTPS_BINARY_FILE
 import com.duckduckgo.app.httpsupgrade.store.HttpsBloomFilterSpecDao
-import com.duckduckgo.app.httpsupgrade.store.HttpsEmbeddedDataPersister
 import com.duckduckgo.app.httpsupgrade.store.HttpsDataPersister
+import com.duckduckgo.app.httpsupgrade.store.HttpsEmbeddedDataPersister
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 interface HttpsBloomFilterFactory {
     fun create(): BloomFilter?
@@ -46,7 +46,6 @@ class HttpsBloomFilterFactoryImpl @Inject constructor(
 
     @WorkerThread
     override fun create(): BloomFilter? {
-
         if (httpsEmbeddedDataPersister.shouldPersistEmbeddedData()) {
             Timber.d("Https update data not found, loading embedded data")
             httpsEmbeddedDataPersister.persistEmbeddedData()

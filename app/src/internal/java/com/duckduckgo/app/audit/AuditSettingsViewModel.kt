@@ -22,17 +22,17 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.di.scopes.ActivityScope
+import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class AuditSettingsViewModel @Inject constructor(
     private val userAllowListDao: UserWhitelistDao,
-    private val dispatchers: DispatcherProvider
+    private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
     data class ViewState(
@@ -52,7 +52,7 @@ class AuditSettingsViewModel @Inject constructor(
 
     fun goToUrl(
         url: String,
-        protectionsEnabled: Boolean = true
+        protectionsEnabled: Boolean = true,
     ) {
         viewModelScope.launch {
             if (protectionsEnabled) {

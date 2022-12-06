@@ -26,7 +26,7 @@ interface VoiceSearchRepository {
 }
 
 class RealVoiceSearchRepository constructor(
-    private val dataStore: VoiceSearchDataStore
+    private val dataStore: VoiceSearchDataStore,
 ) : VoiceSearchRepository {
     override fun declinePermissionForever() {
         dataStore.permissionDeclinedForever = true

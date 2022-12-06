@@ -26,10 +26,10 @@ import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.CoroutineScope
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import timber.log.Timber
 
 @ContributesMultibinding(VpnScope::class)
 class AppTPCPUMonitor @Inject constructor(
@@ -57,7 +57,7 @@ class AppTPCPUMonitor @Inject constructor(
 
     override fun onVpnStopped(
         coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
+        vpnStopReason: VpnStopReason,
     ) {
         Timber.v("AppTpSetting.CPUMonitoring - stopping")
         workManager.cancelUniqueWork(APP_TRACKER_CPU_MONITOR_WORKER_TAG)

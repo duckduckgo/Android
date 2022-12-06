@@ -25,7 +25,6 @@ class AppUrl {
         const val COOKIES = "https://$HOST"
         const val SURVEY_COOKIES = "https://surveys.$HOST"
         const val ABOUT = "https://$HOST/about"
-        const val TOSDR = "https://tosdr.org"
         const val PIXEL = "https://improving.duckduckgo.com"
         const val EMAIL_SEGMENT = "email"
     }
@@ -37,6 +36,7 @@ class AppUrl {
         const val RETENTION_ATB = "set_atb"
         const val DEV_MODE = "test"
         const val LANGUAGE = "lg"
+        const val EMAIL = "email"
         const val COUNTRY = "co"
         const val HIDE_SERP = "ko"
         const val VERTICAL = "ia"

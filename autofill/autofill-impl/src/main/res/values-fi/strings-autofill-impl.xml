@@ -63,4 +63,6 @@
     <string name="credentialManagementViewMenuEdit">Muokkaa</string>
     <string name="credentialManagementViewMenuDelete">Poista</string>
 
+    <string name="credentialManagementSuggestionsLabel">Ehdotettu</string>
+
 </resources>

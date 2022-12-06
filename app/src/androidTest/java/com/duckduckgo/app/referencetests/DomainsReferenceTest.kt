@@ -59,8 +59,6 @@ import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.duckduckgo.privacy.config.api.UserAgent
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -74,6 +72,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 @RunWith(Parameterized::class)
@@ -111,7 +111,7 @@ class DomainsReferenceTest(private val testCase: TestCase) {
         fakeUserAgent,
         fakeToggle,
         fakeUserAllowListRepository,
-        coroutinesTestRule.testDispatcherProvider
+        coroutinesTestRule.testDispatcherProvider,
     )
     private val mockGpc: Gpc = mock()
     private val mockAdClickManager: AdClickManager = mock()
@@ -126,7 +126,7 @@ class DomainsReferenceTest(private val testCase: TestCase) {
             var domainTests: DomainTest? = null
             val jsonObject: JSONObject = FileUtilities.getJsonObjectFromFile(
                 DomainsReferenceTest::class.java.classLoader!!,
-                "reference_tests/domain_matching_tests.json"
+                "reference_tests/domain_matching_tests.json",
             )
 
             jsonObject.keys().forEach {
@@ -141,7 +141,7 @@ class DomainsReferenceTest(private val testCase: TestCase) {
     data class DomainTest(
         val name: String,
         val desc: String,
-        val tests: List<TestCase>
+        val tests: List<TestCase>,
     )
 
     data class TestCase(
@@ -150,7 +150,7 @@ class DomainsReferenceTest(private val testCase: TestCase) {
         val requestURL: String,
         val requestType: String,
         val expectAction: String?,
-        val exceptPlatforms: List<String>?
+        val exceptPlatforms: List<String>?,
     )
 
     @UiThreadTest
@@ -168,7 +168,7 @@ class DomainsReferenceTest(private val testCase: TestCase) {
             gpc = mockGpc,
             userAgentProvider = userAgentProvider,
             adClickManager = mockAdClickManager,
-            cloakedCnameDetector = CloakedCnameDetectorImpl(tdsCnameEntityDao)
+            cloakedCnameDetector = CloakedCnameDetectorImpl(tdsCnameEntityDao),
         )
     }
 
@@ -180,7 +180,7 @@ class DomainsReferenceTest(private val testCase: TestCase) {
             request = mockRequest,
             documentUrl = testCase.siteURL,
             webView = webView,
-            webViewClientListener = null
+            webViewClientListener = null,
         )
 
         when (testCase.expectAction) {
@@ -213,7 +213,7 @@ class DomainsReferenceTest(private val testCase: TestCase) {
                 mockContentBlocking,
                 mockTrackerAllowlist,
                 mockWebTrackersBlockedDao,
-                mockAdClickManager
+                mockAdClickManager,
             )
 
         val json = FileUtilities.loadText(javaClass.classLoader!!, "reference_tests/tracker_radar_reference.json")

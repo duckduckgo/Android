@@ -16,8 +16,11 @@
 
 package com.duckduckgo.mobile.android.vpn.waitlist.api
 
+import com.duckduckgo.anvil.annotations.ContributesServiceApi
+import com.duckduckgo.di.scopes.AppScope
 import retrofit2.http.*
 
+@ContributesServiceApi(AppScope::class)
 interface AppTrackingProtectionWaitlistService {
 
     @POST("https://quack.duckduckgo.com/api/auth/waitlist/apptp/join")
@@ -36,7 +39,7 @@ interface AppTrackingProtectionWaitlistService {
 
 data class WaitlistResponse(
     val token: String?,
-    val timestamp: Int?
+    val timestamp: Int?,
 )
 
 data class WaitlistStatusResponse(val timestamp: Int)
@@ -44,7 +47,7 @@ data class AppTPInviteCodeResponse(val code: String)
 data class AppTPRedeemCodeResponse(
     val product: String,
     val status: String,
-    val error: String
+    val error: String,
 )
 
 data class AppTPRedeemCodeError(val error: String) {

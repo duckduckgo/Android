@@ -36,11 +36,11 @@ import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ActivityScope
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class FeedbackViewModel @Inject constructor(
@@ -74,7 +74,7 @@ class FeedbackViewModel @Inject constructor(
             fragmentViewState = newState,
             mainReason = mainReason,
             subReason = null,
-            previousViewState = currentViewState.fragmentViewState
+            previousViewState = currentViewState.fragmentViewState,
         )
     }
 
@@ -131,12 +131,12 @@ class FeedbackViewModel @Inject constructor(
         updateViewCommand.value = if (canShowRatingsButton()) {
             currentViewState.copy(
                 fragmentViewState = PositiveFeedbackFirstStep(NAVIGATION_FORWARDS),
-                previousViewState = currentViewState.fragmentViewState
+                previousViewState = currentViewState.fragmentViewState,
             )
         } else {
             currentViewState.copy(
                 fragmentViewState = PositiveShareFeedback(NAVIGATION_FORWARDS),
-                previousViewState = currentViewState.fragmentViewState
+                previousViewState = currentViewState.fragmentViewState,
             )
         }
     }
@@ -163,7 +163,7 @@ class FeedbackViewModel @Inject constructor(
     fun userSelectedNegativeFeedback() {
         updateViewCommand.value = currentViewState.copy(
             fragmentViewState = NegativeFeedbackMainReason(NAVIGATION_FORWARDS),
-            previousViewState = currentViewState.fragmentViewState
+            previousViewState = currentViewState.fragmentViewState,
         )
     }
 
@@ -174,14 +174,14 @@ class FeedbackViewModel @Inject constructor(
     fun userSelectedToGiveFeedback() {
         updateViewCommand.value = currentViewState.copy(
             fragmentViewState = PositiveShareFeedback(NAVIGATION_FORWARDS),
-            previousViewState = currentViewState.fragmentViewState
+            previousViewState = currentViewState.fragmentViewState,
         )
     }
 
     fun userProvidedNegativeOpenEndedFeedback(
         mainReason: MainReason,
         subReason: SubReason?,
-        feedback: String
+        feedback: String,
     ) {
         appCoroutineScope.launch(dispatchers.main()) {
             command.value = Exit(feedbackSubmitted = true)
@@ -193,7 +193,7 @@ class FeedbackViewModel @Inject constructor(
 
     fun onProvidedBrokenSiteFeedback(
         feedback: String,
-        brokenSite: String?
+        brokenSite: String?,
     ) {
         appCoroutineScope.launch(dispatchers.main()) {
             command.value = Exit(feedbackSubmitted = true)
@@ -232,53 +232,53 @@ class FeedbackViewModel @Inject constructor(
 
     fun userSelectedSubReasonMissingBrowserFeatures(
         mainReason: MainReason,
-        subReason: FeedbackType.MissingBrowserFeaturesSubReasons
+        subReason: FeedbackType.MissingBrowserFeaturesSubReasons,
     ) {
         val newState = NegativeOpenEndedFeedback(NAVIGATION_FORWARDS, mainReason, subReason)
         updateViewCommand.value = currentViewState.copy(
             fragmentViewState = newState,
             mainReason = mainReason,
             subReason = subReason,
-            previousViewState = currentViewState.fragmentViewState
+            previousViewState = currentViewState.fragmentViewState,
         )
     }
 
     fun userSelectedSubReasonSearchNotGoodEnough(
         mainReason: MainReason,
-        subReason: FeedbackType.SearchNotGoodEnoughSubReasons
+        subReason: FeedbackType.SearchNotGoodEnoughSubReasons,
     ) {
         val newState = NegativeOpenEndedFeedback(NAVIGATION_FORWARDS, mainReason, subReason)
         updateViewCommand.value = currentViewState.copy(
             fragmentViewState = newState,
             mainReason = mainReason,
             subReason = subReason,
-            previousViewState = currentViewState.fragmentViewState
+            previousViewState = currentViewState.fragmentViewState,
         )
     }
 
     fun userSelectedSubReasonNeedMoreCustomization(
         mainReason: MainReason,
-        subReason: FeedbackType.CustomizationSubReasons
+        subReason: FeedbackType.CustomizationSubReasons,
     ) {
         val newState = NegativeOpenEndedFeedback(NAVIGATION_FORWARDS, mainReason, subReason)
         updateViewCommand.value = currentViewState.copy(
             fragmentViewState = newState,
             mainReason = mainReason,
             subReason = subReason,
-            previousViewState = currentViewState.fragmentViewState
+            previousViewState = currentViewState.fragmentViewState,
         )
     }
 
     fun userSelectedSubReasonAppIsSlowOrBuggy(
         mainReason: MainReason,
-        subReason: FeedbackType.PerformanceSubReasons
+        subReason: FeedbackType.PerformanceSubReasons,
     ) {
         val newState = NegativeOpenEndedFeedback(NAVIGATION_FORWARDS, mainReason, subReason)
         updateViewCommand.value = currentViewState.copy(
             fragmentViewState = newState,
             mainReason = mainReason,
             subReason = subReason,
-            previousViewState = currentViewState.fragmentViewState
+            previousViewState = currentViewState.fragmentViewState,
         )
     }
 
@@ -292,7 +292,7 @@ data class ViewState(
     val fragmentViewState: FragmentState,
     val previousViewState: FragmentState? = null,
     val mainReason: MainReason? = null,
-    val subReason: SubReason? = null
+    val subReason: SubReason? = null,
 )
 
 sealed class FragmentState(open val forwardDirection: Boolean) {
@@ -308,20 +308,20 @@ sealed class FragmentState(open val forwardDirection: Boolean) {
 
     data class NegativeFeedbackSubReason(
         override val forwardDirection: Boolean,
-        val mainReason: MainReason
+        val mainReason: MainReason,
     ) : FragmentState(forwardDirection)
 
     data class NegativeOpenEndedFeedback(
         override val forwardDirection: Boolean,
         val mainReason: MainReason,
-        val subReason: SubReason? = null
+        val subReason: SubReason? = null,
     ) :
         FragmentState(forwardDirection)
 
     data class NegativeWebSitesBrokenFeedback(
         override val forwardDirection: Boolean,
         val mainReason: MainReason,
-        val subReason: SubReason? = null
+        val subReason: SubReason? = null,
     ) : FragmentState(forwardDirection)
 }
 
@@ -334,5 +334,5 @@ data class UpdateViewCommand(
     val fragmentViewState: FragmentState,
     val previousViewState: FragmentState? = null,
     val mainReason: MainReason? = null,
-    val subReason: SubReason? = null
+    val subReason: SubReason? = null,
 )

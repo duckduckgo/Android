@@ -17,8 +17,8 @@
 package com.duckduckgo.app.global.events.db
 
 import com.duckduckgo.app.global.DispatcherProvider
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
 
 interface UserEventsStore {
     suspend fun getUserEvent(userEventKey: UserEventKey): UserEventEntity?
@@ -29,7 +29,7 @@ interface UserEventsStore {
 
 class AppUserEventsStore @Inject constructor(
     private val userEventsDao: UserEventsDao,
-    private val dispatcher: DispatcherProvider
+    private val dispatcher: DispatcherProvider,
 ) : UserEventsStore {
 
     override suspend fun getUserEvent(userEventKey: UserEventKey): UserEventEntity? {

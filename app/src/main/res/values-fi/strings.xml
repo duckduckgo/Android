@@ -109,76 +109,6 @@
     <string name="tabClosedUndo">Kumoa</string>
     <string name="downloadsMenuItemTitle">Lataukset</string>
 
-    <!-- Privacy Dashboard Activities -->
-    <string name="privacyProtectionToggle">Sivuston yksityisyydensuoja</string>
-    <string name="privacyProtectionEnabled">SIVUSTOSUOJAUS KÄYTÖSSÄ</string>
-    <string name="privacyProtectionDisabled">SIVUSTOSUOJAUS EI KÄYTÖSSÄ</string>
-    <string name="privacyDashboardActivityTitle">Tietosuojan ohjauspaneeli</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes" instruction="Both placeholders are resource ids (integers) for two images">PARANNETTU &lt;img src=\"%1$d\" /&gt;–&lt;img src=\"%2$d\" /&gt;</string>
-    <string name="privacyGradeContentDescription">Tietosuoja-arvosana</string>
-    <string name="privacyProtectionTemporarilyDisabled">Yksityisyyden suoja on väliaikaisesti poistettu käytöstä, koska se näyttäisi rikkovan tämän sivun.</string>
-
-    <string name="httpsGood">Salattu yhteys</string>
-    <string name="httpsMixed">Salaukseltaan vaihteleva yhteys</string>
-    <string name="httpsBad">Salaamaton yhteys</string>
-
-    <string name="scorecardActivityTitle">Tietosuoja-arvosana</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">Sivusto on merkittävä seurantaverkosto</string>
-    <string name="scorecardPrivacyGrade">Tietosuoja-arvosana</string>
-    <string name="scorecardEnhancedGrade">Parannettu arvosana</string>
-
-    <string name="privacyTermsActivityTitle">Tietosuojakäytännöt</string>
-    <string name="practicesGood">Hyvät tietosuojakäytännöt</string>
-    <string name="practicesMixed">Vaihtelevat tietosuojakäytännöt</string>
-    <string name="practicesBad">Huonot tietosuojakäytännöt</string>
-    <string name="practicesUnknown">Tuntemattomat tietosuojakäytännöt</string>
-    <string name="practicesOverview">Tietosuojakäytännöt kertovat, missä määrin verkkosivuston kanssa jakamiasi henkilötietoja suojataan.</string>
-    <string name="practicesTosdrLink">Tietosuojakäytännöt<b><u>-S;DR</u></b>.</string>
-    <string name="practicesIconContentGood">Hyvä käytäntö -kuvake</string>
-    <string name="practicesIconContentBad">Huono käytäntö -kuvake</string>
-
-    <string name="networkTrackerSummaryHeader">PAHIMMAT SEURANTAVERKOSTOT</string>
-    <string name="networkTrackerSummaryNotReady">Keräämme edelleen tietoja näyttääksemme, kuinka monta seurantapalvelinta olemme estäneet.</string>
-
-    <string name="trackersActivityTitle">Estetyt seurantapyynnöt</string>
-    <string name="trackersContentDescription">Estetyt seurantapyynnöt</string>
-    <string name="trackersOverview">Seuraavien kolmansien osapuolten verkkotunnusten pyyntöjen lataaminen estettiin, koska ne tunnistettiin seurantapyynnöiksi. Jos yrityksen pyynnöt ladataan, se voi antaa niille mahdollisuuden profiloida sinut.</string>
-    <string name="trackersOverviewProtectionsOff">Seurantapyyntöjä ei estetty latautumasta, koska suojaukset on poistettu käytöstä tältä sivustolta. Jos yrityksen pyynnöt ladataan, yritys voi mahdollisesti profiloida sinut.</string>
-
-    <string name="domainsLoadedActivityTitle">Kolmannen osapuolen pyynnöt ladattu</string>
-    <string name="domainsLoadedContentDescription">Kolmannen osapuolen pyynnöt ladattu</string>
-    <string name="domainsLoadedOverview">Seuraavat kolmannen osapuolen verkkotunnusten pyynnöt ladattiin. Jos yrityksen pyynnöt ladataan, se voi antaa heidän profiloida sinut, vaikka muut verkkoseurannan suojauksemme ovat edelleen voimassa.</string>
-    <string name="domainsLoadedOverviewProtectionsOff">Kolmannen osapuolen pyyntöjä ei estetty latautumasta, koska suojaukset on poistettu käytöstä tältä sivustolta. Jos yrityksen pyynnöt ladataan, yritys voi mahdollisesti profiloida sinut.</string>
-    <string name="domainsLoadedOverviewEmpty">Emme havainneet pyyntöjä kolmannen osapuolen verkkotunnuksilta.</string>
-    <string name="domainsLoadedHeadingText">Ei ladattuja kolmannen osapuolen verkkotunnuksia</string>
-
-    <string name="webTrackingProtectionsText"><annotation type="learn_more_link">Tietoja verkkoseurantasuojauksistamme</annotation></string>
-    <string name="webTrackingProtectionsUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
-
-    <string name="trackersBlockedNoSectionDescription">Seuraavien verkkotunnusten pyynnöt ladattiin.</string>
-
-    <string name="adLoadedSectionDescription" instruction="Placeholder is the name of the company who owns the ad">Seuraavat verkkotunnuksen pyynnöt ladattiin, koska %1$s-mainosta DuckDuckGossa napsautettiin äskettäin. Nämä pyynnöt auttavat arvioimaan mainosten tehokkuutta. Kaikki DuckDuckGon mainokset ovat ei-profiloivia.</string>
-    <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Miten hakumainoksemme vaikuttavat suojauksiimme</annotation></string>
-    <string name="adLoadedSectionUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
-
-    <string name="domainsLoadedSectionDescription">Myös seuraavat verkkotunnuksen pyynnöt ladattiin.</string>
-    <string name="domainsLoadedSectionSingleSectionDescription">Seuraavien verkkotunnusten seurantapyynnöt ladattiin.</string>
-    <string name="domainsLoadedSectionEmptyListDescription">Emme havainneet pyyntöjä kolmannen osapuolen verkkotunnuksilta.</string>
-
-    <string name="domainsLoadedBreakageSectionDescription">Seuraavan verkkotunnuksen pyynnöt ladattiin sivuston rikkoutumisen estämiseksi.</string>
-    <string name="domainsLoadedAssociatedSectionDescription" instruction="Placeholder is the name of a company">Seuraavan verkkotunnuksen pyynnöt ladattiin, koska ne liittyvät kohteeseen %1$s.</string>
-
-    <string name="trackersBlockedText">Pyynnöt, joiden lataaminen estetty</string>
-    <string name="trackersNotBlockedText">Ei estettyjä seurantapyyntöjä</string>
-    <string name="trackersNoFoundText">Seurantapyyntöjä ei löytynyt</string>
-    <string name="trackersFoundText">Löydetyt seurantapyynnöt</string>
-
-    <string name="domainsLoadedText">Kolmannen osapuolen pyynnöt ladattu</string>
-    <string name="domainsNotLoadedText">Kolmannen osapuolen pyyntöjä ei ole ladattu</string>
-
-    <string name="majorNetworksNoFound">Merkittäviä seurantaverkostoja ei löytynyt</string>
-    <string name="majorNetworksFound">Merkittäviä seurantaverkostoja löytynyt</string>
-
     <!-- Fire -->
     <string name="fireMenu">Poista tiedot</string>
     <string name="fireClearAll">Poista kaikki välilehdet ja tiedot</string>
@@ -733,10 +663,12 @@
     <string name="sitePermissionsSettingsMicrophone">Mikrofoni</string>
     <string name="sitePermissionsSettingsAllowedSitesTitle">Hallitse sivustoja</string>
     <string name="sitePermissionsSettingsEmptyText">Ei vielä yhtään sivustoa</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Käyttöoikeudet poistettu kaikilta sivustoilta</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Oikeudet: %1$s </string>
     <string name="permissionsPerWebsiteAskSetting">Kysy</string>
     <string name="permissionsPerWebsiteDenySetting">Estä</string>
     <string name="permissionsPerWebsiteAllowSetting">Salli</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Kysy-toiminto poistettu käytöstä kaikilta sivustoilta</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s: käyttöoikeus – lupa %2$s</string>
 
     <!-- Autofill -->

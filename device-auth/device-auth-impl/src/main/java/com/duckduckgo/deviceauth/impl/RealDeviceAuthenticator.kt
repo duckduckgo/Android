@@ -20,6 +20,7 @@ import android.os.Build
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.deviceauth.api.AutofillAuthorizationGracePeriod
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.Features
@@ -31,7 +32,8 @@ import javax.inject.Inject
 class RealDeviceAuthenticator @Inject constructor(
     private val deviceAuthChecker: SupportedDeviceAuthChecker,
     private val appBuildConfig: AppBuildConfig,
-    private val authLauncher: AuthLauncher
+    private val authLauncher: AuthLauncher,
+    private val autofillAuthGracePeriod: AutofillAuthorizationGracePeriod,
 ) : DeviceAuthenticator {
 
     override fun hasValidDeviceAuthentication(): Boolean {
@@ -47,21 +49,29 @@ class RealDeviceAuthenticator @Inject constructor(
     override fun authenticate(
         featureToAuth: Features,
         fragment: Fragment,
-        onResult: (AuthResult) -> Unit
+        onResult: (AuthResult) -> Unit,
     ) {
-        authLauncher.launch(getAuthText(featureToAuth), fragment, onResult)
+        if (autofillAuthGracePeriod.isAuthRequired()) {
+            authLauncher.launch(getAuthText(featureToAuth), fragment, onResult)
+        } else {
+            onResult(AuthResult.Success)
+        }
     }
 
     override fun authenticate(
         featureToAuth: Features,
         fragmentActivity: FragmentActivity,
-        onResult: (AuthResult) -> Unit
+        onResult: (AuthResult) -> Unit,
     ) {
-        authLauncher.launch(getAuthText(featureToAuth), fragmentActivity, onResult)
+        if (autofillAuthGracePeriod.isAuthRequired()) {
+            authLauncher.launch(getAuthText(featureToAuth), fragmentActivity, onResult)
+        } else {
+            onResult(AuthResult.Success)
+        }
     }
 
     private fun getAuthText(
-        feature: Features
+        feature: Features,
     ): Int = when (feature) {
         Features.AUTOFILL -> R.string.autofill_auth_text
     }

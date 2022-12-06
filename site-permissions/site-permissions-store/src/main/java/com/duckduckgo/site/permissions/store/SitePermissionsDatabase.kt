@@ -26,7 +26,7 @@ import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissi
 @Database(
     exportSchema = true,
     version = 1,
-    entities = [SitePermissionsEntity::class, SitePermissionAllowedEntity::class]
+    entities = [SitePermissionsEntity::class, SitePermissionAllowedEntity::class],
 )
 
 abstract class SitePermissionsDatabase : RoomDatabase() {

@@ -20,7 +20,7 @@ interface Client {
 
     enum class ClientType {
         BLOCKING,
-        WHITELIST
+        WHITELIST,
     }
 
     enum class ClientName(val type: ClientType) {
@@ -30,7 +30,7 @@ interface Client {
         // legacy clients
         EASYLIST(ClientType.BLOCKING),
         EASYPRIVACY(ClientType.BLOCKING),
-        TRACKERSWHITELIST(ClientType.WHITELIST)
+        TRACKERSWHITELIST(ClientType.WHITELIST),
     }
 
     data class Result(
@@ -38,13 +38,13 @@ interface Client {
         val entityName: String? = null,
         val categories: List<String>? = null,
         val surrogate: String? = null,
-        val isATracker: Boolean
+        val isATracker: Boolean,
     )
 
     val name: ClientName
 
     fun matches(
         url: String,
-        documentUrl: String
+        documentUrl: String,
     ): Result
 }

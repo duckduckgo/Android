@@ -121,32 +121,35 @@ class AdClickFeatureTogglesPluginTest {
     private fun givenAdCLickFeatureIsEnabled() {
         whenever(
             adClickFeatureToggleRepository.get(
-                AdClickFeatureName.AdClickAttributionFeatureName, true
-            )
+                AdClickFeatureName.AdClickAttributionFeatureName,
+                true,
+            ),
         ).thenReturn(true)
     }
 
     private fun givenAdCLickFeatureIsDisabled() {
         whenever(
             adClickFeatureToggleRepository.get(
-                AdClickFeatureName.AdClickAttributionFeatureName, true
-            )
+                AdClickFeatureName.AdClickAttributionFeatureName,
+                true,
+            ),
         ).thenReturn(false)
     }
 
     private fun givenAdCLickFeatureReturnsDefaultValue(defaultValue: Boolean) {
         whenever(
             adClickFeatureToggleRepository.get(
-                AdClickFeatureName.AdClickAttributionFeatureName, defaultValue
-            )
+                AdClickFeatureName.AdClickAttributionFeatureName,
+                defaultValue,
+            ),
         ).thenReturn(defaultValue)
     }
 
     private fun givenAppVersionIsEqualToMinSupportedVersion() {
         whenever(
             adClickFeatureToggleRepository.getMinSupportedVersion(
-                AdClickFeatureName.AdClickAttributionFeatureName
-            )
+                AdClickFeatureName.AdClickAttributionFeatureName,
+            ),
         ).thenReturn(1234)
 
         whenever(mockAppBuildConfig.versionCode).thenReturn(1234)
@@ -155,8 +158,8 @@ class AdClickFeatureTogglesPluginTest {
     private fun givenAppVersionIsGreaterThanMinSupportedVersion() {
         whenever(
             adClickFeatureToggleRepository.getMinSupportedVersion(
-                AdClickFeatureName.AdClickAttributionFeatureName
-            )
+                AdClickFeatureName.AdClickAttributionFeatureName,
+            ),
         ).thenReturn(1234)
 
         whenever(mockAppBuildConfig.versionCode).thenReturn(5678)
@@ -165,8 +168,8 @@ class AdClickFeatureTogglesPluginTest {
     private fun givenAppVersionIsSmallerThanMinSupportedVersion() {
         whenever(
             adClickFeatureToggleRepository.getMinSupportedVersion(
-                AdClickFeatureName.AdClickAttributionFeatureName
-            )
+                AdClickFeatureName.AdClickAttributionFeatureName,
+            ),
         ).thenReturn(1234)
 
         whenever(mockAppBuildConfig.versionCode).thenReturn(123)
