@@ -25,7 +25,7 @@ import androidx.room.migration.Migration
     version = 1,
     entities = [
         ElementHidingEntity::class,
-    ]
+    ],
 )
 abstract class ElementHidingDatabase : RoomDatabase() {
     abstract fun elementHidingDao(): ElementHidingDao

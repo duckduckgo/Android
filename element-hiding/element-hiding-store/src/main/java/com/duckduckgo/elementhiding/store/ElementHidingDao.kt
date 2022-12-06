@@ -30,7 +30,7 @@ abstract class ElementHidingDao {
 
     @Transaction
     open fun updateAll(
-        elementHidingEntity: ElementHidingEntity
+        elementHidingEntity: ElementHidingEntity,
     ) {
         delete()
         insert(elementHidingEntity)

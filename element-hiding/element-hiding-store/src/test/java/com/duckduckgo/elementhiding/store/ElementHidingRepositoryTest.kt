@@ -17,9 +17,6 @@
 package com.duckduckgo.elementhiding.store
 
 import com.duckduckgo.app.CoroutineTestRule
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -27,6 +24,9 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 class ElementHidingRepositoryTest {
@@ -50,7 +50,7 @@ class ElementHidingRepositoryTest {
                 RealElementHidingRepository(
                     mockDatabase,
                     TestScope(),
-                    coroutineRule.testDispatcherProvider
+                    coroutineRule.testDispatcherProvider,
                 )
 
             verify(mockElementHidingDao).get()
@@ -65,7 +65,7 @@ class ElementHidingRepositoryTest {
                 RealElementHidingRepository(
                     mockDatabase,
                     TestScope(),
-                    coroutineRule.testDispatcherProvider
+                    coroutineRule.testDispatcherProvider,
                 )
 
             verify(mockElementHidingDao).get()
@@ -79,7 +79,7 @@ class ElementHidingRepositoryTest {
                 RealElementHidingRepository(
                     mockDatabase,
                     TestScope(),
-                    coroutineRule.testDispatcherProvider
+                    coroutineRule.testDispatcherProvider,
                 )
 
             testee.updateAll(elementHidingEntity)

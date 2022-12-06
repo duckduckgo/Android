@@ -22,7 +22,7 @@ import kotlinx.coroutines.launch
 
 interface ElementHidingRepository {
     fun updateAll(
-        elementHidingEntity: ElementHidingEntity
+        elementHidingEntity: ElementHidingEntity,
     )
     var elementHidingEntity: ElementHidingEntity
 }
@@ -30,7 +30,7 @@ interface ElementHidingRepository {
 class RealElementHidingRepository constructor(
     val database: ElementHidingDatabase,
     val coroutineScope: CoroutineScope,
-    val dispatcherProvider: DispatcherProvider
+    val dispatcherProvider: DispatcherProvider,
 ) : ElementHidingRepository {
 
     private val elementHidingDao: ElementHidingDao = database.elementHidingDao()

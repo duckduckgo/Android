@@ -50,7 +50,7 @@ object ElementHidingModule {
     fun provideElementHidingRepository(
         database: ElementHidingDatabase,
         @AppCoroutineScope coroutineScope: CoroutineScope,
-        dispatcherProvider: DispatcherProvider
+        dispatcherProvider: DispatcherProvider,
     ): ElementHidingRepository {
         return RealElementHidingRepository(database, coroutineScope, dispatcherProvider)
     }

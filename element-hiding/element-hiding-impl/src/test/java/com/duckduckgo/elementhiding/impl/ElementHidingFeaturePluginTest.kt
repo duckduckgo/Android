@@ -18,12 +18,12 @@ package com.duckduckgo.elementhiding.impl
 
 import com.duckduckgo.elementhiding.store.ElementHidingEntity
 import com.duckduckgo.elementhiding.store.ElementHidingRepository
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 
 class ElementHidingFeaturePluginTest {
     lateinit var testee: ElementHidingFeaturePlugin
