@@ -14,39 +14,37 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/settingsSectionInternal"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+<androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/settingsSectionInternal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
     <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
-        android:id="@+id/settingsInternalSectionBottomDivider"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+            android:id="@+id/settingsInternalSectionBottomDivider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
 
-    <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
-        android:id="@+id/settingsInternalTitle"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/settingsInternalSectionBottomDivider"
-        android:text="Internal Features"/>
+    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            android:id="@+id/settingsInternalTitle"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/settingsInternalSectionBottomDivider"
+            app:primaryText="Internal Features"/>
 
     <LinearLayout
-        android:id="@+id/settingsInternalFeaturesContainer"
-        android:layout_width="match_parent"
-        android:orientation="vertical"
-        android:layout_height="match_parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/settingsInternalTitle"
-        >
-
-    </LinearLayout>
+            android:id="@+id/settingsInternalFeaturesContainer"
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_height="match_parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/settingsInternalTitle"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
