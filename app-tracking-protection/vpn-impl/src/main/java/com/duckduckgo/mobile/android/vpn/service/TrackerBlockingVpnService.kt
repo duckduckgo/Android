@@ -224,7 +224,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
                 createTunnelInterface(it)
             } else {
                 Timber.e("Failed to obtain config needed to establish the TUN interface")
-                stopVpn(VpnStopReason.ERROR)
+                stopVpn(VpnStopReason.ERROR, false)
             }
         }
 
@@ -247,7 +247,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             Timber.d("Enable new error handling for onStartVpn")
             vpnNetworkStack.onStartVpn(tunInterface!!).getOrElse {
                 Timber.e("Failed to start VPN")
-                stopVpn(VpnStopReason.ERROR)
+                stopVpn(VpnStopReason.ERROR, false)
                 return@withContext
             }
         } else {
@@ -355,7 +355,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
 
         if (tunInterface == null) {
             Timber.e("VPN log: Failed to establish VPN tunnel")
-            stopVpn(VpnStopReason.ERROR)
+            stopVpn(VpnStopReason.ERROR, false)
         }
     }
 
@@ -452,7 +452,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         }
     }
 
-    private suspend fun stopVpn(reason: VpnStopReason) = withContext(Dispatchers.IO) {
+    private suspend fun stopVpn(reason: VpnStopReason, shouldStopCallbacks: Boolean = true) = withContext(Dispatchers.IO) {
         Timber.d("VPN log: Stopping VPN. $reason")
 
         vpnNetworkStack.onStopVpn()
@@ -462,9 +462,11 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
 
         sendStopPixels(reason)
 
-        vpnServiceCallbacksPluginPoint.getPlugins().forEach {
-            Timber.v("VPN log: stopping ${it.javaClass} callback")
-            it.onVpnStopped(this, reason)
+        if (shouldStopCallbacks) {
+            vpnServiceCallbacksPluginPoint.getPlugins().forEach {
+                Timber.v("VPN log: stopping ${it.javaClass} callback")
+                it.onVpnStopped(this, reason)
+            }
         }
 
         vpnStateServiceReference?.let {
