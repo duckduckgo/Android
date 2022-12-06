@@ -34,7 +34,6 @@ dependencies {
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':di')
     implementation project(path: ':common')
-    implementation project(path: ':statistics')
     implementation project(path: ':privacy-config-api')
     implementation project(path: ':feature-toggles-api')
     implementation project(path: ':app-build-config-api')
@@ -75,9 +74,6 @@ dependencies {
         // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
-
-    implementation "com.jakewharton.threetenabp:threetenabp:_"
-    testImplementation "org.threeten:threetenbp:_"
 
     implementation JakeWharton.timber
 
