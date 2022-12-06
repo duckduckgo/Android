@@ -16,22 +16,14 @@
 
 package com.duckduckgo.mobile.android.vpn.integration
 
-import android.content.Context
 import android.os.ParcelFileDescriptor
 import android.util.LruCache
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.mobile.android.vpn.apps.VpnExclusionList
-import com.duckduckgo.mobile.android.vpn.model.TrackingApp
-import com.duckduckgo.mobile.android.vpn.model.VpnTracker
+import com.duckduckgo.mobile.android.app.tracking.AppTrackerDetector
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack.VpnTunnelConfig
-import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver
-import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.AppTrackerRecorder
-import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
-import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
-import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerType
 import com.duckduckgo.vpn.network.api.*
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
@@ -53,26 +45,16 @@ private const val EMFILE_ERRNO = 24
 )
 @SingleInstanceIn(VpnScope::class)
 class NgVpnNetworkStack @Inject constructor(
-    context: Context,
     private val appBuildConfig: AppBuildConfig,
     private val vpnNetwork: Lazy<VpnNetwork>,
-    private val appTrackerRepository: AppTrackerRepository,
-    private val appNameResolver: AppNameResolver,
-    private val appTrackerRecorder: AppTrackerRecorder,
-    vpnDatabase: VpnDatabase,
     private val runtime: Runtime,
+    private val appTrackerDetector: AppTrackerDetector,
 ) : VpnNetworkStack, VpnNetworkCallback {
-
-    private val packageManager = context.packageManager
-    private val vpnAppTrackerBlockingDao = vpnDatabase.vpnAppTrackerBlockingDao()
 
     private var tunnelThread: Thread? = null
     private var jniContext = 0L
     private val jniLock = Any()
     private val addressLookupLruCache = LruCache<String, String>(LRU_CACHE_SIZE)
-
-    // cache packageId -> app name
-    private val appNamesCache = LruCache<String, AppNameResolver.OriginatingApp>(100)
 
     override val name: String = "ng"
 
@@ -171,72 +153,10 @@ class NgVpnNetworkStack @Inject constructor(
         name: String,
         uid: Int,
     ): Boolean {
-        val packageId = getPackageIdForUid(uid)
+        val tracker = appTrackerDetector.evaluate(name, uid)
+        Timber.d("shouldAllowDomain for $name ($uid) = $tracker")
 
-        if (VpnExclusionList.isDdgApp(packageId)) {
-            Timber.v("shouldAllowDomain: DDG ap is always allowed")
-            return true
-        }
-
-        val type = appTrackerRepository.findTracker(name, packageId)
-
-        if (type is AppTrackerType.ThirdParty && !isTrackerInExceptionRules(packageId = packageId, hostname = name)) {
-            Timber.d("shouldAllowDomain for $name/$packageId = false")
-            val trackingApp = appNamesCache[packageId] ?: appNameResolver.getAppNameForPackageId(packageId)
-            appNamesCache.put(packageId, trackingApp)
-
-            // if the app name is unknown, do not block
-            if (trackingApp.isUnknown()) return true
-
-            VpnTracker(
-                trackerCompanyId = type.tracker.trackerCompanyId,
-                company = type.tracker.owner.name,
-                companyDisplayName = type.tracker.owner.displayName,
-                domain = type.tracker.hostname,
-                trackingApp = TrackingApp(trackingApp.packageId, trackingApp.appName),
-            ).run {
-                appTrackerRecorder.insertTracker(this)
-            }
-            return false
-        }
-
-        return true
-    }
-
-    private fun isTrackerInExceptionRules(
-        packageId: String,
-        hostname: String,
-    ): Boolean {
-        return vpnAppTrackerBlockingDao.getRuleByTrackerDomain(hostname)?.let { rule ->
-            Timber.d("isTrackerInExceptionRules: found rule $rule for $hostname")
-            return rule.packageNames.contains(packageId)
-        } ?: false
-    }
-
-    private fun getPackageIdForUid(uid: Int): String {
-        val packages: Array<String>?
-
-        try {
-            packages = packageManager.getPackagesForUid(uid)
-        } catch (e: SecurityException) {
-            Timber.e(e, "Failed to get package ID for UID: $uid due to security violation.")
-            return "unknown"
-        }
-
-        if (packages.isNullOrEmpty()) {
-            Timber.w("Failed to get package ID for UID: $uid")
-            return "unknown"
-        }
-
-        if (packages.size > 1) {
-            val sb = StringBuilder(String.format("Found %d packages for uid:%d", packages.size, uid))
-            packages.forEach {
-                sb.append(String.format("\npackage: %s", it))
-            }
-            Timber.d(sb.toString())
-        }
-
-        return packages.first()
+        return tracker == null
     }
 
     private fun startNative(tunfd: Int): Result<Unit> {

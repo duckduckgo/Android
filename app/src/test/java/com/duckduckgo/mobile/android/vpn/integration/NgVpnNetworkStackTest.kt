@@ -16,16 +16,10 @@
 
 package com.duckduckgo.mobile.android.vpn.integration
 
-import android.content.pm.PackageManager
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.mobile.android.vpn.dao.VpnAppTrackerBlockingDao
-import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver
-import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.AppTrackerRecorder
-import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
-import com.duckduckgo.mobile.android.vpn.trackers.*
+import com.duckduckgo.mobile.android.app.tracking.AppTrackerDetector
 import com.duckduckgo.vpn.network.api.*
 import java.net.InetAddress
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -34,8 +28,9 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.*
+
+private const val TRACKER_HOSTNAME = "api2.branch.com"
 
 @RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -47,33 +42,21 @@ class NgVpnNetworkStackTest {
 
     private val appBuildConfig: AppBuildConfig = mock()
     private val vpnNetwork: VpnNetwork = mock()
-    private val appTrackerRepository: AppTrackerRepository = mock()
-    private val packageManager: PackageManager = mock()
-    private val appTrackerRecorder: AppTrackerRecorder = mock()
-    private val vpnDatabase: VpnDatabase = mock()
     private val runtime: Runtime = mock()
-    private val vpnAppTrackerBlockingDao: VpnAppTrackerBlockingDao = mock()
+    private val appTrackerDetector: AppTrackerDetector = mock()
 
     private lateinit var ngVpnNetworkStack: NgVpnNetworkStack
 
     @Before
     fun setup() {
-        val appNameResolver = AppNameResolver(packageManager)
-        whenever(packageManager.getApplicationLabel(packageManager.getApplicationInfo(anyString(), eq(PackageManager.GET_META_DATA))))
-            .thenReturn("DuckDuckGo")
-        whenever(vpnDatabase.vpnAppTrackerBlockingDao()).thenReturn(vpnAppTrackerBlockingDao)
         whenever(vpnNetwork.create()).thenReturn(111)
         whenever(vpnNetwork.mtu()).thenReturn(1500)
 
         ngVpnNetworkStack = NgVpnNetworkStack(
-            InstrumentationRegistry.getInstrumentation().targetContext,
             appBuildConfig,
             { vpnNetwork },
-            appTrackerRepository,
-            appNameResolver,
-            appTrackerRecorder,
-            vpnDatabase,
             runtime,
+            appTrackerDetector,
         )
     }
 
@@ -152,69 +135,30 @@ class NgVpnNetworkStackTest {
     }
 
     @Test
-    fun whenIsAddressBlockedAndDomainIsThirdPartyTrackerThenReturnTrue() {
+    fun whenIsAddressBlockedAndDomainIsTrackerThenReturnTrue() {
         val uid = 1200
+        val tracker = AppTrackerDetector.AppTracker(
+            "hostname",
+            33,
+            "AppDisplayName",
+            "app.package.name",
+            "AppName",
+        )
 
-        whenever(appTrackerRepository.findTracker(eq(THIRD_PARTY_TRACKER.tracker.hostname), anyString())).thenReturn(THIRD_PARTY_TRACKER)
-        whenever(vpnAppTrackerBlockingDao.getRuleByTrackerDomain(THIRD_PARTY_TRACKER.tracker.hostname)).thenReturn(null)
-        ngVpnNetworkStack.onDnsResolved(createDnsRecord(THIRD_PARTY_TRACKER.tracker.hostname, "1.1.1.1"))
+        whenever(appTrackerDetector.evaluate(TRACKER_HOSTNAME, uid)).thenReturn(tracker)
+        ngVpnNetworkStack.onDnsResolved(createDnsRecord(TRACKER_HOSTNAME, "1.1.1.1"))
 
         assertTrue(ngVpnNetworkStack.isAddressBlocked(AddressRR("1.1.1.1", uid)))
-    }
-
-    @Test
-    fun whenIsAddressBlockedAndDomainIsFirstPartyTrackerThenReturnFalse() {
-        val uid = 1200
-
-        whenever(appTrackerRepository.findTracker(eq(THIRD_PARTY_TRACKER.tracker.hostname), anyString())).thenReturn(FIRST_PARTY_TRACKER)
-        whenever(vpnAppTrackerBlockingDao.getRuleByTrackerDomain(THIRD_PARTY_TRACKER.tracker.hostname)).thenReturn(null)
-        ngVpnNetworkStack.onDnsResolved(createDnsRecord(THIRD_PARTY_TRACKER.tracker.hostname, "1.1.1.1"))
-
-        assertFalse(ngVpnNetworkStack.isAddressBlocked(AddressRR("1.1.1.1", uid)))
     }
 
     @Test
     fun whenIsAddressBlockedAndDomainIsNotTrackerThenReturnFalse() {
         val uid = 1200
 
-        whenever(appTrackerRepository.findTracker(eq(THIRD_PARTY_TRACKER.tracker.hostname), anyString())).thenReturn(AppTrackerType.NotTracker)
-        whenever(vpnAppTrackerBlockingDao.getRuleByTrackerDomain(THIRD_PARTY_TRACKER.tracker.hostname)).thenReturn(null)
-        ngVpnNetworkStack.onDnsResolved(createDnsRecord(THIRD_PARTY_TRACKER.tracker.hostname, "1.1.1.1"))
+        whenever(appTrackerDetector.evaluate(TRACKER_HOSTNAME, uid)).thenReturn(null)
+        ngVpnNetworkStack.onDnsResolved(createDnsRecord(TRACKER_HOSTNAME, "1.1.1.1"))
 
         assertFalse(ngVpnNetworkStack.isAddressBlocked(AddressRR("1.1.1.1", uid)))
-    }
-
-    @Test
-    fun whenIsDomainBlockedAndDomainIsFirstPartyTrackerThenReturnFalse() {
-        val uid = 1200
-        val hostname = TEST_APP_TRACKER.hostname
-
-        whenever(appTrackerRepository.findTracker(eq(hostname), anyString())).thenReturn(FIRST_PARTY_TRACKER)
-        whenever(vpnAppTrackerBlockingDao.getRuleByTrackerDomain(hostname)).thenReturn(null)
-
-        assertFalse(ngVpnNetworkStack.isDomainBlocked(DomainRR(hostname, uid)))
-    }
-
-    @Test
-    fun whenIsDomainBlockedAndDomainIsThirdPartyTrackerThenReturnTrue() {
-        val uid = 1200
-        val hostname = TEST_APP_TRACKER.hostname
-
-        whenever(appTrackerRepository.findTracker(eq(hostname), anyString())).thenReturn(THIRD_PARTY_TRACKER)
-        whenever(vpnAppTrackerBlockingDao.getRuleByTrackerDomain(hostname)).thenReturn(null)
-
-        assertTrue(ngVpnNetworkStack.isDomainBlocked(DomainRR(hostname, uid)))
-    }
-
-    @Test
-    fun whenIsDomainBlockedAndDomainIsNotTrackerThenReturnFalse() {
-        val uid = 1200
-        val hostname = TEST_APP_TRACKER.hostname
-
-        whenever(appTrackerRepository.findTracker(eq(hostname), anyString())).thenReturn(AppTrackerType.NotTracker)
-        whenever(vpnAppTrackerBlockingDao.getRuleByTrackerDomain(hostname)).thenReturn(null)
-
-        assertFalse(ngVpnNetworkStack.isDomainBlocked(DomainRR(hostname, uid)))
     }
 
     private fun createDnsRecord(
@@ -228,21 +172,5 @@ class NgVpnNetworkStackTest {
             resource = address,
             ttl = 0,
         )
-    }
-
-    companion object {
-        private val TEST_APP_TRACKER = AppTracker(
-            hostname = "api2.branch.com",
-            trackerCompanyId = 0,
-            owner = TrackerOwner(
-                name = "Branch",
-                displayName = "Branch",
-            ),
-            app = TrackerApp(0, 0.0),
-            isCdn = false,
-        )
-
-        private val THIRD_PARTY_TRACKER = AppTrackerType.ThirdParty(TEST_APP_TRACKER)
-        private val FIRST_PARTY_TRACKER = AppTrackerType.FirstParty(TEST_APP_TRACKER)
     }
 }
