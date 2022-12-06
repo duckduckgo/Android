@@ -67,7 +67,7 @@
         <item name="android:contentDescription">@string/autofillDialogCloseButtonContentDescription</item>
         <item name="android:importantForAccessibility">yes</item>
         <item name="android:padding">12dp</item>
-        <item name="android:src">@drawable/ic_close_24dp</item>
+        <item name="android:src">@drawable/ic_close_24</item>
     </style>
 
 </resources>
