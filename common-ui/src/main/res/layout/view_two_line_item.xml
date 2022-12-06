@@ -49,6 +49,7 @@
         android:layout_marginStart="@dimen/keyline_4"
         android:layout_marginTop="@dimen/twoLineItemVerticalPadding"
         android:layout_marginEnd="8dp"
+        android:breakStrategy="balanced"
         app:layout_constraintEnd_toStartOf="@id/betaPill"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintHorizontal_chainStyle="packed"

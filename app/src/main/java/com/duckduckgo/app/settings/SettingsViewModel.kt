@@ -26,6 +26,7 @@ import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName.*
+import com.duckduckgo.app.settings.clear.AppLinkSettingType
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
@@ -461,10 +462,4 @@ class SettingsViewModel @Inject constructor(
     companion object {
         const val EMAIL_PROTECTION_URL = "https://duckduckgo.com/email"
     }
-}
-
-enum class AppLinkSettingType {
-    ASK_EVERYTIME,
-    ALWAYS,
-    NEVER,
 }
