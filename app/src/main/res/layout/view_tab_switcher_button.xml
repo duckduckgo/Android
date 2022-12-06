@@ -18,16 +18,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:parentTag="android.widget.RelativeLayout">
 
+    <!-- This TextView doesn't migrate to DaxTextView, special case for the Tabs icon  -->
     <TextView
         android:id="@+id/tabCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAlignment="center"
-        android:textColor="?toolbarIconColor"
+        android:textColor="?attr/daxColorPrimaryIcon"
         android:textSize="12sp"
         android:fontFamily="sans-serif-black"
         android:textStyle="bold"
         android:gravity="center"
+        android:padding="3dp"
         android:background="@drawable/ic_tabs"
         tools:text="66" />
 
