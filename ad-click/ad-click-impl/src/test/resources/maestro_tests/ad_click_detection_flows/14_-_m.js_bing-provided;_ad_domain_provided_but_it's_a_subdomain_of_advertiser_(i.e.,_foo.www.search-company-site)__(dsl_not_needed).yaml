@@ -9,8 +9,7 @@ appId: com.duckduckgo.mobile.android
 - assertVisible:
     text: ".*I'll also upgrade the security of your connection if possible.*"
 - inputText: "https://www.search-company.site/"
-- tapOn:
-    id: ".*key_pos_ime_action.*"
+- pressKey: Enter
 - assertVisible:
     text: ".*Got It.*"
 - tapOn:
