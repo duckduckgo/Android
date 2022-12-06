@@ -34,6 +34,8 @@ import com.duckduckgo.app.global.extensions.html
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command.*
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder.EventListener
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import javax.inject.Inject
@@ -150,16 +152,17 @@ class WhitelistActivity : DuckDuckGoActivity() {
     }
 
     private fun showDeleteDialog(entry: UserWhitelistedDomain) {
-        val deleteDialog = AlertDialog.Builder(this).apply {
-            setTitle(R.string.dialogConfirmTitle)
-            setMessage(getString(R.string.whitelistEntryDeleteConfirmMessage, entry.domain).html(this.context))
-            setPositiveButton(android.R.string.yes) { _, _ -> viewModel.onEntryDeleted(entry) }
-            setNegativeButton(android.R.string.no) { _, _ -> }
-        }.create()
-
-        dialog?.dismiss()
-        dialog = deleteDialog
-        deleteDialog.show()
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.dialogConfirmTitle)
+            .setMessage(getString(R.string.whitelistEntryDeleteConfirmMessage, entry.domain).html(this))
+            .setPositiveButton(android.R.string.yes)
+            .setNegativeButton(android.R.string.no)
+            .addEventListener(object : EventListener() {
+                override fun onPositiveButtonClicked() {
+                    viewModel.onEntryDeleted(entry)
+                }
+            },)
+            .show()
     }
 
     private fun showWhitelistFormatError() {
