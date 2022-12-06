@@ -16,8 +16,9 @@
 
 package com.duckduckgo.autofill.configuration
 
+import com.duckduckgo.autofill.jsbridge.response.AvailableInputTypeCredentials
 import com.squareup.moshi.Moshi.Builder
-import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class RealRuntimeConfigurationWriterTest {
@@ -25,14 +26,20 @@ class RealRuntimeConfigurationWriterTest {
 
     @Test
     fun whenGenerateResponseGetAvailableInputTypesThenReturnAvailableInputTypesJson() {
-        val expectedJson = "{\n" +
-            "  \"credentials\": false,\n" +
-            "  \"email\": true\n" +
-            "}"
-        Assert.assertEquals(
+        val expectedJson = """
+            {
+              "credentials": {
+                "password": false,
+                "username": false
+              },
+              "email": true
+            }
+        """.trimIndent()
+
+        assertEquals(
             expectedJson,
             testee.generateResponseGetAvailableInputTypes(
-                credentialsAvailable = false,
+                credentialsAvailable = AvailableInputTypeCredentials(username = false, password = false),
                 emailAvailable = true,
             ),
         )
@@ -40,16 +47,18 @@ class RealRuntimeConfigurationWriterTest {
 
     @Test
     fun whenGenerateContentScopeTheReturnContentScopeString() {
-        val expectedJson = "contentScope = {\n" +
-            "  \"features\": {\n" +
-            "    \"autofill\": {\n" +
-            "      \"state\": \"enabled\",\n" +
-            "      \"exceptions\": []\n" +
-            "    }\n" +
-            "  },\n" +
-            "  \"unprotectedTemporary\": []\n" +
-            "};"
-        Assert.assertEquals(
+        val expectedJson = """
+            contentScope = {
+              "features": {
+                "autofill": {
+                  "state": "enabled",
+                  "exceptions": []
+                }
+              },
+              "unprotectedTemporary": []
+            };
+        """.trimIndent()
+        assertEquals(
             expectedJson,
             testee.generateContentScope(),
         )
@@ -58,7 +67,7 @@ class RealRuntimeConfigurationWriterTest {
     @Test
     fun whenGenerateUserUnprotectedDomainsThenReturnUserUnprotectedDomainsString() {
         val expectedJson = "userUnprotectedDomains = [];"
-        Assert.assertEquals(
+        assertEquals(
             expectedJson,
             testee.generateUserUnprotectedDomains(),
         )
@@ -66,28 +75,30 @@ class RealRuntimeConfigurationWriterTest {
 
     @Test
     fun whenGenerateUserPreferencesThenReturnUserPreferencesString() {
-        val expectedJson = "userPreferences = {\n" +
-            "  \"debug\": false,\n" +
-            "  \"platform\": {\n" +
-            "    \"name\": \"android\"\n" +
-            "  },\n" +
-            "  \"features\": {\n" +
-            "    \"autofill\": {\n" +
-            "      \"settings\": {\n" +
-            "        \"featureToggles\": {\n" +
-            "          \"inputType_credentials\": true,\n" +
-            "          \"inputType_identities\": false,\n" +
-            "          \"inputType_creditCards\": false,\n" +
-            "          \"emailProtection\": true,\n" +
-            "          \"password_generation\": false,\n" +
-            "          \"credentials_saving\": true,\n" +
-            "          \"inlineIcon_credentials\": true\n" +
-            "        }\n" +
-            "      }\n" +
-            "    }\n" +
-            "  }\n" +
-            "};"
-        Assert.assertEquals(
+        val expectedJson = """
+            userPreferences = {
+              "debug": false,
+              "platform": {
+                "name": "android"
+              },
+              "features": {
+                "autofill": {
+                  "settings": {
+                    "featureToggles": {
+                      "inputType_credentials": true,
+                      "inputType_identities": false,
+                      "inputType_creditCards": false,
+                      "emailProtection": true,
+                      "password_generation": false,
+                      "credentials_saving": true,
+                      "inlineIcon_credentials": true
+                    }
+                  }
+                }
+              }
+            };
+        """.trimIndent()
+        assertEquals(
             expectedJson,
             testee.generateUserPreferences(
                 autofillCredentials = true,

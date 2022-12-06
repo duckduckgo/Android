@@ -17,6 +17,7 @@
 package com.duckduckgo.autofill.configuration
 
 import com.duckduckgo.app.email.EmailManager
+import com.duckduckgo.autofill.jsbridge.response.AvailableInputTypeCredentials
 import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.di.scopes.AppScope
@@ -73,12 +74,16 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
     private fun determineIfAutofillEnabled(): Boolean =
         autofillStore.autofillAvailable && autofillStore.autofillEnabled && deviceAuthenticator.hasValidDeviceAuthentication()
 
-    private suspend fun determineIfCredentialsAvailable(url: String?): Boolean {
+    private suspend fun determineIfCredentialsAvailable(url: String?): AvailableInputTypeCredentials {
         return if (url == null || !determineIfAutofillEnabled()) {
-            false
+            AvailableInputTypeCredentials(username = false, password = false)
         } else {
             val savedCredentials = autofillStore.getCredentials(url)
-            savedCredentials.isNotEmpty()
+
+            val usernameSearch = savedCredentials.find { !it.username.isNullOrEmpty() }
+            val passwordSearch = savedCredentials.find { !it.password.isNullOrEmpty() }
+
+            AvailableInputTypeCredentials(username = usernameSearch != null, password = passwordSearch != null)
         }
     }
 
