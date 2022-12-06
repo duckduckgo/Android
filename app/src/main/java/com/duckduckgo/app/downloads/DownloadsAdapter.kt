@@ -139,7 +139,7 @@ class DownloadsAdapter @Inject constructor(
                 }
             }
 
-            twoListItem.setTrailingIcon(R.drawable.ic_overflow)
+            twoListItem.setTrailingIcon(com.duckduckgo.mobile.android.R.drawable.ic_menu_vertical_24)
             twoListItem.setTrailingIconClickListener { view ->
                 showPopupMenu(view, item)
             }
