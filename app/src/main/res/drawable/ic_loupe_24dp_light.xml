@@ -15,12 +15,12 @@
   -->
 
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="24dp"
-    android:height="24dp"
-    android:viewportWidth="24"
-    android:viewportHeight="24">
+        android:width="24dp"
+        android:height="24dp"
+        android:viewportWidth="24"
+        android:viewportHeight="24">
     <path
-        android:fillColor="@color/almostBlack"
-        android:fillType="nonZero"
-        android:pathData="M14.774,16.051a6.702,6.702 0,0 1,-8.716 -10.13,6.7 6.7,0 0,1 10.13,8.716l3.446,3.447a1,1 0,0 1,-1.414 1.414l-3.446,-3.447zM7.33,14.124a4.9,4.9 0,1 0,6.93 -6.93,4.9 4.9,0 0,0 -6.93,6.93z" />
+        android:pathData="M10.5,2C5.806,2 2,5.806 2,10.5C2,15.194 5.806,19 10.5,19C12.487,19 14.314,18.318 15.762,17.176L20.293,21.707C20.683,22.098 21.317,22.098 21.707,21.707C22.098,21.317 22.098,20.683 21.707,20.293L17.176,15.762C18.318,14.314 19,12.487 19,10.5C19,5.806 15.194,2 10.5,2ZM4,10.5C4,6.91 6.91,4 10.5,4C14.09,4 17,6.91 17,10.5C17,14.09 14.09,17 10.5,17C6.91,17 4,14.09 4,10.5Z"
+        android:fillColor="?attr/daxColorBlack"
+        android:fillType="evenOdd"/>
 </vector>

@@ -35,6 +35,6 @@
         android:paddingStart="14dp"
         android:paddingEnd="@dimen/toolbarOverflowPadding"
         android:scaleType="center"
-        android:src="@drawable/ic_overflow"
+        android:src="@drawable/ic_menu_vertical_24"
         tools:ignore="ContentDescription" />
 </LinearLayout>
