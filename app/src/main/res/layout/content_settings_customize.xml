@@ -48,6 +48,7 @@
         android:id="@+id/appLinksSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:primaryTextTruncated="false"
         app:primaryText="@string/settingsTitleAppLinks" />
 
 </LinearLayout>

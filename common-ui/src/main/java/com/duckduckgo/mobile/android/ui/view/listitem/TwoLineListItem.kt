@@ -59,10 +59,12 @@ class TwoLineListItem @JvmOverloads constructor(
                 binding.primaryText.setTextColor(getColorStateList(R.styleable.TwoLineListItem_primaryTextColorOverlay))
             }
 
-            val truncated = getBoolean(R.styleable.TwoLineListItem_primaryTextTruncated, false)
+            val truncated = getBoolean(R.styleable.TwoLineListItem_primaryTextTruncated, true)
             if (truncated) {
                 binding.primaryText.maxLines = 1
                 binding.primaryText.ellipsize = TruncateAt.END
+            } else {
+                binding.primaryText.maxLines = Int.MAX_VALUE
             }
 
             if (hasValue(R.styleable.TwoLineListItem_secondaryTextColorOverlay)) {
