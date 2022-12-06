@@ -243,7 +243,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
     private fun resetToolbar() {
         setTitle(R.string.managementScreenTitle)
         binding.includeToolbar.toolbar.menu.clear()
-        supportActionBar?.setHomeAsUpIndicator(com.duckduckgo.mobile.android.R.drawable.ic_back_24)
+        supportActionBar?.setHomeAsUpIndicator(com.duckduckgo.mobile.android.R.drawable.ic_arrow_left_24)
     }
 
     override fun onBackPressed() {
