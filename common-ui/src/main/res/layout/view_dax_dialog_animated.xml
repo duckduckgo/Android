@@ -43,7 +43,7 @@
             app:typography="button"
             android:textColor="?attr/daxColorWhite"
             android:padding="@dimen/keyline_3"
-            tools:text="HIDE"
+            tools:text="Hide"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

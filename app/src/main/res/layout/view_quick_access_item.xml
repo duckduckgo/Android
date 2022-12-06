@@ -15,16 +15,17 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:paddingTop="15dp"
-    android:paddingBottom="15dp"
-    android:clipToPadding="false"
-    android:clickable="true"
-    android:focusable="true">
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:orientation="vertical"
+              android:paddingTop="15dp"
+              android:paddingBottom="15dp"
+              android:clipToPadding="false"
+              android:background="?selectableItemBackground"
+              android:clickable="true"
+              android:focusable="true">
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/quickAccessFaviconCard"
@@ -33,8 +34,8 @@
         android:layout_gravity="center_horizontal"
         android:paddingStart="15dp"
         android:paddingEnd="15dp"
-        app:cardBackgroundColor="?attr/colorPrimary"
-        app:cardCornerRadius="10dp"
+        app:cardBackgroundColor="?attr/daxColorBackground"
+        app:cardCornerRadius="@dimen/smallShapeCornerRadius"
         app:cardElevation="4dp">
 
         <ImageView
@@ -45,10 +46,12 @@
 
     </com.google.android.material.card.MaterialCardView>
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/quickAccessTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:typography="caption"
+        app:textType="secondary"
         android:layout_gravity="center_horizontal"
         android:ellipsize="end"
         android:gravity="center"
@@ -56,8 +59,6 @@
         android:paddingStart="11dp"
         android:paddingEnd="11dp"
         android:paddingTop="8dp"
-        android:textColor="?quickAccessItemTitleTextColor"
-        android:textSize="12sp"
-        tools:text="Super long favorite title" />
+        tools:text="Super long favorite title"/>
 
 </LinearLayout>

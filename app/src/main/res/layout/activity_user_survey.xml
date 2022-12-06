@@ -54,7 +54,7 @@
             android:layout_height="24dp"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
-            app:srcCompat="@drawable/ic_close_24dp"
+            app:srcCompat="@drawable/ic_close_24"
             app:backgroundTint="@color/carolinaBlue"
             app:contentDescription="@string/surveyDismissContentDescription"
             app:layout_constraintBottom_toBottomOf="@id/title"

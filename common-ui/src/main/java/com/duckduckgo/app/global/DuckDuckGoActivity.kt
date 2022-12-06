@@ -86,7 +86,7 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
     fun setupToolbar(toolbar: Toolbar) {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        toolbar.setNavigationIcon(R.drawable.ic_back_24)
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_left_24)
     }
 
     fun isDarkThemeEnabled(): Boolean {

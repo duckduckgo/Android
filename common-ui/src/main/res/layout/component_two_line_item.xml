@@ -58,7 +58,7 @@
         app:leadingIcon="@drawable/ic_globe_gray_16dp"
         app:primaryText="Two Line Item"
         app:secondaryText="With Leading and Trailing Image"
-        app:trailingIcon="@drawable/ic_overflow"
+        app:trailingIcon="@drawable/ic_menu_vertical_24"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/twoLineListItemWithImage"/>
@@ -69,7 +69,7 @@
         android:layout_height="wrap_content"
         app:primaryText="Two Line Item"
         app:secondaryText="With Trailing Image"
-        app:trailingIcon="@drawable/ic_overflow"
+        app:trailingIcon="@drawable/ic_menu_vertical_24"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/twoLineListItemWithImageAndTrailingIcon"/>
@@ -93,7 +93,7 @@
             app:leadingIconBackground="circular"
             app:primaryText="Two Line Item"
             app:secondaryText="With Leading Image over Circular Background"
-            app:trailingIcon="@drawable/ic_overflow"
+            app:trailingIcon="@drawable/ic_menu_vertical_24"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/twoLineListItemWithBetaPill"/>
@@ -106,7 +106,7 @@
             app:leadingIconBackground="rounded"
             app:primaryText="Two Line Item"
             app:secondaryText="With Leading Image over Rounded Background"
-            app:trailingIcon="@drawable/ic_overflow"
+            app:trailingIcon="@drawable/ic_menu_vertical_24"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/twoLineListItemWithCircularImage"/>

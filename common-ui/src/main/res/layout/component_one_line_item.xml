@@ -58,7 +58,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithImage"
         app:primaryText="Item With Trailing Icon"
-        app:trailingIcon="@drawable/ic_overflow" />
+        app:trailingIcon="@drawable/ic_menu_vertical_24" />
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/oneLineListItemWithLeadingAndTrailingIcons"
@@ -71,7 +71,7 @@
         app:leadingIcon="@drawable/ic_globe_gray_16dp"
         app:leadingIconBackground="circular"
         app:primaryText="Item With Leading and Trailing Icons"
-        app:trailingIcon="@drawable/ic_overflow" />
+        app:trailingIcon="@drawable/ic_menu_vertical_24" />
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/oneLineListItemSwitch"

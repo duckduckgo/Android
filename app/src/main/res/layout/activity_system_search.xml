@@ -37,7 +37,7 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="?attr/toolbarBgColor"
+                android:background="?attr/daxColorSurface"
                 app:contentInsetEnd="0dp"
                 app:contentInsetStart="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -80,8 +80,8 @@
                         android:inputType="textUri|textNoSuggestions"
                         android:maxLines="1"
                         android:selectAllOnFocus="true"
-                        android:textColor="?attr/omnibarTextColor"
-                        android:textColorHint="?attr/omnibarHintColor"
+                        android:textColor="?attr/daxColorPrimaryText"
+                        android:textColorHint="?attr/daxColorSecondaryText"
                         android:textCursorDrawable="@drawable/text_cursor"
                         android:textSize="16sp"
                         android:textStyle="normal"
@@ -113,7 +113,7 @@
                         android:background="?selectableItemBackground"
                         android:contentDescription="@string/clearButtonContentDescription"
                         android:padding="3dp"
-                        android:src="@drawable/ic_close"
+                        android:src="@drawable/ic_close_24"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
@@ -143,8 +143,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:clipToPadding="false"
-            android:background="?toolbarBgColor"
-            android:backgroundTint="?toolbarBgColor"
+            android:background="?attr/daxColorSurface"
+            android:backgroundTint="?attr/daxColorSurface"
             android:elevation="4dp">
 
             <androidx.recyclerview.widget.RecyclerView
@@ -157,7 +157,7 @@
                 tools:itemCount="4"
                 tools:listitem="@layout/item_autocomplete_search_suggestion" />
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:id="@+id/deviceLabel"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -166,13 +166,11 @@
                 android:paddingEnd="16dp"
                 android:paddingBottom="2dp"
                 android:text="@string/systemSearchDeviceAppLabel"
-                android:textColor="?normalTextColor"
-                android:textSize="13sp"
+                app:typography="caption_allCaps"
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/autocompleteSuggestions"
-                app:textAllCaps="true" />
+                app:layout_constraintTop_toBottomOf="@id/autocompleteSuggestions"/>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/deviceAppSuggestions"
