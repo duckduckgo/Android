@@ -183,23 +183,23 @@ class SitePermissionsAdapter(
             val iconRes = when (item.text) {
                 R.string.sitePermissionsSettingsLocation -> {
                     if (item.enable) {
-                        R.drawable.ic_location
+                        R.drawable.location_24
                     } else {
-                        R.drawable.ic_location_disabled
+                        R.drawable.location_blocked_24
                     }
                 }
                 R.string.sitePermissionsSettingsCamera -> {
                     if (item.enable) {
-                        R.drawable.ic_camera
+                        R.drawable.camera_24
                     } else {
-                        R.drawable.ic_camera_disabled
+                        R.drawable.camera_blocked_24
                     }
                 }
                 R.string.sitePermissionsSettingsMicrophone -> {
                     if (item.enable) {
-                        R.drawable.ic_microphone
+                        R.drawable.microphone_24
                     } else {
-                        R.drawable.ic_microphone_disabled
+                        R.drawable.microphone_blocked_24
                     }
                 }
                 else -> null
