@@ -35,8 +35,8 @@
 
     <!-- Toolbar -->
     <dimen name="toolbarIconSize">24dp</dimen>
-    <dimen name="toolbarIconContainerSize">48dp</dimen>
     <dimen name="toolbarOverflowPadding">10dp</dimen>
+    <dimen name="toolbarIconPadding">3dp</dimen>
 
     <!-- Buttons -->
     <dimen name="legacyButtonSmallHeight">36dp</dimen>

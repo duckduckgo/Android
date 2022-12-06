@@ -25,10 +25,7 @@
     <attr name="browserIconColorSelector" format="color" />
     <attr name="browserMenuTextColor" format="color" />
     <attr name="browserMenuTextColorDisabled" format="color" />
-    <attr name="omnibarRoundedFieldBackgroundColor" format="color" />
     <attr name="cookiesRoundedFieldBackgroundColor" format="color" />
-    <attr name="omnibarTextColor" format="color" />
-    <attr name="omnibarHintColor" format="color" />
     <attr name="omnibarLogoLetterTextColor" format="color" />
     <attr name="autoCompleteTextColor" format="color" />
     <attr name="autoCompleteSubtitleTextColor" format="color" />
@@ -69,7 +66,6 @@
     <attr name="fireproofWebsiteTitleTextColor" format="color" />
     <attr name="emailButtonRippleColor" format="color" />
     <attr name="deviceShieldExcludedAppNameTextColor" format="color" />
-    <attr name="quickAccessItemTitleTextColor" format="color" />
     <attr name="listItemImageBackground" format="color" />
     <attr name="lightContainerBackground" format="color" />
 
