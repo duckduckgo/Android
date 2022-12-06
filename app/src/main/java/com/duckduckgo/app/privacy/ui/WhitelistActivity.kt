@@ -157,11 +157,13 @@ class WhitelistActivity : DuckDuckGoActivity() {
             .setMessage(getString(R.string.whitelistEntryDeleteConfirmMessage, entry.domain).html(this))
             .setPositiveButton(android.R.string.yes)
             .setNegativeButton(android.R.string.no)
-            .addEventListener(object : EventListener() {
-                override fun onPositiveButtonClicked() {
-                    viewModel.onEntryDeleted(entry)
-                }
-            },)
+            .addEventListener(
+                object : EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onEntryDeleted(entry)
+                    }
+                },
+            )
             .show()
     }
 
