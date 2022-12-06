@@ -19,9 +19,11 @@
     <!-- Design System Theme Agnostic Reference Colors
         daxColorDim - Dim color behine some dialogs / Dax Dialog
         daxColorWhite - Brand White
+        daxColorBlack - Brand Black
         -->
     <attr name="daxColorDim" format="color"/>
     <attr name="daxColorWhite" format="color"/>
+    <attr name="daxColorBlack" format="color"/>
 
     <!-- Design System Reference Colors
         daxColorBackground - Bottom Layer - Background of the screen
