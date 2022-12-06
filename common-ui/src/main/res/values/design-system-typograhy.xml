@@ -93,7 +93,7 @@
 
     <style name="Typography.DuckDuckGo.Title">
         <item name="android:textSize">32sp</item>
-        <item name="android:lineSpacingExtra">2sp</item>
+        <item name="android:lineSpacingExtra">4sp</item>
         <item name="android:lineHeight">36sp</item>
         <item name="android:textStyle">bold</item>
     </style>
