@@ -15,12 +15,11 @@
   -->
 
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="24dp"
-    android:height="24dp"
-    android:viewportWidth="24"
-    android:viewportHeight="24">
+        android:width="20dp"
+        android:height="20dp"
+        android:viewportWidth="20"
+        android:viewportHeight="20">
     <path
-        android:fillColor="?attr/toolbarIconColor"
-        android:fillType="nonZero"
-        android:pathData="M7.035,16.352c0.58,0 1.035,-0.466 1.035,-1.036V9.53l8.168,8.167a1.03,1.03 0,1 0,1.46 -1.46L9.53,8.07h5.786c0.57,0 1.036,-0.466 1.036,-1.035 0,-0.57 -0.466,-1.035 -1.036,-1.035h-8.28C6.465,6 6,6.466 6,7.035v8.281c0,0.57 0.466,1.036 1.035,1.036z" />
+        android:pathData="M15.25,4.5C15.664,4.5 16,4.164 16,3.75C16,3.336 15.664,3 15.25,3H3.75C3.336,3 3,3.336 3,3.75V15.25C3,15.664 3.336,16 3.75,16C4.164,16 4.5,15.664 4.5,15.25L4.5,5.561L15.47,16.53C15.763,16.823 16.237,16.823 16.53,16.53C16.823,16.237 16.823,15.763 16.53,15.47L5.561,4.5L15.25,4.5Z"
+        android:fillColor="?attr/daxColorPrimaryIcon"/>
 </vector>

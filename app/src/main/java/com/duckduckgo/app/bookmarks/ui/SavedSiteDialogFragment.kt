@@ -139,7 +139,7 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
     }
 
     private fun configureUpNavigation(toolbar: Toolbar) {
-        toolbar.setNavigationIcon(CommonR.drawable.ic_back_24)
+        toolbar.setNavigationIcon(CommonR.drawable.ic_arrow_left_24)
         toolbar.setNavigationOnClickListener {
             dismiss()
         }
