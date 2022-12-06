@@ -21,13 +21,13 @@
     android:layout_marginBottom="22dp"
     android:layout_marginTop="8dp">
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:text="@string/no_suggestions"
         android:textAlignment="center"
-        android:textColor="@color/grayishTwo"
-        android:textSize="16sp"
+        app:typography="body1"
+        app:textType="secondary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.5" />
