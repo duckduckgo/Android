@@ -71,7 +71,7 @@
             android:layout_marginBottom="10dp"
             android:text="@string/aboutMoreLink"
             android:textAlignment="center"
-            android:textColor="?attr/colorAccent"
+            android:textColor="?attr/daxColorAccentBlue"
             app:typography="body1_bold" />
 
     </LinearLayout>
