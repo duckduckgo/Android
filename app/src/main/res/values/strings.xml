@@ -399,7 +399,7 @@
     <string name="systemSearchOnboardingButtonOk">Got it</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">HIDE</string>
+    <string name="daxDialogHideButton">Hide</string>
     <string name="daxDialogPhew">Phew!</string>
     <string name="daxDialogNext">Next</string>
     <string name="daxDialogHighFive">High Five!</string>

@@ -37,6 +37,11 @@
         <item name="android:popupBackground">@drawable/popup_menu_bg</item>
     </style>
 
+    <style name="Widget.DuckDuckGo.OverflowButton" parent="@style/Widget.AppCompat.ActionButton.Overflow">
+        <item name="srcCompat">@drawable/ic_menu_vertical_24</item>
+        <item name="android:src">@drawable/ic_menu_vertical_24</item>
+    </style>
+
     <!-- Tabs -->
     <style name="Widget.DuckDuckGo.TabLayout" parent="Widget.MaterialComponents.TabLayout">
         <item name="tabTextAppearance">@style/TextAppearance.MaterialComponents.Button</item>
@@ -76,7 +81,7 @@
 
     <style name="Widget.DuckDuckGo.AutoCompleteTextView" parent="Widget.AppCompat.AutoCompleteTextView">
         <item name="android:textCursorDrawable">@drawable/text_cursor</item>
-        <item name="android:textColorHint">?attr/omnibarHintColor</item>
+        <item name="android:textColorHint">?attr/daxColorSecondaryText</item>
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
@@ -319,6 +324,17 @@
     </style>
 
     <!-- Text Input -->
+    <style name="Widget.DuckDuckGo.SearchInput" parent="@style/Typography.DuckDuckGo.Body1">
+        <item name="android:textColor">?attr/daxColorPrimaryText</item>
+        <item name="android:textColorHint">?attr/daxColorSecondaryText</item>
+        <item name="android:selectAllOnFocus">true</item>
+        <item name="android:background">@null</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:imeOptions">flagNoExtractUi|actionGo|flagNoPersonalizedLearning</item>
+        <item name="android:inputType">textUri|textNoSuggestions</item>
+        <item name="android:textCursorDrawable">@drawable/text_cursor</item>
+    </style>
+
     <style name="Widget.DuckDuckGo.TextInput"
            parent="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="shapeAppearance">@style/ShapeAppearance.DuckDuckGo.SmallComponent</item>
@@ -403,5 +419,4 @@
         <item name="cardBackgroundColor">?attr/daxColorSurface</item>
         <item name="shapeAppearance">@style/ShapeAppearance.DuckDuckGo.MediumComponent</item>
     </style>
-
 </resources>
