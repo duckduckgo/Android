@@ -116,6 +116,10 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         appTpFeatureConfig.isEnabled(AppTpSetting.AlwaysSetDNS)
     }
 
+    private val isStartVpnErrorHandlingEnabled by lazy {
+        appTpFeatureConfig.isEnabled(AppTpSetting.StartVpnErrorHandling)
+    }
+
     private val vpnStateServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(
             name: ComponentName?,
@@ -239,10 +243,16 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             Timber.v("NetworkSwitchHandling disabled...skip setting underlying network")
         }
 
-        vpnNetworkStack.onStartVpn(tunInterface!!).getOrElse {
-            Timber.e("Failed to start VPN")
-            stopVpn(VpnStopReason.ERROR)
-            return@withContext
+        if (isStartVpnErrorHandlingEnabled) {
+            Timber.d("Enable new error handling for onStartVpn")
+            vpnNetworkStack.onStartVpn(tunInterface!!).getOrElse {
+                Timber.e("Failed to start VPN")
+                stopVpn(VpnStopReason.ERROR)
+                return@withContext
+            }
+        } else {
+            Timber.d("Reverted error handling for onStartVpn")
+            vpnNetworkStack.onStartVpn(tunInterface!!).getOrThrow()
         }
 
         vpnServiceCallbacksPluginPoint.getPlugins().forEach {
