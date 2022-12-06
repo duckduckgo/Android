@@ -24,60 +24,57 @@
 
     <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
         android:id="@+id/settingsAppearanceTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/settingsHeadingAppearance"/>
+        app:primaryText="@string/settingsHeadingAppearance" />
 
     <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
         android:id="@+id/selectedThemeSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:primaryText="@string/settingsTheme"
         app:primaryTextTruncated="false"
-        app:secondaryText="@string/settingsSystemTheme"
-        app:primaryText="@string/settingsTheme" />
+        app:secondaryText="@string/settingsSystemTheme" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
         <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
             android:id="@+id/changeAppIconLabel"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:primaryText="@string/changeIconCtaLabel"/>
+            android:layout_weight="1"
+            app:primaryText="@string/changeIconCtaLabel" />
 
         <ImageView
             android:id="@+id/changeAppIcon"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="32dp"
+            android:layout_gravity="center"
             android:layout_marginEnd="16dp"
             android:importantForAccessibility="no"
-            app:layout_constraintBottom_toBottomOf="@+id/changeAppIconLabel"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/changeAppIconLabel"
             tools:srcCompat="@drawable/ic_app_icon_red_round" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
     <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
         android:id="@+id/selectedFireAnimationSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:primaryText="@string/settingsFireAnimation"
         app:primaryTextTruncated="false"
-        app:secondaryText="@string/settingsHeroFireAnimation"
-        app:primaryText="@string/settingsFireAnimation" />
+        app:secondaryText="@string/settingsHeroFireAnimation" />
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/accessibilitySetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/settingsAccessibility"/>
+        app:primaryText="@string/settingsAccessibility" />
 
 </LinearLayout>
