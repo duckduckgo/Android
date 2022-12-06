@@ -116,6 +116,10 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         appTpFeatureConfig.isEnabled(AppTpSetting.AlwaysSetDNS)
     }
 
+    private val isStartVpnErrorHandlingEnabled by lazy {
+        appTpFeatureConfig.isEnabled(AppTpSetting.StartVpnErrorHandling)
+    }
+
     private val vpnStateServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(
             name: ComponentName?,
@@ -215,8 +219,13 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
 
         // We need to rethink how to log this state. This will likely change.
         vpnServiceStateStatsDao.insert(VpnServiceStateStats(state = ENABLING))
-        vpnNetworkStack.onPrepareVpn().getOrThrow().let {
-            createTunnelInterface(it)
+        vpnNetworkStack.onPrepareVpn().getOrNull().also {
+            if (it != null) {
+                createTunnelInterface(it)
+            } else {
+                Timber.e("Failed to obtain config needed to establish the TUN interface")
+                stopVpn(VpnStopReason.ERROR, false)
+            }
         }
 
         if (tunInterface == null) {
@@ -234,7 +243,17 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             Timber.v("NetworkSwitchHandling disabled...skip setting underlying network")
         }
 
-        vpnNetworkStack.onStartVpn(tunInterface!!).getOrThrow()
+        if (isStartVpnErrorHandlingEnabled) {
+            Timber.d("Enable new error handling for onStartVpn")
+            vpnNetworkStack.onStartVpn(tunInterface!!).getOrElse {
+                Timber.e("Failed to start VPN")
+                stopVpn(VpnStopReason.ERROR, false)
+                return@withContext
+            }
+        } else {
+            Timber.d("Reverted error handling for onStartVpn")
+            vpnNetworkStack.onStartVpn(tunInterface!!).getOrThrow()
+        }
 
         vpnServiceCallbacksPluginPoint.getPlugins().forEach {
             Timber.v("VPN log: starting ${it.javaClass} callback")
@@ -336,7 +355,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
 
         if (tunInterface == null) {
             Timber.e("VPN log: Failed to establish VPN tunnel")
-            stopVpn(VpnStopReason.ERROR)
+            stopVpn(VpnStopReason.ERROR, false)
         }
     }
 
@@ -433,7 +452,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         }
     }
 
-    private suspend fun stopVpn(reason: VpnStopReason) = withContext(Dispatchers.IO) {
+    private suspend fun stopVpn(reason: VpnStopReason, shouldStopCallbacks: Boolean = true) = withContext(Dispatchers.IO) {
         Timber.d("VPN log: Stopping VPN. $reason")
 
         vpnNetworkStack.onStopVpn()
@@ -443,9 +462,11 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
 
         sendStopPixels(reason)
 
-        vpnServiceCallbacksPluginPoint.getPlugins().forEach {
-            Timber.v("VPN log: stopping ${it.javaClass} callback")
-            it.onVpnStopped(this, reason)
+        if (shouldStopCallbacks) {
+            vpnServiceCallbacksPluginPoint.getPlugins().forEach {
+                Timber.v("VPN log: stopping ${it.javaClass} callback")
+                it.onVpnStopped(this, reason)
+            }
         }
 
         vpnStateServiceReference?.let {
