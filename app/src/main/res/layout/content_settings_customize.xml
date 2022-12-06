@@ -15,40 +15,40 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:id="@+id/settingsSectionCustomize"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:orientation="vertical">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/settingsSectionCustomize"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
     <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
+    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
         android:id="@+id/settingsCustomizeTitle"
-        android:text="@string/settingsHeadingCustomize"/>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/settingsHeadingCustomize" />
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/sitePermissions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/settingsSitePermissions"/>
+        app:primaryText="@string/settingsSitePermissions" />
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/autocompleteToggle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/settingsAutocompleteEnabled"
-        app:showSwitch="true"/>
+        app:showSwitch="true" />
 
     <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
         android:id="@+id/appLinksSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryTextTruncated="false"
-        app:primaryText="@string/settingsTitleAppLinks" />
+        app:primaryText="@string/settingsTitleAppLinks"
+        app:primaryTextTruncated="false" />
 
 </LinearLayout>
