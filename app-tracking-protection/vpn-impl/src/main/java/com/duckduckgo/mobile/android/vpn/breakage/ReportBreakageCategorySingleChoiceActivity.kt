@@ -20,7 +20,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Base64
-import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.Lifecycle.State.STARTED
@@ -151,7 +150,6 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
         val category =
             viewState.categorySelected?.let { getString(viewState.categorySelected.category) }.orEmpty()
         binding.categoriesSelection.setText(category)
-        binding.otherCategoryDescription.visibility = if (viewState.indexSelected > -1) View.VISIBLE else View.GONE
         binding.ctaNextFormSubmit.isEnabled = viewState.submitAllowed
     }
 
