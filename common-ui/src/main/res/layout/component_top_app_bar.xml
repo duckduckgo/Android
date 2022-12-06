@@ -43,7 +43,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/label"
         app:menu="@menu/top_app_bar_menu"
-        app:navigationIcon="@drawable/ic_back_24"
+        app:navigationIcon="@drawable/ic_arrow_left_24"
         app:title="@string/text_headline" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
