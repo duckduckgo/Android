@@ -33,7 +33,6 @@ import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIREPROOF_SETTING_SELECTION_ALWAYS
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting
 import com.duckduckgo.app.statistics.pixels.Pixel
 import dagger.Lazy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
