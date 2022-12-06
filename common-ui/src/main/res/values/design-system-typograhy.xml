@@ -129,7 +129,7 @@
     <style name="Typography.DuckDuckGo.H5">
         <item name="android:textSize">13sp</item>
         <item name="android:lineSpacingExtra">3sp</item>
-        <item name="android:lineHeight">36sp</item>
+        <item name="android:lineHeight">16sp</item>
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
