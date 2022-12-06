@@ -34,7 +34,6 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel.Command.ShowAutomaticFireproofSettingSelectionDialog
-import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting
 import com.duckduckgo.mobile.android.databinding.RowOneLineListItemBinding
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import kotlinx.coroutines.launch
@@ -93,7 +92,7 @@ class FireproofWebsiteAdapter(
             }
             SECTION_TITLE_TYPE -> {
                 val binding = ViewFireproofTitleBinding.inflate(inflater, parent, false)
-                binding.fireproofWebsiteSectionTitle.setText(R.string.fireproofWebsiteItemsSectionTitle)
+                binding.fireproofWebsiteSectionTitle.primaryText = binding.root.context.getString(R.string.fireproofWebsiteItemsSectionTitle)
                 FireproofWebSiteViewHolder.FireproofWebsiteSimpleViewViewHolder(binding)
             }
             FIREPROOF_WEBSITE_TYPE -> {
@@ -172,8 +171,8 @@ sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolde
     ) :
         FireproofWebSiteViewHolder(binding.root) {
         fun bind(automaticFireproofSetting: AutomaticFireproofSetting) {
-            binding.fireproofWebsiteUserSetting.text = itemView.context.getString(automaticFireproofSetting.stringRes)
-            binding.fireproofWebsiteSettingsSelection.setOnClickListener {
+            binding.fireproofWebsiteSettingListItem.setSecondaryText(itemView.context.getString(automaticFireproofSetting.stringRes))
+            binding.fireproofWebsiteSettingListItem.setOnClickListener {
                 viewModel.command.value = ShowAutomaticFireproofSettingSelectionDialog(automaticFireproofSetting)
             }
         }
