@@ -21,7 +21,7 @@
         <activity
             android:name="com.duckduckgo.autofill.ui.credential.management.AutofillManagementActivity"
             android:configChanges="orientation|screenSize"
-            android:windowSoftInputMode="stateVisible|adjustResize"
+            android:windowSoftInputMode="adjustResize"
             android:exported="false" />
     </application>
 
