@@ -24,8 +24,10 @@ import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.*
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode
+import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import kotlin.reflect.KClass
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -45,7 +47,13 @@ class AutofillSettingsViewModelTest {
     private val mockStore: AutofillStore = mock()
     private val clipboardInteractor: AutofillClipboardInteractor = mock()
     private val pixel: Pixel = mock()
-    private val testee = AutofillSettingsViewModel(mockStore, clipboardInteractor, pixel)
+    private val deviceAuthenticator: DeviceAuthenticator = mock()
+    private val testee = AutofillSettingsViewModel(
+        autofillStore = mockStore,
+        clipboardInteractor = clipboardInteractor,
+        deviceAuthenticator = deviceAuthenticator,
+        pixel = pixel,
+    )
 
     @Test
     fun whenUserEnablesAutofillThenViewStateUpdatedToReflectChange() = runTest {
@@ -312,6 +320,8 @@ class AutofillSettingsViewModelTest {
 
     @Test
     fun whenLaunchDeviceAuthThenUpdateStateToIsAuthenticatingAndEmitLaunchDeviceCommand() = runTest {
+        configureDeviceToHaveValidAuthentication(true)
+        configureStoreToHaveThisManyCredentialsStored(1)
         testee.launchDeviceAuth()
 
         testee.commands.test {
@@ -321,9 +331,23 @@ class AutofillSettingsViewModelTest {
     }
 
     @Test
-    fun whenLaunchedDeviceAuthHasEndedAndLaunchedAgainThenEmitLaunchDeviceCommandtwice() = runTest {
+    fun whenLaunchDeviceAuthWithNoSavedCredentialsThenIsUnlockedAndAuthNotLaunched() = runTest {
+        configureStoreToHaveThisManyCredentialsStored(0)
         testee.launchDeviceAuth()
 
+        testee.commands.test {
+            val commands = this.awaitItem()
+            assertTrue(commands.contains(ExitLockedMode))
+            assertFalse(commands.contains(LaunchDeviceAuth))
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLaunchedDeviceAuthHasEndedAndLaunchedAgainThenEmitLaunchDeviceCommandTwice() = runTest {
+        configureDeviceToHaveValidAuthentication(true)
+        configureStoreToHaveThisManyCredentialsStored(1)
+        testee.launchDeviceAuth()
         testee.launchDeviceAuth()
 
         testee.commands.test {
@@ -333,6 +357,26 @@ class AutofillSettingsViewModelTest {
             )
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenLaunchDeviceAuthWithNoValidAuthenticationThenShowDisabledViewAndAuthNotLaunched() = runTest {
+        configureDeviceToHaveValidAuthentication(false)
+        testee.launchDeviceAuth()
+        testee.commands.test {
+            val commands = awaitItem()
+            assertTrue(commands.contains(ShowDisabledMode))
+            assertFalse(commands.contains(LaunchDeviceAuth))
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    private suspend fun configureStoreToHaveThisManyCredentialsStored(value: Int) {
+        whenever(mockStore.getCredentialCount()).thenReturn(flowOf(value))
+    }
+
+    private fun configureDeviceToHaveValidAuthentication(hasValidAuth: Boolean) {
+        whenever(deviceAuthenticator.hasValidDeviceAuthentication()).thenReturn(hasValidAuth)
     }
 
     private fun someCredentials(): LoginCredentials {

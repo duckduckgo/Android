@@ -36,30 +36,28 @@ class SuggestionListBuilderTest {
     }
 
     @Test
-    fun whenOneSuggestionThenDividersAddedFirstAndLast() {
+    fun whenOneSuggestionThenDividerAddedLast() {
         val suggestions = buildSuggestions(1)
         val list = testee.build(suggestions)
-        assertTrue(list.first() is ListItem.Divider)
         assertTrue(list.last() is ListItem.Divider)
     }
 
     @Test
-    fun whenTwoSuggestionsThenDividersAddedFirstAndLast() {
+    fun whenTwoSuggestionsThenDividerAddedLast() {
         val suggestions = buildSuggestions(2)
         val list = testee.build(suggestions)
-        assertTrue(list.first() is ListItem.Divider)
         assertTrue(list.last() is ListItem.Divider)
     }
 
     @Test
-    fun whenOneSuggestionThen4ListItemsReturned() {
+    fun whenOneSuggestionThenCorrectNumberOfListItemsReturned() {
         val suggestions = buildSuggestions(1)
         val list = testee.build(suggestions)
         assertEquals(NUM_SUGGESTION_HEADERS + NUM_DIVIDERS + suggestions.size, list.size)
     }
 
     @Test
-    fun whenTwoSuggestionsThen5ListItemsReturned() {
+    fun whenTwoSuggestionsThenCorrectNumberOfListItemsReturned() {
         val suggestions = buildSuggestions(2)
         val list = testee.build(suggestions)
         assertEquals(NUM_SUGGESTION_HEADERS + NUM_DIVIDERS + suggestions.size, list.size)
@@ -75,7 +73,7 @@ class SuggestionListBuilderTest {
     @Test
     fun whenSuggestionAddedThenGroupNameIsCorrect() {
         val suggestions = buildSuggestions(1)
-        val heading = testee.build(suggestions)[1]
+        val heading = testee.build(suggestions).first()
         assertTrue(heading is ListItem.GroupHeading)
     }
 
@@ -92,7 +90,7 @@ class SuggestionListBuilderTest {
     }
 
     companion object {
-        private const val NUM_DIVIDERS = 2
+        private const val NUM_DIVIDERS = 1
         private const val NUM_SUGGESTION_HEADERS = 1
     }
 }
