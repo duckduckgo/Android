@@ -376,6 +376,8 @@ interface DeviceShieldPixels {
     fun reportUnprotectedAppsBucket(bucketSize: Int)
 
     fun didPressOnAppTpEnabledCtaButton()
+
+    fun reportErrorCreatingVpnNetworkStack()
 }
 
 @ContributesBinding(AppScope::class)
@@ -818,6 +820,11 @@ class RealDeviceShieldPixels @Inject constructor(
 
     override fun didPressOnAppTpEnabledCtaButton() {
         firePixel(DeviceShieldPixelNames.ATP_DID_PRESS_APPTP_ENABLED_CTA_BUTTON)
+    }
+
+    override fun reportErrorCreatingVpnNetworkStack() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_REPORT_VPN_NETWORK_STACK_CREATE_ERROR_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_REPORT_VPN_NETWORK_STACK_CREATE_ERROR)
     }
 
     private fun firePixel(
