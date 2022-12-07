@@ -28,17 +28,17 @@ appId: com.duckduckgo.mobile.android
     id: "ad-id-10"
 - action: scroll
 - assertVisible:
-    id: "ad-id-14"
+    id: "ad-id-11"
 - tapOn:
-    id: "ad-id-14"
+    id: "ad-id-11"
 - assertVisible:
     text: "Publisher site"
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/omnibarIconContainer"
 - assertVisible:
-    text: "Requests Blocked from Loading"
+    text: "View Tracker Companies"
 - tapOn:
-    text: "Requests Blocked from Loading"
+    text: "View Tracker Companies"
 - assertVisible:
     text: "The following third-party domains’ requests were blocked from loading because they were identified as tracking requests. If a company's requests are loaded, it can allow them to profile you."
 - assertVisible:
@@ -46,12 +46,12 @@ appId: com.duckduckgo.mobile.android
 - assertVisible:
     text: ".*Ad Company"
 - assertVisible:
-    text: "www.ad-company.site"
+    text: "ad-company.site"
 - action: back
 - assertVisible:
-    text: "Third-Party Requests Loaded"
+    text: "View Non-Tracker Companies"
 - tapOn:
-    text: "Third-Party Requests Loaded"
+    text: "View Non-Tracker Companies"
 - assertVisible:
     text: "The following third-party domains’ requests were loaded. If a company's requests are loaded, it can allow them to profile you, though our other web tracking protections still apply."
 - assertVisible:
