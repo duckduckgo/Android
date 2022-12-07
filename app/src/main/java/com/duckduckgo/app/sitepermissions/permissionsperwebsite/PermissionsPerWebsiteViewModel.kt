@@ -102,17 +102,17 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
     ): List<WebsitePermissionSetting> {
         return listOf(
             WebsitePermissionSetting(
-                R.drawable.location_24,
+                R.drawable.ic_location_24,
                 R.string.sitePermissionsSettingsLocation,
                 locationSetting,
             ),
             WebsitePermissionSetting(
-                R.drawable.camera_24,
+                R.drawable.ic_camera_24,
                 R.string.sitePermissionsSettingsCamera,
                 cameraSetting,
             ),
             WebsitePermissionSetting(
-                R.drawable.microphone_24,
+                R.drawable.ic_microphone_24,
                 R.string.sitePermissionsSettingsMicrophone,
                 micSetting,
             ),
