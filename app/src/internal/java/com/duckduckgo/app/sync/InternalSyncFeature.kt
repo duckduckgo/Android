@@ -8,7 +8,6 @@ import com.duckduckgo.sync.impl.ui.SyncInitialSetupActivity
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
-
 @ContributesMultibinding(AppScope::class)
 class InternalSyncFeature @Inject constructor(private val context: Context) : InternalFeaturePlugin {
     override fun internalFeatureTitle(): String {

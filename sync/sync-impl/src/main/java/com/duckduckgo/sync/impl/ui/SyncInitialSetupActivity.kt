@@ -17,11 +17,17 @@
 package com.duckduckgo.sync.impl.ui
 
 import android.os.Bundle
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.databinding.ActivitySyncSetupBinding
+import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.ViewState
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
 class SyncInitialSetupActivity : DuckDuckGoActivity() {
@@ -32,5 +38,20 @@ class SyncInitialSetupActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
+        observeUiEvents()
+    }
+
+    private fun observeUiEvents() {
+        viewModel
+            .viewState()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
+            .onEach { viewState -> renderViewState(viewState) }
+            .launchIn(lifecycleScope)
+    }
+
+    private fun renderViewState(viewState: ViewState) {
+        binding.userIdTextView.text = viewState.userId
+        binding.deviceIdTextView.text = viewState.deviceId
+        binding.deviceNameTextView.text = viewState.deviceName
     }
 }
