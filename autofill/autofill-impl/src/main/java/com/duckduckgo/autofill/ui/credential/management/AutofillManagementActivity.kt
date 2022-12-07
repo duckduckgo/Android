@@ -86,7 +86,9 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
 
     override fun onStart() {
         super.onStart()
-        viewModel.launchDeviceAuth()
+        lifecycleScope.launch {
+            viewModel.launchDeviceAuth()
+        }
     }
 
     override fun onStop() {
@@ -107,18 +109,14 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
     }
 
     private fun launchDeviceAuth() {
-        if (deviceAuthenticator.hasValidDeviceAuthentication()) {
-            viewModel.lock()
+        viewModel.lock()
 
-            deviceAuthenticator.authenticate(AUTOFILL, this) {
-                when (it) {
-                    Success -> onAuthenticationSuccessful()
-                    UserCancelled -> onAuthenticationCancelled()
-                    is Error -> onAuthenticationError()
-                }
+        deviceAuthenticator.authenticate(AUTOFILL, this) {
+            when (it) {
+                Success -> onAuthenticationSuccessful()
+                UserCancelled -> onAuthenticationCancelled()
+                is Error -> onAuthenticationError()
             }
-        } else {
-            viewModel.disabled()
         }
     }
 

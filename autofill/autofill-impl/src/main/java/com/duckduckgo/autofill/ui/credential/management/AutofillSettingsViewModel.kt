@@ -24,13 +24,27 @@ import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED
 import com.duckduckgo.autofill.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED
 import com.duckduckgo.autofill.store.AutofillStore
-import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.*
-import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.*
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ExitCredentialMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ExitDisabledMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ExitListMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ExitLockedMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.InitialiseViewAfterUnlock
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.LaunchDeviceAuth
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowCredentialMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowDisabledMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowLockedMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowUserPasswordCopied
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowUserUsernameCopied
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Editing
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.NotInCredentialMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Viewing
+import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.di.scopes.ActivityScope
 import java.util.*
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -38,6 +52,7 @@ import timber.log.Timber
 class AutofillSettingsViewModel @Inject constructor(
     private val autofillStore: AutofillStore,
     private val clipboardInteractor: AutofillClipboardInteractor,
+    private val deviceAuthenticator: DeviceAuthenticator,
     private val pixel: Pixel,
 ) : ViewModel() {
 
@@ -133,8 +148,19 @@ class AutofillSettingsViewModel @Inject constructor(
         }
     }
 
-    fun launchDeviceAuth() {
-        addCommand(LaunchDeviceAuth)
+    suspend fun launchDeviceAuth() {
+        if (!deviceAuthenticator.hasValidDeviceAuthentication()) {
+            Timber.d("Can't show device auth as there is no valid device authentication")
+            disabled()
+            return
+        }
+
+        if (autofillStore.getCredentialCount().first() == 0) {
+            Timber.d("No credentials; can skip showing device auth")
+            unlock()
+        } else {
+            addCommand(LaunchDeviceAuth)
+        }
     }
 
     fun lock() {
@@ -225,7 +251,7 @@ class AutofillSettingsViewModel @Inject constructor(
 
     data class ViewState(
         val autofillEnabled: Boolean = true,
-        val logins: List<LoginCredentials> = emptyList(),
+        val logins: List<LoginCredentials>? = null,
         val credentialMode: CredentialMode = NotInCredentialMode,
     )
 

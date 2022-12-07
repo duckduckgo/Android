@@ -182,6 +182,10 @@ class SecureStoreBackedAutofillStore(
             }
     }
 
+    override suspend fun getCredentialCount(): Flow<Int> {
+        return secureStorage.websiteLoginDetailsWithCredentials().map { it.size }
+    }
+
     override suspend fun deleteCredentials(id: Long) {
         secureStorage.deleteWebsiteLoginDetailsWithCredentials(id)
     }

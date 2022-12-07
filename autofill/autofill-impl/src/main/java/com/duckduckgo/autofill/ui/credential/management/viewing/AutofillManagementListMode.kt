@@ -41,6 +41,8 @@ import com.duckduckgo.autofill.ui.credential.management.sorting.CredentialGroupe
 import com.duckduckgo.autofill.ui.credential.management.suggestion.SuggestionListBuilder
 import com.duckduckgo.autofill.ui.credential.management.suggestion.SuggestionMatcher
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
 import kotlinx.coroutines.launch
@@ -100,7 +102,9 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.viewState.collect { state ->
                     binding.enabledToggle.quietlySetIsChecked(state.autofillEnabled, globalAutofillToggleListener)
-                    credentialsListUpdated(state.logins)
+                    state.logins?.let {
+                        credentialsListUpdated(it)
+                    }
                 }
             }
         }
@@ -127,6 +131,22 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
     }
 
     private fun credentialsListUpdated(credentials: List<LoginCredentials>) {
+        if (credentials.isEmpty()) {
+            showEmptyCredentialsPlaceholders()
+        } else {
+            renderCredentialList(credentials)
+        }
+    }
+
+    private fun showEmptyCredentialsPlaceholders() {
+        binding.emptyStateLayout.emptyStateContainer.show()
+        binding.logins.gone()
+    }
+
+    private fun renderCredentialList(credentials: List<LoginCredentials>) {
+        binding.emptyStateLayout.emptyStateContainer.gone()
+        binding.logins.show()
+
         val currentUrl = getCurrentUrlForSuggestions()
         val suggestions = suggestionMatcher.getSuggestions(currentUrl, credentials)
 
