@@ -29,6 +29,7 @@ dependencies {
     implementation project(':common')
     implementation project(':common-ui')
     implementation project(':di')
+    implementation project(':app-tracking-api')
     implementation project(':vpn-api')
     implementation project(':vpn-store')
     implementation project(':network-protection-api')
