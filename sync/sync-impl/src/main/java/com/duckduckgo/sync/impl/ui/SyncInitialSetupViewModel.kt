@@ -17,9 +17,41 @@
 package com.duckduckgo.sync.impl.ui
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
-class SyncInitialSetupViewModel @Inject constructor() : ViewModel()
+class SyncInitialSetupViewModel
+@Inject
+constructor(
+    private val syncDeviceIds: SyncDeviceIds,
+) : ViewModel() {
+
+    private val viewState = MutableStateFlow(ViewState())
+    fun viewState(): StateFlow<ViewState> = viewState
+
+    data class ViewState(
+        val userId: String = "",
+        val deviceName: String = "",
+        val deviceId: String = "",
+    )
+
+    init {
+        viewModelScope.launch { updateViewState() }
+    }
+
+    private suspend fun updateViewState() {
+        viewState.emit(
+            viewState.value.copy(
+                userId = syncDeviceIds.userId(),
+                deviceName = syncDeviceIds.deviceName(),
+                deviceId = syncDeviceIds.deviceId(),
+            ),
+        )
+    }
+}
