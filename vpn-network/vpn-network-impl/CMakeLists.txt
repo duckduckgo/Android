@@ -3,20 +3,20 @@ project("vpn-network")
 
 add_library( netguard
              SHARED
-             src/main/cpp/netguard/src/netguard.c
-             src/main/cpp/netguard/src/session.c
-             src/main/cpp/netguard/src/ip.c
-             src/main/cpp/netguard/src/tls.c
-             src/main/cpp/netguard/src/tcp.c
-             src/main/cpp/netguard/src/udp.c
-             src/main/cpp/netguard/src/icmp.c
-             src/main/cpp/netguard/src/dns.c
-             src/main/cpp/netguard/src/dhcp.c
-             src/main/cpp/netguard/src/pcap.c
-             src/main/cpp/netguard/src/memory.c
-             src/main/cpp/netguard/src/socks5.c
-             src/main/cpp/netguard/src/util.c
-             src/main/cpp/netguard/src/android.c
+             src/main/cpp/netguard/src/netguard.cpp
+             src/main/cpp/netguard/src/session.cpp
+             src/main/cpp/netguard/src/ip.cpp
+             src/main/cpp/netguard/src/tls.cpp
+             src/main/cpp/netguard/src/tcp.cpp
+             src/main/cpp/netguard/src/udp.cpp
+             src/main/cpp/netguard/src/icmp.cpp
+             src/main/cpp/netguard/src/dns.cpp
+             src/main/cpp/netguard/src/dhcp.cpp
+             src/main/cpp/netguard/src/pcap.cpp
+             src/main/cpp/netguard/src/memory.cpp
+             src/main/cpp/netguard/src/socks5.cpp
+             src/main/cpp/netguard/src/util.cpp
+             src/main/cpp/netguard/src/android.cpp
              )
 
 include_directories( src/main/cpp/netguard/src/ )
@@ -34,3 +34,25 @@ target_link_libraries( # Specifies the target library.
         # Links the target library to the log library
         # included in the NDK.
         ${log-lib})
+
+include(FetchContent)
+FetchContent_Declare(
+        googletest
+        URL https://github.com/google/googletest/archive/609281088cfefc76f9d0ce82e1ff6c30cc3591e5.zip
+)
+# For Windows: Prevent overriding the parent project's compiler/linker settings
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+enable_testing()
+
+add_executable(
+        test_tcp
+        src/main/cpp/netguard/src/util.cpp
+        src/main/cpp/netguard/src/test_tcp.cpp
+)
+target_link_libraries(
+        test_tcp
+        gtest_main
+)
+
+include(GoogleTest)
