@@ -92,7 +92,6 @@ class CustomAlertDialogBuilder(val context: Context) : DaxAlertDialog {
     }
 
     override fun build(): DaxAlertDialog {
-        checkRequiredFieldsSet()
         val binding: DialogCustomAlertBinding = DialogCustomAlertBinding.inflate(LayoutInflater.from(context))
         binding.customDialogContent.addView(customBinding?.root)
 
@@ -132,25 +131,24 @@ class CustomAlertDialogBuilder(val context: Context) : DaxAlertDialog {
             binding.customDialogMessage.text = messageText
         }
 
-        binding.customDialogPositiveButton.text = positiveButtonText
-        binding.customDialogPositiveButton.setOnClickListener {
-            listener.onPositiveButtonClicked()
-            dialog.dismiss()
-        }
-
-        binding.customDialogNegativeButton.text = negativeButtonText
-        binding.customDialogNegativeButton.setOnClickListener {
-            listener.onNegativeButtonClicked()
-            dialog.dismiss()
-        }
-    }
-
-    private fun checkRequiredFieldsSet() {
         if (positiveButtonText.isEmpty()) {
-            throw Exception("TextAlertDialog: You must always provide a Positive Button")
+            binding.customDialogPositiveButton.gone()
+        } else {
+            binding.customDialogPositiveButton.text = positiveButtonText
+            binding.customDialogPositiveButton.setOnClickListener {
+                listener.onPositiveButtonClicked()
+                dialog.dismiss()
+            }
         }
+
         if (negativeButtonText.isEmpty()) {
-            throw Exception("TextAlertDialog: You must always provide a Negative Button")
+            binding.customDialogNegativeButton.gone()
+        } else {
+            binding.customDialogNegativeButton.text = negativeButtonText
+            binding.customDialogNegativeButton.setOnClickListener {
+                listener.onNegativeButtonClicked()
+                dialog.dismiss()
+            }
         }
     }
 }
