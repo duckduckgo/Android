@@ -16,53 +16,26 @@
 
 package com.duckduckgo.app.sitepermissions.permissionsperwebsite
 
+import androidx.annotation.StringRes
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSettingType.ALLOW
-import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSettingType.ASK
-import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSettingType.ASK_DISABLED
-import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSettingType.DENY
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
 import java.io.Serializable
 
 data class WebsitePermissionSetting(
     val icon: Int,
     val title: Int,
-    val setting: WebsitePermissionSettingType,
-) : Serializable {
+    val setting: WebsitePermissionSettingOption,
+) : Serializable
 
-    fun getOptionIndex(): Int {
-        return when (this.setting) {
-            ASK, ASK_DISABLED -> 1
-            DENY -> 2
-            ALLOW -> 3
-        }
-    }
-
-    companion object {
-        fun Int.getPermissionSettingOptionForIndex(): WebsitePermissionSettingType {
-            return when (this) {
-                2 -> DENY
-                3 -> ALLOW
-                else -> ASK
-            }
-        }
-    }
-}
-
-enum class WebsitePermissionSettingType {
-    ASK,
-    ASK_DISABLED,
-    ALLOW,
-    DENY,
+enum class WebsitePermissionSettingOption(
+    val order: Int,
+    @StringRes val stringRes: Int,
+) {
+    ASK(1, R.string.permissionsPerWebsiteAskSetting),
+    ASK_DISABLED(1, R.string.permissionsPerWebsiteAskDisabledSetting),
+    DENY(2, R.string.permissionsPerWebsiteDenySetting),
+    ALLOW(3, R.string.permissionsPerWebsiteAllowSetting),
     ;
-
-    fun toPrettyStringRes(): Int =
-        when (this) {
-            ASK -> R.string.permissionsPerWebsiteAskSetting
-            ASK_DISABLED -> R.string.permissionsPerWebsiteAskDisabledSetting
-            ALLOW -> R.string.permissionsPerWebsiteAllowSetting
-            DENY -> R.string.permissionsPerWebsiteDenySetting
-        }
 
     fun toSitePermissionSettingEntityType(): SitePermissionAskSettingType =
         when (this) {
@@ -72,11 +45,21 @@ enum class WebsitePermissionSettingType {
         }
 
     companion object {
-        fun mapToWebsitePermissionSetting(askSettingType: String?): WebsitePermissionSettingType =
+        fun mapToWebsitePermissionSetting(askSettingType: String?): WebsitePermissionSettingOption =
             when (askSettingType) {
                 SitePermissionAskSettingType.ALLOW_ALWAYS.name -> ALLOW
                 SitePermissionAskSettingType.DENY_ALWAYS.name -> DENY
                 else -> ASK
             }
+
+        fun Int.getPermissionSettingOptionFromPosition(): WebsitePermissionSettingOption {
+            var option = ASK
+            values().forEach {
+                if (it.order == this) {
+                    option = it
+                }
+            }
+            return option
+        }
     }
 }

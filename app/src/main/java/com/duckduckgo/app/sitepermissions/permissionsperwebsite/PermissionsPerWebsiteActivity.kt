@@ -32,7 +32,10 @@ import com.duckduckgo.app.global.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command.GoBackToSitePermissions
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command.ShowPermissionSettingSelectionDialog
-import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSetting.Companion.getPermissionSettingOptionForIndex
+import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSettingOption.ALLOW
+import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSettingOption.ASK
+import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSettingOption.Companion.getPermissionSettingOptionFromPosition
+import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSettingOption.DENY
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
@@ -109,30 +112,29 @@ class PermissionsPerWebsiteActivity : DuckDuckGoActivity() {
         adapter.updateItems(permissionsSettings)
     }
 
-    private fun showPermissionSettingSelectionDialog(setting: WebsitePermissionSetting) {
-        val currentPermissionSetting = setting.getOptionIndex()
+    private fun showPermissionSettingSelectionDialog(currentOption: WebsitePermissionSetting) {
         val dialogTitle = String.format(
             getString(R.string.permissionsPerWebsiteSelectorDialogTitle),
-            getString(setting.title),
+            getString(currentOption.title),
             url.websiteFromGeoLocationsApiOrigin(),
         )
         RadioListAlertDialogBuilder(this)
             .setTitle(dialogTitle)
             .setOptions(
                 listOf(
-                    R.string.permissionsPerWebsiteAskSetting,
-                    R.string.permissionsPerWebsiteDenySetting,
-                    R.string.permissionsPerWebsiteAllowSetting,
+                    ASK.stringRes,
+                    DENY.stringRes,
+                    ALLOW.stringRes,
                 ),
-                currentPermissionSetting,
+                currentOption.setting.order,
             )
             .setPositiveButton(R.string.dialogSave)
             .setNegativeButton(R.string.cancel)
             .addEventListener(
                 object : RadioListAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked(selectedItem: Int) {
-                        val permissionSettingSelected = selectedItem.getPermissionSettingOptionForIndex()
-                        val newPermissionSetting = WebsitePermissionSetting(setting.icon, setting.title, permissionSettingSelected)
+                        val permissionSettingSelected = selectedItem.getPermissionSettingOptionFromPosition()
+                        val newPermissionSetting = WebsitePermissionSetting(currentOption.icon, currentOption.title, permissionSettingSelected)
                         viewModel.onPermissionSettingSelected(newPermissionSetting, url)
                     }
                 },
