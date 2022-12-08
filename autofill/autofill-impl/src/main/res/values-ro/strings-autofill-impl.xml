@@ -63,4 +63,6 @@
     <string name="credentialManagementViewMenuEdit">Editează</string>
     <string name="credentialManagementViewMenuDelete">Ștergere</string>
 
+    <string name="credentialManagementSuggestionsLabel">Sugerat</string>
+
 </resources>

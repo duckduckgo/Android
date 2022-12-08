@@ -21,6 +21,7 @@ import androidx.core.net.toUri
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.FileUtilities.loadText
 import com.duckduckgo.app.InstantSchedulersRule
+import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.global.AppUrl.ParamKey
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.statistics.Variant
@@ -55,6 +56,7 @@ class StatisticsRequesterJsonTest {
     private lateinit var statisticsService: StatisticsService
     private lateinit var statisticsStore: StatisticsDataStore
     private lateinit var testee: StatisticsRequester
+    private var mockEmailManager: EmailManager = mock()
 
     private val server = MockWebServer()
 
@@ -74,7 +76,7 @@ class StatisticsRequesterJsonTest {
                 return listOf()
             }
         }
-        testee = StatisticsRequester(statisticsStore, statisticsService, mockVariantManager, plugins)
+        testee = StatisticsRequester(statisticsStore, statisticsService, mockVariantManager, plugins, mockEmailManager)
         whenever(mockVariantManager.getVariant()).thenReturn(Variant("ma", 100.0, filterBy = { true }))
     }
 

@@ -63,4 +63,6 @@
     <string name="credentialManagementViewMenuEdit">Επεξεργασία</string>
     <string name="credentialManagementViewMenuDelete">Διαγραφή</string>
 
+    <string name="credentialManagementSuggestionsLabel">Προτεινόμενο</string>
+
 </resources>

@@ -20,11 +20,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
-import com.duckduckgo.privacy.config.impl.network.PrivacyConfigService
 import com.duckduckgo.privacy.config.store.ALL_MIGRATIONS
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.PrivacyConfigRepository
@@ -56,33 +53,10 @@ import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.Unprote
 import com.duckduckgo.privacy.config.store.features.useragent.RealUserAgentRepository
 import com.duckduckgo.privacy.config.store.features.useragent.UserAgentRepository
 import com.squareup.anvil.annotations.ContributesTo
-import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
-import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
-
-@Module
-@ContributesTo(AppScope::class)
-object NetworkModule {
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun apiRetrofit(@Named("api") okHttpClient: OkHttpClient): PrivacyConfigService {
-        val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
-        val retrofit = Retrofit.Builder()
-            .baseUrl(AppUrl.Url.API)
-            .client(okHttpClient)
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .build()
-
-        return retrofit.create(PrivacyConfigService::class.java)
-    }
-}
 
 @Module
 @ContributesTo(AppScope::class)

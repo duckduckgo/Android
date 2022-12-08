@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.cohort
+package com.duckduckgo.elementhiding.impl
 
-interface AtpCohortManager {
-    /**
-     * @return the AppTP cohort if it exist, [null] otherwise
-     */
-    fun getCohort(): String?
+/**
+ * Convenience method to get the [ElementHidingFeatureName] from its [String] value
+ */
+fun elementHidingFeatureValueOf(value: String): ElementHidingFeatureName? {
+    return ElementHidingFeatureName.values().find { it.value == value }
 }

@@ -24,9 +24,6 @@ import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.model.Survey.Status.NOT_ALLOCATED
 import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
-import com.duckduckgo.mobile.android.vpn.cohort.AtpCohortManager
-import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateRepository
-import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
 import io.reactivex.Completable
 import java.io.IOException
 import java.util.*
@@ -38,21 +35,9 @@ class SurveyDownloader @Inject constructor(
     private val service: SurveyService,
     private val surveyDao: SurveyDao,
     private val emailManager: EmailManager,
-    private val atpCohortManager: AtpCohortManager,
-    private val atpWaitlistStateRepository: AtpWaitlistStateRepository,
 ) {
 
     private fun getSurveyResponse(): Response<SurveyGroup?> {
-        val callAppTP = service.surveyAppTp()
-        val responseAppTP = callAppTP.execute()
-
-        // FIXME see https://app.asana.com/0/414730916066338/1201395604254213/f
-        // check temporary AppTP survey endpoint else fallback to v2 survey endpoint
-        if (responseAppTP.isSuccessful && responseAppTP.body()?.id != null) {
-            Timber.v("Returning AppTP response")
-            return responseAppTP
-        }
-
         val call = service.survey()
         Timber.v("Returning v2 response")
         return call.execute()
@@ -118,7 +103,6 @@ class SurveyDownloader @Inject constructor(
         surveyOption.urlParameters?.map {
             when {
                 (SurveyUrlParameter.EmailCohortParam.parameter == it) -> builder.appendQueryParameter(it, emailManager.getCohort())
-                (SurveyUrlParameter.AtpCohortParam.parameter == it) -> builder.appendQueryParameter(it, atpCohortManager.getCohort())
                 else -> {
                     // NO OP
                 }
@@ -131,13 +115,6 @@ class SurveyDownloader @Inject constructor(
     private fun canSurveyBeScheduled(surveyOption: SurveyOption): Boolean {
         return if (surveyOption.isEmailSignedInRequired == true) {
             emailManager.isSignedIn()
-        } else if (surveyOption.isAtpWaitlistRequired == true) {
-            // we only want users that have joined the waitlist after the cutting date 24.12.2021 and haven't joined the Beta yet
-            atpWaitlistStateRepository.getState() is WaitlistState.JoinedWaitlist &&
-                atpWaitlistStateRepository.joinedAfterCuttingDate() &&
-                atpCohortManager.getCohort() == null
-        } else if (surveyOption.isAtpEverEnabledRequired == true) {
-            atpCohortManager.getCohort() != null
         } else {
             true
         }

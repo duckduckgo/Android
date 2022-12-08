@@ -671,10 +671,12 @@
     <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
     <string name="sitePermissionsSettingsAllowedSitesTitle">Upravljanje web-lokacijama</string>
     <string name="sitePermissionsSettingsEmptyText">Još nema ni jedne web-lokacije</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Uklonjena su dopuštenja za sve web lokacije</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Dopuštenja za „%1$s“ </string>
     <string name="permissionsPerWebsiteAskSetting">Zatraži</string>
     <string name="permissionsPerWebsiteDenySetting">Odbij</string>
     <string name="permissionsPerWebsiteAllowSetting">Dopusti</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Opcija \"Pitaj\" onemogućena je za sve web lokacije</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s dopuštenje za %2$s</string>
 
     <!-- Autofill -->

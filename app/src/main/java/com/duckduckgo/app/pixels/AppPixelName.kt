@@ -225,6 +225,8 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     FIRE_ANIMATION_NEW_SELECTED("m_fas_s"),
 
     EMAIL_TOOLTIP_DISMISSED("email_tooltip_dismissed"),
+    EMAIL_ENABLED("email_enabled"),
+    EMAIL_DISABLED("email_disabled"),
     EMAIL_USE_ALIAS("email_filled_random"),
     EMAIL_USE_ADDRESS("email_filled_main"),
     EMAIL_COPIED_TO_CLIPBOARD("email_generated_button"),
@@ -247,4 +249,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     REMOTE_MESSAGE_SECONDARY_ACTION_CLICKED("m_remote_message_secondary_action_clicked"),
 
     CREATE_BLOOM_FILTER_ERROR("m_create_bloom_filter_error"),
+
+    FACEBOOK_LOGIN_ERROR_BREAKAGE_INVESTIGATION("m_facebook_login_error_breakage_investigation"),
+    FACEBOOK_LOGIN_BREAKAGE_INVESTIGATION("m_facebook_login_breakage_investigation"),
 }

@@ -116,7 +116,6 @@ sealed class DaxDialogCta(
             val dialog = TypewriterDaxDialog.newInstance(
                 daxText = context.getString(R.string.daxSerpCtaText),
                 primaryButtonText = context.getString(R.string.daxDialogPhew),
-                toolbarDimmed = false,
                 hideButtonText = context.getString(R.string.daxDialogHideButton),
             )
             dialog.setDaxDialogListener(daxDialogListener)

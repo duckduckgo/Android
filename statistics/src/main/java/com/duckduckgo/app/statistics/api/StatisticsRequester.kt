@@ -17,11 +17,15 @@
 package com.duckduckgo.app.statistics.api
 
 import android.annotation.SuppressLint
+import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
 import timber.log.Timber
 
 interface StatisticsUpdater {
@@ -30,11 +34,13 @@ interface StatisticsUpdater {
     fun refreshAppRetentionAtb()
 }
 
-class StatisticsRequester(
+@ContributesBinding(AppScope::class)
+class StatisticsRequester @Inject constructor(
     private val store: StatisticsDataStore,
     private val service: StatisticsService,
     private val variantManager: VariantManager,
     private val plugins: PluginPoint<RefreshRetentionAtbPlugin>,
+    private val emailManager: EmailManager,
 ) : StatisticsUpdater {
 
     /**
@@ -60,7 +66,9 @@ class StatisticsRequester(
         }
 
         service
-            .atb()
+            .atb(
+                email = emailSignInState(),
+            )
             .subscribeOn(Schedulers.io())
             .flatMap {
                 val atb = Atb(it.version)
@@ -96,7 +104,11 @@ class StatisticsRequester(
         val retentionAtb = store.searchRetentionAtb ?: atb.version
 
         service
-            .updateSearchAtb(fullAtb, retentionAtb)
+            .updateSearchAtb(
+                atb = fullAtb,
+                retentionAtb = retentionAtb,
+                email = emailSignInState(),
+            )
             .subscribeOn(Schedulers.io())
             .subscribe(
                 {
@@ -122,7 +134,11 @@ class StatisticsRequester(
         val retentionAtb = store.appRetentionAtb ?: atb.version
 
         service
-            .updateAppAtb(fullAtb, retentionAtb)
+            .updateAppAtb(
+                atb = fullAtb,
+                retentionAtb = retentionAtb,
+                email = emailSignInState(),
+            )
             .subscribeOn(Schedulers.io())
             .subscribe(
                 {
@@ -135,11 +151,16 @@ class StatisticsRequester(
             )
     }
 
+    private fun emailSignInState(): Int =
+        kotlin.runCatching { emailManager.isSignedIn().asInt() }.getOrDefault(0)
+
     private fun storeUpdateVersionIfPresent(retrievedAtb: Atb) {
         if (retrievedAtb.updateVersion != null) {
             store.atb = Atb(retrievedAtb.updateVersion)
         }
     }
+
+    private fun Boolean.asInt() = if (this) 1 else 0
 
     companion object {
         private const val LEGACY_ATB_FORMAT_SUFFIX = "ma"

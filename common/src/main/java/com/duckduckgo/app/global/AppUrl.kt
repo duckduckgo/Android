@@ -36,6 +36,7 @@ class AppUrl {
         const val RETENTION_ATB = "set_atb"
         const val DEV_MODE = "test"
         const val LANGUAGE = "lg"
+        const val EMAIL = "email"
         const val COUNTRY = "co"
         const val HIDE_SERP = "ko"
         const val VERTICAL = "ia"

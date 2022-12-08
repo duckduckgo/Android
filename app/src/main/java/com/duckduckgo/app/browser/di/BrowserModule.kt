@@ -84,7 +84,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.impl.AndroidFileDownloader
 import com.duckduckgo.downloads.impl.DataUriDownloader
-import com.duckduckgo.downloads.impl.DownloadFileService
 import com.duckduckgo.downloads.impl.FileDownloadCallback
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.AmpLinks
@@ -98,7 +97,6 @@ import dagger.multibindings.IntoSet
 import javax.inject.Named
 import javax.inject.Provider
 import kotlinx.coroutines.CoroutineScope
-import retrofit2.Retrofit
 
 @Module
 class BrowserModule {
@@ -355,11 +353,6 @@ class BrowserModule {
     ): NavigationAwareLoginDetector {
         return NextPageLoginDetection(settingsDataStore, appCoroutineScope)
     }
-
-    @Provides
-    fun downloadFileService(@Named("api") retrofit: Retrofit): DownloadFileService = retrofit.create(
-        DownloadFileService::class.java,
-    )
 
     @Provides
     fun fileDownloader(

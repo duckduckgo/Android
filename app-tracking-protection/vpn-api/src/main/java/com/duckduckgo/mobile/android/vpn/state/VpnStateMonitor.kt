@@ -45,6 +45,7 @@ interface VpnStateMonitor {
     }
 
     enum class VpnRunningState {
+        ENABLING,
         ENABLED,
         DISABLED,
         INVALID,

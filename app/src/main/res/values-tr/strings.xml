@@ -663,10 +663,12 @@
     <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
     <string name="sitePermissionsSettingsAllowedSitesTitle">Siteleri Yönet</string>
     <string name="sitePermissionsSettingsEmptyText">Henüz site yok</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Tüm Siteler İçin İzinler Kaldırıldı</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">\"%1$s\" için izinler </string>
     <string name="permissionsPerWebsiteAskSetting">Sor</string>
     <string name="permissionsPerWebsiteDenySetting">Reddet</string>
     <string name="permissionsPerWebsiteAllowSetting">İzin ver</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Tüm siteler için \"Sor\" devre dışı bırakıldı</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%2$s için %1$s izni</string>
 
     <!-- Autofill -->

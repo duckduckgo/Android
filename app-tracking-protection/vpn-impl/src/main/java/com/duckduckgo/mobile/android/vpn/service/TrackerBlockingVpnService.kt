@@ -34,9 +34,13 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
+import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
+import com.duckduckgo.mobile.android.vpn.model.VpnServiceState.ENABLING
+import com.duckduckgo.mobile.android.vpn.model.VpnServiceStateStats
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
+import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack.VpnTunnelConfig
 import com.duckduckgo.mobile.android.vpn.network.util.asRoute
 import com.duckduckgo.mobile.android.vpn.network.util.getActiveNetwork
 import com.duckduckgo.mobile.android.vpn.network.util.getSystemActiveNetworkDefaultDns
@@ -92,6 +96,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
 
     @Inject lateinit var vpnNetworkStack: VpnNetworkStack
 
+    @Inject lateinit var vpnServiceStateStatsDao: VpnServiceStateStatsDao
+
     private var restartRequested = false
 
     private val isInterceptDnsTrafficEnabled by lazy {
@@ -108,6 +114,10 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
 
     private val isAlwaysSetDNSEnabled by lazy {
         appTpFeatureConfig.isEnabled(AppTpSetting.AlwaysSetDNS)
+    }
+
+    private val isStartVpnErrorHandlingEnabled by lazy {
+        appTpFeatureConfig.isEnabled(AppTpSetting.StartVpnErrorHandling)
     }
 
     private val vpnStateServiceConnection = object : ServiceConnection {
@@ -207,7 +217,16 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
     private suspend fun startVpn() = withContext(Dispatchers.IO) {
         Timber.d("VPN log: Starting VPN")
 
-        establishVpnInterface()
+        // We need to rethink how to log this state. This will likely change.
+        vpnServiceStateStatsDao.insert(VpnServiceStateStats(state = ENABLING))
+        vpnNetworkStack.onPrepareVpn().getOrNull().also {
+            if (it != null) {
+                createTunnelInterface(it)
+            } else {
+                Timber.e("Failed to obtain config needed to establish the TUN interface")
+                stopVpn(VpnStopReason.ERROR, false)
+            }
+        }
 
         if (tunInterface == null) {
             Timber.e("Failed to establish the TUN interface")
@@ -224,7 +243,17 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             Timber.v("NetworkSwitchHandling disabled...skip setting underlying network")
         }
 
-        vpnNetworkStack.onStartVpn(tunInterface!!).getOrThrow()
+        if (isStartVpnErrorHandlingEnabled) {
+            Timber.d("Enable new error handling for onStartVpn")
+            vpnNetworkStack.onStartVpn(tunInterface!!).getOrElse {
+                Timber.e("Failed to start VPN")
+                stopVpn(VpnStopReason.ERROR, false)
+                return@withContext
+            }
+        } else {
+            Timber.d("Reverted error handling for onStartVpn")
+            vpnNetworkStack.onStartVpn(tunInterface!!).getOrThrow()
+        }
 
         vpnServiceCallbacksPluginPoint.getPlugins().forEach {
             Timber.v("VPN log: starting ${it.javaClass} callback")
@@ -236,15 +265,15 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         }
     }
 
-    private suspend fun establishVpnInterface() {
+    private suspend fun createTunnelInterface(tunnelConfig: VpnTunnelConfig) {
         tunInterface = Builder().run {
-            vpnNetworkStack.addresses().forEach { addAddress(it.key, it.value) }
+            tunnelConfig.addresses.forEach { addAddress(it.key, it.value) }
 
             // Allow IPv6 to go through the VPN
             // See https://developer.android.com/reference/android/net/VpnService.Builder#allowFamily(int) for more info as to why
             allowFamily(AF_INET6)
 
-            val dnsList = getDns()
+            val dnsList = getDns(tunnelConfig.dns)
 
             // TODO: eventually routes will be set by remote config
             if (appBuildConfig.isPerformanceTest && appBuildConfig.isInternalBuild()) {
@@ -278,14 +307,14 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             // IPv4 public IP addresses. They are addresses that routable in the internet
             addRoute("2000::", 3)
 
-            vpnNetworkStack.routes().forEach {
+            tunnelConfig.routes.forEach {
                 addRoute(it.key, it.value)
             }
 
             setBlocking(true)
             // Cap the max MTU value to avoid backpressure issues in the socket
             // This is effectively capping the max segment size too
-            setMtu(vpnNetworkStack.mtu())
+            setMtu(tunnelConfig.mtu)
             configureMeteredConnection()
 
             // Set DNS
@@ -326,11 +355,11 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
 
         if (tunInterface == null) {
             Timber.e("VPN log: Failed to establish VPN tunnel")
-            stopVpn(VpnStopReason.ERROR)
+            stopVpn(VpnStopReason.ERROR, false)
         }
     }
 
-    private fun getDns(): Set<InetAddress> {
+    private fun getDns(configDns: Set<InetAddress>): Set<InetAddress> {
         // private extension function, this is purposely here to limit visibility
         fun Set<InetAddress>.containsIpv4(): Boolean {
             forEach {
@@ -342,7 +371,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         val dns = mutableSetOf<InetAddress>()
 
         // Add DNS specific to VPNetworkStack
-        vpnNetworkStack.dns().forEach { dns.add(it) }
+        configDns.forEach { dns.add(it) }
 
         // System DNS
         if (isInterceptDnsTrafficEnabled) {
@@ -423,7 +452,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         }
     }
 
-    private suspend fun stopVpn(reason: VpnStopReason) = withContext(Dispatchers.IO) {
+    private suspend fun stopVpn(reason: VpnStopReason, shouldStopCallbacks: Boolean = true) = withContext(Dispatchers.IO) {
         Timber.d("VPN log: Stopping VPN. $reason")
 
         vpnNetworkStack.onStopVpn()
@@ -433,9 +462,11 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
 
         sendStopPixels(reason)
 
-        vpnServiceCallbacksPluginPoint.getPlugins().forEach {
-            Timber.v("VPN log: stopping ${it.javaClass} callback")
-            it.onVpnStopped(this, reason)
+        if (shouldStopCallbacks) {
+            vpnServiceCallbacksPluginPoint.getPlugins().forEach {
+                Timber.v("VPN log: stopping ${it.javaClass} callback")
+                it.onVpnStopped(this, reason)
+            }
         }
 
         vpnStateServiceReference?.let {

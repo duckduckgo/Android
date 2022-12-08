@@ -356,6 +356,7 @@
         <activity
             android:name="com.duckduckgo.app.fire.FireActivity"
             android:exported="false"
+            android:theme="@style/Theme.DuckDuckGo.Dark"
             android:process="@string/fireProcessName" />
         <activity
             android:name="com.duckduckgo.app.icon.ui.ChangeIconActivity"

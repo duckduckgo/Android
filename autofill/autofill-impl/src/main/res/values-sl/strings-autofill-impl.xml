@@ -63,4 +63,6 @@
     <string name="credentialManagementViewMenuEdit">Uredi</string>
     <string name="credentialManagementViewMenuDelete">Izbriši</string>
 
+    <string name="credentialManagementSuggestionsLabel">Predlagano</string>
+
 </resources>

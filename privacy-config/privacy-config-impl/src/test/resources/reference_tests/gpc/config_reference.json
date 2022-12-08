@@ -8,7 +8,15 @@
                     "domain": "washingtonpost.com",
                     "reason": "This is a domain where our iOS/Android apps inject the Sec-GPC request header"
                 }
-            ]
+            ],
+            "settings": {
+                "gpcHeaderEnabledSites": [
+                    "global-privacy-control.glitch.me",
+                    "washingtonpost.com",
+                    "globalprivacycontrol.org",
+                    "example.com"
+                ]
+            }
         }
     },
     "version": 1635943904459,

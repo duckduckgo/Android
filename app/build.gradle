@@ -176,6 +176,7 @@ dependencies {
     implementation project(':app-store')
     implementation project(':common-ui')
     implementation project(':di')
+    implementation project(':app-tracking-api')
     implementation project(':vpn-impl')
     implementation project(':vpn-api')
     implementation project(':vpn-store')
@@ -238,6 +239,9 @@ dependencies {
     implementation project(':fingerprint-protection-api')
     implementation project(':fingerprint-protection-impl')
     implementation project(':fingerprint-protection-store')
+
+    implementation project(':element-hiding-impl')
+    implementation project(':element-hiding-store')
 
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"

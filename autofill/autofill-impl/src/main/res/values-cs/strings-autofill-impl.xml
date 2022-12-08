@@ -63,4 +63,6 @@
     <string name="credentialManagementViewMenuEdit">Upravit</string>
     <string name="credentialManagementViewMenuDelete">Smazat</string>
 
+    <string name="credentialManagementSuggestionsLabel">Navrhované</string>
+
 </resources>

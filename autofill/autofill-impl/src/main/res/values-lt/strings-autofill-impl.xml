@@ -63,4 +63,6 @@
     <string name="credentialManagementViewMenuEdit">Redaguoti</string>
     <string name="credentialManagementViewMenuDelete">Trinti</string>
 
+    <string name="credentialManagementSuggestionsLabel">Siūloma</string>
+
 </resources>

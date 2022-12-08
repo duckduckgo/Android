@@ -24,6 +24,9 @@ import com.duckduckgo.app.email.AppEmailManager.Companion.UNKNOWN_COHORT
 import com.duckduckgo.app.email.api.EmailAlias
 import com.duckduckgo.app.email.api.EmailService
 import com.duckduckgo.app.email.db.EmailDataStore
+import com.duckduckgo.app.pixels.AppPixelName.EMAIL_DISABLED
+import com.duckduckgo.app.pixels.AppPixelName.EMAIL_ENABLED
+import com.duckduckgo.app.statistics.pixels.Pixel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.first
@@ -57,11 +60,12 @@ class AppEmailManagerTest {
 
     private val mockEmailService: EmailService = mock()
     private val mockEmailDataStore: EmailDataStore = FakeEmailDataStore()
+    private val mockPixel: Pixel = mock()
     lateinit var testee: AppEmailManager
 
     @Before
     fun setup() {
-        testee = AppEmailManager(mockEmailService, mockEmailDataStore, coroutineRule.testDispatcherProvider, TestScope())
+        testee = AppEmailManager(mockEmailService, mockEmailDataStore, coroutineRule.testDispatcherProvider, TestScope(), mockPixel)
     }
 
     @Test
@@ -144,6 +148,16 @@ class AppEmailManagerTest {
     }
 
     @Test
+    fun whenStoreCredentialsThenSendPixel() = runTest {
+        mockEmailDataStore.emailToken = "token"
+        whenever(mockEmailService.newAlias(any())).thenReturn(EmailAlias(""))
+
+        testee.storeCredentials("token", "username", "cohort")
+
+        verify(mockPixel).fire(EMAIL_ENABLED)
+    }
+
+    @Test
     fun whenStoreCredentialsThenCredentialsAreStoredInDataStore() {
         testee.storeCredentials("token", "username", "cohort")
 
@@ -175,6 +189,13 @@ class AppEmailManagerTest {
         assertNull(mockEmailDataStore.nextAlias)
 
         assertNull(testee.getAlias())
+    }
+
+    @Test
+    fun whenSignedOutThenSendPixel() {
+        testee.signOut()
+
+        verify(mockPixel).fire(EMAIL_DISABLED)
     }
 
     @Test

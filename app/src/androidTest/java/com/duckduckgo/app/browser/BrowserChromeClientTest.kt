@@ -144,7 +144,7 @@ class BrowserChromeClientTest {
     @Test
     fun whenOnProgressChangedCalledThenListenerInstructedToUpdateProgress() {
         testee.onProgressChanged(webView, 10)
-        verify(mockWebViewClientListener).progressChanged(10)
+        verify(mockWebViewClientListener).progressChanged(20) // Value should come from the webView instance
     }
 
     @UiThreadTest
@@ -292,6 +292,10 @@ class BrowserChromeClientTest {
     private class TestWebView(context: Context) : WebView(context) {
         override fun getUrl(): String {
             return "https://example.com"
+        }
+
+        override fun getProgress(): Int {
+            return 20
         }
     }
 }

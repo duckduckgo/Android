@@ -47,8 +47,9 @@ class EmailModule {
         emailDataStore: EmailDataStore,
         dispatcherProvider: DispatcherProvider,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
+        pixel: Pixel,
     ): EmailManager {
-        return AppEmailManager(emailService, emailDataStore, dispatcherProvider, appCoroutineScope)
+        return AppEmailManager(emailService, emailDataStore, dispatcherProvider, appCoroutineScope, pixel)
     }
 
     @Provides

@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.network
-
-import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.blocklist.AppTrackerListService
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import javax.inject.Named
-import retrofit2.Retrofit
-
-@Module
-@ContributesTo(AppScope::class)
-object VpnNetworkModule {
-    @Provides
-    fun provideAppTrackerListService(@Named("api") retrofit: Retrofit): AppTrackerListService {
-        return retrofit.create(AppTrackerListService::class.java)
-    }
+plugins {
+    id 'java-library'
+    id 'kotlin'
 }
+
+apply from: "$rootProject.projectDir/code-formatting.gradle"
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+dependencies {
+    implementation Kotlin.stdlib.jdk7
+}
+

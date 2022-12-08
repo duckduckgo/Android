@@ -21,7 +21,7 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
-import com.duckduckgo.app.location.data.LocationPermissionsRepositoryAPI
+import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteViewModel
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command.GoBackToSitePermissions
@@ -50,7 +50,7 @@ class PermissionsPerWebsiteViewModelTest {
     var coroutineRule = CoroutineTestRule()
 
     private val mockSitePermissionsRepository: SitePermissionsRepository = mock()
-    private val mockLocationPermissionsRepository: LocationPermissionsRepositoryAPI = mock()
+    private val mockLocationPermissionsRepository: LocationPermissionsRepository = mock()
     private val mockSettingsDataStore: SettingsDataStore = mock()
 
     private val viewModel = PermissionsPerWebsiteViewModel(

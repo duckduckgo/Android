@@ -109,7 +109,7 @@
     <string name="tabClosedUndo">Vrátit</string>
     <string name="downloadsMenuItemTitle">Stahování</string>
 
-   <!-- Fire -->
+    <!-- Fire -->
     <string name="fireMenu">Vymazat data</string>
     <string name="fireClearAll">Vymazat všechny karty a data</string>
     <string name="fireCancel">Zrušit</string>
@@ -671,10 +671,12 @@
     <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
     <string name="sitePermissionsSettingsAllowedSitesTitle">Správa webů</string>
     <string name="sitePermissionsSettingsEmptyText">Zatím žádné weby</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Oprávnění odebrána všem webům</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Oprávnění „%1$s“ </string>
     <string name="permissionsPerWebsiteAskSetting">Zeptat se</string>
     <string name="permissionsPerWebsiteDenySetting">Odmítnout</string>
     <string name="permissionsPerWebsiteAllowSetting">Povolit</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Možnost „Zeptat se“ je u všech webů vypnutá</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s – povolení pro web %2$s</string>
 
     <!-- Autofill -->
