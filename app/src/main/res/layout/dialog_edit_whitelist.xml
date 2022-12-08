@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,53 +13,12 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+<com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/customDialogTextInput"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="@dimen/keyline_5">
-
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
-        android:id="@+id/editWebsiteDialogTitle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:textType="primary"
-        app:typography="h2" />
-
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
-        android:id="@+id/radioListDialogTextInput"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_4"
-        android:hint="@string/whitelistDomainHint"
-        android:inputType="textUri"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editWebsiteDialogTitle" />
-
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
-        android:id="@+id/editWebsiteDialogPositiveButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_4"
-        android:text="@string/dialogSave"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/radioListDialogTextInput" />
-
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
-        android:id="@+id/editWebsiteDialogNegativeButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_4"
-        android:layout_marginEnd="@dimen/keyline_2"
-        android:text="@string/cancel"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/editWebsiteDialogPositiveButton"
-        app:layout_constraintTop_toBottomOf="@+id/radioListDialogTextInput" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+    android:layout_marginTop="@dimen/keyline_4"
+    android:hint="@string/whitelistDomainHint"
+    android:inputType="textUri" />
