@@ -21,8 +21,6 @@ import com.duckduckgo.app.global.extensions.extractETag
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.trackers.*
 import com.duckduckgo.mobile.android.vpn.trackers.AppTracker
-import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRule
-import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExcludedPackage
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerJsonParser
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerPackage
 import com.duckduckgo.mobile.android.vpn.trackers.JsonAppBlockingList

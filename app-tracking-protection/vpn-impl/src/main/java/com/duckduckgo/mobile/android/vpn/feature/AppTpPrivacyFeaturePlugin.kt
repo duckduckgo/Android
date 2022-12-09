@@ -33,7 +33,7 @@ private const val APPTP_FEATURE_SIGNATURE_KEY = "apptp_feature_signature"
 @ContributesMultibinding(AppScope::class)
 class AppTpPrivacyFeaturePlugin @Inject constructor(
     plugins: DaggerSet<AppTpSettingPlugin>,
-    private val context: Context
+    private val context: Context,
 ) : PrivacyFeaturePlugin {
 
     private val settings = plugins.sortedBy { it.settingName.value }

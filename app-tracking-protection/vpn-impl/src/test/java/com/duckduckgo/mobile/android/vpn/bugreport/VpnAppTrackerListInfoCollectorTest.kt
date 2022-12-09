@@ -113,7 +113,7 @@ class VpnAppTrackerListInfoCollectorTest {
     fun whenCollectStateAndAppRemoteGameProtectionEnabledAndInExclusionListThenReturnUnprotectedByDefaultTrue() = runTest {
         whenever(appTpFeatureConfig.isEnabled(AppTpSetting.ProtectGames)).thenReturn(true)
         whenever(appCategoryDetector.getAppCategory(PACKAGE_ID)).thenReturn(AppCategory.Game)
-        whenever(appTrackerRepository.getAppExclusionList()).thenReturn(listOf(AppTrackerExcludedPackage(PACKAGE_ID)))
+        whenever(appTrackerRepository.getAppExclusionList()).thenReturn(listOf(AppTrackerExcludedPackage(PACKAGE_ID, REASON)))
         val jsonObject = collector.collectVpnRelatedState(PACKAGE_ID)
 
         assertEquals("true", jsonObject.get("reportedAppUnprotectedByDefault"))

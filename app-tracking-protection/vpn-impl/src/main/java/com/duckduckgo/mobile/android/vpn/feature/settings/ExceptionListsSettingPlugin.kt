@@ -27,21 +27,21 @@ import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExcludedPackage
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerSystemAppOverridePackage
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 import logcat.LogPriority
 import logcat.asLog
 import logcat.logcat
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = AppTpSettingPlugin::class
+    boundType = AppTpSettingPlugin::class,
 )
 class ExceptionListsSettingPlugin @Inject constructor(
     private val vpnDatabase: VpnDatabase,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val vpnFeaturesRegistry: VpnFeaturesRegistry
+    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
 ) : AppTpSettingPlugin {
     private val jsonAdapter = Moshi.Builder().build().adapter(JsonConfigModel::class.java)
 
@@ -56,14 +56,14 @@ class ExceptionListsSettingPlugin @Inject constructor(
                     val appTrackerExceptionRuleList = exceptionLists.appTrackerAllowList.map { appTrackerAllowRule ->
                         AppTrackerExceptionRule(
                             appTrackerAllowRule.domain,
-                            appTrackerAllowRule.packageNames.map { it.packageName }
+                            appTrackerAllowRule.packageNames.map { it.packageName },
                         )
                     }
 
                     vpnDatabase.vpnAppTrackerBlockingDao().updateTrackerExceptionRules(appTrackerExceptionRuleList)
                     vpnDatabase.vpnAppTrackerBlockingDao().updateExclusionList(exceptionLists.unprotectedApps)
                     vpnDatabase.vpnSystemAppsOverridesDao().upsertSystemAppOverrides(
-                        exceptionLists.unhideSystemApps.map { AppTrackerSystemAppOverridePackage(it) }
+                        exceptionLists.unhideSystemApps.map { AppTrackerSystemAppOverridePackage(it) },
                     )
 
                     // Restart VPN now that the lists were updated
