@@ -14,14 +14,22 @@
   ~ limitations under the License.
   -->
 
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/downloads_empty_text_view"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="center"
-    android:paddingStart="24dp"
-    android:paddingTop="48dp"
-    android:paddingEnd="24dp"
-    android:textColor="?attr/secondaryTextColor"
-    android:textAppearance="@style/TextAppearance.DuckDuckGo.Body1"
-    android:text="@string/downloadsActivityNoItemsDescription" />
+    android:paddingStart="@dimen/keyline_4"
+    android:paddingTop="@dimen/keyline_5"
+    android:paddingEnd="@dimen/keyline_4"
+    android:paddingBottom="@dimen/keyline_5">
+
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        android:id="@+id/downloads_empty_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/downloadsActivityNoItemsDescription"
+        app:textType="secondary"
+        app:typography="body2" />
+
+</FrameLayout>
