@@ -74,8 +74,7 @@ fun AppCompatActivity.getThemeId(theme: DuckDuckGoTheme): Int {
 }
 
 private fun Context.getSystemDefaultTheme(): Int {
-    return if (isInNightMode()) R.style.Theme_DuckDuckGo_Dark
-    else R.style.Theme_DuckDuckGo_Light
+    return if (isInNightMode()) { R.style.Theme_DuckDuckGo_Dark } else { R.style.Theme_DuckDuckGo_Light }
 }
 
 private fun Context.isInNightMode(): Boolean {
