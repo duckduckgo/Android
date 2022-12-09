@@ -24,11 +24,11 @@
         android:id="@+id/includeToolbar"
         layout="@layout/include_default_toolbar" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
-        android:id="@+id/sitePermissionsSectionTitle"
+    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+        android:id="@+id/sitePermissionsSectionHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/permissionPerWebsiteText"/>
+        app:primaryText="@string/permissionPerWebsiteText" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/permissionsPerWebsiteRecyclerView"
