@@ -57,7 +57,9 @@ import java.net.Inet4Address
 import java.net.InetAddress
 import javax.inject.Inject
 import kotlinx.coroutines.*
-import timber.log.Timber
+import logcat.LogPriority
+import logcat.asLog
+import logcat.logcat
 
 @Suppress("NoHardcodedCoroutineDispatcher")
 @InjectWith(VpnScope::class)
@@ -125,12 +127,12 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             name: ComponentName?,
             service: IBinder?,
         ) {
-            Timber.d("Connected to state monitor service")
+            logcat { "Connected to state monitor service" }
             vpnStateServiceReference = service
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
-            Timber.d("Disconnected from state monitor service")
+            logcat { "Disconnected from state monitor service" }
             vpnStateServiceReference = null
         }
     }
@@ -159,22 +161,22 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         super.onCreate()
         AndroidInjection.inject(this)
 
-        Timber.d("VPN log onCreate, creating the ${vpnNetworkStack.name} network stack")
+        logcat { "VPN log onCreate, creating the ${vpnNetworkStack.name} network stack" }
         vpnNetworkStack.onCreateVpn().getOrThrow()
     }
 
     override fun onBind(intent: Intent?): IBinder {
-        Timber.d("VPN log onBind invoked")
+        logcat { "VPN log onBind invoked" }
         return binder
     }
 
     override fun onUnbind(p0: Intent?): Boolean {
-        Timber.d("VPN log onUnbind invoked")
+        logcat { "VPN log onUnbind invoked" }
         return super.onUnbind(p0)
     }
 
     override fun onDestroy() {
-        Timber.d("VPN log onDestroy")
+        logcat { "VPN log onDestroy" }
         vpnNetworkStack.onDestroyVpn()
         super.onDestroy()
 
@@ -189,7 +191,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         flags: Int,
         startId: Int,
     ): Int {
-        Timber.d("VPN log onStartCommand: ${intent?.action}")
+        logcat { "VPN log onStartCommand: ${intent?.action}" }
 
         var returnCode: Int = Service.START_NOT_STICKY
 
@@ -208,14 +210,14 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
                 restartRequested = true
                 launch { stopVpn(VpnStopReason.RESTART) }
             }
-            else -> Timber.e("Unknown intent action: $action")
+            else -> logcat(LogPriority.ERROR) { "Unknown intent action: $action" }
         }
 
         return returnCode
     }
 
     private suspend fun startVpn() = withContext(Dispatchers.IO) {
-        Timber.d("VPN log: Starting VPN")
+        logcat { "VPN log: Starting VPN" }
 
         // We need to rethink how to log this state. This will likely change.
         vpnServiceStateStatsDao.insert(VpnServiceStateStats(state = ENABLING))
@@ -223,40 +225,40 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             if (it != null) {
                 createTunnelInterface(it)
             } else {
-                Timber.e("Failed to obtain config needed to establish the TUN interface")
+                logcat(LogPriority.ERROR) { "Failed to obtain config needed to establish the TUN interface" }
                 stopVpn(VpnStopReason.ERROR, false)
             }
         }
 
         if (tunInterface == null) {
-            Timber.e("Failed to establish the TUN interface")
+            logcat(LogPriority.ERROR) { "Failed to establish the TUN interface" }
             deviceShieldPixels.vpnEstablishTunInterfaceError()
             return@withContext
         }
 
         if (isInterceptDnsTrafficEnabled) {
             applicationContext.getActiveNetwork()?.let { an ->
-                Timber.v("Setting underlying network $an")
+                logcat { "Setting underlying network $an" }
                 setUnderlyingNetworks(arrayOf(an))
             }
         } else {
-            Timber.v("NetworkSwitchHandling disabled...skip setting underlying network")
+            logcat { "NetworkSwitchHandling disabled...skip setting underlying network" }
         }
 
         if (isStartVpnErrorHandlingEnabled) {
-            Timber.d("Enable new error handling for onStartVpn")
+            logcat { "Enable new error handling for onStartVpn" }
             vpnNetworkStack.onStartVpn(tunInterface!!).getOrElse {
-                Timber.e("Failed to start VPN")
+                logcat(LogPriority.ERROR) { "Failed to start VPN" }
                 stopVpn(VpnStopReason.ERROR, false)
                 return@withContext
             }
         } else {
-            Timber.d("Reverted error handling for onStartVpn")
+            logcat { "Reverted error handling for onStartVpn" }
             vpnNetworkStack.onStartVpn(tunInterface!!).getOrThrow()
         }
 
         vpnServiceCallbacksPluginPoint.getPlugins().forEach {
-            Timber.v("VPN log: starting ${it.javaClass} callback")
+            logcat { "VPN log: starting ${it.javaClass} callback" }
             it.onVpnStarted(this)
         }
 
@@ -286,7 +288,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
                     // we need to make sure that all DNS traffic goes through the VPN. Specifically when the DNS server is on the local network
                     dnsList.filterIsInstance<Inet4Address>().forEach { addr ->
                         addr.asRoute()?.let {
-                            Timber.d("Adding DNS address $it to VPN routes")
+                            logcat { "Adding DNS address $it to VPN routes" }
                             vpnRoutes.add(it)
                         }
                     }
@@ -297,7 +299,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
                         if (!it.isLoopbackAddress) {
                             addRoute(route.address, route.maskWidth)
                         } else {
-                            Timber.w("Tried to add loopback address $it to VPN routes")
+                            logcat(LogPriority.WARN) { "Tried to add loopback address $it to VPN routes" }
                         }
                     }
                 }
@@ -320,11 +322,11 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             // Set DNS
             dnsList.forEach { addr ->
                 if (isIpv6SupportEnabled || addr is Inet4Address) {
-                    Timber.v("Adding DNS $addr")
+                    logcat { "Adding DNS $addr" }
                     runCatching {
                         addDnsServer(addr)
                     }.onFailure { t ->
-                        Timber.e(t, "Error setting DNS $addr")
+                        logcat(LogPriority.ERROR) { "Error setting DNS $addr: ${t.asLog()}" }
                         if (addr.isLoopbackAddress) {
                             deviceShieldPixels.reportLoopbackDnsError()
                         } else if (addr.isAnyLocalAddress) {
@@ -340,7 +342,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             val limitingToTestApps = false
             if (limitingToTestApps) {
                 safelyAddAllowedApps(INCLUDED_APPS_FOR_TESTING)
-                Timber.w("Limiting VPN to test apps only:\n${INCLUDED_APPS_FOR_TESTING.joinToString(separator = "\n") { it }}")
+                logcat(LogPriority.WARN) { "Limiting VPN to test apps only:\n${INCLUDED_APPS_FOR_TESTING.joinToString(separator = "\n") { it }}" }
             } else {
                 safelyAddDisallowedApps(
                     deviceShieldExcludedApps.getExclusionAppsList(),
@@ -354,7 +356,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         }
 
         if (tunInterface == null) {
-            Timber.e("VPN log: Failed to establish VPN tunnel")
+            logcat(LogPriority.ERROR) { "VPN log: Failed to establish VPN tunnel" }
             stopVpn(VpnStopReason.ERROR, false)
         }
     }
@@ -398,7 +400,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         if (appBuildConfig.isInternalBuild() && isAlwaysSetDNSEnabled) {
             if (dns.isEmpty()) {
                 kotlin.runCatching {
-                    Timber.d("Adding cloudflare DNS")
+                    logcat { "Adding cloudflare DNS" }
                     dns.add(InetAddress.getByName("1.1.1.1"))
                     dns.add(InetAddress.getByName("1.0.0.1"))
                     if (isIpv6SupportEnabled) {
@@ -406,25 +408,25 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
                         dns.add(InetAddress.getByName("2606:4700:4700::1001"))
                     }
                 }.onFailure {
-                    Timber.w(it, "Error adding fallback DNS")
+                    logcat(LogPriority.WARN) { "Error adding fallback DNS: ${it.asLog()}" }
                 }
             }
 
             // always add ipv4 DNS
             if (!dns.containsIpv4()) {
-                Timber.d("DNS set does not contain IPv4, adding cloudflare")
+                logcat { "DNS set does not contain IPv4, adding cloudflare" }
                 kotlin.runCatching {
                     dns.add(InetAddress.getByName("1.1.1.1"))
                     dns.add(InetAddress.getByName("1.0.0.1"))
                 }.onFailure {
-                    Timber.w(it, "Error adding fallback DNS")
+                    logcat(LogPriority.WARN) { "Error adding fallback DNS ${it.asLog()}" }
                 }
             }
         }
 
         if (!dns.containsIpv4()) {
             // never allow IPv6-only DNS
-            Timber.v("No IPv4 DNS found, return empty DNS list")
+            logcat { "No IPv4 DNS found, return empty DNS list" }
             return setOf()
         }
 
@@ -436,7 +438,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             try {
                 addAllowedApplication(app)
             } catch (e: PackageManager.NameNotFoundException) {
-                Timber.w("Package name not found: %s", app)
+                logcat(LogPriority.WARN) { "Package name not found: $app" }
             }
         }
     }
@@ -444,16 +446,16 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
     private fun Builder.safelyAddDisallowedApps(apps: List<String>) {
         for (app in apps) {
             try {
-                Timber.v("Excluding app from VPN: $app")
+                logcat { "Excluding app from VPN: $app" }
                 addDisallowedApplication(app)
             } catch (e: PackageManager.NameNotFoundException) {
-                Timber.w("Package name not found: %s", app)
+                logcat(LogPriority.WARN) { "Package name not found: $app" }
             }
         }
     }
 
     private suspend fun stopVpn(reason: VpnStopReason, shouldStopCallbacks: Boolean = true) = withContext(Dispatchers.IO) {
-        Timber.d("VPN log: Stopping VPN. $reason")
+        logcat { "VPN log: Stopping VPN. $reason" }
 
         vpnNetworkStack.onStopVpn()
 
@@ -464,7 +466,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
 
         if (shouldStopCallbacks) {
             vpnServiceCallbacksPluginPoint.getPlugins().forEach {
-                Timber.v("VPN log: stopping ${it.javaClass} callback")
+                logcat { "VPN log: stopping ${it.javaClass} callback" }
                 it.onVpnStopped(this, reason)
             }
         }
@@ -493,24 +495,24 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
     }
 
     override fun onRevoke() {
-        Timber.w("VPN log onRevoke called")
+        logcat(LogPriority.WARN) { "VPN log onRevoke called" }
         launch { stopVpn(VpnStopReason.REVOKED) }
     }
 
     override fun onLowMemory() {
-        Timber.w("VPN log onLowMemory called")
+        logcat(LogPriority.WARN) { "VPN log onLowMemory called" }
     }
 
     // https://developer.android.com/reference/android/app/Service.html#onTrimMemory(int)
     override fun onTrimMemory(level: Int) {
-        Timber.d("VPN log onTrimMemory level $level called")
+        logcat { "VPN log onTrimMemory level $level called" }
 
         // Collect memory data info from memory collectors
         val memoryData = mutableMapOf<String, String>()
         memoryCollectorPluginPoint.getPlugins().forEach { memoryData.putAll(it.collectMemoryMetrics()) }
 
         if (memoryData.isEmpty()) {
-            Timber.v("VPN log nothing to send from memory collectors")
+            logcat { "VPN log nothing to send from memory collectors" }
             return
         }
 
@@ -640,12 +642,12 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         ) = withContext(Dispatchers.Default) {
             val applicationContext = context.applicationContext
             if (isServiceRunning(applicationContext)) {
-                Timber.v("VPN log: stopping service")
+                logcat { "VPN log: stopping service" }
 
                 restartService(applicationContext)
 
                 if (forceGc) {
-                    Timber.d("Forcing a garbage collection to run while VPN is restarting")
+                    logcat { "Forcing a garbage collection to run while VPN is restarting" }
                     System.gc()
                 }
             }

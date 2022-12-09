@@ -44,7 +44,8 @@ import dagger.multibindings.IntoSet
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority
+import logcat.logcat
 
 @Module
 @ContributesTo(AppScope::class)
@@ -73,7 +74,7 @@ class VpnServiceHeartbeatMonitor(
         private const val WORKER_HEART_BEAT_MONITOR_TAG = "VpnServiceHeartbeatMonitorWorker"
 
         fun startHeartbeatMonitor(workManager: WorkManager) {
-            Timber.v("(Re)Scheduling the VpnServiceHeartbeatMonitor worker")
+            logcat { "(Re)Scheduling the VpnServiceHeartbeatMonitor worker" }
             workManager.cancelAllWorkByTag(WORKER_HEART_BEAT_MONITOR_TAG)
 
             val request = PeriodicWorkRequestBuilder<VpnServiceHeartbeatMonitorWorker>(15, TimeUnit.MINUTES)
@@ -110,9 +111,9 @@ class VpnServiceHeartbeatMonitorWorker(
     override suspend fun doWork(): Result = withContext(dispatcherProvider.io()) {
         val lastHeartBeat = vpnHeartBeatDao.hearBeats().maxByOrNull { it.timestamp }
 
-        Timber.d("HB monitor checking last HB: $lastHeartBeat")
+        logcat { "HB monitor checking last HB: $lastHeartBeat" }
         if (lastHeartBeat?.isAlive() == true && !TrackerBlockingVpnService.isServiceRunning(context)) {
-            Timber.w("HB monitor: VPN stopped, restarting it")
+            logcat(LogPriority.WARN) { "HB monitor: VPN stopped, restarting it" }
 
             deviceShieldPixels.suddenKillBySystem()
             deviceShieldPixels.automaticRestart()
@@ -120,7 +121,7 @@ class VpnServiceHeartbeatMonitorWorker(
         } else if (didNotBlockRecently()) {
             deviceShieldPixels.automaticRestart()
             // we have not blocked anything "recently", assuming something is wrong with the VPN service
-            Timber.d("HB monitor: VPN not blocking anything, restarting it")
+            logcat { "HB monitor: VPN not blocking anything, restarting it" }
             TrackerBlockingVpnService.restartVpnService(context)
         }
 
@@ -157,7 +158,7 @@ class VpnHeartbeatDeviceBootMonitor : BroadcastReceiver() {
         AndroidInjection.inject(this, context)
 
         if (intent.action == "android.intent.action.BOOT_COMPLETED") {
-            Timber.v("Checking if VPN was running before device BOOT")
+            logcat { "Checking if VPN was running before device BOOT" }
 
             VpnServiceHeartbeatMonitor.startHeartbeatMonitor(workManager)
         }

@@ -41,7 +41,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.logcat
 
 @SingleInstanceIn(VpnScope::class)
 @ContributesMultibinding(VpnScope::class)
@@ -77,10 +77,10 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
     private fun onVPNManuallyStopped() {
         appCoroutineScope.launch(dispatchers.io()) {
             if (vpnFeatureRemover.isFeatureRemoved()) {
-                Timber.d("VPN Manually stopped because user disabled the feature, nothing to do")
+                logcat { "VPN Manually stopped because user disabled the feature, nothing to do" }
             } else {
                 withContext(dispatchers.main()) {
-                    Timber.d("VPN Manually stopped, showing disabled notification")
+                    logcat { "VPN Manually stopped, showing disabled notification" }
                     showImmediateReminderNotification()
                     cancelUndesiredStopReminderAlarm()
                     scheduleReminderForTomorrow()
@@ -90,7 +90,7 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
     }
 
     private fun onVPNRevoked() {
-        Timber.d("VPN Revoked, showing revoke notification")
+        logcat { "VPN Revoked, showing revoke notification" }
         showImmediateRevokedNotification()
         cancelUndesiredStopReminderAlarm()
         scheduleReminderForTomorrow()
@@ -101,7 +101,7 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
     }
 
     private fun scheduleUndesiredStopReminderAlarm() {
-        Timber.v("Scheduling the VpnReminderNotificationWorker worker 5 hours from now")
+        logcat { "Scheduling the VpnReminderNotificationWorker worker 5 hours from now" }
         val request = PeriodicWorkRequestBuilder<VpnReminderNotificationWorker>(5, TimeUnit.HOURS)
             .setInitialDelay(5, TimeUnit.HOURS)
             .addTag(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_UNDESIRED_TAG)
@@ -137,7 +137,7 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
     }
 
     private fun scheduleReminderForTomorrow() {
-        Timber.v("Scheduling the VpnReminderNotification worker for tomorrow")
+        logcat { "Scheduling the VpnReminderNotification worker for tomorrow" }
         val request = OneTimeWorkRequestBuilder<VpnReminderNotificationWorker>()
             .setInitialDelay(24, TimeUnit.HOURS)
             .addTag(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_DAILY_TAG)

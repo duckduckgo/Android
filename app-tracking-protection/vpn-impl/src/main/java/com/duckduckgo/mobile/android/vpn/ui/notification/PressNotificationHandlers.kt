@@ -22,7 +22,8 @@ import android.os.Looper
 import android.os.ResultReceiver
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority
+import logcat.logcat
 
 private const val INVALID_NOTIFICATION_VARIANT = -1
 
@@ -33,7 +34,7 @@ class ReminderNotificationPressedHandler @Inject constructor(
         resultCode: Int,
         resultData: Bundle?,
     ) {
-        Timber.v("Reminder notification pressed")
+        logcat { "Reminder notification pressed" }
         deviceShieldPixels.didPressReminderNotification()
     }
 }
@@ -45,7 +46,7 @@ class OngoingNotificationPressedHandler @Inject constructor(
         resultCode: Int,
         resultData: Bundle?,
     ) {
-        Timber.v("Ongoing notification pressed")
+        logcat { "Ongoing notification pressed" }
         deviceShieldPixels.didPressOngoingNotification()
     }
 }
@@ -60,9 +61,9 @@ class WeeklyNotificationPressedHandler @Inject constructor(
         resultCode: Int,
         resultData: Bundle?,
     ) {
-        Timber.v("Weekly notification pressed")
+        logcat { "Weekly notification pressed" }
         if (notificationVariant == INVALID_NOTIFICATION_VARIANT) {
-            Timber.e("Weekly notification pressed reported with uninitialized notification variant")
+            logcat(LogPriority.ERROR) { "Weekly notification pressed reported with uninitialized notification variant" }
         } else {
             deviceShieldPixels.didPressOnWeeklyNotification(notificationVariant)
         }
@@ -79,9 +80,9 @@ class DailyNotificationPressedHandler @Inject constructor(
         resultCode: Int,
         resultData: Bundle?,
     ) {
-        Timber.v("Daily notification pressed")
+        logcat { "Daily notification pressed" }
         if (notificationVariant == INVALID_NOTIFICATION_VARIANT) {
-            Timber.e("Daily notification pressed reported with uninitialized notification variant")
+            logcat(LogPriority.ERROR) { "Daily notification pressed reported with uninitialized notification variant" }
         } else {
             deviceShieldPixels.didPressOnDailyNotification(notificationVariant)
         }

@@ -33,7 +33,8 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority
+import logcat.logcat
 
 @ContributesWorker(AppScope::class)
 class AppTrackerExclusionListUpdateWorker(
@@ -59,7 +60,7 @@ class AppTrackerExclusionListUpdateWorker(
 
             val success = Result.success()
             if (exclusionListResult != success) {
-                Timber.w("Failed downloading exclusion or system app override lists, scheduling a retry")
+                logcat(LogPriority.WARN) { "Failed downloading exclusion or system app override lists, scheduling a retry" }
                 return@withContext Result.retry()
             }
 
@@ -68,7 +69,7 @@ class AppTrackerExclusionListUpdateWorker(
     }
 
     private suspend fun updateSystemAppOverrides(): Result {
-        Timber.d("Updating the app system app overrides list")
+        logcat { "Updating the app system app overrides list" }
 
         val sysAppsOverrides = appTrackerListDownloader.downloadSystemAppOverrideList()
 
@@ -78,11 +79,11 @@ class AppTrackerExclusionListUpdateWorker(
                 val updatedEtag = sysAppsOverrides.etag.value
 
                 if (updatedEtag == currentEtag) {
-                    Timber.v("Downloaded system app overrides has same eTag, noop")
+                    logcat { "Downloaded system app overrides has same eTag, noop" }
                     return Result.success()
                 }
 
-                Timber.d("Updating the app tracker system app overrides, eTag: ${sysAppsOverrides.etag.value}")
+                logcat { "Updating the app tracker system app overrides, eTag: ${sysAppsOverrides.etag.value}" }
                 vpnDatabase.vpnSystemAppsOverridesDao().upsertSystemAppOverrides(
                     sysAppsOverrides.overridePackages,
                     AppTrackerSystemAppOverrideListMetadata(eTag = updatedEtag),
@@ -93,14 +94,14 @@ class AppTrackerExclusionListUpdateWorker(
                 return Result.success()
             }
             else -> {
-                Timber.w("Received app tracker exclusion list with invalid eTag")
+                logcat(LogPriority.WARN) { "Received app tracker exclusion list with invalid eTag" }
                 return Result.retry()
             }
         }
     }
 
     private suspend fun updateExclusionList(): Result {
-        Timber.d("Updating the app tracker exclusion list")
+        logcat { "Updating the app tracker exclusion list" }
         val exclusionList = appTrackerListDownloader.downloadAppTrackerExclusionList()
 
         when (exclusionList.etag) {
@@ -109,11 +110,11 @@ class AppTrackerExclusionListUpdateWorker(
                 val updatedEtag = exclusionList.etag.value
 
                 if (updatedEtag == currentEtag) {
-                    Timber.v("Downloaded exclusion list has same eTag, noop")
+                    logcat { "Downloaded exclusion list has same eTag, noop" }
                     return Result.success()
                 }
 
-                Timber.d("Updating the app tracker exclusion list, eTag: ${exclusionList.etag.value}")
+                logcat { "Updating the app tracker exclusion list, eTag: ${exclusionList.etag.value}" }
                 vpnDatabase.vpnAppTrackerBlockingDao()
                     .updateExclusionList(exclusionList.excludedPackages, AppTrackerExclusionListMetadata(eTag = exclusionList.etag.value))
 
@@ -122,7 +123,7 @@ class AppTrackerExclusionListUpdateWorker(
                 return Result.success()
             }
             else -> {
-                Timber.w("Received app tracker exclusion list with invalid eTag")
+                logcat(LogPriority.WARN) { "Received app tracker exclusion list with invalid eTag" }
                 return Result.retry()
             }
         }
@@ -138,7 +139,7 @@ class AppTrackerExclusionListUpdateWorkerScheduler @Inject constructor(
 ) : DefaultLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
-        Timber.v("Scheduling tracker exclusion list update worker")
+        logcat { "Scheduling tracker exclusion list update worker" }
         val workerRequest = PeriodicWorkRequestBuilder<AppTrackerExclusionListUpdateWorker>(6, TimeUnit.HOURS)
             .addTag(APP_TRACKER_EXCLUSION_LIST_UPDATE_WORKER_TAG)
             .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)

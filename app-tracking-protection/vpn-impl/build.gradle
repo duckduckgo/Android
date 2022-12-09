@@ -102,7 +102,7 @@ dependencies {
     implementation "com.jakewharton.threetenabp:threetenabp:_"
     testImplementation "org.threeten:threetenbp:_"
 
-    implementation JakeWharton.timber
+    implementation "com.squareup.logcat:logcat:_"
 
     implementation 'nl.dionsegijn:konfetti:1.2.5'
 

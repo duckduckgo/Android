@@ -22,19 +22,21 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import java.io.RandomAccessFile
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority
+import logcat.asLog
+import logcat.logcat
 
 @SingleInstanceIn(VpnScope::class)
 @ContributesMultibinding(VpnScope::class)
 class VpnNetworkMemoryCollector @Inject constructor() : VpnMemoryCollectorPlugin {
     override fun collectMemoryMetrics(): Map<String, String> {
-        Timber.v("Collecting vpn network memory resources")
+        logcat { "Collecting vpn network memory resources" }
 
         val memoryStat = try {
             val reader = RandomAccessFile(PROC_STAT_FILE_PATH, "r")
             reader.readLine()
         } catch (t: Throwable) {
-            Timber.e(t, "Error reading $PROC_STAT_FILE_PATH")
+            logcat(LogPriority.ERROR) { t.asLog() }
             null
         }
 

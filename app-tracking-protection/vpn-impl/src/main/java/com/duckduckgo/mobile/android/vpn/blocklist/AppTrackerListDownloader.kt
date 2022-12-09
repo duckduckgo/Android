@@ -29,9 +29,10 @@ import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerSystemAppOverridePac
 import com.duckduckgo.mobile.android.vpn.trackers.JsonAppBlockingList
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import logcat.LogPriority
+import logcat.logcat
 import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.Response
-import timber.log.Timber
 
 data class AppTrackerBlocklist(
     val etag: ETag = ETag.InvalidETag,
@@ -79,16 +80,16 @@ class RealAppTrackerListDownloader @Inject constructor(
     private val appTrackerListService: AppTrackerListService,
 ) : AppTrackerListDownloader {
     override fun downloadAppTrackerBlocklist(): AppTrackerBlocklist {
-        Timber.d("Downloading the app tracker blocklist...")
+        logcat { "Downloading the app tracker blocklist..." }
         val response = runCatching {
             appTrackerListService.appTrackerBlocklist().execute()
         }.getOrElse {
-            Timber.w("Error downloading tracker rules list: $it")
+            logcat(LogPriority.WARN) { "Error downloading tracker rules list: $it" }
             Response.error(400, "".toResponseBody(null))
         }
 
         if (!response.isSuccessful) {
-            Timber.e("Fail to download the app tracker blocklist, error code: ${response.code()}")
+            logcat(LogPriority.WARN) { "Fail to download the app tracker blocklist, error code: ${response.code()}" }
             return AppTrackerBlocklist()
         }
 
@@ -99,10 +100,10 @@ class RealAppTrackerListDownloader @Inject constructor(
         val packages = extractAppPackages(responseBody)
         val trackerEntities = extractTrackerEntities(responseBody)
 
-        Timber.d(
+        logcat {
             "Received the app tracker remote lists. blocklist size: ${blocklist.size}, " +
-                "app-packages size: ${packages.size}, entities size: ${trackerEntities.size}",
-        )
+                "app-packages size: ${packages.size}, entities size: ${trackerEntities.size}"
+        }
 
         return AppTrackerBlocklist(etag = ETag.ValidETag(eTag), blocklist = blocklist, appPackages = packages, entities = trackerEntities)
     }
@@ -120,16 +121,16 @@ class RealAppTrackerListDownloader @Inject constructor(
     }
 
     override fun downloadAppTrackerExclusionList(): AppTrackerExclusionList {
-        Timber.d("Downloading the app tracker exclusion list...")
+        logcat { "Downloading the app tracker exclusion list..." }
         val response = runCatching {
             appTrackerListService.appTrackerExclusionList().execute()
         }.getOrElse {
-            Timber.w("Error downloading tracker rules list: $it")
+            logcat(LogPriority.WARN) { "Error downloading tracker rules list: $it" }
             Response.error(400, "".toResponseBody(null))
         }
 
         if (!response.isSuccessful) {
-            Timber.e("Fail to download the app tracker exclusion list, error code: ${response.code()}")
+            logcat(LogPriority.WARN) { "Fail to download the app tracker exclusion list, error code: ${response.code()}" }
             return AppTrackerExclusionList()
         }
 
@@ -137,22 +138,22 @@ class RealAppTrackerListDownloader @Inject constructor(
         val exclusionList = response.body()?.rules.orEmpty()
             .map { AppTrackerExcludedPackage(it) }
 
-        Timber.d("Received the app tracker exclusion list, size: ${exclusionList.size}")
+        logcat { "Received the app tracker exclusion list, size: ${exclusionList.size}" }
 
         return AppTrackerExclusionList(etag = ETag.ValidETag(eTag), excludedPackages = exclusionList)
     }
 
     override fun downloadSystemAppOverrideList(): AppTrackerSystemAppOverrideList {
-        Timber.d("Downloading the app tracker system app overrides list...")
+        logcat { "Downloading the app tracker system app overrides list..." }
         val response = runCatching {
             appTrackerListService.appTrackerSystemAppsOverrides().execute()
         }.getOrElse {
-            Timber.w("Error downloading system app overrides list: $it")
+            logcat(LogPriority.WARN) { "Error downloading system app overrides list: $it" }
             Response.error(400, "".toResponseBody(null))
         }
 
         if (!response.isSuccessful) {
-            Timber.e("Fail to download the app system app overrides list, error code: ${response.code()}")
+            logcat(LogPriority.WARN) { "Fail to download the app system app overrides list, error code: ${response.code()}" }
             return AppTrackerSystemAppOverrideList()
         }
 
@@ -160,29 +161,29 @@ class RealAppTrackerListDownloader @Inject constructor(
         val systemAppOverrides = response.body()?.rules.orEmpty()
             .map { AppTrackerSystemAppOverridePackage(it) }
 
-        Timber.d("Received the app system app overrides list, size: ${systemAppOverrides.size}")
+        logcat { "Received the app system app overrides list, size: ${systemAppOverrides.size}" }
 
         return AppTrackerSystemAppOverrideList(etag = ETag.ValidETag(eTag), overridePackages = systemAppOverrides)
     }
 
     override fun downloadAppTrackerExceptionRules(): AppTrackerRuleList {
-        Timber.d("Downloading the app tracker rule list...")
+        logcat { "Downloading the app tracker rule list..." }
         val response = kotlin.runCatching {
             appTrackerListService.appTrackerExceptionRules().execute()
         }.getOrElse {
-            Timber.w("Error downloading tracker rules list: $it")
+            logcat(LogPriority.WARN) { "Error downloading tracker rules list: $it" }
             Response.error(400, "".toResponseBody(null))
         }
 
         if (!response.isSuccessful) {
-            Timber.e("Fail to download the app tracker exclusion list, error code: ${response.code()}")
+            logcat(LogPriority.WARN) { "Fail to download the app tracker exclusion list, error code: ${response.code()}" }
             return AppTrackerRuleList()
         }
 
         val eTag = response.headers().extractETag()
         val exceptionRules = response.body()?.rules.orEmpty()
 
-        Timber.d("Received the app tracker rule list, size: ${exceptionRules.size}")
+        logcat { "Received the app tracker rule list, size: ${exceptionRules.size}" }
 
         return AppTrackerRuleList(etag = ETag.ValidETag(eTag), trackerExceptionRules = exceptionRules)
     }

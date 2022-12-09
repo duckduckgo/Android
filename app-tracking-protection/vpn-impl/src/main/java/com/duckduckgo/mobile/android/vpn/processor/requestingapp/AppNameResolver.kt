@@ -18,7 +18,9 @@ package com.duckduckgo.mobile.android.vpn.processor.requestingapp
 
 import android.content.pm.PackageManager
 import com.duckduckgo.mobile.android.vpn.apps.VpnExclusionList
-import timber.log.Timber
+import logcat.LogPriority
+import logcat.asLog
+import logcat.logcat
 
 private const val UNKNOWN = "unknown"
 
@@ -56,7 +58,7 @@ internal class RealAppNameResolver(private val packageManager: PackageManager) :
             val appName = packageManager.getApplicationLabel(packageManager.getApplicationInfo(stripped, PackageManager.GET_META_DATA)) as String
             AppNameResolver.OriginatingApp(packageId, appName)
         } catch (e: PackageManager.NameNotFoundException) {
-            Timber.e("Failed to find app name for: $stripped. ${e.message}")
+            logcat(LogPriority.ERROR) { "Failed to find app name for: $stripped. ${e.message}" }
             AppNameResolver.OriginatingApp(packageId, UNKNOWN)
         }
     }
@@ -67,12 +69,12 @@ internal class RealAppNameResolver(private val packageManager: PackageManager) :
         try {
             packages = packageManager.getPackagesForUid(uid)
         } catch (e: SecurityException) {
-            Timber.e(e, "Failed to get package ID for UID: $uid due to security violation.")
+            logcat(LogPriority.ERROR) { e.asLog() }
             return UNKNOWN
         }
 
         if (packages.isNullOrEmpty()) {
-            Timber.w("Failed to get package ID for UID: $uid")
+            logcat(LogPriority.WARN) { "Failed to get package ID for UID: $uid" }
             return UNKNOWN
         }
 
@@ -81,7 +83,7 @@ internal class RealAppNameResolver(private val packageManager: PackageManager) :
             packages.forEach {
                 sb.append(String.format("\npackage: %s", it))
             }
-            Timber.d(sb.toString())
+            logcat { sb.toString() }
         }
 
         return packages.first()
