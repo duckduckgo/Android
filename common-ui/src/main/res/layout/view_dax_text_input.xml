@@ -33,7 +33,8 @@
             android:id="@+id/internal_edit_text"
             style="@style/Typography.DuckDuckGo.Body1"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:textColor="?attr/daxColorPrimaryText" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -45,9 +46,9 @@
         android:layout_marginEnd="@dimen/outlinedTextPasswordEndMarginWithEndIcon"
         android:foregroundGravity="center_vertical"
         android:visibility="gone"
+        app:backgroundTint="?attr/daxColorPrimaryIcon"
         app:layout_constraintBottom_toBottomOf="@+id/internal_input_layout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/internal_input_layout"
-        app:srcCompat="@drawable/ic_password_show"
-        app:backgroundTint="?attr/daxColorPrimaryIcon"/>
+        app:srcCompat="@drawable/ic_password_show" />
 </merge>
