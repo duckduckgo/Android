@@ -31,7 +31,7 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/internal_edit_text"
-            style="@style/Typography.DuckDuckGo.Body1"
+            style="@style/Widget.DuckDuckGo.TextInputText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="?attr/daxColorPrimaryText" />

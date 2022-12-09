@@ -345,6 +345,12 @@
         <item name="android:theme">@style/Widget.DuckDuckGo.TextInputCursor</item>
     </style>
 
+    <style name="Widget.DuckDuckGo.TextInputText">
+        <item name="android:textAppearance">@style/Typography.DuckDuckGo.Body1</item>
+        <item name="android:textColor">?attr/daxColorPrimaryText</item>
+    </style>
+
+
     <!-- The color of the cursor comes from the theme, not the widget itself -->
     <style name="Widget.DuckDuckGo.TextInputCursor">
         <item name="android:colorControlActivated">?attr/daxColorAccentBlue</item>
