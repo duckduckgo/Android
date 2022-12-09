@@ -118,6 +118,27 @@
                 ]
             },
             {
+                "name": "Tracker URL, same entity; CNAME is tracker (ignore): ignore",
+                "siteURL": "https://third-party.site/",
+                "requestURL": "https://fake-ignore.tracker.test/spy/script.js",
+                "requestType": "script",
+                "expectAction": "ignore",
+                "exceptPlatforms": [
+                    "ios-browser"
+                ]
+            },
+            {
+                "name": "Non tracker URL; CNAME is tracker (block), same entity: ignore",
+                "siteURL": "https://third-party.site/",
+                "requestURL": "https://bad.cnames.test/spy/script.js",
+                "requestType": "script",
+                "expectAction": "ignore",
+                "exceptPlatforms": [
+                    "ios-browser",
+                    "android-browser"
+                ]
+            },
+            {
                 "name": "no blocklist entry for an uncloacked domain - request should not be blocked",
                 "siteURL": "https://randomsite123.com/",
                 "requestURL": "https://domain.cloaked.test/some/script.js",
