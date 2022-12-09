@@ -18,7 +18,7 @@
     <item android:drawable="@drawable/list_item_image_circular_background"/>
     <item
             android:bottom="10dp"
-            android:drawable="@drawable/ic_file"
+            android:drawable="@drawable/ic_document_24"
             android:left="@dimen/keyline_3"
             android:right="@dimen/keyline_3"
             android:top="10dp"/>
