@@ -38,7 +38,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:importantForAccessibility="no"
-            android:src="@drawable/ic_folder" />
+            android:src="@drawable/ic_folder_24" />
     </FrameLayout>
 
     <TextView

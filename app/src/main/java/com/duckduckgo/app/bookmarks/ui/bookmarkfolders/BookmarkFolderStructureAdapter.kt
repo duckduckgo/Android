@@ -73,10 +73,10 @@ class FolderViewHolder(
         setPadding(item.depth)
 
         if (item.isSelected) {
-            binding.icon.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_check_action)
+            binding.icon.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_check_24)
             binding.iconContainer.setBackgroundResource(R.drawable.selected_icon_background)
         } else {
-            binding.icon.setImageResource(R.drawable.ic_folder)
+            binding.icon.setImageResource(R.drawable.ic_folder_24)
             binding.iconContainer.setBackgroundResource(CommonR.drawable.list_item_image_circular_background)
         }
 
