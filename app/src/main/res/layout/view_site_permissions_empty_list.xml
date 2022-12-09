@@ -13,10 +13,11 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<LinearLayout android:layout_width="match_parent"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    android:orientation="vertical">
 
     <ImageView
         android:layout_width="match_parent"
@@ -24,13 +25,13 @@
         android:layout_marginTop="@dimen/keyline_5"
         android:src="@drawable/ic_sites_empty" />
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="@dimen/keyline_4"
-        android:textSize="14sp"
-        android:textColor="?secondaryTextColor"
-        android:text="@string/sitePermissionsSettingsEmptyText" />
+        android:text="@string/sitePermissionsSettingsEmptyText"
+        app:textType="secondary"
+        app:typography="body2" />
 
 </LinearLayout>
