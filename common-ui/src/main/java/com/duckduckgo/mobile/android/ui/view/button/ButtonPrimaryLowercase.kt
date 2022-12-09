@@ -25,9 +25,9 @@ import com.google.android.material.button.MaterialButton
 class ButtonPrimaryLowercase @JvmOverloads constructor(
     ctx: Context,
     attrs: AttributeSet,
-    defStyleAttr: Int = R.attr.primaryButtonLowercaseStyle
+    defStyleAttr: Int = R.attr.primaryButtonLowercaseStyle,
 ) : MaterialButton(
     ctx,
     attrs,
-    defStyleAttr
+    defStyleAttr,
 )

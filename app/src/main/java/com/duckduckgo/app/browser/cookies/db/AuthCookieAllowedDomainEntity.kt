@@ -22,5 +22,5 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "auth_cookies_allowed_domains")
 data class AuthCookieAllowedDomainEntity(
     @PrimaryKey
-    var domain: String
+    var domain: String,
 )

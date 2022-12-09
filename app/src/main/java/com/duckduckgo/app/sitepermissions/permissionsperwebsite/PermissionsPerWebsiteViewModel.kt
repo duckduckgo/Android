@@ -22,34 +22,30 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
-import com.duckduckgo.app.location.data.LocationPermissionsRepositoryAPI
+import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command.GoBackToSitePermissions
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command.ShowPermissionSettingSelectionDialog
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSettingType.ALLOW
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSettingType.ASK
+import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSettingType.ASK_DISABLED
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSettingType.DENY
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.site.permissions.impl.SitePermissionsRepository
-import com.duckduckgo.site.permissions.impl.pixels.SitePermissionsPixel.PixelParameter
-import com.duckduckgo.site.permissions.impl.pixels.SitePermissionsPixel.PixelValue
-import com.duckduckgo.site.permissions.impl.pixels.SitePermissionsPixel.SitePermissionsPixelName
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
+import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class PermissionsPerWebsiteViewModel @Inject constructor(
     private val sitePermissionsRepository: SitePermissionsRepository,
-    private val locationPermissionsRepository: LocationPermissionsRepositoryAPI,
+    private val locationPermissionsRepository: LocationPermissionsRepository,
     private val settingsDataStore: SettingsDataStore,
-    private val pixel: Pixel
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -59,7 +55,7 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
     val commands: Flow<Command> = _commands.receiveAsFlow()
 
     data class ViewState(
-        val websitePermissions: List<WebsitePermissionSetting> = listOf()
+        val websitePermissions: List<WebsitePermissionSetting> = listOf(),
     )
 
     sealed class Command {
@@ -79,19 +75,21 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
 
     private fun convertToWebsitePermissionSettings(
         sitePermissionsEntity: SitePermissionsEntity?,
-        locationPermissionEntity: LocationPermissionEntity?
+        locationPermissionEntity: LocationPermissionEntity?,
     ): List<WebsitePermissionSetting> {
-        val locationSetting = when (settingsDataStore.appLocationPermission) {
-            true -> WebsitePermissionSettingType.mapToWebsitePermissionSetting(locationPermissionEntity?.permission?.name)
-            false -> DENY
+        var locationSetting = WebsitePermissionSettingType.mapToWebsitePermissionSetting(locationPermissionEntity?.permission?.name)
+        if (locationSetting == ASK && !settingsDataStore.appLocationPermission) {
+            locationSetting = ASK_DISABLED
         }
-        val cameraSetting = when (sitePermissionsRepository.askCameraEnabled) {
-            true -> WebsitePermissionSettingType.mapToWebsitePermissionSetting(sitePermissionsEntity?.askCameraSetting)
-            false -> DENY
+
+        var cameraSetting = WebsitePermissionSettingType.mapToWebsitePermissionSetting(sitePermissionsEntity?.askCameraSetting)
+        if (cameraSetting == ASK && !sitePermissionsRepository.askCameraEnabled) {
+            cameraSetting = ASK_DISABLED
         }
-        val micSetting = when (sitePermissionsRepository.askMicEnabled) {
-            true -> WebsitePermissionSettingType.mapToWebsitePermissionSetting(sitePermissionsEntity?.askMicSetting)
-            false -> DENY
+
+        var micSetting = WebsitePermissionSettingType.mapToWebsitePermissionSetting(sitePermissionsEntity?.askMicSetting)
+        if (micSetting == ASK && !sitePermissionsRepository.askMicEnabled) {
+            micSetting = ASK_DISABLED
         }
 
         return getSettingsList(locationSetting, cameraSetting, micSetting)
@@ -100,24 +98,24 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
     private fun getSettingsList(
         locationSetting: WebsitePermissionSettingType,
         cameraSetting: WebsitePermissionSettingType,
-        micSetting: WebsitePermissionSettingType
+        micSetting: WebsitePermissionSettingType,
     ): List<WebsitePermissionSetting> {
         return listOf(
             WebsitePermissionSetting(
                 R.drawable.ic_location,
                 R.string.sitePermissionsSettingsLocation,
-                locationSetting
+                locationSetting,
             ),
             WebsitePermissionSetting(
                 R.drawable.ic_camera,
                 R.string.sitePermissionsSettingsCamera,
-                cameraSetting
+                cameraSetting,
             ),
             WebsitePermissionSetting(
                 R.drawable.ic_microphone,
                 R.string.sitePermissionsSettingsMicrophone,
-                micSetting
-            )
+                micSetting,
+            ),
         )
     }
 
@@ -141,19 +139,25 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
 
         when (editedPermissionSetting.title) {
             R.string.sitePermissionsSettingsLocation -> {
-                askLocationSetting = editedPermissionSetting.setting
+                askLocationSetting = when (editedPermissionSetting.setting == ASK && !settingsDataStore.appLocationPermission) {
+                    true -> ASK_DISABLED
+                    false -> editedPermissionSetting.setting
+                }
                 updateLocationSetting(editedPermissionSetting.setting, url)
-                fireSettingChangedPixel(PixelValue.LOCATION, askLocationSetting)
             }
             R.string.sitePermissionsSettingsCamera -> {
-                askCameraSetting = editedPermissionSetting.setting
+                askCameraSetting = when (editedPermissionSetting.setting == ASK && !sitePermissionsRepository.askCameraEnabled) {
+                    true -> ASK_DISABLED
+                    false -> editedPermissionSetting.setting
+                }
                 updateSitePermissionsSetting(askCameraSetting, askMicSetting, url)
-                fireSettingChangedPixel(PixelValue.CAMERA, askCameraSetting)
             }
             R.string.sitePermissionsSettingsMicrophone -> {
-                askMicSetting = editedPermissionSetting.setting
+                askMicSetting = when (editedPermissionSetting.setting == ASK && !sitePermissionsRepository.askMicEnabled) {
+                    true -> ASK_DISABLED
+                    false -> editedPermissionSetting.setting
+                }
                 updateSitePermissionsSetting(askCameraSetting, askMicSetting, url)
-                fireSettingChangedPixel(PixelValue.MIC, askMicSetting)
             }
         }
 
@@ -162,7 +166,7 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
 
     private fun updateLocationSetting(locationSetting: WebsitePermissionSettingType, url: String) {
         val locationPermissionType = when (locationSetting) {
-            ASK -> LocationPermissionType.ALLOW_ONCE
+            ASK, ASK_DISABLED -> LocationPermissionType.ALLOW_ONCE
             DENY -> LocationPermissionType.DENY_ALWAYS
             ALLOW -> LocationPermissionType.ALLOW_ALWAYS
         }
@@ -171,27 +175,15 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
         }
     }
 
-    private fun fireSettingChangedPixel(permissionParamValue: String, newPermissionSetting: WebsitePermissionSettingType) {
-        val permissionChangedValue = when (newPermissionSetting) {
-            ASK -> PixelValue.ASK
-            DENY -> PixelValue.DENY
-            ALLOW -> PixelValue.ALLOW
-        }
-        pixel.fire(
-            SitePermissionsPixelName.SITE_PERMISSIONS_SETTING_CHANGED,
-            mapOf(PixelParameter.SITE_PERMISSION to permissionParamValue, PixelParameter.VALUE to permissionChangedValue)
-        )
-    }
-
     private fun updateSitePermissionsSetting(
         askCameraSetting: WebsitePermissionSettingType,
         askMicSetting: WebsitePermissionSettingType,
-        url: String
+        url: String,
     ) {
         val sitePermissionsEntity = SitePermissionsEntity(
             domain = url,
             askCameraSetting = askCameraSetting.toSitePermissionSettingEntityType().name,
-            askMicSetting = askMicSetting.toSitePermissionSettingEntityType().name
+            askMicSetting = askMicSetting.toSitePermissionSettingEntityType().name,
         )
         viewModelScope.launch {
             sitePermissionsRepository.savePermission(sitePermissionsEntity)

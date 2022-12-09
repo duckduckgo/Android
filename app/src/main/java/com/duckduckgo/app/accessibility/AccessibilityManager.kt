@@ -22,19 +22,19 @@ import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 interface AccessibilityManager {
     fun onPageFinished(
         webView: WebView,
-        url: String?
+        url: String?,
     )
 }
 
 class AppAccessibilityManager(val accessibilitySettingsDataStore: AccessibilitySettingsDataStore) : AccessibilityManager {
     override fun onPageFinished(
         webView: WebView,
-        url: String?
+        url: String?,
     ) {
         if (accessibilitySettingsDataStore.forceZoom) {
             webView.loadUrl(
                 "javascript:document.getElementsByName('viewport')[0].setAttribute('content', " +
-                    "'width=device-width,initial-scale=1.0,maximum-scale=10.0,user-scalable=yes');"
+                    "'width=device-width,initial-scale=1.0,maximum-scale=10.0,user-scalable=yes');",
             )
         }
     }

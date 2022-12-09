@@ -21,10 +21,10 @@ import androidx.test.annotation.UiThreadTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.R
-import org.mockito.kotlin.spy
-import org.mockito.kotlin.verify
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.spy
+import org.mockito.kotlin.verify
 
 class BlobConverterInjectorJsTest {
     lateinit var testee: BlobConverterInjectorJs
@@ -50,7 +50,7 @@ class BlobConverterInjectorJsTest {
 
     private fun getJsToEvaluate(): String {
         val js = InstrumentationRegistry.getInstrumentation().targetContext.resources.openRawResource(
-            R.raw.blob_converter
+            R.raw.blob_converter,
         )
             .bufferedReader()
             .use { it.readText() }

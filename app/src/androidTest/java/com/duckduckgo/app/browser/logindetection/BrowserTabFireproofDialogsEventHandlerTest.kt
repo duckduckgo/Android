@@ -20,12 +20,11 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
-import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.blockingObserve
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler.Event
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler.Event.FireproofWebSiteSuccess
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
-import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryImpl
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.events.db.UserEventEntity
 import com.duckduckgo.app.global.events.db.UserEventKey.*
@@ -34,16 +33,17 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting
 import com.duckduckgo.app.statistics.pixels.Pixel
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 class BrowserTabFireproofDialogsEventHandlerTest {
@@ -68,13 +68,13 @@ class BrowserTabFireproofDialogsEventHandlerTest {
             .allowMainThreadQueries()
             .build()
         fireproofWebsiteDao = db.fireproofWebsiteDao()
-        val fireproofWebsiteRepository = FireproofWebsiteRepository(fireproofWebsiteDao, coroutineRule.testDispatcherProvider, mock())
+        val fireproofWebsiteRepositoryImpl = FireproofWebsiteRepositoryImpl(fireproofWebsiteDao, coroutineRule.testDispatcherProvider, mock())
         testee = BrowserTabFireproofDialogsEventHandler(
             mockUserEventsStore,
             mockPixel,
-            fireproofWebsiteRepository,
+            fireproofWebsiteRepositoryImpl,
             mockAppSettingsPreferencesStore,
-            coroutineRule.testDispatcherProvider
+            coroutineRule.testDispatcherProvider,
         )
     }
 
@@ -89,7 +89,7 @@ class BrowserTabFireproofDialogsEventHandlerTest {
 
         verify(mockPixel).fire(
             pixel = AppPixelName.FIREPROOF_LOGIN_DIALOG_SHOWN,
-            parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "false")
+            parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "false"),
         )
     }
 
@@ -101,7 +101,7 @@ class BrowserTabFireproofDialogsEventHandlerTest {
 
         verify(mockPixel).fire(
             pixel = AppPixelName.FIREPROOF_LOGIN_DIALOG_SHOWN,
-            parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "true")
+            parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "true"),
         )
     }
 
@@ -111,7 +111,7 @@ class BrowserTabFireproofDialogsEventHandlerTest {
 
         verify(mockPixel).fire(
             pixel = AppPixelName.FIREPROOF_WEBSITE_LOGIN_ADDED,
-            parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "false")
+            parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "false"),
         )
     }
 
@@ -123,7 +123,7 @@ class BrowserTabFireproofDialogsEventHandlerTest {
 
         verify(mockPixel).fire(
             pixel = AppPixelName.FIREPROOF_WEBSITE_LOGIN_ADDED,
-            parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "true")
+            parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "true"),
         )
     }
 
@@ -148,7 +148,7 @@ class BrowserTabFireproofDialogsEventHandlerTest {
 
         verify(mockPixel).fire(
             pixel = AppPixelName.FIREPROOF_WEBSITE_LOGIN_DISMISS,
-            parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "false")
+            parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "false"),
         )
     }
 
@@ -159,7 +159,7 @@ class BrowserTabFireproofDialogsEventHandlerTest {
 
         verify(mockPixel).fire(
             pixel = AppPixelName.FIREPROOF_WEBSITE_LOGIN_DISMISS,
-            parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "true")
+            parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "true"),
         )
     }
 
@@ -208,7 +208,7 @@ class BrowserTabFireproofDialogsEventHandlerTest {
 
         verify(mockPixel).fire(
             pixel = AppPixelName.FIREPROOF_LOGIN_DISABLE_DIALOG_SHOWN,
-            parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "false")
+            parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "false"),
         )
     }
 
@@ -218,7 +218,7 @@ class BrowserTabFireproofDialogsEventHandlerTest {
 
         verify(mockPixel).fire(
             pixel = AppPixelName.FIREPROOF_LOGIN_DISABLE_DIALOG_DISABLE,
-            parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "false")
+            parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "false"),
         )
     }
 
@@ -230,7 +230,7 @@ class BrowserTabFireproofDialogsEventHandlerTest {
 
         verify(mockPixel).fire(
             pixel = AppPixelName.FIREPROOF_LOGIN_DISABLE_DIALOG_DISABLE,
-            parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "true")
+            parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "true"),
         )
     }
 
@@ -247,7 +247,7 @@ class BrowserTabFireproofDialogsEventHandlerTest {
 
         verify(mockPixel).fire(
             pixel = AppPixelName.FIREPROOF_LOGIN_DISABLE_DIALOG_CANCEL,
-            parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "false")
+            parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "false"),
         )
     }
 
@@ -259,7 +259,7 @@ class BrowserTabFireproofDialogsEventHandlerTest {
 
         verify(mockPixel).fire(
             pixel = AppPixelName.FIREPROOF_LOGIN_DISABLE_DIALOG_CANCEL,
-            parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "true")
+            parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "true"),
         )
     }
 
@@ -278,7 +278,7 @@ class BrowserTabFireproofDialogsEventHandlerTest {
 
         verify(mockPixel).fire(
             pixel = AppPixelName.FIREPROOF_AUTOMATIC_DIALOG_ALWAYS,
-            parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "false")
+            parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "false"),
         )
     }
 
@@ -295,7 +295,7 @@ class BrowserTabFireproofDialogsEventHandlerTest {
 
         verify(mockPixel).fire(
             pixel = AppPixelName.FIREPROOF_AUTOMATIC_DIALOG_FIREPROOF_SITE,
-            parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "false")
+            parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "false"),
         )
     }
 
@@ -312,7 +312,7 @@ class BrowserTabFireproofDialogsEventHandlerTest {
 
         verify(mockPixel).fire(
             pixel = AppPixelName.FIREPROOF_AUTOMATIC_DIALOG_NOT_NOW,
-            parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "false")
+            parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "false"),
         )
     }
 

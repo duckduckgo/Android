@@ -38,7 +38,9 @@ abstract class AutofillDao {
     @Query("select * from autofill_exceptions where domain = :domain")
     abstract fun get(domain: String): AutofillExceptionEntity
 
-    @Query("select * from autofill_exceptions") abstract fun getAll(): List<AutofillExceptionEntity>
+    @Query("select * from autofill_exceptions")
+    abstract fun getAll(): List<AutofillExceptionEntity>
 
-    @Query("delete from autofill_exceptions") abstract fun deleteAll()
+    @Query("delete from autofill_exceptions")
+    abstract fun deleteAll()
 }

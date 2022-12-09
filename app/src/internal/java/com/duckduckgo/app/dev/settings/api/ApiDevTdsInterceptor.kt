@@ -20,16 +20,16 @@ import com.duckduckgo.app.dev.settings.db.DevSettingsDataStore
 import com.duckduckgo.app.global.api.ApiInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 import okhttp3.Interceptor
 import okhttp3.Response
-import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = ApiInterceptorPlugin::class
+    boundType = ApiInterceptorPlugin::class,
 )
 class ApiDevTdsInterceptor @Inject constructor(
-    private val devSettingsDataStore: DevSettingsDataStore
+    private val devSettingsDataStore: DevSettingsDataStore,
 ) : ApiInterceptorPlugin, Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {

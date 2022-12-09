@@ -26,10 +26,10 @@ import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.CoroutineScope
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import logcat.logcat
 
 @ContributesMultibinding(VpnScope::class)
 class AppTPCPUMonitor @Inject constructor(
@@ -44,22 +44,22 @@ class AppTPCPUMonitor @Inject constructor(
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         if (appTpFeatureConfig.isEnabled(AppTpSetting.CPUMonitoring)) {
-            Timber.d("AppTpSetting.CPUMonitoring is enabled, starting monitoring")
+            logcat { "AppTpSetting.CPUMonitoring is enabled, starting monitoring" }
             val work = PeriodicWorkRequestBuilder<CPUMonitorWorker>(4, TimeUnit.HOURS)
                 .setInitialDelay(10, TimeUnit.MINUTES) // let the CPU usage settle after VPN restart
                 .build()
 
             workManager.enqueueUniquePeriodicWork(APP_TRACKER_CPU_MONITOR_WORKER_TAG, ExistingPeriodicWorkPolicy.KEEP, work)
         } else {
-            Timber.d("AppTpSetting.CPUMonitoring is disabled")
+            logcat { "AppTpSetting.CPUMonitoring is disabled" }
         }
     }
 
     override fun onVpnStopped(
         coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
+        vpnStopReason: VpnStopReason,
     ) {
-        Timber.v("AppTpSetting.CPUMonitoring - stopping")
+        logcat { "AppTpSetting.CPUMonitoring - stopping" }
         workManager.cancelUniqueWork(APP_TRACKER_CPU_MONITOR_WORKER_TAG)
     }
 }

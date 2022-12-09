@@ -31,11 +31,11 @@ import dagger.android.AndroidInjector
 import dagger.android.HasDaggerInjector
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
+import java.io.File
+import javax.inject.Inject
 import kotlinx.coroutines.*
 import org.threeten.bp.zone.ZoneRulesProvider
 import timber.log.Timber
-import java.io.File
-import javax.inject.Inject
 
 private const val VPN_PROCESS_NAME = "vpn"
 
@@ -62,6 +62,9 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
 
     @Inject
     lateinit var injectorFactoryMap: DaggerMap<Class<*>, AndroidInjector.Factory<*, *>>
+
+    @Inject
+    lateinit var dispatchers: DispatcherProvider
 
     private val applicationCoroutineScope = CoroutineScope(SupervisorJob())
 
@@ -146,7 +149,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
     // also help with memory
     override fun getDir(
         name: String?,
-        mode: Int
+        mode: Int,
     ): File {
         val dir = super.getDir(name, mode)
         runInSecondaryProcessNamed(VPN_PROCESS_NAME) {
@@ -178,7 +181,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
     private fun initializeDateLibrary() {
         AndroidThreeTen.init(this)
         // Query the ZoneRulesProvider so that it is loaded on a background coroutine
-        GlobalScope.launch(Dispatchers.IO) {
+        GlobalScope.launch(dispatchers.io()) {
             ZoneRulesProvider.getAvailableZoneIds()
         }
     }
@@ -197,7 +200,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
                 """
                 Could not find the dagger component for ${key.simpleName}.
                 You probably forgot to create the ${key.simpleName}Component
-                """.trimIndent()
+                """.trimIndent(),
             )
     }
 }

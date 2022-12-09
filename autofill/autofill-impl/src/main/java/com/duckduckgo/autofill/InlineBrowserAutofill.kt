@@ -20,17 +20,17 @@ import android.webkit.WebView
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 @ContributesBinding(FragmentScope::class)
 class InlineBrowserAutofill @Inject constructor(
-    private val autofillInterface: AutofillJavascriptInterface
+    private val autofillInterface: AutofillJavascriptInterface,
 ) : BrowserAutofill {
 
     override fun addJsInterface(
         webView: WebView,
-        callback: Callback
+        callback: Callback,
     ) {
         Timber.v("Injecting BrowserAutofill interface")
         // Adding the interface regardless if the feature is available or not
@@ -49,5 +49,9 @@ class InlineBrowserAutofill @Inject constructor(
         } else {
             autofillInterface.injectCredentials(credentials)
         }
+    }
+
+    override fun cancelPendingAutofillRequestToChooseCredentials() {
+        autofillInterface.cancelRetrievingStoredLogins()
     }
 }

@@ -24,7 +24,7 @@ import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class RealTaskStackBuilderFactory @Inject constructor(
-    private val context: Context
+    private val context: Context,
 ) : TaskStackBuilderFactory {
     override fun createTaskBuilder(): TaskStackBuilder {
         return TaskStackBuilder.create(context)

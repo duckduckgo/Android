@@ -16,41 +16,39 @@
 
 <resources>
 
-    <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</string>
-
     <!--Main-->
-    <string name="tab_title_color_palette">Color Palette</string>
-    <string name="tab_title_typography">Typography</string>
-    <string name="tab_title_dialogs">DIALOGS</string>
-    <string name="tab_title_component_interactive">Interactive</string>
-    <string name="tab_title_component_cards">Cards</string>
-    <string name="tab_title_component_messaging">Messaging</string>
-    <string name="tab_title_component_list_items">List items</string>
-    <string name="tab_title_component_others">Others</string>
-    <string name="tab_title_component_system">System</string>
+    <string name="tab_title_color_palette" translatable="false">Color Palette</string>
+    <string name="tab_title_typography" translatable="false">Typography</string>
+    <string name="tab_title_buttons" translatable="false">Buttons</string>
+    <string name="tab_title_text_input" translatable="false">Text Input</string>
+    <string name="tab_title_dialogs" translatable="false">Dialogs</string>
+    <string name="tab_title_component_interactive" translatable="false">Interactive</string>
+    <string name="tab_title_component_messaging" translatable="false">Messaging</string>
+    <string name="tab_title_component_list_items" translatable="false">List items</string>
+    <string name="tab_title_component_others" translatable="false">Others</string>
 
     <!--Components-->
-    <string name="text_headline">Headline</string>
-    <string name="button_left_button_label">Left</string>
-    <string name="button_center_button_label">Center</string>
-    <string name="button_right_button_label">Right</string>
-    <string name="top_app_bar_label_title">Top app bar</string>
-    <string name="app_bar_menu_share">Share</string>
-    <string name="app_bar_menu_search">Search</string>
-    <string name="app_bar_menu_bookmark">Bookmark</string>
-    <string name="switch_label_title">Switch</string>
-    <string name="radio_button_label_title">Radio button</string>
-    <string name="checkbox_label_title">Checkbox</string>
-    <string name="snackbar_label_title">Snackbar</string>
-    <string name="text_dialog_title">Title</string>
-    <string name="text_dialog_message">You can put as much text in here as you like. This dialog scales automagically.</string>
-    <string name="text_dialog_positive">Keep using</string>
-    <string name="text_dialog_negative">Negative</string>
-    <string name="text_dialog_option">Option</string>
+    <string name="text_headline" translatable="false">Headline</string>
+    <string name="button_left_button_label" translatable="false">Left</string>
+    <string name="button_center_button_label" translatable="false">Center</string>
+    <string name="button_right_button_label" translatable="false">Right</string>
+    <string name="top_app_bar_label_title" translatable="false">Top app bar</string>
+    <string name="app_bar_menu_share" translatable="false">Share</string>
+    <string name="app_bar_menu_search" translatable="false">Search</string>
+    <string name="app_bar_menu_bookmark" translatable="false">Bookmark</string>
+    <string name="switch_label_title" translatable="false">Switch</string>
+    <string name="radio_button_label_title" translatable="false">Radio button</string>
+    <string name="checkbox_label_title" translatable="false">Checkbox</string>
+    <string name="snackbar_label_title" translatable="false">Snackbar</string>
+    <string name="text_dialog_title" translatable="false">Title</string>
+    <string name="text_dialog_message" translatable="false">You can put as much text in here as you like. This dialog scales automagically.</string>
+    <string name="text_dialog_positive" translatable="false">Keep using</string>
+    <string name="text_dialog_negative" translatable="false">Negative</string>
+    <string name="text_dialog_option" translatable="false">Option</string>
 
     <!-- Defaults Searchbar -->
-    <string name="searchbar_cleartextaction_content_description_default">Collapse</string>
-    <string name="searchbar_searchhint_default">Search</string>
-    <string name="searchbar_upaction_content_description_default">Navigate up</string>
+    <string name="searchbar_cleartextaction_content_description_default" translatable="false">Collapse</string>
+    <string name="searchbar_searchhint_default" translatable="false">Search</string>
+    <string name="searchbar_upaction_content_description_default" translatable="false">Navigate up</string>
 
 </resources>

@@ -23,17 +23,17 @@ import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.cookies.api.RemoveCookiesStrategy
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import kotlinx.coroutines.withContext
-import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 @ContributesBinding(AppScope::class)
 class WebViewCookieManager @Inject constructor(
     private val cookieManager: CookieManagerProvider,
     private val removeCookies: RemoveCookiesStrategy,
-    private val dispatcher: DispatcherProvider
+    private val dispatcher: DispatcherProvider,
 ) : DuckDuckGoCookieManager {
 
     override suspend fun removeExternalCookies() {
@@ -91,5 +91,4 @@ class WebViewCookieManager @Inject constructor(
     companion object {
         private val DDG_COOKIE_DOMAINS = listOf(AppUrl.Url.COOKIES, AppUrl.Url.SURVEY_COOKIES)
     }
-
 }

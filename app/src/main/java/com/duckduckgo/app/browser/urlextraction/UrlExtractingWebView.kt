@@ -28,7 +28,7 @@ class UrlExtractingWebView(
     context: Context,
     webViewClient: UrlExtractingWebViewClient,
     userAgentProvider: UserAgentProvider,
-    urlExtractor: DOMUrlExtractor
+    urlExtractor: DOMUrlExtractor,
 ) : WebView(context) {
 
     var urlExtractionListener: UrlExtractionListener? = null

@@ -29,14 +29,12 @@ import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatter
 
 @Database(
-    exportSchema = true, version = 27,
+    exportSchema = true,
+    version = 32,
     entities = [
-        VpnState::class,
         VpnTracker::class,
-        VpnRunningStats::class,
         VpnServiceStateStats::class,
         HeartBeatEntity::class,
-        VpnPhoenixEntity::class,
         VpnNotification::class,
         AppTracker::class,
         AppTrackerMetadata::class,
@@ -50,35 +48,30 @@ import org.threeten.bp.format.DateTimeFormatter
         AppTrackerSystemAppOverrideListMetadata::class,
         AppTrackerEntity::class,
         VpnFeatureRemoverState::class,
-        VpnAddressLookup::class,
-    ]
+    ],
 )
 
 @TypeConverters(VpnTypeConverters::class)
 abstract class VpnDatabase : RoomDatabase() {
 
-    abstract fun vpnStateDao(): VpnStateDao
     abstract fun vpnTrackerDao(): VpnTrackerDao
-    abstract fun vpnRunningStatsDao(): VpnRunningStatsDao
     abstract fun vpnHeartBeatDao(): VpnHeartBeatDao
-    abstract fun vpnPhoenixDao(): VpnPhoenixDao
     abstract fun vpnNotificationsDao(): VpnNotificationsDao
     abstract fun vpnAppTrackerBlockingDao(): VpnAppTrackerBlockingDao
     abstract fun vpnServiceStateDao(): VpnServiceStateStatsDao
     abstract fun vpnSystemAppsOverridesDao(): VpnAppTrackerSystemAppsOverridesDao
     abstract fun vpnFeatureRemoverDao(): VpnFeatureRemoverDao
-    abstract fun vpnAddressLookupDao(): VpnAddressLookupDao
     companion object {
 
         private val MIGRATION_18_TO_19: Migration = object : Migration(18, 19) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL(
                     "CREATE TABLE IF NOT EXISTS `vpn_app_tracker_system_app_override_list`" +
-                        " (`packageId` TEXT NOT NULL, PRIMARY KEY (`packageId`))"
+                        " (`packageId` TEXT NOT NULL, PRIMARY KEY (`packageId`))",
                 )
                 database.execSQL(
                     "CREATE TABLE IF NOT EXISTS `vpn_app_tracker_system_app_override_list_metadata`" +
-                        " (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `eTag` TEXT)"
+                        " (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `eTag` TEXT)",
                 )
             }
         }
@@ -88,7 +81,7 @@ abstract class VpnDatabase : RoomDatabase() {
                 database.execSQL(
                     "CREATE TABLE IF NOT EXISTS `vpn_app_tracker_entities`" +
                         " (`trackerCompanyId` INTEGER PRIMARY KEY NOT NULL, `entityName` TEXT NOT NULL, " +
-                        "`score` INTEGER NOT NULL, `signals` TEXT NOT NULL)"
+                        "`score` INTEGER NOT NULL, `signals` TEXT NOT NULL)",
                 )
             }
         }
@@ -104,7 +97,7 @@ abstract class VpnDatabase : RoomDatabase() {
                 database.execSQL(
                     "CREATE TABLE IF NOT EXISTS `vpn_feature_remover`" +
                         " (`id` INTEGER PRIMARY KEY NOT NULL, " +
-                        "`isFeatureRemoved` INTEGER NOT NULL)"
+                        "`isFeatureRemoved` INTEGER NOT NULL)",
                 )
             }
         }
@@ -114,7 +107,7 @@ abstract class VpnDatabase : RoomDatabase() {
                 database.execSQL(
                     "CREATE TABLE IF NOT EXISTS `vpn_prefs`" +
                         " (`preference` TEXT PRIMARY KEY NOT NULL, " +
-                        "`value` INTEGER NOT NULL)"
+                        "`value` INTEGER NOT NULL)",
                 )
             }
         }
@@ -130,7 +123,7 @@ abstract class VpnDatabase : RoomDatabase() {
                 database.execSQL(
                     "CREATE TABLE IF NOT EXISTS `vpn_address_lookup`" +
                         " (`address` TEXT PRIMARY KEY NOT NULL, " +
-                        "`domain` TEXT NOT NULL)"
+                        "`domain` TEXT NOT NULL)",
                 )
             }
         }
@@ -142,6 +135,76 @@ abstract class VpnDatabase : RoomDatabase() {
         }
 
         private val MIGRATION_26_TO_27: Migration = object : Migration(26, 27) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE `vpn_service_state_stats` ADD COLUMN `alwaysOnEnabled` INTEGER NOT NULL DEFAULT 0")
+                database.execSQL("ALTER TABLE `vpn_service_state_stats` ADD COLUMN `alwaysOnLockedDown` INTEGER NOT NULL DEFAULT 0")
+            }
+        }
+
+        private val MIGRATION_27_TO_28: Migration = object : Migration(27, 28) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // https://stackoverflow.com/a/57797179/980345
+                // SQLite does not support Alter table operations like Foreign keys
+
+                // delete the old table
+                database.execSQL("DROP TABLE IF EXISTS `vpn_tracker`")
+
+                // create the new table
+                database.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `vpn_tracker`" +
+                        "(trackerCompanyId INTEGER NOT NULL, domain TEXT NOT NULL, company TEXT NOT NULL," +
+                        "companyDisplayName TEXT NOT NULL, packageId TEXT NOT NULL, appDisplayName TEXT NOT NULL," +
+                        "timestamp TEXT NOT NULL, bucket TEXT NOT NULL, count INTEGER NOT NULL, PRIMARY KEY(bucket, domain, packageId))",
+                )
+
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_vpn_tracker_bucket` ON `vpn_tracker` (`bucket`)")
+            }
+        }
+
+        private val MIGRATION_28_TO_29: Migration = object : Migration(28, 29) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("DROP TABLE IF EXISTS `vpn_running_stats`")
+            }
+        }
+
+        private val MIGRATION_29_TO_30: Migration = object : Migration(29, 30) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("DROP TABLE IF EXISTS `vpn_address_lookup`")
+            }
+        }
+
+        private val MIGRATION_30_TO_31: Migration = object : Migration(30, 31) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("DROP TABLE IF EXISTS `vpn_state`")
+                database.execSQL("DROP TABLE IF EXISTS `vpn_phoenix`")
+
+                database.execSQL(
+                    """
+                    CREATE TABLE `vpn_service_state_stats_new` (
+                      `timestamp` INTEGER NOT NULL,
+                      `state` TEXT PRIMARY KEY NOT NULL,
+                      `stopReason` TEXT NOT NULL,
+                      `alwaysOnEnabled` INTEGER NOT NULL,
+                      `alwaysOnLockedDown` INTEGER NOT NULL
+                    )
+                    """.trimIndent(),
+                )
+
+                database.execSQL(
+                    """
+                    INSERT INTO vpn_service_state_stats_new (timestamp, state, stopReason, alwaysOnEnabled, alwaysOnLockedDown)
+                    SELECT 1, state, stopReason, alwaysOnEnabled, alwaysOnLockedDown
+                    FROM vpn_service_state_stats
+                    ORDER BY id DESC limit 1
+                    """.trimIndent(),
+                )
+
+                database.execSQL("DROP TABLE IF EXISTS `vpn_service_state_stats`")
+                database.execSQL("ALTER TABLE `vpn_service_state_stats_new` RENAME TO `vpn_service_state_stats`")
+            }
+        }
+
+        private val MIGRATION_31_TO_32: Migration = object : Migration(31, 32) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("ALTER TABLE `vpn_app_tracker_exclusion_list` ADD COLUMN `reason` TEXT NOT NULL DEFAULT 'UNKNOWN'")
             }
@@ -158,6 +221,11 @@ abstract class VpnDatabase : RoomDatabase() {
                 MIGRATION_24_TO_25,
                 MIGRATION_25_TO_26,
                 MIGRATION_26_TO_27,
+                MIGRATION_27_TO_28,
+                MIGRATION_28_TO_29,
+                MIGRATION_29_TO_30,
+                MIGRATION_30_TO_31,
+                MIGRATION_31_TO_32,
             )
     }
 }

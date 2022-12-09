@@ -37,13 +37,13 @@ import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.MEDIUM
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.SMALL
 import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessage
 import com.duckduckgo.remote.messaging.impl.models.asJsonFormat
-import timber.log.Timber
 import java.util.*
+import timber.log.Timber
 
 private val smallMapper: (JsonContent) -> Content = { jsonContent ->
     Small(
         titleText = jsonContent.titleText.failIfEmpty(),
-        descriptionText = jsonContent.descriptionText.failIfEmpty()
+        descriptionText = jsonContent.descriptionText.failIfEmpty(),
     )
 }
 
@@ -51,7 +51,7 @@ private val mediumMapper: (JsonContent) -> Content = { jsonContent ->
     Medium(
         titleText = jsonContent.titleText.failIfEmpty(),
         descriptionText = jsonContent.descriptionText.failIfEmpty(),
-        placeholder = jsonContent.placeholder.asPlaceholder()
+        placeholder = jsonContent.placeholder.asPlaceholder(),
     )
 }
 
@@ -61,7 +61,7 @@ private val bigMessageSingleActionMapper: (JsonContent) -> Content = { jsonConte
         descriptionText = jsonContent.descriptionText.failIfEmpty(),
         placeholder = jsonContent.placeholder.asPlaceholder(),
         primaryActionText = jsonContent.primaryActionText.failIfEmpty(),
-        primaryAction = jsonContent.primaryAction!!.toAction()
+        primaryAction = jsonContent.primaryAction!!.toAction(),
     )
 }
 
@@ -73,7 +73,7 @@ private val bigMessageTwoActionMapper: (JsonContent) -> Content = { jsonContent 
         primaryActionText = jsonContent.primaryActionText.failIfEmpty(),
         primaryAction = jsonContent.primaryAction!!.toAction(),
         secondaryActionText = jsonContent.secondaryActionText.failIfEmpty(),
-        secondaryAction = jsonContent.secondaryAction!!.toAction()
+        secondaryAction = jsonContent.secondaryAction!!.toAction(),
     )
 }
 
@@ -81,7 +81,7 @@ private val messageMappers = mapOf(
     Pair(SMALL.jsonValue, smallMapper),
     Pair(MEDIUM.jsonValue, mediumMapper),
     Pair(BIG_SINGLE_ACTION.jsonValue, bigMessageSingleActionMapper),
-    Pair(BIG_TWO_ACTION.jsonValue, bigMessageTwoActionMapper)
+    Pair(BIG_TWO_ACTION.jsonValue, bigMessageTwoActionMapper),
 )
 
 private val urlActionMapper: (JsonMessageAction) -> Action = {
@@ -104,7 +104,7 @@ private val actionMappers = mapOf(
     Pair(URL.jsonValue, urlActionMapper),
     Pair(DISMISS.jsonValue, dismissActionMapper),
     Pair(PLAYSTORE.jsonValue, playStoreActionMapper),
-    Pair(DEFAULT_BROWSER.jsonValue, defaultBrowserActionMapper)
+    Pair(DEFAULT_BROWSER.jsonValue, defaultBrowserActionMapper),
 )
 
 fun List<JsonRemoteMessage>.mapToRemoteMessage(locale: Locale): List<RemoteMessage> = this.mapNotNull { it.map(locale) }
@@ -115,7 +115,7 @@ private fun JsonRemoteMessage.map(locale: Locale): RemoteMessage? {
             id = this.id.failIfEmpty(),
             content = this.content!!.mapToContent(this.content.messageType),
             matchingRules = this.matchingRules.orEmpty(),
-            exclusionRules = this.exclusionRules.orEmpty()
+            exclusionRules = this.exclusionRules.orEmpty(),
         )
         remoteMessage.localizeMessage(this.translations, locale)
     }.onFailure {
@@ -158,7 +158,7 @@ private fun Content.localize(translations: JsonContentTranslations): Content {
             titleText = translations.titleText.takeUnless { it.isEmpty() } ?: this.titleText,
             descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText,
             primaryActionText = translations.primaryActionText.takeUnless { it.isEmpty() } ?: this.primaryActionText,
-            secondaryActionText = translations.secondaryActionText.takeUnless { it.isEmpty() } ?: this.secondaryActionText
+            secondaryActionText = translations.secondaryActionText.takeUnless { it.isEmpty() } ?: this.secondaryActionText,
         )
         is Medium -> this.copy(
             titleText = translations.titleText.takeUnless { it.isEmpty() } ?: this.titleText,

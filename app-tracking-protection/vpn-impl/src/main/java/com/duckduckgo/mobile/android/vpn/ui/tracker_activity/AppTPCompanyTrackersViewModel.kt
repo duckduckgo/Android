@@ -20,15 +20,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.mobile.android.vpn.model.VpnTrackerCompanySignal
-import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
-import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
+import com.duckduckgo.mobile.android.vpn.model.VpnTrackerCompanySignal
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackingSignal
 import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -44,7 +43,7 @@ constructor(
     private val excludedAppsRepository: TrackingProtectionAppsRepository,
     private val timeDiffFormatter: TimeDiffFormatter,
     private val deviceShieldPixels: DeviceShieldPixels,
-    private val dispatchers: DispatcherProvider
+    private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
     private val trackerCompanies = mutableMapOf<String, List<TrackingSignal>>()
@@ -59,13 +58,13 @@ constructor(
 
     suspend fun loadData(
         date: String,
-        packageName: String
+        packageName: String,
     ) {
         withContext(dispatchers.io()) {
             statsRepository
                 .getTrackersForAppFromDate(date, packageName)
                 .map { aggregateDataPerApp(it, packageName) }
-                .flowOn(Dispatchers.Default)
+                .flowOn(dispatchers.default())
                 .collectLatest { state ->
                     viewStateFlow.emit(state)
                 }
@@ -74,14 +73,15 @@ constructor(
 
     private suspend fun aggregateDataPerApp(
         trackerData: List<VpnTrackerCompanySignal>,
-        packageName: String
+        packageName: String,
     ): ViewState {
         val sourceData = mutableListOf<CompanyTrackingDetails>()
 
         val lastTrackerBlockedAgo =
             if (trackerData.isNotEmpty()) {
                 timeDiffFormatter.formatTimePassed(
-                    LocalDateTime.now(), LocalDateTime.parse(trackerData[0].tracker.timestamp)
+                    LocalDateTime.now(),
+                    LocalDateTime.parse(trackerData[0].tracker.timestamp),
                 )
             } else {
                 ""
@@ -111,18 +111,18 @@ constructor(
                 CompanyTrackingDetails(
                     companyName = trackerCompanyName,
                     companyDisplayName = trackerCompanyDisplayName,
-                    trackingAttempts = data.value.size,
+                    trackingAttempts = data.value.sumOf { it.tracker.count },
                     timestamp = timestamp,
-                    trackingSignals = trackingSignals
-                )
+                    trackingSignals = trackingSignals,
+                ),
             )
         }
 
         return viewStateFlow.value.copy(
-            totalTrackingAttempts = trackerData.size,
+            totalTrackingAttempts = sourceData.sumOf { it.trackingAttempts },
             lastTrackerBlockedAgo = lastTrackerBlockedAgo,
             trackingCompanies = sourceData,
-            protectionEnabled = excludedAppsRepository.isAppProtectionEnabled(packageName)
+            protectionEnabled = excludedAppsRepository.isAppProtectionEnabled(packageName),
         )
     }
 
@@ -134,7 +134,7 @@ constructor(
 
     fun onAppPermissionToggled(
         checked: Boolean,
-        packageName: String
+        packageName: String,
     ) {
         viewModelScope.launch {
             withContext(dispatchers.io()) {
@@ -157,7 +157,7 @@ constructor(
         val trackingCompanies: List<CompanyTrackingDetails> = emptyList(),
         val protectionEnabled: Boolean = false,
         val userChangedState: Boolean = false,
-        val manualProtectionState: Boolean = false
+        val manualProtectionState: Boolean = false,
     )
 
     internal sealed class Command {
@@ -170,6 +170,6 @@ constructor(
         val trackingAttempts: Int,
         val timestamp: String,
         val trackingSignals: List<TrackingSignal>,
-        val expanded: Boolean = false
+        val expanded: Boolean = false,
     )
 }

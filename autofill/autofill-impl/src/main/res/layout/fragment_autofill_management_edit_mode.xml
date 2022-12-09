@@ -27,26 +27,28 @@
         android:orientation="vertical"
         android:paddingVertical="@dimen/keyline_5">
 
-        <com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
             android:id="@+id/domainTitleEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:type="single_line"
             android:layout_marginBottom="@dimen/keyline_5"
             android:hint="@string/credentialManagementEditLoginTitleHint"
             android:visibility="gone"
             app:editable="true"
             app:endIconContentDescription="@string/credentialManagementEditButtonCopyUsername" />
 
-        <com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
             android:id="@+id/usernameEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/credentialManagementEditUsernameHint"
             app:editable="false"
+            app:type="single_line"
             app:endIcon="@drawable/ic_copy"
             app:endIconContentDescription="@string/credentialManagementEditButtonCopyUsername" />
 
-        <com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
             android:id="@+id/passwordEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -55,21 +57,23 @@
             app:editable="false"
             app:endIcon="@drawable/ic_copy"
             app:endIconContentDescription="@string/credentialManagementEditButtonCopyPassword"
-            app:isPassword="true" />
+            app:type="password" />
 
-        <com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
             android:id="@+id/domainEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_5"
             android:hint="@string/credentialManagementEditWebsiteHint"
+            app:type="single_line"
             app:editable="false" />
 
-        <com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
             android:id="@+id/notesEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_5"
+            app:type="multi_line"
             android:hint="@string/credentialManagementEditNotesHint"
             app:editable="false" />
 

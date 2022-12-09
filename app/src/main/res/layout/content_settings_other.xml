@@ -45,6 +45,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/settingsOtherTitle"
         app:showBetaPill="true"
+        app:primaryTextTruncated="false"
         app:secondaryText="@string/macos_settings_description"
         app:primaryText="@string/macos_settings_title" />
 
@@ -56,6 +57,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/macOsSetting"
         app:showBetaPill="true"
+        app:primaryTextTruncated="false"
         app:secondaryText="@string/settingsEmailProtectionSubtitle"
         app:primaryText="@string/settingsEmailProtectionTitle" />
 
@@ -67,6 +69,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/emailSetting"
         app:showBetaPill="true"
+        app:primaryTextTruncated="false"
         app:secondaryText="@string/atp_SettingsDeviceShieldDisabled"
         app:primaryText="@string/atp_SettingsTitle" />
 

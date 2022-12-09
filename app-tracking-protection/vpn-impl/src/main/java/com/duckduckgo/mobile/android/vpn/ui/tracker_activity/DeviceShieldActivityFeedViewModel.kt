@@ -19,37 +19,71 @@ package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 import androidx.lifecycle.*
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
+import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
+import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
+import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity
 import com.duckduckgo.mobile.android.vpn.model.BucketizedVpnTracker
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.DISABLED
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.ERROR
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
-import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.TimeWindow
-import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.AppsData
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.AppsProtectionData
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerCompanyBadge
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
-import org.threeten.bp.LocalDateTime
-import timber.log.Timber
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem.TrackerDescriptionFeed
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem.TrackerLoadingSkeleton
+import java.lang.Integer.min
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.coroutines.coroutineContext
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.*
+import logcat.logcat
+import org.threeten.bp.LocalDateTime
 
 @ContributesViewModel(FragmentScope::class)
 class DeviceShieldActivityFeedViewModel @Inject constructor(
     private val statsRepository: AppTrackerBlockingStatsRepository,
     private val dispatcherProvider: DispatcherProvider,
-    private val timeDiffFormatter: TimeDiffFormatter
+    private val timeDiffFormatter: TimeDiffFormatter,
+    private val excludedApps: TrackingProtectionAppsRepository,
+    private val vpnStateMonitor: VpnStateMonitor,
 ) : ViewModel() {
 
     private val MAX_BADGES_TO_DISPLAY = 5
     private val MAX_ELEMENTS_TO_DISPLAY = 6
+    private val MAX_ICONS_TO_DISPLAY = 4
 
     private val tickerChannel = MutableStateFlow(System.currentTimeMillis())
     private var tickerJob: Job? = null
 
+    private val refreshVpnRunningState = MutableStateFlow(System.currentTimeMillis())
+
+    sealed class Command {
+        data class ShowProtectedAppsList(
+            val vpnState: VpnState,
+        ) : Command()
+        data class ShowUnprotectedAppsList(
+            val vpnState: VpnState,
+        ) : Command()
+        data class TrackerListDisplayed(
+            val trackersListSize: Int,
+        ) : Command()
+    }
+
+    private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
+
     private fun startTickerRefresher() {
-        Timber.i("startTickerRefresher")
+        logcat { "startTickerRefresher" }
         tickerJob?.cancel()
         tickerJob = viewModelScope.launch {
             while (isActive) {
@@ -59,28 +93,122 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
         }
     }
 
+    private suspend fun getRunningState(): Flow<VpnState> = withContext(dispatcherProvider.io()) {
+        return@withContext vpnStateMonitor
+            .getStateFlow(AppTpVpnFeature.APPTP_VPN)
+            .combine(refreshVpnRunningState.asStateFlow()) { state, _ -> state }
+    }
+
     suspend fun getMostRecentTrackers(
         timeWindow: TimeWindow,
-        showHeadings: Boolean
-    ): Flow<List<TrackerFeedItem>> = withContext(dispatcherProvider.io()) {
+        config: DeviceShieldActivityFeedFragment.ActivityFeedConfig,
+    ): Flow<TrackerFeedViewState> = withContext(dispatcherProvider.io()) {
+        val showHeadings = config.showTimeWindowHeadings
         return@withContext statsRepository.getMostRecentVpnTrackers { timeWindow.asString() }
             .combine(tickerChannel.asStateFlow()) { trackers, _ -> trackers }
             .map { aggregateDataPerApp(it, showHeadings) }
-            .flowOn(Dispatchers.Default)
-            .map { it.ifEmpty { listOf(TrackerFeedItem.TrackerEmptyFeed) } }
+            .combine(getRunningState()) { trackers, runningState ->
+                TrackerFeedIntermediateData(trackers, runningState)
+            }
+            .combine(getAppsData()) { trackerIntermediateState, appsProtectionData ->
+                val trackers = if (trackerIntermediateState.trackers.isEmpty()) {
+                    listOf(TrackerDescriptionFeed)
+                } else {
+                    trackerIntermediateState.trackers
+                }
+                val appDataItems = if (appendAppsData(trackers, trackerIntermediateState.runningState, appsProtectionData, config)) {
+                    listOf(TrackerFeedItem.TrackerTrackerAppsProtection(appsProtectionData))
+                } else {
+                    emptyList()
+                }
+                TrackerFeedViewState(trackers + appDataItems, trackerIntermediateState.runningState)
+            }
+            .flowOn(dispatcherProvider.default())
             .onStart {
                 startTickerRefresher()
-                emit(listOf(TrackerFeedItem.TrackerLoadingSkeleton))
+                emit(TrackerFeedViewState(listOf(TrackerLoadingSkeleton), VpnState(DISABLED, ERROR)))
                 delay(300)
             }
     }
 
+    fun trackerListDisplayed(viewState: TrackerFeedViewState) {
+        viewModelScope.launch {
+            if (viewState.trackers.isNotEmpty() && viewState.trackers.first() != TrackerLoadingSkeleton) {
+                command.send(Command.TrackerListDisplayed(viewState.trackers.size))
+            }
+        }
+    }
+
+    fun showAppsList(vpnState: VpnState, item: TrackerFeedItem.TrackerTrackerAppsProtection) {
+        viewModelScope.launch {
+            if (item.selectedFilter == TrackingProtectionExclusionListActivity.Companion.AppsFilter.PROTECTED_ONLY) {
+                command.send(Command.ShowProtectedAppsList(vpnState))
+            } else if (item.selectedFilter == TrackingProtectionExclusionListActivity.Companion.AppsFilter.UNPROTECTED_ONLY) {
+                command.send(Command.ShowUnprotectedAppsList(vpnState))
+            }
+        }
+    }
+
+    fun commands(): Flow<Command> {
+        return command.receiveAsFlow()
+    }
+
+    internal data class TrackerFeedIntermediateData(
+        val trackers: List<TrackerFeedItem>,
+        val runningState: VpnState,
+    )
+    data class TrackerFeedViewState(
+        val trackers: List<TrackerFeedItem>,
+        val vpnState: VpnState,
+    )
+
+    private suspend fun getAppsData(): Flow<AppsProtectionData> = withContext(dispatcherProvider.io()) {
+        return@withContext excludedApps.getAppsAndProtectionInfo().map { list ->
+            val unprotected = list.filter { it.isExcluded }
+            val protected = list.filter { !it.isExcluded }
+            val unprotectedCount = unprotected.size
+            val protectedCount = list.size - unprotectedCount
+
+            val protectedAppsData = AppsData(
+                appsCount = protectedCount,
+                isProtected = true,
+                packageNames = getPackageNamesList(protected),
+            )
+
+            val unProtectedAppsData = AppsData(
+                appsCount = unprotectedCount,
+                isProtected = false,
+                packageNames = getPackageNamesList(unprotected),
+            )
+
+            AppsProtectionData(protectedAppsData, unProtectedAppsData)
+        }
+    }
+
+    private fun appendAppsData(
+        trackers: List<TrackerFeedItem>,
+        vpnState: VpnState,
+        appsProtectionData: AppsProtectionData?,
+        config: DeviceShieldActivityFeedFragment.ActivityFeedConfig,
+    ): Boolean {
+        return vpnState.state == VpnStateMonitor.VpnRunningState.ENABLED &&
+            trackers.size < config.maxRows &&
+            !config.unboundedRows() &&
+            appsProtectionData != null
+    }
+
+    private fun getPackageNamesList(appInfoList: List<TrackingProtectionAppInfo>): List<String> {
+        if (appInfoList.isEmpty()) return emptyList()
+        val size = min(appInfoList.size, MAX_ICONS_TO_DISPLAY)
+        return appInfoList.slice(IntRange(0, size - 1)).map { it.packageName }
+    }
+
     private suspend fun aggregateDataPerApp(
         trackerData: List<BucketizedVpnTracker>,
-        showHeadings: Boolean
+        showHeadings: Boolean,
     ): List<TrackerFeedItem> {
         val sourceData = mutableListOf<TrackerFeedItem>()
-        val perSessionData = trackerData.groupBy { it.bucket }
+        val perSessionData = trackerData.groupBy { it.trackerCompanySignal.tracker.bucket }
 
         perSessionData.values.forEach { sessionTrackers ->
             coroutineContext.ensureActive()
@@ -107,33 +235,39 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
                             companyName = trackerCompanyName,
                             companyDisplayName = trackerCompanyDisplayName,
                             timestamp = timestamp,
-                            companyPrevalence = trackerCompanyPrevalence
-                        )
+                            companyPrevalence = trackerCompanyPrevalence,
+                        ),
                     )
-                    totalTrackerCount += trackerBucket.value.size
+                    totalTrackerCount += trackerBucket.value.sumOf { it.trackerCompanySignal.tracker.count }
                 }
 
                 if (firstInBucket && showHeadings) {
-                    sourceData.add(TrackerFeedItem.TrackerFeedItemHeader(item.trackerCompanySignal.tracker.timestamp))
-                        .also { firstInBucket = false }
+                    sourceData.add(
+                        TrackerFeedItem.TrackerFeedItemHeader(
+                            timeDiffFormatter.formatTimePassedInDays(
+                                LocalDateTime.now(),
+                                LocalDateTime.parse(item.trackerCompanySignal.tracker.timestamp),
+                            ),
+                        ),
+                    ).also { firstInBucket = false }
                 }
 
                 sourceData.add(
                     TrackerFeedItem.TrackerFeedData(
-                        id = item.bucket.hashCode() + item.trackerCompanySignal.tracker.trackingApp.packageId.hashCode(),
-                        bucket = item.bucket,
+                        id = item.trackerCompanySignal.tracker.bucket.hashCode() + item.trackerCompanySignal.tracker.trackingApp.packageId.hashCode(),
+                        bucket = item.trackerCompanySignal.tracker.bucket,
                         trackingApp = TrackingApp(
                             item.trackerCompanySignal.tracker.trackingApp.packageId,
-                            item.trackerCompanySignal.tracker.trackingApp.appDisplayName
+                            item.trackerCompanySignal.tracker.trackingApp.appDisplayName,
                         ),
                         trackersTotalCount = totalTrackerCount,
                         trackingCompanyBadges = mapTrackingCompanies(trackingCompanyInfo),
                         timestamp = item.trackerCompanySignal.tracker.timestamp,
                         displayTimestamp = timeDiffFormatter.formatTimePassed(
                             LocalDateTime.now(),
-                            LocalDateTime.parse(item.trackerCompanySignal.tracker.timestamp)
-                        )
-                    )
+                            LocalDateTime.parse(item.trackerCompanySignal.tracker.timestamp),
+                        ),
+                    ),
                 )
             }
         }
@@ -162,7 +296,6 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
         val companyName: String,
         val companyDisplayName: String,
         val timestamp: String,
-        val companyPrevalence: Int
+        val companyPrevalence: Int,
     )
-
 }

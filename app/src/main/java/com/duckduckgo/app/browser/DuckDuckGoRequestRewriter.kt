@@ -34,7 +34,7 @@ class DuckDuckGoRequestRewriter(
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val statisticsStore: StatisticsDataStore,
     private val variantManager: VariantManager,
-    private val appReferrerDataStore: AppReferrerDataStore
+    private val appReferrerDataStore: AppReferrerDataStore,
 ) : RequestRewriter {
 
     override fun rewriteRequestWithCustomQueryParams(request: Uri): Uri {

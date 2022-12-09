@@ -17,6 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.network
 
 import android.os.ParcelFileDescriptor
+import java.net.InetAddress
 
 interface VpnNetworkStack {
 
@@ -24,11 +25,17 @@ interface VpnNetworkStack {
     val name: String
 
     /**
-     * Called before the networking layer is enabled
      *
      * @return `true` if the networking layer is successfully created, `false` otherwise
      */
     fun onCreateVpn(): Result<Unit>
+
+    /**
+     * Called before the vpn tunnel is created and before the vpn is started.
+     *
+     * @return VpnTunnelConfig that will be used to configures the VPN's tunnel.
+     */
+    fun onPrepareVpn(): Result<VpnTunnelConfig>
 
     /**
      * Called before the VPN is started
@@ -52,7 +59,19 @@ interface VpnNetworkStack {
     fun onDestroyVpn(): Result<Unit>
 
     /**
-     * @return the MTU size you wish the VPN service to set
+     * Additional configuration data to be set to the VPN tunnel
+     *
+     * @param mtu the MTU size you wish the VPN service to set
+     * @param addresses the address you wish to set to the VPN service. They key contains the InetAddress of the address and
+     * value should be the mask width.
+     * @param dns the additional dns servers you wish to add to the VPN service
+     * @param routes the additional routes you wish to add to the VPN service. The key contains the InetAddress of the route and
+     * value should be the mask width.
      */
-    fun mtu(): Int
+    data class VpnTunnelConfig(
+        val mtu: Int,
+        val addresses: Map<InetAddress, Int>,
+        val dns: Set<InetAddress>,
+        val routes: Map<InetAddress, Int>,
+    )
 }

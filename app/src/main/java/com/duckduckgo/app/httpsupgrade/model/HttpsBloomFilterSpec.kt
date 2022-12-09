@@ -25,7 +25,7 @@ data class HttpsBloomFilterSpec(
     val bitCount: Int,
     val errorRate: Double,
     val totalEntries: Int,
-    val sha256: String
+    val sha256: String,
 ) {
     companion object {
         const val HTTPS_BINARY_FILE = "HTTPS_BINARY_FILE"

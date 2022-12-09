@@ -36,7 +36,6 @@ import com.duckduckgo.app.global.exception.UncaughtExceptionSource
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.privacy.config.api.Drm
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
-import org.mockito.kotlin.*
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
@@ -46,6 +45,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.ArgumentMatchers.anyString
+import org.mockito.kotlin.*
 
 @ExperimentalCoroutinesApi
 class BrowserChromeClientTest {
@@ -78,7 +78,7 @@ class BrowserChromeClientTest {
             mockAppBuildConfig,
             TestScope(),
             coroutineTestRule.testDispatcherProvider,
-            mockSitePermissionsManager
+            mockSitePermissionsManager,
         )
         mockWebViewClientListener = mock()
         mockFilePathCallback = mock()
@@ -144,7 +144,7 @@ class BrowserChromeClientTest {
     @Test
     fun whenOnProgressChangedCalledThenListenerInstructedToUpdateProgress() {
         testee.onProgressChanged(webView, 10)
-        verify(mockWebViewClientListener).progressChanged(10)
+        verify(mockWebViewClientListener).progressChanged(20) // Value should come from the webView instance
     }
 
     @UiThreadTest
@@ -152,6 +152,16 @@ class BrowserChromeClientTest {
     fun whenOnProgressChangedCalledThenListenerInstructedToUpdateNavigationState() {
         testee.onProgressChanged(webView, 10)
         verify(mockWebViewClientListener).navigationStateChanged(any())
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnProgressChangedCalledAndValueIsZeroThenNothingCalled() {
+        val mockWebView: WebView = mock()
+        whenever(mockWebView.progress).thenReturn(0)
+        testee.onProgressChanged(mockWebView, 10)
+        verify(mockWebViewClientListener, never()).navigationStateChanged(any())
+        verify(mockWebViewClientListener, never()).progressChanged(any())
     }
 
     @UiThreadTest
@@ -292,6 +302,10 @@ class BrowserChromeClientTest {
     private class TestWebView(context: Context) : WebView(context) {
         override fun getUrl(): String {
             return "https://example.com"
+        }
+
+        override fun getProgress(): Int {
+            return 20
         }
     }
 }

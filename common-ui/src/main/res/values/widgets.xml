@@ -152,12 +152,48 @@
         <item name="android:layout_height">wrap_content</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.InfoPanel.Text" parent="TextAppearance.DuckDuckGo.Body2">
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textColor">@color/almostBlackDark</item>
+    <!-- Buttons -->
+    <style name="Widget.DuckDuckGo.DaxButton.TextButton" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textAppearance">?attr/textAppearanceButton</item>
+        <item name="shapeAppearance">?shapeAppearanceSmallComponent</item>
     </style>
 
-    <!-- Buttons -->
+    <style name="Widget.DuckDuckGo.DaxButton.TextButton.Primary">
+        <item name="android:textColor">@color/button_primary_text_color_selector</item>
+        <item name="backgroundTint">@color/button_primary_container_selector</item>
+        <item name="rippleColor">@color/button_primary_ripple_selector</item>
+        <item name="iconTint">@color/button_primary_text_color_selector</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.DaxButton.TextButton.Destructive">
+        <item name="android:textColor">@color/button_primary_text_color_selector</item>
+        <item name="backgroundTint">@color/button_destructive_container_selector</item>
+        <item name="rippleColor">@color/button_destructive_ripple_selector</item>
+        <item name="iconTint">@color/button_primary_text_color_selector</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.DaxButton.Secondary" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:textColor">@color/button_secondary_text_color_selector</item>
+        <item name="shapeAppearance">?attr/shapeAppearanceSmallComponent</item>
+        <item name="strokeColor">@color/button_secondary_stroke_selector</item>
+        <item name="rippleColor">@color/button_secondary_ripple_selector</item>
+        <item name="iconTint">@color/button_secondary_text_color_selector</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.DaxButton.Ghost" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">@color/button_secondary_text_color_selector</item>
+        <item name="backgroundTint">@color/button_ghost_container_selector</item>
+        <item name="rippleColor">@color/button_ghost_ripple_selector</item>
+        <item name="iconTint">@color/button_secondary_text_color_selector</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.DaxButton.DestructiveGhost" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">@color/button_destructive_ghost_text_color_selector</item>
+        <item name="backgroundTint">@color/button_destructive_ghost_container_selector</item>
+        <item name="rippleColor">@color/button_desctructive_ghost_ripple_selector</item>
+        <item name="iconTint">@color/button_destructive_ghost_text_color_selector</item>
+    </style>
+
     <style name="Widget.DuckDuckGo.Button" parent="Widget.AppCompat.Button.Borderless">
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/white</item>
@@ -165,7 +201,7 @@
         <item name="android:textAlignment">center</item>
         <item name="android:paddingStart">@dimen/keyline_3</item>
         <item name="android:paddingEnd">@dimen/keyline_3</item>
-        <item name="android:layout_height">@dimen/buttonLargeHeight</item>
+        <item name="android:layout_height">@dimen/legacyButtonHeight</item>
     </style>
 
     <style name="Widget.DuckDuckGo.Button.Primary">
@@ -174,7 +210,7 @@
     </style>
 
     <style name="Widget.DuckDuckGo.Button.Primary.Small">
-        <item name="android:layout_height">@dimen/buttonSmallHeight</item>
+        <item name="android:layout_height">@dimen/legacyButtonSmallHeight</item>
     </style>
 
     <style name="Widget.DuckDuckGo.Button.Primary.Lowercase">
@@ -187,7 +223,7 @@
     </style>
 
     <style name="Widget.DuckDuckGo.Button.Secondary.Small">
-        <item name="android:layout_height">@dimen/buttonSmallHeight</item>
+        <item name="android:layout_height">@dimen/legacyButtonSmallHeight</item>
     </style>
 
     <!-- Rename to Ghost when migration happens -->
@@ -198,7 +234,7 @@
 
     <!-- Rename to Ghost when migration happens -->
     <style name="Widget.DuckDuckGo.Button.Borderless.Small">
-        <item name="android:layout_height">@dimen/buttonSmallHeight</item>
+        <item name="android:layout_height">@dimen/legacyButtonSmallHeight</item>
     </style>
 
     <style name="Widget.DuckDuckGo.Button.Rounded">
@@ -218,9 +254,9 @@
     </style>
 
     <style name="Widget.DuckDuckGo.RadioButton" parent="Widget.MaterialComponents.CompoundButton.RadioButton">
-        <item name="android:textColor">?attr/normalTextColor</item>
+        <item name="android:textColor">?attr/daxColorPrimaryText</item>
         <item name="buttonTint">@color/radio_button_tint</item>
-        <item name="android:paddingStart">10dp</item>
+        <item name="android:padding">@dimen/keyline_3</item>
         <item name="android:textAppearance">?attr/textAppearanceBody1</item>
     </style>
 
@@ -252,8 +288,7 @@
     <!-- Dialogs -->
     <style name="Widget.DuckDuckGo.Dialog" parent="@style/ThemeOverlay.MaterialComponents.MaterialAlertDialog">
         <item name="shapeAppearanceOverlay">@style/Widget.DuckDuckGo.DialogCorners</item>
-        <item name="windowFixedWidthMajor">90%</item>
-        <item name="windowFixedWidthMinor">90%</item>
+        <item name="android:background">?attr/daxColorSurface</item>
     </style>
 
     <style name="Widget.DuckDuckGo.DialogCorners">
@@ -261,23 +296,34 @@
         <item name="cornerSize">@dimen/dialogBorderRadius</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.Dialog.Title">
-        <item name="android:textAppearance">@style/TextAppearance.DuckDuckGo.Headline2</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
-    </style>
-
-    <style name="Widget.DuckDuckGo.OutlinedTextInputView.TextInputLayout"
+    <!-- Text Input -->
+    <style name="Widget.DuckDuckGo.TextInputView"
            parent="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-        <item name="android:textColorHint">@color/outlined_text_input_hint_color_selector</item>
+        <item name="android:textColorHint">@color/text_input_hint_color_selector</item>
         <item name="boxCornerRadiusBottomEnd">@dimen/keyline_2</item>
         <item name="boxCornerRadiusBottomStart">@dimen/keyline_2</item>
         <item name="boxCornerRadiusTopStart">@dimen/keyline_2</item>
         <item name="boxCornerRadiusTopEnd">@dimen/keyline_2</item>
-        <item name="boxStrokeColor">@color/outlined_text_input_box_color_selector</item>
+        <item name="boxStrokeColor">@color/text_input_box_color_selector</item>
         <item name="boxStrokeWidth">1dp</item>
-        <item name="endIconTint">?attr/normalTextColor</item>
-        <item name="hintTextColor">@color/outlined_text_input_hint_color_selector</item>
+        <item name="endIconTint">?attr/daxColorPrimaryIcon</item>
+        <item name="hintTextColor">@color/text_input_hint_color_selector</item>
         <item name="android:theme">@style/TextInputEditTextTheme</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.TextInput"
+           parent="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="shapeAppearance">@style/ShapeAppearance.DuckDuckGo.SmallComponent</item>
+        <item name="boxStrokeColor">@color/text_input_box_color_selector</item>
+        <item name="endIconTint">?attr/daxColorPrimaryIcon</item>
+        <item name="hintTextColor">@color/text_input_hint_color_selector</item>
+        <item name="android:textColorHint">@color/text_input_hint_color_selector</item>
+        <item name="android:theme">@style/Widget.DuckDuckGo.TextInputCursor</item>
+    </style>
+
+    <!-- The color of the cursor comes from the theme, not the widget itself -->
+    <style name="Widget.DuckDuckGo.TextInputCursor">
+        <item name="android:colorControlActivated">?attr/daxColorAccentBlue</item>
     </style>
 
     <style name="Widget.DuckDuckGo.RoundedDialog" parent="@style/ThemeOverlay.MaterialComponents.MaterialAlertDialog">
@@ -291,13 +337,15 @@
 
     <style name="Widget.DuckDuckGo.ModalBottomSheetStyle" parent="Widget.MaterialComponents.BottomSheet.Modal">
         <item name="shapeAppearanceOverlay">@style/Widget.DuckDuckGo.BottomSheetDialogCorners</item>
-        <item name="android:backgroundTint">?attr/daxDialogBackgroundColor</item>
+        <item name="android:backgroundTint">?attr/daxColorSurface</item>
     </style>
 
     <style name="Widget.DuckDuckGo.BottomSheetDialogCorners">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSizeTopRight">@dimen/dialogBorderRadius</item>
         <item name="cornerSizeTopLeft">@dimen/dialogBorderRadius</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
     </style>
 
     <!-- Switches -->
@@ -305,10 +353,9 @@
         <item name="materialThemeOverlay">@style/ThemeOverlay.DuckDuckGo.Switch</item>
     </style>
 
-    <style name="ThemeOverlay.DuckDuckGo.Switch">
-        <item name="colorSurface">@color/white</item>
-        <item name="colorOnSurface">@color/gray70</item>
-        <item name="colorSecondary">@color/cornflowerBlue</item>
+    <style name="ThemeOverlay.DuckDuckGo.Switch" >
+        <item name="trackTint">@color/switch_track_tint</item>
+        <item name="thumbTint">@color/switch_thumb_tint</item>
     </style>
 
     <!-- Deprecated, will be deleted when all new styles are applied -->
@@ -324,17 +371,10 @@
 
     <!-- Slider -->
     <style name="Widget.DuckDuckGo.Slider" parent="Widget.MaterialComponents.Slider">
-        <item name="materialThemeOverlay">@style/ThemeOverlay.DuckDuckGo.Slider</item>
-        <item name="trackHeight">6dp</item>
-        <item name="trackColorInactive">@color/slider_inactive_track</item>
-        <item name="trackColorActive">@color/accentBlue</item>
-        <item name="thumbColor">@color/accentBlue</item>
-    </style>
-
-    <style name="ThemeOverlay.DuckDuckGo.Slider" parent="">
-        <item name="colorPrimary">@color/accentBlue</item>
-        <item name="colorOnPrimary">@color/accentBlue</item>
-        <item name="colorOnSurface">@color/white</item>
+        <item name="trackHeight">@dimen/sliderTrackHeight</item>
+        <item name="trackColorInactive">?attr/daxColorSliderTrackInactive</item>
+        <item name="trackColorActive">?attr/daxColorSliderActive</item>
+        <item name="thumbColor">?attr/daxColorSliderActive</item>
     </style>
 
     <!-- Dividers -->

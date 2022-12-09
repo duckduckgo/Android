@@ -28,33 +28,35 @@ import com.duckduckgo.app.global.extensions.isPrivateDnsActive
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
+import com.duckduckgo.mobile.android.vpn.prefs.VpnPreferences
+import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
+import com.frybits.harmony.getHarmonySharedPreferences
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
-import com.duckduckgo.mobile.android.vpn.prefs.VpnPreferences
-import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
-import com.frybits.harmony.getHarmonySharedPreferences
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.json.JSONObject
-import timber.log.Timber
 import java.net.InetAddress
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import logcat.LogPriority
+import logcat.asLog
+import logcat.logcat
+import org.json.JSONObject
 
 @ContributesMultibinding(
     scope = VpnScope::class,
-    boundType = VpnStateCollectorPlugin::class
+    boundType = VpnStateCollectorPlugin::class,
 )
 @ContributesMultibinding(
     scope = VpnScope::class,
-    boundType = VpnServiceCallbacks::class
+    boundType = VpnServiceCallbacks::class,
 )
 @SingleInstanceIn(VpnScope::class)
 class NetworkTypeCollector @Inject constructor(
@@ -97,13 +99,13 @@ class NetworkTypeCollector @Inject constructor(
     private val cellularNetworkCallback = object : NetworkCallback() {
         override fun onAvailable(network: Network) {
             updateNetworkInfo(
-                Connection(network.networkHandle, NetworkType.CELLULAR, NetworkState.AVAILABLE, context.mobileNetworkCode(NetworkType.CELLULAR))
+                Connection(network.networkHandle, NetworkType.CELLULAR, NetworkState.AVAILABLE, context.mobileNetworkCode(NetworkType.CELLULAR)),
             )
         }
 
         override fun onLost(network: Network) {
             updateNetworkInfo(
-                Connection(network.networkHandle, NetworkType.CELLULAR, NetworkState.LOST, context.mobileNetworkCode(NetworkType.CELLULAR))
+                Connection(network.networkHandle, NetworkType.CELLULAR, NetworkState.LOST, context.mobileNetworkCode(NetworkType.CELLULAR)),
             )
         }
     }
@@ -114,27 +116,27 @@ class NetworkTypeCollector @Inject constructor(
 
             // check for Android Private DNS setting
             val privateDns = if (context.isPrivateDnsActive()) {
-                Timber.v(
-                    "isPrivateDnsActive = %s, server = %s (%s)",
-                    context.isPrivateDnsActive(),
-                    context.getPrivateDnsServerName(),
-                    runCatching { InetAddress.getAllByName(context.getPrivateDnsServerName()) }.getOrNull()?.map { it.hostAddress }
-                )
+                logcat {
+                    """
+                        isPrivateDnsActive = ${context.isPrivateDnsActive()}, server = ${context.getPrivateDnsServerName()}
+                        (${runCatching { InetAddress.getAllByName(context.getPrivateDnsServerName()) }.getOrNull()?.map { it.hostAddress }})
+                    """.trimIndent()
+                }
                 true
             } else {
-                Timber.v("Private DNS disabled")
+                logcat { "Private DNS disabled" }
                 false
             }
 
             // Check if VPN reconfiguration is needed
             if (appTpFeatureConfig.isEnabled(AppTpSetting.PrivateDnsSupport) && vpnPreferences.isPrivateDnsEnabled != privateDns) {
-                Timber.v("Private DNS changed, reconfiguring VPN")
+                logcat { "Private DNS changed, reconfiguring VPN" }
                 coroutineScope.launch {
                     vpnPreferences.isPrivateDnsEnabled = privateDns
                     TrackerBlockingVpnService.restartVpnService(context)
                 }
             } else {
-                Timber.v("Nothing change in Network config, skip reconfiguration")
+                logcat { "Nothing change in Network config, skip reconfiguration" }
             }
         }
     }
@@ -155,7 +157,7 @@ class NetworkTypeCollector @Inject constructor(
 
     override fun onVpnStopped(
         coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
+        vpnStopReason: VpnStopReason,
     ) {
         (context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?)?.let {
             it.safeUnregisterNetworkCallback(wifiNetworkCallback)
@@ -174,7 +176,7 @@ class NetworkTypeCollector @Inject constructor(
                     previousNetworkInfo?.currentNetwork?.netId != null &&
                     connection.netId != previousNetworkInfo.currentNetwork.netId
                 ) {
-                    Timber.d("Lost of previously switched connection: $connection, current: ${previousNetworkInfo.currentNetwork}")
+                    logcat { "Lost of previously switched connection: $connection, current: ${previousNetworkInfo.currentNetwork}" }
                     return@launch
                 }
 
@@ -196,13 +198,13 @@ class NetworkTypeCollector @Inject constructor(
                             currentNetwork = connection,
                             previousNetwork = previousNetwork,
                             lastSwitchTimestampMillis = lastSwitchTimestampMillis,
-                            secondsSinceLastSwitch = secondsSinceLastSwitch
-                        )
+                            secondsSinceLastSwitch = secondsSinceLastSwitch,
+                        ),
                     )
                 currentNetworkInfo = jsonInfo
-                Timber.v("New network info $jsonInfo")
+                logcat { "New network info $jsonInfo" }
             } catch (t: Throwable) {
-                Timber.w(t, "Error updating the network info")
+                logcat(LogPriority.WARN) { t.asLog() }
             }
         }
     }
@@ -210,7 +212,7 @@ class NetworkTypeCollector @Inject constructor(
     private fun updateSecondsSinceLastSwitch() {
         val networkInfo: NetworkInfo = currentNetworkInfo?.let { adapter.fromJson(it) } ?: return
         networkInfo.copy(
-            secondsSinceLastSwitch = TimeUnit.MILLISECONDS.toSeconds(SystemClock.elapsedRealtime() - networkInfo.lastSwitchTimestampMillis)
+            secondsSinceLastSwitch = TimeUnit.MILLISECONDS.toSeconds(SystemClock.elapsedRealtime() - networkInfo.lastSwitchTimestampMillis),
         ).run {
             currentNetworkInfo = adapter.toJson(this)
         }
@@ -226,8 +228,8 @@ class NetworkTypeCollector @Inject constructor(
                 temp?.copy(
                     lastSwitchTimestampMillis = -999,
                     currentNetwork = temp.currentNetwork.copy(netId = -999),
-                    previousNetwork = temp.previousNetwork?.copy(netId = -999)
-                )
+                    previousNetwork = temp.previousNetwork?.copy(netId = -999),
+                ),
             )
         } ?: return JSONObject()
 
@@ -238,7 +240,7 @@ class NetworkTypeCollector @Inject constructor(
         kotlin.runCatching {
             unregisterNetworkCallback(networkCallback)
         }.onFailure {
-            Timber.e(it, "Error unregistering the network callback")
+            logcat(LogPriority.ERROR) { it.asLog() }
         }
     }
 
@@ -246,7 +248,7 @@ class NetworkTypeCollector @Inject constructor(
         kotlin.runCatching {
             registerNetworkCallback(networkRequest, networkCallback)
         }.onFailure {
-            Timber.e(it, "Error registering the network callback")
+            logcat(LogPriority.ERROR) { it.asLog() }
         }
     }
 

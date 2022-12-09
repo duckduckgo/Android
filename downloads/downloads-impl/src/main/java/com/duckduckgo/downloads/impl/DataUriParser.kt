@@ -16,12 +16,12 @@
 
 package com.duckduckgo.downloads.impl
 
-import com.duckduckgo.downloads.impl.DataUriParser.ParseResult.ParsedDataUri
 import android.webkit.MimeTypeMap
-import okio.ByteString.Companion.decodeBase64
+import com.duckduckgo.downloads.impl.DataUriParser.ParseResult.ParsedDataUri
 import java.nio.charset.StandardCharsets
 import java.util.*
 import javax.inject.Inject
+import okio.ByteString.Companion.decodeBase64
 
 class DataUriParser @Inject constructor() {
 
@@ -92,13 +92,13 @@ class DataUriParser @Inject constructor() {
             val fileTypeSpecific: String,
             val data: String,
             val mimeType: String,
-            val filename: GeneratedFilename
+            val filename: GeneratedFilename,
         ) : ParseResult()
     }
 
     data class GeneratedFilename(
         val name: String,
-        val fileType: String = ""
+        val fileType: String = "",
     ) {
 
         override fun toString(): String {

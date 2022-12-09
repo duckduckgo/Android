@@ -34,8 +34,8 @@ import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Autofill
 import dagger.Module
 import dagger.Provides
-import kotlinx.coroutines.CoroutineScope
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
 
 @Module
 class EmailModule {
@@ -46,9 +46,10 @@ class EmailModule {
         emailService: EmailService,
         emailDataStore: EmailDataStore,
         dispatcherProvider: DispatcherProvider,
-        @AppCoroutineScope appCoroutineScope: CoroutineScope
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
+        pixel: Pixel,
     ): EmailManager {
-        return AppEmailManager(emailService, emailDataStore, dispatcherProvider, appCoroutineScope)
+        return AppEmailManager(emailService, emailDataStore, dispatcherProvider, appCoroutineScope, pixel)
     }
 
     @Provides
@@ -58,7 +59,7 @@ class EmailModule {
         dispatcherProvider: DispatcherProvider,
         featureToggle: FeatureToggle,
         javascriptInjector: JavascriptInjector,
-        autofill: Autofill
+        autofill: Autofill,
     ): EmailInjector {
         return EmailInjectorJs(emailManager, duckDuckGoUrlDetector, dispatcherProvider, featureToggle, javascriptInjector, autofill)
     }

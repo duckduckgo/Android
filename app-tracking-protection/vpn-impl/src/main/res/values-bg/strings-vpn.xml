@@ -32,11 +32,11 @@
 
     <!-- Diagnostics -->
     <string name="vpnTimeRunning" instruction="Placeholder is the time expressed as a String that the vpn has been running">Време на работа: %1$s</string>
-    <string name="vpnTrackerCompaniesBlockedToday" instructions="Placeholder is a number">Компании с тракери, блокирани днес: %1$d</string>
-    <string name="vpnTrackerCompaniesBlockedThisWeek" instructions="Placeholder is a number">Компании с тракери, блокирани тази седмица: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedToday" instruction="Placeholder is a number">Компании с тракери, блокирани днес: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedThisWeek" instruction="Placeholder is a number">Компании с тракери, блокирани тази седмица: %1$d</string>
     <string name="vpnTrackerCompaniesNone">"Все още няма блокирани компании с тракери"</string>
-    <string name="vpnTrackersBlockedToday" instructions="Placeholder is a number">Тракери, блокирани днес: %1$d</string>
-    <string name="vpnTrackersBlockedThisWeek" instructions="Placeholder is a number">Тракери, блокирани тази седмица: %1$d</string>
+    <string name="vpnTrackersBlockedToday" instruction="Placeholder is a number">Тракери, блокирани днес: %1$d</string>
+    <string name="vpnTrackersBlockedThisWeek" instruction="Placeholder is a number">Тракери, блокирани тази седмица: %1$d</string>
     <string name="vpnTrackersNone">"Все още няма блокирани тракери"</string>
     <string name="vpnNotRunYet">"VPN услугата все още не е стартирана"</string>
     <string name="vpnDataTransferred" instruction="%1$s is the size of data transferred, i.e. 340MB. %2$s is the amount of packets, i.e. 123 packets ">"%1$s\n%2$s пакета"</string>
@@ -136,24 +136,14 @@
     <string name="atp_ExcludedAppsEnabledLabel">Бета версията на DuckDuckGo може да деактивира защитата за някои приложения с цел разрешаване на известни проблеми със зареждането на съдържание. Вашите персонализирани настройки няма да се променят, освен ако не възстановите настройките по подразбиране.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>App Tracking Protection е деактивирана</b> App Tracking Protection предизвиква ли проблеми с Вашите приложения <annotation type="report_issues_link">Докладване на проблеми</annotation></string>
     <string name="atp_ExcludedAppsReport">Докладване на проблем с друго приложение</string>
-    <string name="atp_ExcludedReasonLoadsWebsites">Зарежда уебсайтове</string>
-    <string name="atp_ExcludedReasonKnownIssues">Известни проблеми</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Деактивирана ръчно</string>
     <string name="atp_ExcludedReasonManuallyEnabled">Активирана ръчно</string>
     <string name="atp_ExcludeAppsManuallyCTACancel">Отмени</string>
-    <string name="atp_ExcludeAppsManuallyCTAEnable">Активиране</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Възстановяване</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName" instruction="Placeholder is the name of an app">Да се активира ли ръчно защитата за приложението %1$s?</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppLabel">Известно е, че в това приложение възникват проблеми при неуспешни опити за проследяване.</string>
-    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Възможно е съдържанието на сайта в това приложение да не се показва правилно, когато защитата е активирана.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">При активиране на защитата името на приложението се изпраща на DuckDuckGo.</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppName">Защитата на поверителността е деактивирана</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Ако сте деактивирали защитата, за да отстраните проблем, проверете дали приложението вече работи, преди да докладвате за проблема на DuckDuckGo.</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">Спря да работи според очакванията</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">Нямам нищо против да ме следят в това приложение</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">По друга причина</string>
-    <string name="atp_ExcludeAppsManuallyCTAReport">Докладване</string>
-    <string name="atp_ExcludeAppsManuallyCTASkip">Пропускане</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Възстановяване на защитени приложения по подразбиране</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Докладване на проблем с приложение</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Възстановяване на защитата по подразбиране?</string>
@@ -197,12 +187,12 @@
     <string name="atp_ActivityPastWeek">През последните 7 дни</string>
     <string name="atp_ActivityTitle">Защита от проследяване в приложения</string>
     <string name="atp_MostRecentActivityTitle">Всички скорошни дейности</string>
-    <string name="atp_ActivityRecentActivity">Скорошни дейности</string>
+    <string name="atp_ActivityRecentActivity">Дейност</string>
     <string name="atp_ActivityCtaShowAll">Преглед на всички скорошни дейности</string>
     <string name="atp_ActivityAppTrackersFAQ">Какво представляват тракерите в приложенията?</string>
     <string name="atp_ActivityReportProblem">Докладвайте за проблем с приложение</string>
     <string name="atp_ActivityBetaInstructions">Инструкции за бета версията</string>
-    <string name="atp_ActivityManageProtection">Имате ли проблеми с някое приложение?</string>
+    <string name="atp_ActivityManageProtection">Имате проблеми с някое приложение?</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
         <![CDATA[1 блокиран опит за проследяване от 1 компания в приложението <b>%1$s</b>]]>
@@ -217,8 +207,6 @@
         <![CDATA[%1$d блокирани опита за проследяване от %2$d компании в приложението <b>%3$s</b>]]>
     </string>
 
-    <string name="atp_ActivityEmptyListTitle">Няма нови дейности</string>
-    <string name="atp_ActivityEmptyListMessage">Продължете да използвате устройството си. Опитите за проследяване, които App Tracking Protection блокира, се появяват тук.</string>
     <string name="atp_ActivityPastWeekBlocked">Блокиран/и</string>
     <string name="atp_ActivityPastWeekAcross">В</string>
 
@@ -230,9 +218,10 @@
         <item quantity="one">Приложение</item>
         <item quantity="other">Приложения</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Тази функция е в бета версия. <annotation type="app_settings_link">Имате ли проблеми с някое приложение?</annotation></string>
+    <string name="atp_ActivityEnabledLabel">Тази функция е в бета версия. Установили сте проблем с някое приложение? <annotation type="app_settings_link">Моля, докладвайте за проблем.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection е деактивирана</b>\nApp Tracking Protection предизвиква ли проблеми с Вашите приложения? <annotation type="report_issues_link">Докладване на проблеми</annotation></string>
-    <string name="atp_ActivityRevokedLabel"><b>VPN приложение на Вашето устройство деактивира App Tracking Protection.</b>\nApp Tracking Protection предизвиква ли проблеми с Вашите приложения? <annotation type="report_issues_link">Докладване на проблеми</annotation></string>
+    <string name="atp_ActivityDisabledBySystemLabel"><b>Android деактивира App Tracking Protection</b>. Искате ли да предотвратите това, за да не се случва отново? <annotation type="re_enable_link">Повторно активиране</annotation></string>
+    <string name="atp_ActivityRevokedLabel"><b>App Tracking Protection е деактивирана.</b>\nВъзможно е защитата да е деактивирана от VPN приложение, инсталирано на устройството. Използвайте превключвателя по-горе, за да я активирате отново.</string>
     <string name="atp_ActivityAbout">За нас</string>
     <string name="atp_ActivityManage">Управление</string>
     <string name="atp_ActivityRemoveFeature">Деактивиране и изтриване на данни</string>
@@ -366,9 +355,9 @@
 
     <!-- Manage Recent Apps Protection -->
     <string name="atp_ManageRecentAppsProtectionReportIssues">Ако имате проблеми с някое приложение (например съдържанието не се зарежда), опитайте да деактивирате защитата за това приложение и <annotation type="report_issues_link">докладвайте проблема.</annotation></string>
-    <string name="atp_ManageRecentAppsProtectionActivityTitle">Скорошни приложения</string>
+    <string name="atp_ManageRecentAppsProtectionActivityTitle">Последна активност на приложенията</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Показване на всички приложения</string>
-    <string name="atp_ManageRecentAppsProtectionEmpty">Все още няма скорошни приложения</string>
+    <string name="atp_ManageRecentAppsProtectionEmpty">Тук се показват приложенията с наскоро блокирани опити за проследяване</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Деактивиране и изтриване на данните?</string>
@@ -377,10 +366,47 @@
     <string name="atp_RemoveFeatureDialogRemove">Забрани</string>
 
     <!--  App Tracking Protection Promote Always On -->
-    <string name="atp_PromoteAlwaysOnDialogTitle">Задаване като „Винаги включено“?</string>
-    <string name="atp_PromoteAlwaysOnDialogMessage">За да предотвратите периодично деактивиране на App Tracking Protection от Android:\n\nВлезте в Настройки на Android\nОтворете VPN настройки за DuckDuckGo\nВключете опцията „Винаги включена VPN услуга“</string>
     <string name="atp_PromoteAlwaysOnDialogSettings">Влезте в Настройки</string>
-    <string name="atp_PromoteAlwaysOnDialogLater">Напомняне по-късно</string>
-    <string name="atp_PromoteAlwaysOnDialogForget">Не, благодаря</string>
+    <string name="atp_PromoteAlwaysOnDialogNotNow">Не сега</string>
+    <string name="atp_AlwaysOnModalBody"><![CDATA[Влезте във настройките на VPN за DuckDuckGo на Вашето устройство и активирайте VPN настройката <b>Винаги включено</b>, за да предотвратите деактивирането на защитата от Android.\n\nУверете се, че сте другата настройка остава ИЗКЛ.]]></string>
+    <string name="atp_AlwaysOnLockdownModalBody"><![CDATA[За да избегнете проблеми с приложенията, влезте в <b>Настройки на VPN за DuckDuckGo</b> и деактивирайте настройката <b>Блокиране на връзките без VPN</b>]]></string>
+    <string name="atp_AlwaysOnModalHeading">Задайте настройка „Винаги включено“</string>
+    <string name="atp_AlwaysOnLockdownModalHeading">Промяна на настройките на VPN</string>
+    <string name="atp_AlwaysOnLockDownEnabled"><b>Изисква се действие!</b> За да избегнете проблеми с приложенията, трябва да промените настройките на Android. <annotation type="open_settings_link">Промяна на настройките</annotation></string>
+    <string name="atp_AlwaysOnLockDownNotificationTitle">Необходимо е действие! Необходимо е да промените една от настройките на Android за App Tracking Protection.</string>
+
+    <!--  App Tracking Protection Exclusion list -->
+    <string name="atp_TrackingProtectionExclusionListActivityTitle">Моите приложения</string>
+    <string name="atp_ExcludedReasonIssuesMayOccur">Проблеми с приложението могат да възникнат, ако защитата е активирана</string>
+    <string name="atp_ExcludeAppsManuallyCTAEnableAnyway">Активиране въпреки това</string>
+    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel" instruction="Placeholder is the name of an app">Може да възникнат проблеми с %1$s, ако защитата App Tracking Protection е активирана</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogTitle">Докладване на проблем?</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel" instruction="Placeholder is the name of an app">Моля, уведомете ни, ако сте деактивирали защитата App Tracking Protection за %1$s, защото са възникнали проблеми с приложението.</string>
+    <string name="atp_ExcludeAppsManuallyCTAReportIssue">Докладване на проблем</string>
+    <string name="atp_ExcludeAppsManuallyCTANotNow">Не сега</string>
+    <string name="atp_ActivityRecentActivityHeader">Дейност</string>
+    <string name="atp_ActivityManageProtectionLabel">Имате проблеми с някое приложение?</string>
+    <string name="atp_ActivityEnabledBannerLabel">В бета версията защитата на някои приложения се деактивира автоматично. <annotation type="app_settings_link">Преглед на приложенията</annotation></string>
+    <string name="atp_ActivityDescription">Блокираните опити за проследяване се показват тук</string>
+    <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
+        <item quantity="one">%1$s от Вашите приложения е защитено от скрити тракери, които установихме, че се опитват да получат достъп до Вашата лична информация</item>
+        <item quantity="other">%1$s от Вашите приложения са защитени от скрити тракери, които установихме, че се опитват да получат достъп до Вашата лична информация</item>
+    </plurals>
+    <plurals name="atp_ActivityUnprotectedApps" instruction="Placeholder is the number of apps that are not protected">
+        <item quantity="one">%1$s от Вашите приложения е с деактивирана защита</item>
+        <item quantity="other">%1$s от Вашите приложения са с деактивирана защита</item>
+    </plurals>
+    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Добри новини! Защитата App Tracking Protection вече е активирана.<br/><br/>👍Ще ви покажа в реално време списък с приложенията на Вашето устройство, които установих, че се опитват да Ви проследяват.]]></string>
+    <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Разбрах!</string>
+    <string name="atp_ExcludedAppsFilterProtectedLabel" instruction="Placeholder is the number of apps where protection is enabled">Активирана защита (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterUnprotectedLabel" instruction="Placeholder is the number of apps where protection is disabled">Деактивирана защита (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterAllLabel">Всички</string>
+    <string name="atp_ExcludedAppsFilterMenuProtectedLabel">Активирана защита</string>
+    <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Деактивирана защита</string>
+    <string name="atp_ExcludedAppsFilterMenuAllLabel">Всички</string>
+    <string name="atp_ActivityViewAppsLabel">Преглед на приложенията</string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Тази функция е в бета версия. Имате проблеми с някое приложение? <annotation type="app_settings_link">Помогнете ни да подобрим защитата</annotation></string>
+    <string name="atp_ExcludedAppsEnabledLearnWhyLabel">При някои приложения може да възникнат проблеми, когато защитата App Tracking Protection е активирана.\n<annotation type="learn_why_link">Научете защо</annotation></string>
+    <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Защитата е деактивирана за приложения с вече известни проблеми. Можете да активирате защитата за тези приложения, но те може да не работят според очакванията. <annotation type="learn_why_link">Научете защо</annotation></string>
 
 </resources>

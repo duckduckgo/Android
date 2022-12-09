@@ -51,7 +51,7 @@ class RealVoiceSearchActivityLauncherTest {
         testee = RealVoiceSearchActivityLauncher(
             blurRenderer,
             pixel,
-            activityResultLauncherWrapper
+            activityResultLauncherWrapper,
         )
     }
 

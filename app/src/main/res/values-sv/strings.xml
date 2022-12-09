@@ -81,7 +81,7 @@
     <string name="previousSearchTermDescription">Hitta föregående</string>
     <string name="closeFindInPageButtonDescription">Stäng sökning i sidvy</string>
     <string name="findInPageHint">Hitta på sidan</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Redigera förfrågan innan sökning</string>
@@ -108,76 +108,6 @@
     <string name="tabClosed">Fliken är stängd</string>
     <string name="tabClosedUndo">Återställ</string>
     <string name="downloadsMenuItemTitle">Nerladdningar</string>
-
-    <!-- Privacy Dashboard Activities -->
-    <string name="privacyProtectionToggle">Webbplatsens integritetsskydd</string>
-    <string name="privacyProtectionEnabled">WEBBPLATSSKYDD AKTIVERAT</string>
-    <string name="privacyProtectionDisabled">WEBBPLATSSKYDD INAKTIVERAT</string>
-    <string name="privacyDashboardActivityTitle">Sekretesspanel</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">FÖRBÄTTRAD FRÅN &lt;img src=\"%1$d\" /&gt; TILL &lt;img src=\"%2$d\" /&gt;</string>
-    <string name="privacyGradeContentDescription">Sekretessklass</string>
-    <string name="privacyProtectionTemporarilyDisabled">Vi har tillfälligt inaktiverat integritetsskydd eftersom det verkade göra att denna webbplats inte fungerade.</string>
-
-    <string name="httpsGood">Krypterad anslutning</string>
-    <string name="httpsMixed">Blandad krypteringsanslutning</string>
-    <string name="httpsBad">Okrypterad anslutning</string>
-
-    <string name="scorecardActivityTitle">Sekretessklass</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">Webbplatsen är ett större spårningsnätverk</string>
-    <string name="scorecardPrivacyGrade">Sekretessklass</string>
-    <string name="scorecardEnhancedGrade">Förbättrad klass</string>
-
-    <string name="privacyTermsActivityTitle">Integritetspraxis</string>
-    <string name="practicesGood">God integritetspraxis</string>
-    <string name="practicesMixed">Halvgod integritetspraxis</string>
-    <string name="practicesBad">Dålig integritetspraxis</string>
-    <string name="practicesUnknown">Okänd integritetspraxis</string>
-    <string name="practicesOverview">Integritetspraxis indikerar hur stor andel av den personliga information du delar med dig av till en webbplats som är skyddad.</string>
-    <string name="practicesTosdrLink">Integritetspraxis från<b><u>ToS;DR</u></b>.</string>
-    <string name="practicesIconContentGood">Ikon för god praxis</string>
-    <string name="practicesIconContentBad">Ikon för dålig praxis</string>
-
-    <string name="networkTrackerSummaryHeader">SPÅRARNÄTVERKETS FRÄMSTA BROTTSLINGAR</string>
-    <string name="networkTrackerSummaryNotReady">Vi samlar fortfarande in data för att visa hur många spårare vi har blockerat.</string>
-
-    <string name="trackersActivityTitle">Spårningsförfrågningar blockerades</string>
-    <string name="trackersContentDescription">Spårningsförfrågningar blockerades</string>
-    <string name="trackersOverview">Följande tredjepartsdomäners förfrågningar blockerades från att läsas in eftersom de identifierades som spårningsförfrågningar. Om ett företags förfrågningar läses in kan det göra det möjligt för företaget att profilera dig.</string>
-    <string name="trackersOverviewProtectionsOff">Inga spårningsförfrågningar blockerades från att läsas in eftersom skyddet är avstängt för den här webbplatsen. Om ett företags förfrågningar läses in kan det göra det möjligt för företaget att profilera dig.</string>
-
-    <string name="domainsLoadedActivityTitle">Förfrågningar från tredje part lästes in</string>
-    <string name="domainsLoadedContentDescription">Förfrågningar från tredje part lästes in</string>
-    <string name="domainsLoadedOverview">Följande tredjepartsdomäners förfrågningar lästes in. Om ett företags förfrågningar läses in kan det göra det möjligt för företaget att profilera dig, även om våra övriga webbspårningsskydd fortfarande gäller.</string>
-    <string name="domainsLoadedOverviewProtectionsOff">Inga förfrågningar från tredje part blockerades från att läsas in eftersom skyddet är avstängt för den här webbplatsen. Om ett företags förfrågningar läses in kan det göra det möjligt för företaget att profilera dig.</string>
-    <string name="domainsLoadedOverviewEmpty">Vi upptäckte inga förfrågningar från några tredjepartsdomäner.</string>
-    <string name="domainsLoadedHeadingText">Inga tredjepartsdomäner har lästs in</string>
-
-    <string name="webTrackingProtectionsText"><annotation type="learn_more_link">Om våra webbspårningsskydd</annotation></string>
-    <string name="webTrackingProtectionsUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
-
-    <string name="trackersBlockedNoSectionDescription">Följande domäns förfrågningar lästes in.</string>
-
-    <string name="adLoadedSectionDescription" instruction="Placeholder is the name of the company who owns the ad">Följande domäns förfrågningar lästes in eftersom du nyligen klickade på en annons från %1$s på DuckDuckGo. Dessa förfrågningar hjälper till att utvärdera annonsens effektivitet. Alla annonser på DuckDuckGo är icke-profilerande.</string>
-    <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Hur våra sökannonser påverkar vårt skydd</annotation></string>
-    <string name="adLoadedSectionUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
-
-    <string name="domainsLoadedSectionDescription">Följande domäns förfrågningar lästes också in.</string>
-    <string name="domainsLoadedSectionSingleSectionDescription">Följande domäners spårningsförfrågningar lästes in.</string>
-    <string name="domainsLoadedSectionEmptyListDescription">Vi upptäckte inga förfrågningar från några tredjepartsdomäner.</string>
-
-    <string name="domainsLoadedBreakageSectionDescription">Följande domäns förfrågningar lästes in för att förhindra fel på webbplatsen.</string>
-    <string name="domainsLoadedAssociatedSectionDescription" instruction="Placeholder is the name of a company">Följande domäns förfrågningar lästes in eftersom de är kopplade till %1$s.</string>
-
-    <string name="trackersBlockedText">Förfrågningar blockerades från att läsas in</string>
-    <string name="trackersNotBlockedText">Inga spårningsförfrågningar blockerades</string>
-    <string name="trackersNoFoundText">Inga spårningsförfrågningar hittades</string>
-    <string name="trackersFoundText">Spårningsförfrågningar hittades</string>
-
-    <string name="domainsLoadedText">Förfrågningar från tredje part lästes in</string>
-    <string name="domainsNotLoadedText">Inga förfrågningar från tredje part lästes in</string>
-
-    <string name="majorNetworksNoFound">Inga större spårningsnätverk hittades</string>
-    <string name="majorNetworksFound">Större spårningsnätverk hittades</string>
 
     <!-- Fire -->
     <string name="fireMenu">Rensa data</string>
@@ -267,7 +197,7 @@
     <string name="importBookmarksFileTitle">Välj en bokmärkesfil att importera</string>
     <string name="importBookmarksError">Det gick inte att importera några bokmärken, något gick fel</string>
     <string name="importBookmarksEmpty">Filen har inga bokmärken att importera</string>
-    <string name="importBookmarksSuccess">%1$d bokmärken har importerats</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">%1$d bokmärken har importerats</string>
     <string name="savedSiteDialogTitleHint">Rubrik</string>
     <string name="savedSiteDialogUrlHint">Webbadress</string>
     <string name="savedSiteDialogTitleEdit">Redigera</string>
@@ -657,8 +587,8 @@
     <string name="bookmarkFolderEmpty">Tom</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s och %1$d objekt?</item>
-        <item quantity="other">%1$s%2$s och %1$d objekt?</item>
+        <item quantity="one">%1$s%2$s och %3$d objekt?</item>
+        <item quantity="other">%1$s%2$s och %3$d objekt?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">
@@ -733,10 +663,12 @@
     <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
     <string name="sitePermissionsSettingsAllowedSitesTitle">Hantera webbplatser</string>
     <string name="sitePermissionsSettingsEmptyText">Inga webbplatser ännu</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Behörigheter har tagits bort för alla webbplatser</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Behörigheter för %1$s </string>
     <string name="permissionsPerWebsiteAskSetting">Fråga</string>
     <string name="permissionsPerWebsiteDenySetting">Neka</string>
     <string name="permissionsPerWebsiteAllowSetting">Tillåt</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">”Fråga” inaktiverat för alla webbplatser</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s-behörighet för %2$s</string>
 
     <!-- Autofill -->

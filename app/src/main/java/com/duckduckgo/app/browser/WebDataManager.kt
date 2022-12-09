@@ -30,7 +30,7 @@ import javax.inject.Inject
 interface WebDataManager {
     suspend fun clearData(
         webView: WebView,
-        webStorage: WebStorage
+        webStorage: WebStorage,
     )
 
     fun clearWebViewSessions()
@@ -41,12 +41,12 @@ class WebViewDataManager @Inject constructor(
     private val webViewSessionStorage: WebViewSessionStorage,
     private val cookieManager: DuckDuckGoCookieManager,
     private val fileDeleter: FileDeleter,
-    private val webViewHttpAuthStore: WebViewHttpAuthStore
+    private val webViewHttpAuthStore: WebViewHttpAuthStore,
 ) : WebDataManager {
 
     override suspend fun clearData(
         webView: WebView,
-        webStorage: WebStorage
+        webStorage: WebStorage,
     ) {
         clearWebViewCache(webView)
         clearHistory(webView)
@@ -107,7 +107,7 @@ class WebViewDataManager @Inject constructor(
 
         private val WEBVIEW_FILES_EXCLUDED_FROM_DELETION = listOf(
             "Default",
-            "Cookies"
+            "Cookies",
         )
     }
 }

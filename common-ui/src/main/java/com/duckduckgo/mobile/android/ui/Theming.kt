@@ -16,12 +16,11 @@
 
 package com.duckduckgo.mobile.android.ui
 
-import android.app.UiModeManager
-import android.app.UiModeManager.MODE_NIGHT_YES
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.view.ContextThemeWrapper
 import androidx.appcompat.app.AppCompatActivity
@@ -33,7 +32,8 @@ import com.duckduckgo.mobile.android.ui.Theming.Constants.BROADCAST_THEME_CHANGE
 enum class DuckDuckGoTheme {
     SYSTEM_DEFAULT,
     DARK,
-    LIGHT;
+    LIGHT,
+    ;
 }
 
 object Theming {
@@ -41,22 +41,17 @@ object Theming {
     fun getThemedDrawable(
         context: Context,
         drawableId: Int,
-        theme: DuckDuckGoTheme
+        theme: DuckDuckGoTheme,
     ): Drawable? {
         val themeId = when (theme) {
-            DuckDuckGoTheme.SYSTEM_DEFAULT -> {
-                val uiManager = context.getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
-                when (uiManager.nightMode) {
-                    MODE_NIGHT_YES -> R.style.Theme_DuckDuckGo_Dark
-                    else -> R.style.Theme_DuckDuckGo_Light
-                }
-            }
-
+            DuckDuckGoTheme.SYSTEM_DEFAULT -> context.getSystemDefaultTheme()
             DuckDuckGoTheme.DARK -> R.style.Theme_DuckDuckGo_Dark
             else -> R.style.Theme_DuckDuckGo_Light
         }
         return ResourcesCompat.getDrawable(
-            context.resources, drawableId, ContextThemeWrapper(context, themeId).theme
+            context.resources,
+            drawableId,
+            ContextThemeWrapper(context, themeId).theme,
         )
     }
 
@@ -72,17 +67,19 @@ fun AppCompatActivity.applyTheme(theme: DuckDuckGoTheme): BroadcastReceiver? {
 
 fun AppCompatActivity.getThemeId(theme: DuckDuckGoTheme): Int {
     return when (theme) {
-        DuckDuckGoTheme.SYSTEM_DEFAULT -> {
-            val uiManager = getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
-            when (uiManager.nightMode) {
-                MODE_NIGHT_YES -> R.style.Theme_DuckDuckGo_Dark
-                else -> R.style.Theme_DuckDuckGo_Light
-            }
-        }
-
+        DuckDuckGoTheme.SYSTEM_DEFAULT -> getSystemDefaultTheme()
         DuckDuckGoTheme.DARK -> R.style.Theme_DuckDuckGo_Dark
         else -> R.style.Theme_DuckDuckGo_Light
     }
+}
+
+private fun Context.getSystemDefaultTheme(): Int {
+    return if (isInNightMode()) { R.style.Theme_DuckDuckGo_Dark } else { R.style.Theme_DuckDuckGo_Light }
+}
+
+private fun Context.isInNightMode(): Boolean {
+    val mode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+    return mode == Configuration.UI_MODE_NIGHT_YES
 }
 
 // Move this to LiveData/Flow and use appDelegate for night/day theming
@@ -92,7 +89,7 @@ private fun AppCompatActivity.registerForThemeChangeBroadcast(): BroadcastReceiv
         object : BroadcastReceiver() {
             override fun onReceive(
                 context: Context,
-                intent: Intent
+                intent: Intent,
             ) {
                 recreate()
             }

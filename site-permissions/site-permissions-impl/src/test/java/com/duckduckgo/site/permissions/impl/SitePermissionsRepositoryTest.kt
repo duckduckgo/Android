@@ -29,6 +29,7 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
+import kotlin.math.abs
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -37,7 +38,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import kotlin.math.abs
 
 @ExperimentalCoroutinesApi
 @RunWith(RobolectricTestRunner::class)
@@ -56,7 +56,7 @@ class SitePermissionsRepositoryTest {
         mockSitePermissionsAllowedDao,
         mockSitePermissionsPreferences,
         coroutineRule.testScope,
-        coroutineRule.testDispatcherProvider
+        coroutineRule.testDispatcherProvider,
     )
 
     private val url = "https://domain.com/whatever"
@@ -242,7 +242,7 @@ class SitePermissionsRepositoryTest {
     private fun setInitialSettings(
         cameraEnabled: Boolean = true,
         micEnabled: Boolean = true,
-        sitePermissionEntity: SitePermissionsEntity? = null
+        sitePermissionEntity: SitePermissionsEntity? = null,
     ) {
         whenever(mockSitePermissionsPreferences.askCameraEnabled).thenReturn(cameraEnabled)
         whenever(mockSitePermissionsPreferences.askMicEnabled).thenReturn(micEnabled)

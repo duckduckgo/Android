@@ -29,19 +29,19 @@ import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.onboarding.store.*
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchDuckDuckGo
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Suggestions.SystemSearchResultsViewState
-import org.mockito.kotlin.*
 import io.reactivex.Observable
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.*
 import org.junit.*
 import org.junit.Assert.*
 import org.mockito.Mockito.verify
+import org.mockito.kotlin.*
 
 @Suppress("EXPERIMENTAL_API_USAGE")
 class SystemSearchViewModelTest {
@@ -84,7 +84,7 @@ class SystemSearchViewModelTest {
             mockFavoritesRepository,
             mockFaviconManager,
             mockSettingsStore,
-            coroutineRule.testDispatcherProvider
+            coroutineRule.testDispatcherProvider,
         )
         testee.command.observeForever(commandObserver)
     }
@@ -377,7 +377,7 @@ class SystemSearchViewModelTest {
             mockFavoritesRepository,
             mockFaviconManager,
             mockSettingsStore,
-            coroutineRule.testDispatcherProvider
+            coroutineRule.testDispatcherProvider,
         )
 
         val viewState = testee.resultsViewState.value as SystemSearchViewModel.Suggestions.QuickAccessItems

@@ -59,7 +59,7 @@
                 android:id="@+id/settings_info"
                 style="@style/Widget.DuckDuckGo.InfoPanel"
                 app:panelBackground="@drawable/info_panel_alert_background"
-                app:panelDrawable="@drawable/ic_alert_color_24"
+                app:panelDrawable="@drawable/ic_info_panel_alert"
                 app:panelText="Turn AppTP ON to be able to configure this settings"
                 android:layout_margin="16dp"/>
 
@@ -108,6 +108,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryText="VPN connectivity checks"
+                app:showSwitch="true"
+            />
+
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+                android:id="@+id/openBetaToggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="Enable Open Beta"
                 app:showSwitch="true"
             />
 

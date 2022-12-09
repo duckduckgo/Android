@@ -24,8 +24,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 @ContributesMultibinding(AppScope::class)
 class SelfTestResultMessageHandlerPlugin @Inject constructor() : MessageHandlerPlugin {

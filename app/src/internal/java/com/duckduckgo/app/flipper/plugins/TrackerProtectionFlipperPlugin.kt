@@ -25,19 +25,19 @@ import com.facebook.flipper.core.FlipperConnection
 import com.facebook.flipper.core.FlipperObject
 import com.facebook.flipper.core.FlipperPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
-import timber.log.Timber
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.Executors
 import javax.inject.Inject
 import kotlin.random.Random
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
+import timber.log.Timber
 
 @ContributesMultibinding(AppScope::class)
 class TrackerProtectionFlipperPlugin @Inject constructor(
     vpnDatabase: VpnDatabase,
-    private val dispatcherProvider: DispatcherProvider,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope
+    private val dispatchers: DispatcherProvider,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : FlipperPlugin {
 
     private var job = ConflatedJob()
@@ -67,7 +67,6 @@ class TrackerProtectionFlipperPlugin @Inject constructor(
                 tracker?.let {
                     Timber.v("$id: sending $tracker")
                     FlipperObject.Builder()
-                        .put("id", tracker.trackerId)
                         .put("timestamp", tracker.timestamp)
                         .put("domain", tracker.domain)
                         .put("company", tracker.companyDisplayName)
@@ -77,7 +76,7 @@ class TrackerProtectionFlipperPlugin @Inject constructor(
                         .also { enqueueRow(it) }
                 }
             }
-            .flowOn(Dispatchers.IO)
+            .flowOn(dispatchers.io())
             .launchIn(appCoroutineScope)
     }
 

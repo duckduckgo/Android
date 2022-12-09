@@ -27,9 +27,19 @@ import com.duckduckgo.autofill.domain.app.LoginCredentials
 interface AutofillSettingsActivityLauncher {
 
     /**
-     * Launch the Autofill management activity.
-     * Optionally, can provide LoginCredentials to jump directly into viewing mode.
-     * If no LoginCredentials provided, will show the list mode.
+     * Launch the Autofill management activity, which will show the full list of available credentials
      */
-    fun intent(context: Context, loginCredentials: LoginCredentials? = null): Intent
+    fun intent(context: Context): Intent
+
+    /**
+     * Launch the Autofill management activity, which will show suggestions for the current url and the full list of available credentials
+     */
+    fun intentAlsoShowSuggestionsForSite(context: Context, currentUrl: String?): Intent
+
+    /**
+     * Launch the Autofill management activity, directly showing particular credentials
+     * @param context
+     * @param loginCredentials jump directly into viewing mode for these credentials
+     */
+    fun intentDirectlyViewCredentials(context: Context, loginCredentials: LoginCredentials): Intent
 }

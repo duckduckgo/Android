@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-apply from: "$rootDir/spotless.gradle"
+apply from: "$rootDir/code-formatting.gradle"
 
 android {
     compileSdkVersion compile_sdk
@@ -32,7 +32,6 @@ android {
 
     lint {
         abortOnError true
-        ignoreTestSources true
         ignoreTestSources true
     }
 
@@ -70,8 +69,8 @@ tasks.register('jvm_tests') {
     dependsOn 'testDebugUnitTest'
 }
 
-tasks.register('spotless') {
-    dependsOn 'spotlessCheck'
+tasks.register('code_format_checks') {
+    dependsOn 'spotlessCheck', 'lintKotlin'
 }
 
 tasks.register('lint_check') {

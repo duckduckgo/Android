@@ -32,14 +32,14 @@ abstract class ComponentFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         return inflater.inflate(R.layout.fragment_component_list, container, false)
     }
 
     override fun onViewCreated(
         view: View,
-        savedInstanceBundle: Bundle?
+        savedInstanceBundle: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceBundle)
 

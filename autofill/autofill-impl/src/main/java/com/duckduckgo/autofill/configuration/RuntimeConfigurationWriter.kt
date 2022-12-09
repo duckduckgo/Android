@@ -17,6 +17,7 @@
 package com.duckduckgo.autofill.configuration
 
 import com.duckduckgo.autofill.jsbridge.response.AvailableInputSuccessResponse
+import com.duckduckgo.autofill.jsbridge.response.AvailableInputTypeCredentials
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
@@ -25,15 +26,15 @@ import javax.inject.Inject
 
 interface RuntimeConfigurationWriter {
     fun generateResponseGetAvailableInputTypes(
-        credentialsAvailable: Boolean,
-        emailAvailable: Boolean
+        credentialsAvailable: AvailableInputTypeCredentials,
+        emailAvailable: Boolean,
     ): String
 
     fun generateContentScope(): String
     fun generateUserUnprotectedDomains(): String
     fun generateUserPreferences(
         autofillCredentials: Boolean,
-        showInlineKeyIcon: Boolean
+        showInlineKeyIcon: Boolean,
     ): String
 }
 
@@ -43,8 +44,8 @@ class RealRuntimeConfigurationWriter @Inject constructor(val moshi: Moshi) : Run
     private val availableInputTypesAdapter = moshi.adapter(AvailableInputSuccessResponse::class.java).indent("  ")
 
     override fun generateResponseGetAvailableInputTypes(
-        credentialsAvailable: Boolean,
-        emailAvailable: Boolean
+        credentialsAvailable: AvailableInputTypeCredentials,
+        emailAvailable: Boolean,
     ): String {
         val availableInputTypes = AvailableInputSuccessResponse(credentialsAvailable, emailAvailable)
         return availableInputTypesAdapter.toJson(availableInputTypes)
@@ -78,7 +79,7 @@ class RealRuntimeConfigurationWriter @Inject constructor(val moshi: Moshi) : Run
 
     override fun generateUserPreferences(
         autofillCredentials: Boolean,
-        showInlineKeyIcon: Boolean
+        showInlineKeyIcon: Boolean,
     ): String {
         return """
             userPreferences = {

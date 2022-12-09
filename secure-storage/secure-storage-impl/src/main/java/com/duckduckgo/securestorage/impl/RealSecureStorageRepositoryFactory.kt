@@ -24,12 +24,14 @@ import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class RealSecureStorageRepositoryFactory @Inject constructor(
-    private val secureStorageDatabaseFactory: SecureStorageDatabaseFactory
+    private val secureStorageDatabaseFactory: SecureStorageDatabaseFactory,
 ) : SecureStorageRepository.Factory {
     override fun get(): SecureStorageRepository? {
         val db = secureStorageDatabaseFactory.getDatabase()
         return if (db != null) {
             RealSecureStorageRepository(db.websiteLoginCredentialsDao())
-        } else null
+        } else {
+            null
+        }
     }
 }

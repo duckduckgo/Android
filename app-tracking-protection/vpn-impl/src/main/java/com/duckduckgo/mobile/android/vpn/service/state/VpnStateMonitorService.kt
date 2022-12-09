@@ -32,10 +32,10 @@ import com.duckduckgo.mobile.android.vpn.model.VpnServiceStateStats
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import dagger.android.AndroidInjection
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
-import javax.inject.Inject
+import logcat.logcat
 
 @InjectWith(VpnScope::class)
 class VpnStateMonitorService : Service() {
@@ -43,7 +43,8 @@ class VpnStateMonitorService : Service() {
     @Inject lateinit var vpnDatabase: VpnDatabase
 
     @Inject
-    @AppCoroutineScope lateinit var coroutineScope: CoroutineScope
+    @AppCoroutineScope
+    lateinit var coroutineScope: CoroutineScope
 
     @Inject lateinit var dispatcherProvider: DispatcherProvider
 
@@ -55,17 +56,17 @@ class VpnStateMonitorService : Service() {
     }
 
     override fun onBind(intent: Intent?): IBinder? {
-        Timber.d("Bound to VPN")
+        logcat { "Bound to VPN" }
         return binder
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
-        Timber.d("Unbound from VPN")
+        logcat { "Unbound from VPN" }
         return super.onUnbind(intent)
     }
 
     override fun onDestroy() {
-        Timber.d("onDestroy")
+        logcat { "onDestroy" }
         coroutineScope.launch(dispatcherProvider.io()) {
             maybeUpdateVPNState()
             vpnBringUpIfSuddenKill()
@@ -77,7 +78,7 @@ class VpnStateMonitorService : Service() {
     private fun maybeUpdateVPNState() {
         val lastStateStats = vpnDatabase.vpnServiceStateDao().getLastStateStats()
         if (lastStateStats?.state != DISABLED) {
-            Timber.d("VpnStateMonitorService destroyed but VPN state stored as ${lastStateStats?.state}, inserting DISABLED")
+            logcat { "VpnStateMonitorService destroyed but VPN state stored as ${lastStateStats?.state}, inserting DISABLED" }
             vpnDatabase.vpnServiceStateDao().insert(VpnServiceStateStats(state = DISABLED))
         }
     }
@@ -86,10 +87,10 @@ class VpnStateMonitorService : Service() {
     private fun vpnBringUpIfSuddenKill() {
         val lastHearBeat = vpnDatabase.vpnHeartBeatDao().hearBeats().maxByOrNull { it.timestamp }
         if (true == lastHearBeat?.isAlive()) {
-            Timber.d("Sudden stop, restarting VPN")
+            logcat { "Sudden stop, restarting VPN" }
             TrackerBlockingVpnService.startService(applicationContext)
         } else {
-            Timber.d("No need to restart the VPN")
+            logcat { "No need to restart the VPN" }
         }
     }
 

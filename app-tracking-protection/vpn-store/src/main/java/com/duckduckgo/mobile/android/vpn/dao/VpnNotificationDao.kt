@@ -36,5 +36,5 @@ interface VpnNotificationsDao {
 @Entity(tableName = "vpn_notification")
 data class VpnNotification(
     @PrimaryKey val id: Int,
-    val timesRun: Long = 0
+    val timesRun: Long = 0,
 )

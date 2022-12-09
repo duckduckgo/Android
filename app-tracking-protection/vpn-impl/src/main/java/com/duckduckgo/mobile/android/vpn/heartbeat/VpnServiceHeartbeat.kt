@@ -24,32 +24,33 @@ import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.ERROR
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.RESTART
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REVOKED
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.UNKNOWN
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.*
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlinx.coroutines.*
+import logcat.logcat
 
 @ContributesMultibinding(
     scope = VpnScope::class,
-    boundType = VpnServiceCallbacks::class
+    boundType = VpnServiceCallbacks::class,
 )
 @SingleInstanceIn(VpnScope::class)
 class VpnServiceHeartbeat @Inject constructor(
     private val context: Context,
     private val vpnDatabase: VpnDatabase,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
 ) : VpnServiceCallbacks {
 
     private var job = ConflatedJob()
 
     private suspend fun storeHeartbeat(type: String) = withContext(dispatcherProvider.io()) {
-        Timber.v("(${Process.myPid()}) - Sending heartbeat $type")
+        logcat { "(${Process.myPid()}) - Sending heartbeat $type" }
         vpnDatabase.vpnHeartBeatDao().insertType(type)
     }
 
@@ -58,7 +59,7 @@ class VpnServiceHeartbeat @Inject constructor(
     }
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        Timber.v("onVpnStarted called")
+        logcat { "onVpnStarted called" }
         job += coroutineScope.launch {
             while (true) {
                 storeHeartbeat(VpnServiceHeartbeatMonitor.DATA_HEART_BEAT_TYPE_ALIVE)
@@ -69,13 +70,14 @@ class VpnServiceHeartbeat @Inject constructor(
 
     override fun onVpnStopped(
         coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
+        vpnStopReason: VpnStopReason,
     ) {
-        Timber.v("onVpnStopped called")
+        logcat { "onVpnStopped called" }
         when (vpnStopReason) {
-            ERROR -> Timber.v("HB monitor: sudden vpn stopped $vpnStopReason")
+            ERROR -> logcat { "HB monitor: sudden vpn stopped $vpnStopReason" }
+            RESTART -> logcat { "HB monitor: restarting vpn $vpnStopReason" }
             SELF_STOP, REVOKED, UNKNOWN -> {
-                Timber.v("HB monitor: self stopped or revoked: $vpnStopReason")
+                logcat { "HB monitor: self stopped or revoked: $vpnStopReason" }
                 coroutineScope.launch { storeHeartbeat(VpnServiceHeartbeatMonitor.DATA_HEART_BEAT_TYPE_STOPPED) }
             }
         }

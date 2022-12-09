@@ -23,5 +23,5 @@ enum class VoiceSearchPixelNames(override val pixelName: String) : Pixel.PixelNa
     VOICE_SEARCH_PRIVACY_DIALOG_ACCEPTED("m_voice_search_privacy_dialog_accepted"),
     VOICE_SEARCH_PRIVACY_DIALOG_REJECTED("m_voice_search_privacy_dialog_rejected"),
     VOICE_SEARCH_STARTED("m_voice_search_started"),
-    VOICE_SEARCH_DONE("m_voice_search_done")
+    VOICE_SEARCH_DONE("m_voice_search_done"),
 }

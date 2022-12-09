@@ -18,8 +18,8 @@ package com.duckduckgo.app.browser.addtohome
 
 import android.content.Context
 import androidx.core.content.pm.ShortcutManagerCompat
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 interface AddToHomeCapabilityDetector {
     fun isAddToHomeSupported(): Boolean

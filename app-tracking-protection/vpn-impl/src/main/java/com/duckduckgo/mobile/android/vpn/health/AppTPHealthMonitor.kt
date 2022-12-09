@@ -16,24 +16,23 @@
 
 package com.duckduckgo.mobile.android.vpn.health
 
-import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.di.VpnCoroutineScope
 import com.duckduckgo.mobile.android.vpn.health.AppTPHealthMonitor.HealthState.BadHealth
 import com.duckduckgo.mobile.android.vpn.health.AppTPHealthMonitor.HealthState.GoodHealth
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.NO_VPN_CONNECTIVITY
+import com.duckduckgo.vpn.di.VpnCoroutineScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import javax.inject.Inject
+import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import timber.log.Timber
-import javax.inject.Inject
-import kotlin.time.Duration.Companion.minutes
+import logcat.logcat
 
 /**
  * Health monitor will periodically obtain the current health metrics across AppTP, and raise an
@@ -81,12 +80,11 @@ class AppTPHealthMonitor @Inject constructor(
     private val monitoringJob = ConflatedJob()
     private val oldMetricCleanupJob = ConflatedJob()
 
-    private var simulatedGoodHealth: SimulatedHealthState? = null
-
     private val healthRules = mutableListOf<HealthRule>()
 
     private val noNetworkConnectivityAlert = object : HealthRule(
-        "noNetworkConnectivityAlert", samplesToWaitBeforeAlerting = NO_NETWORK_CONNECTIVITY_SAMPLES
+        "noNetworkConnectivityAlert",
+        samplesToWaitBeforeAlerting = NO_NETWORK_CONNECTIVITY_SAMPLES,
     ) {}.also { healthRules.add(it) }
 
     private suspend fun checkCurrentHealth() {
@@ -123,7 +121,7 @@ class AppTPHealthMonitor @Inject constructor(
 
     private fun sampleVpnConnectivityEvents(
         timeWindow: Long,
-        healthAlerts: HealthRule
+        healthAlerts: HealthRule,
     ): HealthState {
         val noConnectivityStats = healthMetricCounter.getStat(NO_VPN_CONNECTIVITY(), timeWindow)
         val state = healthClassifier.determineHealthVpnConnectivity(noConnectivityStats, healthAlerts.name)
@@ -151,7 +149,7 @@ class AppTPHealthMonitor @Inject constructor(
     }
 
     override fun startMonitoring() {
-        Timber.v("AppTp Health - start monitoring")
+        logcat { "AppTp Health - start monitoring" }
 
         monitoringJob += coroutineScope.launch {
             while (isActive) {
@@ -162,7 +160,7 @@ class AppTPHealthMonitor @Inject constructor(
 
         oldMetricCleanupJob += coroutineScope.launch {
             while (isActive) {
-                Timber.i("Cleaning up old health metrics")
+                logcat { "Cleaning up old health metrics" }
                 healthMetricCounter.purgeOldMetrics()
                 delay(OLD_METRIC_CLEANUP_FREQUENCY_MS)
             }
@@ -170,7 +168,7 @@ class AppTPHealthMonitor @Inject constructor(
     }
 
     override fun stopMonitoring() {
-        Timber.v("AppTp Health - stop monitoring")
+        logcat { "AppTp Health - stop monitoring" }
 
         monitoringJob.cancel()
         oldMetricCleanupJob.cancel()
@@ -181,38 +179,13 @@ class AppTPHealthMonitor @Inject constructor(
     }
 
     sealed class HealthState(open val metrics: RawMetricsSubmission?) {
-        object Initializing : HealthState(null)
         data class GoodHealth(override val metrics: RawMetricsSubmission) : HealthState(metrics)
         data class BadHealth(override val metrics: RawMetricsSubmission) : HealthState(metrics)
     }
 
-    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
-    fun simulateBadHealthState() {
-        this.simulatedGoodHealth = SimulatedHealthState.BAD
-    }
-
-    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
-    fun simulateCriticalHealthState() {
-        this.simulatedGoodHealth = SimulatedHealthState.CRITICAL
-    }
-
-    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
-    fun simulateGoodHealthState() {
-        this.simulatedGoodHealth = SimulatedHealthState.GOOD
-    }
-
-    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
-    fun stopHealthSimulation() {
-        this.simulatedGoodHealth = null
-    }
-
-    private enum class SimulatedHealthState {
-        GOOD, BAD, CRITICAL
-    }
-
     private abstract class HealthRule(
         open val name: String,
-        open var samplesToWaitBeforeAlerting: Int = DEFAULT_ALERT_SAMPLES
+        open var samplesToWaitBeforeAlerting: Int = DEFAULT_ALERT_SAMPLES,
     ) {
         var badHealthSampleCount: Int = 0
 

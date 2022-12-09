@@ -24,21 +24,21 @@ import android.webkit.WebView
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.*
 import com.duckduckgo.app.browser.model.LongPressTarget
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.AppPixelName.*
-import timber.log.Timber
+import com.duckduckgo.app.statistics.pixels.Pixel
 import javax.inject.Inject
+import timber.log.Timber
 
 interface LongPressHandler {
     fun handleLongPress(
         longPressTargetType: Int,
         longPressTargetUrl: String?,
-        menu: ContextMenu
+        menu: ContextMenu,
     )
 
     fun userSelectedMenuItem(
         longPressTarget: LongPressTarget,
-        item: MenuItem
+        item: MenuItem,
     ): RequiredAction
 
     sealed class RequiredAction {
@@ -53,13 +53,13 @@ interface LongPressHandler {
 
 class WebViewLongPressHandler @Inject constructor(
     private val context: Context,
-    private val pixel: Pixel
+    private val pixel: Pixel,
 ) : LongPressHandler {
 
     override fun handleLongPress(
         longPressTargetType: Int,
         longPressTargetUrl: String?,
-        menu: ContextMenu
+        menu: ContextMenu,
     ) {
         menu.setHeaderTitle(longPressTargetUrl?.take(MAX_TITLE_LENGTH) ?: context.getString(R.string.options))
 
@@ -108,7 +108,7 @@ class WebViewLongPressHandler @Inject constructor(
 
     override fun userSelectedMenuItem(
         longPressTarget: LongPressTarget,
-        item: MenuItem
+        item: MenuItem,
     ): RequiredAction {
         return when (item.itemId) {
             CONTEXT_MENU_ID_OPEN_IN_NEW_TAB -> {

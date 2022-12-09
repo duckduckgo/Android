@@ -24,7 +24,7 @@ interface BackgroundTimeKeeper {
     fun hasEnoughTimeElapsed(
         timeNow: Long = SystemClock.elapsedRealtime(),
         backgroundedTimestamp: Long,
-        clearWhenOption: ClearWhenOption
+        clearWhenOption: ClearWhenOption,
     ): Boolean
 }
 
@@ -33,7 +33,7 @@ class DataClearerTimeKeeper : BackgroundTimeKeeper {
     override fun hasEnoughTimeElapsed(
         timeNow: Long,
         backgroundedTimestamp: Long,
-        clearWhenOption: ClearWhenOption
+        clearWhenOption: ClearWhenOption,
     ): Boolean {
         if (clearWhenOption == ClearWhenOption.APP_EXIT_ONLY) return false
 
@@ -45,7 +45,7 @@ class DataClearerTimeKeeper : BackgroundTimeKeeper {
 
     private fun timeSinceAppBackgrounded(
         timeNow: Long,
-        backgroundedTimestamp: Long
+        backgroundedTimestamp: Long,
     ): Long {
         return timeNow - backgroundedTimestamp
     }

@@ -28,7 +28,7 @@ class FakeVoiceSearchPermissionDialogsLauncher : VoiceSearchPermissionDialogsLau
     override fun showNoMicAccessDialog(
         context: Context,
         onSettingsLaunchSelected: () -> Unit,
-        onSettingsLaunchDeclined: () -> Unit
+        onSettingsLaunchDeclined: () -> Unit,
     ) {
         noMicAccessDialogShown = true
     }
@@ -36,7 +36,7 @@ class FakeVoiceSearchPermissionDialogsLauncher : VoiceSearchPermissionDialogsLau
     override fun showPermissionRationale(
         context: Context,
         onRationaleAccepted: () -> Unit,
-        onRationaleDeclined: () -> Unit
+        onRationaleDeclined: () -> Unit,
     ) {
         rationaleDialogShown = true
         boundOnRationaleAccepted = onRationaleAccepted

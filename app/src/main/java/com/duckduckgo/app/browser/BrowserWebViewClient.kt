@@ -41,15 +41,15 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
+import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.BrowserAutofill
 import com.duckduckgo.autofill.InternalTestUserChecker
-import com.duckduckgo.autoconsent.api.Autoconsent
-import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
+import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.privacy.config.api.AmpLinks
+import java.net.URI
 import kotlinx.coroutines.*
 import timber.log.Timber
-import java.net.URI
 
 class BrowserWebViewClient(
     private val webViewHttpAuthStore: WebViewHttpAuthStore,
@@ -72,7 +72,7 @@ class BrowserWebViewClient(
     private val internalTestUserChecker: InternalTestUserChecker,
     private val adClickManager: AdClickManager,
     private val autoconsent: Autoconsent,
-    private val contentScopeScripts: ContentScopeScripts
+    private val contentScopeScripts: ContentScopeScripts,
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -84,7 +84,7 @@ class BrowserWebViewClient(
     @RequiresApi(Build.VERSION_CODES.N)
     override fun shouldOverrideUrlLoading(
         view: WebView,
-        request: WebResourceRequest
+        request: WebResourceRequest,
     ): Boolean {
         val url = request.url
         return shouldOverride(view, url, request.isForMainFrame)
@@ -96,7 +96,7 @@ class BrowserWebViewClient(
     @Suppress("OverridingDeprecatedMember")
     override fun shouldOverrideUrlLoading(
         view: WebView,
-        urlString: String
+        urlString: String,
     ): Boolean {
         val url = Uri.parse(urlString)
         return shouldOverride(view, url, isForMainFrame = true)
@@ -108,9 +108,8 @@ class BrowserWebViewClient(
     private fun shouldOverride(
         webView: WebView,
         url: Uri,
-        isForMainFrame: Boolean
+        isForMainFrame: Boolean,
     ): Boolean {
-
         Timber.v("shouldOverride $url")
         try {
             if (isForMainFrame && dosDetector.isUrlGeneratingDos(url)) {
@@ -229,7 +228,7 @@ class BrowserWebViewClient(
     private fun loadUrl(
         listener: WebViewClientListener,
         webView: WebView,
-        url: String
+        url: String,
     ) {
         if (listener.linkOpenedInNewTab()) {
             webView.post {
@@ -244,7 +243,7 @@ class BrowserWebViewClient(
     override fun onPageStarted(
         webView: WebView,
         url: String?,
-        favicon: Bitmap?
+        favicon: Bitmap?,
     ) {
         try {
             Timber.v("onPageStarted webViewUrl: ${webView.url} URL: $url")
@@ -276,7 +275,7 @@ class BrowserWebViewClient(
     @UiThread
     override fun onPageFinished(
         webView: WebView,
-        url: String?
+        url: String?,
     ) {
         try {
             accessibilityManager.onPageFinished(webView, url)
@@ -309,12 +308,12 @@ class BrowserWebViewClient(
     @WorkerThread
     override fun shouldInterceptRequest(
         webView: WebView,
-        request: WebResourceRequest
+        request: WebResourceRequest,
     ): WebResourceResponse? {
         return runBlocking {
             try {
-                val documentUrl = withContext(Dispatchers.Main) { webView.url }
-                withContext(Dispatchers.Main) {
+                val documentUrl = withContext(dispatcherProvider.main()) { webView.url }
+                withContext(dispatcherProvider.main()) {
                     loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
                 }
                 Timber.v("Intercepting resource ${request.url} type:${request.method} on page $documentUrl")
@@ -329,7 +328,7 @@ class BrowserWebViewClient(
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onRenderProcessGone(
         view: WebView?,
-        detail: RenderProcessGoneDetail?
+        detail: RenderProcessGoneDetail?,
     ): Boolean {
         Timber.w("onRenderProcessGone. Did it crash? ${detail?.didCrash()}")
         if (detail?.didCrash() == true) {
@@ -347,7 +346,7 @@ class BrowserWebViewClient(
         view: WebView?,
         handler: HttpAuthHandler?,
         host: String?,
-        realm: String?
+        realm: String?,
     ) {
         try {
             Timber.v("onReceivedHttpAuthRequest ${view?.url} $realm, $host")
@@ -380,7 +379,7 @@ class BrowserWebViewClient(
     override fun onReceivedSslError(
         view: WebView?,
         handler: SslErrorHandler,
-        error: SslError
+        error: SslError,
     ) {
         var trusted: CertificateValidationState = CertificateValidationState.UntrustedChain
         when (error.primaryError) {
@@ -399,7 +398,7 @@ class BrowserWebViewClient(
         view: WebView?,
         handler: HttpAuthHandler,
         host: String?,
-        realm: String?
+        realm: String?,
     ) {
         webViewClientListener?.let {
             Timber.v("showAuthenticationDialog - $host, $realm")
@@ -410,7 +409,7 @@ class BrowserWebViewClient(
                 handler = handler,
                 host = host.orEmpty(),
                 realm = realm.orEmpty(),
-                site = siteURL
+                site = siteURL,
             )
 
             it.requiresAuthentication(request)
@@ -420,7 +419,7 @@ class BrowserWebViewClient(
     override fun onReceivedHttpError(
         view: WebView?,
         request: WebResourceRequest?,
-        errorResponse: WebResourceResponse?
+        errorResponse: WebResourceResponse?,
     ) {
         super.onReceivedHttpError(view, request, errorResponse)
         view?.url?.let {

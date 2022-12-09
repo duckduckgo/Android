@@ -20,6 +20,7 @@ package com.duckduckgo.mobile.android.ui.view.listitem
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.text.TextUtils.TruncateAt
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
@@ -31,13 +32,14 @@ import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewTwoLineItemBinding
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
+import com.duckduckgo.mobile.android.ui.view.setEnabledOpacity
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class TwoLineListItem @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = R.attr.twoLineListItemStyle
+    defStyleAttr: Int = R.attr.twoLineListItemStyle,
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
     private val binding: ViewTwoLineItemBinding by viewBinding()
@@ -47,7 +49,7 @@ class TwoLineListItem @JvmOverloads constructor(
             attrs,
             R.styleable.TwoLineListItem,
             0,
-            R.style.Widget_DuckDuckGo_TwoLineListItem
+            R.style.Widget_DuckDuckGo_TwoLineListItem,
         ).apply {
 
             binding.primaryText.text = getString(R.styleable.TwoLineListItem_primaryText)
@@ -55,6 +57,14 @@ class TwoLineListItem @JvmOverloads constructor(
 
             if (hasValue(R.styleable.TwoLineListItem_primaryTextColorOverlay)) {
                 binding.primaryText.setTextColor(getColorStateList(R.styleable.TwoLineListItem_primaryTextColorOverlay))
+            }
+
+            val truncated = getBoolean(R.styleable.TwoLineListItem_primaryTextTruncated, true)
+            if (truncated) {
+                binding.primaryText.maxLines = 1
+                binding.primaryText.ellipsize = TruncateAt.END
+            } else {
+                binding.primaryText.maxLines = Int.MAX_VALUE
             }
 
             if (hasValue(R.styleable.TwoLineListItem_secondaryTextColorOverlay)) {
@@ -190,12 +200,13 @@ class TwoLineListItem @JvmOverloads constructor(
     /** Allows to set a new value to the switch, without triggering the onChangeListener */
     fun quietlySetIsChecked(
         newCheckedState: Boolean,
-        changeListener: CompoundButton.OnCheckedChangeListener?
+        changeListener: CompoundButton.OnCheckedChangeListener?,
     ) {
         binding.trailingSwitch.quietlySetIsChecked(newCheckedState, changeListener)
     }
 
     override fun setEnabled(enabled: Boolean) {
+        setEnabledOpacity(enabled)
         recursiveEnable(enabled)
         super.setEnabled(enabled)
     }

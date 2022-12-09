@@ -16,26 +16,27 @@
 
 package com.duckduckgo.vpn.internal.feature.logs
 
-import timber.log.Timber
+import logcat.AndroidLogcatLogger
+import logcat.LogcatLogger
+import logcat.logcat
 
 class TimberExtensions {
     companion object {
         @JvmStatic
         fun isLoggingEnabled(): Boolean {
-            return Timber.forest().isNotEmpty()
+            return LogcatLogger.isInstalled
         }
 
         @JvmStatic
         fun disableLogging() {
-            Timber.v("Logging Stopped")
-            Timber.uprootAll()
+            logcat { "Logging Stopped" }
+            LogcatLogger.uninstall()
         }
 
         @JvmStatic
         fun enableLogging() {
-            Timber.uprootAll()
-            Timber.plant(Timber.DebugTree())
-            Timber.v("Logging Started")
+            LogcatLogger.install(AndroidLogcatLogger())
+            logcat { "Logging Started" }
         }
     }
 }

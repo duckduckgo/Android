@@ -22,15 +22,15 @@ import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus.STARTED
-import okhttp3.ResponseBody
-import okio.Buffer
-import okio.sink
-import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 import kotlin.math.exp
 import kotlin.math.floor
 import kotlin.random.Random
+import okhttp3.ResponseBody
+import okio.Buffer
+import okio.sink
+import timber.log.Timber
 
 class UrlFileDownloader @Inject constructor(
     private val downloadFileService: DownloadFileService,
@@ -61,8 +61,8 @@ class UrlFileDownloader @Inject constructor(
                 fileName = fileName,
                 contentLength = 0,
                 filePath = directory.path + File.separatorChar + fileName,
-                createdAt = DatabaseDateFormatter.timestamp()
-            )
+                createdAt = DatabaseDateFormatter.timestamp(),
+            ),
 
         )
 

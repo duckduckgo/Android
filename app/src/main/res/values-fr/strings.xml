@@ -81,7 +81,7 @@
     <string name="previousSearchTermDescription">Précédent</string>
     <string name="closeFindInPageButtonDescription">Fermer la recherche en vue de page</string>
     <string name="findInPageHint">Rechercher dans la page</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Modifier la requête avant la recherche</string>
@@ -108,76 +108,6 @@
     <string name="tabClosed">Onglet fermé</string>
     <string name="tabClosedUndo">Annuler</string>
     <string name="downloadsMenuItemTitle">Téléchargements</string>
-
-    <!-- Privacy Dashboard Activities -->
-    <string name="privacyProtectionToggle">Protection de la confidentialité du site</string>
-    <string name="privacyProtectionEnabled">PROTECTION DU SITE ACTIVÉE</string>
-    <string name="privacyProtectionDisabled">PROTECTION DU SITE DÉSACTIVÉE</string>
-    <string name="privacyDashboardActivityTitle">Tableau de bord de confidentialité</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">AMÉLIORÉ DE &lt;img src=\"%1$d\" /&gt; À &lt;img src=\"%2$d\" /&gt;</string>
-    <string name="privacyGradeContentDescription">Degré de confidentialité</string>
-    <string name="privacyProtectionTemporarilyDisabled">Nous avons temporairement désactivé la protection de la confidentialité car elle semble perturber ce site.</string>
-
-    <string name="httpsGood">Connexion chiffrée</string>
-    <string name="httpsMixed">Connexion à chiffrement mixte</string>
-    <string name="httpsBad">Connexion non chiffrée</string>
-
-    <string name="scorecardActivityTitle">Degré de confidentialité</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">Le site est un réseau majeur de traqueurs</string>
-    <string name="scorecardPrivacyGrade">Degré de confidentialité</string>
-    <string name="scorecardEnhancedGrade">Degré amélioré</string>
-
-    <string name="privacyTermsActivityTitle">Pratiques de confidentialité</string>
-    <string name="practicesGood">Bonnes pratiques de confidentialité</string>
-    <string name="practicesMixed">Pratiques de confidentialité mixtes</string>
-    <string name="practicesBad">Mauvaises pratiques de confidentialité</string>
-    <string name="practicesUnknown">Pratiques de confidentialité inconnues</string>
-    <string name="practicesOverview">Les pratiques de confidentialité indiquent dans quelle mesure les informations personnelles que vous partagez avec un site Web sont protégées.</string>
-    <string name="practicesTosdrLink">Les pratiques de confidentialité de <b><u>ToS;DR</u></b>.</string>
-    <string name="practicesIconContentGood">Icône de bonne pratique</string>
-    <string name="practicesIconContentBad">Icône de mauvaise pratique</string>
-
-    <string name="networkTrackerSummaryHeader">PRINCIPAUX COUPABLES DES RÉSEAUX DE TRAQUEURS</string>
-    <string name="networkTrackerSummaryNotReady">Nous recueillons toujours des données pour indiquer le nombre de traqueurs que nous avons bloqués.</string>
-
-    <string name="trackersActivityTitle">Demandes de suivi bloquées</string>
-    <string name="trackersContentDescription">Demandes de suivi bloquées</string>
-    <string name="trackersOverview">Les demandes des domaines tiers suivants ont vu leur chargement bloqué, car elles ont été identifiées comme des demandes de suivi. Si les demandes d\'une entreprise sont chargées, cela peut lui permettre d\'établir votre profil.</string>
-    <string name="trackersOverviewProtectionsOff">Aucune demande de suivi n\'a vu son chargement bloqué car les protections sont désactivées pour ce site. Si les demandes d\'une entreprise sont chargées, cela peut lui permettre d\'établir votre profil.</string>
-
-    <string name="domainsLoadedActivityTitle">Demandes tierces chargées</string>
-    <string name="domainsLoadedContentDescription">Demandes tierces chargées</string>
-    <string name="domainsLoadedOverview">Les demandes des domaines tiers suivants ont été chargées. Si les demandes d\'une entreprise sont chargées, cela peut lui permettre d\'établir votre profil, bien que nos autres protections en matière de suivi sur Internet restent applicables.</string>
-    <string name="domainsLoadedOverviewProtectionsOff">Aucune demande tierce n\'a vu son chargement bloqué car les protections sont désactivées pour ce site. Si les demandes d\'une entreprise sont chargées, cela peut lui permettre d\'établir votre profil.</string>
-    <string name="domainsLoadedOverviewEmpty">Nous n\'avons détecté aucune demande provenant de domaines tiers.</string>
-    <string name="domainsLoadedHeadingText">Aucun domaine tiers chargé</string>
-
-    <string name="webTrackingProtectionsText"><annotation type="learn_more_link">À propos de nos protections contre le suivi Web</annotation></string>
-    <string name="webTrackingProtectionsUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
-
-    <string name="trackersBlockedNoSectionDescription">Les demandes du domaine suivant ont également été chargées.</string>
-
-    <string name="adLoadedSectionDescription" instruction="Placeholder is the name of the company who owns the ad">Les demandes du domaine suivant ont été chargées car une publicité %1$s sur DuckDuckGo a récemment fait l\'objet d\'un clic. Ces demandes permettent d\'évaluer l\'efficacité des publicités. Toutes les publicités sur DuckDuckGo sont sans profilage.</string>
-    <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Impact de nos publicités de recherche sur nos protections </annotation></string>
-    <string name="adLoadedSectionUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
-
-    <string name="domainsLoadedSectionDescription">Les demandes du domaine suivant ont également été chargées.</string>
-    <string name="domainsLoadedSectionSingleSectionDescription">Les demandes de suivi des domaines suivants ont été chargées.</string>
-    <string name="domainsLoadedSectionEmptyListDescription">Nous n\'avons détecté aucune demande provenant de domaines tiers.</string>
-
-    <string name="domainsLoadedBreakageSectionDescription">Les demandes du domaine suivant ont été chargées pour éviter toute coupure du site.</string>
-    <string name="domainsLoadedAssociatedSectionDescription" instruction="Placeholder is the name of a company">Les demandes du domaine suivant ont été chargées car elles sont associées à %1$s.</string>
-
-    <string name="trackersBlockedText">Demandes dont le chargement a été bloqué</string>
-    <string name="trackersNotBlockedText">Aucune demande de suivi bloquée</string>
-    <string name="trackersNoFoundText">Aucune demande de suivi trouvée</string>
-    <string name="trackersFoundText">Demandes de suivi trouvées</string>
-
-    <string name="domainsLoadedText">Demandes tierces chargées</string>
-    <string name="domainsNotLoadedText">Aucune demande tierce chargée</string>
-
-    <string name="majorNetworksNoFound">Aucun réseau majeur de traqueurs trouvé</string>
-    <string name="majorNetworksFound">Principaux réseaux de suivi trouvés</string>
 
     <!-- Fire -->
     <string name="fireMenu">Effacer les données</string>
@@ -267,7 +197,7 @@
     <string name="importBookmarksFileTitle">Sélectionnez un fichier de signets à importer.</string>
     <string name="importBookmarksError">Impossible d\'importer les signets. Un problème est survenu.</string>
     <string name="importBookmarksEmpty">Le fichier ne contient aucun signet à importer.</string>
-    <string name="importBookmarksSuccess">Importation réussie de %1$d signets.</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">Importation réussie de %1$d signets.</string>
     <string name="savedSiteDialogTitleHint">Titre</string>
     <string name="savedSiteDialogUrlHint">URL</string>
     <string name="savedSiteDialogTitleEdit">Modifier</string>
@@ -484,11 +414,11 @@
     <string name="daxIntroCtaText"><![CDATA[Maintenant, essayez de visiter un de vos sites préférés !<br/><br/>Je bloquerai les traqueurs afin qu\'ils ne puissent pas vous espionner. J\'améliorerai également la sécurité de votre connexion dans la mesure du possible. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Bien joué !<br/><br/>Souvenez-vous : chaque fois que vous naviguez avec moi, des publicités intrusives disparaissent. 👍]]></string>
     <string name="daxSerpCtaText">Vos recherches sur DuckDuckGo sont anonymes. Toujours. 🙌</string>
-    <plurals name="daxTrackersBlockedCtaText" tools:ignore="MissingQuantity">
+    <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one"><![CDATA[ et <b>%1$d autre</b> essayaient de vous traquer ici. <br/><br/>Je les ai bloqués !<br/><br/> ☝️Vous pouvez voir dans la barre d\'adresse qui essaie de vous traquer lorsque vous visitez un nouveau site.️]]></item>
         <item quantity="other"><![CDATA[ et <b>%1$d autres</b> essayaient de vous traquer ici. <br/><br/>Je les ai bloqués !<br/><br/> ☝️Vous pouvez voir dans la barre d\'adresse URL qui essaie de vous traquer lorsque vous visitez un nouveau site.️]]></item>
     </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="MissingQuantity, ImpliedQuantity">
+    <plurals name="daxTrackersBlockedCtaZeroText">
         <item quantity="one"><![CDATA[ essayait de vous traquer ici. <br/><br/>Je l\'ai bloqué !<br/><br/> ☝️Vous pouvez voir dans la barre d\'adresse URL qui essaie de vous traquer lorsque vous visitez un nouveau site.️️]]></item>
         <item quantity="other"><![CDATA[ essayaient de vous traquer ici. <br/><br/>Je les ai bloqués !<br/><br/> ☝️Vous pouvez voir dans la barre d\'adresse URL qui essaie de vous traquer lorsque vous visitez un nouveau site.️️]]></item>
     </plurals>
@@ -656,12 +586,12 @@
     <string name="bookmarkFolderDeleteDialogMessage">"Voulez-vous vraiment supprimer "</string>
     <string name="bookmarkFolderEmpty">Vide</string>
 
-    <plurals name="bookmarkFolderDeleteDialogMessage" tools:ignore="MissingQuantity">
-        <item quantity="one">%1$s%2$s et %1$d élément ?</item>
-        <item quantity="other">%1$s%2$s et %1$d éléments ?</item>
+    <plurals name="bookmarkFolderDeleteDialogMessage">
+        <item quantity="one">%1$s%2$s et %3$d élément ?</item>
+        <item quantity="other">%1$s%2$s et %3$d éléments ?</item>
     </plurals>
 
-    <plurals name="bookmarkFolderItems" tools:ignore="MissingQuantity">
+    <plurals name="bookmarkFolderItems">
         <item quantity="one">%1$d élément</item>
         <item quantity="other">%1$d éléments</item>
     </plurals>
@@ -733,10 +663,12 @@
     <string name="sitePermissionsSettingsMicrophone">Micro</string>
     <string name="sitePermissionsSettingsAllowedSitesTitle">Gérer les sites</string>
     <string name="sitePermissionsSettingsEmptyText">Pas encore de sites</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Autorisations supprimées pour tous les sites</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Autorisations pour « %1$s » </string>
     <string name="permissionsPerWebsiteAskSetting">Demander</string>
     <string name="permissionsPerWebsiteDenySetting">Refuser</string>
     <string name="permissionsPerWebsiteAllowSetting">Autoriser</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">« Demander » désactivé pour tous les sites</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Autorisation de %1$s pour %2$s</string>
 
     <!-- Autofill -->

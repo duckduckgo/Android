@@ -26,7 +26,7 @@ import javax.inject.Inject
 @ContributesMultibinding(AppScope::class)
 class AdClickFeatureTogglesPlugin @Inject constructor(
     private val adClickFeatureToggleRepository: AdClickFeatureToggleRepository,
-    private val appBuildConfig: AppBuildConfig
+    private val appBuildConfig: AppBuildConfig,
 ) : FeatureTogglesPlugin {
     override fun isEnabled(featureName: String, defaultValue: Boolean): Boolean? {
         val adClickFeature = adClickFeatureValueOf(featureName) ?: return null

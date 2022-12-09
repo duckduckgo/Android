@@ -18,6 +18,7 @@ package com.duckduckgo.autofill.configuration
 
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.autofill.domain.app.LoginCredentials
+import com.duckduckgo.autofill.jsbridge.response.AvailableInputTypeCredentials
 import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -53,7 +54,7 @@ class RealAutofillRuntimeConfigProviderTest {
             emailManager,
             deviceAuthenticator,
             autofillStore,
-            runtimeConfigurationWriter
+            runtimeConfigurationWriter,
         )
 
         whenever(runtimeConfigurationWriter.generateContentScope()).thenReturn("")
@@ -131,7 +132,11 @@ class RealAutofillRuntimeConfigProviderTest {
 
         testee.getRuntimeConfiguration("", url)
 
-        verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(credentialsAvailable = false, emailAvailable = false)
+        val expectedCredentialResponse = AvailableInputTypeCredentials(username = false, password = false)
+        verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(
+            credentialsAvailable = eq(expectedCredentialResponse),
+            emailAvailable = any(),
+        )
     }
 
     @Test
@@ -146,14 +151,122 @@ class RealAutofillRuntimeConfigProviderTest {
                     id = 1,
                     domain = url,
                     username = "username",
-                    password = "password"
-                )
-            )
+                    password = "password",
+                ),
+            ),
         )
 
         testee.getRuntimeConfiguration("", url)
 
-        verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(credentialsAvailable = true, emailAvailable = false)
+        val expectedCredentialResponse = AvailableInputTypeCredentials(username = true, password = true)
+        verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(
+            credentialsAvailable = eq(expectedCredentialResponse),
+            emailAvailable = any(),
+        )
+    }
+
+    @Test
+    fun whenWithUsernameOnlyForUrlThenConfigurationInputTypeCredentialsUsernameIsTrue() = runTest {
+        val url = "example.com"
+        whenever(deviceAuthenticator.hasValidDeviceAuthentication()).thenReturn(true)
+        whenever(autofillStore.autofillEnabled).thenReturn(true)
+        whenever(autofillStore.autofillAvailable).thenReturn(true)
+        whenever(autofillStore.getCredentials(url)).thenReturn(
+            listOf(
+                LoginCredentials(
+                    id = 1,
+                    domain = url,
+                    username = "username",
+                    password = null,
+                ),
+            ),
+        )
+
+        testee.getRuntimeConfiguration("", url)
+
+        val expectedCredentialResponse = AvailableInputTypeCredentials(username = true, password = false)
+        verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(
+            credentialsAvailable = eq(expectedCredentialResponse),
+            emailAvailable = any(),
+        )
+    }
+
+    @Test
+    fun whenWithEmptyUsernameOnlyForUrlThenConfigurationInputTypeCredentialsUsernameIsFalse() = runTest {
+        val url = "example.com"
+        whenever(deviceAuthenticator.hasValidDeviceAuthentication()).thenReturn(true)
+        whenever(autofillStore.autofillEnabled).thenReturn(true)
+        whenever(autofillStore.autofillAvailable).thenReturn(true)
+        whenever(autofillStore.getCredentials(url)).thenReturn(
+            listOf(
+                LoginCredentials(
+                    id = 1,
+                    domain = url,
+                    username = "",
+                    password = null,
+                ),
+            ),
+        )
+
+        testee.getRuntimeConfiguration("", url)
+
+        val expectedCredentialResponse = AvailableInputTypeCredentials(username = false, password = false)
+        verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(
+            credentialsAvailable = eq(expectedCredentialResponse),
+            emailAvailable = any(),
+        )
+    }
+
+    @Test
+    fun whenWithPasswordOnlyForUrlThenConfigurationInputTypeCredentialsUsernameIsTrue() = runTest {
+        val url = "example.com"
+        whenever(deviceAuthenticator.hasValidDeviceAuthentication()).thenReturn(true)
+        whenever(autofillStore.autofillEnabled).thenReturn(true)
+        whenever(autofillStore.autofillAvailable).thenReturn(true)
+        whenever(autofillStore.getCredentials(url)).thenReturn(
+            listOf(
+                LoginCredentials(
+                    id = 1,
+                    domain = url,
+                    username = null,
+                    password = "password",
+                ),
+            ),
+        )
+
+        testee.getRuntimeConfiguration("", url)
+
+        val expectedCredentialResponse = AvailableInputTypeCredentials(username = false, password = true)
+        verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(
+            credentialsAvailable = eq(expectedCredentialResponse),
+            emailAvailable = any(),
+        )
+    }
+
+    @Test
+    fun whenWithEmptyPasswordOnlyForUrlThenConfigurationInputTypeCredentialsUsernameIsTrue() = runTest {
+        val url = "example.com"
+        whenever(deviceAuthenticator.hasValidDeviceAuthentication()).thenReturn(true)
+        whenever(autofillStore.autofillEnabled).thenReturn(true)
+        whenever(autofillStore.autofillAvailable).thenReturn(true)
+        whenever(autofillStore.getCredentials(url)).thenReturn(
+            listOf(
+                LoginCredentials(
+                    id = 1,
+                    domain = url,
+                    username = null,
+                    password = "",
+                ),
+            ),
+        )
+
+        testee.getRuntimeConfiguration("", url)
+
+        val expectedCredentialResponse = AvailableInputTypeCredentials(username = false, password = false)
+        verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(
+            credentialsAvailable = eq(expectedCredentialResponse),
+            emailAvailable = any(),
+        )
     }
 
     @Test
@@ -168,14 +281,18 @@ class RealAutofillRuntimeConfigProviderTest {
                     id = 1,
                     domain = url,
                     username = "username",
-                    password = "password"
-                )
-            )
+                    password = "password",
+                ),
+            ),
         )
 
         testee.getRuntimeConfiguration("", url)
 
-        verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(credentialsAvailable = false, emailAvailable = false)
+        val expectedCredentialResponse = AvailableInputTypeCredentials(username = false, password = false)
+        verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(
+            credentialsAvailable = eq(expectedCredentialResponse),
+            emailAvailable = any(),
+        )
     }
 
     @Test
@@ -190,14 +307,18 @@ class RealAutofillRuntimeConfigProviderTest {
                     id = 1,
                     domain = url,
                     username = "username",
-                    password = "password"
-                )
-            )
+                    password = "password",
+                ),
+            ),
         )
 
         testee.getRuntimeConfiguration("", url)
 
-        verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(credentialsAvailable = false, emailAvailable = false)
+        val expectedCredentialResponse = AvailableInputTypeCredentials(username = false, password = false)
+        verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(
+            credentialsAvailable = eq(expectedCredentialResponse),
+            emailAvailable = any(),
+        )
     }
 
     @Test
@@ -212,14 +333,18 @@ class RealAutofillRuntimeConfigProviderTest {
                     id = 1,
                     domain = url,
                     username = "username",
-                    password = "password"
-                )
-            )
+                    password = "password",
+                ),
+            ),
         )
 
         testee.getRuntimeConfiguration("", url)
 
-        verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(credentialsAvailable = false, emailAvailable = false)
+        val expectedCredentialResponse = AvailableInputTypeCredentials(username = false, password = false)
+        verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(
+            credentialsAvailable = eq(expectedCredentialResponse),
+            emailAvailable = any(),
+        )
     }
 
     @Test
@@ -230,7 +355,24 @@ class RealAutofillRuntimeConfigProviderTest {
 
         testee.getRuntimeConfiguration("", url)
 
-        verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(credentialsAvailable = false, emailAvailable = true)
+        verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(
+            credentialsAvailable = any(),
+            emailAvailable = eq(true),
+        )
+    }
+
+    @Test
+    fun whenEmailIsSignedOutThenConfigurationInputTypeEmailIsFalse() = runTest {
+        val url = "example.com"
+        whenever(autofillStore.getCredentials(url)).thenReturn(emptyList())
+        whenever(emailManager.isSignedIn()).thenReturn(false)
+
+        testee.getRuntimeConfiguration("", url)
+
+        verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(
+            credentialsAvailable = any(),
+            emailAvailable = eq(false),
+        )
     }
 
     private suspend fun configureAutofillAvailableForSite(url: String) {

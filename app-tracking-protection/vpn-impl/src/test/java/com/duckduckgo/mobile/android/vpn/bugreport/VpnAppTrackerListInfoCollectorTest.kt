@@ -20,6 +20,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.mobile.android.vpn.apps.AppCategory
 import com.duckduckgo.mobile.android.vpn.apps.AppCategoryDetector
 import com.duckduckgo.mobile.android.vpn.dao.VpnAppTrackerBlockingDao
+import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
+import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -40,6 +42,7 @@ class VpnAppTrackerListInfoCollectorTest {
 
     private val appTrackerRepository = mock<AppTrackerRepository>()
     private val appCategoryDetector = mock<AppCategoryDetector>()
+    private val appTpFeatureConfig = mock<AppTpFeatureConfig>()
 
     private lateinit var collector: VpnAppTrackerListInfoCollector
 
@@ -48,7 +51,7 @@ class VpnAppTrackerListInfoCollectorTest {
         whenever(vpnDatabase.vpnAppTrackerBlockingDao()).thenReturn(vpnAppTrackerBlockingDao)
         whenever(appTrackerRepository.getManualAppExclusionList()).thenReturn(listOf())
 
-        collector = VpnAppTrackerListInfoCollector(vpnDatabase, appTrackerRepository, appCategoryDetector)
+        collector = VpnAppTrackerListInfoCollector(vpnDatabase, appTrackerRepository, appCategoryDetector, appTpFeatureConfig)
     }
 
     @Test
@@ -56,7 +59,6 @@ class VpnAppTrackerListInfoCollectorTest {
         val jsonObject = collector.collectVpnRelatedState(PACKAGE_ID)
 
         assertEquals("", jsonObject.get("appTrackerListEtag"))
-
     }
 
     @Test
@@ -65,7 +67,6 @@ class VpnAppTrackerListInfoCollectorTest {
         val jsonObject = collector.collectVpnRelatedState(PACKAGE_ID)
 
         assertEquals("etag", jsonObject.get("appTrackerListEtag"))
-
     }
 
     @Test
@@ -73,7 +74,6 @@ class VpnAppTrackerListInfoCollectorTest {
         val jsonObject = collector.collectVpnRelatedState(PACKAGE_ID)
 
         assertEquals("", jsonObject.get("appExclusionListEtag"))
-
     }
 
     @Test
@@ -82,7 +82,6 @@ class VpnAppTrackerListInfoCollectorTest {
         val jsonObject = collector.collectVpnRelatedState(PACKAGE_ID)
 
         assertEquals("etag", jsonObject.get("appExclusionListEtag"))
-
     }
 
     @Test
@@ -90,7 +89,6 @@ class VpnAppTrackerListInfoCollectorTest {
         val jsonObject = collector.collectVpnRelatedState(PACKAGE_ID)
 
         assertEquals("", jsonObject.get("appExceptionRuleListEtag"))
-
     }
 
     @Test
@@ -99,16 +97,46 @@ class VpnAppTrackerListInfoCollectorTest {
         val jsonObject = collector.collectVpnRelatedState(PACKAGE_ID)
 
         assertEquals("etag", jsonObject.get("appExceptionRuleListEtag"))
-
     }
 
     @Test
     fun whenCollectStateAndAppGameAndInExclusionListThenReturnUnprotectedByDefaultTrue() = runTest {
+        whenever(appTpFeatureConfig.isEnabled(AppTpSetting.ProtectGames)).thenReturn(false)
         whenever(appCategoryDetector.getAppCategory(PACKAGE_ID)).thenReturn(AppCategory.Game)
         whenever(appTrackerRepository.getAppExclusionList()).thenReturn(listOf(AppTrackerExcludedPackage(PACKAGE_ID, REASON)))
         val jsonObject = collector.collectVpnRelatedState(PACKAGE_ID)
 
         assertEquals("true", jsonObject.get("reportedAppUnprotectedByDefault"))
+    }
+
+    @Test
+    fun whenCollectStateAndAppRemoteGameProtectionEnabledAndInExclusionListThenReturnUnprotectedByDefaultTrue() = runTest {
+        whenever(appTpFeatureConfig.isEnabled(AppTpSetting.ProtectGames)).thenReturn(true)
+        whenever(appCategoryDetector.getAppCategory(PACKAGE_ID)).thenReturn(AppCategory.Game)
+        whenever(appTrackerRepository.getAppExclusionList()).thenReturn(listOf(AppTrackerExcludedPackage(PACKAGE_ID)))
+        val jsonObject = collector.collectVpnRelatedState(PACKAGE_ID)
+
+        assertEquals("true", jsonObject.get("reportedAppUnprotectedByDefault"))
+    }
+
+    @Test
+    fun whenCollectStateAndAppGameAndNotInExclusionListThenReturnUnprotectedByDefaultTrue() = runTest {
+        whenever(appTpFeatureConfig.isEnabled(AppTpSetting.ProtectGames)).thenReturn(false)
+        whenever(appCategoryDetector.getAppCategory(PACKAGE_ID)).thenReturn(AppCategory.Game)
+        whenever(appTrackerRepository.getAppExclusionList()).thenReturn(listOf())
+        val jsonObject = collector.collectVpnRelatedState(PACKAGE_ID)
+
+        assertEquals("true", jsonObject.get("reportedAppUnprotectedByDefault"))
+    }
+
+    @Test
+    fun whenCollectStateAndAppRemoteGameProtectionEnabledAndNotInExclusionListThenReturnUnprotectedByDefaultFalse() = runTest {
+        whenever(appTpFeatureConfig.isEnabled(AppTpSetting.ProtectGames)).thenReturn(true)
+        whenever(appCategoryDetector.getAppCategory(PACKAGE_ID)).thenReturn(AppCategory.Game)
+        whenever(appTrackerRepository.getAppExclusionList()).thenReturn(listOf())
+        val jsonObject = collector.collectVpnRelatedState(PACKAGE_ID)
+
+        assertEquals("false", jsonObject.get("reportedAppUnprotectedByDefault"))
     }
 
     @Test
@@ -122,11 +150,22 @@ class VpnAppTrackerListInfoCollectorTest {
 
     @Test
     fun whenCollectStateAndAppGameThenReturnUnprotectedByDefaultTrue() = runTest {
+        whenever(appTpFeatureConfig.isEnabled(AppTpSetting.ProtectGames)).thenReturn(false)
         whenever(appCategoryDetector.getAppCategory(PACKAGE_ID)).thenReturn(AppCategory.Game)
         whenever(appTrackerRepository.getAppExclusionList()).thenReturn(listOf())
         val jsonObject = collector.collectVpnRelatedState(PACKAGE_ID)
 
         assertEquals("true", jsonObject.get("reportedAppUnprotectedByDefault"))
+    }
+
+    @Test
+    fun whenCollectStateAndRemoteGameProtectionEnabledThenReturnUnprotectedByDefaultFalse() = runTest {
+        whenever(appTpFeatureConfig.isEnabled(AppTpSetting.ProtectGames)).thenReturn(true)
+        whenever(appCategoryDetector.getAppCategory(PACKAGE_ID)).thenReturn(AppCategory.Game)
+        whenever(appTrackerRepository.getAppExclusionList()).thenReturn(listOf())
+        val jsonObject = collector.collectVpnRelatedState(PACKAGE_ID)
+
+        assertEquals("false", jsonObject.get("reportedAppUnprotectedByDefault"))
     }
 
     @Test

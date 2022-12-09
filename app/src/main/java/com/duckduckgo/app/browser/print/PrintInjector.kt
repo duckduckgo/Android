@@ -24,11 +24,11 @@ import javax.inject.Inject
 interface PrintInjector {
     fun addJsInterface(
         webView: WebView,
-        onPrintDetected: () -> Unit
+        onPrintDetected: () -> Unit,
     )
 
     fun injectPrint(
-        webView: WebView
+        webView: WebView,
     )
 }
 
@@ -36,7 +36,7 @@ interface PrintInjector {
 class PrintInjectorJS @Inject constructor() : PrintInjector {
     override fun addJsInterface(
         webView: WebView,
-        onPrintDetected: () -> Unit
+        onPrintDetected: () -> Unit,
     ) {
         webView.addJavascriptInterface(PrintJavascriptInterface(onPrintDetected), PrintJavascriptInterface.JAVASCRIPT_INTERFACE_NAME)
     }

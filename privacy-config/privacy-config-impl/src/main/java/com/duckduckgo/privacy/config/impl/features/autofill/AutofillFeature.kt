@@ -21,5 +21,5 @@ import com.duckduckgo.privacy.config.store.AutofillExceptionEntity
 data class AutofillFeature(
     val state: String,
     val minSupportedVersion: Int?,
-    val exceptions: List<AutofillExceptionEntity>
+    val exceptions: List<AutofillExceptionEntity>,
 )

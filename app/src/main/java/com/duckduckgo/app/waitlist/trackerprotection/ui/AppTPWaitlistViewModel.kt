@@ -28,13 +28,13 @@ import com.duckduckgo.mobile.android.vpn.waitlist.AppTPWaitlistManager
 import com.duckduckgo.mobile.android.vpn.waitlist.api.AppTrackingProtectionWaitlistService
 import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateRepository
 import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
+import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class AppTPWaitlistViewModel @Inject constructor(
@@ -43,7 +43,7 @@ class AppTPWaitlistViewModel @Inject constructor(
     private val waitlistService: AppTrackingProtectionWaitlistService,
     private val workManager: WorkManager,
     private val workRequestBuilder: AppTPWaitlistWorkRequestBuilder,
-    private val deviceShieldPixels: DeviceShieldPixels
+    private val deviceShieldPixels: DeviceShieldPixels,
 ) : ViewModel() {
 
     private val viewStateFlow: MutableStateFlow<ViewState> =
@@ -95,7 +95,7 @@ class AppTPWaitlistViewModel @Inject constructor(
 
     private fun joinedWaitlist(
         timestamp: Int,
-        token: String
+        token: String,
     ) {
         viewModelScope.launch {
             waitlistManager.joinWaitlist(timestamp, token)

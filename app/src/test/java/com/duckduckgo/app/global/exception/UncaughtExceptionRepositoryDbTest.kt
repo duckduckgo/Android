@@ -19,7 +19,6 @@ package com.duckduckgo.app.global.exception
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.device.DeviceInfo
-import org.mockito.kotlin.*
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -27,6 +26,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.*
 
 @ExperimentalCoroutinesApi
 class UncaughtExceptionRepositoryDbTest {
@@ -84,18 +84,18 @@ class UncaughtExceptionRepositoryDbTest {
                 entity.copy(
                     message = "different message",
                     exceptionSource = UncaughtExceptionSource.HIDE_CUSTOM_VIEW,
-                    timestamp = 1500
-                )
-            )
+                    timestamp = 1500,
+                ),
+            ),
         )
         assertTrue(
             testee.isNotDuplicate(
                 entity.copy(
                     version = "different version",
                     exceptionSource = UncaughtExceptionSource.HIDE_CUSTOM_VIEW,
-                    timestamp = 1500
-                )
-            )
+                    timestamp = 1500,
+                ),
+            ),
         )
 
         assertTrue(
@@ -104,9 +104,9 @@ class UncaughtExceptionRepositoryDbTest {
                     message = "different message",
                     version = "different version",
                     exceptionSource = UncaughtExceptionSource.HIDE_CUSTOM_VIEW,
-                    timestamp = 1500
-                )
-            )
+                    timestamp = 1500,
+                ),
+            ),
         )
     }
 }

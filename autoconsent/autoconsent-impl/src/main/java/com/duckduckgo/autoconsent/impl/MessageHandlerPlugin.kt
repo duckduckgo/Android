@@ -23,7 +23,7 @@ import com.duckduckgo.di.scopes.AppScope
 
 @ContributesPluginPoint(
     scope = AppScope::class,
-    boundType = MessageHandlerPlugin::class
+    boundType = MessageHandlerPlugin::class,
 )
 @Suppress("unused")
 interface MessageHandlerPlugin {

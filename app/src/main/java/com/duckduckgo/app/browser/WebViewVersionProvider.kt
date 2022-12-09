@@ -32,7 +32,7 @@ interface WebViewVersionProvider {
 
 @ContributesBinding(AppScope::class)
 class DefaultWebViewVersionProvider @Inject constructor(
-    private val webViewVersionSource: WebViewVersionSource
+    private val webViewVersionSource: WebViewVersionSource,
 ) : WebViewVersionProvider {
     companion object {
         const val WEBVIEW_VERSION_DELIMITER = "."

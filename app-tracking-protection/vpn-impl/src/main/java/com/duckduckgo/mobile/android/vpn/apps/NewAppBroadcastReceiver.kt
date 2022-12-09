@@ -27,21 +27,23 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
+import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.goAsync
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
-import timber.log.Timber
-import javax.inject.Inject
-import dagger.SingleInstanceIn
+import logcat.logcat
 
 @SingleInstanceIn(AppScope::class)
 @ContributesMultibinding(
     scope = VpnScope::class,
-    boundType = VpnServiceCallbacks::class
+    boundType = VpnServiceCallbacks::class,
 )
 class NewAppBroadcastReceiver @Inject constructor(
     private val applicationContext: Context,
@@ -49,12 +51,13 @@ class NewAppBroadcastReceiver @Inject constructor(
     private val appTrackerRepository: AppTrackerRepository,
     private val dispatcherProvider: DispatcherProvider,
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
+    private val appTpFeatureConfig: AppTpFeatureConfig,
 ) : BroadcastReceiver(), VpnServiceCallbacks {
 
     @MainThread
     override fun onReceive(
         context: Context,
-        intent: Intent
+        intent: Intent,
     ) {
         when (intent.action) {
             Intent.ACTION_PACKAGE_ADDED -> intent.data?.schemeSpecificPart?.let { restartVpn(it) }
@@ -62,15 +65,15 @@ class NewAppBroadcastReceiver @Inject constructor(
     }
 
     private fun restartVpn(packageName: String) {
-        Timber.d("Newly installed package $packageName")
+        logcat { "Newly installed package $packageName" }
 
         val pendingResult = goAsync()
         goAsync(pendingResult) {
             if (isGame(packageName) || isInExclusionList(packageName)) {
-                Timber.i("Newly installed package $packageName is in exclusion list, disabling/re-enabling vpn")
+                logcat { "Newly installed package $packageName is in exclusion list, disabling/re-enabling vpn" }
                 vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
             } else {
-                Timber.i("Newly installed package $packageName not in exclusion list")
+                logcat { "Newly installed package $packageName not in exclusion list" }
             }
         }
     }
@@ -91,7 +94,7 @@ class NewAppBroadcastReceiver @Inject constructor(
     }
 
     private fun isGame(packageName: String): Boolean {
-        return appCategoryDetector.getAppCategory(packageName) is AppCategory.Game
+        return appCategoryDetector.getAppCategory(packageName) is AppCategory.Game && !appTpFeatureConfig.isEnabled(AppTpSetting.ProtectGames)
     }
 
     @WorkerThread
@@ -100,15 +103,15 @@ class NewAppBroadcastReceiver @Inject constructor(
     }
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        Timber.v("New app receiver started")
+        logcat { "New app receiver started" }
         register()
     }
 
     override fun onVpnStopped(
         coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
+        vpnStopReason: VpnStopReason,
     ) {
-        Timber.v("New app receiver stopped")
+        logcat { "New app receiver stopped" }
         unregister()
     }
 }

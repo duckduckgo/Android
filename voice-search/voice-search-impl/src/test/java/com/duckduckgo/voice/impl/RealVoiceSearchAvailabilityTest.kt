@@ -42,8 +42,8 @@ class RealVoiceSearchAvailabilityTest {
                 deviceModel = "Pixel 6",
                 sdkInt = 31,
                 languageTag = "en-US",
-                isOnDeviceSpeechRecognitionSupported = true
-            )
+                isOnDeviceSpeechRecognitionSupported = true,
+            ),
         )
 
         assertTrue(testee.isVoiceSearchSupported)
@@ -56,8 +56,8 @@ class RealVoiceSearchAvailabilityTest {
                 deviceModel = "pixel 6 Pro",
                 sdkInt = 31,
                 languageTag = "en-US",
-                isOnDeviceSpeechRecognitionSupported = true
-            )
+                isOnDeviceSpeechRecognitionSupported = true,
+            ),
         )
 
         assertTrue(testee.isVoiceSearchSupported)
@@ -70,8 +70,8 @@ class RealVoiceSearchAvailabilityTest {
                 deviceModel = "Pixel 6",
                 sdkInt = 31,
                 languageTag = "en-UK",
-                isOnDeviceSpeechRecognitionSupported = true
-            )
+                isOnDeviceSpeechRecognitionSupported = true,
+            ),
         )
 
         assertFalse(testee.isVoiceSearchSupported)
@@ -84,8 +84,8 @@ class RealVoiceSearchAvailabilityTest {
                 deviceModel = "Pixel 6",
                 sdkInt = 30,
                 languageTag = "en-US",
-                isOnDeviceSpeechRecognitionSupported = true
-            )
+                isOnDeviceSpeechRecognitionSupported = true,
+            ),
         )
 
         assertFalse(testee.isVoiceSearchSupported)
@@ -98,8 +98,8 @@ class RealVoiceSearchAvailabilityTest {
                 deviceModel = "Pixel 6",
                 sdkInt = 32,
                 languageTag = "en-US",
-                isOnDeviceSpeechRecognitionSupported = false
-            )
+                isOnDeviceSpeechRecognitionSupported = false,
+            ),
         )
 
         assertFalse(testee.isVoiceSearchSupported)
@@ -112,8 +112,8 @@ class RealVoiceSearchAvailabilityTest {
                 deviceModel = "Pixel 5",
                 sdkInt = 32,
                 languageTag = "en-US",
-                isOnDeviceSpeechRecognitionSupported = true
-            )
+                isOnDeviceSpeechRecognitionSupported = true,
+            ),
         )
 
         assertFalse(testee.isVoiceSearchSupported)
@@ -126,13 +126,13 @@ class RealVoiceSearchAvailabilityTest {
                 deviceModel = "Pixel 6",
                 sdkInt = 32,
                 languageTag = "en-US",
-                isOnDeviceSpeechRecognitionSupported = false
-            )
+                isOnDeviceSpeechRecognitionSupported = false,
+            ),
         )
 
         val result = testee.shouldShowVoiceSearch(
             isEditing = true,
-            urlLoaded = "https://duckduckgo.com/?q=hello"
+            urlLoaded = "https://duckduckgo.com/?q=hello",
         )
 
         assertFalse(result)
@@ -145,13 +145,13 @@ class RealVoiceSearchAvailabilityTest {
                 deviceModel = "Pixel 6",
                 sdkInt = 32,
                 languageTag = "en-US",
-                isOnDeviceSpeechRecognitionSupported = true
-            )
+                isOnDeviceSpeechRecognitionSupported = true,
+            ),
         )
 
         val result = testee.shouldShowVoiceSearch(
             isEditing = true,
-            urlLoaded = "www.fb.com"
+            urlLoaded = "www.fb.com",
         )
 
         assertTrue(result)
@@ -164,13 +164,13 @@ class RealVoiceSearchAvailabilityTest {
                 deviceModel = "Pixel 6",
                 sdkInt = 32,
                 languageTag = "en-US",
-                isOnDeviceSpeechRecognitionSupported = true
-            )
+                isOnDeviceSpeechRecognitionSupported = true,
+            ),
         )
 
         val result = testee.shouldShowVoiceSearch(
             isEditing = true,
-            urlLoaded = "https://duckduckgo.com/?q=hello"
+            urlLoaded = "https://duckduckgo.com/?q=hello",
         )
 
         assertTrue(result)
@@ -183,13 +183,13 @@ class RealVoiceSearchAvailabilityTest {
                 deviceModel = "Pixel 6",
                 sdkInt = 32,
                 languageTag = "en-US",
-                isOnDeviceSpeechRecognitionSupported = true
-            )
+                isOnDeviceSpeechRecognitionSupported = true,
+            ),
         )
 
         val result = testee.shouldShowVoiceSearch(
             isEditing = false,
-            urlLoaded = "www.fb.com"
+            urlLoaded = "www.fb.com",
         )
 
         assertFalse(result)
@@ -202,13 +202,13 @@ class RealVoiceSearchAvailabilityTest {
                 deviceModel = "Pixel 6",
                 sdkInt = 32,
                 languageTag = "en-US",
-                isOnDeviceSpeechRecognitionSupported = true
-            )
+                isOnDeviceSpeechRecognitionSupported = true,
+            ),
         )
 
         val result = testee.shouldShowVoiceSearch(
             isEditing = false,
-            urlLoaded = "https://duckduckgo.com/?q=hello"
+            urlLoaded = "https://duckduckgo.com/?q=hello",
         )
 
         assertTrue(result)
@@ -221,13 +221,13 @@ class RealVoiceSearchAvailabilityTest {
                 deviceModel = "Pixel 6",
                 sdkInt = 32,
                 languageTag = "en-US",
-                isOnDeviceSpeechRecognitionSupported = true
-            )
+                isOnDeviceSpeechRecognitionSupported = true,
+            ),
         )
 
         val result = testee.shouldShowVoiceSearch(
             isEditing = false,
-            urlLoaded = ""
+            urlLoaded = "",
         )
 
         assertTrue(result)

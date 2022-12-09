@@ -18,9 +18,9 @@ package com.duckduckgo.app.referral
 
 import com.duckduckgo.app.statistics.AtbInitializerListener
 import com.duckduckgo.di.scopes.AppScope
-import timber.log.Timber
-import javax.inject.Inject
 import dagger.SingleInstanceIn
+import javax.inject.Inject
+import timber.log.Timber
 
 interface AppInstallationReferrerStateListener {
 

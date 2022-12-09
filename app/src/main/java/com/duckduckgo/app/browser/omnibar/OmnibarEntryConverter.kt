@@ -21,7 +21,7 @@ interface OmnibarEntryConverter {
     fun convertQueryToUrl(
         searchQuery: String,
         vertical: String? = null,
-        queryOrigin: QueryOrigin = QueryOrigin.FromUser
+        queryOrigin: QueryOrigin = QueryOrigin.FromUser,
     ): String
 }
 

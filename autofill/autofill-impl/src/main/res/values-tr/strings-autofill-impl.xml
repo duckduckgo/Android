@@ -42,6 +42,9 @@
     <string name="updateLoginDialogButtonUpdatePassword">Şifreyi Güncelle</string>
     <string name="updateLoginDialogButtonNotNow">Şimdi Değil</string>
 
+    <string name="updateLoginDialogTitleUpdateUsername">Kullanıcı Adı Güncellensin mi?</string>
+    <string name="updateLoginDialogButtonUpdateUsername">Kullanıcı Adını Güncelle</string>
+
     <string name="autofillDialogCloseButtonContentDescription">Otomatik Doldurma İletişim Kutusunu Kapat</string>
 
     <string name="credentialManagementEditLoginTitleHint">Giriş Başlığı</string>
@@ -59,5 +62,7 @@
     <string name="credentialManagementAutofillToggleLabel">Girişleri Kaydet ve Otomatik Doldur</string>
     <string name="credentialManagementViewMenuEdit">Düzenle</string>
     <string name="credentialManagementViewMenuDelete">Sil</string>
+
+    <string name="credentialManagementSuggestionsLabel">Önerilen</string>
 
 </resources>

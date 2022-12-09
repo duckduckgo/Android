@@ -28,16 +28,18 @@ import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.library.loader.LibraryLoader
 import com.duckduckgo.vpn.network.api.*
 import com.duckduckgo.vpn.network.impl.models.Allowed
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
 import com.duckduckgo.vpn.network.impl.models.Packet
 import com.duckduckgo.vpn.network.impl.models.ResourceRecord
 import com.duckduckgo.vpn.network.impl.models.Usage
-import timber.log.Timber
+import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import java.net.InetSocketAddress
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 import kotlin.system.exitProcess
+import logcat.LogPriority
+import logcat.asLog
+import logcat.logcat
 
 @ContributesBinding(VpnScope::class)
 @SingleInstanceIn(VpnScope::class)
@@ -103,41 +105,34 @@ class RealVpnNetwork @Inject constructor(
     // Called from native code
     @Suppress("unused")
     private fun nativeExit(reason: String) {
-        Timber.v("Native exit reason=$reason")
+        logcat { "Native exit reason=$reason" }
         callback.get()?.onExit(reason)
     }
 
     // Called from native code
     @Suppress("unused")
     private fun nativeError(error: Int, message: String) {
-        Timber.v("Native error $error:$message")
+        logcat { "Native error $error:$message" }
         callback.get()?.onError(error, message)
     }
 
     // Called from native code
     @Suppress("unused")
     private fun logPacket(packet: Packet) {
-        Timber.v("Log packet called for $packet")
+        logcat { "Log packet called for $packet" }
     }
 
     // Called from native code
     @Suppress("unused")
     private fun dnsResolved(rr: ResourceRecord) {
-        Timber.v("dnsResolved called for $rr")
+        logcat { "dnsResolved called for $rr" }
         callback.get()?.onDnsResolved(rr.toDnsRR())
     }
 
     // Called from native code
     @Suppress("unused")
-    private fun sniResolved(name: String, resource: String) {
-        Timber.v("sniResolved called for $name / $resource")
-        callback.get()?.onSniResolved(SniRR(name, resource))
-    }
-
-    // Called from native code
-    @Suppress("unused")
     private fun isDomainBlocked(name: String, uid: Int): Boolean {
-        Timber.v("isDomainBlocked for $name ($uid)")
+        logcat { "isDomainBlocked for $name ($uid)" }
         return callback.get()?.isDomainBlocked(DomainRR(name, uid)) ?: false
     }
 
@@ -148,7 +143,7 @@ class RealVpnNetwork @Inject constructor(
 
         packet.allowed = (callback.get()?.isAddressBlocked(packet.toAddressRR()) == false)
 
-        Timber.v("isAddressAllowed for $packet = ${packet.allowed}")
+        logcat { "isAddressAllowed for $packet = ${packet.allowed}" }
 
         return if (packet.allowed) Allowed() else null
     }
@@ -156,13 +151,13 @@ class RealVpnNetwork @Inject constructor(
     // Called from native code
     @Suppress("unused")
     private fun accountUsage(usage: Usage) {
-        Timber.v("accountUsage $usage")
+        logcat { "accountUsage $usage" }
     }
 
     // Called from native code
     @Suppress("unused")
     private fun protect(socket: Int): Boolean {
-        Timber.v("protect socket")
+        logcat { "protect socket" }
         return true
     }
 
@@ -170,7 +165,7 @@ class RealVpnNetwork @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.Q)
     @Suppress("unused")
     private fun getUidQ(version: Int, protocol: Int, saddr: String, sport: Int, daddr: String, dport: Int): Int {
-        Timber.v(
+        logcat {
             """
             getUidQ called for
               version=$version
@@ -180,7 +175,7 @@ class RealVpnNetwork @Inject constructor(
               daddr=$daddr
               dport=$dport
             """.trimIndent()
-        )
+        }
 
         if (protocol != 6 /* TCP */ && protocol != 17 /* UDP */) return Process.INVALID_UID
 
@@ -189,15 +184,15 @@ class RealVpnNetwork @Inject constructor(
         val local = InetSocketAddress(saddr, sport)
         val remote = InetSocketAddress(daddr, dport)
 
-        Timber.v("Get uid local=$local remote=$remote")
+        logcat { "Get uid local=$local remote=$remote" }
         val uid = cm.getConnectionOwnerUid(protocol, local, remote)
         uidPackageIdMap[uid]?.let { packageId ->
-            Timber.v("Returned cached uid=$uid ($packageId)")
+            logcat { "Returned cached uid=$uid ($packageId)" }
             return uid
         }
         val packageId = getPackageIdForUid(uid)
         uidPackageIdMap[uid] = packageId
-        Timber.v("Get uid=$uid ($packageId)")
+        logcat { "Get uid=$uid ($packageId)" }
         return uid
     }
 
@@ -207,12 +202,12 @@ class RealVpnNetwork @Inject constructor(
         try {
             packages = context.packageManager.getPackagesForUid(uid)
         } catch (e: SecurityException) {
-            Timber.e(e, "Failed to get package ID for UID: $uid due to security violation.")
+            logcat(LogPriority.ERROR) { "Failed to get package ID for UID: $uid due to security violation: ${e.asLog()}" }
             return "unknown"
         }
 
         if (packages.isNullOrEmpty()) {
-            Timber.w("Failed to get package ID for UID: $uid")
+            logcat(LogPriority.WARN) { "Failed to get package ID for UID: $uid" }
             return "unknown"
         }
 
@@ -221,7 +216,7 @@ class RealVpnNetwork @Inject constructor(
             packages.forEach {
                 sb.append(String.format("\npackage: %s", it))
             }
-            Timber.d(sb.toString())
+            logcat { sb.toString() }
         }
 
         return packages.first()
@@ -229,10 +224,10 @@ class RealVpnNetwork @Inject constructor(
 
     init {
         try {
-            Timber.v("Loading native VPN networking library")
+            logcat { "Loading native VPN networking library" }
             LibraryLoader.loadLibrary(context, "netguard")
         } catch (ignored: Throwable) {
-            Timber.e(ignored, "Error loading netguard library")
+            logcat(LogPriority.ERROR) { "Error loading netguard library: ${ignored.asLog()}" }
             exitProcess(1)
         }
     }

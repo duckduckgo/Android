@@ -81,7 +81,7 @@
     <string name="previousSearchTermDescription">Öncekini bul</string>
     <string name="closeFindInPageButtonDescription">Sayfa görünümünde bul özelliğini kapat</string>
     <string name="findInPageHint">Sayfada bul</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Aramadan önce sorguyu düzenle</string>
@@ -108,76 +108,6 @@
     <string name="tabClosed">Sekme kapatıldı</string>
     <string name="tabClosedUndo">Geri al</string>
     <string name="downloadsMenuItemTitle">İndirilenler</string>
-
-    <!-- Privacy Dashboard Activities -->
-    <string name="privacyProtectionToggle">Site Gizlilik Koruması</string>
-    <string name="privacyProtectionEnabled">SAHA KORUMASI ETKİN</string>
-    <string name="privacyProtectionDisabled">SİTE KORUMASI KAPATILDI</string>
-    <string name="privacyDashboardActivityTitle">Gizlilik Tablosu</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">&lt;img src=\"%1$d\" /&gt; \'dan &lt;img src=\"%2$d\" /&gt;\' ye GELİŞTİRİLDİ</string>
-    <string name="privacyGradeContentDescription">Gizlilik Derecesi</string>
-    <string name="privacyProtectionTemporarilyDisabled">Bu sitede hatalara neden olduğu için Gizlilik Korumasını geçici olarak devre dışı bıraktık.</string>
-
-    <string name="httpsGood">Şifreli Bağlantı</string>
-    <string name="httpsMixed">Karma Şifreleme Bağlantısı</string>
-    <string name="httpsBad">Şifrelenmemiş Bağlantı</string>
-
-    <string name="scorecardActivityTitle">Gizlilik Derecesi</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">Site Önemli İzleyici Ağlarından Biri</string>
-    <string name="scorecardPrivacyGrade">Gizlilik Derecesi</string>
-    <string name="scorecardEnhancedGrade">Geliştirilmiş Sınıf</string>
-
-    <string name="privacyTermsActivityTitle">Gizlilik Uygulamaları</string>
-    <string name="practicesGood">Öne Çıkan Gizlilik Uygulamaları</string>
-    <string name="practicesMixed">Karma Gizlilik Uygulamaları</string>
-    <string name="practicesBad">Kötü Gizlilik Uygulamaları</string>
-    <string name="practicesUnknown">Bilinmeyen Gizlilik Uygulamaları</string>
-    <string name="practicesOverview">Gizlilik uygulamaları, bir web sitesiyle paylaştığınız kişisel bilgilerin ne kadar korunduğunu gösterir.</string>
-    <string name="practicesTosdrLink"><b><u>ToS;DR</u></b> Gizlilik Uygulamaları.</string>
-    <string name="practicesIconContentGood">İyi Uygulama Simgesi</string>
-    <string name="practicesIconContentBad">Kötü Uygulama Simgesi</string>
-
-    <string name="networkTrackerSummaryHeader">İZLEYİCİ AĞ İLK SIRADAKİ SUÇLULARI</string>
-    <string name="networkTrackerSummaryNotReady">Kaç izleyiciyi engellediğimizi göstermek için hâlâ veri topluyoruz.</string>
-
-    <string name="trackersActivityTitle">İzleme İstekleri Engellendi</string>
-    <string name="trackersContentDescription">İzleme İstekleri Engellendi</string>
-    <string name="trackersOverview">Aşağıdaki üçüncü taraf alan adlarının isteklerinin yüklenmesi, izleme istekleri olarak tanımlandıkları için engellendi. Bir şirketin istekleri yüklenirse profilinizi oluşturmaları mümkün olabilir.</string>
-    <string name="trackersOverviewProtectionsOff">Bu site için Korumalar kapalı olduğundan hiçbir izleme isteğinin yüklenmesi engellenmedi. Bir şirketin istekleri yüklenirse profilinizi oluşturmaları mümkün olabilir.</string>
-
-    <string name="domainsLoadedActivityTitle">Üçüncü Taraf İstekleri Yüklendi</string>
-    <string name="domainsLoadedContentDescription">Üçüncü Taraf İstekleri Yüklendi</string>
-    <string name="domainsLoadedOverview">Aşağıdaki üçüncü taraf alan adlarının istekleri yüklendi. Bir şirketin istekleri yüklenirse, diğer web izleme korumalarımıza rağmen profilinizi oluşturmaları mümkün olabilir.</string>
-    <string name="domainsLoadedOverviewProtectionsOff">Bu site için Korumalar kapalı olduğundan hiçbir üçüncü taraf isteğin yüklenmesi engellenmedi. Bir şirketin istekleri yüklenirse profilinizi oluşturmaları mümkün olabilir.</string>
-    <string name="domainsLoadedOverviewEmpty">Herhangi bir üçüncü taraf alan adından gelen istek algılanmadı.</string>
-    <string name="domainsLoadedHeadingText">Yüklenen üçüncü taraf alan adı yok</string>
-
-    <string name="webTrackingProtectionsText"><annotation type="learn_more_link">Web İzleme Korumalarımız hakkında</annotation></string>
-    <string name="webTrackingProtectionsUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
-
-    <string name="trackersBlockedNoSectionDescription">Aşağıdaki alanların istekleri yüklendi.</string>
-
-    <string name="adLoadedSectionDescription" instruction="Placeholder is the name of the company who owns the ad">Aşağıdaki alan adından gelen istekler, yakın zamanda DuckDuckGo\'daki bir %1$s reklamı tıklandığı için yüklendi. Bu istekler, reklamların ne kadar etkili olduğunun değerlendirilmesine yardımcı olur. DuckDuckGo\'daki reklamlar profil oluşturma için kullanılmaz.</string>
-    <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Arama ağı reklamlarımız korumalarımızı nasıl etkiler?</annotation></string>
-    <string name="adLoadedSectionUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
-
-    <string name="domainsLoadedSectionDescription">Aşağıdaki alan adlarının istekleri de yüklendi.</string>
-    <string name="domainsLoadedSectionSingleSectionDescription">Aşağıdaki alan adlarının izleme istekleri yüklendi.</string>
-    <string name="domainsLoadedSectionEmptyListDescription">Herhangi bir üçüncü taraf alan adından gelen istek algılanmadı.</string>
-
-    <string name="domainsLoadedBreakageSectionDescription">Site kırılmasını önlemek için aşağıdaki alan adının istekleri yüklendi.</string>
-    <string name="domainsLoadedAssociatedSectionDescription" instruction="Placeholder is the name of a company">Aşağıdaki alan adının istekleri %1$s ile ilişkili oldukları için yüklendi.</string>
-
-    <string name="trackersBlockedText">Yüklenmesi Engellenen İstekler</string>
-    <string name="trackersNotBlockedText">Hiçbir İzleme İsteği Engellenmedi</string>
-    <string name="trackersNoFoundText">İzleme İsteği Bulunamadı</string>
-    <string name="trackersFoundText">İzleme İstekleri Bulundu</string>
-
-    <string name="domainsLoadedText">Üçüncü Taraf İstekleri Yüklendi</string>
-    <string name="domainsNotLoadedText">Yüklenen Üçüncü Taraf İsteği Yok</string>
-
-    <string name="majorNetworksNoFound">Başlıca İzleyici Ağı Tespit Edilmedi</string>
-    <string name="majorNetworksFound">Başlıca İzleyici Ağları Bulundu</string>
 
     <!-- Fire -->
     <string name="fireMenu">Verileri Temizle</string>
@@ -267,7 +197,7 @@
     <string name="importBookmarksFileTitle">İçe aktarılacak bir yer işareti dosyası seçin</string>
     <string name="importBookmarksError">Yer işaretleri içe aktarılamadı, bir hata oluştu</string>
     <string name="importBookmarksEmpty">Dosyada içe aktarılacak yer işareti yok</string>
-    <string name="importBookmarksSuccess">%1$d yer işareti başarıyla içe aktarıldı</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">%1$d yer işareti başarıyla içe aktarıldı</string>
     <string name="savedSiteDialogTitleHint">Title</string>
     <string name="savedSiteDialogUrlHint">URL</string>
     <string name="savedSiteDialogTitleEdit">Düzenle</string>
@@ -657,8 +587,8 @@
     <string name="bookmarkFolderEmpty">Boş</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s ve %1$d öge?</item>
-        <item quantity="other">%1$s%2$s ve %1$d öge?</item>
+        <item quantity="one">%1$s%2$s ve %3$d öge?</item>
+        <item quantity="other">%1$s%2$s ve %3$d öge?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">
@@ -733,10 +663,12 @@
     <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
     <string name="sitePermissionsSettingsAllowedSitesTitle">Siteleri Yönet</string>
     <string name="sitePermissionsSettingsEmptyText">Henüz site yok</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Tüm Siteler İçin İzinler Kaldırıldı</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">\"%1$s\" için izinler </string>
     <string name="permissionsPerWebsiteAskSetting">Sor</string>
     <string name="permissionsPerWebsiteDenySetting">Reddet</string>
     <string name="permissionsPerWebsiteAllowSetting">İzin ver</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Tüm siteler için \"Sor\" devre dışı bırakıldı</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%2$s için %1$s izni</string>
 
     <!-- Autofill -->

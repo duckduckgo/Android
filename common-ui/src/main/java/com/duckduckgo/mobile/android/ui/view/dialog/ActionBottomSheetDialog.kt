@@ -32,10 +32,13 @@ class ActionBottomSheetDialog(builder: Builder) : BottomSheetDialog(builder.cont
     abstract class EventListener {
         /** Sets a listener to be invoked when the bottom sheet is shown */
         open fun onBottomSheetShown() {}
+
         /** Sets a listener to be invoked when the bottom sheet is dismiss */
         open fun onBottomSheetDismissed() {}
+
         /** Sets a listener to be invoked when primary item is clicked */
         open fun onPrimaryItemClicked() {}
+
         /** Sets a listener to be invoked when secondary item is clicked */
         open fun onSecondaryItemClicked() {}
     }
@@ -112,7 +115,7 @@ class ActionBottomSheetDialog(builder: Builder) : BottomSheetDialog(builder.cont
         fun setPrimaryItem(
             text: String,
             @DrawableRes icon: Int? = null,
-            @ColorRes color: Int? = null
+            @ColorRes color: Int? = null,
         ): Builder {
             primaryItemText = text
             primaryItemIcon = icon
@@ -128,7 +131,7 @@ class ActionBottomSheetDialog(builder: Builder) : BottomSheetDialog(builder.cont
         fun setSecondaryItem(
             text: String,
             @DrawableRes icon: Int? = null,
-            @ColorRes color: Int? = null
+            @ColorRes color: Int? = null,
         ): Builder {
             secondaryItemText = text
             secondaryItemIcon = icon

@@ -18,9 +18,9 @@ package com.duckduckgo.app.browser.certificates.rootstore
 
 import android.content.Context
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.certificates.LetsEncryptCertificate
 import com.duckduckgo.app.browser.certificates.CertificateType
 import com.duckduckgo.app.browser.certificates.CertificateTypes
+import com.duckduckgo.app.browser.certificates.LetsEncryptCertificate
 import java.security.cert.Certificate
 import java.security.cert.CertificateFactory
 
@@ -28,7 +28,7 @@ import java.security.cert.CertificateFactory
  * Let's Encrypt ISRG Root X2 (self-signed) ROOT certificate
  */
 class IsrgRootX2(
-    private val context: Context
+    private val context: Context,
 ) : LetsEncryptCertificate {
 
     private val certificate: Certificate by lazy {

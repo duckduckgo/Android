@@ -11,6 +11,7 @@ buildscript {
         target_sdk = 32
         compile_sdk = 33
         fladle_version = "0.17.4"
+        kotlinter_version = "3.12.0"
     }
 
     repositories {
@@ -31,6 +32,7 @@ buildscript {
 
 plugins {
     id 'com.osacky.fulladle' version "$fladle_version"
+    id 'org.jmailen.kotlinter' version "$kotlinter_version" apply false
 }
 
 allprojects {
@@ -65,6 +67,22 @@ subprojects {
             }
         }
     }
+
+    String[] allowStringsIn = ["app"]
+    if (!allowStringsIn.contains(project.name)) {
+        project.projectDir.eachDirRecurse { File parent ->
+            if (parent.name == "values") {
+                parent.eachFile(groovy.io.FileType.FILES) { child ->
+                    if (child.name == "strings.xml") {
+                        throw new GradleException("Duplicate strings.xml file found in $project. " +
+                                "Only :app should contain the strings.xml file. " +
+                                "Rename file to strings-<feature>.xml instead.")
+                    }
+                }
+            }
+        }
+    }
+
     def projectPath = path
     configurations.all {
         if (name == "compileClasspath" || name.endsWith("CompileClasspath")) {

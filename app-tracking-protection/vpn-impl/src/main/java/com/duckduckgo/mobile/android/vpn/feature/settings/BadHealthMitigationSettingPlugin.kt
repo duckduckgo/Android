@@ -22,17 +22,17 @@ import com.duckduckgo.mobile.android.vpn.model.HealthTriggerEntity
 import com.duckduckgo.mobile.android.vpn.store.AppHealthTriggersRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
-import org.json.JSONObject
-import timber.log.Timber
 import javax.inject.Inject
+import logcat.logcat
+import org.json.JSONObject
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = AppTpSettingPlugin::class
+    boundType = AppTpSettingPlugin::class,
 )
 class BadHealthMitigationSettingPlugin @Inject constructor(
     private val appTpFeatureConfig: AppTpFeatureConfig,
-    private val healthTriggersRepository: AppHealthTriggersRepository
+    private val healthTriggersRepository: AppHealthTriggersRepository,
 ) : AppTpSettingPlugin {
     private val jsonAdapter = Moshi.Builder().add(JSONObjectAdapter()).build().adapter(JsonConfigModel::class.java)
 
@@ -40,7 +40,7 @@ class BadHealthMitigationSettingPlugin @Inject constructor(
         @Suppress("NAME_SHADOWING")
         val name = appTpSettingValueOf(name.value)
         if (name == settingName) {
-            Timber.d("Received configuration: $jsonString")
+            logcat { "Received configuration: $jsonString" }
             jsonAdapter.fromJson(jsonString)?.let { config ->
                 appTpFeatureConfig.edit { setEnabled(settingName, config.state == "enabled") }
                 config.settings?.let { handleSettings(it) }
@@ -68,11 +68,11 @@ class BadHealthMitigationSettingPlugin @Inject constructor(
 
     private data class JsonConfigModel(
         val state: String,
-        val settings: BadHealthMitigationFeatureSettings?
+        val settings: BadHealthMitigationFeatureSettings?,
     )
 
     private data class BadHealthMitigationFeatureSettings(
-        val triggers: Map<String, JSONObject?>?
+        val triggers: Map<String, JSONObject?>?,
     )
 
     private data class JsonHealthTrigger(

@@ -18,9 +18,9 @@ package com.duckduckgo.cookies.store
 
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieException
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.util.concurrent.CopyOnWriteArrayList
 
 interface CookiesRepository {
     fun updateAll(exceptions: List<CookieExceptionEntity>, firstPartyTrackerCookiePolicy: FirstPartyCookiePolicyEntity)
@@ -31,7 +31,7 @@ interface CookiesRepository {
 class RealCookieRepository constructor(
     val database: CookiesDatabase,
     coroutineScope: CoroutineScope,
-    dispatcherProvider: DispatcherProvider
+    dispatcherProvider: DispatcherProvider,
 ) : CookiesRepository {
 
     private val cookiesDao: CookiesDao = database.cookiesDao()
@@ -47,7 +47,7 @@ class RealCookieRepository constructor(
 
     override fun updateAll(
         exceptions: List<CookieExceptionEntity>,
-        firstPartyTrackerCookiePolicy: FirstPartyCookiePolicyEntity
+        firstPartyTrackerCookiePolicy: FirstPartyCookiePolicyEntity,
     ) {
         cookiesDao.updateAll(exceptions, firstPartyTrackerCookiePolicy)
         loadToMemory()

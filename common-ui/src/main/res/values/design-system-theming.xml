@@ -45,10 +45,8 @@
         <item name="textAppearanceHeadline5">@style/TextAppearance.DuckDuckGo.Headline5</item>
         <item name="textAppearanceBody1">@style/TextAppearance.DuckDuckGo.Body1</item>
         <item name="textAppearanceBody2">@style/TextAppearance.DuckDuckGo.Body2</item>
-        <item name="textAppearanceButton">@style/TextAppearance.DuckDuckGo.Button1</item>
         <item name="textAppearanceButton1">@style/TextAppearance.DuckDuckGo.Button1</item>
         <item name="textAppearanceButton2">@style/TextAppearance.DuckDuckGo.Button2</item>
-        <item name="textAppearanceCaption">@style/TextAppearance.DuckDuckGo.Caption</item>
 
         <item name="textAppearanceTitle">@style/Typography.DuckDuckGo.Title</item>
         <item name="textAppearanceH1">@style/Typography.DuckDuckGo.H1</item>
@@ -56,6 +54,13 @@
         <item name="textAppearanceH3">@style/Typography.DuckDuckGo.H3</item>
         <item name="textAppearanceH4">@style/Typography.DuckDuckGo.H4</item>
         <item name="textAppearanceH5">@style/Typography.DuckDuckGo.H5</item>
+        <item name="textAppearanceButton">@style/Typography.DuckDuckGo.Button</item>
+        <item name="textAppearanceCaption">@style/Typography.DuckDuckGo.Caption</item>
+
+        <!-- Shape -->
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.DuckDuckGo.SmallComponent</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.DuckDuckGo.MediumComponent</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.DuckDuckGo.LargeComponent</item>
 
         <!-- Android Components -->
         <item name="actionOverflowMenuStyle">@style/PopUpOverflowMenu</item>
@@ -72,8 +77,17 @@
         <item name="alertDialogTheme">@style/AlertDialogTheme</item>
         <item name="android:alertDialogTheme">@style/AlertDialogTheme</item>
         <item name="materialAlertDialogTheme">@style/AlertDialogTheme</item>
+        <item name="materialButtonStyle">@style/Widget.DuckDuckGo.DaxButton.TextButton.Primary</item>
+        <item name="materialButtonOutlinedStyle">@style/Widget.DuckDuckGo.DaxButton.Secondary</item>
+        <item name="borderlessButtonStyle">@style/Widget.DuckDuckGo.DaxButton.Ghost</item>
 
         <!-- Design System Components -->
+        <item name="daxButtonPrimary">@style/Widget.DuckDuckGo.DaxButton.TextButton.Primary</item>
+        <item name="daxButtonSecondary">@style/Widget.DuckDuckGo.DaxButton.Secondary</item>
+        <item name="daxButtonDestructive">@style/Widget.DuckDuckGo.DaxButton.TextButton.Destructive</item>
+        <item name="daxButtonGhost">@style/Widget.DuckDuckGo.DaxButton.Ghost</item>
+        <item name="daxButtonGhostDestructive">@style/Widget.DuckDuckGo.DaxButton.DestructiveGhost</item>
+
         <item name="primaryButtonLargeStyle">@style/Widget.DuckDuckGo.Button.Primary</item>
         <item name="primaryButtonSmallStyle">@style/Widget.DuckDuckGo.Button.Primary.Small</item>
         <item name="secondaryButtonLargeStyle">@style/Widget.DuckDuckGo.Button.Secondary</item>
@@ -111,6 +125,9 @@
         <!--colorBackground appears behind scrollable content and is used for the default window background -->
         <item name="android:colorBackground">?attr/daxColorBackground</item>
         <item name="android:windowBackground">?attr/daxColorBackground</item>
+
+        <!--controls the ripple coloring-->
+        <item name="colorControlHighlight">?attr/daxColorRipple</item>
     </style>
 
     <!-- The app theme will mostly contain values for colour attributes -->
@@ -221,19 +238,49 @@
         <item name="autofillDialogOnboardingExplanationColor">@color/gray50</item>
         <item name="autofillCredentialListSubtitleColor">@color/paleBrownishGray</item>
 
-        <!-- Design System Colors Dark -->
+        <!-- Design System Reference Colors Dark -->
         <item name="daxColorBackground">@color/gray100</item>
         <item name="daxColorBackgroundInverted">@color/gray0</item>
         <item name="daxColorSurface">@color/gray90</item>
-        <item name="daxColorContainer">@color/black12</item>
+        <item name="daxColorContainer">@color/white12</item>
         <item name="daxColorPrimaryText">@color/white84</item>
         <item name="daxColorSecondaryText">@color/white60</item>
         <item name="daxColorPrimaryIcon">@color/white84</item>
-        <item name="daxColorDestructive">@color/destructiveRedDark</item>
-        <item name="daxColorDisabled">@color/black35</item>
+        <item name="daxColorDestructive">@color/red30</item>
+        <item name="daxColorContainerDisabled">@color/white18</item>
+        <item name="daxColorTextDisabled">@color/white36</item>
         <item name="daxColorLines">@color/white12</item>
         <item name="daxColorAccentBlue">@color/blue30</item>
         <item name="daxColorAccentYellow">@color/yellow50</item>
+        <item name="daxColorRipple">@color/white12</item>
+
+        <!-- Design System Component Colors Dark -->
+        <!-- Buttons -->
+        <item name="daxColorButtonPrimaryContainer">@color/blue30</item>
+        <item name="daxColorButtonPrimaryContainerPressed">@color/blue50</item>
+        <item name="daxColorButtonSecondaryContainer">@android:color/transparent</item>
+        <item name="daxColorButtonSecondaryContainerPressed">@color/blue30</item>
+        <item name="daxColorButtonDestructiveContainer">@color/red30</item>
+        <item name="daxColorButtonDestructiveContainerPressed">@color/red50</item>
+        <item name="daxColorButtonDestructiveGhostContainer">@android:color/transparent</item>
+        <item name="daxColorButtonDestructiveGhostContainerPressed">@color/red30_18</item>
+        <item name="daxColorButtonPrimaryText">@color/black84</item>
+        <item name="daxColorButtonPrimaryTextPressed">@color/black84</item>
+        <item name="daxColorButtonSecondaryText">@color/blue30</item>
+        <item name="daxColorButtonSecondaryTextPressed">@color/blue20</item>
+        <item name="daxColorButtonDestructiveGhostText">@color/red30</item>
+        <item name="daxColorButtonDestructiveGhostTextPressed">@color/red20</item>
+
+        <!-- Switch -->
+        <item name="daxColorSwitchTrackOn">?attr/daxColorAccentBlue</item>
+        <item name="daxColorSwitchTrackOff">@color/gray40</item>
+        <item name="daxColorSwitchThumbOn">?attr/daxColorAccentBlue</item>
+        <item name="daxColorSwitchThumbOff">@color/gray40</item>
+
+        <!-- Slider -->
+        <item name="daxColorSliderTrackInactive">@color/gray40_50</item>
+        <item name="daxColorSliderActive">?attr/daxColorAccentBlue</item>
+
     </style>
 
     <style name="Theme.DuckDuckGo.Light" parent="Theme.DuckDuckGo">
@@ -340,8 +387,7 @@
         <item name="autofillCredentialListSubtitleColor">@color/brownishGrayTwo</item>
         <item name="appTPHeaderBackground">@color/light_blue</item>
 
-
-        <!-- Design System Colors Light -->
+        <!-- Design System Reference Colors Light -->
         <item name="daxColorBackground">@color/gray0</item>
         <item name="daxColorBackgroundInverted">@color/gray100</item>
         <item name="daxColorSurface">@color/white</item>
@@ -349,11 +395,41 @@
         <item name="daxColorPrimaryText">@color/black84</item>
         <item name="daxColorSecondaryText">@color/black60</item>
         <item name="daxColorPrimaryIcon">@color/black84</item>
-        <item name="daxColorDestructive">@color/destructiveRedLight</item>
-        <item name="daxColorDisabled">@color/black35</item>
+        <item name="daxColorDestructive">@color/red50</item>
+        <item name="daxColorContainerDisabled">@color/black6</item>
+        <item name="daxColorTextDisabled">@color/black36</item>
         <item name="daxColorLines">@color/black18</item>
         <item name="daxColorAccentBlue">@color/blue50</item>
         <item name="daxColorAccentYellow">@color/yellow50</item>
+        <item name="daxColorRipple">@color/black6</item>
+
+        <!-- Design System Component Colors Light -->
+        <!-- Buttons -->
+        <item name="daxColorButtonPrimaryContainer">@color/blue50</item>
+        <item name="daxColorButtonPrimaryContainerPressed">@color/blue70</item>
+        <item name="daxColorButtonSecondaryContainer">@android:color/transparent</item>
+        <item name="daxColorButtonSecondaryContainerPressed">@color/blue50</item>
+        <item name="daxColorButtonDestructiveContainer">@color/red70</item>
+        <item name="daxColorButtonDestructiveContainerPressed">@color/red70</item>
+        <item name="daxColorButtonDestructiveGhostContainer">@android:color/transparent</item>
+        <item name="daxColorButtonDestructiveGhostContainerPressed">@color/red60_12</item>
+        <item name="daxColorButtonPrimaryText">@color/white</item>
+        <item name="daxColorButtonPrimaryTextPressed">@color/white</item>
+        <item name="daxColorButtonSecondaryText">@color/blue50</item>
+        <item name="daxColorButtonSecondaryTextPressed">@color/blue70</item>
+        <item name="daxColorButtonDestructiveGhostText">@color/red50</item>
+        <item name="daxColorButtonDestructiveGhostTextPressed">@color/red70</item>
+
+        <!-- Switch -->
+        <item name="daxColorSwitchTrackOn">?attr/daxColorAccentBlue</item>
+        <item name="daxColorSwitchTrackOff">@color/gray60</item>
+        <item name="daxColorSwitchThumbOn">?attr/daxColorAccentBlue</item>
+        <item name="daxColorSwitchThumbOff">@color/white</item>
+
+        <!-- Slider -->
+        <item name="daxColorSliderTrackInactive">@color/gray60_50</item>
+        <item name="daxColorSliderActive">?attr/daxColorAccentBlue</item>
+
     </style>
 
     <style name="Theme.DuckDuckGo.Survey" parent="Theme.DuckDuckGo.Light">
@@ -371,5 +447,21 @@
     </style>
 
     <style name="Theme.DuckDuckGo.SplashScreen" parent="Theme.DuckDuckGo.Light"/>
+
+    <style name="ShapeAppearance.DuckDuckGo.SmallComponent" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/smallShapeCornerRadius</item>
+    </style>
+
+    <style name="ShapeAppearance.DuckDuckGo.MediumComponent" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/mediumShapeCornerRadius</item>
+    </style>
+
+    <style name="ShapeAppearance.DuckDuckGo.LargeComponent" parent="ShapeAppearance.MaterialComponents.LargeComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/largeShapeCornerRadius</item>
+    </style>
+
 
 </resources>

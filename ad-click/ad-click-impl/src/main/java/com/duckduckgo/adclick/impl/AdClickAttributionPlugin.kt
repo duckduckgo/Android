@@ -34,7 +34,7 @@ import javax.inject.Inject
 @ContributesMultibinding(AppScope::class)
 class AdClickAttributionPlugin @Inject constructor(
     private val adClickAttributionRepository: AdClickAttributionRepository,
-    private val adClickFeatureTogglesRepository: AdClickFeatureToggleRepository
+    private val adClickFeatureTogglesRepository: AdClickFeatureToggleRepository,
 ) : PrivacyFeaturePlugin {
 
     override fun store(featureName: String, jsonString: String): Boolean {
@@ -55,8 +55,8 @@ class AdClickAttributionPlugin @Inject constructor(
                 linkFormats.add(
                     AdClickAttributionLinkFormatEntity(
                         url = it.url,
-                        adDomainParameterName = it.adDomainParameterName.orEmpty()
-                    )
+                        adDomainParameterName = it.adDomainParameterName.orEmpty(),
+                    ),
                 )
             }
 
@@ -70,14 +70,14 @@ class AdClickAttributionPlugin @Inject constructor(
                 expirations.add(
                     AdClickAttributionExpirationEntity(
                         navigationExpiration = it.navigationExpiration,
-                        totalExpiration = it.totalExpiration
-                    )
+                        totalExpiration = it.totalExpiration,
+                    ),
                 )
                 detections.add(
                     AdClickAttributionDetectionEntity(
                         heuristicDetection = it.heuristicDetection.orEmpty(),
-                        domainDetection = it.domainDetection.orEmpty()
-                    )
+                        domainDetection = it.domainDetection.orEmpty(),
+                    ),
                 )
             }
 

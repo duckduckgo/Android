@@ -16,19 +16,18 @@
 
 package com.duckduckgo.widget
 
+import android.appwidget.AppWidgetManager
+import android.appwidget.AppWidgetManager.ACTION_APPWIDGET_UPDATE
 import android.content.BroadcastReceiver
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.ACTION_LOCALE_CHANGED
-import android.content.ComponentName
-
-import android.appwidget.AppWidgetManager
-import android.appwidget.AppWidgetManager.ACTION_APPWIDGET_UPDATE
 
 class VoiceSearchWidgetUpdater : BroadcastReceiver() {
     override fun onReceive(
         context: Context,
-        intent: Intent
+        intent: Intent,
     ) {
         if (intent.action == ACTION_LOCALE_CHANGED) {
             updateWidgets(context.applicationContext)
@@ -40,7 +39,7 @@ class VoiceSearchWidgetUpdater : BroadcastReceiver() {
             broadcastUpdate(
                 it,
                 context,
-                SearchWidget::class.java
+                SearchWidget::class.java,
             )
         }
 
@@ -48,7 +47,7 @@ class VoiceSearchWidgetUpdater : BroadcastReceiver() {
             broadcastUpdate(
                 it,
                 context,
-                SearchWidgetLight::class.java
+                SearchWidgetLight::class.java,
             )
         }
 
@@ -56,7 +55,7 @@ class VoiceSearchWidgetUpdater : BroadcastReceiver() {
             broadcastUpdate(
                 it,
                 context,
-                SearchAndFavoritesWidget::class.java
+                SearchAndFavoritesWidget::class.java,
             )
         }
     }
@@ -64,7 +63,7 @@ class VoiceSearchWidgetUpdater : BroadcastReceiver() {
     private fun broadcastUpdate(
         id: IntArray,
         context: Context,
-        clazz: Class<*>
+        clazz: Class<*>,
     ) {
         val intent = Intent(context, clazz)
         intent.action = ACTION_APPWIDGET_UPDATE

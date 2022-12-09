@@ -21,25 +21,23 @@ import androidx.lifecycle.Observer
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
-import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
-import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryImpl
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel.Command.ConfirmRemoveFireproofWebsite
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.AppPixelName.FIREPROOF_SETTING_SELECTION_ALWAYS
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting
-import org.mockito.kotlin.atLeastOnce
-import org.mockito.kotlin.mock
+import com.duckduckgo.app.statistics.pixels.Pixel
 import dagger.Lazy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -47,7 +45,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentCaptor
 import org.mockito.Mockito.verify
+import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
 
 @Suppress("EXPERIMENTAL_API_USAGE")
 class FireproofWebsitesViewModelTest {
@@ -95,11 +95,11 @@ class FireproofWebsitesViewModelTest {
             .build()
         fireproofWebsiteDao = db.fireproofWebsiteDao()
         viewModel = FireproofWebsitesViewModel(
-            FireproofWebsiteRepository(fireproofWebsiteDao, coroutineRule.testDispatcherProvider, lazyFaviconManager),
+            FireproofWebsiteRepositoryImpl(fireproofWebsiteDao, coroutineRule.testDispatcherProvider, lazyFaviconManager),
             coroutineRule.testDispatcherProvider,
             mockPixel,
             mockSettingsDataStore,
-            mockUserEventsStore
+            mockUserEventsStore,
         )
         viewModel.command.observeForever(mockCommandObserver)
         viewModel.viewState.observeForever(mockViewStateObserver)
@@ -210,7 +210,7 @@ class FireproofWebsitesViewModelTest {
     fun whenUserUndoesRemoveAllFireproofSitesThenSitesAreAddedBack() {
         val removedWebsites: List<FireproofWebsiteEntity> = listOf(
             FireproofWebsiteEntity(domain = "domain.com"),
-            FireproofWebsiteEntity(domain = "domain2.com")
+            FireproofWebsiteEntity(domain = "domain2.com"),
         )
         viewModel.onSnackBarUndoRemoveAllWebsites(removedWebsites)
 

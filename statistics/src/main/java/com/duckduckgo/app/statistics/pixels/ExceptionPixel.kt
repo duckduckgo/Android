@@ -29,12 +29,12 @@ class ExceptionPixel
 @Inject
 constructor(
     private val pixel: Pixel,
-    private val rootExceptionFinder: RootExceptionFinder
+    private val rootExceptionFinder: RootExceptionFinder,
 ) {
 
     fun sendExceptionPixel(
         pixelName: Pixel.PixelName,
-        throwable: Throwable
+        throwable: Throwable,
     ) {
         val params = getParams(throwable)
         pixel.fire(pixelName, params)
@@ -42,7 +42,7 @@ constructor(
 
     fun sendExceptionPixel(
         pixelName: String,
-        throwable: Throwable
+        throwable: Throwable,
     ) {
         val params = getParams(throwable)
         pixel.fire(pixelName, params)

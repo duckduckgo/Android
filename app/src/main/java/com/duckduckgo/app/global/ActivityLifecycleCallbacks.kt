@@ -26,7 +26,7 @@ import com.duckduckgo.di.scopes.AppScope
 interface ActivityLifecycleCallbacks : Application.ActivityLifecycleCallbacks {
     override fun onActivityCreated(
         activity: Activity,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ) {
     }
 
@@ -40,7 +40,7 @@ interface ActivityLifecycleCallbacks : Application.ActivityLifecycleCallbacks {
 
     override fun onActivitySaveInstanceState(
         activity: Activity,
-        outState: Bundle
+        outState: Bundle,
     ) {
     }
 

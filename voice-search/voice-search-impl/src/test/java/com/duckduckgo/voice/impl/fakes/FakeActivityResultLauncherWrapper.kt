@@ -27,7 +27,7 @@ class FakeActivityResultLauncherWrapper : ActivityResultLauncherWrapper {
 
     override fun register(
         caller: ActivityResultCaller,
-        request: Request
+        request: Request,
     ) {
         lastKnownRequest = request
     }

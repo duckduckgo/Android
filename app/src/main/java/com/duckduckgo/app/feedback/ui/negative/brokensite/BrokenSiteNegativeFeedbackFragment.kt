@@ -31,7 +31,7 @@ class BrokenSiteNegativeFeedbackFragment : FeedbackFragment(R.layout.content_fee
     interface BrokenSiteFeedbackListener {
         fun onProvidedBrokenSiteFeedback(
             feedback: String,
-            url: String?
+            url: String?,
         )
 
         fun userCancelled()

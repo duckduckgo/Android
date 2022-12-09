@@ -17,17 +17,18 @@
 package com.duckduckgo.autofill.configuration
 
 import com.duckduckgo.app.email.EmailManager
+import com.duckduckgo.autofill.jsbridge.response.AvailableInputTypeCredentials
 import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 interface AutofillRuntimeConfigProvider {
     suspend fun getRuntimeConfiguration(
         rawJs: String,
-        url: String?
+        url: String?,
     ): String
 }
 
@@ -36,11 +37,11 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
     private val emailManager: EmailManager,
     private val deviceAuthenticator: DeviceAuthenticator,
     private val autofillStore: AutofillStore,
-    private val runtimeConfigurationWriter: RuntimeConfigurationWriter
+    private val runtimeConfigurationWriter: RuntimeConfigurationWriter,
 ) : AutofillRuntimeConfigProvider {
     override suspend fun getRuntimeConfiguration(
         rawJs: String,
-        url: String?
+        url: String?,
     ): String {
         Timber.v("BrowserAutofill: getRuntimeConfiguration called")
 
@@ -48,7 +49,7 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
         val userUnprotectedDomains = runtimeConfigurationWriter.generateUserUnprotectedDomains()
         val userPreferences = runtimeConfigurationWriter.generateUserPreferences(
             autofillCredentials = determineIfAutofillEnabled(),
-            showInlineKeyIcon = true
+            showInlineKeyIcon = true,
         )
         val availableInputTypes = generateAvailableInputTypes(url)
 
@@ -73,12 +74,16 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
     private fun determineIfAutofillEnabled(): Boolean =
         autofillStore.autofillAvailable && autofillStore.autofillEnabled && deviceAuthenticator.hasValidDeviceAuthentication()
 
-    private suspend fun determineIfCredentialsAvailable(url: String?): Boolean {
+    private suspend fun determineIfCredentialsAvailable(url: String?): AvailableInputTypeCredentials {
         return if (url == null || !determineIfAutofillEnabled()) {
-            false
+            AvailableInputTypeCredentials(username = false, password = false)
         } else {
             val savedCredentials = autofillStore.getCredentials(url)
-            savedCredentials.isNotEmpty()
+
+            val usernameSearch = savedCredentials.find { !it.username.isNullOrEmpty() }
+            val passwordSearch = savedCredentials.find { !it.password.isNullOrEmpty() }
+
+            AvailableInputTypeCredentials(username = usernameSearch != null, password = passwordSearch != null)
         }
     }
 

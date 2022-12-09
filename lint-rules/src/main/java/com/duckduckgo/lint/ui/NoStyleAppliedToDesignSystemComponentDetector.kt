@@ -16,6 +16,7 @@
 
 package com.duckduckgo.lint.ui
 
+import com.android.SdkConstants.ATTR_STYLE
 import com.android.resources.ResourceFolderType
 import com.android.tools.lint.detector.api.Category.Companion.CUSTOM_LINT_CHECKS
 import com.android.tools.lint.detector.api.Implementation
@@ -40,7 +41,7 @@ class NoStyleAppliedToDesignSystemComponentDetector : LayoutDetector() {
         context: XmlContext,
         element: Element
     ) {
-        if (element.hasAttribute("style")) {
+        if (element.hasAttribute(ATTR_STYLE)) {
             reportIssue(context, element)
         }
     }
@@ -66,6 +67,7 @@ class NoStyleAppliedToDesignSystemComponentDetector : LayoutDetector() {
         private const val ONE_LINE_LIST_ITEM = "com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem"
         private const val TWO_LINE_LIST_ITEM = "com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem"
         private const val SWITCH = "com.duckduckgo.mobile.android.ui.view.SwitchView"
+        private const val DAX_TEXT = "com.duckduckgo.mobile.android.ui.view.text.DaxTextView"
 
         val DESIGN_COMPONENTS =
             listOf(
@@ -77,7 +79,8 @@ class NoStyleAppliedToDesignSystemComponentDetector : LayoutDetector() {
                 BUTTON_GHOST_SMALL,
                 ONE_LINE_LIST_ITEM,
                 TWO_LINE_LIST_ITEM,
-                SWITCH
+                SWITCH,
+                DAX_TEXT
             )
 
         val STYLE_IN_DESIGN_SYSTEM_COMPONENT = Issue

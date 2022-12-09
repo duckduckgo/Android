@@ -17,18 +17,18 @@
 package com.duckduckgo.mobile.android.vpn.bugreport
 
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.app.global.formatters.time.model.dateOfLastDay
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
+import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import org.threeten.bp.LocalDateTime
-import javax.inject.Inject
 
 @ContributesMultibinding(VpnScope::class)
 class VpnLastTrackersBlockedCollector @Inject constructor(
@@ -56,8 +56,8 @@ class VpnLastTrackersBlockedCollector @Inject constructor(
                     Map::class.java,
                     String::class.java,
                     List::class.java,
-                    String::class.java
-                )
+                    String::class.java,
+                ),
             )
             return@withContext JSONObject(adapter.toJson(result))
         }

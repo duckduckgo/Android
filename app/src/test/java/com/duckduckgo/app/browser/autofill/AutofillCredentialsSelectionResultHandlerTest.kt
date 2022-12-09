@@ -30,6 +30,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.CredentialAutofillPickerDialog
 import com.duckduckgo.autofill.CredentialSavePickerDialog
 import com.duckduckgo.autofill.CredentialUpdateExistingCredentialsDialog
+import com.duckduckgo.autofill.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.store.AutofillStore
@@ -105,7 +106,7 @@ class AutofillCredentialsSelectionResultHandlerTest {
     @Test
     fun whenUpdateBundleMissingUrlThenNoAttemptToUpdateMade() = runTest {
         setupAuthenticatorAlwaysAuth()
-        val bundle = bundleForUpdateDialog(url = null, credentials = someLoginCredentials())
+        val bundle = bundleForUpdateDialog(url = null, credentials = someLoginCredentials(), CredentialUpdateType.Password)
         testee.processUpdateCredentialsResult(bundle, credentialsSaver)
         verifyUpdateNeverCalled()
     }
@@ -113,7 +114,7 @@ class AutofillCredentialsSelectionResultHandlerTest {
     @Test
     fun whenUpdateBundleMissingCredentialsThenNoAttemptToSaveMade() = runTest {
         setupAuthenticatorAlwaysAuth()
-        val bundle = bundleForUpdateDialog(url = "example.com", credentials = null)
+        val bundle = bundleForUpdateDialog(url = "example.com", credentials = null, CredentialUpdateType.Password)
         testee.processUpdateCredentialsResult(bundle, credentialsSaver)
         verifyUpdateNeverCalled()
     }
@@ -122,9 +123,9 @@ class AutofillCredentialsSelectionResultHandlerTest {
     fun whenUpdateBundleWellFormedThenCredentialsAreUpdated() = runTest {
         setupAuthenticatorAlwaysAuth()
         val loginCredentials = LoginCredentials(domain = "example.com", username = "foo", password = "bar")
-        val bundle = bundleForUpdateDialog("example.com", loginCredentials)
+        val bundle = bundleForUpdateDialog("example.com", loginCredentials, CredentialUpdateType.Password)
         testee.processUpdateCredentialsResult(bundle, credentialsSaver)
-        verify(credentialsSaver).updateCredentials(eq("example.com"), eq(loginCredentials))
+        verify(credentialsSaver).updateCredentials(eq("example.com"), eq(loginCredentials), eq(CredentialUpdateType.Password))
         verifySaveNeverCalled()
     }
 
@@ -221,12 +222,12 @@ class AutofillCredentialsSelectionResultHandlerTest {
     }
 
     private suspend fun verifyUpdateNeverCalled() {
-        verify(credentialsSaver, never()).updateCredentials(any(), any())
+        verify(credentialsSaver, never()).updateCredentials(any(), any(), any())
     }
 
     private fun verifyCredentialsSharedWithPage(
         url: String,
-        credentials: LoginCredentials
+        credentials: LoginCredentials,
     ) {
         verify(credentialsInjector).shareCredentialsWithPage(url, credentials)
     }
@@ -252,7 +253,7 @@ class AutofillCredentialsSelectionResultHandlerTest {
 
     private fun bundleForSaveDialog(
         url: String?,
-        credentials: LoginCredentials?
+        credentials: LoginCredentials?,
     ): Bundle {
         return Bundle().also {
             if (url != null) it.putString(CredentialSavePickerDialog.KEY_URL, url)
@@ -262,18 +263,20 @@ class AutofillCredentialsSelectionResultHandlerTest {
 
     private fun bundleForUpdateDialog(
         url: String?,
-        credentials: LoginCredentials?
+        credentials: LoginCredentials?,
+        updateType: CredentialUpdateType,
     ): Bundle {
         return Bundle().also {
             if (url != null) it.putString(CredentialUpdateExistingCredentialsDialog.KEY_URL, url)
             if (credentials != null) it.putParcelable(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIALS, credentials)
+            it.putParcelable(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIAL_UPDATE_TYPE, updateType)
         }
     }
 
     private fun bundleForSelectionDialog(
         url: String?,
         cancelled: Boolean?,
-        credentials: LoginCredentials?
+        credentials: LoginCredentials?,
     ): Bundle {
         return Bundle().also {
             if (url != null) it.putString(CredentialAutofillPickerDialog.KEY_URL, url)
@@ -303,7 +306,7 @@ class AutofillCredentialsSelectionResultHandlerTest {
             declineCounter = declineCounter,
             autofillStore = autofillStore,
             appCoroutineScope = this,
-            pixel = pixel
+            pixel = pixel,
         )
     }
 
@@ -324,7 +327,6 @@ class AutofillCredentialsSelectionResultHandlerTest {
                 is Result.Success -> onResult(Success)
                 is Result.Cancelled -> onResult(AuthResult.UserCancelled)
                 is Result.Failure -> onResult(AuthResult.Error("Authentication failed"))
-
             }
         }
 
@@ -333,7 +335,7 @@ class AutofillCredentialsSelectionResultHandlerTest {
         override fun authenticate(
             featureToAuth: DeviceAuthenticator.Features,
             fragment: Fragment,
-            onResult: (DeviceAuthenticator.AuthResult) -> Unit
+            onResult: (DeviceAuthenticator.AuthResult) -> Unit,
         ) {
             authenticationCalled(onResult)
         }
@@ -341,7 +343,7 @@ class AutofillCredentialsSelectionResultHandlerTest {
         override fun authenticate(
             featureToAuth: DeviceAuthenticator.Features,
             fragmentActivity: FragmentActivity,
-            onResult: (DeviceAuthenticator.AuthResult) -> Unit
+            onResult: (DeviceAuthenticator.AuthResult) -> Unit,
         ) {
             authenticationCalled(onResult)
         }

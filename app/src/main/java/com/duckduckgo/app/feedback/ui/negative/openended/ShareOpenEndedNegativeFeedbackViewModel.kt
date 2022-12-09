@@ -36,7 +36,7 @@ class ShareOpenEndedNegativeFeedbackViewModel @Inject constructor() : ViewModel(
     fun userSubmittingNegativeFeedback(
         mainReason: MainReason,
         subReason: SubReason?,
-        openEndedComment: String
+        openEndedComment: String,
     ) {
         command.value = Command.ExitAndSubmitNegativeFeedback(mainReason, subReason, openEndedComment)
     }
@@ -45,7 +45,7 @@ class ShareOpenEndedNegativeFeedbackViewModel @Inject constructor() : ViewModel(
         data class ExitAndSubmitNegativeFeedback(
             val mainReason: MainReason,
             val subReason: SubReason?,
-            val feedback: String
+            val feedback: String,
         ) : Command()
 
         data class ExitAndSubmitPositiveFeedback(val feedback: String) : Command()

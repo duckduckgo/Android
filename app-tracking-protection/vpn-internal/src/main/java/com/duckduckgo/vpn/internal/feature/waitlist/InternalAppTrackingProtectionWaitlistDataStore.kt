@@ -16,16 +16,13 @@
 
 package com.duckduckgo.vpn.internal.feature.waitlist
 
-import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.waitlist.AppTrackingProtectionWaitlistDataStore
-import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 
-@ContributesBinding(
-    scope = AppScope::class,
-    priority = ContributesBinding.Priority.HIGHEST
-)
-class InternalAppTrackingProtectionWaitlistDataStore @Inject constructor() : AppTrackingProtectionWaitlistDataStore {
+// @ContributesBinding(
+//    scope = AppScope::class,
+//    priority = ContributesBinding.Priority.HIGHEST
+// )
+class InternalAppTrackingProtectionWaitlistDataStore constructor() : AppTrackingProtectionWaitlistDataStore {
 
     override var inviteCode: String?
         get() = "internaltoken"

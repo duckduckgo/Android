@@ -28,11 +28,11 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 @ContributesViewModel(FragmentScope::class)
 class PrivacyReportViewModel @Inject constructor(
@@ -40,7 +40,7 @@ class PrivacyReportViewModel @Inject constructor(
     private val vpnStore: VpnStore,
     private val vpnFeatureRemover: VpnFeatureRemover,
     vpnStateMonitor: VpnStateMonitor,
-    private val dispatchers: DispatcherProvider
+    private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
     val viewStateFlow = vpnStateMonitor.getStateFlow(AppTpVpnFeature.APPTP_VPN).combine(getReport()) { vpnState, trackersBlocked ->
@@ -53,13 +53,12 @@ class PrivacyReportViewModel @Inject constructor(
             if (trackers.isEmpty()) {
                 PrivacyReportView.TrackersBlocked("", 0, 0)
             } else {
-                val perApp = trackers.groupBy { it.trackingApp }.toList().sortedByDescending { it.second.size }
+                val perApp = trackers.groupBy { it.trackingApp }.toList().sortedByDescending { it.second.sumOf { t -> t.count } }
                 val otherAppsSize = (perApp.size - 1).coerceAtLeast(0)
                 val latestApp = perApp.first().first.appDisplayName
 
-                PrivacyReportView.TrackersBlocked(latestApp, otherAppsSize, trackers.size)
+                PrivacyReportView.TrackersBlocked(latestApp, otherAppsSize, trackers.sumOf { it.count })
             }
-
         }
     }
 
@@ -78,13 +77,13 @@ class PrivacyReportViewModel @Inject constructor(
         data class ViewState(
             val vpnState: VpnState,
             val trackersBlocked: TrackersBlocked,
-            val isFeatureEnabled: Boolean
+            val isFeatureEnabled: Boolean,
         )
 
         data class TrackersBlocked(
             val latestApp: String,
             val otherAppsSize: Int,
-            val trackers: Int
+            val trackers: Int,
         )
     }
 }

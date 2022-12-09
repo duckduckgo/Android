@@ -27,14 +27,10 @@ import android.webkit.PermissionRequest
 import androidx.activity.result.ActivityResultCaller
 import androidx.annotation.StringRes
 import com.duckduckgo.app.global.extractDomain
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.view.toPx
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
-import com.duckduckgo.site.permissions.impl.pixels.SitePermissionsPixel.PixelParameter
-import com.duckduckgo.site.permissions.impl.pixels.SitePermissionsPixel.PixelValue
-import com.duckduckgo.site.permissions.impl.pixels.SitePermissionsPixel.SitePermissionsPixelName
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.snackbar.Snackbar.SnackbarLayout
 import com.squareup.anvil.annotations.ContributesBinding
@@ -46,7 +42,6 @@ import javax.inject.Inject
 class SitePermissionsDialogActivityLauncher @Inject constructor(
     private val systemPermissionsHelper: SystemPermissionsHelper,
     private val sitePermissionsRepository: SitePermissionsRepository,
-    private val pixel: Pixel
 ) : SitePermissionsDialogLauncher {
 
     private lateinit var sitePermissionRequest: PermissionRequest
@@ -60,7 +55,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         systemPermissionsHelper.registerPermissionLaunchers(
             caller,
             this::onResultSystemPermissionRequest,
-            this::onResultMultipleSystemPermissionsRequest
+            this::onResultMultipleSystemPermissionsRequest,
         )
     }
 
@@ -70,7 +65,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         tabId: String,
         permissionsRequested: Array<String>,
         request: PermissionRequest,
-        permissionsGrantedListener: SitePermissionsGrantedListener
+        permissionsGrantedListener: SitePermissionsGrantedListener,
     ) {
         sitePermissionRequest = request
         siteURL = url
@@ -80,15 +75,13 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
 
         when {
             permissionsRequested.size == 2 -> {
-                showSitePermissionsRationaleDialog(
-                    R.string.sitePermissionsMicAndCameraDialogTitle, url, this::askForMicAndCameraPermissions, PixelValue.BOTH
-                )
+                showSitePermissionsRationaleDialog(R.string.sitePermissionsMicAndCameraDialogTitle, url, this::askForMicAndCameraPermissions)
             }
             permissionsRequested.contains(PermissionRequest.RESOURCE_AUDIO_CAPTURE) -> {
-                showSitePermissionsRationaleDialog(R.string.sitePermissionsMicDialogTitle, url, this::askForMicPermissions, PixelValue.MIC)
+                showSitePermissionsRationaleDialog(R.string.sitePermissionsMicDialogTitle, url, this::askForMicPermissions)
             }
             permissionsRequested.contains(PermissionRequest.RESOURCE_VIDEO_CAPTURE) -> {
-                showSitePermissionsRationaleDialog(R.string.sitePermissionsCameraDialogTitle, url, this::askForCameraPermissions, PixelValue.CAMERA)
+                showSitePermissionsRationaleDialog(R.string.sitePermissionsCameraDialogTitle, url, this::askForCameraPermissions)
             }
         }
     }
@@ -97,17 +90,13 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         @StringRes titleRes: Int,
         url: String,
         onPermissionAllowed: () -> Unit,
-        pixelParamValue: String
     ) {
-        pixel.fire(SitePermissionsPixelName.SITE_PERMISSION_DIALOG_SHOWN, mapOf(PixelParameter.SITE_PERMISSION to pixelParamValue))
         AlertDialog.Builder(activity).apply {
             setTitle(String.format(activity.getString(titleRes), url.websiteFromGeoLocationsApiOrigin()))
             setPositiveButton(R.string.sitePermissionsDialogAllowButton) { _, _ ->
-                pixel.fire(SitePermissionsPixelName.SITE_PERMISSION_DIALOG_ALLOWED, mapOf(PixelParameter.SITE_PERMISSION to pixelParamValue))
                 onPermissionAllowed()
             }
             setNegativeButton(R.string.sitePermissionsDialogDenyButton) { _, _ ->
-                pixel.fire(SitePermissionsPixelName.SITE_PERMISSION_DIALOG_DENIED, mapOf(PixelParameter.SITE_PERMISSION to pixelParamValue))
                 sitePermissionRequest.deny()
             }
             setCancelable(false)
@@ -128,8 +117,8 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                 systemPermissionsHelper.requestMultiplePermissions(
                     arrayOf(
                         Manifest.permission.RECORD_AUDIO,
-                        Manifest.permission.MODIFY_AUDIO_SETTINGS
-                    )
+                        Manifest.permission.MODIFY_AUDIO_SETTINGS,
+                    ),
                 )
             }
             else -> {
@@ -137,8 +126,8 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                     arrayOf(
                         Manifest.permission.RECORD_AUDIO,
                         Manifest.permission.MODIFY_AUDIO_SETTINGS,
-                        Manifest.permission.CAMERA
-                    )
+                        Manifest.permission.CAMERA,
+                    ),
                 )
             }
         }
@@ -285,5 +274,5 @@ fun String.websiteFromGeoLocationsApiOrigin(): String {
 enum class SitePermissionsRequestedType {
     CAMERA,
     AUDIO,
-    CAMERA_AND_AUDIO
+    CAMERA_AND_AUDIO,
 }

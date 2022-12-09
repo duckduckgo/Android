@@ -27,7 +27,7 @@ class LocalRemoteMessagingConfigRepositoryTest {
     fun whenRemoteConfigTimestampGreaterThan1DayThenConfigExpired() {
         val remoteMessagingConfig = RemoteMessagingConfig(
             version = 0,
-            evaluationTimestamp = databaseTimestampFormatter().format(LocalDateTime.now().minusDays(2L))
+            evaluationTimestamp = databaseTimestampFormatter().format(LocalDateTime.now().minusDays(2L)),
         )
 
         val expired = remoteMessagingConfig.expired()
@@ -39,7 +39,7 @@ class LocalRemoteMessagingConfigRepositoryTest {
     fun whenRemoteConfigTimestampLessThan1DayThenConfigIsNotExpired() {
         val remoteMessagingConfig = RemoteMessagingConfig(
             version = 0,
-            evaluationTimestamp = databaseTimestampFormatter().format(LocalDateTime.now().minusHours(15L))
+            evaluationTimestamp = databaseTimestampFormatter().format(LocalDateTime.now().minusHours(15L)),
         )
 
         val expired = remoteMessagingConfig.expired()

@@ -50,7 +50,7 @@ class AppTpFeatureConfigImplTest {
             coroutineRule.testScope,
             appBuildConfig,
             vpnRemoteConfigDatabase,
-            coroutineRule.testDispatcherProvider
+            coroutineRule.testDispatcherProvider,
         )
     }
 
@@ -67,6 +67,9 @@ class AppTpFeatureConfigImplTest {
                 AppTpSetting.ConnectivityChecks -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.ProtectGames -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.ExceptionLists -> assertTrue(config.isEnabled(setting))
+                AppTpSetting.OpenBeta -> assertFalse(config.isEnabled(setting))
+                AppTpSetting.CheckBlockingFunction -> assertFalse(config.isEnabled(setting))
+                AppTpSetting.StartVpnErrorHandling -> assertTrue(config.isEnabled(setting))
             }
         }
     }
@@ -96,7 +99,7 @@ class AppTpFeatureConfigImplTest {
             coroutineRule.testScope,
             appBuildConfig,
             vpnRemoteConfigDatabase,
-            coroutineRule.testDispatcherProvider
+            coroutineRule.testDispatcherProvider,
         )
 
         AppTpSetting.values().forEach {

@@ -16,9 +16,11 @@
 
 package com.duckduckgo.autofill
 
+import android.os.Parcelable
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.domain.app.LoginTriggerType
+import kotlinx.parcelize.Parcelize
 
 /**
  * Dialog which can be shown when user is required to select which saved credential to autofill
@@ -59,6 +61,16 @@ interface CredentialSavePickerDialog {
  */
 interface CredentialUpdateExistingCredentialsDialog {
 
+    @Parcelize
+    sealed interface CredentialUpdateType : Parcelable {
+
+        @Parcelize
+        object Username : CredentialUpdateType
+
+        @Parcelize
+        object Password : CredentialUpdateType
+    }
+
     companion object {
         fun resultKey(tabId: String) = "$tabId/CredentialUpdateExistingCredentialsResult"
 
@@ -66,6 +78,7 @@ interface CredentialUpdateExistingCredentialsDialog {
         const val KEY_URL = "url"
         const val KEY_CREDENTIALS = "credentials"
         const val KEY_TAB_ID = "tabId"
+        const val KEY_CREDENTIAL_UPDATE_TYPE = "updateType"
     }
 }
 
@@ -78,19 +91,24 @@ interface CredentialAutofillDialogFactory {
         url: String,
         credentials: List<LoginCredentials>,
         triggerType: LoginTriggerType,
-        tabId: String
+        tabId: String,
     ): DialogFragment
 
     fun autofillSavingCredentialsDialog(
         url: String,
         credentials: LoginCredentials,
-        tabId: String
+        tabId: String,
     ): DialogFragment
 
-    fun autofillSavingUpdateCredentialsDialog(
+    fun autofillSavingUpdatePasswordDialog(
         url: String,
         credentials: LoginCredentials,
-        tabId: String
+        tabId: String,
     ): DialogFragment
 
+    fun autofillSavingUpdateUsernameDialog(
+        url: String,
+        credentials: LoginCredentials,
+        tabId: String,
+    ): DialogFragment
 }

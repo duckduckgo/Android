@@ -20,13 +20,13 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute.Favorites
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
+import java.util.*
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import java.util.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 class UserAttributeMatcherTest {
 
@@ -39,7 +39,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(appTheme = DuckDuckGoTheme.SYSTEM_DEFAULT)
 
         val result = testee.evaluate(
-            MatchingAttribute.AppTheme(value = "system_default")
+            MatchingAttribute.AppTheme(value = "system_default"),
         )
 
         assertEquals(EvaluationResult.Match, result)
@@ -50,7 +50,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(appTheme = DuckDuckGoTheme.SYSTEM_DEFAULT)
 
         val result = testee.evaluate(
-            MatchingAttribute.AppTheme(value = "light")
+            MatchingAttribute.AppTheme(value = "light"),
         )
 
         assertEquals(EvaluationResult.Fail, result)
@@ -61,7 +61,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(bookmarks = 10L)
 
         val result = testee.evaluate(
-            MatchingAttribute.Bookmarks(value = 10)
+            MatchingAttribute.Bookmarks(value = 10),
         )
 
         assertEquals(EvaluationResult.Match, result)
@@ -72,7 +72,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(bookmarks = 10L)
 
         val result = testee.evaluate(
-            MatchingAttribute.Bookmarks(value = 15)
+            MatchingAttribute.Bookmarks(value = 15),
         )
 
         assertEquals(EvaluationResult.Fail, result)
@@ -83,7 +83,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(bookmarks = 10L)
 
         val result = testee.evaluate(
-            MatchingAttribute.Bookmarks(max = 10)
+            MatchingAttribute.Bookmarks(max = 10),
         )
 
         assertEquals(EvaluationResult.Match, result)
@@ -94,7 +94,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(bookmarks = 15L)
 
         val result = testee.evaluate(
-            MatchingAttribute.Bookmarks(max = 10)
+            MatchingAttribute.Bookmarks(max = 10),
         )
 
         assertEquals(EvaluationResult.Fail, result)
@@ -105,7 +105,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(bookmarks = 10L)
 
         val result = testee.evaluate(
-            MatchingAttribute.Bookmarks(min = 10)
+            MatchingAttribute.Bookmarks(min = 10),
         )
 
         assertEquals(EvaluationResult.Match, result)
@@ -116,7 +116,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(bookmarks = 0L)
 
         val result = testee.evaluate(
-            MatchingAttribute.Bookmarks(min = 9)
+            MatchingAttribute.Bookmarks(min = 9),
         )
 
         assertEquals(EvaluationResult.Fail, result)
@@ -127,7 +127,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(bookmarks = 10L)
 
         val result = testee.evaluate(
-            MatchingAttribute.Bookmarks(min = 9, max = 15)
+            MatchingAttribute.Bookmarks(min = 9, max = 15),
         )
 
         assertEquals(EvaluationResult.Match, result)
@@ -138,7 +138,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(bookmarks = 10L)
 
         val result = testee.evaluate(
-            MatchingAttribute.Bookmarks(min = 3, max = 6)
+            MatchingAttribute.Bookmarks(min = 3, max = 6),
         )
 
         assertEquals(EvaluationResult.Fail, result)
@@ -150,7 +150,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(favorites = 10L)
 
         val result = testee.evaluate(
-            Favorites(value = 10)
+            Favorites(value = 10),
         )
 
         assertEquals(EvaluationResult.Match, result)
@@ -161,7 +161,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(favorites = 10L)
 
         val result = testee.evaluate(
-            Favorites(value = 15)
+            Favorites(value = 15),
         )
 
         assertEquals(EvaluationResult.Fail, result)
@@ -172,7 +172,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(favorites = 10L)
 
         val result = testee.evaluate(
-            Favorites(max = 10)
+            Favorites(max = 10),
         )
 
         assertEquals(EvaluationResult.Match, result)
@@ -183,7 +183,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(favorites = 10L)
 
         val result = testee.evaluate(
-            Favorites(max = 5)
+            Favorites(max = 5),
         )
 
         assertEquals(EvaluationResult.Fail, result)
@@ -194,7 +194,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(favorites = 10L)
 
         val result = testee.evaluate(
-            Favorites(min = 10)
+            Favorites(min = 10),
         )
 
         assertEquals(EvaluationResult.Match, result)
@@ -205,7 +205,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(favorites = 0L)
 
         val result = testee.evaluate(
-            Favorites(min = 10)
+            Favorites(min = 10),
         )
 
         assertEquals(EvaluationResult.Fail, result)
@@ -216,7 +216,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(favorites = 10L)
 
         val result = testee.evaluate(
-            Favorites(min = 9, max = 15)
+            Favorites(min = 9, max = 15),
         )
 
         assertEquals(EvaluationResult.Match, result)
@@ -227,7 +227,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(favorites = 10L)
 
         val result = testee.evaluate(
-            Favorites(min = 3, max = 6)
+            Favorites(min = 3, max = 6),
         )
 
         assertEquals(EvaluationResult.Fail, result)
@@ -239,7 +239,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(daysSinceInstalled = 10L)
 
         val result = testee.evaluate(
-            MatchingAttribute.DaysSinceInstalled(max = 10)
+            MatchingAttribute.DaysSinceInstalled(max = 10),
         )
 
         assertEquals(EvaluationResult.Match, result)
@@ -250,7 +250,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(daysSinceInstalled = 10L)
 
         val result = testee.evaluate(
-            MatchingAttribute.DaysSinceInstalled(max = 5)
+            MatchingAttribute.DaysSinceInstalled(max = 5),
         )
 
         assertEquals(EvaluationResult.Fail, result)
@@ -261,7 +261,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(daysSinceInstalled = 10L)
 
         val result = testee.evaluate(
-            MatchingAttribute.DaysSinceInstalled(min = 10)
+            MatchingAttribute.DaysSinceInstalled(min = 10),
         )
 
         assertEquals(EvaluationResult.Match, result)
@@ -272,7 +272,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(daysSinceInstalled = 1L)
 
         val result = testee.evaluate(
-            MatchingAttribute.DaysSinceInstalled(min = 10)
+            MatchingAttribute.DaysSinceInstalled(min = 10),
         )
 
         assertEquals(EvaluationResult.Fail, result)
@@ -283,7 +283,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(daysSinceInstalled = 10L)
 
         val result = testee.evaluate(
-            MatchingAttribute.DaysSinceInstalled(min = 9, max = 15)
+            MatchingAttribute.DaysSinceInstalled(min = 9, max = 15),
         )
 
         assertEquals(EvaluationResult.Match, result)
@@ -294,7 +294,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(daysSinceInstalled = 10L)
 
         val result = testee.evaluate(
-            MatchingAttribute.DaysSinceInstalled(min = 3, max = 6)
+            MatchingAttribute.DaysSinceInstalled(min = 3, max = 6),
         )
 
         assertEquals(EvaluationResult.Fail, result)
@@ -306,7 +306,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(daysUsedSince = 10L)
 
         val result = testee.evaluate(
-            MatchingAttribute.DaysUsedSince(since = Date(), value = 10)
+            MatchingAttribute.DaysUsedSince(since = Date(), value = 10),
         )
 
         assertEquals(EvaluationResult.Match, result)
@@ -317,7 +317,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(daysUsedSince = 10L)
 
         val result = testee.evaluate(
-            MatchingAttribute.DaysUsedSince(since = Date(), value = 8)
+            MatchingAttribute.DaysUsedSince(since = Date(), value = 8),
         )
 
         assertEquals(EvaluationResult.Fail, result)
@@ -329,7 +329,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(defaultBrowser = true)
 
         val result = testee.evaluate(
-            MatchingAttribute.DefaultBrowser(value = true)
+            MatchingAttribute.DefaultBrowser(value = true),
         )
 
         assertEquals(EvaluationResult.Match, result)
@@ -340,7 +340,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(defaultBrowser = false)
 
         val result = testee.evaluate(
-            MatchingAttribute.DefaultBrowser(value = true)
+            MatchingAttribute.DefaultBrowser(value = true),
         )
 
         assertEquals(EvaluationResult.Fail, result)
@@ -352,7 +352,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(emailEnabled = true)
 
         val result = testee.evaluate(
-            MatchingAttribute.EmailEnabled(value = true)
+            MatchingAttribute.EmailEnabled(value = true),
         )
 
         assertEquals(EvaluationResult.Match, result)
@@ -363,7 +363,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(emailEnabled = false)
 
         val result = testee.evaluate(
-            MatchingAttribute.EmailEnabled(value = true)
+            MatchingAttribute.EmailEnabled(value = true),
         )
 
         assertEquals(EvaluationResult.Fail, result)
@@ -375,7 +375,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(searchCount = 10L)
 
         val result = testee.evaluate(
-            MatchingAttribute.SearchCount(value = 10)
+            MatchingAttribute.SearchCount(value = 10),
         )
 
         assertEquals(EvaluationResult.Match, result)
@@ -386,7 +386,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(searchCount = 10L)
 
         val result = testee.evaluate(
-            MatchingAttribute.SearchCount(value = 15)
+            MatchingAttribute.SearchCount(value = 15),
         )
 
         assertEquals(EvaluationResult.Fail, result)
@@ -397,7 +397,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(searchCount = 10L)
 
         val result = testee.evaluate(
-            MatchingAttribute.SearchCount(max = 10)
+            MatchingAttribute.SearchCount(max = 10),
         )
 
         assertEquals(EvaluationResult.Match, result)
@@ -408,7 +408,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(searchCount = 10L)
 
         val result = testee.evaluate(
-            MatchingAttribute.SearchCount(max = 5)
+            MatchingAttribute.SearchCount(max = 5),
         )
 
         assertEquals(EvaluationResult.Fail, result)
@@ -419,7 +419,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(searchCount = 10L)
 
         val result = testee.evaluate(
-            MatchingAttribute.SearchCount(min = 10)
+            MatchingAttribute.SearchCount(min = 10),
         )
 
         assertEquals(EvaluationResult.Match, result)
@@ -430,7 +430,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(searchCount = 1L)
 
         val result = testee.evaluate(
-            MatchingAttribute.SearchCount(min = 10)
+            MatchingAttribute.SearchCount(min = 10),
         )
 
         assertEquals(EvaluationResult.Fail, result)
@@ -441,7 +441,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(searchCount = 10L)
 
         val result = testee.evaluate(
-            MatchingAttribute.SearchCount(min = 10, max = 15)
+            MatchingAttribute.SearchCount(min = 10, max = 15),
         )
 
         assertEquals(EvaluationResult.Match, result)
@@ -452,7 +452,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(searchCount = 10L)
 
         val result = testee.evaluate(
-            MatchingAttribute.SearchCount(min = 3, max = 6)
+            MatchingAttribute.SearchCount(min = 3, max = 6),
         )
 
         assertEquals(EvaluationResult.Fail, result)
@@ -464,7 +464,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(widgetAdded = true)
 
         val result = testee.evaluate(
-            MatchingAttribute.WidgetAdded(value = true)
+            MatchingAttribute.WidgetAdded(value = true),
         )
 
         assertEquals(EvaluationResult.Match, result)
@@ -475,7 +475,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(widgetAdded = false)
 
         val result = testee.evaluate(
-            MatchingAttribute.WidgetAdded(value = true)
+            MatchingAttribute.WidgetAdded(value = true),
         )
 
         assertEquals(EvaluationResult.Fail, result)
@@ -490,7 +490,7 @@ class UserAttributeMatcherTest {
         defaultBrowser: Boolean = true,
         emailEnabled: Boolean = true,
         searchCount: Long = 8L,
-        widgetAdded: Boolean = true
+        widgetAdded: Boolean = true,
     ) {
         whenever(userBrowserProperties.appTheme()).thenReturn(appTheme)
         whenever(userBrowserProperties.bookmarks()).thenReturn(bookmarks)
@@ -502,5 +502,4 @@ class UserAttributeMatcherTest {
         whenever(userBrowserProperties.searchCount()).thenReturn(searchCount)
         whenever(userBrowserProperties.widgetAdded()).thenReturn(widgetAdded)
     }
-
 }

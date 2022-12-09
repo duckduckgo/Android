@@ -16,12 +16,12 @@
 
 package com.duckduckgo.adclick.impl
 
+import java.util.concurrent.TimeUnit
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import java.util.concurrent.TimeUnit
 
 class DuckDuckGoAdClickDataTest {
 
@@ -73,6 +73,6 @@ class DuckDuckGoAdClickDataTest {
     private fun dummyExpiration(host: String) = Exemption(
         hostTldPlusOne = host,
         navigationExemptionDeadline = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(10),
-        exemptionDeadline = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(60)
+        exemptionDeadline = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(60),
     )
 }

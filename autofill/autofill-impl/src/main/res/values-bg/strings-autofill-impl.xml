@@ -42,6 +42,9 @@
     <string name="updateLoginDialogButtonUpdatePassword">Актуализиране на паролата</string>
     <string name="updateLoginDialogButtonNotNow">Не сега</string>
 
+    <string name="updateLoginDialogTitleUpdateUsername">Актуализиране на потребителското име?</string>
+    <string name="updateLoginDialogButtonUpdateUsername">Актуализиране на потребителското име</string>
+
     <string name="autofillDialogCloseButtonContentDescription">Затваряне на диалоговия прозорец за автоматично попълване</string>
 
     <string name="credentialManagementEditLoginTitleHint">Име на данните за вход</string>
@@ -59,5 +62,7 @@
     <string name="credentialManagementAutofillToggleLabel">Запазване и автоматично попълване на данните за вход</string>
     <string name="credentialManagementViewMenuEdit">Редактиране</string>
     <string name="credentialManagementViewMenuDelete">Изтриване</string>
+
+    <string name="credentialManagementSuggestionsLabel">Предложения</string>
 
 </resources>

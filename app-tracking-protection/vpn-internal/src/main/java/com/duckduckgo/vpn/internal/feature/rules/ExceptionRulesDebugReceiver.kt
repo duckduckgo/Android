@@ -20,16 +20,16 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRule
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import logcat.logcat
 
 /**
  * This receiver allows to add exclusion rules to appTP
@@ -42,7 +42,7 @@ import javax.inject.Inject
 class ExceptionRulesDebugReceiver(
     context: Context,
     intentAction: String = ACTION,
-    private val receiver: (Intent) -> Unit
+    private val receiver: (Intent) -> Unit,
 ) : BroadcastReceiver() {
 
     init {
@@ -52,7 +52,7 @@ class ExceptionRulesDebugReceiver(
 
     override fun onReceive(
         context: Context,
-        intent: Intent
+        intent: Intent,
     ) {
         receiver(intent)
     }
@@ -62,7 +62,7 @@ class ExceptionRulesDebugReceiver(
 
         fun ruleIntent(
             packageId: String,
-            domain: String
+            domain: String,
         ): Intent {
             return Intent(ACTION).apply {
                 putExtra("app", packageId)
@@ -76,12 +76,13 @@ class ExceptionRulesDebugReceiver(
 class ExceptionRulesDebugReceiverRegister @Inject constructor(
     private val context: Context,
     private val exclusionRulesRepository: ExclusionRulesRepository,
+    private val dispatchers: DispatcherProvider,
 ) : VpnServiceCallbacks {
 
     private val exceptionRulesSavedState = mutableListOf<AppTrackerExceptionRule>()
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        Timber.i("Debug receiver ExceptionRulesDebugReceiver registered")
+        logcat { "Debug receiver ExceptionRulesDebugReceiver registered" }
 
         saveExceptionRulesState(coroutineScope)
 
@@ -89,10 +90,10 @@ class ExceptionRulesDebugReceiverRegister @Inject constructor(
             val appId = kotlin.runCatching { intent.getStringExtra("app") }.getOrNull()
             val domain = kotlin.runCatching { intent.getStringExtra("domain") }.getOrNull()
 
-            Timber.i("Excluding %s for app %s", domain, appId)
+            logcat { "Excluding $domain for app $appId" }
 
             if (appId != null && domain != null) {
-                coroutineScope.launch(Dispatchers.IO) {
+                coroutineScope.launch(dispatchers.io()) {
                     exclusionRulesRepository.upsertRule(appId, domain)
                 }
             }
@@ -101,11 +102,11 @@ class ExceptionRulesDebugReceiverRegister @Inject constructor(
 
     override fun onVpnStopped(
         coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
+        vpnStopReason: VpnStopReason,
     ) {
-        Timber.i("Debug receiver ExceptionRulesDebugReceiver restoring exception rules")
+        logcat { "Debug receiver ExceptionRulesDebugReceiver restoring exception rules" }
 
-        coroutineScope.launch(Dispatchers.IO) {
+        coroutineScope.launch(dispatchers.io()) {
             exclusionRulesRepository.deleteAllTrackerRules()
             exclusionRulesRepository.insertTrackerRules(exceptionRulesSavedState).also {
                 exceptionRulesSavedState.clear()
@@ -114,7 +115,7 @@ class ExceptionRulesDebugReceiverRegister @Inject constructor(
     }
 
     private fun saveExceptionRulesState(coroutineScope: CoroutineScope) {
-        coroutineScope.launch(Dispatchers.IO) {
+        coroutineScope.launch(dispatchers.io()) {
             exceptionRulesSavedState.clear()
             exceptionRulesSavedState.addAll(exclusionRulesRepository.getAllTrackerRules())
         }

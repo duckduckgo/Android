@@ -16,10 +16,10 @@
 
 package com.duckduckgo.downloads.api
 
-import java.io.File
-import java.io.Serializable
 import android.os.Environment
 import androidx.annotation.AnyThread
+import java.io.File
+import java.io.Serializable
 
 /** Interface for the starting point of a download. */
 interface FileDownloader {
@@ -35,6 +35,6 @@ interface FileDownloader {
         val mimeType: String? = null,
         val subfolder: String,
         val directory: File = Environment.getExternalStoragePublicDirectory(subfolder),
-        val isUrlCompressed: Boolean = false
+        val isUrlCompressed: Boolean = false,
     ) : Serializable
 }

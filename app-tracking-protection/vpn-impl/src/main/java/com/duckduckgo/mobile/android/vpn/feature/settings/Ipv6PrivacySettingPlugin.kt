@@ -20,12 +20,12 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.feature.*
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
-import timber.log.Timber
 import javax.inject.Inject
+import logcat.logcat
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = AppTpSettingPlugin::class
+    boundType = AppTpSettingPlugin::class,
 )
 class Ipv6PrivacySettingPlugin @Inject constructor(
     private val appTpFeatureConfig: AppTpFeatureConfig,
@@ -37,7 +37,7 @@ class Ipv6PrivacySettingPlugin @Inject constructor(
         @Suppress("NAME_SHADOWING")
         val name = appTpSettingValueOf(name.value)
         if (name == settingName) {
-            Timber.d("Received configuration: $jsonString")
+            logcat { "Received configuration: $jsonString" }
             jsonAdapter.fromJson(jsonString)?.let { config ->
                 appTpFeatureConfig.edit { setEnabled(settingName, config.state == "enabled") }
             }

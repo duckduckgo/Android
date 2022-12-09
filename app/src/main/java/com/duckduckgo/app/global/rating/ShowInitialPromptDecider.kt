@@ -26,7 +26,7 @@ interface ShowPromptDecider {
 
 class InitialPromptDecider(
     private val appDaysUsedRepository: AppDaysUsedRepository,
-    private val appEnjoymentRepository: AppEnjoymentRepository
+    private val appEnjoymentRepository: AppEnjoymentRepository,
 ) : ShowPromptDecider {
 
     override suspend fun shouldShowPrompt(): Boolean {
@@ -54,7 +54,7 @@ class InitialPromptDecider(
 
 class SecondaryPromptDecider(
     private val appDaysUsedRepository: AppDaysUsedRepository,
-    private val appEnjoymentRepository: AppEnjoymentRepository
+    private val appEnjoymentRepository: AppEnjoymentRepository,
 ) : ShowPromptDecider {
 
     override suspend fun shouldShowPrompt(): Boolean {

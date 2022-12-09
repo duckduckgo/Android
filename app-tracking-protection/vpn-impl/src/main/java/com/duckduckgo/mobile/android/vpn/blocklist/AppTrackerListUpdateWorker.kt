@@ -27,41 +27,46 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.duckduckgo.anvil.annotations.ContributesWorker
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerMetadata
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority
+import logcat.logcat
 
 @ContributesWorker(AppScope::class)
 class AppTrackerListUpdateWorker(context: Context, workerParameters: WorkerParameters) :
     CoroutineWorker(context, workerParameters) {
     @Inject
     lateinit var appTrackerListDownloader: AppTrackerListDownloader
+
     @Inject
     lateinit var vpnDatabase: VpnDatabase
 
+    @Inject
+    lateinit var dispatchers: DispatcherProvider
+
     override suspend fun doWork(): Result {
-        return withContext(Dispatchers.IO) {
+        return withContext(dispatchers.io()) {
             val updateBlocklistResult = updateTrackerBlocklist()
 
             val success = Result.success()
             if (updateBlocklistResult != success) {
-                Timber.w("One of the app tracker list updates failed, scheduling a retry")
+                logcat(LogPriority.WARN) { "One of the app tracker list updates failed, scheduling a retry" }
                 return@withContext Result.retry()
             }
 
-            Timber.w("Tracker list updates success")
+            logcat { "Tracker list updates success" }
             return@withContext success
         }
     }
 
     private fun updateTrackerBlocklist(): Result {
-        Timber.d("Updating the app tracker blocklist")
+        logcat { "Updating the app tracker blocklist" }
         val blocklist = appTrackerListDownloader.downloadAppTrackerBlocklist()
         when (blocklist.etag) {
             is ETag.ValidETag -> {
@@ -70,11 +75,11 @@ class AppTrackerListUpdateWorker(context: Context, workerParameters: WorkerParam
                 val updatedEtag = blocklist.etag.value
 
                 if (updatedEtag == currentEtag) {
-                    Timber.v("Downloaded blocklist has same eTag, noop")
+                    logcat { "Downloaded blocklist has same eTag, noop" }
                     return Result.success()
                 }
 
-                Timber.d("Updating the app tracker blocklist, eTag: ${blocklist.etag.value}")
+                logcat { "Updating the app tracker blocklist, eTag: ${blocklist.etag.value}" }
 
                 vpnDatabase
                     .vpnAppTrackerBlockingDao()
@@ -82,13 +87,13 @@ class AppTrackerListUpdateWorker(context: Context, workerParameters: WorkerParam
                         blocklist.blocklist,
                         blocklist.appPackages,
                         AppTrackerMetadata(eTag = blocklist.etag.value),
-                        blocklist.entities
+                        blocklist.entities,
                     )
 
                 return Result.success()
             }
             else -> {
-                Timber.w("Received app tracker blocklist with invalid eTag")
+                logcat(LogPriority.WARN) { "Received app tracker blocklist with invalid eTag" }
                 return Result.retry()
             }
         }
@@ -97,21 +102,23 @@ class AppTrackerListUpdateWorker(context: Context, workerParameters: WorkerParam
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = LifecycleObserver::class
+    boundType = LifecycleObserver::class,
 )
 class AppTrackerListUpdateWorkerScheduler @Inject constructor(
-    private val workManager: WorkManager
+    private val workManager: WorkManager,
 ) : DefaultLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
-        Timber.v("Scheduling tracker blocklist update worker")
+        logcat { "Scheduling tracker blocklist update worker" }
         val workerRequest =
             PeriodicWorkRequestBuilder<AppTrackerListUpdateWorker>(12, TimeUnit.HOURS)
                 .addTag(APP_TRACKER_LIST_UPDATE_WORKER_TAG)
                 .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
                 .build()
         workManager.enqueueUniquePeriodicWork(
-            APP_TRACKER_LIST_UPDATE_WORKER_TAG, ExistingPeriodicWorkPolicy.KEEP, workerRequest
+            APP_TRACKER_LIST_UPDATE_WORKER_TAG,
+            ExistingPeriodicWorkPolicy.KEEP,
+            workerRequest,
         )
     }
 

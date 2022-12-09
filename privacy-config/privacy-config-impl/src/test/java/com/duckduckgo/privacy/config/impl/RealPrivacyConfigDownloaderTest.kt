@@ -21,9 +21,6 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.impl.network.PrivacyConfigService
 import com.duckduckgo.privacy.config.store.UnprotectedTemporaryEntity
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
@@ -33,6 +30,9 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
@@ -54,7 +54,8 @@ class RealPrivacyConfigDownloaderTest {
         runTest {
             testee =
                 RealPrivacyConfigDownloader(
-                    TestFailingPrivacyConfigService(), mockPrivacyConfigPersister
+                    TestFailingPrivacyConfigService(),
+                    mockPrivacyConfigPersister,
                 )
             assertFalse(testee.download())
         }
@@ -83,7 +84,7 @@ class RealPrivacyConfigDownloaderTest {
                 version = 1,
                 readme = "readme",
                 features = mapOf(FEATURE_NAME to JSONObject(FEATURE_JSON)),
-                unprotectedTemporaryList
+                unprotectedTemporaryList,
             )
         }
     }

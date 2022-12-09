@@ -26,7 +26,7 @@ import io.reactivex.Completable
 @Module
 @ContributesTo(
     scope = AppScope::class,
-    replaces = [AppConfigurationDownloaderModule::class]
+    replaces = [AppConfigurationDownloaderModule::class],
 )
 class StubAppConfigurationDownloadModule {
 

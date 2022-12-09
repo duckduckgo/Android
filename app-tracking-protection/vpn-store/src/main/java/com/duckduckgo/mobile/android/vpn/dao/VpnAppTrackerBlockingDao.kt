@@ -17,10 +17,10 @@
 package com.duckduckgo.mobile.android.vpn.dao
 
 import androidx.room.*
+import com.duckduckgo.mobile.android.vpn.trackers.*
 import com.duckduckgo.mobile.android.vpn.trackers.AppTracker
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerMetadata
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerPackage
-import com.duckduckgo.mobile.android.vpn.trackers.*
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -61,7 +61,7 @@ interface VpnAppTrackerBlockingDao {
         blocklist: List<AppTracker>,
         appPackages: List<AppTrackerPackage>,
         metadata: AppTrackerMetadata,
-        entities: List<AppTrackerEntity>
+        entities: List<AppTrackerEntity>,
     ) {
         setTrackerBlocklistMetadata(metadata)
 
@@ -95,7 +95,7 @@ interface VpnAppTrackerBlockingDao {
 
     @Transaction
     fun updateExclusionList(
-        exclusionList: List<AppTrackerExcludedPackage>
+        exclusionList: List<AppTrackerExcludedPackage>,
     ) {
         deleteExclusionList()
         insertExclusionList(exclusionList)
@@ -104,7 +104,7 @@ interface VpnAppTrackerBlockingDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertTrackerExceptionRules(trackerExceptionRules: List<AppTrackerExceptionRule>)
 
-    @Query("SELECT * from vpn_app_tracker_exception_rules WHERE rule = :domain LIMIT 1")
+    @Query("SELECT * from vpn_app_tracker_exception_rules WHERE :domain LIKE '%' || rule LIMIT 1")
     fun getRuleByTrackerDomain(domain: String): AppTrackerExceptionRule?
 
     @Query("SELECT * from vpn_app_tracker_exception_rules")
@@ -121,7 +121,7 @@ interface VpnAppTrackerBlockingDao {
 
     @Transaction
     fun updateTrackerExceptionRules(
-        exceptionRules: List<AppTrackerExceptionRule>
+        exceptionRules: List<AppTrackerExceptionRule>,
     ) {
         deleteTrackerExceptionRules()
         insertTrackerExceptionRules(exceptionRules)
@@ -138,5 +138,4 @@ interface VpnAppTrackerBlockingDao {
 
     @Query("DELETE from vpn_app_tracker_manual_exclusion_list")
     fun deleteManualAppExclusionList()
-
 }

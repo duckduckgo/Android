@@ -103,7 +103,7 @@ class WebViewActivity : DuckDuckGoActivity() {
         fun intent(
             context: Context,
             urlExtra: String,
-            titleExtra: String
+            titleExtra: String,
         ): Intent {
             val intent = Intent(context, WebViewActivity::class.java)
             intent.putExtra(URL_EXTRA, urlExtra)

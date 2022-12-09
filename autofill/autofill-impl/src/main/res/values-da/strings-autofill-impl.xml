@@ -42,6 +42,9 @@
     <string name="updateLoginDialogButtonUpdatePassword">Opdater adgangskode</string>
     <string name="updateLoginDialogButtonNotNow">Ikke nu</string>
 
+    <string name="updateLoginDialogTitleUpdateUsername">Opdater brugernavn?</string>
+    <string name="updateLoginDialogButtonUpdateUsername">Opdater brugernavn</string>
+
     <string name="autofillDialogCloseButtonContentDescription">Luk dialogboksen for automatisk udfyldning</string>
 
     <string name="credentialManagementEditLoginTitleHint">Login-titel</string>
@@ -59,5 +62,7 @@
     <string name="credentialManagementAutofillToggleLabel">Gem og udfyld automatisk logins</string>
     <string name="credentialManagementViewMenuEdit">Rediger</string>
     <string name="credentialManagementViewMenuDelete">Slet</string>
+
+    <string name="credentialManagementSuggestionsLabel">Foreslået</string>
 
 </resources>

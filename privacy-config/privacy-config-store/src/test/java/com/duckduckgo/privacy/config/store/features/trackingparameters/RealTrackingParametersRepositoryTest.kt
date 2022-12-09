@@ -48,7 +48,7 @@ class RealTrackingParametersRepositoryTest {
         testee = RealTrackingParametersRepository(
             mockDatabase,
             TestScope(),
-            coroutineRule.testDispatcherProvider
+            coroutineRule.testDispatcherProvider,
         )
     }
 
@@ -59,7 +59,7 @@ class RealTrackingParametersRepositoryTest {
         testee = RealTrackingParametersRepository(
             mockDatabase,
             TestScope(),
-            coroutineRule.testDispatcherProvider
+            coroutineRule.testDispatcherProvider,
         )
 
         assertEquals(trackingParameterExceptionEntity.toTrackingParameterException(), testee.exceptions.first())
@@ -71,7 +71,7 @@ class RealTrackingParametersRepositoryTest {
         testee = RealTrackingParametersRepository(
             mockDatabase,
             TestScope(),
-            coroutineRule.testDispatcherProvider
+            coroutineRule.testDispatcherProvider,
         )
 
         testee.updateAll(listOf(), listOf())
@@ -86,7 +86,7 @@ class RealTrackingParametersRepositoryTest {
         testee = RealTrackingParametersRepository(
             mockDatabase,
             TestScope(),
-            coroutineRule.testDispatcherProvider
+            coroutineRule.testDispatcherProvider,
         )
         assertEquals(1, testee.exceptions.size)
         assertEquals(1, testee.parameters.size)
@@ -107,11 +107,11 @@ class RealTrackingParametersRepositoryTest {
     companion object {
         val trackingParameterExceptionEntity = TrackingParameterExceptionEntity(
             domain = "https://www.example.com",
-            reason = "reason"
+            reason = "reason",
         )
 
         val trackingParameterEntity = TrackingParameterEntity(
-            parameter = "parameter"
+            parameter = "parameter",
         )
     }
 }

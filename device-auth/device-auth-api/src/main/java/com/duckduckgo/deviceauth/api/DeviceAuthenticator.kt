@@ -32,7 +32,7 @@ interface DeviceAuthenticator {
     fun authenticate(
         featureToAuth: Features,
         fragment: Fragment,
-        onResult: (AuthResult) -> Unit
+        onResult: (AuthResult) -> Unit,
     )
 
     /**
@@ -42,7 +42,7 @@ interface DeviceAuthenticator {
     fun authenticate(
         featureToAuth: Features,
         fragmentActivity: FragmentActivity,
-        onResult: (AuthResult) -> Unit
+        onResult: (AuthResult) -> Unit,
     )
 
     sealed class AuthResult {
@@ -52,6 +52,6 @@ interface DeviceAuthenticator {
     }
 
     enum class Features {
-        AUTOFILL
+        AUTOFILL,
     }
 }

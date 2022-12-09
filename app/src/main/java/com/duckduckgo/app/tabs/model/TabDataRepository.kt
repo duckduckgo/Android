@@ -23,6 +23,7 @@ import androidx.lifecycle.distinctUntilChanged
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.tabs.db.TabsDao
@@ -30,8 +31,9 @@ import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
+import java.util.*
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -40,8 +42,6 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.util.*
-import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
 class TabDataRepository @Inject constructor(
@@ -49,7 +49,8 @@ class TabDataRepository @Inject constructor(
     private val siteFactory: SiteFactory,
     private val webViewPreviewPersister: WebViewPreviewPersister,
     private val faviconManager: FaviconManager,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val dispatchers: DispatcherProvider,
 ) : TabRepository {
 
     override val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs().distinctUntilChanged()
@@ -72,7 +73,7 @@ class TabDataRepository @Inject constructor(
 
     override suspend fun add(
         url: String?,
-        skipHome: Boolean
+        skipHome: Boolean,
     ): String {
         val tabId = generateTabId()
         add(tabId, buildSiteData(url), skipHome = skipHome, isDefaultTab = false)
@@ -82,7 +83,7 @@ class TabDataRepository @Inject constructor(
     override suspend fun addFromSourceTab(
         url: String?,
         skipHome: Boolean,
-        sourceTabId: String
+        sourceTabId: String,
     ): String {
         val tabId = generateTabId()
 
@@ -91,7 +92,7 @@ class TabDataRepository @Inject constructor(
             data = buildSiteData(url),
             skipHome = skipHome,
             isDefaultTab = false,
-            sourceTabId = sourceTabId
+            sourceTabId = sourceTabId,
         )
 
         return tabId
@@ -104,7 +105,7 @@ class TabDataRepository @Inject constructor(
             tabId = tabId,
             data = buildSiteData(null),
             skipHome = false,
-            isDefaultTab = true
+            isDefaultTab = true,
         )
 
         return tabId
@@ -126,11 +127,10 @@ class TabDataRepository @Inject constructor(
         data: MutableLiveData<Site>,
         skipHome: Boolean,
         isDefaultTab: Boolean,
-        sourceTabId: String? = null
+        sourceTabId: String? = null,
     ) {
         siteData[tabId] = data
         databaseExecutor().scheduleDirect {
-
             Timber.i("Trying to add tab, is default? $isDefaultTab, current tabs count: ${tabsDao.tabs().size}")
 
             if (isDefaultTab && tabsDao.tabs().isNotEmpty()) {
@@ -154,14 +154,13 @@ class TabDataRepository @Inject constructor(
                     skipHome = skipHome,
                     viewed = true,
                     position = position,
-                    sourceTabId = sourceTabId
-                )
+                    sourceTabId = sourceTabId,
+                ),
             )
         }
     }
 
     override suspend fun selectByUrlOrNewTab(url: String) {
-
         val tabId = tabsDao.selectTabByUrl(url)
         if (tabId != null) {
             select(tabId)
@@ -172,7 +171,7 @@ class TabDataRepository @Inject constructor(
 
     override suspend fun addNewTabAfterExistingTab(
         url: String?,
-        tabId: String
+        tabId: String,
     ) {
         databaseExecutor().scheduleDirect {
             val position = tabsDao.tab(tabId)?.position ?: -1
@@ -185,7 +184,7 @@ class TabDataRepository @Inject constructor(
                 skipHome = false,
                 viewed = false,
                 position = position + 1,
-                sourceTabId = tabId
+                sourceTabId = tabId,
             )
             tabsDao.insertTabAtPosition(tab)
         }
@@ -193,7 +192,7 @@ class TabDataRepository @Inject constructor(
 
     override suspend fun update(
         tabId: String,
-        site: Site?
+        site: Site?,
     ) {
         databaseExecutor().scheduleDirect {
             tabsDao.updateUrlAndTitle(tabId, site?.url, site?.title, viewed = true)
@@ -232,7 +231,7 @@ class TabDataRepository @Inject constructor(
         }
     }
 
-    override suspend fun purgeDeletableTabs() = withContext(Dispatchers.IO) {
+    override suspend fun purgeDeletableTabs() = withContext(dispatchers.io()) {
         appCoroutineScope.launch {
             tabsDao.purgeDeletableTabsAndUpdateSelection()
         }.join()
@@ -276,7 +275,7 @@ class TabDataRepository @Inject constructor(
 
     override fun updateTabFavicon(
         tabId: String,
-        fileName: String?
+        fileName: String?,
     ) {
         databaseExecutor().scheduleDirect {
             val tab = tabsDao.tab(tabId)
@@ -291,7 +290,7 @@ class TabDataRepository @Inject constructor(
 
     override fun updateTabPreviewImage(
         tabId: String,
-        fileName: String?
+        fileName: String?,
     ) {
         databaseExecutor().scheduleDirect {
             val tab = tabsDao.tab(tabId)
@@ -309,7 +308,7 @@ class TabDataRepository @Inject constructor(
 
     private fun deleteOldFavicon(
         tabId: String,
-        currentFavicon: String? = null
+        currentFavicon: String? = null,
     ) {
         Timber.i("Deleting old favicon for $tabId. Current favicon is $currentFavicon")
         appCoroutineScope.launch { faviconManager.deleteOldTempFavicon(tabId, currentFavicon) }
@@ -317,7 +316,7 @@ class TabDataRepository @Inject constructor(
 
     private fun deleteOldPreviewImages(
         tabId: String,
-        currentPreviewImage: String? = null
+        currentPreviewImage: String? = null,
     ) {
         Timber.i("Deleting old preview image for $tabId. Current image is $currentPreviewImage")
         appCoroutineScope.launch { webViewPreviewPersister.deletePreviewsForTab(tabId, currentPreviewImage) }

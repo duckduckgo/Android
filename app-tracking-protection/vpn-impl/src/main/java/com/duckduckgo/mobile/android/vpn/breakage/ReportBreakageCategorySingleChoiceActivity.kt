@@ -20,7 +20,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Base64
-import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.Lifecycle.State.STARTED
@@ -37,9 +36,9 @@ import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategorySingleCh
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityReportBreakageCategorySingleChoiceBinding
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import dagger.WrongScope
+import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @WrongScope(
     comment = "To use the right scope we first need to enable dagger component nesting",
@@ -83,7 +82,7 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
         binding.appBreakageFormDisclaimer.text =
             HtmlCompat.fromHtml(
                 getString(R.string.atp_ReportBreakageFormDisclaimerText),
-                HtmlCompat.FROM_HTML_MODE_LEGACY
+                HtmlCompat.FROM_HTML_MODE_LEGACY,
             )
     }
 
@@ -138,8 +137,8 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
                     customMetadata =
                     Base64.encodeToString(
                         metadataReporter.getVpnStateMetadata(brokenApp.appPackageId).toByteArray(),
-                        Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE
-                    )
+                        Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE,
+                    ),
                 )
             deviceShieldPixels.sendAppBreakageReport(issue.toMap())
             setResult(RESULT_OK, Intent().apply { issue.addToIntent(this) })
@@ -151,9 +150,7 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
         val category =
             viewState.categorySelected?.let { getString(viewState.categorySelected.category) }.orEmpty()
         binding.categoriesSelection.setText(category)
-        binding.otherCategoryDescription.visibility = if (viewState.indexSelected == 8) View.VISIBLE else View.GONE
         binding.ctaNextFormSubmit.isEnabled = viewState.submitAllowed
-
     }
 
     companion object {
@@ -161,7 +158,6 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
         private const val APP_PACKAGE_ID_EXTRA = "APP_PACKAGE_ID_EXTRA"
 
         fun intent(context: Context, brokenApp: BrokenApp): Intent {
-
             return Intent(context, ReportBreakageCategorySingleChoiceActivity::class.java).apply {
                 putExtra(APP_PACKAGE_ID_EXTRA, brokenApp)
             }

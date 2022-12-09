@@ -27,14 +27,14 @@ import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
-import javax.inject.Inject
+import logcat.logcat
 
 @ContributesMultibinding(
     scope = VpnScope::class,
-    boundType = VpnServiceCallbacks::class
+    boundType = VpnServiceCallbacks::class,
 )
 @SingleInstanceIn(VpnScope::class)
 class RestartReceiver @Inject constructor(
@@ -52,7 +52,7 @@ class RestartReceiver @Inject constructor(
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         if (appBuildConfig.isInternalBuild()) {
-            Timber.v("Starting vpn-service receiver")
+            logcat { "Starting vpn-service receiver" }
             unregister()
             context.registerReceiver(this, IntentFilter("vpn-service"))
         }

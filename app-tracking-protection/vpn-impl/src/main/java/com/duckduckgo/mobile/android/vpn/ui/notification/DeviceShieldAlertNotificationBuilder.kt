@@ -43,7 +43,7 @@ object DeviceShieldAlertNotificationBuilderModule {
 
     @Provides
     fun providesDeviceShieldAlertNotificationBuilder(
-        appBuildConfig: AppBuildConfig
+        appBuildConfig: AppBuildConfig,
     ): DeviceShieldAlertNotificationBuilder {
         return AndroidDeviceShieldAlertNotificationBuilder(appBuildConfig)
     }
@@ -53,17 +53,23 @@ interface DeviceShieldAlertNotificationBuilder {
 
     fun buildReminderNotification(
         context: Context,
-        silent: Boolean
+        silent: Boolean,
     ): Notification
 
     fun buildRevokedNotification(
-        context: Context
+        context: Context,
     ): Notification
 
     fun buildStatusNotification(
         context: Context,
         deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification,
-        onNotificationPressedCallback: ResultReceiver
+        onNotificationPressedCallback: ResultReceiver,
+    ): Notification
+
+    fun buildAlwaysOnLockdownNotification(
+        context: Context,
+        deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification,
+        onNotificationPressedCallback: ResultReceiver,
     ): Notification
 }
 
@@ -86,7 +92,7 @@ class AndroidDeviceShieldAlertNotificationBuilder constructor(
 
     override fun buildReminderNotification(
         context: Context,
-        silent: Boolean
+        silent: Boolean,
     ): Notification {
         registerAlertChannel(context)
 
@@ -96,8 +102,8 @@ class AndroidDeviceShieldAlertNotificationBuilder constructor(
             addNextIntentWithParentStack(
                 Intent(
                     context,
-                    Class.forName("com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity")
-                )
+                    Class.forName("com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"),
+                ),
             )
             getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         }
@@ -119,8 +125,8 @@ class AndroidDeviceShieldAlertNotificationBuilder constructor(
                 NotificationCompat.Action(
                     R.drawable.ic_vpn_notification_24,
                     context.getString(R.string.atp_EnableCTA),
-                    restartVpnIntent
-                )
+                    restartVpnIntent,
+                ),
             )
             .addAction(NotificationActionReportIssue.reportIssueNotificationAction(context))
             .setChannelId(VPN_ALERTS_CHANNEL_ID)
@@ -136,8 +142,8 @@ class AndroidDeviceShieldAlertNotificationBuilder constructor(
             addNextIntentWithParentStack(
                 Intent(
                     context,
-                    Class.forName("com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity")
-                )
+                    Class.forName("com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"),
+                ),
             )
             getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         }
@@ -159,8 +165,8 @@ class AndroidDeviceShieldAlertNotificationBuilder constructor(
                 NotificationCompat.Action(
                     R.drawable.ic_vpn_notification_24,
                     context.getString(R.string.atp_EnableCTA),
-                    restartVpnIntent
-                )
+                    restartVpnIntent,
+                ),
             )
             .addAction(NotificationActionReportIssue.reportIssueNotificationAction(context))
             .build()
@@ -169,7 +175,7 @@ class AndroidDeviceShieldAlertNotificationBuilder constructor(
     override fun buildStatusNotification(
         context: Context,
         deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification,
-        onNotificationPressedCallback: ResultReceiver
+        onNotificationPressedCallback: ResultReceiver,
     ): Notification {
         registerAlertChannel(context)
 
@@ -179,7 +185,23 @@ class AndroidDeviceShieldAlertNotificationBuilder constructor(
         notificationLayout.setImageViewResource(R.id.deviceShieldNotificationStatusIcon, notificationImage)
         notificationLayout.setTextViewText(R.id.deviceShieldNotificationText, deviceShieldNotification.title)
 
-        return buildNotification(context, notificationLayout, onNotificationPressedCallback)
+        return buildNotification(context, notificationLayout, onNotificationPressedCallback, addReportIssueAction = true)
+    }
+
+    override fun buildAlwaysOnLockdownNotification(
+        context: Context,
+        deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification,
+        onNotificationPressedCallback: ResultReceiver,
+    ): Notification {
+        registerAlertChannel(context)
+
+        val notificationLayout = RemoteViews(context.packageName, R.layout.notification_device_shield_report)
+
+        val notificationImage = getNotificationImage(deviceShieldNotification)
+        notificationLayout.setImageViewResource(R.id.deviceShieldNotificationStatusIcon, notificationImage)
+        notificationLayout.setTextViewText(R.id.deviceShieldNotificationText, deviceShieldNotification.title)
+
+        return buildNotification(context, notificationLayout, onNotificationPressedCallback, addReportIssueAction = false)
     }
 
     private fun getNotificationImage(deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification): Int {
@@ -201,7 +223,8 @@ class AndroidDeviceShieldAlertNotificationBuilder constructor(
     private fun buildNotification(
         context: Context,
         content: RemoteViews,
-        resultReceiver: ResultReceiver? = null
+        resultReceiver: ResultReceiver? = null,
+        addReportIssueAction: Boolean,
     ): Notification {
         registerAlertChannel(context)
 
@@ -220,7 +243,11 @@ class AndroidDeviceShieldAlertNotificationBuilder constructor(
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setCategory(NotificationCompat.CATEGORY_STATUS)
-            .addAction(NotificationActionReportIssue.reportIssueNotificationAction(context))
+            .apply {
+                if (addReportIssueAction) {
+                    addAction(NotificationActionReportIssue.reportIssueNotificationAction(context))
+                }
+            }
             .build()
     }
 

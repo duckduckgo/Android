@@ -21,9 +21,9 @@ import com.duckduckgo.privacy.config.api.DrmException
 import com.duckduckgo.privacy.config.store.DrmExceptionEntity
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.toDrmException
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.util.concurrent.CopyOnWriteArrayList
 
 interface DrmRepository {
     fun updateAll(exceptions: List<DrmExceptionEntity>)
@@ -33,7 +33,7 @@ interface DrmRepository {
 class RealDrmRepository(
     val database: PrivacyConfigDatabase,
     coroutineScope: CoroutineScope,
-    dispatcherProvider: DispatcherProvider
+    dispatcherProvider: DispatcherProvider,
 ) :
     DrmRepository {
 

@@ -42,6 +42,9 @@
     <string name="updateLoginDialogButtonUpdatePassword">Atnaujinti slaptažodį</string>
     <string name="updateLoginDialogButtonNotNow">Ne dabar</string>
 
+    <string name="updateLoginDialogTitleUpdateUsername">Atnaujinti naudotojo vardą?</string>
+    <string name="updateLoginDialogButtonUpdateUsername">Atnaujinti naudotojo vardą</string>
+
     <string name="autofillDialogCloseButtonContentDescription">Uždaryti automatinio pildymo dialogo langą</string>
 
     <string name="credentialManagementEditLoginTitleHint">Prisijungimo pavadinimas</string>
@@ -59,5 +62,7 @@
     <string name="credentialManagementAutofillToggleLabel">Išsaugoti ir automatiškai pildyti prisijungimus</string>
     <string name="credentialManagementViewMenuEdit">Redaguoti</string>
     <string name="credentialManagementViewMenuDelete">Trinti</string>
+
+    <string name="credentialManagementSuggestionsLabel">Siūloma</string>
 
 </resources>

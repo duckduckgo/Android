@@ -20,7 +20,9 @@ import android.app.Dialog
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.fragment.app.DialogFragment
+import com.duckduckgo.app.global.extensions.safeGetApplicationIcon
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -31,7 +33,7 @@ class ManuallyDisableAppProtectionDialog : DialogFragment() {
         fun onAppProtectionDisabled(
             appName: String,
             packageName: String,
-            report: Boolean = false
+            report: Boolean = false,
         )
     }
 
@@ -50,10 +52,10 @@ class ManuallyDisableAppProtectionDialog : DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-
         val rootView = layoutInflater.inflate(R.layout.dialog_tracking_protection_manually_disable_app, null)
 
         val appIcon = rootView.findViewById<ImageView>(R.id.trackingProtectionAppIcon)
+        val appLabel = rootView.findViewById<TextView>(R.id.trackingProtectionAppLabel)
         val reportCTA = rootView.findViewById<Button>(R.id.trackingProtectionExcludeAppDialogReport)
         val skipCTA = rootView.findViewById<Button>(R.id.trackingProtectionExcludeAppDialogSkip)
 
@@ -64,6 +66,7 @@ class ManuallyDisableAppProtectionDialog : DialogFragment() {
         isCancelable = false
 
         populateAppIcon(appIcon)
+        populateAppName(appLabel)
         configureListeners(reportCTA, skipCTA)
 
         return alertDialog.create()
@@ -72,6 +75,10 @@ class ManuallyDisableAppProtectionDialog : DialogFragment() {
     private fun populateAppIcon(appIcon: ImageView) {
         val icon = requireActivity().packageManager.safeGetApplicationIcon(getPackageName())
         appIcon.setImageDrawable(icon)
+    }
+
+    private fun populateAppName(appLabel: TextView) {
+        appLabel.text = getString(R.string.atp_ExcludeAppsManuallyDisableAppDialogLabel, getAppName())
     }
 
     private fun getPackageName(): String {
@@ -84,7 +91,7 @@ class ManuallyDisableAppProtectionDialog : DialogFragment() {
 
     private fun configureListeners(
         reportCTA: Button,
-        skipCTA: Button
+        skipCTA: Button,
     ) {
         reportCTA.setOnClickListener {
             dismiss()

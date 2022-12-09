@@ -20,7 +20,7 @@ data class AdClickAttributionFeature(
     val state: String,
     val minSupportedVersion: Int?,
     val settings: AdClickAttributionSettings,
-    val exceptions: List<AdClickAttributionException>
+    val exceptions: List<AdClickAttributionException>,
 )
 
 data class AdClickAttributionSettings(
@@ -29,17 +29,17 @@ data class AdClickAttributionSettings(
     val navigationExpiration: Long,
     val totalExpiration: Long,
     val heuristicDetection: String?,
-    val domainDetection: String?
+    val domainDetection: String?,
 )
 
 data class AdClickAttributionLinkFormat(
     val url: String,
-    val adDomainParameterName: String?
+    val adDomainParameterName: String?,
 )
 
 data class AdClickAttributionAllowlist(
     val blocklistEntry: String?,
-    val host: String?
+    val host: String?,
 )
 
 data class AdClickAttributionException(val domain: String, val reason: String)

@@ -42,6 +42,9 @@
     <string name="updateLoginDialogButtonUpdatePassword">Wachtwoord bijwerken</string>
     <string name="updateLoginDialogButtonNotNow">Niet nu</string>
 
+    <string name="updateLoginDialogTitleUpdateUsername">Gebruikersnaam bijwerken?</string>
+    <string name="updateLoginDialogButtonUpdateUsername">Gebruikersnaam bijwerken</string>
+
     <string name="autofillDialogCloseButtonContentDescription">Dialoogvenster Automatisch invullen sluiten</string>
 
     <string name="credentialManagementEditLoginTitleHint">Aanmeldgegevens Titel</string>
@@ -59,5 +62,7 @@
     <string name="credentialManagementAutofillToggleLabel">Aanmeldgegevens opslaan en automatisch invullen</string>
     <string name="credentialManagementViewMenuEdit">Bewerken</string>
     <string name="credentialManagementViewMenuDelete">Verwijderen</string>
+
+    <string name="credentialManagementSuggestionsLabel">Aanbevolen</string>
 
 </resources>

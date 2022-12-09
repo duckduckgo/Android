@@ -41,7 +41,7 @@ class RealFeatureToggleImplTest {
     class FakeTruePlugin : FeatureTogglesPlugin {
         override fun isEnabled(
             featureName: String,
-            defaultValue: Boolean
+            defaultValue: Boolean,
         ): Boolean? {
             return if (featureName == TrueFeatureName().value) {
                 true

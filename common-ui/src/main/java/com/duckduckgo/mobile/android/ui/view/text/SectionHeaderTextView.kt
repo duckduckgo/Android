@@ -23,12 +23,11 @@ import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatTextView
 import com.duckduckgo.mobile.android.R
 
-class SectionHeaderTextView
-@JvmOverloads
-constructor(
+@Deprecated("Use SectionHeaderListItem.kt instead")
+class SectionHeaderTextView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = R.style.Widget_DuckDuckGo_SectionHeader
+    defStyleAttr: Int = R.style.Widget_DuckDuckGo_SectionHeader,
 ) : AppCompatTextView(context, attrs, defStyleAttr) {
 
     init {
@@ -37,13 +36,13 @@ constructor(
                 attrs,
                 R.styleable.SectionHeaderTextView,
                 0,
-                R.style.Widget_DuckDuckGo_SectionHeader
+                R.style.Widget_DuckDuckGo_SectionHeader,
             )
 
         val textAppearanceId =
             typedArray.getResourceId(
                 R.styleable.SectionHeaderTextView_android_textAppearance,
-                android.R.style.TextAppearance
+                android.R.style.TextAppearance,
             )
         setTextAppearance(textAppearanceId)
 

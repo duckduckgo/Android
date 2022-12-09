@@ -25,7 +25,7 @@ interface WebTrackersBlockedRepository {
 
     fun get(
         startTime: () -> String,
-        endTime: String = noEndDate()
+        endTime: String = noEndDate(),
     ): Flow<List<WebTrackerBlocked>>
 
     private fun noEndDate(): String {

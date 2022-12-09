@@ -25,7 +25,7 @@ import androidx.room.RoomDatabase
     entities = [
         AutoconsentExceptionEntity::class,
         DisabledCmpsEntity::class,
-    ]
+    ],
 )
 abstract class AutoconsentDatabase : RoomDatabase() {
     abstract fun autoconsentDao(): AutoconsentDao

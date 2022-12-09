@@ -23,23 +23,22 @@ import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.fire.AppCacheClearer
-import com.duckduckgo.app.fire.ClearDataPixel
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
-import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryAPI
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
-import org.mockito.kotlin.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -57,9 +56,8 @@ class ClearPersonalDataActionTest {
     private val mockGeoLocationPermissions: GeoLocationPermissions = mock()
     private val mockThirdPartyCookieManager: ThirdPartyCookieManager = mock()
     private val mockAdClickManager: AdClickManager = mock()
-    private val mockFireproofWebsiteRepository: FireproofWebsiteRepositoryAPI = mock()
+    private val mockFireproofWebsiteRepository: FireproofWebsiteRepository = mock()
     private val mockSitePermissionsManager: SitePermissionsManager = mock()
-    private val mockClearDataPixel: ClearDataPixel = mock()
 
     private val fireproofWebsites: LiveData<List<FireproofWebsiteEntity>> = MutableLiveData()
 
@@ -78,7 +76,6 @@ class ClearPersonalDataActionTest {
             adClickManager = mockAdClickManager,
             fireproofWebsiteRepository = mockFireproofWebsiteRepository,
             sitePermissionsManager = mockSitePermissionsManager,
-            clearDataPixel = mockClearDataPixel
         )
         whenever(mockFireproofWebsiteRepository.getFireproofWebsites()).thenReturn(fireproofWebsites)
     }

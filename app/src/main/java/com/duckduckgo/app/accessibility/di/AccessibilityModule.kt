@@ -39,12 +39,12 @@ class AccessibilityModule {
     fun providesAccessibilitySettingsDataStore(
         context: Context,
         dispatcherProvider: DispatcherProvider,
-        @AppCoroutineScope appCoroutineScope: CoroutineScope
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
     ): AccessibilitySettingsDataStore = AccessibilitySettingsSharedPreferences(context, dispatcherProvider, appCoroutineScope)
 
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun providesAccessibilityManager(
-        accessibilitySettingsDataStore: AccessibilitySettingsDataStore
+        accessibilitySettingsDataStore: AccessibilitySettingsDataStore,
     ): AccessibilityManager = AppAccessibilityManager(accessibilitySettingsDataStore)
 }

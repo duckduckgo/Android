@@ -23,10 +23,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.GridLayoutManager
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.browser.databinding.ActivityAppIconsBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 @InjectWith(ActivityScope::class)
@@ -57,7 +57,6 @@ class ChangeIconActivity : DuckDuckGoActivity() {
     }
 
     private fun observeViewModel() {
-
         viewModel.viewState.observe(this) { viewState ->
             viewState?.let {
                 render(it)

@@ -20,7 +20,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.autofill.AutofillDomainFormatterDomainNameOnly
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem
-import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem.Credential
+import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem.CredentialListItem.Credential
 import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem.GroupHeading
 import com.duckduckgo.autofill.ui.credential.management.sorting.CredentialGrouper
 import com.duckduckgo.autofill.ui.credential.management.sorting.CredentialInitialExtractor
@@ -38,7 +38,7 @@ class CredentialGrouperTest {
 
     private val testee = CredentialGrouper(
         initialExtractor = initialExtractor,
-        sorter = CredentialListSorterByTitleAndDomain(domainFormatter)
+        sorter = CredentialListSorterByTitleAndDomain(domainFormatter),
     )
 
     @Test
@@ -51,7 +51,7 @@ class CredentialGrouperTest {
     @Test
     fun whenSingleCredentialThenInitialAdded() {
         val credentials = listOf(
-            creds("example.com")
+            creds("example.com"),
         )
         val grouped = testee.group(credentials)
 
@@ -137,7 +137,7 @@ class CredentialGrouperTest {
             creds(title = "ä"),
             creds(title = "A"),
             creds(title = "Ğ"),
-            creds(title = "G")
+            creds(title = "G"),
 
         )
         val grouped = testee.group(credentials)
@@ -152,7 +152,7 @@ class CredentialGrouperTest {
     @Test
     fun whenNonEnglishAlphabetCharactersThenTheyDoGetTheirOwnGroup() {
         val credentials = listOf(
-            creds(title = "ß")
+            creds(title = "ß"),
         )
         val grouped = testee.group(credentials)
 
@@ -165,7 +165,7 @@ class CredentialGrouperTest {
     @Test
     fun whenEmojiThenTheTheyAreInPlaceholder() {
         val credentials = listOf(
-            creds(title = "😅")
+            creds(title = "😅"),
         )
         val grouped = testee.group(credentials)
 
@@ -179,7 +179,7 @@ class CredentialGrouperTest {
     fun whenNumberThenGroupedIntoPlaceholder() {
         val credentials = listOf(
             creds(title = "8"),
-            creds(title = "5")
+            creds(title = "5"),
         )
         val grouped = testee.group(credentials)
 
@@ -242,7 +242,7 @@ class CredentialGrouperTest {
 
     private fun ListItem.assertIsGroupHeading(expectedInitial: String) {
         assertTrue(this is GroupHeading)
-        assertEquals(expectedInitial, (this as GroupHeading).initial)
+        assertEquals(expectedInitial, (this as GroupHeading).label)
     }
 
     private fun ListItem.assertIsCredentialWithDomain(expectedDomain: String?) {
@@ -258,5 +258,4 @@ class CredentialGrouperTest {
     private fun creds(domain: String? = null, title: String? = null): LoginCredentials {
         return LoginCredentials(domain = domain, domainTitle = title, username = null, password = null)
     }
-
 }

@@ -42,7 +42,7 @@ class DeviceShieldEnabledNotificationBuilder {
                     NotificationChannel(
                         VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID,
                         VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_NAME,
-                        NotificationManager.IMPORTANCE_LOW
+                        NotificationManager.IMPORTANCE_LOW,
                     )
                 channel.description = VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_DESCRIPTION
                 val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -53,9 +53,8 @@ class DeviceShieldEnabledNotificationBuilder {
         fun buildDeviceShieldEnabledNotification(
             context: Context,
             deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification,
-            notificationPressHandler: OngoingNotificationPressedHandler
+            notificationPressHandler: OngoingNotificationPressedHandler,
         ): Notification {
-
             registerOngoingNotificationChannel(context)
 
             val privacyReportIntent = DeviceShieldTrackerActivity.intent(context = context, onLaunchCallback = notificationPressHandler)
@@ -82,9 +81,8 @@ class DeviceShieldEnabledNotificationBuilder {
         fun buildTrackersBlockedNotification(
             context: Context,
             deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification,
-            notificationPressHandler: OngoingNotificationPressedHandler
+            notificationPressHandler: OngoingNotificationPressedHandler,
         ): Notification {
-
             registerOngoingNotificationChannel(context)
 
             val privacyReportIntent = DeviceShieldTrackerActivity.intent(context = context, onLaunchCallback = notificationPressHandler)

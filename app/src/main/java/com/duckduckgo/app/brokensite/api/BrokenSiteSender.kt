@@ -46,7 +46,7 @@ class BrokenSiteSubmitter(
     private val pixel: Pixel,
     private val appCoroutineScope: CoroutineScope,
     private val appBuildConfig: AppBuildConfig,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
 ) : BrokenSiteSender {
 
     override fun submitBrokenSiteFeedback(brokenSite: BrokenSite) {
@@ -74,7 +74,7 @@ class BrokenSiteSubmitter(
             )
             val encodedParams = mapOf(
                 BLOCKED_TRACKERS_KEY to brokenSite.blockedTrackers,
-                SURROGATES_KEY to brokenSite.surrogates
+                SURROGATES_KEY to brokenSite.surrogates,
             )
             runCatching {
                 pixel.fire(AppPixelName.BROKEN_SITE_REPORT.pixelName, params, encodedParams)

@@ -298,27 +298,6 @@
             android:name="com.duckduckgo.app.tabs.ui.TabSwitcherActivity"
             android:exported="false"
             android:label="@string/tabActivityTitle" />
-
-        <activity
-            android:name="com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity"
-            android:exported="false"
-            android:label="@string/privacyDashboardActivityTitle"
-            android:parentActivityName=".BrowserActivity" />
-        <activity
-            android:name="com.duckduckgo.app.privacy.ui.ScorecardActivity"
-            android:exported="false"
-            android:label="@string/scorecardActivityTitle"
-            android:parentActivityName="com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity" />
-        <activity
-            android:name="com.duckduckgo.app.privacy.ui.TrackerNetworksActivity"
-            android:exported="false"
-            android:label="@string/trackersActivityTitle"
-            android:parentActivityName="com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity" />
-        <activity
-            android:name="com.duckduckgo.app.privacy.ui.PrivacyPracticesActivity"
-            android:exported="false"
-            android:label="@string/privacyTermsActivityTitle"
-            android:parentActivityName="com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity" />
         <activity
             android:name="com.duckduckgo.app.settings.SettingsActivity"
             android:exported="true"
@@ -377,6 +356,7 @@
         <activity
             android:name="com.duckduckgo.app.fire.FireActivity"
             android:exported="false"
+            android:theme="@style/Theme.DuckDuckGo.Dark"
             android:process="@string/fireProcessName" />
         <activity
             android:name="com.duckduckgo.app.icon.ui.ChangeIconActivity"

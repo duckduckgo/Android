@@ -19,16 +19,19 @@ package com.duckduckgo.autofill.store
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.autofill.InternalTestUserChecker
 
 interface AutofillPrefsStore {
     var isEnabled: Boolean
     var showOnboardingWhenOfferingToSaveLogin: Boolean
     var autofillDeclineCount: Int
     var monitorDeclineCounts: Boolean
+    var hasEverBeenPromptedToSaveLogin: Boolean
 }
 
 class RealAutofillPrefsStore constructor(
-    private val applicationContext: Context
+    private val applicationContext: Context,
+    private val internalTestUserChecker: InternalTestUserChecker,
 ) : AutofillPrefsStore {
 
     private val prefs: SharedPreferences by lazy {
@@ -36,7 +39,7 @@ class RealAutofillPrefsStore constructor(
     }
 
     override var isEnabled: Boolean
-        get() = prefs.getBoolean(AUTOFILL_ENABLED, true)
+        get() = prefs.getBoolean(AUTOFILL_ENABLED, autofillEnabledDefaultValue())
         set(value) = prefs.edit {
             putBoolean(AUTOFILL_ENABLED, value)
         }
@@ -44,6 +47,10 @@ class RealAutofillPrefsStore constructor(
     override var showOnboardingWhenOfferingToSaveLogin: Boolean
         get() = prefs.getBoolean(SHOW_SAVE_LOGIN_ONBOARDING, true)
         set(value) = prefs.edit { putBoolean(SHOW_SAVE_LOGIN_ONBOARDING, value) }
+
+    override var hasEverBeenPromptedToSaveLogin: Boolean
+        get() = prefs.getBoolean(HAS_EVER_BEEN_PROMPTED_TO_SAVE_LOGIN, false)
+        set(value) = prefs.edit { putBoolean(HAS_EVER_BEEN_PROMPTED_TO_SAVE_LOGIN, value) }
 
     override var autofillDeclineCount: Int
         get() = prefs.getInt(AUTOFILL_DECLINE_COUNT, 0)
@@ -53,10 +60,20 @@ class RealAutofillPrefsStore constructor(
         get() = prefs.getBoolean(MONITOR_AUTOFILL_DECLINES, true)
         set(value) = prefs.edit { putBoolean(MONITOR_AUTOFILL_DECLINES, value) }
 
+    /**
+     * Internal builds should have autofill enabled by default
+     * It'll be disabled by default for public users, even after internal testing gate removed
+     * If we decide to make it enabled by default for all users, we can hardcode the value to true
+     */
+    private fun autofillEnabledDefaultValue(): Boolean {
+        return internalTestUserChecker.isInternalTestUser
+    }
+
     companion object {
         const val FILENAME = "com.duckduckgo.autofill.store.autofill_store"
         const val AUTOFILL_ENABLED = "autofill_enabled"
         const val SHOW_SAVE_LOGIN_ONBOARDING = "autofill_show_onboardind_saved_login"
+        const val HAS_EVER_BEEN_PROMPTED_TO_SAVE_LOGIN = "autofill_has_ever_been_prompted_to_save_login"
         const val AUTOFILL_DECLINE_COUNT = "autofill_decline_count"
         const val MONITOR_AUTOFILL_DECLINES = "monitor_autofill_declines"
     }

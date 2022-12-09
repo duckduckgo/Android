@@ -36,7 +36,7 @@ interface SystemPermissionsHelper {
     fun registerPermissionLaunchers(
         caller: ActivityResultCaller,
         onResultPermissionRequest: (Boolean) -> Unit,
-        onResultMultiplePermissionsRequest: (Map<String, Boolean>) -> Unit
+        onResultMultiplePermissionsRequest: (Map<String, Boolean>) -> Unit,
     )
     fun requestPermission(permission: String)
     fun requestMultiplePermissions(permissions: Array<String>)
@@ -45,7 +45,7 @@ interface SystemPermissionsHelper {
 
 @ContributesBinding(FragmentScope::class)
 class SystemPermissionsHelperImpl @Inject constructor(
-    private val context: Context
+    private val context: Context,
 ) : SystemPermissionsHelper {
 
     private lateinit var permissionLauncher: ActivityResultLauncher<String>
@@ -61,7 +61,7 @@ class SystemPermissionsHelperImpl @Inject constructor(
     override fun registerPermissionLaunchers(
         caller: ActivityResultCaller,
         onResultPermissionRequest: (Boolean) -> Unit,
-        onResultMultiplePermissionsRequest: (Map<String, Boolean>) -> Unit
+        onResultMultiplePermissionsRequest: (Map<String, Boolean>) -> Unit,
     ) {
         permissionLauncher = caller.registerForActivityResult(RequestPermission()) {
             onResultPermissionRequest.invoke(it)

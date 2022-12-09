@@ -25,10 +25,10 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.vpn.internal.feature.InternalFeatureReceiver
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
-import javax.inject.Inject
+import logcat.logcat
 
 /**
  * This receiver allows deletion of previously seen trackers.
@@ -62,7 +62,7 @@ class DeleteTrackersDebugReceiverRegister @Inject constructor(
     private var receiver: DeleteTrackersDebugReceiver? = null
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        Timber.i("Debug receiver %s registered", className)
+        logcat { "Debug receiver $className registered" }
 
         receiver?.unregister()
 
@@ -75,7 +75,7 @@ class DeleteTrackersDebugReceiverRegister @Inject constructor(
 
     override fun onVpnStopped(
         coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
+        vpnStopReason: VpnStopReason,
     ) {
         receiver?.unregister()
     }

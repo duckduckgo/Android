@@ -28,6 +28,7 @@ import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import java.util.concurrent.CopyOnWriteArrayList
 import junit.framework.TestCase.assertEquals
 import org.json.JSONObject
 import org.junit.Before
@@ -36,7 +37,6 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.robolectric.ParameterizedRobolectricTestRunner
-import java.util.concurrent.CopyOnWriteArrayList
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
 class AdClickAttributionAllowlistReferenceTest(private val testCase: TestCase) {
@@ -64,8 +64,8 @@ class AdClickAttributionAllowlistReferenceTest(private val testCase: TestCase) {
             val test = adapter.fromJson(
                 FileUtilities.loadText(
                     AdClickAttributionAllowlistReferenceTest::class.java.classLoader!!,
-                    "reference_tests/adclickattribution/ad_click_attribution_matching_tests.json"
-                )
+                    "reference_tests/adclickattribution/ad_click_attribution_matching_tests.json",
+                ),
             )
             return test?.adClickAllowlist?.tests ?: emptyList()
         }
@@ -82,7 +82,7 @@ class AdClickAttributionAllowlistReferenceTest(private val testCase: TestCase) {
         val adClickAllowlist = CopyOnWriteArrayList<AdClickAttributionAllowlistEntity>()
         val jsonObject: JSONObject = FileUtilities.getJsonObjectFromFile(
             AdClickAttributionAllowlistReferenceTest::class.java.classLoader!!,
-            "reference_tests/adclickattribution/ad_click_attribution_reference.json"
+            "reference_tests/adclickattribution/ad_click_attribution_reference.json",
         )
 
         val allowList: List<AdClickAttributionAllowlist>? = jsonAdapter.fromJson(jsonObject.toString())?.settings?.allowlist
@@ -90,7 +90,7 @@ class AdClickAttributionAllowlistReferenceTest(private val testCase: TestCase) {
             adClickAllowlist.addAll(
                 list.map {
                     AdClickAttributionAllowlistEntity(blocklistEntry = it.blocklistEntry.orEmpty(), host = it.host.orEmpty())
-                }
+                },
             )
         }
         whenever(mockRepository.allowList).thenReturn(adClickAllowlist)
@@ -105,10 +105,10 @@ class AdClickAttributionAllowlistReferenceTest(private val testCase: TestCase) {
     data class AdClickAllowlistTest(
         val name: String,
         val desc: String,
-        val tests: List<TestCase>
+        val tests: List<TestCase>,
     )
 
     data class ReferenceTest(
-        val adClickAllowlist: AdClickAllowlistTest
+        val adClickAllowlist: AdClickAllowlistTest,
     )
 }

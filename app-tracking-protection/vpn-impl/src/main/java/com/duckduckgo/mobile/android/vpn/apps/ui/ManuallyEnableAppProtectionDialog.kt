@@ -22,9 +22,9 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
+import com.duckduckgo.app.global.extensions.safeGetApplicationIcon
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
-import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo.Companion.LOADS_WEBSITES_EXCLUSION_REASON
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class ManuallyEnableAppProtectionDialog : DialogFragment() {
@@ -49,12 +49,10 @@ class ManuallyEnableAppProtectionDialog : DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-
         val rootView = layoutInflater.inflate(R.layout.dialog_tracking_protection_manually_enable_app, null)
 
         val appIcon = rootView.findViewById<ImageView>(R.id.trackingProtectionAppIcon)
-        val appName = rootView.findViewById<TextView>(R.id.trackingProtectionAppName)
-        val label = rootView.findViewById<TextView>(R.id.trackingProtectionAppLabel)
+        val title = rootView.findViewById<TextView>(R.id.trackingProtectionTitle)
         val enableCTA = rootView.findViewById<Button>(R.id.trackingProtectionExcludeAppDialogEnable)
         val skipCTA = rootView.findViewById<Button>(R.id.trackingProtectionExcludeAppDialogSkip)
 
@@ -65,8 +63,7 @@ class ManuallyEnableAppProtectionDialog : DialogFragment() {
         isCancelable = false
 
         populateAppIcon(appIcon)
-        populateAppName(appName)
-        populateText(label)
+        populateTitle(title)
         configureListeners(enableCTA, skipCTA)
 
         return alertDialog.create()
@@ -77,16 +74,8 @@ class ManuallyEnableAppProtectionDialog : DialogFragment() {
         appIcon.setImageDrawable(icon)
     }
 
-    private fun populateAppName(appName: TextView) {
-        appName.text = getString(R.string.atp_ExcludeAppsManuallyEnableAppName, getAppName())
-    }
-
-    private fun populateText(label: TextView) {
-        if (getExcludingReason() == LOADS_WEBSITES_EXCLUSION_REASON) {
-            label.text = getString(R.string.atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel)
-        } else {
-            label.text = getString(R.string.atp_ExcludeAppsManuallyEnableAppLabel)
-        }
+    private fun populateTitle(appName: TextView) {
+        appName.text = getString(R.string.atp_ExcludeAppsManuallyEnableAnywayLabel, getAppName())
     }
 
     private fun getPackageName(): String {
@@ -97,17 +86,13 @@ class ManuallyEnableAppProtectionDialog : DialogFragment() {
         return requireArguments().getString(KEY_APP_NAME)!!
     }
 
-    private fun getExcludingReason(): Int {
-        return requireArguments().getInt(KEY_EXCLUDING_REASON)!!
-    }
-
     private fun getPosition(): Int {
         return requireArguments().getInt(KEY_POSITION)!!
     }
 
     private fun configureListeners(
         enableCTA: Button,
-        skipCTA: Button
+        skipCTA: Button,
     ) {
         enableCTA.setOnClickListener {
             dismiss()
@@ -146,7 +131,7 @@ class ManuallyEnableAppProtectionDialog : DialogFragment() {
 
         fun instance(
             appInfo: TrackingProtectionAppInfo,
-            position: Int
+            position: Int,
         ): ManuallyEnableAppProtectionDialog {
             return ManuallyEnableAppProtectionDialog().also { fragment ->
                 val bundle = Bundle()

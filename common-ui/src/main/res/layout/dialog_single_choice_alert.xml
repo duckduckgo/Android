@@ -16,61 +16,62 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="?dialogBgColor"
+    android:orientation="vertical"
     android:padding="@dimen/keyline_5">
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/radioListDialogTitle"
-        style="@style/Widget.DuckDuckGo.Dialog.Title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent"
+        app:textColor="primary"
+        app:typography="h2" />
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/radioListDialogMessage"
-        style="@style/TextAppearance.DuckDuckGo.Body1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/keyline_2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/radioListDialogTitle"/>
+        app:layout_constraintTop_toBottomOf="@+id/radioListDialogTitle"
+        app:textColor="secondary"
+        app:typography="body1" />
 
     <RadioGroup
         android:id="@+id/radioListDialogRadioGroup"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="@dimen/keyline_2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/radioListDialogMessage"/>
+        app:layout_constraintTop_toBottomOf="@+id/radioListDialogMessage" />
 
-    <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryLarge
+    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
         android:id="@+id/radioListDialogPositiveButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Positive" app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toBottomOf="@+id/radioListDialogRadioGroup"/>
+        android:layout_marginTop="@dimen/keyline_4"
+        android:text="Positive"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/radioListDialogRadioGroup" />
 
-    <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostSmall
+    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
         android:id="@+id/radioListDialogNegativeButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/keyline_4"
+        android:layout_marginEnd="@dimen/keyline_2"
         android:text="Cancel"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/radioListDialogPositiveButton"
-        app:layout_constraintTop_toBottomOf="@+id/radioListDialogRadioGroup"/>
+        app:layout_constraintTop_toBottomOf="@+id/radioListDialogRadioGroup" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

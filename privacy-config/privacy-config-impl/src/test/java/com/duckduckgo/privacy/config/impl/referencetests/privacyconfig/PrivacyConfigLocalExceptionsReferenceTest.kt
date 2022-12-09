@@ -27,9 +27,6 @@ import com.duckduckgo.privacy.config.impl.features.contentblocking.RealContentBl
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -40,6 +37,9 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import org.robolectric.ParameterizedRobolectricTestRunner
 
 @ExperimentalCoroutinesApi
@@ -68,8 +68,8 @@ class PrivacyConfigLocalExceptionsReferenceTest(private val testCase: TestCase) 
             val referenceTest = adapter.fromJson(
                 FileUtilities.loadText(
                     PrivacyConfigMissingReferenceTest::class.java.classLoader!!,
-                    "reference_tests/privacyconfig/tests.json"
-                )
+                    "reference_tests/privacyconfig/tests.json",
+                ),
             )
             referenceJsonFile = referenceTest?.localExceptions?.referenceConfig!!
             return referenceTest.localExceptions.tests.filterNot { it.exceptPlatforms.contains("android-browser") }
@@ -119,12 +119,12 @@ class PrivacyConfigLocalExceptionsReferenceTest(private val testCase: TestCase) 
             referenceTestUtilities.unprotectedTemporaryRepository,
             referenceTestUtilities.privacyRepository,
             db,
-            InMemorySharedPreferences()
+            InMemorySharedPreferences(),
         )
         privacyConfigPersister.persistPrivacyConfig(
             referenceTestUtilities.getJsonPrivacyConfig(
-                "reference_tests/privacyconfig/$referenceJsonFile"
-            )
+                "reference_tests/privacyconfig/$referenceJsonFile",
+            ),
         )
     }
 
@@ -137,17 +137,17 @@ class PrivacyConfigLocalExceptionsReferenceTest(private val testCase: TestCase) 
         val featureName: String,
         val siteURL: String,
         val expectFeatureEnabled: Boolean,
-        val exceptPlatforms: List<String>
+        val exceptPlatforms: List<String>,
     )
 
     data class LocalExceptionsTest(
         val name: String,
         val desc: String,
         val referenceConfig: String,
-        val tests: List<TestCase>
+        val tests: List<TestCase>,
     )
 
     data class ReferenceTest(
-        val localExceptions: LocalExceptionsTest
+        val localExceptions: LocalExceptionsTest,
     )
 }

@@ -42,6 +42,9 @@
     <string name="updateLoginDialogButtonUpdatePassword">Ažuriraj lozinku</string>
     <string name="updateLoginDialogButtonNotNow">Ne sada</string>
 
+    <string name="updateLoginDialogTitleUpdateUsername">Želiš li ažurirati korisničko ime?</string>
+    <string name="updateLoginDialogButtonUpdateUsername">Ažuriraj korisničko ime</string>
+
     <string name="autofillDialogCloseButtonContentDescription">Zatvori dijaloški okvir za automatsko popunjavanje</string>
 
     <string name="credentialManagementEditLoginTitleHint">Naslov prijave</string>
@@ -59,5 +62,7 @@
     <string name="credentialManagementAutofillToggleLabel">Spremi i automatski popuni prijave</string>
     <string name="credentialManagementViewMenuEdit">Uredi</string>
     <string name="credentialManagementViewMenuDelete">Izbriši</string>
+
+    <string name="credentialManagementSuggestionsLabel">Predloženo</string>
 
 </resources>

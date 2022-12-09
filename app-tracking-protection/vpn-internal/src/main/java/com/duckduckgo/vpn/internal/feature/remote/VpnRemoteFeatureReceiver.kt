@@ -41,11 +41,12 @@ import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.vpn.internal.feature.InternalFeatureReceiver
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
-import javax.inject.Inject
+import logcat.LogPriority
+import logcat.logcat
 
 private const val REMOTE_FEATURE = "remote-feature"
 private const val ON = "on"
@@ -54,7 +55,7 @@ private const val TYPE = "type"
 
 class VpnRemoteFeatureReceiver(
     context: Context,
-    receiver: (Intent) -> Unit
+    receiver: (Intent) -> Unit,
 ) : InternalFeatureReceiver(context, receiver) {
 
     override fun intentAction(): String = REMOTE_FEATURE
@@ -99,10 +100,10 @@ class VpnRemoteFeatureReceiverRegister @Inject constructor(
     private var receiver: VpnRemoteFeatureReceiver? = null
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        Timber.v("Debug receiver RemoteFeatureReceiver registered")
+        logcat { "Debug receiver RemoteFeatureReceiver registered" }
 
         receiver = VpnRemoteFeatureReceiver(context) { intent ->
-            Timber.v("RemoteFeatureReceiver receive $intent")
+            logcat { "RemoteFeatureReceiver receive $intent" }
             when {
                 VpnRemoteFeatureReceiver.isOnIntent(intent) -> {
                     coroutineScope.launch {
@@ -132,14 +133,14 @@ class VpnRemoteFeatureReceiverRegister @Inject constructor(
                         }
                     }
                 }
-                else -> Timber.w("RemoteFeatureReceiver unknown intent")
+                else -> logcat(LogPriority.WARN) { "RemoteFeatureReceiver unknown intent" }
             }
         }.apply { register() }
     }
 
     override fun onVpnStopped(
         coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
+        vpnStopReason: VpnStopReason,
     ) {
         receiver?.unregister()
     }

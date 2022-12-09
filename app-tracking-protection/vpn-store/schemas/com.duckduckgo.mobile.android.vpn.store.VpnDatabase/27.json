@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 27,
-    "identityHash": "05b8ce9cafca842571bbc4866c82691f",
+    "identityHash": "0a01c27fb13d9187f6a4bb08a66a0db2",
     "entities": [
       {
         "tableName": "vpn_state",
@@ -130,7 +130,7 @@
       },
       {
         "tableName": "vpn_service_state_stats",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `timestamp` TEXT NOT NULL, `state` TEXT NOT NULL, `stopReason` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `timestamp` TEXT NOT NULL, `state` TEXT NOT NULL, `stopReason` TEXT NOT NULL, `alwaysOnEnabled` INTEGER NOT NULL, `alwaysOnLockedDown` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -154,6 +154,18 @@
             "fieldPath": "stopReason",
             "columnName": "stopReason",
             "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "alwaysOnState.alwaysOnEnabled",
+            "columnName": "alwaysOnEnabled",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "alwaysOnState.alwaysOnLockedDown",
+            "columnName": "alwaysOnLockedDown",
+            "affinity": "INTEGER",
             "notNull": true
           }
         ],
@@ -340,17 +352,11 @@
       },
       {
         "tableName": "vpn_app_tracker_exclusion_list",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`packageId` TEXT NOT NULL, `reason` TEXT NOT NULL, PRIMARY KEY(`packageId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`packageId` TEXT NOT NULL, PRIMARY KEY(`packageId`))",
         "fields": [
           {
             "fieldPath": "packageId",
             "columnName": "packageId",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "reason",
-            "columnName": "reason",
             "affinity": "TEXT",
             "notNull": true
           }
@@ -634,7 +640,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '05b8ce9cafca842571bbc4866c82691f')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0a01c27fb13d9187f6a4bb08a66a0db2')"
     ]
   }
 }

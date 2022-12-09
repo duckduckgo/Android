@@ -32,7 +32,7 @@ class AddWidgetCompatLauncherTest {
     private val testee = AddWidgetCompatLauncher(
         defaultAddWidgetLauncher,
         legacyAddWidgetLauncher,
-        widgetCapabilities
+        widgetCapabilities,
     )
 
     @Test

@@ -29,7 +29,7 @@ import dagger.SingleInstanceIn
 @Module(includes = [DaoModule::class])
 @ContributesTo(
     scope = AppScope::class,
-    replaces = [DatabaseModule::class]
+    replaces = [DatabaseModule::class],
 )
 class StubDatabaseModule {
 

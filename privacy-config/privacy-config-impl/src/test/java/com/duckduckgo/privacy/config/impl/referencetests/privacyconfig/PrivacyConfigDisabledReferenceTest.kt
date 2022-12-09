@@ -20,15 +20,13 @@ import androidx.room.Room
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.app.global.api.InMemorySharedPreferences
-import com.duckduckgo.privacy.config.impl.features.privacyFeatureValueOf
 import com.duckduckgo.privacy.config.impl.RealPrivacyConfigPersister
 import com.duckduckgo.privacy.config.impl.ReferenceTestUtilities
+import com.duckduckgo.privacy.config.impl.features.privacyFeatureValueOf
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -38,6 +36,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.robolectric.ParameterizedRobolectricTestRunner
 
 @ExperimentalCoroutinesApi
@@ -64,8 +64,8 @@ class PrivacyConfigDisabledReferenceTest(private val testCase: TestCase) {
             val referenceTest = adapter.fromJson(
                 FileUtilities.loadText(
                     PrivacyConfigDisabledReferenceTest::class.java.classLoader!!,
-                    "reference_tests/privacyconfig/tests.json"
-                )
+                    "reference_tests/privacyconfig/tests.json",
+                ),
             )
             referenceJsonFile = referenceTest?.featuresDisabled?.referenceConfig!!
             return referenceTest.featuresDisabled.tests.filterNot { it.exceptPlatforms.contains("android-browser") }
@@ -83,7 +83,7 @@ class PrivacyConfigDisabledReferenceTest(private val testCase: TestCase) {
             referenceTestUtilities.unprotectedTemporaryRepository,
             referenceTestUtilities.privacyRepository,
             db,
-            InMemorySharedPreferences()
+            InMemorySharedPreferences(),
         )
     }
 
@@ -100,8 +100,8 @@ class PrivacyConfigDisabledReferenceTest(private val testCase: TestCase) {
             PrivacyFeatureToggles(
                 privacyFeatureValueOf(testCase.featureName)!!.value,
                 testCase.expectFeatureEnabled,
-                null
-            )
+                null,
+            ),
         )
     }
 
@@ -117,17 +117,17 @@ class PrivacyConfigDisabledReferenceTest(private val testCase: TestCase) {
         val featureName: String,
         val siteURL: String,
         val expectFeatureEnabled: Boolean,
-        val exceptPlatforms: List<String>
+        val exceptPlatforms: List<String>,
     )
 
     data class FeaturesDisabledTest(
         val name: String,
         val desc: String,
         val referenceConfig: String,
-        val tests: List<TestCase>
+        val tests: List<TestCase>,
     )
 
     data class ReferenceTest(
-        val featuresDisabled: FeaturesDisabledTest
+        val featuresDisabled: FeaturesDisabledTest,
     )
 }

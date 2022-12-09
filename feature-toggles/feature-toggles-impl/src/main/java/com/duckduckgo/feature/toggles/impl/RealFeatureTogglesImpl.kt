@@ -22,8 +22,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.feature.toggles.api.FeatureTogglesPlugin
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
@@ -32,7 +32,7 @@ class RealFeatureToggleImpl @Inject constructor(private val featureTogglesPlugin
 
     override fun isFeatureEnabled(
         featureName: String,
-        defaultValue: Boolean
+        defaultValue: Boolean,
     ): Boolean {
         featureTogglesPluginPoint.getPlugins().forEach { plugin ->
             plugin.isEnabled(featureName, defaultValue)?.let { return it }
@@ -44,7 +44,7 @@ class RealFeatureToggleImpl @Inject constructor(private val featureTogglesPlugin
 
 @ContributesPluginPoint(
     scope = AppScope::class,
-    boundType = FeatureTogglesPlugin::class
+    boundType = FeatureTogglesPlugin::class,
 )
 @Suppress("unused")
 interface FeatureTogglesPluginPoint

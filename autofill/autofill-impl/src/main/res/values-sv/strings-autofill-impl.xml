@@ -42,6 +42,9 @@
     <string name="updateLoginDialogButtonUpdatePassword">Uppdatera lösenord</string>
     <string name="updateLoginDialogButtonNotNow">Inte nu</string>
 
+    <string name="updateLoginDialogTitleUpdateUsername">Uppdatera användarnamn?</string>
+    <string name="updateLoginDialogButtonUpdateUsername">Uppdatera användarnamn</string>
+
     <string name="autofillDialogCloseButtonContentDescription">Stäng dialogrutan för automatisk ifyllning</string>
 
     <string name="credentialManagementEditLoginTitleHint">Inloggningens titel</string>
@@ -59,5 +62,7 @@
     <string name="credentialManagementAutofillToggleLabel">Spara och fyll i inloggningar automatiskt</string>
     <string name="credentialManagementViewMenuEdit">Redigera</string>
     <string name="credentialManagementViewMenuDelete">Ta bort</string>
+
+    <string name="credentialManagementSuggestionsLabel">Förslag</string>
 
 </resources>

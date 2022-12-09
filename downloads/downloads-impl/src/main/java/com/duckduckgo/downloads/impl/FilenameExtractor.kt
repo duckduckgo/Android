@@ -21,12 +21,12 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.downloads.impl.FilenameExtractor.GuessQuality.NotGoodEnough
 import com.duckduckgo.downloads.impl.FilenameExtractor.GuessQuality.TriedAllOptions
-import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
+import timber.log.Timber
 
 class FilenameExtractor @Inject constructor(
-    private val pixel: Pixel
+    private val pixel: Pixel,
 ) {
 
     fun extract(pendingDownload: PendingFileDownload): FilenameExtractionResult {
@@ -49,7 +49,7 @@ class FilenameExtractor @Inject constructor(
 
     private fun evaluateGuessQuality(
         guesses: Guesses,
-        pathSegments: List<String>
+        pathSegments: List<String>,
     ): GuessQuality {
         val latestGuess = guesses.latestGuess
         val bestGuess = guesses.bestGuess
@@ -67,7 +67,7 @@ class FilenameExtractor @Inject constructor(
     private fun guessFilename(
         url: String,
         contentDisposition: String?,
-        mimeType: String?
+        mimeType: String?,
     ): String {
         val tidiedUrl = url.removeSuffix("/")
         var guessedFilename = DownloaderUtil.guessFileName(tidiedUrl, contentDisposition, mimeType)
@@ -139,6 +139,6 @@ class FilenameExtractor @Inject constructor(
 
     data class Guesses(
         var latestGuess: String,
-        var bestGuess: String? = null
+        var bestGuess: String? = null,
     )
 }

@@ -60,7 +60,10 @@ class TrackingProtectionAppsRepositoryTest {
 
         trackingProtectionAppsRepository =
             RealTrackingProtectionAppsRepository(
-                packageManager, appTrackerRepository, coroutineRule.testDispatcherProvider, appTpFeatureConfig
+                packageManager,
+                appTrackerRepository,
+                coroutineRule.testDispatcherProvider,
+                appTpFeatureConfig,
             )
     }
 
@@ -70,7 +73,7 @@ class TrackingProtectionAppsRepositoryTest {
 
         assertEquals(
             listOf("com.example.app2", "com.example.app3", "com.example.app5", "com.example.game", "com.example.system", "com.duckduckgo.mobile"),
-            exclusionList
+            exclusionList,
         )
     }
 
@@ -101,7 +104,7 @@ class TrackingProtectionAppsRepositoryTest {
                 ApplicationInfo().apply {
                     packageName = "com.example.game"
                     category = ApplicationInfo.CATEGORY_GAME
-                }
+                },
             )
 
         val isEnabled = trackingProtectionAppsRepository.isAppProtectionEnabled("com.example.game")
@@ -153,7 +156,7 @@ class TrackingProtectionAppsRepositoryTest {
         trackingProtectionAppsRepository.manuallyExcludedApps().test {
             assertEquals(
                 listOf("com.example.app1" to true, "com.example.app2" to false, "com.example.app3" to false),
-                awaitItem()
+                awaitItem(),
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -173,9 +176,9 @@ class TrackingProtectionAppsRepositoryTest {
                 "com.example.app5",
                 "com.example.game",
                 "com.example.system",
-                "com.duckduckgo.mobile"
+                "com.duckduckgo.mobile",
             ),
-            exclusionList
+            exclusionList,
         )
     }
 
@@ -187,7 +190,7 @@ class TrackingProtectionAppsRepositoryTest {
 
         assertEquals(
             listOf("com.example.app1", "com.example.app3", "com.example.app5", "com.example.game", "com.example.system", "com.duckduckgo.mobile"),
-            exclusionList
+            exclusionList,
         )
     }
 
@@ -205,7 +208,7 @@ class TrackingProtectionAppsRepositoryTest {
                     "com.example.game" to true,
                     "com.example.system.overriden" to false,
                 ),
-                this.awaitItem().map { it.packageName to it.isExcluded }
+                this.awaitItem().map { it.packageName to it.isExcluded },
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -236,7 +239,7 @@ class TrackingProtectionAppsRepositoryTest {
                     "com.example.game" to false,
                     "com.example.system.overriden" to false,
                 ),
-                this.awaitItem().map { it.packageName to it.isExcluded }
+                this.awaitItem().map { it.packageName to it.isExcluded },
             )
             cancelAndIgnoreRemainingEvents()
         }

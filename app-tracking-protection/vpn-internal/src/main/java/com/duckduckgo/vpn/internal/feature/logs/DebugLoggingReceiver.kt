@@ -23,13 +23,13 @@ import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.vpn.internal.feature.InternalFeatureReceiver
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.CoroutineScope
-import timber.log.Timber
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import logcat.logcat
 
 class DebugLoggingReceiver(
     context: Context,
-    receiver: (Intent) -> Unit
+    receiver: (Intent) -> Unit,
 ) : InternalFeatureReceiver(context, receiver) {
 
     override fun intentAction(): String = ACTION
@@ -61,13 +61,13 @@ class DebugLoggingReceiver(
 
 @ContributesMultibinding(VpnScope::class)
 class DebugLoggingReceiverRegister @Inject constructor(
-    private val context: Context
+    private val context: Context,
 ) : VpnServiceCallbacks {
 
     private var receiver: DebugLoggingReceiver? = null
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        Timber.v("Debug receiver DebugLoggingReceiver registered")
+        logcat { "Debug receiver DebugLoggingReceiver registered" }
 
         receiver = DebugLoggingReceiver(context) { intent ->
             when {
@@ -77,14 +77,14 @@ class DebugLoggingReceiverRegister @Inject constructor(
                 DebugLoggingReceiver.isLoggingOffIntent(intent) -> {
                     TimberExtensions.disableLogging()
                 }
-                else -> Timber.w("Debug receiver DebugLoggingReceiver unknown intent")
+                else -> logcat { "Debug receiver DebugLoggingReceiver unknown intent" }
             }
         }.apply { register() }
     }
 
     override fun onVpnStopped(
         coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
+        vpnStopReason: VpnStopReason,
     ) {
         receiver?.unregister()
     }

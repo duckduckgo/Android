@@ -32,29 +32,29 @@ import com.duckduckgo.di.scopes.QuickSettingsScope
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
 import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateRepository
 import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
 import dagger.android.AndroidInjection
 import dagger.binding.TileServiceBingingKey
 import javax.inject.Inject
 import kotlinx.coroutines.*
-import timber.log.Timber
+import logcat.logcat
 
+@Suppress("NoHardcodedCoroutineDispatcher")
 @RequiresApi(Build.VERSION_CODES.N)
 // We don't use the DeviceShieldTileService::class as binding key because TileService (Android) class does not
 // exist in all APIs, and so using it DeviceShieldTileService::class as key would compile but immediately crash
 // at startup when Java class loader tries to resolve the TileService::class upon Dagger setup
 @InjectWith(
     scope = QuickSettingsScope::class,
-    bindingKey = TileServiceBingingKey::class
+    bindingKey = TileServiceBingingKey::class,
 )
 class DeviceShieldTileService : TileService() {
 
     @Inject lateinit var deviceShieldPixels: DeviceShieldPixels
+
     @Inject lateinit var repository: AtpWaitlistStateRepository
-    @Inject lateinit var vpnStore: VpnStore
+
     @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
     private var deviceShieldStatePollingJob = ConflatedJob()
@@ -80,28 +80,11 @@ class DeviceShieldTileService : TileService() {
         } else {
             deviceShieldPixels.enableFromQuickSettingsTile()
             if (hasVpnPermission()) {
-                if (shouldPromoteAlwaysOn()) {
-                    launchActivity(DeviceShieldTrackerActivity::class.java)
-                } else {
-                    startDeviceShield()
-                }
+                startDeviceShield()
             } else {
                 launchActivity(VpnPermissionRequesterActivity::class.java)
             }
         }
-    }
-
-    private fun shouldPromoteAlwaysOn(): Boolean {
-        val shouldPromoteAlwaysOn =
-            vpnStore.getAppTPManuallyEnables() >= VpnStore.ALWAYS_ON_PROMOTION_DELTA &&
-                vpnStore.userAllowsShowPromoteAlwaysOn() &&
-                !vpnStore.isAlwaysOnEnabled()
-
-        if (shouldPromoteAlwaysOn) {
-            vpnStore.resetAppTPManuallyEnablesCounter()
-        }
-
-        return shouldPromoteAlwaysOn
     }
 
     private fun launchActivity(activityClass: Class<*>) {
@@ -143,7 +126,6 @@ class DeviceShieldTileService : TileService() {
     }
 
     private fun startDeviceShield() {
-        vpnStore.onAppTPManuallyEnabled()
         vpnFeaturesRegistry.registerFeature(AppTpVpnFeature.APPTP_VPN)
     }
 }
@@ -166,7 +148,7 @@ class VpnPermissionRequesterActivity : AppCompatActivity() {
     override fun onActivityResult(
         requestCode: Int,
         resultCode: Int,
-        data: Intent?
+        data: Intent?,
     ) {
         when (requestCode) {
             RC_REQUEST_VPN_PERMISSION -> handleVpnPermissionResult(resultCode)
@@ -176,9 +158,9 @@ class VpnPermissionRequesterActivity : AppCompatActivity() {
 
     private fun handleVpnPermissionResult(resultCode: Int) {
         when (resultCode) {
-            RESULT_CANCELED -> Timber.i("User cancelled and refused VPN permission")
+            RESULT_CANCELED -> logcat { "User cancelled and refused VPN permission" }
             RESULT_OK -> {
-                Timber.i("User granted VPN permission")
+                logcat { "User granted VPN permission" }
                 startDeviceShield()
             }
         }

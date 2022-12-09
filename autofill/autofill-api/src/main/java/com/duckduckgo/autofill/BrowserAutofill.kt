@@ -52,13 +52,18 @@ interface BrowserAutofill {
      */
     fun injectCredentials(credentials: LoginCredentials?)
 
+    /**
+     * Cancels any ongoing autofill operations which would show the user the prompt to choose credentials
+     * This would only normally be needed if a user-interaction happened such that showing autofill prompt would be undesirable.
+     */
+    fun cancelPendingAutofillRequestToChooseCredentials()
 }
 
 /**
  * Browser Autofill callbacks
  */
 interface Callback {
-    suspend fun onCredentialsAvailableToInject(credentials: List<LoginCredentials>, triggerType: LoginTriggerType)
+    suspend fun onCredentialsAvailableToInject(originalUrl: String, credentials: List<LoginCredentials>, triggerType: LoginTriggerType)
     suspend fun onCredentialsAvailableToSave(currentUrl: String, credentials: LoginCredentials)
     fun noCredentialsAvailable(originalUrl: String)
 }

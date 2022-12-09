@@ -16,6 +16,7 @@
   -->
 
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_enabled="false" android:color="?attr/listItemDisabledColor" />
-    <item android:color="?attr/listItemPrimaryTextColor" android:state_enabled="true"/>
+    <item android:state_enabled="false" android:color="?attr/daxColorPrimaryText" />
+    <item android:color="?attr/daxColorPrimaryText" android:state_pressed="true"/>
+    <item android:color="?attr/daxColorPrimaryText" android:state_enabled="true"/>
 </selector>

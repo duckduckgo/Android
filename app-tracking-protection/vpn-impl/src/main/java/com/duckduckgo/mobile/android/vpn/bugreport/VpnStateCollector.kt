@@ -24,10 +24,10 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateCollector
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.withContext
-import org.json.JSONObject
-import timber.log.Timber
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
+import logcat.logcat
+import org.json.JSONObject
 
 @ContributesBinding(VpnScope::class)
 @SingleInstanceIn(VpnScope::class)
@@ -41,7 +41,7 @@ class RealVpnStateCollector @Inject constructor(
             val vpnState = JSONObject()
             // other VPN metrics
             vpnStateCollectors.getPlugins().forEach {
-                Timber.v("collectVpnState from ${it.collectorName}")
+                logcat { "collectVpnState from ${it.collectorName}" }
                 vpnState.put(it.collectorName, it.collectVpnRelatedState(appPackageId))
             }
 
@@ -52,7 +52,7 @@ class RealVpnStateCollector @Inject constructor(
 
 @ContributesPluginPoint(
     scope = VpnScope::class,
-    boundType = VpnStateCollectorPlugin::class
+    boundType = VpnStateCollectorPlugin::class,
 )
 @Suppress("unused")
 interface VpnStateCollectorPluginPoint

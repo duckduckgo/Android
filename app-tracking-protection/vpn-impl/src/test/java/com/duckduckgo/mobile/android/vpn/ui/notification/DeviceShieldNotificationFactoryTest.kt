@@ -19,23 +19,30 @@ package com.duckduckgo.mobile.android.vpn.ui.notification
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerDao
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationFactory.DeviceShieldNotification
 import com.jakewharton.threetenabp.AndroidThreeTen
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class DeviceShieldNotificationFactoryTest {
+
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private lateinit var db: VpnDatabase
     private lateinit var vpnTrackerDao: VpnTrackerDao
@@ -50,7 +57,7 @@ class DeviceShieldNotificationFactoryTest {
             .allowMainThreadQueries()
             .build()
         vpnTrackerDao = db.vpnTrackerDao()
-        appTrackerBlockingStatsRepository = RealAppTrackerBlockingStatsRepository(db)
+        appTrackerBlockingStatsRepository = RealAppTrackerBlockingStatsRepository(db, coroutineTestRule.testDispatcherProvider)
 
         factory =
             DeviceShieldNotificationFactory(InstrumentationRegistry.getInstrumentation().targetContext.resources, appTrackerBlockingStatsRepository)
@@ -81,7 +88,7 @@ class DeviceShieldNotificationFactoryTest {
     fun createTrackersCountDeviceShieldNotificationWhenTrackersFoundInTwoApps() {
         val trackers = listOf(
             aTrackerAndCompany(appContainingTracker = trackingApp1()),
-            aTrackerAndCompany(appContainingTracker = trackingApp2())
+            aTrackerAndCompany(appContainingTracker = trackingApp2()),
         )
         val notification = factory.createNotificationNewTrackerFound(trackers)
 
@@ -95,7 +102,7 @@ class DeviceShieldNotificationFactoryTest {
             aTrackerAndCompany(appContainingTracker = trackingApp1()),
             aTrackerAndCompany(appContainingTracker = trackingApp1()),
             aTrackerAndCompany(appContainingTracker = trackingApp1()),
-            aTrackerAndCompany(appContainingTracker = trackingApp2())
+            aTrackerAndCompany(appContainingTracker = trackingApp2()),
         )
         val notification = factory.createNotificationNewTrackerFound(trackers)
         notification.assertTitleEquals("Tracking attempts blocked across 2 apps (past hour).")
@@ -112,7 +119,7 @@ class DeviceShieldNotificationFactoryTest {
         trackerCompanyName: String = "Tracking LLC",
         trackerCompanyId: Int = -1,
         appContainingTracker: TrackingApp = defaultApp(),
-        timestamp: String = DatabaseDateFormatter.bucketByHour()
+        timestamp: String = DatabaseDateFormatter.bucketByHour(),
     ): VpnTracker {
         return VpnTracker(
             trackerCompanyId = trackerCompanyId,
@@ -120,7 +127,7 @@ class DeviceShieldNotificationFactoryTest {
             timestamp = timestamp,
             company = trackerCompanyName,
             companyDisplayName = trackerCompanyName,
-            trackingApp = appContainingTracker
+            trackingApp = appContainingTracker,
         )
     }
 

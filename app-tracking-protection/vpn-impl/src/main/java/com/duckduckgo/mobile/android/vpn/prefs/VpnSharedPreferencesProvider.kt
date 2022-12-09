@@ -23,22 +23,23 @@ import androidx.core.content.edit
 import com.duckduckgo.di.scopes.AppScope
 import com.frybits.harmony.getHarmonySharedPreferences
 import com.squareup.anvil.annotations.ContributesBinding
-import timber.log.Timber
 import javax.inject.Inject
+import logcat.LogPriority
+import logcat.logcat
 
 private const val MIGRATED_TO_HARMONY = "migrated_to_harmony"
 
 @ContributesBinding(AppScope::class)
 class VpnSharedPreferencesProviderImpl @Inject constructor(
-    private val context: Context
+    private val context: Context,
 ) : VpnSharedPreferencesProvider {
     override fun getSharedPreferences(name: String, multiprocess: Boolean, migrate: Boolean): SharedPreferences {
         return if (multiprocess) {
             if (migrate) {
-                Timber.v("Migrate and return preferences to Harmony")
+                logcat { "Migrate and return preferences to Harmony" }
                 return migrateToHarmonyIfNecessary(name)
             } else {
-                Timber.v("Return Harmony preferences")
+                logcat { "Return Harmony preferences" }
                 context.getHarmonySharedPreferences(name)
             }
         } else {
@@ -51,7 +52,7 @@ class VpnSharedPreferencesProviderImpl @Inject constructor(
         val destination = context.getHarmonySharedPreferences(name)
 
         if (destination.getBoolean(MIGRATED_TO_HARMONY, false)) return destination
-        Timber.v("Performing migration to Harmony")
+        logcat { "Performing migration to Harmony" }
 
         val contents = origin.all
 
@@ -72,7 +73,7 @@ class VpnSharedPreferencesProviderImpl @Inject constructor(
                 is String -> {
                     destination.edit { putString(key, originalValue) }
                 }
-                else -> Timber.w("Could not migrate $key from $name preferences")
+                else -> logcat(LogPriority.WARN) { "Could not migrate $key from $name preferences" }
             }
         }
 

@@ -24,6 +24,7 @@ import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.*
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode
+import kotlin.reflect.KClass
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -34,7 +35,6 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import kotlin.reflect.KClass
 
 @ExperimentalCoroutinesApi
 class AutofillSettingsViewModelTest {
@@ -133,7 +133,7 @@ class AutofillSettingsViewModelTest {
         testee.viewState.test {
             assertEquals(
                 CredentialMode.Editing(credentials, startedCredentialModeWithEdit = false, hasPopulatedFields = true),
-                this.awaitItem().credentialMode
+                this.awaitItem().credentialMode,
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -148,7 +148,7 @@ class AutofillSettingsViewModelTest {
         testee.commands.test {
             assertEquals(
                 ShowCredentialMode(credentials, isLaunchedDirectly = false),
-                this.awaitItem().first()
+                this.awaitItem().first(),
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -156,7 +156,7 @@ class AutofillSettingsViewModelTest {
         testee.viewState.test {
             assertEquals(
                 CredentialMode.Editing(credentials, startedCredentialModeWithEdit = true, hasPopulatedFields = false),
-                this.awaitItem().credentialMode
+                this.awaitItem().credentialMode,
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -188,18 +188,8 @@ class AutofillSettingsViewModelTest {
         testee.unlock()
 
         testee.commands.test {
-            assertEquals(
-                listOf(
-                    ExitDisabledMode,
-                    ExitLockedMode,
-                ),
-                this.expectMostRecentItem().toList()
-            )
-            cancelAndIgnoreRemainingEvents()
-        }
-
-        testee.viewState.test {
-            assertFalse(this.awaitItem().isLocked)
+            val commands = this.awaitItem()
+            assertTrue(commands.contains(ExitLockedMode))
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -214,15 +204,10 @@ class AutofillSettingsViewModelTest {
                     ExitListMode,
                     ExitCredentialMode,
                     ExitLockedMode,
-                    ShowDisabledMode
+                    ShowDisabledMode,
                 ),
-                this.expectMostRecentItem().toList()
+                this.expectMostRecentItem().toList(),
             )
-            cancelAndIgnoreRemainingEvents()
-        }
-
-        testee.viewState.test {
-            assertTrue(this.awaitItem().isLocked)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -293,20 +278,15 @@ class AutofillSettingsViewModelTest {
         testee.onEditCredentials(someCredentials(), true)
         testee.disabled()
 
-        testee.viewState.test {
-            val finalResult = this.expectMostRecentItem()
-            assertTrue(finalResult.isLocked)
-            cancelAndIgnoreRemainingEvents()
-        }
         testee.commands.test {
             assertEquals(
                 listOf(
                     ExitListMode,
                     ExitCredentialMode,
                     ExitLockedMode,
-                    ShowDisabledMode
+                    ShowDisabledMode,
                 ),
-                this.expectMostRecentItem().toList()
+                this.expectMostRecentItem().toList(),
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -324,7 +304,7 @@ class AutofillSettingsViewModelTest {
             val finalResult = this.expectMostRecentItem()
             assertEquals(
                 CredentialMode.Editing(credentials, saveable = false, startedCredentialModeWithEdit = false, hasPopulatedFields = true),
-                finalResult.credentialMode
+                finalResult.credentialMode,
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -334,11 +314,6 @@ class AutofillSettingsViewModelTest {
     fun whenLaunchDeviceAuthThenUpdateStateToIsAuthenticatingAndEmitLaunchDeviceCommand() = runTest {
         testee.launchDeviceAuth()
 
-        testee.viewState.test {
-            val finalResult = this.expectMostRecentItem()
-            assertTrue(finalResult.isAuthenticating)
-            cancelAndIgnoreRemainingEvents()
-        }
         testee.commands.test {
             awaitItem().first().assertCommandType(LaunchDeviceAuth::class)
             cancelAndIgnoreRemainingEvents()
@@ -346,49 +321,16 @@ class AutofillSettingsViewModelTest {
     }
 
     @Test
-    fun whenLaunchDeviceAuthTwiceThenEmitLaunchDeviceCommandOnceOnly() = runTest {
-        testee.launchDeviceAuth()
-        testee.launchDeviceAuth()
-
-        testee.commands.test {
-            assertEquals(
-                listOf(LaunchDeviceAuth),
-                this.expectMostRecentItem().toList()
-            )
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
     fun whenLaunchedDeviceAuthHasEndedAndLaunchedAgainThenEmitLaunchDeviceCommandtwice() = runTest {
         testee.launchDeviceAuth()
-        testee.onAuthenticationEnded()
-
-        testee.viewState.test {
-            val finalResult = this.expectMostRecentItem()
-            assertFalse(finalResult.isAuthenticating)
-            cancelAndIgnoreRemainingEvents()
-        }
 
         testee.launchDeviceAuth()
 
         testee.commands.test {
             assertEquals(
                 listOf(LaunchDeviceAuth, LaunchDeviceAuth),
-                this.expectMostRecentItem().toList()
+                this.expectMostRecentItem().toList(),
             )
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenAuthWasLaunchAndThenDeviceAuthDisabledThenEmitViewStateWithIsAuthenticatingFalse() = runTest {
-        testee.launchDeviceAuth()
-        testee.disabled()
-
-        testee.viewState.test {
-            val finalResult = this.expectMostRecentItem()
-            assertFalse(finalResult.isAuthenticating)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -398,7 +340,7 @@ class AutofillSettingsViewModelTest {
             id = -1,
             domain = "example.com",
             username = "username",
-            password = "password"
+            password = "password",
         )
     }
 

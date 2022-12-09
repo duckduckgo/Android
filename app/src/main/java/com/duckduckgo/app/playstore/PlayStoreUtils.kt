@@ -50,7 +50,6 @@ class PlayStoreAndroidUtils(val context: Context) : PlayStoreUtils {
 
     override fun isPlayStoreInstalled(): Boolean {
         return try {
-
             if (!isPlayStoreActivityResolvable(context)) {
                 Timber.i("Cannot resolve Play Store activity")
                 return false

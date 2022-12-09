@@ -20,10 +20,10 @@ import com.duckduckgo.autofill.AutofillDomainFormatter
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
-import timber.log.Timber
 import java.lang.Character.*
 import java.text.Normalizer
 import javax.inject.Inject
+import timber.log.Timber
 
 interface InitialExtractor {
     fun extractInitial(loginCredentials: LoginCredentials): String
@@ -33,7 +33,7 @@ interface InitialExtractor {
 
 @ContributesBinding(FragmentScope::class)
 class CredentialInitialExtractor @Inject constructor(
-    private val domainFormatter: AutofillDomainFormatter
+    private val domainFormatter: AutofillDomainFormatter,
 ) : InitialExtractor {
 
     override fun extractInitial(loginCredentials: LoginCredentials): String {

@@ -26,7 +26,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     FORGET_ALL_EXECUTED("mf"),
     FORGET_ALL_AUTO_RESTART("m_f_r"),
     FORGET_ALL_AUTO_RESTART_WITH_INTENT("m_f_ri"),
-    DATA_CLEARED_DAILY("m_data_cleared_today"),
 
     BROKEN_SITE_REPORTED("m_bsr"),
     BROKEN_SITE_REPORT("epbf"),
@@ -39,18 +38,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     ONBOARDING_DAX_CTA_SHOWN("m_odc_s"),
     ONBOARDING_DAX_ALL_CTA_HIDDEN("m_odc_h"),
     ONBOARDING_DAX_CTA_OK_BUTTON("m_odc_ok"),
-
-    PRIVACY_DASHBOARD_OPENED("mp"),
-    PRIVACY_DASHBOARD_SCORECARD("mp_c"),
-    PRIVACY_DASHBOARD_ENCRYPTION("mp_e"),
-    PRIVACY_DASHBOARD_GLOBAL_STATS("mp_s"),
-    PRIVACY_DASHBOARD_PRIVACY_PRACTICES("mp_p"),
-    PRIVACY_DASHBOARD_NETWORKS("mp_n"),
-    PRIVACY_DASHBOARD_OTHER_DOMAINS_LOADED_CLICKED("m_privacy_dashboard_other_domains_loaded_clicked"),
-    PRIVACY_DASHBOARD_WHITELIST_ADD("mp_wla"),
-    PRIVACY_DASHBOARD_WHITELIST_REMOVE("mp_wlr"),
-    PRIVACY_DASHBOARD_MANAGE_WHITELIST("mp_mw"),
-    PRIVACY_DASHBOARD_REPORT_BROKEN_SITE("mp_rb"),
 
     BROWSER_MENU_WHITELIST_ADD("mb_wla"),
     BROWSER_MENU_WHITELIST_REMOVE("mb_wlr"),
@@ -238,6 +225,8 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     FIRE_ANIMATION_NEW_SELECTED("m_fas_s"),
 
     EMAIL_TOOLTIP_DISMISSED("email_tooltip_dismissed"),
+    EMAIL_ENABLED("email_enabled"),
+    EMAIL_DISABLED("email_disabled"),
     EMAIL_USE_ALIAS("email_filled_random"),
     EMAIL_USE_ADDRESS("email_filled_main"),
     EMAIL_COPIED_TO_CLIPBOARD("email_generated_button"),
@@ -259,5 +248,8 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     REMOTE_MESSAGE_PRIMARY_ACTION_CLICKED("m_remote_message_primary_action_clicked"),
     REMOTE_MESSAGE_SECONDARY_ACTION_CLICKED("m_remote_message_secondary_action_clicked"),
 
-    CREATE_BLOOM_FILTER_ERROR("m_create_bloom_filter_error")
+    CREATE_BLOOM_FILTER_ERROR("m_create_bloom_filter_error"),
+
+    FACEBOOK_LOGIN_ERROR_BREAKAGE_INVESTIGATION("m_facebook_login_error_breakage_investigation"),
+    FACEBOOK_LOGIN_BREAKAGE_INVESTIGATION("m_facebook_login_breakage_investigation"),
 }

@@ -34,7 +34,6 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.CoroutineTestRule
-import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.ValueCaptorObserver
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
@@ -87,26 +86,25 @@ import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
-import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryImpl
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.Site
-import com.duckduckgo.app.global.model.SiteFactory
+import com.duckduckgo.app.global.model.SiteFactoryImpl
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsDao
-import com.duckduckgo.app.location.data.LocationPermissionsRepository
+import com.duckduckgo.app.location.data.LocationPermissionsRepositoryImpl
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
-import com.duckduckgo.app.privacy.model.PrivacyGrade
-import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -120,10 +118,11 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
-import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.trackerdetection.model.TrackerType
+import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
+import com.duckduckgo.autofill.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.downloads.api.DownloadStateListener
@@ -142,14 +141,12 @@ import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
-import org.mockito.kotlin.*
-import org.mockito.kotlin.any
-import org.mockito.kotlin.atLeastOnce
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.eq
-import org.mockito.kotlin.whenever
 import dagger.Lazy
 import io.reactivex.Observable
+import java.io.File
+import java.util.Locale
+import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
@@ -161,6 +158,7 @@ import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -175,10 +173,12 @@ import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
 import org.mockito.internal.util.DefaultMockingDetails
-import java.io.File
-import java.util.Locale
-import java.util.concurrent.CopyOnWriteArrayList
-import java.util.concurrent.TimeUnit
+import org.mockito.kotlin.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.whenever
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -205,9 +205,6 @@ class BrowserTabViewModelTest {
 
     @Mock
     private lateinit var mockCommandObserver: Observer<Command>
-
-    @Mock
-    private lateinit var mockPrivacyPractices: PrivacyPractices
 
     @Mock
     private lateinit var mockSettingsStore: SettingsDataStore
@@ -394,7 +391,11 @@ class BrowserTabViewModelTest {
         locationPermissionsDao = db.locationPermissionsDao()
 
         mockAutoCompleteApi = AutoCompleteApi(mockAutoCompleteService, mockBookmarksDao, mockFavoritesRepository)
-        val fireproofWebsiteRepository = FireproofWebsiteRepository(fireproofWebsiteDao, coroutineRule.testDispatcherProvider, lazyFaviconManager)
+        val fireproofWebsiteRepositoryImpl = FireproofWebsiteRepositoryImpl(
+            fireproofWebsiteDao,
+            coroutineRule.testDispatcherProvider,
+            lazyFaviconManager,
+        )
 
         whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(dismissedCtaDaoChannel.consumeAsFlow())
         whenever(mockTabRepository.flowTabs).thenReturn(flowOf(emptyList()))
@@ -423,7 +424,7 @@ class BrowserTabViewModelTest {
             appTheme = mockAppTheme,
         )
 
-        val siteFactory = SiteFactory(mockPrivacyPractices, mockEntityLookup)
+        val siteFactory = SiteFactoryImpl(mockEntityLookup, mockUserWhitelistDao, mockContentBlocking, TestScope())
 
         accessibilitySettingsDataStore = AccessibilitySettingsSharedPreferences(context, coroutineRule.testDispatcherProvider, TestScope())
 
@@ -432,7 +433,6 @@ class BrowserTabViewModelTest {
         whenever(mockNavigationAwareLoginDetector.loginEventLiveData).thenReturn(loginEventLiveData)
         whenever(mockTabRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
         whenever(mockTabRepository.childClosedTabs).thenReturn(childClosedTabsFlow)
-        whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         whenever(mockUserWhitelistDao.contains(anyString())).thenReturn(false)
         whenever(mockContentBlocking.isAnException(anyString())).thenReturn(false)
@@ -458,11 +458,11 @@ class BrowserTabViewModelTest {
             searchCountDao = mockSearchCountDao,
             pixel = mockPixel,
             dispatchers = coroutineRule.testDispatcherProvider,
-            fireproofWebsiteRepository = fireproofWebsiteRepository,
-            locationPermissionsRepository = LocationPermissionsRepository(
+            fireproofWebsiteRepository = fireproofWebsiteRepositoryImpl,
+            locationPermissionsRepository = LocationPermissionsRepositoryImpl(
                 locationPermissionsDao,
                 lazyFaviconManager,
-                coroutineRule.testDispatcherProvider
+                coroutineRule.testDispatcherProvider,
             ),
             geoLocationPermissions = geoLocationPermissions,
             navigationAwareLoginDetector = mockNavigationAwareLoginDetector,
@@ -485,7 +485,7 @@ class BrowserTabViewModelTest {
             settingsDataStore = mockSettingsDataStore,
             autofillStore = mockAutofillStore,
             adClickManager = mockAdClickManager,
-            sitePermissionsManager = mockSitePermissionsManager
+            sitePermissionsManager = mockSitePermissionsManager,
         )
 
         testee.loadData("abc", null, false, false)
@@ -675,7 +675,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenNoSiteAndUserSelectsToAddFavoriteThenSiteIsNotAdded() = runTest {
-
         testee.onFavoriteMenuClicked()
 
         verify(mockFavoritesRepository, times(0)).insert(any(), any())
@@ -719,7 +718,7 @@ class BrowserTabViewModelTest {
             entity = networkEntity,
             surrogateId = null,
             status = TrackerStatus.ALLOWED,
-            type = TrackerType.OTHER
+            type = TrackerType.OTHER,
         )
         testee.trackerDetected(event)
         verify(mockNetworkLeaderboardDao).incrementNetworkCount("Network1")
@@ -952,22 +951,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUrlClearedThenPrivacyGradeIsCleared() = runTest {
-        loadUrl("https://duckduckgo.com")
-        assertNotNull(privacyGradeState().privacyGrade)
-        loadUrl(null)
-        assertNull(privacyGradeState().privacyGrade)
-    }
-
-    @Test
-    fun whenUrlLoadedThenPrivacyGradeIsReset() = runTest {
-        loadUrl("https://duckduckgo.com")
-        assertNotNull(privacyGradeState().privacyGrade)
-    }
-
-    @Test
-    fun whenEnoughTrackersDetectedThenPrivacyGradeIsUpdated() {
-        val grade = privacyGradeState().privacyGrade
+    fun whentrackersDetectedThenPrivacyGradeIsUpdated() {
+        val grade = privacyShieldState().privacyShield
         loadUrl("https://example.com")
         val entity = TestEntity("Network1", "Network1", 10.0)
         for (i in 1..10) {
@@ -979,31 +964,34 @@ class BrowserTabViewModelTest {
                     entity = entity,
                     surrogateId = null,
                     status = TrackerStatus.ALLOWED,
-                    type = TrackerType.OTHER
-                )
+                    type = TrackerType.OTHER,
+                ),
             )
         }
-        assertNotEquals(grade, privacyGradeState().privacyGrade)
+        assertNotEquals(grade, privacyShieldState().privacyShield)
     }
 
     @Test
-    fun whenPrivacyGradeFinishedLoadingThenDoNotShowLoadingGrade() {
-        testee.stopShowingEmptyGrade()
-        assertFalse(privacyGradeState().showEmptyGrade)
-    }
-
-    @Test
-    fun whenProgressChangesWhileBrowsingButSiteNotFullyLoadedThenPrivacyGradeShouldAnimateIsTrue() {
-        setBrowserShowing(true)
-        testee.progressChanged(50)
-        assertTrue(privacyGradeState().shouldAnimate)
-    }
-
-    @Test
-    fun whenProgressChangesWhileBrowsingAndSiteIsFullyLoadedThenPrivacyGradeShouldAnimateIsFalse() {
-        setBrowserShowing(true)
-        testee.progressChanged(100)
-        assertFalse(privacyGradeState().shouldAnimate)
+    fun whenOnSiteChangedThenPrivacyShieldIsUpdated() {
+        givenCurrentSite("https://www.example.com/").also {
+            whenever(it.privacyProtection()).thenReturn(PROTECTED)
+        }
+        loadUrl("https://example.com")
+        val entity = TestEntity("Network1", "Network1", 10.0)
+        for (i in 1..10) {
+            testee.trackerDetected(
+                TrackingEvent(
+                    documentUrl = "https://example.com",
+                    trackerUrl = "",
+                    categories = null,
+                    entity = entity,
+                    surrogateId = null,
+                    status = TrackerStatus.ALLOWED,
+                    type = TrackerType.OTHER,
+                ),
+            )
+        }
+        assertEquals(PROTECTED, privacyShieldState().privacyShield)
     }
 
     @Test
@@ -1015,95 +1003,20 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenProgressChangesAndIsProcessingTrackingLinkThenPrivacyGradeShouldAnimateIsTrue() {
-        setBrowserShowing(true)
-        testee.startProcessingTrackingLink()
-        testee.progressChanged(100)
-        assertTrue(privacyGradeState().shouldAnimate)
-    }
-
-    @Test
-    fun whenProgressChangesAndPrivacyIsOnThenShowLoadingGradeIsAlwaysTrue() {
-        setBrowserShowing(true)
-        testee.progressChanged(50)
-        assertTrue(privacyGradeState().showEmptyGrade)
-        testee.progressChanged(100)
-        assertTrue(privacyGradeState().showEmptyGrade)
-    }
-
-    @Test
-    fun whenProgressChangesAndPrivacyIsOffButSiteNotFullyLoadedThenShowLoadingGradeIsTrue() {
-        setBrowserShowing(true)
-        testee.loadingViewState.value = loadingViewState().copy(privacyOn = false)
-        testee.progressChanged(50)
-        assertTrue(privacyGradeState().showEmptyGrade)
-    }
-
-    @Test
-    fun whenProgressChangesAndPrivacyIsOffAndSiteIsFullyLoadedThenShowLoadingGradeIsFalse() {
-        setBrowserShowing(true)
-        testee.loadingViewState.value = loadingViewState().copy(privacyOn = false)
-        testee.progressChanged(100)
-        assertFalse(privacyGradeState().showEmptyGrade)
-    }
-
-    @Test
-    fun whenProgressChangesAndIsProcessingTrackingLinkThenShowLoadingGradeIsTrue() {
-        setBrowserShowing(true)
-        testee.loadingViewState.value = loadingViewState().copy(privacyOn = false)
-        testee.startProcessingTrackingLink()
-        testee.progressChanged(100)
-        assertTrue(privacyGradeState().showEmptyGrade)
-    }
-
-    @Test
-    fun whenProgressChangesButIsTheSameAsBeforeThenDoNotUpdateState() {
-        setBrowserShowing(true)
-        testee.progressChanged(100)
-        testee.stopShowingEmptyGrade()
-        testee.progressChanged(100)
-        assertFalse(privacyGradeState().showEmptyGrade)
-    }
-
-    @Test
-    fun whenNotShowingEmptyGradeAndPrivacyGradeIsNotUnknownThenIsEnableIsTrue() {
-        val testee = BrowserTabViewModel.PrivacyGradeViewState(PrivacyGrade.A, shouldAnimate = false, showEmptyGrade = false)
-        assertTrue(testee.isEnabled)
-    }
-
-    @Test
-    fun whenPrivacyGradeIsUnknownThenIsEnableIsFalse() {
-        val testee = BrowserTabViewModel.PrivacyGradeViewState(PrivacyGrade.UNKNOWN, shouldAnimate = false, showEmptyGrade = false)
-        assertFalse(testee.isEnabled)
-    }
-
-    @Test
-    fun whenShowEmptyGradeIsTrueThenIsEnableIsTrue() {
-        val testee = BrowserTabViewModel.PrivacyGradeViewState(PrivacyGrade.A, shouldAnimate = false, showEmptyGrade = true)
-        assertTrue(testee.isEnabled)
-    }
-
-    @Test
     fun whenInitialisedThenPrivacyGradeIsNotShown() {
-        assertFalse(browserViewState().showPrivacyGrade)
+        assertFalse(browserViewState().showPrivacyShield)
     }
 
     @Test
     fun whenUrlUpdatedThenPrivacyGradeIsShown() {
         loadUrl("")
-        assertTrue(browserViewState().showPrivacyGrade)
-    }
-
-    @Test
-    fun whenOmnibarDoesNotHaveFocusThenShowEmptyGradeIsFalse() {
-        testee.onOmnibarInputStateChanged(query = "", hasFocus = false, hasQueryChanged = false)
-        assertFalse(privacyGradeState().showEmptyGrade)
+        assertTrue(browserViewState().showPrivacyShield)
     }
 
     @Test
     fun whenOmnibarDoesNotHaveFocusThenPrivacyGradeIsShownAndSearchIconIsHidden() {
         testee.onOmnibarInputStateChanged(query = "", hasFocus = false, hasQueryChanged = false)
-        assertTrue(browserViewState().showPrivacyGrade)
+        assertTrue(browserViewState().showPrivacyShield)
         assertFalse(browserViewState().showSearchIcon)
     }
 
@@ -1112,14 +1025,14 @@ class BrowserTabViewModelTest {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         testee.onUserSubmittedQuery("foo")
         testee.onOmnibarInputStateChanged(query = "", hasFocus = false, hasQueryChanged = false)
-        assertTrue(browserViewState().showPrivacyGrade)
+        assertTrue(browserViewState().showPrivacyShield)
         assertFalse(browserViewState().showSearchIcon)
     }
 
     @Test
     fun whenBrowserNotShownAndOmnibarInputHasFocusThenPrivacyGradeIsNotShown() {
         testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
-        assertFalse(browserViewState().showPrivacyGrade)
+        assertFalse(browserViewState().showPrivacyShield)
     }
 
     @Test
@@ -1127,7 +1040,7 @@ class BrowserTabViewModelTest {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         testee.onUserSubmittedQuery("foo")
         testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
-        assertFalse(browserViewState().showPrivacyGrade)
+        assertFalse(browserViewState().showPrivacyShield)
         assertTrue(browserViewState().showSearchIcon)
     }
 
@@ -2629,7 +2542,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenBrowsingDDGSiteAndPrivacyGradeIsVisibleThenDaxIconIsVisible() {
+    fun whenBrowsingDDGSiteThenDaxIconIsVisible() {
         val url = "https://duckduckgo.com?q=test%20search"
         loadUrl(url, isBrowserShowing = true)
         assertTrue(browserViewState().showDaxIcon)
@@ -2641,7 +2554,7 @@ class BrowserTabViewModelTest {
         val url = "https://example.com"
         loadUrl(url, isBrowserShowing = true)
         assertFalse(browserViewState().showDaxIcon)
-        assertTrue(browserViewState().showPrivacyGrade)
+        assertTrue(browserViewState().showPrivacyShield)
     }
 
     @Test
@@ -3480,7 +3393,7 @@ class BrowserTabViewModelTest {
 
         verify(mockPixel).enqueueFire(
             AppPixelName.EMAIL_USE_ALIAS,
-            mapOf(Pixel.PixelParameter.COHORT to "cohort", Pixel.PixelParameter.LAST_USED_DAY to "2021-01-01")
+            mapOf(Pixel.PixelParameter.COHORT to "cohort", Pixel.PixelParameter.LAST_USED_DAY to "2021-01-01"),
         )
     }
 
@@ -3533,7 +3446,7 @@ class BrowserTabViewModelTest {
 
         verify(mockPixel).enqueueFire(
             AppPixelName.EMAIL_USE_ALIAS,
-            mapOf(Pixel.PixelParameter.COHORT to "cohort", Pixel.PixelParameter.LAST_USED_DAY to "2021-01-01")
+            mapOf(Pixel.PixelParameter.COHORT to "cohort", Pixel.PixelParameter.LAST_USED_DAY to "2021-01-01"),
         )
     }
 
@@ -3577,7 +3490,7 @@ class BrowserTabViewModelTest {
 
         verify(mockPixel).enqueueFire(
             AppPixelName.EMAIL_USE_ADDRESS,
-            mapOf(Pixel.PixelParameter.COHORT to "cohort", Pixel.PixelParameter.LAST_USED_DAY to "2021-01-01")
+            mapOf(Pixel.PixelParameter.COHORT to "cohort", Pixel.PixelParameter.LAST_USED_DAY to "2021-01-01"),
         )
     }
 
@@ -3717,13 +3630,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenLoadUrlAndSiteIsInContentBlockingExceptionsListThenDoNotChangePrivacyGrade() {
-        whenever(mockContentBlocking.isAnException(any())).thenReturn(true)
-        loadUrl("https://example.com")
-        assertNull(privacyGradeState().privacyGrade)
-    }
-
-    @Test
     fun whenEditBookmarkRequestedThenRepositoryIsNotUpdated() = runTest {
         val url = "http://www.example.com"
         val bookmark = Bookmark(id = 1L, title = "", url = url, parentId = 0L)
@@ -3775,7 +3681,7 @@ class BrowserTabViewModelTest {
         loadUrl("www.example.com", isBrowserShowing = true)
         testee.onFavoriteMenuClicked()
         verify(mockPixel).fire(
-            AppPixelName.MENU_ACTION_REMOVE_FAVORITE_PRESSED.pixelName
+            AppPixelName.MENU_ACTION_REMOVE_FAVORITE_PRESSED.pixelName,
         )
     }
 
@@ -3884,7 +3790,7 @@ class BrowserTabViewModelTest {
     private fun buildPendingDownload(
         url: String,
         contentDisposition: String?,
-        mimeType: String?
+        mimeType: String?,
     ): PendingFileDownload {
         return PendingFileDownload(
             url = url,
@@ -4120,6 +4026,7 @@ class BrowserTabViewModelTest {
         loadUrl(url = "www.example.com", isBrowserShowing = true)
         assertFalse(testee.linkOpenedInNewTab())
     }
+
     @Test
     fun whenUserLongPressedBackOnEmptyStackBrowserNotShowingThenShowHistoryCommandNotSent() {
         setBrowserShowing(false)
@@ -4162,7 +4069,7 @@ class BrowserTabViewModelTest {
             id = 1,
             domain = url,
             username = "tester",
-            password = "test123"
+            password = "test123",
         )
         testee.shareCredentialsWithPage(url, credentials)
 
@@ -4189,7 +4096,7 @@ class BrowserTabViewModelTest {
             id = 1,
             domain = url,
             username = "tester",
-            password = "test123"
+            password = "test123",
         )
         testee.saveCredentials(url, credentials)
 
@@ -4203,11 +4110,11 @@ class BrowserTabViewModelTest {
             id = 1,
             domain = url,
             username = "tester",
-            password = "test123"
+            password = "test123",
         )
-        testee.updateCredentials(url, credentials)
+        testee.updateCredentials(url, credentials, CredentialUpdateType.Password)
 
-        verify(mockAutofillStore).updateCredentials(url, credentials)
+        verify(mockAutofillStore).updateCredentials(url, credentials, CredentialUpdateType.Password)
     }
 
     @Test
@@ -4267,10 +4174,65 @@ class BrowserTabViewModelTest {
         }
     }
 
+    @Test
+    fun whenNotEditingUrlBarAndNotCancelledThenCanAutomaticallyShowAutofillPrompt() {
+        configureOmnibarNotEditing()
+        assertTrue(testee.canAutofillSelectCredentialsDialogCanAutomaticallyShow())
+    }
+
+    @Test
+    fun whenEditingUrlBarAndNotCancelledThenCannotAutomaticallyShowAutofillPrompt() {
+        configureOmnibarEditing()
+        assertFalse(testee.canAutofillSelectCredentialsDialogCanAutomaticallyShow())
+    }
+
+    @Test
+    fun whenNotEditingUrlBarAndCancelledThenCannotAutomaticallyShowAutofillPrompt() {
+        configureOmnibarNotEditing()
+        testee.cancelPendingAutofillRequestToChooseCredentials()
+        assertFalse(testee.canAutofillSelectCredentialsDialogCanAutomaticallyShow())
+    }
+
+    @Test
+    fun whenEditingUrlBarAndCancelledThenCannotAutomaticallyShowAutofillPrompt() {
+        configureOmnibarEditing()
+        testee.cancelPendingAutofillRequestToChooseCredentials()
+        assertFalse(testee.canAutofillSelectCredentialsDialogCanAutomaticallyShow())
+    }
+
+    @Test
+    fun whenNavigationStateChangesSameSiteThenShowAutofillPromptFlagIsReset() {
+        testee.cancelPendingAutofillRequestToChooseCredentials()
+        updateUrl("example.com", "example.com", true)
+        assertTrue(testee.canAutofillSelectCredentialsDialogCanAutomaticallyShow())
+    }
+
+    @Test
+    fun whenNavigationStateChangesDifferentSiteThenShowAutofillPromptFlagIsReset() {
+        testee.cancelPendingAutofillRequestToChooseCredentials()
+        updateUrl("example.com", "foo.com", true)
+        assertTrue(testee.canAutofillSelectCredentialsDialogCanAutomaticallyShow())
+    }
+
+    @Test
+    fun whenPageRefreshesThenShowAutofillPromptFlagIsReset() {
+        testee.cancelPendingAutofillRequestToChooseCredentials()
+        testee.onWebViewRefreshed()
+        assertTrue(testee.canAutofillSelectCredentialsDialogCanAutomaticallyShow())
+    }
+
     private fun assertShowHistoryCommandSent(expectedStackSize: Int) {
         assertCommandIssued<ShowBackNavigationHistory> {
             assertEquals(expectedStackSize, history.size)
         }
+    }
+
+    private fun configureOmnibarEditing() {
+        testee.onOmnibarInputStateChanged(hasFocus = true, query = "", hasQueryChanged = false)
+    }
+
+    private fun configureOmnibarNotEditing() {
+        testee.onOmnibarInputStateChanged(hasFocus = false, query = "", hasQueryChanged = false)
     }
 
     private fun buildNavigationHistoryStack(stackSize: Int) {
@@ -4319,7 +4281,7 @@ class BrowserTabViewModelTest {
 
     private fun givenUserAlreadySelectedPermissionForDomain(
         domain: String,
-        permission: LocationPermissionType
+        permission: LocationPermissionType,
     ) {
         locationPermissionsDao.insert(LocationPermissionEntity(domain, permission))
     }
@@ -4333,7 +4295,7 @@ class BrowserTabViewModelTest {
         override fun invoke(
             p0: String?,
             p1: Boolean,
-            p2: Boolean
+            p2: Boolean,
         ) {
             // nothing to see
         }
@@ -4367,10 +4329,10 @@ class BrowserTabViewModelTest {
 
     private fun pixelParams(
         showedBookmarks: Boolean,
-        bookmarkCapable: Boolean
+        bookmarkCapable: Boolean,
     ) = mapOf(
         Pixel.PixelParameter.SHOWED_BOOKMARKS to showedBookmarks.toString(),
-        Pixel.PixelParameter.BOOKMARK_CAPABLE to bookmarkCapable.toString()
+        Pixel.PixelParameter.BOOKMARK_CAPABLE to bookmarkCapable.toString(),
     )
 
     private fun givenExpectedCtaAddWidgetInstructions() {
@@ -4402,7 +4364,7 @@ class BrowserTabViewModelTest {
 
     private fun givenLoginDetected(domain: String) = LoginDetected(authLoginDomain = "", forwardedToDomain = domain)
 
-    private fun givenCurrentSite(domain: String) {
+    private fun givenCurrentSite(domain: String): Site {
         val site: Site = mock()
         whenever(site.url).thenReturn(domain)
         whenever(site.uri).thenReturn(Uri.parse(domain))
@@ -4410,12 +4372,14 @@ class BrowserTabViewModelTest {
         siteLiveData.value = site
         whenever(mockTabRepository.retrieveSiteData("TAB_ID")).thenReturn(siteLiveData)
         testee.loadData("TAB_ID", domain, false, false)
+
+        return site
     }
 
     private fun givenRemoteMessagingModel(
         remoteMessagingRepository: RemoteMessagingRepository,
         pixel: Pixel,
-        dispatchers: DispatcherProvider
+        dispatchers: DispatcherProvider,
     ) = RemoteMessagingModel(remoteMessagingRepository, pixel, dispatchers)
 
     private fun setBrowserShowing(isBrowsing: Boolean) {
@@ -4437,7 +4401,7 @@ class BrowserTabViewModelTest {
     private fun loadUrl(
         url: String?,
         title: String? = null,
-        isBrowserShowing: Boolean = true
+        isBrowserShowing: Boolean = true,
     ) {
         setBrowserShowing(isBrowserShowing)
         testee.navigationStateChanged(buildWebNavigation(originalUrl = url, currentUrl = url, title = title))
@@ -4447,7 +4411,7 @@ class BrowserTabViewModelTest {
     private fun updateUrl(
         originalUrl: String?,
         currentUrl: String?,
-        isBrowserShowing: Boolean
+        isBrowserShowing: Boolean,
     ) {
         setBrowserShowing(isBrowserShowing)
         testee.navigationStateChanged(buildWebNavigation(originalUrl = originalUrl, currentUrl = currentUrl))
@@ -4456,14 +4420,14 @@ class BrowserTabViewModelTest {
     @Suppress("SameParameterValue")
     private fun onProgressChanged(
         url: String?,
-        newProgress: Int
+        newProgress: Int,
     ) {
         testee.navigationStateChanged(buildWebNavigation(originalUrl = url, currentUrl = url, progress = newProgress))
     }
 
     private fun overrideUrl(
         url: String,
-        isBrowserShowing: Boolean = true
+        isBrowserShowing: Boolean = true,
     ) {
         setBrowserShowing(isBrowserShowing)
         testee.willOverrideUrl(newUrl = url)
@@ -4474,7 +4438,7 @@ class BrowserTabViewModelTest {
         isBrowsing: Boolean,
         canGoForward: Boolean = false,
         canGoBack: Boolean = false,
-        stepsToPreviousPage: Int = 0
+        stepsToPreviousPage: Int = 0,
     ) {
         testee.skipHome = skipHome
         setBrowserShowing(isBrowsing)
@@ -4499,7 +4463,7 @@ class BrowserTabViewModelTest {
         canGoBack: Boolean = false,
         stepsToPreviousPage: Int = 0,
         progress: Int? = null,
-        navigationHistory: List<NavigationHistoryEntry> = emptyList()
+        navigationHistory: List<NavigationHistoryEntry> = emptyList(),
     ): WebNavigationState {
         val nav: WebNavigationState = mock()
         whenever(nav.originalUrl).thenReturn(originalUrl)
@@ -4513,7 +4477,7 @@ class BrowserTabViewModelTest {
         return nav
     }
 
-    private fun privacyGradeState() = testee.privacyGradeViewState.value!!
+    private fun privacyShieldState() = testee.privacyShieldViewState.value!!
     private fun ctaViewState() = testee.ctaViewState.value!!
     private fun browserViewState() = testee.browserViewState.value!!
     private fun omnibarViewState() = testee.omnibarViewState.value!!

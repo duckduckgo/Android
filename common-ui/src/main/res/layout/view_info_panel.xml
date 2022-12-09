@@ -15,34 +15,29 @@
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              xmlns:tools="http://schemas.android.com/tools"
-              style="@style/Widget.DuckDuckGo.InfoPanel"
-              android:id="@+id/item_container"
-              android:orientation="horizontal">
+                                                   xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                   xmlns:tools="http://schemas.android.com/tools"
+                                                   style="@style/Widget.DuckDuckGo.InfoPanel"
+                                                   android:id="@+id/item_container"
+                                                   android:orientation="horizontal"
+                                                   android:padding="@dimen/keyline_4">
 
     <ImageView
         android:id="@+id/infoPanelImage"
-        android:layout_width="@dimen/listItemImageSize"
-        android:layout_height="@dimen/listItemImageSize"
+        android:layout_width="@dimen/infoPanelIconSize"
+        android:layout_height="@dimen/infoPanelIconSize"
         android:layout_gravity="start"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/keyline_1"
         android:importantForAccessibility="no"
-        tools:src="@drawable/ic_check_color_24"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" app:srcCompat="@drawable/ic_info_panel_info"/>
 
     <TextView
         android:id="@+id/infoPanelText"
-        android:textAppearance="@style/TextAppearance.DuckDuckGo.Body2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:textAppearance="@style/TextAppearance.DuckDuckGo.Body2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/infoPanelImage"
         app:layout_constraintTop_toTopOf="parent"

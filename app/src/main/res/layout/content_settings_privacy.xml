@@ -36,6 +36,7 @@
         android:id="@+id/globalPrivacyControlSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:primaryTextTruncated="false"
         app:primaryText="@string/globalPrivacyControlSetting"
         tools:secondaryText="test test test" />
 
@@ -43,6 +44,7 @@
         android:id="@+id/autoconsentSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:primaryTextTruncated="false"
         app:primaryText="@string/autoconsentSetting" />
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
@@ -61,6 +63,7 @@
         android:id="@+id/automaticallyClearWhatSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:primaryTextTruncated="false"
         app:primaryText="@string/settingsAutomaticallyClearWhat"
         tools:secondaryText="test test test" />
 

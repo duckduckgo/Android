@@ -59,9 +59,9 @@ import com.duckduckgo.app.sitepermissions.SitePermissionsActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.waitlist.trackerprotection.ui.AppTPWaitlistActivity
 import com.duckduckgo.app.widget.AddWidgetLauncher
-import com.duckduckgo.autofill.ui.AutofillSettingsActivityLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.impl.ui.AutoconsentSettingsActivity
+import com.duckduckgo.autofill.ui.AutofillSettingsActivityLauncher
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.macos_impl.MacOsActivity
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
@@ -71,10 +71,10 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnOnboardingActivity
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
 import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
+import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
-import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class SettingsActivity :
@@ -192,8 +192,8 @@ class SettingsActivity :
                     WebViewActivity.intent(
                         this@SettingsActivity,
                         PRIVACY_POLICY_WEB_LINK,
-                        getString(R.string.settingsPrivacyPolicyDuckduckgo)
-                    )
+                        getString(R.string.settingsPrivacyPolicyDuckduckgo),
+                    ),
                 )
             }
         }
@@ -239,7 +239,11 @@ class SettingsActivity :
                     setAutoconsentSetting(it.autoconsentEnabled)
                     updateSelectedFireAnimation(it.selectedFireAnimation)
                     updateAppLinkBehavior(it.appLinksSettingType)
-                    updateDeviceShieldSettings(it.appTrackingProtectionEnabled, it.appTrackingProtectionWaitlistState)
+                    updateDeviceShieldSettings(
+                        it.appTrackingProtectionEnabled,
+                        it.appTrackingProtectionWaitlistState,
+                        it.appTrackingProtectionOnboardingShown,
+                    )
                     updateEmailSubtitle(it.emailAddress)
                     updateAutofill(it.showAutofill)
                 }
@@ -293,7 +297,7 @@ class SettingsActivity :
                 DuckDuckGoTheme.DARK -> R.string.settingsDarkTheme
                 DuckDuckGoTheme.LIGHT -> R.string.settingsLightTheme
                 DuckDuckGoTheme.SYSTEM_DEFAULT -> R.string.settingsSystemTheme
-            }
+            },
         )
         viewsAppearance.selectedThemeSetting.setSecondaryText(subtitle)
     }
@@ -304,7 +308,7 @@ class SettingsActivity :
                 AppLinkSettingType.ASK_EVERYTIME -> R.string.settingsAppLinksAskEveryTime
                 AppLinkSettingType.ALWAYS -> R.string.settingsAppLinksAlways
                 AppLinkSettingType.NEVER -> R.string.settingsAppLinksNever
-            }
+            },
         )
         viewsCustomize.appLinksSetting.setSecondaryText(subtitle)
     }
@@ -374,7 +378,8 @@ class SettingsActivity :
 
     private fun updateDeviceShieldSettings(
         appTPEnabled: Boolean,
-        waitlistState: WaitlistState
+        waitlistState: WaitlistState,
+        appTrackingProtectionOnboardingShown: Boolean,
     ) {
         with(viewsMore) {
             if (waitlistState != WaitlistState.InBeta) {
@@ -383,7 +388,11 @@ class SettingsActivity :
                 if (appTPEnabled) {
                     vpnSetting.setSecondaryText(getString(R.string.atp_SettingsDeviceShieldEnabled))
                 } else {
-                    vpnSetting.setSecondaryText(getString(R.string.atp_SettingsDeviceShieldDisabled))
+                    if (appTrackingProtectionOnboardingShown) {
+                        vpnSetting.setSecondaryText(getString(R.string.atp_SettingsDeviceShieldDisabled))
+                    } else {
+                        vpnSetting.setSecondaryText(getString(R.string.atp_SettingsDeviceShieldNeverEnabled))
+                    }
                 }
             }
         }
@@ -522,7 +531,7 @@ class SettingsActivity :
     override fun onActivityResult(
         requestCode: Int,
         resultCode: Int,
-        data: Intent?
+        data: Intent?,
     ) {
         when (requestCode) {
             FEEDBACK_REQUEST_CODE -> handleFeedbackResult(resultCode)

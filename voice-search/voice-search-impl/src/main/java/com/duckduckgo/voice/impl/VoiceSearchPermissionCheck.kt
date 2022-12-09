@@ -30,9 +30,10 @@ interface VoiceSearchPermissionCheck {
 
 @ContributesBinding(ActivityScope::class)
 class RealVoiceVoiceSearchPermissionCheck @Inject constructor(
-    private val context: Context
+    private val context: Context,
 ) : VoiceSearchPermissionCheck {
     override fun hasRequiredPermissionsGranted(): Boolean = ContextCompat.checkSelfPermission(
-        context, Manifest.permission.RECORD_AUDIO
+        context,
+        Manifest.permission.RECORD_AUDIO,
     ) == PackageManager.PERMISSION_GRANTED
 }

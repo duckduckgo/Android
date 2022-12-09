@@ -25,17 +25,17 @@ import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.withContext
-import retrofit2.HttpException
-import timber.log.Timber
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
+import logcat.logcat
+import retrofit2.HttpException
 
 interface AppTPWaitlistManager {
     suspend fun fetchInviteCode(): FetchCodeResult
     fun notifyOnJoinedWaitlist()
     fun joinWaitlist(
         timestamp: Int,
-        token: String
+        token: String,
     )
 
     suspend fun redeemCode(inviteCode: String): RedeemCodeResult
@@ -47,7 +47,7 @@ class AndroidAppTPWaitlistManager @Inject constructor(
     private val service: AppTrackingProtectionWaitlistService,
     private val dataStore: AppTrackingProtectionWaitlistDataStore,
     private val repository: AtpWaitlistStateRepository,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
 ) : AppTPWaitlistManager {
 
     override suspend fun fetchInviteCode(): FetchCodeResult {
@@ -78,7 +78,7 @@ class AndroidAppTPWaitlistManager @Inject constructor(
 
     override fun joinWaitlist(
         timestamp: Int,
-        token: String
+        token: String,
     ) {
         if (dataStore.waitlistTimestamp == -1) {
             dataStore.waitlistTimestamp = timestamp
@@ -90,7 +90,6 @@ class AndroidAppTPWaitlistManager @Inject constructor(
 
     override suspend fun redeemCode(inviteCode: String): RedeemCodeResult {
         return withContext(dispatcherProvider.io()) {
-
             val result = try {
                 service.redeemCode(inviteCode)
                 storeInviteCode(inviteCode)
@@ -98,7 +97,7 @@ class AndroidAppTPWaitlistManager @Inject constructor(
             } catch (e: HttpException) {
                 parseRedeemCodeError(e)
             } catch (e: Exception) {
-                Timber.d(e.toString())
+                logcat { e.toString() }
                 RedeemCodeResult.Failure
             }
             return@withContext result

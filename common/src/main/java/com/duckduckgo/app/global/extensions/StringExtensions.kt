@@ -39,7 +39,7 @@ fun String.html(context: Context): Spanned {
 
 private fun htmlDrawable(
     context: Context,
-    resource: Int
+    resource: Int,
 ): Drawable? {
     return ContextCompat.getDrawable(context, resource)?.also {
         it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)

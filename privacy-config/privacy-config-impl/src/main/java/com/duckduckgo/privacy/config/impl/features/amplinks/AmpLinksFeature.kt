@@ -22,10 +22,10 @@ data class AmpLinksFeature(
     val state: String,
     val minSupportedVersion: Int?,
     val settings: AmpLinkSettings,
-    val exceptions: List<AmpLinkException>
+    val exceptions: List<AmpLinkException>,
 )
 
 data class AmpLinkSettings(
     val linkFormats: List<String>,
-    val keywords: List<String>
+    val keywords: List<String>,
 )

@@ -27,7 +27,7 @@ abstract class TextChangedWatcher : TextWatcher {
         p0: CharSequence,
         p1: Int,
         p2: Int,
-        p3: Int
+        p3: Int,
     ) {
     }
 
@@ -35,7 +35,7 @@ abstract class TextChangedWatcher : TextWatcher {
         charSequence: CharSequence,
         start: Int,
         before: Int,
-        count: Int
+        count: Int,
     ) {
     }
 }

@@ -21,14 +21,14 @@ import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnMemoryCollectorPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import timber.log.Timber
 import javax.inject.Inject
+import logcat.logcat
 
 @SingleInstanceIn(VpnScope::class)
 @ContributesMultibinding(VpnScope::class)
 class ProcessMemoryCollector @Inject constructor() : VpnMemoryCollectorPlugin {
     override fun collectMemoryMetrics(): Map<String, String> {
-        Timber.v("Collecting process memory data")
+        logcat { "Collecting process memory data" }
 
         val metrics = mutableMapOf<String, String>()
 

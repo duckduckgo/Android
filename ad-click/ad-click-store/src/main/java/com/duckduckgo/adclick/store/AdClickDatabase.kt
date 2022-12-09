@@ -28,8 +28,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         AdClickAttributionLinkFormatEntity::class,
         AdClickAttributionAllowlistEntity::class,
         AdClickAttributionExpirationEntity::class,
-        AdClickAttributionDetectionEntity::class
-    ]
+        AdClickAttributionDetectionEntity::class,
+    ],
 )
 abstract class AdClickDatabase : RoomDatabase() {
     abstract fun adClickDao(): AdClickDao

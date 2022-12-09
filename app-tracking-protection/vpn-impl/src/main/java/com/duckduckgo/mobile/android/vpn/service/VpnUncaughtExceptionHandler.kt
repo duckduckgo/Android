@@ -25,12 +25,14 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import timber.log.Timber
-import java.lang.Thread.UncaughtExceptionHandler
 import dagger.SingleInstanceIn
+import java.lang.Thread.UncaughtExceptionHandler
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.launch
+import logcat.LogPriority
+import logcat.asLog
+import logcat.logcat
 
 class VpnUncaughtExceptionHandler(
     private val originalHandler: UncaughtExceptionHandler?,
@@ -42,22 +44,22 @@ class VpnUncaughtExceptionHandler(
 
     override fun uncaughtException(
         thread: Thread,
-        throwable: Throwable
+        throwable: Throwable,
     ) {
-        Timber.e(throwable, "VPN uncaughtException")
+        logcat(LogPriority.ERROR) { throwable.asLog() }
         recordExceptionAndAllowCrash(thread, throwable)
     }
 
     private fun recordExceptionAndAllowCrash(
         thread: Thread,
-        originalException: Throwable
+        originalException: Throwable,
     ) {
         coroutineScope.launch(dispatcherProvider.io() + NonCancellable) {
             try {
                 uncaughtExceptionRepository.recordUncaughtException(originalException, UncaughtExceptionSource.GLOBAL)
                 offlinePixelCountDataStore.applicationCrashCount += 1
             } catch (e: Throwable) {
-                Timber.e(e, "Failed to record exception")
+                logcat(LogPriority.ERROR) { e.asLog() }
             } finally {
                 originalHandler?.uncaughtException(thread, originalException)
             }
@@ -83,7 +85,7 @@ object VpnExceptionModule {
             vpnCoroutineScope,
             dispatcherProvider,
             offlinePixelCountDataStore,
-            uncaughtExceptionRepository
+            uncaughtExceptionRepository,
         )
     }
 }

@@ -26,7 +26,7 @@ import timber.log.Timber
 class AutoconsentInterface(
     private val messageHandlerPlugins: PluginPoint<MessageHandlerPlugin>,
     private val webView: WebView,
-    private val autoconsentCallback: AutoconsentCallback
+    private val autoconsentCallback: AutoconsentCallback,
 ) {
     @JavascriptInterface
     fun process(message: String) {

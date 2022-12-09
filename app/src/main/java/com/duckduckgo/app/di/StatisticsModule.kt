@@ -22,14 +22,9 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.device.ContextDeviceInfo
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
-import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.statistics.AtbInitializer
 import com.duckduckgo.app.statistics.AtbInitializerListener
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.*
-import com.duckduckgo.app.statistics.config.StatisticsLibraryConfig
-import com.duckduckgo.app.statistics.pixels.RxBasedPixel
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -38,66 +33,20 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
+import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
 import kotlinx.coroutines.CoroutineScope
-import retrofit2.Retrofit
-import javax.inject.Named
-import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(AppScope::class)
 object StatisticsModule {
 
     @Provides
-    fun statisticsService(@Named("api") retrofit: Retrofit): StatisticsService = retrofit.create(StatisticsService::class.java)
-
-    @Provides
-    fun statisticsUpdater(
-        statisticsDataStore: StatisticsDataStore,
-        statisticsService: StatisticsService,
-        variantManager: VariantManager,
-        plugins: PluginPoint<RefreshRetentionAtbPlugin>,
-    ): StatisticsUpdater {
-        return StatisticsRequester(
-            statisticsDataStore, statisticsService, variantManager, plugins
-        )
-    }
-
-    @Provides
-    fun pixelService(@Named("nonCaching") retrofit: Retrofit): PixelService {
-        return retrofit.create(PixelService::class.java)
-    }
-
-    @Provides
-    fun pixel(
-        pixelSender: PixelSender
-    ): Pixel =
-        RxBasedPixel(pixelSender)
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun pixelSender(
-        pixelService: PixelService,
-        statisticsDataStore: StatisticsDataStore,
-        variantManager: VariantManager,
-        deviceInfo: DeviceInfo,
-        pendingPixelDao: PendingPixelDao,
-        statisticsLibraryConfig: StatisticsLibraryConfig
-    ): PixelSender {
-        return RxPixelSender(pixelService, pendingPixelDao, statisticsDataStore, variantManager, deviceInfo, statisticsLibraryConfig)
-    }
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    @IntoSet
-    fun pixelSenderObserver(pixelSender: PixelSender): LifecycleObserver = pixelSender
-
-    @Provides
     fun offlinePixelSender(
         offlinePixelCountDataStore: OfflinePixelCountDataStore,
         uncaughtExceptionRepository: UncaughtExceptionRepository,
         pixelSender: PixelSender,
-        offlinePixels: DaggerSet<OfflinePixel>
+        offlinePixels: DaggerSet<OfflinePixel>,
     ): OfflinePixelSender = OfflinePixelSender(offlinePixelCountDataStore, uncaughtExceptionRepository, pixelSender, offlinePixels)
 
     @Provides
@@ -110,7 +59,7 @@ object StatisticsModule {
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         statisticsDataStore: StatisticsDataStore,
         statisticsUpdater: StatisticsUpdater,
-        listeners: DaggerSet<AtbInitializerListener>
+        listeners: DaggerSet<AtbInitializerListener>,
     ): LifecycleObserver {
         return AtbInitializer(appCoroutineScope, statisticsDataStore, statisticsUpdater, listeners)
     }

@@ -26,11 +26,11 @@ import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExcludedPackage
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerManualExcludedApp
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.squareup.anvil.annotations.ContributesBinding
-import kotlinx.coroutines.withContext
-import timber.log.Timber
-import javax.inject.Inject
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.withContext
+import logcat.logcat
 
 interface TrackingProtectionAppsRepository {
 
@@ -69,7 +69,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
     override suspend fun getAppsAndProtectionInfo(): Flow<List<TrackingProtectionAppInfo>> {
         return appTrackerRepository.getAppExclusionListFlow()
             .combine(appTrackerRepository.getManualAppExclusionListFlow()) { ddgExclusionList, manualList ->
-                Timber.d("getProtectedApps flow")
+                logcat { "getProtectedApps flow" }
                 installedApps
                     .map {
                         val isExcluded = shouldBeExcluded(it, ddgExclusionList, manualList)
@@ -80,7 +80,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
                             category = it.parseAppCategory(),
                             isExcluded = isExcluded,
                             knownProblem = hasKnownIssue(it, ddgExclusionList),
-                            userModified = isUserModified(it.packageName, manualList)
+                            userModified = isUserModified(it.packageName, manualList),
                         )
                     }
                     .sortedBy { it.name.lowercase() }
@@ -91,7 +91,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
     }
 
     private fun refreshInstalledApps() {
-        Timber.d("Excluded Apps: refreshInstalledApps")
+        logcat { "Excluded Apps: refreshInstalledApps" }
         installedApps = packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
             .asSequence()
             .filterNot { shouldNotBeShown(it) }
@@ -127,7 +127,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
     private fun shouldBeExcluded(
         appInfo: ApplicationInfo,
         ddgExclusionList: List<AppTrackerExcludedPackage>,
-        userExclusionList: List<AppTrackerManualExcludedApp>
+        userExclusionList: List<AppTrackerManualExcludedApp>,
     ): Boolean {
         return VpnExclusionList.isDdgApp(appInfo.packageName) ||
             isSystemAppAndNotOverridden(appInfo) ||
@@ -137,7 +137,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
     private fun isManuallyExcluded(
         appInfo: ApplicationInfo,
         ddgExclusionList: List<AppTrackerExcludedPackage>,
-        userExclusionList: List<AppTrackerManualExcludedApp>
+        userExclusionList: List<AppTrackerManualExcludedApp>,
     ): Boolean {
         val userExcludedApp = userExclusionList.find { it.packageId == appInfo.packageName }
         if (userExcludedApp != null) {
@@ -153,7 +153,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
 
     private fun hasKnownIssue(
         appInfo: ApplicationInfo,
-        ddgExclusionList: List<AppTrackerExcludedPackage>
+        ddgExclusionList: List<AppTrackerExcludedPackage>,
     ): Int {
         if (BROWSERS.contains(appInfo.packageName)) {
             return TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON
@@ -169,7 +169,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
 
     private fun isUserModified(
         packageName: String,
-        userExclusionList: List<AppTrackerManualExcludedApp>
+        userExclusionList: List<AppTrackerManualExcludedApp>,
     ): Boolean {
         val userExcludedApp = userExclusionList.find { it.packageId == packageName }
         return userExcludedApp != null
@@ -194,7 +194,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
     }
 
     override suspend fun isAppProtectionEnabled(packageName: String): Boolean {
-        Timber.d("TrackingProtectionAppsRepository: Checking $packageName protection status")
+        logcat { "TrackingProtectionAppsRepository: Checking $packageName protection status" }
         val appInfo = runCatching { packageManager.getApplicationInfo(packageName, 0) }.getOrElse { return true }
         val appExclusionList = appTrackerRepository.getAppExclusionList()
         val manualAppExclusionList = appTrackerRepository.getManualAppExclusionList()
@@ -252,7 +252,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
             "com.qwantjunior.mobile",
             "com.nhn.android.search",
             "cz.seznam.sbrowser",
-            "com.coccoc.trinhduyet"
+            "com.coccoc.trinhduyet",
         )
     }
 }

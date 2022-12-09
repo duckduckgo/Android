@@ -25,20 +25,20 @@ import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.duckduckgo.privacy.config.store.TrackerAllowlistEntity
 import com.duckduckgo.privacy.config.store.features.trackerallowlist.TrackerAllowlistRepository
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import java.net.URI
 import javax.inject.Inject
-import dagger.SingleInstanceIn
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class RealTrackerAllowlist @Inject constructor(
     private val trackerAllowlistRepository: TrackerAllowlistRepository,
-    private val featureToggle: FeatureToggle
+    private val featureToggle: FeatureToggle,
 ) : TrackerAllowlist {
 
     override fun isAnException(
         documentURL: String,
-        url: String
+        url: String,
     ): Boolean {
         return if (featureToggle.isFeatureEnabled(PrivacyFeatureName.TrackerAllowlistFeatureName.value, true)) {
             trackerAllowlistRepository.exceptions
@@ -53,7 +53,7 @@ class RealTrackerAllowlist @Inject constructor(
     private fun matches(
         url: String,
         documentUrl: String,
-        trackerAllowlist: TrackerAllowlistEntity
+        trackerAllowlist: TrackerAllowlistEntity,
     ): Boolean {
         val cleanedUrl = removePortFromUrl(url)
         return trackerAllowlist.rules.any {

@@ -30,12 +30,12 @@ interface AppTPOnboardingResourceHelper {
     fun getHeaderRes(resourceType: AppTPOnboadingResource): Int
 }
 
-@ContributesBinding(AppScope::class)
 // TODO: Remove this class when we can rely on the platform day/night/system theme
+@ContributesBinding(AppScope::class)
 class AppThemeAppTPOnboardingResourceHelper @Inject constructor(val appTheme: AppTheme) : AppTPOnboardingResourceHelper {
 
     override fun getHeaderRes(
-        resourceType: AppTPOnboadingResource
+        resourceType: AppTPOnboadingResource,
     ): Int {
         return when (resourceType) {
             TRACKERS_COUNT -> {
@@ -54,9 +54,9 @@ class AppThemeAppTPOnboardingResourceHelper @Inject constructor(val appTheme: Ap
             }
             VPN ->
                 if (appTheme.isLightModeEnabled()) {
-                    R.drawable.device_shield_onboarding_page_three_header
+                    R.drawable.device_shield_onboarding_page_three_header_transparent
                 } else {
-                    R.drawable.device_shield_onboarding_page_three_header_dark
+                    R.drawable.device_shield_onboarding_page_three_header_dark_transparent
                 }
         }
     }
@@ -64,6 +64,6 @@ class AppThemeAppTPOnboardingResourceHelper @Inject constructor(val appTheme: Ap
     enum class AppTPOnboadingResource {
         TRACKERS_COUNT,
         TRACKING_APPS,
-        VPN
+        VPN,
     }
 }

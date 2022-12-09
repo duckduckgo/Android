@@ -30,9 +30,11 @@ import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.ViewEvent
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.BannerState
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.ViewEvent
 import com.jakewharton.threetenabp.AndroidThreeTen
+import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
@@ -43,10 +45,9 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.times
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
 @ExperimentalCoroutinesApi
@@ -78,14 +79,14 @@ class DeviceShieldTrackerActivityViewModelTest {
             vpnDetector,
             vpnFeatureRemover,
             vpnStore,
-            coroutineRule.testDispatcherProvider
+            coroutineRule.testDispatcherProvider,
         )
     }
 
     @Test
     fun whenGetRunningStateThenReturnRunningState() = runTest {
         whenever(vpnStateMonitor.getStateFlow(AppTpVpnFeature.APPTP_VPN)).thenReturn(
-            flow { emit(VpnStateMonitor.VpnState(VpnStateMonitor.VpnRunningState.ENABLED)) }
+            flow { emit(VpnStateMonitor.VpnState(VpnStateMonitor.VpnRunningState.ENABLED)) },
         )
 
         viewModel.getRunningState().test {
@@ -100,17 +101,6 @@ class DeviceShieldTrackerActivityViewModelTest {
             viewModel.onViewEvent(ViewEvent.LaunchAppTrackersFAQ)
 
             assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchAppTrackersFAQ, awaitItem())
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenLaunchBetaInstructionsViewEventThenCommandIsLaunchBetaInstructions() = runBlocking {
-        viewModel.commands().test {
-            viewModel.onViewEvent(ViewEvent.LaunchBetaInstructions)
-
-            assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchBetaInstructions, awaitItem())
 
             cancelAndConsumeRemainingEvents()
         }
@@ -189,15 +179,13 @@ class DeviceShieldTrackerActivityViewModelTest {
     }
 
     @Test
-    fun whenVPNLaunchedAndShouldPromoteAlwaysOnThenShowPromoteAlwaysOnDialogCommandisSent() = runBlocking {
-        whenever(vpnStore.getAppTPManuallyEnables()).thenReturn(6)
-        whenever(vpnStore.userAllowsShowPromoteAlwaysOn()).thenReturn(true)
+    fun whenVpnLaunchedAlwaysOnDisabledAndSystemKilledAppTpThenShowAlwaysOnPromotion() = runBlocking {
         whenever(vpnStore.isAlwaysOnEnabled()).thenReturn(false)
+        whenever(vpnStore.vpnLastDisabledByAndroid()).thenReturn(true)
 
         viewModel.commands().test {
             viewModel.onVPNPermissionResult(AppCompatActivity.RESULT_OK)
             assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchVPN, awaitItem())
-            verify(vpnStore).resetAppTPManuallyEnablesCounter()
             assertEquals(DeviceShieldTrackerActivityViewModel.Command.ShowAlwaysOnPromotionDialog, awaitItem())
 
             cancelAndConsumeRemainingEvents()
@@ -205,43 +193,25 @@ class DeviceShieldTrackerActivityViewModelTest {
     }
 
     @Test
-    fun whenVPNLaunchedLessThanEnoughTimesThenShowPromoteAlwaysOnDialogCommandisNotSent() = runBlocking {
-        whenever(vpnStore.getAppTPManuallyEnables()).thenReturn(1)
-        whenever(vpnStore.userAllowsShowPromoteAlwaysOn()).thenReturn(true)
+    fun whenVpnLaunchedAlwaysOnDisabledAndSystemDidNotKilledAppTpThenDoNotShowAlwaysOnPromotion() = runBlocking {
         whenever(vpnStore.isAlwaysOnEnabled()).thenReturn(false)
+        whenever(vpnStore.vpnLastDisabledByAndroid()).thenReturn(false)
 
         viewModel.commands().test {
             viewModel.onVPNPermissionResult(AppCompatActivity.RESULT_OK)
             assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchVPN, expectMostRecentItem())
-            verify(vpnStore, times(0)).resetAppTPManuallyEnablesCounter()
             cancelAndConsumeRemainingEvents()
         }
     }
 
     @Test
-    fun whenUserForgotAlwaysOnPromotionDialogThenShowPromoteAlwaysOnDialogCommandisNotSent() = runBlocking {
-        whenever(vpnStore.getAppTPManuallyEnables()).thenReturn(6)
-        whenever(vpnStore.userAllowsShowPromoteAlwaysOn()).thenReturn(false)
-        whenever(vpnStore.isAlwaysOnEnabled()).thenReturn(false)
-
-        viewModel.commands().test {
-            viewModel.onVPNPermissionResult(AppCompatActivity.RESULT_OK)
-            assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchVPN, expectMostRecentItem())
-            verify(vpnStore, times(0)).resetAppTPManuallyEnablesCounter()
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenVPNInAlwaysOnModeThenShowPromoteAlwaysOnDialogCommandisNotSent() = runBlocking {
-        whenever(vpnStore.getAppTPManuallyEnables()).thenReturn(6)
-        whenever(vpnStore.userAllowsShowPromoteAlwaysOn()).thenReturn(true)
+    fun whenVPNInAlwaysOnModeThenShowPromoteAlwaysOnDialogCommandIsNotSent() = runBlocking {
         whenever(vpnStore.isAlwaysOnEnabled()).thenReturn(true)
+        whenever(vpnStore.vpnLastDisabledByAndroid()).thenReturn(true)
 
         viewModel.commands().test {
             viewModel.onVPNPermissionResult(AppCompatActivity.RESULT_OK)
             assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchVPN, expectMostRecentItem())
-            verify(vpnStore, times(0)).resetAppTPManuallyEnablesCounter()
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -333,25 +303,54 @@ class DeviceShieldTrackerActivityViewModelTest {
     }
 
     @Test
-    fun whenPromoteAlwaysOnRemindLaterThenPixelIsSent() {
-        viewModel.onViewEvent(ViewEvent.PromoteAlwaysOnRemindLater)
+    fun whenAppTpEnabledCtaShownAndListShownThenNoCommandSent() = runBlocking {
+        whenever(vpnStore.didShowAppTpEnabledCta()).thenReturn(true)
 
-        verify(deviceShieldPixels).didChooseToDismissPromoteAlwaysOnDialog()
+        viewModel.commands().test {
+            viewModel.showAppTpEnabledCtaIfNeeded()
+
+            expectNoEvents()
+            verify(vpnStore, never()).appTpEnabledCtaDidShow()
+        }
     }
 
     @Test
-    fun whenPromoteAlwaysOnForgetThenPixelIsSent() {
-        viewModel.onViewEvent(ViewEvent.PromoteAlwaysOnForget)
+    fun whenAppTpEnabledCtaNotAlreadyShownAndListShownThenCommandSent() = runBlocking {
+        whenever(vpnStore.didShowAppTpEnabledCta()).thenReturn(false)
 
-        verify(deviceShieldPixels).didChooseToForgetPromoteAlwaysOnDialog()
-        verify(vpnStore).onForgetPromoteAlwaysOn()
+        viewModel.commands().test {
+            viewModel.showAppTpEnabledCtaIfNeeded()
+
+            verify(vpnStore).appTpEnabledCtaDidShow()
+            verify(vpnStore).onOnboardingSessionSet()
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.ShowAppTpEnabledCta, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenBannerStateCalledOutsideOnboardingSessionThenReturnNextSessionBanner() {
+        whenever(vpnStore.isOnboardingSession()).thenReturn(false)
+
+        val bannerState = viewModel.bannerState()
+
+        assertEquals(BannerState.NextSessionBanner, bannerState)
+    }
+
+    @Test
+    fun whenBannerStateCalledDuringOnboardingSessionThenReturnOnboardingBanner() {
+        whenever(vpnStore.isOnboardingSession()).thenReturn(true)
+
+        val bannerState = viewModel.bannerState()
+
+        assertEquals(BannerState.OnboardingBanner, bannerState)
     }
 
     private fun createInMemoryDb(): VpnDatabase {
         AndroidThreeTen.init(InstrumentationRegistry.getInstrumentation().targetContext)
         return Room.inMemoryDatabaseBuilder(
             InstrumentationRegistry.getInstrumentation().targetContext,
-            VpnDatabase::class.java
+            VpnDatabase::class.java,
         )
             .allowMainThreadQueries()
             .build()

@@ -19,6 +19,7 @@ package com.duckduckgo.deviceauth.impl
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.deviceauth.api.AutofillAuthorizationGracePeriod
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.Features.AUTOFILL
 import org.junit.Before
 import org.junit.Test
@@ -26,7 +27,7 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
-import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -43,14 +44,25 @@ class RealDeviceAuthenticatorTest {
     @Mock
     private lateinit var authLauncher: AuthLauncher
 
+    @Mock
+    private lateinit var autofillAuthorizationGracePeriod: AutofillAuthorizationGracePeriod
+
+    @Mock
+    private lateinit var fragment: Fragment
+
+    @Mock
+    private lateinit var fragmentActivity: FragmentActivity
+
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
         testee = RealDeviceAuthenticator(
             deviceAuthChecker,
             appBuildConfig,
-            authLauncher
+            authLauncher,
+            autofillAuthorizationGracePeriod,
         )
+        whenever(autofillAuthorizationGracePeriod.isAuthRequired()).thenReturn(true)
     }
 
     @Test
@@ -82,8 +94,6 @@ class RealDeviceAuthenticatorTest {
 
     @Test
     fun whenAuthenticateIsCalledWithFragmentThenLaunchAuthLauncher() {
-        val fragment: Fragment = mock()
-
         testee.authenticate(AUTOFILL, fragment) {}
 
         verify(authLauncher).launch(eq(R.string.autofill_auth_text), eq(fragment), any())
@@ -91,10 +101,20 @@ class RealDeviceAuthenticatorTest {
 
     @Test
     fun whenAuthenticateIsCalledWithActivityThenLaunchAuthLauncher() {
-        val fragment: FragmentActivity = mock()
-
         testee.authenticate(AUTOFILL, fragment) {}
 
         verify(authLauncher).launch(eq(R.string.autofill_auth_text), eq(fragment), any())
+    }
+
+    @Test
+    fun whenAuthGracePeriodActiveThenNoDeviceAuthLaunched() {
+        whenever(autofillAuthorizationGracePeriod.isAuthRequired()).thenReturn(false)
+        testee.authenticate(AUTOFILL, fragmentActivity) {}
+        verifyAuthNotLaunched()
+    }
+
+    private fun verifyAuthNotLaunched() {
+        verify(authLauncher, never()).launch(any(), any<Fragment>(), any())
+        verify(authLauncher, never()).launch(any(), any<FragmentActivity>(), any())
     }
 }

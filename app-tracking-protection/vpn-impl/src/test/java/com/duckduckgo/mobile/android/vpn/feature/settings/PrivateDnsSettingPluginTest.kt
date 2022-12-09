@@ -18,18 +18,17 @@ package com.duckduckgo.mobile.android.vpn.feature.settings
 
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
+import com.duckduckgo.mobile.android.vpn.feature.FakeAppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.SettingName
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.*
 
 class PrivateDnsSettingPluginTest {
 
     private lateinit var featureConfig: PrivateDnsSettingPlugin
-    private val appTpFeatureConfig: AppTpFeatureConfig = mock()
-    private val appTpFeatureConfigEditor: AppTpFeatureConfig.Editor = mock()
+    private lateinit var appTpFeatureConfig: AppTpFeatureConfig
     private val jsonEnabled = """
         {
           "state": "enabled",
@@ -45,7 +44,7 @@ class PrivateDnsSettingPluginTest {
 
     @Before
     fun setup() {
-        whenever(appTpFeatureConfig.edit()).thenReturn(appTpFeatureConfigEditor)
+        appTpFeatureConfig = FakeAppTpFeatureConfig()
         featureConfig = PrivateDnsSettingPlugin(appTpFeatureConfig)
     }
 
@@ -53,16 +52,16 @@ class PrivateDnsSettingPluginTest {
     fun whenStoreWithCorrectSettingAndEnabledThenStoreAndReturnTrue() {
         val result = featureConfig.store(featureConfig.settingName, jsonEnabled)
 
-        verify(appTpFeatureConfigEditor).setEnabled(AppTpSetting.PrivateDnsSupport, enabled = true, isManualOverride = false)
         assertTrue(result)
+        assertTrue(appTpFeatureConfig.isEnabled(AppTpSetting.PrivateDnsSupport))
     }
 
     @Test
     fun whenStoreWithCorrectSettingAndDisabledThenStoreAndReturnTrue() {
         val result = featureConfig.store(featureConfig.settingName, jsonDisabled)
 
-        verify(appTpFeatureConfigEditor).setEnabled(AppTpSetting.PrivateDnsSupport, enabled = false, isManualOverride = false)
         assertTrue(result)
+        assertFalse(appTpFeatureConfig.isEnabled(AppTpSetting.PrivateDnsSupport))
     }
 
     @Test
@@ -70,7 +69,7 @@ class PrivateDnsSettingPluginTest {
         val settingName = SettingName { "wrongSettingName" }
         val result = featureConfig.store(settingName, jsonEnabled)
 
-        verify(appTpFeatureConfigEditor, never()).setEnabled(any(), any(), any())
         assertFalse(result)
+        assertFalse(appTpFeatureConfig.isEnabled(AppTpSetting.PrivateDnsSupport))
     }
 }

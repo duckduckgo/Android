@@ -23,13 +23,13 @@ import javax.inject.Inject
 
 class SitePermissionsManagerImpl @Inject constructor(
     private val packageManager: PackageManager,
-    private val sitePermissionsRepository: SitePermissionsRepository
+    private val sitePermissionsRepository: SitePermissionsRepository,
 ) : SitePermissionsManager {
 
     override suspend fun getSitePermissionsGranted(
         url: String,
         tabId: String,
-        resources: Array<String>
+        resources: Array<String>,
     ): Array<String> =
         resources
             .filter { sitePermissionsRepository.isDomainGranted(url, tabId, it) }
@@ -37,7 +37,7 @@ class SitePermissionsManagerImpl @Inject constructor(
 
     override suspend fun getSitePermissionsAllowedToAsk(
         url: String,
-        resources: Array<String>
+        resources: Array<String>,
     ): Array<String> =
         resources
             .filter { isPermissionSupported(it) && isHardwareSupported(it) }
@@ -45,9 +45,6 @@ class SitePermissionsManagerImpl @Inject constructor(
             .toTypedArray()
 
     override suspend fun clearAllButFireproof(fireproofDomains: List<String>) {
-        sitePermissionsRepository.askCameraEnabled = true
-        sitePermissionsRepository.askMicEnabled = true
-
         sitePermissionsRepository.sitePermissionsForAllWebsites().forEach { permission ->
             if (!fireproofDomains.contains(permission.domain)) {
                 sitePermissionsRepository.deletePermissionsForSite(permission.domain)

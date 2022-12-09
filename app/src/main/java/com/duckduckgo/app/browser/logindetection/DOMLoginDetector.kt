@@ -25,13 +25,13 @@ import com.duckduckgo.app.browser.logindetection.LoginDetectionJavascriptInterfa
 import com.duckduckgo.app.global.getValidUrl
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 interface DOMLoginDetector {
     fun addLoginDetection(
         webView: WebView,
-        onLoginDetected: () -> Unit
+        onLoginDetected: () -> Unit,
     )
 
     fun onEvent(event: WebNavigationEvent)
@@ -41,7 +41,7 @@ sealed class WebNavigationEvent {
     data class OnPageStarted(val webView: WebView) : WebNavigationEvent()
     data class ShouldInterceptRequest(
         val webView: WebView,
-        val request: WebResourceRequest
+        val request: WebResourceRequest,
     ) : WebNavigationEvent()
 }
 
@@ -52,7 +52,7 @@ class JsLoginDetector @Inject constructor(private val settingsDataStore: Setting
 
     override fun addLoginDetection(
         webView: WebView,
-        onLoginDetected: () -> Unit
+        onLoginDetected: () -> Unit,
     ) {
         webView.addJavascriptInterface(LoginDetectionJavascriptInterface { onLoginDetected() }, JAVASCRIPT_INTERFACE_NAME)
     }

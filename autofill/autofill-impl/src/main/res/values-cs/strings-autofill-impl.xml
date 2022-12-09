@@ -42,6 +42,9 @@
     <string name="updateLoginDialogButtonUpdatePassword">Aktualizuj si heslo</string>
     <string name="updateLoginDialogButtonNotNow">Teď ne</string>
 
+    <string name="updateLoginDialogTitleUpdateUsername">Aktualizovat uživatelské jméno?</string>
+    <string name="updateLoginDialogButtonUpdateUsername">Aktualizovat uživatelské jméno</string>
+
     <string name="autofillDialogCloseButtonContentDescription">Zavřít dialogové okno Automatické vyplňování</string>
 
     <string name="credentialManagementEditLoginTitleHint">Přihlašovací jméno</string>
@@ -59,5 +62,7 @@
     <string name="credentialManagementAutofillToggleLabel">Uložit a automaticky vyplnit přihlášení</string>
     <string name="credentialManagementViewMenuEdit">Upravit</string>
     <string name="credentialManagementViewMenuDelete">Smazat</string>
+
+    <string name="credentialManagementSuggestionsLabel">Navrhované</string>
 
 </resources>

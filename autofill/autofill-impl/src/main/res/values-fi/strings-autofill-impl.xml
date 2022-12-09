@@ -42,6 +42,9 @@
     <string name="updateLoginDialogButtonUpdatePassword">Päivitä salasana</string>
     <string name="updateLoginDialogButtonNotNow">Ei nyt</string>
 
+    <string name="updateLoginDialogTitleUpdateUsername">Päivitetäänkö käyttäjätunnus?</string>
+    <string name="updateLoginDialogButtonUpdateUsername">Päivitä käyttäjätunnus</string>
+
     <string name="autofillDialogCloseButtonContentDescription">Sulje automaattisen täytön valintaikkuna</string>
 
     <string name="credentialManagementEditLoginTitleHint">Kirjautumistietojen otsikko</string>
@@ -59,5 +62,7 @@
     <string name="credentialManagementAutofillToggleLabel">Tallenna ja täytä kirjautumistiedot automaattisesti</string>
     <string name="credentialManagementViewMenuEdit">Muokkaa</string>
     <string name="credentialManagementViewMenuDelete">Poista</string>
+
+    <string name="credentialManagementSuggestionsLabel">Ehdotettu</string>
 
 </resources>
