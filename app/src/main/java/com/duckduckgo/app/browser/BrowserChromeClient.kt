@@ -90,6 +90,7 @@ class BrowserChromeClient @Inject constructor(
             // We want to use webView.progress rather than newProgress because the former gives you the overall progress of the new site
             // and the latter gives you the progress of the current main request being loaded and one site could have several redirects.
             Timber.d("onProgressChanged ${webView.url}, ${webView.progress}")
+            if (webView.progress == 0) return
             val navigationList = webView.safeCopyBackForwardList() ?: return
             webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList, webView.progress))
             webViewClientListener?.progressChanged(webView.progress)
