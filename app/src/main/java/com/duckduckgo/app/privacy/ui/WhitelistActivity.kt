@@ -22,17 +22,19 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityWhitelistBinding
-import com.duckduckgo.app.browser.databinding.EditWhitelistBinding
+import com.duckduckgo.app.browser.databinding.DialogEditWhitelistBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.extensions.html
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command.*
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.ui.view.dialog.CustomAlertDialogBuilder
+import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder.EventListener
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
 
@@ -43,10 +45,7 @@ class WhitelistActivity : DuckDuckGoActivity() {
     lateinit var faviconManager: FaviconManager
 
     private lateinit var adapter: WebsitesAdapter
-
     private val binding: ActivityWhitelistBinding by viewBinding()
-
-    private var dialog: AlertDialog? = null
     private val viewModel: WhitelistViewModel by bindViewModel()
 
     private val toolbar
@@ -107,62 +106,60 @@ class WhitelistActivity : DuckDuckGoActivity() {
     }
 
     private fun showAddDialog() {
-        val dialogBinding = EditWhitelistBinding.inflate(layoutInflater)
-        val addDialog = AlertDialog.Builder(this).apply {
-            setTitle(R.string.dialogAddTitle)
-            setView(dialogBinding.root)
-            setPositiveButton(R.string.dialogSaveAction) { _, _ ->
-                val newText = dialogBinding.textInput.text.toString()
-                viewModel.onEntryAdded(UserWhitelistedDomain(newText))
-            }
-            setNegativeButton(android.R.string.no) { _, _ -> }
-        }.create()
-
-        dialog?.dismiss()
-        dialog = addDialog
-        addDialog.show()
+        val inputBinding = DialogEditWhitelistBinding.inflate(layoutInflater)
+        CustomAlertDialogBuilder(this)
+            .setTitle(R.string.dialogAddTitle)
+            .setPositiveButton(R.string.dialogSave)
+            .setNegativeButton(R.string.cancel)
+            .setView(inputBinding)
+            .addEventListener(
+                object : CustomAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        val newText = inputBinding.customDialogTextInput.text
+                        viewModel.onEntryAdded(UserWhitelistedDomain(newText))
+                    }
+                },
+            )
+            .show()
     }
 
     private fun showEditDialog(entry: UserWhitelistedDomain) {
-        val dialogBinding = EditWhitelistBinding.inflate(layoutInflater)
-        val editDialog = AlertDialog.Builder(this).apply {
-            setTitle(R.string.dialogEditTitle)
-            setView(dialogBinding.root)
-            setPositiveButton(R.string.dialogSaveAction) { _, _ ->
-                val newText = dialogBinding.textInput.text.toString()
-                viewModel.onEntryEdited(entry, UserWhitelistedDomain(newText))
-            }
-            setNegativeButton(android.R.string.no) { _, _ -> }
-        }.create()
-
-        dialog?.dismiss()
-        dialog = editDialog
-        editDialog.show()
-
-        dialogBinding.textInput.setText(entry.domain)
-        dialogBinding.textInput.setSelection(entry.domain.length)
+        val inputBinding = DialogEditWhitelistBinding.inflate(layoutInflater)
+        inputBinding.customDialogTextInput.text = entry.domain
+        CustomAlertDialogBuilder(this)
+            .setTitle(R.string.dialogEditTitle)
+            .setPositiveButton(R.string.dialogSave)
+            .setNegativeButton(R.string.cancel)
+            .setView(inputBinding)
+            .addEventListener(
+                object : CustomAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        val newText = inputBinding.customDialogTextInput.text
+                        viewModel.onEntryEdited(entry, UserWhitelistedDomain(newText))
+                    }
+                },
+            )
+            .show()
     }
 
     private fun showDeleteDialog(entry: UserWhitelistedDomain) {
-        val deleteDialog = AlertDialog.Builder(this).apply {
-            setTitle(R.string.dialogConfirmTitle)
-            setMessage(getString(R.string.whitelistEntryDeleteConfirmMessage, entry.domain).html(this.context))
-            setPositiveButton(android.R.string.yes) { _, _ -> viewModel.onEntryDeleted(entry) }
-            setNegativeButton(android.R.string.no) { _, _ -> }
-        }.create()
-
-        dialog?.dismiss()
-        dialog = deleteDialog
-        deleteDialog.show()
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.dialogConfirmTitle)
+            .setMessage(getString(R.string.whitelistEntryDeleteConfirmMessage, entry.domain).html(this))
+            .setPositiveButton(android.R.string.yes)
+            .setNegativeButton(android.R.string.no)
+            .addEventListener(
+                object : EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onEntryDeleted(entry)
+                    }
+                },
+            )
+            .show()
     }
 
     private fun showWhitelistFormatError() {
         Toast.makeText(this, R.string.whitelistFormatError, Toast.LENGTH_LONG).show()
-    }
-
-    override fun onDestroy() {
-        dialog?.dismiss()
-        super.onDestroy()
     }
 
     companion object {
