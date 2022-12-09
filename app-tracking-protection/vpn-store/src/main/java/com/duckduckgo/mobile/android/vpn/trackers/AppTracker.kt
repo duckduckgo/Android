@@ -138,7 +138,7 @@ data class AppTrackerBlocklist(
 
 /** JSON Model that represents the app exclusion list */
 data class JsonAppTrackerExclusionList(
-    val rules: List<AppTrackerExcludedPackage>,
+    val unprotectedApps: List<AppTrackerExcludedPackage>,
 )
 
 /** JSON Model that represents the system app overrides */
