@@ -32,7 +32,6 @@ import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.mobile.android.databinding.RowOneLineListItemBinding
 import com.duckduckgo.mobile.android.databinding.ViewSectionHeaderBinding
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
-import com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -46,15 +45,13 @@ class WebsitesAdapter(
         const val SITE_ENTRY = 0
         const val DESCRIPTION_TYPE = 1
         const val EMPTY_STATE_TYPE = 2
-        const val DIVIDER_TYPE = 3
-        const val SECTION_TITLE_TYPE = 4
+        const val SECTION_TITLE_TYPE = 3
 
         const val EMPTY_HINT_ITEM_SIZE = 1
     }
 
     private val sortedHeaderElements = listOf(
         DESCRIPTION_TYPE,
-        DIVIDER_TYPE,
         SECTION_TITLE_TYPE,
     )
 
@@ -105,9 +102,6 @@ class WebsitesAdapter(
                 val binding = ViewListItemDescriptionBinding.inflate(inflater, parent, false)
                 binding.websiteDescription.setText(R.string.whitelistExplanation)
                 WebsiteViewHolder.SimpleViewHolder(binding.root)
-            }
-            DIVIDER_TYPE -> {
-                WebsiteViewHolder.SimpleViewHolder(HorizontalDivider(parent.context))
             }
             SECTION_TITLE_TYPE -> {
                 val binding = ViewSectionHeaderBinding.inflate(inflater, parent, false)
