@@ -14,46 +14,13 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="@dimen/keyline_4">
+    android:layout_height="wrap_content">
 
-    <ImageView
-        android:id="@+id/permissionSettingIcon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_2"
-        android:src="@drawable/ic_location"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+        android:id="@+id/permissionSettingListItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
-    <TextView
-        android:id="@+id/permissionSettingSelectionTitle"
-        style="@style/TextAppearance.DuckDuckGo.Body1"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_4"
-        android:layout_marginEnd="@dimen/keyline_2"
-        android:textColor="?attr/normalTextColor"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/permissionSettingIcon"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="@string/locationLabel" />
-
-    <TextView
-        android:id="@+id/permissionSetting"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_1"
-        android:textColor="@color/gray70"
-        android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="@id/permissionSettingSelectionTitle"
-        app:layout_constraintStart_toStartOf="@id/permissionSettingSelectionTitle"
-        app:layout_constraintTop_toBottomOf="@id/permissionSettingSelectionTitle"
-        tools:text="Ask" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>

@@ -27,7 +27,7 @@ import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWe
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command.GoBackToSitePermissions
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command.ShowPermissionSettingSelectionDialog
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSetting
-import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSettingType
+import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSettingOption
 import com.duckduckgo.site.permissions.impl.SitePermissionsRepository
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
@@ -83,7 +83,7 @@ class PermissionsPerWebsiteViewModelTest {
 
         viewModel.viewState.test {
             val cameraSetting = awaitItem().websitePermissions[1]
-            assertEquals(WebsitePermissionSettingType.ALLOW, cameraSetting.setting)
+            assertEquals(WebsitePermissionSettingOption.ALLOW, cameraSetting.setting)
         }
     }
 
@@ -96,7 +96,7 @@ class PermissionsPerWebsiteViewModelTest {
 
         viewModel.viewState.test {
             val cameraSetting = awaitItem().websitePermissions[1]
-            assertEquals(WebsitePermissionSettingType.ASK, cameraSetting.setting)
+            assertEquals(WebsitePermissionSettingOption.ASK, cameraSetting.setting)
         }
     }
 
@@ -109,7 +109,7 @@ class PermissionsPerWebsiteViewModelTest {
 
         viewModel.viewState.test {
             val cameraSetting = awaitItem().websitePermissions[1]
-            assertEquals(WebsitePermissionSettingType.DENY, cameraSetting.setting)
+            assertEquals(WebsitePermissionSettingOption.DENY, cameraSetting.setting)
         }
     }
 
@@ -122,7 +122,7 @@ class PermissionsPerWebsiteViewModelTest {
 
         viewModel.viewState.test {
             val cameraSetting = awaitItem().websitePermissions[1]
-            assertEquals(WebsitePermissionSettingType.ASK_DISABLED, cameraSetting.setting)
+            assertEquals(WebsitePermissionSettingOption.ASK_DISABLED, cameraSetting.setting)
         }
     }
 
@@ -135,7 +135,7 @@ class PermissionsPerWebsiteViewModelTest {
 
         viewModel.viewState.test {
             val cameraSetting = awaitItem().websitePermissions[1]
-            assertEquals(WebsitePermissionSettingType.DENY, cameraSetting.setting)
+            assertEquals(WebsitePermissionSettingOption.DENY, cameraSetting.setting)
         }
     }
 
@@ -148,7 +148,7 @@ class PermissionsPerWebsiteViewModelTest {
 
         viewModel.viewState.test {
             val cameraSetting = awaitItem().websitePermissions[1]
-            assertEquals(WebsitePermissionSettingType.ALLOW, cameraSetting.setting)
+            assertEquals(WebsitePermissionSettingOption.ALLOW, cameraSetting.setting)
         }
     }
 
@@ -159,7 +159,7 @@ class PermissionsPerWebsiteViewModelTest {
 
         viewModel.websitePermissionSettings(domain)
         val websitePermissionSetting =
-            WebsitePermissionSetting(R.drawable.ic_camera, R.string.sitePermissionsSettingsCamera, WebsitePermissionSettingType.ASK)
+            WebsitePermissionSetting(R.drawable.ic_camera_24, R.string.sitePermissionsSettingsCamera, WebsitePermissionSettingOption.ASK)
         viewModel.permissionSettingSelected(websitePermissionSetting)
 
         viewModel.commands.test {
@@ -174,7 +174,7 @@ class PermissionsPerWebsiteViewModelTest {
 
         viewModel.websitePermissionSettings(domain)
         val websitePermissionSetting =
-            WebsitePermissionSetting(R.drawable.ic_camera, R.string.sitePermissionsSettingsCamera, WebsitePermissionSettingType.ASK)
+            WebsitePermissionSetting(R.drawable.ic_camera_24, R.string.sitePermissionsSettingsCamera, WebsitePermissionSettingOption.ASK)
         val sitePermissionSetting =
             SitePermissionsEntity(
                 domain,
