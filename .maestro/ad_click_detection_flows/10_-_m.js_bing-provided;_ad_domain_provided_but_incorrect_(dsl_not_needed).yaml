@@ -9,8 +9,7 @@ appId: com.duckduckgo.mobile.android
 - assertVisible:
     text: ".*I'll also upgrade the security of your connection if possible.*"
 - inputText: "https://www.search-company.site/"
-- tapOn:
-    id: ".*key_pos_ime_action.*"
+- pressKey: Enter
 - assertVisible:
     text: ".*Got It.*"
 - tapOn:
@@ -19,18 +18,27 @@ appId: com.duckduckgo.mobile.android
     text: "HIDE TIPS FOREVER"
 - tapOn:
     text: "HIDE TIPS FOREVER"
+- swipe:
+    start: 100,1000
+    end: 100,200
+- swipe:
+    start: 100,1000
+    end: 100,200
+- swipe:
+    start: 100,1000
+    end: 100,200
 - assertVisible:
-    id: "ad-id-2"
+    id: "ad-id-10"
 - tapOn:
-    id: "ad-id-2"
+    id: "ad-id-10"
 - assertVisible:
     text: "Publisher site"
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/omnibarIconContainer"
 - assertVisible:
-    text: "Requests Blocked from Loading"
+    text: "View Tracker Companies"
 - tapOn:
-    text: "Requests Blocked from Loading"
+    text: "View Tracker Companies"
 - assertVisible:
     text: "The following third-party domains’ requests were blocked from loading because they were identified as tracking requests. If a company's requests are loaded, it can allow them to profile you."
 - assertVisible:
@@ -40,12 +48,12 @@ appId: com.duckduckgo.mobile.android
 - assertVisible:
     text: "convert.ad-company.site"
 - assertVisible:
-    text: "www.ad-company.site"
+    text: "ad-company.site"
 - action: back
 - assertVisible:
-    text: "No Third-Party Requests Found"
+    text: "View Non-Tracker Companies"
 - tapOn:
-    text: "No Third-Party Requests Found"
+    text: "View Non-Tracker Companies"
 - assertVisible:
     text: "We did not identify any requests from third-party domains."
 - assertVisible:
