@@ -25,8 +25,8 @@ import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import timber.log.Timber
 import javax.inject.Inject
+import logcat.logcat
 
 private const val APPTP_FEATURE_SIGNATURE_KEY = "apptp_feature_signature"
 
@@ -51,7 +51,7 @@ class AppTpPrivacyFeaturePlugin @Inject constructor(
             val config = kotlin.runCatching { adapter.fromJson(jsonString) }.getOrNull() ?: return false
             val currentHash = preferences.getSignature() ?: ""
             if (currentHash == config.hash) {
-                Timber.v("Downloaded appTP feature config has same hash, noop")
+                logcat { "Downloaded appTP feature config has same hash, noop" }
                 return true
             }
 

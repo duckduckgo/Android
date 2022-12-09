@@ -29,8 +29,10 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
+import logcat.LogPriority
+import logcat.asLog
+import logcat.logcat
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -47,7 +49,7 @@ class ExceptionListsSettingPlugin @Inject constructor(
         @Suppress("NAME_SHADOWING")
         val name = appTpSettingValueOf(name.value)
         if (name == settingName) {
-            Timber.d("Received configuration: $jsonString")
+            logcat { "Received configuration: $jsonString" }
             runCatching {
                 jsonAdapter.fromJson(jsonString)?.let { exceptionLists ->
 
@@ -70,7 +72,7 @@ class ExceptionListsSettingPlugin @Inject constructor(
                     }
                 }
             }.onFailure {
-                Timber.w(it, "Invalid JSON remote configuration for $settingName")
+                logcat(LogPriority.WARN) { it.asLog() }
             }
             return true
         }
