@@ -14,14 +14,16 @@
   ~ limitations under the License.
   -->
 
-<com.google.android.material.textview.MaterialTextView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.duckduckgo.mobile.android.ui.view.text.DaxTextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/locationPermissionsDescription"
-    style="@style/Widget.DuckDuckGo.ListItem.Description"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingStart="16dp"
-    android:paddingEnd="16dp"
-    android:paddingBottom="12dp"
+    android:paddingStart="@dimen/keyline_4"
+    android:paddingEnd="@dimen/keyline_4"
+    android:paddingBottom="@dimen/keyline_3"
     android:text="@string/sitePermissionsSettingsDescription"
+    app:textType="secondary"
+    app:typography="body2"
     tools:text="Lorem ipsum dolor sit amet" />
