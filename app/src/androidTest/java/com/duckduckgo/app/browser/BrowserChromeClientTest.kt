@@ -156,6 +156,16 @@ class BrowserChromeClientTest {
 
     @UiThreadTest
     @Test
+    fun whenOnProgressChangedCalledAndValueIsZeroThenNothingCalled() {
+        val mockWebView: WebView = mock()
+        whenever(mockWebView.progress).thenReturn(0)
+        testee.onProgressChanged(mockWebView, 10)
+        verify(mockWebViewClientListener, never()).navigationStateChanged(any())
+        verify(mockWebViewClientListener, never()).progressChanged(any())
+    }
+
+    @UiThreadTest
+    @Test
     fun whenOnProgressChangedThrowsExceptionThenRecordException() = runTest {
         val exception = RuntimeException()
         whenever(mockWebViewClientListener.progressChanged(anyInt())).thenThrow(exception)
