@@ -14,28 +14,15 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:layout_height="wrap_content">
 
-    <ImageView
-        android:id="@+id/sitePermissionToggleIcon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        tools:src="@drawable/ic_camera_disabled"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp" />
-
-    <com.duckduckgo.mobile.android.ui.view.SwitchView
-        android:id="@+id/sitePermissionsToggle"
-        android:layout_gravity="end"
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+        android:id="@+id/sitePermissionToggle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/keyline_4"
-        android:textColor="?attr/normalTextColor"
-        tools:text="@string/preciseLocationToggleText" />
+        app:showSwitch="true" />
 
-</LinearLayout>
+</FrameLayout>
