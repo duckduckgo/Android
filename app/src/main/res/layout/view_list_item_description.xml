@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2020 DuckDuckGo
+  ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,14 +14,15 @@
   ~ limitations under the License.
   -->
 
-<com.google.android.material.textview.MaterialTextView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.duckduckgo.mobile.android.ui.view.text.DaxTextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/websiteDescription"
-    style="@style/Widget.DuckDuckGo.ListItem.Description"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingStart="16dp"
-    android:paddingTop="12dp"
-    android:paddingEnd="16dp"
-    android:paddingBottom="12dp"
+    android:paddingStart="@dimen/keyline_4"
+    android:paddingEnd="@dimen/keyline_4"
+    android:paddingBottom="@dimen/keyline_3"
+    app:textType="secondary"
+    app:typography="body2"
     tools:text="Lorem ipsum dolor sit amet" />
