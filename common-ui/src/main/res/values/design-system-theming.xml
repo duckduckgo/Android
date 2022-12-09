@@ -286,6 +286,10 @@
         <item name="daxColorSliderTrackInactive">@color/gray40_50</item>
         <item name="daxColorSliderActive">?attr/daxColorAccentBlue</item>
 
+        <!-- Text Input -->
+        <item name="daxColorTextInputFocusedOutline">?attr/daxColorAccentBlue</item>
+        <item name="daxColorTextInputEnabledOutline">@color/white30</item>
+
     </style>
 
     <style name="Theme.DuckDuckGo.Light" parent="Theme.DuckDuckGo">
@@ -426,6 +430,10 @@
         <!-- Slider -->
         <item name="daxColorSliderTrackInactive">@color/gray60_50</item>
         <item name="daxColorSliderActive">?attr/daxColorAccentBlue</item>
+
+        <!-- Text Input -->
+        <item name="daxColorTextInputFocusedOutline">?attr/daxColorAccentBlue</item>
+        <item name="daxColorTextInputEnabledOutline">@color/black30</item>
 
     </style>
 
