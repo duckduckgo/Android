@@ -28,10 +28,10 @@
         android:layout_width="@dimen/listItemImageContainerSize"
         android:layout_height="@dimen/listItemImageContainerSize"
         android:layout_marginStart="@dimen/keyline_4"
-        android:background="@drawable/list_item_image_circular_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        tools:background="@drawable/list_item_image_circular_background">
 
         <ImageView
             android:id="@+id/leadingIcon"
