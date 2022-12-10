@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.trackerdetection
 
+import android.os.Build
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
 import org.junit.Before
@@ -47,7 +48,9 @@ class RealUrlToTypeMapperTest {
 
     @Test
     fun whenUrlHasScriptExtensionThenReturnScript() {
-        assertEquals("script", testee.map("example.com/test.js"))
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            assertEquals("script", testee.map("example.com/test.js"))
+        }
     }
 
     @Test
