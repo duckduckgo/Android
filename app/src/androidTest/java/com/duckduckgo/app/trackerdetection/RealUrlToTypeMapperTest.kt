@@ -54,9 +54,4 @@ class RealUrlToTypeMapperTest {
     fun whenUrlHasStylesheetExtensionThenReturnStylesheet() {
         assertEquals("stylesheet", testee.map("example.com/test.css"))
     }
-
-    @Test
-    fun whenUrlHasXmlHttpRequestExtensionThenReturnStylesheet() {
-        assertEquals("xmlhttprequest", testee.map("example.com/test.json"))
-    }
 }

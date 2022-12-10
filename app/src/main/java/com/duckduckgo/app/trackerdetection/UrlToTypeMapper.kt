@@ -37,7 +37,6 @@ class RealUrlToTypeMapper @Inject constructor() : UrlToTypeMapper {
             if (checkImage(it)) return IMAGE
             if (checkScript(it)) return SCRIPT
             if (checkStyleSheet(it)) return STYLESHEET
-            if (checkXmlHttpRequest(it)) return XMLHTTPREQUEST
         }
 
         return null
@@ -55,14 +54,9 @@ class RealUrlToTypeMapper @Inject constructor() : UrlToTypeMapper {
         return mimeType == "text/css"
     }
 
-    private fun checkXmlHttpRequest(mimeType: String): Boolean {
-        return mimeType == "application/json"
-    }
-
     companion object {
         const val IMAGE = "image"
         const val SCRIPT = "script"
         const val STYLESHEET = "stylesheet"
-        const val XMLHTTPREQUEST = "xmlhttprequest"
     }
 }
