@@ -27,6 +27,7 @@ import java.net.URI
 class TdsClient(
     override val name: Client.ClientName,
     private val trackers: List<TdsTracker>,
+    private val urlToTypeMapper: UrlToTypeMapper,
 ) : Client {
 
     override fun matches(
@@ -53,7 +54,9 @@ class TdsClient(
         tracker.rules.forEach { rule ->
             val regex = ".*${rule.rule}.*".toRegex()
             if (url.matches(regex)) {
-                if (matchedException(rule.exceptions, documentUrl)) {
+                val type = urlToTypeMapper.map(url)
+
+                if (matchedException(rule.exceptions, documentUrl, type)) {
                     return MatchedResult(shouldBlock = false, isATracker = true)
                 }
                 if (rule.action == IGNORE) {
@@ -72,16 +75,15 @@ class TdsClient(
     private fun matchedException(
         exceptions: RuleExceptions?,
         documentUrl: String,
+        type: String?,
     ): Boolean {
         if (exceptions == null) return false
 
         val domains = exceptions.domains
         val types = exceptions.types
 
-        // We don't support type filtering on android so if the types exist without a domain
-        // we allow the exception through
         if (domains.isNullOrEmpty() && !types.isNullOrEmpty()) {
-            return true
+            return !types.contains(type)
         }
 
         domains?.forEach {

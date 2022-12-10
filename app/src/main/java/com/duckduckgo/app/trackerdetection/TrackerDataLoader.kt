@@ -55,6 +55,7 @@ class TrackerDataLoader @Inject constructor(
     private val context: Context,
     private val appDatabase: AppDatabase,
     private val moshi: Moshi,
+    private val urlToTypeMapper: UrlToTypeMapper,
 ) : DefaultLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -97,7 +98,7 @@ class TrackerDataLoader @Inject constructor(
     fun loadTrackers() {
         val trackers = tdsTrackerDao.getAll()
         Timber.d("Loaded ${trackers.size} tds trackers from DB")
-        val client = TdsClient(Client.ClientName.TDS, trackers)
+        val client = TdsClient(Client.ClientName.TDS, trackers, urlToTypeMapper)
         trackerDetector.addClient(client)
     }
 
