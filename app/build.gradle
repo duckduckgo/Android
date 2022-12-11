@@ -247,6 +247,7 @@ dependencies {
 
     implementation project(':sync-api')
     implementation project(':sync-impl')
+    implementation project(':sync-store')
 
     implementation project(':request-filterer-api')
     implementation project(':request-filterer-impl')
