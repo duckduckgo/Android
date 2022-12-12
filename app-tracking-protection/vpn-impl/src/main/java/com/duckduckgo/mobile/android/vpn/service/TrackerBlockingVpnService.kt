@@ -33,7 +33,6 @@ import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
 import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
@@ -67,9 +66,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
 
     @Inject
     lateinit var vpnPreferences: VpnPreferences
-
-    @Inject
-    lateinit var deviceShieldExcludedApps: TrackingProtectionAppsRepository
 
     @Inject
     lateinit var deviceShieldNotificationFactory: DeviceShieldNotificationFactory
@@ -345,16 +341,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
                 }
             }
 
-            // Can either route all apps through VPN and exclude a few (better for prod), or exclude all apps and include a few (better for dev)
-            val limitingToTestApps = false
-            if (limitingToTestApps) {
-                safelyAddAllowedApps(INCLUDED_APPS_FOR_TESTING)
-                logcat(LogPriority.WARN) { "Limiting VPN to test apps only:\n${INCLUDED_APPS_FOR_TESTING.joinToString(separator = "\n") { it }}" }
-            } else {
-                safelyAddDisallowedApps(
-                    deviceShieldExcludedApps.getExclusionAppsList(),
-                )
-            }
+            safelyAddDisallowedApps(tunnelConfig.appExclusionList.toList())
 
             // Apparently we always need to call prepare, even tho not clear in docs
             // without this prepare, establish() returns null after device reboot
@@ -669,16 +656,4 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         private const val ACTION_RESTART_VPN = "ACTION_RESTART_VPN"
         private const val ACTION_ALWAYS_ON_START = "android.net.VpnService"
     }
-
-    private val INCLUDED_APPS_FOR_TESTING = listOf(
-        "com.duckduckgo.networkrequestor",
-        "com.cdrussell.networkrequestor",
-        "meteor.test.and.grade.internet.connection.speed",
-        "org.zwanoo.android.speedtest",
-        "com.netflix.Speedtest",
-        "eu.vspeed.android",
-        "net.fireprobe.android",
-        "com.philips.lighting.hue2",
-        "com.duckduckgo.mobile.android.debug",
-    )
 }
