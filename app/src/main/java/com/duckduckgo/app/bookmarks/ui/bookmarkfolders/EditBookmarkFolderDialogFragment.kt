@@ -34,14 +34,14 @@ class EditBookmarkFolderDialogFragment : SavedSiteDialogFragment() {
         setToolbarTitle(getString(R.string.editFolder))
         showAddFolderMenu = true
         arguments?.getSerializable(BookmarkFoldersActivity.KEY_CURRENT_FOLDER)?.let {
-            binding.titleInput.setText((it as BookmarkFolder).name)
+            binding.titleInput.text =(it as BookmarkFolder).name
         }
         configureFieldVisibility()
     }
 
     private fun configureFieldVisibility() {
         binding.savedSiteLocationContainer.visibility = View.VISIBLE
-        binding.savedSiteUrlInputContainer.visibility = View.GONE
+        binding.urlInput.visibility = View.GONE
     }
 
     override fun onConfirmation() {
