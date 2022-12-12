@@ -120,7 +120,7 @@ sealed class BookmarkFolderScreenViewHolders(itemView: View) : RecyclerView.View
 
         fun update(bookmarkFolder: BookmarkFolder) {
             val listItem = binding.root
-            //fixme: After migration this contentDescription will be lost
+            // fixme: After migration this contentDescription will be lost
             // binding.overflowMenu.contentDescription = context.getString(
             //     R.string.bookmarkOverflowContentDescription,
             //     bookmarkFolder.name,

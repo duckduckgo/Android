@@ -34,7 +34,7 @@ class EditBookmarkFolderDialogFragment : SavedSiteDialogFragment() {
         setToolbarTitle(getString(R.string.editFolder))
         showAddFolderMenu = true
         arguments?.getSerializable(BookmarkFoldersActivity.KEY_CURRENT_FOLDER)?.let {
-            binding.titleInput.text =(it as BookmarkFolder).name
+            binding.titleInput.text = (it as BookmarkFolder).name
         }
         configureFieldVisibility()
     }
@@ -46,7 +46,7 @@ class EditBookmarkFolderDialogFragment : SavedSiteDialogFragment() {
 
     override fun onConfirmation() {
         arguments?.getLong(KEY_PARENT_FOLDER_ID)?.let {
-            val name = binding.titleInput.text.toString()
+            val name = binding.titleInput.text
             if (name.isNotBlank()) {
                 val bookmarkFolder = arguments?.getSerializable(BookmarkFoldersActivity.KEY_CURRENT_FOLDER) as BookmarkFolder
                 listener?.onBookmarkFolderUpdated(bookmarkFolder.copy(name = name, parentId = it))

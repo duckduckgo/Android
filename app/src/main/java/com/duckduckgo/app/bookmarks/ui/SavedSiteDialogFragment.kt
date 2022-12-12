@@ -24,7 +24,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.EditText
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.DialogFragment
@@ -40,7 +39,6 @@ import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.mobile.android.ui.view.showKeyboard
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
-import kotlinx.android.synthetic.main.include_find_in_page.*
 
 abstract class SavedSiteDialogFragment : DialogFragment() {
 

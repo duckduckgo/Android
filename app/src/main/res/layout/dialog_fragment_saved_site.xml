@@ -14,11 +14,10 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
     <include
         android:id="@+id/savedSiteAppBar"
@@ -30,25 +29,27 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/keyline_4"
         android:hint="@string/savedSiteDialogTitleHint"
-        android:inputType="text|textCapWords" />
+        android:inputType="text|textCapWords"
+        app:layout_constraintTop_toBottomOf="@id/savedSiteAppBar" />
 
     <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
         android:id="@+id/urlInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_4"
-        android:layout_marginEnd="@dimen/keyline_4"
-        android:layout_marginBottom="@dimen/keyline_4"
+        android:layout_margin="@dimen/keyline_4"
         android:hint="@string/savedSiteDialogUrlHint"
-        android:inputType="textUri" />
+        android:inputType="textUri"
+        app:layout_constraintTop_toBottomOf="@id/titleInput" />
 
     <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/savedSiteLocationLabel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
+        android:layout_marginTop="@dimen/keyline_4"
         android:layout_marginEnd="@dimen/keyline_4"
         android:text="@string/locationLabel"
+        app:layout_constraintTop_toBottomOf="@id/urlInput"
         app:textType="secondary"
         app:typography="caption" />
 
@@ -62,12 +63,14 @@
         android:paddingEnd="@dimen/keyline_4"
         android:paddingBottom="@dimen/keyline_2"
         android:text="@string/bookmarksSectionTitle"
+        app:layout_constraintTop_toBottomOf="@id/savedSiteLocationLabel"
         app:typography="body1" />
 
     <androidx.constraintlayout.widget.Group
         android:id="@+id/savedSiteLocationContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         app:constraint_referenced_ids="savedSiteLocationLabel,savedSiteLocation" />
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
