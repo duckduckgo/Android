@@ -23,7 +23,6 @@ import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import java.util.UUID
 import kotlinx.coroutines.flow.*
-import logcat.LogPriority
 import logcat.logcat
 
 private const val PREFS_FILENAME = "com.duckduckgo.mobile.android.vpn.feature.registry.v1"
@@ -40,10 +39,6 @@ internal class VpnFeaturesRegistryImpl(
     private val registryInitialValue = Pair("", false)
     private val _registry = MutableStateFlow(registryInitialValue)
 
-    private var isInitialized: Boolean
-        get() = preferences.getBoolean(IS_INITIALIZED, false)
-        set(value) = preferences.edit(commit = true) { putBoolean(IS_INITIALIZED, value) }
-
     init {
         // we don't need to unregister the listener
         preferences.registerOnSharedPreferenceChangeListener(this)
@@ -51,72 +46,36 @@ internal class VpnFeaturesRegistryImpl(
 
     @Synchronized
     override fun registerFeature(feature: VpnFeature) {
-        if (!isInitialized) {
-            logcat { "Initializing VpnFeaturesRegistry" }
-            isInitialized = true
-        }
-
-        if (!vpnServiceWrapper.isServiceRunning()) {
-            logcat { "no features registered, start the service" }
-            // there's not a registered feature, so we need to start the VPN too
-            vpnServiceWrapper.startService()
-        }
-        logcat { "(re)registering feature" }
+        logcat { "registerFeature: $feature" }
         preferences.edit(commit = true) {
             // we use random UUID to force change listener to be called
             putString(feature.featureName, UUID.randomUUID().toString())
         }
+        vpnServiceWrapper.restartVpnService()
     }
 
     @Synchronized
     override fun unregisterFeature(feature: VpnFeature) {
-        if (!isInitialized) {
-            logcat { "Initializing VpnFeaturesRegistry, auto-registering AppTP" }
-            isInitialized = true
-            vpnServiceWrapper.stopService()
-            return
-        }
+        if (!preferences.contains(feature.featureName)) return
 
-        if (registeredFeatures().size == 1 && preferences.contains(feature.featureName)) {
-            logcat { "$feature is the last registered feature, stopping VPN" }
-            // this is the last feature registered for VPN usage, stop the service
-            vpnServiceWrapper.stopService()
-        }
-
-        logcat { "$feature removal" }
         preferences.edit(commit = true) {
             remove(feature.featureName)
+        }
+
+        logcat { "unregisterFeature: $feature" }
+        if (registeredFeatures().isNotEmpty()) {
+            vpnServiceWrapper.restartVpnService()
+        } else {
+            vpnServiceWrapper.stopService()
         }
     }
 
     override fun isFeatureRegistered(feature: VpnFeature): Boolean {
-        val isRegistered = registeredFeatures().contains(feature.featureName) ||
-            (!isInitialized && vpnServiceWrapper.isServiceRunning())
-
-        if (isRegistered && !isInitialized) {
-            logcat { "isFeatureRegistered($feature) - should be registered as we're not initialised " }
-            preferences.edit(commit = true) {
-                // we use random UUID to force change listener to be called
-                putString(feature.featureName, UUID.randomUUID().toString())
-            }
-            isInitialized = true
-        }
-
-        logcat { "isFeatureRegistered($feature) = $isRegistered" }
-        return isRegistered && vpnServiceWrapper.isServiceRunning()
+        return registeredFeatures().contains(feature.featureName) && vpnServiceWrapper.isServiceRunning()
     }
 
     override suspend fun refreshFeature(feature: VpnFeature) {
-        if (!isInitialized) {
-            logcat { "Initializing VpnFeaturesRegistry, attempting to restart VPN service" }
-            isInitialized = true
-
-            vpnServiceWrapper.restartVpnService()
-        } else if (!preferences.all.contains(feature.featureName)) {
-            logcat(LogPriority.WARN) { "The $feature is not registered for VPN usage" }
-        } else {
-            vpnServiceWrapper.restartVpnService()
-        }
+        vpnServiceWrapper.restartVpnService()
     }
 
     override fun registryChanges(): Flow<Pair<String, Boolean>> {
@@ -125,6 +84,10 @@ internal class VpnFeaturesRegistryImpl(
                 logcat { "change $it" }
                 it != registryInitialValue && it.first != IS_INITIALIZED
             }
+    }
+
+    override fun getRegisteredFeatures(): List<VpnFeature> {
+        return registeredFeatures().keys.map { VpnFeature { it } }
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
@@ -144,8 +107,8 @@ internal class VpnFeaturesRegistryImpl(
  * The class is marked as open to be able to mock it in tests.
  */
 internal open class VpnServiceWrapper(private val context: Context) {
-    open suspend fun restartVpnService() {
-        TrackerBlockingVpnService.restartVpnService(context)
+    open fun restartVpnService() {
+        TrackerBlockingVpnService.restartVpnService(context, forceRestart = true)
     }
 
     open fun stopService() {

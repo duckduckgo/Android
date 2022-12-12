@@ -74,4 +74,28 @@ interface VpnNetworkStack {
         val dns: Set<InetAddress>,
         val routes: Map<InetAddress, Int>,
     )
+
+    companion object EmptyVpnNetworkStack : VpnNetworkStack {
+        override val name = "empty"
+
+        override fun onCreateVpn(): Result<Unit> {
+            return Result.failure(Exception("EmptyVpnNetworkStack"))
+        }
+
+        override fun onPrepareVpn(): Result<VpnTunnelConfig> {
+            return Result.failure(Exception("EmptyVpnNetworkStack"))
+        }
+
+        override fun onStartVpn(tunfd: ParcelFileDescriptor): Result<Unit> {
+            return Result.failure(Exception("EmptyVpnNetworkStack"))
+        }
+
+        override fun onStopVpn(): Result<Unit> {
+            return Result.failure(Exception("EmptyVpnNetworkStack"))
+        }
+
+        override fun onDestroyVpn(): Result<Unit> {
+            return Result.failure(Exception("EmptyVpnNetworkStack"))
+        }
+    }
 }

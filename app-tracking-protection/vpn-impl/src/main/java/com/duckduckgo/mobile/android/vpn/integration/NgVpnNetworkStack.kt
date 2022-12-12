@@ -22,10 +22,12 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.app.tracking.AppTrackerDetector
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack.VpnTunnelConfig
 import com.duckduckgo.vpn.network.api.*
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
 import java.net.InetAddress
@@ -37,7 +39,7 @@ import logcat.logcat
 private const val LRU_CACHE_SIZE = 2048
 private const val EMFILE_ERRNO = 24
 
-@ContributesBinding(
+@ContributesMultibinding(
     scope = VpnScope::class,
     boundType = VpnNetworkStack::class,
 )
@@ -58,7 +60,7 @@ class NgVpnNetworkStack @Inject constructor(
     private val jniLock = Any()
     private val addressLookupLruCache = LruCache<String, String>(LRU_CACHE_SIZE)
 
-    override val name: String = "ng"
+    override val name: String = AppTpVpnFeature.APPTP_VPN.featureName
 
     override fun onCreateVpn(): Result<Unit> {
         val vpnNetwork = vpnNetwork.safeGet().getOrElse { return Result.failure(it) }

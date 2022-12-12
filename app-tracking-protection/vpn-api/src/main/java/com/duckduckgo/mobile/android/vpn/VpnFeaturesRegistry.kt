@@ -56,8 +56,26 @@ interface VpnFeaturesRegistry {
      * When a VPN feature is (re)unregistered it will emit a pair with the name of the feature and `false`
      */
     fun registryChanges(): Flow<Pair<String, Boolean>>
+
+    fun getRegisteredFeatures(): List<VpnFeature>
 }
 
 interface VpnFeature {
     val featureName: String
+}
+
+/**
+ * Fake constructor for [VpnFeature] from the passed in [block] lambda
+ * instead of using the anonymous `object : VpnFeature` syntax.
+ *
+ * Usage:
+ *
+ * ```kotlin
+ * val name = VpnFeature {
+ *
+ * }
+ * ```
+ */
+fun VpnFeature(block: () -> String): VpnFeature = object : VpnFeature {
+    override val featureName: String = block()
 }

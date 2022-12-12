@@ -37,9 +37,9 @@ import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
 import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
+import com.duckduckgo.mobile.android.vpn.integration.VpnNetworkStackProvider
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceState.ENABLING
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceStateStats
-import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack.VpnTunnelConfig
 import com.duckduckgo.mobile.android.vpn.network.util.asRoute
 import com.duckduckgo.mobile.android.vpn.network.util.getActiveNetwork
@@ -96,7 +96,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
 
     @Inject lateinit var appTpFeatureConfig: AppTpFeatureConfig
 
-    @Inject lateinit var vpnNetworkStack: VpnNetworkStack
+    @Inject lateinit var vpnNetworkStackProvider: VpnNetworkStackProvider
 
     @Inject lateinit var vpnServiceStateStatsDao: VpnServiceStateStatsDao
 
@@ -120,6 +120,10 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
 
     private val isStartVpnErrorHandlingEnabled by lazy {
         appTpFeatureConfig.isEnabled(AppTpSetting.StartVpnErrorHandling)
+    }
+
+    private val vpnNetworkStack by lazy {
+        vpnNetworkStackProvider.provideNetworkStack()
     }
 
     private val vpnStateServiceConnection = object : ServiceConnection {
@@ -162,7 +166,10 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         AndroidInjection.inject(this)
 
         logcat { "VPN log onCreate, creating the ${vpnNetworkStack.name} network stack" }
-        vpnNetworkStack.onCreateVpn().getOrThrow()
+        vpnNetworkStack.onCreateVpn().getOrNull()?.let {
+            // report and proceed
+            deviceShieldPixels.reportErrorCreatingVpnNetworkStack()
+        }
     }
 
     override fun onBind(intent: Intent?): IBinder {
@@ -628,7 +635,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             }
         }
 
-        internal fun restartService(context: Context) {
+        private fun restartService(context: Context) {
             val applicationContext = context.applicationContext
 
             restartIntent(applicationContext).run {
@@ -636,10 +643,11 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             }
         }
 
-        internal suspend fun restartVpnService(
+        internal fun restartVpnService(
             context: Context,
             forceGc: Boolean = false,
-        ) = withContext(Dispatchers.Default) {
+            forceRestart: Boolean = false,
+        ) {
             val applicationContext = context.applicationContext
             if (isServiceRunning(applicationContext)) {
                 logcat { "VPN log: stopping service" }
@@ -650,6 +658,9 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
                     logcat { "Forcing a garbage collection to run while VPN is restarting" }
                     System.gc()
                 }
+            } else if (forceRestart) {
+                logcat { "VPN log: starting service" }
+                startVpnService(applicationContext)
             }
         }
 
