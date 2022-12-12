@@ -20,12 +20,16 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.mobile.android.app.tracking.AppTrackerDetector
+import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
+import com.duckduckgo.vpn.network.api.*
 import com.duckduckgo.vpn.network.api.AddressRR
 import com.duckduckgo.vpn.network.api.DnsRR
 import com.duckduckgo.vpn.network.api.VpnNetwork
 import java.net.InetAddress
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -46,6 +50,7 @@ class NgVpnNetworkStackTest {
     private val vpnNetwork: VpnNetwork = mock()
     private val runtime: Runtime = mock()
     private val appTrackerDetector: AppTrackerDetector = mock()
+    private val trackingProtectionAppsRepository: TrackingProtectionAppsRepository = mock()
 
     private lateinit var ngVpnNetworkStack: NgVpnNetworkStack
 
@@ -59,6 +64,7 @@ class NgVpnNetworkStackTest {
             { vpnNetwork },
             runtime,
             appTrackerDetector,
+            trackingProtectionAppsRepository,
         )
     }
 
@@ -92,7 +98,9 @@ class NgVpnNetworkStackTest {
     }
 
     @Test
-    fun whenOnPrepareVpnThenReturnCorrectVpnTunnelConfig() {
+    fun whenOnPrepareVpnThenReturnCorrectVpnTunnelConfig() = runTest {
+        whenever(trackingProtectionAppsRepository.getExclusionAppsList()).thenReturn(listOf())
+
         val configResult = ngVpnNetworkStack.onPrepareVpn()
         Assert.assertTrue(configResult.isSuccess)
 

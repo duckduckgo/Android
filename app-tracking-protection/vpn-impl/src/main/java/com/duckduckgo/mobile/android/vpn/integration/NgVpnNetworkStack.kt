@@ -23,6 +23,7 @@ import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.app.tracking.AppTrackerDetector
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack.VpnTunnelConfig
 import com.duckduckgo.vpn.network.api.*
@@ -53,6 +54,7 @@ class NgVpnNetworkStack @Inject constructor(
     private val vpnNetwork: Lazy<VpnNetwork>,
     private val runtime: Runtime,
     private val appTrackerDetector: AppTrackerDetector,
+    private val trackingProtectionAppsRepository: TrackingProtectionAppsRepository,
 ) : VpnNetworkStack, VpnNetworkCallback {
 
     private var tunnelThread: Thread? = null
@@ -79,7 +81,7 @@ class NgVpnNetworkStack @Inject constructor(
         return Result.success(Unit)
     }
 
-    override fun onPrepareVpn(): Result<VpnTunnelConfig> = Result.success(
+    override suspend fun onPrepareVpn(): Result<VpnTunnelConfig> = Result.success(
         VpnTunnelConfig(
             mtu = vpnNetwork.get().mtu(),
             addresses = mapOf(
@@ -88,6 +90,7 @@ class NgVpnNetworkStack @Inject constructor(
             ),
             dns = emptySet(),
             routes = emptyMap(),
+            appExclusionList = trackingProtectionAppsRepository.getExclusionAppsList().toSet(),
         ),
     )
 
