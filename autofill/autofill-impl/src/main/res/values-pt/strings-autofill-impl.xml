@@ -65,4 +65,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Sugerido</string>
 
+    <string name="credentialManagementNoLoginsSavedTitle">Nenhum início de sessão guardado</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Os inícios de sessão são armazenados em segurança apenas neste dispositivo.</string>
+
 </resources>
