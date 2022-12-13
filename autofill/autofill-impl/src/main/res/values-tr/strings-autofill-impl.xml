@@ -65,4 +65,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Önerilen</string>
 
+    <string name="credentialManagementNoLoginsSavedTitle">Henüz kaydedilmiş Giriş yok</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Girişler yalnızca bu cihazda güvenli bir şekilde saklanır.</string>
+
 </resources>

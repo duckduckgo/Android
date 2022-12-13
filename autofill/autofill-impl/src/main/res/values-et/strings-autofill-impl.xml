@@ -65,4 +65,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Soovitatud</string>
 
+    <string name="credentialManagementNoLoginsSavedTitle">Sisselogimisandmeid pole veel salvestatud</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Sisselogimisandmed salvestatakse turvaliselt ainult selles seadmes.</string>
+
 </resources>
