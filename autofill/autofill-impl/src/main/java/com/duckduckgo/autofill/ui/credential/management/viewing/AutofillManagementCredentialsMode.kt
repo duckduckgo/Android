@@ -30,6 +30,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DuckDuckGoFragment
@@ -39,7 +40,12 @@ import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.FragmentAutofillManagementEditModeBinding
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Editing
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.EditingExisting
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.EditingNewEntry
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Viewing
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialModeCommand
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialModeCommand.ShowEditCredentialMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialModeCommand.ShowManualCredentialMode
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.R.dimen
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
@@ -48,6 +54,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @InjectWith(FragmentScope::class)
 class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_autofill_management_edit_mode), MenuProvider {
@@ -74,15 +81,24 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
     private val binding: FragmentAutofillManagementEditModeBinding by viewBinding()
 
     override fun onPrepareMenu(menu: Menu) {
-        if (viewModel.viewState.value.credentialMode is Editing) {
-            menu.findItem(R.id.view_menu_save).isVisible = (viewModel.viewState.value.credentialMode as Editing).saveable
-            menu.findItem(R.id.view_menu_delete).isVisible = false
-            menu.findItem(R.id.view_menu_edit).isVisible = false
-        } else if (viewModel.viewState.value.credentialMode is Viewing) {
-            menu.findItem(R.id.view_menu_save).isVisible = false
-            menu.findItem(R.id.view_menu_delete).isVisible = true
-            menu.findItem(R.id.view_menu_edit).isVisible = true
+        var saveButtonVisible = false
+        var deleteButtonVisible = false
+        var editButtonVisible = false
+        when (viewModel.viewState.value.credentialMode) {
+            is Editing -> {
+                saveButtonVisible = (viewModel.viewState.value.credentialMode as Editing).saveable
+            }
+
+            is Viewing -> {
+                deleteButtonVisible = true
+                editButtonVisible = true
+            }
+
+            else -> {}
         }
+        menu.findItem(R.id.view_menu_save).isVisible = saveButtonVisible
+        menu.findItem(R.id.view_menu_delete).isVisible = deleteButtonVisible
+        menu.findItem(R.id.view_menu_edit).isVisible = editButtonVisible
     }
 
     override fun onCreateMenu(
@@ -95,16 +111,12 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
         return when (menuItem.itemId) {
             R.id.view_menu_edit -> {
-                viewModel.viewState.value.credentialMode.credentialsViewed?.let {
-                    viewModel.onEditCredentials(it, true)
-                }
+                viewModel.onEditCurrentCredentials()
                 true
             }
 
             R.id.view_menu_delete -> {
-                viewModel.viewState.value.credentialMode.credentialsViewed?.let {
-                    viewModel.onDeleteCredentials(it)
-                }
+                viewModel.onDeleteCurrentCredentials()
                 viewModel.onExitCredentialMode()
                 true
             }
@@ -125,11 +137,25 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
         super.onViewCreated(view, savedInstanceState)
         requireActivity().addMenuProvider(this)
         observeViewModel()
-        binding.watchSaveState(saveStateWatcher) {
-            viewModel.allowSaveInEditMode(it)
-        }
         configureUiEventHandlers()
         initialiseToolbar()
+    }
+
+    private fun startEditTextWatchers() {
+        val initialState = binding.currentTextState()
+        viewModel.allowSaveInEditMode(false)
+        binding.watchSaveState(saveStateWatcher) {
+            val currentState = binding.currentTextState()
+
+            val changed = currentState != initialState
+            val empty = currentState.isEmpty()
+
+            viewModel.allowSaveInEditMode(!empty && changed)
+        }
+    }
+
+    private fun stopEditTextWatchers() {
+        binding.removeSaveStateWatcher(saveStateWatcher)
     }
 
     private fun initialiseToolbar() {
@@ -146,7 +172,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
         binding.removeSaveStateWatcher(saveStateWatcher)
     }
 
-    private fun initializeEditStateIfNecessary(mode: Editing) {
+    private fun initializeEditStateIfNecessary(mode: EditingExisting) {
         if (!mode.hasPopulatedFields) {
             populateFields(mode.credentialsViewed)
             viewModel.onCredentialEditModePopulated()
@@ -181,7 +207,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
             domainTitle = binding.domainTitleEditText.text.convertBlankToNull(),
             notes = binding.notesEditText.text.convertBlankToNull(),
         )
-        viewModel.updateCredentials(updatedCredentials)
+        viewModel.saveOrUpdateCredentials(updatedCredentials)
     }
 
     private fun populateFields(credentials: LoginCredentials) {
@@ -211,10 +237,10 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
             domainEditText.isEditable = false
             notesEditText.isEditable = false
         }
+        stopEditTextWatchers()
     }
 
     private fun showEditMode() {
-        updateToolbarForEdit()
         binding.apply {
             domainTitleEditText.visibility = View.VISIBLE
             lastUpdatedView.visibility = View.GONE
@@ -224,6 +250,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
             domainEditText.isEditable = true
             notesEditText.isEditable = true
         }
+        startEditTextWatchers()
     }
 
     private fun DaxTextInput.setText(text: String?) {
@@ -231,6 +258,14 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
     }
 
     private fun observeViewModel() {
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.commandsCredentialView.collect { commands ->
+                    commands.forEach { processCommand(it) }
+                }
+            }
+        }
+
         viewModel.viewState
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
             .onEach { state ->
@@ -240,15 +275,32 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
                         showViewMode(state.credentialMode.credentialsViewed)
                     }
 
-                    is Editing -> {
+                    is EditingExisting -> {
                         initializeEditStateIfNecessary(state.credentialMode)
-                        showEditMode()
+                        updateToolbarForEdit()
+                    }
+
+                    is EditingNewEntry -> {
+                        updateToolbarForEdit()
                     }
 
                     else -> {
                     }
                 }
             }.launchIn(lifecycleScope)
+    }
+
+    private fun processCommand(command: CredentialModeCommand) {
+        var processed = true
+        when (command) {
+            is ShowEditCredentialMode -> showEditMode()
+            is ShowManualCredentialMode -> showEditMode()
+            else -> processed = false
+        }
+        if (processed) {
+            Timber.v("Processed command $command")
+            viewModel.commandProcessed(command)
+        }
     }
 
     private fun String.convertBlankToNull(): String? = this.ifBlank { null }
@@ -280,9 +332,9 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
                         faviconManager.loadFromDiskWithParams(
                             tabId = null,
                             url = it,
-                            width = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.toolbarIconSize),
-                            height = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.toolbarIconSize),
-                            cornerRadius = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_0),
+                            width = resources.getDimensionPixelSize(dimen.toolbarIconSize),
+                            height = resources.getDimensionPixelSize(dimen.toolbarIconSize),
+                            cornerRadius = resources.getDimensionPixelSize(dimen.keyline_0),
                         ),
                     ),
                 )

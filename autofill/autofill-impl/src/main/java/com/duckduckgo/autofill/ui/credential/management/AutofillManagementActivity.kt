@@ -43,7 +43,8 @@ import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewMode
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowLockedMode
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowUserPasswordCopied
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowUserUsernameCopied
-import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Editing
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.EditingExisting
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.EditingNewEntry
 import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementCredentialsMode
 import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementDisabledMode
 import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementListMode
@@ -145,7 +146,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
     private fun processCommand(command: AutofillSettingsViewModel.Command) {
         var processed = true
         when (command) {
-            is ShowCredentialMode -> showCredentialMode(command.credentials, command.isLaunchedDirectly)
+            is ShowCredentialMode -> showCredentialMode(command.isLaunchedDirectly)
             is ShowUserUsernameCopied -> showCopiedToClipboardSnackbar("Username")
             is ShowUserPasswordCopied -> showCopiedToClipboardSnackbar("Password")
             is ShowDisabledMode -> showDisabledMode()
@@ -178,17 +179,12 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun showCredentialMode(
-        credentials: LoginCredentials?,
-        isLaunchedDirectly: Boolean,
-    ) {
-        if (credentials != null) {
-            supportFragmentManager.commit {
-                setReorderingAllowed(true)
-                replace(R.id.fragment_container_view, AutofillManagementCredentialsMode.instance(), TAG_CREDENTIAL)
-                if (!isLaunchedDirectly) {
-                    addToBackStack(TAG_CREDENTIAL)
-                }
+    private fun showCredentialMode(isLaunchedDirectly: Boolean) {
+        supportFragmentManager.commit {
+            setReorderingAllowed(true)
+            replace(R.id.fragment_container_view, AutofillManagementCredentialsMode.instance(), TAG_CREDENTIAL)
+            if (!isLaunchedDirectly) {
+                addToBackStack(TAG_CREDENTIAL)
             }
         }
     }
@@ -250,7 +246,8 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
 
     override fun onBackPressed() {
         when (viewModel.viewState.value.credentialMode) {
-            is Editing -> viewModel.onCancelEditMode()
+            is EditingExisting -> viewModel.onCancelEditMode()
+            is EditingNewEntry -> viewModel.onCancelManualCreation()
             else -> super.onBackPressed()
         }
     }

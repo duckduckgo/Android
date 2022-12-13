@@ -17,8 +17,12 @@
 package com.duckduckgo.autofill.ui.credential.management.viewing
 
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.widget.CompoundButton
+import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -93,6 +97,28 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         configureToggle()
         configureRecyclerView()
         observeViewModel()
+        configureToolbar()
+    }
+
+    private fun configureToolbar() {
+        activity?.addMenuProvider(
+            object : MenuProvider {
+                override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) = menuInflater.inflate(R.menu.autofill_list_mode_menu, menu)
+
+                override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                    return when (menuItem.itemId) {
+                        R.id.addLoginManually -> {
+                            viewModel.onCreateNewCredentials()
+                            true
+                        }
+
+                        else -> false
+                    }
+                }
+            },
+            viewLifecycleOwner,
+            Lifecycle.State.RESUMED,
+        )
     }
 
     private fun getCurrentUrlForSuggestions() = arguments?.getString(ARG_CURRENT_URL, null)
@@ -165,7 +191,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
             onCredentialSelected = this::onCredentialsSelected,
             onContextMenuItemClicked = {
                 when (it) {
-                    is Edit -> viewModel.onEditCredentials(it.credentials, false)
+                    is Edit -> viewModel.onEditCredentials(it.credentials)
                     is Delete -> viewModel.onDeleteCredentials(it.credentials)
                     is CopyUsername -> onCopyUsername(it.credentials)
                     is CopyPassword -> onCopyPassword(it.credentials)
