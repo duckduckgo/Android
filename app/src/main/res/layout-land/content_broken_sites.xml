@@ -45,78 +45,45 @@
                 android:layout_height="150dp"
                 android:layout_marginTop="8dp"
                 android:importantForAccessibility="no"
-                android:src="@drawable/broken_bicycle" />
+                android:src="@drawable/broken_bike" />
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:id="@+id/noteText"
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="12dp"
-                android:lineSpacingExtra="4sp"
                 android:text="@string/brokenSiteDescription"
-                android:textColor="?attr/normalTextColor"
-                android:textSize="15sp" />
+                app:typography="body1" />
         </LinearLayout>
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:layout_width="12dp"
-            android:layout_height="12dp"
-            android:layout_marginTop="26dp"
-            android:layout_marginEnd="18dp"
-            app:layout_constraintEnd_toEndOf="@+id/textInputLayout"
-            app:layout_constraintTop_toTopOf="@id/textInputLayout"
-            app:srcCompat="@drawable/ic_broken_sites_down_arrow" />
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/textInputLayout"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
+            android:id="@+id/categoriesSelection"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginStart="25dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginEnd="25dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_5"
+            android:layout_marginTop="@dimen/keyline_3"
+            android:layout_marginEnd="@dimen/keyline_5"
             android:hint="@string/brokenSitesCategoriesHint"
-            android:textColorHint="?attr/brokenSiteOutlinedColor"
-            app:boxStrokeColor="@color/broken_sites_dropdown_selector"
-            app:hintTextColor="@color/broken_sites_dropdown_selector"
+            app:editable="false"
+            app:endIcon="@drawable/ic_chevron_down_24_small"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/headerLayout">
+            app:layout_constraintTop_toBottomOf="@id/headerLayout" />
 
-            <EditText
-                android:id="@+id/categoriesSelection"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:cursorVisible="false"
-                android:ellipsize="end"
-                android:focusable="false"
-                android:importantForAutofill="no"
-                android:inputType="none"
-                android:labelFor="@id/categoriesSelection"
-                android:maxLines="1"
-                android:paddingEnd="32dp"
-                android:textColor="?attr/normalTextColor"
-                android:textIsSelectable="false"
-                tools:ignore="RtlSymmetry" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryLarge
+        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
             android:id="@+id/submitButton"
             android:layout_width="0dp"
-            android:layout_height="70dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="25dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="25dp"
             android:layout_marginBottom="30dp"
             android:text="@string/brokenSiteSubmitButton"
-            android:textSize="15sp"
-            android:textAllCaps="true"
+            app:buttonSize="large"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/textInputLayout" />
+            app:layout_constraintTop_toBottomOf="@id/categoriesSelection" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </ScrollView>

@@ -82,7 +82,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
     private fun configureListeners() {
         val categories = viewModel.categories.map { getString(it.category) }.toTypedArray()
 
-        brokenSites.categoriesSelection.setOnClickListener {
+        brokenSites.categoriesSelection.onAction {
             AlertDialog.Builder(this)
                 .setTitle(getString(R.string.brokenSitesCategoriesTitle))
                 .setSingleChoiceItems(categories, viewModel.indexSelected) { _, newIndex ->
@@ -129,7 +129,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         val category = viewState.categorySelected?.let {
             getString(viewState.categorySelected.category)
         }.orEmpty()
-        brokenSites.categoriesSelection.setText(category)
+        brokenSites.categoriesSelection.text = category
         brokenSites.submitButton.isEnabled = viewState.submitAllowed
     }
 
