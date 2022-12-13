@@ -27,7 +27,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesMultibinding(
     scope = VpnScope::class,
@@ -41,11 +41,11 @@ class WgStatsMonitor @Inject constructor(
     private var logConfigJob: Job? = null
     private var isRunning = false
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        Timber.d("onVpnStarted called")
+        logcat { "onVpnStarted called" }
         isRunning = true
         logConfigJob = coroutineScope.launch(dispactherProvider.io()) {
             while (isRunning) {
-                Timber.d("NetP config: ${wgProtocol.getStatistics()}")
+                logcat { "NetP config: ${wgProtocol.getStatistics()}" }
                 delay(2000)
             }
         }
@@ -55,7 +55,7 @@ class WgStatsMonitor @Inject constructor(
         coroutineScope: CoroutineScope,
         vpnStopReason: VpnStopReason,
     ) {
-        Timber.d("onVpnStopped called")
+        logcat { "onVpnStopped called" }
         isRunning = false
         logConfigJob?.cancel()
         logConfigJob = null

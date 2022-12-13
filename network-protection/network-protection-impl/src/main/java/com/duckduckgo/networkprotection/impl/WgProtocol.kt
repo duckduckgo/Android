@@ -23,7 +23,8 @@ import com.wireguard.android.backend.GoBackend
 import com.wireguard.crypto.Key
 import dagger.SingleInstanceIn
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority
+import logcat.logcat
 
 interface WgProtocol {
     fun startWg(
@@ -50,7 +51,7 @@ class RealWgProtocol @Inject constructor(
     ) {
         wgTunnel = goBackend.wgTurnOn(INTERFACE_NAME, tunFd, configString, androidLogLevel)
         if (wgTunnel < 0) {
-            Timber.e("Wireguard tunnel failed to start: check config / tunFd")
+            logcat(LogPriority.ERROR) { "Wireguard tunnel failed to start: check config / tunFd" }
         }
     }
 
@@ -63,7 +64,7 @@ class RealWgProtocol @Inject constructor(
         goBackend.wgGetConfig(wgTunnel)?.toNetworkProtectionStatistics() ?: NetworkProtectionStatistics()
 
     private fun String.toNetworkProtectionStatistics(): NetworkProtectionStatistics {
-        Timber.d("Full config $this")
+        logcat { "Full config $this" }
         var rx = 0L
         var tx = 0L
         var serverIP = ""

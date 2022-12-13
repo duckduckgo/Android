@@ -28,7 +28,9 @@ import dagger.SingleInstanceIn
 import java.net.InetSocketAddress
 import javax.inject.Inject
 import kotlin.system.exitProcess
-import timber.log.Timber
+import logcat.LogPriority
+import logcat.asLog
+import logcat.logcat
 
 @SingleInstanceIn(VpnScope::class)
 class GoBackend @Inject constructor(
@@ -37,10 +39,10 @@ class GoBackend @Inject constructor(
 ) {
     init {
         try {
-            Timber.v("Loading wireguard-go library")
+            logcat { "Loading wireguard-go library" }
             LibraryLoader.loadLibrary(context, "wg-go")
         } catch (ignored: Throwable) {
-            Timber.e(ignored, "Error loading wireguard-go library")
+            logcat(LogPriority.ERROR) { "Error loading wireguard-go library: ${ignored.asLog()}" }
             exitProcess(1)
         }
     }
@@ -66,7 +68,7 @@ class GoBackend @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.Q)
     @Suppress("unused")
     fun shouldAllow(protocol: Int, saddr: String, sport: Int, daddr: String, dport: Int, sni: String): Boolean {
-        Timber.v(
+        logcat {
             """
             shouldAllow called for
               protocol=$protocol
@@ -75,8 +77,8 @@ class GoBackend @Inject constructor(
               daddr=$daddr
               dport=$dport
               sni=$sni
-            """.trimIndent(),
-        )
+            """.trimIndent()
+        }
 
         if (protocol != 6 /* TCP */ && protocol != 17 /* UDP */) return true
 
@@ -85,7 +87,7 @@ class GoBackend @Inject constructor(
         val local = InetSocketAddress(saddr, sport)
         val remote = InetSocketAddress(daddr, dport)
 
-        Timber.v("Get uid local=$local remote=$remote")
+        logcat { "Get uid local=$local remote=$remote" }
         val uid = cm.getConnectionOwnerUid(protocol, local, remote)
         return shouldAllowDomain(sni, uid)
     }
@@ -95,7 +97,7 @@ class GoBackend @Inject constructor(
         uid: Int,
     ): Boolean {
         val tracker = appTrackerDetector.evaluate(name, uid)
-        Timber.d("shouldAllowDomain for $name ($uid) = $tracker")
+        logcat { "shouldAllowDomain for $name ($uid) = $tracker" }
 
         return tracker == null
     }

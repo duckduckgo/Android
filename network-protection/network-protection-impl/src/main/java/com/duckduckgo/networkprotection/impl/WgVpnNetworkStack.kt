@@ -18,13 +18,12 @@ package com.duckduckgo.networkprotection.impl
 
 import android.os.ParcelFileDescriptor
 import android.util.Log
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack.VpnTunnelConfig
 import com.duckduckgo.networkprotection.impl.configuration.WgConfigProvider
-import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
 import com.wireguard.config.BadConfigException
 import com.wireguard.config.BadConfigException.Location.TOP_LEVEL
 import com.wireguard.config.BadConfigException.Reason
@@ -33,10 +32,9 @@ import com.wireguard.config.Config
 import dagger.Lazy
 import dagger.SingleInstanceIn
 import javax.inject.Inject
-import kotlinx.coroutines.runBlocking
-import timber.log.Timber
+import logcat.logcat
 
-@ContributesBinding(
+@ContributesMultibinding(
     scope = VpnScope::class,
     boundType = VpnNetworkStack::class,
 )
@@ -44,21 +42,19 @@ import timber.log.Timber
 class WgVpnNetworkStack @Inject constructor(
     private val wgProtocol: Lazy<WgProtocol>,
     private val configProvider: Lazy<WgConfigProvider>,
-    private val dispatcherProvider: DispatcherProvider,
     private val appBuildConfig: AppBuildConfig,
 ) : VpnNetworkStack {
     private var wgThread: Thread? = null
     private var config: Config? = null
-    override val name: String = "wireguard"
+
+    override val name: String = NetPVpnFeature.NETP_VPN.featureName
 
     override fun onCreateVpn(): Result<Unit> = Result.success(Unit)
 
-    override fun onPrepareVpn(): Result<VpnTunnelConfig> {
+    override suspend fun onPrepareVpn(): Result<VpnTunnelConfig> {
         return try {
-            runBlocking(dispatcherProvider.io()) {
-                config = configProvider.get().get().also {
-                    Timber.d("Received config from BE: $it")
-                }
+            config = configProvider.get().get().also {
+                logcat { "Received config from BE: $it" }
             }
             Result.success(
                 VpnTunnelConfig(
@@ -66,6 +62,11 @@ class WgVpnNetworkStack @Inject constructor(
                     addresses = config?.getInterface()?.addresses?.associate { Pair(it.address, it.mask) } ?: emptyMap(),
                     dns = emptySet(),
                     routes = emptyMap(),
+                    // TODO: for now we exclude our app from going through the VPN
+                    appExclusionList = setOf(
+                        "com.duckduckgo.mobile.android.debug.netp",
+                        "com.duckduckgo.mobile.android.netp",
+                    ),
                 ),
             )
         } catch (e: Exception) {
@@ -74,17 +75,17 @@ class WgVpnNetworkStack @Inject constructor(
     }
 
     override fun onStartVpn(tunfd: ParcelFileDescriptor): Result<Unit> {
-        Timber.d("onStartVpn called.")
+        logcat { "onStartVpn called." }
         return turnOnNative(tunfd.fd)
     }
 
     override fun onStopVpn(): Result<Unit> {
-        Timber.d("onStopVpn called.")
+        logcat { "onStopVpn called." }
         return turnOffNative()
     }
 
     override fun onDestroyVpn(): Result<Unit> {
-        Timber.d("onDestroyVpn called.")
+        logcat { "onDestroyVpn called." }
         return Result.success(Unit)
     }
 
@@ -93,19 +94,19 @@ class WgVpnNetworkStack @Inject constructor(
             return Result.failure(BadConfigException(CONFIG, TOP_LEVEL, Reason.MISSING_SECTION, "Config could not be empty."))
         }
         if (wgThread == null) {
-            Timber.d("turnOnNative wg")
+            logcat { "turnOnNative wg" }
 
             val level = if (appBuildConfig.isDebug) Log.VERBOSE else Log.ASSERT
             wgThread = Thread {
-                Timber.d("Thread: Started turnOnNative")
+                logcat { "Thread: Started turnOnNative" }
                 wgProtocol.get().startWg(
                     tunfd,
                     config!!.toWgUserspaceString().also {
-                        Timber.d("WgUserspace config: $it")
+                        logcat { "WgUserspace config: $it" }
                     },
                     level,
                 )
-                Timber.d("Thread: Completed turnOnNative")
+                logcat { "Thread: Completed turnOnNative" }
                 wgThread = null
             }.also { it.start() }
         }
@@ -115,12 +116,12 @@ class WgVpnNetworkStack @Inject constructor(
 
     private fun turnOffNative(): Result<Unit> {
         if (wgThread == null) {
-            Timber.d("turnOffNative wg")
+            logcat { "turnOffNative wg" }
 
             wgThread = Thread {
-                Timber.d("Thread: Started turnOffNative")
+                logcat { "Thread: Started turnOffNative" }
                 wgProtocol.get().stopWg()
-                Timber.d("Thread: Completed turnOffNative")
+                logcat { "Thread: Completed turnOffNative" }
                 wgThread = null
             }.also { it.start() }
         }
