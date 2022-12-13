@@ -1,0 +1,78 @@
+apply plugin: 'com.android.library'
+
+import org.gradle.internal.os.OperatingSystem
+
+android {
+    compileSdkVersion 30
+
+    defaultConfig {
+        minSdkVersion 23
+        targetSdkVersion 30
+        versionCode 1
+        versionName "1.0.18.0"
+
+        defaultConfig {
+            ndk {
+                moduleName "sodium-jni"
+                abiFilters 'arm64-v8a', 'x86', 'x86_64'
+            }
+        }
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    sourceSets {
+        main {
+            jniLibs.srcDir "jniLibs"
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path "src/main/cpp/CMakeLists.txt"
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    def arches = [
+            [android: 'armeabi-v7a', sodium: 'armv7-a', sodium_out: 'armv7-a'],
+            [android: 'arm64-v8a', sodium: 'armv8-a', sodium_out: 'armv8-a'],
+            [android: 'x86', sodium: 'x86', sodium_out: 'i686'],
+            [android: 'x86_64', sodium: 'x86_64', sodium_out: 'westmere']
+    ]
+
+    arches.each { arch ->
+        def compileTask = "compileSodium_${arch['android']}"
+
+        task (compileTask) {
+            def dir = './src/main/cpp/third-party'
+            inputs.dir  fileTree(dir: "${dir}/src", exclude: ["${dir}/**/.libs", "${dir}/*.la", "${dir}/**/*.lo", "${dir}/**/*.o", "${dir}/**/*.Plo", "**/Makefile", "**/Makefile.in", "**/.deps/*", "**/.libs/*"])
+            outputs.dir("${dir}/libsodium-android-${arch['sodium_out']}")
+            doFirst {
+                exec {
+                    workingDir dir
+                    environment 'LIBSODIUM_FULL_BUILD', 'true'
+                    def script = "./dist-build/android-${arch['sodium']}.sh"
+                    environment 'ANDROID_NDK_HOME', android.ndkDirectory
+                    commandLine script
+                }
+            }
+        }
+
+        gradle.projectsEvaluated {
+            externalNativeBuildDebug.dependsOn compileTask
+            externalNativeBuildRelease.dependsOn compileTask
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation JakeWharton.timber
+}

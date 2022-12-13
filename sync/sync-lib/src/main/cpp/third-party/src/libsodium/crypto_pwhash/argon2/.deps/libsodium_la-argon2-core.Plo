@@ -1,0 +1,264 @@
+crypto_pwhash/argon2/libsodium_la-argon2-core.lo: \
+  crypto_pwhash/argon2/argon2-core.c \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/errno.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/sys/cdefs.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/android/versioning.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/android/api-level.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/bits/get_device_api_level_inlines.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/android/ndk-version.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/linux/errno.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/arm-linux-androideabi/asm/errno.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/asm-generic/errno.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/asm-generic/errno-base.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/android/legacy_errno_inlines.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/include/stdint.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/stdint.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/bits/wchar_limits.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/include/stddef.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/include/__stddef_max_align_t.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/stdio.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/sys/types.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/linux/types.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/arm-linux-androideabi/asm/types.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/asm-generic/int-ll64.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/arm-linux-androideabi/asm/bitsperlong.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/asm-generic/bitsperlong.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/linux/posix_types.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/linux/stddef.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/linux/compiler_types.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/linux/compiler.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/arm-linux-androideabi/asm/posix_types.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/asm-generic/posix_types.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/bits/pthread_types.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/include/stdarg.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/bits/seek_constants.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/bits/struct_file.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/local/include/stdlib.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/stdlib.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/alloca.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/bits/wait.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/linux/wait.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/malloc.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/xlocale.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/android/legacy_stdlib_inlines.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/include/float.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/string.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/bits/strcasecmp.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/strings.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/android/legacy_strings_inlines.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/sys/mman.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/linux/memfd.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/asm-generic/hugetlb_encode.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/linux/mman.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/arm-linux-androideabi/asm/mman.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/asm-generic/mman.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/asm-generic/mman-common.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/android/legacy_sys_mman_inlines.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/unistd.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/sys/select.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/linux/time.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/linux/time_types.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/signal.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/arm-linux-androideabi/asm/sigcontext.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/bits/signal_types.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/include/limits.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/limits.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/linux/limits.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/bits/posix_limits.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/linux/signal.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/arm-linux-androideabi/asm/signal.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/asm-generic/signal-defs.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/arm-linux-androideabi/asm/siginfo.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/asm-generic/siginfo.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/bits/timespec.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/sys/ucontext.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/sys/user.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/android/legacy_signal_inlines.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/bits/fcntl.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/bits/getopt.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/bits/ioctl.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/bits/lockf.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/bits/sysconf.h \
+  include/sodium/crypto_generichash_blake2b.h include/sodium/export.h \
+  include/sodium/private/common.h include/sodium/private/quirks.h \
+  include/sodium/private/implementations.h include/sodium/runtime.h \
+  include/sodium/utils.h crypto_pwhash/argon2/argon2-core.h \
+  crypto_pwhash/argon2/argon2.h crypto_pwhash/argon2/blake2b-long.h
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/errno.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/sys/cdefs.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/android/versioning.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/android/api-level.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/bits/get_device_api_level_inlines.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/android/ndk-version.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/linux/errno.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/arm-linux-androideabi/asm/errno.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/asm-generic/errno.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/asm-generic/errno-base.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/android/legacy_errno_inlines.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/include/stdint.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/stdint.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/bits/wchar_limits.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/include/stddef.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/include/__stddef_max_align_t.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/stdio.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/sys/types.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/linux/types.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/arm-linux-androideabi/asm/types.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/asm-generic/int-ll64.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/arm-linux-androideabi/asm/bitsperlong.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/asm-generic/bitsperlong.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/linux/posix_types.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/linux/stddef.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/linux/compiler_types.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/linux/compiler.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/arm-linux-androideabi/asm/posix_types.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/asm-generic/posix_types.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/bits/pthread_types.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/include/stdarg.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/bits/seek_constants.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/bits/struct_file.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/local/include/stdlib.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/stdlib.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/alloca.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/bits/wait.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/linux/wait.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/malloc.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/xlocale.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/android/legacy_stdlib_inlines.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/include/float.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/string.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/bits/strcasecmp.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/strings.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/android/legacy_strings_inlines.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/sys/mman.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/linux/memfd.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/asm-generic/hugetlb_encode.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/linux/mman.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/arm-linux-androideabi/asm/mman.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/asm-generic/mman.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/asm-generic/mman-common.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/android/legacy_sys_mman_inlines.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/unistd.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/sys/select.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/linux/time.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/linux/time_types.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/signal.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/arm-linux-androideabi/asm/sigcontext.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/bits/signal_types.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/include/limits.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/limits.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/linux/limits.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/bits/posix_limits.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/linux/signal.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/arm-linux-androideabi/asm/signal.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/asm-generic/signal-defs.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/arm-linux-androideabi/asm/siginfo.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/asm-generic/siginfo.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/bits/timespec.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/sys/ucontext.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/sys/user.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/android/legacy_signal_inlines.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/bits/fcntl.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/bits/getopt.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/bits/ioctl.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/bits/lockf.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/bits/sysconf.h:
+
+include/sodium/crypto_generichash_blake2b.h:
+
+include/sodium/export.h:
+
+include/sodium/private/common.h:
+
+include/sodium/private/quirks.h:
+
+include/sodium/private/implementations.h:
+
+include/sodium/runtime.h:
+
+include/sodium/utils.h:
+
+crypto_pwhash/argon2/argon2-core.h:
+
+crypto_pwhash/argon2/argon2.h:
+
+crypto_pwhash/argon2/blake2b-long.h:

@@ -1,0 +1,58 @@
+crypto_box/libsodium_la-crypto_box.lo: crypto_box/crypto_box.c \
+  include/sodium/crypto_box.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/include/stddef.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/include/__stddef_max_align_t.h \
+  include/sodium/crypto_box_curve25519xsalsa20poly1305.h \
+  include/sodium/crypto_stream_xsalsa20.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/include/stdint.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/stdint.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/bits/wchar_limits.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/sys/cdefs.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/android/versioning.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/android/api-level.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/bits/get_device_api_level_inlines.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/android/ndk-version.h \
+  include/sodium/export.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/include/limits.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/limits.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/include/float.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/linux/limits.h \
+  /Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/bits/posix_limits.h
+
+include/sodium/crypto_box.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/include/stddef.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/include/__stddef_max_align_t.h:
+
+include/sodium/crypto_box_curve25519xsalsa20poly1305.h:
+
+include/sodium/crypto_stream_xsalsa20.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/include/stdint.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/stdint.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/bits/wchar_limits.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/sys/cdefs.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/android/versioning.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/android/api-level.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/bits/get_device_api_level_inlines.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/android/ndk-version.h:
+
+include/sodium/export.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/include/limits.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/limits.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/include/float.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/linux/limits.h:
+
+/Users/cristian/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64//bin/../sysroot/usr/include/bits/posix_limits.h:
