@@ -19,11 +19,11 @@ package com.duckduckgo.app.location.ui
 import android.app.Dialog
 import android.os.Bundle
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentSystemLocationPermissionDialogBinding
 import com.duckduckgo.app.global.extensions.websiteFromGeoLocationsApiOrigin
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class SystemLocationPermissionDialog : DialogFragment() {
 
@@ -41,7 +41,9 @@ class SystemLocationPermissionDialog : DialogFragment() {
 
         val binding = ContentSystemLocationPermissionDialogBinding.inflate(layoutInflater, null, false)
 
-        val alertBuilder = AlertDialog.Builder(requireActivity()).setView(binding.root)
+        val alertBuilder = MaterialAlertDialogBuilder(requireActivity(), com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_Dialog).setView(
+            binding.root,
+        )
 
         validateBundleArguments()
         populateSubtitle(binding.systemPermissionDialogSubtitle)

@@ -92,6 +92,7 @@ class CustomAlertDialogBuilder(val context: Context) : DaxAlertDialog {
     }
 
     override fun build(): DaxAlertDialog {
+        checkRequiredFieldsSet()
         val binding: DialogCustomAlertBinding = DialogCustomAlertBinding.inflate(LayoutInflater.from(context))
         binding.customDialogContent.addView(customBinding?.root)
 
@@ -119,11 +120,23 @@ class CustomAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         dialog?.dismiss()
     }
 
+    override fun isShowing(): Boolean {
+        return if (dialog != null) {
+            dialog!!.isShowing
+        } else {
+            false
+        }
+    }
+
     private fun setViews(
         binding: DialogCustomAlertBinding,
         dialog: AlertDialog,
     ) {
-        binding.customDialogTitle.text = titleText
+        if (titleText.isEmpty()) {
+            binding.customDialogTitle.gone()
+        } else {
+            binding.customDialogTitle.text = titleText
+        }
 
         if (messageText.isEmpty()) {
             binding.customDialogMessage.gone()
@@ -149,6 +162,15 @@ class CustomAlertDialogBuilder(val context: Context) : DaxAlertDialog {
                 listener.onNegativeButtonClicked()
                 dialog.dismiss()
             }
+        }
+    }
+
+    private fun checkRequiredFieldsSet() {
+        if (positiveButtonText.isEmpty()) {
+            throw Exception("CustomAlertDialogBuilder: You must always provide a Positive Button")
+        }
+        if (negativeButtonText.isEmpty()) {
+            throw Exception("CustomAlertDialogBuilder: You must always provide a Negative Button")
         }
     }
 }

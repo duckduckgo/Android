@@ -19,10 +19,8 @@ package com.duckduckgo.app.location.ui
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
-import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -33,6 +31,7 @@ import com.duckduckgo.app.global.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.view.gone
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.Job
@@ -74,8 +73,9 @@ class SiteLocationPermissionDialog : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val binding = ContentSiteLocationPermissionDialogBinding.inflate(layoutInflater, null, false)
-
-        val alertDialog = AlertDialog.Builder(requireActivity()).setView(binding.root)
+        val alertDialog = MaterialAlertDialogBuilder(requireActivity(), com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_Dialog).setView(
+            binding.root,
+        )
 
         validateBundleArguments()
         populateTitle(binding.sitePermissionDialogTitle)
@@ -90,11 +90,8 @@ class SiteLocationPermissionDialog : DialogFragment() {
         hideExtraViews(
             binding.siteAllowOnceLocationPermission,
             binding.siteDenyOnceLocationPermission,
-            binding.siteAllowOnceLocationPermissionDivider,
-            binding.siteDenyLocationPermissionDivider,
         )
         makeCancellable()
-
         return alertDialog.create()
     }
 
@@ -165,12 +162,8 @@ class SiteLocationPermissionDialog : DialogFragment() {
     private fun hideExtraViews(
         allowOnce: TextView,
         denyOnce: TextView,
-        dividerOne: View,
-        dividerTwo: View,
     ) {
         if (isEditingPermissions()) {
-            dividerOne.gone()
-            dividerTwo.gone()
             allowOnce.gone()
             denyOnce.gone()
         }

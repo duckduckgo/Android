@@ -131,6 +131,14 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         dialog?.dismiss()
     }
 
+    override fun isShowing(): Boolean {
+        return if (dialog != null) {
+            dialog!!.isShowing
+        } else {
+            false
+        }
+    }
+
     private fun setViews(
         binding: DialogSingleChoiceAlertBinding,
         dialog: AlertDialog,

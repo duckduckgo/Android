@@ -77,7 +77,6 @@ import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
 import com.duckduckgo.app.browser.remotemessage.asBrowserTabCommand
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
-import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
 import com.duckduckgo.app.browser.urlextraction.UrlExtractionListener
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -190,7 +189,6 @@ class BrowserTabViewModel @Inject constructor(
     private val sitePermissionsManager: SitePermissionsManager,
 ) : WebViewClientListener,
     EditSavedSiteListener,
-    HttpAuthenticationListener,
     SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
     SystemLocationPermissionDialog.SystemLocationPermissionDialogListener,
     UrlExtractionListener,
@@ -2549,7 +2547,7 @@ class BrowserTabViewModel @Inject constructor(
         command.value = RequiresAuthentication(request)
     }
 
-    override fun handleAuthentication(
+    fun handleAuthentication(
         request: BasicAuthenticationRequest,
         credentials: BasicAuthenticationCredentials,
     ) {
@@ -2558,7 +2556,7 @@ class BrowserTabViewModel @Inject constructor(
         command.value = SaveCredentials(request, credentials)
     }
 
-    override fun cancelAuthentication(request: BasicAuthenticationRequest) {
+    fun cancelAuthentication(request: BasicAuthenticationRequest) {
         request.handler.cancel()
         command.value = ShowWebContent
     }
