@@ -32,8 +32,7 @@
         android:importantForAccessibility="no"
         android:src="@drawable/ic_globe_gray_16dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent"/>
 
     <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/textAlertDialogTitle"
@@ -42,8 +41,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textAlertDialogImage"
-        app:textType="primary"
-        app:typography="h2"/>
+        app:textType="primary" app:typography="h2"/>
 
     <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/textAlertDialogMessage"
