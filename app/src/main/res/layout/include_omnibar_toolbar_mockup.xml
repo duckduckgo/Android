@@ -47,20 +47,20 @@
                 android:id="@+id/searchIconMockup"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:importantForAccessibility="no"
                 android:gravity="center"
-                android:padding="4dp"
-                android:src="@drawable/ic_find_search_20" />
+                android:importantForAccessibility="no"
+                android:padding="6dp"
+                android:src="@drawable/ic_find_search_20_a05"/>
 
             <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:id="@+id/omnibarTextInputMockup"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="@string/omnibarInputHint"
-                android:maxLines="1"
                 android:gravity="start|center"
+                android:maxLines="1"
                 android:paddingStart="37dp"
                 android:paddingEnd="8dp"
+                android:text="@string/omnibarInputHint"
                 android:textColor="?attr/daxColorSecondaryText"/>
 
         </FrameLayout>
@@ -86,7 +86,7 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/browserPopupMenu"
                 android:padding="@dimen/toolbarIconPadding"
-                android:src="@drawable/ic_fire" />
+                android:src="@drawable/ic_fire"/>
         </FrameLayout>
 
         <com.duckduckgo.app.browser.TabSwitcherButton
@@ -95,11 +95,11 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/keyline_2"
             android:layout_marginEnd="@dimen/keyline_2"
-            android:background="?selectableItemBackgroundBorderless"
+            android:padding="@dimen/toolbarIconPadding"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/browserMenuMockup"
             app:layout_constraintStart_toEndOf="@id/fireIconMenuMockup"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"/>
 
         <FrameLayout
             android:id="@+id/browserMenuMockup"
@@ -119,7 +119,7 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/browserPopupMenu"
                 android:padding="@dimen/toolbarIconPadding"
-                android:src="@drawable/ic_menu_vertical_24" />
+                android:src="@drawable/ic_menu_vertical_24"/>
 
         </FrameLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
