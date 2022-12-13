@@ -82,7 +82,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
-                        android:layout_marginEnd="6dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent">
@@ -91,30 +90,30 @@
                             android:id="@+id/daxIcon"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
-                            android:importantForAccessibility="no"
                             android:gravity="center"
+                            android:importantForAccessibility="no"
                             android:padding="4dp"
                             android:src="@drawable/ic_ddg_logo"
-                            android:visibility="gone" />
+                            android:visibility="gone"/>
 
                         <ImageView
                             android:id="@+id/searchIcon"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
-                            android:importantForAccessibility="no"
                             android:gravity="center"
+                            android:importantForAccessibility="no"
                             android:padding="6dp"
-                            android:src="@drawable/ic_find_search_20" />
+                            android:src="@drawable/ic_find_search_20_a05"/>
 
                         <FrameLayout
+                            android:id="@+id/scene_root"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="start|center_vertical"
-                            android:visibility="gone"
                             android:layout_marginStart="17dp"
                             android:layout_marginEnd="4dp"
-                            android:id="@+id/scene_root">
-                            <include layout="@layout/cookie_scene_1" />
+                            android:visibility="gone">
+                            <include layout="@layout/cookie_scene_1"/>
                         </FrameLayout>
 
                         <!-- Placeholder should have same size a sibling ImageViews. size = image_width + padding -->
@@ -126,7 +125,6 @@
                             android:visibility="invisible"/>
 
                     </FrameLayout>
-
                     <View
                         android:id="@+id/cookieDummyView"
                         android:layout_width="@dimen/omnibarCookieAnimationBannerHeight"
@@ -174,8 +172,7 @@
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@id/voiceSearchButton"
                         app:layout_constraintStart_toEndOf="@id/omnibarIconContainer"
-                        app:layout_constraintTop_toTopOf="parent"
-                        tools:text="https://duckduckgo.com/?q=areallylongexampleexample" />
+                        app:layout_constraintTop_toTopOf="parent" />
 
                     <com.duckduckgo.mobile.android.ui.view.button.IconButton
                         android:id="@+id/voiceSearchButton"
