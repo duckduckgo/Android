@@ -98,6 +98,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
 
     private var restartRequested = false
 
+    private val startVpnLock = Object()
+
     private val isInterceptDnsTrafficEnabled by lazy {
         appTpFeatureConfig.isEnabled(AppTpSetting.InterceptDnsTraffic)
     }
@@ -221,9 +223,19 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
 
     private suspend fun startVpn() = withContext(Dispatchers.IO) {
         logcat { "VPN log: Starting VPN" }
+        
+        synchronized(startVpnLock) {
+            val currStateStats = vpnServiceStateStatsDao.getLastStateStats()
+            if (currStateStats?.state == ENABLING) {
+                // Sometimes onStartCommand gets called twice - this is a safety rail against that
+                logcat(LogPriority.WARN) { "VPN is already being started, abort" }
+                return@withContext
+            }
 
-        // We need to rethink how to log this state. This will likely change.
-        vpnServiceStateStatsDao.insert(VpnServiceStateStats(state = ENABLING))
+            // We need to rethink how to log this state. This will likely change.
+            vpnServiceStateStatsDao.insert(VpnServiceStateStats(state = ENABLING))
+        }
+        
         vpnNetworkStack.onPrepareVpn().getOrNull().also {
             if (it != null) {
                 createTunnelInterface(it)
