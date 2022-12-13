@@ -20,7 +20,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.Command
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.ViewState
@@ -30,6 +29,7 @@ import com.duckduckgo.app.browser.databinding.ActivityBrokenSiteBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
 
@@ -83,19 +83,26 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         val categories = viewModel.categories.map { getString(it.category) }.toTypedArray()
 
         brokenSites.categoriesSelection.onAction {
-            AlertDialog.Builder(this)
+            RadioListAlertDialogBuilder(this)
                 .setTitle(getString(R.string.brokenSitesCategoriesTitle))
-                .setSingleChoiceItems(categories, viewModel.indexSelected) { _, newIndex ->
-                    viewModel.onCategoryIndexChanged(newIndex)
-                }
-                .setPositiveButton(getString(android.R.string.yes)) { dialog, _ ->
-                    viewModel.onCategoryAccepted()
-                    dialog.dismiss()
-                }
-                .setNegativeButton(getString(android.R.string.no)) { dialog, _ ->
-                    viewModel.onCategorySelectionCancelled()
-                    dialog.dismiss()
-                }
+                .setOptions(categories.toList(), viewModel.indexSelected + 1)
+                .setPositiveButton(android.R.string.yes)
+                .setNegativeButton(android.R.string.no)
+                .addEventListener(
+                    object : RadioListAlertDialogBuilder.EventListener() {
+                        override fun onRadioItemSelected(selectedItem: Int) {
+                            viewModel.onCategoryIndexChanged(selectedItem - 1)
+                        }
+
+                        override fun onPositiveButtonClicked(selectedItem: Int) {
+                            viewModel.onCategoryAccepted()
+                        }
+
+                        override fun onNegativeButtonClicked() {
+                            viewModel.onCategorySelectionCancelled()
+                        }
+                    },
+                )
                 .show()
         }
 
