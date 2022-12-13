@@ -64,5 +64,7 @@
     <string name="credentialManagementViewMenuDelete">Delete</string>
 
     <string name="credentialManagementSuggestionsLabel">Suggested</string>
+    <string name="credentialManagementNoLoginsSavedTitle">No Logins saved yet</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Logins are stored securely on this device only.</string>
 
 </resources>

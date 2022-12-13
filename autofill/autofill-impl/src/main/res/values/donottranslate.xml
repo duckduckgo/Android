@@ -16,6 +16,5 @@
   -->
 
 <resources>
-    <string name="managementEmptyNoLoginsSavedTitle">No Logins saved yet</string>
-    <string name="managementEmptyNoLoginsSavedSubtitle">Logins are stored securely on this device only.</string>
+
 </resources>
