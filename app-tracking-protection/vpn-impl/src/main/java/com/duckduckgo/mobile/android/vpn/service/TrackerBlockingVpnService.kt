@@ -223,7 +223,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
 
     private suspend fun startVpn() = withContext(Dispatchers.IO) {
         logcat { "VPN log: Starting VPN" }
-        
+
         synchronized(startVpnLock) {
             val currStateStats = vpnServiceStateStatsDao.getLastStateStats()
             if (currStateStats?.state == ENABLING) {
@@ -235,7 +235,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             // We need to rethink how to log this state. This will likely change.
             vpnServiceStateStatsDao.insert(VpnServiceStateStats(state = ENABLING))
         }
-        
+
         vpnNetworkStack.onPrepareVpn().getOrNull().also {
             if (it != null) {
                 createTunnelInterface(it)
