@@ -19,7 +19,6 @@ package com.duckduckgo.app.brokensite
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.Command
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.ViewState
@@ -31,6 +30,7 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
@@ -128,8 +128,18 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
     }
 
     private fun confirmAndFinish() {
-        Toast.makeText(this, R.string.brokenSiteSubmitted, Toast.LENGTH_LONG).show()
-        finishAfterTransition()
+        val snackbar = Snackbar.make(binding.root, getString(R.string.brokenSiteSubmitted), Snackbar.LENGTH_SHORT)
+        snackbar.addCallback(
+            object : Snackbar.Callback() {
+                override fun onDismissed(
+                    transientBottomBar: Snackbar?,
+                    event: Int,
+                ) {
+                    finish()
+                }
+            },
+        )
+        snackbar.show()
     }
 
     private fun render(viewState: ViewState) {
