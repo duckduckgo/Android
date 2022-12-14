@@ -87,6 +87,19 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         return this
     }
 
+    @Deprecated(message = "options should be passed as List<Int> so we make sure they are localised")
+    @JvmName("setOptionsString")
+    fun setOptions(
+        stackedButtonTextId: List<String>,
+        selectedItem: Int? = null,
+    ): RadioListAlertDialogBuilder {
+        stackedButtonTextId.forEach {
+            optionList.add(it)
+        }
+        selectedOption = selectedItem
+        return this
+    }
+
     fun setPositiveButton(@StringRes textId: Int): RadioListAlertDialogBuilder {
         positiveButtonText = context.getText(textId)
         return this
