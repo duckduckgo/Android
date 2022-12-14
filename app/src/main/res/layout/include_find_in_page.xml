@@ -33,7 +33,8 @@
         android:importantForAccessibility="no"
         android:gravity="center"
         android:layout_marginStart="20dp"
-        android:src="@drawable/ic_find_search_20_a05" />
+        android:alpha="0.5"
+        android:src="@drawable/ic_find_search_20" />
 
     <EditText
         android:id="@+id/findInPageInput"

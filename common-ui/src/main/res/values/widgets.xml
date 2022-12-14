@@ -328,13 +328,6 @@
         <item name="android:layout_marginBottom">@dimen/keyline_4</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.DaxDialog.Content">
-        <item name="android:paddingTop">@dimen/daxDialogContentPaddingTop</item>
-        <item name="android:paddingBottom">@dimen/dialogContentPaddingBottom</item>
-        <item name="android:paddingStart">@dimen/dialogContentPaddingStart</item>
-        <item name="android:paddingEnd">@dimen/dialogContentPaddingEnd</item>
-    </style>
-
     <!-- Text Input -->
     <style name="Widget.DuckDuckGo.SearchInput" parent="@style/Typography.DuckDuckGo.Body1">
         <item name="android:textColor">?attr/daxColorPrimaryText</item>
