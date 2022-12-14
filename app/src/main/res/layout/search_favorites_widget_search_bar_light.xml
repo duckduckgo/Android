@@ -43,5 +43,5 @@
         android:id="@+id/search"
         style="@style/SearchWidgetSearchIcon"
         android:src="@drawable/ic_find_search_24"
-        app:tint="@color/black84"/>
+        app:tint="?attr/daxColorBlack"/>
 </RelativeLayout>

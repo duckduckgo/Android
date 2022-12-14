@@ -362,8 +362,8 @@ class BookmarksActivity : DuckDuckGoActivity() {
         TextAlertDialogBuilder(this)
             .setTitle(R.string.delete)
             .setMessage(getMessageString(bookmarkFolder))
-            .setPositiveButton(android.R.string.yes)
-            .setNegativeButton(android.R.string.no)
+            .setPositiveButton(R.string.yes)
+            .setNegativeButton(R.string.no)
             .addEventListener(
                 object : EventListener() {
                     override fun onPositiveButtonClicked() {

@@ -78,7 +78,7 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setStyle(STYLE_NO_TITLE, R.style.SavedSiteFullScreenDialog)
+        setStyle(STYLE_NO_TITLE, CommonR.style.Widget_DuckDuckGo_DialogFullScreen)
     }
 
     override fun onCreateView(
