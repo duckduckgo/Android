@@ -51,7 +51,7 @@ internal class VpnFeaturesRegistryImpl(
             // we use random UUID to force change listener to be called
             putString(feature.featureName, UUID.randomUUID().toString())
         }
-        vpnServiceWrapper.restartVpnService()
+        vpnServiceWrapper.restartVpnService(forceRestart = true)
     }
 
     @Synchronized
@@ -64,7 +64,7 @@ internal class VpnFeaturesRegistryImpl(
 
         logcat { "unregisterFeature: $feature" }
         if (registeredFeatures().isNotEmpty()) {
-            vpnServiceWrapper.restartVpnService()
+            vpnServiceWrapper.restartVpnService(forceRestart = true)
         } else {
             vpnServiceWrapper.stopService()
         }
@@ -75,7 +75,7 @@ internal class VpnFeaturesRegistryImpl(
     }
 
     override suspend fun refreshFeature(feature: VpnFeature) {
-        vpnServiceWrapper.restartVpnService()
+        vpnServiceWrapper.restartVpnService(forceRestart = false)
     }
 
     override fun registryChanges(): Flow<Pair<String, Boolean>> {
@@ -107,8 +107,8 @@ internal class VpnFeaturesRegistryImpl(
  * The class is marked as open to be able to mock it in tests.
  */
 internal open class VpnServiceWrapper(private val context: Context) {
-    open fun restartVpnService() {
-        TrackerBlockingVpnService.restartVpnService(context, forceRestart = true)
+    open fun restartVpnService(forceRestart: Boolean) {
+        TrackerBlockingVpnService.restartVpnService(context, forceRestart = forceRestart)
     }
 
     open fun stopService() {
