@@ -443,18 +443,28 @@ li {
   position: relative;
 }
 
-form,
-input,
-select,
-option,
-button {
+.environment--android form,
+.environment--android input,
+.environment--android select,
+.environment--android option,
+.environment--android button,
+.environment--ios form,
+.environment--ios input,
+.environment--ios select,
+.environment--ios option,
+.environment--ios button {
   outline: none;
 }
-form *,
-input *,
-select *,
-option *,
-button * {
+.environment--android form *,
+.environment--android input *,
+.environment--android select *,
+.environment--android option *,
+.environment--android button *,
+.environment--ios form *,
+.environment--ios input *,
+.environment--ios select *,
+.environment--ios option *,
+.environment--ios button * {
   outline: none;
 }
 

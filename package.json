@@ -17,7 +17,7 @@
     "@duckduckgo/autoconsent": "^3.0.4",
     "@duckduckgo/autofill": "github:duckduckgo/duckduckgo-autofill#6.0.0",
     "@duckduckgo/content-scope-scripts": "github:duckduckgo/content-scope-scripts#3.4.1",
-    "@duckduckgo/privacy-dashboard": "github:duckduckgo/privacy-dashboard#6b0a5c03618f8f8d1ffe9dcb17452546d1860940",
+    "@duckduckgo/privacy-dashboard": "github:duckduckgo/privacy-dashboard#1.3.0",
     "@duckduckgo/privacy-reference-tests": "github:duckduckgo/privacy-reference-tests#1670517912"
   }
 }
