@@ -38,7 +38,7 @@ import dagger.android.AndroidInjection
 import dagger.binding.TileServiceBingingKey
 import javax.inject.Inject
 import kotlinx.coroutines.*
-import timber.log.Timber
+import logcat.logcat
 
 @Suppress("NoHardcodedCoroutineDispatcher")
 @RequiresApi(Build.VERSION_CODES.N)
@@ -158,9 +158,9 @@ class VpnPermissionRequesterActivity : AppCompatActivity() {
 
     private fun handleVpnPermissionResult(resultCode: Int) {
         when (resultCode) {
-            RESULT_CANCELED -> Timber.i("User cancelled and refused VPN permission")
+            RESULT_CANCELED -> logcat { "User cancelled and refused VPN permission" }
             RESULT_OK -> {
-                Timber.i("User granted VPN permission")
+                logcat { "User granted VPN permission" }
                 startDeviceShield()
             }
         }

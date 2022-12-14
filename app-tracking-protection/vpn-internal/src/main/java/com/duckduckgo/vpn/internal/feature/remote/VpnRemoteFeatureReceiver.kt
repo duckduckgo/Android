@@ -45,7 +45,8 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority
+import logcat.logcat
 
 private const val REMOTE_FEATURE = "remote-feature"
 private const val ON = "on"
@@ -99,10 +100,10 @@ class VpnRemoteFeatureReceiverRegister @Inject constructor(
     private var receiver: VpnRemoteFeatureReceiver? = null
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        Timber.v("Debug receiver RemoteFeatureReceiver registered")
+        logcat { "Debug receiver RemoteFeatureReceiver registered" }
 
         receiver = VpnRemoteFeatureReceiver(context) { intent ->
-            Timber.v("RemoteFeatureReceiver receive $intent")
+            logcat { "RemoteFeatureReceiver receive $intent" }
             when {
                 VpnRemoteFeatureReceiver.isOnIntent(intent) -> {
                     coroutineScope.launch {
@@ -132,7 +133,7 @@ class VpnRemoteFeatureReceiverRegister @Inject constructor(
                         }
                     }
                 }
-                else -> Timber.w("RemoteFeatureReceiver unknown intent")
+                else -> logcat(LogPriority.WARN) { "RemoteFeatureReceiver unknown intent" }
             }
         }.apply { register() }
     }

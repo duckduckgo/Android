@@ -28,7 +28,7 @@ import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import javax.inject.Inject
 import kotlinx.coroutines.flow.firstOrNull
-import timber.log.Timber
+import logcat.logcat
 
 class DeviceShieldNotificationFactory @Inject constructor(
     private val resources: Resources,
@@ -64,7 +64,7 @@ class DeviceShieldNotificationFactory @Inject constructor(
 
         val notificationText = resources.getQuantityString(R.plurals.atp_OnNotification, numberOfApps.size, numberOfApps.size)
 
-        Timber.v("createTrackersCountDeviceShieldNotification [$notificationText]")
+        logcat { "createTrackersCountDeviceShieldNotification [$notificationText]" }
         return DeviceShieldNotification(
             SpannableStringBuilder(HtmlCompat.fromHtml(notificationText, HtmlCompat.FROM_HTML_MODE_LEGACY)),
         )
@@ -83,10 +83,10 @@ class DeviceShieldNotificationFactory @Inject constructor(
             val trackers = appTrackerBlockingStatsRepository.getVpnTrackersSync({ dateOfLastDay() })
             val trackerCount =
                 appTrackerBlockingStatsRepository.getBlockedTrackersCountBetween({ dateOfLastDay() }).firstOrNull() ?: trackers.sumOf { it.count }
-            Timber.v(
+            logcat {
                 "createDailyDeviceShieldNotification. $trackerCount total trackers in the last day, number of trackers returned is " +
-                    "${trackers.sumOf { it.count }}. Notification type: $dailyNotificationType",
-            )
+                    "${trackers.sumOf { it.count }}. Notification type: $dailyNotificationType"
+            }
 
             if (trackers.isEmpty()) {
                 return DeviceShieldNotification(hidden = true)
@@ -122,7 +122,7 @@ class DeviceShieldNotificationFactory @Inject constructor(
                 }
             }
 
-            Timber.v("createDailyTotalTrackersNotification. Trackers=$totalTrackersCount. Apps=$apps. Output=[$textToStyle]")
+            logcat { "createDailyTotalTrackersNotification. Trackers=$totalTrackersCount. Apps=$apps. Output=[$textToStyle]" }
             return DeviceShieldNotification(
                 SpannableStringBuilder(HtmlCompat.fromHtml(textToStyle, HtmlCompat.FROM_HTML_MODE_LEGACY)),
             )
@@ -139,7 +139,7 @@ class DeviceShieldNotificationFactory @Inject constructor(
                 numberApps,
             )
 
-            Timber.v("createDailyTopTrackerCompanyNotification: $textToStyle")
+            logcat { "createDailyTopTrackerCompanyNotification: $textToStyle" }
             return DeviceShieldNotification(
                 SpannableStringBuilder(HtmlCompat.fromHtml(textToStyle, HtmlCompat.FROM_HTML_MODE_LEGACY)),
             )
@@ -155,7 +155,7 @@ class DeviceShieldNotificationFactory @Inject constructor(
 
             val textToStyle = resources.getQuantityString(R.plurals.atp_DailyCompanyBlockedNotification, apps.size, firstAppName, secondAppName)
 
-            Timber.v("createDailyNotificationTopAppsContainingTrackers. Text to style: [$textToStyle]")
+            logcat { "createDailyNotificationTopAppsContainingTrackers. Text to style: [$textToStyle]" }
             return DeviceShieldNotification(
                 SpannableStringBuilder(HtmlCompat.fromHtml(textToStyle, HtmlCompat.FROM_HTML_MODE_LEGACY)),
             )
@@ -215,7 +215,7 @@ class DeviceShieldNotificationFactory @Inject constructor(
                 }
             }
 
-            Timber.v("createDailyLastCompanyAttemptNotification. [$textToStyle]")
+            logcat { "createDailyLastCompanyAttemptNotification. [$textToStyle]" }
             return DeviceShieldNotification(
                 SpannableStringBuilder(HtmlCompat.fromHtml(textToStyle, HtmlCompat.FROM_HTML_MODE_LEGACY)),
             )
@@ -298,7 +298,7 @@ class DeviceShieldNotificationFactory @Inject constructor(
                 }
             }
 
-            Timber.v("createWeeklyReportNotification. $textToStyle\nTotal apps: ${perApp.size}. Other apps: $otherAppsSize")
+            logcat { "createWeeklyReportNotification. $textToStyle\nTotal apps: ${perApp.size}. Other apps: $otherAppsSize" }
 
             return DeviceShieldNotification(
                 SpannableStringBuilder(HtmlCompat.fromHtml(textToStyle, HtmlCompat.FROM_HTML_MODE_LEGACY)),
@@ -327,7 +327,7 @@ class DeviceShieldNotificationFactory @Inject constructor(
                 mostRecentAppContainingTracker.trackingApp.appDisplayName,
             )
 
-            Timber.v("createWeeklyTopTrackerCompanyNotification. text=$textToStyle")
+            logcat { "createWeeklyTopTrackerCompanyNotification. text=$textToStyle" }
             return DeviceShieldNotification(
                 SpannableStringBuilder(HtmlCompat.fromHtml(textToStyle, HtmlCompat.FROM_HTML_MODE_LEGACY)),
             )

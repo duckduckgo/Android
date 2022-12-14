@@ -28,7 +28,7 @@ import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesBinding(
     scope = AppScope::class,
@@ -67,7 +67,7 @@ class AppTpFeatureConfigImpl @Inject constructor(
             togglesCache[settingName.value] = enabled
             persistToggle(VpnConfigToggle(settingName.value, enabled, isManualOverride))
         } else {
-            Timber.d("Skip setEnabled($settingName, $enabled, $isManualOverride)")
+            logcat { "Skip setEnabled($settingName, $enabled, $isManualOverride)" }
         }
     }
 

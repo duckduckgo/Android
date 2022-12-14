@@ -30,7 +30,7 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.logcat
 
 interface TrackingProtectionAppsRepository {
 
@@ -69,7 +69,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
     override suspend fun getAppsAndProtectionInfo(): Flow<List<TrackingProtectionAppInfo>> {
         return appTrackerRepository.getAppExclusionListFlow()
             .combine(appTrackerRepository.getManualAppExclusionListFlow()) { ddgExclusionList, manualList ->
-                Timber.d("getProtectedApps flow")
+                logcat { "getProtectedApps flow" }
                 installedApps
                     .map {
                         val isExcluded = shouldBeExcluded(it, ddgExclusionList, manualList)
@@ -91,7 +91,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
     }
 
     private fun refreshInstalledApps() {
-        Timber.d("Excluded Apps: refreshInstalledApps")
+        logcat { "Excluded Apps: refreshInstalledApps" }
         installedApps = packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
             .asSequence()
             .filterNot { shouldNotBeShown(it) }
@@ -194,7 +194,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
     }
 
     override suspend fun isAppProtectionEnabled(packageName: String): Boolean {
-        Timber.d("TrackingProtectionAppsRepository: Checking $packageName protection status")
+        logcat { "TrackingProtectionAppsRepository: Checking $packageName protection status" }
         val appInfo = runCatching { packageManager.getApplicationInfo(packageName, 0) }.getOrElse { return true }
         val appExclusionList = appTrackerRepository.getAppExclusionList()
         val manualAppExclusionList = appTrackerRepository.getManualAppExclusionList()

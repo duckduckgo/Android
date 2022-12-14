@@ -34,6 +34,7 @@ import com.duckduckgo.cookies.store.CookiesRepository
 import com.duckduckgo.cookies.store.FirstPartyCookiePolicyEntity
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.api.UnprotectedTemporaryException
+import java.util.Locale
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.Dispatchers
@@ -255,7 +256,8 @@ class RealFirstPartyCookiesModifierTest {
         val time = Instant.now()
             .plus(expiryTimeInSeconds, ChronoUnit.SECONDS)
             .atOffset(ZoneOffset.UTC)
-            .format(DateTimeFormatter.ofPattern("EEE, d MMMM yyyy HH:mm:ss Z"))
+            .format(DateTimeFormatter.ofPattern("EEE, d MMMM yyyy HH:mm:ss Z").withLocale(Locale.US))
+
         cookieManager.setCookie(cookieName, "da=da;expires=$time")
         cookieManager.flush()
     }

@@ -19,7 +19,7 @@ package com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.duckduckgo.mobile.android.vpn.R
-import timber.log.Timber
+import logcat.logcat
 
 enum class TrackingSignal(
     val signaltag: String,
@@ -95,7 +95,7 @@ enum class TrackingSignal(
             return try {
                 valueOf(signalTag.uppercase())
             } catch (exception: Exception) {
-                Timber.d("Unknown TrackingSignal $signalTag")
+                logcat { "Unknown TrackingSignal $signalTag" }
                 UNIQUE_IDENTIFIER
             }
         }

@@ -22,7 +22,7 @@ import androidx.work.WorkerParameters
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.di.scopes.AppScope
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesWorker(AppScope::class)
 class VpnFeatureRemoverWorker(
@@ -34,7 +34,7 @@ class VpnFeatureRemoverWorker(
     lateinit var vpnFeatureRemover: VpnFeatureRemover
 
     override suspend fun doWork(): Result {
-        Timber.d("VpnFeatureRemoverWorker, automatically removing AppTP feature")
+        logcat { "VpnFeatureRemoverWorker, automatically removing AppTP feature" }
         vpnFeatureRemover.scheduledRemoveFeature()
         return Result.success()
     }

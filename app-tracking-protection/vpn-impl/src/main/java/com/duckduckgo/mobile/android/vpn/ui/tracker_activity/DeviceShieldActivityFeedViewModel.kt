@@ -47,8 +47,8 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
+import logcat.logcat
 import org.threeten.bp.LocalDateTime
-import timber.log.Timber
 
 @ContributesViewModel(FragmentScope::class)
 class DeviceShieldActivityFeedViewModel @Inject constructor(
@@ -83,7 +83,7 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
 
     private fun startTickerRefresher() {
-        Timber.i("startTickerRefresher")
+        logcat { "startTickerRefresher" }
         tickerJob?.cancel()
         tickerJob = viewModelScope.launch {
             while (isActive) {

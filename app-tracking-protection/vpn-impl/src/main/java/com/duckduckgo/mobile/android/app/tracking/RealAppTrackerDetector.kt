@@ -30,7 +30,7 @@ import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerType
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import timber.log.Timber
+import logcat.logcat
 
 class RealAppTrackerDetector constructor(
     private val appTrackerRepository: AppTrackerRepository,
@@ -46,7 +46,7 @@ class RealAppTrackerDetector constructor(
         val packageId = appNameResolver.getPackageIdForUid(uid)
 
         if (VpnExclusionList.isDdgApp(packageId)) {
-            Timber.v("shouldAllowDomain: DDG app is always allowed")
+            logcat { "shouldAllowDomain: DDG app is always allowed" }
             return null
         }
 
@@ -87,7 +87,7 @@ class RealAppTrackerDetector constructor(
         hostname: String,
     ): Boolean {
         return vpnAppTrackerBlockingDao.getRuleByTrackerDomain(hostname)?.let { rule ->
-            Timber.d("isTrackerInExceptionRules: found rule $rule for $hostname")
+            logcat { "isTrackerInExceptionRules: found rule $rule for $hostname" }
             return rule.packageNames.contains(packageId)
         } ?: false
     }

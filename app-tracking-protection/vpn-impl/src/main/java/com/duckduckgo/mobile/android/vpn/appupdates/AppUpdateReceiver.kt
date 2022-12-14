@@ -20,7 +20,7 @@ import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import timber.log.Timber
+import logcat.logcat
 
 /**
  * We don't need to take any action here; but having this registered
@@ -33,6 +33,6 @@ class AppUpdateReceiver : BroadcastReceiver() {
         context: Context?,
         intent: Intent?,
     ) {
-        Timber.i("Notified of app update")
+        logcat { "Notified of app update" }
     }
 }

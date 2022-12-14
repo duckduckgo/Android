@@ -22,20 +22,25 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.app.tracking.AppTrackerDetector
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack.VpnTunnelConfig
 import com.duckduckgo.vpn.network.api.*
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
 import java.net.InetAddress
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority
+import logcat.asLog
+import logcat.logcat
 
 private const val LRU_CACHE_SIZE = 2048
 private const val EMFILE_ERRNO = 24
 
-@ContributesBinding(
+@ContributesMultibinding(
     scope = VpnScope::class,
     boundType = VpnNetworkStack::class,
 )
@@ -49,6 +54,7 @@ class NgVpnNetworkStack @Inject constructor(
     private val vpnNetwork: Lazy<VpnNetwork>,
     private val runtime: Runtime,
     private val appTrackerDetector: AppTrackerDetector,
+    private val trackingProtectionAppsRepository: TrackingProtectionAppsRepository,
 ) : VpnNetworkStack, VpnNetworkCallback {
 
     private var tunnelThread: Thread? = null
@@ -56,7 +62,7 @@ class NgVpnNetworkStack @Inject constructor(
     private val jniLock = Any()
     private val addressLookupLruCache = LruCache<String, String>(LRU_CACHE_SIZE)
 
-    override val name: String = "ng"
+    override val name: String = AppTpVpnFeature.APPTP_VPN.featureName
 
     override fun onCreateVpn(): Result<Unit> {
         val vpnNetwork = vpnNetwork.safeGet().getOrElse { return Result.failure(it) }
@@ -75,7 +81,7 @@ class NgVpnNetworkStack @Inject constructor(
         return Result.success(Unit)
     }
 
-    override fun onPrepareVpn(): Result<VpnTunnelConfig> = Result.success(
+    override suspend fun onPrepareVpn(): Result<VpnTunnelConfig> = Result.success(
         VpnTunnelConfig(
             mtu = vpnNetwork.get().mtu(),
             addresses = mapOf(
@@ -84,6 +90,7 @@ class NgVpnNetworkStack @Inject constructor(
             ),
             dns = emptySet(),
             routes = emptyMap(),
+            appExclusionList = trackingProtectionAppsRepository.getExclusionAppsList().toSet(),
         ),
     )
 
@@ -108,7 +115,7 @@ class NgVpnNetworkStack @Inject constructor(
     }
 
     override fun onExit(reason: String) {
-        Timber.w("Native exit reason=$reason")
+        logcat(LogPriority.WARN) { "Native exit reason=$reason" }
 
         fun killProcess() {
             runtime.exit(0)
@@ -125,7 +132,7 @@ class NgVpnNetworkStack @Inject constructor(
             return this == EMFILE_ERRNO
         }
 
-        Timber.w("onError $errorCode:$message")
+        logcat(LogPriority.WARN) { "onError $errorCode:$message" }
 
         if (errorCode.isEmfile()) {
             onExit(message)
@@ -134,18 +141,18 @@ class NgVpnNetworkStack @Inject constructor(
 
     override fun onDnsResolved(dnsRR: DnsRR) {
         addressLookupLruCache.put(dnsRR.resource, dnsRR.qName)
-        Timber.d("dnsResolved called for $dnsRR")
+        logcat { "dnsResolved called for $dnsRR" }
     }
 
     override fun isDomainBlocked(domainRR: DomainRR): Boolean {
-        Timber.d("isDomainBlocked for $domainRR")
+        logcat { "isDomainBlocked for $domainRR" }
         return !shouldAllowDomain(domainRR.name, domainRR.uid)
     }
 
     override fun isAddressBlocked(addressRR: AddressRR): Boolean {
         val hostname = addressLookupLruCache[addressRR.address] ?: return false
         val domainAllowed = shouldAllowDomain(hostname, addressRR.uid)
-        Timber.d("isAddressBlocked for $addressRR ($hostname) = ${!domainAllowed}")
+        logcat { "isAddressBlocked for $addressRR ($hostname) = ${!domainAllowed}" }
         return !domainAllowed
     }
 
@@ -154,7 +161,7 @@ class NgVpnNetworkStack @Inject constructor(
         uid: Int,
     ): Boolean {
         val tracker = appTrackerDetector.evaluate(name, uid)
-        Timber.d("shouldAllowDomain for $name ($uid) = $tracker")
+        logcat { "shouldAllowDomain for $name ($uid) = $tracker" }
 
         return tracker == null
     }
@@ -162,45 +169,45 @@ class NgVpnNetworkStack @Inject constructor(
     private fun startNative(tunfd: Int): Result<Unit> {
         val vpnNetwork = vpnNetwork.safeGet().getOrElse { return Result.failure(it) }
         if (tunnelThread == null) {
-            Timber.d("Start native runtime")
+            logcat { "Start native runtime" }
             val level = if (appBuildConfig.isDebug || appBuildConfig.isInternalBuild()) VpnNetworkLog.DEBUG else VpnNetworkLog.ASSERT
             vpnNetwork.start(jniContext, level)
 
             tunnelThread = Thread {
-                Timber.d("Running tunnel in context $jniContext")
+                logcat { "Running tunnel in context $jniContext" }
                 vpnNetwork.run(jniContext, tunfd)
-                Timber.w("Tunnel exited")
+                logcat(LogPriority.WARN) { "Tunnel exited" }
                 tunnelThread = null
             }.also { it.start() }
 
-            Timber.d("Started tunnel thread")
+            logcat { "Started tunnel thread" }
         }
 
         return Result.success(Unit)
     }
 
     private fun stopNative(): Result<Unit> {
-        Timber.d("Stop native runtime")
+        logcat { "Stop native runtime" }
         val vpnNetwork = vpnNetwork.safeGet().getOrElse { return Result.failure(it) }
 
         tunnelThread?.let {
-            Timber.d("Stopping tunnel thread")
+            logcat { "Stopping tunnel thread" }
 
             vpnNetwork.stop(jniContext)
 
             var thread = tunnelThread
             while (thread != null && thread.isAlive) {
                 try {
-                    Timber.v("Joining tunnel thread context $jniContext")
+                    logcat { "Joining tunnel thread context $jniContext" }
                     thread.join()
                 } catch (t: InterruptedException) {
-                    Timber.d("Joined tunnel thread")
+                    logcat { "Joined tunnel thread" }
                 }
                 thread = tunnelThread
             }
             tunnelThread = null
 
-            Timber.d("Stopped tunnel thread")
+            logcat { "Stopped tunnel thread" }
         }
 
         return Result.success(Unit)
@@ -210,7 +217,7 @@ class NgVpnNetworkStack @Inject constructor(
         return runCatching {
             get()
         }.onFailure {
-            Timber.e(it, "Failed to get VpnNetwork")
+            logcat(LogPriority.ERROR) { it.asLog() }
             Result.failure<VpnNetwork>(it)
         }
     }

@@ -32,7 +32,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.logcat
 
 /**
  * Health monitor will periodically obtain the current health metrics across AppTP, and raise an
@@ -149,7 +149,7 @@ class AppTPHealthMonitor @Inject constructor(
     }
 
     override fun startMonitoring() {
-        Timber.v("AppTp Health - start monitoring")
+        logcat { "AppTp Health - start monitoring" }
 
         monitoringJob += coroutineScope.launch {
             while (isActive) {
@@ -160,7 +160,7 @@ class AppTPHealthMonitor @Inject constructor(
 
         oldMetricCleanupJob += coroutineScope.launch {
             while (isActive) {
-                Timber.i("Cleaning up old health metrics")
+                logcat { "Cleaning up old health metrics" }
                 healthMetricCounter.purgeOldMetrics()
                 delay(OLD_METRIC_CLEANUP_FREQUENCY_MS)
             }
@@ -168,7 +168,7 @@ class AppTPHealthMonitor @Inject constructor(
     }
 
     override fun stopMonitoring() {
-        Timber.v("AppTp Health - stop monitoring")
+        logcat { "AppTp Health - stop monitoring" }
 
         monitoringJob.cancel()
         oldMetricCleanupJob.cancel()

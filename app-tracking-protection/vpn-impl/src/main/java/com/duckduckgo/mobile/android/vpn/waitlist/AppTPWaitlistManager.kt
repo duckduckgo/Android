@@ -27,8 +27,8 @@ import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
+import logcat.logcat
 import retrofit2.HttpException
-import timber.log.Timber
 
 interface AppTPWaitlistManager {
     suspend fun fetchInviteCode(): FetchCodeResult
@@ -97,7 +97,7 @@ class AndroidAppTPWaitlistManager @Inject constructor(
             } catch (e: HttpException) {
                 parseRedeemCodeError(e)
             } catch (e: Exception) {
-                Timber.d(e.toString())
+                logcat { e.toString() }
                 RedeemCodeResult.Failure
             }
             return@withContext result
