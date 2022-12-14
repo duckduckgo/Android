@@ -49,7 +49,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_2"
-        android:scrollbars="none"
+        android:fadeScrollbars="false"
         app:layout_constraintBottom_toTopOf="@id/radioListDialogPositiveButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_max="@dimen/dialogRadioGroupHeightMax"
