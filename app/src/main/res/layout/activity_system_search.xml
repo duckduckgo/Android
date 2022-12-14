@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2020 DuckDuckGo
+  ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,99 +14,100 @@
   ~ limitations under the License.
   -->
 
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/rootView"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/rootView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
     <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBarLayout"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
+            android:id="@+id/appBarLayout"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/toolbarContainer"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="?toolbarBgColor">
+                android:id="@+id/toolbarContainer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?attr/daxColorSurface">
 
             <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="?attr/daxColorSurface"
-                app:contentInsetEnd="0dp"
-                app:contentInsetStart="0dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu">
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:background="?attr/daxColorSurface"
+                    app:contentInsetEnd="0dp"
+                    app:contentInsetStart="0dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/omniBarContainer"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_margin="8dp"
-                    android:background="@drawable/omnibar_field_background"
-                    android:paddingStart="6dp"
-                    android:paddingEnd="6dp">
+                        android:id="@+id/omniBarContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="8dp"
+                        android:background="@drawable/omnibar_field_background"
+                        android:paddingStart="6dp"
+                        android:paddingEnd="6dp">
 
                     <ImageView
-                        android:id="@+id/logo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:importantForAccessibility="no"
-                        android:src="@drawable/ic_ddg_logo"
-                        android:padding="4dp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                            android:id="@+id/logo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:importantForAccessibility="no"
+                            android:src="@drawable/ic_ddg_logo"
+                            android:padding="4dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"/>
 
                     <androidx.appcompat.widget.AppCompatEditText
-                        android:id="@+id/omnibarTextInput"
-                        style="@style/Widget.DuckDuckGo.SearchInput"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:layout_marginStart="4dp"
-                        android:hint="@string/systemSearchOmnibarInputHint"
-                        android:imeOptions="flagNoExtractUi|actionGo|flagNoPersonalizedLearning"
-                        android:inputType="textUri|textNoSuggestions"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@id/voiceSearchButton"
-                        app:layout_constraintStart_toEndOf="@id/logo"
-                        app:layout_constraintTop_toTopOf="parent">
+                            android:id="@+id/omnibarTextInput"
+                            style="@style/Widget.DuckDuckGo.SearchInput"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:layout_marginStart="4dp"
+                            android:hint="@string/systemSearchOmnibarInputHint"
+                            android:imeOptions="flagNoExtractUi|actionGo|flagNoPersonalizedLearning"
+                            android:inputType="textUri|textNoSuggestions"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@id/voiceSearchButton"
+                            app:layout_constraintStart_toEndOf="@id/logo"
+                            app:layout_constraintTop_toTopOf="parent">
 
-                        <requestFocus />
+                        <requestFocus/>
 
                     </androidx.appcompat.widget.AppCompatEditText>
 
                     <com.duckduckgo.mobile.android.ui.view.button.IconButton
-                        android:id="@+id/voiceSearchButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:contentDescription="@string/voiceSearchIconContentDescription"
-                        android:padding="@dimen/keyline_2"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/clearTextButton"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:srcCompat="@drawable/ic_microphone_24"/>
+                            android:id="@+id/voiceSearchButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:contentDescription="@string/voiceSearchIconContentDescription"
+                            android:padding="@dimen/keyline_2"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@+id/clearTextButton"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:srcCompat="@drawable/ic_microphone_24"/>
 
                     <ImageView
-                        android:id="@+id/clearTextButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="?selectableItemBackground"
-                        android:contentDescription="@string/clearButtonContentDescription"
-                        android:padding="3dp"
-                        android:src="@drawable/ic_close_24"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        tools:visibility="visible" />
+                            android:id="@+id/clearTextButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="?selectableItemBackground"
+                            android:contentDescription="@string/clearButtonContentDescription"
+                            android:padding="3dp"
+                            android:src="@drawable/ic_close_24"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:visibility="visible"/>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -119,61 +120,61 @@
     <include layout="@layout/include_quick_access_items"/>
 
     <androidx.core.widget.NestedScrollView
-        android:id="@+id/results"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:clipToPadding="false"
-        android:elevation="@dimen/systemSearchResultsElevation"
-        android:paddingBottom="4dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/resultsContent"
+            android:id="@+id/results"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:clipToPadding="false"
-            android:background="?attr/daxColorSurface"
-            android:backgroundTint="?attr/daxColorSurface"
-            android:elevation="4dp">
+            android:elevation="@dimen/systemSearchResultsElevation"
+            android:paddingBottom="4dp"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/resultsContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:background="?attr/daxColorSurface"
+                android:backgroundTint="?attr/daxColorSurface"
+                android:elevation="4dp">
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/autocompleteSuggestions"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:itemCount="4"
-                tools:listitem="@layout/item_autocomplete_search_suggestion" />
+                    android:id="@+id/autocompleteSuggestions"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:itemCount="4"
+                    tools:listitem="@layout/item_autocomplete_search_suggestion"/>
 
             <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
-                android:id="@+id/deviceLabel"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:paddingStart="16dp"
-                android:paddingTop="6dp"
-                android:paddingEnd="16dp"
-                android:paddingBottom="2dp"
-                android:text="@string/systemSearchDeviceAppLabel"
-                app:typography="caption_allCaps"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/autocompleteSuggestions"/>
+                    android:id="@+id/deviceLabel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="16dp"
+                    android:paddingTop="6dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="2dp"
+                    android:text="@string/systemSearchDeviceAppLabel"
+                    app:typography="caption_allCaps"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/autocompleteSuggestions"/>
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/deviceAppSuggestions"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/deviceLabel"
-                tools:itemCount="4"
-                tools:listitem="@layout/item_device_app_suggestion" />
+                    android:id="@+id/deviceAppSuggestions"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/deviceLabel"
+                    tools:itemCount="4"
+                    tools:listitem="@layout/item_device_app_suggestion"/>
 
             <include
-                android:id="@+id/includeSystemSearchOnboarding"
-                layout="@layout/include_system_search_onboarding" />
+                    android:id="@+id/includeSystemSearchOnboarding"
+                    layout="@layout/include_system_search_onboarding"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
