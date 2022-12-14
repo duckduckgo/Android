@@ -28,7 +28,6 @@ import com.duckduckgo.app.bookmarks.service.SavedSitesManager
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.*
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.EditSavedSiteListener
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment.AddBookmarkFolderListener
-import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.DeleteBookmarkFolderConfirmationFragment.DeleteBookmarkFolderListener
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.EditBookmarkFolderDialogFragment.EditBookmarkFolderListener
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DispatcherProvider
@@ -49,7 +48,7 @@ class BookmarksViewModel @Inject constructor(
     private val savedSitesManager: SavedSitesManager,
     private val pixel: Pixel,
     private val dispatcherProvider: DispatcherProvider,
-) : EditSavedSiteListener, AddBookmarkFolderListener, EditBookmarkFolderListener, DeleteBookmarkFolderListener, ViewModel() {
+) : EditSavedSiteListener, AddBookmarkFolderListener, EditBookmarkFolderListener, ViewModel() {
 
     data class ViewState(
         val enableSearch: Boolean = false,
@@ -214,7 +213,7 @@ class BookmarksViewModel @Inject constructor(
         }
     }
 
-    override fun onBookmarkFolderDeleted(bookmarkFolder: BookmarkFolder) {
+    fun onBookmarkFolderDeleted(bookmarkFolder: BookmarkFolder) {
         viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
             val folderBranch = bookmarksRepository.deleteFolderBranch(bookmarkFolder)
             command.postValue(ConfirmDeleteBookmarkFolder(bookmarkFolder, folderBranch))
