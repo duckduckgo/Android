@@ -16,6 +16,7 @@
 
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/widgetContainer"
     style="@style/SearchWidgetSearchBarContainer"
     android:background="@drawable/search_widget_background">
@@ -42,6 +43,7 @@
     <ImageView
         android:id="@+id/search"
         style="@style/SearchWidgetSearchIcon"
-        android:src="@drawable/ic_loupe_24dp_dark" />
+        android:src="@drawable/ic_find_search_24"
+        app:tint="@color/white84" />
 
 </RelativeLayout>
