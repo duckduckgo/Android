@@ -46,7 +46,7 @@ class AppSiteViewStateMapper @Inject constructor(
 
         return SiteViewState(
             url = site.url,
-            domain = site.domain!!,
+            domain = site.domain,
             upgradedHttps = site.upgradedHttps,
             parentEntity = entityViewState,
             secCertificateViewModels = site.certificate?.let { listOf(it.map()) } ?: emptyList(),
