@@ -132,6 +132,13 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
+    fun whenOnPageStartedCalledThenInterceptorCallOnPageStarted() {
+        testee.onPageStarted(webView, EXAMPLE_URL, null)
+        verify(requestInterceptor).onPageStarted(EXAMPLE_URL)
+    }
+
+    @UiThreadTest
+    @Test
     fun whenOnPageStartedCalledThenListenerInstructedToUpdateNavigationState() {
         testee.onPageStarted(webView, EXAMPLE_URL, null)
         verify(listener).navigationStateChanged(any())

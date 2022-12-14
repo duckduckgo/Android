@@ -1,0 +1,12 @@
+{
+  "state": "enabled",
+  "exceptions": [
+    {
+      "domain": "example.com",
+      "reason": "reason"
+    }
+  ],
+  "settings": {
+    "windowInMs": 100
+  }
+}
