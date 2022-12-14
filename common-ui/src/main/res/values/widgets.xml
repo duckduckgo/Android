@@ -301,6 +301,11 @@
         <item name="cornerSize">@dimen/dialogBorderRadius</item>
     </style>
 
+    <style name="Widget.DuckDuckGo.DialogFullScreen">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
     <!-- Dax Dialog -->
     <style name="Widget.DuckDuckGo.DaxDialogFragment" parent="android:Theme.DeviceDefault.Light.NoActionBar">
         <item name="android:windowTranslucentStatus">true</item>

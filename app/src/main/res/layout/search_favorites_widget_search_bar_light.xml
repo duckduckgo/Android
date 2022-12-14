@@ -17,7 +17,8 @@
 <RelativeLayout android:id="@+id/widgetSearchBarContainer"
     style="@style/SearchWithFavoritesWidgetSearchBarContainer"
     android:background="@drawable/search_favorites_widget_search_bar_background_light"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ImageView
         android:id="@+id/logo"
@@ -41,5 +42,6 @@
     <ImageView
         android:id="@+id/search"
         style="@style/SearchWidgetSearchIcon"
-        android:src="@drawable/ic_loupe_24dp_light" />
+        android:src="@drawable/ic_find_search_24"
+        app:tint="?attr/daxColorBlack"/>
 </RelativeLayout>

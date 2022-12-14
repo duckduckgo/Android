@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<!--
   ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,11 +19,8 @@
     android:height="24dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
-    <path
-        android:pathData="M5,14L10,19L20,5"
-        android:strokeLineJoin="round"
-        android:strokeWidth="2"
-        android:fillColor="#00000000"
-        android:strokeColor="?attr/toolbarIconColor"
-        android:strokeLineCap="round"/>
+  <path
+      android:pathData="M2,7c0,-2.21 1.79,-4 4,-4h4c1.657,0 3,1.343 3,3h5c2.21,0 4,1.79 4,4v7c0,2.21 -1.79,4 -4,4L6,21c-2.21,0 -4,-1.79 -4,-4L2,7zM6,5c-1.105,0 -2,0.895 -2,2v3h16c0,-1.105 -0.895,-2 -2,-2h-5c-1.105,0 -2,-0.895 -2,-2 0,-0.552 -0.448,-1 -1,-1L6,5zM20,12L4,12v5c0,1.105 0.895,2 2,2h12c1.105,0 2,-0.895 2,-2v-5z"
+      android:fillColor="?attr/daxColorPrimaryIcon"
+      android:fillType="evenOdd"/>
 </vector>
