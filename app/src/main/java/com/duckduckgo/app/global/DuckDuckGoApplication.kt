@@ -35,7 +35,7 @@ import java.io.File
 import javax.inject.Inject
 import kotlinx.coroutines.*
 import logcat.AndroidLogcatLogger
-import logcat.LogcatLogger
+import logcat.LogPriority
 import org.threeten.bp.zone.ZoneRulesProvider
 import timber.log.Timber
 
@@ -95,7 +95,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
     }
 
     override fun onSecondaryProcessCreate(shortProcessName: String) {
-        LogcatLogger.install(AndroidLogcatLogger())
+        AndroidLogcatLogger.installOnDebuggableApp(this, minPriority = LogPriority.VERBOSE)
         Timber.d("onSecondaryProcessCreate $shortProcessName")
         runInSecondaryProcessNamed(VPN_PROCESS_NAME) {
             Timber.d("Init for secondary process $shortProcessName")
