@@ -97,8 +97,6 @@ import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
-import com.duckduckgo.app.location.ui.SiteLocationPermissionDialog
-import com.duckduckgo.app.location.ui.SystemLocationPermissionDialog
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FACEBOOK_LOGIN_BREAKAGE_INVESTIGATION
 import com.duckduckgo.app.pixels.AppPixelName.FACEBOOK_LOGIN_ERROR_BREAKAGE_INVESTIGATION
@@ -189,8 +187,6 @@ class BrowserTabViewModel @Inject constructor(
     private val sitePermissionsManager: SitePermissionsManager,
 ) : WebViewClientListener,
     EditSavedSiteListener,
-    SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
-    SystemLocationPermissionDialog.SystemLocationPermissionDialogListener,
     UrlExtractionListener,
     AutofillCredentialsSelectionResultHandler.AutofillCredentialSaver,
     AutofillCredentialsSelectionResultHandler.CredentialInjector,
@@ -1485,7 +1481,7 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    override fun onSiteLocationPermissionSelected(
+    fun onSiteLocationPermissionSelected(
         domain: String,
         permission: LocationPermissionType,
     ) {
@@ -1569,17 +1565,17 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    override fun onSystemLocationPermissionAllowed() {
+    fun onSystemLocationPermissionAllowed() {
         pixel.fire(AppPixelName.PRECISE_LOCATION_SYSTEM_DIALOG_ENABLE)
         command.postValue(RequestSystemLocationPermission)
     }
 
-    override fun onSystemLocationPermissionNotAllowed() {
+    fun onSystemLocationPermissionNotAllowed() {
         pixel.fire(AppPixelName.PRECISE_LOCATION_SYSTEM_DIALOG_LATER)
         onSiteLocationPermissionAlwaysDenied()
     }
 
-    override fun onSystemLocationPermissionNeverAllowed() {
+    fun onSystemLocationPermissionNeverAllowed() {
         locationPermission?.let { locationPermission ->
             onSiteLocationPermissionSelected(locationPermission.origin, LocationPermissionType.DENY_ALWAYS)
             pixel.fire(AppPixelName.PRECISE_LOCATION_SYSTEM_DIALOG_NEVER)
