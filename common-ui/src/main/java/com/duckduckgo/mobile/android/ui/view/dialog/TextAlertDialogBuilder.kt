@@ -120,13 +120,7 @@ class TextAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         dialog?.dismiss()
     }
 
-    override fun isShowing(): Boolean {
-        return if (dialog != null) {
-            dialog!!.isShowing
-        } else {
-            false
-        }
-    }
+    override fun isShowing(): Boolean = dialog?.isShowing == true
 
     private fun setViews(
         binding: DialogTextAlertBinding,
