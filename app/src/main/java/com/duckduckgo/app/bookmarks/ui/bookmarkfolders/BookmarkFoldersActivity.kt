@@ -63,22 +63,20 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
     private fun observeViewModel() {
         viewModel.viewState.observe(
             this,
-            { viewState ->
-                viewState?.let {
-                    adapter.submitList(it.folderStructure)
-                }
-            },
-        )
+        ) { viewState ->
+            viewState?.let {
+                adapter.submitList(it.folderStructure)
+            }
+        }
 
         viewModel.command.observe(
             this,
-            {
-                when (it) {
-                    is BookmarkFoldersViewModel.Command.SelectFolder -> setSelectedFolderResult(it.selectedBookmarkFolder)
-                    is BookmarkFoldersViewModel.Command.NewFolderCreatedUpdateTheStructure -> setNewlyCreatedSelectedFolderResult()
-                }
-            },
-        )
+        ) {
+            when (it) {
+                is BookmarkFoldersViewModel.Command.SelectFolder -> setSelectedFolderResult(it.selectedBookmarkFolder)
+                is BookmarkFoldersViewModel.Command.NewFolderCreatedUpdateTheStructure -> setNewlyCreatedSelectedFolderResult()
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
