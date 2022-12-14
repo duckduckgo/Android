@@ -301,6 +301,13 @@
         <item name="cornerSize">@dimen/dialogBorderRadius</item>
     </style>
 
+    <style name="Widget.DuckDuckGo.Dialog.Content">
+        <item name="android:paddingTop">@dimen/keyline_5</item>
+        <item name="android:paddingBottom">@dimen/dialogContentPaddingBottom</item>
+        <item name="android:paddingStart">@dimen/keyline_5</item>
+        <item name="android:paddingEnd">@dimen/keyline_5</item>
+    </style>
+
     <style name="Widget.DuckDuckGo.DialogFullScreen">
         <item name="android:windowIsFloating">false</item>
         <item name="android:windowTranslucentStatus">true</item>
@@ -319,13 +326,6 @@
         <item name="android:layout_marginStart">@dimen/keyline_4</item>
         <item name="android:layout_marginEnd">@dimen/keyline_4</item>
         <item name="android:layout_marginBottom">@dimen/keyline_4</item>
-    </style>
-
-    <style name="Widget.DuckDuckGo.DaxDialog.Content">
-        <item name="android:paddingTop">@dimen/daxDialogContentPaddingTop</item>
-        <item name="android:paddingBottom">@dimen/daxDialogContentPaddingBottom</item>
-        <item name="android:paddingStart">@dimen/daxDialogContentPaddingStart</item>
-        <item name="android:paddingEnd">@dimen/daxDialogContentPaddingEnd</item>
     </style>
 
     <!-- Text Input -->
