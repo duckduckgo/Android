@@ -92,6 +92,8 @@ import com.duckduckgo.app.browser.DownloadConfirmationFragment.DownloadConfirmat
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.autofill.AutofillCredentialsSelectionResultHandler
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
+import com.duckduckgo.app.browser.databinding.ContentSiteLocationPermissionDialogBinding
+import com.duckduckgo.app.browser.databinding.ContentSystemLocationPermissionDialogBinding
 import com.duckduckgo.app.browser.databinding.HttpAuthenticationBinding
 import com.duckduckgo.app.browser.downloader.BlobConverterInjector
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -153,8 +155,6 @@ import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.global.view.toggleFullScreen
 import com.duckduckgo.app.location.data.LocationPermissionType
-import com.duckduckgo.app.location.ui.SiteLocationPermissionDialog
-import com.duckduckgo.app.location.ui.SystemLocationPermissionDialog
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.statistics.VariantManager
@@ -227,8 +227,6 @@ class BrowserTabFragment :
     CoroutineScope,
     TrackersAnimatorListener,
     DownloadConfirmationDialogListener,
-    SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
-    SystemLocationPermissionDialog.SystemLocationPermissionDialogListener,
     SitePermissionsGrantedListener {
 
     private val supervisorJob = SupervisorJob()
@@ -1126,12 +1124,40 @@ class BrowserTabFragment :
             if (deniedForever) {
                 viewModel.onSystemLocationPermissionDeniedOneTime()
             } else {
-                val dialog = SystemLocationPermissionDialog.instance(domain)
-                dialog.show(childFragmentManager, SystemLocationPermissionDialog.SYSTEM_LOCATION_PERMISSION_TAG)
+                showSystemLocationPermissionDialog(domain)
             }
         } else {
             viewModel.onSystemLocationPermissionGranted()
         }
+    }
+
+    private fun showSystemLocationPermissionDialog(domain: String) {
+        val binding = ContentSystemLocationPermissionDialogBinding.inflate(layoutInflater)
+
+        val originUrl = domain.websiteFromGeoLocationsApiOrigin()
+        val subtitle = getString(R.string.preciseLocationSystemDialogSubtitle, originUrl, originUrl)
+        binding.systemPermissionDialogSubtitle.text = subtitle
+
+        val dialog = CustomAlertDialogBuilder(requireActivity())
+            .setView(binding)
+            .build()
+
+        binding.allowLocationPermission.setOnClickListener {
+            viewModel.onSystemLocationPermissionAllowed()
+            dialog.dismiss()
+        }
+
+        binding.denyLocationPermission.setOnClickListener {
+            viewModel.onSystemLocationPermissionNotAllowed()
+            dialog.dismiss()
+        }
+
+        binding.neverAllowLocationPermission.setOnClickListener {
+            viewModel.onSystemLocationPermissionNeverAllowed()
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     private fun requestLocationPermissions() {
@@ -1145,8 +1171,44 @@ class BrowserTabFragment :
     }
 
     private fun askSiteLocationPermission(domain: String) {
-        val dialog = SiteLocationPermissionDialog.instance(domain, false, tabId)
-        dialog.show(childFragmentManager, SiteLocationPermissionDialog.SITE_LOCATION_PERMISSION_TAG)
+        val binding = ContentSiteLocationPermissionDialogBinding.inflate(layoutInflater)
+
+        val title = domain.websiteFromGeoLocationsApiOrigin()
+        binding.sitePermissionDialogTitle.text = title
+        binding.sitePermissionDialogSubtitle.text = if (title == DDG_DOMAIN) {
+            getString(R.string.preciseLocationDDGDialogSubtitle)
+        } else {
+            getString(R.string.preciseLocationSiteDialogSubtitle)
+        }
+        lifecycleScope.launch {
+            faviconManager.loadToViewFromLocalOrFallback(tabId, domain, binding.sitePermissionDialogFavicon)
+        }
+
+        val dialog = CustomAlertDialogBuilder(requireActivity())
+            .setView(binding)
+            .build()
+
+        binding.siteAllowAlwaysLocationPermission.setOnClickListener {
+            viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ALWAYS)
+            dialog.dismiss()
+        }
+
+        binding.siteAllowOnceLocationPermission.setOnClickListener {
+            viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ONCE)
+            dialog.dismiss()
+        }
+
+        binding.siteDenyOnceLocationPermission.setOnClickListener {
+            viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.DENY_ONCE)
+            dialog.dismiss()
+        }
+
+        binding.siteDenyAlwaysLocationPermission.setOnClickListener {
+            viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.DENY_ALWAYS)
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     private fun launchBrokenSiteFeedback(data: BrokenSiteData) {
@@ -1394,9 +1456,11 @@ class BrowserTabFragment :
                                 AutomaticFireproofDialogOptions.ALWAYS -> {
                                     viewModel.onUserEnabledAutomaticFireproofLoginDialog(fireproofWebsite.domain)
                                 }
+
                                 AutomaticFireproofDialogOptions.FIREPROOF_THIS_SITE -> {
                                     viewModel.onUserFireproofSiteInAutomaticFireproofLoginDialog(fireproofWebsite.domain)
                                 }
+
                                 AutomaticFireproofDialogOptions.NOT_NOW -> {
                                     viewModel.onUserDismissedAutomaticFireproofLoginDialog()
                                 }
@@ -1459,6 +1523,7 @@ class BrowserTabFragment :
                                         destroyWebView()
                                     }
                                 }
+
                                 LaunchInExternalAppOptions.CANCEL -> {} // no-op
                             }
                         }
@@ -2466,6 +2531,7 @@ class BrowserTabFragment :
         private const val URL_EXTRA_ARG = "URL_EXTRA_ARG"
         private const val SKIP_HOME_ARG = "SKIP_HOME_ARG"
         private const val FAVORITES_ONBOARDING_ARG = "FAVORITES_ONBOARDING_ARG"
+        private const val DDG_DOMAIN = "duckduckgo.com"
 
         private const val ADD_SAVED_SITE_FRAGMENT_TAG = "ADD_SAVED_SITE"
         private const val KEYBOARD_DELAY = 200L
@@ -3240,25 +3306,6 @@ class BrowserTabFragment :
         } else {
             viewModel.ctaViewState.observe(viewLifecycleOwner, ctaViewStateObserver)
         }
-    }
-
-    override fun onSiteLocationPermissionSelected(
-        domain: String,
-        permission: LocationPermissionType,
-    ) {
-        viewModel.onSiteLocationPermissionSelected(domain, permission)
-    }
-
-    override fun onSystemLocationPermissionAllowed() {
-        viewModel.onSystemLocationPermissionAllowed()
-    }
-
-    override fun onSystemLocationPermissionNotAllowed() {
-        viewModel.onSystemLocationPermissionNotAllowed()
-    }
-
-    override fun onSystemLocationPermissionNeverAllowed() {
-        viewModel.onSystemLocationPermissionNeverAllowed()
     }
 
     override fun permissionsGrantedOnWhereby() {
