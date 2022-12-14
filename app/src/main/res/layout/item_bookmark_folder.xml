@@ -16,47 +16,36 @@
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="?android:attr/selectableItemBackground"
-    android:clickable="true"
-    android:focusable="true">
+    android:layout_height="wrap_content">
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+        android:id="@+id/bookmarkFolderItem"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:leadingIcon="@drawable/ic_folder_24"
+        app:leadingIconBackground="circular" />
 
     <FrameLayout
-        android:id="@+id/iconContainer"
+        android:id="@+id/selectedFolderContainer"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:background="@drawable/list_item_image_circular_background"
+        android:layout_marginStart="@dimen/keyline_4"
+        android:background="@drawable/selected_icon_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:id="@+id/icon"
             android:layout_width="24dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:importantForAccessibility="no"
-            android:src="@drawable/ic_folder" />
+            android:src="@drawable/ic_check_24"
+            app:tint="@color/white" />
     </FrameLayout>
-
-    <TextView
-        android:id="@+id/name"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:paddingStart="16dp"
-        android:ellipsize="end"
-        android:fontFamily="sans-serif"
-        android:maxLines="1"
-        android:singleLine="true"
-        android:textColor="?attr/normalTextColor"
-        android:textSize="16sp"
-        android:textStyle="normal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/iconContainer"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:text="Folder" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

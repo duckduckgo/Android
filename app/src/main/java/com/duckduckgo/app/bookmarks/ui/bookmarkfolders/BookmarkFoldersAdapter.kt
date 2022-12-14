@@ -20,14 +20,13 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.databinding.ViewBookmarkFolderEntryBinding
+import com.duckduckgo.mobile.android.databinding.RowTwoLineItemBinding
 import com.duckduckgo.mobile.android.databinding.ViewSectionHeaderBinding
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import timber.log.Timber
@@ -69,7 +68,7 @@ class BookmarkFoldersAdapter(
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             BOOKMARK_FOLDER_TYPE -> {
-                val binding = ViewBookmarkFolderEntryBinding.inflate(inflater, parent, false)
+                val binding = RowTwoLineItemBinding.inflate(inflater, parent, false)
                 BookmarkFolderScreenViewHolders.BookmarkFoldersViewHolder(layoutInflater, binding, viewModel)
             }
             BOOKMARK_FOLDERS_SECTION_TITLE_TYPE -> {
@@ -113,41 +112,44 @@ sealed class BookmarkFolderScreenViewHolders(itemView: View) : RecyclerView.View
 
     class BookmarkFoldersViewHolder(
         private val layoutInflater: LayoutInflater,
-        private val binding: ViewBookmarkFolderEntryBinding,
+        private val binding: RowTwoLineItemBinding,
         private val viewModel: BookmarksViewModel,
     ) : BookmarkFolderScreenViewHolders(binding.root) {
 
         private val context: Context = binding.root.context
 
         fun update(bookmarkFolder: BookmarkFolder) {
-            binding.overflowMenu.contentDescription = context.getString(
-                R.string.bookmarkOverflowContentDescription,
-                bookmarkFolder.name,
-            )
+            val listItem = binding.root
+            // fixme: After migration this contentDescription will be lost
+            // binding.overflowMenu.contentDescription = context.getString(
+            //     R.string.bookmarkOverflowContentDescription,
+            //     bookmarkFolder.name,
+            // )
 
-            binding.title.text = bookmarkFolder.name
+            listItem.setPrimaryText(bookmarkFolder.name)
 
             val totalItems = bookmarkFolder.numBookmarks + bookmarkFolder.numFolders
 
             if (totalItems == 0) {
-                binding.subtitle.text = context.getString(R.string.bookmarkFolderEmpty)
+                listItem.setSecondaryText(context.getString(R.string.bookmarkFolderEmpty))
             } else {
-                binding.subtitle.text = context.resources.getQuantityString(R.plurals.bookmarkFolderItems, totalItems, totalItems)
+                listItem.setSecondaryText(context.resources.getQuantityString(R.plurals.bookmarkFolderItems, totalItems, totalItems))
             }
 
-            binding.icon.setImageResource(R.drawable.ic_folder)
+            listItem.setLeadingIcon(R.drawable.ic_folder_24)
 
-            binding.overflowMenu.setOnClickListener {
-                showOverFlowMenu(binding.overflowMenu, bookmarkFolder)
+            listItem.showTrailingIcon()
+            listItem.setTrailingIconClickListener {
+                showOverFlowMenu(listItem, bookmarkFolder)
             }
 
-            binding.root.setOnClickListener {
+            listItem.setOnClickListener {
                 viewModel.onBookmarkFolderSelected(bookmarkFolder)
             }
         }
 
         private fun showOverFlowMenu(
-            anchor: ImageView,
+            anchor: View,
             bookmarkFolder: BookmarkFolder,
         ) {
             val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_delete_menu)
