@@ -31,6 +31,7 @@ import android.view.View.OnFocusChangeListener
 import android.view.inputmethod.EditorInfo
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.doOnNextLayout
+import androidx.core.view.postDelayed
 import androidx.core.view.updateLayoutParams
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewDaxTextInputBinding
@@ -124,6 +125,12 @@ class DaxTextInput @JvmOverloads constructor(
             binding.internalEditText.isEnabled = value
             handleIsEditableChangeForEndIcon(value)
         }
+
+    fun showKeyboardDelayed() {
+        binding.root.postDelayed(KEYBOARD_DELAY) {
+            binding.internalEditText.showKeyboard()
+        }
+    }
 
     private fun handleIsEditableChangeForEndIcon(isEditable: Boolean) {
         if (binding.internalInputLayout.endIconMode != END_ICON_NONE) {
@@ -262,6 +269,10 @@ class DaxTextInput @JvmOverloads constructor(
         INPUT_TYPE_PASSWORD(2),
     }
 
+    companion object {
+        private const val KEYBOARD_DELAY = 500L
+    }
+
     internal class SavedState : BaseSavedState {
         var childrenStates: SparseArray<Parcelable>? = null
 
@@ -282,6 +293,7 @@ class DaxTextInput @JvmOverloads constructor(
         }
 
         companion object {
+
             @JvmField
             val CREATOR: ClassLoaderCreator<SavedState> = object : ClassLoaderCreator<SavedState> {
                 override fun createFromParcel(

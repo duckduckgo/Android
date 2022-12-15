@@ -77,7 +77,6 @@ import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
 import com.duckduckgo.app.browser.remotemessage.asBrowserTabCommand
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
-import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
 import com.duckduckgo.app.browser.urlextraction.UrlExtractionListener
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -98,8 +97,6 @@ import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
-import com.duckduckgo.app.location.ui.SiteLocationPermissionDialog
-import com.duckduckgo.app.location.ui.SystemLocationPermissionDialog
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FACEBOOK_LOGIN_BREAKAGE_INVESTIGATION
 import com.duckduckgo.app.pixels.AppPixelName.FACEBOOK_LOGIN_ERROR_BREAKAGE_INVESTIGATION
@@ -190,9 +187,6 @@ class BrowserTabViewModel @Inject constructor(
     private val sitePermissionsManager: SitePermissionsManager,
 ) : WebViewClientListener,
     EditSavedSiteListener,
-    HttpAuthenticationListener,
-    SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
-    SystemLocationPermissionDialog.SystemLocationPermissionDialogListener,
     UrlExtractionListener,
     AutofillCredentialsSelectionResultHandler.AutofillCredentialSaver,
     AutofillCredentialsSelectionResultHandler.CredentialInjector,
@@ -1487,7 +1481,7 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    override fun onSiteLocationPermissionSelected(
+    fun onSiteLocationPermissionSelected(
         domain: String,
         permission: LocationPermissionType,
     ) {
@@ -1571,17 +1565,17 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    override fun onSystemLocationPermissionAllowed() {
+    fun onSystemLocationPermissionAllowed() {
         pixel.fire(AppPixelName.PRECISE_LOCATION_SYSTEM_DIALOG_ENABLE)
         command.postValue(RequestSystemLocationPermission)
     }
 
-    override fun onSystemLocationPermissionNotAllowed() {
+    fun onSystemLocationPermissionNotAllowed() {
         pixel.fire(AppPixelName.PRECISE_LOCATION_SYSTEM_DIALOG_LATER)
         onSiteLocationPermissionAlwaysDenied()
     }
 
-    override fun onSystemLocationPermissionNeverAllowed() {
+    fun onSystemLocationPermissionNeverAllowed() {
         locationPermission?.let { locationPermission ->
             onSiteLocationPermissionSelected(locationPermission.origin, LocationPermissionType.DENY_ALWAYS)
             pixel.fire(AppPixelName.PRECISE_LOCATION_SYSTEM_DIALOG_NEVER)
@@ -2549,7 +2543,7 @@ class BrowserTabViewModel @Inject constructor(
         command.value = RequiresAuthentication(request)
     }
 
-    override fun handleAuthentication(
+    fun handleAuthentication(
         request: BasicAuthenticationRequest,
         credentials: BasicAuthenticationCredentials,
     ) {
@@ -2558,7 +2552,7 @@ class BrowserTabViewModel @Inject constructor(
         command.value = SaveCredentials(request, credentials)
     }
 
-    override fun cancelAuthentication(request: BasicAuthenticationRequest) {
+    fun cancelAuthentication(request: BasicAuthenticationRequest) {
         request.handler.cancel()
         command.value = ShowWebContent
     }

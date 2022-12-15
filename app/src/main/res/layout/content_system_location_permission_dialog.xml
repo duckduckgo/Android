@@ -16,65 +16,66 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="?toolbarBgColor"
     android:gravity="center"
     android:orientation="vertical">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/faviconImage"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginTop="24dp"
+        android:layout_width="@dimen/dialogImageSize"
+        android:layout_height="@dimen/dialogImageSize"
         android:layout_gravity="center"
         android:importantForAccessibility="no"
+        android:layout_marginBottom="@dimen/keyline_4"
         app:srcCompat="@drawable/ic_dax_icon"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"/>
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/systemPermissionDialogTitle"
-        style="@style/LocationPermissionDialogTitle"
+        app:typography="h2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/preciseLocationSystemDialogTitle" />
+        android:text="@string/preciseLocationSystemDialogTitle"/>
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/systemPermissionDialogSubtitle"
-        style="@style/LocationPermissionDialogSubtitle"
+        app:typography="body1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="24dp"
-        android:text="@string/preciseLocationSystemDialogSubtitle" />
+        android:layout_marginTop="@dimen/keyline_2"
+        android:text="@string/preciseLocationSystemDialogSubtitle"/>
 
-    <View style="@style/LocationPermissionDialogSplitter" />
-
-    <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostLarge
-        android:id="@+id/allowLocationPermission"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/preciseLocationSystemDialogAllow" />
+        android:layout_marginTop="@dimen/keyline_5"
+        android:gravity="end"
+        android:orientation="vertical">
 
-    <View style="@style/LocationPermissionDialogSplitter" />
+        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
+            android:id="@+id/allowLocationPermission"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/preciseLocationSystemDialogAllow"/>
 
-    <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostLarge
-        android:id="@+id/denyLocationPermission"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/preciseLocationSystemDialogDeny" />
+        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
+            android:id="@+id/denyLocationPermission"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/preciseLocationSystemDialogDeny"/>
 
-    <View style="@style/LocationPermissionDialogSplitter" />
+        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
+            android:id="@+id/neverAllowLocationPermission"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/preciseLocationSystemDialogNeverAllow"/>
 
-    <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostLarge
-        android:id="@+id/neverAllowLocationPermission"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/preciseLocationSystemDialogNeverAllow" />
+    </LinearLayout>
 
 </LinearLayout>
