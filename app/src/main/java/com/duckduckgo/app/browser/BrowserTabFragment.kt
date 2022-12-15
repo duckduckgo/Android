@@ -2511,11 +2511,12 @@ class BrowserTabFragment :
         context?.let {
             val isShowing: Boolean? = emailAutofillTooltipDialog?.isShowing
             if (isShowing != true) {
-                emailAutofillTooltipDialog = EmailAutofillTooltipFragment(it, address)
-                emailAutofillTooltipDialog?.show()
-                emailAutofillTooltipDialog?.setOnCancelListener { viewModel.cancelAutofillTooltip() }
-                emailAutofillTooltipDialog?.useAddress = { viewModel.useAddress() }
-                emailAutofillTooltipDialog?.usePrivateAlias = { viewModel.consumeAlias() }
+                emailAutofillTooltipDialog = EmailAutofillTooltipFragment(it, address).apply {
+                    show()
+                    setOnCancelListener { viewModel.cancelAutofillTooltip() }
+                    useAddress = { viewModel.useAddress() }
+                    usePrivateAlias = { viewModel.consumeAlias() }
+                }
             }
         }
     }
