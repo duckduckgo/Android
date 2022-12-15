@@ -171,8 +171,6 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autofill.*
-import com.duckduckgo.autofill.BrowserAutofill
-import com.duckduckgo.autofill.Callback
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult.*
@@ -187,9 +185,6 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.mobile.android.ui.store.BrowserAppTheme
 import com.duckduckgo.mobile.android.ui.view.*
-import com.duckduckgo.mobile.android.ui.view.DaxDialog
-import com.duckduckgo.mobile.android.ui.view.DaxDialogListener
-import com.duckduckgo.mobile.android.ui.view.KeyboardAwareEditText
 import com.duckduckgo.mobile.android.ui.view.dialog.CustomAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.dialog.DaxAlertDialog
 import com.duckduckgo.mobile.android.ui.view.dialog.StackedAlertDialogBuilder
@@ -201,11 +196,6 @@ import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
-import java.io.File
-import java.util.EventListener
-import javax.inject.Inject
-import javax.inject.Provider
-import kotlin.coroutines.CoroutineContext
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
@@ -219,6 +209,10 @@ import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.cancellable
 import timber.log.Timber
+import java.io.File
+import javax.inject.Inject
+import javax.inject.Provider
+import kotlin.coroutines.CoroutineContext
 
 @InjectWith(FragmentScope::class)
 class BrowserTabFragment :
