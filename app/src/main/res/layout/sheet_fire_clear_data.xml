@@ -56,7 +56,7 @@
                 android:layout_height="wrap_content"
                 app:leadingIcon="@drawable/ic_fire_red"
                 app:primaryText="@string/fireClearAll"
-                app:primaryTextColorOverlay="@color/marketing_red" />
+                app:primaryTextColorOverlay="?attr/daxColorDestructive" />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/cancelOption"
