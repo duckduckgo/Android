@@ -119,11 +119,23 @@ class CustomAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         dialog?.dismiss()
     }
 
+    override fun isShowing(): Boolean {
+        return if (dialog != null) {
+            dialog!!.isShowing
+        } else {
+            false
+        }
+    }
+
     private fun setViews(
         binding: DialogCustomAlertBinding,
         dialog: AlertDialog,
     ) {
-        binding.customDialogTitle.text = titleText
+        if (titleText.isEmpty()) {
+            binding.customDialogTitle.gone()
+        } else {
+            binding.customDialogTitle.text = titleText
+        }
 
         if (messageText.isEmpty()) {
             binding.customDialogMessage.gone()
