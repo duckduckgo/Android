@@ -28,8 +28,6 @@ import com.squareup.moshi.Moshi
 import javax.inject.Inject
 import logcat.logcat
 
-private const val APPTP_FEATURE_SIGNATURE_KEY = "apptp_feature_signature"
-
 @ContributesMultibinding(AppScope::class)
 class AppTpPrivacyFeaturePlugin @Inject constructor(
     plugins: DaggerSet<AppTpSettingPlugin>,
@@ -83,6 +81,7 @@ class AppTpPrivacyFeaturePlugin @Inject constructor(
     override val featureName: String = AppTpFeatureName.AppTrackerProtection.value
 
     companion object {
+        private const val APPTP_FEATURE_SIGNATURE_KEY = "apptp_feature_signature"
         private const val FILENAME = "com.duckduckgo.mobile.vpn.feature.plugin"
     }
 }
