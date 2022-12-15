@@ -33,6 +33,8 @@
 
     <string name="devSettingsScreenUserAgentSection">USER AGENT</string>
     <string name="devSettingsScreenUserAgentOverride">Override UserAgent</string>
+    <string name="devSettingsScreenPrivacyRemoteConfigUrlOverride">Override Privacy Remote Config URL</string>
+    <string name="devSettingsScreenPrivacyRemoteConfigUrlOverrideSubtitle">Click here to customize the Privacy Remote Config URL</string>
     <string name="devSettingsScreenUserAgentSelectorTitle">UserAgent</string>
     <string name="devSettingsScreenUserAgentNoAppId">Omit DuckDuckGo AppId</string>
     <string name="devSettingsScreenUserAgentNoVersion">Omit Webview Version</string>

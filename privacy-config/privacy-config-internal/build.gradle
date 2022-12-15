@@ -17,25 +17,35 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
+    id 'com.squareup.anvil'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
-dependencies {
-    implementation project(path: ':common-ui')
-    implementation project(path: ':common')
-    implementation Kotlin.stdlib.jdk7
-    implementation AndroidX.core.ktx
-    implementation KotlinX.coroutines.core
-
-    implementation JakeWharton.timber
-    implementation Square.okHttp3.okHttp
-    // Room
-    implementation AndroidX.room.runtime
-
-    // LiveData
-    implementation AndroidX.lifecycle.liveDataKtx
-}
 android {
-  namespace 'com.duckduckgo.browser.api'
+    anvil {
+        generateDaggerFactories = true // default is false
+    }
+}
+
+dependencies {
+    anvil project(path: ':anvil-compiler')
+    implementation project(path: ':anvil-annotations')
+    implementation project(path: ':privacy-config-api')
+    implementation project(path: ':di')
+    implementation project(path: ':common')
+    implementation project(path: ':common-ui')
+    implementation project(path: ':browser-api')
+
+    implementation Kotlin.stdlib.jdk7
+
+    implementation AndroidX.core.ktx
+
+    implementation AndroidX.appCompat
+    implementation Google.android.material
+    implementation AndroidX.constraintLayout
+    implementation Square.okHttp3.okHttp
+    
+    // Dagger
+    implementation Google.dagger
 }

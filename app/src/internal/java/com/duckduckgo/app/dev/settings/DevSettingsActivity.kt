@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.dev.settings
 
+import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -38,8 +39,8 @@ import com.duckduckgo.app.dev.settings.db.UAOverride
 import com.duckduckgo.app.dev.settings.privacy.TrackerDataDevReceiver.Companion.DOWNLOAD_TDS_INTENT_ACTION
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.privacy.config.internal.PrivacyConfigInternalSettingsActivity
 import java.lang.IllegalStateException
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -87,6 +88,7 @@ class DevSettingsActivity : DuckDuckGoActivity() {
             viewModel.clearSavedSites()
         }
         binding.overrideUserAgentSelector.setOnClickListener { viewModel.onUserAgentSelectorClicked() }
+        binding.overridePrivacyRemoteConfigUrl.setOnClickListener { viewModel.onRemotePrivacyUrlClicked() }
     }
 
     private fun observeViewModel() {
@@ -113,6 +115,7 @@ class DevSettingsActivity : DuckDuckGoActivity() {
             is Command.SendTdsIntent -> sendTdsIntent()
             is Command.OpenUASelector -> showUASelector(R.menu.user_agent_menu)
             is Command.ShowSavedSitesClearedConfirmation -> showSavedSitesClearedConfirmation()
+            is Command.ChangePrivacyConfigUrl -> showChangePrivacyUrl()
             else -> TODO()
         }
     }
@@ -151,6 +154,11 @@ class DevSettingsActivity : DuckDuckGoActivity() {
 
     private fun showSavedSitesClearedConfirmation() {
         Toast.makeText(this, getString(R.string.devSettingsClearSavedSitesConfirmation), Toast.LENGTH_SHORT).show()
+    }
+
+    private fun showChangePrivacyUrl() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        startActivity(PrivacyConfigInternalSettingsActivity.intent(this), options)
     }
 
     companion object {

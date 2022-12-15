@@ -78,6 +78,14 @@
                     app:primaryText="@string/devSettingsScreenTdsVersionSubtitle"
                     app:showSwitch="true"/>
 
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+                android:id="@+id/overridePrivacyRemoteConfigUrl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/devSettingsScreenPrivacyRemoteConfigUrlOverride"
+                app:secondaryText="@string/devSettingsScreenPrivacyRemoteConfigUrlOverrideSubtitle"
+                />
+
             <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

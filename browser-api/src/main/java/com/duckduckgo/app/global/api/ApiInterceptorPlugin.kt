@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2021 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.trackerdetection.api
+package com.duckduckgo.app.global.api
 
-import com.duckduckgo.anvil.annotations.ContributesServiceApi
-import com.duckduckgo.di.scopes.AppScope
-import retrofit2.Call
-import retrofit2.http.GET
+import okhttp3.Interceptor
 
-@ContributesServiceApi(AppScope::class)
-interface TrackerListService {
-    @GET("${TDS_URL}tds.json")
-    fun tds(): Call<TdsJson>
-
-    @GET("/contentblocking/trackers-unprotected-temporary.txt")
-    fun temporaryWhitelist(): Call<String>
+interface ApiInterceptorPlugin {
+    fun getInterceptor(): Interceptor
 }
-
-const val TDS_URL = "https://staticcdn.duckduckgo.com/trackerblocking/v3/"

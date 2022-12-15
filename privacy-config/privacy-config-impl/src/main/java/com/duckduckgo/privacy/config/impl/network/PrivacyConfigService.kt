@@ -18,11 +18,12 @@ package com.duckduckgo.privacy.config.impl.network
 
 import com.duckduckgo.anvil.annotations.ContributesServiceApi
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.privacy.config.api.PRIVACY_REMOTE_CONFIG_URL
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import retrofit2.http.GET
 
 @ContributesServiceApi(AppScope::class)
 interface PrivacyConfigService {
-    @GET("https://staticcdn.duckduckgo.com/trackerblocking/config/v2/android-config.json")
+    @GET(PRIVACY_REMOTE_CONFIG_URL)
     suspend fun privacyConfig(): JsonPrivacyConfig
 }
