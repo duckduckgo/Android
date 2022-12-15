@@ -16,12 +16,13 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="@dimen/keyline_5">
+    style="@style/Widget.DuckDuckGo.Dialog.Content">
 
     <ImageView
         android:id="@+id/stackedAlertDialogImage"
@@ -32,7 +33,7 @@
         android:src="@drawable/ic_globe_gray_16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/stackedAlertDialogTitle"
@@ -42,7 +43,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/stackedAlertDialogImage"
         app:textType="primary"
-        app:typography="h2" />
+        app:typography="h2"/>
 
     <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/stackedlertDialogMessage"
@@ -53,7 +54,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/stackedAlertDialogTitle"
         app:textType="secondary"
-        app:typography="body1" />
+        app:typography="body1"/>
 
     <LinearLayout
         android:id="@+id/stackedAlertDialogButtonLayout"
@@ -65,6 +66,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/stackedlertDialogMessage" />
+        app:layout_constraintTop_toBottomOf="@+id/stackedlertDialogMessage"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
