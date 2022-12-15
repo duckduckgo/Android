@@ -21,4 +21,5 @@ interface DaxAlertDialog {
     fun build(): DaxAlertDialog
     fun show()
     fun dismiss()
+    fun isShowing(): Boolean
 }
