@@ -62,9 +62,9 @@
 
         </FrameLayout>
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/onboarding_page_title"
-            android:textAppearance="@style/TextAppearance.DuckDuckGo.Headline2"
+            app:typography="h2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="40dp"
@@ -76,10 +76,10 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/onboarding_page_header" />
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/onboarding_page_text"
-            android:textAppearance="@style/TextAppearance.DuckDuckGo.Body2"
-            android:textColor="?secondaryTextColor"
+            app:typography="body2"
+            app:textType="secondary"
             android:textAlignment="center"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
