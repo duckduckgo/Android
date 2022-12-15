@@ -1,5 +1,0 @@
-crypto_stream/salsa20/xmm6/libsodium_la-salsa20_xmm6-asm.lo: \
-  crypto_stream/salsa20/xmm6/salsa20_xmm6-asm.S \
-  crypto_stream/salsa20/xmm6/salsa20_xmm6-asm_namespace.h
-
-crypto_stream/salsa20/xmm6/salsa20_xmm6-asm_namespace.h:

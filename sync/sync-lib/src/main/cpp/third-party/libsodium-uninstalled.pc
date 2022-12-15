@@ -1,7 +1,0 @@
-Name: libsodium
-Version: 1.0.18
-Description: A modern and easy-to-use crypto library
-
-Libs: -L${pcfiledir}/src/libsodium -lsodium
-Libs.private:  -pthread 
-Cflags: -I${pcfiledir}/src/libsodium/include -I./src/libsodium/include -I./src/libsodium/include/sodium
