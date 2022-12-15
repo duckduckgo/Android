@@ -242,6 +242,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             } else {
                 logcat(LogPriority.ERROR) { "Failed to obtain config needed to establish the TUN interface" }
                 stopVpn(VpnStopReason.ERROR, false)
+                return@withContext
             }
         }
 
@@ -437,16 +438,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         }
 
         return dns.toSet()
-    }
-
-    private fun Builder.safelyAddAllowedApps(apps: List<String>) {
-        for (app in apps) {
-            try {
-                addAllowedApplication(app)
-            } catch (e: PackageManager.NameNotFoundException) {
-                logcat(LogPriority.WARN) { "Package name not found: $app" }
-            }
-        }
     }
 
     private fun Builder.safelyAddDisallowedApps(apps: List<String>) {
