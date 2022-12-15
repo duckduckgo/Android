@@ -33,10 +33,15 @@ class NativeLib constructor(
     init {
         try {
             Timber.v("Loading native SYNC library")
-            System.loadLibrary("lib")
+            System.loadLibrary("ddgcrypto")
         } catch (ignored: Throwable) {
             Timber.e(ignored, "Error loading netguard library")
             exitProcess(1)
         }
     }
+    fun initialize() {
+        init()
+    }
+
+    private external fun init(): Long
 }

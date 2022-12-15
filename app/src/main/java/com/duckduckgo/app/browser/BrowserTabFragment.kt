@@ -200,6 +200,7 @@ import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
+import com.duckduckgo.sync.lib.NativeLib
 import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -563,6 +564,8 @@ class BrowserTabFragment :
             }
         }
         sitePermissionsDialogLauncher.registerPermissionLauncher(this)
+        var nativeLib = NativeLib(requireContext())
+        nativeLib.initialize()
     }
 
     private fun resumeWebView() {
