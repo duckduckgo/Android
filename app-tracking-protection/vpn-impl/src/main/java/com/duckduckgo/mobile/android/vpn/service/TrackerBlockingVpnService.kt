@@ -229,6 +229,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             if (currStateStats?.state == ENABLING) {
                 // Sometimes onStartCommand gets called twice - this is a safety rail against that
                 logcat(LogPriority.WARN) { "VPN is already being started, abort" }
+                deviceShieldPixels.reportConcurrentVpnStart()
                 return@withContext
             }
 

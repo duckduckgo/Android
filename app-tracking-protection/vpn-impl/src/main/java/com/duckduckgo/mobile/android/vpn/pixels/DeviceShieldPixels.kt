@@ -378,6 +378,8 @@ interface DeviceShieldPixels {
     fun didPressOnAppTpEnabledCtaButton()
 
     fun reportErrorCreatingVpnNetworkStack()
+
+    fun reportConcurrentVpnStart()
 }
 
 @ContributesBinding(AppScope::class)
@@ -825,6 +827,10 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun reportErrorCreatingVpnNetworkStack() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_REPORT_VPN_NETWORK_STACK_CREATE_ERROR_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_REPORT_VPN_NETWORK_STACK_CREATE_ERROR)
+    }
+
+    override fun reportConcurrentVpnStart() {
+        firePixel(DeviceShieldPixelNames.ATP_REPORT_CONCURRENT_VPN_START)
     }
 
     private fun firePixel(

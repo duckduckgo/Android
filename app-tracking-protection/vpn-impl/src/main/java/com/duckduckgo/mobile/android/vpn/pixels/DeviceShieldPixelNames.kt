@@ -219,5 +219,7 @@ enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: B
     ATP_REPORT_VPN_NETWORK_STACK_CREATE_ERROR("m_atp_ev_apptp_create_network_stack_error_c"),
     ATP_REPORT_VPN_NETWORK_STACK_CREATE_ERROR_DAILY("m_atp_ev_apptp_create_network_stack_error_d"),
 
+    ATP_REPORT_CONCURRENT_VPN_START("m_atp_ev_apptp_concurrent_vpn_start_c"),
+
     ;
 }
