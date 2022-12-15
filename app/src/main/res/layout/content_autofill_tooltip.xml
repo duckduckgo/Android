@@ -29,38 +29,6 @@
         app:primaryText="@string/autofillTooltipUseYourAlias"
         app:secondaryText="@string/autofillTooltipUseYourAliasDescription" />
 
-    <!--    <LinearLayout-->
-    <!--        android:id="@+id/primaryCta"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:orientation="vertical">-->
-
-    <!--        <TextView-->
-    <!--            android:id="@+id/tooltipPrimaryCtaTitle"-->
-    <!--            android:layout_width="wrap_content"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:layout_marginStart="21dp"-->
-    <!--            android:layout_marginEnd="21dp"-->
-    <!--            android:text="@string/autofillTooltipUseYourAlias"-->
-    <!--            android:textColor="?attr/normalTextColor"-->
-    <!--            android:textSize="15sp"-->
-    <!--            android:textStyle="bold"-->
-    <!--            app:layout_constraintEnd_toEndOf="parent"-->
-    <!--            app:layout_constraintStart_toStartOf="parent"-->
-    <!--            app:layout_constraintTop_toTopOf="parent" />-->
-
-    <!--        <TextView-->
-    <!--            android:id="@+id/tooltipPrimaryCtaDescription"-->
-    <!--            android:layout_width="wrap_content"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:layout_marginStart="21dp"-->
-    <!--            android:layout_marginEnd="21dp"-->
-    <!--            android:text="@string/autofillTooltipUseYourAliasDescription"-->
-    <!--            android:textColor="?attr/normalTextColor"-->
-    <!--            android:textSize="12sp" />-->
-
-    <!--    </LinearLayout>-->
-
     <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
         android:id="@+id/secondaryCta"
         android:layout_width="match_parent"
@@ -68,38 +36,4 @@
         app:primaryText="@string/autofillTooltipGenerateAddress"
         app:secondaryText="@string/autofillTooltipGenerateAddressDescription" />
 
-    <!--    <LinearLayout-->
-    <!--        android:id="@+id/secondaryCta"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:foreground="?selectableItemBackgroundBorderless"-->
-    <!--        android:orientation="vertical"-->
-    <!--        android:padding="16dp"-->
-    <!--        tools:ignore="UnusedAttribute">-->
-
-    <!--        <TextView-->
-    <!--            android:id="@+id/tooltipSecondaryCtaTitle"-->
-    <!--            android:layout_width="wrap_content"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:layout_marginStart="21dp"-->
-    <!--            android:layout_marginEnd="21dp"-->
-    <!--            android:text="@string/autofillTooltipGenerateAddress"-->
-    <!--            android:textColor="?attr/normalTextColor"-->
-    <!--            android:textSize="15sp"-->
-    <!--            android:textStyle="bold"-->
-    <!--            app:layout_constraintEnd_toEndOf="parent"-->
-    <!--            app:layout_constraintStart_toStartOf="parent"-->
-    <!--            app:layout_constraintTop_toTopOf="parent" />-->
-
-    <!--        <TextView-->
-    <!--            android:id="@+id/tooltipSecondaryCtaDescription"-->
-    <!--            android:layout_width="wrap_content"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:layout_marginStart="21dp"-->
-    <!--            android:layout_marginEnd="21dp"-->
-    <!--            android:text="@string/autofillTooltipGenerateAddressDescription"-->
-    <!--            android:textColor="?attr/normalTextColor"-->
-    <!--            android:textSize="12sp" />-->
-
-    <!--    </LinearLayout>-->
 </LinearLayout>
