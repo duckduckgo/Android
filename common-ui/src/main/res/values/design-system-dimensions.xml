@@ -90,11 +90,13 @@
     <!-- InfoPanel -->
     <dimen name="infoPanelIconSize">16dp</dimen>
 
+    <!-- Dialog  -->
+    <dimen name="dialogContentPaddingBottom">20dp</dimen>
+    <dimen name="dialogContentPaddingStart">@dimen/keyline_5</dimen>
+    <dimen name="dialogContentPaddingEnd">@dimen/keyline_5</dimen>
+
     <!-- Dax Dialog  -->
     <dimen name="daxDialogContentPaddingTop">20dp</dimen>
-    <dimen name="daxDialogContentPaddingBottom">20dp</dimen>
-    <dimen name="daxDialogContentPaddingStart">@dimen/keyline_5</dimen>
-    <dimen name="daxDialogContentPaddingEnd">@dimen/keyline_5</dimen>
     <dimen name="daxDialogButtonSpacing">14dp</dimen>
 
     <!-- Card -->
