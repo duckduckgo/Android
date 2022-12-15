@@ -196,6 +196,10 @@ import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
+import java.io.File
+import javax.inject.Inject
+import javax.inject.Provider
+import kotlin.coroutines.CoroutineContext
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
@@ -209,10 +213,6 @@ import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.cancellable
 import timber.log.Timber
-import java.io.File
-import javax.inject.Inject
-import javax.inject.Provider
-import kotlin.coroutines.CoroutineContext
 
 @InjectWith(FragmentScope::class)
 class BrowserTabFragment :
