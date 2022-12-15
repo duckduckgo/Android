@@ -19,7 +19,9 @@ add_library( # Sets the name of the library.
         # Sets the library as a shared library.
         SHARED
         # Provides a relative path to your source file(s).
-        sodium-jni.c
+        ddg-sync-jni.c
+        DDGSyncCrypto.c
+        DDGSyncCrypto.h
         )
 target_include_directories(ddgcrypto PRIVATE ${CMAKE_SOURCE_DIR}/third-party/android.${SODIUM_ARCH}/include)
 target_link_libraries(ddgcrypto sodium)

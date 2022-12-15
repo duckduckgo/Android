@@ -39,8 +39,8 @@ class NativeLib constructor(
             exitProcess(1)
         }
     }
-    fun initialize() {
-        init()
+    fun initialize(): Int {
+        return init().toInt()
     }
 
     private external fun init(): Long
