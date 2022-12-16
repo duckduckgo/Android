@@ -17,15 +17,15 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".ui.onboarding.DeviceShieldFAQActivity">
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent" xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:orientation="vertical"
+              tools:context=".ui.onboarding.DeviceShieldFAQActivity">
 
     <include
         android:id="@+id/include_toolbar"
-        layout="@layout/include_default_toolbar" />
+        layout="@layout/include_default_toolbar"/>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -37,123 +37,106 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingStart="@dimen/keyline_6"
+            android:paddingEnd="@dimen/keyline_6"
+            android:paddingTop="@dimen/keyline_6">
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                style="@style/DeviceShieldOnboardingFAQHeaderStyle"
-                android:layout_marginTop="32dp"
-                android:text="@string/atp_FAQFirstHeader"
-                android:paddingStart="35dp"
-                android:paddingEnd="35dp" />
+                app:typography="h2"
+                android:text="@string/atp_FAQFirstHeader"/>
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                style="@style/DeviceShieldOnboardingFAQTextStyle"
-                android:layout_marginTop="24dp"
-                android:text="@string/atp_FAQFirstText"
-                android:paddingStart="35dp"
-                android:paddingEnd="35dp"/>
+                app:typography="body2"
+                app:textType="secondary"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:text="@string/atp_FAQFirstText"/>
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                style="@style/DeviceShieldOnboardingFAQHeaderStyle"
-                android:layout_marginTop="32dp"
-                android:text="@string/atp_FAQSecondHeader"
-                android:paddingStart="35dp"
-                android:paddingEnd="35dp" />
+                app:typography="h2"
+                android:layout_marginTop="@dimen/keyline_6"
+                android:text="@string/atp_FAQSecondHeader"/>
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                style="@style/DeviceShieldOnboardingFAQTextStyle"
-                android:layout_marginTop="24dp"
-                android:text="@string/atp_FAQSecondText"
-                android:paddingStart="35dp"
-                android:paddingEnd="35dp"/>
+                app:typography="body1"
+                app:textType="secondary"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:text="@string/atp_FAQSecondText"/>
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                style="@style/DeviceShieldOnboardingFAQHeaderStyle"
-                android:layout_marginTop="32dp"
-                android:text="@string/atp_FAQThirdHeader"
-                android:paddingStart="35dp"
-                android:paddingEnd="35dp" />
+                app:typography="h2"
+                android:layout_marginTop="@dimen/keyline_6"
+                android:text="@string/atp_FAQThirdHeader"/>
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                style="@style/DeviceShieldOnboardingFAQTextStyle"
-                android:layout_marginTop="24dp"
-                android:text="@string/atp_FAQThirdText"
-                android:paddingStart="35dp"
-                android:paddingEnd="35dp"/>
+                app:typography="body1"
+                app:textType="secondary"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:text="@string/atp_FAQThirdText"/>
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                style="@style/DeviceShieldOnboardingFAQHeaderStyle"
-                android:layout_marginTop="32dp"
-                android:text="@string/atp_FAQFourthHeader"
-                android:paddingStart="35dp"
-                android:paddingEnd="35dp" />
+                app:typography="h2"
+                android:layout_marginTop="@dimen/keyline_6"
+                android:text="@string/atp_FAQFourthHeader"/>
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                style="@style/DeviceShieldOnboardingFAQTextStyle"
-                android:layout_marginTop="24dp"
-                android:text="@string/atp_FAQFourthText"
-                android:paddingStart="35dp"
-                android:paddingEnd="35dp"/>
+                app:typography="body1"
+                app:textType="secondary"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:text="@string/atp_FAQFourthText"/>
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                style="@style/DeviceShieldOnboardingFAQHeaderStyle"
-                android:layout_marginTop="32dp"
-                android:text="@string/atp_FAQFifthHeader"
-                android:paddingStart="35dp"
-                android:paddingEnd="35dp" />
+                app:typography="h2"
+                android:layout_marginTop="@dimen/keyline_6"
+                android:text="@string/atp_FAQFifthHeader"/>
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                style="@style/DeviceShieldOnboardingFAQTextStyle"
-                android:layout_marginTop="24dp"
-                android:text="@string/atp_FAQFifthText"
-                android:paddingStart="35dp"
-                android:paddingEnd="35dp"/>
+                app:typography="body1"
+                app:textType="secondary"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:text="@string/atp_FAQFifthText"/>
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                style="@style/DeviceShieldOnboardingFAQHeaderStyle"
-                android:layout_marginTop="32dp"
-                android:text="@string/atp_FAQSixthHeader"
-                android:paddingStart="35dp"
-                android:paddingEnd="35dp" />
+                app:typography="h2"
+                android:layout_marginTop="@dimen/keyline_6"
+                android:text="@string/atp_FAQSixthHeader"/>
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                style="@style/DeviceShieldOnboardingFAQTextStyle"
-                android:layout_marginTop="24dp"
-                android:text="@string/atp_FAQSixthText"
-                android:paddingStart="35dp"
-                android:paddingEnd="35dp"/>
-
+                app:typography="body1"
+                app:textType="secondary"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:text="@string/atp_FAQSixthText"/>
 
             <ImageView
                 android:layout_marginTop="60dp"
                 android:layout_marginBottom="60dp"
                 android:layout_gravity="center"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:layout_width="@dimen/keyline_6"
+                android:layout_height="@dimen/keyline_6"
                 android:src="@drawable/ic_red_dax"/>
 
         </LinearLayout>
