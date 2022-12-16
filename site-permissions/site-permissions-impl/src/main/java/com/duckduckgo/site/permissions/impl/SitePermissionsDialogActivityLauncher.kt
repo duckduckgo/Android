@@ -18,7 +18,6 @@ package com.duckduckgo.site.permissions.impl
 
 import android.Manifest
 import android.app.Activity
-import android.app.AlertDialog
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
@@ -28,6 +27,7 @@ import androidx.activity.result.ActivityResultCaller
 import androidx.annotation.StringRes
 import com.duckduckgo.app.global.extractDomain
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.toPx
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
@@ -91,17 +91,22 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         url: String,
         onPermissionAllowed: () -> Unit,
     ) {
-        AlertDialog.Builder(activity).apply {
-            setTitle(String.format(activity.getString(titleRes), url.websiteFromGeoLocationsApiOrigin()))
-            setPositiveButton(R.string.sitePermissionsDialogAllowButton) { _, _ ->
-                onPermissionAllowed()
-            }
-            setNegativeButton(R.string.sitePermissionsDialogDenyButton) { _, _ ->
-                sitePermissionRequest.deny()
-            }
-            setCancelable(false)
-            show()
-        }
+        TextAlertDialogBuilder(activity)
+            .setTitle(String.format(activity.getString(titleRes), url.websiteFromGeoLocationsApiOrigin()))
+            .setPositiveButton(R.string.sitePermissionsDialogAllowButton)
+            .setNegativeButton(R.string.sitePermissionsDialogDenyButton)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        onPermissionAllowed()
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        sitePermissionRequest.deny()
+                    }
+                },
+            )
+            .show()
     }
 
     private fun askForMicAndCameraPermissions() {
@@ -243,20 +248,23 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
             SitePermissionsRequestedType.AUDIO -> R.string.systemPermissionDialogAudioDeniedContent
             SitePermissionsRequestedType.CAMERA_AND_AUDIO -> R.string.systemPermissionDialogCameraAndAudioDeniedContent
         }
-
-        AlertDialog.Builder(activity).apply {
-            setTitle(titleRes)
-            setMessage(contentRes)
-            setPositiveButton(R.string.systemPermissionsDeniedDialogPositiveButton) { _, _ ->
-                val intent = Intent()
-                intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-                val uri = Uri.fromParts("package", activity.packageName, null)
-                intent.data = uri
-                context.startActivity(intent)
-            }
-            setNegativeButton(R.string.systemPermissionsDeniedDialogNegativeButton) { _, _ -> }
-            show()
-        }
+        TextAlertDialogBuilder(activity)
+            .setTitle(titleRes)
+            .setMessage(contentRes)
+            .setPositiveButton(R.string.systemPermissionsDeniedDialogPositiveButton)
+            .setNegativeButton(R.string.systemPermissionsDeniedDialogNegativeButton)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        val intent = Intent()
+                        intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                        val uri = Uri.fromParts("package", activity.packageName, null)
+                        intent.data = uri
+                        activity.startActivity(intent)
+                    }
+                },
+            )
+            .show()
     }
 }
 
