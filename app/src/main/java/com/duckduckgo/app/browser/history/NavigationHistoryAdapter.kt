@@ -19,12 +19,12 @@ package com.duckduckgo.app.browser.history
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
-import com.duckduckgo.app.browser.databinding.ItemNavigationHistoryPopupRowBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.mobile.android.databinding.RowOneLineListItemBinding
+import com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
 import kotlinx.coroutines.launch
 
 class NavigationHistoryAdapter(
@@ -45,7 +45,7 @@ class NavigationHistoryAdapter(
         viewType: Int,
     ): NavigationViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val binding = ItemNavigationHistoryPopupRowBinding.inflate(inflater, parent, false)
+        val binding = RowOneLineListItemBinding.inflate(inflater, parent, false)
         return NavigationViewHolder(binding)
     }
 
@@ -54,10 +54,11 @@ class NavigationHistoryAdapter(
         position: Int,
     ) {
         val entry = navigationHistory[position]
+        val listItem = holder.binding.root
 
-        with(holder.binding.title) { text = entry.title }
-        loadFavicon(entry, holder.binding.favicon)
-        holder.binding.root.setOnClickListener { listener.historicalPageSelected(position) }
+        loadFavicon(entry, holder.binding.root)
+        listItem.setPrimaryText(entry.title.orEmpty())
+        listItem.setOnClickListener { listener.historicalPageSelected(position) }
     }
 
     override fun getItemCount(): Int {
@@ -72,15 +73,15 @@ class NavigationHistoryAdapter(
 
     private fun loadFavicon(
         historyEntry: NavigationHistoryEntry,
-        view: ImageView,
+        oneListItem: OneLineListItem,
     ) {
         lifecycleOwner.lifecycleScope.launch {
-            faviconManager.loadToViewFromLocalOrFallback(url = historyEntry.url, tabId = tabId, view = view)
+            faviconManager.loadToViewFromLocalOrFallback(url = historyEntry.url, tabId = tabId, view = oneListItem.leadingIcon())
         }
     }
 }
 
-data class NavigationViewHolder(val binding: ItemNavigationHistoryPopupRowBinding) :
+data class NavigationViewHolder(val binding: RowOneLineListItemBinding) :
     RecyclerView.ViewHolder(binding.root)
 
 data class NavigationHistoryEntry(
