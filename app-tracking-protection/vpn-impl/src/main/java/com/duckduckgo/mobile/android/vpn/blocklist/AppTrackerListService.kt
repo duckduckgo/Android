@@ -19,9 +19,6 @@ package com.duckduckgo.mobile.android.vpn.blocklist
 import com.duckduckgo.anvil.annotations.ContributesServiceApi
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.trackers.JsonAppBlockingList
-import com.duckduckgo.mobile.android.vpn.trackers.JsonAppTrackerExceptionRules
-import com.duckduckgo.mobile.android.vpn.trackers.JsonAppTrackerExclusionList
-import com.duckduckgo.mobile.android.vpn.trackers.JsonAppTrackerSystemAppOverrides
 import retrofit2.Call
 import retrofit2.http.GET
 
@@ -29,13 +26,4 @@ import retrofit2.http.GET
 interface AppTrackerListService {
     @GET("https://staticcdn.duckduckgo.com/trackerblocking/appTB/1.0/blocklist.json")
     fun appTrackerBlocklist(): Call<JsonAppBlockingList>
-
-    @GET("https://staticcdn.duckduckgo.com/trackerblocking/appTB/1.0/apps-unprotected-temporary.json")
-    fun appTrackerExclusionList(): Call<JsonAppTrackerExclusionList>
-
-    @GET("https://staticcdn.duckduckgo.com/trackerblocking/appTB/1.0/unbreak.json")
-    fun appTrackerExceptionRules(): Call<JsonAppTrackerExceptionRules>
-
-    @GET("https://staticcdn.duckduckgo.com/trackerblocking/appTB/1.0/system-apps-overrides.json")
-    fun appTrackerSystemAppsOverrides(): Call<JsonAppTrackerSystemAppOverrides>
 }

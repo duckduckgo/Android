@@ -54,7 +54,7 @@ class TrackingProtectionAppsRepositoryTest {
         whenever(appTpFeatureConfig.isEnabled(AppTpSetting.ProtectGames)).thenReturn(false)
         whenever(packageManager.getInstalledApplications(PackageManager.GET_META_DATA)).thenReturn(INSTALLED_APPS.asApplicationInfo())
         whenever(packageManager.getApplicationLabel(any())).thenReturn("App Name")
-        appTrackerRepository.appExclusionList = EXCLUSION_LIST.toSet()
+        appTrackerRepository.appExclusionList = EXCLUSION_LIST.toMutableMap()
         appTrackerRepository.manualExclusionList = MANUAL_EXCLUSION_LIST.toMutableMap()
         appTrackerRepository.systemAppOverrides = SYSTEM_OVERRIDE_LIST.toSet()
 
@@ -269,10 +269,10 @@ class TrackingProtectionAppsRepositoryTest {
             "com.example.system.overriden",
             "com.duckduckgo.mobile", // should be automatically be added to exclusion list
         )
-        private val EXCLUSION_LIST = listOf(
-            "com.example.app1",
-            "com.example.app3",
-            "com.example.app5",
+        private val EXCLUSION_LIST = mapOf(
+            "com.example.app1" to "UNKNOWN",
+            "com.example.app3" to "UNKNOWN",
+            "com.example.app5" to "Browser",
         )
         private val MANUAL_EXCLUSION_LIST = mapOf(
             "com.example.app1" to true,

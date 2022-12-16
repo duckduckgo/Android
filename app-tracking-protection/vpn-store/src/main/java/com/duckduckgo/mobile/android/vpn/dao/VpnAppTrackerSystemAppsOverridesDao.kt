@@ -32,9 +32,7 @@ interface VpnAppTrackerSystemAppsOverridesDao {
     @Transaction
     fun upsertSystemAppOverrides(
         systemAppOverrides: List<AppTrackerSystemAppOverridePackage>,
-        metadata: AppTrackerSystemAppOverrideListMetadata,
     ) {
-        setSystemAppOverridesMetadata(metadata)
         deleteSystemAppOverrides()
         insertSystemAppOverrides(systemAppOverrides)
     }
@@ -47,7 +45,4 @@ interface VpnAppTrackerSystemAppsOverridesDao {
 
     @Query("SELECT * from vpn_app_tracker_system_app_override_list_metadata ORDER BY id DESC LIMIT 1")
     fun getSystemAppOverridesMetadata(): AppTrackerSystemAppOverrideListMetadata?
-
-    @Insert
-    fun setSystemAppOverridesMetadata(systemAppOverridesMetadata: AppTrackerSystemAppOverrideListMetadata)
 }

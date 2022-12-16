@@ -30,7 +30,6 @@ import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
-import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRuleMetadata
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerMetadata
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.TimeUnit
@@ -54,10 +53,9 @@ class AppTrackerListUpdateWorker(context: Context, workerParameters: WorkerParam
     override suspend fun doWork(): Result {
         return withContext(dispatchers.io()) {
             val updateBlocklistResult = updateTrackerBlocklist()
-            val updateRulesResult = updateTrackerExceptionRules()
 
             val success = Result.success()
-            if (updateBlocklistResult != success || updateRulesResult != success) {
+            if (updateBlocklistResult != success) {
                 logcat(LogPriority.WARN) { "One of the app tracker list updates failed, scheduling a retry" }
                 return@withContext Result.retry()
             }
@@ -96,37 +94,6 @@ class AppTrackerListUpdateWorker(context: Context, workerParameters: WorkerParam
             }
             else -> {
                 logcat(LogPriority.WARN) { "Received app tracker blocklist with invalid eTag" }
-                return Result.retry()
-            }
-        }
-    }
-
-    private fun updateTrackerExceptionRules(): Result {
-        logcat { "Updating the app tracker exception rules" }
-        val exceptionRules = appTrackerListDownloader.downloadAppTrackerExceptionRules()
-        when (exceptionRules.etag) {
-            is ETag.ValidETag -> {
-                val currentEtag =
-                    vpnDatabase.vpnAppTrackerBlockingDao().getTrackerExceptionRulesMetadata()?.eTag
-                val updatedEtag = exceptionRules.etag.value
-
-                if (updatedEtag == currentEtag) {
-                    logcat { "Downloaded exception rules has same eTag, noop" }
-                    return Result.success()
-                }
-
-                logcat { "Updating the app tracker rules, eTag: ${exceptionRules.etag.value}" }
-                vpnDatabase
-                    .vpnAppTrackerBlockingDao()
-                    .updateTrackerExceptionRules(
-                        exceptionRules.trackerExceptionRules,
-                        AppTrackerExceptionRuleMetadata(eTag = exceptionRules.etag.value),
-                    )
-
-                return Result.success()
-            }
-            else -> {
-                logcat(LogPriority.WARN) { "Received app tracker exception rules with invalid eTag" }
                 return Result.retry()
             }
         }

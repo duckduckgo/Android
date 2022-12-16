@@ -45,7 +45,10 @@ data class AppTrackerPackage(
 
 @Entity(tableName = "vpn_app_tracker_exclusion_list")
 data class AppTrackerExcludedPackage(
-    @PrimaryKey val packageId: String,
+    @field:Json(name = "packageName")
+    @PrimaryKey
+    val packageId: String,
+    val reason: String,
 )
 
 @Entity(tableName = "vpn_app_tracker_exclusion_list_metadata")
@@ -136,7 +139,7 @@ data class AppTrackerBlocklist(
 
 /** JSON Model that represents the app exclusion list */
 data class JsonAppTrackerExclusionList(
-    val rules: List<String>,
+    val unprotectedApps: List<AppTrackerExcludedPackage>,
 )
 
 /** JSON Model that represents the system app overrides */
