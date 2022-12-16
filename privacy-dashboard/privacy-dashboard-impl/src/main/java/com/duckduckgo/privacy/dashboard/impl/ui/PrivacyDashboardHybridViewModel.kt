@@ -110,7 +110,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
 
     data class SiteViewState(
         val url: String,
-        val domain: String,
+        val domain: String?,
         val upgradedHttps: Boolean,
         val parentEntity: EntityViewState?,
         val secCertificateViewModels: List<CertificateViewState?> = emptyList(),
@@ -191,12 +191,14 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         Timber.i("PrivacyDashboard: onPrivacyProtectionsClicked $enabled")
 
         viewModelScope.launch(dispatcher.io()) {
-            if (enabled) {
-                userWhitelistDao.delete(currentViewState().siteViewState.domain)
-                pixel.fire(PRIVACY_DASHBOARD_ALLOWLIST_REMOVE)
-            } else {
-                userWhitelistDao.insert(currentViewState().siteViewState.domain)
-                pixel.fire(PRIVACY_DASHBOARD_ALLOWLIST_ADD)
+            currentViewState().siteViewState.domain?.let { domain ->
+                if (enabled) {
+                    userWhitelistDao.delete(domain)
+                    pixel.fire(PRIVACY_DASHBOARD_ALLOWLIST_REMOVE)
+                } else {
+                    userWhitelistDao.insert(domain)
+                    pixel.fire(PRIVACY_DASHBOARD_ALLOWLIST_ADD)
+                }
             }
             delay(CLOSE_DASHBOARD_ON_INTERACTION_DELAY)
             withContext(dispatcher.main()) {
