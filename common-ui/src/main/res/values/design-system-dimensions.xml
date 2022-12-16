@@ -67,7 +67,7 @@
     <!-- Dialogs -->
     <dimen name="dialogButtonHeight">40dp</dimen>
     <dimen name="dialogImageSize">40dp</dimen>
-    <dimen name="dialogBorderRadius">12dp</dimen>
+    <dimen name="dialogBorderRadius">@dimen/mediumShapeCornerRadius</dimen>
     <dimen name="dialogRadioGroupHeightMax">376dp</dimen>
 
     <!-- Bottom Sheet -->
