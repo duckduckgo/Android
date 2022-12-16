@@ -198,7 +198,7 @@ class AutofillSettingsViewModel @Inject constructor(
     }
 
     fun lock() {
-        Timber.w("Locking autofill settings")
+        Timber.v("Locking autofill settings")
         trackCurrentModeBeforeLocking()
         addCommand(ShowLockedMode)
         _viewState.value = _viewState.value.copy(credentialMode = Locked)

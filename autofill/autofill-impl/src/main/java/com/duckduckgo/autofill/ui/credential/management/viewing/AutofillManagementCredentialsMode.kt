@@ -158,6 +158,11 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
         binding.removeSaveStateWatcher(saveStateWatcher)
     }
 
+    private fun initialiseTextWatchers() {
+        stopEditTextWatchers()
+        startEditTextWatchers()
+    }
+
     private fun initialiseToolbar() {
         activity?.findViewById<Toolbar>(com.duckduckgo.mobile.android.R.id.toolbar)?.apply {
             initialActionBarTitle = title.toString()
@@ -175,6 +180,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
     private fun initializeEditStateIfNecessary(mode: EditingExisting) {
         if (!mode.hasPopulatedFields) {
             populateFields(mode.credentialsViewed)
+            initialiseTextWatchers()
             viewModel.onCredentialEditModePopulated()
         }
     }
@@ -250,7 +256,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
             domainEditText.isEditable = true
             notesEditText.isEditable = true
         }
-        startEditTextWatchers()
+        initialiseTextWatchers()
     }
 
     private fun DaxTextInput.setText(text: String?) {
