@@ -24,7 +24,8 @@
     <dimen name="keyline_3">12dp</dimen>
     <dimen name="keyline_4">16dp</dimen>
     <dimen name="keyline_5">24dp</dimen>
-    <dimen name="keyline_6">48dp</dimen>
+    <dimen name="keyline_6">32dp</dimen>
+    <dimen name="keyline_7">48dp</dimen>
 
     <!-- Shape radius -->
     <dimen name="smallShapeCornerRadius">8dp</dimen>
