@@ -21,6 +21,7 @@ import android.os.Build
 import android.webkit.CookieManager
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.fire.FireproofRepository
 import com.duckduckgo.app.fire.WebViewDatabaseLocator
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.db.AppDatabase
@@ -64,6 +65,7 @@ class RealFirstPartyCookiesModifierTest {
     private val mockCookiesRepository: CookiesRepository = mock()
     private val mockUnprotectedTemporary: UnprotectedTemporary = mock()
     private val mockUserAllowListRepository: UserAllowListRepository = mock()
+    private val mockFireproofRepository: FireproofRepository = mock()
     private val webViewDatabaseLocator = WebViewDatabaseLocator(context)
 
     @Before
@@ -73,6 +75,7 @@ class RealFirstPartyCookiesModifierTest {
         whenever(mockCookiesRepository.exceptions).thenReturn(emptyList())
         whenever(mockUnprotectedTemporary.unprotectedTemporaryExceptions).thenReturn(emptyList())
         whenever(mockUserAllowListRepository.domainsInUserAllowList()).thenReturn(emptyList())
+        whenever(mockFireproofRepository.fireproofWebsites()).thenReturn(emptyList())
     }
 
     @After
@@ -209,6 +212,66 @@ class RealFirstPartyCookiesModifierTest {
         assertEquals(initialValue, finalValue)
     }
 
+    @Test
+    fun when1stPartyCookiesExistAndDomainIsFireproofedThenExpiryDateDoesNotChange() = runTest {
+        if (Build.VERSION.SDK_INT == 28) {
+            // this test fails on API 28 due to WAL. This effectively skips these tests on 28.
+            return@runTest
+        }
+
+        givenDatabaseWithCookies((THRESHOLD + 1).toLong())
+        whenever(mockFireproofRepository.fireproofWebsites()).thenReturn(
+            listOf("example.com"),
+        )
+        val sqlCookieRemover = givenRealFirstPartyCookiesModifier()
+
+        val initialValue = queryCookiesDB("example.com")
+        sqlCookieRemover.expireFirstPartyCookies()
+        val finalValue = queryCookiesDB("example.com")
+
+        assertNotNull(initialValue)
+        assertNotNull(finalValue)
+        assertEquals(initialValue, finalValue)
+    }
+
+    @Test
+    fun when1stPartyCookiesExistAndDomainIsDuckDuckGoThenExpiryDateDoesNotChange() = runTest {
+        if (Build.VERSION.SDK_INT == 28) {
+            // this test fails on API 28 due to WAL. This effectively skips these tests on 28.
+            return@runTest
+        }
+
+        givenDatabaseWithCookies((THRESHOLD + 1).toLong(), "duckduckgo.com")
+        val sqlCookieRemover = givenRealFirstPartyCookiesModifier()
+
+        val initialValue = queryCookiesDB("duckduckgo.com")
+        sqlCookieRemover.expireFirstPartyCookies()
+        val finalValue = queryCookiesDB("duckduckgo.com")
+
+        assertNotNull(initialValue)
+        assertNotNull(finalValue)
+        assertEquals(initialValue, finalValue)
+    }
+
+    @Test
+    fun when1stPartyCookiesExistAndDomainIsDuckDuckGoSurveysThenExpiryDateDoesNotChange() = runTest {
+        if (Build.VERSION.SDK_INT == 28) {
+            // this test fails on API 28 due to WAL. This effectively skips these tests on 28.
+            return@runTest
+        }
+
+        givenDatabaseWithCookies((THRESHOLD + 1).toLong(), "surveys.duckduckgo.com")
+        val sqlCookieRemover = givenRealFirstPartyCookiesModifier()
+
+        val initialValue = queryCookiesDB("surveys.duckduckgo.com")
+        sqlCookieRemover.expireFirstPartyCookies()
+        val finalValue = queryCookiesDB("surveys.duckduckgo.com")
+
+        assertNotNull(initialValue)
+        assertNotNull(finalValue)
+        assertEquals(initialValue, finalValue)
+    }
+
     private suspend fun queryCookiesDB(host: String): Long? {
         return withContext(DefaultDispatcherProvider().io()) {
             val databasePath: String = webViewDatabaseLocator.getDatabasePath()
@@ -277,6 +340,7 @@ class RealFirstPartyCookiesModifierTest {
             mockUserAllowListRepository,
             webViewDatabaseLocator,
             ExceptionPixel(mockPixel, RootExceptionFinder()),
+            mockFireproofRepository,
             DefaultDispatcherProvider(),
         )
     }
