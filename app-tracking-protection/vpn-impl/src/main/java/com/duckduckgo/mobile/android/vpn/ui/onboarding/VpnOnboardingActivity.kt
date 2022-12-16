@@ -31,6 +31,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.ui.view.getColorFromAttr
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.R
@@ -87,6 +88,12 @@ class VpnOnboardingActivity : DuckDuckGoActivity(), AppTPVpnConflictDialog.Liste
         binding.onboardingClose.setOnClickListener {
             close()
         }
+
+        overrideStatusBarColor()
+    }
+
+    private fun overrideStatusBarColor() {
+        window.statusBarColor = getColorFromAttr(com.duckduckgo.mobile.android.R.attr.appTPHeaderBackground)
     }
 
     private fun observeViewModel() {
