@@ -780,8 +780,8 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.dimen.keyline_6` appears to be unused"
-        errorLine1="    &lt;dimen name=&quot;keyline_6&quot;>48dp&lt;/dimen>"
+        message="The resource `R.dimen.keyline_7` appears to be unused"
+        errorLine1="    &lt;dimen name=&quot;keyline_7&quot;>48dp&lt;/dimen>"
         errorLine2="           ~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/design-system-dimensions.xml"

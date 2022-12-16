@@ -31,7 +31,7 @@
 
         <ImageView
             android:id="@+id/onboarding_page_image"
-            android:layout_marginTop="@dimen/keyline_6"
+            android:layout_marginTop="@dimen/keyline_7"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:contentDescription="@string/atp_OnboardingLogoDescription"
