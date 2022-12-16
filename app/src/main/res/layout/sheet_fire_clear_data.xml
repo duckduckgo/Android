@@ -15,7 +15,6 @@
   -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -42,53 +41,29 @@
             android:layout_marginBottom="24dp"
             android:layout="@layout/include_dax_dialog_cta" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?dialogBgColor">
+            android:background="@drawable/rounded_top_corners_bottom_sheet_background"
+            android:orientation="vertical"
+            android:paddingTop="@dimen/actionBottomSheetVerticalPadding"
+            android:paddingBottom="@dimen/actionBottomSheetVerticalPadding">
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/clearAllOption"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackground"
-                app:drawableStartCompat="@drawable/ic_fire_red"
-                android:drawablePadding="24dp"
-                android:fontFamily="sans-serif"
-                android:paddingStart="24dp"
-                android:paddingTop="24dp"
-                android:paddingEnd="24dp"
-                android:paddingBottom="17dp"
-                android:text="@string/fireClearAll"
-                android:textColor="@color/marketing_red"
-                android:textSize="16sp"
-                android:textStyle="normal"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:leadingIcon="@drawable/ic_fire_red"
+                app:primaryText="@string/fireClearAll"
+                app:primaryTextColorOverlay="?attr/daxColorDestructive" />
 
-            <!-- Drawable tint does not work on API 21 so we have to use a pre-colored drawable -->
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/cancelOption"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackground"
-                app:drawableStartCompat="@drawable/ic_cancel_brownish_24dp"
-                android:drawablePadding="24dp"
-                android:fontFamily="sans-serif"
-                android:paddingStart="24dp"
-                android:paddingTop="17dp"
-                android:paddingEnd="24dp"
-                android:paddingBottom="24dp"
-                android:text="@string/fireCancel"
-                android:textColor="?normalTextColor"
-                android:textSize="16sp"
-                android:textStyle="normal"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/clearAllOption"
-                tools:ignore="UnusedAttribute" />
+                app:leadingIcon="@drawable/ic_close_24"
+                app:primaryText="@string/fireCancel" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
     </LinearLayout>
 </FrameLayout>
