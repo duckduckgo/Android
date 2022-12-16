@@ -17,7 +17,7 @@
 <shape
     xmlns:android="http://schemas.android.com/apk/res/android">
     <corners
-        android:topLeftRadius="12dp"
-        android:topRightRadius="12dp" />
-    <solid android:color="?attr/daxDialogBackgroundColor" />
+        android:topLeftRadius="@dimen/dialogBorderRadius"
+        android:topRightRadius="@dimen/dialogBorderRadius" />
+    <solid android:color="?attr/daxColorSurface" />
 </shape>

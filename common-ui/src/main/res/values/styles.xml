@@ -258,43 +258,10 @@
         <item name="android:background">@android:color/transparent</item>
     </style>
 
-    <style name="NavigationHistoryDialog" parent="@style/Theme.Design.BottomSheetDialog">
-        <item name="android:windowIsFloating">false</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="bottomSheetStyle">@style/NavigationHistoryDialogStyle</item>
-    </style>
-
-    <style name="NavigationHistoryDialogStyle" parent="@style/Widget.Design.BottomSheet.Modal">
-        <item name="android:background">@android:color/transparent</item>
-    </style>
-
-    <style name="EmailTooltip" parent="@style/Theme.Design.BottomSheetDialog">
-        <item name="android:windowIsFloating">false</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="bottomSheetStyle">@style/EmailTooltipStyle</item>
-    </style>
-
-    <style name="EmailTooltipStyle" parent="@style/Widget.Design.BottomSheet.Modal">
-        <item name="android:background">@android:color/transparent</item>
-    </style>
-
     <style name="LocationPermissionDialogSplitter">
         <item name="android:background">?attr/daxColorLines</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">1dp</item>
-    </style>
-
-    <style name="SitePermissionsSwitch">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:paddingTop">12dp</item>
-        <item name="android:paddingBottom">12dp</item>
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textColor">?attr/settingsItemTextColor</item>
-        <item name="android:textSize">16sp</item>
-        <item name="android:textStyle">normal</item>
-        <item name="android:selectable">false</item>
-        <item name="android:gravity">start</item>
     </style>
 
     <style name="DeviceShield" />
