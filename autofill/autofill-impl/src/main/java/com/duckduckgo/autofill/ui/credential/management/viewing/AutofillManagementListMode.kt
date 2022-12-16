@@ -124,7 +124,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
     private fun getCurrentUrlForSuggestions() = arguments?.getString(ARG_CURRENT_URL, null)
 
     private fun observeViewModel() {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.viewState.collect { state ->
                     binding.enabledToggle.quietlySetIsChecked(state.autofillEnabled, globalAutofillToggleListener)
@@ -134,7 +134,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
                 }
             }
         }
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.commands.collect { commands ->
                     commands.forEach { processCommand(it) }

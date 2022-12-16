@@ -33,12 +33,15 @@ import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewMode
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.LaunchDeviceAuth
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowCredentialMode
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowDisabledMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowListMode
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowLockedMode
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowUserPasswordCopied
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowUserUsernameCopied
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Disabled
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.EditingExisting
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.EditingNewEntry
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.ListMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Locked
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Viewing
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialModeCommand.ShowEditCredentialMode
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialModeCommand.ShowManualCredentialMode
@@ -73,6 +76,9 @@ class AutofillSettingsViewModel @Inject constructor(
     // after unlocking, we want to initialise the view once (next unlock, the view stack will already exist)
     private var initialStateAlreadyPresented: Boolean = false
 
+    // after unlocking, we want to know which mode to return to
+    private var credentialModeBeforeLocking: CredentialMode = ListMode
+
     fun onCopyUsername(username: String?) {
         username?.let { clipboardInteractor.copyToClipboard(it) }
         addCommand(ShowUserUsernameCopied())
@@ -81,6 +87,11 @@ class AutofillSettingsViewModel @Inject constructor(
     fun onCopyPassword(password: String?) {
         password?.let { clipboardInteractor.copyToClipboard(it) }
         addCommand(ShowUserPasswordCopied())
+    }
+
+    fun onShowListMode() {
+        addCommand(ShowListMode)
+        _viewState.value = _viewState.value.copy(credentialMode = ListMode)
     }
 
     fun onViewCredentials(
@@ -187,16 +198,30 @@ class AutofillSettingsViewModel @Inject constructor(
     }
 
     fun lock() {
+        Timber.w("Locking autofill settings")
+        trackCurrentModeBeforeLocking()
         addCommand(ShowLockedMode)
+        _viewState.value = _viewState.value.copy(credentialMode = Locked)
     }
 
     fun unlock() {
+        Timber.v("Unlocking autofill settings. Will return view state to ${credentialModeBeforeLocking.javaClass.canonicalName}")
         addCommand(ExitDisabledMode)
         addCommand(ExitLockedMode)
 
         if (!initialStateAlreadyPresented) {
             initialStateAlreadyPresented = true
             addCommand(InitialiseViewAfterUnlock)
+        }
+
+        _viewState.value = _viewState.value.copy(credentialMode = credentialModeBeforeLocking)
+    }
+
+    private fun trackCurrentModeBeforeLocking() {
+        _viewState.value.credentialMode.let { currentMode ->
+            if (currentMode !is Locked && currentMode !is Disabled) {
+                credentialModeBeforeLocking = currentMode
+            }
         }
     }
 
@@ -206,6 +231,7 @@ class AutofillSettingsViewModel @Inject constructor(
         addCommand(ExitCredentialMode)
         addCommand(ExitLockedMode)
         addCommand(ShowDisabledMode)
+        _viewState.value = _viewState.value.copy(credentialMode = Disabled)
     }
 
     private fun addCommand(command: Command) {
@@ -352,6 +378,9 @@ class AutofillSettingsViewModel @Inject constructor(
         data class EditingNewEntry(
             override val saveable: Boolean = true,
         ) : Editing(saveable)
+
+        object Disabled : CredentialMode()
+        object Locked : CredentialMode()
     }
 
     sealed class Command(val id: String = UUID.randomUUID().toString()) {
@@ -362,6 +391,7 @@ class AutofillSettingsViewModel @Inject constructor(
          * [credentials] Credentials to be used to render the credential view
          * [isLaunchedDirectly] if true it means that the credential view was launched directly and didn't have to go through the management screen.
          */
+        object ShowListMode : Command()
         data class ShowCredentialMode(val isLaunchedDirectly: Boolean) : Command()
         object ShowDisabledMode : Command()
         object ShowLockedMode : Command()

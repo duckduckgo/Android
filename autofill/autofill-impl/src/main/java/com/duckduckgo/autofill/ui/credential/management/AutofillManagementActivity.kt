@@ -40,11 +40,15 @@ import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewMode
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.LaunchDeviceAuth
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowCredentialMode
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowDisabledMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowListMode
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowLockedMode
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowUserPasswordCopied
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowUserUsernameCopied
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Disabled
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.EditingExisting
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.EditingNewEntry
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.ListMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Locked
 import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementCredentialsMode
 import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementDisabledMode
 import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementListMode
@@ -105,7 +109,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
                 viewModel.onViewCredentials(it, true)
             }
         } else {
-            showListMode()
+            viewModel.onShowListMode()
         }
     }
 
@@ -149,6 +153,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
             is ShowCredentialMode -> showCredentialMode(command.isLaunchedDirectly)
             is ShowUserUsernameCopied -> showCopiedToClipboardSnackbar("Username")
             is ShowUserPasswordCopied -> showCopiedToClipboardSnackbar("Password")
+            is ShowListMode -> showListMode()
             is ShowDisabledMode -> showDisabledMode()
             is ShowLockedMode -> showLockMode()
             is LaunchDeviceAuth -> launchDeviceAuth()
@@ -193,7 +198,10 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
         if (credentialModeLaunchedDirectly()) {
             finish()
         } else {
-            supportFragmentManager.popBackStack()
+            resetToolbar()
+            supportFragmentManager.commit {
+                replace(R.id.fragment_container_view, AutofillManagementListMode.instance(), TAG_ALL_CREDENTIALS)
+            }
         }
     }
 
@@ -232,8 +240,8 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
     private fun showDisabledMode() {
         resetToolbar()
 
-        supportFragmentManager.commitNow {
-            setReorderingAllowed(true)
+        supportFragmentManager.commit {
+            supportFragmentManager.findFragmentByTag(TAG_DISABLED)?.let { remove(it) }
             replace(R.id.fragment_container_view, AutofillManagementDisabledMode.instance(), TAG_DISABLED)
         }
     }
@@ -248,6 +256,9 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
         when (viewModel.viewState.value.credentialMode) {
             is EditingExisting -> viewModel.onCancelEditMode()
             is EditingNewEntry -> viewModel.onCancelManualCreation()
+            is ListMode -> finish()
+            is Disabled -> finish()
+            is Locked -> finish()
             else -> super.onBackPressed()
         }
     }
