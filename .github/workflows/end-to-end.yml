@@ -62,9 +62,19 @@ jobs:
           workspace: .maestro/ad_click_detection_flows
 
       - name: Privacy Tests
+        if: always()
         uses: mobile-dev-inc/action-maestro-cloud@v1.1.1
         with:
           api-key: ${{ secrets.MOBILE_DEV_API_KEY }}
           name: ${{ github.sha }}
           app-file: apk/release.apk
           workspace: .maestro/privacy_tests
+
+      - name: Release Tests
+        if: always()
+        uses: mobile-dev-inc/action-maestro-cloud@v1.1.1
+        with:
+          api-key: ${{ secrets.MOBILE_DEV_API_KEY }}
+          name: ${{ github.sha }}
+          app-file: apk/release.apk
+          workspace: .maestro/release_tests
