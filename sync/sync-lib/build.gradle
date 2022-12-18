@@ -29,4 +29,5 @@ android {
 
 dependencies {
     implementation JakeWharton.timber
+    implementation Square.okio
 }

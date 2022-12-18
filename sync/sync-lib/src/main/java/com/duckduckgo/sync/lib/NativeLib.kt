@@ -17,16 +17,19 @@
 package com.duckduckgo.sync.lib
 
 import android.content.Context
-import timber.log.Timber
+import android.widget.Toast
+import okio.internal.commonToUtf8String
 import kotlin.system.exitProcess
+import timber.log.Timber
 
-class NativeLib constructor(
+class NativeLib
+constructor(
     private val context: Context,
 ) {
 
     /**
-     * A native method that is implemented by the 'lib' native library,
-     * which is packaged with this application.
+     * A native method that is implemented by the 'lib' native library, which is packaged with this
+     * application.
      */
     external fun stringFromJNI(): String
 
@@ -40,8 +43,33 @@ class NativeLib constructor(
         }
     }
     fun initialize(): Int {
-        return init().toInt()
+        val primaryKey = ByteArray(32)
+        val secretKey = ByteArray(32)
+        val protectedSecretKey = ByteArray(32)
+        val passwordHash = ByteArray(32)
+
+        Timber.v("SYNC PRE PK: ${primaryKey[0]}")
+        Timber.v("SYNC PRE SK: ${String(secretKey)}")
+        Timber.v("SYNC PRE PSK: ${String(protectedSecretKey)}")
+        Timber.v("SYNC PRE PH: ${String(passwordHash)}")
+
+        val paco: String = init(primaryKey, secretKey, protectedSecretKey, passwordHash, "test", "password")
+
+        Timber.v("SYNC PK: ${primaryKey[0]}")
+        Timber.v("SYNC PK: $paco")
+        Timber.v("SYNC PK: ${String(primaryKey, Charsets.UTF_8)}")
+        Timber.v("SYNC SK: ${String(secretKey, Charsets.UTF_8)}")
+        Timber.v("SYNC PSK: ${String(protectedSecretKey, Charsets.UTF_8)}")
+        Timber.v("SYNC PH: ${String(passwordHash, Charsets.UTF_8)}")
+        return 10
     }
 
-    private external fun init(): Long
+    private external fun init(
+        primaryKey: ByteArray,
+        secretKey: ByteArray,
+        protectedSecretKey: ByteArray,
+        passwordHash: ByteArray,
+        userId: String,
+        password: String,
+    ): String
 }
