@@ -17,6 +17,7 @@
 package com.duckduckgo.privacy.dashboard.impl.ui
 
 import android.webkit.WebView
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.CookiePromptManagementStatus
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.EntityViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.ProtectionStatusViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.RequestDataViewState
@@ -63,6 +64,12 @@ class PrivacyDashboardRenderer(
         val requestDataJson = requestDataAdapter.toJson(viewState.requestData)
 
         onPrivacyProtectionSettingChanged(viewState.userChangedValues)
+
+        // An example of providing 'cookie consent management status'
+        val cookiePromptManagementStatusAdapter = moshi.adapter(CookiePromptManagementStatus::class.java)
+        val cookiePromptManagementStatusJson = cookiePromptManagementStatusAdapter.toJson(viewState.cookiePromptManagementStatus)
+        webView.evaluateJavascript("javascript:onChangeConsentManaged(${cookiePromptManagementStatusJson});", null)
+
         if (viewState.siteViewState.locale != lastSeenPrivacyDashboardViewState?.siteViewState?.locale) {
             webView.evaluateJavascript("javascript:onChangeLocale($siteViewStateJson);", null)
         }

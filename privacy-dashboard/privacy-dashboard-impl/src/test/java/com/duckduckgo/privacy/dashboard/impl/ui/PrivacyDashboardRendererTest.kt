@@ -23,6 +23,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.global.domain
 import com.duckduckgo.privacy.dashboard.impl.di.JsonModule
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.CookiePromptManagementStatus
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.DetectedRequest
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.EntityViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.ProtectionStatusViewState
@@ -82,7 +83,7 @@ class PrivacyDashboardRendererTest {
 
         testee.render(aViewState())
 
-        verify(spyWebView, times(6)).evaluateJavascript(captor.capture(), eq(null))
+        verify(spyWebView, times(7)).evaluateJavascript(captor.capture(), eq(null))
 
         assertNotNull(captor.allValues.find { it.startsWith("javascript:onChangeLocale") })
         assertNotNull(captor.allValues.find { it.startsWith("javascript:onChangeProtectionStatus") })
@@ -121,6 +122,7 @@ class PrivacyDashboardRendererTest {
             ),
         ),
         protectionStatus = ProtectionStatusViewState(true, true, emptyList(), true),
+        cookiePromptManagementStatus = CookiePromptManagementStatus()
     )
 
     private fun getMoshiPD(): Moshi = JsonModule.moshi(Moshi.Builder().build())
