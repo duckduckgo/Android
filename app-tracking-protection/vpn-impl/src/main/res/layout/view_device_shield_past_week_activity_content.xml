@@ -24,7 +24,7 @@
 
     <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/content_title"
-        app:typography="caption"
+        app:typography="caption_allCaps"
         app:textType="secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -39,8 +39,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:textSize="20sp"
-        android:fontFamily="sans-serif-medium"
         tools:text="31,306"/>
 
     <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
