@@ -131,23 +131,6 @@
         <item name="android:background">?attr/selectableItemBackground</item>
     </style>
 
-    <style name="DeviceShieldOnboardingFAQHeaderStyle">
-        <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textColor">?attr/normalTextColor</item>
-        <item name="android:textSize">20sp</item>
-        <item name="android:lineSpacingExtra">8sp</item>
-        <item name="android:textAlignment">viewStart</item>
-    </style>
-
-    <style name="DeviceShieldOnboardingFAQTextStyle">
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textColor">?attr/secondaryTextColor</item>
-        <item name="android:textSize">16sp</item>
-        <item name="android:textStyle">normal</item>
-        <item name="android:lineSpacingExtra">8sp</item>
-        <item name="android:textAlignment">viewStart</item>
-    </style>
-
     <style name="FeedbackFragmentStyle">
         <item name="android:background">?attr/colorPrimaryDark</item>
         <item name="android:layout_width">match_parent</item>

@@ -50,23 +50,24 @@
                 app:lottie_rawRes="@raw/device_shield_tracker_count"
                 app:lottie_autoPlay="true"/>
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:id="@+id/trackerProfilingInfoHeader"
-                style="@style/DeviceShieldOnboardingFAQHeaderStyle"
+                app:typography="h2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingStart="35dp"
-                android:paddingEnd="35dp"
+                android:paddingStart="@dimen/keyline_6"
+                android:paddingEnd="@dimen/keyline_6"
                 android:text="@string/atp_ProfilingInfoTitle"/>
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:id="@+id/trackerProfilingInfoFirstContent"
-                style="@style/DeviceShieldOnboardingFAQTextStyle"
+                app:typography="body1"
+                app:textType="secondary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:paddingStart="35dp"
-                android:paddingEnd="35dp"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:paddingStart="@dimen/keyline_6"
+                android:paddingEnd="@dimen/keyline_6"
                 android:text="@string/atp_ProfilingInfoFirstParagraph"/>
 
             <ImageView
