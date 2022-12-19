@@ -66,6 +66,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         val userChangedValues: Boolean = false,
         val requestData: RequestDataViewState,
         val protectionStatus: ProtectionStatusViewState,
+        val cookiePromptManagementStatus: CookiePromptManagementStatus,
     )
 
     data class ProtectionStatusViewState(
@@ -146,6 +147,12 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         val prevalence: Double,
     )
 
+    data class CookiePromptManagementStatus(
+        val consentManaged: Boolean = false,
+        val optoutFailed: Boolean? = false,
+        val configurable: Boolean? = false
+    )
+
     val viewState = MutableStateFlow<ViewState?>(null)
 
     private var site: Site? = null
@@ -182,6 +189,10 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                     siteViewState = siteViewStateMapper.mapFromSite(site),
                     requestData = requestDataViewStateMapper.mapFromSite(site),
                     protectionStatus = protectionStatusViewStateMapper.mapFromSite(site),
+                    cookiePromptManagementStatus = CookiePromptManagementStatus(
+                        consentManaged = true,
+                        configurable = true
+                    )
                 ),
             )
         }
