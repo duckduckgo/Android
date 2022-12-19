@@ -43,6 +43,7 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.privacy.dashboard.impl.databinding.ActivityPrivacyHybridDashboardBinding
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenSettings
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenURL
 import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
@@ -85,6 +86,9 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                 onUrlClicked = { payload ->
                     viewModel.onUrlClicked(payload)
                 },
+                onOpenSettings = { payload ->
+                    viewModel.onOpenSettings(payload)
+                },
                 onBrokenSiteClicked = { viewModel.onReportBrokenSiteSelected() },
                 onClose = { this@PrivacyDashboardHybridActivity.finish() },
             ),
@@ -121,11 +125,17 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                 startActivity(brokenSiteNav.navigate(this, it.data))
             }
             is OpenURL -> openUrl(it.url)
+            is OpenSettings -> openSettings(it.target)
         }
     }
 
     private fun openUrl(url: String) {
         startActivity(browserNav.openInNewTab(this, url))
+        finish()
+    }
+
+    private fun openSettings(target: String) {
+        // TODO: Open settings here - target is 'cpm'
         finish()
     }
 

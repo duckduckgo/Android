@@ -35,6 +35,7 @@ sealed class RendererViewHolder {
         val onBrokenSiteClicked: () -> Unit,
         val onPrivacyProtectionsClicked: (Boolean) -> Unit,
         val onUrlClicked: (String) -> Unit,
+        val onOpenSettings: (String) -> Unit,
         val onClose: () -> Unit,
     ) : RendererViewHolder()
 }
@@ -53,6 +54,7 @@ class BrowserPrivacyDashboardRendererFactory @Inject constructor(
                 renderer.onBrokenSiteClicked,
                 renderer.onPrivacyProtectionsClicked,
                 renderer.onUrlClicked,
+                renderer.onOpenSettings,
                 renderer.onClose,
             )
         }

@@ -29,6 +29,7 @@ import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVA
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_ALLOWLIST_REMOVE
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_OPENED
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenSettings
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenURL
 import java.util.*
 import javax.inject.Inject
@@ -59,6 +60,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     sealed class Command {
         class LaunchReportBrokenSite(val data: BrokenSiteData) : Command()
         class OpenURL(val url: String) : Command()
+        class OpenSettings(val target: String) : Command()
     }
 
     data class ViewState(
@@ -233,6 +235,14 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         viewModelScope.launch(dispatcher.io()) {
             privacyDashboardPayloadAdapter.onUrlClicked(payload).takeIf { it.isNotEmpty() }?.let {
                 command.send(OpenURL(it))
+            }
+        }
+    }
+
+    fun onOpenSettings(payload: String) {
+        viewModelScope.launch(dispatcher.io()) {
+            privacyDashboardPayloadAdapter.onOpenSettings(payload).takeIf { it.isNotEmpty() }?.let {
+                command.send(OpenSettings(it))
             }
         }
     }
