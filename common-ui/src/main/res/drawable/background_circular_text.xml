@@ -18,7 +18,7 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
        android:shape="oval">
 
-    <solid android:color="?accentIconColor" />
+    <solid android:color="?attr/daxColorSurface" />
     <padding android:top="1.5dp"
              android:right="4dp"
              android:left="4dp"/>
