@@ -107,9 +107,9 @@ class AutofillSettingsViewModelTest {
     }
 
     @Test
-    fun whenUserDeletesViewedCredentialsLaunchedDirectlyThen() = runTest {
+    fun whenUserDeletesViewedCredentialsLaunchedDirectlyThenCredentialsDeleted() = runTest {
         val credentials = someCredentials()
-        testee.onViewCredentials(credentials, isLaunchedDirectly = true)
+        testee.onViewCredentials(credentials)
         testee.onDeleteCredentials(credentials)
         verify(mockStore).deleteCredentials(credentials.id!!)
     }
@@ -117,10 +117,10 @@ class AutofillSettingsViewModelTest {
     @Test
     fun whenOnViewCredentialsCalledFromListThenShowCredentialViewingMode() = runTest {
         val credentials = someCredentials()
-        testee.onViewCredentials(credentials, false)
+        testee.onViewCredentials(credentials)
 
         testee.commands.test {
-            assertEquals(ShowCredentialMode(false), awaitItem().first())
+            assertEquals(ShowCredentialMode, awaitItem().first())
             cancelAndIgnoreRemainingEvents()
         }
         testee.viewState.test {
@@ -132,10 +132,10 @@ class AutofillSettingsViewModelTest {
     @Test
     fun whenOnViewCredentialsCalledFirstThenShowCredentialViewingMode() = runTest {
         val credentials = someCredentials()
-        testee.onViewCredentials(credentials, true)
+        testee.onViewCredentials(credentials)
 
         testee.commands.test {
-            assertEquals(ShowCredentialMode(true), awaitItem().first())
+            assertEquals(ShowCredentialMode, awaitItem().first())
             cancelAndIgnoreRemainingEvents()
         }
         testee.viewState.test {
@@ -147,7 +147,7 @@ class AutofillSettingsViewModelTest {
     @Test
     fun whenOnEditCredentialsCalledThenShowCredentialEditingMode() = runTest {
         val credentials = someCredentials()
-        testee.onViewCredentials(credentials, false)
+        testee.onViewCredentials(credentials)
         testee.onEditCurrentCredentials()
 
         testee.viewState.test {
@@ -181,7 +181,7 @@ class AutofillSettingsViewModelTest {
 
         testee.commands.test {
             assertEquals(
-                ShowCredentialMode(isLaunchedDirectly = false),
+                ShowCredentialMode,
                 this.awaitItem().first(),
             )
             cancelAndIgnoreRemainingEvents()
@@ -285,7 +285,7 @@ class AutofillSettingsViewModelTest {
     @Test
     fun whenOnExitEditModeThenUpdateCredentialModeStateToViewing() = runTest {
         val credentials = someCredentials()
-        testee.onViewCredentials(credentials, false)
+        testee.onViewCredentials(credentials)
         testee.onEditCurrentCredentials()
 
         testee.onCancelEditMode()
@@ -305,11 +305,6 @@ class AutofillSettingsViewModelTest {
 
         testee.commands.test {
             awaitItem().last().assertCommandType(ExitCredentialMode::class)
-            cancelAndIgnoreRemainingEvents()
-        }
-
-        testee.viewState.test {
-            assertEquals(CredentialMode.ListMode, this.awaitItem().credentialMode)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -346,7 +341,7 @@ class AutofillSettingsViewModelTest {
     @Test
     fun whenAllowSaveInEditModeSetToFalseThenUpdateViewStateToEditingSaveableFalse() = runTest {
         val credentials = someCredentials()
-        testee.onViewCredentials(credentials, true)
+        testee.onViewCredentials(credentials)
         testee.onEditCurrentCredentials()
 
         testee.allowSaveInEditMode(false)

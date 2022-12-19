@@ -96,14 +96,13 @@ class AutofillSettingsViewModel @Inject constructor(
 
     fun onViewCredentials(
         credentials: LoginCredentials,
-        isLaunchedDirectly: Boolean,
     ) {
-        addCommand(ShowCredentialMode(isLaunchedDirectly = isLaunchedDirectly))
+        addCommand(ShowCredentialMode)
         _viewState.value = viewState.value.copy(credentialMode = Viewing(credentialsViewed = credentials))
     }
 
     fun onCreateNewCredentials() {
-        addCommand(ShowCredentialMode(isLaunchedDirectly = false))
+        addCommand(ShowCredentialMode)
         _viewState.value = viewState.value.copy(credentialMode = EditingNewEntry())
         addCommand(ShowManualCredentialMode)
     }
@@ -122,7 +121,7 @@ class AutofillSettingsViewModel @Inject constructor(
     // if edit is opened but not from view mode, it means that we should show the credentials view and we need to set hasPopulatedFields to false
     // to force credential view to prefill the fields.
     fun onEditCredentials(credentials: LoginCredentials) {
-        addCommand(ShowCredentialMode(isLaunchedDirectly = false))
+        addCommand(ShowCredentialMode)
 
         _viewState.value = viewState.value.copy(
             credentialMode = EditingExisting(
@@ -171,7 +170,6 @@ class AutofillSettingsViewModel @Inject constructor(
 
     fun onExitCredentialMode() {
         addCommand(ExitCredentialMode)
-        _viewState.value = viewState.value.copy(credentialMode = ListMode)
     }
 
     fun allowSaveInEditMode(saveable: Boolean) {
@@ -392,7 +390,7 @@ class AutofillSettingsViewModel @Inject constructor(
          * [isLaunchedDirectly] if true it means that the credential view was launched directly and didn't have to go through the management screen.
          */
         object ShowListMode : Command()
-        data class ShowCredentialMode(val isLaunchedDirectly: Boolean) : Command()
+        object ShowCredentialMode : Command()
         object ShowDisabledMode : Command()
         object ShowLockedMode : Command()
         object LaunchDeviceAuth : Command()

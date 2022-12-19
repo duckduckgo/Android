@@ -201,7 +201,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
     }
 
     private fun onCredentialsSelected(credentials: LoginCredentials) {
-        viewModel.onViewCredentials(credentials, false)
+        viewModel.onViewCredentials(credentials)
     }
 
     private fun onCopyUsername(credentials: LoginCredentials) {

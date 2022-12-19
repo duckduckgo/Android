@@ -49,6 +49,7 @@ import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewMode
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.EditingNewEntry
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.ListMode
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Locked
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Viewing
 import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementCredentialsMode
 import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementDisabledMode
 import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementListMode
@@ -106,7 +107,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
     private fun setupInitialState() {
         if (intent.hasExtra(EXTRAS_CREDENTIALS_TO_VIEW)) {
             intent.getParcelableExtra<LoginCredentials>(EXTRAS_CREDENTIALS_TO_VIEW)?.let {
-                viewModel.onViewCredentials(it, true)
+                viewModel.onViewCredentials(it)
             }
         } else {
             viewModel.onShowListMode()
@@ -150,7 +151,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
     private fun processCommand(command: AutofillSettingsViewModel.Command) {
         var processed = true
         when (command) {
-            is ShowCredentialMode -> showCredentialMode(command.isLaunchedDirectly)
+            is ShowCredentialMode -> showCredentialMode()
             is ShowUserUsernameCopied -> showCopiedToClipboardSnackbar("Username")
             is ShowUserPasswordCopied -> showCopiedToClipboardSnackbar("Password")
             is ShowListMode -> showListMode()
@@ -177,20 +178,16 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
     private fun showListMode() {
         resetToolbar()
         val currentUrl = intent.getStringExtra(EXTRAS_SUGGESTIONS_FOR_URL)
+        Timber.v("showListMode. currentUrl is %s", currentUrl)
 
-        supportFragmentManager.commit {
-            setReorderingAllowed(true)
+        supportFragmentManager.commitNow {
             replace(R.id.fragment_container_view, AutofillManagementListMode.instance(currentUrl), TAG_ALL_CREDENTIALS)
         }
     }
 
-    private fun showCredentialMode(isLaunchedDirectly: Boolean) {
-        supportFragmentManager.commit {
-            setReorderingAllowed(true)
+    private fun showCredentialMode() {
+        supportFragmentManager.commitNow {
             replace(R.id.fragment_container_view, AutofillManagementCredentialsMode.instance(), TAG_CREDENTIAL)
-            if (!isLaunchedDirectly) {
-                addToBackStack(TAG_CREDENTIAL)
-            }
         }
     }
 
@@ -198,10 +195,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
         if (credentialModeLaunchedDirectly()) {
             finish()
         } else {
-            resetToolbar()
-            supportFragmentManager.commit {
-                replace(R.id.fragment_container_view, AutofillManagementListMode.instance(), TAG_ALL_CREDENTIALS)
-            }
+            viewModel.onShowListMode()
         }
     }
 
@@ -256,6 +250,13 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
         when (viewModel.viewState.value.credentialMode) {
             is EditingExisting -> viewModel.onCancelEditMode()
             is EditingNewEntry -> viewModel.onCancelManualCreation()
+            is Viewing -> {
+                if (credentialModeLaunchedDirectly()) {
+                    finish()
+                } else {
+                    viewModel.onShowListMode()
+                }
+            }
             is ListMode -> finish()
             is Disabled -> finish()
             is Locked -> finish()
