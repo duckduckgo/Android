@@ -21,10 +21,7 @@
     android:layout_marginStart="7dp"
     android:layout_marginTop="6dp"
     android:layout_marginEnd="7dp"
-    android:layout_marginBottom="10dp"
-    app:cardElevation="4dp"
-    app:cardBackgroundColor="?toolbarBgColor"
-    app:cardCornerRadius="6dp">
+    android:layout_marginBottom="10dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cardContentsContainer"
@@ -67,24 +64,20 @@
             android:background="?selectableItemBackground"
             android:contentDescription="@string/closeContentDescription"
             android:scaleType="center"
-            android:src="@drawable/ic_close_tab"
-            android:tint="?normalTextColor"
+            android:src="@drawable/ic_close_24"
             app:layout_constraintBottom_toBottomOf="@id/favicon"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/favicon" />
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/title"
+            app:typography="h5"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:fontFamily="sans-serif-medium"
             android:ellipsize="end"
             android:lines="1"
-            android:textColor="?attr/tabTitleTextColor"
             android:textIsSelectable="false"
-            android:textSize="13sp"
-            android:textStyle="normal"
             app:layout_constraintBottom_toBottomOf="@id/favicon"
             app:layout_constraintEnd_toStartOf="@id/close"
             app:layout_constraintStart_toEndOf="@id/favicon"
