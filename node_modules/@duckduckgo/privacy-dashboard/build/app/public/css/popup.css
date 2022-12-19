@@ -804,6 +804,10 @@ body.environment--windows {
   background-image: url("../../img/refresh-assets/Locked-128.svg");
 }
 
+.hero-icon--cookies-managed {
+  background-image: url("../../img/refresh-assets/Cookies-Managed-128.svg");
+}
+
 .key-insight {
   position: relative;
   padding-bottom: 24px;
