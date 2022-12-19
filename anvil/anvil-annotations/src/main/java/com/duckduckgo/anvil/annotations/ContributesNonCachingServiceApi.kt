@@ -19,12 +19,12 @@ package com.duckduckgo.anvil.annotations
 import kotlin.reflect.KClass
 
 /**
- * Anvil annotation to generate plugin points
+ * Anvil annotation to generate a non-caching Retrofit service interface implementation.
  *
  * Usage:
  * ```kotlin
- * @ContributesPluginPoint(SomeDaggerScope::class)
- * interface MyPlugin {
+ * @ContributesNonCachingServiceApi(SomeDaggerScope::class)
+ * interface MyServiceApi {
  *
  * }
  * ```
@@ -41,7 +41,7 @@ annotation class ContributesNonCachingServiceApi(
      *
      * usage:
      * ```kotlin
-     * @ContributesServiceApi(
+     * @ContributesNonCachingServiceApi(
      *   scope = AppScope::class,
      * )
      * interface MyRetrofitServiceApi {...}

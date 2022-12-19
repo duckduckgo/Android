@@ -1,0 +1,46 @@
+appId: com.duckduckgo.mobile.android
+---
+- launchApp:
+      clearState: true
+      stopApp: true
+- assertVisible:
+    text: ".*Not to worry! Searching and browsing privately.*"
+- tapOn: "let's do it!"
+- tapOn: "cancel"
+- assertVisible:
+    text: ".*I'll also upgrade the security of your connection if possible.*"
+- tapOn:
+    text: "search or type URL"
+- inputText: "https://privacy-test-pages.glitch.me"
+- tapOn:
+    id: "com.google.android.inputmethod.latin:id/key_pos_ime_action"
+- assertVisible:
+    text: ".*keep browsing.*"
+- tapOn:
+    text: "got it"
+- tapOn:
+      id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+- assertVisible:
+    text: "add bookmark"
+- tapOn:
+    text: "add bookmark"
+- tapOn:
+      id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+- assertVisible:
+    text: "bookmarks"
+- tapOn:
+    text: "bookmarks"
+- assertVisible:
+    text: "No favorites added yet"
+- assertVisible:
+    text: "Privacy Test Pages - Home"
+- tapOn:
+      id: "com.duckduckgo.mobile.android:id/trailingIcon"
+- assertVisible:
+    text: "Delete"
+- tapOn:
+    text: "delete"
+- assertNotVisible:
+    text: "Privacy Test Pages - Home"
+- assertVisible:
+    text: "No bookmarks added yet"
