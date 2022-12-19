@@ -173,9 +173,6 @@
         <item name="omnibarLogoLetterTextColor">@color/midGray</item>
         <item name="autoCompleteTextColor">@color/white</item>
         <item name="autoCompleteSubtitleTextColor">@color/grayish</item>
-        <item name="tabTitleTextColor">@color/white</item>
-        <item name="tabTitleTextColorLegacy">@color/midnight</item>
-        <item name="tabSubtitleTextColor">@color/coolGray</item>
         <item name="tabSelectedBorderColor">@color/skyBlue</item>
         <item name="tabsFireTextColor">@color/white</item>
         <item name="tabCardBackgroundColor">@color/almostBlack</item>
@@ -316,9 +313,6 @@
         <item name="omnibarLogoLetterTextColor">@color/whiteFour</item>
         <item name="autoCompleteTextColor">@color/almostBlackDark</item>
         <item name="autoCompleteSubtitleTextColor">@color/warmerGray</item>
-        <item name="tabTitleTextColor">@color/almostBlackDark</item>
-        <item name="tabTitleTextColorLegacy">@color/almostBlackDark</item>
-        <item name="tabSubtitleTextColor">@color/warmerGray</item>
         <item name="tabSelectedBorderColor">@color/cornflowerBlue</item>
         <item name="tabsFireTextColor">@color/warmerGray</item>
         <item name="tabCardBackgroundColor">@color/white</item>
