@@ -49,7 +49,7 @@
                     app:panelDrawable="@drawable/ic_info_panel_info"
                     app:panelText="@string/atp_ActivityEnabledBannerLabel"
                     android:visibility="gone"
-                    android:layout_margin="16dp"/>
+                    android:layout_margin="@dimen/keyline_4"/>
 
                 <com.duckduckgo.mobile.android.ui.view.InfoPanel
                     android:id="@+id/deviceShieldTrackerLabelDisabled"
@@ -58,21 +58,19 @@
                     app:panelDrawable="@drawable/ic_info_panel_alert"
                     app:panelText="@string/atp_ActivityDisabledLabel"
                     android:visibility="gone"
-                    android:layout_margin="16dp"/>
+                    android:layout_margin="@dimen/keyline_4"/>
 
                 <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
                     android:id="@+id/past_week_activity"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingTop="@dimen/keyline_4"
-                    android:paddingBottom="@dimen/keyline_2"
-                    android:paddingStart="@dimen/keyline_4"
-                    android:text="@string/atp_ActivityPastWeek"/>
+                    app:primaryText="@string/atp_ActivityPastWeek"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="@dimen/keyline_3"
+                    android:layout_marginBottom="@dimen/keyline_3"
                     android:orientation="horizontal">
 
                     <com.duckduckgo.mobile.android.vpn.ui.tracker_activity.PastWeekTrackerActivityContentView
@@ -86,8 +84,8 @@
                         android:id="@+id/vertical_divider"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:layout_marginTop="4dp"
-                        android:layout_marginBottom="4dp"/>
+                        android:layout_marginTop="@dimen/keyline_1"
+                        android:layout_marginBottom="@dimen/keyline_1"/>
 
                     <com.duckduckgo.mobile.android.vpn.ui.tracker_activity.PastWeekTrackerActivityContentView
                         android:id="@+id/tracking_apps_count"
@@ -107,9 +105,7 @@
                     android:id="@+id/most_recent_activity"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/atp_ActivityRecentActivityHeader"
-                    android:paddingStart="@dimen/keyline_4"
-                    android:paddingBottom="@dimen/keyline_2"/>
+                    app:primaryText="@string/atp_ActivityRecentActivityHeader"/>
 
                 <androidx.fragment.app.FragmentContainerView
                     android:id="@+id/activity_list"
@@ -136,9 +132,7 @@
                 <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="@dimen/keyline_2"
-                    android:paddingStart="@dimen/keyline_4"
-                    android:text="@string/atp_ActivityAbout"/>
+                    app:primaryText="@string/atp_ActivityAbout"/>
 
                 <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                     android:id="@+id/cta_what_are_app_trackers"
@@ -156,9 +150,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingTop="@dimen/keyline_4"
-                    android:paddingBottom="@dimen/keyline_2"
-                    android:paddingStart="@dimen/keyline_4"
-                    android:text="@string/atp_ActivityManage"/>
+                    app:primaryText="@string/atp_ActivityManage"/>
 
                 <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                     android:id="@+id/cta_manage_protection"
