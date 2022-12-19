@@ -45,7 +45,7 @@ constructor(
     fun initialize(): Int {
         val primaryKey = ByteArray(32)
         val secretKey = ByteArray(32)
-        val protectedSecretKey = ByteArray(32)
+        val protectedSecretKey = ByteArray(64)
         val passwordHash = ByteArray(32)
 
         Timber.v("SYNC PRE PK: ${primaryKey[0]}")
@@ -53,10 +53,9 @@ constructor(
         Timber.v("SYNC PRE PSK: ${String(protectedSecretKey)}")
         Timber.v("SYNC PRE PH: ${String(passwordHash)}")
 
-        val paco: String = init(primaryKey, secretKey, protectedSecretKey, passwordHash, "test", "password")
+        init(primaryKey, secretKey, protectedSecretKey, passwordHash, "test", "password")
 
         Timber.v("SYNC PK: ${primaryKey[0]}")
-        Timber.v("SYNC PK: $paco")
         Timber.v("SYNC PK: ${String(primaryKey, Charsets.UTF_8)}")
         Timber.v("SYNC SK: ${String(secretKey, Charsets.UTF_8)}")
         Timber.v("SYNC PSK: ${String(protectedSecretKey, Charsets.UTF_8)}")
@@ -71,5 +70,5 @@ constructor(
         passwordHash: ByteArray,
         userId: String,
         password: String,
-    ): String
+    ): Long
 }

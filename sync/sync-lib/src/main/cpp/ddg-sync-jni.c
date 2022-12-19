@@ -5,7 +5,7 @@
 
 #include "DDGSyncCrypto.h"
 
-JNIEXPORT jstring JNICALL
+JNIEXPORT jint JNICALL
 Java_com_duckduckgo_sync_lib_NativeLib_init(JNIEnv* env, jclass class,
     jbyteArray primaryKey,
     jbyteArray secretKey,
@@ -38,15 +38,11 @@ Java_com_duckduckgo_sync_lib_NativeLib_init(JNIEnv* env, jclass class,
         userIdChars,
         passwordChars);
 
-    jstring paco = (*env)->NewStringUTF(env, primaryKeyElements);
-
+    // Release the arrays and jstring arguments
     (*env)->ReleaseByteArrayElements(env, primaryKey, primaryKeyElements, JNI_COMMIT);
     (*env)->ReleaseByteArrayElements(env, secretKey, secretKeyElements, JNI_COMMIT);
     (*env)->ReleaseByteArrayElements(env, protectedSecretKey, protectedSecretKeyElements, JNI_COMMIT);
     (*env)->ReleaseByteArrayElements(env, passwordHash, passwordHashElements, JNI_COMMIT);
     (*env)->ReleaseStringUTFChars(env, userId, userIdChars);
     (*env)->ReleaseStringUTFChars(env, password, passwordChars);
-
-    return paco;
-    // Release the arrays and jstring arguments
 }
