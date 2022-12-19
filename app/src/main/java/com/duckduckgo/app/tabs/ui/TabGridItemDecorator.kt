@@ -38,7 +38,7 @@ class TabGridItemDecorator(
         strokeWidth = BORDER_WIDTH
 
         val typedValue = TypedValue()
-        context.theme.resolveAttribute(CommonR.attr.normalTextColor, typedValue, true)
+        context.theme.resolveAttribute(CommonR.attr.daxColorBackgroundInverted, typedValue, true)
         color = ContextCompat.getColor(context, typedValue.resourceId)
     }
 
