@@ -33,6 +33,7 @@ class PrivacyDashboardRenderer(
     private val onBrokenSiteClicked: () -> Unit,
     private val onPrivacyProtectionsClicked: (Boolean) -> Unit,
     private val onUrlClicked: (String) -> Unit,
+    private val onOpenSettings: (String) -> Unit,
     private val onClose: () -> Unit,
 ) {
 
@@ -47,6 +48,9 @@ class PrivacyDashboardRenderer(
                 },
                 onUrlClicked = {
                     onUrlClicked(it)
+                },
+                onOpenSettings = {
+                    onOpenSettings(it)
                 },
                 onClose = { onClose() },
             ),

@@ -22,6 +22,7 @@ class PrivacyDashboardJavascriptInterface constructor(
     val onBrokenSiteClicked: () -> Unit,
     val onPrivacyProtectionsClicked: (Boolean) -> Unit,
     val onUrlClicked: (String) -> Unit,
+    val onOpenSettings: (String) -> Unit,
     val onClose: () -> Unit,
 ) {
     @JavascriptInterface
@@ -42,6 +43,11 @@ class PrivacyDashboardJavascriptInterface constructor(
     @JavascriptInterface
     fun openInNewTab(payload: String) {
         onUrlClicked(payload)
+    }
+
+    @JavascriptInterface
+    fun openSettings(payload: String) {
+        onOpenSettings(payload)
     }
 
     companion object {
