@@ -228,7 +228,7 @@ class VpnOnboardingActivity : DuckDuckGoActivity() {
         viewModel.onAppTpEnabled()
     }
 
-    private fun showVpnConflictDialog(){
+    private fun showVpnConflictDialog() {
         deviceShieldPixels.didShowVpnConflictDialog()
         TextAlertDialogBuilder(this)
             .setTitle(R.string.atp_VpnConflictDialogTitle)
@@ -249,7 +249,7 @@ class VpnOnboardingActivity : DuckDuckGoActivity() {
             .show()
     }
 
-    private fun showAlwaysOnConflictDialog(){
+    private fun showAlwaysOnConflictDialog() {
         deviceShieldPixels.didShowVpnConflictDialog()
         TextAlertDialogBuilder(this)
             .setTitle(R.string.atp_VpnConflictAlwaysOnDialogTitle)
