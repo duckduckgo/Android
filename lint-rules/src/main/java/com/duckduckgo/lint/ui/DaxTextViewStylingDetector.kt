@@ -17,15 +17,14 @@
 package com.duckduckgo.lint.ui
 
 import com.android.SdkConstants.ANDROID_URI
-import com.android.SdkConstants.ATTR_LAYOUT_HEIGHT
-import com.android.SdkConstants.ATTR_LAYOUT_WIDTH
+import com.android.SdkConstants.ATTR_FONT
+import com.android.SdkConstants.ATTR_FONT_FAMILY
 import com.android.SdkConstants.ATTR_STYLE
 import com.android.SdkConstants.ATTR_TEXT_ALL_CAPS
 import com.android.SdkConstants.ATTR_TEXT_APPEARANCE
-import com.android.SdkConstants.ATTR_TEXT_COLOR
+import com.android.SdkConstants.ATTR_TEXT_SIZE
 import com.android.SdkConstants.ATTR_TEXT_STYLE
 import com.android.SdkConstants.ATTR_TINT
-import com.android.SdkConstants.VIEW
 import com.android.tools.lint.detector.api.Category.Companion.CUSTOM_LINT_CHECKS
 import com.android.tools.lint.detector.api.Implementation
 import com.android.tools.lint.detector.api.Issue
@@ -74,8 +73,9 @@ class DaxTextViewStylingDetector : LayoutDetector() {
     companion object {
 
         private const val DAX_TEXT_VIEW = "com.duckduckgo.mobile.android.ui.view.text.DaxTextView"
-
-        val INVALID_ATTRIBUTES = listOf(ATTR_TEXT_STYLE, ATTR_TEXT_APPEARANCE, ATTR_TEXT_ALL_CAPS, ATTR_TINT)
+        
+        val INVALID_ATTRIBUTES = listOf(ATTR_TEXT_STYLE, ATTR_TEXT_APPEARANCE,
+            ATTR_TEXT_ALL_CAPS, ATTR_TINT, ATTR_TEXT_SIZE, ATTR_FONT, ATTR_FONT_FAMILY)
 
         val INVALID_DAX_TEXT_VIEW_PROPERTY = Issue
             .create(
