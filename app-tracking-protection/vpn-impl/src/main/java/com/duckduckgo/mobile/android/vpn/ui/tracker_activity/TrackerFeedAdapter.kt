@@ -36,6 +36,7 @@ import com.duckduckgo.mobile.android.ui.TextDrawable
 import com.duckduckgo.mobile.android.ui.recyclerviewext.StickyHeaders
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.hide
+import com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
@@ -131,7 +132,7 @@ class TrackerFeedAdapter @Inject constructor(
     }
 
     private class TrackerFeedHeaderViewHolder(
-        val view: TextView,
+        val view: SectionHeaderListItem,
     ) :
         RecyclerView.ViewHolder(view) {
         companion object {
@@ -140,12 +141,12 @@ class TrackerFeedAdapter @Inject constructor(
             ): TrackerFeedHeaderViewHolder {
                 val inflater = LayoutInflater.from(parent.context)
                 val view = inflater.inflate(R.layout.view_device_shield_activity_entry_header, parent, false)
-                return TrackerFeedHeaderViewHolder(view as TextView)
+                return TrackerFeedHeaderViewHolder(view as SectionHeaderListItem)
             }
         }
 
         fun bind(item: TrackerFeedItem.TrackerFeedItemHeader) {
-            view.text = item.timestamp
+            view.primaryText = item.timestamp
         }
     }
 

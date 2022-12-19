@@ -314,7 +314,7 @@ class DeviceShieldTrackerActivity :
             .show()
     }
 
-    private fun showVpnConflictDialog(){
+    private fun showVpnConflictDialog() {
         quietlyToggleAppTpSwitch(false)
         deviceShieldPixels.didShowVpnConflictDialog()
         TextAlertDialogBuilder(this)
@@ -336,7 +336,7 @@ class DeviceShieldTrackerActivity :
             .show()
     }
 
-    private fun showAlwaysOnConflictDialog(){
+    private fun showAlwaysOnConflictDialog() {
         deviceShieldPixels.didShowVpnConflictDialog()
         TextAlertDialogBuilder(this)
             .setTitle(R.string.atp_VpnConflictAlwaysOnDialogTitle)
