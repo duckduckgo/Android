@@ -81,8 +81,7 @@ import nl.dionsegijn.konfetti.models.Size
 @InjectWith(ActivityScope::class)
 class DeviceShieldTrackerActivity :
     DuckDuckGoActivity(),
-    DeviceShieldActivityFeedFragment.DeviceShieldActivityFeedListener,
-    VpnRemoveFeatureConfirmationDialog.Listener {
+    DeviceShieldActivityFeedFragment.DeviceShieldActivityFeedListener {
 
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels
@@ -296,13 +295,23 @@ class DeviceShieldTrackerActivity :
     private fun launchRemoveFeatureConfirmationDialog() {
         deviceShieldPixels.didShowRemoveTrackingProtectionFeatureDialog()
 
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.atp_RemoveFeatureDialogTitle)
+            .setMessage(R.string.atp_RemoveFeatureDialogMessage)
+            .setPositiveButton(R.string.atp_RemoveFeatureDialogRemove)
+            .setNegativeButton(R.string.atp_RemoveFeatureDialogCancel)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.removeFeature()
+                    }
 
-
-        val dialog = VpnRemoveFeatureConfirmationDialog.instance(this)
-        dialog.show(
-            supportFragmentManager,
-            VpnRemoveFeatureConfirmationDialog.TAG_VPN_REMOVE_FEATURE_DIALOG,
-        )
+                    override fun onNegativeButtonClicked() {
+                        deviceShieldPixels.didChooseToCancelRemoveTrakcingProtectionDialog()
+                    }
+                },
+            )
+            .show()
     }
 
     private fun showVpnConflictDialog(){
@@ -420,14 +429,6 @@ class DeviceShieldTrackerActivity :
     fun onVpnConflictDialogContinue() {
         deviceShieldPixels.didChooseToContinueFromVpnConflictDialog()
         checkVPNPermission()
-    }
-
-    override fun OnRemoveFeatureDialogCancel() {
-        deviceShieldPixels.didChooseToCancelRemoveTrakcingProtectionDialog()
-    }
-
-    override fun onRemoveFeature() {
-        viewModel.removeFeature()
     }
 
     private fun checkVPNPermission() {
