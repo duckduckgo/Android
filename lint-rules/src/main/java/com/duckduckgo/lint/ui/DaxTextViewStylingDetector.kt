@@ -73,7 +73,7 @@ class DaxTextViewStylingDetector : LayoutDetector() {
     companion object {
 
         private const val DAX_TEXT_VIEW = "com.duckduckgo.mobile.android.ui.view.text.DaxTextView"
-        
+
         val INVALID_ATTRIBUTES = listOf(ATTR_TEXT_STYLE, ATTR_TEXT_APPEARANCE,
             ATTR_TEXT_ALL_CAPS, ATTR_TINT, ATTR_TEXT_SIZE, ATTR_FONT, ATTR_FONT_FAMILY)
 
