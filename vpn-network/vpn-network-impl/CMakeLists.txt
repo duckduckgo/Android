@@ -16,6 +16,7 @@ add_library( netguard
              src/main/cpp/netguard/src/memory.c
              src/main/cpp/netguard/src/socks5.c
              src/main/cpp/netguard/src/util.c
+             src/main/cpp/netguard/src/uid_mapping.c
              src/main/cpp/netguard/src/android.c
              )
 

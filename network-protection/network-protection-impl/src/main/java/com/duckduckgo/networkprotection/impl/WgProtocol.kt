@@ -16,6 +16,8 @@
 
 package com.duckduckgo.networkprotection.impl
 
+import android.util.Log
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionStatistics
 import com.squareup.anvil.annotations.ContributesBinding
@@ -30,7 +32,6 @@ interface WgProtocol {
     fun startWg(
         tunFd: Int,
         configString: String,
-        androidLogLevel: Int,
     )
 
     fun stopWg()
@@ -41,15 +42,16 @@ interface WgProtocol {
 @SingleInstanceIn(VpnScope::class)
 class RealWgProtocol @Inject constructor(
     private val goBackend: GoBackend,
+    private val appBuildConfig: AppBuildConfig,
 ) : WgProtocol {
     private var wgTunnel: Int = -1
 
     override fun startWg(
         tunFd: Int,
         configString: String,
-        androidLogLevel: Int,
     ) {
-        wgTunnel = goBackend.wgTurnOn(INTERFACE_NAME, tunFd, configString, androidLogLevel)
+        val level = if (appBuildConfig.isDebug) Log.VERBOSE else Log.ASSERT
+        wgTunnel = goBackend.wgTurnOn(INTERFACE_NAME, tunFd, configString, level, appBuildConfig.sdkInt)
         if (wgTunnel < 0) {
             logcat(LogPriority.ERROR) { "Wireguard tunnel failed to start: check config / tunFd" }
         }

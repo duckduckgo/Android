@@ -31,7 +31,6 @@ dependencies {
     implementation project(':di')
     implementation project(':app-tracking-api')
     implementation project(':vpn-api')
-    implementation project(':vpn-store')
     implementation project(':network-protection-api')
     implementation project(':network-protection-store')
     implementation project(':library-loader-api')

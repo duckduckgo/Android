@@ -5,6 +5,7 @@
 
 #include "netguard.h"
 #include "tls.h"
+#include "uid_mapping.h"
 
 struct go_string { const char *str; long n; };
 extern int wgTurnOn(struct go_string ifname, int tun_fd, struct go_string settings);
@@ -17,10 +18,14 @@ extern char *wgVersion();
 static JavaVM *JVM = NULL;
 static jobject GO_BACKEND = NULL;
 static jmethodID MID_SHOULD_ALLOW = NULL;
+static jint SDK = 0;
 
-JNIEXPORT jint JNICALL Java_com_wireguard_android_backend_GoBackend_wgTurnOn(JNIEnv *env, jobject  goBackend, jstring ifname, jint tun_fd, jstring settings, jint loglevel_)
+JNIEXPORT jint JNICALL Java_com_wireguard_android_backend_GoBackend_wgTurnOn(JNIEnv *env, jobject  goBackend, jstring ifname,
+                                          jint tun_fd, jstring settings, jint loglevel_,
+                                          jint sdk)
 {
     loglevel = loglevel_;
+    SDK = sdk;
 
     // Init global variables
     jint rs = (*env)->GetJavaVM(env, &JVM);
@@ -32,7 +37,7 @@ JNIEXPORT jint JNICALL Java_com_wireguard_android_backend_GoBackend_wgTurnOn(JNI
     GO_BACKEND = (*env)->NewGlobalRef(env, goBackend);
 
     jclass clsGoBackend = (*env)->GetObjectClass(env, goBackend);
-    const char *shouldAllowSig = "(ILjava/lang/String;ILjava/lang/String;ILjava/lang/String;)Z";
+    const char *shouldAllowSig = "(ILjava/lang/String;ILjava/lang/String;ILjava/lang/String;I)Z";
     MID_SHOULD_ALLOW = jniGetMethodID(env, clsGoBackend, "shouldAllow", shouldAllowSig);
     (*env)->DeleteLocalRef(env, clsGoBackend);
 
@@ -106,6 +111,11 @@ int is_pkt_allowed(const uint8_t *buffer, int length) {
 
     log_print(PLATFORM_LOG_PRIORITY_INFO, "TLS server %s (%s) found", sn, dest);
 
+    // Get UID natively if we can; otherwise we will get it in Kotlin
+    jint uid = -1;
+    if (SDK <= 28) // Android 9 Pie
+        uid = get_uid(version, IPPROTO_TCP, saddr, sport, daddr, dport);
+
     // Prep call to Kotlin
     jstring jsource = (*env)->NewStringUTF(env, source);
     jstring jdest = (*env)->NewStringUTF(env, dest);
@@ -113,7 +123,7 @@ int is_pkt_allowed(const uint8_t *buffer, int length) {
 
     jboolean jallow = (*env)->CallBooleanMethod(
             env, GO_BACKEND, MID_SHOULD_ALLOW,
-            6, jsource, sport, jdest, dport, jsni);
+            IPPROTO_TCP, jsource, sport, jdest, dport, jsni, uid);
     jniCheckException(env);
 
     // Cleanup
@@ -134,6 +144,8 @@ JNIEXPORT void JNICALL Java_com_wireguard_android_backend_GoBackend_wgTurnOff(JN
     // Cleanup globals
     if (GO_BACKEND != NULL)
         (*env)->DeleteGlobalRef(env, GO_BACKEND);
+
+    cleanup_uid_cache();
 }
 
 JNIEXPORT jint JNICALL Java_com_wireguard_android_backend_GoBackend_wgGetSocketV4(JNIEnv *env, jclass c, jint handle)

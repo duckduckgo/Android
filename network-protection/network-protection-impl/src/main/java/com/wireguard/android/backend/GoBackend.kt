@@ -20,6 +20,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.VpnService
 import android.os.Build
+import android.os.Process
 import androidx.annotation.RequiresApi
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.library.loader.LibraryLoader
@@ -60,14 +61,14 @@ class GoBackend @Inject constructor(
         tunFd: Int,
         settings: String,
         androidLogLevel: Int,
+        sdk: Int,
     ): Int
 
     external fun wgVersion(): String
 
     // Called from native code
-    @RequiresApi(Build.VERSION_CODES.Q)
     @Suppress("unused")
-    fun shouldAllow(protocol: Int, saddr: String, sport: Int, daddr: String, dport: Int, sni: String): Boolean {
+    fun shouldAllow(protocol: Int, saddr: String, sport: Int, daddr: String, dport: Int, sni: String, uid: Int): Boolean {
         logcat {
             """
             shouldAllow called for
@@ -77,18 +78,19 @@ class GoBackend @Inject constructor(
               daddr=$daddr
               dport=$dport
               sni=$sni
+              uid=$uid
             """.trimIndent()
         }
 
         if (protocol != 6 /* TCP */ && protocol != 17 /* UDP */) return true
 
-        val cm = context.getSystemService(VpnService.CONNECTIVITY_SERVICE) as ConnectivityManager? ?: return true
+        @Suppress("NAME_SHADOWING")
+        val uid = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            getUidQ(protocol, saddr, sport, daddr, dport)
+        } else {
+            uid
+        }
 
-        val local = InetSocketAddress(saddr, sport)
-        val remote = InetSocketAddress(daddr, dport)
-
-        logcat { "Get uid local=$local remote=$remote" }
-        val uid = cm.getConnectionOwnerUid(protocol, local, remote)
         return shouldAllowDomain(sni, uid)
     }
 
@@ -100,5 +102,16 @@ class GoBackend @Inject constructor(
         logcat { "shouldAllowDomain for $name ($uid) = $tracker" }
 
         return tracker == null
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun getUidQ(protocol: Int, saddr: String, sport: Int, daddr: String, dport: Int): Int {
+        val cm = context.getSystemService(VpnService.CONNECTIVITY_SERVICE) as ConnectivityManager? ?: return Process.INVALID_UID
+
+        val local = InetSocketAddress(saddr, sport)
+        val remote = InetSocketAddress(daddr, dport)
+
+        logcat { "Get uid local=$local remote=$remote" }
+        return cm.getConnectionOwnerUid(protocol, local, remote)
     }
 }
