@@ -158,7 +158,6 @@
         <item name="primaryIconColor">@color/gray20</item>
         <item name="primaryIconDisabledColor">@color/gray60</item>
         <item name="secondaryIconColor">@color/gray70</item>
-        <item name="chipBackgroundColor">@color/gray90</item>
         <item name="listItemPrimaryTextColor">@color/white</item>
         <item name="listItemSecondaryTextColor">@color/grayishTwo</item>
         <item name="listItemDisabledColor">@color/warGreyTwo</item>
@@ -300,7 +299,6 @@
         <item name="primaryIconColor">@color/gray95</item>
         <item name="primaryIconDisabledColor">@color/gray50</item>
         <item name="secondaryIconColor">@color/gray40</item>
-        <item name="chipBackgroundColor">@color/gray20</item>
         <item name="dialogBgColor">@color/white</item>
         <item name="browserIconColorSelector">@color/browser_icon_color_selector_light</item>
         <item name="browserMenuTextColor">@color/almostBlackDark</item>

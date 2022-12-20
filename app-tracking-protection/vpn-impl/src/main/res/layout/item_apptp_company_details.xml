@@ -22,9 +22,9 @@
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:orientation="vertical"
-              android:paddingStart="16dp"
-              android:paddingTop="8dp"
-              android:paddingEnd="16dp">
+              android:paddingStart="@dimen/keyline_4"
+              android:paddingTop="@dimen/keyline_2"
+              android:paddingEnd="@dimen/keyline_4">
 
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -33,22 +33,20 @@
             android:paddingTop="@dimen/keyline_2"
             android:paddingBottom="@dimen/keyline_1">
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:id="@+id/tracking_company_name"
-                style="@style/TextAppearance.DuckDuckGo.Body1"
+                app:typography="body1_bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:textColor="?normalTextColor"
-                android:textStyle="bold"
+                android:layout_marginStart="@dimen/keyline_4"
                 app:layout_constraintStart_toEndOf="@+id/tracking_company_icon"
                 app:layout_constraintTop_toTopOf="@+id/tracking_company_icon"
                 tools:text="Google"/>
 
         <ImageView
                 android:id="@+id/tracking_company_icon"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="@dimen/listItemImageContainerSize"
+                android:layout_height="@dimen/listItemImageContainerSize"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -64,12 +62,12 @@
                 app:layout_constraintTop_toTopOf="@+id/tracking_company_icon"
                 app:srcCompat="@drawable/ic_block"/>
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:id="@+id/tracking_company_attempts"
-                style="@style/TextAppearance.DuckDuckGo.Body2"
+                app:typography="body2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
+                android:layout_marginStart="@dimen/keyline_4"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/tracking_company_icon"
                 tools:text="6 attempts. Known to collect:"/>
@@ -84,9 +82,9 @@
             android:layout_marginTop="@dimen/keyline_1"
             android:orientation="vertical"/>
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/tracking_company_show_more"
-            style="@style/TextAppearance.DuckDuckGo.Body2"
+            app:typography="body2"
             android:background="?selectableItemBackground"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -103,9 +101,9 @@
             android:orientation="vertical"
             android:visibility="gone"/>
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/tracking_company_show_less"
-            style="@style/TextAppearance.DuckDuckGo.Body2"
+            app:typography="body2"
             android:background="?selectableItemBackground"
             android:text="@string/atp_CompanyDetailsTrackingShowLess"
             android:layout_width="wrap_content"
