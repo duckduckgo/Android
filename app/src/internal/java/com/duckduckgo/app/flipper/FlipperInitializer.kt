@@ -17,10 +17,9 @@
 package com.duckduckgo.app.flipper
 
 import android.content.Context
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
 import com.facebook.flipper.android.AndroidFlipperClient
 import com.facebook.flipper.core.FlipperPlugin
@@ -32,12 +31,12 @@ import timber.log.Timber
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = LifecycleObserver::class,
+    boundType = MainProcessLifecycleObserver::class,
 )
 class FlipperInitializer @Inject constructor(
     private val context: Context,
     private val flipperPluginPoint: PluginPoint<FlipperPlugin>,
-) : DefaultLifecycleObserver {
+) : MainProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
         Timber.v("Flipper: setup flipper")

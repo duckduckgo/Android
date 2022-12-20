@@ -19,10 +19,10 @@ package com.duckduckgo.app.widget
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
-import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.widget.SearchAndFavoritesWidget
 import dagger.SingleInstanceIn
@@ -35,7 +35,7 @@ class FavoritesObserver @Inject constructor(
     context: Context,
     private val favoritesRepository: FavoritesRepository,
     private val appCoroutineScope: CoroutineScope,
-) : DefaultLifecycleObserver {
+) : MainProcessLifecycleObserver {
 
     private val instance = AppWidgetManager.getInstance(context)
     private val componentName = ComponentName(context, SearchAndFavoritesWidget::class.java)

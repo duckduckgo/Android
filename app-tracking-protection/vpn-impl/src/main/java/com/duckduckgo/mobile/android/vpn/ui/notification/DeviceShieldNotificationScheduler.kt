@@ -18,12 +18,11 @@ package com.duckduckgo.mobile.android.vpn.ui.notification
 
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.*
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.dao.VpnNotification
 import com.duckduckgo.mobile.android.vpn.dao.VpnNotificationsDao
@@ -51,7 +50,7 @@ object DeviceShieldNotificationSchedulerModule {
         workManager: WorkManager,
         vpnDatabase: VpnDatabase,
         dispatchers: DispatcherProvider,
-    ): LifecycleObserver {
+    ): MainProcessLifecycleObserver {
         return DeviceShieldNotificationScheduler(coroutineScope, workManager, vpnDatabase, dispatchers)
     }
 
@@ -64,7 +63,7 @@ class DeviceShieldNotificationScheduler(
     private val workManager: WorkManager,
     private val vpnDatabase: VpnDatabase,
     private val dispatchers: DispatcherProvider,
-) : DefaultLifecycleObserver {
+) : MainProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
         scheduleDailyNotification()

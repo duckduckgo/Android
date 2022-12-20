@@ -17,8 +17,6 @@
 package com.duckduckgo.cookies.impl.features.firstparty
 
 import android.content.Context
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.BackoffPolicy
 import androidx.work.CoroutineWorker
@@ -28,6 +26,7 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.cookies.api.CookiesFeatureName
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
@@ -63,13 +62,13 @@ class FirstPartyCookiesModifierWorker(
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = LifecycleObserver::class,
+    boundType = MainProcessLifecycleObserver::class,
 )
 @SingleInstanceIn(AppScope::class)
 class FirstPartyCookiesModifierWorkerScheduler @Inject constructor(
     private val workManager: WorkManager,
     private val toggle: FeatureToggle,
-) : DefaultLifecycleObserver {
+) : MainProcessLifecycleObserver {
 
     private val workerRequest = PeriodicWorkRequestBuilder<FirstPartyCookiesModifierWorker>(1, DAYS)
         .addTag(FIRST_PARTY_COOKIES_EXPIRE_WORKER_TAG)

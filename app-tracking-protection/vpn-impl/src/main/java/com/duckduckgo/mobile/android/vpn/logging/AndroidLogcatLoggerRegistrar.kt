@@ -14,29 +14,30 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.deviceauth.impl
+package com.duckduckgo.mobile.android.vpn.logging
 
-import androidx.lifecycle.LifecycleOwner
-import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.deviceauth.api.AutofillAuthorizationGracePeriod
+import com.duckduckgo.app.lifecycle.VpnProcessLifecycleObserver
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.AndroidLogcatLogger
+import logcat.LogPriority
+import logcat.LogcatLogger
+import logcat.logcat
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    boundType = VpnProcessLifecycleObserver::class,
 )
-@SingleInstanceIn(AppScope::class)
-class AutofillGracePeriodLifecycleObserver @Inject constructor(
-    private val gracePeriod: AutofillAuthorizationGracePeriod,
-) : MainProcessLifecycleObserver {
+class AndroidLogcatLoggerRegistrar @Inject constructor(
+    private val appBuildConfig: AppBuildConfig,
+) : VpnProcessLifecycleObserver {
 
-    override fun onStop(owner: LifecycleOwner) {
-        super.onStop(owner)
-        Timber.d("App in background, invalidating autofill grace period")
-        gracePeriod.invalidate()
+    override fun onVpnProcessCreated() {
+        if (appBuildConfig.isDebug) {
+            LogcatLogger.install(AndroidLogcatLogger(LogPriority.DEBUG))
+            logcat { "Registering LogcatLogger" }
+        }
     }
 }

@@ -20,13 +20,12 @@ import android.annotation.SuppressLint
 import androidx.annotation.CheckResult
 import androidx.annotation.UiThread
 import androidx.annotation.VisibleForTesting
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.WorkManager
 import com.duckduckgo.app.global.job.AppConfigurationSyncWorkRequestBuilder
 import com.duckduckgo.app.global.job.AppConfigurationSyncWorkRequestBuilder.Companion.APP_CONFIG_SYNC_WORK_TAG
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -47,7 +46,7 @@ class AppConfigurationSyncerModule {
         appConfigurationSyncWorkRequestBuilder: AppConfigurationSyncWorkRequestBuilder,
         workManager: WorkManager,
         appConfigurationDownloader: ConfigurationDownloader,
-    ): LifecycleObserver {
+    ): MainProcessLifecycleObserver {
         return AppConfigurationSyncer(appConfigurationSyncWorkRequestBuilder, workManager, appConfigurationDownloader)
     }
 }
@@ -57,7 +56,7 @@ class AppConfigurationSyncer(
     private val appConfigurationSyncWorkRequestBuilder: AppConfigurationSyncWorkRequestBuilder,
     private val workManager: WorkManager,
     private val appConfigurationDownloader: ConfigurationDownloader,
-) : DefaultLifecycleObserver {
+) : MainProcessLifecycleObserver {
 
     @SuppressLint("CheckResult")
     @UiThread

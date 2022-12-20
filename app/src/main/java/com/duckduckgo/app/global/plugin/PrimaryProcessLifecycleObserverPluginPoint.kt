@@ -16,13 +16,13 @@
 
 package com.duckduckgo.app.global.plugin
 
-import androidx.lifecycle.LifecycleObserver
 import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
 
 @ContributesPluginPoint(
     scope = AppScope::class,
-    boundType = LifecycleObserver::class,
+    boundType = MainProcessLifecycleObserver::class,
 )
 @Suppress("unused")
-interface LifecycleObserverPluginPoint
+interface PrimaryProcessLifecycleObserverPluginPoint
