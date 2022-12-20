@@ -19,6 +19,8 @@ package com.duckduckgo.mobile.android.app.tracking
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.dao.VpnAppTrackerBlockingDao
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.AppTrackerRecorder
@@ -31,6 +33,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -40,6 +43,7 @@ class NetpAppTrackerDetectorTest {
     private val appTrackerRecorder: AppTrackerRecorder = mock()
     private val vpnAppTrackerBlockingDao: VpnAppTrackerBlockingDao = mock()
     private val packageManager: PackageManager = mock()
+    private val vpnFeaturesRegistry: VpnFeaturesRegistry = mock()
 
     private lateinit var appTrackerDetector: AppTrackerDetector
 
@@ -49,6 +53,7 @@ class NetpAppTrackerDetectorTest {
         whenever(appNameResolver.getAppNameForPackageId(AppNameResolver.OriginatingApp.unknown().packageId))
             .thenReturn(AppNameResolver.OriginatingApp.unknown())
         whenever(packageManager.getApplicationInfo(any(), eq(0))).thenReturn(ApplicationInfo())
+        whenever(vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)).thenReturn(true)
 
         appTrackerDetector = NetpRealAppTrackerDetector(
             appTrackerRepository,
@@ -56,6 +61,7 @@ class NetpAppTrackerDetectorTest {
             appTrackerRecorder,
             vpnAppTrackerBlockingDao,
             packageManager,
+            vpnFeaturesRegistry,
         )
     }
 
@@ -313,6 +319,7 @@ class NetpAppTrackerDetectorTest {
         assertNull(appTrackerDetector.evaluate(TEST_APP_TRACKER.hostname, APP_UID))
     }
 
+    @Test
     fun whenEvaluateNonTrackerThenReturnNull() {
         whenever(appTrackerRepository.findTracker(TEST_APP_TRACKER.hostname, APP_PACKAGE_ID)).thenReturn(AppTrackerType.NotTracker)
         whenever(appNameResolver.getPackageIdForUid(APP_UID)).thenReturn(APP_ORIGINATING_APP.packageId)
@@ -320,6 +327,25 @@ class NetpAppTrackerDetectorTest {
         whenever(vpnAppTrackerBlockingDao.getRuleByTrackerDomain(TEST_APP_TRACKER.hostname)).thenReturn(null)
 
         assertNull(appTrackerDetector.evaluate(TEST_APP_TRACKER.hostname, APP_UID))
+    }
+
+    @Test
+    fun whenAppTpDisabledReturnNull() {
+        whenever(vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)).thenReturn(false)
+
+        val appTrackerDetectorDisabled = NetpRealAppTrackerDetector(
+            appTrackerRepository,
+            appNameResolver,
+            appTrackerRecorder,
+            vpnAppTrackerBlockingDao,
+            packageManager,
+            vpnFeaturesRegistry,
+        )
+
+        assertNull(appTrackerDetectorDisabled.evaluate(TEST_APP_TRACKER.hostname, APP_UID))
+
+        verifyNoInteractions(appNameResolver)
+        verifyNoInteractions(appTrackerRepository)
     }
 
     companion object {

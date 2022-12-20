@@ -19,6 +19,8 @@ package com.duckduckgo.mobile.android.app.tracking
 import android.content.pm.PackageManager
 import android.util.LruCache
 import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.apps.VpnExclusionList
 import com.duckduckgo.mobile.android.vpn.apps.isSystemApp
 import com.duckduckgo.mobile.android.vpn.dao.VpnAppTrackerBlockingDao
@@ -40,12 +42,22 @@ class NetpRealAppTrackerDetector constructor(
     private val appTrackerRecorder: AppTrackerRecorder,
     private val vpnAppTrackerBlockingDao: VpnAppTrackerBlockingDao,
     private val packageManager: PackageManager,
+    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
 ) : AppTrackerDetector {
+
+    private val isAppTpDisabled by lazy {
+        !vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)
+    }
 
     // cache packageId -> app name
     private val appNamesCache = LruCache<String, AppNameResolver.OriginatingApp>(100)
 
     override fun evaluate(domain: String, uid: Int): AppTrackerDetector.AppTracker? {
+        // Check if AppTP is enabled first
+        if (isAppTpDisabled) {
+            return null
+        }
+
         val packageId = appNameResolver.getPackageIdForUid(uid)
 
         if (VpnExclusionList.isDdgApp(packageId) || packageId.isInExclusionList()) {
@@ -127,6 +139,7 @@ object NetpAppTrackerDetectorModule {
         appTrackerRecorder: AppTrackerRecorder,
         vpnDatabase: VpnDatabase,
         packageManager: PackageManager,
+        vpnFeaturesRegistry: VpnFeaturesRegistry,
     ): AppTrackerDetector {
         return NetpRealAppTrackerDetector(
             appTrackerRepository = appTrackerRepository,
@@ -134,6 +147,7 @@ object NetpAppTrackerDetectorModule {
             appTrackerRecorder = appTrackerRecorder,
             vpnAppTrackerBlockingDao = vpnDatabase.vpnAppTrackerBlockingDao(),
             packageManager = packageManager,
+            vpnFeaturesRegistry = vpnFeaturesRegistry,
         )
     }
 }
