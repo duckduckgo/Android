@@ -15,11 +15,11 @@
   -->
 
 
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.duckduckgo.mobile.android.ui.view.text.DaxTextView xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:app="http://schemas.android.com/apk/res-auto"
           xmlns:tools="http://schemas.android.com/tools"
           android:id="@+id/excludedAppsFilterText"
-          style="@style/TextAppearance.DuckDuckGo.Body2"
+          app:typography="body2"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:drawablePadding="@dimen/keyline_2"

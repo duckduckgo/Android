@@ -50,12 +50,12 @@
         app:layout_constraintBottom_toBottomOf="@id/deviceShieldAppEntryIcon"
         app:layout_constraintEnd_toEndOf="@id/deviceShieldAppEntryIcon"/>
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/deviceShieldAppExclusionReason"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.DuckDuckGo.Caption"
-        android:textColor="?attr/secondaryTextColor"
+        app:typography="caption"
+        app:textType="secondary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/deviceShieldAppEntryName"
         app:layout_constraintStart_toStartOf="@+id/deviceShieldAppEntryName"
@@ -70,18 +70,19 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" app:layout_constraintVertical_bias="0.562"/>
-    <TextView
+
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/deviceShieldAppEntryName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
+        app:typography="body1"
+        android:layout_marginStart="@dimen/keyline_4"
+        android:layout_marginEnd="@dimen/keyline_4"
         android:layout_weight="1"
         android:ellipsize="end"
         android:maxLines="1"
         android:orientation="vertical"
         android:singleLine="true"
-        android:textAppearance="@style/TextAppearance.DuckDuckGo.Body1"
         app:layout_constraintBottom_toTopOf="@+id/deviceShieldAppExclusionReason"
         app:layout_constraintEnd_toStartOf="@+id/deviceShieldAppEntryShieldEnabled"
         app:layout_constraintStart_toEndOf="@+id/deviceShieldAppEntryIcon"
