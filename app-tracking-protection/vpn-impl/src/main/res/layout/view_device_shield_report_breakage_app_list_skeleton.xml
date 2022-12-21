@@ -23,10 +23,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-   android:paddingStart="@dimen/keyline_2"
-   android:paddingTop="@dimen/keyline_2"
-   android:paddingEnd="@dimen/keyline_4"
-   android:paddingBottom="@dimen/keyline_2">
+    android:padding="@dimen/keyline_4">
 
     <TextView
         android:id="@+id/report_breakage_rbutton_entry_skeleton_imageView"
