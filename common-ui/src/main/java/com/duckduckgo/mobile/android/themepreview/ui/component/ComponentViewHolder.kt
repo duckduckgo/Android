@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.mobile.android.R
+import com.duckduckgo.mobile.android.ui.view.MessageCta.Message
 import com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
 import com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
@@ -59,6 +60,21 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
     class InfoPanelComponentViewHolder(
         parent: ViewGroup,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_info_panel))
+
+    class RemoteMessageComponentViewHolder(
+        parent: ViewGroup,
+    ) : ComponentViewHolder(inflate(parent, R.layout.component_remote_message)) {
+        override fun bind(component: Component) {
+
+            val remoteMessage = Message()
+
+            view.findViewById<SectionHeaderListItem>(R.id.sectionHeaderWithOverflow).apply {
+                setOverflowMenuClickListener { Snackbar.make(view, "Overflow menu clicked", Snackbar.LENGTH_SHORT).show() }
+                revertUpperCaseTitleText()
+            }
+        }
+    }
+
 
     class SearchBarComponentViewHolder(
         parent: ViewGroup,
@@ -236,6 +252,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.SLIDER -> SliderComponentViewHolder(parent)
                 Component.SNACKBAR -> SnackbarComponentViewHolder(parent)
                 Component.INFO_PANEL -> InfoPanelComponentViewHolder(parent)
+                Component.REMOTE_MESSAGE -> RemoteMessageComponentViewHolder(parent)
                 Component.SEARCH_BAR -> SearchBarComponentViewHolder(parent)
                 Component.MENU_ITEM -> MenuItemComponentViewHolder(parent)
                 Component.SECTION_HEADER_LIST_ITEM -> HeaderSectionComponentViewHolder(parent)
