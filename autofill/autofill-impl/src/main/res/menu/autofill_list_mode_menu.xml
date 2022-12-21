@@ -20,7 +20,7 @@
     <item
         android:id="@+id/addLoginManually"
         android:icon="@drawable/ic_baseline_add_24"
-        android:title="@string/managementAddLogin"
+        android:title="@string/autofillManagementAddLogin"
         app:showAsAction="always" />
 
 </menu>

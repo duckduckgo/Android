@@ -313,12 +313,32 @@ class AutofillSettingsViewModelTest {
     fun whenOnExitCredentialModeThenExitCredentialMode() = runTest {
         testee.onExitCredentialMode()
 
+        testee.commands.test {
+            awaitItem().first().assertCommandType(ExitCredentialMode::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLockingAndUnlockingPreviousViewStateRestoredIfWasListMode() = runTest {
+        testee.onShowListMode()
+        testee.lock()
+        testee.unlock()
+
         testee.viewState.test {
             assertEquals(CredentialMode.ListMode, this.awaitItem().credentialMode)
             cancelAndIgnoreRemainingEvents()
         }
-        testee.commands.test {
-            awaitItem().first().assertCommandType(ExitCredentialMode::class)
+    }
+
+    @Test
+    fun whenLockingAndUnlockingPreviousViewStateRestoredIfWasCredentialViewingMode() = runTest {
+        testee.onViewCredentials(someCredentials())
+        testee.lock()
+        testee.unlock()
+
+        testee.viewState.test {
+            assertTrue(this.awaitItem().credentialMode is CredentialMode.Viewing)
             cancelAndIgnoreRemainingEvents()
         }
     }

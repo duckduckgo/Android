@@ -77,7 +77,7 @@ class AutofillSettingsViewModel @Inject constructor(
     private var initialStateAlreadyPresented: Boolean = false
 
     // after unlocking, we want to know which mode to return to
-    private var credentialModeBeforeLocking: CredentialMode = ListMode
+    private var credentialModeBeforeLocking: CredentialMode? = null
 
     fun onCopyUsername(username: String?) {
         username?.let { clipboardInteractor.copyToClipboard(it) }
@@ -90,15 +90,15 @@ class AutofillSettingsViewModel @Inject constructor(
     }
 
     fun onShowListMode() {
-        addCommand(ShowListMode)
         _viewState.value = _viewState.value.copy(credentialMode = ListMode)
+        addCommand(ShowListMode)
     }
 
     fun onViewCredentials(
         credentials: LoginCredentials,
     ) {
-        addCommand(ShowCredentialMode)
         _viewState.value = viewState.value.copy(credentialMode = Viewing(credentialsViewed = credentials))
+        addCommand(ShowCredentialMode)
     }
 
     fun onCreateNewCredentials() {
@@ -203,7 +203,7 @@ class AutofillSettingsViewModel @Inject constructor(
     }
 
     fun unlock() {
-        Timber.v("Unlocking autofill settings. Will return view state to ${credentialModeBeforeLocking.javaClass.canonicalName}")
+        Timber.v("Unlocking autofill settings")
         addCommand(ExitDisabledMode)
         addCommand(ExitLockedMode)
 
@@ -212,7 +212,10 @@ class AutofillSettingsViewModel @Inject constructor(
             addCommand(InitialiseViewAfterUnlock)
         }
 
-        _viewState.value = _viewState.value.copy(credentialMode = credentialModeBeforeLocking)
+        credentialModeBeforeLocking?.let { mode ->
+            Timber.v("Will return view state to ${mode.javaClass.name}")
+            _viewState.value = _viewState.value.copy(credentialMode = mode)
+        }
     }
 
     private fun trackCurrentModeBeforeLocking() {
@@ -345,7 +348,7 @@ class AutofillSettingsViewModel @Inject constructor(
     data class ViewState(
         val autofillEnabled: Boolean = true,
         val logins: List<LoginCredentials>? = null,
-        val credentialMode: CredentialMode = ListMode,
+        val credentialMode: CredentialMode? = null,
     )
 
     /**

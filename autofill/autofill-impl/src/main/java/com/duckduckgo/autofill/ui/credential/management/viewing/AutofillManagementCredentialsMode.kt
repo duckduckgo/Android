@@ -279,6 +279,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
                     is Viewing -> {
                         populateFields(state.credentialMode.credentialsViewed)
                         showViewMode(state.credentialMode.credentialsViewed)
+                        invalidateMenu()
                     }
 
                     is EditingExisting -> {
@@ -287,7 +288,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
                     }
 
                     is EditingNewEntry -> {
-                        updateToolbarForEdit()
+                        updateToolbarForNewEntry()
                     }
 
                     else -> {
@@ -315,6 +316,15 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
         getActionBar()?.apply {
             setHomeAsUpIndicator(com.duckduckgo.mobile.android.R.drawable.ic_close)
             title = getString(R.string.credentialManagementEditTitle)
+            setDisplayUseLogoEnabled(false)
+        }
+        invalidateMenu()
+    }
+
+    private fun updateToolbarForNewEntry() {
+        getActionBar()?.apply {
+            setHomeAsUpIndicator(com.duckduckgo.mobile.android.R.drawable.ic_close)
+            title = getString(R.string.autofillManagementAddLogin)
             setDisplayUseLogoEnabled(false)
         }
         invalidateMenu()
