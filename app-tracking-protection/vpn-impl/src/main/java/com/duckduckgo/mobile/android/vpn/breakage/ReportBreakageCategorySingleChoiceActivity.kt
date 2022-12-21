@@ -149,7 +149,7 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
     private fun render(viewState: ViewState) {
         val category =
             viewState.categorySelected?.let { getString(viewState.categorySelected.category) }.orEmpty()
-        binding.categoriesSelection.setText(category)
+        binding.categoriesSelection.text = category
         binding.ctaNextFormSubmit.isEnabled = viewState.submitAllowed
     }
 
