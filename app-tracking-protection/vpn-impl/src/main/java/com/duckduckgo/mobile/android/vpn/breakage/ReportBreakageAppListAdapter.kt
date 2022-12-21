@@ -104,9 +104,7 @@ class ReportBreakageAppListViewHolder(view: View) : RecyclerView.ViewHolder(view
         position: Int,
         listener: ReportBreakageAppListAdapter.Listener,
     ) {
-        itemView.deviceShieldInstalledAppEntryName.text =
-            String.format(itemView.context.resources.getString(R.string.atp_ReportBreakageAppEntry), installedApp.name)
-                .applyBoldSpanTo(listOf(installedApp.name))
+        itemView.deviceShieldInstalledAppEntryName.text = installedApp.name
 
         itemView.deviceShieldInstalledAppSelector.quietlySetIsChecked(installedApp.isSelected) { _, _ ->
             listener.onInstalledAppSelected(installedApp, position)
