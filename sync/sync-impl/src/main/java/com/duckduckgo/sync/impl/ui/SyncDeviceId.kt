@@ -7,6 +7,7 @@ import android.provider.Settings
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.store.SyncEncryptedStore
 import com.squareup.anvil.annotations.ContributesBinding
+import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
@@ -32,6 +33,7 @@ class AppSyncDeviceIds @Inject constructor(
     }
 
     override fun deviceName(): String {
+        Timber.i("SYNC: ${Build.BRAND}, ${Build.DEVICE}, ${Build.MODEL}, ${Build.DISPLAY}, ${Build.MANUFACTURER}, ${Build.PRODUCT}")
         var deviceName = syncEncryptedStore.deviceName
         if (deviceName != null) return deviceName
 
