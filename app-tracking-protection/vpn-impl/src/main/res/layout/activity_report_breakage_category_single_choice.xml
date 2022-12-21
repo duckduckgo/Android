@@ -56,7 +56,8 @@
 
             <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                     android:id="@+id/appBreakageFormHeading"
-                    app:typography="h3"
+                    app:typography="body2"
+                    app:textType="secondary"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/keyline_4"

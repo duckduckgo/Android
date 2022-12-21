@@ -20,7 +20,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Base64
-import androidx.appcompat.app.AlertDialog
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.flowWithLifecycle
@@ -92,7 +91,7 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
         binding.categoriesSelection.onAction {
             RadioListAlertDialogBuilder(this)
                 .setTitle(getString(R.string.atp_ReportBreakageCategoriesTitle))
-                .setOptions(categories,viewModel.indexSelected + 1)
+                .setOptions(categories, viewModel.indexSelected + 1)
                 .setPositiveButton(android.R.string.ok)
                 .setNegativeButton(android.R.string.cancel)
                 .addEventListener(
