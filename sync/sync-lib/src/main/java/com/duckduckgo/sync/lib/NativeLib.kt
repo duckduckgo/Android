@@ -18,6 +18,7 @@ package com.duckduckgo.sync.lib
 
 import android.content.Context
 import android.util.Base64
+import okio.ByteString.Companion.decodeBase64
 import kotlin.system.exitProcess
 import timber.log.Timber
 
@@ -40,27 +41,30 @@ class NativeLib constructor(
             exitProcess(1)
         }
     }
-    fun initialize(): Account {
+
+    /**
+     * Used to create data needed to create an account.  Once the server returns a JWT, store the primary and secret key.
+     *
+     * @param primaryKey OUT - store this.  In combination with user id, this is the recovery key.
+     * @param secretKey OUT - store this. This is used to encrypt an decrypt e2e data.
+     * @param protectedSecretKey OUT - do not store this.  Send to /sign up endpoint.
+     * @param passwordHash OUT - do not store this.  Send to /signup endpoint.
+     * @param userId IN
+     * @param password IN
+     */
+    fun generateAccountKeys(): Account {
         val primaryKey = ByteArray(32)
         val secretKey = ByteArray(32)
         val protectedSecretKey = ByteArray(64)
         val passwordHash = ByteArray(32)
 
-        Timber.v("SYNC PRE PK: ${primaryKey[0]}")
-        Timber.v("SYNC PRE SK: ${String(secretKey)}")
-        Timber.v("SYNC PRE PSK: ${String(protectedSecretKey)}")
-        Timber.v("SYNC PRE PH: ${String(passwordHash)}")
+        Timber.v("SYNC PRE PK: ${primaryKey.encode()}")
+        Timber.v("SYNC PRE SK: ${secretKey.encode()}")
+        Timber.v("SYNC PRE PSK: ${protectedSecretKey.encode()}")
+        Timber.v("SYNC PRE PH: ${passwordHash.encode()}")
 
-        val result: Long = init(primaryKey, secretKey, protectedSecretKey, passwordHash, "test", "password")
+        val result: Long = generateAccountKeys(primaryKey, secretKey, protectedSecretKey, passwordHash, "test", "password")
 
-        Timber.v("SYNC PK: ${primaryKey[0]}")
-        Timber.v("SYNC PK: ${String(primaryKey, Charsets.UTF_8)}")
-        Timber.v("SYNC SK: ${String(secretKey, Charsets.UTF_8)}")
-        Timber.v("SYNC PSK: ${String(protectedSecretKey, Charsets.UTF_8)}")
-        Timber.v("SYNC PH: ${String(passwordHash, Charsets.UTF_8)}")
-
-
-        Timber.v("SYNC PK: ${primaryKey[0]}")
         Timber.v("SYNC PK: ${primaryKey.encode()}")
         Timber.v("SYNC SK: ${secretKey.encode()}")
         Timber.v("SYNC PSK: ${protectedSecretKey.encode()}")
@@ -81,7 +85,11 @@ class NativeLib constructor(
         return Base64.encodeToString(this, Base64.NO_WRAP)
     }
 
-    private external fun init(
+    fun String.decode(): ByteArray {
+        return Base64.decode(this, Base64.NO_WRAP)
+    }
+
+    private external fun generateAccountKeys(
         primaryKey: ByteArray,
         secretKey: ByteArray,
         protectedSecretKey: ByteArray,

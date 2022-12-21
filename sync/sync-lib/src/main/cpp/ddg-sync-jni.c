@@ -6,7 +6,7 @@
 #include "DDGSyncCrypto.h"
 
 JNIEXPORT jint JNICALL
-Java_com_duckduckgo_sync_lib_NativeLib_init(JNIEnv* env, jclass class,
+Java_com_duckduckgo_sync_lib_NativeLib_generateAccountKeys(JNIEnv* env, jclass class,
     jbyteArray primaryKey,
     jbyteArray secretKey,
     jbyteArray protectedSecretKey,

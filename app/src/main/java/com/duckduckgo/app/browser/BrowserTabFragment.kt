@@ -565,7 +565,7 @@ class BrowserTabFragment :
         }
         sitePermissionsDialogLauncher.registerPermissionLauncher(this)
         var nativeLib = NativeLib(requireContext())
-        Toast.makeText(requireContext(), "${nativeLib.initialize().result}", Toast.LENGTH_LONG).show()
+        Toast.makeText(requireContext(), "${nativeLib.generateAccountKeys().result}", Toast.LENGTH_LONG).show()
     }
 
     private fun resumeWebView() {
