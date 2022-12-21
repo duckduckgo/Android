@@ -18,6 +18,7 @@ package com.duckduckgo.sync.impl.di
 
 import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.impl.SyncService
 import com.duckduckgo.sync.crypto.SyncNativeLib
 import com.duckduckgo.sync.store.EncryptedSharedPrefsProvider
 import com.duckduckgo.sync.store.SharedPrefsProvider
@@ -27,6 +28,8 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
+import retrofit2.Retrofit
+import javax.inject.Named
 
 @Module
 @ContributesTo(AppScope::class)
@@ -48,5 +51,10 @@ object SyncStoreModule {
     @SingleInstanceIn(AppScope::class)
     fun providesNativeLib(context: Context): SyncNativeLib {
         return SyncNativeLib(context)
+    }
+
+    @Provides
+    fun pixelService(@Named("nonCaching") retrofit: Retrofit): SyncService {
+        return retrofit.create(SyncService::class.java)
     }
 }
