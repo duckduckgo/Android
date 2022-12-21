@@ -74,16 +74,18 @@
         />
 
 
-        <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryLowercase
+        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
             android:id="@+id/goToSettingsButton"
+            app:buttonSize="large"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:text="@string/atp_PromoteAlwaysOnDialogSettings"
         />
 
-        <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryLarge
+        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonSecondary
             android:id="@+id/notNowButton"
+            app:buttonSize="large"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
