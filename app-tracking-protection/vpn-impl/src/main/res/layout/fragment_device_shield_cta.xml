@@ -44,9 +44,9 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="ContentDescription" />
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/deviceShieldCtaHeader"
-        style="@style/DeviceShield.NewTab.TextStyle"
+        app:typography="body2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="22dp"

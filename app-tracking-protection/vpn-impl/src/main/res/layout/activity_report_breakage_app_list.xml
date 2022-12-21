@@ -111,6 +111,6 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/keyline_4"
             android:enabled="false"
-            android:text="@string/daxDialogNext"/>
+            android:text="@string/atp_ReportBreakageAppNextCta"/>
 
 </LinearLayout>
