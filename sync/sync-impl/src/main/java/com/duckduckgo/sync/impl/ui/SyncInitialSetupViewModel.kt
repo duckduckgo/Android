@@ -20,6 +20,10 @@ import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.SyncDeviceIds
+import com.duckduckgo.sync.impl.SyncApi
+import com.duckduckgo.sync.lib.AccountKeys
+import com.duckduckgo.sync.lib.SyncNativeLib
+import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,6 +34,8 @@ class SyncInitialSetupViewModel
 @Inject
 constructor(
     private val syncDeviceIds: SyncDeviceIds,
+    private val nativeLib: SyncNativeLib,
+    private val syncApi: SyncApi,
 ) : ViewModel() {
 
     private val viewState = MutableStateFlow(ViewState())
@@ -49,5 +55,17 @@ constructor(
                 deviceId = syncDeviceIds.deviceId(),
             ),
         )
+    }
+
+    fun onCreateAccountClicked() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val account: AccountKeys = nativeLib.generateAccountKeys()
+            syncApi.createAccount(
+                account.userId,
+                account.passwordHash,
+                account.protectedSecretKey,
+                syncDeviceIds.deviceId(),
+                syncDeviceIds.deviceName())
+        }
     }
 }

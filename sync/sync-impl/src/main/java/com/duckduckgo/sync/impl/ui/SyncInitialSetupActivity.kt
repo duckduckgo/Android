@@ -39,6 +39,11 @@ class SyncInitialSetupActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
         observeUiEvents()
+        configureListeners()
+    }
+
+    private fun configureListeners() {
+        binding.createAccountButton.setOnClickListener { viewModel.onCreateAccountClicked() }
     }
 
     private fun observeUiEvents() {

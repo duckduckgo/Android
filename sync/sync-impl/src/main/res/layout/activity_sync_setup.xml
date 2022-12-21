@@ -73,5 +73,12 @@
             android:layout_height="wrap_content"
             app:typography="body1" />
 
+    <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimarySmall
+            android:id="@+id/createAccountButton"
+            android:layout_width="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_height="wrap_content"
+            android:text="Create account"/>
+
     </LinearLayout>
 </ScrollView>
