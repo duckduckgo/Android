@@ -81,11 +81,13 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(
                     pixel.fire(AUTOFILL_AUTHENTICATION_TO_AUTOFILL_AUTH_SUCCESSFUL)
                     credentialInjector.shareCredentialsWithPage(originalUrl, selectedCredentials)
                 }
+
                 UserCancelled -> {
                     Timber.d("Autofill: user selected credential to use, but cancelled without authenticating")
                     pixel.fire(AUTOFILL_AUTHENTICATION_TO_AUTOFILL_AUTH_CANCELLED)
                     credentialInjector.returnNoCredentialsWithPage(originalUrl)
                 }
+
                 is Error -> {
                     Timber.w("Autofill: user selected credential to use, but there was an error when authenticating: ${it.reason}")
                     pixel.fire(AUTOFILL_AUTHENTICATION_TO_AUTOFILL_AUTH_FAILURE)

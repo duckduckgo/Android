@@ -19,16 +19,27 @@ package com.duckduckgo.autofill.ui.credential.management.viewing
 import android.text.Editable
 import android.text.TextWatcher
 import com.duckduckgo.autofill.impl.databinding.FragmentAutofillManagementEditModeBinding
+import com.duckduckgo.autofill.ui.credential.management.viewing.SaveStateWatcher.TextState
 import javax.inject.Inject
+
+fun FragmentAutofillManagementEditModeBinding.currentTextState(): TextState {
+    return TextState(
+        title = domainTitleEditText.text,
+        username = usernameEditText.text,
+        password = passwordEditText.text,
+        websiteUrl = domainEditText.text,
+        notes = notesEditText.text,
+    )
+}
 
 fun FragmentAutofillManagementEditModeBinding.watchSaveState(
     saveStateWatcher: SaveStateWatcher,
-    saveStateUpdater: (Boolean) -> Unit = {},
+    saveStateUpdater: () -> Unit = {},
 ) {
-    saveStateWatcher.start(saveStateUpdater) {
-        domainTitleEditText.text.isEmpty() && domainEditText.text.isEmpty() &&
-            notesEditText.text.isEmpty() && passwordEditText.text.isEmpty() && usernameEditText.text.isEmpty()
+    saveStateWatcher.start {
+        saveStateUpdater()
     }
+    domainTitleEditText.addTextChangedListener(saveStateWatcher)
     domainEditText.addTextChangedListener(saveStateWatcher)
     notesEditText.addTextChangedListener(saveStateWatcher)
     usernameEditText.addTextChangedListener(saveStateWatcher)
@@ -44,14 +55,11 @@ fun FragmentAutofillManagementEditModeBinding.removeSaveStateWatcher(saveStateWa
 }
 
 class SaveStateWatcher @Inject constructor() : TextWatcher {
-    private var _saveStateUpdater: (Boolean) -> Unit = {}
-    private var _allTextInputIsEmpty: () -> Boolean = { false }
+    private var _saveStateUpdater: () -> Unit = {}
     fun start(
-        saveStateUpdater: (Boolean) -> Unit,
-        allTextInputIsEmpty: () -> Boolean,
+        saveStateUpdater: () -> Unit,
     ) {
         _saveStateUpdater = saveStateUpdater
-        _allTextInputIsEmpty = allTextInputIsEmpty
     }
 
     override fun beforeTextChanged(
@@ -71,6 +79,27 @@ class SaveStateWatcher @Inject constructor() : TextWatcher {
     }
 
     override fun afterTextChanged(s: Editable?) {
-        _saveStateUpdater(!_allTextInputIsEmpty())
+        _saveStateUpdater()
+    }
+
+    data class TextState(
+        val title: String,
+        val username: String,
+        val password: String,
+        val websiteUrl: String,
+        val notes: String,
+    ) {
+        fun isEmpty(): Boolean {
+            return title.isBlank() && username.isBlank() && password.isBlank() && websiteUrl.isBlank() && notes.isBlank()
+        }
+
+        override fun toString(): String {
+            return "TextState(" +
+                "title='$title', " +
+                "username='$username', " +
+                "password='********', " +
+                "websiteUrl='$websiteUrl', " +
+                "notes='$notes')"
+        }
     }
 }

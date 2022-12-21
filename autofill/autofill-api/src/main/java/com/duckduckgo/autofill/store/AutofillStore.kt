@@ -95,6 +95,11 @@ interface AutofillStore {
     suspend fun getAllCredentials(): Flow<List<LoginCredentials>>
 
     /**
+     * Returns a count of how many credentials are stored
+     */
+    suspend fun getCredentialCount(): Flow<Int>
+
+    /**
      * Deletes the credential with the given ID
      */
     suspend fun deleteCredentials(id: Long)

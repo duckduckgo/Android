@@ -31,7 +31,6 @@ class SuggestionListBuilder @Inject constructor(private val context: Context) {
         val list = mutableListOf<ListItem>()
 
         if (suggestions.isNotEmpty()) {
-            list.add(Divider)
             list.add(GroupHeading(context.getString(string.credentialManagementSuggestionsLabel)))
             list.addAll(suggestions.map { SuggestedCredential(it) })
             list.add(Divider)
