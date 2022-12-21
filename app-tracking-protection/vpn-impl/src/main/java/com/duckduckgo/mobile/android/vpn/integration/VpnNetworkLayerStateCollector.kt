@@ -24,12 +24,14 @@ import org.json.JSONObject
 
 @ContributesMultibinding(VpnScope::class)
 class VpnNetworkLayerStateCollector @Inject constructor(
-    private val vpnNetworkStackProvider: VpnNetworkStackProvider,
+    // TODO avoid circular dependency when introducing the VpnSocketProtector, see https://app.asana.com/0/0/1203590158968622/f
+//    private val vpnNetworkStackProvider: VpnNetworkStackProvider,
 ) : VpnStateCollectorPlugin {
 
     override suspend fun collectVpnRelatedState(appPackageId: String?): JSONObject {
         return JSONObject().apply {
-            put("name", vpnNetworkStackProvider.provideNetworkStack().name)
+//            put("name", vpnNetworkStackProvider.provideNetworkStack().name)
+            put("name", "netp-ng")
         }
     }
 

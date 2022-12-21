@@ -55,6 +55,9 @@ import com.duckduckgo.mobile.android.vpn.prefs.VpnPreferences
 import com.duckduckgo.mobile.android.vpn.service.state.VpnStateMonitorService
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.ui.notification.VpnEnabledNotificationBuilder
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Binds
+import dagger.Module
 import dagger.android.AndroidInjection
 import java.net.Inet4Address
 import java.net.Inet6Address
@@ -68,7 +71,7 @@ import logcat.logcat
 
 @Suppress("NoHardcodedCoroutineDispatcher")
 @InjectWith(VpnScope::class)
-class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
+class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), VpnSocketProtector {
 
     @Inject
     lateinit var vpnPreferences: VpnPreferences
@@ -757,4 +760,11 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         private const val ACTION_RESTART_VPN = "ACTION_RESTART_VPN"
         private const val ACTION_ALWAYS_ON_START = "android.net.VpnService"
     }
+}
+
+@Module
+@ContributesTo(VpnScope::class)
+abstract class VpnSocketProtectorModule {
+    @Binds
+    abstract fun bindVpnSocketProtector(impl: TrackerBlockingVpnService): VpnSocketProtector
 }

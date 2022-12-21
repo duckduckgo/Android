@@ -59,11 +59,7 @@ class WgVpnNetworkStack @Inject constructor(
                     addresses = config?.getInterface()?.addresses?.associate { Pair(it.address, it.mask) } ?: emptyMap(),
                     dns = emptySet(),
                     routes = emptyMap(),
-                    // TODO: for now we exclude our app from going through the VPN
-                    appExclusionList = setOf(
-                        "com.duckduckgo.mobile.android.debug.netp",
-                        "com.duckduckgo.mobile.android.netp",
-                    ),
+                    appExclusionList = setOf(),
                 ),
             )
         } catch (e: Exception) {
