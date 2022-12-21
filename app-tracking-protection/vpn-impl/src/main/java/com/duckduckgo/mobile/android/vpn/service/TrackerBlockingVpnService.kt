@@ -38,7 +38,6 @@ import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.integration.VpnNetworkStackProvider
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceState.ENABLING
-import com.duckduckgo.mobile.android.vpn.model.VpnServiceStateStats
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack.VpnTunnelConfig
 import com.duckduckgo.mobile.android.vpn.network.util.asRoute
 import com.duckduckgo.mobile.android.vpn.network.util.getActiveNetwork
@@ -232,8 +231,10 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
                 return@withContext
             }
 
-            // We need to rethink how to log this state. This will likely change.
-            vpnServiceStateStatsDao.insert(VpnServiceStateStats(state = ENABLING))
+            vpnServiceCallbacksPluginPoint.getPlugins().forEach {
+                logcat { "VPN log: onVpnStarting ${it.javaClass} callback" }
+                it.onVpnStarting(this)
+            }
         }
 
         vpnNetworkStack.onPrepareVpn().getOrNull().also {
@@ -274,7 +275,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         }
 
         vpnServiceCallbacksPluginPoint.getPlugins().forEach {
-            logcat { "VPN log: starting ${it.javaClass} callback" }
+            logcat { "VPN log: onVpnStarted ${it.javaClass} callback" }
             it.onVpnStarted(this)
         }
 
@@ -451,7 +452,10 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         }
     }
 
-    private suspend fun stopVpn(reason: VpnStopReason, shouldStopCallbacks: Boolean = true) = withContext(Dispatchers.IO) {
+    private suspend fun stopVpn(
+        reason: VpnStopReason,
+        hasVpnAlreadyStarted: Boolean = true,
+    ) = withContext(Dispatchers.IO) {
         logcat { "VPN log: Stopping VPN. $reason" }
 
         vpnNetworkStack.onStopVpn()
@@ -461,10 +465,16 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
 
         sendStopPixels(reason)
 
-        if (shouldStopCallbacks) {
+        // If VPN has been started, then onVpnStopped must be called. Else, an error might have occurred before start so we call onVpnStartFailed
+        if (hasVpnAlreadyStarted) {
             vpnServiceCallbacksPluginPoint.getPlugins().forEach {
                 logcat { "VPN log: stopping ${it.javaClass} callback" }
                 it.onVpnStopped(this, reason)
+            }
+        } else {
+            vpnServiceCallbacksPluginPoint.getPlugins().forEach {
+                logcat { "VPN log: onVpnStartFailed ${it.javaClass} callback" }
+                it.onVpnStartFailed(this)
             }
         }
 

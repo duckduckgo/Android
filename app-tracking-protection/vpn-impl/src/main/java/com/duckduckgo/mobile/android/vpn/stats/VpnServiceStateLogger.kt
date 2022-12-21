@@ -60,7 +60,20 @@ class VpnServiceStateLogger @Inject constructor(
     private val dispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
     private val job = ConflatedJob()
 
+    override fun onVpnStarting(coroutineScope: CoroutineScope) {
+        job += coroutineScope.launch(dispatcher) {
+            logcat { "VpnServiceStateLogger, new state ENABLING" }
+            vpnDatabase.vpnServiceStateDao().insert(VpnServiceStateStats(state = VpnServiceState.ENABLING))
+        }
+    }
+
+    override fun onVpnStartFailed(coroutineScope: CoroutineScope) {
+        onVpnStopped(coroutineScope, VpnStopReason.ERROR)
+    }
+
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
+        job.cancel()
+
         job += coroutineScope.launch(dispatcher) {
             logcat { "VpnServiceStateLogger, new state ENABLED" }
             vpnDatabase.vpnServiceStateDao().insert(VpnServiceStateStats(state = VpnServiceState.ENABLED))
