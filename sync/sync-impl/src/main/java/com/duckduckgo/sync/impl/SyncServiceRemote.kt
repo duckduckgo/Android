@@ -33,10 +33,14 @@ interface SyncApi {
         deviceName: String,
     ): Result<AccountCreatedResponse>
 
-    fun logout(
-        token: String,
+    fun login(
+        userID: String,
+        hashedPassword: String,
         deviceId: String,
-    ): Result<Logout>
+        deviceName: String
+    )
+
+    fun logout(token: String, deviceId: String): Result<Logout>
 
     fun deleteAccount(token: String): Result<Boolean>
 }
@@ -105,6 +109,44 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
         return onSuccess(response) {
             Result.Success(true)
         }
+    }
+
+    override fun login(
+            userID: String,
+            hashedPassword: String,
+            deviceId: String,
+            deviceName: String,
+    ) {
+        runCatching {
+            val call = syncService.login(Login(
+                    user_id = userID,
+                    hashed_password = hashedPassword,
+                    device_id = deviceId,
+                    device_name = deviceName,
+            ))
+            call.execute()
+        }.onSuccess { response ->
+            if (response.isSuccessful) {
+                Timber.i("SYNC login success ${response.code()}")
+                Timber.i("SYNC login success body ${response.body()}")
+                syncEncryptedStore.token =
+                        response.body()?.token ?: throw IllegalStateException("Empty body")
+            } else {
+                response.errorBody()?.let { errorBody ->
+                    val converter: Converter<ResponseBody, ErrorResponse> =
+                            retrofit.responseBodyConverter(
+                                    ErrorResponse::class.java, arrayOfNulls(0))
+                    val errorResponse =
+                            converter.convert(errorBody)
+                                    ?: throw IllegalArgumentException("Can't parse body")
+                    Timber.i("SYNC login failed ${errorResponse.code} ${errorResponse.error}")
+                }
+                        ?: kotlin.run {
+                            Timber.i("SYNC login failed ${response.code()} ${response.message()}")
+                        }
+            }
+        }
+                .onFailure { throwable -> Timber.i("SYNC login failed ${throwable.message}") }
     }
 
     private fun <T, R> onSuccess(
