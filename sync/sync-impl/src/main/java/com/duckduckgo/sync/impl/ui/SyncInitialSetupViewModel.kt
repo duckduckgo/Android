@@ -62,6 +62,8 @@ constructor(
             val account: AccountKeys = nativeLib.generateAccountKeys()
             syncApi.createAccount(
                 account.userId,
+                account.primaryKey,
+                account.secretKey,
                 account.passwordHash,
                 account.protectedSecretKey,
                 syncDeviceIds.deviceId(),

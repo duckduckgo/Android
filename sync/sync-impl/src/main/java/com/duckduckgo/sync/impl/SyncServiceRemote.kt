@@ -30,6 +30,8 @@ import java.lang.IllegalArgumentException
 interface SyncApi {
     fun createAccount(
         userID: String,
+        primaryKey: String,
+        secretKey: String,
         hashedPassword: String,
         protectedEncryptionKey: String,
         deviceIds: String,
@@ -47,6 +49,8 @@ constructor(
 ) : SyncApi {
     override fun createAccount(
         userID: String,
+        primaryKey: String,
+        secretKey: String,
         hashedPassword: String,
         protectedEncryptionKey: String,
         deviceIds: String,
@@ -65,6 +69,8 @@ constructor(
                     Timber.i("SYNC signup success ${response.code()} ${response.message()}")
                     syncEncryptedStore.token =
                         response.body()?.token ?: throw IllegalStateException("Empty body")
+                    syncEncryptedStore.primaryKey = primaryKey
+                    syncEncryptedStore.secretKey = secretKey
                 } else {
                     response.errorBody()?.let { errorBody ->
                         val converter: Converter<ResponseBody, ErrorResponse> =
