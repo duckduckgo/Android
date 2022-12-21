@@ -37,9 +37,10 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:id="@+id/appBreakageReportFeature"
-                style="@style/TextAppearance.DuckDuckGo.Body2"
+                app:typography="body2"
+                app:textType="secondary"
                 android:paddingTop="@dimen/keyline_4"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
