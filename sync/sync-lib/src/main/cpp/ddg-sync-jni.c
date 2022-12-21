@@ -48,3 +48,30 @@ Java_com_duckduckgo_sync_lib_NativeLib_generateAccountKeys(JNIEnv* env, jclass c
 
     return result;
 }
+
+JNIEXPORT jint JNICALL
+Java_com_duckduckgo_sync_lib_NativeLib_prepareForLogin(
+    JNIEnv *env,
+    jclass clazz,
+    jbyteArray passwordHash,
+    jbyteArray stretchedPrimaryKey,
+    jbyteArray primaryKey) {
+
+    // Get the input arrays as C arrays
+    jbyte *passwordHashCArray = (*env)->GetByteArrayElements(env, passwordHash, NULL);
+    jbyte *stretchedPrimaryKeyCArray = (*env)->GetByteArrayElements(env, stretchedPrimaryKey, NULL);
+    jbyte *primaryKeyCArray = (*env)->GetByteArrayElements(env, primaryKey, NULL);
+
+    jint result = 111;
+    result = ddgSyncPrepareForLogin(
+        (unsigned char *)passwordHashCArray,
+        (unsigned char *)stretchedPrimaryKeyCArray,
+        (unsigned char *)primaryKeyCArray
+    );
+
+    // Release the input arrays
+    (*env)->ReleaseByteArrayElements(env, passwordHash, passwordHashCArray, JNI_COMMIT);
+    (*env)->ReleaseByteArrayElements(env, stretchedPrimaryKey, stretchedPrimaryKeyCArray, JNI_COMMIT);
+
+    return result;
+}

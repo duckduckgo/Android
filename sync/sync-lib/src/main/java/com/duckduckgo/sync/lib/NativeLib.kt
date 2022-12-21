@@ -81,6 +81,33 @@ class NativeLib constructor(
         )
     }
 
+    /**
+     * Prepare keys for calling /login when using a recovery code.  Once the protected secret key has been retrieved, use `ddgSyncDecrypt` to extract the secret key, using the stretched primary key as the secret key for the decryption.
+     *
+     * @param passwordHash OUT
+     * @param stretchedPrimaryKey OUT
+     * @param primaryKey IN
+     */
+    fun prepareForLogin(
+        primaryKey: ByteArray
+    ): Login{
+        val passwordHash = ByteArray(32)
+        val stretchedPrimaryKey = ByteArray(32)
+
+        val result: Long = prepareForLogin(passwordHash, stretchedPrimaryKey, primaryKey)
+
+        Timber.v("SYNC PK: ${primaryKey.encode()}")
+        Timber.v("SYNC PH: ${passwordHash.encode()}")
+        Timber.v("SYNC SPK: ${stretchedPrimaryKey.encode()}")
+
+        return Login(
+            result = result,
+            passwordHash = passwordHash.encode(),
+            stretchedPrimaryKey = stretchedPrimaryKey.encode(),
+            primaryKey = primaryKey.encode(),
+        )
+    }
+
     fun ByteArray.encode(): String {
         return Base64.encodeToString(this, Base64.NO_WRAP)
     }
@@ -97,6 +124,12 @@ class NativeLib constructor(
         userId: String,
         password: String,
     ): Long
+
+    private external fun prepareForLogin(
+        passwordHash: ByteArray,
+        stretchedPrimaryKey: ByteArray,
+        primaryKey: ByteArray,
+    ): Long
 }
 
 class Account(
@@ -107,4 +140,11 @@ class Account(
     val passwordHash: String,
     val userId: String,
     val password: String,
+)
+
+class Login(
+    val result: Long,
+    val passwordHash: String,
+    val stretchedPrimaryKey: String,
+    val primaryKey: String
 )
