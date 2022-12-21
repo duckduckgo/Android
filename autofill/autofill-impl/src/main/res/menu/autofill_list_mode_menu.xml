@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +14,13 @@
   ~ limitations under the License.
   -->
 
-<resources>
-    <string name="autofillManagementAddLogin">Add Login</string>
-</resources>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/addLoginManually"
+        android:icon="@drawable/ic_baseline_add_24"
+        android:title="@string/autofillManagementAddLogin"
+        app:showAsAction="always" />
+
+</menu>
