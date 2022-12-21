@@ -7,6 +7,7 @@ interface SyncStore {
     var userId: String?
     var deviceName: String?
     var deviceId: String?
+    var token: String?
 }
 
 class SyncSharedPrefsStore
@@ -57,10 +58,23 @@ constructor(
             }
         }
 
+    override var token: String?
+        get() = encryptedPreferences?.getString(KEY_TOKEN, null)
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                if (value == null) {
+                    remove(KEY_TOKEN)
+                } else {
+                    putString(KEY_TOKEN, value)
+                }
+            }
+        }
+
     companion object {
         private const val FILENAME = "com.duckduckgo.sync.store"
         private const val KEY_USER_ID = "KEY_USER_ID"
         private const val KEY_DEVICE_ID = "KEY_DEVICE_ID"
         private const val KEY_DEVICE_NAME = "KEY_DEVICE_NAME"
+        private const val KEY_TOKEN = "KEY_TOKEN"
     }
 }

@@ -16,22 +16,16 @@
 
 package com.duckduckgo.sync.impl
 
-import com.duckduckgo.app.global.AppUrl
-import com.duckduckgo.sync.impl.ui.SyncDeviceIds
-import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.Body
-import retrofit2.http.GET
 import retrofit2.http.POST
-import retrofit2.http.Query
-import java.util.*
 
 interface SyncService {
 
     @POST("https://dev-sync-use.duckduckgo.com/sync/signup")
     fun signup(
         @Body request: Signup,
-    ): Call<ResponseBody>
+    ): Call<AccountCreatedResponse>
 }
 
 data class Signup(
@@ -40,4 +34,14 @@ data class Signup(
     val protected_encryption_key: String,
     val device_id: String,
     val device_name: String,
+)
+
+data class AccountCreatedResponse(
+    val user_id: String,
+    val token: String,
+)
+
+data class ErrorResponse(
+    val code: Int,
+    val error: String,
 )
