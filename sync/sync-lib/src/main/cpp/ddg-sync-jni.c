@@ -29,8 +29,8 @@ Java_com_duckduckgo_sync_lib_NativeLib_init(JNIEnv* env, jclass class,
     // Convert the jstring arguments to const char*
     const char* userIdChars = (*env)->GetStringUTFChars(env, userId, NULL);
     const char* passwordChars = (*env)->GetStringUTFChars(env, password, NULL);
-
-    ddgSyncGenerateAccountKeys(
+    jint result = 111;
+    result = ddgSyncGenerateAccountKeys(
         (unsigned char*) primaryKeyElements,
         (unsigned char*) secretKeyElements,
         (unsigned char*) protectedSecretKeyElements,
@@ -45,4 +45,6 @@ Java_com_duckduckgo_sync_lib_NativeLib_init(JNIEnv* env, jclass class,
     (*env)->ReleaseByteArrayElements(env, passwordHash, passwordHashElements, JNI_COMMIT);
     (*env)->ReleaseStringUTFChars(env, userId, userIdChars);
     (*env)->ReleaseStringUTFChars(env, password, passwordChars);
+
+    return result;
 }

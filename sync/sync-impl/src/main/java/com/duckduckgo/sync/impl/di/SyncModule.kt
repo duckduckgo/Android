@@ -22,6 +22,7 @@ import com.duckduckgo.sync.store.EncryptedSharedPrefsProvider
 import com.duckduckgo.sync.store.SharedPrefsProvider
 import com.duckduckgo.sync.store.SyncSharedPrefsStore
 import com.duckduckgo.sync.store.SyncStore
+import com.duckduckgo.sync.lib.NativeLib
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -41,5 +42,11 @@ object SyncStoreModule {
     @SingleInstanceIn(AppScope::class)
     fun provideSharedPrefsProvider(context: Context): SharedPrefsProvider {
         return EncryptedSharedPrefsProvider(context)
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providesNativeLib(context: Context): NativeLib {
+        return NativeLib(context)
     }
 }
