@@ -4,3 +4,6 @@
 [submodule "submodules/privacy-grade"]
 	path = submodules/privacy-grade
 	url = https://github.com/duckduckgo/privacy-grade
+[submodule "vpn-network/vpn-network-impl/src/main/cpp/netguard"]
+	path = vpn-network/vpn-network-impl/src/main/cpp/netguard
+	url = git@github.com:duckduckgo/netguard.git

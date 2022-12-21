@@ -33,7 +33,6 @@ dependencies {
 
     implementation Kotlin.stdlib.jdk7
     implementation "com.squareup.logcat:logcat:_"
-    implementation "com.duckduckgo.netguard:netguard-android:_"
 
     implementation Google.dagger
     implementation AndroidX.core.ktx
@@ -50,6 +49,19 @@ dependencies {
 }
 
 android {
+    defaultConfig {
+        externalNativeBuild {
+            cmake {
+                targets "netguard", "libwg-go.so"
+            }
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path "CMakeLists.txt"
+        }
+    }
     anvil {
         generateDaggerFactories = true // default is false
     }
@@ -58,6 +70,6 @@ android {
             includeAndroidResources = true
         }
     }
-  namespace 'com.duckduckgo.vpn.network.impl'
+    namespace 'com.duckduckgo.vpn.network.impl'
 }
 
