@@ -44,7 +44,6 @@ import com.duckduckgo.mobile.android.vpn.ui.onboarding.Command.LaunchVPN
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.Command.RequestVPNPermission
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.Command.ShowVpnAlwaysOnConflictDialog
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.Command.ShowVpnConflictDialog
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPVpnConflictDialog
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
