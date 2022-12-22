@@ -42,7 +42,7 @@ dependencies {
     implementation KotlinX.coroutines.core
 
     // ViewModel and LiveData
-    implementation AndroidX.lifecycle.runtimeKtx
+    implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.lifecycle.viewModelKtx
     implementation AndroidX.lifecycle.process
 
