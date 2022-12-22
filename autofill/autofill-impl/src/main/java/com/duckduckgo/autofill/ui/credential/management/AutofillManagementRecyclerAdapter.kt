@@ -32,6 +32,7 @@ import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ItemRowAutofillCredentialsManagementScreenBinding
 import com.duckduckgo.autofill.impl.databinding.ItemRowAutofillCredentialsManagementScreenDividerBinding
 import com.duckduckgo.autofill.impl.databinding.ItemRowAutofillCredentialsManagementScreenHeaderBinding
+import com.duckduckgo.autofill.impl.databinding.ItemRowSearchNoResultsBinding
 import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter.ContextMenuAction.CopyPassword
 import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter.ContextMenuAction.CopyUsername
 import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter.ContextMenuAction.Delete
@@ -40,6 +41,7 @@ import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecycl
 import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem.CredentialListItem.SuggestedCredential
 import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem.Divider
 import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem.GroupHeading
+import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem.NoMatchingSearchResults
 import com.duckduckgo.autofill.ui.credential.management.sorting.CredentialGrouper
 import com.duckduckgo.autofill.ui.credential.management.suggestion.SuggestionListBuilder
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
@@ -82,6 +84,11 @@ class AutofillManagementRecyclerAdapter(
                 DividerViewHolder(binding)
             }
 
+            ITEM_VIEW_TYPE_NO_MATCHING_SEARCH_RESULTS -> {
+                val binding = ItemRowSearchNoResultsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                NoMatchingSearchResultsViewHolder(binding)
+            }
+
             else -> throw IllegalArgumentException("Unknown view type")
         }
     }
@@ -94,7 +101,17 @@ class AutofillManagementRecyclerAdapter(
             is SuggestedCredentialsViewHolder -> onBindViewHolderSuggestedCredential(position, viewHolder)
             is CredentialsViewHolder -> onBindViewHolderCredential(position, viewHolder)
             is HeadingViewHolder -> onBindViewHolderHeading(position, viewHolder)
+            is NoMatchingSearchResultsViewHolder -> onBindViewHolderNoMatchingSearchResults(position, viewHolder)
         }
+    }
+
+    private fun onBindViewHolderNoMatchingSearchResults(
+        position: Int,
+        viewHolder: NoMatchingSearchResultsViewHolder,
+    ) {
+        val item = listItems[position] as NoMatchingSearchResults
+        val formattedNoResultsText = viewHolder.itemView.context.getString(R.string.autofillManagementNoSearchResults, item.query)
+        viewHolder.binding.noMatchingLoginsHint.text = formattedNoResultsText
     }
 
     private fun onBindViewHolderCredential(
@@ -147,6 +164,7 @@ class AutofillManagementRecyclerAdapter(
             is Credential -> ITEM_VIEW_TYPE_CREDENTIAL
             is SuggestedCredential -> ITEM_VIEW_TYPE_SUGGESTED_CREDENTIAL
             is Divider -> ITEM_VIEW_TYPE_DIVIDER
+            is NoMatchingSearchResults -> ITEM_VIEW_TYPE_NO_MATCHING_SEARCH_RESULTS
         }
     }
 
@@ -199,6 +217,12 @@ class AutofillManagementRecyclerAdapter(
         notifyDataSetChanged()
     }
 
+    @SuppressLint("NotifyDataSetChanged")
+    fun showNoMatchingSearchResults(query: String) {
+        listItems = listOf(NoMatchingSearchResults(query))
+        notifyDataSetChanged()
+    }
+
     override fun getItemCount(): Int = listItems.size
 
     sealed class ContextMenuAction {
@@ -216,17 +240,20 @@ class AutofillManagementRecyclerAdapter(
 
         data class GroupHeading(val label: String) : ListItem
         object Divider : ListItem
+        data class NoMatchingSearchResults(val query: String) : ListItem
     }
 
     open class CredentialsViewHolder(open val binding: ItemRowAutofillCredentialsManagementScreenBinding) : RecyclerView.ViewHolder(binding.root)
     class SuggestedCredentialsViewHolder(override val binding: ItemRowAutofillCredentialsManagementScreenBinding) : CredentialsViewHolder(binding)
     class HeadingViewHolder(val binding: ItemRowAutofillCredentialsManagementScreenHeaderBinding) : RecyclerView.ViewHolder(binding.root)
     class DividerViewHolder(val binding: ItemRowAutofillCredentialsManagementScreenDividerBinding) : RecyclerView.ViewHolder(binding.root)
+    class NoMatchingSearchResultsViewHolder(val binding: ItemRowSearchNoResultsBinding) : RecyclerView.ViewHolder(binding.root)
 
     companion object {
         private const val ITEM_VIEW_TYPE_HEADER = 0
         private const val ITEM_VIEW_TYPE_CREDENTIAL = 1
         private const val ITEM_VIEW_TYPE_SUGGESTED_CREDENTIAL = 2
         private const val ITEM_VIEW_TYPE_DIVIDER = 3
+        private const val ITEM_VIEW_TYPE_NO_MATCHING_SEARCH_RESULTS = 4
     }
 }
