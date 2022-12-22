@@ -66,20 +66,19 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         parent: ViewGroup,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_remote_message)) {
         override fun bind(component: Component) {
-
             val smallMessage = Message(title = "Small Message", subtitle = "Body text goes here. This component doesn't have buttons")
             val bigSingleMessage = Message(
                 illustration = R.drawable.ic_announce,
                 title = "Big Single  Message",
                 subtitle = "Body text goes here. This component has one button",
-                action = "Primary"
+                action = "Primary",
             )
             val bigTwoActionsMessage = Message(
                 illustration = R.drawable.ic_ddg_announce,
                 title = "Big Two Actions Message",
                 subtitle = "Body text goes here. This component has two buttons",
                 action = "Primary",
-                action2 = "Secondary"
+                action2 = "Secondary",
             )
 
             val bigTwoActionsUpdateMessage = Message(
@@ -87,13 +86,13 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 title = "Big Two Actions Message",
                 subtitle = "Body text goes here. This component has two buttons and showcases and app update",
                 action = "Primary",
-                action2 = "Secondary"
+                action2 = "Secondary",
             )
 
             val mediumMessage = Message(
                 illustration = R.drawable.ic_critical_update,
                 title = "Big Single  Message",
-                subtitle = "Body text goes here. This component has one button"
+                subtitle = "Body text goes here. This component has one button",
             )
 
             view.findViewById<MessageCta>(R.id.small_remote_message).apply {
