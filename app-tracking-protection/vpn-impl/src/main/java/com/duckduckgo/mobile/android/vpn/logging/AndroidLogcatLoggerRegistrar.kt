@@ -16,6 +16,8 @@
 
 package com.duckduckgo.mobile.android.vpn.logging
 
+import androidx.lifecycle.LifecycleOwner
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.lifecycle.VpnProcessLifecycleObserver
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
@@ -30,9 +32,17 @@ import logcat.logcat
     scope = AppScope::class,
     boundType = VpnProcessLifecycleObserver::class,
 )
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = MainProcessLifecycleObserver::class,
+)
 class AndroidLogcatLoggerRegistrar @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
-) : VpnProcessLifecycleObserver {
+) : VpnProcessLifecycleObserver, MainProcessLifecycleObserver {
+
+    override fun onCreate(owner: LifecycleOwner) {
+        onVpnProcessCreated()
+    }
 
     override fun onVpnProcessCreated() {
         if (appBuildConfig.isDebug) {
