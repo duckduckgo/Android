@@ -15,228 +15,228 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@drawable/popup_menu_bg"
-    android:orientation="vertical">
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:background="@drawable/popup_menu_bg"
+              android:orientation="vertical">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:layout_marginTop="@dimen/keyline_4"
-        android:layout_marginBottom="@dimen/keyline_4"
-        android:layout_marginStart="@dimen/keyline_6"
-        android:layout_marginEnd="@dimen/keyline_6">
+            android:id="@+id/header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/keyline_4"
+            android:layout_marginBottom="@dimen/keyline_4"
+            android:layout_marginStart="@dimen/keyline_6"
+            android:layout_marginEnd="@dimen/keyline_6">
 
         <ImageButton
-            android:id="@+id/backMenuItem"
-            style="@style/Widget.DuckDuckGo.NavigationalIcon"
-            android:contentDescription="@string/back"
-            android:src="@drawable/ic_arrow_left_24"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+                android:id="@+id/backMenuItem"
+                style="@style/Widget.DuckDuckGo.NavigationalIcon"
+                android:contentDescription="@string/back"
+                android:src="@drawable/ic_arrow_left_24"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
 
         <ImageButton
-            android:id="@+id/forwardMenuItem"
-            style="@style/Widget.DuckDuckGo.NavigationalIcon"
-            android:contentDescription="@string/forward"
-            android:src="@drawable/ic_arrow_right_24"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/refreshMenuItem"
-            app:layout_constraintStart_toEndOf="@+id/backMenuItem"
-            app:layout_constraintTop_toTopOf="parent" />
+                android:id="@+id/forwardMenuItem"
+                style="@style/Widget.DuckDuckGo.NavigationalIcon"
+                android:contentDescription="@string/forward"
+                android:src="@drawable/ic_arrow_right_24"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/refreshMenuItem"
+                app:layout_constraintStart_toEndOf="@+id/backMenuItem"
+                app:layout_constraintTop_toTopOf="parent"/>
 
         <ImageButton
-            android:id="@+id/refreshMenuItem"
-            style="@style/Widget.DuckDuckGo.NavigationalIcon"
-            android:contentDescription="@string/refresh"
-            android:src="@drawable/ic_reload_24"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+                android:id="@+id/refreshMenuItem"
+                style="@style/Widget.DuckDuckGo.NavigationalIcon"
+                android:contentDescription="@string/refresh"
+                android:src="@drawable/ic_reload_24"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        app:defaultPadding="false"
-        android:paddingTop="8dp"
-        android:paddingBottom="0dp"/>
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            app:defaultPadding="false"
+            android:paddingTop="8dp"
+            android:paddingBottom="0dp"/>
 
     <View
-        android:id="@+id/dividerShadow"
-        android:layout_height="3dp"
-        android:layout_width="match_parent"
-        android:visibility="invisible"
-        android:background="?attr/bottomShadowBackground"/>
+            android:id="@+id/dividerShadow"
+            android:layout_height="3dp"
+            android:layout_width="match_parent"
+            android:visibility="invisible"
+            android:background="?attr/bottomShadowBackground"/>
 
     <ScrollView
-        android:id="@+id/menuScrollableContent"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:overScrollMode="never">
-
-        <LinearLayout
+            android:id="@+id/menuScrollableContent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingBottom="@dimen/keyline_2">
+            android:overScrollMode="never">
 
-            <com.duckduckgo.mobile.android.ui.view.MenuItemView
-                android:id="@+id/newTabMenuItem"
+        <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:labelText="@string/newTabMenuItem"
-                app:iconDrawable="@drawable/ic_add_16" />
+                android:orientation="vertical"
+                android:paddingBottom="@dimen/keyline_2">
+
+            <com.duckduckgo.mobile.android.ui.view.MenuItemView
+                    android:id="@+id/newTabMenuItem"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:labelText="@string/newTabMenuItem"
+                    app:iconDrawable="@drawable/ic_add_16"/>
 
             <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
-                android:id="@+id/siteOptionsMenuDivider"
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent"
-                app:defaultPadding="false"
-                android:layout_marginTop="@dimen/keyline_empty"
-                android:layout_marginBottom="@dimen/keyline_empty"
-                android:layout_marginStart="@dimen/keyline_5"
-                android:layout_marginEnd="@dimen/keyline_5"/>
+                    android:id="@+id/siteOptionsMenuDivider"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    app:defaultPadding="false"
+                    android:layout_marginTop="@dimen/keyline_empty"
+                    android:layout_marginBottom="@dimen/keyline_empty"
+                    android:layout_marginStart="@dimen/keyline_5"
+                    android:layout_marginEnd="@dimen/keyline_5"/>
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
-                android:id="@+id/sharePageMenuItem"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:labelText="@string/shareMenuTitle"
-                app:iconDrawable="@drawable/ic_share_16_1" />
+                    android:id="@+id/sharePageMenuItem"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:labelText="@string/shareMenuTitle"
+                    app:iconDrawable="@drawable/ic_share_16"/>
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
-                android:id="@+id/addBookmarksMenuItem"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:labelText="@string/addBookmarkMenuTitle"
-                app:iconDrawable="@drawable/ic_bookmark_16" />
+                    android:id="@+id/addBookmarksMenuItem"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:labelText="@string/addBookmarkMenuTitle"
+                    app:iconDrawable="@drawable/ic_bookmark_16"/>
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
-                android:id="@+id/addFavoriteMenuItem"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:labelText="@string/addFavoriteMenuTitle"
-                app:iconDrawable="@drawable/ic_favorite_16" />
+                    android:id="@+id/addFavoriteMenuItem"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:labelText="@string/addFavoriteMenuTitle"
+                    app:iconDrawable="@drawable/ic_favorite_16"/>
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
-                android:id="@+id/bookmarksMenuItem"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:labelText="@string/bookmarksMenuTitle"
-                app:iconDrawable="@drawable/ic_library_16" />
+                    android:id="@+id/bookmarksMenuItem"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:labelText="@string/bookmarksMenuTitle"
+                    app:iconDrawable="@drawable/ic_library_16"/>
 
             <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
-                android:id="@+id/browserOptionsMenuDivider"
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent"
-                android:paddingTop="3dp"
-                android:paddingBottom="3dp"
-                app:defaultPadding="false"
-                android:layout_marginStart="@dimen/keyline_5"
-                android:layout_marginEnd="@dimen/keyline_5"/>
+                    android:id="@+id/browserOptionsMenuDivider"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
+                    app:defaultPadding="false"
+                    android:layout_marginStart="@dimen/keyline_5"
+                    android:layout_marginEnd="@dimen/keyline_5"/>
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
-                android:id="@+id/fireproofWebsiteMenuItem"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:labelText="@string/fireproofWebsiteMenuTitleAdd"
-                app:iconDrawable="@drawable/ic_fire_16" />
+                    android:id="@+id/fireproofWebsiteMenuItem"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:labelText="@string/fireproofWebsiteMenuTitleAdd"
+                    app:iconDrawable="@drawable/ic_fire_16"/>
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
-                android:id="@+id/createAliasMenuItem"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:labelText="@string/newEmailAliasMenuTitle"
-                app:iconDrawable="@drawable/ic_email_16" />
+                    android:id="@+id/createAliasMenuItem"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:labelText="@string/newEmailAliasMenuTitle"
+                    app:iconDrawable="@drawable/ic_email_16"/>
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
-                android:id="@+id/changeBrowserModeMenuItem"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:labelText="@string/requestDesktopSiteMenuTitle"
-                app:iconDrawable="@drawable/ic_device_desktop_16" />
+                    android:id="@+id/changeBrowserModeMenuItem"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:labelText="@string/requestDesktopSiteMenuTitle"
+                    app:iconDrawable="@drawable/ic_device_desktop_16"/>
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
-                android:id="@+id/findInPageMenuItem"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:labelText="@string/findInPageMenuTitle"
-                app:iconDrawable="@drawable/ic_find_search_16" />
+                    android:id="@+id/findInPageMenuItem"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:labelText="@string/findInPageMenuTitle"
+                    app:iconDrawable="@drawable/ic_find_search_16"/>
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
                     android:id="@+id/printPageMenuItem"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:labelText="@string/printMenuTitle"
-                    app:iconDrawable="@drawable/ic_print_16" />
+                    app:iconDrawable="@drawable/ic_print_16"/>
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
-                android:id="@+id/openInAppMenuItem"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                app:labelText="@string/appLinkMenuItemTitle"
-                app:iconDrawable="@drawable/ic_open_in_16_1" />
+                    android:id="@+id/openInAppMenuItem"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:labelText="@string/appLinkMenuItemTitle"
+                    app:iconDrawable="@drawable/ic_open_in_16_1"/>
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
-                android:id="@+id/addToHomeMenuItem"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:labelText="@string/addToHome"
-                app:iconDrawable="@drawable/ic_add_to_home_16" />
+                    android:id="@+id/addToHomeMenuItem"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:labelText="@string/addToHome"
+                    app:iconDrawable="@drawable/ic_add_to_home_16"/>
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
-                android:id="@+id/privacyProtectionMenuItem"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:labelText="@string/enablePrivacyProtection"
-                app:iconDrawable="@drawable/ic_protections_blocked_16" />
+                    android:id="@+id/privacyProtectionMenuItem"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:labelText="@string/enablePrivacyProtection"
+                    app:iconDrawable="@drawable/ic_protections_blocked_16"/>
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
-                android:id="@+id/brokenSiteMenuItem"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:labelText="@string/brokenSiteReportBrokenSiteMenuItem"
-                app:iconDrawable="@drawable/ic_feedback_16" />
+                    android:id="@+id/brokenSiteMenuItem"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:labelText="@string/brokenSiteReportBrokenSiteMenuItem"
+                    app:iconDrawable="@drawable/ic_feedback_16"/>
 
             <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
-                android:id="@+id/settingsMenuDivider"
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent"
-                android:paddingTop="3dp"
-                android:paddingBottom="3dp"
-                app:defaultPadding="false"
-                android:layout_marginStart="@dimen/keyline_5"
-                android:layout_marginEnd="@dimen/keyline_5"/>
+                    android:id="@+id/settingsMenuDivider"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
+                    app:defaultPadding="false"
+                    android:layout_marginStart="@dimen/keyline_5"
+                    android:layout_marginEnd="@dimen/keyline_5"/>
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
-                android:id="@+id/autofillMenuItem"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:iconDrawable="@drawable/ic_key_16"
-                app:labelText="@string/managementScreenTitle" />
+                    android:id="@+id/autofillMenuItem"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:iconDrawable="@drawable/ic_key_16"
+                    app:labelText="@string/managementScreenTitle"/>
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
-                android:id="@+id/downloadsMenuItem"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:labelText="@string/downloadsMenuTitle"
-                app:iconDrawable="@drawable/ic_downloads_16" />
+                    android:id="@+id/downloadsMenuItem"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:labelText="@string/downloadsMenuTitle"
+                    app:iconDrawable="@drawable/ic_downloads_16"/>
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
-                android:id="@+id/settingsMenuItem"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:labelText="@string/settingsMenuItemTitle"
-                app:iconDrawable="@drawable/ic_settings_16" />
+                    android:id="@+id/settingsMenuItem"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:labelText="@string/settingsMenuItemTitle"
+                    app:iconDrawable="@drawable/ic_settings_16"/>
 
         </LinearLayout>
 
