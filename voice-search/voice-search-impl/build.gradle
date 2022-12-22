@@ -43,7 +43,7 @@ dependencies {
     implementation AndroidX.appCompat
     implementation AndroidX.constraintLayout
     implementation AndroidX.core.ktx
-    implementation AndroidX.lifecycle.runtimeKtx
+    implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.lifecycle.viewModelKtx
     implementation Google.dagger
     implementation JakeWharton.timber
