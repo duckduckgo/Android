@@ -74,6 +74,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
 
     override fun onMainProcessCreate() {
         configureLogging()
+        AndroidLogcatLogger.installOnDebuggableApp(this, minPriority = LogPriority.VERBOSE)
         Timber.d("onMainProcessCreate $currentProcessName")
 
         configureDependencyInjection()
