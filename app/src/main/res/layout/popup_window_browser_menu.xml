@@ -27,10 +27,10 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="horizontal"
-            android:layout_marginTop="@dimen/keyline_4"
-            android:layout_marginBottom="@dimen/keyline_4"
-            android:layout_marginStart="@dimen/keyline_6"
-            android:layout_marginEnd="@dimen/keyline_6">
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:layout_marginStart="@dimen/keyline_5"
+            android:layout_marginEnd="@dimen/keyline_5">
 
         <ImageButton
                 android:id="@+id/backMenuItem"
@@ -92,6 +92,7 @@
                     android:id="@+id/newTabMenuItem"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_2"
                     app:labelText="@string/newTabMenuItem"
                     app:iconDrawable="@drawable/ic_add_16"/>
 
@@ -100,10 +101,10 @@
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
                     app:defaultPadding="false"
-                    android:layout_marginTop="@dimen/keyline_empty"
-                    android:layout_marginBottom="@dimen/keyline_empty"
                     android:layout_marginStart="@dimen/keyline_5"
-                    android:layout_marginEnd="@dimen/keyline_5"/>
+                    android:layout_marginEnd="@dimen/keyline_5"
+                    android:layout_marginTop="@dimen/keyline_1"
+                    android:layout_marginBottom="@dimen/keyline_1"/>
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
                     android:id="@+id/sharePageMenuItem"
@@ -137,11 +138,11 @@
                     android:id="@+id/browserOptionsMenuDivider"
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
-                    android:paddingTop="3dp"
-                    android:paddingBottom="3dp"
-                    app:defaultPadding="false"
                     android:layout_marginStart="@dimen/keyline_5"
-                    android:layout_marginEnd="@dimen/keyline_5"/>
+                    android:layout_marginEnd="@dimen/keyline_5"
+                    android:paddingTop="@dimen/keyline_1"
+                    android:paddingBottom="@dimen/keyline_1"
+                    app:defaultPadding="false"/>
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
                     android:id="@+id/fireproofWebsiteMenuItem"
@@ -211,11 +212,11 @@
                     android:id="@+id/settingsMenuDivider"
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
-                    android:paddingTop="3dp"
-                    android:paddingBottom="3dp"
-                    app:defaultPadding="false"
                     android:layout_marginStart="@dimen/keyline_5"
-                    android:layout_marginEnd="@dimen/keyline_5"/>
+                    android:layout_marginEnd="@dimen/keyline_5"
+                    android:paddingTop="@dimen/keyline_1"
+                    android:paddingBottom="@dimen/keyline_1"
+                    app:defaultPadding="false"/>
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
                     android:id="@+id/autofillMenuItem"
