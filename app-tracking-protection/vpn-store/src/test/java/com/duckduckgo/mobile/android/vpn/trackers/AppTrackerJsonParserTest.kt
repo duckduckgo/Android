@@ -31,7 +31,7 @@ class AppTrackerJsonParserTest {
         val blocklist = AppTrackerJsonParser.parseAppTrackerJson(moshi, json)
 
         Assert.assertEquals("1639624032609", blocklist.version)
-        Assert.assertEquals(255, blocklist.trackers.count())
+        Assert.assertEquals(257, blocklist.trackers.count())
         Assert.assertEquals(376, blocklist.packages.count())
         Assert.assertEquals(127, blocklist.entities.count())
     }
