@@ -53,6 +53,11 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.ui.WhitelistActivity
 import com.duckduckgo.app.settings.SettingsViewModel.AutomaticallyClearData
 import com.duckduckgo.app.settings.SettingsViewModel.Command
+import com.duckduckgo.app.settings.SettingsViewModel.NetPState
+import com.duckduckgo.app.settings.SettingsViewModel.NetPState.CONNECTED
+import com.duckduckgo.app.settings.SettingsViewModel.NetPState.CONNECTING
+import com.duckduckgo.app.settings.SettingsViewModel.NetPState.DISCONNECTED
+import com.duckduckgo.app.settings.SettingsViewModel.NetPState.INVALID
 import com.duckduckgo.app.settings.SettingsViewModel.ViewState
 import com.duckduckgo.app.settings.clear.AppLinkSettingType
 import com.duckduckgo.app.settings.clear.ClearWhatOption
@@ -89,7 +94,7 @@ import com.duckduckgo.windows.api.WindowsWaitlistState.InBeta
 import com.duckduckgo.windows.api.WindowsWaitlistState.JoinedWaitlist
 import com.duckduckgo.windows.api.WindowsWaitlistState.NotJoinedQueue
 import com.duckduckgo.windows.api.ui.WindowsWaitlistScreenWithEmptyParams
-import com.duckduckgo.networkprotection.impl.entry.NetworkProtectionManagementActivity
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementActivity
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -270,7 +275,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                         it.appTrackingProtectionEnabled,
                         it.appTrackingProtectionOnboardingShown,
                     )
-                    updateNetPSettings(it.networkProtectionEnabled)
+                    updateNetPSettings(it.networkProtectionState)
                     updateEmailSubtitle(it.emailAddress)
                     updateWindowsSettings(it.windowsWaitlistState)
                     updateFeaturesSection(it)
@@ -498,12 +503,15 @@ class SettingsActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun updateNetPSettings(networkProtectionEnabled: Boolean) {
+    private fun updateNetPSettings(networkProtectionState: NetPState) {
         with(viewsMore) {
-            if (networkProtectionEnabled) {
-                netpPSetting.setSecondaryText(getString(R.string.atp_SettingsDeviceShieldEnabled))
-            } else {
-                netpPSetting.setSecondaryText(getString(R.string.atp_SettingsDeviceShieldDisabled))
+            when (networkProtectionState) {
+                CONNECTING -> R.string.netpSettingsConnecting
+                CONNECTED -> R.string.netpSettingsConnected
+                DISCONNECTED -> R.string.netpSettingsDisconnected
+                INVALID -> null
+            }?.run {
+                netpPSetting.setSecondaryText(getString(this))
             }
         }
     }

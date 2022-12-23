@@ -17,23 +17,31 @@
 package com.duckduckgo.networkprotection.impl.configuration
 
 import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.networkprotection.impl.configuration.WgTunnelDataProvider.WgTunnelData
 import com.squareup.anvil.annotations.ContributesBinding
 import com.wireguard.config.Config
 import com.wireguard.config.Interface
 import com.wireguard.config.Peer
+import java.net.InetAddress
 import javax.inject.Inject
 
-interface WgConfigProvider {
-    suspend fun get(): Config
+interface WgTunnelDataProvider {
+    suspend fun get(): WgTunnelData
+    data class WgTunnelData(
+        val userSpaceConfig: String,
+        val serverLocation: String?,
+        val serverIP: String?,
+        val tunnelAddress: Map<InetAddress, Int>,
+    )
 }
 
 @ContributesBinding(VpnScope::class)
-class RealWgConfigProvider @Inject constructor(
+class RealWgTunnelDataProvider @Inject constructor(
     private val deviceKeys: DeviceKeys,
     private val wgServerDataProvider: WgServerDataProvider,
-) : WgConfigProvider {
+) : WgTunnelDataProvider {
 
-    override suspend fun get(): Config {
+    override suspend fun get(): WgTunnelData {
         val serverData = wgServerDataProvider.get(deviceKeys.publicKey)
         return Config.Builder()
             .setInterface(
@@ -49,6 +57,13 @@ class RealWgConfigProvider @Inject constructor(
                     .parseEndpoint(serverData.publicEndpoint)
                     .build(),
             )
-            .build()
+            .build().run {
+                WgTunnelData(
+                    userSpaceConfig = this.toWgUserspaceString(),
+                    serverLocation = serverData.location,
+                    serverIP = kotlin.runCatching { InetAddress.getByName(peers[0].endpoint?.host).hostAddress }.getOrNull(),
+                    tunnelAddress = getInterface().addresses.associate { Pair(it.address, it.mask) },
+                )
+            }
     }
 }

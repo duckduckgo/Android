@@ -40,6 +40,7 @@ dependencies {
     implementation AndroidX.lifecycle.runtimeKtx
     implementation AndroidX.lifecycle.viewModelKtx
     implementation AndroidX.room.runtime
+    implementation Google.android.material
     implementation Google.dagger
     implementation "com.squareup.logcat:logcat:_"
     implementation KotlinX.coroutines.core

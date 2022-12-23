@@ -1,0 +1,30 @@
+<!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+  <path
+      android:pathData="M2,12C2,6.477 6.477,2 12,2s10,4.477 10,10c0,0.247 -0.341,0.333 -0.498,0.143 -0.341,-0.412 -0.755,-0.76 -1.22,-1.029 -0.215,-0.125 -0.37,-0.334 -0.416,-0.579 -0.464,-2.507 -2.096,-4.604 -4.312,-5.704 0.065,0.13 0.128,0.263 0.188,0.399 0.606,1.362 1.02,3.08 1.182,4.97 0.02,0.243 -0.143,0.46 -0.375,0.538 -1.03,0.347 -1.912,1.052 -2.458,1.988 -0.096,0.164 -0.268,0.274 -0.459,0.274L9.026,13c0.101,1.966 0.498,3.695 1.06,4.958 0.327,0.738 0.692,1.273 1.046,1.61 0.35,0.333 0.641,0.432 0.868,0.432 0.235,0 0.5,0.144 0.5,0.379v0.342c0,0.169 0.015,0.334 0.044,0.495 0.067,0.374 -0.164,0.784 -0.544,0.784 -5.523,0 -10,-4.477 -10,-10zM4.062,11C4.4,8.289 6.095,5.999 8.446,4.831c-0.065,0.13 -0.128,0.263 -0.188,0.399 -0.69,1.552 -1.132,3.566 -1.235,5.77L4.062,11zM4.062,13c0.338,2.711 2.033,5.001 4.384,6.169 -0.065,-0.13 -0.128,-0.263 -0.188,-0.399 -0.69,-1.552 -1.132,-3.566 -1.235,-5.77L4.062,13zM9.026,11c0.101,-1.967 0.498,-3.695 1.06,-4.958 0.327,-0.738 0.692,-1.273 1.046,-1.61 0.35,-0.333 0.641,-0.432 0.868,-0.432 0.227,0 0.518,0.1 0.868,0.432 0.354,0.337 0.719,0.872 1.047,1.61 0.561,1.263 0.958,2.991 1.06,4.958h-5.95z"
+      android:fillColor="?attr/daxColorPrimaryIcon"
+      android:fillType="evenOdd"/>
+  <path
+      android:pathData="M14.977,14.926v1.278c-0.47,0.132 -0.815,0.563 -0.815,1.075v3.442c0,0.616 0.5,1.116 1.117,1.116h5.442c0.616,0 1.116,-0.5 1.116,-1.116v-3.442c0,-0.512 -0.344,-0.943 -0.814,-1.075v-1.278c0,-1.665 -1.39,-2.95 -3.023,-2.95 -1.633,0 -3.023,1.285 -3.023,2.95zM18,14.024c-0.576,0 -0.977,0.44 -0.977,0.902v1.237h1.954v-1.237c0,-0.462 -0.401,-0.902 -0.977,-0.902z"
+      android:fillColor="?attr/daxColorPrimaryIcon"
+      android:fillType="evenOdd"/>
+</vector>

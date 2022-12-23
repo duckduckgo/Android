@@ -26,4 +26,7 @@
 
     <!-- Network Protection -->
     <string name="netpSettingsTitle">Network Protection</string>
+    <string name="netpSettingsConnecting">Connecting</string>
+    <string name="netpSettingsConnected">Connected</string>
+    <string name="netpSettingsDisconnected">Disconnected</string>
 </resources>

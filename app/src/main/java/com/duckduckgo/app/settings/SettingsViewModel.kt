@@ -26,6 +26,10 @@ import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName.*
+import com.duckduckgo.app.settings.SettingsViewModel.NetPState.CONNECTED
+import com.duckduckgo.app.settings.SettingsViewModel.NetPState.CONNECTING
+import com.duckduckgo.app.settings.SettingsViewModel.NetPState.DISCONNECTED
+import com.duckduckgo.app.settings.SettingsViewModel.NetPState.INVALID
 import com.duckduckgo.app.settings.clear.AppLinkSettingType
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
@@ -46,6 +50,8 @@ import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
@@ -60,6 +66,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -84,6 +92,7 @@ class SettingsViewModel @Inject constructor(
     private val windowsWaitlist: WindowsWaitlist,
     private val windowsFeature: WindowsWaitlistFeature,
     private val deviceSyncState: DeviceSyncState,
+    private val vpnStateMonitor: VpnStateMonitor,
 ) : ViewModel() {
 
     data class ViewState(
@@ -107,7 +116,7 @@ class SettingsViewModel @Inject constructor(
         val autoconsentEnabled: Boolean = false,
         @StringRes val notificationsSettingSubtitleId: Int = R.string.settingsSubtitleNotificationsDisabled,
         val windowsWaitlistState: WindowsWaitlistState? = null,
-        val networkProtectionEnabled: Boolean = false,
+        val networkProtectionState: NetPState = DISCONNECTED,
     )
 
     data class AutomaticallyClearData(
@@ -115,6 +124,13 @@ class SettingsViewModel @Inject constructor(
         val clearWhenOption: ClearWhenOption,
         val clearWhenOptionEnabled: Boolean = true,
     )
+
+    enum class NetPState {
+        CONNECTING,
+        CONNECTED,
+        DISCONNECTED,
+        INVALID,
+    }
 
     sealed class Command {
         object LaunchDefaultBrowser : Command()
@@ -184,7 +200,6 @@ class SettingsViewModel @Inject constructor(
                     windowsWaitlistState = windowsSettingState(),
                     showSyncSetting = deviceSyncState.isFeatureEnabled(),
                     syncEnabled = deviceSyncState.isUserSignedInOnDevice(),
-                    networkProtectionEnabled = vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN),
                 ),
             )
         }
@@ -210,17 +225,17 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun startPollingNetPEnableState() {
-        viewModelScope.launch {
-            while (isActive) {
-                val isDeviceShieldEnabled = vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)
-                if (currentViewState().networkProtectionEnabled != isDeviceShieldEnabled) {
-                    viewState.value = currentViewState().copy(
-                        networkProtectionEnabled = isDeviceShieldEnabled,
-                    )
-                }
-                delay(1_000)
-            }
-        }
+        vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)
+            .onEach {
+                viewState.value = currentViewState().copy(
+                    networkProtectionState = when (it.state) {
+                        VpnRunningState.ENABLING -> CONNECTING
+                        VpnRunningState.ENABLED -> CONNECTED
+                        VpnRunningState.DISABLED -> DISCONNECTED
+                        else -> INVALID
+                    },
+                )
+            }.launchIn(viewModelScope)
     }
 
     fun viewState(): StateFlow<ViewState> {

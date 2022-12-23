@@ -20,13 +20,15 @@ import android.os.ParcelFileDescriptor
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack.VpnTunnelConfig
-import com.duckduckgo.networkprotection.impl.configuration.WgConfigProvider
+import com.duckduckgo.networkprotection.impl.configuration.WgTunnelDataProvider
+import com.duckduckgo.networkprotection.impl.configuration.WgTunnelDataProvider.WgTunnelData
+import com.duckduckgo.networkprotection.store.NetworkProtectionRepository
+import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ServerDetails
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.wireguard.config.BadConfigException
 import com.wireguard.config.BadConfigException.Location.TOP_LEVEL
 import com.wireguard.config.BadConfigException.Reason
 import com.wireguard.config.BadConfigException.Section.CONFIG
-import com.wireguard.config.Config
 import dagger.Lazy
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -39,10 +41,12 @@ import logcat.logcat
 @SingleInstanceIn(VpnScope::class)
 class WgVpnNetworkStack @Inject constructor(
     private val wgProtocol: Lazy<WgProtocol>,
-    private val configProvider: Lazy<WgConfigProvider>,
+    private val configProvider: Lazy<WgTunnelDataProvider>,
+    private val networkProtectionRepository: Lazy<NetworkProtectionRepository>,
+    private val currentTimeProvider: CurrentTimeProvider,
 ) : VpnNetworkStack {
     private var wgThread: Thread? = null
-    private var config: Config? = null
+    private var wgTunnelData: WgTunnelData? = null
 
     override val name: String = NetPVpnFeature.NETP_VPN.featureName
 
@@ -50,13 +54,18 @@ class WgVpnNetworkStack @Inject constructor(
 
     override suspend fun onPrepareVpn(): Result<VpnTunnelConfig> {
         return try {
-            config = configProvider.get().get().also {
-                logcat { "Received config from BE: $it" }
-            }
+            wgTunnelData = configProvider.get().get()
+            logcat { "Received config from BE: $wgTunnelData" }
+
+            networkProtectionRepository.get().serverDetails = ServerDetails(
+                ipAddress = wgTunnelData!!.serverIP,
+                location = wgTunnelData!!.serverLocation,
+            )
+
             Result.success(
                 VpnTunnelConfig(
                     mtu = 1420,
-                    addresses = config?.getInterface()?.addresses?.associate { Pair(it.address, it.mask) } ?: emptyMap(),
+                    addresses = wgTunnelData?.tunnelAddress ?: emptyMap(),
                     dns = emptySet(),
                     routes = emptyMap(),
                     appExclusionList = setOf(),
@@ -83,7 +92,7 @@ class WgVpnNetworkStack @Inject constructor(
     }
 
     private fun turnOnNative(tunfd: Int): Result<Unit> {
-        if (config == null) {
+        if (wgTunnelData == null) {
             return Result.failure(BadConfigException(CONFIG, TOP_LEVEL, Reason.MISSING_SECTION, "Config could not be empty."))
         }
         if (wgThread == null) {
@@ -93,7 +102,7 @@ class WgVpnNetworkStack @Inject constructor(
                 logcat { "Thread: Started turnOnNative" }
                 wgProtocol.get().startWg(
                     tunfd,
-                    config!!.toWgUserspaceString().also {
+                    wgTunnelData!!.userSpaceConfig.also {
                         logcat { "WgUserspace config: $it" }
                     },
                 )
@@ -102,6 +111,7 @@ class WgVpnNetworkStack @Inject constructor(
             }.also { it.start() }
         }
 
+        networkProtectionRepository.get().enabledTimeInMillis = currentTimeProvider.get()
         return Result.success(Unit)
     }
 
@@ -117,6 +127,8 @@ class WgVpnNetworkStack @Inject constructor(
             }.also { it.start() }
         }
 
+        networkProtectionRepository.get().serverDetails = null
+        networkProtectionRepository.get().enabledTimeInMillis = -1
         return Result.success(Unit)
     }
 }

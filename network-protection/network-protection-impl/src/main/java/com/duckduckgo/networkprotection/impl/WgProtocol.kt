@@ -65,8 +65,10 @@ class RealWgProtocol @Inject constructor(
     }
 
     override fun stopWg() {
-        goBackend.wgTurnOff(wgTunnel)
-        wgTunnel = -1
+        if (wgTunnel != -1) {
+            goBackend.wgTurnOff(wgTunnel)
+            wgTunnel = -1
+        }
     }
 
     override fun getStatistics(): NetworkProtectionStatistics =

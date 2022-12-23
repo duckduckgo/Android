@@ -26,6 +26,7 @@ interface WgServerDataProvider {
         val publicKey: String,
         val publicEndpoint: String,
         val address: String,
+        val location: String?,
         val allowedIPs: String = "0.0.0.0/0,::0/0",
     )
 
@@ -46,5 +47,6 @@ class RealWgServerDataProvider @Inject constructor(
         publicKey = server.publicKey,
         publicEndpoint = server.hostnames[0] + ":" + server.port,
         address = allowedIPs.joinToString(","),
+        location = server.attributes["location"],
     )
 }

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="netpManagementTitle" translatable="false">Network Protection</string>
+    <string name="netpManagementHeadlineStatusOn">Network Protection is On</string>
+    <string name="netpManagementHeadlineStatusOff">Network Protection is Off</string>
+    <string name="netpManagementDescription">Hide your location from websites and conceal your online activity from Internet providers and others on your network.</string>
+    <string name="netpManagementToggleTitle">Network Protection</string>
+    <string name="netpManagementToggleSubtitleConnecting">Connecting…</string>
+    <string name="netpManagementToggleSubtitleConnected" instruction="Placeholder is elapsed time in hh:MM:ss format.">Connected · %1$s</string>
+    <string name="netpManagementToggleSubtitleDisconnecting">Disconnecting…</string>
+    <string name="netpManagementToggleSubtitleDisconnected">Not connected</string>
+    <string name="netpManagementBetaDescription">DuckDuckGo Network Protection is currently in beta.</string>
+
+    <!-- Connection details -->
+    <string name="netpManagementConnectionDetailsHeader">Connection Details</string>
+    <string name="netpManagementConnectionDetailsLocation">Location</string>
+    <string name="netpManagementConnectionDetailsIp">IP Address</string>
+</resources>

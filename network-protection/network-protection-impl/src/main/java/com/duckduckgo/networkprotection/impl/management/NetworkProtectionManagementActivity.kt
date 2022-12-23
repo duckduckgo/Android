@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.networkprotection.impl.entry
+package com.duckduckgo.networkprotection.impl.management
 
 import android.content.Context
 import android.content.Intent
@@ -28,15 +28,18 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpManagementBinding
-import com.duckduckgo.networkprotection.impl.entry.NetworkProtectionManagementViewModel.Command
-import com.duckduckgo.networkprotection.impl.entry.NetworkProtectionManagementViewModel.ConnectionState
-import com.duckduckgo.networkprotection.impl.entry.NetworkProtectionManagementViewModel.ViewState
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionDetails
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ViewState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
 class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
@@ -55,21 +58,22 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(binding.root)
+        setupToolbar(binding.includeToolbar.toolbar)
         bindViews()
 
         observeViewModel()
     }
 
     private fun bindViews() {
+        setTitle(R.string.netpManagementTitle)
         binding.netpToggle.setOnCheckedChangeListener(toggleChangeListener)
     }
 
     private fun observeViewModel() {
-        lifecycleScope.launch {
-            viewModel.viewState()
-                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-                .collect { renderViewState(it) }
-        }
+        viewModel.viewState()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { renderViewState(it) }
+            .launchIn(lifecycleScope)
 
         viewModel.commands()
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
@@ -78,13 +82,45 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
     }
 
     private fun renderViewState(viewState: ViewState) {
-        if (viewState.connectionState == ConnectionState.Connected) {
-            binding.netpToggle.quietlySetChecked(true)
-            binding.netpToggle.setSecondaryText("Connected")
-        } else {
-            binding.netpToggle.quietlySetChecked(false)
-            binding.netpToggle.setSecondaryText("Disconnected")
+        when (viewState.connectionState) {
+            ConnectionState.Connecting -> binding.renderConnectingState()
+            ConnectionState.Connected -> viewState.connectionDetails?.let { binding.renderConnectedState(it) }
+            ConnectionState.Disconnected -> binding.renderDisconnectedState()
         }
+    }
+
+    private fun ActivityNetpManagementBinding.renderConnectedState(connectionDetailsData: ConnectionDetails) {
+        netpStatusImage.setImageResource(R.drawable.illustration_vpn_on)
+        netpStatusHeader.setText(R.string.netpManagementHeadlineStatusOn)
+        netpToggle.quietlySetChecked(true)
+        connectionDetailsData.elapsedConnectedTime?.let {
+            netpToggle.setSecondaryText(getString(R.string.netpManagementToggleSubtitleConnected, it))
+        }
+        connectionDetails.root.show()
+        if (connectionDetailsData.location.isNullOrEmpty()) {
+            connectionDetails.connectionDetailsLocation.gone()
+        } else {
+            connectionDetails.connectionDetailsLocation.setSecondaryText(connectionDetailsData.location)
+        }
+        if (connectionDetailsData.ipAddress.isNullOrEmpty()) {
+            connectionDetails.connectionDetailsIp.gone()
+        } else {
+            connectionDetails.connectionDetailsIp.setSecondaryText(connectionDetailsData.ipAddress)
+        }
+    }
+
+    private fun ActivityNetpManagementBinding.renderDisconnectedState() {
+        netpStatusImage.setImageResource(R.drawable.illustration_vpn_off)
+        netpStatusHeader.setText(R.string.netpManagementHeadlineStatusOff)
+        netpToggle.quietlySetChecked(false)
+        netpToggle.setSecondaryText(getString(R.string.netpManagementToggleSubtitleDisconnected))
+        connectionDetails.root.gone()
+    }
+
+    private fun ActivityNetpManagementBinding.renderConnectingState() {
+        netpToggle.quietlySetChecked(true)
+        netpToggle.setSecondaryText(getString(R.string.netpManagementToggleSubtitleConnecting))
+        connectionDetails.root.gone()
     }
 
     private fun handleCommand(command: Command) {

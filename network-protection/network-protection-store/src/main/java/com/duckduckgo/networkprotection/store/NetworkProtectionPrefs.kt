@@ -23,13 +23,23 @@ import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 interface NetworkProtectionPrefs {
     fun putString(
         key: String,
-        value: String,
+        value: String?,
     )
 
     fun getString(
         key: String,
         default: String?,
     ): String?
+
+    fun putLong(
+        key: String,
+        value: Long,
+    )
+
+    fun getLong(
+        key: String,
+        default: Long,
+    ): Long
 }
 
 class RealNetworkProtectionPrefs constructor(
@@ -41,7 +51,7 @@ class RealNetworkProtectionPrefs constructor(
 
     override fun putString(
         key: String,
-        value: String,
+        value: String?,
     ) {
         prefs.edit { putString(key, value) }
     }
@@ -54,4 +64,16 @@ class RealNetworkProtectionPrefs constructor(
     companion object {
         private const val FILENAME = "com.duckduckgo.networkprotection.store.prefs.v1"
     }
+
+    override fun putLong(
+        key: String,
+        value: Long,
+    ) {
+        prefs.edit { putLong(key, value) }
+    }
+
+    override fun getLong(
+        key: String,
+        default: Long,
+    ): Long = prefs.getLong(key, default)
 }

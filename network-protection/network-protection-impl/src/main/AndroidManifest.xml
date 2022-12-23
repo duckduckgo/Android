@@ -19,8 +19,7 @@
 
     <application>
         <activity
-            android:name=".entry.NetworkProtectionManagementActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
+            android:name=".management.NetworkProtectionManagementActivity"
+            android:exported="false" />
     </application>
 </manifest>

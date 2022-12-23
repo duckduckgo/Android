@@ -17,7 +17,7 @@
 package com.duckduckgo.networkprotection.impl.di
 
 import android.content.Context
-import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.store.RealNetworkProtectionPrefs
@@ -28,10 +28,10 @@ import dagger.Provides
 import dagger.SingleInstanceIn
 
 @Module
-@ContributesTo(VpnScope::class)
+@ContributesTo(AppScope::class)
 class DataModule {
     @Provides
-    @SingleInstanceIn(VpnScope::class)
+    @SingleInstanceIn(AppScope::class)
     fun provideNetworkProtectionRepository(
         context: Context,
         vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
