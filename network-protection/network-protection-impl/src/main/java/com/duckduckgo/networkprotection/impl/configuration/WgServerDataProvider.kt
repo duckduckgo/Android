@@ -16,6 +16,8 @@
 
 package com.duckduckgo.networkprotection.impl.configuration
 
+import android.content.Context
+import android.telephony.TelephonyManager
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.networkprotection.impl.configuration.WgServerDataProvider.WgServerData
 import com.squareup.anvil.annotations.ContributesBinding
@@ -36,12 +38,15 @@ interface WgServerDataProvider {
 @ContributesBinding(VpnScope::class)
 class RealWgServerDataProvider @Inject constructor(
     private val wgVpnControllerService: WgVpnControllerService,
+    context: Context,
 ) : WgServerDataProvider {
+    private val telephonyManager = context.applicationContext.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+
     override suspend fun get(publicKey: String): WgServerData = wgVpnControllerService.registerKey(
         RegisterKeyBody(
             publicKey = publicKey,
         ),
-    )[1].toWgServerData()
+    ).getRelevantServer().toWgServerData()
 
     private fun EligibleServerInfo.toWgServerData(): WgServerData = WgServerData(
         publicKey = server.publicKey,
@@ -49,4 +54,28 @@ class RealWgServerDataProvider @Inject constructor(
         address = allowedIPs.joinToString(","),
         location = server.attributes["location"],
     )
+
+    private fun List<EligibleServerInfo>.getRelevantServer(): EligibleServerInfo {
+        val countryCode = telephonyManager.networkCountryIso.lowercase()
+        val resultingList = if (countryCode == COUNTRY_CODE_US) {
+            this.filter {
+                it.server.name == SERVER_NAME_US
+            }
+        } else {
+            this.filter {
+                it.server.name != SERVER_NAME_US
+            }
+        }
+
+        return if (resultingList.isEmpty()) {
+            this[0] // we just take the first if for some reason the usc server changes in name or disappears
+        } else {
+            resultingList[0] // if there's a lot of matches, we just take the first
+        }
+    }
+
+    companion object {
+        private const val COUNTRY_CODE_US = "us"
+        private const val SERVER_NAME_US = "egress.usc"
+    }
 }
