@@ -97,9 +97,6 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
     }
 
     override fun onSecondaryProcessCreate(shortProcessName: String) {
-        configureLogging()
-        Timber.d("onSecondaryProcessCreate $shortProcessName")
-
         runInSecondaryProcessNamed(VPN_PROCESS_NAME) {
             Timber.d("Init for secondary process $shortProcessName")
             configureDependencyInjection()
@@ -111,7 +108,6 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
             // See https://developer.android.com/reference/android/arch/lifecycle/ProcessLifecycleOwner#get
             ProcessLifecycleOwner.get().lifecycle.apply {
                 vpnLifecycleObserverPluginPoint.getPlugins().forEach {
-                    Timber.d("Registering secondary process lifecycle observer: ${it.javaClass.canonicalName}")
                     it.onVpnProcessCreated()
                 }
             }
