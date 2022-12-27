@@ -19,14 +19,13 @@ package com.duckduckgo.app.browser.httpauth
 import android.webkit.WebView
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.browser.WebViewDatabaseProvider
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.DatabaseCleaner
 import com.duckduckgo.app.fire.DatabaseLocator
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -70,7 +69,7 @@ interface WebViewHttpAuthStore {
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = LifecycleObserver::class,
+    boundType = MainProcessLifecycleObserver::class,
 )
 @ContributesBinding(
     scope = AppScope::class,
@@ -84,7 +83,7 @@ class RealWebViewHttpAuthStore @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val appBuildConfig: AppBuildConfig,
-) : WebViewHttpAuthStore, DefaultLifecycleObserver {
+) : WebViewHttpAuthStore, MainProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
         // API 28 seems to use WAL for the http_auth db and changing the journal mode does not seem

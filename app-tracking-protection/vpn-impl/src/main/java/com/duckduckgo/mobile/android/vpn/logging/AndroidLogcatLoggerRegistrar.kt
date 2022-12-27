@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,43 +14,40 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.flipper
+package com.duckduckgo.mobile.android.vpn.logging
 
-import android.content.Context
 import androidx.lifecycle.LifecycleOwner
-import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.app.lifecycle.VpnProcessLifecycleObserver
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
-import com.facebook.flipper.android.AndroidFlipperClient
-import com.facebook.flipper.core.FlipperPlugin
-import com.facebook.flipper.plugins.databases.DatabasesFlipperPlugin
-import com.facebook.soloader.SoLoader
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.AndroidLogcatLogger
+import logcat.LogPriority
+import logcat.LogcatLogger
+import logcat.logcat
 
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = VpnProcessLifecycleObserver::class,
+)
 @ContributesMultibinding(
     scope = AppScope::class,
     boundType = MainProcessLifecycleObserver::class,
 )
-class FlipperInitializer @Inject constructor(
-    private val context: Context,
-    private val flipperPluginPoint: PluginPoint<FlipperPlugin>,
-) : MainProcessLifecycleObserver {
+class AndroidLogcatLoggerRegistrar @Inject constructor(
+    private val appBuildConfig: AppBuildConfig,
+) : VpnProcessLifecycleObserver, MainProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
-        Timber.v("Flipper: setup flipper")
-        SoLoader.init(context, false)
+        onVpnProcessCreated()
+    }
 
-        with(AndroidFlipperClient.getInstance(context)) {
-            flipperPluginPoint.getPlugins().forEach { plugin ->
-                addPlugin(plugin)
-            }
-
-            // Common device plugins
-            addPlugin(DatabasesFlipperPlugin(context))
-
-            start()
+    override fun onVpnProcessCreated() {
+        if (appBuildConfig.isDebug) {
+            LogcatLogger.install(AndroidLogcatLogger(LogPriority.DEBUG))
+            logcat { "Registering LogcatLogger" }
         }
     }
 }

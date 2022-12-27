@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.pixels
 
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.WorkManager
@@ -49,7 +48,7 @@ class EnqueuedPixelWorkerTest {
     @Test
     fun whenOnCreateAndPendingPixelCountClearDataThenScheduleWorkerToFireMf() {
         whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(2)
-        enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_CREATE)
+        enqueuedPixelWorker.onCreate(lifecycleOwner)
 
         verify(workManager).enqueueUniquePeriodicWork(
             eq("com.duckduckgo.pixels.enqueued.worker"),
@@ -61,7 +60,7 @@ class EnqueuedPixelWorkerTest {
     @Test
     fun whenOnCreateAndPendingPixelCountClearDataIsZeroThenDoNotFireMf() {
         whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(0)
-        enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_CREATE)
+        enqueuedPixelWorker.onCreate(lifecycleOwner)
 
         verify(pixel, never()).fire(AppPixelName.FORGET_ALL_EXECUTED)
     }
@@ -71,8 +70,8 @@ class EnqueuedPixelWorkerTest {
         whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(1)
         whenever(unsentForgetAllPixelStore.lastClearTimestamp).thenReturn(System.currentTimeMillis())
 
-        enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_CREATE)
-        enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_START)
+        enqueuedPixelWorker.onCreate(lifecycleOwner)
+        enqueuedPixelWorker.onStart(lifecycleOwner)
 
         verify(pixel, never()).fire(AppPixelName.APP_LAUNCH)
     }
@@ -82,8 +81,8 @@ class EnqueuedPixelWorkerTest {
         whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(1)
         whenever(webViewVersionProvider.getMajorVersion()).thenReturn("91")
 
-        enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_CREATE)
-        enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_START)
+        enqueuedPixelWorker.onCreate(lifecycleOwner)
+        enqueuedPixelWorker.onStart(lifecycleOwner)
 
         verify(pixel).fire(
             AppPixelName.APP_LAUNCH,
@@ -97,9 +96,9 @@ class EnqueuedPixelWorkerTest {
         whenever(unsentForgetAllPixelStore.lastClearTimestamp).thenReturn(System.currentTimeMillis())
         whenever(webViewVersionProvider.getMajorVersion()).thenReturn("91")
 
-        enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_CREATE)
-        enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_START)
-        enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_START)
+        enqueuedPixelWorker.onCreate(lifecycleOwner)
+        enqueuedPixelWorker.onStart(lifecycleOwner)
+        enqueuedPixelWorker.onStart(lifecycleOwner)
 
         verify(pixel).fire(
             AppPixelName.APP_LAUNCH,

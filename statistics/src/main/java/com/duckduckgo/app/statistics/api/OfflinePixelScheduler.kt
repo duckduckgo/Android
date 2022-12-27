@@ -17,12 +17,10 @@
 package com.duckduckgo.app.statistics.api
 
 import android.content.Context
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.*
 import com.duckduckgo.anvil.annotations.ContributesWorker
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.TimeUnit
@@ -31,19 +29,14 @@ import timber.log.Timber
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = LifecycleObserver::class,
+    boundType = MainProcessLifecycleObserver::class,
 )
 class OfflinePixelScheduler @Inject constructor(
     private val workManager: WorkManager,
-) : LifecycleEventObserver {
+) : MainProcessLifecycleObserver {
 
-    override fun onStateChanged(
-        source: LifecycleOwner,
-        event: Lifecycle.Event,
-    ) {
-        if (event == Lifecycle.Event.ON_CREATE) {
-            scheduleOfflinePixels()
-        }
+    override fun onCreate(owner: LifecycleOwner) {
+        scheduleOfflinePixels()
     }
 
     private fun scheduleOfflinePixels() {

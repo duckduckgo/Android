@@ -17,10 +17,10 @@
 package com.duckduckgo.app.global.rating
 
 import androidx.annotation.UiThread
-import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -29,7 +29,7 @@ class AppEnjoymentAppCreationObserver(
     private val promptTypeDecider: PromptTypeDecider,
     private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
-) : DefaultLifecycleObserver {
+) : MainProcessLifecycleObserver {
 
     @UiThread
     override fun onStart(owner: LifecycleOwner) {

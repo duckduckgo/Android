@@ -17,7 +17,6 @@
 package com.duckduckgo.app.browser.rating.di
 
 import android.content.Context
-import androidx.lifecycle.LifecycleObserver
 import com.duckduckgo.app.browser.rating.db.AppEnjoymentDao
 import com.duckduckgo.app.browser.rating.db.AppEnjoymentDatabaseRepository
 import com.duckduckgo.app.browser.rating.db.AppEnjoymentRepository
@@ -25,6 +24,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.rating.*
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.playstore.PlayStoreAndroidUtils
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.usage.app.AppDaysUsedRepository
@@ -48,7 +48,7 @@ class RatingModule {
         appEnjoymentPromptEmitter: AppEnjoymentPromptEmitter,
         promptTypeDecider: PromptTypeDecider,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
-    ): LifecycleObserver {
+    ): MainProcessLifecycleObserver {
         return AppEnjoymentAppCreationObserver(appEnjoymentPromptEmitter, promptTypeDecider, appCoroutineScope)
     }
 
