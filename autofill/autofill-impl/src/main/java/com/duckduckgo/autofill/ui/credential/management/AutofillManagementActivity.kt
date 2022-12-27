@@ -250,7 +250,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
         setTitle(R.string.managementScreenTitle)
         binding.toolbar.menu.clear()
         hideSearchBar()
-        supportActionBar?.setHomeAsUpIndicator(com.duckduckgo.mobile.android.R.drawable.ic_back_24)
+        supportActionBar?.setHomeAsUpIndicator(com.duckduckgo.mobile.android.R.drawable.ic_arrow_left_24)
     }
 
     fun showSearchBar() {
