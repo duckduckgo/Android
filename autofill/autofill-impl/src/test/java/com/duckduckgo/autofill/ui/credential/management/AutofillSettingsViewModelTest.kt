@@ -25,6 +25,7 @@ import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewMode
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.*
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.EditingExisting
+import com.duckduckgo.autofill.ui.credential.management.searching.CredentialListFilter
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import kotlin.reflect.KClass
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -51,12 +52,14 @@ class AutofillSettingsViewModelTest {
     private val clipboardInteractor: AutofillClipboardInteractor = mock()
     private val pixel: Pixel = mock()
     private val deviceAuthenticator: DeviceAuthenticator = mock()
+    private val credentialListFilter: CredentialListFilter = mock()
     private val testee = AutofillSettingsViewModel(
         autofillStore = mockStore,
         clipboardInteractor = clipboardInteractor,
         deviceAuthenticator = deviceAuthenticator,
         pixel = pixel,
         dispatchers = coroutineTestRule.testDispatcherProvider,
+        credentialListFilter = credentialListFilter,
     )
 
     @Test

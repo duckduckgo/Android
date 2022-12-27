@@ -45,12 +45,14 @@ import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewMode
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Viewing
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialModeCommand.ShowEditCredentialMode
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialModeCommand.ShowManualCredentialMode
+import com.duckduckgo.autofill.ui.credential.management.searching.CredentialListFilter
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.di.scopes.ActivityScope
 import java.util.*
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -62,6 +64,7 @@ class AutofillSettingsViewModel @Inject constructor(
     private val deviceAuthenticator: DeviceAuthenticator,
     private val pixel: Pixel,
     private val dispatchers: DispatcherProvider,
+    private val credentialListFilter: CredentialListFilter,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -75,6 +78,8 @@ class AutofillSettingsViewModel @Inject constructor(
 
     // after unlocking, we want to initialise the view once (next unlock, the view stack will already exist)
     private var initialStateAlreadyPresented: Boolean = false
+
+    private var searchQueryFilter = MutableStateFlow("")
 
     // after unlocking, we want to know which mode to return to
     private var credentialModeBeforeLocking: CredentialMode? = null
@@ -268,7 +273,11 @@ class AutofillSettingsViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.default()) {
             _viewState.value = _viewState.value.copy(autofillEnabled = autofillStore.autofillEnabled)
 
-            autofillStore.getAllCredentials().collect { credentials ->
+            val allCredentials = autofillStore.getAllCredentials()
+            val combined = allCredentials.combine(searchQueryFilter) { credentials, filter ->
+                credentialListFilter.filter(credentials, filter)
+            }
+            combined.collect { credentials ->
                 _viewState.value = _viewState.value.copy(
                     logins = credentials,
                 )
@@ -345,10 +354,17 @@ class AutofillSettingsViewModel @Inject constructor(
         pixel.fire(AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED)
     }
 
+    fun onSearchQueryChanged(searchText: String) {
+        Timber.v("Search query changed: %s", searchText)
+        searchQueryFilter.value = searchText
+        _viewState.value = _viewState.value.copy(credentialSearchQuery = searchText)
+    }
+
     data class ViewState(
         val autofillEnabled: Boolean = true,
         val logins: List<LoginCredentials>? = null,
         val credentialMode: CredentialMode? = null,
+        val credentialSearchQuery: String = "",
     )
 
     /**
