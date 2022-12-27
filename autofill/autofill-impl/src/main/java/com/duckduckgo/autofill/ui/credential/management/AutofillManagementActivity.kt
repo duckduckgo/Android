@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
+import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.fragment.app.commitNow
 import androidx.lifecycle.Lifecycle
@@ -61,6 +62,11 @@ import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.UserCancelle
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.Features.AUTOFILL
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.ui.view.SearchBar
+import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.hideKeyboard
+import com.duckduckgo.mobile.android.ui.view.show
+import com.duckduckgo.mobile.android.ui.view.showKeyboard
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.anvil.annotations.ContributesTo
@@ -73,7 +79,7 @@ import timber.log.Timber
 @InjectWith(ActivityScope::class)
 class AutofillManagementActivity : DuckDuckGoActivity() {
 
-    private val binding: ActivityAutofillSettingsBinding by viewBinding()
+    val binding: ActivityAutofillSettingsBinding by viewBinding()
     private val viewModel: AutofillSettingsViewModel by bindViewModel()
 
     @Inject
@@ -86,7 +92,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         setContentView(binding.root)
-        setupToolbar(binding.includeToolbar.toolbar)
+        setupToolbar(binding.toolbar)
         observeViewModel()
     }
 
@@ -242,9 +248,27 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
 
     private fun resetToolbar() {
         setTitle(R.string.managementScreenTitle)
-        binding.includeToolbar.toolbar.menu.clear()
+        binding.toolbar.menu.clear()
+        hideSearchBar()
         supportActionBar?.setHomeAsUpIndicator(com.duckduckgo.mobile.android.R.drawable.ic_arrow_left_24)
     }
+
+    fun showSearchBar() {
+        with(binding) {
+            toolbar.gone()
+            searchBar.handle(SearchBar.Event.ShowSearchBar)
+            searchBar.showKeyboard()
+        }
+    }
+
+    fun hideSearchBar() {
+        with(binding) {
+            toolbar.show()
+            searchBar.handle(SearchBar.Event.DismissSearchBar)
+            searchBar.hideKeyboard()
+        }
+    }
+    private fun isSearchBarVisible(): Boolean = binding.searchBar.isVisible
 
     override fun onBackPressed() {
         when (viewModel.viewState.value.credentialMode) {
@@ -257,7 +281,15 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
                     viewModel.onShowListMode()
                 }
             }
-            is ListMode -> finish()
+
+            is ListMode -> {
+                if (isSearchBarVisible()) {
+                    hideSearchBar()
+                } else {
+                    finish()
+                }
+            }
+
             is Disabled -> finish()
             is Locked -> finish()
             else -> super.onBackPressed()
