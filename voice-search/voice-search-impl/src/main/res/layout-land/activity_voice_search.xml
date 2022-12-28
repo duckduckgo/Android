@@ -31,6 +31,7 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
+        android:layout_marginTop="@dimen/keyline_5"
         android:background="@android:color/transparent"
         android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
         app:layout_constraintTop_toTopOf="parent"
