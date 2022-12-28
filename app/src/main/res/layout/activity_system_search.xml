@@ -60,8 +60,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:importantForAccessibility="no"
-                        android:src="@drawable/ic_ddg_logo"
                         android:padding="4dp"
+                        android:src="@drawable/ic_ddg_logo"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
@@ -84,16 +84,17 @@
 
                     </androidx.appcompat.widget.AppCompatEditText>
 
-                    <com.duckduckgo.mobile.android.ui.view.button.IconButton
+                    <ImageView
                         android:id="@+id/voiceSearchButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:background="?selectableItemBackground"
                         android:contentDescription="@string/voiceSearchIconContentDescription"
-                        android:padding="@dimen/keyline_2"
+                        android:padding="@dimen/toolbarIconPadding"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@+id/clearTextButton"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:srcCompat="@drawable/ic_microphone_24"/>
+                        app:srcCompat="@drawable/ic_microphone_24" />
 
                     <ImageView
                         android:id="@+id/clearTextButton"
@@ -101,7 +102,7 @@
                         android:layout_height="wrap_content"
                         android:background="?selectableItemBackground"
                         android:contentDescription="@string/clearButtonContentDescription"
-                        android:padding="3dp"
+                        android:padding="@dimen/toolbarIconPadding"
                         android:src="@drawable/ic_close_24"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -116,7 +117,7 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <include layout="@layout/include_quick_access_items"/>
+    <include layout="@layout/include_quick_access_items" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/results"
@@ -131,9 +132,9 @@
             android:id="@+id/resultsContent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clipToPadding="false"
             android:background="?attr/daxColorSurface"
             android:backgroundTint="?attr/daxColorSurface"
+            android:clipToPadding="false"
             android:elevation="4dp">
 
             <androidx.recyclerview.widget.RecyclerView
@@ -155,11 +156,11 @@
                 android:paddingEnd="16dp"
                 android:paddingBottom="2dp"
                 android:text="@string/systemSearchDeviceAppLabel"
-                app:typography="caption_allCaps"
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/autocompleteSuggestions"/>
+                app:layout_constraintTop_toBottomOf="@id/autocompleteSuggestions"
+                app:typography="caption_allCaps" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/deviceAppSuggestions"
