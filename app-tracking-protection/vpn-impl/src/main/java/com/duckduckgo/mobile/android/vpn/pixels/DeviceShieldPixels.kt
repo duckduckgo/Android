@@ -266,16 +266,6 @@ interface DeviceShieldPixels {
     fun didChooseToContinueFromVpnConflictDialog()
 
     /**
-     * Will fire when the user presses "notify me" CTA in the waitlist dialog
-     */
-    fun didPressWaitlistDialogNotifyMe()
-
-    /**
-     * Will fire when the user presses dismisses the waitlist dialog
-     */
-    fun didPressWaitlistDialogDismiss()
-
-    /**
      * Will send CPU usage alert
      */
     fun sendCPUUsageAlert(cpuThresholdPassed: Int)
@@ -660,14 +650,6 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun didChooseToContinueFromVpnConflictDialog() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_CONTINUE_VPN_CONFLICT_DIALOG_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_CONTINUE_VPN_CONFLICT_DIALOG)
-    }
-
-    override fun didPressWaitlistDialogNotifyMe() {
-        firePixel(DeviceShieldPixelNames.ATP_DID_PRESS_WAITLIST_DIALOG_NOTIFY_ME)
-    }
-
-    override fun didPressWaitlistDialogDismiss() {
-        firePixel(DeviceShieldPixelNames.ATP_DID_PRESS_WAITLIST_DIALOG_DISMISS)
     }
 
     override fun sendCPUUsageAlert(cpuThresholdPassed: Int) {
