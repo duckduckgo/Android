@@ -23,6 +23,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.core.view.postDelayed
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -66,6 +67,10 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun configureViews() {
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+        )
         binding.indicator.onAction {
             if (it == INDICATOR_CLICKED) {
                 viewModel.userInitiatesSearchComplete()

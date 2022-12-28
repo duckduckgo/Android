@@ -19,26 +19,26 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:alpha="0.85"
-    android:background="?attr/colorPrimary">
+    android:background="?attr/daxColorBackground">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
+        android:layout_marginTop="@dimen/keyline_5"
         android:background="@android:color/transparent"
         android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
         app:layout_constraintTop_toTopOf="parent"
         app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu" />
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/speechResults"
-        style="@style/TextAppearance.DuckDuckGo.Body1"
+        app:typography="body1"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginHorizontal="30dp"
+        android:layout_marginHorizontal="@dimen/keyline_6"
         android:layout_marginTop="@dimen/keyline_2"
         android:gravity="center|bottom"
-        android:textColor="?attr/normalTextColor"
         android:maxLines="10"
         android:ellipsize="end"
         app:layout_constraintBottom_toTopOf="@+id/indicator"
@@ -57,16 +57,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/speechResults" />
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/footer"
-        style="@style/TextAppearance.DuckDuckGo.Body2"
+        app:typography="body2"
+        app:textType="secondary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="30dp"
-        android:layout_marginBottom="54dp"
+        android:layout_marginHorizontal="@dimen/keyline_6"
+        android:layout_marginBottom="102dp"
         android:gravity="center"
         android:text="@string/voiceSearchListeningFooter"
-        android:textColor="@color/gray70"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
