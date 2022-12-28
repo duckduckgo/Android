@@ -22,12 +22,11 @@
         android:id="@+id/close"
         android:layout_width="@dimen/messageCtaCloseButtonSize"
         android:layout_height="@dimen/messageCtaCloseButtonSize"
-        android:padding="@dimen/keyline_2"
         android:background="?selectableItemBackground"
+        android:padding="@dimen/keyline_2"
         android:src="@drawable/ic_close_24"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="?normalTextColor" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/illustration"
@@ -40,47 +39,44 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/messageTitle"
-        style="@style/MessageCta.Title"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_4"
-        android:layout_marginTop="6dp"
-        android:layout_marginEnd="@dimen/keyline_4"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="@dimen/keyline_2"
+        android:layout_marginEnd="40dp"
+        android:gravity="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/illustration"
-        app:layout_goneMarginTop="20dp"
+        app:layout_goneMarginTop="@dimen/keyline_4"
+        app:typography="h3"
         tools:text="Placeholder Title" />
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/messageSubtitle"
-        style="@style/MessageCta.Description"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_4"
         android:layout_marginTop="4dp"
         android:layout_marginEnd="@dimen/keyline_4"
-        android:layout_marginBottom="6dp"
+        android:gravity="center"
         app:layout_constraintBottom_toTopOf="@id/primaryActionButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/messageTitle"
         app:layout_goneMarginBottom="18dp"
+        app:typography="body2"
         tools:text="Body text goes here. This component can be used with one or two buttons." />
 
-    <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimarySmall
+    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
         android:id="@+id/primaryActionButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_2"
-        android:layout_marginTop="@dimen/keyline_2"
+        android:layout_marginStart="@dimen/keyline_1"
+        android:layout_marginTop="@dimen/keyline_4"
         android:layout_marginBottom="@dimen/keyline_4"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        android:paddingStart="14dp"
-        android:paddingEnd="14dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/secondaryActionButton"
@@ -88,19 +84,17 @@
         app:layout_goneMarginStart="0dp"
         tools:text="button" />
 
-    <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostSmall
+    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
         android:id="@+id/secondaryActionButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        android:paddingStart="14dp"
-        android:paddingEnd="14dp"
-        app:layout_constraintBottom_toBottomOf="@id/primaryActionButton"
+        android:layout_marginTop="@dimen/keyline_4"
+        android:layout_marginEnd="@dimen/keyline_1"
+        android:layout_marginBottom="@dimen/keyline_4"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/primaryActionButton"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/primaryActionButton"
         tools:text="button" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

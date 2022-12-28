@@ -439,16 +439,6 @@
 
     <style name="MessageCta" />
 
-    <style name="MessageCta.Title" parent="TextAppearance.DuckDuckGo.Headline4">
-        <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textStyle">normal</item>
-        <item name="android:gravity">center</item>
-    </style>
-
-    <style name="MessageCta.Description" parent="TextAppearance.DuckDuckGo.Body2">
-        <item name="android:gravity">center</item>
-    </style>
-
     <style name="MessageCta.Button" parent="Widget.AppCompat.Button.Borderless">
         <item name="android:minHeight">36dp</item>
         <item name="android:paddingTop">10dp</item>
