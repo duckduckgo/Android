@@ -24,6 +24,8 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.mobile.android.R
+import com.duckduckgo.mobile.android.ui.view.MessageCta
+import com.duckduckgo.mobile.android.ui.view.MessageCta.Message
 import com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
 import com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
@@ -59,6 +61,61 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
     class InfoPanelComponentViewHolder(
         parent: ViewGroup,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_info_panel))
+
+    class RemoteMessageComponentViewHolder(
+        parent: ViewGroup,
+    ) : ComponentViewHolder(inflate(parent, R.layout.component_remote_message)) {
+        override fun bind(component: Component) {
+            val smallMessage = Message(title = "Small Message", subtitle = "Body text goes here. This component doesn't have buttons")
+            val bigSingleMessage = Message(
+                illustration = R.drawable.ic_announce,
+                title = "Big Single  Message",
+                subtitle = "Body text goes here. This component has one button",
+                action = "Primary",
+            )
+            val bigTwoActionsMessage = Message(
+                illustration = R.drawable.ic_ddg_announce,
+                title = "Big Two Actions Message",
+                subtitle = "Body text goes here. This component has two buttons",
+                action = "Primary",
+                action2 = "Secondary",
+            )
+
+            val bigTwoActionsUpdateMessage = Message(
+                illustration = R.drawable.ic_app_update,
+                title = "Big Two Actions Message",
+                subtitle = "Body text goes here. This component has two buttons and showcases and app update",
+                action = "Primary",
+                action2 = "Secondary",
+            )
+
+            val mediumMessage = Message(
+                illustration = R.drawable.ic_critical_update,
+                title = "Big Single  Message",
+                subtitle = "Body text goes here. This component has one button",
+            )
+
+            view.findViewById<MessageCta>(R.id.small_remote_message).apply {
+                setMessage(smallMessage)
+            }
+
+            view.findViewById<MessageCta>(R.id.medium_remote_message).apply {
+                setMessage(mediumMessage)
+            }
+
+            view.findViewById<MessageCta>(R.id.big_single_remote_message).apply {
+                setMessage(bigSingleMessage)
+            }
+
+            view.findViewById<MessageCta>(R.id.big_two_actions_remote_message).apply {
+                setMessage(bigTwoActionsMessage)
+            }
+
+            view.findViewById<MessageCta>(R.id.big_two_actions_update_remote_message).apply {
+                setMessage(bigTwoActionsUpdateMessage)
+            }
+        }
+    }
 
     class SearchBarComponentViewHolder(
         parent: ViewGroup,
@@ -236,6 +293,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.SLIDER -> SliderComponentViewHolder(parent)
                 Component.SNACKBAR -> SnackbarComponentViewHolder(parent)
                 Component.INFO_PANEL -> InfoPanelComponentViewHolder(parent)
+                Component.REMOTE_MESSAGE -> RemoteMessageComponentViewHolder(parent)
                 Component.SEARCH_BAR -> SearchBarComponentViewHolder(parent)
                 Component.MENU_ITEM -> MenuItemComponentViewHolder(parent)
                 Component.SECTION_HEADER_LIST_ITEM -> HeaderSectionComponentViewHolder(parent)
