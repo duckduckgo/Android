@@ -18,6 +18,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="@drawable/popup_menu_bg"
     android:orientation="vertical">
 
@@ -26,9 +27,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:layout_marginTop="@dimen/keyline_4"
+        android:layout_marginTop="@dimen/keyline_2"
         android:layout_marginEnd="10dp"
-        android:layout_marginBottom="@dimen/keyline_4"
+        android:layout_marginBottom="@dimen/keyline_2"
         android:gravity="center"
         android:orientation="horizontal">
 
@@ -170,7 +171,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
-                app:iconDrawable="@drawable/ic_open_in_16_1"
+                tools:visibility="visible"
+                app:iconDrawable="@drawable/ic_open_in_app_android_alt_16"
                 app:labelText="@string/appLinkMenuItemTitle" />
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
