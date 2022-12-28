@@ -298,20 +298,6 @@ class RealDeviceShieldPixelsTest {
     }
 
     @Test
-    fun whenWaitlistDialogDismissThenFirePixels() {
-        deviceShieldPixels.didPressWaitlistDialogDismiss()
-
-        verify(pixel).fire(DeviceShieldPixelNames.ATP_DID_PRESS_WAITLIST_DIALOG_DISMISS.pixelName)
-    }
-
-    @Test
-    fun whenWaitlistDialogNotifyMeThenFirePixels() {
-        deviceShieldPixels.didPressWaitlistDialogNotifyMe()
-
-        verify(pixel).fire(DeviceShieldPixelNames.ATP_DID_PRESS_WAITLIST_DIALOG_NOTIFY_ME.pixelName)
-    }
-
-    @Test
     fun whenReportUnprotectedAppsBucketCalledThenFirePixels() {
         val bucketSize = 20
         deviceShieldPixels.reportUnprotectedAppsBucket(bucketSize)
