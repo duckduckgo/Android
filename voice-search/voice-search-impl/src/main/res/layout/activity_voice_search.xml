@@ -64,7 +64,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/keyline_6"
-        android:layout_marginBottom="54dp"
+        android:layout_marginBottom="102dp"
         android:gravity="center"
         android:text="@string/voiceSearchListeningFooter"
         app:layout_constraintBottom_toBottomOf="parent"
