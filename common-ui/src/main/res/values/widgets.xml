@@ -116,6 +116,14 @@
         <item name="android:background">?attr/selectableItemBackground</item>
     </style>
 
+    <style name="Widget.DuckDuckGo.PopupMenuHorizontalDivider">
+        <item name="android:layout_marginStart">@dimen/keyline_5</item>
+        <item name="android:layout_marginTop">@dimen/keyline_1</item>
+        <item name="android:layout_marginEnd">@dimen/keyline_5</item>
+        <item name="android:layout_marginBottom">@dimen/keyline_1</item>
+        <item name="defaultPadding">false</item>
+    </style>
+
     <style name="Widget.DuckDuckGo.NavigationalIcon">
         <item name="android:background">@drawable/ripple_rectangle_rounded</item>
         <item name="android:layout_width">@dimen/popupMenuNavigationItemSize</item>
@@ -128,7 +136,7 @@
     <style name="Widget.DuckDuckGo.MenuItemView">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:paddingStart">20dp</item>
+        <item name="android:paddingStart">@dimen/keyline_5</item>
         <item name="android:paddingEnd">@dimen/keyline_5</item>
         <item name="android:paddingTop">@dimen/keyline_3</item>
         <item name="android:paddingBottom">@dimen/keyline_3</item>
@@ -347,8 +355,7 @@
         <item name="android:textCursorDrawable">@drawable/text_cursor</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.TextInput"
-           parent="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+    <style name="Widget.DuckDuckGo.TextInput" parent="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="shapeAppearance">@style/ShapeAppearance.DuckDuckGo.SmallComponent</item>
         <item name="boxStrokeColor">@color/text_input_box_color_selector</item>
         <item name="endIconTint">?attr/daxColorPrimaryIcon</item>
