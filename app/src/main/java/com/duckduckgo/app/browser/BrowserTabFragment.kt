@@ -2712,9 +2712,6 @@ class BrowserTabFragment :
                     viewModel.onAutofillMenuSelected()
                 }
             }
-            view.menuScrollableContent.setOnScrollChangeListener { _, _, _, _, _ ->
-                view.dividerShadow.isVisible = view.menuScrollableContent.canScrollVertically(-1)
-            }
             browserMenu.setOnClickListener {
                 viewModel.onBrowserMenuClicked()
                 hideKeyboardImmediately()
