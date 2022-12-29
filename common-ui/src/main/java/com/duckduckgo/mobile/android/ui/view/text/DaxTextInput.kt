@@ -110,6 +110,9 @@ class DaxTextInput @JvmOverloads constructor(
                 }
             }
 
+            val minLines = getInt(R.styleable.DaxTextInput_android_minLines, 1)
+            binding.internalEditText.minLines = minLines
+
             recycle()
         }
     }
