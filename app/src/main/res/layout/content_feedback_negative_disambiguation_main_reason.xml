@@ -20,52 +20,64 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
     android:fillViewport="true">
 
-    <androidx.constraintlayout.widget.ConstraintLayout style="@style/FeedbackFragmentStyle">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
         <ImageView
             android:id="@+id/emoticonImage"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_marginTop="@dimen/feedbackTitleMarginTop"
+            android:layout_marginTop="@dimen/keyline_4"
             android:importantForAccessibility="no"
             android:src="@drawable/ic_sad_face"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/title"
-            style="@style/FeedbackTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_4"
             android:text="@string/feedbackNegativeMainReasonPageTitle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/emoticonImage" />
+            app:layout_constraintTop_toBottomOf="@id/emoticonImage"
+            app:typography="h1" />
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/subtitle"
-            style="@style/FeedbackTitle.FeedbackSubtitle"
-            android:layout_marginTop="5dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_5"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginEnd="@dimen/keyline_5"
             android:text="@string/feedbackNegativeMainReasonPageSubtitle"
+            android:textAlignment="center"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/title" />
+            app:layout_constraintTop_toBottomOf="@id/title"
+            app:typography="body1" />
+
+        <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_4"
+            app:layout_constraintTop_toBottomOf="@id/subtitle" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
-            android:layout_marginTop="@dimen/feedbackTitleMarginTop"
+            android:layout_height="wrap_content"
             android:clipToPadding="false"
-            tools:itemCount="6"
-            tools:listitem="@layout/item_feedback_reason"
-            app:layout_constraintTop_toBottomOf="@id/subtitle"
             android:paddingBottom="2dp"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_height="wrap_content" />
-
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
