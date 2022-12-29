@@ -92,7 +92,7 @@ class ShareOpenEndedFeedbackFragment : FeedbackFragment(R.layout.content_feedbac
     private fun updateDisplayForPositiveFeedback() {
         binding.title.text = getString(R.string.feedbackShareDetails)
         binding.subtitle.text = getString(R.string.sharePositiveFeedbackWithTheTeam)
-        binding.openEndedFeedbackContainer.hint = getString(R.string.whatHaveYouBeenEnjoying)
+        binding.openEndedFeedback.hint = getString(R.string.whatHaveYouBeenEnjoying)
         binding.emoticonImage.setImageResource(R.drawable.ic_happy_face)
     }
 
@@ -102,7 +102,7 @@ class ShareOpenEndedFeedbackFragment : FeedbackFragment(R.layout.content_feedbac
 
         binding.title.text = getDisplayText(mainReason!!)
         binding.subtitle.text = getDisplayText(subReason)
-        binding.openEndedFeedbackContainer.hint = getInputHintText(mainReason!!)
+        binding.openEndedFeedback.hint = getInputHintText(mainReason!!)
         binding.emoticonImage.setImageResource(R.drawable.ic_sad_face)
     }
 
@@ -127,7 +127,7 @@ class ShareOpenEndedFeedbackFragment : FeedbackFragment(R.layout.content_feedbac
     override fun configureListeners() {
         with(binding) {
             rootScrollView.doOnNextLayout {
-                binding.openEndedFeedback.setOnTouchListener(LayoutScrollingTouchListener(rootScrollView, openEndedFeedbackContainer.y.toInt()))
+                binding.openEndedFeedback.setOnTouchListener(LayoutScrollingTouchListener(rootScrollView, openEndedFeedback.y.toInt()))
             }
 
             submitFeedbackButton.setOnClickListener {
