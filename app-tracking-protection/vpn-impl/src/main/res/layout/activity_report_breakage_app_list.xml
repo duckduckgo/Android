@@ -15,54 +15,51 @@
   -->
 
 <LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
->
-    <include
-        android:id="@+id/include_toolbar"
-        layout="@layout/include_default_toolbar"/>
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?attr/daxColorSurface"
+        android:orientation="vertical">
 
+    <include
+            android:id="@+id/include_toolbar"
+            layout="@layout/include_default_toolbar"/>
 
     <androidx.core.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+            android:background="?attr/daxColorBackground"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/appBreakageReportFeature"
-                style="@style/TextAppearance.DuckDuckGo.Body2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
                 android:paddingTop="@dimen/keyline_4"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/keyline_4"
-                android:layout_marginEnd="@dimen/keyline_4"
-                android:text="@string/atp_ReportBreakageAppFeature"
-                android:textColor="?attr/settingsMinorTextColor"/>
+                android:paddingEnd="@dimen/keyline_4"
+                android:paddingStart="@dimen/keyline_4">
 
-            <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
-                android:id="@+id/appBreakageReportSplitter"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                    android:id="@+id/appBreakageReportFeature"
+                    app:typography="body2"
+                    app:textType="secondary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/keyline_3"
+                    android:text="@string/atp_ReportBreakageAppFeature"/>
 
             <com.facebook.shimmer.ShimmerFrameLayout
-                android:id="@+id/deviceShieldReportBreakageAppListSkeleton"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                    android:id="@+id/deviceShieldReportBreakageAppListSkeleton"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
 
                 <LinearLayout
-                    android:paddingTop="@dimen/keyline_2"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
+                        android:paddingBottom="@dimen/keyline_2"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
 
                     <include layout="@layout/view_device_shield_report_breakage_app_list_skeleton"/>
 
@@ -91,30 +88,29 @@
             </com.facebook.shimmer.ShimmerFrameLayout>
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/reportBreakageAppsRecycler"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clipToPadding="false"
-                android:paddingBottom="@dimen/keyline_2"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:listItem="@layout/view_device_shield_report_app_breakage_entry"/>
+                    android:id="@+id/reportBreakageAppsRecycler"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:listItem="@layout/view_device_shield_report_app_breakage_entry"/>
 
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
 
     <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+            app:defaultPadding="false"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
 
-    <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryLarge
-        android:id="@+id/ctaSubmitAppBreakage"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_4"
-        android:layout_marginEnd="@dimen/keyline_4"
-        android:layout_marginBottom="@dimen/keyline_4"
-        android:enabled="false"
-        android:text="@string/atp_ReportBreakageAppSubmitCta"/>
+    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+            android:id="@+id/ctaSubmitAppBreakage"
+            app:buttonSize="large"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/keyline_4"
+            android:enabled="false"
+            android:text="@string/atp_ReportBreakageAppNextCta"/>
 
 </LinearLayout>

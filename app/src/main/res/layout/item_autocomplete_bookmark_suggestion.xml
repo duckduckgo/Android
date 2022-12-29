@@ -64,7 +64,6 @@
         android:maxLines="1"
         android:textAlignment="textStart"
         android:textColor="?attr/autoCompleteSubtitleTextColor"
-        android:textSize="14sp"
         app:layout_constraintEnd_toStartOf="@id/goToBookmarkImage"
         app:layout_constraintStart_toEndOf="@id/bookmarkIndicator"
         app:layout_constraintBottom_toBottomOf="parent"

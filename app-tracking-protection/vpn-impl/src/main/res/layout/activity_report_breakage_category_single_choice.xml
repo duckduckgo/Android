@@ -17,134 +17,97 @@
   -->
 
 <LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".breakage.ReportBreakageCategorySingleChoiceActivity">
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="?attr/daxColorSurface"
+        tools:context=".breakage.ReportBreakageCategorySingleChoiceActivity">
 
     <include
-        android:id="@+id/include_toolbar"
-        layout="@layout/include_default_toolbar"/>
+            android:id="@+id/include_toolbar"
+            layout="@layout/include_default_toolbar"/>
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+    <androidx.core.widget.NestedScrollView
+            android:background="?attr/daxColorBackground"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/textInputLayout"
-                style="@style/TextInputBoxStyle"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:layout_marginStart="25dp"
-                android:layout_marginTop="25dp"
-                android:layout_marginEnd="25dp"
-                android:hint="@string/atp_ReportBreakageCategoriesHint"
-                android:textColorHint="?attr/normalTextColor"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/include_toolbar">
-
-                <EditText
-                    android:id="@+id/categoriesSelection"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:cursorVisible="false"
-                    android:ellipsize="end"
-                    android:focusable="false"
-                    android:importantForAutofill="no"
-                    android:inputType="none"
-                    android:labelFor="@id/categoriesSelection"
-                    android:maxLines="1"
-                    android:drawableEnd="@drawable/ic_report_breakage_down_arrow_24dp"
-                    android:textColor="?attr/normalTextColor"
-                    android:textIsSelectable="false"
-                    tools:ignore="RtlSymmetry" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <LinearLayout
-                android:id="@+id/otherCategoryDescription"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:visibility="visible">
-
-                <TextView
-                    android:id="@+id/appBreakageFormHeading"
-                    style="@style/TextAppearance.DuckDuckGo.Headline3"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/keyline_2"
-                    android:fontFamily="sans-serif-medium"
-                    android:padding="@dimen/keyline_4"
-                    android:text="@string/atp_ReportBreakageFormWhatHappenedText"
-                    android:textStyle="bold"
-                    android:textColor="?attr/normalTextColor"/>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/appBreakageFormFeedbackContainer"
-                    style="@style/TextInputBoxStyle"
-                    android:layout_width="match_parent"
-                    android:layout_height="140dp"
-                    android:layout_marginTop="@dimen/keyline_2"
-                    android:hint="@string/atp_ReportBreakageFormInputHint"
-                    android:paddingStart="@dimen/keyline_4"
-                    android:paddingEnd="@dimen/keyline_4"
-                    app:hintTextAppearance="@android:style/TextAppearance"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/appBreakageFormFeedbackInput"
-                        style="@style/TextInputStyle"
-                        android:gravity="top" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/appBreakageFormDisclaimer"
-                style="@style/TextAppearance.DuckDuckGo.Body2"
-                android:layout_marginTop="@dimen/keyline_2"
-                android:padding="@dimen/keyline_4"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/atp_ReportBreakageFormDisclaimerText"
-                android:textColor="?attr/settingsMinorTextColor"/>
+                android:orientation="vertical"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4">
+
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
+                    android:id="@+id/categoriesSelection"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/atp_ReportBreakageCategoriesHint"
+                    app:editable="false"
+                    app:endIcon="@drawable/ic_chevron_down_24_small"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"/>
+
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                    android:id="@+id/appBreakageFormHeading"
+                    app:typography="body2"
+                    app:textType="secondary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_4"
+                    android:text="@string/atp_ReportBreakageFormWhatHappenedText"/>
+
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
+                    android:id="@+id/appBreakageFormFeedbackInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_4"
+                    android:hint="@string/atp_ReportBreakageFormInputHint"
+                    app:editable="true"
+                    app:type="multi_line"
+                    android:minLines="3"/>
+
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                    android:id="@+id/appBreakageFormDisclaimer"
+                    app:typography="body2"
+                    app:textType="secondary"
+                    android:layout_marginTop="@dimen/keyline_4"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/atp_ReportBreakageFormDisclaimerText"/>
 
         </LinearLayout>
 
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
-    <TextView
-        android:id="@+id/appBreakageFormConfirmationCheckbox"
-        android:padding="@dimen/keyline_4"
-        style="@style/TextAppearance.AppCompat.Body1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/atp_ReportBreakageFormCheckboxText" />
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            android:id="@+id/appBreakageFormConfirmationCheckbox"
+            app:typography="body1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginEnd="@dimen/keyline_4"
+            android:layout_marginTop="@dimen/keyline_4"
+            android:text="@string/atp_ReportBreakageFormCheckboxText"/>
 
     <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
 
-    <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryLarge
-        android:id="@+id/ctaNextFormSubmit"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_4"
-        android:layout_marginEnd="@dimen/keyline_4"
-        android:layout_marginBottom="@dimen/keyline_4"
-        android:text="@string/atp_ReportBreakageAppSubmitCta"/>
+    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+            android:id="@+id/ctaNextFormSubmit"
+            app:buttonSize="large"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginEnd="@dimen/keyline_4"
+            android:layout_marginBottom="@dimen/keyline_4"
+            android:text="@string/atp_ReportBreakageAppSubmitCta"/>
 
 </LinearLayout>
