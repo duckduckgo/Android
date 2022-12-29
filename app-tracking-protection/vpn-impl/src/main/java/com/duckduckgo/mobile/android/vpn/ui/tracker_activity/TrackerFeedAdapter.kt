@@ -57,12 +57,7 @@ class TrackerFeedAdapter @Inject constructor(
         position: Int,
     ) {
         when (holder) {
-            is TrackerFeedViewHolder -> holder.bind(
-                trackerFeedItems[position] as TrackerFeedItem.TrackerFeedData,
-                onAppClick,
-                position == trackerFeedItems.size - 1,
-            )
-
+            is TrackerFeedViewHolder -> holder.bind(trackerFeedItems[position] as TrackerFeedItem.TrackerFeedData, onAppClick)
             is TrackerSkeletonViewHolder -> holder.bind()
             is TrackerFeedHeaderViewHolder -> holder.bind(trackerFeedItems[position] as TrackerFeedItem.TrackerFeedItemHeader)
             is TrackerAppsProtectionStateViewHolder ->
@@ -162,7 +157,6 @@ class TrackerFeedAdapter @Inject constructor(
         val context: Context = view.context
         var activityMessage: TextView = view.findViewById(R.id.activity_message)
         var timeSinceTrackerBlocked: TextView = view.findViewById(R.id.activity_time_since)
-        var splitter: View = view.findViewById(R.id.entry_splitter)
         var trackingAppIcon: ImageView = view.findViewById(R.id.tracking_app_icon)
         var trackerBadgesView: RecyclerView = view.findViewById<RecyclerView>(R.id.tracker_badges).apply {
             adapter = TrackerBadgeAdapter()
@@ -172,8 +166,7 @@ class TrackerFeedAdapter @Inject constructor(
 
         fun bind(
             tracker: TrackerFeedItem.TrackerFeedData?,
-            onAppClick: (TrackerFeedItem.TrackerFeedData) -> Unit,
-            shouldHideDivider: Boolean,
+            onAppClick: (TrackerFeedItem.TrackerFeedData) -> Unit
         ) {
             tracker?.let { item ->
                 with(activityMessage) {
@@ -240,11 +233,6 @@ class TrackerFeedAdapter @Inject constructor(
                 }
                 itemView.setOnClickListener {
                     onAppClick(item)
-                }
-                if (shouldHideDivider) {
-                    splitter.hide()
-                } else {
-                    splitter.show()
                 }
             }
         }

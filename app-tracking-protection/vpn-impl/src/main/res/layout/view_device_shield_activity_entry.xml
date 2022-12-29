@@ -63,6 +63,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_1"
+        android:paddingBottom="@dimen/keyline_4"
         app:layout_constraintEnd_toStartOf="@id/entry_chevron"
         app:layout_constraintStart_toStartOf="@id/tracker_badges"
         app:layout_constraintTop_toBottomOf="@id/tracker_badges"
@@ -84,7 +85,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="72dp"
-        android:layout_marginTop="@dimen/keyline_4"
         app:defaultPadding="false"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/activity_time_since" />
