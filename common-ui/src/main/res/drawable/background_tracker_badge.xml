@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyright (c) 2022 DuckDuckGo
   ~
@@ -14,14 +15,12 @@
   ~ limitations under the License.
   -->
 
-<resources>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+       android:shape="oval">
 
-    <style name="AlwaysOnBottomSheetDialogTheme" parent="@style/ThemeOverlay.MaterialComponents.BottomSheetDialog">
-        <item name="bottomSheetStyle">@style/AlwaysOnBottomSheetStyle</item>
-    </style>
+    <solid android:color="?attr/daxColorContainer" />
+    <padding android:top="1.5dp"
+             android:right="4dp"
+             android:left="4dp"/>
 
-    <style name="AlwaysOnBottomSheetStyle" parent="Widget.MaterialComponents.BottomSheet.Modal">
-        <item name="backgroundTint">@android:color/transparent</item>
-        <item name="behavior_skipCollapsed">true</item>
-    </style>
-</resources>
+</shape>

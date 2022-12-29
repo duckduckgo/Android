@@ -15,15 +15,15 @@
   -->
 
 
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:app="http://schemas.android.com/apk/res-auto"
-          xmlns:tools="http://schemas.android.com/tools"
-          android:id="@+id/excludedAppsFilterText"
-          style="@style/TextAppearance.DuckDuckGo.Body2"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:drawablePadding="@dimen/keyline_2"
-          android:layout_marginTop="@dimen/keyline_2"
-          android:padding="@dimen/keyline_4"
-          app:drawableEndCompat="@drawable/ic_arrow_down"
-          tools:text="Protection Enabled (11)"/>
+<com.duckduckgo.mobile.android.ui.view.text.DaxTextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/excludedAppsFilterText"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/keyline_2"
+    android:drawablePadding="@dimen/keyline_2"
+    android:padding="@dimen/keyline_4"
+    app:drawableEndCompat="@drawable/ic_arrow_down"
+    app:typography="body2"
+    tools:text="Protection Enabled (11)" />
