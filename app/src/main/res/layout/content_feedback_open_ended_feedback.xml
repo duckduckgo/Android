@@ -55,26 +55,28 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/keyline_5"
-            android:layout_marginTop="@dimen/keyline_4"
+            android:layout_marginTop="@dimen/keyline_2"
             android:layout_marginEnd="@dimen/keyline_5"
             android:textAlignment="center"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/title"
+            app:typography="body1"
             tools:text="Which feature can we improve or add?" />
 
         <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
             android:id="@+id/openEndedFeedback"
             android:layout_width="0dp"
-            android:layout_height="140dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="@dimen/feedbackTitleMarginTop"
             android:layout_marginEnd="20dp"
             android:hint="@string/openEndedInputHint"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_min="140dp"
+            app:layout_constraintHeight_max="140dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/subtitle" />
+            app:layout_constraintTop_toBottomOf="@id/subtitle"
+            app:type="multi_line" />
 
         <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
             android:id="@+id/submitFeedbackButton"

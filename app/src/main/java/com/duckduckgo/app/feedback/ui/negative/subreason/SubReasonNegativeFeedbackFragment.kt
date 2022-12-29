@@ -94,7 +94,6 @@ class SubReasonNegativeFeedbackFragment : FeedbackFragment(R.layout.content_feed
         activity?.let {
             binding.recyclerView.layoutManager = LinearLayoutManager(it)
             binding.recyclerView.adapter = recyclerAdapter
-            binding.recyclerView.addItemDecoration(FeedbackItemDecoration(ContextCompat.getDrawable(it, R.drawable.feedback_list_divider)!!))
 
             arguments?.let { args ->
 

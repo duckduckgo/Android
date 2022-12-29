@@ -54,25 +54,31 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/keyline_5"
-            android:layout_marginTop="@dimen/keyline_4"
+            android:layout_marginTop="@dimen/keyline_2"
             android:layout_marginEnd="@dimen/keyline_5"
             android:textAlignment="center"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/title"
+            app:typography="body1"
             tools:text="Which XXX feature can we improve or add?" />
 
+        <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_4"
+            app:layout_constraintTop_toBottomOf="@id/subtitle" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/feedbackTitleMarginTop"
             android:clipToPadding="false"
             android:paddingBottom="2dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/subtitle" />
+            app:layout_constraintTop_toBottomOf="@id/divider" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

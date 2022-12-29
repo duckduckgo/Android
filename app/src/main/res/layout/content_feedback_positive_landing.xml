@@ -53,60 +53,52 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/keyline_5"
-            android:layout_marginTop="@dimen/keyline_4"
+            android:layout_marginTop="@dimen/keyline_2"
             android:layout_marginEnd="@dimen/keyline_5"
             android:text="@string/shareTheLoveWithARating"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/title" />
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintGuide_percent="0.5"
-            app:layout_constraintTop_toBottomOf="@id/subtitle" />
+            app:layout_constraintTop_toBottomOf="@id/title"
+            app:typography="body1" />
 
         <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
             android:id="@+id/rateAppButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginEnd="@dimen/keyline_4"
+            android:layout_marginBottom="@dimen/keyline_4"
             android:text="@string/rateTheApp"
             app:buttonSize="large"
             app:layout_constraintBottom_toTopOf="@id/shareFeedbackButton"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/guideline" />
+            app:layout_constraintStart_toStartOf="parent" />
 
         <com.duckduckgo.mobile.android.ui.view.button.DaxButtonSecondary
             android:id="@+id/shareFeedbackButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="@dimen/keyline_2"
-            android:layout_marginEnd="20dp"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginEnd="@dimen/keyline_4"
+            android:layout_marginBottom="@dimen/keyline_4"
             android:text="@string/feedbackShareDetails"
             app:buttonSize="large"
+            app:layout_constraintBottom_toTopOf="@id/cancelButton"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/rateAppButton" />
+            app:layout_constraintStart_toStartOf="parent" />
 
         <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
             android:id="@+id/cancelButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="@dimen/keyline_5"
-            android:layout_marginEnd="20dp"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginEnd="@dimen/keyline_4"
+            android:layout_marginBottom="@dimen/keyline_5"
             android:text="@string/declineFurtherFeedback"
             app:buttonSize="large"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/shareFeedbackButton" />
+            app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
