@@ -49,7 +49,7 @@ class AlwaysOnAlertDialogFragment private constructor() : BottomSheetDialogFragm
     private lateinit var listener: Listener
     private lateinit var fragmentType: FragmentType
 
-    override fun getTheme(): Int = R.style.AlwaysOnBottomSheetDialogTheme
+    override fun getTheme(): Int = com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_BottomSheetDialogCollapsed
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)

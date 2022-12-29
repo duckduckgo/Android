@@ -386,6 +386,15 @@
         <item name="android:backgroundTint">?attr/daxColorSurface</item>
     </style>
 
+    <style name="Widget.DuckDuckGo.BottomSheetDialogCollapsed" parent="ThemeOverlay.MaterialComponents.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/Widget.DuckDuckGo.ModalBottomSheetCollapsedStyle</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.ModalBottomSheetCollapsedStyle" parent="Widget.MaterialComponents.BottomSheet.Modal">
+        <item name="backgroundTint">@android:color/transparent</item>
+        <item name="behavior_skipCollapsed">true</item>
+    </style>
+
     <style name="Widget.DuckDuckGo.BottomSheetDialogCorners">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSizeTopRight">@dimen/dialogBorderRadius</item>

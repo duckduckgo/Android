@@ -17,7 +17,6 @@
 package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 
 import android.content.Context
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,6 +25,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.mobile.android.ui.TextDrawable
+import com.duckduckgo.mobile.android.ui.view.getColorFromAttr
 import com.duckduckgo.mobile.android.ui.view.hide
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.vpn.R
@@ -84,13 +84,14 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
 
         private fun displayTrackerCompany(trackerInfo: TrackerCompanyBadge.Company) {
             val badge = badgeIcon(iconBadge.context, trackerInfo.companyName)
+            val textColor = iconBadge.context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorPrimaryText)
             if (badge == null) {
                 iconBadge.setImageDrawable(
                     TextDrawable.builder()
                         .beginConfig()
                         .fontSize(50)
                         .endConfig()
-                        .buildRound(trackerInfo.companyName.take(1), Color.DKGRAY),
+                        .buildRound(trackerInfo.companyName.take(1), textColor),
                 )
             } else {
                 iconBadge.setImageResource(badge)

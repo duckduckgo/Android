@@ -18,7 +18,7 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
        android:shape="rectangle">
 
-    <solid android:color="?accentIconColor" />
+    <solid android:color="?attr/daxColorSurface" />
     <corners android:radius="12dp" />
     <padding android:top="1.5dp"
              android:right="6dp"
