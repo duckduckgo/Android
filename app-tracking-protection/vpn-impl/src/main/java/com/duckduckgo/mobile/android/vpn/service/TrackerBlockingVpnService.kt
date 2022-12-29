@@ -37,7 +37,6 @@ import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.integration.VpnNetworkStackProvider
-import com.duckduckgo.mobile.android.vpn.model.VpnServiceState.ENABLED
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceState.ENABLING
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack.VpnTunnelConfig
 import com.duckduckgo.mobile.android.vpn.network.util.asRoute
@@ -226,7 +225,9 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
 
         synchronized(startVpnLock) {
             val currStateStats = vpnServiceStateStatsDao.getLastStateStats()
-            if (currStateStats?.state == ENABLING || currStateStats?.state == ENABLED) {
+            // We don't check for ENABLED state here because it break when the app is updated
+            // (See: https://app.asana.com/0/488551667048375/1203621692416589/f)
+            if (currStateStats?.state == ENABLING) {
                 // Sometimes onStartCommand gets called twice - this is a safety rail against that
                 logcat(LogPriority.WARN) { "VPN is already being started, abort" }
                 return@withContext
