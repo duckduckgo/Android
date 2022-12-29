@@ -26,10 +26,12 @@
     <ImageView
         android:id="@+id/closeButton"
         android:src="@drawable/ic_close_24"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginTop="@dimen/keyline_4"
+        android:layout_marginEnd="@dimen/keyline_4"
+        android:layout_marginBottom="@dimen/keyline_1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="?selectableItemBackground"
         android:layout_gravity="end"
     />
 
@@ -48,16 +50,15 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="40dp"
-        android:paddingEnd="40dp"
-        android:paddingBottom="40dp"
+        android:paddingStart="@dimen/keyline_6"
+        android:paddingEnd="@dimen/keyline_6"
+        android:paddingBottom="@dimen/keyline_6"
     >
-
         <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/alwaysOnModalHeading"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="24dp"
+            android:paddingTop="@dimen/keyline_5"
             android:gravity="center"
             app:typography="h2"
             android:text="@string/atp_AlwaysOnModalHeading"
@@ -67,26 +68,27 @@
             android:id="@+id/alwaysOnModalDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="24dp"
+            android:paddingTop="@dimen/keyline_5"
             android:gravity="center"
             app:typography="body1"
             android:text="@string/atp_AlwaysOnModalBody"
         />
 
-
-        <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryLowercase
+        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
             android:id="@+id/goToSettingsButton"
+            app:buttonSize="large"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="@dimen/keyline_5"
             android:text="@string/atp_PromoteAlwaysOnDialogSettings"
         />
 
-        <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryLarge
+        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonSecondary
             android:id="@+id/notNowButton"
+            app:buttonSize="large"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="@dimen/keyline_1"
             android:text="@string/atp_PromoteAlwaysOnDialogNotNow"
         />
     </LinearLayout>
