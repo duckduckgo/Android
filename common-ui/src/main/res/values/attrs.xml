@@ -76,11 +76,9 @@
 
     <attr name="normalTextColor" format="color" />
     <attr name="secondaryTextColor" format="color"/>
-    <attr name="accentTextColor" format="color" />
     <attr name="primaryIconColor" format="color" />
     <attr name="primaryIconDisabledColor" format="color" />
     <attr name="secondaryIconColor" format="color" />
-    <attr name="accentIconColor" format="color" />
     <attr name="splitterColor" format="color" />
 
     <attr name="secondaryButtonPressedColor" format="color" />

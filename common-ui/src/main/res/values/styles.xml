@@ -148,6 +148,12 @@
         <item name="android:textAlignment">viewStart</item>
     </style>
 
+    <style name="FeedbackFragmentStyle">
+        <item name="android:background">?attr/colorPrimaryDark</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+    </style>
+
     <style name="TextInputEditTextTheme" parent="ThemeOverlay.MaterialComponents.TextInputEditText.OutlinedBox">
         <item name="android:colorControlActivated">@color/cornflowerBlue</item>
     </style>
@@ -221,37 +227,6 @@
     </style>
 
     <style name="DeviceShield" />
-
-    <style name="DeviceShield.PrivacyReport" />
-
-    <style name="DeviceShield.PrivacyReport.PastWeekCounters">
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textColor">?normalTextColor</item>
-        <item name="android:textStyle">normal</item>
-        <item name="android:selectable">false</item>
-    </style>
-
-    <style name="DeviceShield.PrivacyReport.PastWeekCounters.Title">
-        <item name="android:textColor">@color/warmerGray</item>
-        <item name="android:textSize">12sp</item>
-        <item name="android:textAllCaps">true</item>
-    </style>
-
-    <style name="DeviceShield.PrivacyReport.TrackerEntry">
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textColor">@color/primary_text_color_selector</item>
-        <item name="android:lineSpacingExtra">6sp</item>
-        <item name="android:textStyle">normal</item>
-        <item name="android:selectable">false</item>
-        <item name="android:textSize">16sp</item>
-    </style>
-
-    <style name="DeviceShield.PrivacyReport.Time">
-        <item name="android:textColor">?secondaryTextColor</item>
-        <item name="android:textStyle">normal</item>
-        <item name="android:selectable">false</item>
-        <item name="android:textSize">14sp</item>
-    </style>
 
     <style name="DeviceShield.NewTab" />
 

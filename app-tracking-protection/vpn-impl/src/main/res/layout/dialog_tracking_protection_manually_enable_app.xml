@@ -21,38 +21,34 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?dialogBgColor">
+    style="@style/Widget.DuckDuckGo.Dialog.Content">
 
     <ImageView
         android:id="@+id/trackingProtectionAppIcon"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:layout_marginTop="@dimen/keyline_5"
         android:importantForAccessibility="no"
         android:src="@drawable/ic_globe_gray_16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/trackingProtectionTitle"
-        style="@style/TextAppearance.AppCompat.Title"
+        app:typography="h2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_5"
         android:layout_marginTop="@dimen/keyline_4"
-        android:layout_marginEnd="@dimen/keyline_5"
         android:gravity="center"
-        android:textColor="?normalTextColor"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/trackingProtectionAppIcon"
         tools:text="Facebook may experience issues if App Tracking Protection is enabled" />
 
-    <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimarySmall
+    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
         android:id="@+id/trackingProtectionExcludeAppDialogEnable"
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/dialogButtonHeight"
+        android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_0"
         android:layout_marginTop="@dimen/keyline_4"
         android:gravity="center|center_horizontal"
@@ -62,15 +58,14 @@
         app:layout_constraintStart_toEndOf="@id/trackingProtectionExcludeAppDialogSkip"
         app:layout_constraintTop_toBottomOf="@id/trackingProtectionTitle" />
 
-    <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostSmall
+    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
         android:id="@+id/trackingProtectionExcludeAppDialogSkip"
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/dialogButtonHeight"
+        android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_4"
-        android:layout_marginEnd="@dimen/keyline_0"
+        android:layout_marginEnd="@dimen/keyline_2"
         android:gravity="center|center_horizontal"
         android:text="@string/atp_ExcludeAppsManuallyCTACancel"
-        android:textColor="@color/cornflowerBlue"
         app:layout_constraintEnd_toStartOf="@id/trackingProtectionExcludeAppDialogEnable"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent"
@@ -84,18 +79,16 @@
         android:layout_marginBottom="-4dp"
         app:layout_constraintBottom_toBottomOf="@+id/trackingProtectionAppIcon"
         app:layout_constraintEnd_toEndOf="@+id/trackingProtectionAppIcon" app:srcCompat="@drawable/ic_apptp_alert"/>
-    <TextView
+
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/trackingProtectionEnableProtectionDisclaimer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_5"
+        app:typography="caption"
+        app:textType="secondary"
         android:layout_marginTop="@dimen/keyline_4"
-        android:layout_marginEnd="@dimen/keyline_5"
-        android:layout_marginBottom="@dimen/keyline_5"
         android:gravity="center"
         android:text="@string/atp_ExcludeAppsManuallyEnableFooter"
-        android:textAppearance="@style/TextAppearance.DuckDuckGo.Caption"
-        android:textColor="?attr/secondaryTextColor"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
