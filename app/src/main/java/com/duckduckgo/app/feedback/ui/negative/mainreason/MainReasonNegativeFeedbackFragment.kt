@@ -17,13 +17,11 @@
 package com.duckduckgo.app.feedback.ui.negative.mainreason
 
 import android.os.Bundle
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentFeedbackNegativeDisambiguationMainReasonBinding
 import com.duckduckgo.app.feedback.ui.common.FeedbackFragment
-import com.duckduckgo.app.feedback.ui.common.FeedbackItemDecoration
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason
 import com.duckduckgo.app.feedback.ui.negative.FeedbackTypeDisplay
 import com.duckduckgo.app.feedback.ui.negative.FeedbackTypeDisplay.FeedbackTypeMainReasonDisplay
