@@ -41,7 +41,7 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textInputLayout"
-                style="@style/FeedbackInputBoxStyle"
+                style="@style/TextInputBoxStyle"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:layout_marginStart="25dp"
@@ -92,7 +92,7 @@
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/appBreakageFormFeedbackContainer"
-                    style="@style/FeedbackInputBoxStyle"
+                    style="@style/TextInputBoxStyle"
                     android:layout_width="match_parent"
                     android:layout_height="140dp"
                     android:layout_marginTop="@dimen/keyline_2"
@@ -105,7 +105,7 @@
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/appBreakageFormFeedbackInput"
-                        style="@style/FeedbackEditTextInputStyle"
+                        style="@style/TextInputStyle"
                         android:gravity="top" />
 
                 </com.google.android.material.textfield.TextInputLayout>

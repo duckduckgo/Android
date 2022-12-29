@@ -18,28 +18,39 @@
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_height="match_parent"
-    android:layout_width="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:fillViewport="true">
 
-    <androidx.constraintlayout.widget.ConstraintLayout style="@style/FeedbackFragmentStyle">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/title"
-            style="@style/FeedbackTitle.FeedbackHappySadDisambiguationTitle"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_4"
             android:text="@string/feedbackInitialDisambiguationTitle"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/subtitle"
-            style="@style/FeedbackTitle.FeedbackSubtitle.FeedbackHappySadDisambiguationSubtitle"
-            android:text="@string/feedbackInitialDisambiguationSubtitle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/title" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:typography="h1" />
+
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            android:id="@+id/subtitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_5"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginEnd="@dimen/keyline_5"
+            android:text="@string/feedbackInitialDisambiguationSubtitle"
+            android:textAlignment="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/title"
+            app:typography="body1" />
 
         <ImageView
             android:id="@+id/positiveFeedbackButton"
@@ -50,36 +61,35 @@
             android:clickable="true"
             android:contentDescription="@string/feedbackInitialDisambiguationHappyButtonContentDescription"
             android:focusable="true"
-            tools:src="@drawable/button_happy_light_theme"
             app:layout_constraintEnd_toStartOf="@id/negativeFeedbackButton"
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/subtitle" />
+            app:layout_constraintTop_toBottomOf="@id/subtitle"
+            tools:src="@drawable/button_happy_light_theme" />
 
         <ImageView
             android:id="@+id/negativeFeedbackButton"
             android:layout_width="100dp"
             android:layout_height="100dp"
+            android:layout_marginStart="28dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/feedbackInitialDisambiguationSadButtonContentDescription"
-            tools:src="@drawable/button_sad_light_theme"
-            android:layout_marginStart="28dp"
             app:layout_constraintBottom_toBottomOf="@id/positiveFeedbackButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/positiveFeedbackButton"
-            app:layout_constraintTop_toTopOf="@id/positiveFeedbackButton" />
+            app:layout_constraintTop_toTopOf="@id/positiveFeedbackButton"
+            tools:src="@drawable/button_sad_light_theme" />
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="26dp"
-            android:fontFamily="sans-serif-medium"
+            android:layout_marginBottom="@dimen/keyline_5"
             android:text="@string/feedbackIsImportantToUs"
-            android:textColor="?attr/feedbackAnonymousFeedbackLabelColor"
-            android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:textType="secondary"
+            app:typography="caption" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

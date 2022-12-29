@@ -47,6 +47,7 @@ import com.google.android.material.textfield.TextInputLayout.END_ICON_NONE
 
 interface TextInput {
     var text: String
+    var hint: String
     var isEditable: Boolean
 
     fun addTextChangedListener(textWatcher: TextWatcher)
@@ -117,6 +118,12 @@ class DaxTextInput @JvmOverloads constructor(
         get() = binding.internalEditText.text.toString()
         set(value) {
             binding.internalEditText.setText(value)
+        }
+
+    override var hint: String
+        get() = binding.internalEditText.text.toString()
+        set(value) {
+            binding.internalInputLayout.setHintWithoutAnimation(value)
         }
 
     override var isEditable: Boolean
