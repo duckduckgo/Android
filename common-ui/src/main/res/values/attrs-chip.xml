@@ -17,9 +17,6 @@
 
 <resources>
 
-    <!--Used by Chip view-->
-    <attr name="chipBackgroundColor" format="color" />
-
     <!--Chip view-->
     <declare-styleable name="Chip">
         <attr name="chipBackground" format="reference" />

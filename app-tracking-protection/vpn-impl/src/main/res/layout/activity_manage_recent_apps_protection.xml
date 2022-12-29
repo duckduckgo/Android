@@ -41,13 +41,13 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:id="@+id/manageRecentAppsReportIssues"
-                style="@style/TextAppearance.DuckDuckGo.Body2"
+                app:typography="body2"
+                app:textType="secondary"
                 tools:text="@string/atp_ManageRecentAppsProtectionReportIssues"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="?secondaryTextColor"
                 android:paddingStart="@dimen/keyline_4"
                 android:paddingEnd="@dimen/keyline_4"
                 android:paddingTop="@dimen/keyline_4"
@@ -89,9 +89,9 @@
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:listItem="@layout/view_device_shield_excluded_app_entry"/>
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:id="@+id/manageRecentAppsEmptyView"
-                style="@style/DeviceShield.PrivacyReport.TrackerEntry"
+                app:typography="body1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/keyline_4"

@@ -23,9 +23,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingStart="16dp"
-    android:paddingTop="8dp"
-    android:paddingEnd="16dp">
+    android:paddingTop="@dimen/keyline_4"
+    android:paddingStart="@dimen/keyline_2"
+    android:paddingEnd="@dimen/keyline_4"
+    android:paddingBottom="@dimen/keyline_4">
 
     <TextView
         android:id="@+id/report_breakage_rbutton_entry_skeleton_imageView"
@@ -37,38 +38,24 @@
         app:layout_constraintTop_toTopOf="parent"/>
 
     <TextView
-        android:id="@+id/report_breakage_app_entry_skeleton_imageView"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginStart="16dp"
-        android:background="@drawable/background_skeleton_ui"
-        app:layout_constraintStart_toEndOf="@+id/report_breakage_rbutton_entry_skeleton_imageView"
-        app:layout_constraintTop_toTopOf="parent"/>
+            android:id="@+id/report_breakage_app_entry_skeleton_imageView"
+            android:layout_width="@dimen/listItemImageContainerSize"
+            android:layout_height="@dimen/listItemImageContainerSize"
+            android:layout_marginStart="36dp"
+            android:background="@drawable/background_skeleton_ui"
+            app:layout_constraintStart_toEndOf="@+id/report_breakage_rbutton_entry_skeleton_imageView"
+            app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toBottomOf="parent"/>
 
     <TextView
-        android:id="@+id/report_breakage_app_entry_skeleton_top_text"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="80dp"
-        android:background="@drawable/background_skeleton_ui"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/report_breakage_app_entry_skeleton_imageView"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/report_breakage_app_entry_skeleton_bottom_text"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="120dp"
-        android:background="@drawable/background_skeleton_ui"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/report_breakage_app_entry_skeleton_imageView"
-        app:layout_constraintTop_toBottomOf="@+id/report_breakage_app_entry_skeleton_top_text" />
+            android:id="@+id/report_breakage_app_entry_skeleton_top_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="80dp"
+            android:background="@drawable/background_skeleton_ui"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/report_breakage_app_entry_skeleton_imageView"
+            app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 
