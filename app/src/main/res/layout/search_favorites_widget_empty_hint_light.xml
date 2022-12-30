@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2018 DuckDuckGo
+  ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -15,19 +15,18 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/quickAccessFaviconContainer"
-    style="@style/SearchWidgetFavoriteContainer"
-    android:orientation="vertical">
-
-    <ImageView
-        android:id="@+id/quickAccessFavicon"
-        style="@style/SearchWidgetFavoriteFavicon"
-        android:background="@drawable/search_widget_favorite_favicon_daynight_background" />
+    android:id="@+id/emptyGridViewContainer"
+    style="@style/SearchWidgetEmptyFavoritesHintContainer">
 
     <TextView
-        android:id="@+id/quickAccessTitle"
-        style="@style/SearchWidgetFavoriteTitle"
-        tools:text="Super long favorite title" />
+        android:id="@+id/noFavoritesText"
+        style="@style/SearchWidgetEmptyFavoritesHint"
+        android:text="@string/searchWidgetEmtpyFavoritesHint"
+        android:textColor="@color/black60" />
 
+    <TextView
+        android:id="@+id/addFavoriteText"
+        style="@style/SearchWidgetEmptyFavoritesAction"
+        android:text="@string/searchWidgetEmtpyFavoritesCta"
+        android:textColor="@color/blue50" />
 </LinearLayout>

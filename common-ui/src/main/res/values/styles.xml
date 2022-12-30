@@ -239,7 +239,7 @@
 
     <style name="SearchWidgetFavoriteContainer">
         <item name="android:layout_width">@dimen/searchWidgetFavoriteItemContainerWidth</item>
-        <item name="android:layout_height">@dimen/searchWidgetFavoriteItemContainerHeight</item>
+        <item name="android:layout_height">wrap_content</item>
         <item name="android:clipToPadding">false</item>
     </style>
 
@@ -256,7 +256,7 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:gravity">center</item>
         <item name="android:layout_gravity">center_horizontal|bottom</item>
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">@color/favoriteTitleTextColor</item>
         <item name="android:textSize">12sp</item>
         <item name="android:maxLines">1</item>
         <item name="android:ellipsize">end</item>
@@ -345,7 +345,7 @@
         <item name="android:textSize">14sp</item>
         <item name="android:maxLines">1</item>
         <item name="android:ellipsize">end</item>
-        <item name="android:textColor">@color/warGreyTwo</item>
+        <item name="android:textColor">@color/emptyFavoriteDescriptionTextColor</item>
     </style>
 
     <style name="SearchWidgetEmptyFavoritesAction">
@@ -356,7 +356,7 @@
         <item name="android:textSize">15sp</item>
         <item name="android:maxLines">1</item>
         <item name="android:ellipsize">end</item>
-        <item name="android:textColor">@color/cornflowerBlue</item>
+        <item name="android:textColor">@color/emptyFavoriteActionTextColor</item>
     </style>
 
     <style name="Theme.AppCompat.Transparent.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">

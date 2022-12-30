@@ -39,6 +39,6 @@
             android:stretchMode="columnWidth"
             android:columnWidth="@dimen/searchWidgetFavoriteItemContainerWidth" />
 
-        <include layout="@layout/search_favorites_widget_empty_hint"/>
+        <include layout="@layout/search_favorites_widget_empty_hint_dark"/>
     </FrameLayout>
 </LinearLayout>
