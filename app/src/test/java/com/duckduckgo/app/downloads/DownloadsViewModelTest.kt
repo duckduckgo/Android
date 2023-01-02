@@ -31,6 +31,7 @@ import com.duckduckgo.app.downloads.DownloadsViewModel.Command.OpenFile
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.ShareFile
 import com.duckduckgo.app.global.R as CommonR
 import com.duckduckgo.app.global.formatters.time.RealTimeDiffFormatter
+import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
 import com.duckduckgo.downloads.api.DownloadsRepository
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus.FINISHED
@@ -64,7 +65,7 @@ class DownloadsViewModelTest {
     private val testee: DownloadsViewModel by lazy {
         val model =
             DownloadsViewModel(
-                RealTimeDiffFormatter(context),
+                FakeTimeDiffFormatter(TODAY, RealTimeDiffFormatter(context)),
                 mockDownloadsRepository,
                 coroutineRule.testDispatcherProvider,
             )
@@ -103,7 +104,8 @@ class DownloadsViewModelTest {
 
     @Test
     fun whenDownloadsCalledAndMultipleDownloadsThenViewStateEmittedWithMultipleItemsAndHeaders() = runTest {
-        val today = LocalDateTime.now()
+        val formatter = org.threeten.bp.format.DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
+        val today = LocalDateTime.parse(TODAY, formatter)
         val yesterday = today.minusDays(1)
         val sometimeDuringPastWeek = today.minusDays(6)
         val sometimeDuringPastMonth = today.minusDays(20)
@@ -329,4 +331,37 @@ class DownloadsViewModelTest {
             createdAt = "2022-02-21T10:56:22",
             filePath = "/",
         )
+
+    companion object {
+        private const val TODAY = "2022-11-02T13:00:00"
+    }
+}
+
+private class FakeTimeDiffFormatter(
+    today: String,
+    private val realTimeDiffFormatter: RealTimeDiffFormatter,
+) : TimeDiffFormatter by realTimeDiffFormatter {
+    private val formatter = org.threeten.bp.format.DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
+    private val formattedToday = LocalDateTime.parse(today, formatter)
+
+    override fun formatTimePassed(endLocalDateTime: LocalDateTime, startLocalDateTime: LocalDateTime): String {
+        return realTimeDiffFormatter.formatTimePassed(
+            endLocalDateTime = formattedToday,
+            startLocalDateTime = startLocalDateTime,
+        )
+    }
+
+    override fun formatTimePassedInDays(endLocalDateTime: LocalDateTime, startLocalDateTime: LocalDateTime): String {
+        return realTimeDiffFormatter.formatTimePassedInDays(
+            endLocalDateTime = formattedToday,
+            startLocalDateTime = startLocalDateTime,
+        )
+    }
+
+    override fun formatTimePassedInDaysWeeksMonthsYears(endLocalDateTime: LocalDateTime, startLocalDateTime: LocalDateTime): String {
+        return realTimeDiffFormatter.formatTimePassedInDaysWeeksMonthsYears(
+            endLocalDateTime = formattedToday,
+            startLocalDateTime = startLocalDateTime,
+        )
+    }
 }
