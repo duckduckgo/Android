@@ -33,13 +33,14 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
-import javax.inject.Inject
 import timber.log.Timber
+import javax.inject.Inject
 
 @Module
 @ContributesTo(AppScope::class)
@@ -75,6 +76,7 @@ class AppShortcutCreator @Inject constructor(private val context: Context) {
         shortcutList.add(buildNewTabShortcut(context))
         shortcutList.add(buildClearDataShortcut(context))
         shortcutList.add(buildBookmarksShortcut(context))
+        shortcutList.add(buildApptpShortcut(context))
 
         val shortcutManager = context.getSystemService(ShortcutManager::class.java)
         kotlin.runCatching { shortcutManager.dynamicShortcuts = shortcutList }
@@ -121,9 +123,23 @@ class AppShortcutCreator @Inject constructor(private val context: Context) {
             .build().toShortcutInfo()
     }
 
+    @RequiresApi(Build.VERSION_CODES.N_MR1)
+    private fun buildApptpShortcut(context: Context): ShortcutInfo {
+        return ShortcutInfoCompat.Builder(context, SHORTCUT_ID_OPEN_APPTP)
+            .setShortLabel(context.getString(R.string.atp_ShortcutTitle))
+            .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_apptp))
+            .setIntent(
+                Intent(context, DeviceShieldTrackerActivity::class.java).also {
+                    it.action = Intent.ACTION_VIEW
+                },
+            )
+            .build().toShortcutInfo()
+    }
+
     companion object {
         private const val SHORTCUT_ID_CLEAR_DATA = "clearData"
         private const val SHORTCUT_ID_NEW_TAB = "newTab"
         private const val SHORTCUT_ID_SHOW_BOOKMARKS = "showBookmarks"
+        private const val SHORTCUT_ID_OPEN_APPTP = "openAtp"
     }
 }

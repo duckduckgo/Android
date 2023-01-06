@@ -641,6 +641,7 @@
     <string name="atp_SettingsDeviceShieldNeverEnabled">Block app trackers on your device</string>
     <string name="atp_SettingsDeviceShieldEnabled">Enabled</string>
     <string name="atp_SettingsDeviceShieldDisabled">Disabled</string>
+    <string name="atp_ShortcutTitle">App Tracking</string>
 
     <!-- Autoconsent -->
     <!-- smartling.character_limit = 82 -->
