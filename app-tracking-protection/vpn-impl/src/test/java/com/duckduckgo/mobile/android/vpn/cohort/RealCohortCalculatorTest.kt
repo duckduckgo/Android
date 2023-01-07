@@ -17,7 +17,6 @@
 package com.duckduckgo.mobile.android.vpn.cohort
 
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.threeten.bp.LocalDate
@@ -33,12 +32,49 @@ class RealCohortCalculatorTest {
     }
 
     @Test
-    fun whenLocalDateIsFirstDayOfLastDayOf2021ThenReturnCohort() {
+    fun whenLocalDateIsFirstDayOfLastDayOf2021ThenReturnWeeklyCohort() {
         val date = LocalDate.of(2022, 1, 1)
+        val now = date.plusWeeks(3)
 
-        val cohort = cohortCalculator.calculateCohortForDate(date)
+        val cohort = cohortCalculator.calculateCohortForDate(date, now)
         val success = (cohort == "2021-week-52") || (cohort == "2022-JANUARY") || (cohort == "2022-q1") || (cohort == "2022-h1")
-        assertTrue(success)
+        assertEquals("2021-week-52", cohort)
+    }
+
+    @Test
+    fun whenLocalDateIsFirstDayOfLastDayOf2021ThenReturnMonthlyCohort() {
+        val date = LocalDate.of(2022, 1, 1)
+        val now = date.plusWeeks(12)
+
+        val cohort = cohortCalculator.calculateCohortForDate(date, now)
+        assertEquals("2022-JANUARY", cohort)
+    }
+
+    @Test
+    fun whenLocalDateIsFirstDayOfLastDayOf2021ThenReturnQuarterCohort() {
+        val date = LocalDate.of(2022, 1, 1)
+        val now = date.plusWeeks(25)
+
+        val cohort = cohortCalculator.calculateCohortForDate(date, now)
+        assertEquals("2022-q1", cohort)
+    }
+
+    @Test
+    fun whenLocalDateIsFirstDayOfLastDayOf2021ThenReturnHalfYearCohort() {
+        val date = LocalDate.of(2022, 1, 1)
+        val now = date.plusWeeks(51)
+
+        val cohort = cohortCalculator.calculateCohortForDate(date, now)
+        assertEquals("2022-h1", cohort)
+    }
+
+    @Test
+    fun whenLocalDateIsFirstDayOfLastDayOf2021ThenReturnUniqueCohort() {
+        val date = LocalDate.of(2022, 1, 1)
+        val now = date.plusWeeks(53)
+
+        val cohort = cohortCalculator.calculateCohortForDate(date, now)
+        assertEquals("-", cohort)
     }
 
     @Test
