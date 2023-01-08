@@ -52,7 +52,10 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
                 viewModel.onStartVpn()
             }
         }
-    private val toggleChangeListener = OnCheckedChangeListener { _, isChecked -> viewModel.onNetpToggleClicked(isChecked) }
+    private val toggleChangeListener = OnCheckedChangeListener { _, isChecked ->
+        binding.netpToggle.isEnabled = false
+        viewModel.onNetpToggleClicked(isChecked)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -93,6 +96,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         netpStatusImage.setImageResource(R.drawable.illustration_vpn_on)
         netpStatusHeader.setText(R.string.netpManagementHeadlineStatusOn)
         netpToggle.quietlySetChecked(true)
+        netpToggle.isEnabled = true
         connectionDetailsData.elapsedConnectedTime?.let {
             netpToggle.setSecondaryText(getString(R.string.netpManagementToggleSubtitleConnected, it))
         }
@@ -114,12 +118,14 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         netpStatusHeader.setText(R.string.netpManagementHeadlineStatusOff)
         netpToggle.quietlySetChecked(false)
         netpToggle.setSecondaryText(getString(R.string.netpManagementToggleSubtitleDisconnected))
+        netpToggle.isEnabled = true
         connectionDetails.root.gone()
     }
 
     private fun ActivityNetpManagementBinding.renderConnectingState() {
         netpToggle.quietlySetChecked(true)
         netpToggle.setSecondaryText(getString(R.string.netpManagementToggleSubtitleConnecting))
+        netpToggle.isEnabled = false
         connectionDetails.root.gone()
     }
 
