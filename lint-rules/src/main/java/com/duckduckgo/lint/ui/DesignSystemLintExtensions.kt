@@ -59,6 +59,32 @@ class DesignSystemLintExtensions {
 
         private val DEPRECATED_SWITCHES = listOf(APP_COMPAT_SWITCH, MATERIAL_SWITCH, SWITCH)
 
+        // Android Design System Components
+        private const val BUTTON_PRIMARY_LARGE = "com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryLarge"
+        private const val BUTTON_PRIMARY_SMALL = "com.duckduckgo.mobile.android.ui.view.button.ButtonPrimarySmall"
+        private const val BUTTON_SECONDARY_LARGE = "com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryLarge"
+        private const val BUTTON_SECONDARY_SMALL = "com.duckduckgo.mobile.android.ui.view.button.ButtonSecondarySmall"
+        private const val BUTTON_GHOST_LARGE = "com.duckduckgo.mobile.android.ui.view.button.ButtonGhostLarge"
+        private const val BUTTON_GHOST_SMALL = "com.duckduckgo.mobile.android.ui.view.button.ButtonGhostSmall"
+        private const val ONE_LINE_LIST_ITEM = "com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem"
+        private const val TWO_LINE_LIST_ITEM = "com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem"
+        private const val SWITCH_VIEW = "com.duckduckgo.mobile.android.ui.view.SwitchView"
+        private const val DAX_TEXT = "com.duckduckgo.mobile.android.ui.view.text.DaxTextView"
+
+        val ANDROID_DESIGN_COMPONENTS =
+            listOf(
+                BUTTON_PRIMARY_LARGE,
+                BUTTON_PRIMARY_SMALL,
+                BUTTON_SECONDARY_LARGE,
+                BUTTON_SECONDARY_SMALL,
+                BUTTON_GHOST_LARGE,
+                BUTTON_GHOST_SMALL,
+                ONE_LINE_LIST_ITEM,
+                TWO_LINE_LIST_ITEM,
+                SWITCH_VIEW,
+                DAX_TEXT
+            )
+
         val DEPRECATED_WIDGETS = DEPRECATED_BUTTON_WIDGETS.plus(DEPRECATED_TEXT_WIDGETS).plus(DEPRECATED_SWITCHES)
     }
 }
