@@ -16,7 +16,6 @@
 
 package com.duckduckgo.lint.ui
 
-import com.android.resources.ResourceFolderType
 import com.android.tools.lint.detector.api.Category.Companion.CUSTOM_LINT_CHECKS
 import com.android.tools.lint.detector.api.Implementation
 import com.android.tools.lint.detector.api.Issue
@@ -25,16 +24,13 @@ import com.android.tools.lint.detector.api.Scope
 import com.android.tools.lint.detector.api.Severity
 import com.android.tools.lint.detector.api.TextFormat
 import com.android.tools.lint.detector.api.XmlContext
+import com.duckduckgo.lint.ui.DesignSystemLintExtensions.Companion.DEPRECATED_WIDGETS
 import org.w3c.dom.Element
 
 @Suppress("UnstableApiUsage")
-class DeprecatedAndroidButtonUsedInXmlDetector : LayoutDetector() {
+class DeprecatedAndroidWidgetsUsedInXmlDetector : LayoutDetector() {
 
-    override fun getApplicableElements() = BUTTON_WIDGETS
-
-    override fun appliesTo(folderType: ResourceFolderType): Boolean {
-        return folderType == ResourceFolderType.LAYOUT
-    }
+    override fun getApplicableElements() = DEPRECATED_WIDGETS
 
     override fun visitElement(
         context: XmlContext,
@@ -48,37 +44,28 @@ class DeprecatedAndroidButtonUsedInXmlDetector : LayoutDetector() {
         element: Element
     ) {
         context.report(
-            issue = DEPRECATED_BUTTON_IN_XML,
+            issue = DEPRECATED_WIDGET_IN_XML,
             location = context.getNameLocation(element),
-            message = DEPRECATED_BUTTON_IN_XML.getExplanation(TextFormat.RAW)
+            message = DEPRECATED_WIDGET_IN_XML.getExplanation(TextFormat.RAW),
         )
     }
 
     companion object {
 
-        private const val LEGACY_PRIMARY_LOWERCASE_BUTTON = "com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryLowercase"
-        private const val LEGACY_PRIMARY_ROUNDED_BUTTON = "com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryRounded"
-        private const val LEGACY_SECONDARY_ROUNDED_BUTTON = "com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryRounded"
-
-        private const val LEGACY_ANDROID_BUTTON = "Button"
-        private const val MATERIAL_BUTTON = "com.google.android.material.button.MaterialButton"
-
-        // this list will also contain the depreacated DS buttons that we are using until the migration is complete
-        val BUTTON_WIDGETS = listOf(LEGACY_ANDROID_BUTTON, MATERIAL_BUTTON)
-        val DEPRECATED_BUTTON_IN_XML = Issue
+        val DEPRECATED_WIDGET_IN_XML = Issue
             .create(
-                id = "AndroidButtonInXml",
-                briefDescription = "Default Android Button Widget used instead of Design System Component",
-                explanation = "Always favor the use of the Design System Component. ButtonPrimaryLarge, ButtonSecondaryLarge, etc...",
+                id = "DeprecatedWidgetInXml",
+                briefDescription = "Default Android Widget used instead of Design System Component",
+                explanation = "Always favor the use of the Design System Component",
                 moreInfo = "https://app.asana.com/0/1202857801505092/list",
                 category = CUSTOM_LINT_CHECKS,
                 priority = 10,
                 severity = Severity.ERROR,
                 androidSpecific = true,
                 implementation = Implementation(
-                    DeprecatedAndroidButtonUsedInXmlDetector::class.java,
-                    Scope.RESOURCE_FILE_SCOPE
-                )
+                    DeprecatedAndroidWidgetsUsedInXmlDetector::class.java,
+                    Scope.RESOURCE_FILE_SCOPE,
+                ),
             )
     }
 }

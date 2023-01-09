@@ -30,7 +30,7 @@ import com.duckduckgo.lint.NoSystemLoadLibraryDetector.Companion.NO_SYSTEM_LOAD_
 import com.duckduckgo.lint.strings.MissingInstructionDetector.Companion.MISSING_INSTRUCTION
 import com.duckduckgo.lint.strings.PlaceholderDetector.Companion.PLACEHOLDER_MISSING_POSITION
 import com.duckduckgo.lint.ui.DaxTextViewStylingDetector.Companion.INVALID_DAX_TEXT_VIEW_PROPERTY
-import com.duckduckgo.lint.ui.DeprecatedAndroidButtonUsedInXmlDetector.Companion.DEPRECATED_BUTTON_IN_XML
+import com.duckduckgo.lint.ui.DeprecatedAndroidWidgetsUsedInXmlDetector.Companion.DEPRECATED_WIDGET_IN_XML
 import com.duckduckgo.lint.ui.DeprecatedSwitchUsedInXmlDetector.Companion.DEPRECATED_SWITCH_IN_XML
 import com.duckduckgo.lint.ui.MissingDividerDetector.Companion.MISSING_HORIZONTAL_DIVIDER
 import com.duckduckgo.lint.ui.MissingDividerDetector.Companion.MISSING_VERTICAL_DIVIDER
@@ -53,7 +53,7 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             NO_RETROFIT_CREATE_CALL,
 
             // Android Design System
-            DEPRECATED_BUTTON_IN_XML,
+            DEPRECATED_WIDGET_IN_XML,
             STYLE_IN_DESIGN_SYSTEM_COMPONENT,
             NO_DESIGN_SYSTEM_DIALOG,
             DEPRECATED_SWITCH_IN_XML,
@@ -61,6 +61,7 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             MISSING_HORIZONTAL_DIVIDER,
             NO_BOTTOM_SHEET,
             INVALID_DAX_TEXT_VIEW_PROPERTY,
+
         )
 
     override val api: Int
