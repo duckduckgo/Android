@@ -57,7 +57,7 @@ class RealWgServerDataProvider @Inject constructor(
 
     private fun List<EligibleServerInfo>.getRelevantServer(): EligibleServerInfo {
         val countryCode = telephonyManager.networkCountryIso.lowercase()
-        val resultingList = if (countryCode == COUNTRY_CODE_US) {
+        val resultingList = if (US_COUNTRY_CODES.contains(countryCode)) {
             this.filter {
                 it.server.name == SERVER_NAME_US
             }
@@ -75,7 +75,7 @@ class RealWgServerDataProvider @Inject constructor(
     }
 
     companion object {
-        private const val COUNTRY_CODE_US = "us"
+        private const val US_COUNTRY_CODES = "us,ca"
         private const val SERVER_NAME_US = "egress.usc"
     }
 }
