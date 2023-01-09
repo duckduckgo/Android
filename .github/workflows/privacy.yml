@@ -42,12 +42,21 @@ jobs:
           arguments: runFlankPrivacyTests
 
       - name: Bundle the Android CI tests report
-        if: always()
         run: find . -type d -name 'fladleResults' | zip -@ -r android-tests-report.zip
 
       - name: Upload the Android CI tests report
-        if: always()
         uses: actions/upload-artifact@v3
         with:
           name: android-tests-report
           path: android-tests-report.zip
+
+      - name: Create Asana task when workflow failed
+        if: ${{ failure() }}
+        uses: honeycombio/gha-create-asana-task@main
+        with:
+          asana-secret: ${{ secrets.GH_ASANA_SECRET }}
+          asana-workspace-id: ${{ secrets.GH_ASANA_WORKSPACE_ID }}
+          asana-project-id: ${{ secrets.GH_ASANA_AOR_PROJECT_ID }}
+          asana-section-id: ${{ secrets.GH_ASANA_INCOMING_ID }}
+          asana-task-name: GH Workflow Failure - Privacy tests
+          asana-task-description: The privacy workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
