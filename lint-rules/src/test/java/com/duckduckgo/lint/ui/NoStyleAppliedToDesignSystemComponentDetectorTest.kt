@@ -18,6 +18,7 @@ package com.duckduckgo.lint.ui
 
 import com.android.tools.lint.checks.infrastructure.TestFiles
 import com.android.tools.lint.checks.infrastructure.TestLintTask.lint
+import com.duckduckgo.lint.ui.DaxButtonStylingDetector.Companion
 import com.duckduckgo.lint.ui.NoStyleAppliedToDesignSystemComponentDetector.Companion.STYLE_IN_DESIGN_SYSTEM_COMPONENT
 import org.junit.Test
 
@@ -149,6 +150,49 @@ style="@style/Widget.DuckDuckGo.Button.Primary"
                 res/layout/buttons.xml:17: Error: Design System Components should not be styled. Consider creating a new Component or use one of the Components already created [StyleInDesignSystemComponent]
                                   <com.duckduckgo.mobile.android.ui.view.SwitchView
                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                1 errors, 0 warnings
+            """.trimMargin()
+            )
+    }
+
+    @Test
+    fun whenDaxTextViewStyleChangedThenFail() {
+        lint()
+            .files(
+                TestFiles.xml(
+                    "res/layout/buttons.xml",
+                    """
+                <android.support.design.widget.CoordinatorLayout
+                    xmlns:android="http://schemas.android.com/apk/res/android"
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                    xmlns:tools="http://schemas.android.com/tools"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#eeeeee">
+
+                  <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                    android:id="@+id/text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_2"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/customDialogTitle" 
+                    style="@style/Widget.DuckDuckGo.Button.Primary"
+                    app:textType="secondary"
+                    app:typography="body1" />
+                      
+                </android.support.design.widget.CoordinatorLayout>
+            """
+                ).indented()
+            )
+            .issues(STYLE_IN_DESIGN_SYSTEM_COMPONENT)
+            .run()
+            .expect(
+                """
+                res/layout/buttons.xml:9: Error: style is defined by the DaxButton Component, you shouldn't change it [InvalidDaxButtonProperty]
+                  <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 1 errors, 0 warnings
             """.trimMargin()
             )
