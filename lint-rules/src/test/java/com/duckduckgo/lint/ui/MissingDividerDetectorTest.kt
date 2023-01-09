@@ -93,34 +93,4 @@ class MissingDividerDetectorTest {
             """.trimMargin()
             )
     }
-
-    @Test
-    fun whenAndroidButtonNotFoundThenSucceed() {
-        lint()
-            .files(
-                TestFiles.xml(
-                    "res/layout/buttons.xml",
-                    """
-                <android.support.design.widget.CoordinatorLayout
-                    xmlns:android="http://schemas.android.com/apk/res/android"
-                    xmlns:app="http://schemas.android.com/apk/res-auto"
-                    xmlns:tools="http://schemas.android.com/tools"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="#eeeeee">
-
-                  <View
-                      android:id="@+id/divider"
-                      android:layout_width="wrap_contant"
-                      android:layout_height="match_parent"/>
-                      
-                </android.support.design.widget.CoordinatorLayout>
-            """
-                ).indented()
-            )
-            .allowCompilationErrors()
-            .issues(DeprecatedAndroidButtonUsedInXmlDetector.DEPRECATED_BUTTON_IN_XML)
-            .run()
-            .expectClean()
-    }
 }

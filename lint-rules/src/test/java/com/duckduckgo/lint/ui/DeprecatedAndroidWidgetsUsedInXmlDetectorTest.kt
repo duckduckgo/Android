@@ -21,7 +21,7 @@ import com.android.tools.lint.checks.infrastructure.TestLintTask.lint
 import org.junit.Test
 
 @Suppress("UnstableApiUsage")
-class DeprecatedAndroidButtonUsedInXmlDetectorTest {
+class DeprecatedAndroidWidgetsUsedInXmlDetectorTest {
     @Test
     fun whenAndroidButtonFoundThenFailWithError() {
         lint()
@@ -57,7 +57,7 @@ class DeprecatedAndroidButtonUsedInXmlDetectorTest {
             """
                 ).indented()
             )
-            .issues(DeprecatedAndroidButtonUsedInXmlDetector.DEPRECATED_BUTTON_IN_XML)
+            .issues(DeprecatedAndroidWidgetsUsedInXmlDetector.DEPRECATED_WIDGET_IN_XML)
             .run()
             .expect(
                 """
@@ -105,7 +105,7 @@ class DeprecatedAndroidButtonUsedInXmlDetectorTest {
                 ).indented()
             )
             .allowCompilationErrors()
-            .issues(DeprecatedAndroidButtonUsedInXmlDetector.DEPRECATED_BUTTON_IN_XML)
+            .issues(DeprecatedAndroidWidgetsUsedInXmlDetector.DEPRECATED_WIDGET_IN_XML)
             .run()
             .expectClean()
     }
