@@ -89,6 +89,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
             ConnectionState.Connecting -> binding.renderConnectingState()
             ConnectionState.Connected -> viewState.connectionDetails?.let { binding.renderConnectedState(it) }
             ConnectionState.Disconnected -> binding.renderDisconnectedState()
+            else -> { }
         }
     }
 
@@ -123,7 +124,6 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
     }
 
     private fun ActivityNetpManagementBinding.renderConnectingState() {
-        netpToggle.quietlySetChecked(true)
         netpToggle.setSecondaryText(getString(R.string.netpManagementToggleSubtitleConnecting))
         netpToggle.isEnabled = false
         connectionDetails.root.gone()

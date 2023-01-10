@@ -36,6 +36,7 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Connected
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Connecting
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Disconnected
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Unknown
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -43,11 +44,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
@@ -98,7 +95,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         ENABLING -> Connecting
         ENABLED -> Connected
         DISABLED -> Disconnected
-        else -> Disconnected
+        else -> Unknown
     }
 
     private fun loadConnectionDetails() {
@@ -216,5 +213,6 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         Connecting,
         Connected,
         Disconnected,
+        Unknown,
     }
 }
