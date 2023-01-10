@@ -74,6 +74,10 @@ internal class VpnFeaturesRegistryImpl(
         return registeredFeatures().contains(feature.featureName) && vpnServiceWrapper.isServiceRunning()
     }
 
+    override fun isAnyFeatureRegistered(): Boolean {
+        return registeredFeatures().isNotEmpty() && vpnServiceWrapper.isServiceRunning()
+    }
+
     override suspend fun refreshFeature(feature: VpnFeature) {
         vpnServiceWrapper.restartVpnService(forceRestart = false)
     }

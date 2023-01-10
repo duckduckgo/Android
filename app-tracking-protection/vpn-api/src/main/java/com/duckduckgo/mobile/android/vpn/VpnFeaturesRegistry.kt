@@ -44,6 +44,11 @@ interface VpnFeaturesRegistry {
     fun isFeatureRegistered(feature: VpnFeature): Boolean
 
     /**
+     * @return returns `true` if there's any feature currently using the VPN, `false` otherwise
+     */
+    fun isAnyFeatureRegistered(): Boolean
+
+    /**
      * Refreshing the feature will cause the VPN to be stopped/restarted if it is enabled and the feature is already registered.
      */
     suspend fun refreshFeature(feature: VpnFeature)

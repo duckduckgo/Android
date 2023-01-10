@@ -79,6 +79,28 @@ class VpnFeaturesRegistryImplTest {
     }
 
     @Test
+    fun whenIsAnyFeatureRegisteredAndFeaturesAreNotRegisteredThenReturnFalse() {
+        vpnFeaturesRegistry.registerFeature(TestVpnFeatures.FOO)
+    }
+
+    @Test
+    fun whenIsAnyFeatureRegisteredAndFeaturesAreRegisteredThenReturnTrue() {
+        vpnFeaturesRegistry.registerFeature(TestVpnFeatures.FOO)
+
+        assertTrue(vpnFeaturesRegistry.isAnyFeatureRegistered())
+        assertTrue(vpnServiceWrapper.isServiceRunning())
+    }
+
+    @Test
+    fun whenIsAnyFeatureRegisteredAndFeaturesAreRegisteredAndVpnDisabledThenReturnFalse() {
+        vpnFeaturesRegistry.registerFeature(TestVpnFeatures.FOO)
+        vpnServiceWrapper.stopService()
+
+        assertFalse(vpnFeaturesRegistry.isAnyFeatureRegistered())
+        assertFalse(vpnServiceWrapper.isServiceRunning())
+    }
+
+    @Test
     fun whenUnregisterFeatureThenFeatureIsUnregistered() {
         vpnFeaturesRegistry.registerFeature(TestVpnFeatures.FOO)
         vpnFeaturesRegistry.unregisterFeature(TestVpnFeatures.FOO)

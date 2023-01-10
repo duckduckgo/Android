@@ -20,6 +20,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -28,9 +29,13 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class)
 class RealVpnDetector @Inject constructor(
     private val context: Context,
+    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
 ) : VpnDetector {
 
     override fun isVpnDetected(): Boolean {
+        // if we're the ones using the VPN, no VPN is detected
+        if (vpnFeaturesRegistry.isAnyFeatureRegistered()) return false
+
         val connectivityManager = context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetwork = connectivityManager.activeNetwork
         return connectivityManager.getNetworkCapabilities(activeNetwork)?.hasTransport(NetworkCapabilities.TRANSPORT_VPN) ?: false
