@@ -652,7 +652,6 @@
     <string name="autoconsentSecondaryCta">Nej tak.</string>
 
     <string name="autoconsentSetting">Administrer cookie pop op-vinduer</string>
-    <string name="autoconsentAnimationText">Administrerede cookies</string>
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Tilladelser til webstedet</string>

@@ -467,9 +467,9 @@ class BrowserTabFragment :
             // }
         }
 
-        override fun onPopUpHandled() {
+        override fun onPopUpHandled(isCosmetic: Boolean) {
             launch {
-                context?.let { animatorHelper.createCookiesAnimation(it, omnibarViews(), cookieDummyView, cookieAnimation, scene_root) }
+                context?.let { animatorHelper.createCookiesAnimation(it, omnibarViews(), cookieDummyView, cookieAnimation, scene_root, isCosmetic) }
             }
         }
 

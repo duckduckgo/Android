@@ -660,7 +660,6 @@
     <string name="autoconsentSecondaryCta">Nie, ďakujem</string>
 
     <string name="autoconsentSetting">Správa kontextových okien súborov cookie</string>
-    <string name="autoconsentAnimationText">Spravované súbory cookie</string>
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Oprávnenia na lokalitu</string>

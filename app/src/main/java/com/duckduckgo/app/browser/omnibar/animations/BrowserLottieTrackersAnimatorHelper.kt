@@ -55,6 +55,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     private lateinit var cookieView: LottieAnimationView
     private lateinit var cookieScene: ViewGroup
     private lateinit var cookieViewBackground: View
+    private var cookieCosmeticHide: Boolean = false
 
     private var runPartialAnimation: Boolean = false
     private var completePartialAnimation: Boolean = false
@@ -141,10 +142,12 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         cookieBackground: View,
         cookieAnimationView: LottieAnimationView,
         cookieScene: ViewGroup,
+        cookieCosmeticHide: Boolean,
     ) {
         this.cookieScene = cookieScene
         this.cookieViewBackground = cookieBackground
         this.cookieView = cookieAnimationView
+        this.cookieCosmeticHide = cookieCosmeticHide
 
         if (this.trackersAnimation?.isAnimating != true && !runPartialAnimation) {
             startCookiesAnimation(context, omnibarViews)
@@ -197,8 +200,14 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         omnibarViews: List<View>,
     ) {
         isCookiesAnimationRunning = true
-        firstScene = Scene.getSceneForLayout(cookieScene, R.layout.cookie_scene_1, context)
-        secondScene = Scene.getSceneForLayout(cookieScene, R.layout.cookie_scene_2, context)
+
+        if (cookieCosmeticHide) {
+            firstScene = Scene.getSceneForLayout(cookieScene, R.layout.cookie_cosmetic_scene_1, context)
+            secondScene = Scene.getSceneForLayout(cookieScene, R.layout.cookie_cosmetic_scene_2, context)
+        } else {
+            firstScene = Scene.getSceneForLayout(cookieScene, R.layout.cookie_scene_1, context)
+            secondScene = Scene.getSceneForLayout(cookieScene, R.layout.cookie_scene_2, context)
+        }
 
         hasCookiesAnimationBeenCanceled = false
         val allOmnibarViews: List<View> = (omnibarViews).filterNotNull().toList()

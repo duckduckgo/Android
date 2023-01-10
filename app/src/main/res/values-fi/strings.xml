@@ -652,7 +652,6 @@
     <string name="autoconsentSecondaryCta">Ei kiitos</string>
 
     <string name="autoconsentSetting">Evästeiden hallinnan ponnahdusikkunat</string>
-    <string name="autoconsentAnimationText">Hallitut evästeet</string>
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Sivuston käyttöoikeudet</string>

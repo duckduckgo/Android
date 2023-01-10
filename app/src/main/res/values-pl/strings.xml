@@ -660,7 +660,6 @@
     <string name="autoconsentSecondaryCta">Nie, dziękuję</string>
 
     <string name="autoconsentSetting">Zarządzaj wyskakującymi okienkami z prośbą o używanie plików cookie</string>
-    <string name="autoconsentAnimationText">Zarządzane pliki cookie</string>
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Uprawnienia witryny</string>

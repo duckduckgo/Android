@@ -652,7 +652,6 @@
     <string name="autoconsentSecondaryCta">Όχι, ευχαριστώ</string>
 
     <string name="autoconsentSetting">Διαχείριση αναδυόμενων παραθύρων για cookies</string>
-    <string name="autoconsentAnimationText">Διαχειριζόμενα cookies</string>
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Δικαιώματα ιστότοπου</string>

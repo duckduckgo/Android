@@ -660,7 +660,6 @@
     <string name="autoconsentSecondaryCta">Ne, hvala</string>
 
     <string name="autoconsentSetting">Upravljanje skočnim prozorima kolačića</string>
-    <string name="autoconsentAnimationText">Upravlja se kolačićima</string>
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Dozvole web lokacija</string>

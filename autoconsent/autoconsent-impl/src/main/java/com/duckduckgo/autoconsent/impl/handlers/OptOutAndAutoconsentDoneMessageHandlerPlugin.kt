@@ -72,7 +72,7 @@ class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor(
             val message: AutoconsentDoneMessage = parseAutoconsentDoneMessage(jsonString) ?: return
             message.url.toUri().host ?: return
 
-            autoconsentCallback.onPopUpHandled()
+            autoconsentCallback.onPopUpHandled(message.isCosmetic)
             autoconsentCallback.onResultReceived(consentManaged = true, optOutFailed = false, selfTestFailed = false)
 
             if (selfTest) {
@@ -98,7 +98,7 @@ class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor(
 
     data class OptOutResultMessage(val type: String, val cmp: String, val result: Boolean, val scheduleSelfTest: Boolean, val url: String)
 
-    data class AutoconsentDoneMessage(val type: String, val cmp: String, val url: String)
+    data class AutoconsentDoneMessage(val type: String, val cmp: String, val url: String, val isCosmetic: Boolean)
 
     companion object {
         const val OPT_OUT = "optOutResult"

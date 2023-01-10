@@ -656,7 +656,6 @@
     <string name="autoconsentSecondaryCta">Nē, paldies</string>
 
     <string name="autoconsentSetting">Pārvaldīt sīkfailu uznirstošos logus</string>
-    <string name="autoconsentAnimationText">Pārvaldītie sīkfaili</string>
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Vietnes atļaujas</string>

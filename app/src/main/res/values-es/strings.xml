@@ -652,7 +652,6 @@
     <string name="autoconsentSecondaryCta">No, gracias</string>
 
     <string name="autoconsentSetting">Administrar ventanas emergentes de cookies</string>
-    <string name="autoconsentAnimationText">Cookies gestionadas</string>
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Permisos del sitio</string>
