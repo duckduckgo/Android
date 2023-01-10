@@ -38,7 +38,7 @@
             style="@style/Widget.DuckDuckGo.NavigationalIcon"
             android:layout_marginStart="@dimen/keyline_4"
             android:contentDescription="@string/back"
-            android:src="@drawable/ic_arrow_left_24"
+            app:srcCompat="@drawable/ic_arrow_left_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
