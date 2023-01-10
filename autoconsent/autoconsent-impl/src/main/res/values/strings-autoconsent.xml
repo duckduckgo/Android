@@ -18,6 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="autoconsentTitle">Manage Cookie Pop-ups</string>
-    <string name="autoconsentDescription">When DuckDuckGo detects cookie consent pop-ups on sites you visit, we can try to automatically set your cookie preferences to minimize cookies and maximize privacy, then close the pop-ups.</string>
+    <string name="autoconsentDescription">When DuckDuckGo detects cookie consent pop-ups on sites you visit, we can automatically set your cookie preferences to minimize cookies and maximize privacy, then close the pop-ups. For pop-ups without options to manage tracking, we simply hide the pop-up.</string>
     <string name="autoconsentToggle">Let DuckDuckGo manage cookie consent pop-ups</string>
 </resources>
