@@ -132,6 +132,7 @@
 
     <!-- Styles for App Components -->
 
+    <!-- Menus -->
     <style name="Widget.DuckDuckGo.MenuItemView">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
