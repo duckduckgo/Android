@@ -89,6 +89,6 @@ class WebViewCookieManager @Inject constructor(
     }
 
     companion object {
-        private val DDG_COOKIE_DOMAINS = listOf(AppUrl.Url.COOKIES, AppUrl.Url.SURVEY_COOKIES)
+        val DDG_COOKIE_DOMAINS = listOf(AppUrl.Url.COOKIES, AppUrl.Url.SURVEY_COOKIES)
     }
 }
