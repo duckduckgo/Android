@@ -49,16 +49,18 @@ class RealVpnStateMonitor @Inject constructor(
 
     override fun getStateFlow(vpnFeature: VpnFeature): Flow<VpnState> {
         return database.vpnServiceStateDao().getStateStats().map { mapState(it) }
-            .filter { it.state != INVALID }
+            .filter {
+                // we only care about the following states
+                (it.state == VpnRunningState.ENABLED) || (it.state == VpnRunningState.ENABLING) || (it.state == VpnRunningState.DISABLED)
+            }
             .onEach { logcat { "service state value $it" } }
             .map { vpnState ->
                 val isFeatureEnabled = vpnFeaturesRegistry.isFeatureRegistered(vpnFeature)
-                val isVpnEnabled = vpnState.state == VpnRunningState.ENABLED
 
-                if (isVpnEnabled && isFeatureEnabled) {
-                    vpnState
-                } else {
+                if (!isFeatureEnabled) {
                     vpnState.copy(state = VpnRunningState.DISABLED)
+                } else {
+                    vpnState
                 }
             }
             .onStart {

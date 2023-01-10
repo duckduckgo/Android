@@ -38,12 +38,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -67,6 +62,8 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     internal suspend fun getRunningState(): Flow<VpnState> = withContext(dispatcherProvider.io()) {
         return@withContext vpnStateMonitor
             .getStateFlow(AppTpVpnFeature.APPTP_VPN)
+            // we only cared about enabled and disabled states for AppTP
+            .filter { (it.state == VpnStateMonitor.VpnRunningState.ENABLED) || (it.state == VpnStateMonitor.VpnRunningState.DISABLED) }
             .combine(refreshVpnRunningState.asStateFlow()) { state, _ -> state }
     }
 

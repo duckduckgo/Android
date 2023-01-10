@@ -54,7 +54,6 @@ import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.prefs.VpnPreferences
 import com.duckduckgo.mobile.android.vpn.service.state.VpnStateMonitorService
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
-import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldEnabledNotificationBuilder
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationFactory
 import com.duckduckgo.mobile.android.vpn.ui.notification.OngoingNotificationPressedHandler
@@ -103,8 +102,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
     @Inject lateinit var vpnNetworkStackProvider: VpnNetworkStackProvider
 
     @Inject lateinit var vpnServiceStateStatsDao: VpnServiceStateStatsDao
-
-    @Inject lateinit var vpnDatabase: VpnDatabase
 
     private var restartRequested = false
 
@@ -246,7 +243,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
                 return@withContext
             }
 
-            vpnDatabase.vpnServiceStateDao().insert(createVpnState(state = ENABLING))
+            vpnServiceStateStatsDao.insert(createVpnState(state = ENABLING))
 
             vpnServiceCallbacksPluginPoint.getPlugins().forEach {
                 logcat { "VPN log: onVpnStarting ${it.javaClass} callback" }
@@ -301,7 +298,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         }
 
         // lastly set the VPN state to enabled
-        vpnDatabase.vpnServiceStateDao().insert(createVpnState(state = ENABLED))
+        vpnServiceStateStatsDao.insert(createVpnState(state = ENABLED))
         alwaysOnStateJob += launch { monitorVpnAlwaysOnState() }
     }
 
@@ -489,7 +486,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         sendStopPixels(reason)
 
         // Set the state to DISABLED here, then call the on stop/failure callbacks
-        vpnDatabase.vpnServiceStateDao().insert(createVpnState(state = VpnServiceState.DISABLED, stopReason = reason))
+        vpnServiceStateStatsDao.insert(createVpnState(state = VpnServiceState.DISABLED, stopReason = reason))
 
         // If VPN has been started, then onVpnStopped must be called. Else, an error might have occurred before start so we call onVpnStartFailed
         if (hasVpnAlreadyStarted) {
@@ -595,11 +592,11 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         @SuppressLint("NewApi") // IDE doesn't get we use appBuildConfig
         if (appBuildConfig.sdkInt >= 29) {
             incrementalPeriodicChecks {
-                if (vpnDatabase.vpnServiceStateDao().getLastStateStats()?.state == ENABLED) {
+                if (vpnServiceStateStatsDao.getLastStateStats()?.state == ENABLED) {
                     if (vpnState.alwaysOnState.alwaysOnEnabled) deviceShieldPixels.reportAlwaysOnEnabledDaily()
                     if (vpnState.alwaysOnState.alwaysOnLockedDown) deviceShieldPixels.reportAlwaysOnLockdownEnabledDaily()
 
-                    vpnDatabase.vpnServiceStateDao().insert(vpnState).also { logcat { "VPN: log, state: $vpnState" } }
+                    vpnServiceStateStatsDao.insert(vpnState).also { logcat { "VPN: log, state: $vpnState" } }
                 }
             }
         }
