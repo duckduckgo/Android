@@ -399,7 +399,7 @@
         <item name="daxColorButtonSecondaryContainer">@android:color/transparent</item>
         <item name="daxColorButtonSecondaryContainerPressed">@color/blue50</item>
         <item name="daxColorButtonDestructiveContainer">@color/alertRedOnLightDefault</item>
-        <item name="daxColorButtonDestructiveContainerPressed">@color/alertRedOnLightPressed_18</item>
+        <item name="daxColorButtonDestructiveContainerPressed">@color/alertRedOnLightPressed</item>
         <item name="daxColorButtonDestructiveGhostContainer">@android:color/transparent</item>
         <item name="daxColorButtonDestructiveGhostContainerPressed">@color/alertRedOnLightPressed_18</item>
         <item name="daxColorButtonPrimaryText">@color/white</item>
