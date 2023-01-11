@@ -24,6 +24,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.SyncRepository
 import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -49,6 +50,7 @@ constructor(
         val userId: String = "",
         val deviceName: String = "",
         val deviceId: String = "",
+        val token: String = "",
         val isSignedIn: Boolean = false,
     )
 
@@ -80,6 +82,10 @@ constructor(
         }
     }
 
+    fun onLogoutClicked() {
+        viewModelScope.launch(Dispatchers.IO) { syncApi.logout() }
+    }
+
     private suspend fun updateViewState() {
         val accountInfo = syncRepository.getAccountInfo()
         viewState.emit(
@@ -88,6 +94,7 @@ constructor(
                 deviceName = accountInfo.deviceName,
                 deviceId = accountInfo.deviceId,
                 isSignedIn = accountInfo.isSignedIn,
+                token = syncApi.latestToken(),
             ),
         )
     }

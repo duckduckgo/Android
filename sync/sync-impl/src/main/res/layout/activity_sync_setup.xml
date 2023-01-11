@@ -78,6 +78,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:typography="body1" />
+
+            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+                android:id="@+id/tokenSectionHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="Latest token"/>
+
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                android:id="@+id/tokenTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:typography="body1"/>
         </LinearLayout>
 
         <LinearLayout
@@ -109,6 +121,13 @@
             android:layout_margin="10dp"
             android:layout_height="wrap_content"
             android:text="Store Recovery Code" />
+
+        <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimarySmall
+            android:id="@+id/logoutButton"
+            android:layout_width="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_height="wrap_content"
+            android:text="Logout"/>
 
         <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
             android:id="@+id/resetButton"

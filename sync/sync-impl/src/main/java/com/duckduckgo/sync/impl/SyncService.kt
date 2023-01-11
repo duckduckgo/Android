@@ -20,6 +20,8 @@ import com.duckduckgo.anvil.annotations.ContributesServiceApi
 import com.duckduckgo.di.scopes.AppScope
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.Header
+import retrofit2.http.Headers
 import retrofit2.http.POST
 
 @ContributesServiceApi(AppScope::class)
@@ -29,6 +31,13 @@ interface SyncService {
     fun signup(
         @Body request: Signup,
     ): Call<AccountCreatedResponse>
+
+
+    @POST("https://dev-sync-use.duckduckgo.com/sync/logout-device")
+    fun logout(
+        @Header("Authorization") token: String,
+        @Body request: Logout,
+    ): Call<Logout>
 }
 
 data class Signup(
@@ -37,6 +46,10 @@ data class Signup(
     val protected_encryption_key: String,
     val device_id: String,
     val device_name: String,
+)
+
+data class Logout(
+    val device_id: String,
 )
 
 data class AccountCreatedResponse(

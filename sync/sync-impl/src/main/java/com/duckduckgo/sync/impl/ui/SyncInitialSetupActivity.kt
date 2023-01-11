@@ -50,6 +50,7 @@ class SyncInitialSetupActivity : DuckDuckGoActivity() {
             viewModel.onStoreRecoveryCodeClicked()
         }
         binding.resetButton.setOnClickListener { viewModel.onResetClicked() }
+        binding.logoutButton.setOnClickListener { viewModel.onLogoutClicked() }
     }
 
     private fun observeUiEvents() {
@@ -78,7 +79,7 @@ class SyncInitialSetupActivity : DuckDuckGoActivity() {
         binding.uuidsViewGroup.isVisible = viewState.isSignedIn
         binding.userIdTextView.text = viewState.userId
         binding.deviceIdTextView.text = viewState.deviceId
+        binding.tokenTextView.text = viewState.token
         binding.deviceNameTextView.text = viewState.deviceName
-        binding.accountStateTextView.isVisible = viewState.isSignedIn
     }
 }

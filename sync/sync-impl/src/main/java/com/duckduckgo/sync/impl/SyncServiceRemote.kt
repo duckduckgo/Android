@@ -21,8 +21,9 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import javax.inject.Inject
 import retrofit2.Response
+import timber.log.Timber
+import javax.inject.Inject
 
 interface SyncApi {
     fun createAccount(
@@ -32,6 +33,10 @@ interface SyncApi {
         deviceId: String,
         deviceName: String,
     ): Result<AccountCreatedResponse>
+
+    fun logout()
+
+    fun latestToken(): String
 }
 
 @ContributesBinding(AppScope::class)
@@ -87,6 +92,47 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
         }.getOrElse {
             return Result.Error(reason = response.message())
         }
+    }
+
+    override fun logout() {
+        kotlin
+            .runCatching {
+                val deviceId = syncEncryptedStore.deviceId ?: return
+                val token = syncEncryptedStore.token ?: return
+                val logoutCall = syncService.logout("Bearer $token", Logout(deviceId))
+                logoutCall.execute()
+            }
+            .onSuccess { response ->
+                kotlin.runCatching {
+                    if (response.isSuccessful) {
+                        Timber.i("SYNC logout success ${response.code()} ${response.message()}")
+                    } else {
+                        Timber.i("SYNC logout failed ${response.code()} ${response.message()}")
+                        response.errorBody()?.let { errorBody ->
+                            val converter: Converter<ResponseBody, ErrorResponse> =
+                                retrofit.responseBodyConverter(
+                                    ErrorResponse::class.java, arrayOfNulls(0),
+                                )
+                            val errorResponse =
+                                converter.convert(errorBody)
+                                    ?: throw IllegalArgumentException("Can't parse body")
+                            Timber.i(
+                                "SYNC logout failed ${errorResponse.code} ${errorResponse.error}",
+                            )
+                        }
+                            ?: kotlin.run {
+                                Timber.i(
+                                    "SYNC logout failed ${response.code()} ${response.message()}",
+                                )
+                            }
+                    }
+                }.onFailure { throwable -> Timber.i("SYNC jsonmap error ${throwable.message}") }
+            }
+            .onFailure { throwable -> Timber.i("SYNC logout failed ${throwable.message}") }
+    }
+
+    override fun latestToken(): String {
+        return syncEncryptedStore.token ?: ""
     }
 
     private class Adapters {
