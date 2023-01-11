@@ -262,13 +262,13 @@
         <item name="daxColorButtonDestructiveContainer">@color/alertRedOnDarkDefault</item>
         <item name="daxColorButtonDestructiveContainerPressed">@color/alertRedOnDarkPressed</item>
         <item name="daxColorButtonDestructiveGhostContainer">@android:color/transparent</item>
-        <item name="daxColorButtonDestructiveGhostContainerPressed">@color/alertRedOnDarkPressed_18</item>
+        <item name="daxColorButtonDestructiveGhostContainerPressed">@color/alertRedOnDarkDefault_18</item>
         <item name="daxColorButtonPrimaryText">@color/black84</item>
         <item name="daxColorButtonPrimaryTextPressed">@color/black84</item>
         <item name="daxColorButtonSecondaryText">@color/blue30</item>
         <item name="daxColorButtonSecondaryTextPressed">@color/blue20</item>
-        <item name="daxColorButtonDestructiveGhostText">@color/red30</item>
-        <item name="daxColorButtonDestructiveGhostTextPressed">@color/red20</item>
+        <item name="daxColorButtonDestructiveGhostText">@color/alertRedOnDarkDefault</item>
+        <item name="daxColorButtonDestructiveGhostTextPressed">@color/alertRedOnDarkTextPressed</item>
 
         <!-- Switch -->
         <item name="daxColorSwitchTrackOn">?attr/daxColorAccentBlue</item>
@@ -401,13 +401,13 @@
         <item name="daxColorButtonDestructiveContainer">@color/alertRedOnLightDefault</item>
         <item name="daxColorButtonDestructiveContainerPressed">@color/alertRedOnLightPressed</item>
         <item name="daxColorButtonDestructiveGhostContainer">@android:color/transparent</item>
-        <item name="daxColorButtonDestructiveGhostContainerPressed">@color/alertRedOnLightPressed_18</item>
+        <item name="daxColorButtonDestructiveGhostContainerPressed">@color/alertRedOnLightDefault</item>
         <item name="daxColorButtonPrimaryText">@color/white</item>
         <item name="daxColorButtonPrimaryTextPressed">@color/white</item>
         <item name="daxColorButtonSecondaryText">@color/blue50</item>
         <item name="daxColorButtonSecondaryTextPressed">@color/blue70</item>
         <item name="daxColorButtonDestructiveGhostText">@color/alertRedOnLightDefault</item>
-        <item name="daxColorButtonDestructiveGhostTextPressed">@color/alertRedOnLightPressed_18</item>
+        <item name="daxColorButtonDestructiveGhostTextPressed">@color/alertRedOnLightPressed</item>
 
         <!-- Switch -->
         <item name="daxColorSwitchTrackOn">?attr/daxColorAccentBlue</item>
