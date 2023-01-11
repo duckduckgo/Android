@@ -19,9 +19,7 @@ package com.duckduckgo.mobile.android.ui.view
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.LinearLayout
-import androidx.annotation.DrawableRes
 import com.duckduckgo.mobile.android.R
-import com.duckduckgo.mobile.android.databinding.ViewMenuItemBinding
 import com.duckduckgo.mobile.android.databinding.ViewPopupMenuItemBinding
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
