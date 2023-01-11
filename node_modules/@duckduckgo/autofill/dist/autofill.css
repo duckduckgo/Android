@@ -261,3 +261,72 @@ hr:first-child {
 .tooltip__button--email__secondary-text {
     font-size: 12px;
 }
+
+/* Email Protection signup notice */
+:not(.top-autofill) .tooltip--email-signup {
+    color: #222222;
+    padding: 20px;
+    width: 380px;
+}
+
+.tooltip--email-signup h1 {
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.tooltip--email-signup p {
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.notice-controls {
+    display: flex;
+}
+
+.tooltip--email-signup .notice-controls > * {
+    border-radius: 8px;
+    border: 0;
+    cursor: pointer;
+    display: inline-block;
+    font-style: normal;
+    font-weight: bold;
+    padding: 8px 12px;
+    text-decoration: none;
+}
+
+.notice-controls .ghost {
+    margin-left: 1rem;
+}
+
+.tooltip--email-signup a.primary {
+    background: #3969EF;
+    color: #fff;
+}
+
+.tooltip--email-signup a.primary:hover,
+.tooltip--email-signup a.primary:focus {
+    background: #2b55ca;
+}
+
+.tooltip--email-signup a.primary:active {
+    background: #1e42a4;
+}
+
+.tooltip--email-signup button.ghost {
+    background: transparent;
+    color: #3969EF;
+}
+
+.tooltip--email-signup button.ghost:hover,
+.tooltip--email-signup button.ghost:focus {
+    background-color: rgba(0, 0, 0, 0.06);
+    color: #2b55ca;
+}
+
+.tooltip--email-signup button.ghost:active {
+    background-color: rgba(0, 0, 0, 0.12);
+    color: #1e42a4;
+}
