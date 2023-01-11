@@ -31,15 +31,28 @@ interface DeviceKeys {
 @ContributesBinding(VpnScope::class)
 class RealDeviceKeys @Inject constructor(
     private val networkProtectionRepository: NetworkProtectionRepository,
+    private val keyPairGenerator: KeyPairGenerator,
 ) : DeviceKeys {
     override val publicKey: String
-        get() = KeyPair(Key.fromBase64(privateKey)).publicKey.toBase64()
+        get() = keyPairGenerator.generatePublicKey(privateKey)
     override val privateKey: String
         get() = if (networkProtectionRepository.privateKey.isNullOrEmpty()) {
-            KeyPair().privateKey.toBase64().also {
+            keyPairGenerator.generatePrivateKey().also {
                 networkProtectionRepository.privateKey = it
             }
         } else {
             networkProtectionRepository.privateKey!!
         }
+}
+
+interface KeyPairGenerator {
+    fun generatePrivateKey(): String
+    fun generatePublicKey(privateKey: String): String
+}
+
+@ContributesBinding(VpnScope::class)
+class WgKeyPairGenerator @Inject constructor() : KeyPairGenerator {
+    override fun generatePrivateKey(): String = KeyPair().privateKey.toBase64()
+
+    override fun generatePublicKey(privateKey: String): String = KeyPair(Key.fromBase64(privateKey)).publicKey.toBase64()
 }

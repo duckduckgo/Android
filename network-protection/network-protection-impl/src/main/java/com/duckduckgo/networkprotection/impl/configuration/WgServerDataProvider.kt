@@ -38,9 +38,8 @@ interface WgServerDataProvider {
 @ContributesBinding(VpnScope::class)
 class RealWgServerDataProvider @Inject constructor(
     private val wgVpnControllerService: WgVpnControllerService,
-    context: Context,
+    private val countryIsoProvider: CountryIsoProvider,
 ) : WgServerDataProvider {
-    private val telephonyManager = context.applicationContext.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
 
     override suspend fun get(publicKey: String): WgServerData = wgVpnControllerService.registerKey(
         RegisterKeyBody(
@@ -56,7 +55,7 @@ class RealWgServerDataProvider @Inject constructor(
     )
 
     private fun List<EligibleServerInfo>.getRelevantServer(): EligibleServerInfo {
-        val countryCode = telephonyManager.networkCountryIso.lowercase()
+        val countryCode = countryIsoProvider.getCountryIso()
         val resultingList = if (US_COUNTRY_CODES.contains(countryCode)) {
             this.filter {
                 it.server.name == SERVER_NAME_US
@@ -78,4 +77,17 @@ class RealWgServerDataProvider @Inject constructor(
         private const val US_COUNTRY_CODES = "us,ca"
         private const val SERVER_NAME_US = "egress.usc"
     }
+}
+
+interface CountryIsoProvider {
+    fun getCountryIso(): String
+}
+
+@ContributesBinding(VpnScope::class)
+class SystemCountryIsoProvider @Inject constructor(
+    context: Context,
+) : CountryIsoProvider {
+    private val telephonyManager = context.applicationContext.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+
+    override fun getCountryIso(): String = telephonyManager.networkCountryIso.lowercase()
 }

@@ -24,6 +24,10 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 dependencies {
     implementation project(':vpn-api')
     implementation AndroidX.core.ktx
+
+    testImplementation project(path: ':common-test')
+    testImplementation Testing.junit4
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
 }
 
 android {

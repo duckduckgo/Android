@@ -68,7 +68,7 @@ class WgVpnNetworkStack @Inject constructor(
                     addresses = wgTunnelData?.tunnelAddress ?: emptyMap(),
                     dns = emptySet(),
                     routes = emptyMap(),
-                    appExclusionList = setOf(),
+                    appExclusionList = emptySet(),
                 ),
             )
         } catch (e: Exception) {

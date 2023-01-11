@@ -46,6 +46,12 @@ dependencies {
     implementation KotlinX.coroutines.core
     implementation Square.retrofit2.retrofit
     implementation Square.retrofit2.converter.moshi
+
+    testImplementation project(path: ':common-test')
+    testImplementation CashApp.turbine
+    testImplementation Testing.junit4
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation Testing.robolectric
 }
 android {
     namespace 'com.duckduckgo.networkprotection.impl'
