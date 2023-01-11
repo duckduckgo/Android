@@ -51,6 +51,7 @@
     <attr name="daxColorSecondaryText" format="color"/>
     <attr name="daxColorSecondaryInvertedText" format="color"/>
     <attr name="daxColorPrimaryIcon" format="color"/>
+    <attr name="daxColorIconDisabled" format="color"/>
     <attr name="daxColorDestructive" format="color"/>
     <attr name="daxColorLines" format="color"/>
     <attr name="daxColorAccentBlue" format="color"/>
