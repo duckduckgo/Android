@@ -95,6 +95,8 @@ constructor(
         val primaryKey = syncEncryptedStore.primaryKey ?: return
         val userID = syncEncryptedStore.userId ?: return
         val recoveryCodeJson = Adapters.recoveryCodeAdapter.toJson(RecoveryCode(primaryKey, userID))
+
+        Timber.i("SYNC store recoverCode: ${recoveryCodeJson}")
         syncEncryptedStore.recoveryCode = recoveryCodeJson
     }
 
