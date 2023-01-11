@@ -26,6 +26,7 @@ import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack.VpnTunnelConfig
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.vpn.network.api.*
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -98,7 +99,7 @@ class NgVpnNetworkStack @Inject constructor(
         return startNative(tunfd.fd)
     }
 
-    override fun onStopVpn(): Result<Unit> {
+    override fun onStopVpn(reason: VpnStopReason): Result<Unit> {
         return stopNative()
     }
 
