@@ -38,6 +38,11 @@ interface SyncService {
         @Header("Authorization") token: String,
         @Body request: Logout,
     ): Call<Logout>
+
+    @POST("https://dev-sync-use.duckduckgo.com/sync/delete-account")
+    fun deleteAccount(
+        @Header("Authorization") token: String,
+    ): Call<Void>
 }
 
 data class Signup(

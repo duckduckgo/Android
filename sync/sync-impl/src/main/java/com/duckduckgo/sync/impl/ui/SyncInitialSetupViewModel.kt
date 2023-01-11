@@ -98,4 +98,10 @@ constructor(
             ),
         )
     }
+
+    fun onDeleteAccountClicked() {
+        viewModelScope.launch(Dispatchers.IO) {
+            syncApi.deleteAccount()
+        }
+    }
 }

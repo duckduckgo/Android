@@ -36,6 +36,8 @@ interface SyncApi {
 
     fun logout()
 
+    fun deleteAccount()
+
     fun latestToken(): String
 }
 
@@ -129,6 +131,39 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
                 }.onFailure { throwable -> Timber.i("SYNC jsonmap error ${throwable.message}") }
             }
             .onFailure { throwable -> Timber.i("SYNC logout failed ${throwable.message}") }
+    }
+
+    override fun deleteAccount() {
+        kotlin
+            .runCatching {
+                val token = syncEncryptedStore.token ?: return
+                val deleteAccountCall = syncService.deleteAccount("Bearer $token")
+                deleteAccountCall.execute()
+            }
+            .onSuccess { response ->
+                kotlin.runCatching {
+                    if (response.isSuccessful) {
+                        Timber.i("SYNC deleteAccount success ${response.code()} ${response.message()}")
+                    } else {
+                        Timber.i("SYNC deleteAccount failed ${response.code()} ${response.message()}")
+                        response.errorBody()?.let { errorBody ->
+                            val converter: Converter<ResponseBody, ErrorResponse> =
+                                retrofit.responseBodyConverter(
+                                    ErrorResponse::class.java, arrayOfNulls(0))
+                            val errorResponse =
+                                converter.convert(errorBody)
+                                    ?: throw IllegalArgumentException("Can't parse body")
+                            Timber.i(
+                                "SYNC deleteAccount failed ${errorResponse.code} ${errorResponse.error}")
+                        }
+                            ?: kotlin.run {
+                                Timber.i(
+                                    "SYNC deleteAccount failed ${response.code()} ${response.message()}")
+                            }
+                    }
+                }.onFailure  { throwable -> Timber.i("SYNC jsonmap error ${throwable.message}") }
+            }
+            .onFailure { throwable -> Timber.i("SYNC deleteAccount failed ${throwable.message}") }
     }
 
     override fun latestToken(): String {

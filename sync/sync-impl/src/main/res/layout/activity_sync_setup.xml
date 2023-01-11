@@ -122,19 +122,26 @@
             android:layout_height="wrap_content"
             android:text="Store Recovery Code" />
 
-        <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimarySmall
-            android:id="@+id/logoutButton"
-            android:layout_width="wrap_content"
-            android:layout_margin="10dp"
-            android:layout_height="wrap_content"
-            android:text="Logout"/>
+        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+                android:id="@+id/logoutButton"
+                android:layout_width="wrap_content"
+                android:layout_margin="10dp"
+                android:layout_height="wrap_content"
+                android:text="Logout"/>
+
 
         <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
-            android:id="@+id/resetButton"
+            android:id="@+id/deleteAccountButton"
             android:layout_width="wrap_content"
             android:layout_margin="10dp"
             android:layout_height="wrap_content"
-            android:text="Reset" />
+            android:text="DeleteAccount"/>
 
+        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+                android:id="@+id/resetButton"
+                android:layout_width="wrap_content"
+                android:layout_margin="10dp"
+                android:layout_height="wrap_content"
+                android:text="Reset"/>
     </LinearLayout>
 </ScrollView>
