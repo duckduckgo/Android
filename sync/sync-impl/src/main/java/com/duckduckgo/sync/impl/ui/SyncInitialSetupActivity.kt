@@ -44,6 +44,7 @@ class SyncInitialSetupActivity : DuckDuckGoActivity() {
 
     private fun configureListeners() {
         binding.createAccountButton.setOnClickListener { viewModel.onCreateAccountClicked() }
+        binding.storeRecoveryCodeButton.setOnClickListener { viewModel.onStoreRecoveryCodeClicked() }
     }
 
     private fun observeUiEvents() {

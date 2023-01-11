@@ -19,6 +19,9 @@ package com.duckduckgo.sync.impl
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.store.SyncEncryptedStore
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
 import javax.inject.Inject
 import javax.inject.Named
 import okhttp3.ResponseBody
@@ -37,6 +40,8 @@ interface SyncApi {
         deviceIds: String,
         deviceName: String,
     )
+
+    fun storeRecoveryCode()
 }
 
 @ContributesBinding(AppScope::class)
@@ -85,4 +90,23 @@ constructor(
             }
             .onFailure { throwable -> Timber.i("SYNC signup failed ${throwable.message}") }
     }
+
+    override fun storeRecoveryCode() {
+        val primaryKey = syncEncryptedStore.primaryKey ?: return
+        val userID = syncEncryptedStore.userId ?: return
+        val recoveryCodeJson = Adapters.recoveryCodeAdapter.toJson(RecoveryCode(primaryKey, userID))
+        syncEncryptedStore.recoveryCode = recoveryCodeJson
+    }
+
+    class Adapters {
+        companion object {
+            private val moshi = Moshi.Builder().build()
+            val recoveryCodeAdapter: JsonAdapter<RecoveryCode> = moshi.adapter(RecoveryCode::class.java)
+        }
+    }
+
+    data class RecoveryCode(
+        val primaryKey: String,
+        val userID: String,
+    )
 }

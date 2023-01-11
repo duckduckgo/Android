@@ -70,4 +70,10 @@ constructor(
                 syncDeviceIds.deviceName())
         }
     }
+
+    fun onStoreRecoveryCodeClicked() {
+        viewModelScope.launch(Dispatchers.IO) {
+            syncApi.storeRecoveryCode()
+        }
+    }
 }

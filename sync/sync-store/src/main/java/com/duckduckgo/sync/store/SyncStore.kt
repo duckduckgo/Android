@@ -10,6 +10,8 @@ interface SyncStore {
     var token: String?
     var primaryKey: String?
     var secretKey: String?
+
+    var recoveryCode:String?
 }
 
 class SyncSharedPrefsStore
@@ -95,6 +97,17 @@ constructor(
                 }
             }
         }
+    override var recoveryCode: String?
+        get() = encryptedPreferences?.getString(KEY_RECOVERY_CODE, null)
+        set(value)  {
+            encryptedPreferences?.edit(commit = true) {
+                if (value == null) {
+                    remove(KEY_RECOVERY_CODE)
+                } else {
+                    putString(KEY_RECOVERY_CODE, value)
+                }
+            }
+        }
 
     companion object {
         private const val FILENAME = "com.duckduckgo.sync.store"
@@ -104,5 +117,6 @@ constructor(
         private const val KEY_TOKEN = "KEY_TOKEN"
         private const val KEY_PK = "KEY_PK"
         private const val KEY_SK = "KEY_SK"
+        private const val KEY_RECOVERY_CODE = "KEY_RECOVERY_CODE"
     }
 }
