@@ -59,7 +59,9 @@ constructor(
 
     fun onCreateAccountClicked() {
         viewModelScope.launch(Dispatchers.IO) {
-            val account: AccountKeys = nativeLib.generateAccountKeys()
+            val account: AccountKeys = nativeLib.generateAccountKeys(
+                userId = syncDeviceIds.userId()
+            )
             syncApi.createAccount(
                 account.userId,
                 account.primaryKey,
