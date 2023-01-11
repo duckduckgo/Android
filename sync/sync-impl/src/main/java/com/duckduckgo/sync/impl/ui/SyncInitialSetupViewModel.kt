@@ -101,6 +101,18 @@ constructor(
         }
     }
 
+    fun loginAccountClicked() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val account: Account = nativeLib.prepareForLogin(primaryKey)
+            val login = syncApi.login(
+                    userID = account.userId,
+                    hashedPassword = hashedPassword,
+                    deviceId =,
+                    deviceName =
+            )
+        }
+    }
+
     private suspend fun updateViewState() {
         val accountInfo = syncRepository.getAccountInfo()
         viewState.emit(

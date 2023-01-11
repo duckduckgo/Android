@@ -50,6 +50,7 @@ class SyncInitialSetupActivity : DuckDuckGoActivity() {
             viewModel.onStoreRecoveryCodeClicked()
         }
         binding.resetButton.setOnClickListener { viewModel.onResetClicked() }
+        binding.loginAccountButton.setOnClickListener { viewModel.loginAccountClicked() }
         binding.logoutButton.setOnClickListener { viewModel.onLogoutClicked() }
         binding.deleteAccountButton.setOnClickListener { viewModel.onDeleteAccountClicked() }
     }

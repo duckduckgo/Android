@@ -38,7 +38,7 @@ interface SyncApi {
         hashedPassword: String,
         deviceId: String,
         deviceName: String
-    )
+    ): LoginResponse?
 
     fun logout(token: String, deviceId: String): Result<Logout>
 
@@ -112,11 +112,11 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
     }
 
     override fun login(
-            userID: String,
-            hashedPassword: String,
-            deviceId: String,
-            deviceName: String,
-    ) {
+        userID: String,
+        hashedPassword: String,
+        deviceId: String,
+        deviceName: String,
+    ): LoginResponse? {
         runCatching {
             val call = syncService.login(Login(
                     user_id = userID,
@@ -130,7 +130,13 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
                 Timber.i("SYNC login success ${response.code()}")
                 Timber.i("SYNC login success body ${response.body()}")
                 syncEncryptedStore.token =
-                        response.body()?.token ?: throw IllegalStateException("Empty body")
+                    response.body()?.token ?: throw IllegalStateException("Empty body")
+
+                return LoginResponse(
+                    token = syncEncryptedStore.token!!,
+                    protected_encryption_key = response.body()!!.protected_encryption_key,
+                    devices = emptyList()
+                )
             } else {
                 response.errorBody()?.let { errorBody ->
                     val converter: Converter<ResponseBody, ErrorResponse> =
@@ -146,7 +152,9 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
                         }
             }
         }
-                .onFailure { throwable -> Timber.i("SYNC login failed ${throwable.message}") }
+            .onFailure { throwable -> Timber.i("SYNC login failed ${throwable.message}") }
+
+        return null
     }
 
     private fun <T, R> onSuccess(
