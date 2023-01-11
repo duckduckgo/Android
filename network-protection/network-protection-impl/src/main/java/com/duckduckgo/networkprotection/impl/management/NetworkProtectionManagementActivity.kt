@@ -65,6 +65,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         bindViews()
 
         observeViewModel()
+        lifecycle.addObserver(viewModel)
     }
 
     private fun bindViews() {

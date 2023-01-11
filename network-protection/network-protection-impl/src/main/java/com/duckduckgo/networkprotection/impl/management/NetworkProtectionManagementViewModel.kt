@@ -23,6 +23,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
@@ -40,7 +41,6 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -60,7 +60,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     private val command = Channel<Command>(1, DROP_OLDEST)
 
     private var isTimerTickRunning: Boolean = false
-    private var timerTickJob: Job? = null
+    private var timerTickJob = ConflatedJob()
 
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
 
@@ -120,7 +120,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         if (!isTimerTickRunning) {
             isTimerTickRunning = true
             loadConnectionDetails()
-            timerTickJob = viewModelScope.launch(dispatcherProvider.default()) {
+            timerTickJob += viewModelScope.launch(dispatcherProvider.default()) {
                 var enabledTime = networkProtectionRepository.enabledTimeInMillis
                 while (isTimerTickRunning) {
                     if (enabledTime == -1L) {
@@ -151,8 +151,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     private fun stopElapsedTimeTimer() {
         if (isTimerTickRunning) {
             isTimerTickRunning = false
-            timerTickJob?.cancel()
-            timerTickJob = null
+            timerTickJob.cancel()
         }
     }
 
