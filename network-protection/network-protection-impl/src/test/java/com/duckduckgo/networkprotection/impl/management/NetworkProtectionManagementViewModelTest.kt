@@ -68,7 +68,10 @@ class NetworkProtectionManagementViewModelTest {
     fun setUp() {
         MockitoAnnotations.openMocks(this)
         testee = NetworkProtectionManagementViewModel(
-            vpnStateMonitor, vpnFeaturesRegistry, networkProtectionRepository, coroutineRule.testDispatcherProvider,
+            vpnStateMonitor,
+            vpnFeaturesRegistry,
+            networkProtectionRepository,
+            coroutineRule.testDispatcherProvider,
         )
     }
 

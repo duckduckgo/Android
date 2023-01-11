@@ -17,6 +17,8 @@
 package com.duckduckgo.networkprotection.impl
 
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack.VpnTunnelConfig
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.RESTART
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelDataProvider
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelDataProvider.WgTunnelData
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository
@@ -34,6 +36,7 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 
@@ -97,7 +100,7 @@ class WgVpnNetworkStackTest {
     }
 
     @Test
-    fun whenOnStartVpnThenSetEnabledTimeInMillis() = runTest {
+    fun whenOnStartVpnAndEnabledTimeHasBeenResetThenSetEnabledTimeInMillis() = runTest {
         whenever(wgTunnelDataProvider.get()).thenReturn(
             WgTunnelData(
                 userSpaceConfig = "testuserspaceconfig",
@@ -106,6 +109,7 @@ class WgVpnNetworkStackTest {
                 tunnelAddress = emptyMap(),
             ),
         )
+        whenever(networkProtectionRepository.enabledTimeInMillis).thenReturn(-1L)
         whenever(currentTimeProvider.get()).thenReturn(1672229650358L)
 
         testee.onPrepareVpn()
@@ -119,6 +123,34 @@ class WgVpnNetworkStackTest {
     }
 
     @Test
+    fun whenOnStartVpnAndEnabledTimeHasBeenSetThenDoNotUpdateEnabledTime() = runTest {
+        whenever(wgTunnelDataProvider.get()).thenReturn(
+            WgTunnelData(
+                userSpaceConfig = "testuserspaceconfig",
+                serverIP = "10.10.10.10",
+                serverLocation = "Stockholm, Sweden",
+                tunnelAddress = emptyMap(),
+            ),
+        )
+        whenever(networkProtectionRepository.enabledTimeInMillis).thenReturn(16722296505000L)
+        whenever(currentTimeProvider.get()).thenReturn(1672229650358L)
+
+        testee.onPrepareVpn()
+
+        assertEquals(
+            Result.success(Unit),
+            testee.onStartVpn(mock()),
+        )
+
+        verify(networkProtectionRepository).serverDetails = ServerDetails(
+            ipAddress = "10.10.10.10",
+            location = "Stockholm, Sweden",
+        )
+        verify(networkProtectionRepository).enabledTimeInMillis
+        verifyNoMoreInteractions(networkProtectionRepository)
+    }
+
+    @Test
     fun whenNoWgTunnelDataThenOnStartVpnReturnsFailure() = runTest {
         val result = testee.onStartVpn(mock())
         assertTrue(result.isFailure)
@@ -128,13 +160,24 @@ class WgVpnNetworkStackTest {
     }
 
     @Test
-    fun whenOnStopVpnThenResetEnabledTimeInMillisAndServerDetails() = runTest {
+    fun whenOnStopVpnWithSelfStopThenResetEnabledTimeInMillisAndServerDetails() = runTest {
         assertEquals(
             Result.success(Unit),
-            testee.onStopVpn(),
+            testee.onStopVpn(SELF_STOP),
         )
 
         verify(networkProtectionRepository).enabledTimeInMillis = -1
         verify(networkProtectionRepository).serverDetails = null
+    }
+
+    @Test
+    fun whenOnStopVpnWithRestartThenResetEnabledTimeInMillisAndServerDetails() = runTest {
+        assertEquals(
+            Result.success(Unit),
+            testee.onStopVpn(RESTART),
+        )
+
+        verify(networkProtectionRepository).serverDetails = null
+        verifyNoMoreInteractions(networkProtectionRepository)
     }
 }

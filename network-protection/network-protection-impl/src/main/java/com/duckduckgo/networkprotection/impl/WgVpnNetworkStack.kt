@@ -20,6 +20,8 @@ import android.os.ParcelFileDescriptor
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack.VpnTunnelConfig
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelDataProvider
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelDataProvider.WgTunnelData
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository
@@ -81,9 +83,9 @@ class WgVpnNetworkStack @Inject constructor(
         return turnOnNative(tunfd.fd)
     }
 
-    override fun onStopVpn(): Result<Unit> {
+    override fun onStopVpn(reason: VpnStopReason): Result<Unit> {
         logcat { "onStopVpn called." }
-        return turnOffNative()
+        return turnOffNative(reason)
     }
 
     override fun onDestroyVpn(): Result<Unit> {
@@ -111,11 +113,14 @@ class WgVpnNetworkStack @Inject constructor(
             }.also { it.start() }
         }
 
-        networkProtectionRepository.get().enabledTimeInMillis = currentTimeProvider.get()
+        // Only update if enabledTimeInMillis has been reset
+        if (networkProtectionRepository.get().enabledTimeInMillis == -1L) {
+            networkProtectionRepository.get().enabledTimeInMillis = currentTimeProvider.get()
+        }
         return Result.success(Unit)
     }
 
-    private fun turnOffNative(): Result<Unit> {
+    private fun turnOffNative(reason: VpnStopReason): Result<Unit> {
         if (wgThread == null) {
             logcat { "turnOffNative wg" }
 
@@ -128,7 +133,11 @@ class WgVpnNetworkStack @Inject constructor(
         }
 
         networkProtectionRepository.get().serverDetails = null
-        networkProtectionRepository.get().enabledTimeInMillis = -1
+
+        // Only update if enabledTimeInMillis stop has been initiated by the user
+        if (reason == SELF_STOP) {
+            networkProtectionRepository.get().enabledTimeInMillis = -1
+        }
         return Result.success(Unit)
     }
 }
