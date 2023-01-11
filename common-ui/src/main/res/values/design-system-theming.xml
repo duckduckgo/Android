@@ -259,10 +259,10 @@
         <item name="daxColorButtonPrimaryContainerPressed">@color/blue50</item>
         <item name="daxColorButtonSecondaryContainer">@android:color/transparent</item>
         <item name="daxColorButtonSecondaryContainerPressed">@color/blue30</item>
-        <item name="daxColorButtonDestructiveContainer">@color/red30</item>
-        <item name="daxColorButtonDestructiveContainerPressed">@color/red50</item>
+        <item name="daxColorButtonDestructiveContainer">@color/alertRedOnDarkDefault</item>
+        <item name="daxColorButtonDestructiveContainerPressed">@color/alertRedOnDarkPressed</item>
         <item name="daxColorButtonDestructiveGhostContainer">@android:color/transparent</item>
-        <item name="daxColorButtonDestructiveGhostContainerPressed">@color/red30_18</item>
+        <item name="daxColorButtonDestructiveGhostContainerPressed">@color/alertRedOnDarkPressed_18</item>
         <item name="daxColorButtonPrimaryText">@color/black84</item>
         <item name="daxColorButtonPrimaryTextPressed">@color/black84</item>
         <item name="daxColorButtonSecondaryText">@color/blue30</item>
@@ -398,10 +398,10 @@
         <item name="daxColorButtonPrimaryContainerPressed">@color/blue70</item>
         <item name="daxColorButtonSecondaryContainer">@android:color/transparent</item>
         <item name="daxColorButtonSecondaryContainerPressed">@color/blue50</item>
-        <item name="daxColorButtonDestructiveContainer">@color/red70</item>
-        <item name="daxColorButtonDestructiveContainerPressed">@color/red70</item>
+        <item name="daxColorButtonDestructiveContainer">@color/alertRedOnLightDefault</item>
+        <item name="daxColorButtonDestructiveContainerPressed">@color/alertRedOnLightPressed</item>
         <item name="daxColorButtonDestructiveGhostContainer">@android:color/transparent</item>
-        <item name="daxColorButtonDestructiveGhostContainerPressed">@color/red60_12</item>
+        <item name="daxColorButtonDestructiveGhostContainerPressed">@color/alertRedOnLightPressed_18</item>
         <item name="daxColorButtonPrimaryText">@color/white</item>
         <item name="daxColorButtonPrimaryTextPressed">@color/white</item>
         <item name="daxColorButtonSecondaryText">@color/blue50</item>
