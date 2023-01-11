@@ -39,13 +39,10 @@ constructor(
         val distanceFromEdge = resources.getDimension(R.dimen.daxBubbleDialogDistanceFromEdge)
         val edgeTreatment = DaxBubbleEdgeTreatment(cornerSize, distanceFromEdge)
 
-        background = MaterialShapeDrawable(
-            ShapeAppearanceModel.builder()
-                .setAllCornerSizes(cornderRadius)
-                .setTopEdge(edgeTreatment)
-                .build(),
-        ).apply {
-            fillColor = ColorStateList.valueOf(context.getColorFromAttr(R.attr.daxColorSurface))
-        }
+        setCardBackgroundColor(ColorStateList.valueOf(context.getColorFromAttr(R.attr.daxColorSurface)))
+        shapeAppearanceModel =  ShapeAppearanceModel.builder()
+            .setAllCornerSizes(cornderRadius)
+            .setTopEdge(edgeTreatment)
+            .build()
     }
 }
