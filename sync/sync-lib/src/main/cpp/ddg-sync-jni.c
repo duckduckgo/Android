@@ -29,6 +29,7 @@ Java_com_duckduckgo_sync_lib_NativeLib_generateAccountKeys(JNIEnv* env, jclass c
     // Convert the jstring arguments to const char*
     const char* userIdChars = (*env)->GetStringUTFChars(env, userId, NULL);
     const char* passwordChars = (*env)->GetStringUTFChars(env, password, NULL);
+
     jint result = 111;
     result = ddgSyncGenerateAccountKeys(
         (unsigned char*) primaryKeyElements,
@@ -72,6 +73,43 @@ Java_com_duckduckgo_sync_lib_NativeLib_prepareForLogin(
     // Release the input arrays
     (*env)->ReleaseByteArrayElements(env, passwordHash, passwordHashCArray, JNI_COMMIT);
     (*env)->ReleaseByteArrayElements(env, stretchedPrimaryKey, stretchedPrimaryKeyCArray, JNI_COMMIT);
+
+    return result;
+}
+
+JNIEXPORT jint JNICALL
+Java_com_example_MyNativeLibrary_decrypt(
+    JNIEnv *env,
+    jclass clazz,
+    jbyteArray rawBytes, //out
+    jbyteArray encryptedBytes, //in
+    jint encryptedBytesLength, //in
+    jbyteArray secretKey // in
+) {
+
+    // Get the size of the arrays
+    jsize rawBytesLength = (*env)->GetArrayLength(env, rawBytes);
+    jsize encryptedBytesLength2 = (*env)->GetArrayLength(env, encryptedBytes);
+
+    // Get pointers to the arrays
+    jbyte* rawBytesElements = (*env)->GetByteArrayElements(env, rawBytes, NULL);
+    jbyte* encryptedBytesElements = (*env)->GetByteArrayElements(env, encryptedBytes, NULL);
+    jbyte* secretKeyElements = (*env)->GetByteArrayElements(env, secretKey, NULL);
+
+    // Call the C function
+    jint result = 111;
+
+    result = ddgSyncDecrypt(
+      rawBytesElements,
+      (unsigned char *)encryptedBytesElements,
+      (unsigned long long)encryptedBytesLength2,
+      (unsigned char *)secretKeyElements
+    );
+
+    // Release the input arrays
+    (*env)->ReleaseByteArrayElements(env, encryptedBytes, encryptedBytesElements, JNI_ABORT);
+    (*env)->ReleaseByteArrayElements(env, secretKey, secretKeyElements, JNI_ABORT);
+    (*env)->ReleaseByteArrayElements(env, rawBytes, rawBytesElements, JNI_COMMIT);
 
     return result;
 }

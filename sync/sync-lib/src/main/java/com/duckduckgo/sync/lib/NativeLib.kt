@@ -108,6 +108,19 @@ class NativeLib constructor(
         )
     }
 
+    fun decrypt(
+        encryptedData: ByteArray,
+        secretKey: ByteArray,
+    ): ByteArray {
+        val decryptedData = ByteArray(32) //TODO: validate if size is correct
+        val result: Long = prepareForLogin(decryptedData, encryptedData, secretKey)
+
+        Timber.v("SYNC result: $result")
+        Timber.v("SYNC decryptedData: ${decryptedData}")
+
+        return decryptedData
+    }
+
     fun ByteArray.encode(): String {
         return Base64.encodeToString(this, Base64.NO_WRAP)
     }
@@ -129,6 +142,13 @@ class NativeLib constructor(
         passwordHash: ByteArray,
         stretchedPrimaryKey: ByteArray,
         primaryKey: ByteArray,
+    ): Long
+
+    private external fun decrypt(
+        decryptedData: ByteArray,
+        encryptedData: ByteArray,
+        length: Long, //TODO: test if necessary
+        secretKey: ByteArray,
     ): Long
 }
 
