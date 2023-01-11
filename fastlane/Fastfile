@@ -20,6 +20,7 @@
     releaseNotesFileHiring = "../app/version/release-notes-hiring"
     releaseNotesFileSuffix = "../app/version/release-notes-suffix"
     releaseNotesLocales= ["en-US", "en-GB", "en-CA"]
+    releaseNotesMaxLength = 500
     errorMessageCancelled = "Release cancelled 😢"
     asanaBridgeInstallationProblem = "Android Asana Release Bridge not installed or configured correctly - see https://app.asana.com/0/0/1203116937958001/f for instructions"
 
@@ -35,7 +36,10 @@ platform :android do
     releaseNotesHiring = File.read(releaseNotesFileHiring)
 
     formatted = "#{releaseNotesBodyHeader}\n#{releaseNotesBody}#{releaseNotesHiring}\n\n#{releaseNotesSuffixHeader}\n#{releaseNotesSuffix}"
+
+    validateReleaseNotes(releaseNotes: formatted)
     UI.message("\n#{formatted}")
+
     formatted
 
   end
@@ -230,7 +234,7 @@ platform :android do
             existingReleaseNotes = File.read(releaseNotesFileBody)
 
             # This handles the flow when no options were passed. We will prompt the user for input.
-            if notes_type == nil && custom_release_notes == nil then
+            releaseNotes = if (notes_type == nil && custom_release_notes == nil) then
                 commits = changelog_from_git_commits(
                     between: [last_git_tag, "HEAD"],
                     pretty: "- %s",
@@ -244,7 +248,7 @@ platform :android do
                     "Bug fixes and other improvements",
                     ]
 
-                rl = retrieve_notes_for_type(
+                retrieve_notes_for_type(
                     notes_type: choice,
                     existingReleaseNotes: existingReleaseNotes
                 )
@@ -264,6 +268,17 @@ platform :android do
                     )
                 end
 
+            end
+
+            validateReleaseNotes(releaseNotes: releaseNotes)
+            releaseNotes
+        end
+
+        desc "Validates the release notes to ensure they are suitable for the Play Store"
+        private_lane :validateReleaseNotes do |options|
+            releaseNotesLength = options[:releaseNotes].length
+            if (releaseNotesLength > releaseNotesMaxLength)
+                UI.user_error!("Release notes are too long for Play Store (#{releaseNotesLength} characters). Max size allowed: #{releaseNotesMaxLength}")
             end
         end
 
