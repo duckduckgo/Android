@@ -22,7 +22,6 @@ import android.util.AttributeSet
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.view.getColorFromAttr
 import com.google.android.material.card.MaterialCardView
-import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
 
 class DaxBubbleCardView
@@ -40,7 +39,7 @@ constructor(
         val edgeTreatment = DaxBubbleEdgeTreatment(cornerSize, distanceFromEdge)
 
         setCardBackgroundColor(ColorStateList.valueOf(context.getColorFromAttr(R.attr.daxColorSurface)))
-        shapeAppearanceModel =  ShapeAppearanceModel.builder()
+        shapeAppearanceModel = ShapeAppearanceModel.builder()
             .setAllCornerSizes(cornderRadius)
             .setTopEdge(edgeTreatment)
             .build()
