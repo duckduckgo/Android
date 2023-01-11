@@ -34,7 +34,7 @@
 <resources>
     <!-- Widget colors -->
     <color name="favoriteTitleTextColor">@color/black60</color>
-    <color name="favoriteFaviconBackgroundColor">@color/black6</color>
+    <color name="favoriteFaviconBackgroundColor">@color/black3</color>
     <color name="searchWidgetBackgroundColor">@color/white</color>
     <color name="searchWidgetSearchBarBackgroundColor">@color/black6</color>
     <color name="searchWidgetSearchBarHintColor">@color/black60</color>
