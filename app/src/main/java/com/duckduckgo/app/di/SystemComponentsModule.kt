@@ -18,13 +18,13 @@ package com.duckduckgo.app.di
 
 import android.content.Context
 import android.content.pm.PackageManager
-import androidx.lifecycle.LifecycleObserver
 import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.fire.LottieFireAnimationLoader
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.shortcut.AppShortcutCreator
 import com.duckduckgo.app.icon.api.AppIconModifier
 import com.duckduckgo.app.icon.api.IconModifier
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.systemsearch.DeviceAppListProvider
 import com.duckduckgo.app.systemsearch.DeviceAppLookup
@@ -79,5 +79,5 @@ object SystemComponentsModule {
 abstract class SystemComponentsModuleBindings {
     @Binds
     @IntoSet
-    abstract fun animatorLoaderObserver(fireAnimationLoader: FireAnimationLoader): LifecycleObserver
+    abstract fun animatorLoaderObserver(fireAnimationLoader: FireAnimationLoader): MainProcessLifecycleObserver
 }

@@ -64,5 +64,12 @@
     <string name="credentialManagementViewMenuDelete">Διαγραφή</string>
 
     <string name="credentialManagementSuggestionsLabel">Προτεινόμενο</string>
+    <string name="credentialManagementNoLoginsSavedTitle">Δεν έχουν αποθηκευτεί ακόμα στοιχεία σύνδεσης</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Τα στοιχεία σύνδεσης αποθηκεύονται με ασφάλεια μόνο σε αυτήν τη συσκευή.</string>
+
+    <string name="autofillManagementAddLogin">Προσθήκη στοιχείων σύνδεσης</string>
+    <string name="autofillManagementSearchLogins">Αναζήτηση</string>
+    <string name="autofillManagementSearchClearDescription">Εκκαθάριση εισαγωγής αναζήτησης</string>
+    <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Δεν υπάρχουν αποτελέσματα για «%1$s»</string>
 
 </resources>

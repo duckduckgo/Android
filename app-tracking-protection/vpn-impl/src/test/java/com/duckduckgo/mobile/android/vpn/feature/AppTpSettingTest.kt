@@ -34,6 +34,7 @@ class AppTpSettingTest {
                 AppTpSetting.CPUMonitoring -> assertFalse(setting.defaultValue)
                 AppTpSetting.ConnectivityChecks -> assertFalse(setting.defaultValue)
                 AppTpSetting.ProtectGames -> assertFalse(setting.defaultValue)
+                AppTpSetting.ExceptionLists -> assertTrue(setting.defaultValue)
                 AppTpSetting.OpenBeta -> assertFalse(setting.defaultValue)
                 AppTpSetting.CheckBlockingFunction -> assertFalse(setting.defaultValue)
                 AppTpSetting.StartVpnErrorHandling -> assertTrue(setting.defaultValue)

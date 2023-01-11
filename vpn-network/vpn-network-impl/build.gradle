@@ -33,6 +33,7 @@ dependencies {
 
     implementation Kotlin.stdlib.jdk7
     implementation "com.squareup.logcat:logcat:_"
+    implementation "com.github.duckduckgo:netguard:1.0.0"
 
     implementation Google.dagger
     implementation AndroidX.core.ktx
@@ -49,12 +50,6 @@ dependencies {
 }
 
 android {
-    externalNativeBuild {
-
-        cmake {
-            path "CMakeLists.txt"
-        }
-    }
     anvil {
         generateDaggerFactories = true // default is false
     }

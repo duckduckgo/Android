@@ -16,6 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.service
 
+import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.app.Service
 import android.content.ComponentName
@@ -30,6 +31,7 @@ import androidx.core.content.ContextCompat
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.extensions.getPrivateDnsServerName
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.VpnScope
@@ -37,8 +39,12 @@ import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.integration.VpnNetworkStackProvider
+import com.duckduckgo.mobile.android.vpn.model.AlwaysOnState
+import com.duckduckgo.mobile.android.vpn.model.VpnServiceState
+import com.duckduckgo.mobile.android.vpn.model.VpnServiceState.ENABLED
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceState.ENABLING
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceStateStats
+import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack.VpnTunnelConfig
 import com.duckduckgo.mobile.android.vpn.network.util.asRoute
 import com.duckduckgo.mobile.android.vpn.network.util.getActiveNetwork
@@ -54,6 +60,7 @@ import com.duckduckgo.mobile.android.vpn.ui.notification.OngoingNotificationPres
 import dagger.android.AndroidInjection
 import java.net.Inet4Address
 import java.net.InetAddress
+import java.util.concurrent.Executors
 import javax.inject.Inject
 import kotlinx.coroutines.*
 import logcat.LogPriority
@@ -99,6 +106,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
     private var restartRequested = false
 
     private val startVpnLock = Object()
+
+    private val alwaysOnStateJob = ConflatedJob()
 
     private val isInterceptDnsTrafficEnabled by lazy {
         appTpFeatureConfig.isEnabled(AppTpSetting.InterceptDnsTraffic)
@@ -226,14 +235,20 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
 
         synchronized(startVpnLock) {
             val currStateStats = vpnServiceStateStatsDao.getLastStateStats()
+            // We don't check for ENABLED state here because it break when the app is updated
+            // (See: https://app.asana.com/0/488551667048375/1203621692416589/f)
             if (currStateStats?.state == ENABLING) {
                 // Sometimes onStartCommand gets called twice - this is a safety rail against that
                 logcat(LogPriority.WARN) { "VPN is already being started, abort" }
                 return@withContext
             }
 
-            // We need to rethink how to log this state. This will likely change.
-            vpnServiceStateStatsDao.insert(VpnServiceStateStats(state = ENABLING))
+            vpnServiceStateStatsDao.insert(createVpnState(state = ENABLING))
+
+            vpnServiceCallbacksPluginPoint.getPlugins().forEach {
+                logcat { "VPN log: onVpnStarting ${it.javaClass} callback" }
+                it.onVpnStarting(this)
+            }
         }
 
         vpnNetworkStack.onPrepareVpn().getOrNull().also {
@@ -274,13 +289,17 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         }
 
         vpnServiceCallbacksPluginPoint.getPlugins().forEach {
-            logcat { "VPN log: starting ${it.javaClass} callback" }
+            logcat { "VPN log: onVpnStarted ${it.javaClass} callback" }
             it.onVpnStarted(this)
         }
 
         Intent(applicationContext, VpnStateMonitorService::class.java).also {
             bindService(it, vpnStateServiceConnection, Context.BIND_AUTO_CREATE)
         }
+
+        // lastly set the VPN state to enabled
+        vpnServiceStateStatsDao.insert(createVpnState(state = ENABLED))
+        alwaysOnStateJob += launch { monitorVpnAlwaysOnState() }
     }
 
     private suspend fun createTunnelInterface(tunnelConfig: VpnTunnelConfig) {
@@ -451,7 +470,10 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         }
     }
 
-    private suspend fun stopVpn(reason: VpnStopReason, shouldStopCallbacks: Boolean = true) = withContext(Dispatchers.IO) {
+    private suspend fun stopVpn(
+        reason: VpnStopReason,
+        hasVpnAlreadyStarted: Boolean = true,
+    ) = withContext(Dispatchers.IO) {
         logcat { "VPN log: Stopping VPN. $reason" }
 
         vpnNetworkStack.onStopVpn()
@@ -459,12 +481,23 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         tunInterface?.close()
         tunInterface = null
 
+        alwaysOnStateJob.cancel()
+
         sendStopPixels(reason)
 
-        if (shouldStopCallbacks) {
+        // Set the state to DISABLED here, then call the on stop/failure callbacks
+        vpnServiceStateStatsDao.insert(createVpnState(state = VpnServiceState.DISABLED, stopReason = reason))
+
+        // If VPN has been started, then onVpnStopped must be called. Else, an error might have occurred before start so we call onVpnStartFailed
+        if (hasVpnAlreadyStarted) {
             vpnServiceCallbacksPluginPoint.getPlugins().forEach {
                 logcat { "VPN log: stopping ${it.javaClass} callback" }
                 it.onVpnStopped(this, reason)
+            }
+        } else {
+            vpnServiceCallbacksPluginPoint.getPlugins().forEach {
+                logcat { "VPN log: onVpnStartFailed ${it.javaClass} callback" }
+                it.onVpnStartFailed(this)
             }
         }
 
@@ -530,6 +563,64 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             VPN_FOREGROUND_SERVICE_ID,
             DeviceShieldEnabledNotificationBuilder
                 .buildDeviceShieldEnabledNotification(applicationContext, deviceShieldNotification, ongoingNotificationPressedHandler),
+        )
+    }
+
+    private suspend fun monitorVpnAlwaysOnState() = withContext(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) {
+        suspend fun incrementalPeriodicChecks(
+            times: Int = Int.MAX_VALUE,
+            initialDelay: Long = 500, // 0.5 second
+            maxDelay: Long = 300_000, // 5 minutes
+            factor: Double = 1.05, // 5% increase
+            block: suspend () -> Unit,
+        ) {
+            var currentDelay = initialDelay
+            repeat(times - 1) {
+                try {
+                    if (isActive) block()
+                } catch (t: Throwable) {
+                    // you can log an error here and/or make a more finer-grained
+                    // analysis of the cause to see if retry is needed
+                }
+                delay(currentDelay)
+                currentDelay = (currentDelay * factor).toLong().coerceAtMost(maxDelay)
+            }
+        }
+
+        val vpnState = createVpnState(ENABLED)
+
+        @SuppressLint("NewApi") // IDE doesn't get we use appBuildConfig
+        if (appBuildConfig.sdkInt >= 29) {
+            incrementalPeriodicChecks {
+                if (vpnServiceStateStatsDao.getLastStateStats()?.state == ENABLED) {
+                    if (vpnState.alwaysOnState.alwaysOnEnabled) deviceShieldPixels.reportAlwaysOnEnabledDaily()
+                    if (vpnState.alwaysOnState.alwaysOnLockedDown) deviceShieldPixels.reportAlwaysOnLockdownEnabledDaily()
+
+                    vpnServiceStateStatsDao.insert(vpnState).also { logcat { "VPN: log, state: $vpnState" } }
+                }
+            }
+        }
+    }
+
+    @SuppressLint("NewApi")
+    private fun createVpnState(state: VpnServiceState, stopReason: VpnStopReason = VpnStopReason.UNKNOWN): VpnServiceStateStats {
+        fun VpnStopReason.asVpnStoppingReason(): VpnStoppingReason {
+            return when (this) {
+                VpnStopReason.RESTART -> VpnStoppingReason.RESTART
+                VpnStopReason.SELF_STOP -> VpnStoppingReason.SELF_STOP
+                VpnStopReason.REVOKED -> VpnStoppingReason.REVOKED
+                VpnStopReason.ERROR -> VpnStoppingReason.ERROR
+                VpnStopReason.UNKNOWN -> VpnStoppingReason.UNKNOWN
+            }
+        }
+
+        val isAlwaysOnEnabled = if (appBuildConfig.sdkInt >= 29) isAlwaysOn else false
+        val isLockdownEnabled = if (appBuildConfig.sdkInt >= 29) isLockdownEnabled else false
+
+        return VpnServiceStateStats(
+            state = state,
+            alwaysOnState = AlwaysOnState(isAlwaysOnEnabled, isLockdownEnabled),
+            stopReason = stopReason.asVpnStoppingReason(),
         )
     }
 

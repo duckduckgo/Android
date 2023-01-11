@@ -64,5 +64,12 @@
     <string name="credentialManagementViewMenuDelete">Usuń</string>
 
     <string name="credentialManagementSuggestionsLabel">Sugerowane</string>
+    <string name="credentialManagementNoLoginsSavedTitle">Nie zapisano jeszcze żadnych loginów</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Loginy są bezpiecznie przechowywane tylko na tym urządzeniu.</string>
+
+    <string name="autofillManagementAddLogin">Dodaj login</string>
+    <string name="autofillManagementSearchLogins">Szukaj</string>
+    <string name="autofillManagementSearchClearDescription">Usuń treść wyszukiwania</string>
+    <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Nie znaleziono wyników dla frazy „%1$s”</string>
 
 </resources>

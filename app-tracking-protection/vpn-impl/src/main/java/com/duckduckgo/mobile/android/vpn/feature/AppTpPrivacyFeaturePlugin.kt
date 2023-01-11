@@ -16,6 +16,9 @@
 
 package com.duckduckgo.mobile.android.vpn.feature
 
+import android.content.Context
+import android.content.SharedPreferences
+import androidx.core.content.edit
 import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
@@ -23,13 +26,18 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
+import logcat.logcat
 
 @ContributesMultibinding(AppScope::class)
 class AppTpPrivacyFeaturePlugin @Inject constructor(
     plugins: DaggerSet<AppTpSettingPlugin>,
+    private val context: Context,
 ) : PrivacyFeaturePlugin {
 
     private val settings = plugins.sortedBy { it.settingName.value }
+
+    private val preferences: SharedPreferences
+        get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
 
     override fun store(featureName: String, jsonString: String): Boolean {
         @Suppress("NAME_SHADOWING")
@@ -39,7 +47,13 @@ class AppTpPrivacyFeaturePlugin @Inject constructor(
             val adapter: JsonAdapter<JsonAppTpFeatureConfig> = moshi.adapter(JsonAppTpFeatureConfig::class.java)
 
             val config = kotlin.runCatching { adapter.fromJson(jsonString) }.getOrNull() ?: return false
+            val currentHash = preferences.getSignature() ?: ""
+            if (currentHash == config.hash) {
+                logcat { "Downloaded appTP feature config has same hash, noop" }
+                return true
+            }
 
+            config.hash?.let { preferences.setSignature(it) }
             config.settings.forEach { setting ->
                 setting.value?.let { jsonObject ->
                     settings.firstOrNull { setting.key == it.settingName.value }?.let { settingPlugin ->
@@ -54,7 +68,22 @@ class AppTpPrivacyFeaturePlugin @Inject constructor(
         return false
     }
 
+    private fun SharedPreferences.getSignature(): String? {
+        return getString(APPTP_FEATURE_SIGNATURE_KEY, null)
+    }
+
+    private fun SharedPreferences.setSignature(value: String) {
+        edit {
+            putString(APPTP_FEATURE_SIGNATURE_KEY, value)
+        }
+    }
+
     override val featureName: String = AppTpFeatureName.AppTrackerProtection.value
+
+    companion object {
+        private const val APPTP_FEATURE_SIGNATURE_KEY = "apptp_feature_signature"
+        private const val FILENAME = "com.duckduckgo.mobile.vpn.feature.plugin"
+    }
 }
 
 interface AppTpSettingPlugin {

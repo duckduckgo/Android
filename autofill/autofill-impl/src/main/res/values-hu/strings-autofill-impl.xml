@@ -64,5 +64,12 @@
     <string name="credentialManagementViewMenuDelete">Törlés</string>
 
     <string name="credentialManagementSuggestionsLabel">Javasolt</string>
+    <string name="credentialManagementNoLoginsSavedTitle">Még nincsenek mentett bejelentkezési adatok</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Csak ezen az eszközön és biztonságosan tároljuk a bejelentkezési adatokat.</string>
+
+    <string name="autofillManagementAddLogin">Bejelentkezési adatok hozzáadása</string>
+    <string name="autofillManagementSearchLogins">Keresés</string>
+    <string name="autofillManagementSearchClearDescription">Megadott keresés törlése</string>
+    <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Nincs találat erre: „%1$s”</string>
 
 </resources>

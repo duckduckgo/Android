@@ -28,7 +28,8 @@ data class AppTracker(
     val trackerCompanyId: Int,
     @Embedded val owner: TrackerOwner,
     @Embedded val app: TrackerApp,
-    val isCdn: Boolean,
+    @Deprecated("This field is no longer used. Stays to avoid db migration, SQLite doesn't allow rename columns")
+    val isCdn: Boolean = false,
 )
 
 @Entity(tableName = "vpn_app_tracker_blocking_list_metadata")
@@ -45,7 +46,10 @@ data class AppTrackerPackage(
 
 @Entity(tableName = "vpn_app_tracker_exclusion_list")
 data class AppTrackerExcludedPackage(
-    @PrimaryKey val packageId: String,
+    @field:Json(name = "packageName")
+    @PrimaryKey
+    val packageId: String,
+    val reason: String,
 )
 
 @Entity(tableName = "vpn_app_tracker_exclusion_list_metadata")
@@ -102,8 +106,8 @@ data class JsonAppBlockingList(
 class JsonAppTracker(
     val owner: TrackerOwner,
     val app: TrackerApp,
-    @field:Json(name = "CDN")
-    val isCdn: Boolean,
+    @field:Json(name = "default")
+    val defaultAction: String? = null,
 )
 
 class JsonTrackingSignal(
@@ -136,7 +140,7 @@ data class AppTrackerBlocklist(
 
 /** JSON Model that represents the app exclusion list */
 data class JsonAppTrackerExclusionList(
-    val rules: List<String>,
+    val unprotectedApps: List<AppTrackerExcludedPackage>,
 )
 
 /** JSON Model that represents the system app overrides */

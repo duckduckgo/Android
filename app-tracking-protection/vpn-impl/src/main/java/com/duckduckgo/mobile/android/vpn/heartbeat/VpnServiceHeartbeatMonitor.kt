@@ -19,13 +19,12 @@ package com.duckduckgo.mobile.android.vpn.heartbeat
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.*
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ReceiverScope
 import com.duckduckgo.mobile.android.vpn.dao.HeartBeatEntity
@@ -52,7 +51,7 @@ import logcat.logcat
 class VpnServiceHeartbeatMonitorModule {
     @Provides
     @IntoSet
-    fun provideVpnServiceHeartbeatMonitor(workManager: WorkManager): LifecycleObserver {
+    fun provideVpnServiceHeartbeatMonitor(workManager: WorkManager): MainProcessLifecycleObserver {
         return VpnServiceHeartbeatMonitor(workManager)
     }
 
@@ -62,7 +61,7 @@ class VpnServiceHeartbeatMonitorModule {
 
 class VpnServiceHeartbeatMonitor(
     private val workManager: WorkManager,
-) : DefaultLifecycleObserver {
+) : MainProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
         startHeartbeatMonitor(workManager)

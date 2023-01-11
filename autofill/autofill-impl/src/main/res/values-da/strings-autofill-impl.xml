@@ -64,5 +64,12 @@
     <string name="credentialManagementViewMenuDelete">Slet</string>
 
     <string name="credentialManagementSuggestionsLabel">Foreslået</string>
+    <string name="credentialManagementNoLoginsSavedTitle">Ingen logins gemt endnu</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Login gemmes kun sikkert på denne enhed.</string>
+
+    <string name="autofillManagementAddLogin">Tilføj login</string>
+    <string name="autofillManagementSearchLogins">Søg</string>
+    <string name="autofillManagementSearchClearDescription">Ryd søgeinput</string>
+    <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Ingen resultater for \"%1$s\"</string>
 
 </resources>

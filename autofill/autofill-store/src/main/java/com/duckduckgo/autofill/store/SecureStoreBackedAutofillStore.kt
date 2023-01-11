@@ -123,7 +123,11 @@ class SecureStoreBackedAutofillStore(
             domainTitle = credentials.domainTitle,
             lastUpdatedMillis = lastUpdatedTimeProvider.getInMillis(),
         )
-        val webSiteLoginCredentials = WebsiteLoginDetailsWithCredentials(loginDetails, password = credentials.password)
+        val webSiteLoginCredentials = WebsiteLoginDetailsWithCredentials(
+            details = loginDetails,
+            password = credentials.password,
+            notes = credentials.notes,
+        )
 
         return withContext(dispatcherProvider.io()) {
             secureStorage.addWebsiteLoginDetailsWithCredentials(webSiteLoginCredentials)?.toLoginCredentials().also {
@@ -180,6 +184,10 @@ class SecureStoreBackedAutofillStore(
             .map { list ->
                 list.map { it.toLoginCredentials() }
             }
+    }
+
+    override suspend fun getCredentialCount(): Flow<Int> {
+        return secureStorage.websiteLoginDetailsWithCredentials().map { it.size }
     }
 
     override suspend fun deleteCredentials(id: Long) {

@@ -17,12 +17,15 @@
 package com.duckduckgo.cookies.impl.features.firstparty
 
 import android.database.sqlite.SQLiteDatabase
+import androidx.core.net.toUri
 import com.duckduckgo.app.fire.DatabaseLocator
+import com.duckduckgo.app.fire.FireproofRepository
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.ExceptionPixel
 import com.duckduckgo.cookies.impl.CookiesPixelName
 import com.duckduckgo.cookies.impl.SQLCookieRemover
+import com.duckduckgo.cookies.impl.WebViewCookieManager.Companion.DDG_COOKIE_DOMAINS
 import com.duckduckgo.cookies.store.CookiesRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
@@ -43,6 +46,7 @@ class RealFirstPartyCookiesModifier @Inject constructor(
     private val userAllowListRepository: UserAllowListRepository,
     @Named("webViewDbLocator") private val webViewDatabaseLocator: DatabaseLocator,
     private val exceptionPixel: ExceptionPixel,
+    private val fireproofRepository: FireproofRepository,
     private val dispatcherProvider: DispatcherProvider,
 ) : FirstPartyCookiesModifier {
 
@@ -56,10 +60,19 @@ class RealFirstPartyCookiesModifier @Inject constructor(
         }
     }
 
+    // The First Party Cookies expiry feature does not expire the user's DuckDuckGo search settings, which are saved as cookies.
+    // Expiring these cookies would reset them and have undesired consequences, i.e. changing the theme, default language, etc.
+    // This feature also does not expire temporary cookies associated with 'surveys.duckduckgo.com'.
+    // When we launch surveys to help us understand issues that impact users over time, we use this cookie to temporarily store anonymous
+    // survey answers, before deleting the cookie. Cookie storage duration is communicated to users before they opt to submit survey answers.
+    // These cookies are not stored in a personally identifiable way. For example, the large size setting is stored as 's=l.'
+    // More info in https://duckduckgo.com/privacy
     private fun excludedSites(): List<String> =
         cookiesRepository.exceptions.map { it.domain } +
             userAllowListRepository.domainsInUserAllowList() +
-            unprotectedTemporary.unprotectedTemporaryExceptions.map { it.domain }
+            unprotectedTemporary.unprotectedTemporaryExceptions.map { it.domain } +
+            fireproofRepository.fireproofWebsites() +
+            DDG_COOKIE_DOMAINS.map { it.toUri().host!! }
 
     private fun buildSQLWhereClause(timestampThreshold: Long): String {
         val excludedSites: List<String> = excludedSites()

@@ -72,6 +72,12 @@ class DataUriParserTest {
     }
 
     @Test
+    fun whenInvalidDataUriContainingCommaIsProvidedTheInvalidTypeTurned() {
+        val parsed = testee.generate("data:,")
+        assertTrue(parsed === Invalid)
+    }
+
+    @Test
     fun whenKnownMimeTypeProvidedAsNonImageTypeThenSuffixStillGenerated() {
         val parsed = testee.generate("data:text/plain;base64,AAAA") as ParsedDataUri
         assertEquals("txt", parsed.filename.fileType)

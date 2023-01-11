@@ -65,8 +65,8 @@ class SearchBarView @JvmOverloads constructor(
         binding.upAction.setOnClickListener {
             actionHandler(SearchBar.Action.PerformUpAction)
         }
-        binding.omnibarTextInput.doOnTextChanged { text, _, _, count ->
-            binding.clearTextButton.visibility = if (count == 0) GONE else VISIBLE
+        binding.omnibarTextInput.doOnTextChanged { text, _, _, _ ->
+            binding.clearTextButton.visibility = if (text.isNullOrEmpty()) GONE else VISIBLE
             actionHandler(SearchBar.Action.PerformSearch(text.toString()))
         }
         binding.clearTextButton.setOnClickListener {

@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 class FakeAppTrackerRepository : AppTrackerRepository {
     // list of app IDs
-    var appExclusionList: Set<String> = setOf()
+    var appExclusionList: MutableMap<String, String> = mutableMapOf()
         set(value) {
             field = value
             exclusionListFlow.value = getAppExclusionList()
@@ -51,7 +51,7 @@ class FakeAppTrackerRepository : AppTrackerRepository {
     }
 
     override fun getAppExclusionList(): List<AppTrackerExcludedPackage> {
-        return appExclusionList.map { AppTrackerExcludedPackage(it) }
+        return appExclusionList.map { AppTrackerExcludedPackage(it.key, it.value) }
     }
 
     override fun getAppExclusionListFlow(): Flow<List<AppTrackerExcludedPackage>> {

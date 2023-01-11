@@ -1,0 +1,30 @@
+appId: com.duckduckgo.mobile.android
+---
+- launchApp:
+    clearState: true
+    stopApp: true
+- assertVisible:
+    text: ".*Not to worry! Searching and browsing privately.*"
+- tapOn: "let's do it!"
+- tapOn: "cancel"
+- assertVisible:
+    text: ".*I'll also upgrade the security of your connection if possible.*"
+- tapOn:
+    text: "search or type URL"
+- inputText: "https://privacy-test-pages.glitch.me"
+- tapOn:
+    id: "com.google.android.inputmethod.latin:id/key_pos_ime_action"
+- assertVisible:
+    text: ".*keep browsing.*"
+- tapOn:
+    text: "got it"
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/fireIconImageView"
+- assertVisible: "Personal data can build up in your browser.*"
+- tapOn: "Cancel"
+- assertNotVisible: "Personal data can build up in your browser.*"
+- tapOn:
+      id: "com.duckduckgo.mobile.android:id/fireIconImageView"
+- assertNotVisible: "Personal data can build up in your browser.*"
+- tapOn: "Clear All Tabs And Data"
+- assertVisible: "You've got this!.*"

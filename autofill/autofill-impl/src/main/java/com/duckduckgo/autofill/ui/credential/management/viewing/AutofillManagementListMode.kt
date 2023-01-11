@@ -17,8 +17,12 @@
 package com.duckduckgo.autofill.ui.credential.management.viewing
 
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.widget.CompoundButton
+import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -30,6 +34,7 @@ import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.FragmentAutofillManagementListModeBinding
+import com.duckduckgo.autofill.ui.credential.management.AutofillManagementActivity
 import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter
 import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter.ContextMenuAction.CopyPassword
 import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter.ContextMenuAction.CopyUsername
@@ -41,6 +46,9 @@ import com.duckduckgo.autofill.ui.credential.management.sorting.CredentialGroupe
 import com.duckduckgo.autofill.ui.credential.management.suggestion.SuggestionListBuilder
 import com.duckduckgo.autofill.ui.credential.management.suggestion.SuggestionMatcher
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.mobile.android.ui.view.SearchBar
+import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
 import kotlinx.coroutines.launch
@@ -74,6 +82,8 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
     private val binding: FragmentAutofillManagementListModeBinding by viewBinding()
     private lateinit var adapter: AutofillManagementRecyclerAdapter
 
+    private var searchMenuItem: MenuItem? = null
+
     private val globalAutofillToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
         if (!lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) return@OnCheckedChangeListener
         if (isChecked) viewModel.onEnableAutofill() else viewModel.onDisableAutofill()
@@ -91,20 +101,83 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         configureToggle()
         configureRecyclerView()
         observeViewModel()
+        configureToolbar()
     }
 
-    private fun getCurrentUrlForSuggestions() = arguments?.getString(ARG_CURRENT_URL, null)
+    override fun onStop() {
+        super.onStop()
+        hideSearchBar()
+    }
 
-    private fun observeViewModel() {
-        lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.viewState.collect { state ->
-                    binding.enabledToggle.quietlySetIsChecked(state.autofillEnabled, globalAutofillToggleListener)
-                    credentialsListUpdated(state.logins)
+    private fun configureToolbar() {
+        activity?.addMenuProvider(
+            object : MenuProvider {
+                override fun onCreateMenu(
+                    menu: Menu,
+                    menuInflater: MenuInflater,
+                ) {
+                    menuInflater.inflate(R.menu.autofill_list_mode_menu, menu)
+                    searchMenuItem = menu.findItem(R.id.searchLogins)
+                    initializeSearchBar()
+                }
+
+                override fun onPrepareMenu(menu: Menu) {
+                    searchMenuItem?.isVisible = !(viewModel.viewState.value.logins.isNullOrEmpty())
+                }
+
+                override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                    return when (menuItem.itemId) {
+                        R.id.addLoginManually -> {
+                            viewModel.onCreateNewCredentials()
+                            true
+                        }
+
+                        else -> false
+                    }
+                }
+            },
+            viewLifecycleOwner,
+            Lifecycle.State.RESUMED,
+        )
+    }
+
+    private fun initializeSearchBar() {
+        searchMenuItem?.setOnMenuItemClickListener {
+            showSearchBar()
+            return@setOnMenuItemClickListener true
+        }
+
+        parentBinding()?.let { parentBinding ->
+            parentBinding.searchBar.onAction {
+                when (it) {
+                    is SearchBar.Action.PerformUpAction -> hideSearchBar()
+                    is SearchBar.Action.PerformSearch -> viewModel.onSearchQueryChanged(it.searchText)
                 }
             }
         }
-        lifecycleScope.launch {
+    }
+
+    private fun showSearchBar() = parentActivity()?.showSearchBar()
+    private fun hideSearchBar() = parentActivity()?.hideSearchBar()
+
+    private fun getCurrentUrlForSuggestions() = arguments?.getString(ARG_CURRENT_URL, null)
+
+    private fun parentBinding() = parentActivity()?.binding
+    private fun parentActivity() = (activity as AutofillManagementActivity?)
+
+    private fun observeViewModel() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.viewState.collect { state ->
+                    binding.enabledToggle.quietlySetIsChecked(state.autofillEnabled, globalAutofillToggleListener)
+                    state.logins?.let {
+                        credentialsListUpdated(it, state.credentialSearchQuery)
+                        parentActivity()?.invalidateOptionsMenu()
+                    }
+                }
+            }
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.commands.collect { commands ->
                     commands.forEach { processCommand(it) }
@@ -126,13 +199,40 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         }
     }
 
-    private fun credentialsListUpdated(credentials: List<LoginCredentials>) {
+    private fun credentialsListUpdated(
+        credentials: List<LoginCredentials>,
+        credentialSearchQuery: String,
+    ) {
+        if (credentials.isEmpty() && credentialSearchQuery.isEmpty()) {
+            showEmptyCredentialsPlaceholders()
+        } else if (credentials.isEmpty()) {
+            showNoResultsPlaceholders(credentialSearchQuery)
+        } else {
+            renderCredentialList(credentials)
+        }
+    }
+
+    private fun showNoResultsPlaceholders(query: String) {
+        binding.emptyStateLayout.emptyStateContainer.gone()
+        binding.logins.show()
+        adapter.showNoMatchingSearchResults(query)
+    }
+
+    private fun showEmptyCredentialsPlaceholders() {
+        binding.emptyStateLayout.emptyStateContainer.show()
+        binding.logins.gone()
+    }
+
+    private fun renderCredentialList(credentials: List<LoginCredentials>) {
+        binding.emptyStateLayout.emptyStateContainer.gone()
+        binding.logins.show()
+
         val currentUrl = getCurrentUrlForSuggestions()
         val suggestions = suggestionMatcher.getSuggestions(currentUrl, credentials)
 
         adapter.updateLogins(credentials, suggestions)
 
-        Timber.v("Current url: $currentUrl. Matching suggestions: %d", suggestions.size)
+        Timber.v("Current url: %s. Matching suggestions: %d", currentUrl, suggestions.size)
     }
 
     private fun configureRecyclerView() {
@@ -145,7 +245,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
             onCredentialSelected = this::onCredentialsSelected,
             onContextMenuItemClicked = {
                 when (it) {
-                    is Edit -> viewModel.onEditCredentials(it.credentials, false)
+                    is Edit -> viewModel.onEditCredentials(it.credentials)
                     is Delete -> viewModel.onDeleteCredentials(it.credentials)
                     is CopyUsername -> onCopyUsername(it.credentials)
                     is CopyPassword -> onCopyPassword(it.credentials)
@@ -155,7 +255,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
     }
 
     private fun onCredentialsSelected(credentials: LoginCredentials) {
-        viewModel.onViewCredentials(credentials, false)
+        viewModel.onViewCredentials(credentials)
     }
 
     private fun onCopyUsername(credentials: LoginCredentials) {

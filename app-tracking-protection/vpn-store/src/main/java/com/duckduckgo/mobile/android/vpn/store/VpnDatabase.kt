@@ -30,7 +30,7 @@ import org.threeten.bp.format.DateTimeFormatter
 
 @Database(
     exportSchema = true,
-    version = 31,
+    version = 32,
     entities = [
         VpnTracker::class,
         VpnServiceStateStats::class,
@@ -204,6 +204,12 @@ abstract class VpnDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_31_TO_32: Migration = object : Migration(31, 32) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE `vpn_app_tracker_exclusion_list` ADD COLUMN `reason` TEXT NOT NULL DEFAULT 'UNKNOWN'")
+            }
+        }
+
         val ALL_MIGRATIONS: List<Migration>
             get() = listOf(
                 MIGRATION_18_TO_19,
@@ -219,6 +225,7 @@ abstract class VpnDatabase : RoomDatabase() {
                 MIGRATION_28_TO_29,
                 MIGRATION_29_TO_30,
                 MIGRATION_30_TO_31,
+                MIGRATION_31_TO_32,
             )
     }
 }

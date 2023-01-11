@@ -66,8 +66,6 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
     private val tickerChannel = MutableStateFlow(System.currentTimeMillis())
     private var tickerJob: Job? = null
 
-    private val refreshVpnRunningState = MutableStateFlow(System.currentTimeMillis())
-
     sealed class Command {
         data class ShowProtectedAppsList(
             val vpnState: VpnState,
@@ -96,7 +94,6 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
     private suspend fun getRunningState(): Flow<VpnState> = withContext(dispatcherProvider.io()) {
         return@withContext vpnStateMonitor
             .getStateFlow(AppTpVpnFeature.APPTP_VPN)
-            .combine(refreshVpnRunningState.asStateFlow()) { state, _ -> state }
     }
 
     suspend fun getMostRecentTrackers(

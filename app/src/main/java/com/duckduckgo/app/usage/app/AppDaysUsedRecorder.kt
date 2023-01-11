@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.usage.app
 
-import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -25,7 +25,7 @@ import timber.log.Timber
 class AppDaysUsedRecorder(
     private val appDaysUsedRepository: AppDaysUsedRepository,
     private val appCoroutineScope: CoroutineScope,
-) : DefaultLifecycleObserver {
+) : MainProcessLifecycleObserver {
 
     override fun onStart(owner: LifecycleOwner) {
         appCoroutineScope.launch {

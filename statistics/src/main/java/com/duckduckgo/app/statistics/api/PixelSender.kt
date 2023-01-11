@@ -16,10 +16,9 @@
 
 package com.duckduckgo.app.statistics.api
 
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.global.device.DeviceInfo
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.config.StatisticsLibraryConfig
 import com.duckduckgo.app.statistics.model.PixelEntity
@@ -36,7 +35,7 @@ import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import timber.log.Timber
 
-interface PixelSender : DefaultLifecycleObserver {
+interface PixelSender : MainProcessLifecycleObserver {
     fun sendPixel(
         pixelName: String,
         parameters: Map<String, String>,
@@ -56,7 +55,7 @@ interface PixelSender : DefaultLifecycleObserver {
 )
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = LifecycleObserver::class,
+    boundType = MainProcessLifecycleObserver::class,
 )
 @SingleInstanceIn(AppScope::class)
 class RxPixelSender @Inject constructor(

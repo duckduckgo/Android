@@ -64,5 +64,12 @@
     <string name="credentialManagementViewMenuDelete">Ta bort</string>
 
     <string name="credentialManagementSuggestionsLabel">Förslag</string>
+    <string name="credentialManagementNoLoginsSavedTitle">Inga inloggningar sparade ännu</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Inloggningar lagras säkert endast på den här enheten.</string>
+
+    <string name="autofillManagementAddLogin">Lägg till inloggning</string>
+    <string name="autofillManagementSearchLogins">Sökning</string>
+    <string name="autofillManagementSearchClearDescription">Rensa sökfältet</string>
+    <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Inga resultat för ”%1$s”</string>
 
 </resources>

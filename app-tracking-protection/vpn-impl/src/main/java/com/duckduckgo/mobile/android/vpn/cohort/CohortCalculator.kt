@@ -24,14 +24,14 @@ import org.threeten.bp.temporal.ChronoUnit
 import org.threeten.bp.temporal.IsoFields
 
 interface CohortCalculator {
-    fun calculateCohortForDate(localDate: LocalDate): String
+    fun calculateCohortForDate(localDate: LocalDate, now: LocalDate = LocalDate.now()): String
 }
 
 @ContributesBinding(AppScope::class)
 class RealCohortCalculator @Inject constructor() : CohortCalculator {
 
-    override fun calculateCohortForDate(localDate: LocalDate): String {
-        val weeksSinceDate = ChronoUnit.WEEKS.between(localDate, LocalDate.now())
+    override fun calculateCohortForDate(localDate: LocalDate, now: LocalDate): String {
+        val weeksSinceDate = ChronoUnit.WEEKS.between(localDate, now)
 
         return when {
             weeksSinceDate <= WEEKS_TO_MONTHLY_COHORT -> {

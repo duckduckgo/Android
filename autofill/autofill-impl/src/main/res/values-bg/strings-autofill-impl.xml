@@ -64,5 +64,12 @@
     <string name="credentialManagementViewMenuDelete">Изтриване</string>
 
     <string name="credentialManagementSuggestionsLabel">Предложения</string>
+    <string name="credentialManagementNoLoginsSavedTitle">Все още няма запазени данни за вход</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Данните за вход се съхраняват на сигурно място само на това устройство.</string>
+
+    <string name="autofillManagementAddLogin">Добавяне на данни за вход</string>
+    <string name="autofillManagementSearchLogins">Търсене</string>
+    <string name="autofillManagementSearchClearDescription">Изчистване на въведеното търсене</string>
+    <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Няма резултати за \'%1$s\'</string>
 
 </resources>

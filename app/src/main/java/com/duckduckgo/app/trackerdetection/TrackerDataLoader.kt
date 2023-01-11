@@ -18,12 +18,11 @@ package com.duckduckgo.app.trackerdetection
 
 import android.content.Context
 import androidx.annotation.WorkerThread
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.trackerdetection.api.TdsJson
 import com.duckduckgo.app.trackerdetection.db.TdsCnameEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
@@ -42,7 +41,7 @@ import timber.log.Timber
 @WorkerThread
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = LifecycleObserver::class,
+    boundType = MainProcessLifecycleObserver::class,
 )
 class TrackerDataLoader @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
@@ -55,7 +54,7 @@ class TrackerDataLoader @Inject constructor(
     private val context: Context,
     private val appDatabase: AppDatabase,
     private val moshi: Moshi,
-) : DefaultLifecycleObserver {
+) : MainProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
         appCoroutineScope.launch { loadData() }
