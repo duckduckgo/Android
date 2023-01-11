@@ -293,4 +293,29 @@ class UriStringTest {
     fun whenGivenNumberThenIsWebUrlIsFalse() {
         assertFalse(isWebUrl("33"))
     }
+
+    @Test
+    fun whenNamedLocalMachineWithSchemeAndPortThenIsTrue() {
+        assertTrue(isWebUrl("http://raspberrypi:8080"))
+    }
+
+    @Test
+    fun whenNamedLocalMachineWithNoSchemeAndPortThenIsFalse() {
+        assertFalse(isWebUrl("raspberrypi:8080"))
+    }
+
+    @Test
+    fun whenNamedLocalMachineWithSchemeNoPortThenIsTrue() {
+        assertTrue(isWebUrl("http://raspberrypi"))
+    }
+
+    @Test
+    fun whenStartsWithSiteSpecificSearchThenIsFalse() {
+        assertFalse(isWebUrl("site:example.com"))
+    }
+
+    @Test
+    fun whenSchemeIsValidFtpButNotHttpThenNot() {
+        assertFalse(isWebUrl("ftp://example.com"))
+    }
 }
