@@ -254,7 +254,6 @@
     <string name="atp_FAQSixthText">Защита от слежки работает на вашем устройстве и не передает ваши личные данные в DuckDuckGo.</string>
 
     <!--  App Tracking Protection Waitlist -->
-    <string name="atp_WaitlistActivityWaitlistTitle">Очередь на защиту от слежки</string>
     <string name="atp_WaitlistNotificationTitle">Вы получили приглашение воспользоваться защитой от слежки!</string>
     <string name="atp_WaitlistNotificationDescription">Ранее вы просили добавить вас в список ожидания, чтобы мы сообщили, когда вам станет доступна защита от слежки. Нажмите, чтобы открыть приглашение.</string>
     <string name="atp_WaitlistStatusNotJoined">Один простой шаг для надежной защиты данных!</string>

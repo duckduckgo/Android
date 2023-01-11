@@ -37,7 +37,6 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.R as VpnR
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -65,7 +64,6 @@ class NotificationRegistrar @Inject constructor(
         const val PrivacyProtection = 101
         const val Article = 103 // 102 was used for the search notification hence using 103 moving forward
         const val AppFeature = 104
-        const val EmailWaitlist = 106 // 105 was used for the UOA notification
     }
 
     object ChannelType {
@@ -73,11 +71,6 @@ class NotificationRegistrar @Inject constructor(
             "com.duckduckgo.tutorials",
             R.string.notificationChannelTutorials,
             NotificationManagerCompat.IMPORTANCE_DEFAULT,
-        )
-        val APP_TP_WAITLIST = Channel(
-            "com.duckduckgo.apptp",
-            VpnR.string.atp_WaitlistActivityWaitlistTitle,
-            NotificationManagerCompat.IMPORTANCE_HIGH,
         )
         // Do not add new channels here, instead follow https://app.asana.com/0/1125189844152671/1201842645469204
     }
@@ -99,7 +92,6 @@ class NotificationRegistrar @Inject constructor(
 
     private val channels = listOf(
         ChannelType.TUTORIALS,
-        ChannelType.APP_TP_WAITLIST,
     )
 
     private fun registerApp() {

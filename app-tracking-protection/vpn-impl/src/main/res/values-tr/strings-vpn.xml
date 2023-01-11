@@ -242,7 +242,6 @@
     <string name="atp_FAQSixthText">Uygulama İzleme Koruması, cihazınızda çalışır ve kişisel verilerinizi cihazınızdan DuckDuckGo\'ya göndermez.</string>
 
     <!--  App Tracking Protection Waitlist -->
-    <string name="atp_WaitlistActivityWaitlistTitle">Uygulama İzleme Koruması bekleme listesi</string>
     <string name="atp_WaitlistNotificationTitle">Uygulama İzleme Koruması Davetiyeniz Burada!</string>
     <string name="atp_WaitlistNotificationDescription">Bekleme listesine katılarak Uygulama İzleme Koruması özelliğini deneme sırası size geldiğinde sizi bilgilendirmemizi istediniz. Davetiyenizi görüntülemek için dokunun.</string>
     <string name="atp_WaitlistStatusNotJoined">Daha iyi uygulama gizliliği için tek bir kolay adım!</string>

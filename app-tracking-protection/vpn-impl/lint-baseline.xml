@@ -1794,17 +1794,6 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.string.atp_WaitlistActivityWaitlistTitle` appears to be unused"
-        errorLine1="    &lt;string name=&quot;atp_WaitlistActivityWaitlistTitle&quot;>App Tracking Protection waitlist&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings-vpn.xml"
-            line="249"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
         message="The resource `R.string.atp_WaitlistNotificationTitle` appears to be unused"
         errorLine1="    &lt;string name=&quot;atp_WaitlistNotificationTitle&quot;>Your App Tracking Protection Invitation is Here!&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">

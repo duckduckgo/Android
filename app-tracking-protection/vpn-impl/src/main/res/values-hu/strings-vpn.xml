@@ -242,7 +242,6 @@
     <string name="atp_FAQSixthText">Az alkalmazáskövetés elleni védelem a készülékeden működik, és nem küld személyes adatokat a készülékedről a DuckDuckGónak.</string>
 
     <!--  App Tracking Protection Waitlist -->
-    <string name="atp_WaitlistActivityWaitlistTitle">Alkalmazáskövetés elleni védelem várólistája</string>
     <string name="atp_WaitlistNotificationTitle">Megérkezett az alkalmazáskövetés elleni védelmi meghívója!</string>
     <string name="atp_WaitlistNotificationDescription">Feliratkoztál a várólistára, és arra kértél minket, hogy értesítsünk, amikor rád kerül a sor, hogy kipróbálhasd az alkalmazáskövetés elleni védelmi funkciót. Koppints a meghívó megtekintéséhez.</string>
     <string name="atp_WaitlistStatusNotJoined">Egyetlen egyszerű lépés az alkalmazások jobb védelme érdekében!</string>

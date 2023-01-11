@@ -248,7 +248,6 @@
     <string name="atp_FAQSixthText">Lietotņu pretizsekošanas aizsardzība darbojas tavā ierīcē un nesūta tavus personiskos datus no ierīces uz DuckDuckGo.</string>
 
     <!--  App Tracking Protection Waitlist -->
-    <string name="atp_WaitlistActivityWaitlistTitle">Lietotņu pretizsekošanas aizsardzības gaidīšanas saraksts</string>
     <string name="atp_WaitlistNotificationTitle">Tavs Lietotņu pretizsekošanas aizsardzības ielūgums ir klāt!</string>
     <string name="atp_WaitlistNotificationDescription">Tu pievienojies gaidīšanas sarakstam un lūdzi mūs informēt, kad pienāks tava kārta izmēģināt mūsu Lietotņu pretizsekošanas aizsardzības funkciju. Pieskaries, lai skatītu savu uzaicinājumu.</string>
     <string name="atp_WaitlistStatusNotJoined">Viens vienkāršs solis labākam lietotņu privātumam!</string>

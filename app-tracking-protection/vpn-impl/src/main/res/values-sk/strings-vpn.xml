@@ -254,7 +254,6 @@
     <string name="atp_FAQSixthText">Ochrana pred sledovaním aplikácií funguje vo vašom zariadení a neodosiela vaše osobné údaje zo zariadenia do DuckDuckGo.</string>
 
     <!--  App Tracking Protection Waitlist -->
-    <string name="atp_WaitlistActivityWaitlistTitle">Zoznam čakateľov na ochranu pred sledovaním aplikácií</string>
     <string name="atp_WaitlistNotificationTitle">Vaša pozvánka na ochranu pred sledovaním aplikácie je tu!</string>
     <string name="atp_WaitlistNotificationDescription">Pridali ste sa na zoznam čakateľov a požiadali ste nás, aby sme vás upozornili, keď na vás príde rad a budete si môcť vyskúšať našu ochranu e‑mailu. Klepnutím zobrazíte vašu pozvánku.</string>
     <string name="atp_WaitlistStatusNotJoined">Jeden jednoduchý krok pre lepšie súkromie aplikácie!</string>
