@@ -64,6 +64,7 @@ class NotificationRegistrar @Inject constructor(
         const val PrivacyProtection = 101
         const val Article = 103 // 102 was used for the search notification hence using 103 moving forward
         const val AppFeature = 104
+        // 105 and 106 where already used previously
     }
 
     object ChannelType {
@@ -119,6 +120,12 @@ class NotificationRegistrar @Inject constructor(
             list.toList()
         }
         manager.createNotificationChannels(notificationChannels + pluginChannels)
+
+        // TODO this is hack because we don't have a good way to remove channels when we no longer use them
+        // if we don't call deleteNotificationChannel() method, the channel only disappears on fresh installs, not app updates
+        // See https://app.asana.com/0/1125189844152671/1201842645469204 for more info
+        // This was the AppTP waitlist notification channel
+        manager.deleteNotificationChannel("com.duckduckgo.apptp")
     }
 
     @VisibleForTesting
