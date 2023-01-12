@@ -15,14 +15,12 @@
   -->
 
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="24dp"
-    android:height="24dp"
-    android:viewportWidth="24"
-    android:viewportHeight="24">
+    android:width="20dp"
+    android:height="20dp"
+    android:viewportWidth="20"
+    android:viewportHeight="20">
     <path
         android:fillColor="@color/searchWidgetSearchBarTrailingIconColor"
-        android:pathData="M9,6C9,4.3432 10.3431,3 12,3C13.6569,3 15,4.3432 15,6V11C15,12.6569 13.6569,14 12,14C10.3431,14 9,12.6569 9,11V6Z" />
-    <path
-        android:fillColor="@color/searchWidgetSearchBarTrailingIconColor"
-        android:pathData="M7,19C6.4477,19 6,19.4477 6,20C6,20.5523 6.4477,21 7,21H17C17.5523,21 18,20.5523 18,20C18,19.4477 17.5523,19 17,19H13V17.9291C16.3923,17.4439 19,14.5265 19,11C19,10.4477 18.5523,10 18,10C17.4477,10 17,10.4477 17,11C17,13.7614 14.7614,16 12,16C9.2386,16 7,13.7614 7,11C7,10.4477 6.5523,10 6,10C5.4477,10 5,10.4477 5,11C5,14.5265 7.6077,17.4439 11,17.9291V19H7Z" />
+        android:fillType="evenOdd"
+        android:pathData="M9,2C5.134,2 2,5.134 2,9C2,12.866 5.134,16 9,16C10.645,16 12.157,15.433 13.352,14.483L16.634,17.766C16.947,18.078 17.453,18.078 17.766,17.766C18.078,17.453 18.078,16.947 17.766,16.634L14.483,13.352C15.433,12.157 16,10.645 16,9C16,5.134 12.866,2 9,2ZM3.6,9C3.6,6.018 6.018,3.6 9,3.6C11.982,3.6 14.4,6.018 14.4,9C14.4,11.982 11.982,14.4 9,14.4C6.018,14.4 3.6,11.982 3.6,9Z" />
 </vector>
