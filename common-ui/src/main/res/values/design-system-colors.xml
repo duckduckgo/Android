@@ -149,6 +149,7 @@
     <color name="black18">#2E000000</color>
     <color name="black12">#1F000000</color>
     <color name="black6">#0F000000</color>
+    <color name="black3">#08000000</color>
     <color name="black">#000000</color>
 
     <color name="white84">#D6FFFFFF</color>
@@ -158,6 +159,7 @@
     <color name="white18">#2EFFFFFF</color>
     <color name="white12">#1FFFFFFF</color>
     <color name="white9">#17FFFFFF</color>
+    <color name="white6">#0FFFFFFF</color>
     <color name="white">#FFFFFF</color>
 </resources>
 
