@@ -84,5 +84,9 @@ class SyncInitialSetupActivity : DuckDuckGoActivity() {
         binding.deviceIdTextView.text = viewState.deviceId
         binding.tokenTextView.text = viewState.token
         binding.deviceNameTextView.text = viewState.deviceName
+        binding.primaryKeyTextView.text = viewState.primaryKey
+        binding.secretKeyTextView.text = viewState.secretKey
+        binding.protectedEncryptionKeyTextView.text = viewState.protectedEncryptionKey
+        binding.passwordHashTextView.text = viewState.passwordHash
     }
 }

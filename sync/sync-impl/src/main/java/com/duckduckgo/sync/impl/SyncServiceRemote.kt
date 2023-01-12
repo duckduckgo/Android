@@ -129,12 +129,16 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
             if (response.isSuccessful) {
                 Timber.i("SYNC login success ${response.code()}")
                 Timber.i("SYNC login success body ${response.body()}")
+                val match = response.body()?.protected_encryption_key == syncEncryptedStore.protectedEncryptionKey
+                Timber.i("SYNC login ProtectedEncryptionKey match $match ")
                 syncEncryptedStore.token =
-                    response.body()?.token ?: throw IllegalStateException("Empty body")
+                    response.body()?.token ?: throw IllegalStateException("Empty token")
+                syncEncryptedStore.protectedEncryptionKey = response.body()?.protected_encryption_key ?: throw IllegalStateException("Empty PEK")
+                Timber.i("SYNC login success ProtectedEncryptionKey ${syncEncryptedStore.protectedEncryptionKey}")
 
                 return LoginResponse(
                     token = syncEncryptedStore.token!!,
-                    protected_encryption_key = response.body()!!.protected_encryption_key,
+                    protected_encryption_key = syncEncryptedStore.protectedEncryptionKey!!,
                     devices = emptyList()
                 )
             } else {

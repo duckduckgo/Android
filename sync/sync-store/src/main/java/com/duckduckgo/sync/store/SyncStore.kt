@@ -11,6 +11,8 @@ interface SyncStore {
     var primaryKey: String?
     var secretKey: String?
     var recoveryCode: String?
+    var protectedEncryptionKey: String?
+    var passwordHash: String?
     fun clearAll()
 }
 
@@ -108,6 +110,28 @@ constructor(
                 }
             }
         }
+    override var protectedEncryptionKey: String?
+        get() = encryptedPreferences?.getString(KEY_PROTECTED_ENCR_KEY, null)
+        set(value)  {
+            encryptedPreferences?.edit(commit = true) {
+                if (value == null) {
+                    remove(KEY_PROTECTED_ENCR_KEY)
+                } else {
+                    putString(KEY_PROTECTED_ENCR_KEY, value)
+                }
+            }
+        }
+    override var passwordHash: String?
+        get() = encryptedPreferences?.getString(KEY_PASSWORD_HASH_KEY, null)
+        set(value)  {
+            encryptedPreferences?.edit(commit = true) {
+                if (value == null) {
+                    remove(KEY_PASSWORD_HASH_KEY)
+                } else {
+                    putString(KEY_PASSWORD_HASH_KEY, value)
+                }
+            }
+        }
 
     override fun clearAll() {
         encryptedPreferences?.edit(commit = true) { clear() }
@@ -122,5 +146,7 @@ constructor(
         private const val KEY_PK = "KEY_PK"
         private const val KEY_SK = "KEY_SK"
         private const val KEY_RECOVERY_CODE = "KEY_RECOVERY_CODE"
+        private const val KEY_PROTECTED_ENCR_KEY = "KEY_PROTECTED_ENCR_KEY"
+        private const val KEY_PASSWORD_HASH_KEY = "KEY_PASSWORD_HASH_KEY"
     }
 }

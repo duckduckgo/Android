@@ -79,7 +79,55 @@
                 android:layout_height="wrap_content"
                 app:typography="body1" />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+        <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+                android:id="@+id/primaryKeySectionHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="Primary key"/>
+
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                android:id="@+id/primaryKeyTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:typography="body1"/>
+
+        <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+                android:id="@+id/secretKeySectionHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="Secret key"/>
+
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                android:id="@+id/secretKeyTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:typography="body1"/>
+
+        <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+                android:id="@+id/passwordHashSectionHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="Password Hash"/>
+
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                android:id="@+id/passwordHashTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:typography="body1"/>
+
+        <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+                android:id="@+id/protectedEncryptionKeySectionHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="Protected Encryption Key"/>
+
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                android:id="@+id/protectedEncryptionKeyTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:typography="body1"/>
+
+        <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/tokenSectionHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
