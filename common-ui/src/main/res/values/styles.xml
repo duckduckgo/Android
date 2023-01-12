@@ -256,7 +256,7 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:gravity">center</item>
         <item name="android:layout_gravity">center_horizontal|bottom</item>
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">@color/favoriteTitleTextColor</item>
         <item name="android:textSize">12sp</item>
         <item name="android:maxLines">1</item>
         <item name="android:ellipsize">end</item>
@@ -311,8 +311,8 @@
     </style>
 
     <style name="SearchWidgetSearchIcon">
-        <item name="android:layout_width">24dp</item>
-        <item name="android:layout_height">24dp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_alignParentEnd">true</item>
         <item name="android:layout_centerVertical">true</item>
         <item name="android:layout_marginStart">12dp</item>
@@ -345,7 +345,7 @@
         <item name="android:textSize">14sp</item>
         <item name="android:maxLines">1</item>
         <item name="android:ellipsize">end</item>
-        <item name="android:textColor">@color/warGreyTwo</item>
+        <item name="android:textColor">@color/emptyFavoriteDescriptionTextColor</item>
     </style>
 
     <style name="SearchWidgetEmptyFavoritesAction">
@@ -356,7 +356,7 @@
         <item name="android:textSize">15sp</item>
         <item name="android:maxLines">1</item>
         <item name="android:ellipsize">end</item>
-        <item name="android:textColor">@color/cornflowerBlue</item>
+        <item name="android:textColor">@color/emptyFavoriteActionTextColor</item>
     </style>
 
     <style name="Theme.AppCompat.Transparent.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
