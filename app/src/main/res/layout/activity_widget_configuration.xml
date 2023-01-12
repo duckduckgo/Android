@@ -15,7 +15,6 @@
   -->
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -42,7 +41,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:layout_gravity="center_horizontal"
-            android:src="@drawable/search_favorites_widget_preview" />
+            android:src="@drawable/search_favorites_widget_light_preview" />
 
         <RadioGroup
             android:id="@+id/widgetConfigThemeRadioGroup"
@@ -83,13 +82,12 @@
                 android:text="@string/widgetConfigurationDarkThemeOption" />
         </RadioGroup>
 
-        <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostLarge
+        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
             android:id="@+id/widgetConfigAddWidgetButton"
             android:layout_width="wrap_content"
-            android:layout_height="36dp"
+            android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:paddingStart="14dp"
-            android:paddingEnd="14dp"
+            android:layout_marginEnd="8dp"
             android:layout_marginTop="16dp"
             android:text="@string/widgetConfigurationAddWidgetOption"/>
     </LinearLayout>

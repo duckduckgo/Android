@@ -1,5 +1,5 @@
-<!--
-  ~ Copyright (c) 2018 DuckDuckGo
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -15,6 +15,6 @@
   -->
 
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/white" />
-    <corners android:radius="@dimen/largeShapeCornerRadius" />
+    <solid android:color="@color/gray90" />
+    <corners android:radius="@dimen/smallShapeCornerRadius" />
 </shape>

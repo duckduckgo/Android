@@ -36,6 +36,6 @@
             style="@style/SearchWidgetFavoritesGrid"
             android:numColumns="4" />
 
-        <include layout="@layout/search_favorites_widget_empty_hint"/>
+        <include layout="@layout/search_favorites_widget_empty_hint_daylight"/>
     </FrameLayout>
 </LinearLayout>
