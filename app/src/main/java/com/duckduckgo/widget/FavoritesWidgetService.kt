@@ -21,6 +21,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.view.View
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import androidx.core.graphics.drawable.toBitmap
@@ -127,10 +128,11 @@ class FavoritesWidgetService : RemoteViewsService() {
                 if (item.bitmap != null) {
                     remoteViews.setImageViewBitmap(R.id.quickAccessFavicon, item.bitmap)
                 }
+                remoteViews.setViewVisibility(R.id.quickAccessTitle, View.VISIBLE)
                 remoteViews.setTextViewText(R.id.quickAccessTitle, item.title)
                 configureClickListener(remoteViews, item.url)
             } else {
-                remoteViews.setTextViewText(R.id.quickAccessTitle, "")
+                remoteViews.setViewVisibility(R.id.quickAccessTitle, View.GONE)
                 remoteViews.setImageViewResource(R.id.quickAccessFavicon, getEmptyBackgroundDrawable())
             }
 
