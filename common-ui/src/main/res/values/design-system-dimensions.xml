@@ -41,12 +41,13 @@
 
     <!-- Buttons -->
     <dimen name="legacyButtonSmallHeight">36dp</dimen>
-    <dimen name="buttonLargeHeight">60dp</dimen>
-    <dimen name="buttonSmallHeight">48dp</dimen>
-    <dimen name="buttonSmallSidePadding">16dp</dimen>
-    <dimen name="buttonLargeSidePadding">24dp</dimen>
-    <dimen name="buttonSmallTopPadding">8dp</dimen>
-    <dimen name="buttonLargeTopPadding">14dp</dimen>
+    <dimen name="daxButtonLargeHeight">48dp</dimen>
+    <dimen name="daxButtonSmallHeight">36dp</dimen>
+    <dimen name="daxButtonDefaultMargin">8dp</dimen> // Default margin between buttons and other components
+    <dimen name="daxButtonSmallSidePadding">16dp</dimen>
+    <dimen name="daxButtonLargeSidePadding">24dp</dimen>
+    <dimen name="daxButtonSmallTopPadding">8dp</dimen>
+    <dimen name="daxButtonLargeTopPadding">14dp</dimen>
 
     <!-- List Items -->
     <dimen name="listItemImageContainerSize">40dp</dimen>
@@ -98,7 +99,6 @@
 
     <!-- Dax Dialog  -->
     <dimen name="daxDialogContentPaddingTop">20dp</dimen>
-    <dimen name="daxDialogButtonSpacing">14dp</dimen>
 
     <!-- Card -->
     <dimen name="daxBubbleDialogDistanceFromEdge">22dp</dimen>

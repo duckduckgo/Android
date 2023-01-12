@@ -50,15 +50,15 @@ open class DaxButton @JvmOverloads constructor(
         typedArray.recycle()
 
         val sidePadding = if (buttonSize == Small) {
-            resources.getDimensionPixelSize(R.dimen.buttonSmallSidePadding)
+            resources.getDimensionPixelSize(R.dimen.daxButtonSmallSidePadding)
         } else {
-            resources.getDimensionPixelSize(R.dimen.buttonLargeSidePadding)
+            resources.getDimensionPixelSize(R.dimen.daxButtonLargeSidePadding)
         }
 
         val topPadding = if (buttonSize == Small) {
-            resources.getDimensionPixelSize(R.dimen.buttonSmallTopPadding)
+            resources.getDimensionPixelSize(R.dimen.daxButtonSmallTopPadding)
         } else {
-            resources.getDimensionPixelSize(R.dimen.buttonLargeTopPadding)
+            resources.getDimensionPixelSize(R.dimen.daxButtonLargeTopPadding)
         }
 
         minHeight = resources.getDimensionPixelSize(Size.dimension(buttonSize))
@@ -83,9 +83,9 @@ enum class Size {
 
         fun dimension(size: Size): Int {
             return when (size) {
-                Small -> R.dimen.buttonSmallHeight
-                Large -> R.dimen.buttonLargeHeight
-                else -> R.dimen.buttonSmallHeight
+                Small -> R.dimen.daxButtonSmallHeight
+                Large -> R.dimen.daxButtonLargeHeight
+                else -> R.dimen.daxButtonSmallHeight
             }
         }
     }

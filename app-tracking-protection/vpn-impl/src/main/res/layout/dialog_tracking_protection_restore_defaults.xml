@@ -84,7 +84,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/keyline_4"
-                    android:layout_marginEnd="@dimen/keyline_2"
+                    android:layout_marginEnd="@dimen/daxButtonDefaultMargin"
                     android:gravity="center|center_horizontal"
                     android:text="@string/atp_ExcludeAppsManuallyCTACancel"
                     app:layout_constraintEnd_toStartOf="@id/trackingProtectionRestoreDefaultsRestore"

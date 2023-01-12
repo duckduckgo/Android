@@ -84,7 +84,7 @@
         app:buttonSize="large"
         android:layout_marginStart="@dimen/keyline_5"
         android:layout_marginEnd="@dimen/keyline_5"
-        android:layout_marginBottom="@dimen/keyline_1"
+        android:layout_marginBottom="@dimen/daxButtonDefaultMargin"
         android:layout_height="wrap_content"
         android:text="@string/defaultBrowserLetsDoIt"
         app:layout_constraintBottom_toTopOf="@+id/continueButton"

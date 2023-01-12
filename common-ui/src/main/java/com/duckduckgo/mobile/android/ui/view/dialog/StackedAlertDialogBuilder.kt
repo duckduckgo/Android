@@ -22,6 +22,7 @@ import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
+import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.DialogStackedAlertBinding
 import com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
 import com.duckduckgo.mobile.android.ui.view.gone
@@ -140,9 +141,13 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
             LinearLayout.LayoutParams.WRAP_CONTENT,
         )
 
+        val topMargin = context.resources.getDimensionPixelSize(R.dimen.daxButtonDefaultMargin)
+
         stackedButtonList.forEachIndexed { index, text ->
             val button = DaxButtonGhost(context, null)
             button.text = text
+
+            buttonParams.setMargins(0, topMargin, 0, 0)
             button.layoutParams = buttonParams
 
             button.setOnClickListener {

@@ -169,6 +169,8 @@
     <style name="Widget.DuckDuckGo.DaxButton.TextButton" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="android:textAppearance">?attr/textAppearanceButton</item>
         <item name="shapeAppearance">?shapeAppearanceSmallComponent</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
     </style>
 
     <style name="Widget.DuckDuckGo.DaxButton.TextButton.Primary">
@@ -191,6 +193,8 @@
         <item name="strokeColor">@color/button_secondary_stroke_selector</item>
         <item name="rippleColor">@color/button_secondary_ripple_selector</item>
         <item name="iconTint">@color/button_secondary_text_color_selector</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
     </style>
 
     <style name="Widget.DuckDuckGo.DaxButton.Ghost" parent="Widget.MaterialComponents.Button.TextButton">
@@ -198,6 +202,8 @@
         <item name="backgroundTint">@color/button_ghost_container_selector</item>
         <item name="rippleColor">@color/button_ghost_ripple_selector</item>
         <item name="iconTint">@color/button_secondary_text_color_selector</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
     </style>
 
     <style name="Widget.DuckDuckGo.DaxButton.DestructiveGhost" parent="Widget.MaterialComponents.Button.TextButton">
@@ -205,6 +211,8 @@
         <item name="backgroundTint">@color/button_destructive_ghost_container_selector</item>
         <item name="rippleColor">@color/button_desctructive_ghost_ripple_selector</item>
         <item name="iconTint">@color/button_destructive_ghost_text_color_selector</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
     </style>
 
     <style name="Widget.DuckDuckGo.Button" parent="Widget.AppCompat.Button.Borderless">
@@ -307,10 +315,7 @@
     </style>
 
     <style name="Widget.DuckDuckGo.Dialog.Content">
-        <item name="android:paddingTop">@dimen/keyline_5</item>
-        <item name="android:paddingBottom">@dimen/dialogContentPaddingBottom</item>
-        <item name="android:paddingStart">@dimen/keyline_5</item>
-        <item name="android:paddingEnd">@dimen/keyline_5</item>
+        <item name="android:padding">@dimen/keyline_5</item>
     </style>
 
     <style name="Widget.DuckDuckGo.DialogFullScreen">

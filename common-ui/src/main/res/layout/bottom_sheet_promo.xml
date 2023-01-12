@@ -73,7 +73,7 @@
         android:id="@+id/bottomSheetPromoSecondaryButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/keyline_2"
+        android:layout_marginEnd="@dimen/daxButtonDefaultMargin"
         app:layout_constraintBottom_toBottomOf="@id/bottomSheetPromoPrimaryButton"
         app:layout_constraintEnd_toStartOf="@id/bottomSheetPromoPrimaryButton"
         app:layout_constraintTop_toTopOf="@id/bottomSheetPromoPrimaryButton"
