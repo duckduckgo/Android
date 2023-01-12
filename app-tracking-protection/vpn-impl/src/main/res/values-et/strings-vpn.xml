@@ -242,7 +242,6 @@
     <string name="atp_FAQSixthText">Rakenduse jälgimise kaitse töötab seadmes ja ei saada sinu isikuandmeid seadmest välja DuckDuckGo\'le.</string>
 
     <!--  App Tracking Protection Waitlist -->
-    <string name="atp_WaitlistActivityWaitlistTitle">Rakenduse jälgimise kaitse ootenimekiri</string>
     <string name="atp_WaitlistNotificationTitle">Sinu rakenduse jälgimise kaitse kutse on siin.</string>
     <string name="atp_WaitlistNotificationDescription">Liitusid ootenimekirjaga ja palusid meil sind teavitada, kui on sinu kord proovida meie rakenduse jälgimise kaitse funktsiooni. Kutse vaatamiseks puuduta siin.</string>
     <string name="atp_WaitlistStatusNotJoined">Üks lihtne samm parema rakenduse privaatsuse saavutamiseks.</string>

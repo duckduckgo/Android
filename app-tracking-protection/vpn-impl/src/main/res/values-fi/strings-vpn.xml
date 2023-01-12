@@ -242,7 +242,6 @@
     <string name="atp_FAQSixthText">App Tracking Protection toimii laitteessasi, eikä lähetä henkilökohtaisia tietojasi laitteeltasi DuckDuckGolle.</string>
 
     <!--  App Tracking Protection Waitlist -->
-    <string name="atp_WaitlistActivityWaitlistTitle">App Tracking Protection -jonotuslista</string>
     <string name="atp_WaitlistNotificationTitle">App Tracking Protection -kutsusi on täällä!</string>
     <string name="atp_WaitlistNotificationDescription">Liityit odotuslistalle ja pyysit meitä ilmoittamaan, kun on sinun vuorosi kokeilla App Tracking Protection -ominaisuuttamme. Näytä kutsu napauttamalla.</string>
     <string name="atp_WaitlistStatusNotJoined">Yksi helppo askel kohti parempaa sovellusten tietosuojaa!</string>

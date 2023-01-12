@@ -242,7 +242,6 @@
     <string name="atp_FAQSixthText">App Tracking Protection fonctionne localement et ne transmet pas les données personnelles de votre appareil à DuckDuckGo.</string>
 
     <!--  App Tracking Protection Waitlist -->
-    <string name="atp_WaitlistActivityWaitlistTitle">Liste d\'attente d\'App Tracking Protection</string>
     <string name="atp_WaitlistNotificationTitle">Vous avez reçu une invitation à essayer App Tracking Protection !</string>
     <string name="atp_WaitlistNotificationDescription">Vous vous étiez inscrit(e) sur la liste d\'attente et souhaitiez savoir quand vous pourriez tester notre fonctionnalité App Tracking Protection. Appuyez pour voir votre invitation.</string>
     <string name="atp_WaitlistStatusNotJoined">Un geste simple pour mieux préserver la confidentialité des applications !</string>

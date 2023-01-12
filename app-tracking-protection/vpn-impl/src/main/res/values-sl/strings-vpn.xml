@@ -254,7 +254,6 @@
     <string name="atp_FAQSixthText">Zaščita pred sledenjem aplikacijam App Tracking Protection deluje v vaši napravi in vaših osebnih podatkov ne pošilja iz naprave v DuckDuckGo.</string>
 
     <!--  App Tracking Protection Waitlist -->
-    <string name="atp_WaitlistActivityWaitlistTitle">Čakalna lista za zaščito pred sledenjem aplikacijam App Tracking Protection</string>
     <string name="atp_WaitlistNotificationTitle">Vaše povabilo za zaščito pred sledenjem aplikacijam App Tracking Protection je tu!</string>
     <string name="atp_WaitlistNotificationDescription">Pridružili ste se čakalnemu seznamu in prosili, da vas obvestimo, ko boste na vrsti za preizkus naše funkcije zaščite e-pošte. Dotaknite se za ogled vabila.</string>
     <string name="atp_WaitlistStatusNotJoined">En enostaven korak za boljšo zasebnost aplikacij!</string>
