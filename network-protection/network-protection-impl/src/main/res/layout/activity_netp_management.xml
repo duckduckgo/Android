@@ -85,6 +85,20 @@
                 app:textColor="secondary"
                 app:typography="body2" />
 
+            <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="0dp"/>
+
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+                android:id="@+id/shareFeedback"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:primaryText="Share Feedback"
+                />
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 

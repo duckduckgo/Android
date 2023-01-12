@@ -18,6 +18,7 @@ package com.duckduckgo.networkprotection.impl.management
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.net.VpnService
 import android.os.Bundle
 import android.widget.CompoundButton.OnCheckedChangeListener
@@ -44,6 +45,7 @@ import kotlinx.coroutines.flow.onEach
 @InjectWith(ActivityScope::class)
 class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
 
+    private val feedbackURL = Uri.parse("https://form.asana.com/?k=_wNLt6YcT5ILpQjDuW0Mxw&d=137249556945")
     private val binding: ActivityNetpManagementBinding by viewBinding()
     private val viewModel: NetworkProtectionManagementViewModel by bindViewModel()
     private val vpnPermissionRequestActivityResult =
@@ -71,6 +73,10 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
     private fun bindViews() {
         setTitle(R.string.netpManagementTitle)
         binding.netpToggle.setOnCheckedChangeListener(toggleChangeListener)
+
+        binding.shareFeedback.setOnClickListener {
+            startActivity(Intent(Intent.ACTION_VIEW, feedbackURL))
+        }
     }
 
     private fun observeViewModel() {
