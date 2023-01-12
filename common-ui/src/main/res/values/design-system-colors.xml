@@ -89,6 +89,14 @@
 
     <!-- Design System Brand Colors -->
     <color name="disabledColor">#59000000</color>
+    <color name="alertRedOnLightDefault">#EB102D</color>
+    <color name="alertRedOnLightDefault_18">#2EEB102D</color>
+    <color name="alertRedOnLightPressed">#C10D25</color>
+    <color name="alertRedOnDarkDefault">#FF545A</color>
+    <color name="alertRedOnDarkDefault_18">#2EFF545A</color>
+    <color name="alertRedOnDarkPressed">#D1454A</color>
+    <color name="alertRedOnLightTextPressed">@color/alertRedOnLightPressed</color>
+    <color name="alertRedOnDarkTextPressed">#FF7378</color>
 
     <!-- Design System Raw Colors -->
     <color name="red20">#F2A18A</color>
