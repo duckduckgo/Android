@@ -78,4 +78,10 @@ constructor(
             syncApi.storeRecoveryCode()
         }
     }
+
+    fun onResetClicked() {
+        viewModelScope.launch(Dispatchers.IO) {
+
+        }
+    }
 }

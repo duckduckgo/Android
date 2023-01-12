@@ -87,5 +87,12 @@
             android:layout_height="wrap_content"
             android:text="Store Recovery Code" />
 
+        <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimarySmall
+            android:id="@+id/resetButton"
+            android:layout_width="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_height="wrap_content"
+            android:text="Reset"/>
+
     </LinearLayout>
 </ScrollView>
