@@ -386,7 +386,7 @@
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Tästä laitteesta</string>
-    <string name="systemSearchOmnibarInputHint"><font size="13">Hae tai kirjoita URL</font></string>
+    <string name="systemSearchOmnibarInputHint">Hae tai kirjoita URL</string>
     <string name="systemSearchAppNotFound">Sovellusta ei löytynyt</string>
     <string name="systemSearchOnboardingText">Kiitos, että valitsit DuckDuckGon!\nKun nyt käytät hakua tai sovellusta, hakusi ovat suojattuja.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">DuckDuckGo-sovellus myös:</string>

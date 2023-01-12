@@ -386,7 +386,7 @@
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Sa ovog uređaja</string>
-    <string name="systemSearchOmnibarInputHint"><font size="13">Traži ili upiši URL adresu</font></string>
+    <string name="systemSearchOmnibarInputHint">Traži ili upiši URL adresu</string>
     <string name="systemSearchAppNotFound">Aplikaciju nije bilo moguće pronaći</string>
     <string name="systemSearchOnboardingText">Hvala što si odabrao/la DuckDuckGo!\nSada kada koristiš našu tražilicu ili aplikaciju, tvoje su pretrage zaštićene.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Aplikacija DuckDuckGo također:</string>

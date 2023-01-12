@@ -386,7 +386,7 @@
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Από αυτή τη συσκευή</string>
-    <string name="systemSearchOmnibarInputHint"><font size="13">Αναζήτηση ή πληκτρολόγηση διεύθυνσης URL</font></string>
+    <string name="systemSearchOmnibarInputHint">Αναζήτηση ή πληκτρολόγηση διεύθυνσης URL</string>
     <string name="systemSearchAppNotFound">Η εφαρμογή δεν βρέθηκε</string>
     <string name="systemSearchOnboardingText">Ευχαριστώ που επιλέξατε το DuckDuckGo!\nΤώρα, όταν χρησιμοποιείτε την αναζήτηση ή την εφαρμογή μας, οι αναζητήσεις σας προστατεύονται.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Η εφαρμογή DuckDuckGo επίσης:</string>

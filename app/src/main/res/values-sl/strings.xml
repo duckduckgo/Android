@@ -386,7 +386,7 @@
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Iz te naprave</string>
-    <string name="systemSearchOmnibarInputHint"><font size="13">Iščite z iskalnikom ali vnesite URL</font></string>
+    <string name="systemSearchOmnibarInputHint">Iščite z iskalnikom ali vnesite URL</string>
     <string name="systemSearchAppNotFound">Prošnje ni bilo mogoče najti</string>
     <string name="systemSearchOnboardingText">Hvala, ker ste izbrali DuckDuckGo!\nZdaj, ko uporabljate naše iskalnike ali aplikacijo, so vaša iskanja zaščitena.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Tudi aplikacija DuckDuckGo:</string>

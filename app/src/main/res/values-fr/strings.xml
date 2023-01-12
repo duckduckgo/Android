@@ -386,7 +386,7 @@
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Depuis cet appareil</string>
-    <string name="systemSearchOmnibarInputHint"><font size="13">Faire des recherches ou saisir l\'URL</font></string>
+    <string name="systemSearchOmnibarInputHint">Faire des recherches ou saisir l\'URL</string>
     <string name="systemSearchAppNotFound">Impossible de trouver l\'application</string>
     <string name="systemSearchOnboardingText">Merci d\'avoir choisi DuckDuckGo!\nDésormais, lorsque vous utilisez notre outil de recherche ou notre application, vos recherches sont protégées.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">L\'application DuckDuckGo offre également les fonctionnalités suivantes :</string>

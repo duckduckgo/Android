@@ -386,7 +386,7 @@
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">De pe acest dispozitiv</string>
-    <string name="systemSearchOmnibarInputHint"><font size="13">Căutare sau tastare URL</font></string>
+    <string name="systemSearchOmnibarInputHint">Căutare sau tastare URL</string>
     <string name="systemSearchAppNotFound">Aplicația nu a fost găsită</string>
     <string name="systemSearchOnboardingText">Mulțumim pentru că ai ales DuckDuckGo!\nAcum, când utilizezi căutarea sau aplicația noastră, căutările tale sunt protejate.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">De asemenea, aplicația DuckDuckGo:</string>

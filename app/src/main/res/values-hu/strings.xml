@@ -386,7 +386,7 @@
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Ebből az eszközből</string>
-    <string name="systemSearchOmnibarInputHint"><font size="13">Keresés vagy URL beírása</font></string>
+    <string name="systemSearchOmnibarInputHint">Keresés vagy URL beírása</string>
     <string name="systemSearchAppNotFound">Az alkalmazás nem található</string>
     <string name="systemSearchOnboardingText">Köszönjük, hogy a DuckDuckGo-t választottad!\nMost, amikor a mi keresésünket vagy az alkalmazásunkat használod, a kereséseid védettek.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">A DuckDuckGo alkalmazás is:</string>

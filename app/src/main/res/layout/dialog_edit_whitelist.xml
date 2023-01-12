@@ -14,6 +14,12 @@
   ~ limitations under the License.
   -->
 
+<<<<<<<< HEAD:app/src/main/res/drawable/search_widget_background_black.xml
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/gray90" />
+    <corners android:radius="@dimen/smallShapeCornerRadius" />
+</shape>
+========
 <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/customDialogTextInput"
@@ -22,3 +28,4 @@
     android:layout_marginTop="@dimen/keyline_4"
     android:hint="@string/whitelistDomainHint"
     android:inputType="textUri" />
+>>>>>>>> b2423b2b1700a02c181894f3851cbfee41776afd:app/src/main/res/layout/dialog_edit_whitelist.xml

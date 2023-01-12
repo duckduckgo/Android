@@ -386,7 +386,7 @@
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Z tohto zariadenia</string>
-    <string name="systemSearchOmnibarInputHint"><font size="13">Vyhľadať alebo zadať webovú adresu</font></string>
+    <string name="systemSearchOmnibarInputHint">Vyhľadať alebo zadať webovú adresu</string>
     <string name="systemSearchAppNotFound">Aplikáciu sa nepodarilo nájsť</string>
     <string name="systemSearchOnboardingText">Ďakujeme, že ste si vybrali aplikáciu DuckDuckGo!\nPri použití nášho vyhľadávača alebo aplikácie je vaše vyhľadávanie chránené.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Aplikácia DuckDuckGo tiež:</string>

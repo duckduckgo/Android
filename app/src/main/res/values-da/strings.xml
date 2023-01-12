@@ -386,7 +386,7 @@
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Fra denne enhed</string>
-    <string name="systemSearchOmnibarInputHint"><font size="13">Søg eller indtast URL</font></string>
+    <string name="systemSearchOmnibarInputHint">Søg eller indtast URL</string>
     <string name="systemSearchAppNotFound">Appen kunne ikke findes</string>
     <string name="systemSearchOnboardingText">Tak, fordi du valgte DuckDuckGo!\nNår du bruger vores søgning eller app, er dine søgninger beskyttet.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">DuckDuckGo-appen kan også:</string>

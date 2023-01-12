@@ -106,6 +106,8 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     private val textChangeWatcher = object : TextChangedWatcher() {
         override fun afterTextChanged(editable: Editable) {
             showOmnibar()
+            val searchQuery = omnibarTextInput.text.toString()
+            binding.clearTextButton.isVisible = searchQuery.isNotEmpty()
             viewModel.userUpdatedQuery(omnibarTextInput.text.toString())
         }
     }
@@ -162,29 +164,27 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     private fun configureObservers() {
         viewModel.onboardingViewState.observe(
             this,
-            {
-                it?.let { renderOnboardingViewState(it) }
-            },
-        )
+        ) {
+            it?.let { renderOnboardingViewState(it) }
+        }
         viewModel.resultsViewState.observe(
             this,
-            {
-                when (it) {
-                    is SystemSearchViewModel.Suggestions.SystemSearchResultsViewState -> {
-                        renderResultsViewState(it)
-                    }
-                    is SystemSearchViewModel.Suggestions.QuickAccessItems -> {
-                        renderQuickAccessItems(it)
-                    }
+        ) {
+            when (it) {
+                is SystemSearchViewModel.Suggestions.SystemSearchResultsViewState -> {
+                    renderResultsViewState(it)
                 }
-            },
-        )
+
+                is SystemSearchViewModel.Suggestions.QuickAccessItems -> {
+                    renderQuickAccessItems(it)
+                }
+            }
+        }
         viewModel.command.observe(
             this,
-            {
-                processCommand(it)
-            },
-        )
+        ) {
+            processCommand(it)
+        }
     }
 
     private fun configureOnboarding() {

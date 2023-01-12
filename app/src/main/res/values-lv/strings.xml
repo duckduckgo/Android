@@ -386,7 +386,7 @@
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">No šīs ierīces</string>
-    <string name="systemSearchOmnibarInputHint"><font size="13">Meklē vai ieraksti URL</font></string>
+    <string name="systemSearchOmnibarInputHint">Meklē vai ieraksti URL</string>
     <string name="systemSearchAppNotFound">Lietojumprogrammu nevarēja atrast</string>
     <string name="systemSearchOnboardingText">Paldies, ka izvēlējies DuckDuckGo!\nTagad, izmantojot mūsu meklētāju vai lietotni, tavi meklējumi tiks aizsargāti.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Tāpat DuckDuckGo lietotne:</string>

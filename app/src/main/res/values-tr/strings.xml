@@ -386,7 +386,7 @@
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Bu cihazdan</string>
-    <string name="systemSearchOmnibarInputHint"><font size="13">URL\'yi arayın veya bir URL yazın</font></string>
+    <string name="systemSearchOmnibarInputHint">URL\'yi arayın veya bir URL yazın</string>
     <string name="systemSearchAppNotFound">Uygulama bulunamadı</string>
     <string name="systemSearchOnboardingText">DuckDuckGo\'yu seçtiğiniz için teşekkürler!\nArama motorumuzu veya uygulamamızı kullanırken tüm aramalarınız güvende.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">DuckDuckGo uygulaması ayrıca:</string>
