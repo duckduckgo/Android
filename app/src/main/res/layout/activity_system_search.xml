@@ -66,15 +66,13 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
-                    <androidx.appcompat.widget.AppCompatEditText
+                    <EditText
                         android:id="@+id/omnibarTextInput"
                         style="@style/Widget.DuckDuckGo.SearchInput"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         android:layout_marginStart="4dp"
                         android:hint="@string/systemSearchOmnibarInputHint"
-                        android:imeOptions="flagNoExtractUi|actionGo|flagNoPersonalizedLearning"
-                        android:inputType="textUri|textNoSuggestions"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@id/voiceSearchButton"
                         app:layout_constraintStart_toEndOf="@id/logo"
@@ -82,7 +80,7 @@
 
                         <requestFocus />
 
-                    </androidx.appcompat.widget.AppCompatEditText>
+                    </EditText>
 
                     <ImageView
                         android:id="@+id/voiceSearchButton"
@@ -103,6 +101,7 @@
                         android:background="?selectableItemBackground"
                         android:contentDescription="@string/clearButtonContentDescription"
                         android:padding="@dimen/toolbarIconPadding"
+                        android:visibility="invisible"
                         android:src="@drawable/ic_close_24"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
