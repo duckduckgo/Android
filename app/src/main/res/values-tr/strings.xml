@@ -652,7 +652,7 @@
     <string name="autoconsentSecondaryCta">Hayır Teşekkürler</string>
 
     <string name="autoconsentSetting">Çerez Açılır Pencerelerini Yönetin</string>
-    <string name="autoconsentAnimationText">Yönetilen Çerezler</string>
+    <string name="autoconsentManagedNoticeAnimationText">Yönetilen Çerezler</string>
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Site İzinleri</string>

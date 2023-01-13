@@ -660,7 +660,7 @@
     <string name="autoconsentSecondaryCta">Нет, спасибо</string>
 
     <string name="autoconsentSetting">Управление окнами выбора куки-файлов</string>
-    <string name="autoconsentAnimationText">Kуки-файлы выбраны</string>
+    <string name="autoconsentManagedNoticeAnimationText">Kуки-файлы выбраны</string>
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Разрешения для сайтов</string>

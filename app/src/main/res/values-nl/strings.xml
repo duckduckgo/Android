@@ -652,7 +652,7 @@
     <string name="autoconsentSecondaryCta">Nee, bedankt</string>
 
     <string name="autoconsentSetting">Cookiepop-ups beheren</string>
-    <string name="autoconsentAnimationText">Beheerde cookies</string>
+    <string name="autoconsentManagedNoticeAnimationText">Beheerde cookies</string>
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Sitetoestemmingen</string>

@@ -660,7 +660,7 @@
     <string name="autoconsentSecondaryCta">Ne, hvala</string>
 
     <string name="autoconsentSetting">Upravljanje pojavnih oken za piškotke</string>
-    <string name="autoconsentAnimationText">Upravljani piškotki</string>
+    <string name="autoconsentManagedNoticeAnimationText">Upravljani piškotki</string>
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Dovoljenja za spletno mesto</string>

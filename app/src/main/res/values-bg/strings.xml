@@ -652,7 +652,7 @@
     <string name="autoconsentSecondaryCta">Не, благодаря</string>
 
     <string name="autoconsentSetting">Управление на изскачащите прозорци за бисквитки</string>
-    <string name="autoconsentAnimationText">Бисквитките са настроени</string>
+    <string name="autoconsentManagedNoticeAnimationText">Бисквитките са настроени</string>
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Разрешения за сайтове</string>

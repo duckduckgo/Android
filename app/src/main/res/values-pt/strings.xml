@@ -652,7 +652,7 @@
     <string name="autoconsentSecondaryCta">Não, obrigado</string>
 
     <string name="autoconsentSetting">Gerir pop-ups de cookies</string>
-    <string name="autoconsentAnimationText">Cookies geridos</string>
+    <string name="autoconsentManagedNoticeAnimationText">Cookies geridos</string>
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Permissões dos sites</string>

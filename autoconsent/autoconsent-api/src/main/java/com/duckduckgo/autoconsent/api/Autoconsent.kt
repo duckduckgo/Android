@@ -70,7 +70,7 @@ interface AutoconsentCallback {
     /**
      * This method is called whenever a popup is handled but not for the first time.
      */
-    fun onPopUpHandled()
+    fun onPopUpHandled(isCosmetic: Boolean)
 
     /**
      * This method is called whenever autoconsent has a result to be sent
