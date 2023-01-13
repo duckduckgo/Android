@@ -166,7 +166,6 @@
         <item name="browserIconColorSelector">@color/browser_icon_color_selector_dark</item>
         <item name="browserMenuTextColor">@color/white</item>
         <item name="browserMenuTextColorDisabled">@color/warGreyTwo</item>
-        <item name="cookiesRoundedFieldBackgroundColor">@color/almostBlackDark</item>
         <item name="omnibarLogoLetterTextColor">@color/midGray</item>
         <item name="autoCompleteTextColor">@color/white</item>
         <item name="autoCompleteSubtitleTextColor">@color/grayish</item>
@@ -303,7 +302,6 @@
         <item name="browserIconColorSelector">@color/browser_icon_color_selector_light</item>
         <item name="browserMenuTextColor">@color/almostBlackDark</item>
         <item name="browserMenuTextColorDisabled">@color/pinkish_grey_two</item>
-        <item name="cookiesRoundedFieldBackgroundColor">@color/whiteFive</item>
         <item name="omnibarLogoLetterTextColor">@color/whiteFour</item>
         <item name="autoCompleteTextColor">@color/almostBlackDark</item>
         <item name="autoCompleteSubtitleTextColor">@color/warmerGray</item>
