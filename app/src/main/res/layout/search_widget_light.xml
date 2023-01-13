@@ -16,9 +16,11 @@
 
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/widgetContainer"
     style="@style/SearchWidgetSearchBarContainer"
-    android:background="@drawable/search_widget_background_white">
+    android:background="@drawable/search_widget_background_white"
+    tools:ignore="DeprecatedWidgetInXml">
 
     <ImageView
         android:id="@+id/logo"

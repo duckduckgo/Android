@@ -16,9 +16,11 @@
 
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/widgetContainer"
     style="@style/SearchWidgetSearchBarContainer"
-    android:background="@drawable/search_widget_background_black">
+    android:background="@drawable/search_widget_background_black"
+    tools:ignore="DeprecatedWidgetInXml">
 
     <ImageView
         android:id="@+id/logo"
@@ -37,7 +39,7 @@
         android:id="@+id/voiceSearch"
         style="@style/SearchWidgetSearchIcon"
         android:src="@drawable/ic_microphone_dark"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
     <ImageView
         android:id="@+id/search"

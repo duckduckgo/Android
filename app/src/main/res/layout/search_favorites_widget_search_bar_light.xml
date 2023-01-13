@@ -14,10 +14,12 @@
   ~ limitations under the License.
   -->
 
-<RelativeLayout android:id="@+id/widgetSearchBarContainer"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/widgetSearchBarContainer"
     style="@style/SearchWithFavoritesWidgetSearchBarContainer"
     android:background="@drawable/search_widget_background_light"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    tools:ignore="DeprecatedWidgetInXml">
 
     <ImageView
         android:id="@+id/logo"
@@ -36,10 +38,10 @@
         android:id="@+id/voiceSearch"
         style="@style/SearchWidgetSearchIcon"
         android:src="@drawable/ic_microphone_light"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
     <ImageView
         android:id="@+id/search"
         style="@style/SearchWidgetSearchIcon"
-        android:src="@drawable/ic_find_search_20_light"/>
+        android:src="@drawable/ic_find_search_20_light" />
 </RelativeLayout>

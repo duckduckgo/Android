@@ -15,8 +15,10 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/emptyGridViewContainer"
-    style="@style/SearchWidgetEmptyFavoritesHintContainer">
+    style="@style/SearchWidgetEmptyFavoritesHintContainer"
+    tools:ignore="DeprecatedWidgetInXml">
 
     <TextView
         android:id="@+id/noFavoritesText"
