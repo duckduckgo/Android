@@ -69,7 +69,7 @@ import logcat.logcat
 
 @Suppress("NoHardcodedCoroutineDispatcher")
 @InjectWith(VpnScope::class)
-class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
+class TrackerBlockingVpnService : VpnService(), CoroutineScope by CoroutineScope(Dispatchers.IO + SupervisorJob()) {
 
     @Inject
     lateinit var vpnPreferences: VpnPreferences
