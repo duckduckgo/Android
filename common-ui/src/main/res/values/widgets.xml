@@ -128,11 +128,11 @@
         <item name="android:background">@drawable/ripple_rectangle_rounded</item>
         <item name="android:layout_width">@dimen/popupMenuNavigationItemSize</item>
         <item name="android:layout_height">@dimen/popupMenuNavigationItemSize</item>
-        <item name="android:tint">@color/primary_icon_color_selector</item>
     </style>
 
     <!-- Styles for App Components -->
 
+    <!-- Menus -->
     <style name="Widget.DuckDuckGo.MenuItemView">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>

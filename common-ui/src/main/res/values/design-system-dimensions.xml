@@ -63,6 +63,7 @@
     <dimen name="popupMenuWidth">280dp</dimen>
     <dimen name="popupMenuNavigationItemHeight">24dp</dimen>
     <dimen name="popupMenuItemHeight">48dp</dimen>
+    <dimen name="popupMenuItemWidth">198dp</dimen>
     <dimen name="popupMenuNavigationItemSize">40dp</dimen>
 
     <!-- Dialogs -->

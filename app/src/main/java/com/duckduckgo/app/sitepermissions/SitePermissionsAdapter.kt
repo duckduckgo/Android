@@ -20,7 +20,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
-import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.lifecycle.LifecycleOwner
@@ -48,7 +47,9 @@ import com.duckduckgo.app.sitepermissions.SitePermissionsListViewType.SITE_ALLOW
 import com.duckduckgo.app.sitepermissions.SitePermissionsListViewType.TOGGLE
 import com.duckduckgo.mobile.android.databinding.RowOneLineListItemBinding
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
+import com.duckduckgo.mobile.android.ui.view.PopupMenuItemView
 import com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+import com.duckduckgo.mobile.android.ui.view.setEnabledOpacity
 import kotlinx.coroutines.launch
 
 class SitePermissionsAdapter(
@@ -163,8 +164,11 @@ class SitePermissionsAdapter(
 
         private fun showOverflowMenu(removeDisabled: Boolean) {
             val popupMenu = PopupMenu(layoutInflater, layout.popup_window_remove_all_menu)
-            val menuItem = popupMenu.contentView.findViewById<TextView>(R.id.removeAll)
-            if (removeDisabled) menuItem.isEnabled = false
+            val menuItem = popupMenu.contentView.findViewById<PopupMenuItemView>(R.id.removeAll)
+            if (removeDisabled) {
+                menuItem.isEnabled = false
+                menuItem.setEnabledOpacity(false)
+            }
             popupMenu.apply {
                 onMenuItemClicked(menuItem) { viewModel.removeAllSitesSelected() }
                 show(binding.root, binding.sitePermissionsSectionHeader)
