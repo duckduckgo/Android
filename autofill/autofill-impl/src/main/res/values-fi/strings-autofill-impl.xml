@@ -64,7 +64,6 @@
     <string name="credentialManagementViewMenuDelete">Poista</string>
 
     <string name="credentialManagementSuggestionsLabel">Ehdotettu</string>
-
     <string name="credentialManagementNoLoginsSavedTitle">Kirjautumistietoja ei ole vielä tallennettu</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Kirjautumistiedot tallennetaan turvallisesti vain tälle laitteelle.</string>
 

@@ -64,7 +64,6 @@
     <string name="credentialManagementViewMenuDelete">Изтриване</string>
 
     <string name="credentialManagementSuggestionsLabel">Предложения</string>
-
     <string name="credentialManagementNoLoginsSavedTitle">Все още няма запазени данни за вход</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Данните за вход се съхраняват на сигурно място само на това устройство.</string>
 

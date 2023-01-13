@@ -64,7 +64,6 @@
     <string name="credentialManagementViewMenuDelete">Eliminar</string>
 
     <string name="credentialManagementSuggestionsLabel">Sugerencias</string>
-
     <string name="credentialManagementNoLoginsSavedTitle">Aún no hay inicios de sesión guardados</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Los inicios de sesión se almacenan de forma segura únicamente en este dispositivo.</string>
 

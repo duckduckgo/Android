@@ -64,7 +64,6 @@
     <string name="credentialManagementViewMenuDelete">Trinti</string>
 
     <string name="credentialManagementSuggestionsLabel">Siūloma</string>
-
     <string name="credentialManagementNoLoginsSavedTitle">Dar nėra išsaugotų prisijungimų</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Prisijungimai saugiai saugomi tik šiame įrenginyje.</string>
 

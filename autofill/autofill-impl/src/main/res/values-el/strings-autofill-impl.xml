@@ -64,7 +64,6 @@
     <string name="credentialManagementViewMenuDelete">Διαγραφή</string>
 
     <string name="credentialManagementSuggestionsLabel">Προτεινόμενο</string>
-
     <string name="credentialManagementNoLoginsSavedTitle">Δεν έχουν αποθηκευτεί ακόμα στοιχεία σύνδεσης</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Τα στοιχεία σύνδεσης αποθηκεύονται με ασφάλεια μόνο σε αυτήν τη συσκευή.</string>
 

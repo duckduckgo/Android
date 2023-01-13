@@ -64,7 +64,6 @@
     <string name="credentialManagementViewMenuDelete">Löschen</string>
 
     <string name="credentialManagementSuggestionsLabel">Vorgeschlagen</string>
-
     <string name="credentialManagementNoLoginsSavedTitle">Noch keine Anmeldedaten gespeichert</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Anmeldedaten werden nur auf diesem Gerät sicher gespeichert.</string>
 

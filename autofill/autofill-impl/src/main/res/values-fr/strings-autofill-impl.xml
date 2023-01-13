@@ -64,7 +64,6 @@
     <string name="credentialManagementViewMenuDelete">Supprimer</string>
 
     <string name="credentialManagementSuggestionsLabel">Suggéré</string>
-
     <string name="credentialManagementNoLoginsSavedTitle">Aucun identifiant enregistré pour l\'instant</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Les identifiants sont stockés de manière sécurisée sur cet appareil uniquement.</string>
 

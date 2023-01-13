@@ -64,7 +64,6 @@
     <string name="credentialManagementViewMenuDelete">Smazat</string>
 
     <string name="credentialManagementSuggestionsLabel">Navrhované</string>
-
     <string name="credentialManagementNoLoginsSavedTitle">Zatím nemáš uložené žádné přihlašovací údaje</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Přihlašovací údaje jsou bezpečně uložené jen v tomhle zařízení.</string>
 

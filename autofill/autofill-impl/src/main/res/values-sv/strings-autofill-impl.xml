@@ -64,7 +64,6 @@
     <string name="credentialManagementViewMenuDelete">Ta bort</string>
 
     <string name="credentialManagementSuggestionsLabel">Förslag</string>
-
     <string name="credentialManagementNoLoginsSavedTitle">Inga inloggningar sparade ännu</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Inloggningar lagras säkert endast på den här enheten.</string>
 

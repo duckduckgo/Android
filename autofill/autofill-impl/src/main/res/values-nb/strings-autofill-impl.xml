@@ -64,7 +64,6 @@
     <string name="credentialManagementViewMenuDelete">Slett</string>
 
     <string name="credentialManagementSuggestionsLabel">Forslag</string>
-
     <string name="credentialManagementNoLoginsSavedTitle">Ingen pålogginger er lagret ennå</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Pålogginger lagres sikkert og bare på denne enheten.</string>
 
