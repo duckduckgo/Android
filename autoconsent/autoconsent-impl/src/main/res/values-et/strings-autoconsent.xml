@@ -18,6 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="autoconsentTitle">Halda küpsiste hüpikaknaid</string>
-    <string name="autoconsentDescription">Kui DuckDuckGo tuvastab külastatavatel veebisaitidel küpsiste nõusoleku hüpikaknad, saame proovida automaatselt seadistada sinu küpsise-eelistused selliselt, et minimeerida küpsised ja maksimeerida privaatsust, ning seejärel hüpikaknad sulgeda.</string>
+    <string name="autoconsentDescription">Kui DuckDuckGo tuvastab külastatavatel veebisaitidel küpsiste nõusoleku hüpikaknad, saame proovida automaatselt seadistada sinu küpsise-eelistused selliselt, et minimeerida küpsised ja maksimeerida privaatsust, ning seejärel hüpikaknad sulgeda. Mõned saidid ei paku võimalust küpsise-eelistuste haldamiseks, seega saame sellised hüpikaknad ainult peita.</string>
     <string name="autoconsentToggle">Luba DuckDuckGo\'l hallata küpsiste nõusoleku hüpikaknaid</string>
 </resources>
