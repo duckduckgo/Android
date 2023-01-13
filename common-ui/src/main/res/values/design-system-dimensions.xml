@@ -92,7 +92,7 @@
     <dimen name="infoPanelIconSize">16dp</dimen>
 
     <!-- Dialog  -->
-    <dimen name="dialogContentPaddingBottom">20dp</dimen>
+    <dimen name="dialogContentPaddingBottom">18dp</dimen>
     <dimen name="dialogContentPaddingStart">@dimen/keyline_5</dimen>
     <dimen name="dialogContentPaddingEnd">@dimen/keyline_5</dimen>
 
