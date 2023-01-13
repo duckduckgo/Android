@@ -20,7 +20,12 @@
     <!--Menu item view-->
     <declare-styleable name="MenuItemView">
         <attr name="iconDrawable" format="reference" />
-        <attr name="labelText" format="string" />
+        <attr name="primaryText" />
     </declare-styleable>
+
+    <declare-styleable name="PopupMenuItemView">
+        <attr name="primaryText" />
+    </declare-styleable>
+
 
 </resources>

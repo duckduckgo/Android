@@ -16,27 +16,28 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:background="@drawable/popup_menu_bg">
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical"
+              android:background="@drawable/popup_menu_bg">
 
-    <TextView
-        android:id="@+id/share"
-        style="@style/Widget.DuckDuckGo.PopupMenuItem"
-        android:minWidth="198dp"
-        android:text="@string/downloadsItemMenuShare" />
+    <com.duckduckgo.mobile.android.ui.view.PopupMenuItemView
+            android:id="@+id/share"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/downloadsItemMenuShare" />
 
-    <TextView
-        android:id="@+id/delete"
-        style="@style/Widget.DuckDuckGo.PopupMenuItem"
-        android:minWidth="198dp"
-        android:text="@string/downloadsItemMenuDelete" />
+    <com.duckduckgo.mobile.android.ui.view.PopupMenuItemView
+            android:id="@+id/delete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/downloadsItemMenuDelete" />
 
-    <TextView
-        android:id="@+id/cancel"
-        style="@style/Widget.DuckDuckGo.PopupMenuItem"
-        android:minWidth="198dp"
-        android:text="@string/downloadsItemMenuCancel" />
+    <com.duckduckgo.mobile.android.ui.view.PopupMenuItemView
+            android:id="@+id/cancel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/downloadsItemMenuCancel" />
 
 </LinearLayout>
