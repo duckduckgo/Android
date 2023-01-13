@@ -72,7 +72,7 @@
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         android:layout_marginStart="4dp"
-                        android:hint="@string/systemSearchOmnibarInputHint"
+                        android:hint="@string/omnibarInputHint"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@id/voiceSearchButton"
                         app:layout_constraintStart_toEndOf="@id/logo"
