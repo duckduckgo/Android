@@ -34,29 +34,14 @@ class SyncNativeLib constructor(context: Context) {
         }
     }
 
-    /**
-     * Used to create data needed to create an account.  Once the server returns a JWT, store the primary and secret key.
-     *
-     * @param primaryKey OUT - store this.  In combination with user id, this is the recovery key.
-     * @param secretKey OUT - store this. This is used to encrypt an decrypt e2e data.
-     * @param protectedSecretKey OUT - do not store this.  Send to /sign up endpoint.
-     * @param passwordHash OUT - do not store this.  Send to /signup endpoint.
-     * @param userId IN
-     * @param password IN
-     */
     fun generateAccountKeys(
         userId: String,
         password: String
     ): Account {
-        val primaryKey = ByteArray(32)
-        val secretKey = ByteArray(32)
-        val protectedSecretKey = ByteArray(72) // 32+16(mac)+24
-        val passwordHash = ByteArray(32)
-
-        Timber.v("SYNC PRE PK: ${primaryKey.encode()}")
-        Timber.v("SYNC PRE SK: ${secretKey.encode()}")
-        Timber.v("SYNC PRE PSK: ${protectedSecretKey.encode()}")
-        Timber.v("SYNC PRE PH: ${passwordHash.encode()}")
+        val primaryKey = ByteArray(getPrimaryKeySize())
+        val secretKey = ByteArray(getSecretKeySize())
+        val protectedSecretKey = ByteArray(getProtectedSecretKeySize())
+        val passwordHash = ByteArray(getPasswordHashSize())
 
         val result: Long = generateAccountKeys(primaryKey, secretKey, protectedSecretKey, passwordHash, userId, password)
 
@@ -76,19 +61,12 @@ class SyncNativeLib constructor(context: Context) {
         )
     }
 
-    /**
-     * Prepare keys for calling /login when using a recovery code.  Once the protected secret key has been retrieved, use `ddgSyncDecrypt` to extract the secret key, using the stretched primary key as the secret key for the decryption.
-     *
-     * @param passwordHash OUT
-     * @param stretchedPrimaryKey OUT
-     * @param primaryKey IN
-     */
     fun prepareForLogin(
         primaryKey: String
     ): Login {
         val primarKeyByteArray = primaryKey.decode()
-        val passwordHash = ByteArray(primarKeyByteArray.size)
-        val stretchedPrimaryKey = ByteArray(primarKeyByteArray.size)
+        val passwordHash = ByteArray(getPasswordHashSize())
+        val stretchedPrimaryKey = ByteArray(getStretchedPrimaryKeySize())
 
         val result: Long = prepareForLogin(passwordHash, stretchedPrimaryKey, primarKeyByteArray)
 
@@ -110,9 +88,9 @@ class SyncNativeLib constructor(context: Context) {
     ): String {
         val encryptedDataByteArray = encryptedData.decode()
         val secretKeyByteArray = secretKey.decode()
-        val decryptedData = ByteArray(encryptedDataByteArray.size-16-24) //TODO: validate if size is correct
+        val decryptedData = ByteArray(encryptedDataByteArray.size-getEncryptedExtraBytes())
 
-        val result: Long = decrypt(decryptedData, encryptedDataByteArray, encryptedDataByteArray.size.toLong(), secretKeyByteArray)
+        val result: Long = decrypt(decryptedData, encryptedDataByteArray, secretKeyByteArray)
 
         Timber.v("SYNC result: $result")
         Timber.v("SYNC decryptedData: ${decryptedData}")
@@ -146,9 +124,15 @@ class SyncNativeLib constructor(context: Context) {
     private external fun decrypt(
         rawBytes: ByteArray,
         encryptedBytes: ByteArray,
-        encryptedBytesLength: Long, //TODO: test if necessary
         secretKey: ByteArray,
     ): Long
+
+    private external fun getPrimaryKeySize(): Int
+    private external fun getSecretKeySize(): Int
+    private external fun getProtectedSecretKeySize(): Int
+    private external fun getPasswordHashSize(): Int
+    private external fun getStretchedPrimaryKeySize(): Int
+    private external fun getEncryptedExtraBytes(): Int
 }
 
 class Account(

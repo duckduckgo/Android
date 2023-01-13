@@ -38,6 +38,15 @@ class SyncNativeLibTest {
     }
 
     @Test
+    fun whenGeneratingAccountKeysThenPrimaryIs32Bytes() {
+        val syncNativeLib = SyncNativeLib(InstrumentationRegistry.getInstrumentation().targetContext)
+        val account = syncNativeLib.generateAccountKeys(aUserId, aPassword)
+        val primaryKey = account.primaryKey
+
+        assertEquals(32, primaryKey.decodeBase64()?.size)
+    }
+
+    @Test
     fun whenGeneratingAccountKeysThenSecretKeyIsNonDeterministic() {
         val syncNativeLib = SyncNativeLib(InstrumentationRegistry.getInstrumentation().targetContext)
         val account = syncNativeLib.generateAccountKeys(aUserId, aPassword)

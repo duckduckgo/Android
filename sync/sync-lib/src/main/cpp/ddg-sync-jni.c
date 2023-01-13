@@ -14,12 +14,6 @@ Java_com_duckduckgo_sync_lib_SyncNativeLib_generateAccountKeys(JNIEnv* env, jcla
     jstring userId,
     jstring password) {
 
-    // Get the size of the arrays
-    jsize primaryKeyLength = (*env)->GetArrayLength(env, primaryKey);
-    jsize secretKeyLength = (*env)->GetArrayLength(env, secretKey);
-    jsize protectedSecretKeyLength = (*env)->GetArrayLength(env, protectedSecretKey);
-    jsize passwordHashLength = (*env)->GetArrayLength(env, passwordHash);
-
     // Get pointers to the arrays
     jbyte* primaryKeyElements = (*env)->GetByteArrayElements(env, primaryKey, NULL);
     jbyte* secretKeyElements = (*env)->GetByteArrayElements(env, secretKey, NULL);
@@ -30,8 +24,7 @@ Java_com_duckduckgo_sync_lib_SyncNativeLib_generateAccountKeys(JNIEnv* env, jcla
     const char* userIdChars = (*env)->GetStringUTFChars(env, userId, NULL);
     const char* passwordChars = (*env)->GetStringUTFChars(env, password, NULL);
 
-    jint result = 111;
-    result = ddgSyncGenerateAccountKeys(
+    jint result = ddgSyncGenerateAccountKeys(
         (unsigned char*) primaryKeyElements,
         (unsigned char*) secretKeyElements,
         (unsigned char*) protectedSecretKeyElements,
@@ -63,8 +56,7 @@ Java_com_duckduckgo_sync_lib_SyncNativeLib_prepareForLogin(
     jbyte *stretchedPrimaryKeyCArray = (*env)->GetByteArrayElements(env, stretchedPrimaryKey, NULL);
     jbyte *primaryKeyCArray = (*env)->GetByteArrayElements(env, primaryKey, NULL);
 
-    jint result = 111;
-    result = ddgSyncPrepareForLogin(
+    jint result = ddgSyncPrepareForLogin(
         (unsigned char *)passwordHashCArray,
         (unsigned char *)stretchedPrimaryKeyCArray,
         (unsigned char *)primaryKeyCArray
@@ -73,6 +65,7 @@ Java_com_duckduckgo_sync_lib_SyncNativeLib_prepareForLogin(
     // Release the input arrays
     (*env)->ReleaseByteArrayElements(env, passwordHash, passwordHashCArray, JNI_COMMIT);
     (*env)->ReleaseByteArrayElements(env, stretchedPrimaryKey, stretchedPrimaryKeyCArray, JNI_COMMIT);
+    (*env)->ReleaseByteArrayElements(env, primaryKey, primaryKeyCArray, JNI_ABORT);
 
     return result;
 }
@@ -81,20 +74,19 @@ JNIEXPORT jint JNICALL
 Java_com_duckduckgo_sync_lib_SyncNativeLib_decrypt(
     JNIEnv *env,
     jclass clazz,
-    jbyteArray rawBytes, //out
-    jbyteArray encryptedBytes, //in
-    jlong encryptedBytesLength, //in
-    jbyteArray secretKey // in
+    jbyteArray rawBytes,
+    jbyteArray encryptedBytes,
+    jbyteArray secretKey
 ) {
+    jsize encryptedBytesLength = (*env)->GetArrayLength(env, encryptedBytes);
+
     // Get pointers to the arrays
     jbyte* rawBytesElements = (*env)->GetByteArrayElements(env, rawBytes, NULL);
     jbyte* encryptedBytesElements = (*env)->GetByteArrayElements(env, encryptedBytes, NULL);
     jbyte* secretKeyElements = (*env)->GetByteArrayElements(env, secretKey, NULL);
 
     // Call the C function
-    jint result = 111;
-
-    result = ddgSyncDecrypt(
+    jint result = ddgSyncDecrypt(
       (unsigned char *)rawBytesElements,
       (unsigned char *)encryptedBytesElements,
       (unsigned long long)encryptedBytesLength,
@@ -102,9 +94,57 @@ Java_com_duckduckgo_sync_lib_SyncNativeLib_decrypt(
     );
 
     // Release the input arrays
+    (*env)->ReleaseByteArrayElements(env, rawBytes, rawBytesElements, JNI_COMMIT);
     (*env)->ReleaseByteArrayElements(env, encryptedBytes, encryptedBytesElements, JNI_ABORT);
     (*env)->ReleaseByteArrayElements(env, secretKey, secretKeyElements, JNI_ABORT);
-    (*env)->ReleaseByteArrayElements(env, rawBytes, rawBytesElements, JNI_COMMIT);
 
     return result;
+}
+
+JNIEXPORT jint JNICALL
+Java_com_duckduckgo_sync_lib_SyncNativeLib_getPrimaryKeySize(
+    JNIEnv *env,
+    jclass clazz
+) {
+    return DDGSYNCCRYPTO_PRIMARY_KEY_SIZE;
+}
+
+JNIEXPORT jint JNICALL
+Java_com_duckduckgo_sync_lib_SyncNativeLib_getSecretKeySize(
+    JNIEnv *env,
+    jclass clazz
+) {
+    return DDGSYNCCRYPTO_SECRET_KEY_SIZE;
+}
+
+JNIEXPORT jint JNICALL
+Java_com_duckduckgo_sync_lib_SyncNativeLib_getProtectedSecretKeySize(
+    JNIEnv *env,
+    jclass clazz
+) {
+    return DDGSYNCCRYPTO_PROTECTED_SECRET_KEY_SIZE;
+}
+
+JNIEXPORT jint JNICALL
+Java_com_duckduckgo_sync_lib_SyncNativeLib_getPasswordHashSize(
+    JNIEnv *env,
+    jclass clazz
+) {
+    return DDGSYNCCRYPTO_HASH_SIZE;
+}
+
+JNIEXPORT jint JNICALL
+Java_com_duckduckgo_sync_lib_SyncNativeLib_getStretchedPrimaryKeySize(
+    JNIEnv *env,
+    jclass clazz
+) {
+    return DDGSYNCCRYPTO_STRETCHED_PRIMARY_KEY_SIZE;
+}
+
+JNIEXPORT jint JNICALL
+Java_com_duckduckgo_sync_lib_SyncNativeLib_getEncryptedExtraBytes(
+    JNIEnv *env,
+    jclass clazz
+) {
+    return DDGSYNCCRYPTO_ENCRYPTED_EXTRA_BYTES_SIZE;
 }
