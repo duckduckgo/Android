@@ -652,6 +652,7 @@
     <string name="autoconsentSecondaryCta">Ei aitäh</string>
 
     <string name="autoconsentSetting">Halda küpsiste hüpikaknaid</string>
+    <string name="autoconsentCosmeticNoticeAnimationText">Hüpikaken on peidetud</string>
     <string name="autoconsentManagedNoticeAnimationText">Hallatavad küpsised</string>
 
     <!-- Site Permissions Settings -->
