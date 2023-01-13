@@ -30,4 +30,13 @@ android {
 dependencies {
     implementation JakeWharton.timber
     implementation Square.okio
+    implementation project(':library-loader-api')
+
+    // Testing dependencies
+    androidTestUtil AndroidX.test.orchestrator
+    androidTestImplementation AndroidX.archCore.testing
+    androidTestImplementation AndroidX.test.runner
+    androidTestUtil AndroidX.test.orchestrator
+    androidTestImplementation AndroidX.test.ext.junit
+    androidTestImplementation "androidx.test.ext:junit-ktx:_"
 }

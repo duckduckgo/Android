@@ -6,7 +6,7 @@
 #include "DDGSyncCrypto.h"
 
 JNIEXPORT jint JNICALL
-Java_com_duckduckgo_sync_lib_NativeLib_generateAccountKeys(JNIEnv* env, jclass class,
+Java_com_duckduckgo_sync_lib_SyncNativeLib_generateAccountKeys(JNIEnv* env, jclass class,
     jbyteArray primaryKey,
     jbyteArray secretKey,
     jbyteArray protectedSecretKey,
@@ -51,7 +51,7 @@ Java_com_duckduckgo_sync_lib_NativeLib_generateAccountKeys(JNIEnv* env, jclass c
 }
 
 JNIEXPORT jint JNICALL
-Java_com_duckduckgo_sync_lib_NativeLib_prepareForLogin(
+Java_com_duckduckgo_sync_lib_SyncNativeLib_prepareForLogin(
     JNIEnv *env,
     jclass clazz,
     jbyteArray passwordHash,
@@ -78,19 +78,14 @@ Java_com_duckduckgo_sync_lib_NativeLib_prepareForLogin(
 }
 
 JNIEXPORT jint JNICALL
-Java_com_example_MyNativeLibrary_decrypt(
+Java_com_duckduckgo_sync_lib_SyncNativeLib_decrypt(
     JNIEnv *env,
     jclass clazz,
     jbyteArray rawBytes, //out
     jbyteArray encryptedBytes, //in
-    jint encryptedBytesLength, //in
+    jlong encryptedBytesLength, //in
     jbyteArray secretKey // in
 ) {
-
-    // Get the size of the arrays
-    jsize rawBytesLength = (*env)->GetArrayLength(env, rawBytes);
-    jsize encryptedBytesLength2 = (*env)->GetArrayLength(env, encryptedBytes);
-
     // Get pointers to the arrays
     jbyte* rawBytesElements = (*env)->GetByteArrayElements(env, rawBytes, NULL);
     jbyte* encryptedBytesElements = (*env)->GetByteArrayElements(env, encryptedBytes, NULL);
@@ -100,9 +95,9 @@ Java_com_example_MyNativeLibrary_decrypt(
     jint result = 111;
 
     result = ddgSyncDecrypt(
-      rawBytesElements,
+      (unsigned char *)rawBytesElements,
       (unsigned char *)encryptedBytesElements,
-      (unsigned long long)encryptedBytesLength2,
+      (unsigned long long)encryptedBytesLength,
       (unsigned char *)secretKeyElements
     );
 

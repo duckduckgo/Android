@@ -18,26 +18,18 @@ package com.duckduckgo.sync.lib
 
 import android.content.Context
 import android.util.Base64
-import okio.ByteString.Companion.decodeBase64
+import com.duckduckgo.library.loader.LibraryLoader
 import kotlin.system.exitProcess
 import timber.log.Timber
 
-class NativeLib constructor(
-    private val context: Context,
-) {
-
-    /**
-     * A native method that is implemented by the 'lib' native library, which is packaged with this
-     * application.
-     */
-    external fun stringFromJNI(): String
+class SyncNativeLib constructor(context: Context) {
 
     init {
         try {
             Timber.v("Loading native SYNC library")
-            System.loadLibrary("ddgcrypto")
+            LibraryLoader.loadLibrary(context, "ddgcrypto")
         } catch (ignored: Throwable) {
-            Timber.e(ignored, "Error loading netguard library")
+            Timber.e(ignored, "Error loading sync library")
             exitProcess(1)
         }
     }
@@ -52,10 +44,13 @@ class NativeLib constructor(
      * @param userId IN
      * @param password IN
      */
-    fun generateAccountKeys(): Account {
+    fun generateAccountKeys(
+        userId: String,
+        password: String
+    ): Account {
         val primaryKey = ByteArray(32)
         val secretKey = ByteArray(32)
-        val protectedSecretKey = ByteArray(64)
+        val protectedSecretKey = ByteArray(72) // 32+16(mac)+24
         val passwordHash = ByteArray(32)
 
         Timber.v("SYNC PRE PK: ${primaryKey.encode()}")
@@ -63,7 +58,7 @@ class NativeLib constructor(
         Timber.v("SYNC PRE PSK: ${protectedSecretKey.encode()}")
         Timber.v("SYNC PRE PH: ${passwordHash.encode()}")
 
-        val result: Long = generateAccountKeys(primaryKey, secretKey, protectedSecretKey, passwordHash, "test", "password")
+        val result: Long = generateAccountKeys(primaryKey, secretKey, protectedSecretKey, passwordHash, userId, password)
 
         Timber.v("SYNC PK: ${primaryKey.encode()}")
         Timber.v("SYNC SK: ${secretKey.encode()}")
@@ -76,8 +71,8 @@ class NativeLib constructor(
             secretKey = secretKey.encode(),
             protectedSecretKey = protectedSecretKey.encode(),
             passwordHash = passwordHash.encode(),
-            userId = "test1234",
-            password = "password"
+            userId = userId,
+            password = password
         )
     }
 
@@ -89,14 +84,15 @@ class NativeLib constructor(
      * @param primaryKey IN
      */
     fun prepareForLogin(
-        primaryKey: ByteArray
-    ): Login{
-        val passwordHash = ByteArray(32)
-        val stretchedPrimaryKey = ByteArray(32)
+        primaryKey: String
+    ): Login {
+        val primarKeyByteArray = primaryKey.decode()
+        val passwordHash = ByteArray(primarKeyByteArray.size)
+        val stretchedPrimaryKey = ByteArray(primarKeyByteArray.size)
 
-        val result: Long = prepareForLogin(passwordHash, stretchedPrimaryKey, primaryKey)
+        val result: Long = prepareForLogin(passwordHash, stretchedPrimaryKey, primarKeyByteArray)
 
-        Timber.v("SYNC PK: ${primaryKey.encode()}")
+        Timber.v("SYNC PK: ${primaryKey}")
         Timber.v("SYNC PH: ${passwordHash.encode()}")
         Timber.v("SYNC SPK: ${stretchedPrimaryKey.encode()}")
 
@@ -104,21 +100,24 @@ class NativeLib constructor(
             result = result,
             passwordHash = passwordHash.encode(),
             stretchedPrimaryKey = stretchedPrimaryKey.encode(),
-            primaryKey = primaryKey.encode(),
+            primaryKey = primaryKey,
         )
     }
 
     fun decrypt(
-        encryptedData: ByteArray,
-        secretKey: ByteArray,
-    ): ByteArray {
-        val decryptedData = ByteArray(32) //TODO: validate if size is correct
-        val result: Long = prepareForLogin(decryptedData, encryptedData, secretKey)
+        encryptedData: String,
+        secretKey: String,
+    ): String {
+        val encryptedDataByteArray = encryptedData.decode()
+        val secretKeyByteArray = secretKey.decode()
+        val decryptedData = ByteArray(encryptedDataByteArray.size-16-24) //TODO: validate if size is correct
+
+        val result: Long = decrypt(decryptedData, encryptedDataByteArray, encryptedDataByteArray.size.toLong(), secretKeyByteArray)
 
         Timber.v("SYNC result: $result")
         Timber.v("SYNC decryptedData: ${decryptedData}")
 
-        return decryptedData
+        return decryptedData.encode()
     }
 
     fun ByteArray.encode(): String {
@@ -145,9 +144,9 @@ class NativeLib constructor(
     ): Long
 
     private external fun decrypt(
-        decryptedData: ByteArray,
-        encryptedData: ByteArray,
-        length: Long, //TODO: test if necessary
+        rawBytes: ByteArray,
+        encryptedBytes: ByteArray,
+        encryptedBytesLength: Long, //TODO: test if necessary
         secretKey: ByteArray,
     ): Long
 }
