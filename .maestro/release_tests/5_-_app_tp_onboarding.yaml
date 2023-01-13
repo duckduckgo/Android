@@ -37,7 +37,7 @@ appId: com.duckduckgo.mobile.android
       text: "Good news! App Tracking Protection is now enabled.*"
 - assertVisible: "Got it!"
 - tapOn: "Got it!"
-- assertVisible: "This feature is in beta. Having issues with an app? Help us improve"
+- assertVisible: "During beta, protection for some apps is automatically disabled. View apps"
 - assertVisible: "Blocked tracking attempts will appear here"
 - assertVisible:
     id: "com.duckduckgo.mobile.android:id/activity_apps"
