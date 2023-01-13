@@ -21,7 +21,7 @@
     android:viewportHeight="24">
   <path
       android:pathData="M12,12m-11,0a11,11 0,1 1,22 0a11,11 0,1 1,-22 0"
-      android:fillColor="?attr/daxColorContainer"/>
+      android:fillColor="?attr/daxColorSurface"/>
   <path
       android:pathData="M14.627,12.089l-4.179,-2.396v4.793l4.179,-2.397z"
       android:fillColor="?attr/toolbarIconColor"
