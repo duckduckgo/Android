@@ -89,7 +89,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:iconDrawable="@drawable/ic_add_16"
-                app:labelText="@string/newTabMenuItem" />
+                app:primaryText="@string/newTabMenuItem" />
 
             <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
                 android:id="@+id/siteOptionsMenuDivider"
