@@ -106,6 +106,8 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     private val textChangeWatcher = object : TextChangedWatcher() {
         override fun afterTextChanged(editable: Editable) {
             showOmnibar()
+            val searchQuery = omnibarTextInput.text.toString()
+            binding.clearTextButton.isVisible = searchQuery.isNotEmpty()
             viewModel.userUpdatedQuery(omnibarTextInput.text.toString())
         }
     }

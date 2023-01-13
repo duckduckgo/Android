@@ -64,6 +64,7 @@
     <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/onboardingText"
         android:layout_width="0dp"
+        app:typography="body2"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="6dp"
@@ -124,6 +125,7 @@
             android:layout_marginTop="6dp"
             android:layout_marginBottom="6dp"
             android:drawableStart="@drawable/ic_success"
+            app:typography="body2"
             android:drawablePadding="12dp"
             android:text="@string/systemSearchOnboardingFeatureThreeText"/>
     </LinearLayout>
