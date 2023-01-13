@@ -18,6 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="autoconsentTitle">Evästeiden hallinnan ponnahdusikkunat</string>
-    <string name="autoconsentDescription">Kun DuckDuckGo havaitsee evästeiden hallinnan ponnahdusikkunoita sivustoilla, joilla käyt, voimme automaattisesti yrittää määrittää evästeasetuksesi evästeiden minimoimiseksi ja yksityisyyden maksimoimiseksi ja sulkea sitten ponnahdusikkunat.</string>
+    <string name="autoconsentDescription">Kun DuckDuckGo havaitsee evästeiden hallinnan ponnahdusikkunoita vierailemillasi sivustoilla, voimme yrittää määrittää evästeasetuksesi automaattisesti evästeiden minimoimiseksi ja yksityisyyden maksimoimiseksi ja sulkea sitten ponnahdusikkunat. Joillakin sivustoilla evästeiden hallinta ei ole mahdollista, joten voimme vain piilottaa tällaiset ponnahdusikkunat.</string>
     <string name="autoconsentToggle">Anna DuckDuckGon hallinnoida evästeiden hallinnan ponnahdusikkunoita</string>
 </resources>
