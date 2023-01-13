@@ -19,21 +19,20 @@ package com.duckduckgo.mobile.android.ui.view
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.LinearLayout
-import androidx.annotation.DrawableRes
 import com.duckduckgo.mobile.android.R
-import com.duckduckgo.mobile.android.databinding.ViewMenuItemBinding
+import com.duckduckgo.mobile.android.databinding.ViewPopupMenuItemBinding
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
-class MenuItemView
+class PopupMenuItemView
 @JvmOverloads
 constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-    defStyleRes: Int = R.style.Widget_DuckDuckGo_MenuItemView,
+    defStyleRes: Int = 0,
 ) : LinearLayout(context, attrs, defStyleAttr, defStyleRes) {
 
-    private val binding: ViewMenuItemBinding by viewBinding()
+    private val binding: ViewPopupMenuItemBinding by viewBinding()
 
     init {
         initAttr(attrs)
@@ -42,17 +41,11 @@ constructor(
     private fun initAttr(attrs: AttributeSet?) {
         val attributes = context.obtainStyledAttributes(
             attrs,
-            R.styleable.MenuItemView,
+            R.styleable.PopupMenuItemView,
             0,
-            R.style.Widget_DuckDuckGo_MenuItemView,
+            0,
         )
-        binding.label.text = attributes.getString(R.styleable.MenuItemView_primaryText) ?: ""
-        binding.icon.setImageResource(
-            attributes.getResourceId(
-                R.styleable.MenuItemView_iconDrawable,
-                R.drawable.ic_globe_gray_16dp,
-            ),
-        )
+        binding.label.text = attributes.getString(R.styleable.PopupMenuItemView_primaryText) ?: ""
         updateContentDescription()
         attributes.recycle()
     }
@@ -65,10 +58,6 @@ constructor(
     fun label(label: () -> String) {
         binding.label.text = label()
         updateContentDescription()
-    }
-
-    fun setIcon(@DrawableRes iconResId: Int) {
-        binding.icon.setImageResource(iconResId)
     }
 
     private fun updateContentDescription() {
