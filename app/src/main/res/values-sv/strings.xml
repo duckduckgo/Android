@@ -652,6 +652,7 @@
     <string name="autoconsentSecondaryCta">Nej tack</string>
 
     <string name="autoconsentSetting">Hantera popup-fönster för cookies</string>
+    <string name="autoconsentCosmeticNoticeAnimationText">Popup-fönster dolt</string>
     <string name="autoconsentManagedNoticeAnimationText">Cookies hanteras</string>
 
     <!-- Site Permissions Settings -->
