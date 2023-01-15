@@ -660,6 +660,7 @@
     <string name="autoconsentSecondaryCta">Ne, dėkoju</string>
 
     <string name="autoconsentSetting">Valdyti slapukų iššokančiuosius langus</string>
+    <string name="autoconsentCosmeticNoticeAnimationText">Iškylantysis langas paslėptas</string>
     <string name="autoconsentManagedNoticeAnimationText">Slapukai valdomi</string>
 
     <!-- Site Permissions Settings -->
