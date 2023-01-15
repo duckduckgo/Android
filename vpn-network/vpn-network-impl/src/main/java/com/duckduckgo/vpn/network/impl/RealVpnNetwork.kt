@@ -26,11 +26,11 @@ import androidx.annotation.RequiresApi
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.library.loader.LibraryLoader
+import com.duckduckgo.netguard.network.models.Allowed
+import com.duckduckgo.netguard.network.models.Packet
+import com.duckduckgo.netguard.network.models.ResourceRecord
+import com.duckduckgo.netguard.network.models.Usage
 import com.duckduckgo.vpn.network.api.*
-import com.duckduckgo.vpn.network.impl.models.Allowed
-import com.duckduckgo.vpn.network.impl.models.Packet
-import com.duckduckgo.vpn.network.impl.models.ResourceRecord
-import com.duckduckgo.vpn.network.impl.models.Usage
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import java.net.InetSocketAddress
