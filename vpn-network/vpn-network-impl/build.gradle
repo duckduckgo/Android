@@ -33,7 +33,7 @@ dependencies {
 
     implementation Kotlin.stdlib.jdk7
     implementation "com.squareup.logcat:logcat:_"
-    implementation "com.github.duckduckgo:netguard:1.0.0"
+    implementation "com.duckduckgo.netguard:netguard-android:_"
 
     implementation Google.dagger
     implementation AndroidX.core.ktx
