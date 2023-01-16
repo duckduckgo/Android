@@ -59,12 +59,12 @@ class TdsClient(
                 if (rule.action == IGNORE) {
                     return MatchedResult(shouldBlock = false, isATracker = true)
                 }
+                if (rule.surrogate?.isNotEmpty() == true) {
+                    return MatchedResult(shouldBlock = true, surrogate = rule.surrogate, isATracker = true)
+                }
                 // Null means no action which we should default to block
                 if (rule.action == BLOCK || rule.action == null) {
                     return MatchedResult(shouldBlock = true, isATracker = true)
-                }
-                if (rule.surrogate?.isNotEmpty() == true) {
-                    return MatchedResult(shouldBlock = true, surrogate = rule.surrogate, isATracker = true)
                 }
             }
         }
