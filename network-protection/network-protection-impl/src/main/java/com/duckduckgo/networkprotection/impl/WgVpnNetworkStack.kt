@@ -34,6 +34,7 @@ import com.wireguard.config.BadConfigException.Section.CONFIG
 import dagger.Lazy
 import dagger.SingleInstanceIn
 import javax.inject.Inject
+import logcat.asLog
 import logcat.logcat
 
 @ContributesMultibinding(
@@ -47,7 +48,6 @@ class WgVpnNetworkStack @Inject constructor(
     private val networkProtectionRepository: Lazy<NetworkProtectionRepository>,
     private val currentTimeProvider: CurrentTimeProvider,
 ) : VpnNetworkStack {
-    private var wgThread: Thread? = null
     private var wgTunnelData: WgTunnelData? = null
 
     override val name: String = NetPVpnFeature.NETP_VPN.featureName
@@ -80,7 +80,7 @@ class WgVpnNetworkStack @Inject constructor(
 
     override fun onStartVpn(tunfd: ParcelFileDescriptor): Result<Unit> {
         logcat { "onStartVpn called." }
-        return turnOnNative(tunfd.fd)
+        return turnOnNative(tunfd.detachFd())
     }
 
     override fun onStopVpn(reason: VpnStopReason): Result<Unit> {
@@ -97,21 +97,14 @@ class WgVpnNetworkStack @Inject constructor(
         if (wgTunnelData == null) {
             return Result.failure(BadConfigException(CONFIG, TOP_LEVEL, Reason.MISSING_SECTION, "Config could not be empty."))
         }
-        if (wgThread == null) {
-            logcat { "turnOnNative wg" }
-
-            wgThread = Thread {
-                logcat { "Thread: Started turnOnNative" }
-                wgProtocol.get().startWg(
-                    tunfd,
-                    wgTunnelData!!.userSpaceConfig.also {
-                        logcat { "WgUserspace config: $it" }
-                    },
-                )
-                logcat { "Thread: Completed turnOnNative" }
-                wgThread = null
-            }.also { it.start() }
-        }
+        logcat { "Thread: Started turnOnNative" }
+        wgProtocol.get().startWg(
+            tunfd,
+            wgTunnelData!!.userSpaceConfig.also {
+                logcat { "WgUserspace config: $it" }
+            },
+        )
+        logcat { "Thread: Completed turnOnNative" }
 
         // Only update if enabledTimeInMillis has been reset
         if (networkProtectionRepository.get().enabledTimeInMillis == -1L) {
@@ -121,16 +114,15 @@ class WgVpnNetworkStack @Inject constructor(
     }
 
     private fun turnOffNative(reason: VpnStopReason): Result<Unit> {
-        if (wgThread == null) {
-            logcat { "turnOffNative wg" }
+        logcat { "turnOffNative wg" }
 
-            wgThread = Thread {
-                logcat { "Thread: Started turnOffNative" }
-                wgProtocol.get().stopWg()
-                logcat { "Thread: Completed turnOffNative" }
-                wgThread = null
-            }.also { it.start() }
+        logcat { "Thread: Started turnOffNative" }
+        kotlin.runCatching {
+            wgProtocol.get().stopWg()
+        }.onFailure {
+            logcat { "WG network: ${it.asLog()}" }
         }
+        logcat { "Thread: Completed turnOffNative" }
 
         networkProtectionRepository.get().serverDetails = null
 
