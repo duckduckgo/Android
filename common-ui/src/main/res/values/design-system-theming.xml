@@ -37,17 +37,6 @@
     is where we override or define default styles for views and text appearance attributes. -->
     <style name="Base.Theme.DuckDuckGo" parent="Platform.Theme.DuckDuckGo">
 
-        <!--Design System Legacy Typography (to be removed when the migration happens) -->
-        <item name="textAppearanceHeadline1">@style/TextAppearance.DuckDuckGo.Headline1</item>
-        <item name="textAppearanceHeadline2">@style/TextAppearance.DuckDuckGo.Headline2</item>
-        <item name="textAppearanceHeadline3">@style/TextAppearance.DuckDuckGo.Headline3</item>
-        <item name="textAppearanceHeadline4">@style/TextAppearance.DuckDuckGo.Headline4</item>
-        <item name="textAppearanceHeadline5">@style/TextAppearance.DuckDuckGo.Headline5</item>
-        <item name="textAppearanceBody1">@style/TextAppearance.DuckDuckGo.Body1</item>
-        <item name="textAppearanceBody2">@style/TextAppearance.DuckDuckGo.Body2</item>
-        <item name="textAppearanceButton1">@style/TextAppearance.DuckDuckGo.Button1</item>
-        <item name="textAppearanceButton2">@style/TextAppearance.DuckDuckGo.Button2</item>
-
         <item name="textAppearanceTitle">@style/Typography.DuckDuckGo.Title</item>
         <item name="textAppearanceH1">@style/Typography.DuckDuckGo.H1</item>
         <item name="textAppearanceH2">@style/Typography.DuckDuckGo.H2</item>

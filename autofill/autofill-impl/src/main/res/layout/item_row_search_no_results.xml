@@ -15,6 +15,7 @@
   -->
 
 <com.google.android.material.textview.MaterialTextView xmlns:android="http://schemas.android.com/apk/res/android"
+   tools:ignore="DeprecatedWidgetInXml"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/noMatchingLoginsHint"
     android:layout_width="match_parent"
