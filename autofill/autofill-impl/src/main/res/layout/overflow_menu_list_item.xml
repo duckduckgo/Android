@@ -15,18 +15,21 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:background="@drawable/popup_menu_bg">
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:orientation="vertical"
+              android:background="@drawable/popup_menu_bg">
 
     <TextView
+        tools:ignore="DeprecatedWidgetInXml"
         android:id="@+id/item_copy_username"
         style="@style/Widget.DuckDuckGo.PopupMenuItem"
         android:text="@string/credentialManagementEditButtonCopyUsername" />
 
     <TextView
+        tools:ignore="DeprecatedWidgetInXml"
         android:id="@+id/item_copy_password"
         style="@style/Widget.DuckDuckGo.PopupMenuItem"
         android:text="@string/credentialManagementEditButtonCopyPassword" />
@@ -37,11 +40,13 @@
         android:layout_height="wrap_content" />
 
     <TextView
+        tools:ignore="DeprecatedWidgetInXml"
         android:id="@+id/item_overflow_edit"
         style="@style/Widget.DuckDuckGo.PopupMenuItem"
         android:text="@string/credentialManagementViewMenuEdit" />
 
     <TextView
+        tools:ignore="DeprecatedWidgetInXml"
         android:id="@+id/item_overflow_delete"
         style="@style/Widget.DuckDuckGo.PopupMenuItem"
         android:text="@string/credentialManagementViewMenuDelete" />

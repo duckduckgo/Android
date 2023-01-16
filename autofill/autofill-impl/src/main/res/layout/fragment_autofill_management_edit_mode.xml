@@ -77,13 +77,13 @@
             android:hint="@string/credentialManagementEditNotesHint"
             app:editable="false" />
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/lastUpdatedView"
+            app:typography="caption"
+            app:textType="secondary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/keyline_4"
-            android:textAppearance="@style/TextAppearance.DuckDuckGo.Caption"
-            android:textColor="?attr/secondaryTextColor" />
+            android:layout_marginTop="@dimen/keyline_4" />
 
     </LinearLayout>
 

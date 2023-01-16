@@ -62,7 +62,7 @@
 
     <style name="Widget.DuckDuckGo.ListItem"/>
 
-    <style name="Widget.DuckDuckGo.ListItem.Description" parent="TextAppearance.DuckDuckGo.Body2">
+    <style name="Widget.DuckDuckGo.ListItem.Description" parent="Typography.DuckDuckGo.Body2">
         <item name="android:lineSpacingExtra">4sp</item>
         <item name="android:textAlignment">viewStart</item>
         <item name="android:textColor">?attr/settingsMinorTextColor</item>
@@ -105,7 +105,7 @@
         <item name="android:background">@drawable/popup_menu_bg</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.PopupMenuItem" parent="TextAppearance.DuckDuckGo.Body1">
+    <style name="Widget.DuckDuckGo.PopupMenuItem" parent="Typography.DuckDuckGo.Body1">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">@dimen/popupMenuItemHeight</item>
         <item name="android:paddingEnd">@dimen/keyline_4</item>
@@ -141,22 +141,6 @@
         <item name="android:paddingTop">@dimen/keyline_3</item>
         <item name="android:paddingBottom">@dimen/keyline_3</item>
         <item name="android:background">?attr/selectableItemBackground</item>
-    </style>
-
-    <!-- Section Header -->
-    <style name="Widget.DuckDuckGo.SectionHeader">
-        <item name="android:paddingTop">@dimen/keyline_4</item>
-        <item name="android:paddingBottom">@dimen/keyline_4</item>
-        <item name="android:paddingStart">@dimen/keyline_4</item>
-        <item name="android:paddingEnd">@dimen/keyline_4</item>
-        <item name="android:textAppearance">@style/Widget.DuckDuckGo.SectionHeader.TextAppearance</item>
-    </style>
-
-    <style name="Widget.DuckDuckGo.SectionHeader.TextAppearance" parent="TextAppearance.DuckDuckGo.Body2">
-        <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textColor">@color/blue50</item>
-        <item name="android:textSize">14sp</item>
-        <item name="android:textAllCaps">true</item>
     </style>
 
     <!-- Info Panel -->
