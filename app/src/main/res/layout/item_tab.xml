@@ -62,8 +62,8 @@
             android:layout_height="36dp"
             android:background="?selectableItemBackground"
             android:contentDescription="@string/closeContentDescription"
-            android:padding="6dp"
-            android:src="@drawable/ic_close_small_16"
+            android:scaleType="center"
+            android:src="@drawable/ic_close_24_small"
             app:layout_constraintBottom_toBottomOf="@id/favicon"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/favicon" />
