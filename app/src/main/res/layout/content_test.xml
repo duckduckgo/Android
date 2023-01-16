@@ -29,7 +29,7 @@
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listItem="@layout/view_bookmark_entry" />
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/emptyBookmarks"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -37,8 +37,6 @@
         android:layout_marginTop="40dp"
         android:layout_marginEnd="10dp"
         android:text="@string/noBookmarks"
-        android:textAlignment="center"
-        android:textColor="?attr/listItemPrimaryTextColor"
-        android:textSize="16sp" />
+        android:textAlignment="center"/>
 
 </FrameLayout>

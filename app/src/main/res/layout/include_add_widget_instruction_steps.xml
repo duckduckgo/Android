@@ -38,98 +38,83 @@
         app:barrierDirection="end"
         app:constraint_referenced_ids="instruction1,instruction2,instruction3" />
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/instructionLabel1"
+        app:typography="caption"
         android:layout_width="18dp"
         android:layout_height="18dp"
         android:layout_margin="16dp"
         android:background="@drawable/background_add_widget_number"
-        android:fontFamily="sans-serif-black"
         android:gravity="center"
         android:text="@string/addWidgetInstruction1Label"
-        android:textColor="@color/white"
-        android:textSize="10sp"
-        android:textStyle="normal"
+        android:textColor="?attr/daxColorWhite"
         app:layout_constraintBaseline_toBaselineOf="@id/instruction1"
         app:layout_constraintEnd_toStartOf="@id/instruction1"
         tools:ignore="SmallSp" />
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/instruction1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:fontFamily="sans-serif"
-        android:lineSpacingExtra="4sp"
+        app:typography="body2"
         android:paddingBottom="20dp"
         android:text="@string/addWidgetInstruction1"
-        android:textColor="@color/white"
-        android:textSize="14sp"
-        android:textStyle="normal"
+        android:textColor="?attr/daxColorWhite"
         app:layout_constraintEnd_toEndOf="@id/instructionsEndBarrier"
         app:layout_constraintStart_toEndOf="@id/instructionLabel1"
         app:layout_constraintStart_toStartOf="@id/instructionsStartBarrier"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_max="400dp" />
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/instructionLabel2"
         android:layout_width="18dp"
         android:layout_height="18dp"
         android:layout_margin="16dp"
+        app:typography="caption"
         android:background="@drawable/background_add_widget_number"
-        android:fontFamily="sans-serif-black"
         android:gravity="center"
         android:text="@string/addWidgetInstruction2Label"
-        android:textColor="@color/white"
-        android:textSize="10sp"
-        android:textStyle="normal"
+        android:textColor="?attr/daxColorWhite"
         app:layout_constraintBaseline_toBaselineOf="@id/instruction2"
         app:layout_constraintEnd_toStartOf="@id/instruction2"
         tools:ignore="SmallSp" />
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/instruction2"
+        app:typography="body2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:fontFamily="sans-serif"
-        android:lineSpacingExtra="4sp"
         android:paddingBottom="20dp"
         android:text="@string/addWidgetInstruction2"
-        android:textColor="@color/white"
-        android:textSize="14sp"
-        android:textStyle="normal"
+        android:textColor="?attr/daxColorWhite"
         app:layout_constraintEnd_toEndOf="@id/instructionsEndBarrier"
         app:layout_constraintStart_toStartOf="@id/instructionsStartBarrier"
         app:layout_constraintTop_toBottomOf="@+id/instruction1"
         app:layout_constraintWidth_max="400dp" />
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/instructionLabel3"
         android:layout_width="18dp"
         android:layout_height="18dp"
         android:layout_margin="16dp"
+        app:typography="caption"
         android:background="@drawable/background_add_widget_number"
-        android:fontFamily="sans-serif-black"
+        android:textColor="?attr/daxColorWhite"
         android:gravity="center"
         android:text="@string/addWidgetInstruction3Label"
-        android:textColor="@color/white"
-        android:textSize="10sp"
-        android:textStyle="normal"
         app:layout_constraintBaseline_toBaselineOf="@id/instruction3"
         app:layout_constraintEnd_toStartOf="@id/instruction3"
         tools:ignore="SmallSp" />
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/instruction3"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:fontFamily="sans-serif"
-        android:lineSpacingExtra="4sp"
+        app:typography="body2"
         android:paddingBottom="42dp"
         android:text="@string/addWidgetInstruction3"
-        android:textColor="@color/white"
-        android:textSize="14sp"
-        android:textStyle="normal"
+        android:textColor="?attr/daxColorWhite"
         app:layout_constraintEnd_toEndOf="@id/instructionsEndBarrier"
         app:layout_constraintStart_toStartOf="@id/instructionsStartBarrier"
         app:layout_constraintTop_toBottomOf="@+id/instruction2"

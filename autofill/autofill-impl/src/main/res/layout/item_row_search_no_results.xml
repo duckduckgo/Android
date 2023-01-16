@@ -14,20 +14,14 @@
   ~ limitations under the License.
   -->
 
-<com.google.android.material.textview.MaterialTextView xmlns:android="http://schemas.android.com/apk/res/android"
-   tools:ignore="DeprecatedWidgetInXml"
+<com.duckduckgo.mobile.android.ui.view.text.DaxTextView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/noMatchingLoginsHint"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:fontFamily="sans-serif"
     android:gravity="center"
-    android:lineSpacingExtra="4sp"
     android:paddingStart="16dp"
     android:paddingTop="24dp"
     android:paddingEnd="16dp"
     android:paddingBottom="24dp"
-    android:textColor="?attr/normalTextColor"
-    android:textSize="16sp"
-    android:textStyle="normal"
     tools:text="Lorem ipsum dolor sit amet" />
