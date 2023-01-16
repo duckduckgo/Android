@@ -660,6 +660,7 @@
     <string name="autoconsentSecondaryCta">Nie, ďakujem</string>
 
     <string name="autoconsentSetting">Správa kontextových okien súborov cookie</string>
+    <string name="autoconsentCosmeticNoticeAnimationText">Kontextové okno je skryté</string>
     <string name="autoconsentManagedNoticeAnimationText">Spravované súbory cookie</string>
 
     <!-- Site Permissions Settings -->
