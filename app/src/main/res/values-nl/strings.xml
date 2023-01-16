@@ -652,6 +652,7 @@
     <string name="autoconsentSecondaryCta">Nee, bedankt</string>
 
     <string name="autoconsentSetting">Cookiepop-ups beheren</string>
+    <string name="autoconsentCosmeticNoticeAnimationText">Pop-up verborgen</string>
     <string name="autoconsentManagedNoticeAnimationText">Beheerde cookies</string>
 
     <!-- Site Permissions Settings -->
