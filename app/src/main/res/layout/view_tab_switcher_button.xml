@@ -18,9 +18,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:parentTag="android.widget.RelativeLayout">
 
-    <!-- This TextView doesn't migrate to DaxTextView, special case for the Tabs icon  -->
     <TextView
-            tools:ignore="MergeRootFrame"
+        tools:ignore="DeprecatedWidgetInXml"
         android:id="@+id/tabCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
