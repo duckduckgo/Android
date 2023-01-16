@@ -99,7 +99,7 @@
 
     <!-- Dax Dialog  -->
     <dimen name="daxDialogContentPaddingTop">20dp</dimen>
-    <dimen name="daxDialogButtonSpacing">14dp</dimen>
+    <dimen name="daxDialogButtonSpacing">10dp</dimen>
 
     <!-- Card -->
     <dimen name="daxBubbleDialogDistanceFromEdge">22dp</dimen>

@@ -35,6 +35,7 @@ import com.duckduckgo.app.global.extensions.safeGetApplicationIcon
 import com.duckduckgo.mobile.android.ui.TextDrawable
 import com.duckduckgo.mobile.android.ui.recyclerviewext.StickyHeaders
 import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.hide
 import com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.vpn.R
@@ -57,6 +58,7 @@ class TrackerFeedAdapter @Inject constructor(
     ) {
         when (holder) {
             is TrackerFeedViewHolder -> holder.bind(trackerFeedItems[position] as TrackerFeedItem.TrackerFeedData, onAppClick)
+            is TrackerDescriptionViewHolder -> holder.bind()
             is TrackerSkeletonViewHolder -> holder.bind()
             is TrackerFeedHeaderViewHolder -> holder.bind(trackerFeedItems[position] as TrackerFeedItem.TrackerFeedItemHeader)
             is TrackerAppsProtectionStateViewHolder ->
@@ -248,6 +250,12 @@ class TrackerFeedAdapter @Inject constructor(
                 val view = inflater.inflate(R.layout.view_device_shield_activity_description, parent, false)
                 return TrackerDescriptionViewHolder(view)
             }
+        }
+
+        var splitter: View = view.findViewById(R.id.entry_splitter)
+
+        fun bind() {
+            splitter.hide()
         }
     }
 

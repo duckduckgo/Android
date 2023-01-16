@@ -26,11 +26,11 @@
     <style name="Widget.DuckDuckGo.ToolbarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="colorControlNormal">?attr/daxColorPrimaryIcon</item>
         <item name="android:textColorPrimary">?attr/daxColorPrimaryText</item>
-        <item name="colorControlHighlight">@color/subtleGrayTwo</item>
+        <item name="colorControlHighlight">?attr/daxColorRipple</item>
         <item name="colorAccent">?attr/daxColorAccentBlue</item>
         <item name="colorControlActivated">?attr/daxColorAccentBlue</item>
         <item name="colorSwitchThumbNormal">?attr/daxColorAccentBlue</item>
-        <item name="android:colorForeground">@color/subtleGrayTwo</item>
+        <item name="android:colorForeground">?attr/daxColorRipple</item>
     </style>
 
     <style name="Widget.DuckDuckGo.PopUpOverflowMenu" parent="@style/Widget.MaterialComponents.PopupMenu.Overflow">
