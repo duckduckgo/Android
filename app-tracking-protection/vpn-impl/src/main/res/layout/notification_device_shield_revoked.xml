@@ -22,6 +22,7 @@
     android:orientation="horizontal">
 
     <TextView
+        tools:ignore="DeprecatedWidgetInXml"
         android:id="@+id/deviceShieldNotificationHeader"
         style="@style/TextAppearance.Compat.Notification"
         android:layout_gravity="center"

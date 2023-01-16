@@ -28,7 +28,7 @@
     android:paddingEnd="@dimen/keyline_4"
     android:paddingBottom="@dimen/keyline_4">
 
-    <TextView
+    <View
         android:id="@+id/report_breakage_rbutton_entry_skeleton_imageView"
         android:layout_width="20dp"
         android:layout_height="20dp"
@@ -37,7 +37,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <TextView
+    <View
             android:id="@+id/report_breakage_app_entry_skeleton_imageView"
             android:layout_width="@dimen/listItemImageContainerSize"
             android:layout_height="@dimen/listItemImageContainerSize"
@@ -46,7 +46,7 @@
             app:layout_constraintStart_toEndOf="@+id/report_breakage_rbutton_entry_skeleton_imageView"
             app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toBottomOf="parent"/>
 
-    <TextView
+    <View
             android:id="@+id/report_breakage_app_entry_skeleton_top_text"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
