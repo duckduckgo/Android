@@ -35,7 +35,7 @@ data class TdsTracker(
 enum class Action {
     BLOCK,
     IGNORE,
-    ;
+    UNSUPPORTED,
 }
 
 class Rule(

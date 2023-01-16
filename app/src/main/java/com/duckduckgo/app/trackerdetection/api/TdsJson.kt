@@ -17,6 +17,7 @@
 package com.duckduckgo.app.trackerdetection.api
 
 import com.duckduckgo.app.trackerdetection.model.*
+import com.duckduckgo.app.trackerdetection.model.Action.UNSUPPORTED
 import com.squareup.moshi.FromJson
 import java.util.*
 
@@ -83,7 +84,9 @@ data class TdsJsonOwner(
 class ActionJsonAdapter {
 
     @FromJson
-    fun fromJson(actionName: String): Action? {
-        return Action.values().firstOrNull { it.name == actionName.uppercase(Locale.ROOT) }
+    fun fromJson(actionName: String): Action {
+        // If action not null but not supported, return unsupported.
+        // Unsupported actions are always ignored.
+        return Action.values().firstOrNull { it.name == actionName.uppercase(Locale.ROOT) } ?: UNSUPPORTED
     }
 }
