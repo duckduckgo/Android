@@ -143,51 +143,9 @@
         android:id="@+id/label"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        app:primaryText="Deprecated Buttons"
+        app:primaryText="Icon Buttons"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
-
-    <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryLarge
-        android:id="@+id/button_primary_large"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Button Primary Large"/>
-
-    <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimarySmall
-        android:id="@+id/button_primary_small"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Button Primary Small"/>
-
-    <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryLarge
-        android:id="@+id/button_secondary_large"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Button Secondary Large"/>
-
-    <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondarySmall
-        android:id="@+id/button_secondary_small"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Button Secondary Small"/>
-
-    <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostLarge
-        android:id="@+id/button_ghost_large"
-        android:layout_marginTop="16dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Button Ghost Large"/>
-
-    <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostSmall
-        android:id="@+id/button_ghost_small"
-        android:layout_marginTop="16dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Button Ghost Small"/>
 
     <com.duckduckgo.mobile.android.ui.view.button.IconButton
         android:layout_gravity="center"
@@ -196,19 +154,5 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         app:srcCompat="@drawable/ic_union"/>
-
-    <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryRounded
-        android:id="@+id/button_primary_rounded"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Button Primary Rounded"/>
-
-    <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryRounded
-        android:id="@+id/button_secondary_rounded"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Button Secondary Rounded"/>
 
 </LinearLayout>
