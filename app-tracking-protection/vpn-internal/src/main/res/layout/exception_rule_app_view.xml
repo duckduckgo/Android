@@ -43,20 +43,17 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/ruleAppName"
+            app:typography="body1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_weight="1"
             android:ellipsize="end"
-            android:fontFamily="sans-serif"
             android:maxLines="1"
             android:orientation="vertical"
             android:singleLine="true"
-            android:textColor="?normalTextColor"
-            android:textSize="16sp"
-            android:textStyle="normal"
             tools:text="Facebook"/>
     </LinearLayout>
 
