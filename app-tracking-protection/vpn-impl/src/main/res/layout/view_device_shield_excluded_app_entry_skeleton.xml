@@ -27,7 +27,7 @@
     android:paddingTop="8dp"
     android:paddingEnd="16dp">
 
-    <TextView
+    <View
         android:id="@+id/excluded_app_entry_skeleton_imageView"
         android:layout_width="40dp"
         android:layout_height="40dp"
@@ -36,7 +36,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
+    <View
         android:id="@+id/excluded_app_entry_skeleton_top_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -48,7 +48,7 @@
         app:layout_constraintStart_toEndOf="@+id/excluded_app_entry_skeleton_imageView"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
+    <View
         android:id="@+id/excluded_app_entry_skeleton_bottom_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

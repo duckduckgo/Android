@@ -23,6 +23,7 @@
     android:orientation="horizontal">
 
     <TextView
+        tools:ignore="DeprecatedWidgetInXml"
         android:id="@+id/deviceShieldNotificationText"
         style="@style/TextAppearance.Compat.Notification"
         android:layout_width="0dp"
