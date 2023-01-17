@@ -134,8 +134,7 @@
                 "requestType": "script",
                 "expectAction": "ignore",
                 "exceptPlatforms": [
-                    "ios-browser",
-                    "android-browser"
+                    "ios-browser"
                 ]
             },
             {
