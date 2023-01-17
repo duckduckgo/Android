@@ -6,6 +6,7 @@ on:
       - 'node_modules/@duckduckgo/privacy-dashboard/**'
       - 'privacy-dashboard/privacy-dashboard-api/**'
       - 'privacy-dashboard/privacy-dashboard-impl/**'
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.head_ref || github.ref_name }}
