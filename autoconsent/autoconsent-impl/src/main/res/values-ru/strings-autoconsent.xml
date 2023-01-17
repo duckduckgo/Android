@@ -18,6 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="autoconsentTitle">Управление окнами выбора куки-файлов</string>
-    <string name="autoconsentDescription">Если DuckDuckGo встретит всплывающее окно выбора куки-файлов на сайте, мы попытаемся автоматически принять минимум куки и максимально защитить ваши данные, а затем закроем окно.</string>
+    <string name="autoconsentDescription">Если DuckDuckGo обнаружит всплывающее окно выбора куки-файлов на каком-либо сайте, мы попытаемся автоматически выбрать минимум куки, максимально защитив ваши данные, а затем закроем окно. Некоторые сайты не позволяют контролировать настройки куки-файлов. В этом случае мы можем их только скрыть.</string>
     <string name="autoconsentToggle">Разрешить DuckDuckGo управлять окнами выбора куки-файлов</string>
 </resources>
