@@ -652,6 +652,7 @@
     <string name="autoconsentSecondaryCta">Nem, köszönöm</string>
 
     <string name="autoconsentSetting">Felugró sütiablakok kezelése</string>
+    <string name="autoconsentCosmeticNoticeAnimationText">Felugró ablak elrejtve</string>
     <string name="autoconsentManagedNoticeAnimationText">Kezelt sütik</string>
 
     <!-- Site Permissions Settings -->
