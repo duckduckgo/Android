@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.dev.settings.api
+package com.duckduckgo.privacy.config.internal.plugins
 
-import com.duckduckgo.app.dev.settings.db.DevSettingsDataStore
+import android.webkit.URLUtil
 import com.duckduckgo.app.global.api.ApiInterceptorPlugin
-import com.duckduckgo.app.trackerdetection.api.TDS_URL
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.privacy.config.api.PRIVACY_REMOTE_CONFIG_URL
+import com.duckduckgo.privacy.config.internal.store.DevPrivacyConfigSettingsDataStore
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import okhttp3.Interceptor
@@ -29,21 +30,22 @@ import okhttp3.Response
     scope = AppScope::class,
     boundType = ApiInterceptorPlugin::class,
 )
-class ApiDevTdsInterceptor @Inject constructor(
-    private val devSettingsDataStore: DevSettingsDataStore,
+class ApiDevPrivacyConfigInterceptor @Inject constructor(
+    private val devSettingsDataStore: DevPrivacyConfigSettingsDataStore,
 ) : ApiInterceptorPlugin, Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request().newBuilder()
 
         val url = chain.request().url
-        if (url.toString().contains(TDS_URL)) {
-            val tds = if (devSettingsDataStore.nextTdsEnabled) {
-                NEXT_TDS
-            } else {
-                TDS
-            }
-            request.url("$TDS_URL$tds")
+        val storedUrl = devSettingsDataStore.remotePrivacyConfigUrl
+        val isCustomSettingEnabled = devSettingsDataStore.useCustomPrivacyConfigUrl
+        val canUrlBeChanged = isCustomSettingEnabled && !storedUrl.isNullOrEmpty() && URLUtil.isValidUrl(storedUrl)
+
+        if (url.toString().contains(PRIVACY_REMOTE_CONFIG_URL) && canUrlBeChanged) {
+            request.url(storedUrl!!)
+        } else {
+            request.url(PRIVACY_REMOTE_CONFIG_URL)
         }
 
         return chain.proceed(request.build())
@@ -51,10 +53,5 @@ class ApiDevTdsInterceptor @Inject constructor(
 
     override fun getInterceptor(): Interceptor {
         return this
-    }
-
-    companion object {
-        private const val NEXT_TDS = "tds-next.json"
-        private const val TDS = "tds.json"
     }
 }

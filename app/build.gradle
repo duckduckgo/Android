@@ -187,6 +187,8 @@ dependencies {
     implementation project(':privacy-config-api')
     implementation project(':privacy-config-impl')
     implementation project(':privacy-config-store')
+    internalImplementation project(':privacy-config-internal')
+
     implementation project(':anrs-api')
     implementation project(':anrs-store')
     implementation project(':anrs-impl')
