@@ -660,6 +660,7 @@
     <string name="autoconsentSecondaryCta">Ne, děkuji</string>
 
     <string name="autoconsentSetting">Správa vyskakovacích oken ohledně cookies</string>
+    <string name="autoconsentCosmeticNoticeAnimationText">Skryté vyskakovací okno</string>
     <string name="autoconsentManagedNoticeAnimationText">O cookies je postaráno!</string>
 
     <!-- Site Permissions Settings -->
