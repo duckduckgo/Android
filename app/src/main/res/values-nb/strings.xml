@@ -652,6 +652,7 @@
     <string name="autoconsentSecondaryCta">Nei takk</string>
 
     <string name="autoconsentSetting">Administrer popup-vinduer om informasjonskapsler</string>
+    <string name="autoconsentCosmeticNoticeAnimationText">Popup-vindu skjult</string>
     <string name="autoconsentManagedNoticeAnimationText">Informasjonskapsler administrert</string>
 
     <!-- Site Permissions Settings -->
