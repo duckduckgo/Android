@@ -652,6 +652,7 @@
     <string name="autoconsentSecondaryCta">Non merci</string>
 
     <string name="autoconsentSetting">Gérer les fenêtres contextuelles de cookies</string>
+    <string name="autoconsentCosmeticNoticeAnimationText">Fenêtre contextuelle masquée</string>
     <string name="autoconsentManagedNoticeAnimationText">Cookies gérés</string>
 
     <!-- Site Permissions Settings -->
