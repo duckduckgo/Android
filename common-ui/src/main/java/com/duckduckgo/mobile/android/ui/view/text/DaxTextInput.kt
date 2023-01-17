@@ -97,7 +97,14 @@ class DaxTextInput @JvmOverloads constructor(
 
             binding.internalEditText.onFocusChangeListener = OnFocusChangeListener { _, hasFocus ->
                 if (hasFocus) {
-                    showKeyboard()
+                    if (isPassword) {
+                        showPassword()
+                    }
+                    binding.internalEditText.showKeyboard()
+                } else {
+                    if (isPassword) {
+                        hidePassword()
+                    }
                 }
             }
 
@@ -174,17 +181,28 @@ class DaxTextInput @JvmOverloads constructor(
             }
         }
         binding.internalPasswordIcon.setOnClickListener {
-            isPasswordShown = !isPasswordShown
             if (isPasswordShown) {
-                binding.internalPasswordIcon.setImageResource(R.drawable.ic_password_hide)
-                binding.internalEditText.inputType = EditorInfo.TYPE_CLASS_TEXT or EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE
-                binding.internalEditText.transformationMethod = null
+                hidePassword()
             } else {
-                binding.internalPasswordIcon.setImageResource(R.drawable.ic_password_show)
-                binding.internalEditText.inputType = EditorInfo.TYPE_TEXT_VARIATION_PASSWORD
-                binding.internalEditText.transformationMethod = transformationMethod
+                showPassword()
             }
         }
+    }
+
+    private fun showPassword() {
+        isPasswordShown = true
+        binding.internalPasswordIcon.setImageResource(R.drawable.ic_password_hide)
+        binding.internalEditText.inputType = EditorInfo.TYPE_CLASS_TEXT or EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE
+        binding.internalEditText.transformationMethod = null
+        binding.internalEditText.setSelection(binding.internalEditText.length())
+    }
+
+    private fun hidePassword() {
+        isPasswordShown = false
+        binding.internalPasswordIcon.setImageResource(R.drawable.ic_password_show)
+        binding.internalEditText.inputType = EditorInfo.TYPE_TEXT_VARIATION_PASSWORD
+        binding.internalEditText.transformationMethod = transformationMethod
+        binding.internalEditText.setSelection(binding.internalEditText.length())
     }
 
     private fun setupTextMode(inputType: Type) {
