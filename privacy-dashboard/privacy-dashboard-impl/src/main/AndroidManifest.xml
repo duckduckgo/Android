@@ -24,6 +24,5 @@
             android:exported="false"
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
             android:parentActivityName=".BrowserActivity" />
-        
     </application>
 </manifest>
