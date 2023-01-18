@@ -6,31 +6,21 @@ import androidx.core.content.edit
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 
-interface SyncEncryptedStore {
+interface SyncStore {
     var userId: String?
     var deviceName: String?
     var deviceId: String?
 }
 
-class SyncEncryptedSharedPrefsStore constructor(
-        private val context: Context,
-): SyncEncryptedStore {
+class SyncSharedPrefsStore constructor(
+        private val sharedPrefsProv: SharedPrefsProvider,
+): SyncStore {
 
     private val encryptedPreferences: SharedPreferences? by lazy { encryptedPreferences() }
 
     @Synchronized
     private fun encryptedPreferences(): SharedPreferences? {
-        return try {
-            EncryptedSharedPreferences.create(
-                    context,
-                    FILENAME,
-                    MasterKey.Builder(context).setKeyScheme(MasterKey.KeyScheme.AES256_GCM).build(),
-                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
-            )
-        } catch (e: Exception) {
-            null
-        }
+        return sharedPrefsProv.getSharedPrefs(FILENAME)
     }
 
     override var userId: String?

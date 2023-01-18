@@ -5,7 +5,7 @@ import android.content.Context
 import android.os.Build
 import android.provider.Settings
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.sync.store.SyncEncryptedStore
+import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
 import timber.log.Timber
 import java.util.*
@@ -19,36 +19,36 @@ interface SyncDeviceIds {
 
 @ContributesBinding(ActivityScope::class)
 class AppSyncDeviceIds @Inject constructor(
-    val context: Context,
-    private val syncEncryptedStore: SyncEncryptedStore,
+        val context: Context,
+        private val syncStore: SyncStore,
 ) : SyncDeviceIds {
     override fun userId(): String {
-        var userId = syncEncryptedStore.userId
+        var userId = syncStore.userId
         if (userId != null) return userId
 
         userId = UUID.randomUUID().toString()
-        syncEncryptedStore.userId = userId
+        syncStore.userId = userId
 
         return userId
     }
 
     override fun deviceName(): String {
         Timber.i("SYNC: ${Build.BRAND}, ${Build.DEVICE}, ${Build.MODEL}, ${Build.DISPLAY}, ${Build.MANUFACTURER}, ${Build.PRODUCT}")
-        var deviceName = syncEncryptedStore.deviceName
+        var deviceName = syncStore.deviceName
         if (deviceName != null) return deviceName
 
         deviceName = "${Build.BRAND} ${Build.MODEL}"
-        syncEncryptedStore.deviceName = deviceName
+        syncStore.deviceName = deviceName
         return deviceName
     }
 
     @SuppressLint("HardwareIds")
     override fun deviceId(): String {
-        var deviceName = syncEncryptedStore.deviceId
+        var deviceName = syncStore.deviceId
         if (deviceName != null) return deviceName
 
         deviceName = Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID) ?: "UNKNOWN"
-        syncEncryptedStore.deviceId = deviceName
+        syncStore.deviceId = deviceName
         return deviceName
     }
 }
