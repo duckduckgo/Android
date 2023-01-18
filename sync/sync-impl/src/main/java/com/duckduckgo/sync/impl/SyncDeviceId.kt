@@ -1,4 +1,20 @@
-package com.duckduckgo.sync.impl.ui
+/*
+ * Copyright (c) 2023 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.sync.impl
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -7,7 +23,6 @@ import android.provider.Settings
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
-import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
@@ -18,9 +33,11 @@ interface SyncDeviceIds {
 }
 
 @ContributesBinding(ActivityScope::class)
-class AppSyncDeviceIds @Inject constructor(
-        val context: Context,
-        private val syncStore: SyncStore,
+class AppSyncDeviceIds
+@Inject
+constructor(
+    private val context: Context,
+    private val syncStore: SyncStore,
 ) : SyncDeviceIds {
     override fun userId(): String {
         var userId = syncStore.userId
@@ -33,7 +50,6 @@ class AppSyncDeviceIds @Inject constructor(
     }
 
     override fun deviceName(): String {
-        Timber.i("SYNC: ${Build.BRAND}, ${Build.DEVICE}, ${Build.MODEL}, ${Build.DISPLAY}, ${Build.MANUFACTURER}, ${Build.PRODUCT}")
         var deviceName = syncStore.deviceName
         if (deviceName != null) return deviceName
 
@@ -47,7 +63,9 @@ class AppSyncDeviceIds @Inject constructor(
         var deviceName = syncStore.deviceId
         if (deviceName != null) return deviceName
 
-        deviceName = Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID) ?: "UNKNOWN"
+        deviceName =
+            Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
+                ?: "UNKNOWN"
         syncStore.deviceId = deviceName
         return deviceName
     }

@@ -18,7 +18,7 @@ package com.duckduckgo.sync.impl.di
 
 import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.store.EncryptedSharedPrefsProvided
+import com.duckduckgo.sync.store.EncryptedSharedPrefsProvider
 import com.duckduckgo.sync.store.SharedPrefsProvider
 import com.duckduckgo.sync.store.SyncSharedPrefsStore
 import com.duckduckgo.sync.store.SyncStore
@@ -40,6 +40,6 @@ object SyncStoreModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun provideSharedPrefsProvider(context: Context): SharedPrefsProvider {
-        return EncryptedSharedPrefsProvided(context)
+        return EncryptedSharedPrefsProvider(context)
     }
 }

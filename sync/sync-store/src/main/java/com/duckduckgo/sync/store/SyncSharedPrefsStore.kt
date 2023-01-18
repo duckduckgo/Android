@@ -1,10 +1,7 @@
 package com.duckduckgo.sync.store
 
-import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKey
 
 interface SyncStore {
     var userId: String?
@@ -12,9 +9,10 @@ interface SyncStore {
     var deviceId: String?
 }
 
-class SyncSharedPrefsStore constructor(
-        private val sharedPrefsProv: SharedPrefsProvider,
-): SyncStore {
+class SyncSharedPrefsStore
+constructor(
+    private val sharedPrefsProv: SharedPrefsProvider,
+) : SyncStore {
 
     private val encryptedPreferences: SharedPreferences? by lazy { encryptedPreferences() }
 
