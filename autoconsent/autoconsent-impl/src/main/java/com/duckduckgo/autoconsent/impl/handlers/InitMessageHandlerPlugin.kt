@@ -69,7 +69,7 @@ class InitMessageHandlerPlugin @Inject constructor(
                     }
 
                     // Reset site
-                    autoconsentCallback.onResultReceived(consentManaged = false, optOutFailed = false, selfTestFailed = false)
+                    autoconsentCallback.onResultReceived(consentManaged = false, optOutFailed = false, selfTestFailed = false, isCosmetic = false)
 
                     val disabledCmps = repository.disabledCmps.map { it.name }
                     val autoAction = getAutoAction()

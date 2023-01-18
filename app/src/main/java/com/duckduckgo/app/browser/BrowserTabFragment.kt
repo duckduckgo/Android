@@ -477,8 +477,9 @@ class BrowserTabFragment :
             consentManaged: Boolean,
             optOutFailed: Boolean,
             selfTestFailed: Boolean,
+            isCosmetic: Boolean?,
         ) {
-            viewModel.onAutoconsentResultReceived(consentManaged, optOutFailed, selfTestFailed)
+            viewModel.onAutoconsentResultReceived(consentManaged, optOutFailed, selfTestFailed, isCosmetic)
         }
     }
 

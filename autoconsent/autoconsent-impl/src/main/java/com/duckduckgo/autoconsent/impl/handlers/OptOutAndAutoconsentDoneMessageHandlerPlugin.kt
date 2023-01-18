@@ -58,7 +58,7 @@ class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor(
             val message: OptOutResultMessage = parseOptOutMessage(jsonString) ?: return
 
             if (!message.result) {
-                autoconsentCallback.onResultReceived(consentManaged = true, optOutFailed = true, selfTestFailed = false)
+                autoconsentCallback.onResultReceived(consentManaged = true, optOutFailed = true, selfTestFailed = false, isCosmetic = null)
             } else if (message.scheduleSelfTest) {
                 selfTest = true
             }
@@ -73,7 +73,7 @@ class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor(
             message.url.toUri().host ?: return
 
             autoconsentCallback.onPopUpHandled(message.isCosmetic)
-            autoconsentCallback.onResultReceived(consentManaged = true, optOutFailed = false, selfTestFailed = false)
+            autoconsentCallback.onResultReceived(consentManaged = true, optOutFailed = false, selfTestFailed = false, isCosmetic = message.isCosmetic)
 
             if (selfTest) {
                 appCoroutineScope.launch(dispatcherProvider.main()) {

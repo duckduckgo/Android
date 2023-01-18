@@ -53,6 +53,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     private val requestDataViewStateMapper: RequestDataViewStateMapper,
     private val protectionStatusViewStateMapper: ProtectionStatusViewStateMapper,
     private val privacyDashboardPayloadAdapter: PrivacyDashboardPayloadAdapter,
+    private val autoconsentStatusViewStateMapper: AutoconsentStatusViewStateMapper,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -68,7 +69,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         val userChangedValues: Boolean = false,
         val requestData: RequestDataViewState,
         val protectionStatus: ProtectionStatusViewState,
-        val cookiePromptManagementStatus: CookiePromptManagementStatus,
+        val cookiePromptManagementStatus: CookiePromptManagementState,
     )
 
     data class ProtectionStatusViewState(
@@ -149,10 +150,11 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         val prevalence: Double,
     )
 
-    data class CookiePromptManagementStatus(
+    data class CookiePromptManagementState(
         val consentManaged: Boolean = false,
         val optoutFailed: Boolean? = false,
-        val configurable: Boolean? = false
+        val configurable: Boolean? = true,
+        val cosmetic: Boolean? = false,
     )
 
     val viewState = MutableStateFlow<ViewState?>(null)
@@ -191,10 +193,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                     siteViewState = siteViewStateMapper.mapFromSite(site),
                     requestData = requestDataViewStateMapper.mapFromSite(site),
                     protectionStatus = protectionStatusViewStateMapper.mapFromSite(site),
-                    cookiePromptManagementStatus = CookiePromptManagementStatus(
-                        consentManaged = true,
-                        configurable = true
-                    )
+                    cookiePromptManagementStatus = autoconsentStatusViewStateMapper.mapFromSite(site),
                 ),
             )
         }

@@ -75,7 +75,7 @@ interface AutoconsentCallback {
     /**
      * This method is called whenever autoconsent has a result to be sent
      */
-    fun onResultReceived(consentManaged: Boolean, optOutFailed: Boolean, selfTestFailed: Boolean)
+    fun onResultReceived(consentManaged: Boolean, optOutFailed: Boolean, selfTestFailed: Boolean, isCosmetic: Boolean?)
 }
 
 /** List of [AutoconsentFeatureName] that belong to the Autoconsent feature */
