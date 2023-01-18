@@ -66,10 +66,7 @@
       "name": "affinity.serif.com",
       "detectCmp": [
         {
-          "exists": ".c-cookie-banner"
-        },
-        {
-          "exists": ".c-cookie-banner button"
+          "exists": ".c-cookie-banner button[data-qa='allow-all-cookies']"
         }
       ],
       "detectPopup": [
@@ -172,7 +169,7 @@
     },
     {
       "name": "ausopen.com",
-      "isHidingRule": true,
+      "cosmetic": true,
       "detectCmp": [
         {
           "exists": ".gdpr-popup__message"
@@ -192,9 +189,7 @@
       ],
       "optIn": [
         {
-          "click": [
-            ".gdpr-popup__message button"
-          ]
+          "click": ".gdpr-popup__message button"
         }
       ]
     },
@@ -280,6 +275,7 @@
       "prehideSelectors": [
         ".cookie-alert.t-dark"
       ],
+      "cosmetic": true,
       "detectCmp": [
         {
           "exists": ".cookie-alert.t-dark"
@@ -422,6 +418,7 @@
     },
     {
       "name": "cc_banner",
+      "cosmetic": true,
       "prehideSelectors": [
         ".cc_banner-wrapper"
       ],
@@ -573,6 +570,7 @@
       "prehideSelectors": [
         ".cc-type-info[aria-describedby=\"cookieconsent:desc\"]"
       ],
+      "cosmetic": true,
       "detectCmp": [
         {
           "exists": ".cc-type-info[aria-describedby=\"cookieconsent:desc\"]"
@@ -696,6 +694,7 @@
       "prehideSelectors": [
         "#cookie-notice"
       ],
+      "cosmetic": true,
       "detectCmp": [
         {
           "visible": "#cookie-notice .cookie-notice-container"
@@ -708,9 +707,7 @@
       ],
       "optIn": [
         {
-          "click": [
-            "#cn-accept-cookie"
-          ]
+          "click": "#cn-accept-cookie"
         }
       ],
       "optOut": [
@@ -718,6 +715,54 @@
           "hide": [
             "#cookie-notice"
           ]
+        }
+      ]
+    },
+    {
+      "name": "cookiealert",
+      "intermediate": false,
+      "prehideSelectors": [],
+      "runContext": {
+        "frame": true,
+        "main": true
+      },
+      "detectCmp": [
+        {
+          "exists": ".cookie-alert-extended"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": ".cookie-alert-extended-modal"
+        }
+      ],
+      "optIn": [
+        {
+          "click": "button[data-controller='cookie-alert/extended/button/accept']"
+        },
+        {
+          "eval": "document.querySelector('body').removeAttribute('style') || true"
+        }
+      ],
+      "optOut": [
+        {
+          "click": "a[data-controller='cookie-alert/extended/detail-link']"
+        },
+        {
+          "click": ".cookie-alert-configuration-input:checked",
+          "all": true,
+          "optional": true
+        },
+        {
+          "click": "button[data-controller='cookie-alert/extended/button/configuration']"
+        },
+        {
+          "eval": "document.querySelector('body').removeAttribute('style') || true"
+        }
+      ],
+      "test": [
+        {
+          "eval": "window.CookieConsent.declined === true"
         }
       ]
     },
@@ -912,6 +957,7 @@
       "prehideSelectors": [
         ".sp-dsgvo"
       ],
+      "cosmetic": true,
       "detectCmp": [
         {
           "exists": ".sp-dsgvo.sp-dsgvo-popup-overlay"
@@ -1025,7 +1071,7 @@
       ],
       "detectPopup": [
         {
-          "visible": ".eu-cookie-compliance-banner-info"
+          "exists": ".eu-cookie-compliance-popup-open"
         }
       ],
       "optIn": [
@@ -1056,6 +1102,7 @@
       "prehideSelectors": [
         ".pea_cook_wrapper,.pea_cook_more_info_popover"
       ],
+      "cosmetic": true,
       "detectCmp": [
         {
           "exists": ".pea_cook_wrapper"
@@ -1113,6 +1160,9 @@
         }
       ],
       "optOut": [
+        {
+          "wait": 500
+        },
         {
           "click": "#ez-manage-settings"
         },
@@ -1202,6 +1252,31 @@
       "optIn": [
         {
           "click": ".fc-cta-consent"
+        }
+      ]
+    },
+    {
+      "name": "generic-cosmetic",
+      "cosmetic": true,
+      "prehideSelectors": [
+        "#js-cookie-banner,.js-cookie-banner,.cookie-banner,#cookie-banner"
+      ],
+      "detectCmp": [
+        {
+          "exists": "#js-cookie-banner,.js-cookie-banner,.cookie-banner,#cookie-banner"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "#js-cookie-banner,.js-cookie-banner,.cookie-banner,#cookie-banner"
+        }
+      ],
+      "optIn": [],
+      "optOut": [
+        {
+          "hide": [
+            "#js-cookie-banner,.js-cookie-banner,.cookie-banner,#cookie-banner"
+          ]
         }
       ]
     },
@@ -1365,6 +1440,35 @@
       ]
     },
     {
+      "name": "indeed.com",
+      "cosmetic": true,
+      "prehideSelectors": [
+        "#CookiePrivacyNotice"
+      ],
+      "detectCmp": [
+        {
+          "exists": "#CookiePrivacyNotice"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "#CookiePrivacyNotice"
+        }
+      ],
+      "optIn": [
+        {
+          "click": "#CookiePrivacyNotice button[data-gnav-element-name=CookiePrivacyNoticeOk]"
+        }
+      ],
+      "optOut": [
+        {
+          "hide": [
+            "#CookiePrivacyNotice"
+          ]
+        }
+      ]
+    },
+    {
       "name": "ionos.de",
       "prehideSelectors": [
         ".privacy-consent--backdrop",
@@ -1474,6 +1578,7 @@
       "prehideSelectors": [
         ".cookie-bar"
       ],
+      "cosmetic": true,
       "detectCmp": [
         {
           "exists": ".cookie-bar .cookie-bar__message,.cookie-bar .cookie-bar__buttons"
@@ -1553,7 +1658,7 @@
     },
     {
       "name": "marksandspencer.com",
-      "isHidingRule": true,
+      "cosmetic": true,
       "detectCmp": [
         {
           "exists": ".navigation-cookiebbanner"
@@ -1573,9 +1678,7 @@
       ],
       "optIn": [
         {
-          "click": [
-            ".navigation-cookiebbanner__submit"
-          ]
+          "click": ".navigation-cookiebbanner__submit"
         }
       ]
     },
@@ -1813,32 +1916,6 @@
       ]
     },
     {
-      "name": "motor-talk.de",
-      "prehideSelectors": [
-        ".mt-cc-bnnr__wrapper"
-      ],
-      "detectCmp": [
-        {
-          "exists": ".mt-cc-bnnr"
-        }
-      ],
-      "detectPopup": [
-        {
-          "visible": ".mt-cc-bnnr__wrapper"
-        }
-      ],
-      "optIn": [
-        {
-          "click": ".mt-cc-bnnr__button-main"
-        }
-      ],
-      "optOut": [
-        {
-          "click": ".mt-cc-bnnr__decline-link"
-        }
-      ]
-    },
-    {
       "name": "national-lottery.co.uk",
       "detectCmp": [
         {
@@ -1928,6 +2005,7 @@
       "prehideSelectors": [
         ".button--notice"
       ],
+      "cosmetic": true,
       "detectCmp": [
         {
           "exists": ".notice--cookie"
@@ -1982,6 +2060,7 @@
       "prehideSelectors": [
         ".osano-cm-window"
       ],
+      "cosmetic": true,
       "detectCmp": [
         {
           "exists": ".osano-cm-window"
@@ -2066,6 +2145,38 @@
         },
         {
           "eval": "document.cookie.includes('cookie_prefs') === true"
+        }
+      ]
+    },
+    {
+      "name": "pornhub.com",
+      "runContext": {
+        "urlPattern": "^https://(www\\.)?pornhub\\.com/"
+      },
+      "cosmetic": true,
+      "prehideSelectors": [
+        ".cookiesBanner"
+      ],
+      "detectCmp": [
+        {
+          "exists": ".cookiesBanner"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": ".cookiesBanner"
+        }
+      ],
+      "optIn": [
+        {
+          "click": ".cookiesBanner .okButton"
+        }
+      ],
+      "optOut": [
+        {
+          "hide": [
+            ".cookiesBanner"
+          ]
         }
       ]
     },
@@ -2704,6 +2815,7 @@
       "prehideSelectors": [
         "#catapult-cookie-bar"
       ],
+      "cosmetic": true,
       "detectCmp": [
         {
           "exists": "#catapult-cookie-bar"
@@ -2977,6 +3089,35 @@
       "test": [
         {
           "eval": "document.cookie.includes('userConsent=%7B%22marketing%22%3Afalse')"
+        }
+      ]
+    },
+    {
+      "name": "xnxx-com",
+      "cosmetic": true,
+      "prehideSelectors": [
+        "#cookies-use-alert"
+      ],
+      "detectCmp": [
+        {
+          "exists": "#cookies-use-alert"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "#cookies-use-alert"
+        }
+      ],
+      "optIn": [
+        {
+          "click": "#cookies-use-alert .close"
+        }
+      ],
+      "optOut": [
+        {
+          "hide": [
+            "#cookies-use-alert"
+          ]
         }
       ]
     },
