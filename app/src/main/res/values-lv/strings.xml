@@ -656,6 +656,7 @@
     <string name="autoconsentSecondaryCta">Nē, paldies</string>
 
     <string name="autoconsentSetting">Pārvaldīt sīkfailu uznirstošos logus</string>
+    <string name="autoconsentCosmeticNoticeAnimationText">Uznirstošais logs paslēpts</string>
     <string name="autoconsentManagedNoticeAnimationText">Pārvaldītie sīkfaili</string>
 
     <!-- Site Permissions Settings -->
