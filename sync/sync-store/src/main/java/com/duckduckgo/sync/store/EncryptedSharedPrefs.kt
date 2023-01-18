@@ -25,14 +25,14 @@ interface SharedPrefsProvider {
     fun getSharedPrefs(fileName: String): SharedPreferences?
 }
 
-class EncryptedSharedPrefsProvided(
+class EncryptedSharedPrefsProvider(
     private val context: Context,
 ) : SharedPrefsProvider {
     override fun getSharedPrefs(fileName: String): SharedPreferences? {
         return try {
             EncryptedSharedPreferences.create(
                 context,
-                    fileName,
+                fileName,
                 MasterKey.Builder(context).setKeyScheme(MasterKey.KeyScheme.AES256_GCM).build(),
                 EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
                 EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
