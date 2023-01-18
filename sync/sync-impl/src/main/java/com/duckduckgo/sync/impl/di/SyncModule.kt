@@ -18,8 +18,10 @@ package com.duckduckgo.sync.impl.di
 
 import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.store.SyncEncryptedSharedPrefsStore
-import com.duckduckgo.sync.store.SyncEncryptedStore
+import com.duckduckgo.sync.store.EncryptedSharedPrefsProvided
+import com.duckduckgo.sync.store.SharedPrefsProvider
+import com.duckduckgo.sync.store.SyncSharedPrefsStore
+import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -31,7 +33,13 @@ object SyncStoreModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun providesEncryptedStore(context: Context): SyncEncryptedStore {
-        return SyncEncryptedSharedPrefsStore(context)
+    fun providesSyncStore(sharedPrefsProvider: SharedPrefsProvider): SyncStore {
+        return SyncSharedPrefsStore(sharedPrefsProvider)
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun provideSharedPrefsProvider(context: Context): SharedPrefsProvider {
+        return EncryptedSharedPrefsProvided(context)
     }
 }
