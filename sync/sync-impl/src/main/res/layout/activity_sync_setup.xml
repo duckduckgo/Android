@@ -14,50 +14,64 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:scrollbarAlwaysDrawVerticalTrack="true"
+    android:fadeScrollbars="false"
+    android:scrollbars="vertical">
 
-    <include
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <include
             android:id="@+id/includeToolbar"
             layout="@layout/include_default_toolbar" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+        <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
             android:id="@+id/userIdSectionHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:primaryText="User ID" />
+            app:primaryText="@string/userIdSectionHeader" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/userIdTextView"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginEnd="@dimen/keyline_4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:typography="body1"/>
+            app:typography="body1" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+        <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
             android:id="@+id/deviceIdSectionHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:primaryText="Device Id" />
+            app:primaryText="@string/deviceIdSectionHeader" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/deviceIdTextView"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginEnd="@dimen/keyline_4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:typography="body1"/>
+            app:typography="body1" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+        <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
             android:id="@+id/deviceNameSectionHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:primaryText="Device Name" />
+            app:primaryText="@string/deviceNameSectionHeader" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/deviceNameTextView"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginEnd="@dimen/keyline_4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:typography="body1"/>
+            app:typography="body1" />
 
-</LinearLayout>
+    </LinearLayout>
+</ScrollView>

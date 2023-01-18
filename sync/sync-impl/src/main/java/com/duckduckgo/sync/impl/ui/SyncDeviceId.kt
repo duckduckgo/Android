@@ -23,7 +23,7 @@ class AppSyncDeviceIds @Inject constructor(
 ) : SyncDeviceIds {
     override fun userId(): String = UUID.randomUUID().toString()
 
-    override fun deviceName(): String = Build.MODEL
+    override fun deviceName(): String = "${Build.BRAND} ${Build.MODEL}"
 
     @SuppressLint("HardwareIds")
     override fun deviceId(): String {
