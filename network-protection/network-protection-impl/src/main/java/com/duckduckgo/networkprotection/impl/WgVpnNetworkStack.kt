@@ -66,7 +66,7 @@ class WgVpnNetworkStack @Inject constructor(
 
             Result.success(
                 VpnTunnelConfig(
-                    mtu = 1420,
+                    mtu = 1280,
                     addresses = wgTunnelData?.tunnelAddress ?: emptyMap(),
                     dns = emptySet(),
                     routes = emptyMap(),
