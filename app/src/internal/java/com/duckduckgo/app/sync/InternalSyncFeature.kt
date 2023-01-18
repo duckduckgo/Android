@@ -2,6 +2,7 @@ package com.duckduckgo.app.sync
 
 import android.content.Context
 import android.content.Intent
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.settings.extension.InternalFeaturePlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupActivity
@@ -11,11 +12,11 @@ import javax.inject.Inject
 @ContributesMultibinding(AppScope::class)
 class InternalSyncFeature @Inject constructor(private val context: Context) : InternalFeaturePlugin {
     override fun internalFeatureTitle(): String {
-        return "Sync"
+        return context.getString(R.string.syncSettingsTitle)
     }
 
     override fun internalFeatureSubtitle(): String {
-        return "Sync setup internal test"
+        return context.getString(R.string.syncSettingsSubtitle)
     }
 
     override fun onInternalFeatureClicked(activityContext: Context) {
