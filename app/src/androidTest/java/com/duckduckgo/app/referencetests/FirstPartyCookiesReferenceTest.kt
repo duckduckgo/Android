@@ -22,6 +22,7 @@ import android.os.Build
 import androidx.core.net.toUri
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.FileUtilities
+import com.duckduckgo.app.fire.FireproofRepository
 import com.duckduckgo.app.fire.WebViewDatabaseLocator
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.exception.RootExceptionFinder
@@ -76,6 +77,7 @@ class FirstPartyCookiesReferenceTest(private val testCase: TestCase) {
     private val cookiesRepository = mock<CookiesRepository>()
     private val unprotectedTemporary = mock<UnprotectedTemporary>()
     private val userAllowListRepository = mock<UserAllowListRepository>()
+    private val fireproofRepository = mock<FireproofRepository>()
     private val webViewDatabaseLocator = WebViewDatabaseLocator(context)
     private lateinit var cookieModifier: FirstPartyCookiesModifier
 
@@ -107,6 +109,7 @@ class FirstPartyCookiesReferenceTest(private val testCase: TestCase) {
             userAllowListRepository,
             webViewDatabaseLocator,
             ExceptionPixel(mockPixel, RootExceptionFinder()),
+            fireproofRepository,
             DefaultDispatcherProvider(),
         )
         val host = testCase.siteURL.toUri().host
@@ -221,6 +224,7 @@ class FirstPartyCookiesReferenceTest(private val testCase: TestCase) {
         whenever(cookiesRepository.exceptions).thenReturn(CopyOnWriteArrayList(cookieExceptions))
         whenever(cookiesRepository.firstPartyCookiePolicy).thenReturn(policy)
         whenever(unprotectedTemporary.unprotectedTemporaryExceptions).thenReturn(unprotectedTemporaryExceptions)
+        whenever(fireproofRepository.fireproofWebsites()).thenReturn(emptyList())
     }
 
     data class TestCase(

@@ -48,7 +48,15 @@ class CloakedCnameDetectorImplTest {
     fun whenDetectCnameAndCnameDetectedThenReturnUncloakedHost() {
         whenever(mockUri.host).thenReturn("host.com")
         whenever(mockCnameEntityDao.get(any())).thenReturn(TdsCnameEntity("host.com", "uncloaked-host.com"))
-        assertEquals("uncloaked-host.com", testee.detectCnameCloakedHost(mockUri))
+        assertEquals("http://uncloaked-host.com", testee.detectCnameCloakedHost(mockUri))
+    }
+
+    @Test
+    fun whenDetectCnameAndCnameDetectedAndHasSchemeThenReturnUncloakedHostWithScheme() {
+        whenever(mockUri.host).thenReturn("host.com")
+        whenever(mockUri.scheme).thenReturn("https")
+        whenever(mockCnameEntityDao.get(any())).thenReturn(TdsCnameEntity("host.com", "uncloaked-host.com"))
+        assertEquals("https://uncloaked-host.com", testee.detectCnameCloakedHost(mockUri))
     }
 
     @Test
@@ -63,6 +71,15 @@ class CloakedCnameDetectorImplTest {
         whenever(mockUri.host).thenReturn("host.com")
         whenever(mockUri.path).thenReturn("/path")
         whenever(mockCnameEntityDao.get(any())).thenReturn(TdsCnameEntity("host.com", "uncloaked-host.com"))
-        assertEquals("uncloaked-host.com/path", testee.detectCnameCloakedHost(mockUri))
+        assertEquals("http://uncloaked-host.com/path", testee.detectCnameCloakedHost(mockUri))
+    }
+
+    @Test
+    fun whenDetectCnameAndCnameDetectedAndHasSchemeAndPathThenReturnUncloakedHostWithSchemeAndPathAppended() {
+        whenever(mockUri.host).thenReturn("host.com")
+        whenever(mockUri.path).thenReturn("/path")
+        whenever(mockUri.scheme).thenReturn("https")
+        whenever(mockCnameEntityDao.get(any())).thenReturn(TdsCnameEntity("host.com", "uncloaked-host.com"))
+        assertEquals("https://uncloaked-host.com/path", testee.detectCnameCloakedHost(mockUri))
     }
 }

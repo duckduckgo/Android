@@ -17,6 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.network
 
 import android.os.ParcelFileDescriptor
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 
 class FakeVpnNetworkStack(override val name: String) : VpnNetworkStack {
     override fun onCreateVpn(): Result<Unit> {
@@ -31,7 +32,7 @@ class FakeVpnNetworkStack(override val name: String) : VpnNetworkStack {
         return Result.success(Unit)
     }
 
-    override fun onStopVpn(): Result<Unit> {
+    override fun onStopVpn(reason: VpnStopReason): Result<Unit> {
         return Result.success(Unit)
     }
 

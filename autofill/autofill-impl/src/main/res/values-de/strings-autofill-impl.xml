@@ -67,4 +67,9 @@
     <string name="credentialManagementNoLoginsSavedTitle">Noch keine Anmeldedaten gespeichert</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Anmeldedaten werden nur auf diesem Gerät sicher gespeichert.</string>
 
+    <string name="autofillManagementAddLogin">Anmeldedaten hinzufügen</string>
+    <string name="autofillManagementSearchLogins">Suche</string>
+    <string name="autofillManagementSearchClearDescription">Sucheingabe löschen</string>
+    <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Keine Ergebnisse für „%1$s“</string>
+
 </resources>

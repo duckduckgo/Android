@@ -187,6 +187,8 @@ dependencies {
     implementation project(':privacy-config-api')
     implementation project(':privacy-config-impl')
     implementation project(':privacy-config-store')
+    internalImplementation project(':privacy-config-internal')
+
     implementation project(':anrs-api')
     implementation project(':anrs-store')
     implementation project(':anrs-impl')
@@ -242,6 +244,10 @@ dependencies {
 
     implementation project(':element-hiding-impl')
     implementation project(':element-hiding-store')
+
+    implementation project(':request-filterer-api')
+    implementation project(':request-filterer-impl')
+    implementation project(':request-filterer-store')
 
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"

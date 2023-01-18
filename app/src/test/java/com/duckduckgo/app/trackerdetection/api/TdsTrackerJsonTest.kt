@@ -18,6 +18,7 @@ package com.duckduckgo.app.trackerdetection.api
 
 import com.duckduckgo.app.FileUtilities.loadText
 import com.duckduckgo.app.trackerdetection.model.Action.BLOCK
+import com.duckduckgo.app.trackerdetection.model.Action.UNSUPPORTED
 import com.duckduckgo.app.trackerdetection.model.TdsTracker
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -47,12 +48,12 @@ class TdsTrackerJsonTest {
     }
 
     @Test
-    fun whenTrackerHasInvalidDefaultActionThenTrackerNotCreated() {
+    fun whenTrackerHasInvalidDefaultActionThenTrackerConvertedCorrectly() {
         val json = loadText(javaClass.classLoader!!, "json/tds_trackers_action_invalid.json")
         val jsonTrackers = jsonAdapter.fromJson(json)!!
         val trackers = jsonTrackers.jsonToTrackers()
-        assertEquals(2, trackers.count())
-        assertFalse(trackers.containsKey("1dmp.io"))
+        val tracker = trackers["1dmp.io"]
+        assertEquals(TdsTracker("1dmp.io", UNSUPPORTED, "CleverDATA LLC", listOf("Advertising"), arrayListOf()), tracker)
     }
 
     @Test

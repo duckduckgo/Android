@@ -17,6 +17,7 @@
 package com.duckduckgo.app.trackerdetection
 
 import android.net.Uri
+import com.duckduckgo.app.global.UrlScheme
 import com.duckduckgo.app.trackerdetection.db.TdsCnameEntityDao
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -41,6 +42,11 @@ class CloakedCnameDetectorImpl @Inject constructor(
                 Timber.v("$host is a CNAME cloaked host. Uncloaked host name: $uncloakedHostName")
                 url.path?.let { path ->
                     uncloakedHostName += path
+                }
+                uncloakedHostName = if (url.scheme != null) {
+                    "${url.scheme}://$uncloakedHostName"
+                } else {
+                    "${UrlScheme.http}://$uncloakedHostName"
                 }
                 return uncloakedHostName
             }

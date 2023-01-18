@@ -17,7 +17,6 @@
 package com.duckduckgo.mobile.android.vpn.processor.requestingapp
 
 import android.content.pm.PackageManager
-import com.duckduckgo.mobile.android.vpn.apps.VpnExclusionList
 import logcat.LogPriority
 import logcat.asLog
 import logcat.logcat
@@ -33,10 +32,6 @@ interface AppNameResolver {
         val appName: String,
     ) {
         override fun toString(): String = "package=$packageId ($appName)"
-
-        fun isDdg(): Boolean {
-            return VpnExclusionList.isDdgApp(packageId)
-        }
 
         fun isUnknown(): Boolean {
             return UNKNOWN.equals(appName, ignoreCase = true)

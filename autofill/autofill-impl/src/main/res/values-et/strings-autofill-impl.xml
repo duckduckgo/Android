@@ -67,4 +67,9 @@
     <string name="credentialManagementNoLoginsSavedTitle">Sisselogimisandmeid pole veel salvestatud</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Sisselogimisandmed salvestatakse turvaliselt ainult selles seadmes.</string>
 
+    <string name="autofillManagementAddLogin">Lisa sisselogimisandmed</string>
+    <string name="autofillManagementSearchLogins">Otsing</string>
+    <string name="autofillManagementSearchClearDescription">Tühjenda otsingusisend</string>
+    <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Päringule „%1$s” ei leitud tulemusi</string>
+
 </resources>

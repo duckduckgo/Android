@@ -90,6 +90,7 @@ import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.privacy.config.api.UserAgent
+import com.duckduckgo.request.filterer.api.RequestFilterer
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
@@ -277,6 +278,7 @@ class BrowserModule {
         userAgentProvider: UserAgentProvider,
         adClickManager: AdClickManager,
         cloakedCnameDetector: CloakedCnameDetector,
+        requestFilterer: RequestFilterer,
     ): RequestInterceptor =
         WebViewRequestInterceptor(
             resourceSurrogates,
@@ -287,6 +289,7 @@ class BrowserModule {
             userAgentProvider,
             adClickManager,
             cloakedCnameDetector,
+            requestFilterer,
         )
 
     @Provides

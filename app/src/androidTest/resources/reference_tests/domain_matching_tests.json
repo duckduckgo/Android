@@ -134,8 +134,7 @@
                 "requestType": "script",
                 "expectAction": "ignore",
                 "exceptPlatforms": [
-                    "ios-browser",
-                    "android-browser"
+                    "ios-browser"
                 ]
             },
             {
@@ -240,6 +239,20 @@
                     "ios-browser",
                     "web-extension-mv3"
                 ]
+            },
+            {
+                "name": "unknown rule action ignored, default block",
+                "siteURL": "https://random.test/",
+                "requestURL": "https://tracker.test/unsupported-action",
+                "requestType": "script",
+                "expectAction": "block"
+            },
+            {
+                "name": "unknown rule action ignored, default ignore",
+                "siteURL": "https://random.test/",
+                "requestURL": "https://ignore.test/unsupported-action",
+                "requestType": "script",
+                "expectAction": "ignore"
             }
         ]
     },

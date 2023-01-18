@@ -67,4 +67,9 @@
     <string name="credentialManagementNoLoginsSavedTitle">Zatiaľ nie sú uložené žiadne prihlásenia</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Prihlásenia sú zabezpečene uložené iba v tomto zariadení.</string>
 
+    <string name="autofillManagementAddLogin">Pridať prihlásenie</string>
+    <string name="autofillManagementSearchLogins">Vyhľadávať</string>
+    <string name="autofillManagementSearchClearDescription">Vymazať hľadaný výraz</string>
+    <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Žiadne výsledky pre „%1$s”</string>
+
 </resources>

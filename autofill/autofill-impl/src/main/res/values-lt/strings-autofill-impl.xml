@@ -67,4 +67,9 @@
     <string name="credentialManagementNoLoginsSavedTitle">Dar nėra išsaugotų prisijungimų</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Prisijungimai saugiai saugomi tik šiame įrenginyje.</string>
 
+    <string name="autofillManagementAddLogin">Pridėti prisijungimą</string>
+    <string name="autofillManagementSearchLogins">Paieška</string>
+    <string name="autofillManagementSearchClearDescription">Išvalyti paieškos įvestį</string>
+    <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Rezultatų pagal paiešką „%1$s“ nerasta</string>
+
 </resources>

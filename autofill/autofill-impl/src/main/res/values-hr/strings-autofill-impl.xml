@@ -67,4 +67,9 @@
     <string name="credentialManagementNoLoginsSavedTitle">Još nema spremljenih prijava</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Prijave su sigurno spremljene samo na ovom uređaju.</string>
 
+    <string name="autofillManagementAddLogin">Dodaj prijavu</string>
+    <string name="autofillManagementSearchLogins">Pretraga</string>
+    <string name="autofillManagementSearchClearDescription">Obriši unos pretraživanja</string>
+    <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Nema rezultata za \"%1$s\"</string>
+
 </resources>
