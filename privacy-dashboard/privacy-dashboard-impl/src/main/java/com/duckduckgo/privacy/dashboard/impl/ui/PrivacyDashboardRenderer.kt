@@ -51,7 +51,7 @@ class PrivacyDashboardRenderer(
             ),
             PrivacyDashboardJavascriptInterface.JAVASCRIPT_INTERFACE_NAME,
         )
-        webView.loadUrl("file:///android_asset/html/android2.html")
+        webView.loadUrl("file:///android_asset/html/android.html")
     }
 
     fun render(viewState: ViewState) {
