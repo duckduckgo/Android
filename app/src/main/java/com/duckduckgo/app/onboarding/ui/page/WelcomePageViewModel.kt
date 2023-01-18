@@ -24,6 +24,7 @@ import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
@@ -33,6 +34,7 @@ class WelcomePageViewModel(
     private val context: Context,
     private val pixel: Pixel,
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
+    private val appBuildConfig: AppBuildConfig,
 ) : ViewModel() {
 
     fun reduce(event: WelcomePageView.Event): Flow<WelcomePageView.State> {
@@ -64,7 +66,10 @@ class WelcomePageViewModel(
 
         pixel.fire(
             AppPixelName.DEFAULT_BROWSER_SET,
-            mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()),
+            mapOf(
+                Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString(),
+                Pixel.PixelParameter.DEFAULT_BROWSER_SET_ON_ANDROID_13_OR_ABOVE to appBuildConfig.isAndroid13OrAbove().toString(),
+            ),
         )
 
         emit(WelcomePageView.State.Finish)
@@ -77,11 +82,16 @@ class WelcomePageViewModel(
 
         pixel.fire(
             AppPixelName.DEFAULT_BROWSER_NOT_SET,
-            mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()),
+            mapOf(
+                Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString(),
+                Pixel.PixelParameter.DEFAULT_BROWSER_SET_ON_ANDROID_13_OR_ABOVE to appBuildConfig.isAndroid13OrAbove().toString(),
+            ),
         )
 
         emit(WelcomePageView.State.Finish)
     }
+
+    private fun AppBuildConfig.isAndroid13OrAbove(): Boolean = sdkInt >= android.os.Build.VERSION_CODES.TIRAMISU
 }
 
 @Suppress("UNCHECKED_CAST")
@@ -90,6 +100,7 @@ class WelcomePageViewModelFactory(
     private val context: Context,
     private val pixel: Pixel,
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
+    private val appBuildConfig: AppBuildConfig,
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -100,6 +111,7 @@ class WelcomePageViewModelFactory(
                     context,
                     pixel,
                     defaultRoleBrowserDialog,
+                    appBuildConfig,
                 )
                 else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
             }
