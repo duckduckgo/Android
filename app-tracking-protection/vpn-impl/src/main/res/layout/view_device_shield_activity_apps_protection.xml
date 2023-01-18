@@ -21,22 +21,15 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/apps_protection_state_insetPadding"
-        app:defaultPadding="false" />
-
     <com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.AppsProtectionStateView
         android:id="@+id/protectedAppsState"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+    <com.google.android.material.divider.MaterialDivider
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/apps_protection_state_insetPadding"
-        app:defaultPadding="false" />
+        android:layout_height="@dimen/horizontalDividerHeight"
+        app:dividerInsetStart="@dimen/apps_protection_state_insetPadding"/>
 
     <com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.AppsProtectionStateView
         android:id="@+id/unProtectedAppsState"

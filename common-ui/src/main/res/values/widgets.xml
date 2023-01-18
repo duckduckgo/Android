@@ -436,13 +436,18 @@
     <style name="Widget.DuckDuckGo.HorizontalDivider">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">@dimen/horizontalDividerHeight</item>
-        <item name="android:background">?attr/sectionDividerColor</item>
+        <item name="android:background">?attr/daxColorLines</item>
     </style>
 
     <style name="Widget.DuckDuckGo.VerticalDivider">
         <item name="android:layout_width">@dimen/verticalDividerWidth</item>
         <item name="android:layout_height">match_parent</item>
-        <item name="android:background">?attr/sectionDividerColor</item>
+        <item name="android:background">?attr/daxColorLines</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.ListDivider" parent="Widget.MaterialComponents.MaterialDivider">
+        <item name="dividerColor">?attr/daxColorLines</item>
+        <item name="dividerThickness">@dimen/horizontalDividerHeight</item>
     </style>
 
     <!-- Cards -->
@@ -450,4 +455,5 @@
         <item name="cardBackgroundColor">?attr/daxColorSurface</item>
         <item name="shapeAppearance">@style/ShapeAppearance.DuckDuckGo.MediumComponent</item>
     </style>
+
 </resources>

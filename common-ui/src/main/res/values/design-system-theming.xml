@@ -81,6 +81,7 @@
         <item name="materialButtonOutlinedStyle">@style/Widget.DuckDuckGo.DaxButton.Secondary</item>
         <item name="borderlessButtonStyle">@style/Widget.DuckDuckGo.DaxButton.Ghost</item>
         <item name="materialCardViewStyle">@style/Widget.DuckDuckGo.CardView</item>
+        <item name="materialDividerStyle">@style/Widget.DuckDuckGo.ListDivider</item>
 
         <!-- Design System Components -->
         <item name="daxButtonPrimary">@style/Widget.DuckDuckGo.DaxButton.TextButton.Primary</item>
@@ -223,7 +224,6 @@
         <item name="dialogPrimaryButtonColor">@color/cornflowerBlue</item>
         <item name="dialogSecondaryButtonColor">?attr/dialogBgColor</item>
 
-        <item name="sectionDividerColor">@color/gray80</item>
         <item name="bottomShadowBackground">@null</item>
         <item name="appTPHeaderBackground">@color/darkThemePrimaryDark</item>
 
@@ -363,7 +363,6 @@
         <item name="dialogPrimaryButtonColor">@color/cornflowerBlue</item>
         <item name="dialogSecondaryButtonColor">?attr/dialogBgColor</item>
 
-        <item name="sectionDividerColor">@color/gray30</item>
         <item name="bottomShadowBackground">@drawable/divider_shadow_background</item>
 
         <item name="tooltipPanelBackgroundColor">@color/tooltipPanelBackgroundColorLight</item>
@@ -389,7 +388,7 @@
         <item name="daxColorDestructive">@color/alertRedOnLightDefault</item>
         <item name="daxColorContainerDisabled">@color/black6</item>
         <item name="daxColorTextDisabled">@color/black36</item>
-        <item name="daxColorLines">@color/black18</item>
+        <item name="daxColorLines">@color/black9</item>
         <item name="daxColorAccentBlue">@color/blue50</item>
         <item name="daxColorAccentYellow">@color/yellow50</item>
         <item name="daxColorRipple">@color/black6</item>

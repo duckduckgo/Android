@@ -38,7 +38,6 @@
     <attr name="settingsItemTextColor" format="color" />
     <attr name="settingsItemTextColorDisabled" format="color" />
     <attr name="settingsMinorTextColor" format="color" />
-    <attr name="sectionDividerColor" format="color" />
     <attr name="buttonOutlinedBorderColor" format="color" />
     <attr name="buttonOutlinedTextColor" format="color" />
     <attr name="callToActionTitleColor" format="color" />
