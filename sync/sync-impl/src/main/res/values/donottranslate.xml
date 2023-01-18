@@ -17,4 +17,7 @@
 <resources>
     <!-- Internal Setting -->
     <string name="sync_internal_activity_label">Sync Setup Internal</string>
+    <string name="userIdSectionHeader">User ID</string>
+    <string name="deviceIdSectionHeader">Device Id</string>
+    <string name="deviceNameSectionHeader">Device Name</string>
 </resources>
