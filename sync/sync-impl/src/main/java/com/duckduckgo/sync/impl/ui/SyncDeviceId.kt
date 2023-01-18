@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Build
 import android.provider.Settings
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ActivityScope
 import com.squareup.anvil.annotations.ContributesBinding
 import java.util.*
@@ -19,7 +18,6 @@ interface SyncDeviceIds {
 @ContributesBinding(ActivityScope::class)
 class AppSyncDeviceIds @Inject constructor(
     val context: Context,
-    val appBuildConfig: AppBuildConfig,
 ) : SyncDeviceIds {
     override fun userId(): String = UUID.randomUUID().toString()
 
