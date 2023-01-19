@@ -132,7 +132,6 @@
         <item name="preferDarkNavigationBarIcons">false</item>
 
         <!-- Legacy colors to remove-->
-        <item name="daxLogoTextColor">@color/white</item>
         <item name="normalTextColor">@color/white</item>
         <item name="secondaryTextColor">@color/gray50</item>
         <item name="primaryIconColor">@color/gray20</item>
@@ -271,9 +270,6 @@
         <item name="preferDarkNavigationBarIcons">true</item>
 
         <!-- Legacy colors to remove-->
-        <item name="colorPrimary">@color/lightThemePrimary</item>
-        <item name="colorPrimaryDark">@color/lightThemePrimaryDark</item>
-        <item name="daxLogoTextColor">@color/almostBlackDark</item>
         <item name="normalTextColor">@color/almostBlackDark</item>
         <item name="secondaryTextColor">@color/warmerGray</item>
         <item name="primaryIconColor">@color/gray95</item>
