@@ -44,11 +44,10 @@ class ApiDevPrivacyConfigInterceptor @Inject constructor(
 
         if (url.toString().contains(PRIVACY_REMOTE_CONFIG_URL) && canUrlBeChanged) {
             request.url(storedUrl!!)
-        } else {
-            request.url(PRIVACY_REMOTE_CONFIG_URL)
+            return chain.proceed(request.build())
         }
 
-        return chain.proceed(request.build())
+        return chain.proceed(chain.request())
     }
 
     override fun getInterceptor(): Interceptor {
