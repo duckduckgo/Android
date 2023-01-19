@@ -81,6 +81,7 @@
         <item name="materialButtonOutlinedStyle">@style/Widget.DuckDuckGo.DaxButton.Secondary</item>
         <item name="borderlessButtonStyle">@style/Widget.DuckDuckGo.DaxButton.Ghost</item>
         <item name="materialCardViewStyle">@style/Widget.DuckDuckGo.CardView</item>
+        <item name="materialDividerStyle">@style/Widget.DuckDuckGo.ListDivider</item>
 
         <!-- Design System Components -->
         <item name="daxButtonPrimary">@style/Widget.DuckDuckGo.DaxButton.TextButton.Primary</item>
@@ -223,7 +224,6 @@
         <item name="dialogPrimaryButtonColor">@color/cornflowerBlue</item>
         <item name="dialogSecondaryButtonColor">?attr/dialogBgColor</item>
 
-        <item name="sectionDividerColor">@color/gray80</item>
         <item name="bottomShadowBackground">@null</item>
         <item name="appTPHeaderBackground">@color/darkThemePrimaryDark</item>
 
@@ -239,6 +239,7 @@
         <item name="daxColorBackgroundInverted">@color/gray0</item>
         <item name="daxColorSurface">@color/gray90</item>
         <item name="daxColorContainer">@color/white12</item>
+        <item name="daxColorWindow">@color/gray85</item>
         <item name="daxColorPrimaryText">@color/white84</item>
         <item name="daxColorPrimaryInvertedText">@color/black84</item>
         <item name="daxColorSecondaryText">@color/white60</item>
@@ -252,7 +253,6 @@
         <item name="daxColorAccentBlue">@color/blue30</item>
         <item name="daxColorAccentYellow">@color/yellow50</item>
         <item name="daxColorRipple">@color/white12</item>
-        <item name="daxColorWindow">@color/gray85</item>
 
         <!-- Design System Component Colors Dark -->
         <!-- Buttons -->
@@ -363,7 +363,6 @@
         <item name="dialogPrimaryButtonColor">@color/cornflowerBlue</item>
         <item name="dialogSecondaryButtonColor">?attr/dialogBgColor</item>
 
-        <item name="sectionDividerColor">@color/gray30</item>
         <item name="bottomShadowBackground">@drawable/divider_shadow_background</item>
 
         <item name="tooltipPanelBackgroundColor">@color/tooltipPanelBackgroundColorLight</item>
@@ -379,6 +378,7 @@
         <item name="daxColorBackgroundInverted">@color/gray100</item>
         <item name="daxColorSurface">@color/white</item>
         <item name="daxColorContainer">@color/black6</item>
+        <item name="daxColorWindow">@color/white</item>
         <item name="daxColorPrimaryText">@color/black84</item>
         <item name="daxColorPrimaryInvertedText">@color/white84</item>
         <item name="daxColorSecondaryText">@color/black60</item>
@@ -388,11 +388,10 @@
         <item name="daxColorDestructive">@color/alertRedOnLightDefault</item>
         <item name="daxColorContainerDisabled">@color/black6</item>
         <item name="daxColorTextDisabled">@color/black36</item>
-        <item name="daxColorLines">@color/black18</item>
+        <item name="daxColorLines">@color/black9</item>
         <item name="daxColorAccentBlue">@color/blue50</item>
         <item name="daxColorAccentYellow">@color/yellow50</item>
         <item name="daxColorRipple">@color/black6</item>
-        <item name="daxColorWindow">@color/white</item>
 
         <!-- Design System Component Colors Light -->
         <!-- Buttons -->

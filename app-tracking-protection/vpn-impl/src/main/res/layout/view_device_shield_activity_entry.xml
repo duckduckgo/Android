@@ -21,7 +21,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/default_selectable_bg">
+    android:background="?attr/selectableItemBackground">
 
     <ImageView
         android:id="@+id/tracking_app_icon"
@@ -79,14 +79,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_chevron_forward_small_24" />
-
-    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
-        android:id="@+id/entry_splitter"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="72dp"
-        app:defaultPadding="false"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/activity_time_since" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

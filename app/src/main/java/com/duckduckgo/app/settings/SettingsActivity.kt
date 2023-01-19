@@ -163,7 +163,7 @@ class SettingsActivity : DuckDuckGoActivity() {
 
         with(viewsAppearance) {
             selectedThemeSetting.setClickListener { viewModel.userRequestedToChangeTheme() }
-            changeAppIconLabel.setClickListener { viewModel.userRequestedToChangeIcon() }
+            changeAppIconSetting.setOnClickListener { viewModel.userRequestedToChangeIcon() }
             selectedFireAnimationSetting.setClickListener { viewModel.userRequestedToChangeFireAnimation() }
             accessibilitySetting.setClickListener { viewModel.onAccessibilitySettingClicked() }
         }

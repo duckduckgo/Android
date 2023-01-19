@@ -41,16 +41,25 @@
         app:secondaryText="@string/settingsSystemTheme" />
 
     <LinearLayout
+        android:id="@+id/changeAppIconSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
         android:orientation="horizontal">
 
-        <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/changeAppIconLabel"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/oneLineItemHeight"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginEnd="@dimen/keyline_4"
+            android:gravity="center_vertical"
             android:layout_weight="1"
-            app:primaryText="@string/changeIconCtaLabel" />
+            android:textColor="@color/primary_text_color_selector"
+            android:text="@string/changeIconCtaLabel"
+            app:typography="body1" />
 
         <ImageView
             android:id="@+id/changeAppIcon"
