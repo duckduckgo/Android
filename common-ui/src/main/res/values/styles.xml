@@ -16,15 +16,6 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="TextInputLayoutTheme" parent="Widget.Design.TextInputLayout">
-        <item name="colorControlActivated">?colorAccent</item>
-        <item name="colorControlNormal">?colorAccent</item>
-        <item name="colorControlHighlight">?colorAccent</item>
-        <item name="android:textColor">?normalTextColor</item>
-        <item name="android:textColorSecondary">?normalTextColor</item>
-        <item name="android:textColorHint">?normalTextColor</item>
-    </style>
-
     <style name="AutoCompleteTextViewStyle" parent="Widget.AppCompat.AutoCompleteTextView">
         <item name="android:textCursorDrawable">@drawable/text_cursor</item>
         <item name="android:textColorHint">?attr/daxColorSecondaryText</item>
@@ -54,18 +45,18 @@
     </style>
 
     <style name="RadioButtonStyle" parent="Widget.MaterialComponents.CompoundButton.RadioButton">
-        <item name="android:textColor">?attr/normalTextColor</item>
+        <item name="android:textColor">?attr/daxColorPrimaryText</item>
         <item name="buttonTint">@color/radio_button_tint</item>
     </style>
 
     <style name="AlertDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
-        <item name="android:textColor">?attr/normalTextColor</item>
-        <item name="android:textColorPrimary">?attr/normalTextColor</item>
-        <item name="android:textColorSecondary">?attr/secondaryTextColor</item>
+        <item name="android:textColor">?attr/daxColorPrimaryText</item>
+        <item name="android:textColorPrimary">?attr/daxColorPrimaryText</item>
+        <item name="android:textColorSecondary">?attr/daxColorSecondaryText</item>
         <item name="android:background">?attr/dialogBgColor</item>
         <item name="colorAccent">@color/cornflowerBlue</item>
-        <item name="android:textColorAlertDialogListItem">?attr/normalTextColor</item>
-        <item name="textColorAlertDialogListItem">?attr/normalTextColor</item>
+        <item name="android:textColorAlertDialogListItem">?attr/daxColorPrimaryText</item>
+        <item name="textColorAlertDialogListItem">?attr/daxColorPrimaryText</item>
         <item name="android:buttonBarButtonStyle">@style/AlertDialogButtonStyle</item>
         <item name="buttonBarNegativeButtonStyle">@style/AlertDialogButtonStyle</item>
         <item name="buttonBarPositiveButtonStyle">@style/AlertDialogButtonStyle</item>
@@ -131,23 +122,6 @@
         <item name="android:background">?attr/selectableItemBackground</item>
     </style>
 
-    <style name="DeviceShieldOnboardingFAQHeaderStyle">
-        <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textColor">?attr/normalTextColor</item>
-        <item name="android:textSize">20sp</item>
-        <item name="android:lineSpacingExtra">8sp</item>
-        <item name="android:textAlignment">viewStart</item>
-    </style>
-
-    <style name="DeviceShieldOnboardingFAQTextStyle">
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textColor">?attr/secondaryTextColor</item>
-        <item name="android:textSize">16sp</item>
-        <item name="android:textStyle">normal</item>
-        <item name="android:lineSpacingExtra">8sp</item>
-        <item name="android:textAlignment">viewStart</item>
-    </style>
-
     <style name="FeedbackFragmentStyle">
         <item name="android:background">?attr/colorPrimaryDark</item>
         <item name="android:layout_width">match_parent</item>
@@ -164,17 +138,6 @@
         <item name="android:textColorHint">?attr/feedbackEditTextHintColor</item>
         <item name="boxBackgroundColor">?attr/feedbackEditTextBackgroundColor</item>
         <item name="android:theme">@style/TextInputEditTextTheme</item>
-    </style>
-
-    <style name="TextInputStyle" parent="Widget.MaterialComponents.TextInputEditText.FilledBox">
-        <item name="android:textSize">14sp</item>
-        <item name="android:imeOptions">flagNoExtractUi</item>
-        <item name="android:inputType">textLongMessage|textMultiLine</item>
-        <item name="android:importantForAutofill" tools:ignore="NewApi">no</item>
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">match_parent</item>
-        <item name="android:gravity">top</item>
-        <item name="android:textColor">?attr/normalTextColor</item>
     </style>
 
     <style name="EmailSignOutButton" parent="@style/Widget.MaterialComponents.Button.TextButton">

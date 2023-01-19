@@ -132,7 +132,6 @@
         <item name="preferDarkNavigationBarIcons">false</item>
 
         <!-- Legacy colors to remove-->
-        <item name="normalTextColor">@color/white</item>
         <item name="secondaryTextColor">@color/gray50</item>
         <item name="primaryIconColor">@color/gray20</item>
         <item name="primaryIconDisabledColor">@color/gray60</item>
@@ -188,7 +187,7 @@
         <item name="emailButtonRippleColor">@color/white</item>
 
         <item name="savedSiteEditTextUnderlineColor">@color/whiteSemiTransparent</item>
-        <item name="android:textColorAlertDialogListItem">?attr/normalTextColor</item>
+        <item name="android:textColorAlertDialogListItem">?attr/daxColorPrimaryText</item>
         <item name="lightContainerBackground">@color/almostBlack</item>
 
         <item name="listItemBackgroundColor">@color/almostBlack</item>
@@ -270,7 +269,6 @@
         <item name="preferDarkNavigationBarIcons">true</item>
 
         <!-- Legacy colors to remove-->
-        <item name="normalTextColor">@color/almostBlackDark</item>
         <item name="secondaryTextColor">@color/warmerGray</item>
         <item name="primaryIconColor">@color/gray95</item>
         <item name="primaryIconDisabledColor">@color/gray50</item>
