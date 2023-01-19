@@ -16,7 +16,6 @@
 
 package com.duckduckgo.downloads.impl
 
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -25,6 +24,7 @@ import android.os.Handler
 import android.os.Looper
 import androidx.annotation.AnyThread
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.FileProvider
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
@@ -52,7 +52,7 @@ private const val SUMMARY_ID = 0
 )
 @SingleInstanceIn(AppScope::class)
 class DefaultFileDownloadNotificationManager @Inject constructor(
-    private val notificationManager: NotificationManager,
+    private val notificationManager: NotificationManagerCompat,
     private val applicationContext: Context,
     private val appBuildConfig: AppBuildConfig,
 ) : FileDownloadNotificationManager, BrowserLifecycleObserver {
