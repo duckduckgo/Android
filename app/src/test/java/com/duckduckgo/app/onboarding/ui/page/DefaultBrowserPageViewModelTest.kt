@@ -28,6 +28,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DEFAULT_BROWSER_DIALOG
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DEFAULT_BROWSER_SETTINGS
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -57,6 +58,9 @@ class DefaultBrowserPageViewModelTest {
     @Mock
     private lateinit var mockCommandObserver: Observer<Command>
 
+    @Mock
+    private lateinit var mockAppBuildConfig: AppBuildConfig
+
     @Captor
     private lateinit var commandCaptor: ArgumentCaptor<Command>
 
@@ -65,7 +69,7 @@ class DefaultBrowserPageViewModelTest {
     @Before
     fun setup() {
         MockitoAnnotations.openMocks(this)
-        testee = DefaultBrowserPageViewModel(mockDefaultBrowserDetector, mockPixel, mockInstallStore)
+        testee = DefaultBrowserPageViewModel(mockDefaultBrowserDetector, mockPixel, mockInstallStore, mockAppBuildConfig)
         testee.command.observeForever(mockCommandObserver)
     }
 
@@ -91,7 +95,7 @@ class DefaultBrowserPageViewModelTest {
     fun whenInitializingIfThereIsADefaultBrowserThenShowSettingsUI() {
         whenever(mockDefaultBrowserDetector.hasDefaultBrowser()).thenReturn(true)
 
-        testee = DefaultBrowserPageViewModel(mockDefaultBrowserDetector, mockPixel, mockInstallStore)
+        testee = DefaultBrowserPageViewModel(mockDefaultBrowserDetector, mockPixel, mockInstallStore, mockAppBuildConfig)
 
         assertTrue(viewState() is DefaultBrowserSettingsUI)
     }
@@ -100,7 +104,7 @@ class DefaultBrowserPageViewModelTest {
     fun whenInitializingIfThereIsNotADefaultBrowserThenShowDialogUI() {
         whenever(mockDefaultBrowserDetector.hasDefaultBrowser()).thenReturn(false)
 
-        testee = DefaultBrowserPageViewModel(mockDefaultBrowserDetector, mockPixel, mockInstallStore)
+        testee = DefaultBrowserPageViewModel(mockDefaultBrowserDetector, mockPixel, mockInstallStore, mockAppBuildConfig)
 
         assertTrue(viewState() is DefaultBrowserDialogUI)
     }
@@ -218,14 +222,34 @@ class DefaultBrowserPageViewModelTest {
     }
 
     @Test
-    fun whenUserSetDDGAsDefaultFromDialogThenContinueToBrowserAndFirePixel() {
+    fun whenUserSetDDGAsDefaultFromDialogOnAndroid13ThenContinueToBrowserAndFirePixelWithCorrectParams() {
         val params = mapOf(
             Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString(),
             Pixel.PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to DEFAULT_BROWSER_DIALOG,
+            Pixel.PixelParameter.DEFAULT_BROWSER_SET_ON_ANDROID_13_OR_ABOVE to true.toString(),
         )
         testee.loadUI()
         testee.onDefaultBrowserClicked()
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+        whenever(mockAppBuildConfig.sdkInt).thenReturn(android.os.Build.VERSION_CODES.TIRAMISU)
+
+        testee.handleResult(Origin.InternalBrowser)
+
+        assertTrue(captureCommands().lastValue is Command.ContinueToBrowser)
+        verify(mockPixel).fire(AppPixelName.DEFAULT_BROWSER_SET, params)
+    }
+
+    @Test
+    fun whenUserSetDDGAsDefaultFromDialogOnAndroid12ThenContinueToBrowserAndFirePixelWithCorrectParams() {
+        val params = mapOf(
+            Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString(),
+            Pixel.PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to DEFAULT_BROWSER_DIALOG,
+            Pixel.PixelParameter.DEFAULT_BROWSER_SET_ON_ANDROID_13_OR_ABOVE to false.toString(),
+        )
+        testee.loadUI()
+        testee.onDefaultBrowserClicked()
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+        whenever(mockAppBuildConfig.sdkInt).thenReturn(android.os.Build.VERSION_CODES.S)
 
         testee.handleResult(Origin.InternalBrowser)
 
@@ -296,15 +320,36 @@ class DefaultBrowserPageViewModelTest {
     }
 
     @Test
-    fun whenUserSetDDGAsDefaultThenContinueToBrowser() {
+    fun whenUserSetDDGAsDefaultOnAndroid13ThenContinueToBrowserAndFirePixelWithCorrectParams() {
         val params = mapOf(
             Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString(),
             Pixel.PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to Pixel.PixelValues.DEFAULT_BROWSER_EXTERNAL,
+            Pixel.PixelParameter.DEFAULT_BROWSER_SET_ON_ANDROID_13_OR_ABOVE to true.toString(),
         )
         testee.loadUI()
         testee.onDefaultBrowserClicked()
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
         whenever(mockDefaultBrowserDetector.hasDefaultBrowser()).thenReturn(true)
+        whenever(mockAppBuildConfig.sdkInt).thenReturn(android.os.Build.VERSION_CODES.TIRAMISU)
+
+        testee.handleResult(Origin.ExternalBrowser)
+
+        assertTrue(captureCommands().lastValue is Command.ContinueToBrowser)
+        verify(mockPixel).fire(AppPixelName.DEFAULT_BROWSER_SET, params)
+    }
+
+    @Test
+    fun whenUserSetDDGAsDefaultOnAndroid12ThenContinueToBrowserAndFirePixelWithCorrectParams() {
+        val params = mapOf(
+            Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString(),
+            Pixel.PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to Pixel.PixelValues.DEFAULT_BROWSER_EXTERNAL,
+            Pixel.PixelParameter.DEFAULT_BROWSER_SET_ON_ANDROID_13_OR_ABOVE to false.toString(),
+        )
+        testee.loadUI()
+        testee.onDefaultBrowserClicked()
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+        whenever(mockDefaultBrowserDetector.hasDefaultBrowser()).thenReturn(true)
+        whenever(mockAppBuildConfig.sdkInt).thenReturn(android.os.Build.VERSION_CODES.S)
 
         testee.handleResult(Origin.ExternalBrowser)
 
@@ -338,15 +383,35 @@ class DefaultBrowserPageViewModelTest {
     }
 
     @Test
-    fun whenUserSelectedDDGAsDefaultInSettingsScreenThenFirePixel() {
+    fun whenUserSelectedDDGAsDefaultInSettingsScreenOnAndroid13ThenFirePixelWithCorrectParams() {
         whenever(mockDefaultBrowserDetector.hasDefaultBrowser()).thenReturn(true)
         val params = mapOf(
             Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString(),
             Pixel.PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to DEFAULT_BROWSER_SETTINGS,
+            Pixel.PixelParameter.DEFAULT_BROWSER_SET_ON_ANDROID_13_OR_ABOVE to true.toString(),
         )
         testee.loadUI()
         testee.onDefaultBrowserClicked()
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+        whenever(mockAppBuildConfig.sdkInt).thenReturn(android.os.Build.VERSION_CODES.TIRAMISU)
+
+        testee.handleResult(Origin.Settings)
+
+        verify(mockPixel).fire(AppPixelName.DEFAULT_BROWSER_SET, params)
+    }
+
+    @Test
+    fun whenUserSelectedDDGAsDefaultInSettingsScreenOnAndroid12ThenFirePixelWithCorrectParams() {
+        whenever(mockDefaultBrowserDetector.hasDefaultBrowser()).thenReturn(true)
+        val params = mapOf(
+            Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString(),
+            Pixel.PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to DEFAULT_BROWSER_SETTINGS,
+            Pixel.PixelParameter.DEFAULT_BROWSER_SET_ON_ANDROID_13_OR_ABOVE to false.toString(),
+        )
+        testee.loadUI()
+        testee.onDefaultBrowserClicked()
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+        whenever(mockAppBuildConfig.sdkInt).thenReturn(android.os.Build.VERSION_CODES.S)
 
         testee.handleResult(Origin.Settings)
 
