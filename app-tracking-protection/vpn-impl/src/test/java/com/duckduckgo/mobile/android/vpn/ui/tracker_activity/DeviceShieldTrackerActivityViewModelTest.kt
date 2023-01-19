@@ -322,7 +322,6 @@ class DeviceShieldTrackerActivityViewModelTest {
             viewModel.showAppTpEnabledCtaIfNeeded()
 
             verify(vpnStore).appTpEnabledCtaDidShow()
-            verify(vpnStore).onOnboardingSessionSet()
             assertEquals(DeviceShieldTrackerActivityViewModel.Command.ShowAppTpEnabledCta, awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
@@ -330,7 +329,7 @@ class DeviceShieldTrackerActivityViewModelTest {
 
     @Test
     fun whenBannerStateCalledOutsideOnboardingSessionThenReturnNextSessionBanner() {
-        whenever(vpnStore.isOnboardingSession()).thenReturn(false)
+        whenever(vpnStore.getAndSetOnboardingSession()).thenReturn(false)
 
         val bannerState = viewModel.bannerState()
 
@@ -339,7 +338,7 @@ class DeviceShieldTrackerActivityViewModelTest {
 
     @Test
     fun whenBannerStateCalledDuringOnboardingSessionThenReturnOnboardingBanner() {
-        whenever(vpnStore.isOnboardingSession()).thenReturn(true)
+        whenever(vpnStore.getAndSetOnboardingSession()).thenReturn(true)
 
         val bannerState = viewModel.bannerState()
 

@@ -126,7 +126,6 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     fun showAppTpEnabledCtaIfNeeded() {
         if (!vpnStore.didShowAppTpEnabledCta()) {
             vpnStore.appTpEnabledCtaDidShow()
-            vpnStore.onOnboardingSessionSet()
             sendCommand(Command.ShowAppTpEnabledCta)
         }
     }
@@ -195,7 +194,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     }
 
     fun bannerState(): BannerState {
-        return if (vpnStore.isOnboardingSession()) {
+        return if (vpnStore.getAndSetOnboardingSession()) {
             BannerState.OnboardingBanner
         } else {
             BannerState.NextSessionBanner
