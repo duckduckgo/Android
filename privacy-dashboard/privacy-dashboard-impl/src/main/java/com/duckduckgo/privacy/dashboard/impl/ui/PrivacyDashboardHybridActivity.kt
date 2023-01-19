@@ -36,6 +36,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.tabId
+import com.duckduckgo.autoconsent.api.AutoconsentNav
 import com.duckduckgo.browser.api.brokensite.BrokenSiteNav
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.store.AppTheme
@@ -60,6 +61,9 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var rendererFactory: PrivacyDashboardRendererFactory
+
+    @Inject
+    lateinit var autoconsentNav: AutoconsentNav
 
     @Inject
     lateinit var brokenSiteNav: BrokenSiteNav
@@ -125,7 +129,7 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                 startActivity(brokenSiteNav.navigate(this, it.data))
             }
             is OpenURL -> openUrl(it.url)
-            is OpenSettings -> openSettings(it.target)
+            is OpenSettings -> openAutoconsentSettings(it.target)
         }
     }
 
@@ -134,8 +138,8 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
         finish()
     }
 
-    private fun openSettings(target: String) {
-        // TODO: Open settings here - target is 'cpm'
+    private fun openAutoconsentSettings(target: String) {
+        startActivity(autoconsentNav.navigate(this))
         finish()
     }
 
