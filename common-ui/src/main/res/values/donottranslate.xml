@@ -51,4 +51,7 @@
     <string name="searchbar_searchhint_default" translatable="false">Search</string>
     <string name="searchbar_upaction_content_description_default" translatable="false">Navigate up</string>
 
+    <!-- Notify Me View -->
+    <string name="notifyme_button_label" translatable="false">Notify me</string>
+
 </resources>
