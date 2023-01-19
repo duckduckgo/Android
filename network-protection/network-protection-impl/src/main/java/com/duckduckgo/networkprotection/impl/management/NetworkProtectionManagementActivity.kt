@@ -18,17 +18,18 @@ package com.duckduckgo.networkprotection.impl.management
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.net.VpnService
 import android.os.Bundle
 import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.ui.view.addClickableLink
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.mobile.android.ui.view.show
@@ -45,7 +46,6 @@ import kotlinx.coroutines.flow.onEach
 @InjectWith(ActivityScope::class)
 class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
 
-    private val feedbackURL = Uri.parse("https://form.asana.com/?k=_wNLt6YcT5ILpQjDuW0Mxw&d=137249556945")
     private val binding: ActivityNetpManagementBinding by viewBinding()
     private val viewModel: NetworkProtectionManagementViewModel by bindViewModel()
     private val vpnPermissionRequestActivityResult =
@@ -74,8 +74,11 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         setTitle(R.string.netpManagementTitle)
         binding.netpToggle.setOnCheckedChangeListener(toggleChangeListener)
 
-        binding.shareFeedback.setOnClickListener {
-            startActivity(Intent(Intent.ACTION_VIEW, feedbackURL))
+        binding.netpBetaDescription.addClickableLink(
+            REPORT_ISSUES_ANNOTATION,
+            getText(R.string.netpManagementBetaDescription),
+        ) {
+            startActivity(Intent(Intent.ACTION_VIEW, FEEDBACK_URL))
         }
     }
 
@@ -180,6 +183,8 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
     }
 
     companion object {
+        private const val REPORT_ISSUES_ANNOTATION = "report_issues_link"
+        val FEEDBACK_URL = "https://form.asana.com/?k=_wNLt6YcT5ILpQjDuW0Mxw&d=137249556945".toUri()
         fun intent(context: Context): Intent {
             return Intent(context, NetworkProtectionManagementActivity::class.java)
         }

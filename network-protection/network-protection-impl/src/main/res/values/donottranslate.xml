@@ -24,7 +24,7 @@
     <string name="netpManagementToggleSubtitleConnected" instruction="Placeholder is elapsed time in hh:MM:ss format.">Connected · %1$s</string>
     <string name="netpManagementToggleSubtitleDisconnecting">Disconnecting…</string>
     <string name="netpManagementToggleSubtitleDisconnected">Not connected</string>
-    <string name="netpManagementBetaDescription">DuckDuckGo Network Protection is currently in beta.</string>
+    <string name="netpManagementBetaDescription">DuckDuckGo Network Protection is currently in beta. Help us improve and <annotation type="report_issues_link">share feedback</annotation></string>
 
     <!-- Connection details -->
     <string name="netpManagementConnectionDetailsHeader">Connection Details</string>
