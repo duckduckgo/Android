@@ -83,7 +83,7 @@ class SyncNativeLibTest {
 
         val decryptedSecretKey = syncNativeLib.decrypt(accountKeys.protectedSecretKey, prepareForLogin.stretchedPrimaryKey)
 
-        assertEquals(accountKeys.secretKey, decryptedSecretKey)
+        assertEquals(accountKeys.secretKey, decryptedSecretKey.decryptedData)
     }
 
     companion object {

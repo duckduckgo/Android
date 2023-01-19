@@ -34,47 +34,34 @@ class SyncNativeLib constructor(context: Context) {
         }
     }
 
-    fun generateAccountKeys(
-        userId: String,
-        password: String
-    ): Account {
+    fun generateAccountKeys(userId: String, password: String): AccountKeys {
         val primaryKey = ByteArray(getPrimaryKeySize())
         val secretKey = ByteArray(getSecretKeySize())
         val protectedSecretKey = ByteArray(getProtectedSecretKeySize())
         val passwordHash = ByteArray(getPasswordHashSize())
 
-        val result: Long = generateAccountKeys(primaryKey, secretKey, protectedSecretKey, passwordHash, userId, password)
+        val result: Long =
+            generateAccountKeys(
+                primaryKey, secretKey, protectedSecretKey, passwordHash, userId, password)
 
-        Timber.v("SYNC PK: ${primaryKey.encode()}")
-        Timber.v("SYNC SK: ${secretKey.encode()}")
-        Timber.v("SYNC PSK: ${protectedSecretKey.encode()}")
-        Timber.v("SYNC PH: ${passwordHash.encode()}")
-
-        return Account(
+        return AccountKeys(
             result = result,
             primaryKey = primaryKey.encode(),
             secretKey = secretKey.encode(),
             protectedSecretKey = protectedSecretKey.encode(),
             passwordHash = passwordHash.encode(),
             userId = userId,
-            password = password
-        )
+            password = password)
     }
 
-    fun prepareForLogin(
-        primaryKey: String
-    ): Login {
+    fun prepareForLogin(primaryKey: String): LoginKeys {
         val primarKeyByteArray = primaryKey.decode()
         val passwordHash = ByteArray(getPasswordHashSize())
         val stretchedPrimaryKey = ByteArray(getStretchedPrimaryKeySize())
 
         val result: Long = prepareForLogin(passwordHash, stretchedPrimaryKey, primarKeyByteArray)
 
-        Timber.v("SYNC PK: ${primaryKey}")
-        Timber.v("SYNC PH: ${passwordHash.encode()}")
-        Timber.v("SYNC SPK: ${stretchedPrimaryKey.encode()}")
-
-        return Login(
+        return LoginKeys(
             result = result,
             passwordHash = passwordHash.encode(),
             stretchedPrimaryKey = stretchedPrimaryKey.encode(),
@@ -85,24 +72,24 @@ class SyncNativeLib constructor(context: Context) {
     fun decrypt(
         encryptedData: String,
         secretKey: String,
-    ): String {
+    ): DecryptResult {
         val encryptedDataByteArray = encryptedData.decode()
         val secretKeyByteArray = secretKey.decode()
-        val decryptedData = ByteArray(encryptedDataByteArray.size-getEncryptedExtraBytes())
+        val decryptedData = ByteArray(encryptedDataByteArray.size - getEncryptedExtraBytes())
 
         val result: Long = decrypt(decryptedData, encryptedDataByteArray, secretKeyByteArray)
 
-        Timber.v("SYNC result: $result")
-        Timber.v("SYNC decryptedData: ${decryptedData}")
-
-        return decryptedData.encode()
+        return DecryptResult(
+                result = result,
+                decryptedData = decryptedData.encode(),
+        )
     }
 
-    fun ByteArray.encode(): String {
+    private fun ByteArray.encode(): String {
         return Base64.encodeToString(this, Base64.NO_WRAP)
     }
 
-    fun String.decode(): ByteArray {
+    private fun String.decode(): ByteArray {
         return Base64.decode(this, Base64.NO_WRAP)
     }
 
@@ -135,7 +122,7 @@ class SyncNativeLib constructor(context: Context) {
     private external fun getEncryptedExtraBytes(): Int
 }
 
-class Account(
+class AccountKeys(
     val result: Long,
     val primaryKey: String,
     val secretKey: String,
@@ -145,9 +132,14 @@ class Account(
     val password: String,
 )
 
-class Login(
+class LoginKeys(
     val result: Long,
     val passwordHash: String,
     val stretchedPrimaryKey: String,
-    val primaryKey: String
+    val primaryKey: String,
+)
+
+class DecryptResult(
+    val result: Long,
+    val decryptedData: String,
 )
