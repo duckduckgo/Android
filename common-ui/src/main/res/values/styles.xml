@@ -189,17 +189,6 @@
         <item name="android:layout_height">1dp</item>
     </style>
 
-    <style name="DeviceShield" />
-
-    <style name="DeviceShield.NewTab" />
-
-    <style name="DeviceShield.NewTab.TextStyle">
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textColor">?normalTextColor</item>
-        <item name="android:textSize">14sp</item>
-        <item name="android:lineSpacingExtra">6sp</item>
-    </style>
-
     <style name="SearchWidgetFavoriteContainer">
         <item name="android:layout_width">@dimen/searchWidgetFavoriteItemContainerWidth</item>
         <item name="android:layout_height">@dimen/searchWidgetFavoriteItemContainerHeight</item>
