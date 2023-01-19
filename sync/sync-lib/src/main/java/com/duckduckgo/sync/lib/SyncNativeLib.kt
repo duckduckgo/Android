@@ -41,8 +41,7 @@ class SyncNativeLib constructor(context: Context) {
         val passwordHash = ByteArray(getPasswordHashSize())
 
         val result: Long =
-            generateAccountKeys(
-                primaryKey, secretKey, protectedSecretKey, passwordHash, userId, password)
+            generateAccountKeys(primaryKey, secretKey, protectedSecretKey, passwordHash, userId, password)
 
         return AccountKeys(
             result = result,
@@ -51,7 +50,8 @@ class SyncNativeLib constructor(context: Context) {
             protectedSecretKey = protectedSecretKey.encode(),
             passwordHash = passwordHash.encode(),
             userId = userId,
-            password = password)
+            password = password,
+        )
     }
 
     fun prepareForLogin(primaryKey: String): LoginKeys {
@@ -80,8 +80,8 @@ class SyncNativeLib constructor(context: Context) {
         val result: Long = decrypt(decryptedData, encryptedDataByteArray, secretKeyByteArray)
 
         return DecryptResult(
-                result = result,
-                decryptedData = decryptedData.encode(),
+            result = result,
+            decryptedData = decryptedData.encode(),
         )
     }
 
