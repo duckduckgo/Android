@@ -17,6 +17,10 @@
 package com.duckduckgo.networkprotection.impl
 
 import android.os.ParcelFileDescriptor
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack.VpnTunnelConfig
@@ -47,6 +51,9 @@ class WgVpnNetworkStack @Inject constructor(
     private val configProvider: Lazy<WgTunnelDataProvider>,
     private val networkProtectionRepository: Lazy<NetworkProtectionRepository>,
     private val currentTimeProvider: CurrentTimeProvider,
+    private val netPDebugMtuProvider: PluginPoint<NetPDebugMtuProvider>,
+    private val exclusionListProvider: PluginPoint<NetPDebugExclusionListProvider>,
+    private val appBuildConfig: AppBuildConfig,
 ) : VpnNetworkStack {
     private var wgTunnelData: WgTunnelData? = null
 
@@ -55,6 +62,23 @@ class WgVpnNetworkStack @Inject constructor(
     override fun onCreateVpn(): Result<Unit> = Result.success(Unit)
 
     override suspend fun onPrepareVpn(): Result<VpnTunnelConfig> {
+        fun PluginPoint<NetPDebugMtuProvider>.getMtu(): Int {
+            if (appBuildConfig.isInternalBuild()) {
+                assert(this.getPlugins().size <= 1) { "Only one NetPDebugMtuProvider should be registered" }
+                return this.getPlugins().firstOrNull()?.getMtu() ?: 1280
+            }
+
+            return 1280
+        }
+        fun PluginPoint<NetPDebugExclusionListProvider>.getExclusionList(): Set<String> {
+            if (appBuildConfig.isInternalBuild()) {
+                assert(this.getPlugins().size <= 1) { "Only one NetPDebugMtuProvider should be registered" }
+                return this.getPlugins().firstOrNull()?.getExclusionList() ?: emptySet()
+            }
+
+            return emptySet()
+        }
+
         return try {
             wgTunnelData = configProvider.get().get()
             logcat { "Received config from BE: $wgTunnelData" }
@@ -66,13 +90,13 @@ class WgVpnNetworkStack @Inject constructor(
 
             Result.success(
                 VpnTunnelConfig(
-                    mtu = 1280,
+                    mtu = netPDebugMtuProvider.getMtu(),
                     addresses = wgTunnelData?.tunnelAddress ?: emptyMap(),
                     dns = emptySet(),
                     routes = emptyMap(),
-                    appExclusionList = emptySet(),
+                    appExclusionList = exclusionListProvider.getExclusionList(),
                 ),
-            )
+            ).also { logcat { "Returning VPN configuration: ${it.getOrNull()}" } }
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -132,4 +156,14 @@ class WgVpnNetworkStack @Inject constructor(
         }
         return Result.success(Unit)
     }
+}
+
+@ContributesPluginPoint(VpnScope::class)
+interface NetPDebugMtuProvider {
+    fun getMtu(): Int
+}
+
+@ContributesPluginPoint(VpnScope::class)
+interface NetPDebugExclusionListProvider {
+    fun getExclusionList(): Set<String>
 }

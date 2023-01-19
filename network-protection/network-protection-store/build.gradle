@@ -17,13 +17,23 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
+    id 'kotlin-kapt'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
     implementation project(':vpn-api')
+    implementation project(path: ':common')
+
+    implementation "com.jakewharton.threetenabp:threetenabp:_"
+
     implementation AndroidX.core.ktx
+
+    // Room
+    implementation AndroidX.room.runtime
+    implementation AndroidX.room.ktx
+    kapt AndroidX.room.compiler
 
     testImplementation project(path: ':common-test')
     testImplementation Testing.junit4

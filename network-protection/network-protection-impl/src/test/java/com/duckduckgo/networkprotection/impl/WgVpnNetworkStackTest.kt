@@ -16,6 +16,9 @@
 
 package com.duckduckgo.networkprotection.impl
 
+import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack.VpnTunnelConfig
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.RESTART
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
@@ -55,17 +58,44 @@ class WgVpnNetworkStackTest {
 
     @Mock
     private lateinit var currentTimeProvider: CurrentTimeProvider
+
+    @Mock
+    private lateinit var appBuildConfig: AppBuildConfig
+
     private lateinit var testee: WgVpnNetworkStack
 
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
 
+        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
+
         testee = WgVpnNetworkStack(
             { wgProtocol },
             { wgTunnelDataProvider },
             { networkProtectionRepository },
             currentTimeProvider,
+            object : PluginPoint<NetPDebugMtuProvider> {
+                override fun getPlugins(): Collection<NetPDebugMtuProvider> {
+                    return setOf(
+                        object : NetPDebugMtuProvider {
+                            override fun getMtu() = 5555
+                        },
+                    )
+                }
+            },
+            object : PluginPoint<NetPDebugExclusionListProvider> {
+                override fun getPlugins(): Collection<NetPDebugExclusionListProvider> {
+                    return setOf(
+                        object : NetPDebugExclusionListProvider {
+                            override fun getExclusionList(): Set<String> {
+                                return setOf("com.duckduckgo.com")
+                            }
+                        },
+                    )
+                }
+            },
+            appBuildConfig,
         )
     }
 
@@ -88,6 +118,38 @@ class WgVpnNetworkStackTest {
                     dns = emptySet(),
                     routes = emptyMap(),
                     appExclusionList = emptySet(),
+                ),
+            ),
+            testee.onPrepareVpn(),
+        )
+
+        verify(networkProtectionRepository).serverDetails = ServerDetails(
+            ipAddress = "10.10.10.10",
+            location = "Stockholm, Sweden",
+        )
+    }
+
+    @Test
+    fun whenOnPrepareVpnAndInternalBuildThenReturnVpnTunnelConfigAndStoreServerDetails() = runTest {
+        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
+
+        whenever(wgTunnelDataProvider.get()).thenReturn(
+            WgTunnelData(
+                userSpaceConfig = "testuserspaceconfig",
+                serverIP = "10.10.10.10",
+                serverLocation = "Stockholm, Sweden",
+                tunnelAddress = emptyMap(),
+            ),
+        )
+
+        assertEquals(
+            Result.success(
+                VpnTunnelConfig(
+                    mtu = 5555,
+                    addresses = emptyMap(),
+                    dns = emptySet(),
+                    routes = emptyMap(),
+                    appExclusionList = setOf("com.duckduckgo.com"),
                 ),
             ),
             testee.onPrepareVpn(),
