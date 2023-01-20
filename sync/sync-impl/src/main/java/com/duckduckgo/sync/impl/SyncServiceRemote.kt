@@ -19,15 +19,12 @@ package com.duckduckgo.sync.impl
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.Moshi
 import javax.inject.Inject
 import javax.inject.Named
 import okhttp3.ResponseBody
 import retrofit2.Converter
 import retrofit2.Retrofit
 import timber.log.Timber
-import java.lang.IllegalArgumentException
 
 interface SyncApi {
     fun createAccount(
@@ -38,18 +35,21 @@ interface SyncApi {
         protectedEncryptionKey: String,
         deviceIds: String,
         deviceName: String,
-    )
+    ): Result
+}
 
-    fun storeRecoveryCode()
+sealed class Result {
+    object Success : Result()
+    object Error : Result()
 }
 
 @ContributesBinding(AppScope::class)
 class SyncServiceRemote
 @Inject
 constructor(
-        @Named("nonCaching") private val retrofit: Retrofit,
-        private val syncService: SyncService,
-        private val syncStore: SyncStore,
+    @Named("nonCaching") private val retrofit: Retrofit,
+    private val syncService: SyncService,
+    private val syncStore: SyncStore,
 ) : SyncApi {
     override fun createAccount(
         userID: String,
@@ -59,9 +59,8 @@ constructor(
         protectedEncryptionKey: String,
         deviceIds: String,
         deviceName: String,
-    ) {
-        kotlin
-            .runCatching {
+    ): Result {
+        runCatching {
                 val call =
                     syncService.signup(
                         Signup(
@@ -74,39 +73,24 @@ constructor(
                         response.body()?.token ?: throw IllegalStateException("Empty body")
                     syncStore.primaryKey = primaryKey
                     syncStore.secretKey = secretKey
+                    return Result.Success
                 } else {
                     response.errorBody()?.let { errorBody ->
                         val converter: Converter<ResponseBody, ErrorResponse> =
                             retrofit.responseBodyConverter(
                                 ErrorResponse::class.java, arrayOfNulls(0))
-                        val errorResponse = converter.convert(errorBody) ?: throw IllegalArgumentException("Can't parse body")
+                        val errorResponse =
+                            converter.convert(errorBody)
+                                ?: throw IllegalArgumentException("Can't parse body")
                         Timber.i("SYNC signup failed ${errorResponse.code} ${errorResponse.error}")
-                    } ?: kotlin.run {
-                        Timber.i("SYNC signup failed ${response.code()} ${response.message()}")
                     }
+                        ?: kotlin.run {
+                            Timber.i("SYNC signup failed ${response.code()} ${response.message()}")
+                        }
                 }
             }
             .onFailure { throwable -> Timber.i("SYNC signup failed ${throwable.message}") }
+
+        return Result.Error
     }
-
-    override fun storeRecoveryCode() {
-        val primaryKey = syncStore.primaryKey ?: return
-        val userID = syncStore.userId ?: return
-        val recoveryCodeJson = Adapters.recoveryCodeAdapter.toJson(RecoveryCode(primaryKey, userID))
-
-        Timber.i("SYNC store recoverCode: ${recoveryCodeJson}")
-        syncStore.recoveryCode = recoveryCodeJson
-    }
-
-    class Adapters {
-        companion object {
-            private val moshi = Moshi.Builder().build()
-            val recoveryCodeAdapter: JsonAdapter<RecoveryCode> = moshi.adapter(RecoveryCode::class.java)
-        }
-    }
-
-    data class RecoveryCode(
-        val primaryKey: String,
-        val userID: String,
-    )
 }

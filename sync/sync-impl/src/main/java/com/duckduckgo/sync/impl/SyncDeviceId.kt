@@ -21,6 +21,7 @@ import android.content.Context
 import android.os.Build
 import android.provider.Settings
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
 import java.util.*
@@ -32,7 +33,7 @@ interface SyncDeviceIds {
     fun deviceId(): String
 }
 
-@ContributesBinding(ActivityScope::class)
+@ContributesBinding(AppScope::class)
 class AppSyncDeviceIds
 @Inject
 constructor(

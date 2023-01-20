@@ -10,8 +10,8 @@ interface SyncStore {
     var token: String?
     var primaryKey: String?
     var secretKey: String?
-
     var recoveryCode:String?
+    fun clearAll()
 }
 
 class SyncSharedPrefsStore
@@ -108,6 +108,12 @@ constructor(
                 }
             }
         }
+
+    override fun clearAll() {
+        encryptedPreferences?.edit(commit = true) {
+            clear()
+        }
+    }
 
     companion object {
         private const val FILENAME = "com.duckduckgo.sync.store"
