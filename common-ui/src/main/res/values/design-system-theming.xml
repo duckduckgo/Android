@@ -132,13 +132,6 @@
         <item name="preferDarkNavigationBarIcons">false</item>
 
         <!-- Legacy colors to remove-->
-        <item name="secondaryTextColor">@color/gray50</item>
-        <item name="primaryIconColor">@color/gray20</item>
-        <item name="primaryIconDisabledColor">@color/gray60</item>
-        <item name="secondaryIconColor">@color/gray70</item>
-        <item name="listItemPrimaryTextColor">@color/white</item>
-        <item name="listItemSecondaryTextColor">@color/grayishTwo</item>
-        <item name="listItemDisabledColor">@color/warGreyTwo</item>
         <item name="subtitleTextColor">@color/grayishTwo</item>
         <item name="dialogBgColor">@color/almostBlackDark</item>
         <item name="browserIconColorSelector">@color/browser_icon_color_selector_dark</item>
@@ -269,10 +262,6 @@
         <item name="preferDarkNavigationBarIcons">true</item>
 
         <!-- Legacy colors to remove-->
-        <item name="secondaryTextColor">@color/warmerGray</item>
-        <item name="primaryIconColor">@color/gray95</item>
-        <item name="primaryIconDisabledColor">@color/gray50</item>
-        <item name="secondaryIconColor">@color/gray40</item>
         <item name="dialogBgColor">@color/white</item>
         <item name="browserIconColorSelector">@color/browser_icon_color_selector_light</item>
         <item name="browserMenuTextColor">@color/almostBlackDark</item>
@@ -322,9 +311,6 @@
         <item name="savedSiteEditTextUnderlineColor">@color/black60</item>
         <item name="lightContainerBackground">@color/whiteThree</item>
 
-        <item name="listItemPrimaryTextColor">@color/almostBlackDark</item>
-        <item name="listItemSecondaryTextColor">@color/warmerGray</item>
-        <item name="listItemDisabledColor">@color/warGreyTwo</item>
         <item name="listItemBackgroundColor">@color/whiteFive</item>
         <item name="listItemSeparatorColor">@color/whiteSix</item>
         <item name="textInputOutlinedBoxColor">@color/grayishThree</item>

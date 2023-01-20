@@ -71,10 +71,6 @@
     <attr name="textInputOutlinedBoxColor" format="color" />
     <attr name="textInputOutlinedBoxColorHighlight" format="color" />
 
-    <attr name="secondaryTextColor" format="color"/>
-    <attr name="primaryIconColor" format="color" />
-    <attr name="primaryIconDisabledColor" format="color" />
-    <attr name="secondaryIconColor" format="color" />
     <attr name="splitterColor" format="color" />
 
     <attr name="secondaryButtonPressedColor" format="color" />
