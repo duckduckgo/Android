@@ -20,6 +20,7 @@ import com.duckduckgo.networkprotection.impl.configuration.WgServerDataProvider.
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
@@ -52,7 +53,10 @@ class RealWgServerDataProviderTest {
             allowedIPs = listOf("10.11.181.220/32"),
             server = Server(
                 name = "egress.euw",
-                attributes = emptyMap(),
+                attributes = mapOf(
+                    "country" to "SE",
+                    "city" to "Stockholm",
+                ),
                 publicKey = "CLQMP4SFzpyvAzMj3rXwShm+3n6Yt68hGHBF67At+x0=",
                 hostnames = listOf("euw.egress.np.duck.com"),
                 ips = emptyList(),
@@ -94,9 +98,85 @@ class RealWgServerDataProviderTest {
                 publicKey = "CLQMP4SFzpyvAzMj3rXwShm+3n6Yt68hGHBF67At+x0=",
                 publicEndpoint = "euw.egress.np.duck.com:443",
                 address = "10.11.181.220/32",
-                location = null,
+                location = "Stockholm, Sweden",
             ),
             testee.get("testpublickey"),
         )
+    }
+
+    @Test
+    fun whenNoCountryAttributeThenReturnNoLocation() = runTest {
+        whenever(wgVpnControllerService.registerKey(any())).thenReturn(
+            listOf(
+                EligibleServerInfo(
+                    publicKey = "testpublickey",
+                    allowedIPs = listOf("10.11.181.220/32"),
+                    server = Server(
+                        name = "egress.euw",
+                        attributes = mapOf(
+                            "city" to "Stockholm",
+                        ),
+                        publicKey = "CLQMP4SFzpyvAzMj3rXwShm+3n6Yt68hGHBF67At+x0=",
+                        hostnames = listOf("euw.egress.np.duck.com"),
+                        ips = emptyList(),
+                        port = 443,
+                    ),
+                ),
+            ),
+        )
+        whenever(countryIsoProvider.getCountryIso()).thenReturn("se")
+
+        assertNull(testee.get("testpublickey").location)
+    }
+
+    @Test
+    fun whenNoCityAttributeThenReturnNoLocation() = runTest {
+        whenever(wgVpnControllerService.registerKey(any())).thenReturn(
+            listOf(
+                EligibleServerInfo(
+                    publicKey = "testpublickey",
+                    allowedIPs = listOf("10.11.181.220/32"),
+                    server = Server(
+                        name = "egress.euw",
+                        attributes = mapOf(
+                            "country" to "se",
+                        ),
+                        publicKey = "CLQMP4SFzpyvAzMj3rXwShm+3n6Yt68hGHBF67At+x0=",
+                        hostnames = listOf("euw.egress.np.duck.com"),
+                        ips = emptyList(),
+                        port = 443,
+                    ),
+                ),
+            ),
+        )
+        whenever(countryIsoProvider.getCountryIso()).thenReturn("se")
+
+        assertNull(testee.get("testpublickey").location)
+    }
+
+    @Test
+    fun whenFullCountryPassedThenReturnCorrectFullLocation() = runTest {
+        whenever(wgVpnControllerService.registerKey(any())).thenReturn(
+            listOf(
+                EligibleServerInfo(
+                    publicKey = "testpublickey",
+                    allowedIPs = listOf("10.11.181.220/32"),
+                    server = Server(
+                        name = "egress.euw",
+                        attributes = mapOf(
+                            "city" to "Stockholm",
+                            "country" to "Sweden",
+                        ),
+                        publicKey = "CLQMP4SFzpyvAzMj3rXwShm+3n6Yt68hGHBF67At+x0=",
+                        hostnames = listOf("euw.egress.np.duck.com"),
+                        ips = emptyList(),
+                        port = 443,
+                    ),
+                ),
+            ),
+        )
+        whenever(countryIsoProvider.getCountryIso()).thenReturn("se")
+
+        assertEquals("Stockholm, Sweden", testee.get("testpublickey").location)
     }
 }

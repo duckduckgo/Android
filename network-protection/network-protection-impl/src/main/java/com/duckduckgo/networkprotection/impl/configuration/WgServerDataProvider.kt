@@ -18,9 +18,11 @@ package com.duckduckgo.networkprotection.impl.configuration
 
 import android.content.Context
 import android.telephony.TelephonyManager
+import com.duckduckgo.app.global.extensions.capitalizeFirstLetter
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.networkprotection.impl.configuration.WgServerDataProvider.WgServerData
 import com.squareup.anvil.annotations.ContributesBinding
+import java.util.*
 import javax.inject.Inject
 
 interface WgServerDataProvider {
@@ -51,8 +53,21 @@ class RealWgServerDataProvider @Inject constructor(
         publicKey = server.publicKey,
         publicEndpoint = server.hostnames[0] + ":" + server.port,
         address = allowedIPs.joinToString(","),
-        location = server.attributes["location"],
+        location = server.attributes.extractLocation(),
     )
+
+    private fun Map<String, String>.extractLocation(): String? {
+        val country = this[SERVER_ATTR_COUNTRY]
+        val city = this[SERVER_ATTR_CITY]?.lowercase()?.capitalizeFirstLetter()
+
+        return if (country != null && city != null) {
+            "$city, ${country.getDisplayableCountry()}"
+        } else {
+            null
+        }
+    }
+
+    private fun String.getDisplayableCountry(): String = Locale("", this).displayCountry.lowercase().capitalizeFirstLetter()
 
     private fun List<EligibleServerInfo>.getRelevantServer(): EligibleServerInfo {
         val countryCode = countryIsoProvider.getCountryIso()
@@ -76,6 +91,8 @@ class RealWgServerDataProvider @Inject constructor(
     companion object {
         private const val US_COUNTRY_CODES = "us,ca"
         private const val SERVER_NAME_US = "egress.usc"
+        private const val SERVER_ATTR_CITY = "city"
+        private const val SERVER_ATTR_COUNTRY = "country"
     }
 }
 
