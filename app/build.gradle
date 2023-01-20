@@ -13,7 +13,7 @@ ext {
 }
 
 android {
-    ndkVersion '25.1.8937393'
+    ndkVersion '21.4.7075529'
     defaultConfig {
         applicationId "com.duckduckgo.mobile.android"
         minSdk min_sdk
