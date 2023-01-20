@@ -75,6 +75,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     APP_EMPTY_VIEW_WIDGET_LAUNCH(pixelName = "m_sfew_l"),
     APP_ASSIST_LAUNCH(pixelName = "m_a_l"),
     APP_SYSTEM_SEARCH_BOX_LAUNCH(pixelName = "m_ssb_l"),
+    APP_THIRD_PARTY_LAUNCH(pixelName = "m_third_party_launch"),
     INTERSTITIAL_LAUNCH_BROWSER_QUERY(pixelName = "m_i_lbq"),
     INTERSTITIAL_LAUNCH_DEVICE_APP(pixelName = "m_i_sda"),
     INTERSTITIAL_LAUNCH_DAX(pixelName = "m_i_ld"),

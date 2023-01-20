@@ -21,6 +21,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.BrowserViewModel.Command
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
@@ -29,6 +30,7 @@ import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridActivity.Companion.RELOAD_RESULT_CODE
@@ -80,6 +82,9 @@ class BrowserViewModelTest {
     @Mock
     private lateinit var mockPixel: Pixel
 
+    @Mock
+    private lateinit var mockDefaultBrowserDetector: DefaultBrowserDetector
+
     private lateinit var testee: BrowserViewModel
 
     @Before
@@ -94,6 +99,7 @@ class BrowserViewModelTest {
             dataClearer = mockAutomaticDataClearer,
             appEnjoymentPromptEmitter = mockAppEnjoymentPromptEmitter,
             appEnjoymentUserEventRecorder = mockAppEnjoymentUserEventRecorder,
+            defaultBrowserDetector = mockDefaultBrowserDetector,
             dispatchers = coroutinesTestRule.testDispatcherProvider,
             pixel = mockPixel,
         )
@@ -219,6 +225,26 @@ class BrowserViewModelTest {
         whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
         testee.onOpenFavoriteFromWidget(url)
         verify(mockPixel).fire(AppPixelName.APP_FAVORITES_ITEM_WIDGET_LAUNCH)
+    }
+
+    @Test
+    fun whenOpenFromThirdPartyAndNotDefaultBrowserThenFirePixel() = runTest {
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+        testee.launchFromThirdParty()
+        verify(mockPixel).fire(
+            AppPixelName.APP_THIRD_PARTY_LAUNCH,
+            mapOf(PixelParameter.DEFAULT_BROWSER to "false"),
+        )
+    }
+
+    @Test
+    fun whenOpenFromThirdPartyAndDefaultBrowserThenFirePixel() = runTest {
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+        testee.launchFromThirdParty()
+        verify(mockPixel).fire(
+            AppPixelName.APP_THIRD_PARTY_LAUNCH,
+            mapOf(PixelParameter.DEFAULT_BROWSER to "true"),
+        )
     }
 
     companion object {
