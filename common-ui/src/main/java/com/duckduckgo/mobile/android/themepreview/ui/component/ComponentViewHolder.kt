@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.view.MessageCta
 import com.duckduckgo.mobile.android.ui.view.MessageCta.Message
+import com.duckduckgo.mobile.android.ui.view.NotifyMeView
 import com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
 import com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
@@ -279,6 +280,14 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         }
     }
 
+    class NotifyMeComponentViewHolder(parent: ViewGroup) : ComponentViewHolder(inflate(parent, R.layout.component_notify_me)) {
+        init {
+            val notifyMeView: NotifyMeView = view.findViewById(R.id.notifyMe)
+            notifyMeView.setTitle("Component title")
+            notifyMeView.setSubtitle("Component subtitle")
+        }
+    }
+
     companion object {
         fun create(
             parent: ViewGroup,
@@ -301,6 +310,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.TWO_LINE_LIST_ITEM -> TwoLineItemComponentViewHolder(parent)
                 Component.SECTION_DIVIDER -> DividerComponentViewHolder(parent)
                 Component.CARD -> CardComponentViewHolder(parent)
+                Component.NOTIFY_ME_VIEW -> NotifyMeComponentViewHolder(parent)
                 else -> {
                     TODO()
                 }
