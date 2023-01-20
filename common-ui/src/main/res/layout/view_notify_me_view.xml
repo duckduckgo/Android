@@ -28,7 +28,7 @@
         android:layout_height="match_parent"
         android:padding="@dimen/keyline_4">
 
-        <<com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/notifyMeMessageTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -49,7 +49,7 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="ContentDescription" />
 
-        <<com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/notifyMeMessageSubtitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
