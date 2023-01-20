@@ -17,14 +17,13 @@
 package com.duckduckgo.sync.impl
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import javax.inject.Named
 import okhttp3.ResponseBody
 import retrofit2.Converter
+import retrofit2.Response
 import retrofit2.Retrofit
-import timber.log.Timber
 
 interface SyncApi {
     fun createAccount(
@@ -38,18 +37,12 @@ interface SyncApi {
     ): Result
 }
 
-sealed class Result {
-    object Success : Result()
-    object Error : Result()
-}
-
 @ContributesBinding(AppScope::class)
 class SyncServiceRemote
 @Inject
 constructor(
     @Named("nonCaching") private val retrofit: Retrofit,
     private val syncService: SyncService,
-    private val syncStore: SyncStore,
 ) : SyncApi {
     override fun createAccount(
         userID: String,
@@ -60,37 +53,48 @@ constructor(
         deviceIds: String,
         deviceName: String,
     ): Result {
+        val response =
+            runCatching {
+                    val call =
+                        syncService.signup(
+                            Signup(
+                                userID,
+                                hashedPassword,
+                                protectedEncryptionKey,
+                                deviceIds,
+                                deviceName,
+                            ))
+                    call.execute()
+                }
+                .getOrElse { throwable ->
+                    return Result.Error(reason = throwable.message.toString())
+                }
+
+        return onSuccess(response)
+    }
+
+    private fun onSuccess(response: Response<AccountCreatedResponse>): Result {
         runCatching {
-                val call =
-                    syncService.signup(
-                        Signup(
-                            userID, hashedPassword, protectedEncryptionKey, deviceIds, deviceName))
-                call.execute()
-            }
-            .onSuccess { response ->
                 if (response.isSuccessful) {
-                    syncStore.token =
-                        response.body()?.token ?: throw IllegalStateException("Empty body")
-                    syncStore.primaryKey = primaryKey
-                    syncStore.secretKey = secretKey
-                    return Result.Success
+                    val token = response.body()?.token ?: throw IllegalStateException("Empty body")
+                    return Result.Success(token)
                 } else {
-                    response.errorBody()?.let { errorBody ->
+                    return response.errorBody()?.let { errorBody ->
                         val converter: Converter<ResponseBody, ErrorResponse> =
                             retrofit.responseBodyConverter(
-                                ErrorResponse::class.java, arrayOfNulls(0))
+                                ErrorResponse::class.java,
+                                arrayOfNulls(0),
+                            )
                         val errorResponse =
                             converter.convert(errorBody)
                                 ?: throw IllegalArgumentException("Can't parse body")
-                        Timber.i("SYNC signup failed ${errorResponse.code} ${errorResponse.error}")
+                        Result.Error(errorResponse.code, errorResponse.error)
                     }
-                        ?: kotlin.run {
-                            Timber.i("SYNC signup failed ${response.code()} ${response.message()}")
-                        }
+                        ?: Result.Error(code = response.code(), reason = response.code().toString())
                 }
             }
-            .onFailure { throwable -> Timber.i("SYNC signup failed ${throwable.message}") }
-
-        return Result.Error
+            .getOrElse {
+                return Result.Error(reason = response.message())
+            }
     }
 }

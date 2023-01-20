@@ -28,7 +28,7 @@ import javax.inject.Inject
 import timber.log.Timber
 
 interface SyncRepository {
-    fun createAccount(): Boolean
+    fun createAccount(): Result
     fun getAccountInfo(): AccountInfo
     fun storeRecoveryCode()
     fun removeAccount()
@@ -45,8 +45,12 @@ constructor(
     private val syncStore: SyncStore,
 ) : SyncRepository {
 
-    override fun createAccount(): Boolean {
-        val account: AccountKeys = nativeLib.generateAccountKeys(userId = syncDeviceIds.userId())
+    override fun createAccount(): Result {
+        val userId = syncDeviceIds.userId()
+        val deviceId = syncDeviceIds.deviceId()
+        val deviceName = syncDeviceIds.deviceName()
+
+        val account: AccountKeys = nativeLib.generateAccountKeys(userId = userId)
         val result =
             syncApi.createAccount(
                 account.userId,
@@ -54,19 +58,31 @@ constructor(
                 account.secretKey,
                 account.passwordHash,
                 account.protectedSecretKey,
-                syncDeviceIds.deviceId(),
-                syncDeviceIds.deviceName())
+                deviceId,
+                deviceName,
+            )
 
-        return result is Result.Success
+        if (result is Result.Success) {
+            syncStore.userId = userId
+            syncStore.deviceId = deviceId
+            syncStore.deviceName = deviceName
+            syncStore.token = result.token
+            syncStore.primaryKey = account.primaryKey
+            syncStore.secretKey = account.secretKey
+        } else {
+            Timber.i("SYNC signup failed $result")
+        }
+
+        return result
     }
 
     override fun getAccountInfo(): AccountInfo {
         if (!isSignedIn()) return AccountInfo()
 
         return AccountInfo(
-            userId = syncDeviceIds.userId(),
-            deviceName = syncDeviceIds.deviceName(),
-            deviceId = syncDeviceIds.deviceId(),
+            userId = syncStore.userId.orEmpty(),
+            deviceName = syncStore.deviceName.orEmpty(),
+            deviceId = syncStore.deviceId.orEmpty(),
             isSignedIn = isSignedIn(),
         )
     }
@@ -106,3 +122,8 @@ data class RecoveryCode(
     val primaryKey: String,
     val userID: String,
 )
+
+sealed class Result {
+    data class Success(val token: String) : Result()
+    data class Error(val code: Int = -1, val reason: String) : Result()
+}

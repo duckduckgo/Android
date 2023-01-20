@@ -17,6 +17,7 @@
 package com.duckduckgo.sync.impl.ui
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -55,6 +56,19 @@ class SyncInitialSetupActivity : DuckDuckGoActivity() {
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { viewState -> renderViewState(viewState) }
             .launchIn(lifecycleScope)
+
+        viewModel.commands()
+                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .onEach { processCommand(it) }
+                .launchIn(lifecycleScope)
+    }
+
+    private fun processCommand(command: SyncInitialSetupViewModel.Command) {
+        when(command) {
+            is SyncInitialSetupViewModel.Command.ShowMessage -> {
+                Toast.makeText(this, command.message, Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     private fun renderViewState(viewState: ViewState) {

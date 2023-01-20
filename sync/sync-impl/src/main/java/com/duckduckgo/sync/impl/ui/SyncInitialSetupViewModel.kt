@@ -21,11 +21,15 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.SyncRepository
 import javax.inject.Inject
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
@@ -36,8 +40,10 @@ constructor(
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
+    private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     private val viewState = MutableStateFlow(ViewState())
     fun viewState(): Flow<ViewState> = viewState.onStart { updateViewState() }
+    fun commands(): Flow<Command> = command.receiveAsFlow()
 
     data class ViewState(
         val userId: String = "",
@@ -46,9 +52,16 @@ constructor(
         val isSignedIn: Boolean = false
     )
 
+    sealed class Command {
+        data class ShowMessage(val message: String) : Command()
+    }
+
     fun onCreateAccountClicked() {
         viewModelScope.launch(dispatchers.io()) {
-            syncRepository.createAccount()
+            val result = syncRepository.createAccount()
+            if (result is Error) {
+                command.send(Command.ShowMessage("${result.code}-${result.reason}"))
+            }
             updateViewState()
         }
     }
@@ -74,8 +87,7 @@ constructor(
                 userId = accountInfo.userId,
                 deviceName = accountInfo.deviceName,
                 deviceId = accountInfo.deviceId,
-                isSignedIn = accountInfo.isSignedIn
-            ),
+                isSignedIn = accountInfo.isSignedIn),
         )
     }
 }

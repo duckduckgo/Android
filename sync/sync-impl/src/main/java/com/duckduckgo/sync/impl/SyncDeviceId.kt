@@ -45,7 +45,6 @@ constructor(
         if (userId != null) return userId
 
         userId = UUID.randomUUID().toString()
-        syncStore.userId = userId
 
         return userId
     }
@@ -55,7 +54,6 @@ constructor(
         if (deviceName != null) return deviceName
 
         deviceName = "${Build.BRAND} ${Build.MODEL}"
-        syncStore.deviceName = deviceName
         return deviceName
     }
 
@@ -67,7 +65,6 @@ constructor(
         deviceName =
             Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
                 ?: "UNKNOWN"
-        syncStore.deviceId = deviceName
         return deviceName
     }
 }
