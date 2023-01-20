@@ -20,7 +20,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    tools:context="com.duckduckgo.autofill.ui.credential.management.AutofillManagementActivity">
+    tools:context=".ui.credential.management.AutofillManagementActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
