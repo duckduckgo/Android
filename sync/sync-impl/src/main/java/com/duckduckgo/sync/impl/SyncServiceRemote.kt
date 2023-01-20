@@ -17,11 +17,10 @@
 package com.duckduckgo.sync.impl
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.store.SyncEncryptedStore
+import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.Types
 import javax.inject.Inject
 import javax.inject.Named
 import okhttp3.ResponseBody
@@ -48,9 +47,9 @@ interface SyncApi {
 class SyncServiceRemote
 @Inject
 constructor(
-    @Named("nonCaching") private val retrofit: Retrofit,
-    private val syncService: SyncService,
-    private val syncEncryptedStore: SyncEncryptedStore,
+        @Named("nonCaching") private val retrofit: Retrofit,
+        private val syncService: SyncService,
+        private val syncStore: SyncStore,
 ) : SyncApi {
     override fun createAccount(
         userID: String,
@@ -71,11 +70,10 @@ constructor(
             }
             .onSuccess { response ->
                 if (response.isSuccessful) {
-                    Timber.i("SYNC signup success ${response.code()} ${response.message()}")
-                    syncEncryptedStore.token =
+                    syncStore.token =
                         response.body()?.token ?: throw IllegalStateException("Empty body")
-                    syncEncryptedStore.primaryKey = primaryKey
-                    syncEncryptedStore.secretKey = secretKey
+                    syncStore.primaryKey = primaryKey
+                    syncStore.secretKey = secretKey
                 } else {
                     response.errorBody()?.let { errorBody ->
                         val converter: Converter<ResponseBody, ErrorResponse> =
@@ -92,12 +90,12 @@ constructor(
     }
 
     override fun storeRecoveryCode() {
-        val primaryKey = syncEncryptedStore.primaryKey ?: return
-        val userID = syncEncryptedStore.userId ?: return
+        val primaryKey = syncStore.primaryKey ?: return
+        val userID = syncStore.userId ?: return
         val recoveryCodeJson = Adapters.recoveryCodeAdapter.toJson(RecoveryCode(primaryKey, userID))
 
         Timber.i("SYNC store recoverCode: ${recoveryCodeJson}")
-        syncEncryptedStore.recoveryCode = recoveryCodeJson
+        syncStore.recoveryCode = recoveryCodeJson
     }
 
     class Adapters {

@@ -21,6 +21,7 @@ import android.util.Base64
 import com.duckduckgo.library.loader.LibraryLoader
 import kotlin.system.exitProcess
 import timber.log.Timber
+import java.util.*
 
 class SyncNativeLib constructor(context: Context) {
 
@@ -34,7 +35,10 @@ class SyncNativeLib constructor(context: Context) {
         }
     }
 
-    fun generateAccountKeys(userId: String, password: String): AccountKeys {
+    fun generateAccountKeys(
+            userId: String,
+            password: String = UUID.randomUUID().toString(),
+    ): AccountKeys {
         val primaryKey = ByteArray(getPrimaryKeySize())
         val secretKey = ByteArray(getSecretKeySize())
         val protectedSecretKey = ByteArray(getProtectedSecretKeySize())

@@ -40,6 +40,7 @@ dependencies {
     implementation KotlinX.coroutines.core
     implementation AndroidX.fragment.ktx
 
+    implementation Square.retrofit2.converter.moshi
     implementation Google.dagger
     implementation AndroidX.core.ktx
 
