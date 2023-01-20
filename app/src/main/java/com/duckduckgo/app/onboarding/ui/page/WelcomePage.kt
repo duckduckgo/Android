@@ -16,12 +16,16 @@
 
 package com.duckduckgo.app.onboarding.ui.page
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewPropertyAnimatorCompat
 import androidx.lifecycle.ViewModelProvider
@@ -49,6 +53,11 @@ class WelcomePage : OnboardingPageFragment() {
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
 
+    private val requestPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+        // Nothing to do at this point with the result. Proceed with the welcome animation.
+        scheduleWelcomeAnimation()
+    }
+
     private var ctaText: String = ""
     private var welcomeAnimation: ViewPropertyAnimatorCompat? = null
     private var typingAnimation: ViewPropertyAnimatorCompat? = null
@@ -70,13 +79,22 @@ class WelcomePage : OnboardingPageFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         configureDaxCta()
-        scheduleWelcomeAnimation()
+        requestNotificationsPermissions()
         setSkipAnimationListener()
 
         lifecycleScope.launch {
             events.asFlow()
                 .flatMapLatest { welcomePageViewModel.reduce(it) }
                 .collect(::render)
+        }
+    }
+
+    @SuppressLint("InlinedApi")
+    private fun requestNotificationsPermissions() {
+        if (appBuildConfig.sdkInt >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            requestPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            scheduleWelcomeAnimation()
         }
     }
 
