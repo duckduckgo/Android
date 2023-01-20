@@ -31,6 +31,9 @@ interface SyncRepository {
     fun getAccountInfo(): AccountInfo
     fun storeRecoveryCode()
     fun removeAccount()
+    fun logout(): Result
+    fun deleteAccount(): Result
+    fun latestToken(): String
 }
 
 @ContributesBinding(AppScope::class)
@@ -97,6 +100,43 @@ class AppSyncRepository @Inject constructor(
 
     override fun removeAccount() {
         syncStore.clearAll()
+    }
+
+    override fun logout(): Result {
+        val token =
+            syncStore.token.takeUnless { it.isNullOrEmpty() }
+                ?: return Result.Error(reason = "Token Empty")
+        val deviceId =
+            syncStore.deviceId.takeUnless { it.isNullOrEmpty() }
+                ?: return Result.Error(reason = "Device Id Empty")
+
+        val result = syncApi.logout(token, deviceId)
+
+        if (result is Result.Success) {
+            syncStore.clearAll()
+        } else {
+            Timber.i("SYNC logout failed $result")
+        }
+        return result
+    }
+
+    override fun deleteAccount(): Result {
+        val token =
+            syncStore.token.takeUnless { it.isNullOrEmpty() }
+                ?: return Result.Error(reason = "Token Empty")
+
+        val result = syncApi.deleteAccount(token)
+
+        if (result is Result.Success) {
+            syncStore.clearAll()
+        } else {
+            Timber.i("SYNC deleteAccount failed $result")
+        }
+        return result
+    }
+
+    override fun latestToken(): String {
+        return syncStore.token ?: ""
     }
 
     private fun isSignedIn() = !syncStore.primaryKey.isNullOrEmpty()

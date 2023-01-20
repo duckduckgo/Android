@@ -78,6 +78,7 @@ class SyncInitialSetupActivity : DuckDuckGoActivity() {
 
     private fun renderViewState(viewState: ViewState) {
         binding.uuidsViewGroup.isVisible = viewState.isSignedIn
+        binding.accountStateTextView.isVisible = viewState.isSignedIn
         binding.userIdTextView.text = viewState.userId
         binding.deviceIdTextView.text = viewState.deviceId
         binding.tokenTextView.text = viewState.token

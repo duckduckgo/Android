@@ -22,7 +22,6 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import retrofit2.Response
-import timber.log.Timber
 import javax.inject.Inject
 
 interface SyncApi {
@@ -34,11 +33,12 @@ interface SyncApi {
         deviceName: String,
     ): Result<AccountCreatedResponse>
 
-    fun logout()
+    fun logout(
+        token: String,
+        deviceId: String
+    ): Result
 
-    fun deleteAccount()
-
-    fun latestToken(): String
+    fun deleteAccount(token: String): Result
 }
 
 @ContributesBinding(AppScope::class)
@@ -96,78 +96,35 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
         }
     }
 
-    override fun logout() {
-        kotlin
-            .runCatching {
-                val deviceId = syncEncryptedStore.deviceId ?: return
-                val token = syncEncryptedStore.token ?: return
-                val logoutCall = syncService.logout("Bearer $token", Logout(deviceId))
-                logoutCall.execute()
+    override fun logout(
+        token: String,
+        deviceId: String
+    ): Result {
+        val response = runCatching {
+            val logoutCall = syncService.logout("Bearer $token", Logout(deviceId))
+            logoutCall.execute()
+        }
+            .getOrElse { throwable ->
+                return Result.Error(reason = throwable.message.toString())
             }
-            .onSuccess { response ->
-                kotlin.runCatching {
-                    if (response.isSuccessful) {
-                        Timber.i("SYNC logout success ${response.code()} ${response.message()}")
-                    } else {
-                        Timber.i("SYNC logout failed ${response.code()} ${response.message()}")
-                        response.errorBody()?.let { errorBody ->
-                            val converter: Converter<ResponseBody, ErrorResponse> =
-                                retrofit.responseBodyConverter(
-                                    ErrorResponse::class.java, arrayOfNulls(0),
-                                )
-                            val errorResponse =
-                                converter.convert(errorBody)
-                                    ?: throw IllegalArgumentException("Can't parse body")
-                            Timber.i(
-                                "SYNC logout failed ${errorResponse.code} ${errorResponse.error}",
-                            )
-                        }
-                            ?: kotlin.run {
-                                Timber.i(
-                                    "SYNC logout failed ${response.code()} ${response.message()}",
-                                )
-                            }
-                    }
-                }.onFailure { throwable -> Timber.i("SYNC jsonmap error ${throwable.message}") }
-            }
-            .onFailure { throwable -> Timber.i("SYNC logout failed ${throwable.message}") }
+
+        return onSuccess(response) {
+            Result.Success("")
+        }
     }
 
-    override fun deleteAccount() {
-        kotlin
-            .runCatching {
-                val token = syncEncryptedStore.token ?: return
-                val deleteAccountCall = syncService.deleteAccount("Bearer $token")
-                deleteAccountCall.execute()
+    override fun deleteAccount(token: String): Result {
+        val response = runCatching {
+            val deleteAccountCall = syncService.deleteAccount("Bearer $token")
+            deleteAccountCall.execute()
+        }
+            .getOrElse { throwable ->
+                return Result.Error(reason = throwable.message.toString())
             }
-            .onSuccess { response ->
-                kotlin.runCatching {
-                    if (response.isSuccessful) {
-                        Timber.i("SYNC deleteAccount success ${response.code()} ${response.message()}")
-                    } else {
-                        Timber.i("SYNC deleteAccount failed ${response.code()} ${response.message()}")
-                        response.errorBody()?.let { errorBody ->
-                            val converter: Converter<ResponseBody, ErrorResponse> =
-                                retrofit.responseBodyConverter(
-                                    ErrorResponse::class.java, arrayOfNulls(0))
-                            val errorResponse =
-                                converter.convert(errorBody)
-                                    ?: throw IllegalArgumentException("Can't parse body")
-                            Timber.i(
-                                "SYNC deleteAccount failed ${errorResponse.code} ${errorResponse.error}")
-                        }
-                            ?: kotlin.run {
-                                Timber.i(
-                                    "SYNC deleteAccount failed ${response.code()} ${response.message()}")
-                            }
-                    }
-                }.onFailure  { throwable -> Timber.i("SYNC jsonmap error ${throwable.message}") }
-            }
-            .onFailure { throwable -> Timber.i("SYNC deleteAccount failed ${throwable.message}") }
-    }
 
-    override fun latestToken(): String {
-        return syncEncryptedStore.token ?: ""
+        return onSuccess(response) {
+            Result.Success("")
+        }
     }
 
     private class Adapters {

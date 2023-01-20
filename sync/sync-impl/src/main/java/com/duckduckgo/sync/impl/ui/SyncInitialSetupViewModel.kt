@@ -83,7 +83,23 @@ constructor(
     }
 
     fun onLogoutClicked() {
-        viewModelScope.launch(Dispatchers.IO) { syncApi.logout() }
+        viewModelScope.launch(dispatchers.io()) {
+            val result = syncRepository.logout()
+            if (result is Error) {
+                command.send(Command.ShowMessage("${result.code}-${result.reason}"))
+            }
+            updateViewState()
+        }
+    }
+
+    fun onDeleteAccountClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            val result = syncRepository.deleteAccount()
+            if (result is Error) {
+                command.send(Command.ShowMessage("${result.code}-${result.reason}"))
+            }
+            updateViewState()
+        }
     }
 
     private suspend fun updateViewState() {
@@ -94,14 +110,9 @@ constructor(
                 deviceName = accountInfo.deviceName,
                 deviceId = accountInfo.deviceId,
                 isSignedIn = accountInfo.isSignedIn,
-                token = syncApi.latestToken(),
+                token = syncRepository.latestToken(),
             ),
         )
     }
 
-    fun onDeleteAccountClicked() {
-        viewModelScope.launch(Dispatchers.IO) {
-            syncApi.deleteAccount()
-        }
-    }
 }
