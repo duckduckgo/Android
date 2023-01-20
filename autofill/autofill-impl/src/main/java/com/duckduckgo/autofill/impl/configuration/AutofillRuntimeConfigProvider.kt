@@ -17,9 +17,9 @@
 package com.duckduckgo.autofill.impl.configuration
 
 import com.duckduckgo.app.email.EmailManager
+import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.jsbridge.response.AvailableInputTypeCredentials
-import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -35,9 +35,9 @@ interface AutofillRuntimeConfigProvider {
 @ContributesBinding(AppScope::class)
 class RealAutofillRuntimeConfigProvider @Inject constructor(
     private val emailManager: EmailManager,
-    private val deviceAuthenticator: DeviceAuthenticator,
     private val autofillStore: AutofillStore,
     private val runtimeConfigurationWriter: RuntimeConfigurationWriter,
+    private val autofillCapabilityChecker: AutofillCapabilityChecker,
 ) : AutofillRuntimeConfigProvider {
     override suspend fun getRuntimeConfiguration(
         rawJs: String,
@@ -48,7 +48,8 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
         val contentScope = runtimeConfigurationWriter.generateContentScope()
         val userUnprotectedDomains = runtimeConfigurationWriter.generateUserUnprotectedDomains()
         val userPreferences = runtimeConfigurationWriter.generateUserPreferences(
-            autofillCredentials = determineIfAutofillEnabled(),
+            autofillCredentials = autofillCapabilityChecker.canInjectCredentialsToWebView(),
+            credentialSaving = autofillCapabilityChecker.canSaveCredentialsFromWebView(),
             showInlineKeyIcon = true,
         )
         val availableInputTypes = generateAvailableInputTypes(url)
@@ -70,10 +71,6 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
         return "availableInputTypes = $json"
     }
 
-    // in the future, we'll also tie this into feature toggles and remote config
-    private fun determineIfAutofillEnabled(): Boolean =
-        autofillStore.autofillAvailable && autofillStore.autofillEnabled && deviceAuthenticator.hasValidDeviceAuthentication()
-
     private suspend fun determineIfCredentialsAvailable(url: String?): AvailableInputTypeCredentials {
         return if (url == null || !determineIfAutofillEnabled()) {
             AvailableInputTypeCredentials(username = false, password = false)
@@ -85,6 +82,10 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
 
             AvailableInputTypeCredentials(username = usernameSearch != null, password = passwordSearch != null)
         }
+    }
+
+    private suspend fun determineIfAutofillEnabled(): Boolean {
+        return autofillCapabilityChecker.isAutofillEnabledByConfiguration() && autofillCapabilityChecker.isAutofillEnabledByUser()
     }
 
     private fun determineIfEmailAvailable(): Boolean = emailManager.isSignedIn()

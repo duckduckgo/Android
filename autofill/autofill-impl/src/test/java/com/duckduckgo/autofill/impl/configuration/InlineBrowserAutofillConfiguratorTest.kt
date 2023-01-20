@@ -20,7 +20,7 @@ import android.webkit.WebView
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.autofill.JavascriptInjector
 import com.duckduckgo.autofill.api.Autofill
-import com.duckduckgo.autofill.api.AutofillFeatureName
+import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
@@ -46,6 +46,7 @@ class InlineBrowserAutofillConfiguratorTest {
     private val autofill: Autofill = mock()
     private val featureToggle: FeatureToggle = mock()
     private val webView: WebView = mock()
+    private val autofillCapabilityChecker: AutofillCapabilityChecker = mock()
 
     @Before
     fun before() = runTest {
@@ -58,12 +59,12 @@ class InlineBrowserAutofillConfiguratorTest {
             TestScope(),
             coroutineRule.testDispatcherProvider,
             autofill,
-            featureToggle,
+            autofillCapabilityChecker,
         )
     }
 
     @Test
-    fun whenFeatureIsNotEnabledThenDoNotInject() {
+    fun whenFeatureIsNotEnabledThenDoNotInject() = runTest {
         givenFeatureIsDisabled()
         inlineBrowserAutofillConfigurator.configureAutofillForCurrentPage(webView, "https://example.com")
 
@@ -71,7 +72,7 @@ class InlineBrowserAutofillConfiguratorTest {
     }
 
     @Test
-    fun whenFeatureIsEnabledAndUrlIsExceptionThenDoNotInject() {
+    fun whenFeatureIsEnabledAndUrlIsExceptionThenDoNotInject() = runTest {
         givenUrlIsAnException()
         givenFeatureIsEnabled()
         inlineBrowserAutofillConfigurator.configureAutofillForCurrentPage(webView, "https://example.com")
@@ -80,7 +81,7 @@ class InlineBrowserAutofillConfiguratorTest {
     }
 
     @Test
-    fun whenFeatureIsEnabledAndUrlIsNotExceptionThenInject() {
+    fun whenFeatureIsEnabledAndUrlIsNotExceptionThenInject() = runTest {
         givenUrlIsNotAnException()
         givenFeatureIsEnabled()
         inlineBrowserAutofillConfigurator.configureAutofillForCurrentPage(webView, "https://example.com")
@@ -96,11 +97,11 @@ class InlineBrowserAutofillConfiguratorTest {
         whenever(autofill.isAnException(any())).thenReturn(false)
     }
 
-    private fun givenFeatureIsEnabled() {
-        whenever(featureToggle.isFeatureEnabled(AutofillFeatureName.Autofill.value, true)).thenReturn(true)
+    private suspend fun givenFeatureIsEnabled() {
+        whenever(autofillCapabilityChecker.isAutofillEnabledByConfiguration()).thenReturn(true)
     }
 
-    private fun givenFeatureIsDisabled() {
-        whenever(featureToggle.isFeatureEnabled(AutofillFeatureName.Autofill.value, true)).thenReturn(false)
+    private suspend fun givenFeatureIsDisabled() {
+        whenever(autofillCapabilityChecker.isAutofillEnabledByConfiguration()).thenReturn(false)
     }
 }

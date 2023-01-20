@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.impl.plugins
+package com.duckduckgo.autofill.impl.feature.plugin
 
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.autofill.impl.autofillFeatureValueOf
-import com.duckduckgo.autofill.store.AutofillFeatureToggleRepository
+import com.duckduckgo.autofill.store.feature.AutofillFeatureToggleRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureTogglesPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -26,12 +25,16 @@ import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class AutofillFeatureTogglesPlugin @Inject constructor(
-    private val autofillFeatureToggleRepository: AutofillFeatureToggleRepository,
+    private val configRepository: AutofillFeatureToggleRepository,
     private val appBuildConfig: AppBuildConfig,
 ) : FeatureTogglesPlugin {
-    override fun isEnabled(featureName: String, defaultValue: Boolean): Boolean? {
-        val autofillFeature = autofillFeatureValueOf(featureName) ?: return null
-        return autofillFeatureToggleRepository.get(autofillFeature, defaultValue) &&
-            appBuildConfig.versionCode >= autofillFeatureToggleRepository.getMinSupportedVersion(autofillFeature)
+
+    override fun isEnabled(
+        featureName: String,
+        defaultValue: Boolean,
+    ): Boolean? {
+        val autofillElement = getAutofillElement(featureName) ?: return null
+        return configRepository.get(autofillElement, defaultValue) &&
+            appBuildConfig.versionCode >= configRepository.getMinSupportedVersion(autofillElement)
     }
 }

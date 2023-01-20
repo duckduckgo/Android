@@ -111,6 +111,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
+import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.store.AutofillStore
@@ -181,6 +182,7 @@ class BrowserTabViewModel @Inject constructor(
     private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger,
     private val settingsDataStore: SettingsDataStore,
     private val autofillStore: AutofillStore,
+    private val autofillCapabilityChecker: AutofillCapabilityChecker,
     private val adClickManager: AdClickManager,
     private val sitePermissionsManager: SitePermissionsManager,
 ) : WebViewClientListener,
@@ -2180,7 +2182,7 @@ class BrowserTabViewModel @Inject constructor(
     private suspend fun initializeViewStatesFromPersistedData() {
         withContext(dispatchers.io()) {
             val addToHomeSupported = addToHomeCapabilityDetector.isAddToHomeSupported()
-            val showAutofill = autofillStore.autofillAvailable
+            val showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen()
             val showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch()
 
             withContext(dispatchers.main()) {

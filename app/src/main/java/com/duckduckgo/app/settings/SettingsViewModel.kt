@@ -38,7 +38,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.api.Autoconsent
-import com.duckduckgo.autofill.api.store.AutofillStore
+import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
@@ -74,7 +74,7 @@ class SettingsViewModel @Inject constructor(
     private val pixel: Pixel,
     private val appBuildConfig: AppBuildConfig,
     private val emailManager: EmailManager,
-    private val autofillStore: AutofillStore,
+    private val autofillCapabilityChecker: AutofillCapabilityChecker,
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
     private val autoconsent: Autoconsent,
 ) : ViewModel(), DefaultLifecycleObserver {
@@ -164,7 +164,7 @@ class SettingsViewModel @Inject constructor(
                     appTrackingProtectionOnboardingShown = vpnStore.didShowOnboarding(),
                     appTrackingProtectionEnabled = vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN),
                     emailAddress = emailManager.getEmailAddress(),
-                    showAutofill = autofillStore.autofillAvailable,
+                    showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen(),
                     autoconsentEnabled = autoconsent.isSettingEnabled(),
                 ),
             )

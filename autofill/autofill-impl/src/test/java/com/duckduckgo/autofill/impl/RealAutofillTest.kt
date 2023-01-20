@@ -18,7 +18,7 @@ package com.duckduckgo.autofill.impl
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.autofill.api.AutofillException
-import com.duckduckgo.autofill.store.AutofillRepository
+import com.duckduckgo.autofill.store.feature.AutofillFeatureRepository
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import java.util.concurrent.CopyOnWriteArrayList
 import org.junit.Assert.*
@@ -30,7 +30,7 @@ import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class RealAutofillTest {
-    private val mockAutofillRepository: AutofillRepository = mock()
+    private val mockAutofillRepository: AutofillFeatureRepository = mock()
     private val mockUnprotectedTemporary: UnprotectedTemporary = mock()
     lateinit var testee: RealAutofill
 

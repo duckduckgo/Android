@@ -20,6 +20,7 @@ import android.webkit.WebView
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.Callback
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
@@ -59,6 +60,7 @@ class AutofillStoredBackJavascriptInterfaceTest {
     private val autofillResponseWriter: AutofillResponseWriter = mock()
     private val currentUrlProvider: UrlProvider = mock()
     private val autofillDomainFormatter: AutofillDomainFormatter = AutofillDomainFormatterDomainNameOnly()
+    private val autofillCapabilityChecker: AutofillCapabilityChecker = mock()
     private val coroutineScope: CoroutineScope = TestScope()
 
     private val testWebView = WebView(getApplicationContext())
@@ -68,6 +70,9 @@ class AutofillStoredBackJavascriptInterfaceTest {
 
     @Before
     fun setUp() = runTest {
+        whenever(autofillCapabilityChecker.isAutofillEnabledByConfiguration()).thenReturn(true)
+        whenever(autofillCapabilityChecker.canInjectCredentialsToWebView()).thenReturn(true)
+        whenever(autofillCapabilityChecker.canSaveCredentialsFromWebView()).thenReturn(true)
         testee = AutofillStoredBackJavascriptInterface(
             requestParser = requestParser,
             autofillStore = autofillStore,
@@ -77,6 +82,7 @@ class AutofillStoredBackJavascriptInterfaceTest {
             currentUrlProvider = currentUrlProvider,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             autofillDomainFormatter = autofillDomainFormatter,
+            autofillCapabilityChecker = autofillCapabilityChecker,
         )
         testee.callback = testCallback
         testee.webView = testWebView

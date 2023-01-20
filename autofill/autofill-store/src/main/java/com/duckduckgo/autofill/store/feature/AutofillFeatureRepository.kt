@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,28 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.store
+package com.duckduckgo.autofill.store.feature
 
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autofill.api.AutofillException
+import com.duckduckgo.autofill.store.AutofillDao
+import com.duckduckgo.autofill.store.AutofillDatabase
+import com.duckduckgo.autofill.store.AutofillExceptionEntity
+import com.duckduckgo.autofill.store.toAutofillException
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-interface AutofillRepository {
-    fun updateAll(exceptions: List<AutofillExceptionEntity>)
+interface AutofillFeatureRepository {
+    fun updateAllExceptions(exceptions: List<AutofillExceptionEntity>)
     val exceptions: CopyOnWriteArrayList<AutofillException>
 }
 
-class RealAutofillRepository(
+class RealAutofillFeatureRepository(
     val database: AutofillDatabase,
     coroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
-) : AutofillRepository {
+) : AutofillFeatureRepository {
 
     private val autofillDao: AutofillDao = database.autofillDao()
     override val exceptions = CopyOnWriteArrayList<AutofillException>()
@@ -40,7 +44,7 @@ class RealAutofillRepository(
         coroutineScope.launch(dispatcherProvider.io()) { loadToMemory() }
     }
 
-    override fun updateAll(exceptions: List<AutofillExceptionEntity>) {
+    override fun updateAllExceptions(exceptions: List<AutofillExceptionEntity>) {
         autofillDao.updateAll(exceptions)
         loadToMemory()
     }

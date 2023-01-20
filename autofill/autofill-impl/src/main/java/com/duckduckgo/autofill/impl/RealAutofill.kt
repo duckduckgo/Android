@@ -18,7 +18,7 @@ package com.duckduckgo.autofill.impl
 
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.autofill.api.Autofill
-import com.duckduckgo.autofill.store.AutofillRepository
+import com.duckduckgo.autofill.store.feature.AutofillFeatureRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.squareup.anvil.annotations.ContributesBinding
@@ -28,7 +28,7 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class RealAutofill @Inject constructor(
-    private val autofillRepository: AutofillRepository,
+    private val autofillRepository: AutofillFeatureRepository,
     private val unprotectedTemporary: UnprotectedTemporary,
 ) : Autofill {
 

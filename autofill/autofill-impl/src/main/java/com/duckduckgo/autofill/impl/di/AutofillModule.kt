@@ -25,17 +25,17 @@ import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.api.ui.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.autofill.store.ALL_MIGRATIONS
 import com.duckduckgo.autofill.store.AutofillDatabase
-import com.duckduckgo.autofill.store.AutofillFeatureToggleRepository
-import com.duckduckgo.autofill.store.AutofillFeatureToggleStore
-import com.duckduckgo.autofill.store.AutofillRepository
 import com.duckduckgo.autofill.store.InternalTestUserStore
-import com.duckduckgo.autofill.store.RealAutofillFeatureToggleRepository
-import com.duckduckgo.autofill.store.RealAutofillFeatureToggleStore
 import com.duckduckgo.autofill.store.RealAutofillPrefsStore
-import com.duckduckgo.autofill.store.RealAutofillRepository
 import com.duckduckgo.autofill.store.RealInternalTestUserStore
 import com.duckduckgo.autofill.store.RealLastUpdatedTimeProvider
 import com.duckduckgo.autofill.store.SecureStoreBackedAutofillStore
+import com.duckduckgo.autofill.store.feature.AutofillFeatureRepository
+import com.duckduckgo.autofill.store.feature.AutofillFeatureToggleRepository
+import com.duckduckgo.autofill.store.feature.AutofillFeatureToggleStore
+import com.duckduckgo.autofill.store.feature.RealAutofillFeatureRepository
+import com.duckduckgo.autofill.store.feature.RealAutofillFeatureToggleRepository
+import com.duckduckgo.autofill.store.feature.RealAutofillFeatureToggleStore
 import com.duckduckgo.autofill.store.urlmatcher.AutofillDomainNameUrlMatcher
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.securestorage.api.SecureStorage
@@ -62,7 +62,6 @@ class AutofillModule {
     ): AutofillStore {
         return SecureStoreBackedAutofillStore(
             secureStorage = secureStorage,
-            internalTestUserChecker = internalTestUserChecker,
             lastUpdatedTimeProvider = RealLastUpdatedTimeProvider(),
             autofillPrefsStore = RealAutofillPrefsStore(context, internalTestUserChecker),
             autofillUrlMatcher = autofillUrlMatcher,
@@ -87,14 +86,14 @@ class AutofillModule {
         database: AutofillDatabase,
         @AppCoroutineScope coroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
-    ): AutofillRepository {
-        return RealAutofillRepository(database, coroutineScope, dispatcherProvider)
+    ): AutofillFeatureRepository {
+        return RealAutofillFeatureRepository(database, coroutineScope, dispatcherProvider)
     }
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideAutofillFeatureToggleRepository(cookiesFeatureToggleStore: AutofillFeatureToggleStore): AutofillFeatureToggleRepository {
-        return RealAutofillFeatureToggleRepository(cookiesFeatureToggleStore)
+    fun provideAutofillFeatureToggleRepository(autofillToggleStore: AutofillFeatureToggleStore): AutofillFeatureToggleRepository {
+        return RealAutofillFeatureToggleRepository(autofillToggleStore)
     }
 
     @SingleInstanceIn(AppScope::class)

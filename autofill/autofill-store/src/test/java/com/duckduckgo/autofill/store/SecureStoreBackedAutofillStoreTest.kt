@@ -19,7 +19,6 @@ package com.duckduckgo.autofill.store
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
-import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult
 import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult.ExactMatch
@@ -64,7 +63,6 @@ class SecureStoreBackedAutofillStoreTest {
     @Mock
     private lateinit var autofillPrefsStore: AutofillPrefsStore
     private lateinit var testee: SecureStoreBackedAutofillStore
-    private lateinit var internalTestUserChecker: FakeInternalTestUserChecker
     private lateinit var secureStore: FakeSecureStore
 
     private val autofillUrlMatcher: AutofillUrlMatcher = AutofillDomainNameUrlMatcher()
@@ -78,14 +76,14 @@ class SecureStoreBackedAutofillStoreTest {
 
     @Test
     fun whenAutofillUnavailableAndPrefsAreAllTrueThenReturnTrueForAutofillEnabledAndShowOnboardingWhenOfferingToSaveLogin() {
-        setupTestee(isInternalUser = false, canAccessSecureStorage = false)
+        setupTestee(canAccessSecureStorage = false)
 
         assertTrue(testee.autofillEnabled)
         assertTrue(testee.showOnboardingWhenOfferingToSaveLogin)
     }
 
     @Test
-    fun whenAutofillAvailableAndPrefsAreAllFalseThenReturnFalseForAutofillEnabledAndShowOnboardingWhenOfferingToSaveLogin() {
+    fun whenAutofillAvailableAndPrefsAreAllFalseThenReturnFalseForAutofillEnabledAndShowOnboardingWhenOfferingToSaveLogin() = runTest {
         setupTesteeWithAutofillAvailable()
         whenever(autofillPrefsStore.isEnabled).thenReturn(false)
         whenever(autofillPrefsStore.showOnboardingWhenOfferingToSaveLogin).thenReturn(false)
@@ -95,35 +93,20 @@ class SecureStoreBackedAutofillStoreTest {
     }
 
     @Test
-    fun whenInternalTestUserTrueThenReturnAutofillEnabled() {
+    fun whenSecureStorageAvailableThenReturnAutofillAvailable() = runTest {
         setupTesteeWithAutofillAvailable()
         assertTrue(testee.autofillAvailable)
     }
 
     @Test
-    fun whenInternalTestUserFalseThenReturnAutofillAvailableFalse() {
-        setupTestee(isInternalUser = false, canAccessSecureStorage = true)
+    fun whenSecureStorageNotAvailableThenReturnAutofillAvailableFalse() {
+        setupTestee(canAccessSecureStorage = false)
         assertFalse(testee.autofillAvailable)
     }
 
     @Test
-    fun whenInternalTestUserButCantAccessSecureStorageThenReturnAutofillAvailableFalse() {
-        setupTestee(isInternalUser = true, canAccessSecureStorage = false)
-        assertFalse(testee.autofillAvailable)
-    }
-
-    @Test
-    fun whenInternalTestUserFalseThenGetCredentialsWithDomainReturnsEmpty() = runTest {
-        setupTestee(isInternalUser = false, canAccessSecureStorage = true)
-        val url = "example.com"
-        storeCredentials(1, url, "username", "password")
-
-        assertTrue(testee.getCredentials(url).isEmpty())
-    }
-
-    @Test
-    fun whenInternalTestUserButCantAccessSecureStorageThenGetCredentialsWithDomainReturnsEmpty() = runTest {
-        setupTestee(isInternalUser = true, canAccessSecureStorage = false)
+    fun whenAutofillEnabledButCannotAccessSecureStorageThenGetCredentialsWithDomainReturnsEmpty() = runTest {
+        setupTestee(canAccessSecureStorage = false)
         val url = "example.com"
         storeCredentials(1, url, "username", "password")
 
@@ -447,26 +430,15 @@ class SecureStoreBackedAutofillStoreTest {
     }
 
     private fun setupTesteeWithAutofillAvailable() {
-        internalTestUserChecker = FakeInternalTestUserChecker(true)
-        secureStore = FakeSecureStore(true)
-        testee = SecureStoreBackedAutofillStore(
-            secureStorage = secureStore,
-            internalTestUserChecker = internalTestUserChecker,
-            lastUpdatedTimeProvider = lastUpdatedTimeProvider,
-            autofillPrefsStore = autofillPrefsStore,
-            autofillUrlMatcher = autofillUrlMatcher,
-        )
+        setupTestee(canAccessSecureStorage = true)
     }
 
     private fun setupTestee(
-        isInternalUser: Boolean,
         canAccessSecureStorage: Boolean,
     ) {
-        internalTestUserChecker = FakeInternalTestUserChecker(isInternalUser)
         secureStore = FakeSecureStore(canAccessSecureStorage)
         testee = SecureStoreBackedAutofillStore(
             secureStorage = secureStore,
-            internalTestUserChecker = internalTestUserChecker,
             lastUpdatedTimeProvider = lastUpdatedTimeProvider,
             autofillPrefsStore = autofillPrefsStore,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
@@ -570,15 +542,6 @@ class SecureStoreBackedAutofillStoreTest {
         }
 
         override fun canAccessSecureStorage(): Boolean = canAccessSecureStorage
-    }
-
-    private class FakeInternalTestUserChecker constructor(val expectedValueIsInternalTestUser: Boolean) : InternalTestUserChecker {
-        override val isInternalTestUser: Boolean
-            get() = expectedValueIsInternalTestUser
-
-        override fun verifyVerificationErrorReceived(url: String) {}
-
-        override fun verifyVerificationCompleted(url: String) {}
     }
 
     companion object {

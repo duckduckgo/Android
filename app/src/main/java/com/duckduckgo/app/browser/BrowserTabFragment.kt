@@ -170,6 +170,7 @@ import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
+import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.AutofillSettingsActivityLauncher
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.Callback
@@ -371,6 +372,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var autofillSettingsActivityLauncher: AutofillSettingsActivityLauncher
+
+    @Inject
+    lateinit var autofillCapabilityChecker: AutofillCapabilityChecker
 
     @Inject
     lateinit var sitePermissionsDialogLauncher: SitePermissionsDialogLauncher
@@ -1934,10 +1938,13 @@ class BrowserTabFragment :
     ) {
         delay(delay)
         withContext(dispatchers.main()) {
-            browserLayout.makeSnackbarWithNoBottomInset(messageResourceId, Snackbar.LENGTH_LONG)
-                .setAction(R.string.autofillSnackbarAction) {
+            val snackbar = browserLayout.makeSnackbarWithNoBottomInset(messageResourceId, Snackbar.LENGTH_LONG)
+            if (autofillCapabilityChecker.canAccessCredentialManagementScreen()) {
+                snackbar.setAction(R.string.autofillSnackbarAction) {
                     context?.let { startActivity(autofillSettingsActivityLauncher.intentDirectlyViewCredentials(it, loginCredentials)) }
-                }.show()
+                }
+            }
+            snackbar.show()
         }
     }
 

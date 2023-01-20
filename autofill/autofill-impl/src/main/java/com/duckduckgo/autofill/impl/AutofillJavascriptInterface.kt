@@ -22,6 +22,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.utils.ConflatedJob
+import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.Callback
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
@@ -75,6 +76,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
     private val currentUrlProvider: UrlProvider = WebViewUrlProvider(dispatcherProvider),
+    private val autofillCapabilityChecker: AutofillCapabilityChecker,
 ) : AutofillJavascriptInterface {
 
     override var callback: Callback? = null
@@ -89,6 +91,11 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     override fun getAutofillData(requestString: String) {
         Timber.v("BrowserAutofill: getAutofillData called:\n%s", requestString)
         getAutofillDataJob += coroutineScope.launch(dispatcherProvider.default()) {
+            if (!autofillCapabilityChecker.canInjectCredentialsToWebView()) {
+                Timber.v("BrowserAutofill: getAutofillData called but feature is disabled")
+                return@launch
+            }
+
             val url = currentUrlProvider.currentUrl(webView)
             if (url == null) {
                 Timber.w("Can't autofill as can't retrieve current URL")
@@ -146,6 +153,11 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
         Timber.i("storeFormData called, credentials provided to be persisted")
 
         storeFormDataJob += coroutineScope.launch(dispatcherProvider.default()) {
+            if (!autofillCapabilityChecker.canSaveCredentialsFromWebView()) {
+                Timber.v("BrowserAutofill: storeFormData called but feature is disabled")
+                return@launch
+            }
+
             val currentUrl = currentUrlProvider.currentUrl(webView) ?: return@launch
             val title = autofillDomainFormatter.extractDomain(currentUrl)
 

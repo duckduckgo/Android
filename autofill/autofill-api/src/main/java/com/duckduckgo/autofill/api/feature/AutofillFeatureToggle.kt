@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.impl
+package com.duckduckgo.autofill.api.feature
 
-import com.duckduckgo.autofill.api.feature.AutofillFeatureName
-
-/**
- * Convenience method to get the [AutofillFeatureName] from its [String] value
- */
-fun autofillFeatureValueOf(value: String): AutofillFeatureName? {
-    return AutofillFeatureName.values().find { it.value == value }
+interface AutofillFeatureToggle {
+    /**
+     * This method takes a [featureName] and optionally a default value.
+     * @return `true` if the feature is enabled, `false` if is not
+     */
+    fun isFeatureEnabled(
+        featureName: AutofillSubfeatureName,
+        defaultValue: Boolean = true,
+    ): Boolean
 }

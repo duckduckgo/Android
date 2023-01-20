@@ -122,6 +122,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
+import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.store.AutofillStore
@@ -381,6 +382,8 @@ class BrowserTabViewModelTest {
 
     private val mockAppTheme: AppTheme = mock()
 
+    private val autofillCapabilityChecker: AutofillCapabilityChecker = FakeCapabilityChecker(enabled = false)
+
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
@@ -486,6 +489,7 @@ class BrowserTabViewModelTest {
             autofillStore = mockAutofillStore,
             adClickManager = mockAdClickManager,
             sitePermissionsManager = mockSitePermissionsManager,
+            autofillCapabilityChecker = autofillCapabilityChecker,
         )
 
         testee.loadData("abc", null, false, false)
@@ -4488,4 +4492,13 @@ class BrowserTabViewModelTest {
     private fun globalLayoutViewState() = testee.globalLayoutState.value!!
     private fun browserGlobalLayoutViewState() = testee.globalLayoutState.value!! as BrowserTabViewModel.GlobalLayoutViewState.Browser
     private fun accessibilityViewState() = testee.accessibilityViewState.value!!
+
+    class FakeCapabilityChecker(private val enabled: Boolean) : AutofillCapabilityChecker {
+        override suspend fun isAutofillEnabledByConfiguration() = enabled
+        override suspend fun isAutofillEnabledByUser() = enabled
+        override suspend fun isSecureAutofillAvailable() = enabled
+        override suspend fun canInjectCredentialsToWebView() = enabled
+        override suspend fun canSaveCredentialsFromWebView() = enabled
+        override suspend fun canAccessCredentialManagementScreen() = enabled
+    }
 }
