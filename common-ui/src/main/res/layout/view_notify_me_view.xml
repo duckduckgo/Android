@@ -28,7 +28,7 @@
         android:layout_height="match_parent"
         android:padding="@dimen/keyline_4">
 
-        <TextView
+        <<com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/notifyMeMessageTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
