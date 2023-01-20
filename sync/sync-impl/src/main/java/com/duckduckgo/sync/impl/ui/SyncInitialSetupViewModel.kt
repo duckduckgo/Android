@@ -17,25 +17,23 @@
 package com.duckduckgo.sync.impl.ui
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.sync.impl.SyncDeviceIds
-import com.duckduckgo.sync.impl.SyncApi
-import com.duckduckgo.sync.lib.AccountKeys
-import com.duckduckgo.sync.lib.SyncNativeLib
-import kotlinx.coroutines.Dispatchers
+import com.duckduckgo.sync.impl.SyncRepository
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
 class SyncInitialSetupViewModel
 @Inject
 constructor(
-    private val syncDeviceIds: SyncDeviceIds,
-    private val nativeLib: SyncNativeLib,
-    private val syncApi: SyncApi,
+    private val syncRepository: SyncRepository,
+    private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
     private val viewState = MutableStateFlow(ViewState())
@@ -45,43 +43,39 @@ constructor(
         val userId: String = "",
         val deviceName: String = "",
         val deviceId: String = "",
+        val isSignedIn: Boolean = false
     )
 
-    private suspend fun updateViewState() {
-        viewState.emit(
-            viewState.value.copy(
-                userId = syncDeviceIds.userId(),
-                deviceName = syncDeviceIds.deviceName(),
-                deviceId = syncDeviceIds.deviceId(),
-            ),
-        )
-    }
-
     fun onCreateAccountClicked() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val account: AccountKeys = nativeLib.generateAccountKeys(
-                userId = syncDeviceIds.userId()
-            )
-            syncApi.createAccount(
-                account.userId,
-                account.primaryKey,
-                account.secretKey,
-                account.passwordHash,
-                account.protectedSecretKey,
-                syncDeviceIds.deviceId(),
-                syncDeviceIds.deviceName())
+        viewModelScope.launch(dispatchers.io()) {
+            syncRepository.createAccount()
+            updateViewState()
         }
     }
 
     fun onStoreRecoveryCodeClicked() {
-        viewModelScope.launch(Dispatchers.IO) {
-            syncApi.storeRecoveryCode()
+        viewModelScope.launch(dispatchers.io()) {
+            syncRepository.storeRecoveryCode()
+            updateViewState()
         }
     }
 
     fun onResetClicked() {
-        viewModelScope.launch(Dispatchers.IO) {
-
+        viewModelScope.launch(dispatchers.io()) {
+            syncRepository.removeAccount()
+            updateViewState()
         }
+    }
+
+    private suspend fun updateViewState() {
+        val accountInfo = syncRepository.getAccountInfo()
+        viewState.emit(
+            viewState.value.copy(
+                userId = accountInfo.userId,
+                deviceName = accountInfo.deviceName,
+                deviceId = accountInfo.deviceId,
+                isSignedIn = accountInfo.isSignedIn
+            ),
+        )
     }
 }

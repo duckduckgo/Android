@@ -73,12 +73,28 @@
             android:layout_height="wrap_content"
             app:typography="body1" />
 
-        <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimarySmall
-            android:id="@+id/createAccountButton"
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_margin="10dp"
             android:layout_height="wrap_content"
-            android:text="Create account" />
+            android:orientation="horizontal">
+
+            <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimarySmall
+                android:id="@+id/createAccountButton"
+                android:layout_width="wrap_content"
+                android:layout_margin="10dp"
+                android:layout_height="wrap_content"
+                android:text="Create account" />
+
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                android:id="@+id/accountStateTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:text="Signed in"
+                android:layout_gravity="center"
+                app:typography="body1" />
+        </LinearLayout>
 
         <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimarySmall
             android:id="@+id/storeRecoveryCodeButton"
@@ -92,7 +108,7 @@
             android:layout_width="wrap_content"
             android:layout_margin="10dp"
             android:layout_height="wrap_content"
-            android:text="Reset"/>
+            android:text="Reset" />
 
     </LinearLayout>
 </ScrollView>

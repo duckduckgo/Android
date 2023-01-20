@@ -17,6 +17,7 @@
 package com.duckduckgo.sync.impl.ui
 
 import android.os.Bundle
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -60,5 +61,6 @@ class SyncInitialSetupActivity : DuckDuckGoActivity() {
         binding.userIdTextView.text = viewState.userId
         binding.deviceIdTextView.text = viewState.deviceId
         binding.deviceNameTextView.text = viewState.deviceName
+        binding.accountStateTextView.isVisible = viewState.isSignedIn
     }
 }
