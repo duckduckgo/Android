@@ -53,8 +53,8 @@
         <item name="android:textColor">?attr/daxColorPrimaryText</item>
         <item name="android:textColorPrimary">?attr/daxColorPrimaryText</item>
         <item name="android:textColorSecondary">?attr/daxColorSecondaryText</item>
-        <item name="android:background">?attr/dialogBgColor</item>
-        <item name="colorAccent">@color/cornflowerBlue</item>
+        <item name="android:background">?attr/daxColorSurface</item>
+        <item name="colorAccent">?attr/daxColorAccentBlue</item>
         <item name="android:textColorAlertDialogListItem">?attr/daxColorPrimaryText</item>
         <item name="textColorAlertDialogListItem">?attr/daxColorPrimaryText</item>
         <item name="android:buttonBarButtonStyle">@style/AlertDialogButtonStyle</item>
@@ -64,7 +64,7 @@
     </style>
 
     <style name="AlertDialogButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
-        <item name="android:textColor">@color/cornflowerBlue</item>
+        <item name="android:textColor">?attr/daxColorAccentBlue</item>
     </style>
 
     <style name="SettingsSectionTitle">
@@ -85,41 +85,6 @@
     <style name="SectionDivider">
         <item name="android:paddingTop">24dp</item>
         <item name="android:paddingBottom">24dp</item>
-    </style>
-
-    <style name="BrowserIconMenuItem">
-        <item name="android:paddingTop">6dp</item>
-        <item name="android:paddingBottom">6dp</item>
-        <item name="android:background">?selectableItemBackground</item>
-        <item name="android:tint">?attr/browserIconColorSelector</item>
-    </style>
-
-    <style name="BrowserTextMenuItem">
-        <item name="android:paddingEnd">24dp</item>
-        <item name="android:paddingStart">24dp</item>
-        <item name="android:paddingTop">14dp</item>
-        <item name="android:paddingBottom">14dp</item>
-        <item name="android:textSize">16sp</item>
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textStyle">normal</item>
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:textColor">@color/browser_menu_text</item>
-        <item name="android:background">?attr/selectableItemBackground</item>
-    </style>
-
-    <style name="BrowserCheckBoxMenuItem">
-        <item name="android:paddingEnd">24dp</item>
-        <item name="android:paddingStart">24dp</item>
-        <item name="android:paddingTop">14dp</item>
-        <item name="android:paddingBottom">14dp</item>
-        <item name="android:textSize">16sp</item>
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textStyle">normal</item>
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:textColor">@color/browser_menu_text</item>
-        <item name="android:background">?attr/selectableItemBackground</item>
     </style>
 
     <style name="FeedbackFragmentStyle">
@@ -146,14 +111,6 @@
         <item name="android:textSize">15sp</item>
         <item name="rippleColor">?attr/emailButtonRippleColor</item>
         <item name="android:textColor">@color/red50</item>
-    </style>
-
-    <style name="UnknownTrackerText">
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textAlignment">center</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">?attr/omnibarLogoLetterTextColor</item>
-        <item name="android:textSize">13sp</item>
     </style>
 
     <style name="snackbarButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Snackbar">

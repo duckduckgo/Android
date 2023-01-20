@@ -93,7 +93,7 @@
         <item name="android:paddingStart">@dimen/keyline_4</item>
         <item name="android:gravity">center</item>
         <item name="android:textAlignment">viewStart</item>
-        <item name="android:textColor">@color/browser_menu_text</item>
+        <item name="android:textColor">@color/primary_text_color_selector</item>
         <item name="android:background">?attr/selectableItemBackground</item>
     </style>
 

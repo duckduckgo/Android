@@ -132,18 +132,6 @@
         <item name="preferDarkNavigationBarIcons">false</item>
 
         <!-- Legacy colors to remove-->
-        <item name="subtitleTextColor">@color/grayishTwo</item>
-        <item name="dialogBgColor">@color/almostBlackDark</item>
-        <item name="browserIconColorSelector">@color/browser_icon_color_selector_dark</item>
-        <item name="browserMenuTextColor">@color/white</item>
-        <item name="browserMenuTextColorDisabled">@color/warGreyTwo</item>
-        <item name="omnibarLogoLetterTextColor">@color/midGray</item>
-        <item name="autoCompleteTextColor">@color/white</item>
-        <item name="autoCompleteSubtitleTextColor">@color/grayish</item>
-        <item name="tabSelectedBorderColor">@color/skyBlue</item>
-        <item name="tabsFireTextColor">@color/white</item>
-        <item name="tabCardBackgroundColor">@color/almostBlack</item>
-        <item name="whitelistTextColor">@color/white</item>
         <item name="bookmarkIconColor">@color/white</item>
         <item name="websiteListFaviconBackground">@color/almostBlack</item>
         <item name="listItemImageBackground">@color/almostBlack</item>
@@ -192,7 +180,7 @@
         <item name="primaryButtonDisabledColor">@color/gray85</item>
 
         <item name="dialogPrimaryButtonColor">@color/cornflowerBlue</item>
-        <item name="dialogSecondaryButtonColor">?attr/dialogBgColor</item>
+        <item name="dialogSecondaryButtonColor">?attr/daxColorSurface</item>
 
         <item name="bottomShadowBackground">@null</item>
         <item name="appTPHeaderBackground">@color/darkThemePrimaryDark</item>
@@ -262,19 +250,8 @@
         <item name="preferDarkNavigationBarIcons">true</item>
 
         <!-- Legacy colors to remove-->
-        <item name="dialogBgColor">@color/white</item>
-        <item name="browserIconColorSelector">@color/browser_icon_color_selector_light</item>
-        <item name="browserMenuTextColor">@color/almostBlackDark</item>
-        <item name="browserMenuTextColorDisabled">@color/pinkish_grey_two</item>
-        <item name="omnibarLogoLetterTextColor">@color/whiteFour</item>
-        <item name="autoCompleteTextColor">@color/almostBlackDark</item>
-        <item name="autoCompleteSubtitleTextColor">@color/warmerGray</item>
-        <item name="tabSelectedBorderColor">@color/cornflowerBlue</item>
-        <item name="tabsFireTextColor">@color/warmerGray</item>
-        <item name="tabCardBackgroundColor">@color/white</item>
         <item name="bookmarkIconColor">@color/almostBlackDark</item>
         <item name="savedSiteEmptyTextColor">@color/almostBlackDark</item>
-        <item name="whitelistTextColor">@color/almostBlack</item>
         <item name="websiteListFaviconBackground">@color/whiteSix</item>
         <item name="listItemImageBackground">@color/whiteSix</item>
         <item name="fireproofWebsiteTitleTextColor">@color/almostBlack</item>
@@ -320,7 +297,7 @@
         <item name="primaryButtonDisabledColor">@color/gray30</item>
 
         <item name="dialogPrimaryButtonColor">@color/cornflowerBlue</item>
-        <item name="dialogSecondaryButtonColor">?attr/dialogBgColor</item>
+        <item name="dialogSecondaryButtonColor">?attr/daxColorSurface</item>
 
         <item name="bottomShadowBackground">@drawable/divider_shadow_background</item>
 
