@@ -19,8 +19,6 @@
     <attr name="toolbarIconColor" format="color" />
     <attr name="toolbarBgColor" format="color" />
 
-    <attr name="bookmarkIconColor" format="color" />
-    <attr name="websiteListFaviconBackground" format="color" />
     <attr name="savedSiteEmptyTextColor" format="color" />
     <attr name="settingsItemTextColor" format="color" />
     <attr name="settingsItemTextColorDisabled" format="color" />

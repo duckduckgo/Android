@@ -132,8 +132,6 @@
         <item name="preferDarkNavigationBarIcons">false</item>
 
         <!-- Legacy colors to remove-->
-        <item name="bookmarkIconColor">@color/white</item>
-        <item name="websiteListFaviconBackground">@color/almostBlack</item>
         <item name="listItemImageBackground">@color/almostBlack</item>
         <item name="savedSiteEmptyTextColor">@color/white</item>
         <item name="fireproofWebsiteTitleTextColor">@color/white</item>
@@ -250,9 +248,7 @@
         <item name="preferDarkNavigationBarIcons">true</item>
 
         <!-- Legacy colors to remove-->
-        <item name="bookmarkIconColor">@color/almostBlackDark</item>
         <item name="savedSiteEmptyTextColor">@color/almostBlackDark</item>
-        <item name="websiteListFaviconBackground">@color/whiteSix</item>
         <item name="listItemImageBackground">@color/whiteSix</item>
         <item name="fireproofWebsiteTitleTextColor">@color/almostBlack</item>
         <item name="deviceShieldExcludedAppNameTextColor">@color/almostBlack</item>
