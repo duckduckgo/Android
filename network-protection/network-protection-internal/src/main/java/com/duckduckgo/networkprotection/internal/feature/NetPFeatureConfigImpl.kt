@@ -22,7 +22,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.store.remote_config.NetPConfigToggle
-import com.duckduckgo.networkprotection.store.remote_config.NetPRemoteConfigDatabase
+import com.duckduckgo.networkprotection.store.remote_config.NetPConfigTogglesDao
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import java.util.concurrent.ConcurrentHashMap
@@ -39,11 +39,10 @@ import logcat.logcat
 class NetPFeatureConfigImpl @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val appBuildConfig: AppBuildConfig,
-    private val netPRemoteConfigDatabase: NetPRemoteConfigDatabase,
+    private val togglesDao: NetPConfigTogglesDao,
     dispatcherProvider: DispatcherProvider,
 ) : NetPFeatureConfig, NetPFeatureConfig.Editor {
 
-    private val togglesDao = netPRemoteConfigDatabase.netpConfigTogglesDao()
     private val togglesCache = ConcurrentHashMap<String, Boolean>()
 
     init {

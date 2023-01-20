@@ -19,8 +19,6 @@ package com.duckduckgo.networkprotection.internal.feature
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.MenuItem
-import androidx.annotation.MenuRes
 import androidx.appcompat.widget.PopupMenu
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -33,12 +31,11 @@ import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.internal.network.NetPInternalMtuProvider
-import java.lang.IllegalStateException
+import com.duckduckgo.networkprotection.store.remote_config.NetPServerRepository
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import om.duckduckgo.networkprotection.internal.R
 import om.duckduckgo.networkprotection.internal.databinding.ActivityNetpInternalSettingsBinding
 
 @Suppress("NoHardcodedCoroutineDispatcher")
@@ -53,7 +50,11 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
+    @Inject lateinit var serverRepository: NetPServerRepository
+
     private val binding: ActivityNetpInternalSettingsBinding by viewBinding()
+
+    private val mtuSizes: List<Int?> = listOf(1000, 1100, 1280, 1400, 1500, null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,6 +73,8 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
                 binding.excludeSystemAppsToggle.isEnabled = isEnabled
                 binding.overrideMtuSelector.isEnabled = isEnabled
                 binding.overrideMtuSelector.setSecondaryText("MTU size: ${netPInternalMtuProvider.getMtu()}")
+                binding.overrideServerBackendSelector.isEnabled = isEnabled
+                binding.overrideServerBackendSelector.setSecondaryText("${serverRepository.getSelectedServer()?.name ?: "Automatic"}")
             }
             .launchIn(lifecycleScope)
     }
@@ -89,35 +92,50 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
         }
 
         binding.overrideMtuSelector.setOnClickListener { showMtuSelectorMenu() }
+        binding.overrideServerBackendSelector.setOnClickListener {
+            lifecycleScope.launch {
+                showServerSelectorMenu()
+            }
+        }
     }
 
-    private fun showMtuSelectorMenu(@MenuRes popupMenu: Int = R.menu.mtu_size_menu) {
-        val popup = PopupMenu(this, binding.overrideMtuSelector)
-        popup.menuInflater.inflate(popupMenu, popup.menu)
-        popup.setOnMenuItemClickListener { menuItem: MenuItem ->
-            val mtuSize = when (menuItem.itemId) {
-                R.id.mtuDefault -> null
-                R.id.mtu1500 -> 1500
-                R.id.mtu1420 -> 1420
-                R.id.mtu1300 -> 1300
-                R.id.mtu1280 -> 1280
-                R.id.mtu1100 -> 1100
-                R.id.mtu1000 -> 1000
-                R.id.mtu500 -> 500
-                R.id.mtu200 -> 200
-                R.id.mtu100 -> 100
-                else -> throw IllegalStateException()
+    private fun showMtuSelectorMenu() {
+        PopupMenu(this, binding.overrideMtuSelector).apply {
+            mtuSizes.forEach {
+                menu.add(it?.toString() ?: "Automatic")
             }
-            netPInternalMtuProvider.setMtu(mtuSize)
-            binding.overrideMtuSelector.setSecondaryText("MTU size: ${netPInternalMtuProvider.getMtu()}")
-            lifecycleScope.launch(Dispatchers.Default) {
-                vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
+            setOnMenuItemClickListener { menuItem ->
+                val mtuSize = kotlin.runCatching { menuItem.title.toString().toInt() }.getOrNull()
+                netPInternalMtuProvider.setMtu(mtuSize)
+                binding.overrideMtuSelector.setSecondaryText("MTU size: ${netPInternalMtuProvider.getMtu()}")
+                lifecycleScope.launch(Dispatchers.Default) {
+                    vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
+                }
+
+                true
+            }
+            setOnDismissListener { }
+        }.show()
+    }
+
+    private suspend fun showServerSelectorMenu() {
+        val hostnames = serverRepository.getServerNames()
+        PopupMenu(this, binding.overrideServerBackendSelector).apply {
+            (hostnames + "Automatic").forEach { hostname ->
+                menu.add(hostname)
             }
 
-            true
-        }
-        popup.setOnDismissListener { }
-        popup.show()
+            setOnMenuItemClickListener {
+                this@NetPInternalSettingsActivity.lifecycleScope.launch {
+                    serverRepository.setSelectedServer(it.title.toString())
+                    binding.overrideServerBackendSelector.setSecondaryText("${serverRepository.getSelectedServer()?.name ?: "Automatic"}")
+                    vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
+                }
+                true
+            }
+
+            setOnDismissListener { }
+        }.show()
     }
 
     companion object {

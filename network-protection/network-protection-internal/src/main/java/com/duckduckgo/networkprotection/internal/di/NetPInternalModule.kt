@@ -18,18 +18,45 @@ package com.duckduckgo.networkprotection.internal.di
 
 import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.networkprotection.store.remote_config.NetPRemoteConfigDatabase
+import com.duckduckgo.networkprotection.impl.configuration.WgServerDebugProvider
+import com.duckduckgo.networkprotection.internal.network.WgServerInternalProvider
+import com.duckduckgo.networkprotection.store.remote_config.*
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
+import dagger.multibindings.IntoSet
 
 @Module
 @ContributesTo(AppScope::class)
 object NetPInternalModule {
+
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideNetPRemoveConfigDatabase(context: Context): NetPRemoteConfigDatabase {
-        return NetPRemoteConfigDatabase.create(context)
+    fun provideNetPInternalConfigDatabase(context: Context): NetPInternalConfigDatabase {
+        return NetPInternalConfigDatabase.create(context)
+    }
+
+    @SingleInstanceIn(AppScope::class)
+    @Provides
+    fun provideNetPConfigTogglesDao(netPInternalConfigDatabase: NetPInternalConfigDatabase): NetPConfigTogglesDao {
+        return netPInternalConfigDatabase.configTogglesDao()
+    }
+
+    @SingleInstanceIn(AppScope::class)
+    @Provides
+    fun provideNetPServersDao(netPInternalConfigDatabase: NetPInternalConfigDatabase): NetPServersDao {
+        return netPInternalConfigDatabase.serversDao()
+    }
+
+    @Provides
+    fun provideNetPServerRepository(netPServersDao: NetPServersDao): NetPServerRepository {
+        return NetPServerRepository((netPServersDao))
+    }
+
+    @Provides
+    @IntoSet
+    fun provideWgServerDebugProvider(netPServerRepository: NetPServerRepository): WgServerDebugProvider {
+        return WgServerInternalProvider(netPServerRepository)
     }
 }

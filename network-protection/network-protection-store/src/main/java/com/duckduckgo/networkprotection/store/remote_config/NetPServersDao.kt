@@ -22,10 +22,19 @@ import androidx.room.OnConflictStrategy.REPLACE
 import androidx.room.Query
 
 @Dao
-interface NetPConfigTogglesDao {
+interface NetPServersDao {
     @Insert(onConflict = REPLACE)
-    suspend fun insert(vpnConfigToggle: NetPConfigToggle)
+    suspend fun insertAll(server: List<NetPEgressServer>)
 
-    @Query("SELECT * from netp_config_toggles ORDER BY localtime DESC")
-    fun getConfigToggles(): List<NetPConfigToggle>
+    @Query("SELECT * from netp_egress_servers")
+    suspend fun getServers(): List<NetPEgressServer>
+
+    @Query("DELETE from netp_selected_egress_server_name")
+    suspend fun clearSelectedServer()
+
+    @Query("SELECT * from netp_selected_egress_server_name LIMIT 1")
+    suspend fun getSelectedServer(): SelectedEgressServer?
+
+    @Query("INSERT or REPLACE into netp_selected_egress_server_name (id, name) values (1, :name)")
+    suspend fun selectServer(name: String)
 }

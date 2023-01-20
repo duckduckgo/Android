@@ -33,6 +33,7 @@ dependencies {
     // Room
     implementation AndroidX.room.runtime
     implementation AndroidX.room.ktx
+    implementation Square.retrofit2.converter.moshi
     kapt AndroidX.room.compiler
 
     testImplementation project(path: ':common-test')

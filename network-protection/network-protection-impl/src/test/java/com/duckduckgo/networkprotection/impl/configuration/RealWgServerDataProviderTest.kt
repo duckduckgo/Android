@@ -16,11 +16,13 @@
 
 package com.duckduckgo.networkprotection.impl.configuration
 
+import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.networkprotection.impl.configuration.WgServerDataProvider.WgServerData
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
@@ -35,6 +37,10 @@ class RealWgServerDataProviderTest {
 
     @Mock
     private lateinit var countryIsoProvider: CountryIsoProvider
+
+    @Mock
+    private lateinit var appBuildConfig: AppBuildConfig
+
     private val testServers = listOf(
         EligibleServerInfo(
             publicKey = "testpublickey",
@@ -64,12 +70,27 @@ class RealWgServerDataProviderTest {
             ),
         ),
     )
+
+    private lateinit var fakeWgServerDebugProvider: FakeWgServerDebugProvider
     private lateinit var testee: RealWgServerDataProvider
 
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        testee = RealWgServerDataProvider(wgVpnControllerService, countryIsoProvider)
+
+        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
+        fakeWgServerDebugProvider = FakeWgServerDebugProvider()
+
+        testee = RealWgServerDataProvider(
+            wgVpnControllerService,
+            countryIsoProvider,
+            appBuildConfig,
+            object : PluginPoint<WgServerDebugProvider> {
+                override fun getPlugins(): Collection<WgServerDebugProvider> {
+                    return setOf(fakeWgServerDebugProvider)
+                }
+            },
+        )
     }
 
     @Test
@@ -178,5 +199,58 @@ class RealWgServerDataProviderTest {
         whenever(countryIsoProvider.getCountryIso()).thenReturn("se")
 
         assertEquals("Stockholm, Sweden", testee.get("testpublickey").location)
+    }
+
+    @Test
+    fun whenInternalFlavorGetWgServerDataAndIsoIsNotUSThenReturnUSServerData() = runTest {
+        whenever(wgVpnControllerService.registerKey(any())).thenReturn(testServers)
+        whenever(countryIsoProvider.getCountryIso()).thenReturn("se")
+        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
+
+        assertEquals(
+            WgServerData(
+                publicKey = "ovn9RpzUuvQ4XLQt6B3RKuEXGIxa5QpTnehjduZlcSE=",
+                publicEndpoint = "usc.egress.np.duck.com:443",
+                address = "10.11.86.8/32",
+                location = null,
+            ),
+            testee.get("testpublickey"),
+        )
+    }
+
+    @Test
+    fun whenInternalFlavorGetWgServerDataThenStoreReturnedServers() = runTest {
+        whenever(wgVpnControllerService.registerKey(any())).thenReturn(testServers)
+        whenever(countryIsoProvider.getCountryIso()).thenReturn("se")
+        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
+
+        testee.get("testpublickey")
+
+        assertEquals(
+            testServers,
+            fakeWgServerDebugProvider.cachedServers,
+        )
+    }
+
+    @Test
+    fun whenNotInternalFlavorGetWgServerDataThenStoreReturnedServers() = runTest {
+        whenever(wgVpnControllerService.registerKey(any())).thenReturn(testServers)
+        whenever(countryIsoProvider.getCountryIso()).thenReturn("se")
+
+        testee.get("testpublickey")
+
+        assertTrue(fakeWgServerDebugProvider.cachedServers.isEmpty())
+    }
+}
+
+private class FakeWgServerDebugProvider : WgServerDebugProvider {
+    val cachedServers = mutableListOf<EligibleServerInfo>()
+
+    override suspend fun getSelectedServerName(): String? {
+        return "egress.usc"
+    }
+
+    override suspend fun storeEligibleServers(servers: List<EligibleServerInfo>) {
+        cachedServers.addAll(servers)
     }
 }

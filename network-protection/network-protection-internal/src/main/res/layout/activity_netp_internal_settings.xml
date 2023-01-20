@@ -69,6 +69,12 @@
                 android:layout_height="wrap_content"
                 app:primaryText="MTU Size"/>
 
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+                android:id="@+id/overrideServerBackendSelector"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="VPN Server"/>
+
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/excludeSystemAppsToggle"
                 android:layout_width="match_parent"

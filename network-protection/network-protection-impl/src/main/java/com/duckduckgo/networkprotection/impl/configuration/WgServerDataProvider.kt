@@ -18,7 +18,11 @@ package com.duckduckgo.networkprotection.impl.configuration
 
 import android.content.Context
 import android.telephony.TelephonyManager
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.app.global.extensions.capitalizeFirstLetter
+import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.networkprotection.impl.configuration.WgServerDataProvider.WgServerData
 import com.squareup.anvil.annotations.ContributesBinding
@@ -41,13 +45,22 @@ interface WgServerDataProvider {
 class RealWgServerDataProvider @Inject constructor(
     private val wgVpnControllerService: WgVpnControllerService,
     private val countryIsoProvider: CountryIsoProvider,
+    private val appBuildConfig: AppBuildConfig,
+    private val serverDebugProvider: PluginPoint<WgServerDebugProvider>,
 ) : WgServerDataProvider {
 
     override suspend fun get(publicKey: String): WgServerData = wgVpnControllerService.registerKey(
         RegisterKeyBody(
             publicKey = publicKey,
         ),
-    ).getRelevantServer().toWgServerData()
+    ).also {
+        if (appBuildConfig.isInternalBuild()) {
+            assert(serverDebugProvider.getPlugins().size <= 1) { "Only one debug server provider can be registered" }
+            serverDebugProvider.getPlugins().firstOrNull()?.let { provider ->
+                provider.storeEligibleServers(it)
+            }
+        }
+    }.getRelevantServer().toWgServerData()
 
     private fun EligibleServerInfo.toWgServerData(): WgServerData = WgServerData(
         publicKey = server.publicKey,
@@ -69,7 +82,14 @@ class RealWgServerDataProvider @Inject constructor(
 
     private fun String.getDisplayableCountry(): String = Locale("", this).displayCountry.lowercase().capitalizeFirstLetter()
 
-    private fun List<EligibleServerInfo>.getRelevantServer(): EligibleServerInfo {
+    private suspend fun List<EligibleServerInfo>.getRelevantServer(): EligibleServerInfo {
+        if (appBuildConfig.isInternalBuild()) {
+            assert(serverDebugProvider.getPlugins().size <= 1) { "Only one debug server provider can be registered" }
+            firstOrNull { it.server.name == serverDebugProvider.getPlugins().firstOrNull()?.getSelectedServerName() }
+        } else {
+            null
+        }?.let { return it }
+
         val countryCode = countryIsoProvider.getCountryIso()
         val resultingList = if (US_COUNTRY_CODES.contains(countryCode)) {
             this.filter {
@@ -107,4 +127,11 @@ class SystemCountryIsoProvider @Inject constructor(
     private val telephonyManager = context.applicationContext.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
 
     override fun getCountryIso(): String = telephonyManager.networkCountryIso.lowercase()
+}
+
+@ContributesPluginPoint(VpnScope::class)
+interface WgServerDebugProvider {
+    suspend fun getSelectedServerName(): String?
+
+    suspend fun storeEligibleServers(servers: List<EligibleServerInfo>)
 }
