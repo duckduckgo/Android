@@ -13,7 +13,7 @@ interface SyncStore {
     var recoveryCode: String?
     var protectedEncryptionKey: String?
     var passwordHash: String?
-    fun clearAll()
+    fun clearAll(keepRecoveryCode: Boolean = false)
 }
 
 class SyncSharedPrefsStore
@@ -112,7 +112,7 @@ constructor(
         }
     override var protectedEncryptionKey: String?
         get() = encryptedPreferences?.getString(KEY_PROTECTED_ENCR_KEY, null)
-        set(value)  {
+        set(value) {
             encryptedPreferences?.edit(commit = true) {
                 if (value == null) {
                     remove(KEY_PROTECTED_ENCR_KEY)
@@ -123,7 +123,7 @@ constructor(
         }
     override var passwordHash: String?
         get() = encryptedPreferences?.getString(KEY_PASSWORD_HASH_KEY, null)
-        set(value)  {
+        set(value) {
             encryptedPreferences?.edit(commit = true) {
                 if (value == null) {
                     remove(KEY_PASSWORD_HASH_KEY)
@@ -133,8 +133,12 @@ constructor(
             }
         }
 
-    override fun clearAll() {
+    override fun clearAll(keepRecoveryCode: Boolean) {
+        val recoveryCodeBackup = recoveryCode
         encryptedPreferences?.edit(commit = true) { clear() }
+        if (keepRecoveryCode) {
+            recoveryCode = recoveryCodeBackup
+        }
     }
 
     companion object {

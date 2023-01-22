@@ -33,7 +33,12 @@ interface SyncApi {
         deviceName: String,
     ): Result<AccountCreatedResponse>
 
-    fun login(userID: String, hashedPassword: String, deviceId: String, deviceName: String): Result<LoginResponse>
+    fun login(
+        userID: String,
+        hashedPassword: String,
+        deviceId: String,
+        deviceName: String
+    ): Result<LoginResponse>
 
     fun logout(token: String, deviceId: String): Result<Logout>
 

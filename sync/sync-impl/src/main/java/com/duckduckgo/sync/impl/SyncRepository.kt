@@ -82,9 +82,10 @@ class AppSyncRepository @Inject constructor(
 
     override fun login(): Result<Boolean> {
 
-        val primaryKey =
-            syncStore.primaryKey ?: return Result.Error(reason = "primaryKey not found")
-        val userId = syncDeviceIds.userId()
+        val recoveryCode = getRecoveryCode() ?: return Result.Error(reason = "Not valid Or existing recovery code")
+
+        val primaryKey = recoveryCode.primaryKey
+        val userId = recoveryCode.userID
         val deviceId = syncDeviceIds.deviceId()
         val deviceName = syncDeviceIds.deviceName()
 
@@ -106,6 +107,11 @@ class AppSyncRepository @Inject constructor(
                     nativeLib.decrypt(
                         result.data.protected_encryption_key, preLogin.stretchedPrimaryKey)
                 Timber.i("SYNC decrypt: decoded secret Key: ${decryptResult.decryptedData}")
+                syncStore.userId = userId
+                syncStore.deviceId = deviceId
+                syncStore.deviceName = deviceName
+                syncStore.token = result.data.token
+                syncStore.primaryKey = preLogin.primaryKey
                 syncStore.secretKey = decryptResult.decryptedData
                 Result.Success(true)
             }
@@ -134,6 +140,11 @@ class AppSyncRepository @Inject constructor(
         syncStore.recoveryCode = recoveryCodeJson
     }
 
+    private fun getRecoveryCode(): RecoveryCode? {
+        val recoveryCodeJson = syncStore.recoveryCode ?: return null
+        return Adapters.recoveryCodeAdapter.fromJson(recoveryCodeJson)
+    }
+
     override fun removeAccount() {
         syncStore.clearAll()
     }
@@ -150,7 +161,7 @@ class AppSyncRepository @Inject constructor(
                 result
             }
             is Result.Success -> {
-                syncStore.clearAll()
+                syncStore.clearAll(keepRecoveryCode = true)
                 Result.Success(true)
             }
         }
