@@ -33,12 +33,7 @@ interface SyncApi {
         deviceName: String,
     ): Result<AccountCreatedResponse>
 
-    fun login(
-        userID: String,
-        hashedPassword: String,
-        deviceId: String,
-        deviceName: String
-    ): LoginResponse?
+    fun login(userID: String, hashedPassword: String, deviceId: String, deviceName: String): Result<LoginResponse>
 
     fun logout(token: String, deviceId: String): Result<Logout>
 
@@ -116,49 +111,38 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
         hashedPassword: String,
         deviceId: String,
         deviceName: String,
-    ): LoginResponse? {
-        runCatching {
-            val call = syncService.login(Login(
-                    user_id = userID,
-                    hashed_password = hashedPassword,
-                    device_id = deviceId,
-                    device_name = deviceName,
-            ))
-            call.execute()
-        }.onSuccess { response ->
-            if (response.isSuccessful) {
-                Timber.i("SYNC login success ${response.code()}")
-                Timber.i("SYNC login success body ${response.body()}")
-                val match = response.body()?.protected_encryption_key == syncEncryptedStore.protectedEncryptionKey
-                Timber.i("SYNC login ProtectedEncryptionKey match $match ")
-                syncEncryptedStore.token =
-                    response.body()?.token ?: throw IllegalStateException("Empty token")
-                syncEncryptedStore.protectedEncryptionKey = response.body()?.protected_encryption_key ?: throw IllegalStateException("Empty PEK")
-                Timber.i("SYNC login success ProtectedEncryptionKey ${syncEncryptedStore.protectedEncryptionKey}")
-
-                return LoginResponse(
-                    token = syncEncryptedStore.token!!,
-                    protected_encryption_key = syncEncryptedStore.protectedEncryptionKey!!,
-                    devices = emptyList()
-                )
-            } else {
-                response.errorBody()?.let { errorBody ->
-                    val converter: Converter<ResponseBody, ErrorResponse> =
-                            retrofit.responseBodyConverter(
-                                    ErrorResponse::class.java, arrayOfNulls(0))
-                    val errorResponse =
-                            converter.convert(errorBody)
-                                    ?: throw IllegalArgumentException("Can't parse body")
-                    Timber.i("SYNC login failed ${errorResponse.code} ${errorResponse.error}")
+    ): Result<LoginResponse> {
+        val response =
+            runCatching {
+                    val call =
+                        syncService.login(
+                            Login(
+                                user_id = userID,
+                                hashed_password = hashedPassword,
+                                device_id = deviceId,
+                                device_name = deviceName,
+                            ))
+                    call.execute()
                 }
-                        ?: kotlin.run {
-                            Timber.i("SYNC login failed ${response.code()} ${response.message()}")
-                        }
-            }
-        }
-            .onFailure { throwable -> Timber.i("SYNC login failed ${throwable.message}") }
+                .getOrElse { throwable ->
+                    return Result.Error(reason = throwable.message.toString())
+                }
 
-        return null
+        return onSuccess(response) {
+            val token = response.body()?.token ?: throw IllegalStateException("Empty token")
+            val protectedEncryptionKey =
+                response.body()?.protected_encryption_key
+                    ?: throw IllegalStateException("Empty PEK")
+            Timber.i("SYNC login success ProtectedEncryptionKey $protectedEncryptionKey")
+
+            Result.Success(
+                LoginResponse(
+                    token = token,
+                    protected_encryption_key = protectedEncryptionKey,
+                    devices = emptyList(),
+                ),
+            )
+        }
     }
 
     private fun <T, R> onSuccess(

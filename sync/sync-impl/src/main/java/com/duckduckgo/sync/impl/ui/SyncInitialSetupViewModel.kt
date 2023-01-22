@@ -108,21 +108,10 @@ constructor(
 
     fun loginAccountClicked() {
         viewModelScope.launch(Dispatchers.IO) {
-            val primaryKey = syncEncryptedStore.primaryKey ?: return@launch
-            val preLogin: Login = nativeLib.prepareForLogin(primaryKey)
-            val login =
-                syncApi.login(
-                    userID = syncDeviceIds.userId(),
-                    hashedPassword = preLogin.passwordHash,
-                    deviceId = syncDeviceIds.deviceId(),
-                    deviceName = syncDeviceIds.deviceName())
-                    ?: return@launch
-            Timber.i("SYNC decrypt: previous secret Key: ${syncEncryptedStore.secretKey}")
-            val decryptedData =
-                nativeLib.decrypt(login.protected_encryption_key, preLogin.stretchedPrimaryKey)
-            Timber.i("SYNC decrypt: decoded secret Key: ${decryptedData}")
-            syncEncryptedStore.secretKey = decryptedData
-
+            val result = syncRepository.login()
+            if (result is Error) {
+                command.send(Command.ShowMessage("$result"))
+            }
             updateViewState()
         }
     }
@@ -136,10 +125,8 @@ constructor(
                 deviceId = accountInfo.deviceId,
                 isSignedIn = accountInfo.isSignedIn,
                 token = syncRepository.latestToken(),
-                primaryKey = syncEncryptedStore.primaryKey.orEmpty(),
-                secretKey = syncEncryptedStore.secretKey.orEmpty(),
-                protectedEncryptionKey = syncEncryptedStore.protectedEncryptionKey.orEmpty(),
-                passwordHash = syncEncryptedStore.passwordHash.orEmpty(),
+                primaryKey = accountInfo.primaryKey,
+                secretKey = accountInfo.secretKey,
             ),
         )
     }
