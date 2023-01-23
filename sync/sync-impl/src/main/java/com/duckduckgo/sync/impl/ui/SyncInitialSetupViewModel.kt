@@ -20,9 +20,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
@@ -33,17 +35,15 @@ constructor(
 ) : ViewModel() {
 
     private val viewState = MutableStateFlow(ViewState())
-    fun viewState(): StateFlow<ViewState> = viewState
+    fun viewState(): Flow<ViewState> = viewState.onStart {
+        updateViewState()
+    }
 
     data class ViewState(
         val userId: String = "",
         val deviceName: String = "",
         val deviceId: String = "",
     )
-
-    init {
-        viewModelScope.launch { updateViewState() }
-    }
 
     private suspend fun updateViewState() {
         viewState.emit(
