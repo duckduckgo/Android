@@ -133,16 +133,8 @@
 
         <!-- Legacy colors to remove-->
         <item name="listItemImageBackground">@color/almostBlack</item>
-        <item name="savedSiteEmptyTextColor">@color/white</item>
         <item name="fireproofWebsiteTitleTextColor">@color/white</item>
         <item name="deviceShieldExcludedAppNameTextColor">@color/white</item>
-        <item name="settingsItemTextColor">@color/white</item>
-        <item name="settingsItemTextColorDisabled">@color/warGreyTwo</item>
-        <item name="settingsMinorTextColor">@color/grayishTwo</item>
-        <item name="buttonOutlinedTextColor">@color/pinkishGrayThree</item>
-        <item name="buttonOutlinedBorderColor">@color/brownishGrayTwo</item>
-        <item name="callToActionTitleColor">@color/white</item>
-        <item name="callToActionSubtitleColor">@color/grayishThree</item>
         <item name="daxDialogBackgroundColor">@color/charcoalGrey</item>
         <item name="daxDialogSecondaryButtonTextColor">@color/white</item>
         <item name="daxDialogSecondaryButtonRippleColor">@color/white</item>
@@ -155,8 +147,6 @@
         <item name="topCallToActionDescriptionColor">@color/grayish</item>
         <item name="topCallToActionBackgroundColor">@color/greyishBrownTwo</item>
 
-        <item name="feedbackAnonymousFeedbackLabelColor">@color/grayish</item>
-        <item name="feedbackListItemBackgroundColor">@color/almostBlack</item>
         <item name="feedbackListItemSeparatorColor">@color/charcoalGrey</item>
         <item name="feedbackEditTextBackgroundColor">@color/almostBlack</item>
         <item name="feedbackEditTextHintColor">@color/grayish</item>
@@ -248,17 +238,9 @@
         <item name="preferDarkNavigationBarIcons">true</item>
 
         <!-- Legacy colors to remove-->
-        <item name="savedSiteEmptyTextColor">@color/almostBlackDark</item>
         <item name="listItemImageBackground">@color/whiteSix</item>
         <item name="fireproofWebsiteTitleTextColor">@color/almostBlack</item>
         <item name="deviceShieldExcludedAppNameTextColor">@color/almostBlack</item>
-        <item name="settingsItemTextColor">@color/almostBlackDark</item>
-        <item name="settingsItemTextColorDisabled">@color/pinkish_grey_two</item>
-        <item name="settingsMinorTextColor">@color/warmerGray</item>
-        <item name="buttonOutlinedTextColor">@color/cornflowerBlue</item>
-        <item name="buttonOutlinedBorderColor">@color/grayishThree</item>
-        <item name="callToActionTitleColor">@color/almostBlackDark</item>
-        <item name="callToActionSubtitleColor">@color/brownishGrayTwo</item>
         <item name="daxDialogBackgroundColor">@color/white</item>
         <item name="daxDialogSecondaryButtonTextColor">@color/almostBlackDark</item>
         <item name="daxDialogSecondaryButtonRippleColor">@color/subtleGrayTwo</item>
@@ -271,8 +253,6 @@
         <item name="topCallToActionDescriptionColor">@color/almostBlackDark</item>
         <item name="topCallToActionBackgroundColor">@color/white</item>
 
-        <item name="feedbackAnonymousFeedbackLabelColor">@color/warmerGray</item>
-        <item name="feedbackListItemBackgroundColor">@color/whiteFive</item>
         <item name="feedbackListItemSeparatorColor">@color/whiteSix</item>
         <item name="feedbackEditTextBackgroundColor">@color/whiteFive</item>
         <item name="feedbackEditTextHintColor">@color/warmerGray</item>
