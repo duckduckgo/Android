@@ -17,15 +17,12 @@
 package com.duckduckgo.sync.impl.ui
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
-import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
 class SyncInitialSetupViewModel
@@ -35,9 +32,7 @@ constructor(
 ) : ViewModel() {
 
     private val viewState = MutableStateFlow(ViewState())
-    fun viewState(): Flow<ViewState> = viewState.onStart {
-        updateViewState()
-    }
+    fun viewState(): Flow<ViewState> = viewState.onStart { updateViewState() }
 
     data class ViewState(
         val userId: String = "",
