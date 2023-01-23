@@ -17,7 +17,7 @@
 <resources>
     <style name="FireDialog" parent="@style/Theme.Design.BottomSheetDialog">
         <item name="android:windowIsFloating">false</item>
-        <item name="android:navigationBarColor">?toolbarBgColor</item>
+        <item name="android:navigationBarColor">?daxColorSurface</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="bottomSheetStyle">@style/FireDialogStyle</item>
     </style>

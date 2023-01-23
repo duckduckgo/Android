@@ -20,6 +20,6 @@
     android:viewportWidth="12"
     android:viewportHeight="24">
     <path
-        android:fillColor="?attr/toolbarIconColor"
+        android:fillColor="?attr/daxColorPrimaryIcon"
         android:pathData="M6,8a2,2 0,1 1,0 -4,2 2,0 0,1 0,4zM6,14a2,2 0,1 1,0 -4,2 2,0 0,1 0,4zM6,20a2,2 0,1 1,0 -4,2 2,0 0,1 0,4z" />
 </vector>

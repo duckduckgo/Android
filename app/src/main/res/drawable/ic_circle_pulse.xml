@@ -23,7 +23,7 @@
       android:pathData="M36,36m-35,0a35,35 0,1 1,70 0a35,35 0,1 1,-70 0"
       android:strokeAlpha="0.3"
       android:strokeWidth="2"
-      android:fillColor="?toolbarIconColor"
+      android:fillColor="?daxColorPrimaryIcon"
       android:strokeColor="#FFFFFF"
       android:fillAlpha="0.15"
       android:fillType="evenOdd"/>

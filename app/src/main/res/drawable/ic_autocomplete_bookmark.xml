@@ -21,5 +21,5 @@
     android:height="24dp">
     <path
         android:pathData="M16.286 4H7.714A1.72 1.72 0 0 0 6 5.714V18.67a0.5 0.5 0 0 0 0.697 0.46L12 16.857l5.303 2.273a0.5 0.5 0 0 0 0.697 -0.46V5.714A1.72 1.72 0 0 0 16.286 4z"
-        android:fillColor="?attr/toolbarIconColor" />
+        android:fillColor="?attr/daxColorPrimaryIcon" />
 </vector>

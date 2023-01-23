@@ -33,7 +33,7 @@
 
     <style name="PopUpMenuCheckBoxTheme">
         <item name="colorAccent">@color/cornflowerBlue</item>
-        <item name="android:textColorSecondary">?attr/toolbarIconColor</item>
+        <item name="android:textColorSecondary">?attr/daxColorPrimaryIcon</item>
     </style>
 
     <style name="BottomSheetDialog" parent="Theme.Design.BottomSheetDialog">

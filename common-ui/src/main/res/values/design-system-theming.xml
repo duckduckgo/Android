@@ -113,33 +113,28 @@
         <!--controls the ripple coloring-->
         <item name="colorControlHighlight">?attr/daxColorRipple</item>
 
+        <item name="android:textColorAlertDialogListItem">?attr/daxColorPrimaryText</item>
         <!--Design System Colors theme independent-->
         <item name="daxColorDim">@color/black60</item>
         <item name="daxColorWhite">@color/white</item>
         <item name="daxColorBlack">@color/black84</item>
         <item name="preferredStatusBarColor">?attr/daxColorSurface</item>
         <item name="preferredNavigationBarColor">?attr/daxColorSurface</item>
-
-        <!--Refactoring colors (can be replaced once reviewed)-->
-        <item name="toolbarBgColor">?attr/daxColorSurface</item>
-        <item name="toolbarIconColor">?attr/daxColorPrimaryIcon</item>
     </style>
 
     <!-- The app theme will mostly contain values for colour attributes -->
     <style name="Theme.DuckDuckGo.Dark" parent="Theme.DuckDuckGo">
-
         <item name="preferDarkStatusBarIcons">false</item>
         <item name="preferDarkNavigationBarIcons">false</item>
 
-        <!-- Legacy colors to remove-->
-
-        <item name="android:textColorAlertDialogListItem">?attr/daxColorPrimaryText</item>
-
-        <item name="appTPHeaderBackground">@color/darkThemePrimaryDark</item>
-
+        <!-- Feature specific colors -->
+        <!-- Autofill -->
         <item name="autofillDialogTitleColor">@color/white</item>
         <item name="autofillDialogOnboardingExplanationColor">@color/gray50</item>
         <item name="autofillCredentialListSubtitleColor">@color/paleBrownishGray</item>
+
+        <!-- App Tracking Protection -->
+        <item name="appTPHeaderBackground">@color/darkThemePrimaryDark</item>
 
         <!-- Design System Reference Colors Dark -->
         <item name="daxColorBackground">@color/gray100</item>
@@ -193,8 +188,8 @@
         <item name="daxColorTextInputEnabledOutline">@color/white30</item>
 
         <!-- InfoPanel Input -->
-        <item name="tooltipPanelBackgroundColor">@color/tooltipPanelBackgroundColorDark</item>
-        <item name="alertPanelBackgroundColor">@color/alertPanelBackgroundColorDark</item>
+        <item name="daxInfoPanelTooltipBackgroundColor">@color/daxInfoPanelTooltipBackgroundColorDark</item>
+        <item name="daxInfoPanelAlertBackgroundColor">@color/daxInfoPanelAlertBackgroundColorDark</item>
 
     </style>
 
@@ -202,11 +197,13 @@
         <item name="preferDarkStatusBarIcons">true</item>
         <item name="preferDarkNavigationBarIcons">true</item>
 
-        <!-- Legacy colors to remove-->
-
+        <!-- Feature specific colors -->
+        <!-- Autofill -->
         <item name="autofillDialogTitleColor">@color/gray90</item>
         <item name="autofillDialogOnboardingExplanationColor">@color/gray70</item>
         <item name="autofillCredentialListSubtitleColor">@color/brownishGrayTwo</item>
+
+        <!-- App Tracking Protection -->
         <item name="appTPHeaderBackground">@color/light_blue</item>
 
         <!-- Design System Reference Colors Light -->
@@ -261,8 +258,8 @@
         <item name="daxColorTextInputEnabledOutline">@color/black30</item>
 
         <!-- Info Panel -->
-        <item name="tooltipPanelBackgroundColor">@color/tooltipPanelBackgroundColorLight</item>
-        <item name="alertPanelBackgroundColor">@color/alertPanelBackgroundColorLight</item>
+        <item name="daxInfoPanelTooltipBackgroundColor">@color/daxInfoPanelTooltipBackgroundColorLight</item>
+        <item name="daxInfoPanelAlertBackgroundColor">@color/daxInfoPanelAlertBackgroundColorLight</item>
 
     </style>
 
@@ -277,7 +274,7 @@
         <item name="colorPrimary">@color/darkThemePrimary</item>
         <item name="colorPrimaryDark">@color/darkThemePrimaryDark</item>
         <item name="colorAccent">@color/cornflowerBlue</item>
-        <item name="toolbarIconColor">@color/white</item>
+        <item name="daxColorPrimaryIcon">@color/white</item>
     </style>
 
     <style name="Theme.DuckDuckGo.SplashScreen" parent="Theme.DuckDuckGo.Light"/>

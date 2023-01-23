@@ -31,7 +31,7 @@
             android:id="@+id/toolbarContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="?toolbarBgColor">
+            android:background="?daxColorSurface">
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
