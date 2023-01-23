@@ -135,11 +135,7 @@
 
         <item name="android:textColorAlertDialogListItem">?attr/daxColorPrimaryText</item>
 
-        <item name="bottomShadowBackground">@null</item>
         <item name="appTPHeaderBackground">@color/darkThemePrimaryDark</item>
-
-        <item name="tooltipPanelBackgroundColor">@color/tooltipPanelBackgroundColorDark</item>
-        <item name="alertPanelBackgroundColor">@color/alertPanelBackgroundColorDark</item>
 
         <item name="autofillDialogTitleColor">@color/white</item>
         <item name="autofillDialogOnboardingExplanationColor">@color/gray50</item>
@@ -196,6 +192,10 @@
         <item name="daxColorTextInputFocusedOutline">?attr/daxColorAccentBlue</item>
         <item name="daxColorTextInputEnabledOutline">@color/white30</item>
 
+        <!-- InfoPanel Input -->
+        <item name="tooltipPanelBackgroundColor">@color/tooltipPanelBackgroundColorDark</item>
+        <item name="alertPanelBackgroundColor">@color/alertPanelBackgroundColorDark</item>
+
     </style>
 
     <style name="Theme.DuckDuckGo.Light" parent="Theme.DuckDuckGo">
@@ -203,9 +203,6 @@
         <item name="preferDarkNavigationBarIcons">true</item>
 
         <!-- Legacy colors to remove-->
-
-        <item name="tooltipPanelBackgroundColor">@color/tooltipPanelBackgroundColorLight</item>
-        <item name="alertPanelBackgroundColor">@color/alertPanelBackgroundColorLight</item>
 
         <item name="autofillDialogTitleColor">@color/gray90</item>
         <item name="autofillDialogOnboardingExplanationColor">@color/gray70</item>
@@ -262,6 +259,10 @@
         <!-- Text Input -->
         <item name="daxColorTextInputFocusedOutline">?attr/daxColorAccentBlue</item>
         <item name="daxColorTextInputEnabledOutline">@color/black30</item>
+
+        <!-- Info Panel -->
+        <item name="tooltipPanelBackgroundColor">@color/tooltipPanelBackgroundColorLight</item>
+        <item name="alertPanelBackgroundColor">@color/alertPanelBackgroundColorLight</item>
 
     </style>
 
