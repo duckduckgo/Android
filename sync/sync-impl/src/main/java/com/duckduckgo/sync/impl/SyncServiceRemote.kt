@@ -55,20 +55,20 @@ constructor(
     ): Result<AccountCreatedResponse> {
         val response =
             runCatching {
-                    val call =
-                        syncService.signup(
-                            Signup(
-                                userID,
-                                hashedPassword,
-                                protectedEncryptionKey,
-                                deviceId,
-                                deviceName,
-                            ))
-                    call.execute()
-                }
-                .getOrElse { throwable ->
-                    return Result.Error(reason = throwable.message.toString())
-                }
+                val call =
+                    syncService.signup(
+                        Signup(
+                            userID,
+                            hashedPassword,
+                            protectedEncryptionKey,
+                            deviceId,
+                            deviceName,
+                        ),
+                    )
+                call.execute()
+            }.getOrElse { throwable ->
+                return Result.Error(reason = throwable.message.toString())
+            }
 
         return onSuccess(response) {
             val token = response.body()?.token ?: throw IllegalStateException("Empty body")
@@ -77,31 +77,34 @@ constructor(
                 AccountCreatedResponse(
                     token = token,
                     user_id = userId,
-                ))
+                ),
+            )
         }
     }
 
-    private fun <T, R> onSuccess(response: Response<T?>, onSuccess: (T?) -> Result<R>): Result<R> {
+    private fun <T, R> onSuccess(
+        response: Response<T?>,
+        onSuccess: (T?) -> Result<R>,
+    ): Result<R> {
         runCatching {
-                if (response.isSuccessful) {
-                    return onSuccess(response.body())
-                } else {
-                    return response.errorBody()?.let { errorBody ->
-                        val converter: Converter<ResponseBody, ErrorResponse> =
-                            retrofit.responseBodyConverter(
-                                ErrorResponse::class.java,
-                                arrayOfNulls(0),
-                            )
-                        val errorResponse =
-                            converter.convert(errorBody)
-                                ?: throw IllegalArgumentException("Can't parse body")
-                        Result.Error(errorResponse.code, errorResponse.error)
-                    }
-                        ?: Result.Error(code = response.code(), reason = response.code().toString())
+            if (response.isSuccessful) {
+                return onSuccess(response.body())
+            } else {
+                return response.errorBody()?.let { errorBody ->
+                    val converter: Converter<ResponseBody, ErrorResponse> =
+                        retrofit.responseBodyConverter(
+                            ErrorResponse::class.java,
+                            arrayOfNulls(0),
+                        )
+                    val errorResponse =
+                        converter.convert(errorBody)
+                            ?: throw IllegalArgumentException("Can't parse body")
+                    Result.Error(errorResponse.code, errorResponse.error)
                 }
+                    ?: Result.Error(code = response.code(), reason = response.code().toString())
             }
-            .getOrElse {
-                return Result.Error(reason = response.message())
-            }
+        }.getOrElse {
+            return Result.Error(reason = response.message())
+        }
     }
 }
