@@ -25,9 +25,9 @@ import com.duckduckgo.app.autofill.JavascriptInjector
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.autofill.api.Autofill
+import com.duckduckgo.autofill.api.AutofillFeatureName
 import com.duckduckgo.feature.toggles.api.FeatureToggle
-import com.duckduckgo.privacy.config.api.Autofill
-import com.duckduckgo.privacy.config.api.PrivacyFeatureName.AutofillFeatureName
 import java.io.BufferedReader
 import org.junit.Before
 import org.junit.Test
@@ -47,7 +47,7 @@ class EmailInjectorJsTest {
         testee =
             EmailInjectorJs(mockEmailManager, DuckDuckGoUrlDetector(), mockDispatcherProvider, mockFeatureToggle, javascriptInjector, mockAutofill)
 
-        whenever(mockFeatureToggle.isFeatureEnabled(AutofillFeatureName.value)).thenReturn(true)
+        whenever(mockFeatureToggle.isFeatureEnabled(AutofillFeatureName.Autofill.value)).thenReturn(true)
         whenever(mockAutofill.isAnException(any())).thenReturn(false)
     }
 
@@ -68,7 +68,7 @@ class EmailInjectorJsTest {
     @Test
     @SdkSuppress(minSdkVersion = 24)
     fun whenInjectAddressAndFeatureIsDisabledThenJsCodeNotInjected() {
-        whenever(mockFeatureToggle.isFeatureEnabled(AutofillFeatureName.value)).thenReturn(false)
+        whenever(mockFeatureToggle.isFeatureEnabled(AutofillFeatureName.Autofill.value)).thenReturn(false)
 
         val address = "address"
         val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
@@ -123,7 +123,7 @@ class EmailInjectorJsTest {
     @SdkSuppress(minSdkVersion = 24)
     fun whenNotifyWebAppSignEventAndUrlIsFromDuckDuckGoAndFeatureIsDisabledAndEmailIsNotSignedInThenDoNotEvaluateJsCode() {
         whenever(mockEmailManager.isSignedIn()).thenReturn(false)
-        whenever(mockFeatureToggle.isFeatureEnabled(AutofillFeatureName.value)).thenReturn(false)
+        whenever(mockFeatureToggle.isFeatureEnabled(AutofillFeatureName.Autofill.value)).thenReturn(false)
 
         val jsToEvaluate = getNotifySignOutJsToEvaluate()
         val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
@@ -138,7 +138,7 @@ class EmailInjectorJsTest {
     @SdkSuppress(minSdkVersion = 24)
     fun whenNotifyWebAppSignEventAndUrlIsFromDuckDuckGoAndFeatureIsEnabledAndEmailIsNotSignedInThenEvaluateJsCode() {
         whenever(mockEmailManager.isSignedIn()).thenReturn(false)
-        whenever(mockFeatureToggle.isFeatureEnabled(AutofillFeatureName.value)).thenReturn(true)
+        whenever(mockFeatureToggle.isFeatureEnabled(AutofillFeatureName.Autofill.value)).thenReturn(true)
 
         val jsToEvaluate = getNotifySignOutJsToEvaluate()
         val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))

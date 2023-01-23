@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.features.autofill
+package com.duckduckgo.autofill.impl.plugins
 
+import com.duckduckgo.autofill.api.AutofillFeatureName
+import com.duckduckgo.autofill.impl.AutofillFeature
+import com.duckduckgo.autofill.impl.autofillFeatureValueOf
+import com.duckduckgo.autofill.store.AutofillExceptionEntity
+import com.duckduckgo.autofill.store.AutofillFeatureToggleRepository
+import com.duckduckgo.autofill.store.AutofillFeatureToggles
+import com.duckduckgo.autofill.store.AutofillRepository
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
-import com.duckduckgo.privacy.config.impl.features.privacyFeatureValueOf
-import com.duckduckgo.privacy.config.store.AutofillExceptionEntity
-import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
-import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
-import com.duckduckgo.privacy.config.store.features.autofill.AutofillRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -32,32 +33,31 @@ import javax.inject.Inject
 @ContributesMultibinding(AppScope::class)
 class AutofillPlugin @Inject constructor(
     private val autofillRepository: AutofillRepository,
-    private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository,
+    private val autofillFeatureToggleRepository: AutofillFeatureToggleRepository,
 ) : PrivacyFeaturePlugin {
 
     override fun store(
         featureName: String,
         jsonString: String,
     ): Boolean {
-        @Suppress("NAME_SHADOWING")
-        val privacyFeature = privacyFeatureValueOf(featureName) ?: return false
-        if (privacyFeature.value == this.featureName) {
+        val autofillFeatureName = autofillFeatureValueOf(featureName) ?: return false
+        if (autofillFeatureName.value == this.featureName) {
             val autofillExceptions = mutableListOf<AutofillExceptionEntity>()
             val moshi = Moshi.Builder().build()
             val jsonAdapter: JsonAdapter<AutofillFeature> =
                 moshi.adapter(AutofillFeature::class.java)
 
-            val httpsFeature: AutofillFeature? = jsonAdapter.fromJson(jsonString)
-            httpsFeature?.exceptions?.map {
+            val autofillFeature: AutofillFeature? = jsonAdapter.fromJson(jsonString)
+            autofillFeature?.exceptions?.map {
                 autofillExceptions.add(AutofillExceptionEntity(it.domain, it.reason))
             }
             autofillRepository.updateAll(autofillExceptions)
-            val isEnabled = httpsFeature?.state == "enabled"
-            privacyFeatureTogglesRepository.insert(PrivacyFeatureToggles(this.featureName, isEnabled, httpsFeature?.minSupportedVersion))
+            val isEnabled = autofillFeature?.state == "enabled"
+            autofillFeatureToggleRepository.insert(AutofillFeatureToggles(autofillFeatureName, isEnabled, autofillFeature?.minSupportedVersion))
             return true
         }
         return false
     }
 
-    override val featureName: String = PrivacyFeatureName.AutofillFeatureName.value
+    override val featureName: String = AutofillFeatureName.Autofill.value
 }

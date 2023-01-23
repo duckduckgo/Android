@@ -14,13 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.store.features.autofill
+package com.duckduckgo.autofill.store
 
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.privacy.config.api.AutofillException
-import com.duckduckgo.privacy.config.store.AutofillExceptionEntity
-import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
-import com.duckduckgo.privacy.config.store.toAutofillException
+import com.duckduckgo.autofill.api.AutofillException
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -31,7 +28,7 @@ interface AutofillRepository {
 }
 
 class RealAutofillRepository(
-    val database: PrivacyConfigDatabase,
+    val database: AutofillDatabase,
     coroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
 ) : AutofillRepository {

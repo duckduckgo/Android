@@ -1,5 +1,6 @@
+// ktlint-disable filename
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,21 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.duckduckgo.autofill.store
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-    id 'kotlin-parcelize'
-}
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import com.duckduckgo.autofill.api.AutofillException
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+@Entity(tableName = "autofill_exceptions")
+data class AutofillExceptionEntity(
+    @PrimaryKey val domain: String,
+    val reason: String,
+)
 
-dependencies {
-    implementation KotlinX.coroutines.core
-    implementation AndroidX.appCompat
-}
-
-
-android {
-  namespace 'com.duckduckgo.autofill.api'
+fun AutofillExceptionEntity.toAutofillException(): AutofillException {
+    return AutofillException(domain = this.domain, reason = this.reason)
 }

@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.store.features.autofill
+package com.duckduckgo.autofill.store
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.duckduckgo.privacy.config.store.AutofillExceptionEntity
 
 @Dao
 abstract class AutofillDao {
