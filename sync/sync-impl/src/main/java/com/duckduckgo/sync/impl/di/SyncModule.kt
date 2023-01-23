@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl.di
 import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.SyncService
+import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.crypto.SyncNativeLib
 import com.duckduckgo.sync.store.EncryptedSharedPrefsProvider
 import com.duckduckgo.sync.store.SharedPrefsProvider
@@ -49,7 +50,7 @@ object SyncStoreModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun providesNativeLib(context: Context): SyncNativeLib {
+    fun providesNativeLib(context: Context): SyncLib {
         return SyncNativeLib(context)
     }
 

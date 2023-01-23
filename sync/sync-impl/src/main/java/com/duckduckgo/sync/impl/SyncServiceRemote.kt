@@ -18,12 +18,11 @@ package com.duckduckgo.sync.impl
 
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import javax.inject.Inject
-import javax.inject.Named
-import okhttp3.ResponseBody
-import retrofit2.Converter
 import retrofit2.Response
-import retrofit2.Retrofit
 
 interface SyncApi {
     fun createAccount(
@@ -41,7 +40,6 @@ interface SyncApi {
 class SyncServiceRemote
 @Inject
 constructor(
-    @Named("nonCaching") private val retrofit: Retrofit,
     private val syncService: SyncService,
 ) : SyncApi {
     override fun createAccount(
@@ -55,24 +53,23 @@ constructor(
     ): Result<AccountCreatedResponse> {
         val response =
             runCatching {
-                val call =
-                    syncService.signup(
-                        Signup(
-                            userID,
-                            hashedPassword,
-                            protectedEncryptionKey,
-                            deviceId,
-                            deviceName,
-                        ),
-                    )
+                val call = syncService.signup(
+                    Signup(
+                        user_id = userID,
+                        hashed_password = hashedPassword,
+                        protected_encryption_key = protectedEncryptionKey,
+                        device_id = deviceId,
+                        device_name = deviceName,
+                    ),
+                )
                 call.execute()
             }.getOrElse { throwable ->
                 return Result.Error(reason = throwable.message.toString())
             }
 
         return onSuccess(response) {
-            val token = response.body()?.token ?: throw IllegalStateException("Empty body")
-            val userId = response.body()?.user_id ?: throw IllegalStateException("Empty body")
+            val token = response.body()?.token.takeUnless { it.isNullOrEmpty() } ?: throw IllegalStateException("Empty body")
+            val userId = response.body()?.user_id.takeUnless { it.isNullOrEmpty() } ?: throw IllegalStateException("Empty body")
             Result.Success(
                 AccountCreatedResponse(
                     token = token,
@@ -91,20 +88,21 @@ constructor(
                 return onSuccess(response.body())
             } else {
                 return response.errorBody()?.let { errorBody ->
-                    val converter: Converter<ResponseBody, ErrorResponse> =
-                        retrofit.responseBodyConverter(
-                            ErrorResponse::class.java,
-                            arrayOfNulls(0),
-                        )
-                    val errorResponse =
-                        converter.convert(errorBody)
-                            ?: throw IllegalArgumentException("Can't parse body")
-                    Result.Error(errorResponse.code, errorResponse.error)
-                }
-                    ?: Result.Error(code = response.code(), reason = response.code().toString())
+                    val error = Adapters.errorResponseAdapter.fromJson(errorBody.string()) ?: throw IllegalArgumentException("Can't parse body")
+                    val code = if (error.code == -1) response.code() else error.code
+                    Result.Error(code, error.error)
+                } ?: Result.Error(code = response.code(), reason = response.message().toString())
             }
         }.getOrElse {
             return Result.Error(reason = response.message())
+        }
+    }
+
+    class Adapters {
+        companion object {
+            private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+            val errorResponseAdapter: JsonAdapter<ErrorResponse> =
+                moshi.adapter(ErrorResponse::class.java).lenient()
         }
     }
 }

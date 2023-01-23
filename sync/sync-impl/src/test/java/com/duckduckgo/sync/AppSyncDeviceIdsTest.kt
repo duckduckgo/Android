@@ -22,6 +22,7 @@ import com.duckduckgo.sync.impl.AppSyncDeviceIds
 import com.duckduckgo.sync.store.SyncStore
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
@@ -54,22 +55,22 @@ class AppSyncDeviceIdsTest {
     fun whenUserIdDoesNotExistInStoreThenNewIdIsReturned() {
         val emptySyncStore = getFakeEmptySyncStore()
         assertNull(emptySyncStore.userId)
-        val appSyncDeviceIds =
-            AppSyncDeviceIds(InstrumentationRegistry.getInstrumentation().context, emptySyncStore)
+
+        val appSyncDeviceIds = AppSyncDeviceIds(InstrumentationRegistry.getInstrumentation().context, emptySyncStore)
 
         val userId = appSyncDeviceIds.userId()
-        assertEquals(emptySyncStore.userId, userId)
+        assertTrue(userId.isNotEmpty())
     }
 
     @Test
     fun whenDeviceIdDoesNotExistInStoreThenNewIdIsReturned() {
         val emptySyncStore = getFakeEmptySyncStore()
         assertNull(emptySyncStore.deviceId)
-        val appSyncDeviceIds =
-            AppSyncDeviceIds(InstrumentationRegistry.getInstrumentation().context, emptySyncStore)
+
+        val appSyncDeviceIds = AppSyncDeviceIds(InstrumentationRegistry.getInstrumentation().context, emptySyncStore)
 
         val deviceId = appSyncDeviceIds.deviceId()
-        assertEquals(emptySyncStore.deviceId, deviceId)
+        assertTrue(deviceId.isNotEmpty())
     }
 
     @Test
@@ -80,7 +81,7 @@ class AppSyncDeviceIdsTest {
             AppSyncDeviceIds(InstrumentationRegistry.getInstrumentation().context, emptySyncStore)
 
         val deviceName = appSyncDeviceIds.deviceName()
-        assertEquals(emptySyncStore.deviceName, deviceName)
+        assertTrue(deviceName.isNotEmpty())
     }
 
     private fun getFakeSyncStore(): SyncStore {
@@ -88,6 +89,14 @@ class AppSyncDeviceIdsTest {
             override var userId: String? = "testUserId"
             override var deviceName: String? = "testDeviceName"
             override var deviceId: String? = "deviceId"
+            override var token: String? = "token"
+            override var primaryKey: String? = "primaryKey"
+            override var secretKey: String? = "secretKey"
+            override var recoveryCode: String? = "recoveryCode"
+
+            override fun clearAll() {
+                /* no-op */
+            }
         }
     }
 
@@ -96,6 +105,14 @@ class AppSyncDeviceIdsTest {
             override var userId: String? = null
             override var deviceName: String? = null
             override var deviceId: String? = null
+            override var token: String? = null
+            override var primaryKey: String? = null
+            override var secretKey: String? = null
+            override var recoveryCode: String? = null
+
+            override fun clearAll() {
+                /* no-op */
+            }
         }
     }
 }

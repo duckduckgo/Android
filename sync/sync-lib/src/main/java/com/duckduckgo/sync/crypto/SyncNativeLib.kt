@@ -23,7 +23,20 @@ import java.util.*
 import kotlin.system.exitProcess
 import timber.log.Timber
 
-class SyncNativeLib constructor(context: Context) {
+interface SyncLib {
+    fun generateAccountKeys(
+        userId: String,
+        password: String = UUID.randomUUID().toString(),
+    ): AccountKeys
+
+    fun prepareForLogin(primaryKey: String): LoginKeys
+    fun decrypt(
+        encryptedData: String,
+        secretKey: String,
+    ): DecryptResult
+}
+
+class SyncNativeLib constructor(context: Context) : SyncLib {
 
     init {
         try {
@@ -35,9 +48,9 @@ class SyncNativeLib constructor(context: Context) {
         }
     }
 
-    fun generateAccountKeys(
+    override fun generateAccountKeys(
         userId: String,
-        password: String = UUID.randomUUID().toString(),
+        password: String,
     ): AccountKeys {
         val primaryKey = ByteArray(getPrimaryKeySize())
         val secretKey = ByteArray(getSecretKeySize())
@@ -65,7 +78,7 @@ class SyncNativeLib constructor(context: Context) {
         )
     }
 
-    fun prepareForLogin(primaryKey: String): LoginKeys {
+    override fun prepareForLogin(primaryKey: String): LoginKeys {
         val primarKeyByteArray = primaryKey.decode()
         val passwordHash = ByteArray(getPasswordHashSize())
         val stretchedPrimaryKey = ByteArray(getStretchedPrimaryKeySize())
@@ -80,7 +93,7 @@ class SyncNativeLib constructor(context: Context) {
         )
     }
 
-    fun decrypt(
+    override fun decrypt(
         encryptedData: String,
         secretKey: String,
     ): DecryptResult {

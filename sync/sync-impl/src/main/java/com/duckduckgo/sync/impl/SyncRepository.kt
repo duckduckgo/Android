@@ -18,7 +18,7 @@ package com.duckduckgo.sync.impl
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.lib.AccountKeys
-import com.duckduckgo.sync.lib.SyncNativeLib
+import com.duckduckgo.sync.lib.SyncLib
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
@@ -40,7 +40,7 @@ class AppSyncRepository
 @Inject
 constructor(
     private val syncDeviceIds: SyncDeviceIds,
-    private val nativeLib: SyncNativeLib,
+    private val nativeLib: SyncLib,
     private val syncApi: SyncApi,
     private val syncStore: SyncStore,
 ) : SyncRepository {
@@ -51,6 +51,8 @@ constructor(
         val deviceName = syncDeviceIds.deviceName()
 
         val account: AccountKeys = nativeLib.generateAccountKeys(userId = userId)
+        if (account.result != 0L) return Result.Error(code = account.result.toInt(), reason = "Account keys failed")
+
         val result =
             syncApi.createAccount(
                 account.userId,

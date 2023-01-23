@@ -42,6 +42,6 @@ data class AccountCreatedResponse(
 )
 
 data class ErrorResponse(
-    val code: Int,
+    val code: Int = -1,
     val error: String,
 )
