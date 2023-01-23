@@ -133,7 +133,7 @@
         <item name="autofillCredentialListSubtitleColor">@color/paleBrownishGray</item>
 
         <!-- App Tracking Protection -->
-        <item name="appTPHeaderBackground">@color/darkThemePrimaryDark</item>
+        <item name="appTPHeaderBackground">@color/black</item>
 
         <!-- Design System Reference Colors Dark -->
         <item name="daxColorBackground">@color/gray100</item>
@@ -270,8 +270,8 @@
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
 
-        <item name="colorPrimary">@color/darkThemePrimary</item>
-        <item name="colorPrimaryDark">@color/darkThemePrimaryDark</item>
+        <item name="colorPrimary">@color/newBlack</item>
+        <item name="colorPrimaryDark">@color/black</item>
         <item name="colorAccent">@color/cornflowerBlue</item>
         <item name="daxColorPrimaryIcon">@color/white</item>
     </style>
