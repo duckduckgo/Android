@@ -46,7 +46,9 @@ class SyncInitialSetupActivity : DuckDuckGoActivity() {
 
     private fun configureListeners() {
         binding.createAccountButton.setOnClickListener { viewModel.onCreateAccountClicked() }
-        binding.storeRecoveryCodeButton.setOnClickListener { viewModel.onStoreRecoveryCodeClicked() }
+        binding.storeRecoveryCodeButton.setOnClickListener {
+            viewModel.onStoreRecoveryCodeClicked()
+        }
         binding.resetButton.setOnClickListener { viewModel.onResetClicked() }
     }
 
@@ -57,14 +59,15 @@ class SyncInitialSetupActivity : DuckDuckGoActivity() {
             .onEach { viewState -> renderViewState(viewState) }
             .launchIn(lifecycleScope)
 
-        viewModel.commands()
-                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-                .onEach { processCommand(it) }
-                .launchIn(lifecycleScope)
+        viewModel
+            .commands()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { processCommand(it) }
+            .launchIn(lifecycleScope)
     }
 
     private fun processCommand(command: SyncInitialSetupViewModel.Command) {
-        when(command) {
+        when (command) {
             is SyncInitialSetupViewModel.Command.ShowMessage -> {
                 Toast.makeText(this, command.message, Toast.LENGTH_LONG).show()
             }

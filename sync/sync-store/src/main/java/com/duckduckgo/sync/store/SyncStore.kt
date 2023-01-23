@@ -10,7 +10,7 @@ interface SyncStore {
     var token: String?
     var primaryKey: String?
     var secretKey: String?
-    var recoveryCode:String?
+    var recoveryCode: String?
     fun clearAll()
 }
 
@@ -76,7 +76,7 @@ constructor(
 
     override var primaryKey: String?
         get() = encryptedPreferences?.getString(KEY_PK, null)
-        set(value)  {
+        set(value) {
             encryptedPreferences?.edit(commit = true) {
                 if (value == null) {
                     remove(KEY_PK)
@@ -88,7 +88,7 @@ constructor(
 
     override var secretKey: String?
         get() = encryptedPreferences?.getString(KEY_SK, null)
-        set(value)  {
+        set(value) {
             encryptedPreferences?.edit(commit = true) {
                 if (value == null) {
                     remove(KEY_SK)
@@ -99,7 +99,7 @@ constructor(
         }
     override var recoveryCode: String?
         get() = encryptedPreferences?.getString(KEY_RECOVERY_CODE, null)
-        set(value)  {
+        set(value) {
             encryptedPreferences?.edit(commit = true) {
                 if (value == null) {
                     remove(KEY_RECOVERY_CODE)
@@ -110,9 +110,7 @@ constructor(
         }
 
     override fun clearAll() {
-        encryptedPreferences?.edit(commit = true) {
-            clear()
-        }
+        encryptedPreferences?.edit(commit = true) { clear() }
     }
 
     companion object {

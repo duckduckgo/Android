@@ -49,7 +49,7 @@ constructor(
         val userId: String = "",
         val deviceName: String = "",
         val deviceId: String = "",
-        val isSignedIn: Boolean = false
+        val isSignedIn: Boolean = false,
     )
 
     sealed class Command {
@@ -87,7 +87,8 @@ constructor(
                 userId = accountInfo.userId,
                 deviceName = accountInfo.deviceName,
                 deviceId = accountInfo.deviceId,
-                isSignedIn = accountInfo.isSignedIn),
+                isSignedIn = accountInfo.isSignedIn,
+            ),
         )
     }
 }

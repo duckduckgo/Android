@@ -28,8 +28,8 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
-import retrofit2.Retrofit
 import javax.inject.Named
+import retrofit2.Retrofit
 
 @Module
 @ContributesTo(AppScope::class)

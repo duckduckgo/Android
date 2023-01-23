@@ -19,9 +19,9 @@ package com.duckduckgo.sync.crypto
 import android.content.Context
 import android.util.Base64
 import com.duckduckgo.library.loader.LibraryLoader
+import java.util.*
 import kotlin.system.exitProcess
 import timber.log.Timber
-import java.util.*
 
 class SyncNativeLib constructor(context: Context) {
 
@@ -36,8 +36,8 @@ class SyncNativeLib constructor(context: Context) {
     }
 
     fun generateAccountKeys(
-            userId: String,
-            password: String = UUID.randomUUID().toString(),
+        userId: String,
+        password: String = UUID.randomUUID().toString(),
     ): AccountKeys {
         val primaryKey = ByteArray(getPrimaryKeySize())
         val secretKey = ByteArray(getSecretKeySize())
@@ -45,7 +45,14 @@ class SyncNativeLib constructor(context: Context) {
         val passwordHash = ByteArray(getPasswordHashSize())
 
         val result: Long =
-            generateAccountKeys(primaryKey, secretKey, protectedSecretKey, passwordHash, userId, password)
+            generateAccountKeys(
+                primaryKey,
+                secretKey,
+                protectedSecretKey,
+                passwordHash,
+                userId,
+                password,
+            )
 
         return AccountKeys(
             result = result,

@@ -115,7 +115,7 @@ data class AccountInfo(
     val userId: String = "",
     val deviceName: String = "",
     val deviceId: String = "",
-    val isSignedIn: Boolean = false
+    val isSignedIn: Boolean = false,
 )
 
 data class RecoveryCode(
