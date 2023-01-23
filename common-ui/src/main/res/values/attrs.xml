@@ -18,30 +18,6 @@
 
     <attr name="toolbarIconColor" format="color" />
     <attr name="toolbarBgColor" format="color" />
-
-    <attr name="listItemImageBackground" format="color" />
-
-    <attr name="textAppearanceButton1" format="reference" />
-    <attr name="textAppearanceButton2" format="reference" />
-    <attr name="savedSiteEditTextUnderlineColor" format="color" />
-    <attr name="listItemBackgroundColor" format="color" />
-    <attr name="listItemSeparatorColor" format="color" />
-    <attr name="textInputOutlinedBoxColor" format="color" />
-    <attr name="textInputOutlinedBoxColorHighlight" format="color" />
-
-    <attr name="splitterColor" format="color" />
-
-    <attr name="secondaryButtonPressedColor" format="color" />
-    <attr name="primaryButtonDisabledColor" format="color" />
-
-    <attr name="dialogPrimaryButtonColor" format="color" />
-    <attr name="dialogSecondaryButtonColor" format="color" />
-
-    <attr name="overflowMenuDividerColor" format="color" />
-    <attr name="bottomShadowBackground" format="reference" />
     <attr name="appTPHeaderBackground" format="color" />
-
-    <!-- TODO: For Noelia to remove -->
-    <attr name="settingsSwitchBackgroundColor" format="color" />
 
 </resources>

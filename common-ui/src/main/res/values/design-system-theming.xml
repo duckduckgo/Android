@@ -133,19 +133,7 @@
 
         <!-- Legacy colors to remove-->
 
-        <item name="savedSiteEditTextUnderlineColor">@color/whiteSemiTransparent</item>
         <item name="android:textColorAlertDialogListItem">?attr/daxColorPrimaryText</item>
-
-        <item name="listItemBackgroundColor">@color/almostBlack</item>
-        <item name="listItemSeparatorColor">@color/charcoalGrey</item>
-        <item name="textInputOutlinedBoxColor">@color/grayish</item>
-        <item name="textInputOutlinedBoxColorHighlight">@color/cornflowerBlue</item>
-        <item name="splitterColor">@color/gray85</item>
-        <item name="secondaryButtonPressedColor">@color/black36</item>
-        <item name="primaryButtonDisabledColor">@color/gray85</item>
-
-        <item name="dialogPrimaryButtonColor">@color/cornflowerBlue</item>
-        <item name="dialogSecondaryButtonColor">?attr/daxColorSurface</item>
 
         <item name="bottomShadowBackground">@null</item>
         <item name="appTPHeaderBackground">@color/darkThemePrimaryDark</item>
@@ -215,21 +203,6 @@
         <item name="preferDarkNavigationBarIcons">true</item>
 
         <!-- Legacy colors to remove-->
-
-        <item name="savedSiteEditTextUnderlineColor">@color/black60</item>
-
-        <item name="listItemBackgroundColor">@color/whiteFive</item>
-        <item name="listItemSeparatorColor">@color/whiteSix</item>
-        <item name="textInputOutlinedBoxColor">@color/grayishThree</item>
-        <item name="textInputOutlinedBoxColorHighlight">@color/cornflowerBlue</item>
-        <item name="splitterColor">@color/gray25</item>
-        <item name="secondaryButtonPressedColor">@color/black18</item>
-        <item name="primaryButtonDisabledColor">@color/gray30</item>
-
-        <item name="dialogPrimaryButtonColor">@color/cornflowerBlue</item>
-        <item name="dialogSecondaryButtonColor">?attr/daxColorSurface</item>
-
-        <item name="bottomShadowBackground">@drawable/divider_shadow_background</item>
 
         <item name="tooltipPanelBackgroundColor">@color/tooltipPanelBackgroundColorLight</item>
         <item name="alertPanelBackgroundColor">@color/alertPanelBackgroundColorLight</item>
