@@ -2708,8 +2708,8 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.style.SearchWidgetContainer` appears to be unused"
-        errorLine1="    &lt;style name=&quot;SearchWidgetContainer&quot;>"
+        message="The resource `R.style.Widget.DuckDuckGo.SearchWidgetContainer` appears to be unused"
+        errorLine1="    &lt;style name=&quot;Widget.DuckDuckGo.SearchWidgetContainer&quot;>"
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/styles.xml"
@@ -2719,8 +2719,8 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.style.SearchWidgetSearchBarContainer` appears to be unused"
-        errorLine1="    &lt;style name=&quot;SearchWidgetSearchBarContainer&quot;>"
+        message="The resource `R.style.Widget.DuckDuckGo.SearchWidgetSearchBarContainer` appears to be unused"
+        errorLine1="    &lt;style name=&quot;Widget.DuckDuckGo.SearchWidgetSearchBarContainer&quot;>"
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/styles.xml"
@@ -2730,8 +2730,8 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.style.SearchWithFavoritesWidgetSearchBarContainer` appears to be unused"
-        errorLine1="    &lt;style name=&quot;SearchWithFavoritesWidgetSearchBarContainer&quot;>"
+        message="The resource `R.style.Widget.DuckDuckGo.SearchWithFavoritesWidgetSearchBarContainer` appears to be unused"
+        errorLine1="    &lt;style name=&quot;Widget.DuckDuckGo.SearchWithFavoritesWidgetSearchBarContainer&quot;>"
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/styles.xml"
@@ -2741,8 +2741,8 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.style.SearchWidgetDDGLogo` appears to be unused"
-        errorLine1="    &lt;style name=&quot;SearchWidgetDDGLogo&quot;>"
+        message="The resource `R.style.Widget.DuckDuckGo.SearchWidgetDDGLogo` appears to be unused"
+        errorLine1="    &lt;style name=&quot;Widget.DuckDuckGo.SearchWidgetDDGLogo&quot;>"
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/styles.xml"
@@ -2752,8 +2752,8 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.style.SearchWidgetInputBox` appears to be unused"
-        errorLine1="    &lt;style name=&quot;SearchWidgetInputBox&quot;>"
+        message="The resource `R.style.Widget.DuckDuckGo.SearchWidgetInputBox` appears to be unused"
+        errorLine1="    &lt;style name=&quot;Widget.DuckDuckGo.SearchWidgetInputBox&quot;>"
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/styles.xml"
@@ -2763,8 +2763,8 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.style.SearchWidgetSearchIcon` appears to be unused"
-        errorLine1="    &lt;style name=&quot;SearchWidgetSearchIcon&quot;>"
+        message="The resource `R.style.Widget.DuckDuckGo.SearchWidgetSearchIcon` appears to be unused"
+        errorLine1="    &lt;style name=&quot;Widget.DuckDuckGo.SearchWidgetSearchIcon&quot;>"
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/styles.xml"
@@ -2774,8 +2774,8 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.style.SearchWidgetFavoritesGrid` appears to be unused"
-        errorLine1="    &lt;style name=&quot;SearchWidgetFavoritesGrid&quot;>"
+        message="The resource `R.style.Widget.DuckDuckGo.SearchWidgetFavoritesGrid` appears to be unused"
+        errorLine1="    &lt;style name=&quot;Widget.DuckDuckGo.SearchWidgetFavoritesGrid&quot;>"
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/styles.xml"
@@ -2785,8 +2785,8 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.style.SearchWidgetEmptyFavoritesHintContainer` appears to be unused"
-        errorLine1="    &lt;style name=&quot;SearchWidgetEmptyFavoritesHintContainer&quot;>"
+        message="The resource `R.style.Widget.DuckDuckGo.Widget.DuckDuckGo.SearchWidgetEmptyFavoritesHintContainer` appears to be unused"
+        errorLine1="    &lt;style name=&quot;Widget.DuckDuckGo.Widget.DuckDuckGo.SearchWidgetEmptyFavoritesHintContainer&quot;>"
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/styles.xml"
@@ -2796,8 +2796,8 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.style.SearchWidgetEmptyFavoritesHint` appears to be unused"
-        errorLine1="    &lt;style name=&quot;SearchWidgetEmptyFavoritesHint&quot;>"
+        message="The resource `R.style.Widget.DuckDuckGo.SearchWidgetEmptyFavoritesHint` appears to be unused"
+        errorLine1="    &lt;style name=&quot;Widget.DuckDuckGo.SearchWidgetEmptyFavoritesHint&quot;>"
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/styles.xml"
@@ -2807,8 +2807,8 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.style.SearchWidgetEmptyFavoritesAction` appears to be unused"
-        errorLine1="    &lt;style name=&quot;SearchWidgetEmptyFavoritesAction&quot;>"
+        message="The resource `R.style.Widget.DuckDuckGo.SearchWidgetEmptyFavoritesAction` appears to be unused"
+        errorLine1="    &lt;style name=&quot;Widget.DuckDuckGo.SearchWidgetEmptyFavoritesAction&quot;>"
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/styles.xml"

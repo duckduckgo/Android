@@ -36,7 +36,7 @@
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/daxColorSurface"
             android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
-            app:popupTheme="@style/PopUpOverflowMenu" />
+            app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <ScrollView
