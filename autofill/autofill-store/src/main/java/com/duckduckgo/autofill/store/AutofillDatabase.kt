@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-    id 'kotlin-parcelize'
+package com.duckduckgo.autofill.store
+
+import androidx.room.Database
+import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+
+@Database(
+    exportSchema = true,
+    version = 1,
+    entities = [
+        AutofillExceptionEntity::class,
+    ],
+)
+abstract class AutofillDatabase : RoomDatabase() {
+    abstract fun autofillDao(): AutofillDao
 }
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
-
-dependencies {
-    implementation KotlinX.coroutines.core
-    implementation AndroidX.appCompat
-}
-
-
-android {
-  namespace 'com.duckduckgo.autofill.api'
-}
+val ALL_MIGRATIONS = emptyArray<Migration>()

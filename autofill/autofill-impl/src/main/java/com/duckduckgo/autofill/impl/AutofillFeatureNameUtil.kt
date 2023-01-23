@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.features.autofill
+package com.duckduckgo.autofill.impl
 
-import com.duckduckgo.privacy.config.store.AutofillExceptionEntity
+import com.duckduckgo.autofill.api.AutofillFeatureName
 
-data class AutofillFeature(
-    val state: String,
-    val minSupportedVersion: Int?,
-    val exceptions: List<AutofillExceptionEntity>,
-)
+/**
+ * Convenience method to get the [AutofillFeatureName] from its [String] value
+ */
+fun autofillFeatureValueOf(value: String): AutofillFeatureName? {
+    return AutofillFeatureName.values().find { it.value == value }
+}

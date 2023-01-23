@@ -20,9 +20,9 @@ import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.autofill.api.Autofill
+import com.duckduckgo.autofill.api.AutofillFeatureName
 import com.duckduckgo.feature.toggles.api.FeatureToggle
-import com.duckduckgo.privacy.config.api.Autofill
-import com.duckduckgo.privacy.config.api.PrivacyFeatureName.AutofillFeatureName
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -60,7 +60,7 @@ class EmailJavascriptInterfaceTest {
             mockAutofill,
         ) { counter++ }
 
-        whenever(mockFeatureToggle.isFeatureEnabled(AutofillFeatureName.value)).thenReturn(true)
+        whenever(mockFeatureToggle.isFeatureEnabled(AutofillFeatureName.Autofill.value)).thenReturn(true)
         whenever(mockAutofill.isAnException(any())).thenReturn(false)
     }
 
@@ -130,7 +130,7 @@ class EmailJavascriptInterfaceTest {
     @Test
     fun whenShowTooltipAndFeatureDisabledThenLambdaNotCalled() {
         whenever(mockWebView.url).thenReturn(NON_EMAIL_URL)
-        whenever(mockFeatureToggle.isFeatureEnabled(AutofillFeatureName.value)).thenReturn(false)
+        whenever(mockFeatureToggle.isFeatureEnabled(AutofillFeatureName.Autofill.value)).thenReturn(false)
 
         testee.showTooltip()
 

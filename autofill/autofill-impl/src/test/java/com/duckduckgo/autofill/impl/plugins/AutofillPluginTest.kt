@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.features.autofill
+package com.duckduckgo.autofill.impl.plugins
 
 import com.duckduckgo.app.FileUtilities
-import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
-import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
-import com.duckduckgo.privacy.config.store.features.autofill.AutofillRepository
+import com.duckduckgo.autofill.api.AutofillFeatureName
+import com.duckduckgo.autofill.store.AutofillFeatureToggleRepository
+import com.duckduckgo.autofill.store.AutofillFeatureToggles
+import com.duckduckgo.autofill.store.AutofillRepository
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -31,55 +31,58 @@ import org.mockito.kotlin.verify
 class AutofillPluginTest {
     lateinit var testee: AutofillPlugin
 
-    private val mockFeatureTogglesRepository: PrivacyFeatureTogglesRepository = mock()
+    private val mockFeatureTogglesRepository: AutofillFeatureToggleRepository = mock()
     private val mockAutofillRepository: AutofillRepository = mock()
 
     @Before
     fun before() {
-        testee = AutofillPlugin(mockAutofillRepository, mockFeatureTogglesRepository)
+        testee = AutofillPlugin(
+            mockAutofillRepository,
+            mockFeatureTogglesRepository,
+        )
     }
 
     @Test
-    fun whenFeatureNameDoesNotMatchHttpsThenReturnFalse() {
-        PrivacyFeatureName.values().filter { it != FEATURE_NAME }.forEach {
+    fun whenFeatureNameDoesNotMatchAutofillThenReturnFalse() {
+        AutofillFeatureName.values().filter { it != FEATURE_NAME }.forEach {
             assertFalse(testee.store(it.value, EMPTY_JSON_STRING))
         }
     }
 
     @Test
-    fun whenFeatureNameMatchesHttpsThenReturnTrue() {
+    fun whenFeatureNameMatchesAutofillThenReturnTrue() {
         assertTrue(testee.store(FEATURE_NAME_VALUE, EMPTY_JSON_STRING))
     }
 
     @Test
-    fun whenFeatureNameMatchesHttpsAndIsEnabledThenStoreFeatureEnabled() {
+    fun whenFeatureNameMatchesAutofillAndIsEnabledThenStoreFeatureEnabled() {
         val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/autofill.json")
 
         testee.store(FEATURE_NAME_VALUE, jsonString)
 
-        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME_VALUE, true, null))
+        verify(mockFeatureTogglesRepository).insert(AutofillFeatureToggles(FEATURE_NAME, true, null))
     }
 
     @Test
-    fun whenFeatureNameMatchesHttpsAndIsNotEnabledThenStoreFeatureDisabled() {
+    fun whenFeatureNameMatchesAutofillAndIsNotEnabledThenStoreFeatureDisabled() {
         val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/autofill_disabled.json")
 
         testee.store(FEATURE_NAME_VALUE, jsonString)
 
-        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME_VALUE, false, null))
+        verify(mockFeatureTogglesRepository).insert(AutofillFeatureToggles(FEATURE_NAME, false, null))
     }
 
     @Test
-    fun whenFeatureNameMatchesHttpsAndHasMinSupportedVersionThenStoreMinSupportedVersion() {
+    fun whenFeatureNameMatchesAutofillAndHasMinSupportedVersionThenStoreMinSupportedVersion() {
         val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/autofill_min_supported_version.json")
 
         testee.store(FEATURE_NAME_VALUE, jsonString)
 
-        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME_VALUE, true, 1234))
+        verify(mockFeatureTogglesRepository).insert(AutofillFeatureToggles(FEATURE_NAME, true, 1234))
     }
 
     @Test
-    fun whenFeatureNameMatchesHttpsThenUpdateAllExistingExceptions() {
+    fun whenFeatureNameMatchesAutofillThenUpdateAllExistingExceptions() {
         val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/autofill.json")
 
         testee.store(FEATURE_NAME_VALUE, jsonString)
@@ -88,8 +91,8 @@ class AutofillPluginTest {
     }
 
     companion object {
-        private val FEATURE_NAME = PrivacyFeatureName.AutofillFeatureName
-        private val FEATURE_NAME_VALUE = PrivacyFeatureName.AutofillFeatureName.value
+        private val FEATURE_NAME = AutofillFeatureName.Autofill
+        private val FEATURE_NAME_VALUE = AutofillFeatureName.Autofill.value
         private const val EMPTY_JSON_STRING = "{}"
     }
 }

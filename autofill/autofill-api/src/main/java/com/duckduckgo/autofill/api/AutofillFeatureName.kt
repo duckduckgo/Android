@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,9 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-    id 'kotlin-parcelize'
-}
+package com.duckduckgo.autofill.api
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
-
-dependencies {
-    implementation KotlinX.coroutines.core
-    implementation AndroidX.appCompat
-}
-
-
-android {
-  namespace 'com.duckduckgo.autofill.api'
+/** List of [AutofillFeatureName] that belong to the Autofill feature */
+enum class AutofillFeatureName(val value: String) {
+    Autofill("autofill"),
 }

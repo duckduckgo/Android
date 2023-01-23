@@ -33,6 +33,8 @@ dependencies {
     implementation project(path: ':browser-api')
     implementation project(path: ':autofill-store')
     implementation project(path: ':statistics')
+    implementation project(':privacy-config-api')
+    implementation project(':feature-toggles-api')
 
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
@@ -50,6 +52,7 @@ dependencies {
     implementation Google.dagger
     implementation AndroidX.core.ktx
     implementation AndroidX.work.runtimeKtx
+    implementation AndroidX.room.ktx
 
     // Testing dependencies
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"

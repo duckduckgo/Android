@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.features.autofill
+package com.duckduckgo.autofill.impl
 
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
+import com.duckduckgo.autofill.api.Autofill
+import com.duckduckgo.autofill.store.AutofillRepository
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.privacy.config.api.Autofill
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
-import com.duckduckgo.privacy.config.store.features.autofill.AutofillRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject

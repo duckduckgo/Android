@@ -32,8 +32,6 @@ import com.duckduckgo.privacy.config.store.RealPrivacyConfigRepository
 import com.duckduckgo.privacy.config.store.RealPrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.features.amplinks.AmpLinksRepository
 import com.duckduckgo.privacy.config.store.features.amplinks.RealAmpLinksRepository
-import com.duckduckgo.privacy.config.store.features.autofill.AutofillRepository
-import com.duckduckgo.privacy.config.store.features.autofill.RealAutofillRepository
 import com.duckduckgo.privacy.config.store.features.contentblocking.ContentBlockingRepository
 import com.duckduckgo.privacy.config.store.features.contentblocking.RealContentBlockingRepository
 import com.duckduckgo.privacy.config.store.features.drm.DrmRepository
@@ -181,16 +179,6 @@ object DatabaseModule {
         dispatcherProvider: DispatcherProvider,
     ): TrackingParametersRepository {
         return RealTrackingParametersRepository(database, coroutineScope, dispatcherProvider)
-    }
-
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun provideAutofillRepository(
-        database: PrivacyConfigDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
-        dispatcherProvider: DispatcherProvider,
-    ): AutofillRepository {
-        return RealAutofillRepository(database, coroutineScope, dispatcherProvider)
     }
 
     @SingleInstanceIn(AppScope::class)

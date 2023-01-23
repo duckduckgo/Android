@@ -25,7 +25,6 @@ enum class PrivacyFeatureName(val value: String) {
     DrmFeatureName("eme"),
     AmpLinksFeatureName("ampLinks"),
     TrackingParametersFeatureName("trackingParameters"),
-    AutofillFeatureName("autofill"),
     UserAgentFeatureName("customUserAgent"),
 }
 

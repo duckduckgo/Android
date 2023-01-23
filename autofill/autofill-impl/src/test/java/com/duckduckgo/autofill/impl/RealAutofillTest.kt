@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.features.autofill
+package com.duckduckgo.autofill.impl
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.privacy.config.api.AutofillException
+import com.duckduckgo.autofill.api.AutofillException
+import com.duckduckgo.autofill.store.AutofillRepository
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
-import com.duckduckgo.privacy.config.store.features.autofill.AutofillRepository
 import java.util.concurrent.CopyOnWriteArrayList
 import org.junit.Assert.*
 import org.junit.Before

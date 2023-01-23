@@ -14,20 +14,12 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-    id 'kotlin-parcelize'
-}
+package com.duckduckgo.autofill.impl
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+import com.duckduckgo.autofill.store.AutofillExceptionEntity
 
-dependencies {
-    implementation KotlinX.coroutines.core
-    implementation AndroidX.appCompat
-}
-
-
-android {
-  namespace 'com.duckduckgo.autofill.api'
-}
+data class AutofillFeature(
+    val state: String,
+    val minSupportedVersion: Int?,
+    val exceptions: List<AutofillExceptionEntity>,
+)

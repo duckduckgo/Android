@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
+    id 'kotlin-kapt'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -9,6 +10,8 @@ dependencies {
     implementation project(path: ':common')
     implementation project(path: ':autofill-api')
     implementation project(path: ':secure-storage-api')
+    implementation project(path: ':privacy-config-api')
+    implementation project(path: ':feature-toggles-api')
 
     implementation AndroidX.core.ktx
     implementation AndroidX.appCompat
@@ -19,6 +22,11 @@ dependencies {
 
     implementation Google.dagger
     implementation JakeWharton.timber
+
+    // Room
+    implementation AndroidX.room.runtime
+    implementation AndroidX.room.ktx
+    kapt AndroidX.room.compiler
 
     // Testing dependencies
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
