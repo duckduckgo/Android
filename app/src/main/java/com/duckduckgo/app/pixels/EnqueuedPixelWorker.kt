@@ -21,9 +21,11 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.work.*
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.browser.WebViewVersionProvider
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.DEFAULT_BROWSER
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.WEBVIEW_VERSION
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -43,6 +45,7 @@ class EnqueuedPixelWorker @Inject constructor(
     private val pixel: Provider<Pixel>,
     private val unsentForgetAllPixelStore: UnsentForgetAllPixelStore,
     private val webViewVersionProvider: WebViewVersionProvider,
+    private val defaultBrowserDetector: DefaultBrowserDetector,
 ) : MainProcessLifecycleObserver {
 
     private var launchedByFireAction: Boolean = false
@@ -62,7 +65,10 @@ class EnqueuedPixelWorker @Inject constructor(
         Timber.i("Sending app launch pixel")
         pixel.get().fire(
             pixel = AppPixelName.APP_LAUNCH,
-            parameters = mapOf(WEBVIEW_VERSION to webViewVersionProvider.getMajorVersion()),
+            parameters = mapOf(
+                WEBVIEW_VERSION to webViewVersionProvider.getMajorVersion(),
+                DEFAULT_BROWSER to defaultBrowserDetector.isDefaultBrowser().toString(),
+            ),
         )
     }
 

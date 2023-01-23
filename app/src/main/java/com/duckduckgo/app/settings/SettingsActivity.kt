@@ -57,7 +57,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.impl.ui.AutoconsentSettingsActivity
-import com.duckduckgo.autofill.ui.AutofillSettingsActivityLauncher
+import com.duckduckgo.autofill.api.AutofillSettingsActivityLauncher
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.macos_impl.MacOsActivity
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme

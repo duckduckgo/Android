@@ -22,6 +22,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.rating.ui.AppEnjoymentDialogFragment
 import com.duckduckgo.app.browser.rating.ui.GiveFeedbackDialogFragment
@@ -36,6 +37,7 @@ import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.di.scopes.ActivityScope
@@ -53,6 +55,7 @@ class BrowserViewModel @Inject constructor(
     private val dataClearer: DataClearer,
     private val appEnjoymentPromptEmitter: AppEnjoymentPromptEmitter,
     private val appEnjoymentUserEventRecorder: AppEnjoymentUserEventRecorder,
+    private val defaultBrowserDetector: DefaultBrowserDetector,
     private val dispatchers: DispatcherProvider,
     private val pixel: Pixel,
 ) : AppEnjoymentDialogFragment.Listener,
@@ -155,6 +158,13 @@ class BrowserViewModel @Inject constructor(
     suspend fun onOpenFavoriteFromWidget(query: String) {
         pixel.fire(AppPixelName.APP_FAVORITES_ITEM_WIDGET_LAUNCH)
         tabRepository.selectByUrlOrNewTab(queryUrlConverter.convertQueryToUrl(query))
+    }
+
+    fun launchFromThirdParty() {
+        pixel.fire(
+            AppPixelName.APP_THIRD_PARTY_LAUNCH,
+            mapOf(PixelParameter.DEFAULT_BROWSER to defaultBrowserDetector.isDefaultBrowser().toString()),
+        )
     }
 
     suspend fun onTabsUpdated(tabs: List<TabEntity>?) {

@@ -42,8 +42,8 @@ import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.autoconsent.api.Autoconsent
-import com.duckduckgo.autofill.BrowserAutofill
-import com.duckduckgo.autofill.InternalTestUserChecker
+import com.duckduckgo.autofill.api.BrowserAutofill
+import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.privacy.config.api.AmpLinks
