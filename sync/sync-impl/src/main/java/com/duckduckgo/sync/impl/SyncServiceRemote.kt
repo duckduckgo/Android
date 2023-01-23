@@ -32,9 +32,9 @@ interface SyncApi {
         secretKey: String,
         hashedPassword: String,
         protectedEncryptionKey: String,
-        deviceIds: String,
+        deviceId: String,
         deviceName: String,
-    ): Result
+    ): Result<AccountCreatedResponse>
 }
 
 @ContributesBinding(AppScope::class)
@@ -50,9 +50,9 @@ constructor(
         secretKey: String,
         hashedPassword: String,
         protectedEncryptionKey: String,
-        deviceIds: String,
+        deviceId: String,
         deviceName: String,
-    ): Result {
+    ): Result<AccountCreatedResponse> {
         val response =
             runCatching {
                     val call =
@@ -61,7 +61,7 @@ constructor(
                                 userID,
                                 hashedPassword,
                                 protectedEncryptionKey,
-                                deviceIds,
+                                deviceId,
                                 deviceName,
                             ))
                     call.execute()
@@ -70,14 +70,21 @@ constructor(
                     return Result.Error(reason = throwable.message.toString())
                 }
 
-        return onSuccess(response)
+        return onSuccess(response) {
+            val token = response.body()?.token ?: throw IllegalStateException("Empty body")
+            val userId = response.body()?.user_id ?: throw IllegalStateException("Empty body")
+            Result.Success(
+                AccountCreatedResponse(
+                    token = token,
+                    user_id = userId,
+                ))
+        }
     }
 
-    private fun onSuccess(response: Response<AccountCreatedResponse>): Result {
+    private fun <T, R> onSuccess(response: Response<T?>, onSuccess: (T?) -> Result<R>): Result<R> {
         runCatching {
                 if (response.isSuccessful) {
-                    val token = response.body()?.token ?: throw IllegalStateException("Empty body")
-                    return Result.Success(token)
+                    return onSuccess(response.body())
                 } else {
                     return response.errorBody()?.let { errorBody ->
                         val converter: Converter<ResponseBody, ErrorResponse> =

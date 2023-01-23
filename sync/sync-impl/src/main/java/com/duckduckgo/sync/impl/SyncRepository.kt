@@ -28,7 +28,7 @@ import javax.inject.Inject
 import timber.log.Timber
 
 interface SyncRepository {
-    fun createAccount(): Result
+    fun createAccount(): Result<Boolean>
     fun getAccountInfo(): AccountInfo
     fun storeRecoveryCode()
     fun removeAccount()
@@ -45,7 +45,7 @@ constructor(
     private val syncStore: SyncStore,
 ) : SyncRepository {
 
-    override fun createAccount(): Result {
+    override fun createAccount(): Result<Boolean> {
         val userId = syncDeviceIds.userId()
         val deviceId = syncDeviceIds.deviceId()
         val deviceName = syncDeviceIds.deviceName()
@@ -62,18 +62,21 @@ constructor(
                 deviceName,
             )
 
-        if (result is Result.Success) {
-            syncStore.userId = userId
-            syncStore.deviceId = deviceId
-            syncStore.deviceName = deviceName
-            syncStore.token = result.token
-            syncStore.primaryKey = account.primaryKey
-            syncStore.secretKey = account.secretKey
-        } else {
-            Timber.i("SYNC signup failed $result")
+        return when (result) {
+            is Result.Error -> {
+                Timber.i("SYNC signup failed $result")
+                result
+            }
+            is Result.Success -> {
+                syncStore.userId = userId
+                syncStore.deviceId = deviceId
+                syncStore.deviceName = deviceName
+                syncStore.token = result.data.token
+                syncStore.primaryKey = account.primaryKey
+                syncStore.secretKey = account.secretKey
+                Result.Success(true)
+            }
         }
-
-        return result
     }
 
     override fun getAccountInfo(): AccountInfo {
@@ -123,7 +126,15 @@ data class RecoveryCode(
     val userID: String,
 )
 
-sealed class Result {
-    data class Success(val token: String) : Result()
-    data class Error(val code: Int = -1, val reason: String) : Result()
+sealed class Result<out R> {
+
+    data class Success<out T>(val data: T) : Result<T>()
+    data class Error(val code: Int = -1, val reason: String) : Result<Nothing>()
+
+    override fun toString(): String {
+        return when (this) {
+            is Success<*> -> "Success[data=$data]"
+            is Error -> "Error[exception=$code, $reason]"
+        }
+    }
 }

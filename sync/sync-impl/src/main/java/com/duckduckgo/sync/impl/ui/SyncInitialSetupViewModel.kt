@@ -60,7 +60,7 @@ constructor(
         viewModelScope.launch(dispatchers.io()) {
             val result = syncRepository.createAccount()
             if (result is Error) {
-                command.send(Command.ShowMessage("${result.code}-${result.reason}"))
+                command.send(Command.ShowMessage("$result"))
             }
             updateViewState()
         }
