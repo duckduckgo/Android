@@ -33,6 +33,7 @@ dependencies {
 
     implementation Kotlin.stdlib.jdk7
     implementation "com.squareup.logcat:logcat:_"
+    implementation "com.duckduckgo.netguard:netguard-android:_"
 
     implementation Google.dagger
     implementation AndroidX.core.ktx
@@ -52,7 +53,8 @@ android {
     defaultConfig {
         externalNativeBuild {
             cmake {
-                targets "netguard", "libwg-go.so"
+                targets "libwg-go.so"
+                arguments '-DANDROID_STL=none'
             }
         }
     }
@@ -61,6 +63,9 @@ android {
         cmake {
             path "CMakeLists.txt"
         }
+    }
+    buildFeatures {
+        prefab true
     }
     anvil {
         generateDaggerFactories = true // default is false

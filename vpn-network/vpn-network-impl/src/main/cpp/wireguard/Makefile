@@ -14,7 +14,7 @@ NDK_GO_ARCH_MAP_mips64 := mips64x
 
 CLANG_FLAGS := --target=$(ANDROID_LLVM_TRIPLE) --gcc-toolchain=$(ANDROID_TOOLCHAIN_ROOT) --sysroot=$(ANDROID_SYSROOT)
 export CGO_CFLAGS := $(CLANG_FLAGS) $(CFLAGS)
-export CGO_LDFLAGS := $(CLANG_FLAGS) $(LDFLAGS) -L$(DESTDIR) -lnetguard -Wl,-soname=libwg-go.so
+export CGO_LDFLAGS := $(CLANG_FLAGS) $(LDFLAGS) -L$(DESTDIR) -l$(NETGUARD_PATH) -Wl,-soname=libwg-go.so
 export CC := $(ANDROID_C_COMPILER)
 export GOARCH := $(NDK_GO_ARCH_MAP_$(ANDROID_ARCH_NAME))
 export GOOS := android

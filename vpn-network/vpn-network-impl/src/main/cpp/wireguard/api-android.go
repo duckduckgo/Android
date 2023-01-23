@@ -7,7 +7,7 @@
 package main
 
 // #cgo LDFLAGS: -llog
-// #cgo CFLAGS: -I../netguard/src
+// #cgo CFLAGS: -I../../../../build/netguard
 // #include <android/log.h>
 import "C"
 
