@@ -17,7 +17,6 @@
 package com.duckduckgo.sync.impl.ui
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
