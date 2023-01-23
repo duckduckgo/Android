@@ -36,3 +36,11 @@ dependencies {
     androidTestImplementation AndroidX.test.runner
     androidTestImplementation AndroidX.test.ext.junit
 }
+
+fulladleModuleConfig {
+    maxTestShards.set(1)
+}
+
+tasks.register('androidTestsBuild') {
+    dependsOn 'assembleDebugAndroidTest'
+}
