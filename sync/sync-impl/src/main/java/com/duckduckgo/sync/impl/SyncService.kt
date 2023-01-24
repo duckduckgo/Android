@@ -16,10 +16,13 @@
 
 package com.duckduckgo.sync.impl
 
+import com.duckduckgo.anvil.annotations.ContributesServiceApi
+import com.duckduckgo.di.scopes.AppScope
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.POST
 
+@ContributesServiceApi(AppScope::class)
 interface SyncService {
 
     @POST("https://dev-sync-use.duckduckgo.com/sync/signup")

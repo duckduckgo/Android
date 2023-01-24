@@ -29,8 +29,6 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
-import javax.inject.Named
-import retrofit2.Retrofit
 
 @Module
 @ContributesTo(AppScope::class)
@@ -52,10 +50,5 @@ object SyncStoreModule {
     @SingleInstanceIn(AppScope::class)
     fun providesNativeLib(context: Context): SyncLib {
         return SyncNativeLib(context)
-    }
-
-    @Provides
-    fun pixelService(@Named("nonCaching") retrofit: Retrofit): SyncService {
-        return retrofit.create(SyncService::class.java)
     }
 }
