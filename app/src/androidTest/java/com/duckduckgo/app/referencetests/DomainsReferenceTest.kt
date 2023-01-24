@@ -170,7 +170,7 @@ class DomainsReferenceTest(private val testCase: TestCase) {
             gpc = mockGpc,
             userAgentProvider = userAgentProvider,
             adClickManager = mockAdClickManager,
-            cloakedCnameDetector = CloakedCnameDetectorImpl(tdsCnameEntityDao),
+            cloakedCnameDetector = CloakedCnameDetectorImpl(tdsCnameEntityDao, mockTrackerAllowlist),
             requestFilterer = mockRequestFilterer,
         )
     }

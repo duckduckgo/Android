@@ -617,7 +617,7 @@ class WebViewRequestInterceptorTest {
 
         val uri = "host.com".toUri()
         whenever(mockRequest.url).thenReturn(uri)
-        whenever(mockCloakedCnameDetector.detectCnameCloakedHost(any())).thenReturn(null)
+        whenever(mockCloakedCnameDetector.detectCnameCloakedHost(anyString(), any())).thenReturn(null)
 
         val response = testee.shouldIntercept(
             request = mockRequest,
@@ -626,7 +626,7 @@ class WebViewRequestInterceptorTest {
             webViewClientListener = null,
         )
 
-        verify(mockCloakedCnameDetector).detectCnameCloakedHost(uri)
+        verify(mockCloakedCnameDetector).detectCnameCloakedHost("foo.com", uri)
         assertRequestCanContinueToLoad(response)
     }
 
@@ -638,7 +638,7 @@ class WebViewRequestInterceptorTest {
 
         val uri = "host.com".toUri()
         whenever(mockRequest.url).thenReturn(uri)
-        whenever(mockCloakedCnameDetector.detectCnameCloakedHost(any())).thenReturn("uncloaked-host.com")
+        whenever(mockCloakedCnameDetector.detectCnameCloakedHost(anyString(), any())).thenReturn("uncloaked-host.com")
 
         val response = testee.shouldIntercept(
             request = mockRequest,
@@ -647,7 +647,7 @@ class WebViewRequestInterceptorTest {
             webViewClientListener = null,
         )
 
-        verify(mockCloakedCnameDetector).detectCnameCloakedHost(uri)
+        verify(mockCloakedCnameDetector).detectCnameCloakedHost("foo.com", uri)
         assertRequestCanContinueToLoad(response)
     }
 
@@ -657,7 +657,7 @@ class WebViewRequestInterceptorTest {
 
         val uri = "host.com".toUri()
         whenever(mockRequest.url).thenReturn(uri)
-        whenever(mockCloakedCnameDetector.detectCnameCloakedHost(any())).thenReturn("uncloaked-host.com")
+        whenever(mockCloakedCnameDetector.detectCnameCloakedHost(anyString(), any())).thenReturn("uncloaked-host.com")
 
         val response = testee.shouldIntercept(
             request = mockRequest,
@@ -666,7 +666,7 @@ class WebViewRequestInterceptorTest {
             webViewClientListener = null,
         )
 
-        verify(mockCloakedCnameDetector).detectCnameCloakedHost(uri)
+        verify(mockCloakedCnameDetector).detectCnameCloakedHost("foo.com", uri)
         assertCancelledResponse(response)
     }
 
