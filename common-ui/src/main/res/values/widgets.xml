@@ -143,6 +143,11 @@
         <item name="android:background">?attr/selectableItemBackground</item>
     </style>
 
+    <!-- SkeletonView -->
+    <style name="Widget.DuckDuckGo.SkeletonView">
+        <item name="android:background">@drawable/background_skeleton_ui</item>
+    </style>
+
     <!-- Info Panel -->
     <style name="Widget.DuckDuckGo.InfoPanel">
         <item name="android:layout_width">match_parent</item>
