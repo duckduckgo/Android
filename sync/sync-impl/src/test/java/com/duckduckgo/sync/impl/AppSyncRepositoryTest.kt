@@ -58,8 +58,6 @@ class AppSyncRepositoryTest {
                 anyString(),
                 anyString(),
                 anyString(),
-                anyString(),
-                anyString(),
             ),
         ).thenReturn(accountCreatedSuccess)
 
@@ -88,8 +86,6 @@ class AppSyncRepositoryTest {
                 anyString(),
                 anyString(),
                 anyString(),
-                anyString(),
-                anyString(),
             ),
         ).thenReturn(accountCreatedFailDupUser)
 
@@ -108,8 +104,6 @@ class AppSyncRepositoryTest {
         whenever(nativeLib.generateAccountKeys(userId = anyString(), password = anyString())).thenReturn(accountKeysFailed)
         whenever(
             syncApi.createAccount(
-                anyString(),
-                anyString(),
                 anyString(),
                 anyString(),
                 anyString(),

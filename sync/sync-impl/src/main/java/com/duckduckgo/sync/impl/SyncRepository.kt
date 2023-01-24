@@ -56,8 +56,6 @@ constructor(
         val result =
             syncApi.createAccount(
                 account.userId,
-                account.primaryKey,
-                account.secretKey,
                 account.passwordHash,
                 account.protectedSecretKey,
                 deviceId,

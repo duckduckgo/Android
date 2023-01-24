@@ -44,7 +44,7 @@ class SyncServiceRemoteTest {
         whenever(call.execute()).thenReturn(signupSuccess)
 
         val result = with(accountKeys) {
-            syncRemote.createAccount(userId, primaryKey, secretKey, passwordHash, protectedSecretKey, deviceId, deviceName)
+            syncRemote.createAccount(userId, passwordHash, protectedSecretKey, deviceId, deviceName)
         }
 
         assertEquals(accountCreatedSuccess, result)
@@ -58,7 +58,7 @@ class SyncServiceRemoteTest {
         whenever(call.execute()).thenReturn(signupFailInvalid)
 
         val result = with(accountKeys) {
-            syncRemote.createAccount(userId, primaryKey, secretKey, passwordHash, protectedSecretKey, deviceId, deviceName)
+            syncRemote.createAccount(userId, passwordHash, protectedSecretKey, deviceId, deviceName)
         }
 
         assertEquals(accountCreatedFailInvalid, result)
@@ -72,7 +72,7 @@ class SyncServiceRemoteTest {
         whenever(call.execute()).thenReturn(signupFailDuplicatedUser)
 
         val result = with(accountKeys) {
-            syncRemote.createAccount(userId, primaryKey, secretKey, passwordHash, protectedSecretKey, deviceId, deviceName)
+            syncRemote.createAccount(userId, passwordHash, protectedSecretKey, deviceId, deviceName)
         }
 
         assertEquals(accountCreatedFailDupUser, result)
