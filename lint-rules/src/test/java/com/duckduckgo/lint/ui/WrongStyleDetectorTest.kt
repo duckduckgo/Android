@@ -84,9 +84,16 @@ class WrongStyleDetectorTest {
                 """,
             ).indented(),
         )
-            .issues(WrongStyleDetector.WRONG_STYLE_NAME)
+            .issues(WrongStyleDetector.WRONG_STYLE_PARAMETER)
             .run()
-            .expectClean()
+            .expect(
+                """
+                res/xml/style.xml:2: Error: Styles should not modify android:layout_height or android:layout_width [WrongStyleParameter]
+                    <item name="android:layout_width">match_parent</item>
+                     ~~~~
+                1 errors, 0 warnings
+            """,
+            )
     }
 
     @Test
@@ -103,8 +110,15 @@ class WrongStyleDetectorTest {
                 """,
             ).indented(),
         )
-            .issues(WrongStyleDetector.WRONG_STYLE_NAME)
+            .issues(WrongStyleDetector.WRONG_STYLE_PARAMETER)
             .run()
-            .expectClean()
+            .expect(
+                """
+                res/xml/style.xml:2: Error: Styles should not modify android:layout_height or android:layout_width [WrongStyleParameter]
+                    <item name="android:layout_width">match_parent</item>
+                     ~~~~
+                1 errors, 0 warnings
+            """,
+            )
     }
 }
