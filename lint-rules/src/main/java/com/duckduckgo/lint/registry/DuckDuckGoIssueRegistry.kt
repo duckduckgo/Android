@@ -37,6 +37,7 @@ import com.duckduckgo.lint.ui.MissingDividerDetector.Companion.MISSING_VERTICAL_
 import com.duckduckgo.lint.ui.NoAlertDialogDetector.Companion.NO_DESIGN_SYSTEM_DIALOG
 import com.duckduckgo.lint.ui.NoBottomSheetDialogDetector.Companion.NO_BOTTOM_SHEET
 import com.duckduckgo.lint.ui.NoStyleAppliedToDesignSystemComponentDetector.Companion.STYLE_IN_DESIGN_SYSTEM_COMPONENT
+import com.duckduckgo.lint.ui.SkeletonViewBackgroundDetector.Companion.INVALID_SKELETON_VIEW_BACKGROUND
 
 @Suppress("UnstableApiUsage")
 class DuckDuckGoIssueRegistry : IssueRegistry() {
@@ -60,7 +61,8 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             MISSING_HORIZONTAL_DIVIDER,
             NO_BOTTOM_SHEET,
             INVALID_DAX_TEXT_VIEW_PROPERTY,
-            INVALID_DAX_BUTTON_PROPERTY
+            INVALID_DAX_BUTTON_PROPERTY,
+            INVALID_SKELETON_VIEW_BACKGROUND
 
         )
 
