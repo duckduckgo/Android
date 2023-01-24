@@ -69,7 +69,6 @@ class PrivacyDashboardRenderer(
 
         onPrivacyProtectionSettingChanged(viewState.userChangedValues)
 
-        // An example of providing 'cookie consent management status'
         val cookiePromptManagementStatusAdapter = moshi.adapter(CookiePromptManagementState::class.java)
         val cookiePromptManagementStatusJson = cookiePromptManagementStatusAdapter.toJson(viewState.cookiePromptManagementStatus)
         webView.evaluateJavascript("javascript:onChangeConsentManaged($cookiePromptManagementStatusJson);", null)

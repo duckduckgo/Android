@@ -129,7 +129,7 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                 startActivity(brokenSiteNav.navigate(this, it.data))
             }
             is OpenURL -> openUrl(it.url)
-            is OpenSettings -> openAutoconsentSettings(it.target)
+            is OpenSettings -> openSettings(it.target)
         }
     }
 
@@ -138,8 +138,10 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
         finish()
     }
 
-    private fun openAutoconsentSettings(target: String) {
-        startActivity(autoconsentNav.navigate(this))
+    private fun openSettings(target: String) {
+        if (target == "cpm") {
+            startActivity(autoconsentNav.navigate(this))
+        }
         finish()
     }
 
