@@ -92,6 +92,7 @@ class PrivacyDashboardRendererTest {
         assertNotNull(captor.allValues.find { it.startsWith("javascript:onChangeCertificateData") })
         assertNotNull(captor.allValues.find { it.startsWith("javascript:onChangeUpgradedHttps") })
         assertNotNull(captor.allValues.find { it.startsWith("javascript:onChangeRequestData") })
+        assertNotNull(captor.allValues.find { it.startsWith("javascript:onChangeConsentManaged") })
     }
 
     fun aViewState() = ViewState(
