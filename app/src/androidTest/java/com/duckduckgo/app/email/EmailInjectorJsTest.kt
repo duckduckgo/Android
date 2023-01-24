@@ -22,7 +22,7 @@ import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.autofill.FileBasedJavascriptInjector
 import com.duckduckgo.app.autofill.JavascriptInjector
-import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autofill.api.Autofill
@@ -45,7 +45,14 @@ class EmailInjectorJsTest {
     @Before
     fun setup() {
         testee =
-            EmailInjectorJs(mockEmailManager, DuckDuckGoUrlDetector(), mockDispatcherProvider, mockFeatureToggle, javascriptInjector, mockAutofill)
+            EmailInjectorJs(
+                mockEmailManager,
+                DuckDuckGoUrlDetectorImpl(),
+                mockDispatcherProvider,
+                mockFeatureToggle,
+                javascriptInjector,
+                mockAutofill,
+            )
 
         whenever(mockFeatureToggle.isFeatureEnabled(AutofillFeatureName.Autofill.value)).thenReturn(true)
         whenever(mockAutofill.isAnException(any())).thenReturn(false)

@@ -20,8 +20,11 @@ import com.duckduckgo.app.autofill.JavascriptInjector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.autofill.api.Autofill
+import com.duckduckgo.autofill.api.AutofillFeatureName
 import com.duckduckgo.autofill.api.BrowserAutofill.Configurator
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -34,18 +37,31 @@ class InlineBrowserAutofillConfigurator @Inject constructor(
     private val javascriptInjector: JavascriptInjector,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
+    private val autofill: Autofill,
+    private val featureToggle: FeatureToggle,
 ) : Configurator {
     override fun configureAutofillForCurrentPage(
         webView: WebView,
         url: String?,
     ) {
-        coroutineScope.launch {
-            val rawJs = javascriptInjector.getFunctionsJS()
-            val formatted = autofillRuntimeConfigProvider.getRuntimeConfiguration(rawJs, url)
+        if (canJsBeInjected(url)) {
+            coroutineScope.launch(dispatchers.io()) {
+                val rawJs = javascriptInjector.getFunctionsJS()
+                val formatted = autofillRuntimeConfigProvider.getRuntimeConfiguration(rawJs, url)
 
-            withContext(dispatchers.main()) {
-                webView.evaluateJavascript("javascript:$formatted", null)
+                withContext(dispatchers.main()) {
+                    webView.evaluateJavascript("javascript:$formatted", null)
+                }
             }
         }
     }
+
+    private fun canJsBeInjected(url: String?): Boolean {
+        url?.let {
+            return (isFeatureEnabled() && !autofill.isAnException(url))
+        }
+        return false
+    }
+
+    private fun isFeatureEnabled() = featureToggle.isFeatureEnabled(AutofillFeatureName.Autofill.value, defaultValue = true)
 }

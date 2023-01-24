@@ -19,7 +19,7 @@ package com.duckduckgo.app.email
 import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
 import com.duckduckgo.autofill.api.Autofill
 import com.duckduckgo.autofill.api.AutofillFeatureName
 import com.duckduckgo.feature.toggles.api.FeatureToggle
@@ -54,7 +54,7 @@ class EmailJavascriptInterfaceTest {
         testee = EmailJavascriptInterface(
             mockEmailManager,
             mockWebView,
-            DuckDuckGoUrlDetector(),
+            DuckDuckGoUrlDetectorImpl(),
             coroutineRule.testDispatcherProvider,
             mockFeatureToggle,
             mockAutofill,
