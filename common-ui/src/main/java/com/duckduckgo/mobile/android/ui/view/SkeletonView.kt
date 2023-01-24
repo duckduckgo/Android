@@ -38,5 +38,4 @@ class SkeletonView @JvmOverloads constructor(
             recycle()
         }
     }
-
 }
