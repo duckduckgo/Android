@@ -107,7 +107,7 @@ constructor(
 
     private fun isSignedIn() = !syncStore.primaryKey.isNullOrEmpty()
 
-    class Adapters {
+    private class Adapters {
         companion object {
             private val moshi = Moshi.Builder().build()
             val recoveryCodeAdapter: JsonAdapter<RecoveryCode> =

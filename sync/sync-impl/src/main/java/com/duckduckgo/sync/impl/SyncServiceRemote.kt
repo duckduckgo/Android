@@ -27,8 +27,6 @@ import retrofit2.Response
 interface SyncApi {
     fun createAccount(
         userID: String,
-        primaryKey: String,
-        secretKey: String,
         hashedPassword: String,
         protectedEncryptionKey: String,
         deviceId: String,
@@ -37,39 +35,32 @@ interface SyncApi {
 }
 
 @ContributesBinding(AppScope::class)
-class SyncServiceRemote
-@Inject
-constructor(
-    private val syncService: SyncService,
-) : SyncApi {
+class SyncServiceRemote @Inject constructor(private val syncService: SyncService) : SyncApi {
     override fun createAccount(
         userID: String,
-        primaryKey: String,
-        secretKey: String,
         hashedPassword: String,
         protectedEncryptionKey: String,
         deviceId: String,
         deviceName: String,
     ): Result<AccountCreatedResponse> {
-        val response =
-            runCatching {
-                val call = syncService.signup(
-                    Signup(
-                        user_id = userID,
-                        hashed_password = hashedPassword,
-                        protected_encryption_key = protectedEncryptionKey,
-                        device_id = deviceId,
-                        device_name = deviceName,
-                    ),
-                )
-                call.execute()
-            }.getOrElse { throwable ->
-                return Result.Error(reason = throwable.message.toString())
-            }
+        val response = runCatching {
+            val call = syncService.signup(
+                Signup(
+                    user_id = userID,
+                    hashed_password = hashedPassword,
+                    protected_encryption_key = protectedEncryptionKey,
+                    device_id = deviceId,
+                    device_name = deviceName,
+                ),
+            )
+            call.execute()
+        }.getOrElse { throwable ->
+            return Result.Error(reason = throwable.message.toString())
+        }
 
         return onSuccess(response) {
-            val token = response.body()?.token.takeUnless { it.isNullOrEmpty() } ?: throw IllegalStateException("Empty body")
-            val userId = response.body()?.user_id.takeUnless { it.isNullOrEmpty() } ?: throw IllegalStateException("Empty body")
+            val token = response.body()?.token.takeUnless { it.isNullOrEmpty() } ?: throw IllegalStateException("Token not found")
+            val userId = response.body()?.user_id.takeUnless { it.isNullOrEmpty() } ?: throw IllegalStateException("userId missing")
             Result.Success(
                 AccountCreatedResponse(
                     token = token,
@@ -98,7 +89,7 @@ constructor(
         }
     }
 
-    class Adapters {
+    private class Adapters {
         companion object {
             private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
             val errorResponseAdapter: JsonAdapter<ErrorResponse> =
