@@ -420,7 +420,7 @@ class BrowserTabViewModelTest {
             userStageStore = mockUserStageStore,
             tabRepository = mockTabRepository,
             dispatchers = coroutineRule.testDispatcherProvider,
-            duckDuckGoUrlDetector = DuckDuckGoUrlDetector(),
+            duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),
             appTheme = mockAppTheme,
         )
 
@@ -441,7 +441,7 @@ class BrowserTabViewModelTest {
         testee = BrowserTabViewModel(
             statisticsUpdater = mockStatisticsUpdater,
             queryUrlConverter = mockOmnibarConverter,
-            duckDuckGoUrlDetector = DuckDuckGoUrlDetector(),
+            duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),
             siteFactory = siteFactory,
             tabRepository = mockTabRepository,
             userWhitelistDao = mockUserWhitelistDao,

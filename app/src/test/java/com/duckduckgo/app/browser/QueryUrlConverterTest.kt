@@ -37,7 +37,12 @@ class QueryUrlConverterTest {
     private var mockStatisticsStore: StatisticsDataStore = mock()
     private val variantManager: VariantManager = mock()
     private val mockAppReferrerDataStore: AppReferrerDataStore = mock()
-    private val requestRewriter = DuckDuckGoRequestRewriter(DuckDuckGoUrlDetector(), mockStatisticsStore, variantManager, mockAppReferrerDataStore)
+    private val requestRewriter = DuckDuckGoRequestRewriter(
+        DuckDuckGoUrlDetectorImpl(),
+        mockStatisticsStore,
+        variantManager,
+        mockAppReferrerDataStore,
+    )
     private val testee: QueryUrlConverter = QueryUrlConverter(requestRewriter)
 
     @Before
