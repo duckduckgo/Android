@@ -64,10 +64,18 @@ class RealWgServerDataProvider @Inject constructor(
 
     private fun EligibleServerInfo.toWgServerData(): WgServerData = WgServerData(
         publicKey = server.publicKey,
-        publicEndpoint = server.hostnames[0] + ":" + server.port,
+        publicEndpoint = server.extractPublicEndpoint(),
         address = allowedIPs.joinToString(","),
         location = server.attributes.extractLocation(),
     )
+
+    private fun Server.extractPublicEndpoint(): String {
+        return if (ips.isNotEmpty()) {
+            ips[0]
+        } else {
+            hostnames[0]
+        } + ":" + port
+    }
 
     private fun Map<String, String>.extractLocation(): String? {
         val country = this[SERVER_ATTR_COUNTRY]

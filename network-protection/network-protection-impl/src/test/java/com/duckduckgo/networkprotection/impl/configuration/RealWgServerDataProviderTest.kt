@@ -241,6 +241,58 @@ class RealWgServerDataProviderTest {
 
         assertTrue(fakeWgServerDebugProvider.cachedServers.isEmpty())
     }
+
+    @Test
+    fun whenServerOnlyHasIpsAndNoHostnameThenPublicEndpointShouldUseIps() = runTest {
+        whenever(wgVpnControllerService.registerKey(any())).thenReturn(
+            listOf(
+                EligibleServerInfo(
+                    publicKey = "testpublickey",
+                    allowedIPs = listOf("10.11.181.220/32"),
+                    server = Server(
+                        name = "egress.euw",
+                        attributes = mapOf(
+                            "city" to "Stockholm",
+                            "country" to "Sweden",
+                        ),
+                        publicKey = "CLQMP4SFzpyvAzMj3rXwShm+3n6Yt68hGHBF67At+x0=",
+                        hostnames = emptyList(),
+                        ips = listOf("109.200.208.196"),
+                        port = 443,
+                    ),
+                ),
+            ),
+        )
+        whenever(countryIsoProvider.getCountryIso()).thenReturn("se")
+
+        assertEquals("109.200.208.196:443", testee.get("testpublickey").publicEndpoint)
+    }
+
+    @Test
+    fun whenServerHasBothIpsAndHostnamesThenPublicEndpointShouldUseIps() = runTest {
+        whenever(wgVpnControllerService.registerKey(any())).thenReturn(
+            listOf(
+                EligibleServerInfo(
+                    publicKey = "testpublickey",
+                    allowedIPs = listOf("10.11.181.220/32"),
+                    server = Server(
+                        name = "egress.euw",
+                        attributes = mapOf(
+                            "city" to "Stockholm",
+                            "country" to "Sweden",
+                        ),
+                        publicKey = "CLQMP4SFzpyvAzMj3rXwShm+3n6Yt68hGHBF67At+x0=",
+                        hostnames = listOf("euw.egress.np.duck.com"),
+                        ips = listOf("109.200.208.196"),
+                        port = 443,
+                    ),
+                ),
+            ),
+        )
+        whenever(countryIsoProvider.getCountryIso()).thenReturn("se")
+
+        assertEquals("109.200.208.196:443", testee.get("testpublickey").publicEndpoint)
+    }
 }
 
 private class FakeWgServerDebugProvider : WgServerDebugProvider {
