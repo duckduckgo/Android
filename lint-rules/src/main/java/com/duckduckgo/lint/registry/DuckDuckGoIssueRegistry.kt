@@ -38,6 +38,10 @@ import com.duckduckgo.lint.ui.NoAlertDialogDetector.Companion.NO_DESIGN_SYSTEM_D
 import com.duckduckgo.lint.ui.NoBottomSheetDialogDetector.Companion.NO_BOTTOM_SHEET
 import com.duckduckgo.lint.ui.NoStyleAppliedToDesignSystemComponentDetector.Companion.STYLE_IN_DESIGN_SYSTEM_COMPONENT
 import com.duckduckgo.lint.ui.SkeletonViewBackgroundDetector.Companion.INVALID_SKELETON_VIEW_BACKGROUND
+import com.duckduckgo.lint.ui.WrongStyleDetector
+import com.duckduckgo.lint.ui.WrongStyleDetector.Companion
+import com.duckduckgo.lint.ui.WrongStyleDetector.Companion.WRONG_STYLE_NAME
+import com.duckduckgo.lint.ui.WrongStyleDetector.Companion.WRONG_STYLE_PARAMETER
 
 @Suppress("UnstableApiUsage")
 class DuckDuckGoIssueRegistry : IssueRegistry() {
@@ -62,7 +66,9 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             NO_BOTTOM_SHEET,
             INVALID_DAX_TEXT_VIEW_PROPERTY,
             INVALID_DAX_BUTTON_PROPERTY,
-            INVALID_SKELETON_VIEW_BACKGROUND
+            INVALID_SKELETON_VIEW_BACKGROUND,
+            WRONG_STYLE_PARAMETER,
+            WRONG_STYLE_NAME
 
         )
 
