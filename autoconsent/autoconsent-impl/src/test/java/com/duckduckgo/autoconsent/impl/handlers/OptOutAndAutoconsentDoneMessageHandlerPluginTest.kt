@@ -71,14 +71,14 @@ class OptOutAndAutoconsentDoneMessageHandlerPluginTest {
     }
 
     @Test
-    fun whenProcessAutoconsentDoneIfCosmeticThenUpdateDashboard() {
+    fun whenProcessAutoconsentDoneIfCosmeticThenResultSentWithCosmeticSetToTrue() {
         handler.process(getAutoconsentType(), autoconsentDoneMessage(cosmetic = true), webView, mockCallback)
 
         verify(mockCallback).onResultReceived(consentManaged = true, optOutFailed = false, selfTestFailed = false, isCosmetic = true)
     }
 
     @Test
-    fun whenProcessAutoconsentDoneIfNotCosmeticThenUpdateDashboard() {
+    fun whenProcessAutoconsentDoneIfNotCosmeticThenResultSentWithCosmeticSetToFalse() {
         handler.process(getAutoconsentType(), autoconsentDoneMessage(cosmetic = false), webView, mockCallback)
 
         verify(mockCallback).onResultReceived(consentManaged = true, optOutFailed = false, selfTestFailed = false, isCosmetic = false)
