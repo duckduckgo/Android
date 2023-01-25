@@ -398,7 +398,7 @@
     <string name="systemSearchOnboardingButtonOk">Forstået</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">SKJUL</string>
+    <string name="daxDialogHideButton">Skjul</string>
     <string name="daxDialogPhew">Pyha!</string>
     <string name="daxDialogNext">Næste</string>
     <string name="daxDialogHighFive">Giv mig fem!</string>

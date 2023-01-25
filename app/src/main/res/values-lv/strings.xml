@@ -398,7 +398,7 @@
     <string name="systemSearchOnboardingButtonOk">Sapratu</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">PASLĒPT</string>
+    <string name="daxDialogHideButton">Paslēpt</string>
     <string name="daxDialogPhew">Pē!</string>
     <string name="daxDialogNext">Nākamais</string>
     <string name="daxDialogHighFive">Dod pieci!</string>

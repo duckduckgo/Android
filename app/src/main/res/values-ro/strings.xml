@@ -398,7 +398,7 @@
     <string name="systemSearchOnboardingButtonOk">Am înțeles</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">ASCUNDE</string>
+    <string name="daxDialogHideButton">Ascunde</string>
     <string name="daxDialogPhew">Pfiu!</string>
     <string name="daxDialogNext">Următorul</string>
     <string name="daxDialogHighFive">Bate palma!</string>

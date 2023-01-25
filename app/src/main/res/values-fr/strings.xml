@@ -398,7 +398,7 @@
     <string name="systemSearchOnboardingButtonOk">J\'ai compris</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">MASQUER</string>
+    <string name="daxDialogHideButton">Masquer</string>
     <string name="daxDialogPhew">Ouf !</string>
     <string name="daxDialogNext">Suivant</string>
     <string name="daxDialogHighFive">Bien joué !</string>

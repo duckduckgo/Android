@@ -398,7 +398,7 @@
     <string name="systemSearchOnboardingButtonOk">Разбрах</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">СКРИЙ</string>
+    <string name="daxDialogHideButton">Скрий</string>
     <string name="daxDialogPhew">Слава Богу!</string>
     <string name="daxDialogNext">Следващ</string>
     <string name="daxDialogHighFive">Дай пет!</string>

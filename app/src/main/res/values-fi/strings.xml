@@ -398,7 +398,7 @@
     <string name="systemSearchOnboardingButtonOk">Selvä</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">PIILOTA</string>
+    <string name="daxDialogHideButton">Piilota</string>
     <string name="daxDialogPhew">Huh huh!</string>
     <string name="daxDialogNext">Seuraava</string>
     <string name="daxDialogHighFive">Ylävitonen!</string>

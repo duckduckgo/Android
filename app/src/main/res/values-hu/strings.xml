@@ -398,7 +398,7 @@
     <string name="systemSearchOnboardingButtonOk">Értem</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">ELREJTÉS</string>
+    <string name="daxDialogHideButton">Elrejtés</string>
     <string name="daxDialogPhew">Hűűű!</string>
     <string name="daxDialogNext">Következő</string>
     <string name="daxDialogHighFive">Pacsi!</string>

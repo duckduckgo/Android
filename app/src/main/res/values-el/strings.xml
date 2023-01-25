@@ -398,7 +398,7 @@
     <string name="systemSearchOnboardingButtonOk">Το έπιασα</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">ΑΠΟΚΡΥΨΗ</string>
+    <string name="daxDialogHideButton">Αποκρυψη</string>
     <string name="daxDialogPhew">Φιου!</string>
     <string name="daxDialogNext">Επόμενο</string>
     <string name="daxDialogHighFive">Κόλλα πέντε!</string>

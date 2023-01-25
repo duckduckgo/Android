@@ -398,7 +398,7 @@
     <string name="systemSearchOnboardingButtonOk">Понятно</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">СКРЫТЬ</string>
+    <string name="daxDialogHideButton">Скрыть</string>
     <string name="daxDialogPhew">Уф!</string>
     <string name="daxDialogNext">Далее</string>
     <string name="daxDialogHighFive">Дай пять!</string>

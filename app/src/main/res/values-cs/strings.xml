@@ -398,7 +398,7 @@
     <string name="systemSearchOnboardingButtonOk">Mám to</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">SKRÝT</string>
+    <string name="daxDialogHideButton">Skrýt</string>
     <string name="daxDialogPhew">Pche!</string>
     <string name="daxDialogNext">Další</string>
     <string name="daxDialogHighFive">Plácnutí!</string>

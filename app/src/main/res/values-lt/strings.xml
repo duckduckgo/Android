@@ -398,7 +398,7 @@
     <string name="systemSearchOnboardingButtonOk">Supratau</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">SLĖPTI</string>
+    <string name="daxDialogHideButton">Slėpti</string>
     <string name="daxDialogPhew">Oi!</string>
     <string name="daxDialogNext">Kitas</string>
     <string name="daxDialogHighFive">Duok penkis!</string>

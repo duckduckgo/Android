@@ -398,7 +398,7 @@
     <string name="systemSearchOnboardingButtonOk">Anladım</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">GİZLE</string>
+    <string name="daxDialogHideButton">Gizle</string>
     <string name="daxDialogPhew">Uf!</string>
     <string name="daxDialogNext">Sonraki</string>
     <string name="daxDialogHighFive">Çak Bir Beşlik!</string>

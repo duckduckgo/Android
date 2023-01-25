@@ -398,7 +398,7 @@
     <string name="systemSearchOnboardingButtonOk">Sain aru</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">PEIDA</string>
+    <string name="daxDialogHideButton">Peida</string>
     <string name="daxDialogPhew">Huh!</string>
     <string name="daxDialogNext">Järgmine</string>
     <string name="daxDialogHighFive">Viska viis!</string>
