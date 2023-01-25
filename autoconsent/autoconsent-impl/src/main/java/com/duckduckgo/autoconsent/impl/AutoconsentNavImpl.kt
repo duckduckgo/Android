@@ -26,7 +26,7 @@ import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class AutoconsentNavImpl @Inject constructor() : AutoconsentNav {
-    override fun navigate(context: Context): Intent {
+    override fun openAutoconsentSettings(context: Context): Intent {
         return AutoconsentSettingsActivity.intent(context)
     }
 }
