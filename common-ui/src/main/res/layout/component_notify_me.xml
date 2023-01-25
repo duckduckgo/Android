@@ -33,7 +33,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:primaryText="Notify Me View" />
 
-    <com.duckduckgo.mobile.android.ui.view.NotifyMeView
+    <com.duckduckgo.mobile.android.ui.notifyme.NotifyMeView
         android:id="@+id/notifyMe"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

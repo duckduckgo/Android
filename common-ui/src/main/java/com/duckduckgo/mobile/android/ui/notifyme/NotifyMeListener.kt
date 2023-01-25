@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.downloads
+package com.duckduckgo.mobile.android.ui.notifyme
 
-import com.duckduckgo.downloads.api.model.DownloadItem
+interface NotifyMeListener {
+    fun setDismissed()
 
-sealed class DownloadViewItem {
-    object Empty : DownloadViewItem()
-    object NotifyMe : DownloadViewItem()
-    data class Header(val text: String) : DownloadViewItem()
-    data class Item(val downloadItem: DownloadItem) : DownloadViewItem()
+    fun isDismissed(): Boolean
+
+    fun visibilityChanged(visible: Boolean)
 }

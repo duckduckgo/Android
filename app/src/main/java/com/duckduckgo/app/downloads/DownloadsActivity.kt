@@ -75,10 +75,8 @@ class DownloadsActivity : DuckDuckGoActivity() {
         setupToolbar(toolbar)
         setupRecyclerView()
 
-        viewModel.downloads()
-
         lifecycleScope.launch {
-            viewModel.viewState()
+            viewModel.viewState
                 .flowWithLifecycle(lifecycle, STARTED)
                 .collectLatest { render(it) }
         }
@@ -108,12 +106,19 @@ class DownloadsActivity : DuckDuckGoActivity() {
         return super.onPrepareOptionsMenu(menu)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         if (searchBar.isVisible) {
             hideSearchBar()
         } else {
             super.onBackPressed()
         }
+    }
+
+    override fun onDestroy() {
+        downloadsAdapter.removeNotifyMeListener()
+
+        super.onDestroy()
     }
 
     private fun processCommands(command: Command) {
@@ -193,6 +198,7 @@ class DownloadsActivity : DuckDuckGoActivity() {
 
     private fun setupRecyclerView() {
         downloadsAdapter.setListener(viewModel)
+        downloadsAdapter.setNotifyMeListener(viewModel)
         binding.downloadsContentView.layoutManager = LinearLayoutManager(this)
         binding.downloadsContentView.adapter = downloadsAdapter
     }

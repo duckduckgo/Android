@@ -24,9 +24,10 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.mobile.android.R
+import com.duckduckgo.mobile.android.ui.notifyme.NotifyMeListener
+import com.duckduckgo.mobile.android.ui.notifyme.NotifyMeView
 import com.duckduckgo.mobile.android.ui.view.MessageCta
 import com.duckduckgo.mobile.android.ui.view.MessageCta.Message
-import com.duckduckgo.mobile.android.ui.view.NotifyMeView
 import com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
 import com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
@@ -285,6 +286,21 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             val notifyMeView: NotifyMeView = view.findViewById(R.id.notifyMe)
             notifyMeView.setTitle("Component title")
             notifyMeView.setSubtitle("Component subtitle")
+            notifyMeView.setListener(
+                object : NotifyMeListener {
+                    override fun setDismissed() {
+                        // no op
+                    }
+
+                    override fun isDismissed(): Boolean {
+                        return false
+                    }
+
+                    override fun visibilityChanged(visible: Boolean) {
+                        // no op
+                    }
+                },
+            )
         }
     }
 
