@@ -15,68 +15,68 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical"
-              tools:context="com.duckduckgo.app.dev.settings.DevSettingsActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.duckduckgo.app.dev.settings.DevSettingsActivity">
 
     <include
-            android:id="@+id/includeToolbar"
-            layout="@layout/include_default_toolbar"/>
+        android:id="@+id/includeToolbar"
+        layout="@layout/include_default_toolbar" />
 
     <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-            <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/generalTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/devSettingsScreenGeneralSection"/>
+                app:primaryText="@string/devSettingsScreenGeneralSection" />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-                    android:id="@+id/enableAppStartupTrace"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:secondaryText="@string/devStartupTracingByline"
-                    app:primaryText="@string/devStartupTracing"
-                    app:showSwitch="true"/>
+                android:id="@+id/enableAppStartupTrace"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/devStartupTracing"
+                app:secondaryText="@string/devStartupTracingByline"
+                app:showSwitch="true" />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-                    android:id="@+id/triggerAnr"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:secondaryText="@string/devSettingsTriggerAnrSubtitle"
-                    app:primaryText="@string/devSettingsTriggerAnr"/>
+                android:id="@+id/triggerAnr"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/devSettingsTriggerAnr"
+                app:secondaryText="@string/devSettingsTriggerAnrSubtitle" />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-                    android:id="@+id/clearSavedSites"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:secondaryText="@string/devSettingsClearSavedSitesSubtitle"
-                    app:primaryText="@string/devSettingsClearSavedSites"/>
+                android:id="@+id/clearSavedSites"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/devSettingsClearSavedSites"
+                app:secondaryText="@string/devSettingsClearSavedSitesSubtitle" />
 
-            <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/privacyTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/devSettingsScreenPrivacySection"/>
+                app:primaryText="@string/devSettingsScreenPrivacySection" />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-                    android:id="@+id/nextTdsEnabled"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:secondaryText="@string/devSettingsScreenTdsVersion"
-                    app:primaryText="@string/devSettingsScreenTdsVersionSubtitle"
-                    app:showSwitch="true"/>
+                android:id="@+id/nextTdsEnabled"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/devSettingsScreenTdsVersionSubtitle"
+                app:secondaryText="@string/devSettingsScreenTdsVersion"
+                app:showSwitch="true" />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
                 android:id="@+id/overridePrivacyRemoteConfigUrl"
@@ -89,26 +89,26 @@
             <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingBottom="0dp"/>
+                android:paddingBottom="0dp" />
 
-            <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/userAgentTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/devSettingsScreenUserAgentSection"/>
+                app:primaryText="@string/devSettingsScreenUserAgentSection" />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-                    android:id="@+id/overrideUserAgentToggle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:primaryText="@string/devSettingsScreenUserAgentOverride"
-                    app:showSwitch="true"/>
+                android:id="@+id/overrideUserAgentToggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/devSettingsScreenUserAgentOverride"
+                app:showSwitch="true" />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-                    android:id="@+id/overrideUserAgentSelector"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:primaryText="@string/devSettingsScreenUserAgentSelectorTitle"/>
+                android:id="@+id/overrideUserAgentSelector"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/devSettingsScreenUserAgentSelectorTitle" />
 
         </LinearLayout>
     </ScrollView>

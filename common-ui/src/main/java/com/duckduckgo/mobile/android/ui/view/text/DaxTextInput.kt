@@ -31,6 +31,7 @@ import android.view.View.OnFocusChangeListener
 import android.view.inputmethod.EditorInfo
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.doOnNextLayout
+import androidx.core.view.postDelayed
 import androidx.core.view.updateLayoutParams
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewDaxTextInputBinding
@@ -46,6 +47,7 @@ import com.google.android.material.textfield.TextInputLayout.END_ICON_NONE
 
 interface TextInput {
     var text: String
+    var hint: String
     var isEditable: Boolean
 
     fun addTextChangedListener(textWatcher: TextWatcher)
@@ -108,6 +110,9 @@ class DaxTextInput @JvmOverloads constructor(
                 }
             }
 
+            val minLines = getInt(R.styleable.DaxTextInput_android_minLines, 1)
+            binding.internalEditText.minLines = minLines
+
             recycle()
         }
     }
@@ -118,12 +123,24 @@ class DaxTextInput @JvmOverloads constructor(
             binding.internalEditText.setText(value)
         }
 
+    override var hint: String
+        get() = binding.internalEditText.text.toString()
+        set(value) {
+            binding.internalInputLayout.setHintWithoutAnimation(value)
+        }
+
     override var isEditable: Boolean
         get() = binding.internalEditText.isEnabled
         set(value) {
             binding.internalEditText.isEnabled = value
             handleIsEditableChangeForEndIcon(value)
         }
+
+    fun showKeyboardDelayed() {
+        binding.root.postDelayed(KEYBOARD_DELAY) {
+            binding.internalEditText.showKeyboard()
+        }
+    }
 
     private fun handleIsEditableChangeForEndIcon(isEditable: Boolean) {
         if (binding.internalInputLayout.endIconMode != END_ICON_NONE) {
@@ -262,6 +279,10 @@ class DaxTextInput @JvmOverloads constructor(
         INPUT_TYPE_PASSWORD(2),
     }
 
+    companion object {
+        private const val KEYBOARD_DELAY = 500L
+    }
+
     internal class SavedState : BaseSavedState {
         var childrenStates: SparseArray<Parcelable>? = null
 
@@ -282,6 +303,7 @@ class DaxTextInput @JvmOverloads constructor(
         }
 
         companion object {
+
             @JvmField
             val CREATOR: ClassLoaderCreator<SavedState> = object : ClassLoaderCreator<SavedState> {
                 override fun createFromParcel(

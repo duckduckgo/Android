@@ -14,79 +14,73 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_marginBottom="8dp"
-    android:layout_marginTop="6dp">
+    android:layout_marginTop="6dp"
+    android:paddingTop="@dimen/keyline_2"
+    android:paddingEnd="@dimen/keyline_4"
+    android:paddingStart="20dp"
+    android:paddingBottom="@dimen/keyline_2">
 
     <ImageView
         android:id="@+id/bookmarkIndicator"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_marginStart="18dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:importantForAccessibility="no"
-        android:src="@drawable/ic_autocomplete_bookmark"
+        android:src="@drawable/ic_bookmark_20"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"/>
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="10dp"
         android:ellipsize="end"
         android:includeFontPadding="false"
-        android:fontFamily="sans-serif"
         android:gravity="center_vertical|start"
         android:maxLines="1"
         android:textAlignment="textStart"
-        android:textColor="?attr/autoCompleteTextColor"
-        android:textSize="16sp"
         app:layout_constraintEnd_toStartOf="@id/goToBookmarkImage"
         app:layout_constraintStart_toEndOf="@id/bookmarkIndicator"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="phrase or URL suggestion" />
+        tools:text="phrase or URL suggestion"/>
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/url"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        app:typography="body2"
+        app:textType="secondary"
+        android:layout_marginStart="10dp"
         android:ellipsize="end"
-        android:fontFamily="sans-serif"
         android:gravity="center_vertical|start"
         android:maxLines="1"
         android:textAlignment="textStart"
         android:textColor="?attr/autoCompleteSubtitleTextColor"
-        android:textSize="14sp"
         app:layout_constraintEnd_toStartOf="@id/goToBookmarkImage"
         app:layout_constraintStart_toEndOf="@id/bookmarkIndicator"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/title"
-        tools:text="phrase or URL suggestion" />
+        tools:text="phrase or URL suggestion"/>
 
-    <FrameLayout
+    <ImageView
         android:id="@+id/goToBookmarkImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:background="?selectableItemBackgroundBorderless"
+        android:contentDescription="@string/editQueryBeforeSubmitting"
+        android:padding="3dp"
+        android:src="@drawable/ic_autocomplete_24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:padding="6dp"
-        android:paddingStart="16dp"
-        android:paddingEnd="14dp">
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:contentDescription="@string/editQueryBeforeSubmitting"
-            android:src="@drawable/ic_autocomplete_24dp" />
-    </FrameLayout>
+        app:layout_constraintTop_toTopOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -28,14 +28,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
         android:id="@+id/settingsOtherTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/settingsHeadingMore"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/settingsOtherDivider"/>
+        app:layout_constraintTop_toBottomOf="@id/settingsOtherDivider"
+        app:primaryText="@string/settingsHeadingMore" />
 
     <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
         android:id="@+id/macOsSetting"
@@ -44,10 +42,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/settingsOtherTitle"
-        app:showBetaPill="true"
+        app:primaryText="@string/macos_settings_title"
         app:primaryTextTruncated="false"
         app:secondaryText="@string/macos_settings_description"
-        app:primaryText="@string/macos_settings_title" />
+        app:showBetaPill="true" />
 
     <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
         android:id="@+id/emailSetting"
@@ -56,10 +54,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/macOsSetting"
-        app:showBetaPill="true"
+        app:primaryText="@string/settingsEmailProtectionTitle"
         app:primaryTextTruncated="false"
         app:secondaryText="@string/settingsEmailProtectionSubtitle"
-        app:primaryText="@string/settingsEmailProtectionTitle" />
+        app:showBetaPill="true" />
 
     <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
         android:id="@+id/vpnSetting"
@@ -68,10 +66,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/emailSetting"
-        app:showBetaPill="true"
+        app:primaryText="@string/atp_SettingsTitle"
         app:primaryTextTruncated="false"
         app:secondaryText="@string/atp_SettingsDeviceShieldDisabled"
-        app:primaryText="@string/atp_SettingsTitle" />
+        app:showBetaPill="true" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

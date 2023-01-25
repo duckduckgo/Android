@@ -117,6 +117,9 @@ class OneLineListItem @JvmOverloads constructor(
         binding.leadingIconBackground.show()
     }
 
+    /** Sets visibility of the item image resource to GONE */
+    fun hideLeadingIcon() = binding.leadingIconBackground.gone()
+
     fun leadingIcon() = binding.leadingIcon
 
     /** Sets the trailing icon image resource */

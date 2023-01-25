@@ -76,10 +76,6 @@ class TrackingProtectionAppsAdapter(val listener: AppProtectionListener) :
         return excludedApps.size
     }
 
-    fun updateSwitchPosition(position: Int) {
-        notifyItemChanged(position)
-    }
-
     private class DiffCallback(
         private val oldList: List<AppsProtectionType>,
         private val newList: List<AppsProtectionType>,

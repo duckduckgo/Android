@@ -60,13 +60,13 @@ class BrokenSiteNegativeFeedbackFragment : FeedbackFragment(R.layout.content_fee
     override fun configureListeners() {
         with(binding) {
             submitFeedbackButton.doOnNextLayout {
-                brokenSiteInput.setOnTouchListener(LayoutScrollingTouchListener(rootScrollView, brokenSiteInputContainer.y.toInt()))
-                openEndedFeedback.setOnTouchListener(LayoutScrollingTouchListener(rootScrollView, openEndedFeedbackContainer.y.toInt()))
+                brokenSiteInput.setOnTouchListener(LayoutScrollingTouchListener(rootScrollView, brokenSiteInput.y.toInt()))
+                openEndedFeedback.setOnTouchListener(LayoutScrollingTouchListener(rootScrollView, openEndedFeedback.y.toInt()))
             }
 
             submitFeedbackButton.setOnClickListener {
-                val feedback = openEndedFeedback.text.toString()
-                val brokenSite = brokenSiteInput.text.toString()
+                val feedback = openEndedFeedback.text
+                val brokenSite = brokenSiteInput.text
 
                 viewModel.userSubmittingFeedback(feedback, brokenSite)
             }

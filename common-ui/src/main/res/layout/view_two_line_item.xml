@@ -28,10 +28,10 @@
         android:layout_width="@dimen/listItemImageContainerSize"
         android:layout_height="@dimen/listItemImageContainerSize"
         android:layout_marginStart="@dimen/keyline_4"
-        android:background="@drawable/list_item_image_circular_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        tools:background="@drawable/list_item_image_circular_background">
 
         <ImageView
             android:id="@+id/leadingIcon"
@@ -49,6 +49,7 @@
         android:layout_marginStart="@dimen/keyline_4"
         android:layout_marginTop="@dimen/twoLineItemVerticalPadding"
         android:layout_marginEnd="8dp"
+        android:breakStrategy="balanced"
         app:layout_constraintEnd_toStartOf="@id/betaPill"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintHorizontal_chainStyle="packed"
@@ -80,7 +81,7 @@
         app:layout_constraintEnd_toStartOf="@+id/trailingContainer"
         app:layout_constraintStart_toStartOf="@id/primaryText"
         app:layout_constraintTop_toBottomOf="@id/primaryText"
-        app:textColor="secondary"
+        app:textType="secondary"
         app:typography="body2"
         tools:text="Secondary Text" />
 
@@ -99,14 +100,14 @@
             android:layout_marginEnd="@dimen/listItemEndPadding"
             android:background="?selectableItemBackgroundBorderless"
             android:visibility="gone"
-            app:srcCompat="@drawable/ic_overflow"
+            app:srcCompat="@drawable/ic_menu_vertical_24"
             tools:ignore="ContentDescription" />
 
         <com.duckduckgo.mobile.android.ui.view.SwitchView
             android:id="@+id/trailingSwitch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/keyline_2" />
+            android:layout_marginEnd="@dimen/keyline_4" />
 
     </FrameLayout>
 

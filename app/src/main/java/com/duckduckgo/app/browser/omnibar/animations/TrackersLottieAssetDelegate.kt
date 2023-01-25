@@ -92,7 +92,7 @@ internal class TrackersLottieAssetDelegate(
             }
 
             private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                color = context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.omnibarRoundedFieldBackgroundColor)
+                color = context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorSurface)
                 typeface = Typeface.SANS_SERIF
             }
 

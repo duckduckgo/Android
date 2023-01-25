@@ -19,11 +19,12 @@ package com.duckduckgo.app.bookmarks.ui
 import android.os.Bundle
 import android.text.Editable
 import android.view.View
-import android.widget.EditText
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.view.TextChangedWatcher
+import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
+import com.duckduckgo.mobile.android.ui.view.text.DaxTextView
 
 class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
 
@@ -56,22 +57,22 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
         if (newValue.isNotBlank()) newValue else existingValue
 
     private fun populateFields(
-        titleInput: EditText,
-        urlInput: EditText,
-        savedLocation: EditText,
+        titleInput: DaxTextInput,
+        urlInput: DaxTextInput,
+        savedLocation: DaxTextView,
     ) {
-        titleInput.setText(getExistingTitle())
-        urlInput.setText(getExistingUrl())
+        titleInput.text = getExistingTitle()
+        urlInput.text = getExistingUrl()
         getExistingBookmarkFolderName()?.let {
-            if (it.isNotEmpty()) savedLocation.setText(it)
+            if (it.isNotEmpty()) savedLocation.text = it
         }
     }
 
     override fun onConfirmation() {
         val savedSite = getSavedSite()
 
-        val updatedTitle = validateInput(binding.titleInput.text.toString(), savedSite.title)
-        val updatedUrl = validateInput(binding.urlInput.text.toString(), savedSite.url)
+        val updatedTitle = validateInput(binding.titleInput.text, savedSite.title)
+        val updatedUrl = validateInput(binding.urlInput.text, savedSite.url)
 
         when (savedSite) {
             is SavedSite.Bookmark -> {

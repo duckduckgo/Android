@@ -86,11 +86,11 @@ class WidgetThemeConfiguration : DuckDuckGoActivity() {
                     if (currentNightMode == Configuration.UI_MODE_NIGHT_YES) {
                         binding.widgetConfigPreview.setImageResource(R.drawable.search_favorites_widget_dark_preview)
                     } else {
-                        binding.widgetConfigPreview.setImageResource(R.drawable.search_favorites_widget_preview)
+                        binding.widgetConfigPreview.setImageResource(R.drawable.search_favorites_widget_light_preview)
                     }
                 }
                 R.id.widgetConfigThemeLight -> {
-                    binding.widgetConfigPreview.setImageResource(R.drawable.search_favorites_widget_preview)
+                    binding.widgetConfigPreview.setImageResource(R.drawable.search_favorites_widget_light_preview)
                 }
                 R.id.widgetConfigThemeDark -> {
                     binding.widgetConfigPreview.setImageResource(R.drawable.search_favorites_widget_dark_preview)

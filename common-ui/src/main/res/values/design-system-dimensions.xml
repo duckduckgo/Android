@@ -24,7 +24,8 @@
     <dimen name="keyline_3">12dp</dimen>
     <dimen name="keyline_4">16dp</dimen>
     <dimen name="keyline_5">24dp</dimen>
-    <dimen name="keyline_6">48dp</dimen>
+    <dimen name="keyline_6">32dp</dimen>
+    <dimen name="keyline_7">48dp</dimen>
 
     <!-- Shape radius -->
     <dimen name="smallShapeCornerRadius">8dp</dimen>
@@ -35,11 +36,10 @@
 
     <!-- Toolbar -->
     <dimen name="toolbarIconSize">24dp</dimen>
-    <dimen name="toolbarIconContainerSize">48dp</dimen>
     <dimen name="toolbarOverflowPadding">10dp</dimen>
+    <dimen name="toolbarIconPadding">3dp</dimen>
 
     <!-- Buttons -->
-    <dimen name="legacyButtonHeight">48dp</dimen>
     <dimen name="legacyButtonSmallHeight">36dp</dimen>
     <dimen name="buttonLargeHeight">60dp</dimen>
     <dimen name="buttonSmallHeight">48dp</dimen>
@@ -63,12 +63,14 @@
     <dimen name="popupMenuWidth">280dp</dimen>
     <dimen name="popupMenuNavigationItemHeight">24dp</dimen>
     <dimen name="popupMenuItemHeight">48dp</dimen>
+    <dimen name="popupMenuItemWidth">198dp</dimen>
     <dimen name="popupMenuNavigationItemSize">40dp</dimen>
 
     <!-- Dialogs -->
     <dimen name="dialogButtonHeight">40dp</dimen>
     <dimen name="dialogImageSize">40dp</dimen>
-    <dimen name="dialogBorderRadius">12dp</dimen>
+    <dimen name="dialogBorderRadius">@dimen/mediumShapeCornerRadius</dimen>
+    <dimen name="dialogRadioGroupHeightMax">376dp</dimen>
 
     <!-- Bottom Sheet -->
     <dimen name="actionBottomSheetVerticalPadding">8dp</dimen>
@@ -89,4 +91,17 @@
 
     <!-- InfoPanel -->
     <dimen name="infoPanelIconSize">16dp</dimen>
+
+    <!-- Dialog  -->
+    <dimen name="dialogContentPaddingBottom">18dp</dimen>
+    <dimen name="dialogContentPaddingStart">@dimen/keyline_5</dimen>
+    <dimen name="dialogContentPaddingEnd">@dimen/keyline_5</dimen>
+
+    <!-- Dax Dialog  -->
+    <dimen name="daxDialogContentPaddingTop">20dp</dimen>
+    <dimen name="daxDialogButtonSpacing">10dp</dimen>
+
+    <!-- Card -->
+    <dimen name="daxBubbleDialogDistanceFromEdge">22dp</dimen>
+    <dimen name="daxBubbleDialogEdge">9dp</dimen>
 </resources>

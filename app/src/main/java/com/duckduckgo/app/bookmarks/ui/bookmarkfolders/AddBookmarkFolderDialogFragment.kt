@@ -37,12 +37,12 @@ class AddBookmarkFolderDialogFragment : SavedSiteDialogFragment() {
 
     private fun configureFieldVisibility() {
         binding.savedSiteLocationContainer.visibility = View.VISIBLE
-        binding.savedSiteUrlInputContainer.visibility = View.GONE
+        binding.urlInput.visibility = View.GONE
     }
 
     override fun onConfirmation() {
         arguments?.getLong(KEY_PARENT_FOLDER_ID)?.let {
-            val name = binding.titleInput.text.toString()
+            val name = binding.titleInput.text
             if (name.isNotBlank()) {
                 listener?.onBookmarkFolderAdded(BookmarkFolder(name = name, parentId = it))
             }

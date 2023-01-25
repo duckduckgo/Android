@@ -21,6 +21,6 @@ import com.duckduckgo.mobile.android.themepreview.ui.component.ComponentFragment
 
 class ComponentMessagingFragment : ComponentFragment() {
     override fun getComponents(): List<Component> {
-        return listOf(Component.INFO_PANEL, Component.SNACKBAR)
+        return listOf(Component.REMOTE_MESSAGE, Component.INFO_PANEL, Component.SNACKBAR)
     }
 }

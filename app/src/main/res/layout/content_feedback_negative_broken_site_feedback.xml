@@ -18,102 +18,94 @@
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:toots="http://schemas.android.com/tools"
+    android:id="@+id/rootScrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/rootScrollView"
     android:fillViewport="true">
 
-    <androidx.constraintlayout.widget.ConstraintLayout style="@style/FeedbackFragmentStyle">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
         <ImageView
             android:id="@+id/emoticonImage"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_marginTop="@dimen/feedbackTitleMarginTop"
+            android:layout_marginTop="@dimen/keyline_4"
             android:importantForAccessibility="no"
             android:src="@drawable/ic_sad_face"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/title"
-            style="@style/FeedbackTitle"
-            android:layout_marginTop="12dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_4"
             android:text="@string/websiteNotLoadingTitleLong"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/emoticonImage" />
+            app:layout_constraintTop_toBottomOf="@id/emoticonImage"
+            app:typography="h1" />
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/subtitle"
-            style="@style/FeedbackTitle.FeedbackSubtitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_5"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginEnd="@dimen/keyline_5"
             android:text="@string/whichBrokenSites"
+            android:textAlignment="center"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/title" />
+            app:layout_constraintTop_toBottomOf="@id/title"
+            app:typography="body1" />
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/brokenSiteInputContainer"
-            style="@style/FeedbackInputBoxStyle"
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
+            android:id="@+id/brokenSiteInput"
             android:layout_width="0dp"
-            android:layout_height="70dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="65dp"
             android:layout_marginEnd="20dp"
             android:hint="@string/whichBrokenSitesHint"
-            app:hintTextAppearance="@android:style/TextAppearance"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_max="140dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/subtitle">
+            app:layout_constraintTop_toBottomOf="@id/subtitle"
+            app:type="multi_line" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/brokenSiteInput"
-                style="@style/FeedbackEditTextInputStyle"
-                android:gravity="center_vertical"
-                android:inputType="textUri|textNoSuggestions"
-                android:paddingBottom="20dp"
-                toots:text="https://example.com" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/openEndedFeedbackContainer"
-            style="@style/FeedbackInputBoxStyle"
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
+            android:id="@+id/openEndedFeedback"
             android:layout_width="0dp"
-            android:layout_height="140dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="@dimen/keyline_4"
             android:layout_marginEnd="20dp"
             android:hint="@string/openEndedInputHint"
-            app:hintTextAppearance="@android:style/TextAppearance"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_max="140dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/brokenSiteInputContainer">
+            app:layout_constraintTop_toBottomOf="@id/brokenSiteInput"
+            app:type="multi_line" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/openEndedFeedback"
-                style="@style/FeedbackEditTextInputStyle"
-                android:nextFocusDown="@string/submitFeedback" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryLarge
+        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
             android:id="@+id/submitFeedbackButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
             android:layout_marginTop="20dp"
+            android:layout_marginEnd="20dp"
             android:layout_marginBottom="10dp"
             android:text="@string/submitFeedback"
+            app:buttonSize="large"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/openEndedFeedbackContainer"
+            app:layout_constraintTop_toBottomOf="@id/openEndedFeedback"
             app:layout_constraintVertical_bias="0.9" />
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

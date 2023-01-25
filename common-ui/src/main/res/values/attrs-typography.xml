@@ -26,14 +26,18 @@
             <enum name="h4" value="4"/>
             <enum name="h5" value="5"/>
             <enum name="body1" value="6"/>
-            <enum name="body2" value="7"/>
-            <enum name="button" value="8"/>
-            <enum name="caption" value="9"/>
+            <enum name="body1_bold" value="7"/>
+            <enum name="body2" value="8"/>
+            <enum name="body2_bold" value="9"/>
+            <enum name="button" value="10"/>
+            <enum name="caption" value="11"/>
+            <enum name="caption_allCaps" value="12"/>
         </attr>
-        <attr name="textColor" format="enum" >
+        <attr name="textType" format="enum" >
             <enum name="primary" value="0"/>
             <enum name="secondary" value="1"/>
         </attr>
+        <attr name="android:textColor" format="color"/>
     </declare-styleable>
 
     <!-- Attributes for all Design System Text Appearances -->

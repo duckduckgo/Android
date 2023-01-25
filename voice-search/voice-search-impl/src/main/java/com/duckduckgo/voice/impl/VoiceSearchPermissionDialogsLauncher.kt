@@ -16,9 +16,9 @@
 
 package com.duckduckgo.voice.impl
 
-import android.app.AlertDialog
 import android.content.Context
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -43,15 +43,22 @@ class RealVoiceSearchPermissionDialogsLauncher @Inject constructor() : VoiceSear
         onSettingsLaunchSelected: () -> Unit,
         onSettingsLaunchDeclined: () -> Unit,
     ) {
-        AlertDialog.Builder(context)
+        TextAlertDialogBuilder(context)
             .setTitle(R.string.voiceSearchPermissionRejectedDialogTitle)
             .setMessage(R.string.voiceSearchPermissionRejectedDialogMessage)
-            .setPositiveButton(R.string.voiceSearchPermissionRejectedDialogPositiveAction) { _, _ ->
-                onSettingsLaunchSelected()
-            }
-            .setNegativeButton(R.string.voiceSearchNegativeAction) { _, _ ->
-                onSettingsLaunchDeclined()
-            }
+            .setPositiveButton(R.string.voiceSearchPermissionRejectedDialogPositiveAction)
+            .setNegativeButton(R.string.voiceSearchNegativeAction)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        onSettingsLaunchSelected()
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        onSettingsLaunchDeclined()
+                    }
+                },
+            )
             .show()
     }
 
@@ -60,15 +67,22 @@ class RealVoiceSearchPermissionDialogsLauncher @Inject constructor() : VoiceSear
         onRationaleAccepted: () -> Unit,
         onRationaleDeclined: () -> Unit,
     ) {
-        AlertDialog.Builder(context)
+        TextAlertDialogBuilder(context)
             .setTitle(R.string.voiceSearchPermissionRationaleTitle)
             .setMessage(R.string.voiceSearchPermissionRationaleDescription)
-            .setPositiveButton(R.string.voiceSearchPermissionRationalePositiveAction) { _, _ ->
-                onRationaleAccepted()
-            }
-            .setNegativeButton(R.string.voiceSearchNegativeAction) { _, _ ->
-                onRationaleDeclined()
-            }
+            .setPositiveButton(R.string.voiceSearchPermissionRationalePositiveAction)
+            .setNegativeButton(R.string.voiceSearchNegativeAction)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        onRationaleAccepted()
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        onRationaleDeclined()
+                    }
+                },
+            )
             .show()
     }
 }

@@ -17,13 +17,14 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
-              android:layout_height="wrap_content"
+              android:layout_height="wrap_content" xmlns:app="http://schemas.android.com/apk/res-auto"
               android:orientation="vertical"
               android:background="@drawable/popup_menu_bg">
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.PopupMenuItemView
             android:id="@+id/remove"
-            style="@style/Widget.DuckDuckGo.PopupMenuItem"
-            android:text="@string/remove" />
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/remove" />
 
 </LinearLayout>

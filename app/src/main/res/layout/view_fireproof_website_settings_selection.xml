@@ -14,28 +14,9 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/fireproofWebsiteSettingsSelection"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="@dimen/keyline_4">
-    <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:textColor="?attr/normalTextColor"
-            style="@style/TextAppearance.DuckDuckGo.Body1"
-            android:text="@string/fireproofWebsiteSettingSelectionTitle"/>
-    <TextView
-            android:id="@+id/fireproofWebsiteUserSetting"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/keyline_1"
-            android:textSize="14sp"
-            android:textColor="@color/gray70"
-            tools:text="Ask every time"/>
-
-</LinearLayout>
+<com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/fireproofWebsiteSettingListItem"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:primaryText="@string/fireproofWebsiteSettingSelectionTitle" />

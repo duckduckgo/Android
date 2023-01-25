@@ -33,10 +33,12 @@
 
 <resources>
     <!-- Widget colors -->
-    <color name="favoriteTitleTextColor">@color/white</color>
-    <color name="favoriteFaviconBackgroundColor">@color/almostBlackDark</color>
-    <color name="searchWidgetBackgroundColor">@color/newBlack</color>
-    <color name="searchWidgetSearchBarBackgroundColor">@color/almostBlack</color>
-    <color name="searchWidgetSearchBarHintColor">@color/white</color>
-    <color name="searchWidgetSearchBarLoupeColor">@color/white</color>
+    <color name="favoriteTitleTextColor">@color/white60</color>
+    <color name="favoriteFaviconBackgroundColor">@color/white6</color>
+    <color name="searchWidgetBackgroundColor">@color/gray90</color>
+    <color name="searchWidgetSearchBarBackgroundColor">@color/white12</color>
+    <color name="searchWidgetSearchBarHintColor">@color/white60</color>
+    <color name="searchWidgetSearchBarTrailingIconColor">@color/white84</color>
+    <color name="emptyFavoriteDescriptionTextColor">@color/white60</color>
+    <color name="emptyFavoriteActionTextColor">@color/blue30</color>
 </resources>
