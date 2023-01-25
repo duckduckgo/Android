@@ -19,7 +19,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:fillViewport="true"
-    tools:context="com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementListMode"
+    tools:context=".ui.credential.management.viewing.AutofillManagementListMode"
     android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout

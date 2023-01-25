@@ -20,6 +20,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.WorkManager
 import com.duckduckgo.app.browser.WebViewVersionProvider
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import org.junit.Before
@@ -32,6 +33,7 @@ class EnqueuedPixelWorkerTest {
     private val unsentForgetAllPixelStore: UnsentForgetAllPixelStore = mock()
     private val lifecycleOwner: LifecycleOwner = mock()
     private val webViewVersionProvider: WebViewVersionProvider = mock()
+    private val defaultBrowserDetector: DefaultBrowserDetector = mock()
 
     private lateinit var enqueuedPixelWorker: EnqueuedPixelWorker
 
@@ -42,6 +44,7 @@ class EnqueuedPixelWorkerTest {
             { pixel },
             unsentForgetAllPixelStore,
             webViewVersionProvider,
+            defaultBrowserDetector,
         )
     }
 
@@ -80,13 +83,17 @@ class EnqueuedPixelWorkerTest {
     fun whenOnStartAndAppLaunchThenSendAppLaunchPixel() {
         whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(1)
         whenever(webViewVersionProvider.getMajorVersion()).thenReturn("91")
+        whenever(defaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
 
         enqueuedPixelWorker.onCreate(lifecycleOwner)
         enqueuedPixelWorker.onStart(lifecycleOwner)
 
         verify(pixel).fire(
             AppPixelName.APP_LAUNCH,
-            mapOf(Pixel.PixelParameter.WEBVIEW_VERSION to "91"),
+            mapOf(
+                Pixel.PixelParameter.WEBVIEW_VERSION to "91",
+                Pixel.PixelParameter.DEFAULT_BROWSER to "false",
+            ),
         )
     }
 
@@ -95,6 +102,7 @@ class EnqueuedPixelWorkerTest {
         whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(1)
         whenever(unsentForgetAllPixelStore.lastClearTimestamp).thenReturn(System.currentTimeMillis())
         whenever(webViewVersionProvider.getMajorVersion()).thenReturn("91")
+        whenever(defaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
 
         enqueuedPixelWorker.onCreate(lifecycleOwner)
         enqueuedPixelWorker.onStart(lifecycleOwner)
@@ -102,7 +110,10 @@ class EnqueuedPixelWorkerTest {
 
         verify(pixel).fire(
             AppPixelName.APP_LAUNCH,
-            mapOf(Pixel.PixelParameter.WEBVIEW_VERSION to "91"),
+            mapOf(
+                Pixel.PixelParameter.WEBVIEW_VERSION to "91",
+                Pixel.PixelParameter.DEFAULT_BROWSER to "false",
+            ),
         )
     }
 }

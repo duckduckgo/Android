@@ -29,11 +29,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ReceiverScope
 import com.duckduckgo.mobile.android.vpn.dao.HeartBeatEntity
 import com.duckduckgo.mobile.android.vpn.dao.VpnHeartBeatDao
-import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
-import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
-import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -101,12 +98,6 @@ class VpnServiceHeartbeatMonitorWorker(
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
 
-    @Inject
-    lateinit var trackerBlockingStatsRepository: AppTrackerBlockingStatsRepository
-
-    @Inject
-    lateinit var appTpFeatureConfig: AppTpFeatureConfig
-
     override suspend fun doWork(): Result = withContext(dispatcherProvider.io()) {
         val lastHeartBeat = vpnHeartBeatDao.hearBeats().maxByOrNull { it.timestamp }
 
@@ -117,11 +108,6 @@ class VpnServiceHeartbeatMonitorWorker(
             deviceShieldPixels.suddenKillBySystem()
             deviceShieldPixels.automaticRestart()
             TrackerBlockingVpnService.startService(context)
-        } else if (didNotBlockRecently()) {
-            deviceShieldPixels.automaticRestart()
-            // we have not blocked anything "recently", assuming something is wrong with the VPN service
-            logcat { "HB monitor: VPN not blocking anything, restarting it" }
-            TrackerBlockingVpnService.restartVpnService(context)
         }
 
         return@withContext Result.success()
@@ -129,19 +115,6 @@ class VpnServiceHeartbeatMonitorWorker(
 
     private fun HeartBeatEntity.isAlive(): Boolean {
         return VpnServiceHeartbeatMonitor.DATA_HEART_BEAT_TYPE_ALIVE == type
-    }
-
-    private suspend fun didNotBlockRecently(): Boolean {
-        fun isFeatureDisabled(): Boolean {
-            return !appTpFeatureConfig.isEnabled(AppTpSetting.CheckBlockingFunction)
-        }
-
-        if (isFeatureDisabled()) return false
-
-        val timeWindow = AppTrackerBlockingStatsRepository.TimeWindow(3, TimeUnit.HOURS)
-        // if we ever blocked trackers, and we have not blocked anything in the last 3 hours, we assume something is wrong
-        return trackerBlockingStatsRepository.containsVpnTrackers() &&
-            trackerBlockingStatsRepository.getVpnTrackersSync({ timeWindow.asString() }).isEmpty()
     }
 }
 

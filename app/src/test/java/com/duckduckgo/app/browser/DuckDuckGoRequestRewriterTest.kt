@@ -44,7 +44,7 @@ class DuckDuckGoRequestRewriterTest {
     fun before() {
         whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
         whenever(mockAppReferrerDataStore.installedFromEuAuction).thenReturn(false)
-        testee = DuckDuckGoRequestRewriter(DuckDuckGoUrlDetector(), mockStatisticsStore, mockVariantManager, mockAppReferrerDataStore)
+        testee = DuckDuckGoRequestRewriter(DuckDuckGoUrlDetectorImpl(), mockStatisticsStore, mockVariantManager, mockAppReferrerDataStore)
         builder = Uri.Builder()
     }
 

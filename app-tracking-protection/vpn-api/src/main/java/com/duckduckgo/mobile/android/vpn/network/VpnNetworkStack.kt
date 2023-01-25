@@ -17,6 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.network
 
 import android.os.ParcelFileDescriptor
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import java.net.InetAddress
 
 interface VpnNetworkStack {
@@ -51,7 +52,7 @@ interface VpnNetworkStack {
      *
      * @return `true` if the VPN is successfully stopped, `false` otherwise
      */
-    fun onStopVpn(): Result<Unit>
+    fun onStopVpn(reason: VpnStopReason): Result<Unit>
 
     /**
      * Clean when the networking layer is destroyed. You can use this method to clean up resources
@@ -94,7 +95,7 @@ interface VpnNetworkStack {
             return Result.failure(Exception("EmptyVpnNetworkStack"))
         }
 
-        override fun onStopVpn(): Result<Unit> {
+        override fun onStopVpn(reason: VpnStopReason): Result<Unit> {
             return Result.failure(Exception("EmptyVpnNetworkStack"))
         }
 

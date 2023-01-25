@@ -254,7 +254,6 @@
     <string name="atp_FAQSixthText">Ochrona przed śledzeniem przez aplikacje działa na Twoim urządzeniu i nie wysyła Twoich danych osobowych poza urządzenie do DuckDuckGo.</string>
 
     <!--  App Tracking Protection Waitlist -->
-    <string name="atp_WaitlistActivityWaitlistTitle">Lista oczekujących na ochronę przed śledzeniem przez aplikacje</string>
     <string name="atp_WaitlistNotificationTitle">Oto Twoje zaproszenie do ochrony przed śledzeniem przez aplikacje!</string>
     <string name="atp_WaitlistNotificationDescription">Jesteś już na liście oczekujących i powiadomimy Cię, gdy nadejdzie Twoja kolej na wypróbowanie funkcji ochrony przed śledzeniem przez aplikacje. Dotknij, aby wyświetlić swoje zaproszenie.</string>
     <string name="atp_WaitlistStatusNotJoined">Jeden prosty krok ku większej ochronie prywatności w aplikacjach!</string>

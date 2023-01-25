@@ -42,6 +42,7 @@ import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.UserAgent
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
+import com.duckduckgo.request.filterer.api.RequestFilterer
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -69,6 +70,7 @@ class WebViewRequestInterceptorTest {
     private val mockWebBackForwardList: WebBackForwardList = mock()
     private val mockAdClickManager: AdClickManager = mock()
     private val mockCloakedCnameDetector: CloakedCnameDetector = mock()
+    private val mockRequestFilterer: RequestFilterer = mock()
     private val fakeUserAgent: UserAgent = UserAgentFake()
     private val fakeToggle: FeatureToggle = FeatureToggleFake()
     private val fakeUserAllowListRepository = UserAllowListRepositoryFake()
@@ -99,7 +101,21 @@ class WebViewRequestInterceptorTest {
             userAgentProvider = userAgentProvider,
             adClickManager = mockAdClickManager,
             cloakedCnameDetector = mockCloakedCnameDetector,
+            requestFilterer = mockRequestFilterer,
         )
+    }
+
+    @Test
+    fun whenUrlShouldBeFilteredThenResponseIsCancelled() = runTest {
+        whenever(mockRequestFilterer.shouldFilterOutRequest(mockRequest, "foo.com")).thenReturn(true)
+
+        val response = testee.shouldIntercept(
+            request = mockRequest,
+            documentUrl = "foo.com",
+            webView = webView,
+            webViewClientListener = null,
+        )
+        assertCancelledResponse(response)
     }
 
     @Test
@@ -601,7 +617,7 @@ class WebViewRequestInterceptorTest {
 
         val uri = "host.com".toUri()
         whenever(mockRequest.url).thenReturn(uri)
-        whenever(mockCloakedCnameDetector.detectCnameCloakedHost(any())).thenReturn(null)
+        whenever(mockCloakedCnameDetector.detectCnameCloakedHost(anyString(), any())).thenReturn(null)
 
         val response = testee.shouldIntercept(
             request = mockRequest,
@@ -610,7 +626,7 @@ class WebViewRequestInterceptorTest {
             webViewClientListener = null,
         )
 
-        verify(mockCloakedCnameDetector).detectCnameCloakedHost(uri)
+        verify(mockCloakedCnameDetector).detectCnameCloakedHost("foo.com", uri)
         assertRequestCanContinueToLoad(response)
     }
 
@@ -622,7 +638,7 @@ class WebViewRequestInterceptorTest {
 
         val uri = "host.com".toUri()
         whenever(mockRequest.url).thenReturn(uri)
-        whenever(mockCloakedCnameDetector.detectCnameCloakedHost(any())).thenReturn("uncloaked-host.com")
+        whenever(mockCloakedCnameDetector.detectCnameCloakedHost(anyString(), any())).thenReturn("uncloaked-host.com")
 
         val response = testee.shouldIntercept(
             request = mockRequest,
@@ -631,7 +647,7 @@ class WebViewRequestInterceptorTest {
             webViewClientListener = null,
         )
 
-        verify(mockCloakedCnameDetector).detectCnameCloakedHost(uri)
+        verify(mockCloakedCnameDetector).detectCnameCloakedHost("foo.com", uri)
         assertRequestCanContinueToLoad(response)
     }
 
@@ -641,7 +657,7 @@ class WebViewRequestInterceptorTest {
 
         val uri = "host.com".toUri()
         whenever(mockRequest.url).thenReturn(uri)
-        whenever(mockCloakedCnameDetector.detectCnameCloakedHost(any())).thenReturn("uncloaked-host.com")
+        whenever(mockCloakedCnameDetector.detectCnameCloakedHost(anyString(), any())).thenReturn("uncloaked-host.com")
 
         val response = testee.shouldIntercept(
             request = mockRequest,
@@ -650,7 +666,7 @@ class WebViewRequestInterceptorTest {
             webViewClientListener = null,
         )
 
-        verify(mockCloakedCnameDetector).detectCnameCloakedHost(uri)
+        verify(mockCloakedCnameDetector).detectCnameCloakedHost("foo.com", uri)
         assertCancelledResponse(response)
     }
 

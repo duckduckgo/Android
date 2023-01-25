@@ -19,7 +19,7 @@ package com.duckduckgo.autofill.store
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.duckduckgo.autofill.InternalTestUserChecker
+import com.duckduckgo.autofill.api.InternalTestUserChecker
 
 interface AutofillPrefsStore {
     var isEnabled: Boolean

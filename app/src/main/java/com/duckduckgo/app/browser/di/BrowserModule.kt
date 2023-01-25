@@ -75,8 +75,8 @@ import com.duckduckgo.app.trackerdetection.CloakedCnameDetector
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.api.Autoconsent
-import com.duckduckgo.autofill.BrowserAutofill
-import com.duckduckgo.autofill.InternalTestUserChecker
+import com.duckduckgo.autofill.api.BrowserAutofill
+import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
@@ -90,6 +90,7 @@ import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.privacy.config.api.UserAgent
+import com.duckduckgo.request.filterer.api.RequestFilterer
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
@@ -277,6 +278,7 @@ class BrowserModule {
         userAgentProvider: UserAgentProvider,
         adClickManager: AdClickManager,
         cloakedCnameDetector: CloakedCnameDetector,
+        requestFilterer: RequestFilterer,
     ): RequestInterceptor =
         WebViewRequestInterceptor(
             resourceSurrogates,
@@ -287,6 +289,7 @@ class BrowserModule {
             userAgentProvider,
             adClickManager,
             cloakedCnameDetector,
+            requestFilterer,
         )
 
     @Provides

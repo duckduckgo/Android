@@ -27,7 +27,6 @@ enum class AppTpSetting(override val value: String, override val defaultValue: B
     ProtectGames("protectGames"),
     ExceptionLists("exceptionLists", defaultValue = true),
     OpenBeta("openBeta"),
-    CheckBlockingFunction("checkBlockingFunction"),
     StartVpnErrorHandling("startVpnErrorHandling", defaultValue = true),
 }
 

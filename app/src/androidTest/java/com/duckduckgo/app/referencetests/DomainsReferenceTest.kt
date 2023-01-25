@@ -59,6 +59,7 @@ import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.duckduckgo.privacy.config.api.UserAgent
+import com.duckduckgo.request.filterer.api.RequestFilterer
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -101,6 +102,7 @@ class DomainsReferenceTest(private val testCase: TestCase) {
     private var mockHttpsUpgrader: HttpsUpgrader = mock()
     private var mockRequest: WebResourceRequest = mock()
     private val mockPrivacyProtectionCountDao: PrivacyProtectionCountDao = mock()
+    private val mockRequestFilterer: RequestFilterer = mock()
     private val fakeUserAgent: UserAgent = UserAgentFake()
     private val fakeToggle: FeatureToggle = FeatureToggleFake()
     private val fakeUserAllowListRepository = UserAllowListRepositoryFake()
@@ -168,7 +170,8 @@ class DomainsReferenceTest(private val testCase: TestCase) {
             gpc = mockGpc,
             userAgentProvider = userAgentProvider,
             adClickManager = mockAdClickManager,
-            cloakedCnameDetector = CloakedCnameDetectorImpl(tdsCnameEntityDao),
+            cloakedCnameDetector = CloakedCnameDetectorImpl(tdsCnameEntityDao, mockTrackerAllowlist),
+            requestFilterer = mockRequestFilterer,
         )
     }
 

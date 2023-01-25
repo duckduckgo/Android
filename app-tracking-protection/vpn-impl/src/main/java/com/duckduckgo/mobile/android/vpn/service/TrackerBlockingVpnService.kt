@@ -476,7 +476,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
     ) = withContext(Dispatchers.IO) {
         logcat { "VPN log: Stopping VPN. $reason" }
 
-        vpnNetworkStack.onStopVpn()
+        vpnNetworkStack.onStopVpn(reason)
 
         tunInterface?.close()
         tunInterface = null
@@ -484,9 +484,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         alwaysOnStateJob.cancel()
 
         sendStopPixels(reason)
-
-        // Set the state to DISABLED here, then call the on stop/failure callbacks
-        vpnServiceStateStatsDao.insert(createVpnState(state = VpnServiceState.DISABLED, stopReason = reason))
 
         // If VPN has been started, then onVpnStopped must be called. Else, an error might have occurred before start so we call onVpnStartFailed
         if (hasVpnAlreadyStarted) {
@@ -504,6 +501,9 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         vpnStateServiceReference?.let {
             runCatching { unbindService(vpnStateServiceConnection).also { vpnStateServiceReference = null } }
         }
+
+        // Set the state to DISABLED here, then call the on stop/failure callbacks
+        vpnServiceStateStatsDao.insert(createVpnState(state = VpnServiceState.DISABLED, stopReason = reason))
 
         stopForeground(true)
         stopSelf()
@@ -603,7 +603,10 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
     }
 
     @SuppressLint("NewApi")
-    private fun createVpnState(state: VpnServiceState, stopReason: VpnStopReason = VpnStopReason.UNKNOWN): VpnServiceStateStats {
+    private fun createVpnState(
+        state: VpnServiceState,
+        stopReason: VpnStopReason = VpnStopReason.UNKNOWN,
+    ): VpnServiceStateStats {
         fun VpnStopReason.asVpnStoppingReason(): VpnStoppingReason {
             return when (this) {
                 VpnStopReason.RESTART -> VpnStoppingReason.RESTART

@@ -43,8 +43,7 @@ interface VpnStore {
 
     fun didShowAppTpEnabledCta(): Boolean
     fun appTpEnabledCtaDidShow()
-    fun onOnboardingSessionSet()
-    fun isOnboardingSession(): Boolean
+    fun getAndSetOnboardingSession(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -103,14 +102,18 @@ class SharedPreferencesVpnStore @Inject constructor(
         preferences.edit { putBoolean(KEY_APP_TP_ONBOARDING_VPN_ENABLED_CTA_SHOWN, true) }
     }
 
-    override fun onOnboardingSessionSet() {
-        val now = Instant.now().toEpochMilli()
-        val expiryTimestamp = now.plus(TimeUnit.HOURS.toMillis(WINDOW_INTERVAL_HOURS))
-        preferences.edit { putLong(KEY_APP_TP_ONBOARDING_BANNER_EXPIRY_TIMESTAMP, expiryTimestamp) }
-    }
+    override fun getAndSetOnboardingSession(): Boolean {
+        fun onOnboardingSessionSet() {
+            val now = Instant.now().toEpochMilli()
+            val expiryTimestamp = now.plus(TimeUnit.HOURS.toMillis(WINDOW_INTERVAL_HOURS))
+            preferences.edit { putLong(KEY_APP_TP_ONBOARDING_BANNER_EXPIRY_TIMESTAMP, expiryTimestamp) }
+        }
 
-    override fun isOnboardingSession(): Boolean {
         val expiryTimestamp = preferences.getLong(KEY_APP_TP_ONBOARDING_BANNER_EXPIRY_TIMESTAMP, -1)
+        if (expiryTimestamp == -1L) {
+            onOnboardingSessionSet()
+            return true
+        }
         return Instant.now().toEpochMilli() < expiryTimestamp
     }
 

@@ -242,7 +242,6 @@
     <string name="atp_FAQSixthText">Η Προστασία παρακολούθησης από εφαρμογές λειτουργεί στη συσκευή σας και δεν αποστέλλει τα προσωπικά δεδομένα σας εκτός της συσκευής σας, στο DuckDuckGo.</string>
 
     <!--  App Tracking Protection Waitlist -->
-    <string name="atp_WaitlistActivityWaitlistTitle">Λίστα αναμονής για την Προστασία παρακολούθησης από εφαρμογές</string>
     <string name="atp_WaitlistNotificationTitle">Η πρόσκλησή σας για την Προστασία παρακολούθησης από εφαρμογές είναι εδώ!</string>
     <string name="atp_WaitlistNotificationDescription">Εγγραφήκατε στη λίστα αναμονής και μας ζητήσατε να σας ενημερώσουμε για το πότε θα είναι η σειρά σας να δοκιμάσετε τη λειτουργία μας Προστασία παρακολούθησης από εφαρμογές. Πατήστε για να δείτε την πρόσκλησή σας.</string>
     <string name="atp_WaitlistStatusNotJoined">Ένα εύκολο βήμα για καλύτερο απόρρητο των εφαρμογών!</string>

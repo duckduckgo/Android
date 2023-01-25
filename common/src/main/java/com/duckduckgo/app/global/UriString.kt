@@ -18,6 +18,9 @@ package com.duckduckgo.app.global
 
 import android.net.Uri
 import androidx.core.util.PatternsCompat
+import java.lang.IllegalArgumentException
+import okhttp3.HttpUrl.Companion.toHttpUrl
+import timber.log.Timber
 
 class UriString {
 
@@ -43,19 +46,39 @@ class UriString {
 
         fun isWebUrl(inputQuery: String): Boolean {
             if (inputQuery.contains(space)) return false
-            val uri = Uri.parse(inputQuery).withScheme()
-            if (uri.scheme != UrlScheme.http && uri.scheme != UrlScheme.https) return false
+            val rawUri = Uri.parse(inputQuery)
+
+            val uri = rawUri.withScheme()
+            if (!uri.hasWebScheme()) return false
             if (uri.userInfo != null) return false
 
             val host = uri.host ?: return false
             if (host == localhost) return true
-            if (host.contains(space)) return false
             if (host.contains("!")) return false
-            return (webUrlRegex.containsMatchIn(host))
+
+            if (webUrlRegex.containsMatchIn(host)) return true
+
+            return try {
+                // this will throw an exception if OkHttp thinks it's not a well-formed HTTP or HTTPS URL
+                uri.toString().toHttpUrl()
+
+                // it didn't match the regex and OkHttp thinks it looks good
+                // we might have prepended a scheme to let okHttp check, so only consider it valid at this point if the scheme was manually provided
+                // e.g., this means "http://raspberrypi" will be considered a webUrl, but "raspberrypi" will not
+                rawUri.hasWebScheme()
+            } catch (e: IllegalArgumentException) {
+                Timber.i("Failed to parse %s as a web url; assuming it isn't", inputQuery)
+                false
+            }
         }
 
         fun isValidDomain(domain: String): Boolean {
             return domainRegex.matches(domain)
+        }
+
+        private fun Uri.hasWebScheme(): Boolean {
+            val normalized = normalizeScheme()
+            return normalized.scheme == UrlScheme.http || normalized.scheme == UrlScheme.https
         }
     }
 }

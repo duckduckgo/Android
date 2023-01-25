@@ -184,6 +184,8 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
             Timber.i("Automatic data clearer not yet finished, so deferring processing of intent")
             lastIntent = intent
         }
+
+        viewModel.launchFromThirdParty()
     }
 
     private fun initializeServiceWorker() {

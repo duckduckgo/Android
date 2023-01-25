@@ -18,15 +18,10 @@ appId: com.duckduckgo.mobile.android
     text: "HIDE TIPS FOREVER"
 - tapOn:
     text: "HIDE TIPS FOREVER"
-- swipe:
-    start: 100,1000
-    end: 100,200
-- swipe:
-    start: 100,1000
-    end: 100,200
-- swipe:
-    start: 100,1000
-    end: 100,200
+- scroll
+- scroll
+- scroll
+- scroll
 - assertVisible:
     id: "ad-id-10"
 - tapOn:

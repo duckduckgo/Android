@@ -36,6 +36,7 @@ import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.privacy.config.api.Gpc
+import com.duckduckgo.request.filterer.api.RequestFilterer
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -54,6 +55,8 @@ interface RequestInterceptor {
         request: WebResourceRequest?,
         documentUrl: String?,
     ): WebResourceResponse?
+
+    fun onPageStarted(url: String)
 }
 
 class WebViewRequestInterceptor(
@@ -65,8 +68,13 @@ class WebViewRequestInterceptor(
     private val userAgentProvider: UserAgentProvider,
     private val adClickManager: AdClickManager,
     private val cloakedCnameDetector: CloakedCnameDetector,
+    private val requestFilterer: RequestFilterer,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
 ) : RequestInterceptor {
+
+    override fun onPageStarted(url: String) {
+        requestFilterer.registerOnPageCreated(url)
+    }
 
     /**
      * Notify the application of a resource request and allow the application to return the data.
@@ -85,6 +93,8 @@ class WebViewRequestInterceptor(
         webViewClientListener: WebViewClientListener?,
     ): WebResourceResponse? {
         val url = request.url
+
+        if (requestFilterer.shouldFilterOutRequest(request, documentUrl)) return WebResourceResponse(null, null, null)
 
         adClickManager.detectAdClick(url?.toString(), request.isForMainFrame)
 
@@ -157,7 +167,7 @@ class WebViewRequestInterceptor(
             trackingEvent.status == TrackerStatus.ALLOWED ||
             trackingEvent.status == TrackerStatus.SAME_ENTITY_ALLOWED
         ) {
-            cloakedCnameDetector.detectCnameCloakedHost(request.url)?.let { uncloakedHost ->
+            cloakedCnameDetector.detectCnameCloakedHost(documentUrl, request.url)?.let { uncloakedHost ->
                 trackingEvent(request, documentUrl, webViewClientListener, false, uncloakedHost)?.let { cloakedTrackingEvent ->
                     if (cloakedTrackingEvent.status == TrackerStatus.BLOCKED) {
                         return blockRequest(cloakedTrackingEvent, request, webViewClientListener)

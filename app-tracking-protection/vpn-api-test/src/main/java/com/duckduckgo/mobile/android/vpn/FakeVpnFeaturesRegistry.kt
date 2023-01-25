@@ -33,6 +33,10 @@ class FakeVpnFeaturesRegistry : VpnFeaturesRegistry {
         return features.contains(feature.featureName)
     }
 
+    override fun isAnyFeatureRegistered(): Boolean {
+        return features.isNotEmpty()
+    }
+
     override suspend fun refreshFeature(feature: VpnFeature) {
         // no-op
     }
