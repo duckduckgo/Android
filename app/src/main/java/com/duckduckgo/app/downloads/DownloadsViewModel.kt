@@ -24,13 +24,16 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.downloads.DownloadViewItem.Empty
 import com.duckduckgo.app.downloads.DownloadViewItem.Header
 import com.duckduckgo.app.downloads.DownloadViewItem.Item
+import com.duckduckgo.app.downloads.DownloadViewItem.NotifyMe
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.CancelDownload
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.DisplayMessage
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.DisplayUndoMessage
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.OpenFile
+import com.duckduckgo.app.downloads.DownloadsViewModel.Command.OpenSettings
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.ShareFile
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.downloads.api.DownloadsRepository
 import com.duckduckgo.downloads.api.model.DownloadItem
@@ -41,8 +44,12 @@ import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.threeten.bp.LocalDateTime
 
@@ -51,7 +58,8 @@ class DownloadsViewModel @Inject constructor(
     private val timeDiffFormatter: TimeDiffFormatter,
     private val downloadsRepository: DownloadsRepository,
     private val dispatcher: DispatcherProvider,
-) : ViewModel(), DownloadsItemListener {
+    private val settingsDataStore: SettingsDataStore,
+) : ViewModel(), DownloadsItemListener, DownloadsNotifyMeListener {
 
     data class ViewState(
         val enableSearch: Boolean = false,
@@ -65,24 +73,42 @@ class DownloadsViewModel @Inject constructor(
         data class OpenFile(val item: DownloadItem) : Command()
         data class ShareFile(val item: DownloadItem) : Command()
         data class CancelDownload(val item: DownloadItem) : Command()
+        object OpenSettings : Command()
     }
 
-    private val viewState = MutableStateFlow(ViewState())
     private val command = Channel<Command>(1, DROP_OLDEST)
 
-    fun downloads() {
-        viewModelScope.launch(dispatcher.io()) {
-            downloadsRepository.getDownloadsAsFlow().collect {
-                val itemsList = it.mapToDownloadViewItems()
-                viewState.emit(
-                    currentViewState().copy(downloadItems = itemsList, filteredItems = itemsList),
-                )
-            }
-        }
+    private val downloadItems: Flow<List<DownloadViewItem>> = downloadsRepository.getDownloadsAsFlow().map {
+        it.mapToDownloadViewItems()
     }
 
-    fun viewState(): StateFlow<ViewState> {
-        return viewState
+    private val notificationsAllowed = MutableStateFlow(true)
+
+    private val notificationComponentDismissed = MutableStateFlow(settingsDataStore.notifyMeInDownloadsDismissed)
+
+    private val filterText = MutableStateFlow("")
+
+    val viewState: StateFlow<ViewState> = combine(
+        flow = downloadItems,
+        flow2 = notificationsAllowed,
+        flow3 = notificationComponentDismissed,
+        flow4 = filterText,
+    ) { items, granted, dismissed, filter ->
+        if (granted || dismissed) {
+            val downloadItemsList = items.ifEmpty { listOf(Empty) }
+            val filteredItemsList = if (filter.isEmpty()) downloadItemsList else filtered(items, filter)
+            ViewState(enableSearch = items.isNotEmpty(), downloadItems = downloadItemsList, filteredItems = filteredItemsList)
+        } else {
+            val downloadItemsList = if (items.isEmpty()) listOf(NotifyMe, Empty) else listOf(NotifyMe).plus(items)
+            val filteredItemsList = if (filter.isEmpty()) downloadItemsList else filtered(items, filter)
+            ViewState(enableSearch = items.isNotEmpty(), downloadItems = downloadItemsList, filteredItems = filteredItemsList)
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
+
+    fun updateNotificationsPermissions(granted: Boolean) {
+        viewModelScope.launch {
+            notificationsAllowed.emit(granted)
+        }
     }
 
     fun commands(): Flow<Command> {
@@ -128,38 +154,38 @@ class DownloadsViewModel @Inject constructor(
     }
 
     fun onQueryTextChange(newText: String) {
-        val filtered = LinkedHashMap<Header, List<Item>>()
-        viewModelScope.launch(dispatcher.io()) {
-            currentViewState().downloadItems.forEach { item ->
-                if (item is Header) {
-                    filtered[item] = mutableListOf()
-                } else if (item is Item) {
-                    if (item.downloadItem.fileName.lowercase().contains(newText.lowercase())) {
-                        val list = filtered[filtered.keys.last()]
-                        val newList = list?.plus(item) ?: listOf(item)
-                        filtered[filtered.keys.last()] = newList
-                    }
-                }
-            }
-
-            val list = mutableListOf<DownloadViewItem>()
-            filtered.forEach {
-                if (it.value.isNotEmpty()) {
-                    list.add(it.key)
-                    list.addAll(it.value)
-                }
-            }
-
-            if (list.isEmpty()) {
-                list.add(Empty)
-            }
-
-            viewState.emit(
-                currentViewState().copy(
-                    filteredItems = list,
-                ),
-            )
+        viewModelScope.launch {
+            filterText.emit(newText)
         }
+    }
+
+    private fun filtered(items: List<DownloadViewItem>, newText: String): List<DownloadViewItem> {
+        val filtered = LinkedHashMap<Header, List<Item>>()
+        items.forEach { item ->
+            if (item is Header) {
+                filtered[item] = mutableListOf()
+            } else if (item is Item) {
+                if (item.downloadItem.fileName.lowercase().contains(newText.lowercase())) {
+                    val list = filtered[filtered.keys.last()]
+                    val newList = list?.plus(item) ?: listOf(item)
+                    filtered[filtered.keys.last()] = newList
+                }
+            }
+        }
+
+        val list = mutableListOf<DownloadViewItem>()
+        filtered.forEach {
+            if (it.value.isNotEmpty()) {
+                list.add(it.key)
+                list.addAll(it.value)
+            }
+        }
+
+        if (list.isEmpty()) {
+            list.add(Empty)
+        }
+
+        return list
     }
 
     override fun onItemClicked(item: DownloadItem) {
@@ -182,6 +208,18 @@ class DownloadsViewModel @Inject constructor(
             downloadsRepository.delete(item.downloadId)
             command.send(CancelDownload(item))
         }
+    }
+
+    override fun onCloseClicked() {
+        viewModelScope.launch {
+            val closed = true
+            settingsDataStore.notifyMeInDownloadsDismissed = closed
+            notificationComponentDismissed.emit(closed)
+        }
+    }
+
+    override fun onNotifyMeButtonClicked() {
+        viewModelScope.launch { command.send(OpenSettings) }
     }
 
     private fun DownloadItem.mapToDownloadViewItem(): DownloadViewItem = Item(this)
@@ -213,9 +251,5 @@ class DownloadsViewModel @Inject constructor(
         }
 
         return itemViews
-    }
-
-    private fun currentViewState(): ViewState {
-        return viewState.value
     }
 }

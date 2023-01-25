@@ -456,4 +456,7 @@
         <item name="shapeAppearance">@style/ShapeAppearance.DuckDuckGo.MediumComponent</item>
     </style>
 
+    <!-- Notify Me component -->
+    <style name="Widget.DuckDuckGo.NotifyMeView"/>
+
 </resources>

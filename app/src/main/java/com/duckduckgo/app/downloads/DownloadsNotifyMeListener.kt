@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,8 @@
 
 package com.duckduckgo.app.downloads
 
-import com.duckduckgo.downloads.api.model.DownloadItem
+interface DownloadsNotifyMeListener {
+    fun onCloseClicked()
 
-sealed class DownloadViewItem {
-    object Empty : DownloadViewItem()
-    object NotifyMe : DownloadViewItem()
-    data class Header(val text: String) : DownloadViewItem()
-    data class Item(val downloadItem: DownloadItem) : DownloadViewItem()
+    fun onNotifyMeButtonClicked()
 }

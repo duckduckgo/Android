@@ -16,12 +16,17 @@
 
 package com.duckduckgo.app.downloads
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.provider.Settings
 import android.view.Menu
 import android.view.MenuItem
 import androidx.annotation.StringRes
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.flowWithLifecycle
@@ -34,6 +39,7 @@ import com.duckduckgo.app.downloads.DownloadsViewModel.Command
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.*
 import com.duckduckgo.app.downloads.DownloadsViewModel.ViewState
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.mobile.android.ui.view.SearchBar
@@ -61,6 +67,9 @@ class DownloadsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var downloadsFileActions: DownloadsFileActions
 
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
+
     private val toolbar
         get() = binding.toolbar
 
@@ -75,10 +84,8 @@ class DownloadsActivity : DuckDuckGoActivity() {
         setupToolbar(toolbar)
         setupRecyclerView()
 
-        viewModel.downloads()
-
         lifecycleScope.launch {
-            viewModel.viewState()
+            viewModel.viewState
                 .flowWithLifecycle(lifecycle, STARTED)
                 .collectLatest { render(it) }
         }
@@ -87,6 +94,18 @@ class DownloadsActivity : DuckDuckGoActivity() {
             viewModel.commands()
                 .flowWithLifecycle(lifecycle, STARTED)
                 .collectLatest { processCommands(it) }
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        @SuppressLint("InlinedApi")
+        if (appBuildConfig.sdkInt >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            val value =
+                ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+
+            viewModel.updateNotificationsPermissions(value)
         }
     }
 
@@ -108,6 +127,7 @@ class DownloadsActivity : DuckDuckGoActivity() {
         return super.onPrepareOptionsMenu(menu)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         if (searchBar.isVisible) {
             hideSearchBar()
@@ -123,6 +143,7 @@ class DownloadsActivity : DuckDuckGoActivity() {
             is DisplayMessage -> showSnackbar(command.messageId, command.arg)
             is DisplayUndoMessage -> showUndo(command)
             is CancelDownload -> cancelDownload(command)
+            is OpenSettings -> openSettings()
         }
     }
 
@@ -193,6 +214,7 @@ class DownloadsActivity : DuckDuckGoActivity() {
 
     private fun setupRecyclerView() {
         downloadsAdapter.setListener(viewModel)
+        downloadsAdapter.setNotifyMeListener(viewModel)
         binding.downloadsContentView.layoutManager = LinearLayoutManager(this)
         binding.downloadsContentView.adapter = downloadsAdapter
     }
@@ -221,6 +243,15 @@ class DownloadsActivity : DuckDuckGoActivity() {
         toolbar.show()
         searchBar.handle(SearchBar.Event.DismissSearchBar)
         searchBar.hideKeyboard()
+    }
+
+    private fun openSettings() {
+        // This is called when "Notify Me" button is tapped and that button is displayed only on Android 13+.
+        @SuppressLint("InlinedApi")
+        val settingsIntent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            .putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+        startActivity(settingsIntent)
     }
 
     companion object {

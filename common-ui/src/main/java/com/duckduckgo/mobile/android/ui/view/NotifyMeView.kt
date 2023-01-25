@@ -18,32 +18,48 @@ package com.duckduckgo.mobile.android.ui.view
 
 import android.content.Context
 import android.util.AttributeSet
-import androidx.constraintlayout.widget.ConstraintLayout
+import android.widget.FrameLayout
+import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewNotifyMeViewBinding
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
-class NotifyMeView @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
-) : ConstraintLayout(context, attrs) {
+class NotifyMeView : FrameLayout {
 
-    private val binding: ViewNotifyMeViewBinding by viewBinding()
+    constructor(context: Context) : this(context, null)
 
-    private var onCloseButton: () -> Unit = {
-        this.gone()
-    }
+    constructor(
+        context: Context,
+        attrs: AttributeSet?,
+    ) : this(
+        context,
+        attrs,
+        R.style.Widget_DuckDuckGo_NotifyMeView,
+    )
 
-    private var onNotifyMeButtonClicked: () -> Unit = {}
+    constructor(
+        context: Context,
+        attrs: AttributeSet?,
+        defStyle: Int,
+    ) : super(context, attrs, defStyle) {
+        val attributes = context.obtainStyledAttributes(attrs, R.styleable.NotifyMeView)
 
-    init {
+        setTitle(attributes.getString(R.styleable.NotifyMeView_titleText) ?: "")
+        setSubtitle(attributes.getString(R.styleable.NotifyMeView_subtitleText) ?: "")
+
         binding.notifyMeClose.setOnClickListener {
             onCloseButton.invoke()
         }
-
         binding.notifyMeButton.setOnClickListener {
             onNotifyMeButtonClicked.invoke()
         }
+
+        attributes.recycle()
     }
+
+    private val binding: ViewNotifyMeViewBinding by viewBinding()
+
+    private var onCloseButton: () -> Unit = {}
+    private var onNotifyMeButtonClicked: () -> Unit = {}
 
     fun setTitle(title: String) {
         binding.notifyMeMessageTitle.text = title
