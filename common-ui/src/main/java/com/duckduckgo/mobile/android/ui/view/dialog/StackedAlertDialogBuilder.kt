@@ -116,6 +116,7 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         dialog?.dismiss()
     }
 
+    override fun isShowing(): Boolean = dialog?.isShowing == true
     private fun setViews(
         binding: DialogStackedAlertBinding,
         dialog: AlertDialog,

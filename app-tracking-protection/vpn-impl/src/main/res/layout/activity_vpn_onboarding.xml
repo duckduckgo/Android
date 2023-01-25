@@ -16,12 +16,14 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnOnboardingActivity">
+    tools:context="com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnOnboardingActivity"
+    android:background="?attr/daxColorSurface">
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/onboarding_pager"
@@ -31,22 +33,24 @@
         app:layout_constraintBottom_toTopOf="@+id/onboarding_next_cta"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <ImageButton
         android:id="@+id/onboarding_close"
         android:layout_width="?attr/actionBarSize"
         android:layout_height="?attr/actionBarSize"
         android:background="?selectableItemBackground"
-        android:src="@drawable/ic_close_24dp"
+        android:src="@drawable/ic_close_24"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="SpeakableTextPresentCheck"/>
 
-    <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryRounded
+
+    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
         android:id="@+id/onboarding_next_cta"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        app:buttonSize="large"
         android:layout_marginStart="@dimen/keyline_5"
         android:layout_marginEnd="@dimen/keyline_5"
         android:layout_marginBottom="@dimen/keyline_4"

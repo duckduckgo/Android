@@ -24,8 +24,6 @@
     tools:background="@color/white"
     tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
 
-    <include layout="@layout/include_default_browser_buttons"/>
-
     <ImageView
         android:id="@+id/defaultBrowserImage"
         android:layout_width="0dp"
@@ -40,10 +38,9 @@
         app:layout_constraintVertical_bias="0.5"
         app:layout_constraintWidth_max="300dp" />
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/browserProtectionTitle"
-        android:textAppearance="@style/TextAppearance.DuckDuckGo.Headline2"
-        android:textColor="@color/almostBlackDark"
+        app:typography="h2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="26dp"
@@ -53,10 +50,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/defaultBrowserImage" />
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/browserProtectionSubtitle"
-        android:textSize="16sp"
-        android:textColor="@color/gray90"
+        app:typography="body1"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="@dimen/keyline_4"
@@ -68,5 +64,31 @@
         app:layout_constraintBottom_toTopOf="@id/continueButton"
         app:layout_constraintWidth_max="300dp"
         app:layout_constraintWidth_percent="0.8" />
+
+    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonSecondary
+        android:id="@+id/continueButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:buttonSize="large"
+        android:text="@string/defaultBrowserMaybeLater"
+        android:layout_marginStart="@dimen/keyline_5"
+        android:layout_marginEnd="@dimen/keyline_5"
+        android:layout_marginBottom="@dimen/keyline_5"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+        android:id="@+id/launchSettingsButton"
+        android:layout_width="0dp"
+        app:buttonSize="large"
+        android:layout_marginStart="@dimen/keyline_5"
+        android:layout_marginEnd="@dimen/keyline_5"
+        android:layout_marginBottom="@dimen/keyline_1"
+        android:layout_height="wrap_content"
+        android:text="@string/defaultBrowserLetsDoIt"
+        app:layout_constraintBottom_toTopOf="@+id/continueButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

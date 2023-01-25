@@ -53,7 +53,7 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         private set
     var optionList: MutableList<CharSequence> = mutableListOf()
         private set
-    var selectedOption = 0
+    var selectedOption: Int? = null
         private set
 
     fun setTitle(@StringRes textId: Int): RadioListAlertDialogBuilder {
@@ -78,10 +78,23 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
 
     fun setOptions(
         @StringRes stackedButtonTextId: List<Int>,
-        selectedItem: Int = 0,
+        selectedItem: Int? = null,
     ): RadioListAlertDialogBuilder {
         stackedButtonTextId.forEach {
             optionList.add(context.getText(it))
+        }
+        selectedOption = selectedItem
+        return this
+    }
+
+    @Deprecated(message = "options should be passed as List<Int> so we make sure they are localised")
+    @JvmName("setOptionsString")
+    fun setOptions(
+        stackedButtonTextId: List<String>,
+        selectedItem: Int? = null,
+    ): RadioListAlertDialogBuilder {
+        stackedButtonTextId.forEach {
+            optionList.add(it)
         }
         selectedOption = selectedItem
         return this
@@ -131,6 +144,7 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         dialog?.dismiss()
     }
 
+    override fun isShowing(): Boolean = dialog?.isShowing == true
     private fun setViews(
         binding: DialogSingleChoiceAlertBinding,
         dialog: AlertDialog,
@@ -143,18 +157,20 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
             binding.radioListDialogMessage.text = messageText
         }
 
-        optionList.forEach {
+        optionList.forEachIndexed { index, option ->
             val radioButton = RadioButton(context, null)
-            radioButton.text = it
+            radioButton.id = index + 1
+            radioButton.text = option
             val params = RadioGroup.LayoutParams(RadioGroup.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT)
             radioButton.layoutParams = params
             binding.radioListDialogRadioGroup.addView(radioButton)
         }
 
         with(binding.radioListDialogRadioGroup) {
-            check(selectedOption)
-            setOnCheckedChangeListener { group, checkedId ->
+            selectedOption?.let { check(it) }
+            setOnCheckedChangeListener { _, checkedId ->
                 listener.onRadioItemSelected(checkedId)
+                binding.radioListDialogPositiveButton.isEnabled = true
             }
         }
 
@@ -163,6 +179,7 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
             listener.onPositiveButtonClicked(binding.radioListDialogRadioGroup.checkedRadioButtonId)
             dialog.dismiss()
         }
+        binding.radioListDialogPositiveButton.isEnabled = selectedOption != null
 
         binding.radioListDialogNegativeButton.text = negativeButtonText
         binding.radioListDialogNegativeButton.setOnClickListener {

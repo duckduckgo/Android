@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2020 DuckDuckGo
+  ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -16,83 +16,24 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_gravity="bottom"
-    android:background="?attr/daxDialogBackgroundColor"
     android:orientation="vertical"
-    android:paddingTop="16dp"
-    android:paddingBottom="16dp"
-    android:theme="@style/Theme.AppCompat.Light">
+    android:paddingTop="@dimen/actionBottomSheetVerticalPadding"
+    android:paddingBottom="@dimen/actionBottomSheetVerticalPadding">
 
-    <LinearLayout
+    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
         android:id="@+id/primaryCta"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:foreground="?selectableItemBackgroundBorderless"
-        android:orientation="vertical"
-        android:padding="16dp"
-        tools:ignore="UnusedAttribute">
+        app:primaryText="@string/autofillTooltipUseYourAlias"
+        app:secondaryText="@string/autofillTooltipUseYourAliasDescription" />
 
-        <TextView
-            android:id="@+id/tooltipPrimaryCtaTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="21dp"
-            android:layout_marginEnd="21dp"
-            android:text="@string/autofillTooltipUseYourAlias"
-            android:textColor="?attr/normalTextColor"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/tooltipPrimaryCtaDescription"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="21dp"
-            android:layout_marginEnd="21dp"
-            android:text="@string/autofillTooltipUseYourAliasDescription"
-            android:textColor="?attr/normalTextColor"
-            android:textSize="12sp" />
-
-    </LinearLayout>
-
-    <LinearLayout
+    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
         android:id="@+id/secondaryCta"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:foreground="?selectableItemBackgroundBorderless"
-        android:orientation="vertical"
-        android:padding="16dp"
-        tools:ignore="UnusedAttribute">
+        app:primaryText="@string/autofillTooltipGenerateAddress"
+        app:secondaryText="@string/autofillTooltipGenerateAddressDescription" />
 
-        <TextView
-            android:id="@+id/tooltipSecondaryCtaTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="21dp"
-            android:layout_marginEnd="21dp"
-            android:text="@string/autofillTooltipGenerateAddress"
-            android:textColor="?attr/normalTextColor"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/tooltipSecondaryCtaDescription"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="21dp"
-            android:layout_marginEnd="21dp"
-            android:text="@string/autofillTooltipGenerateAddressDescription"
-            android:textColor="?attr/normalTextColor"
-            android:textSize="12sp" />
-
-    </LinearLayout>
 </LinearLayout>

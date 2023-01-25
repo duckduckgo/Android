@@ -16,6 +16,7 @@
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -23,26 +24,23 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="@color/white"
-        android:padding="16dp"
-        android:orientation="vertical">
+        android:background="?attr/daxColorSurface"
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/almostBlackDark"
-            android:fontFamily="sans-serif-medium"
-            android:textStyle="normal"
-            android:textSize="20sp"
-            android:text="@string/widgetConfigurationTitleText" />
+            android:text="@string/widgetConfigurationTitleText"
+            app:typography="h2" />
 
         <ImageView
             android:id="@+id/widgetConfigPreview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             android:layout_gravity="center_horizontal"
-            android:src="@drawable/search_favorites_widget_preview" />
+            android:layout_marginTop="@dimen/keyline_4"
+            android:src="@drawable/search_favorites_widget_light_preview" />
 
         <RadioGroup
             android:id="@+id/widgetConfigThemeRadioGroup"
@@ -54,43 +52,37 @@
                 android:id="@+id/widgetConfigThemeSystem"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:textColor="@color/almostBlackDark"
                 android:fontFamily="sans-serif-medium"
-                android:textStyle="normal"
+                android:text="@string/widgetConfigurationSystemThemeOption"
+                android:textColor="?attr/daxColorPrimaryText"
                 android:visibility="gone"
-                android:textSize="16sp"
-                android:text="@string/widgetConfigurationSystemThemeOption" />
+                tools:visibility="visible" />
 
             <RadioButton
                 android:id="@+id/widgetConfigThemeLight"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:textColor="@color/almostBlackDark"
-                android:fontFamily="sans-serif-medium"
-                android:textStyle="normal"
-                android:textSize="16sp"
                 android:checked="true"
-                android:text="@string/widgetConfigurationLightThemeOption" />
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/widgetConfigurationLightThemeOption"
+                android:textColor="?attr/daxColorPrimaryText" />
 
             <RadioButton
                 android:id="@+id/widgetConfigThemeDark"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:textColor="@color/almostBlackDark"
                 android:fontFamily="sans-serif-medium"
-                android:textStyle="normal"
-                android:textSize="16sp"
-                android:text="@string/widgetConfigurationDarkThemeOption" />
+                android:text="@string/widgetConfigurationDarkThemeOption"
+                android:textColor="?attr/daxColorPrimaryText" />
         </RadioGroup>
 
-        <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostLarge
+        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
             android:id="@+id/widgetConfigAddWidgetButton"
             android:layout_width="wrap_content"
-            android:layout_height="36dp"
+            android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:paddingStart="14dp"
-            android:paddingEnd="14dp"
             android:layout_marginTop="16dp"
-            android:text="@string/widgetConfigurationAddWidgetOption"/>
+            android:layout_marginEnd="8dp"
+            android:text="@string/widgetConfigurationAddWidgetOption" />
     </LinearLayout>
 </FrameLayout>

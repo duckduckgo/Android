@@ -15,16 +15,13 @@
   ~ limitations under the License.
   -->
 
-<com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+<com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/timestamp_header"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?android:windowBackground"
-    android:paddingStart="16dp"
-    android:paddingTop="15dp"
-    android:paddingEnd="0dp"
-    android:paddingBottom="16dp"
+    android:paddingTop="@dimen/keyline_4"
     tools:text="Yesterday"
 />

@@ -21,7 +21,7 @@
     android:viewportHeight="22">
   <path
       android:pathData="M12,12m-11,0a11,11 0,1 1,22 0a11,11 0,1 1,-22 0"
-      android:fillColor="?attr/omnibarRoundedFieldBackgroundColor"/>
+      android:fillColor="?attr/daxColorSurface"/>
   <path
       android:pathData="M7.6867,12.5612C7.6925,13.2058 8.2137,13.727 8.8583,13.7328C9.4966,13.7328 10.014,13.2154 10.014,12.5771C10.0212,12.2712 9.9039,11.9755 9.6891,11.7577C9.4742,11.5398 9.1802,11.4185 8.8742,11.4214C8.5646,11.4114 8.264,11.5267 8.0405,11.7413C7.817,11.9558 7.6894,12.2514 7.6867,12.5612Z"
       android:strokeWidth="1"

@@ -43,8 +43,8 @@ class BookmarkFoldersViewModel @Inject constructor(
     )
 
     sealed class Command {
-        class SelectFolder(val selectedBookmarkFolder: BookmarkFolder) : BookmarkFoldersViewModel.Command()
-        object NewFolderCreatedUpdateTheStructure : BookmarkFoldersViewModel.Command()
+        class SelectFolder(val selectedBookmarkFolder: BookmarkFolder) : Command()
+        object NewFolderCreatedUpdateTheStructure : Command()
     }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()

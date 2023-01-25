@@ -16,12 +16,23 @@
 
 <resources>
 
+    <!-- Design System Theme Agnostic Reference Colors
+        daxColorDim - Dim color behind some dialogs / Dax Dialog
+        daxColorWhite - Brand White
+        daxColorBlack - Brand Black
+        -->
+    <attr name="daxColorDim" format="color"/>
+    <attr name="daxColorWhite" format="color"/>
+    <attr name="daxColorBlack" format="color"/>
+
     <!-- Design System Reference Colors
         daxColorBackground - Bottom Layer - Background of the screen
         daxColorSurface - First layer on top (Toolbar, Navigation Bar, Dialogs)
         daxColorContainer - Object container (Favicon rounded background)
         daxColorPrimaryText - Primary text color
+        daxColorPrimaryInvertedText - Primary text color inverted
         daxColorSecondaryText - Secondary text color
+        daxColorSecondaryText - Secondary text color inverted
         daxColorPrimaryIcon - Primary color for icons
         daxColorDestructive - Destructive element (Destructive button)
         daxColorLines - Dividers between elements
@@ -36,8 +47,11 @@
     <attr name="daxColorContainer" format="color"/>
     <attr name="daxColorWindow" format="color"/>
     <attr name="daxColorPrimaryText" format="color"/>
+    <attr name="daxColorPrimaryInvertedText" format="color"/>
     <attr name="daxColorSecondaryText" format="color"/>
+    <attr name="daxColorSecondaryInvertedText" format="color"/>
     <attr name="daxColorPrimaryIcon" format="color"/>
+    <attr name="daxColorIconDisabled" format="color"/>
     <attr name="daxColorDestructive" format="color"/>
     <attr name="daxColorLines" format="color"/>
     <attr name="daxColorAccentBlue" format="color"/>
@@ -71,8 +85,19 @@
     <attr name="daxColorSliderTrackInactive" format="color"/>
     <attr name="daxColorSliderActive" format="color"/>
 
+    <attr name="daxColorTextInputFocusedOutline" format="color"/>
+    <attr name="daxColorTextInputEnabledOutline" format="color"/>
+
     <!-- Design System Brand Colors -->
     <color name="disabledColor">#59000000</color>
+    <color name="alertRedOnLightDefault">#EB102D</color>
+    <color name="alertRedOnLightDefault_18">#2EEB102D</color>
+    <color name="alertRedOnLightPressed">#C10D25</color>
+    <color name="alertRedOnDarkDefault">#FF545A</color>
+    <color name="alertRedOnDarkDefault_18">#2EFF545A</color>
+    <color name="alertRedOnDarkPressed">#D1454A</color>
+    <color name="alertRedOnLightTextPressed">@color/alertRedOnLightPressed</color>
+    <color name="alertRedOnDarkTextPressed">#FF7378</color>
 
     <!-- Design System Raw Colors -->
     <color name="red20">#F2A18A</color>
@@ -119,18 +144,26 @@
 
     <color name="black84">#D6000000</color>
     <color name="black60">#99000000</color>
+    <color name="black40">#66000000</color>
     <color name="black36">#5C000000</color>
+    <color name="black30">#4D000000</color>
     <color name="black35">#35000000</color>
     <color name="black18">#2E000000</color>
     <color name="black12">#1F000000</color>
+    <color name="black9">#17000000</color>
     <color name="black6">#0F000000</color>
+    <color name="black3">#08000000</color>
     <color name="black">#000000</color>
 
     <color name="white84">#D6FFFFFF</color>
     <color name="white60">#99FFFFFF</color>
+    <color name="white40">#66FFFFFF</color>
     <color name="white36">#5CFFFFFF</color>
+    <color name="white30">#4DFFFFFF</color>
     <color name="white18">#2EFFFFFF</color>
     <color name="white12">#1FFFFFFF</color>
+    <color name="white9">#17FFFFFF</color>
+    <color name="white6">#0FFFFFFF</color>
     <color name="white">#FFFFFF</color>
 </resources>
 

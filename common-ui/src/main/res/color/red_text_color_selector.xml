@@ -16,6 +16,6 @@
   -->
 
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_enabled="false" android:color="@color/red50" />
-    <item android:state_enabled="true" android:color="@color/red50"/>
+    <item android:state_enabled="false" android:color="?attr/daxColorDestructive" />
+    <item android:state_enabled="true" android:color="?attr/daxColorDestructive"/>
 </selector>

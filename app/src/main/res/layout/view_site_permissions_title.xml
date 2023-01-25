@@ -14,27 +14,16 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:layout_height="wrap_content">
 
-    <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
-        android:id="@+id/sitePermissionsSectionTitle"
-        android:layout_width="0dp"
+    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+        android:id="@+id/sitePermissionsSectionHeader"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        tools:text="Title" />
-
-    <ImageView
-        android:id="@+id/overflowMenu"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:background="?selectableItemBackground"
-        android:paddingStart="14dp"
-        android:paddingEnd="@dimen/toolbarOverflowPadding"
-        android:scaleType="center"
-        android:src="@drawable/ic_overflow"
-        tools:ignore="ContentDescription" />
-</LinearLayout>
+        app:showOverflowMenu="true"
+        tools:primaryText="Title" />
+</FrameLayout>

@@ -32,6 +32,7 @@ enum class Component {
     BOTTOM_APP_BAR,
     TABS,
     SNACKBAR,
+    REMOTE_MESSAGE,
     INFO_PANEL,
     DIALOG,
     BOTTOM_SHEET,

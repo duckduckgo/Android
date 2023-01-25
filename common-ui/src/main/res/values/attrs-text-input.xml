@@ -18,6 +18,7 @@
     <declare-styleable name="DaxTextInput">
         <attr name="android:hint" />
         <attr name="android:text" />
+        <attr name="android:minLines" />
         <attr name="editable" format="boolean" />
         <attr name="endIcon" format="reference" />
         <attr name="endIconContentDescription" format="string" />

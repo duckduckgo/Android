@@ -24,17 +24,22 @@
 
     <!-- Toolbar -->
     <style name="Widget.DuckDuckGo.ToolbarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
-        <item name="colorControlNormal">?attr/toolbarIconColor</item>
-        <item name="android:textColorPrimary">?attr/toolbarTextColor</item>
-        <item name="colorControlHighlight">@color/subtleGrayTwo</item>
-        <item name="colorAccent">@color/cornflowerBlue</item>
-        <item name="colorControlActivated">@color/cornflowerBlue</item>
-        <item name="colorSwitchThumbNormal">@color/white</item>
-        <item name="android:colorForeground">@color/subtleGrayTwo</item>
+        <item name="colorControlNormal">?attr/daxColorPrimaryIcon</item>
+        <item name="android:textColorPrimary">?attr/daxColorPrimaryText</item>
+        <item name="colorControlHighlight">?attr/daxColorRipple</item>
+        <item name="colorAccent">?attr/daxColorAccentBlue</item>
+        <item name="colorControlActivated">?attr/daxColorAccentBlue</item>
+        <item name="colorSwitchThumbNormal">?attr/daxColorAccentBlue</item>
+        <item name="android:colorForeground">?attr/daxColorRipple</item>
     </style>
 
     <style name="Widget.DuckDuckGo.PopUpOverflowMenu" parent="@style/Widget.MaterialComponents.PopupMenu.Overflow">
         <item name="android:popupBackground">@drawable/popup_menu_bg</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.OverflowButton" parent="@style/Widget.AppCompat.ActionButton.Overflow">
+        <item name="srcCompat">@drawable/ic_menu_vertical_24</item>
+        <item name="android:src">@drawable/ic_menu_vertical_24</item>
     </style>
 
     <!-- Tabs -->
@@ -76,7 +81,7 @@
 
     <style name="Widget.DuckDuckGo.AutoCompleteTextView" parent="Widget.AppCompat.AutoCompleteTextView">
         <item name="android:textCursorDrawable">@drawable/text_cursor</item>
-        <item name="android:textColorHint">?attr/omnibarHintColor</item>
+        <item name="android:textColorHint">?attr/daxColorSecondaryText</item>
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
@@ -111,19 +116,27 @@
         <item name="android:background">?attr/selectableItemBackground</item>
     </style>
 
+    <style name="Widget.DuckDuckGo.PopupMenuHorizontalDivider">
+        <item name="android:layout_marginStart">@dimen/keyline_5</item>
+        <item name="android:layout_marginTop">@dimen/keyline_1</item>
+        <item name="android:layout_marginEnd">@dimen/keyline_5</item>
+        <item name="android:layout_marginBottom">@dimen/keyline_1</item>
+        <item name="defaultPadding">false</item>
+    </style>
+
     <style name="Widget.DuckDuckGo.NavigationalIcon">
         <item name="android:background">@drawable/ripple_rectangle_rounded</item>
         <item name="android:layout_width">@dimen/popupMenuNavigationItemSize</item>
         <item name="android:layout_height">@dimen/popupMenuNavigationItemSize</item>
-        <item name="android:tint">@color/primary_icon_color_selector</item>
     </style>
 
     <!-- Styles for App Components -->
 
+    <!-- Menus -->
     <style name="Widget.DuckDuckGo.MenuItemView">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:paddingStart">20dp</item>
+        <item name="android:paddingStart">@dimen/keyline_5</item>
         <item name="android:paddingEnd">@dimen/keyline_5</item>
         <item name="android:paddingTop">@dimen/keyline_3</item>
         <item name="android:paddingBottom">@dimen/keyline_3</item>
@@ -201,7 +214,7 @@
         <item name="android:textAlignment">center</item>
         <item name="android:paddingStart">@dimen/keyline_3</item>
         <item name="android:paddingEnd">@dimen/keyline_3</item>
-        <item name="android:layout_height">@dimen/legacyButtonHeight</item>
+        <item name="android:layout_height">48dp</item>
     </style>
 
     <style name="Widget.DuckDuckGo.Button.Primary">
@@ -279,10 +292,7 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:background">@drawable/background_message_cta</item>
         <item name="android:elevation">4dp</item>
-        <item name="android:layout_marginTop">@dimen/keyline_4</item>
-        <item name="android:layout_marginStart">@dimen/keyline_4</item>
-        <item name="android:layout_marginEnd">@dimen/keyline_4</item>
-        <item name="android:layout_marginBottom">@dimen/keyline_1</item>
+        <item name="android:layout_margin">@dimen/keyline_4</item>
     </style>
 
     <!-- Dialogs -->
@@ -296,23 +306,53 @@
         <item name="cornerSize">@dimen/dialogBorderRadius</item>
     </style>
 
-    <!-- Text Input -->
-    <style name="Widget.DuckDuckGo.TextInputView"
-           parent="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-        <item name="android:textColorHint">@color/text_input_hint_color_selector</item>
-        <item name="boxCornerRadiusBottomEnd">@dimen/keyline_2</item>
-        <item name="boxCornerRadiusBottomStart">@dimen/keyline_2</item>
-        <item name="boxCornerRadiusTopStart">@dimen/keyline_2</item>
-        <item name="boxCornerRadiusTopEnd">@dimen/keyline_2</item>
-        <item name="boxStrokeColor">@color/text_input_box_color_selector</item>
-        <item name="boxStrokeWidth">1dp</item>
-        <item name="endIconTint">?attr/daxColorPrimaryIcon</item>
-        <item name="hintTextColor">@color/text_input_hint_color_selector</item>
-        <item name="android:theme">@style/TextInputEditTextTheme</item>
+    <style name="Widget.DuckDuckGo.Dialog.Content">
+        <item name="android:paddingTop">@dimen/keyline_5</item>
+        <item name="android:paddingBottom">@dimen/dialogContentPaddingBottom</item>
+        <item name="android:paddingStart">@dimen/keyline_5</item>
+        <item name="android:paddingEnd">@dimen/keyline_5</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.TextInput"
-           parent="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+    <style name="Widget.DuckDuckGo.DialogFullScreen">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
+    <!-- Dax Dialog -->
+    <style name="Widget.DuckDuckGo.DaxDialogFragment" parent="android:Theme.DeviceDefault.Light.NoActionBar">
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.DaxDialog"/>
+
+    <style name="Widget.DuckDuckGo.DaxDialog.Outline">
+        <item name="cardCornerRadius">@dimen/largeShapeCornerRadius</item>
+        <item name="android:backgroundTint">?attr/daxColorSurface</item>
+        <item name="android:layout_marginStart">@dimen/keyline_4</item>
+        <item name="android:layout_marginEnd">@dimen/keyline_4</item>
+        <item name="android:layout_marginBottom">@dimen/keyline_4</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.DaxDialog.Content">
+        <item name="android:paddingTop">@dimen/daxDialogContentPaddingTop</item>
+        <item name="android:paddingBottom">@dimen/dialogContentPaddingBottom</item>
+        <item name="android:paddingStart">@dimen/dialogContentPaddingStart</item>
+        <item name="android:paddingEnd">@dimen/dialogContentPaddingEnd</item>
+    </style>
+
+    <!-- Text Input -->
+    <style name="Widget.DuckDuckGo.SearchInput" parent="@style/Typography.DuckDuckGo.Body1">
+        <item name="android:textColor">?attr/daxColorPrimaryText</item>
+        <item name="android:textColorHint">?attr/daxColorSecondaryText</item>
+        <item name="android:selectAllOnFocus">true</item>
+        <item name="android:background">@null</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:imeOptions">flagNoExtractUi|actionGo|flagNoPersonalizedLearning</item>
+        <item name="android:inputType">textUri|textNoSuggestions</item>
+        <item name="android:textCursorDrawable">@drawable/text_cursor</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.TextInput" parent="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="shapeAppearance">@style/ShapeAppearance.DuckDuckGo.SmallComponent</item>
         <item name="boxStrokeColor">@color/text_input_box_color_selector</item>
         <item name="endIconTint">?attr/daxColorPrimaryIcon</item>
@@ -320,6 +360,12 @@
         <item name="android:textColorHint">@color/text_input_hint_color_selector</item>
         <item name="android:theme">@style/Widget.DuckDuckGo.TextInputCursor</item>
     </style>
+
+    <style name="Widget.DuckDuckGo.TextInputText">
+        <item name="android:textAppearance">@style/Typography.DuckDuckGo.Body1</item>
+        <item name="android:textColor">?attr/daxColorPrimaryText</item>
+    </style>
+
 
     <!-- The color of the cursor comes from the theme, not the widget itself -->
     <style name="Widget.DuckDuckGo.TextInputCursor">
@@ -338,6 +384,15 @@
     <style name="Widget.DuckDuckGo.ModalBottomSheetStyle" parent="Widget.MaterialComponents.BottomSheet.Modal">
         <item name="shapeAppearanceOverlay">@style/Widget.DuckDuckGo.BottomSheetDialogCorners</item>
         <item name="android:backgroundTint">?attr/daxColorSurface</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.BottomSheetDialogCollapsed" parent="ThemeOverlay.MaterialComponents.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/Widget.DuckDuckGo.ModalBottomSheetCollapsedStyle</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.ModalBottomSheetCollapsedStyle" parent="Widget.MaterialComponents.BottomSheet.Modal">
+        <item name="backgroundTint">@android:color/transparent</item>
+        <item name="behavior_skipCollapsed">true</item>
     </style>
 
     <style name="Widget.DuckDuckGo.BottomSheetDialogCorners">
@@ -381,12 +436,24 @@
     <style name="Widget.DuckDuckGo.HorizontalDivider">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">@dimen/horizontalDividerHeight</item>
-        <item name="android:background">?attr/sectionDividerColor</item>
+        <item name="android:background">?attr/daxColorLines</item>
     </style>
 
     <style name="Widget.DuckDuckGo.VerticalDivider">
         <item name="android:layout_width">@dimen/verticalDividerWidth</item>
         <item name="android:layout_height">match_parent</item>
-        <item name="android:background">?attr/sectionDividerColor</item>
+        <item name="android:background">?attr/daxColorLines</item>
     </style>
+
+    <style name="Widget.DuckDuckGo.ListDivider" parent="Widget.MaterialComponents.MaterialDivider">
+        <item name="dividerColor">?attr/daxColorLines</item>
+        <item name="dividerThickness">@dimen/horizontalDividerHeight</item>
+    </style>
+
+    <!-- Cards -->
+    <style name="Widget.DuckDuckGo.CardView" parent="Widget.MaterialComponents.CardView">
+        <item name="cardBackgroundColor">?attr/daxColorSurface</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.DuckDuckGo.MediumComponent</item>
+    </style>
+
 </resources>

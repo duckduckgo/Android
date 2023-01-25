@@ -46,15 +46,15 @@
                 app:panelDrawable="@drawable/ic_info_panel_alert"
                 app:panelText="@string/atp_CompanyDetailsAppInfoPanel"
                 android:visibility="gone"
-                android:layout_margin="16dp"/>
+                android:layout_marginTop="@dimen/keyline_4"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"/>
 
-            <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/tracking_attempts"
-                android:paddingStart="@dimen/keyline_4"
+                android:layout_marginTop="@dimen/keyline_4"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
-                android:paddingTop="@dimen/keyline_4"
-                android:paddingBottom="@dimen/keyline_2"
                 tools:text="9 tracking attempts blocked"/>
 
             <androidx.recyclerview.widget.RecyclerView
@@ -67,10 +67,10 @@
                 android:paddingBottom="@dimen/keyline_5"
                 app:layout_constraintStart_toStartOf="parent"/>
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:id="@+id/tracking_learn_more"
-                style="@style/TextAppearance.DuckDuckGo.Body2"
-                android:textColor="?secondaryTextColor"
+                app:typography="body2"
+                app:textType="secondary"
                 tools:text="@string/atp_CompanyDetailsTrackingLearnMore"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

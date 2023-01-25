@@ -31,7 +31,7 @@
         android:paddingTop="@dimen/bottomSheetTitleVerticalPadding"
         android:paddingBottom="@dimen/bottomSheetTitleVerticalPadding"
         android:visibility="gone"
-        app:textColor="secondary"
+        app:textType="secondary"
         app:typography="body1"
         tools:text="Actions" />
 

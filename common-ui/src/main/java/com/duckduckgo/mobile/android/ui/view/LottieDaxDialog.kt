@@ -90,7 +90,7 @@ class LottieDaxDialog : DialogFragment(R.layout.view_dax_dialog_animated), DaxDi
     }
 
     override fun getTheme(): Int {
-        return R.style.DaxDialogFragment
+        return R.style.Widget_DuckDuckGo_DaxDialogFragment
     }
 
     override fun onStart() {

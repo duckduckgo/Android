@@ -71,14 +71,14 @@
             android:layout_height="@dimen/listItemImageSize"
             android:layout_marginEnd="@dimen/listItemEndPadding"
             android:background="?selectableItemBackgroundBorderless"
-            app:srcCompat="@drawable/ic_overflow"
+            app:srcCompat="@drawable/ic_menu_vertical_24"
             tools:ignore="ContentDescription" />
 
         <com.duckduckgo.mobile.android.ui.view.SwitchView
             android:id="@+id/trailingSwitch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/keyline_2"
+            android:layout_marginEnd="@dimen/keyline_4"
             android:padding="0dp"
             tools:ignore="SpeakableTextPresentCheck" />
 

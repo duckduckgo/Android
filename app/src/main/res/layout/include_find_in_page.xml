@@ -14,71 +14,73 @@
   ~ limitations under the License.
   -->
 
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/findInPageContainer"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="?attr/colorPrimary"
-    android:clickable="true"
-    android:orientation="horizontal"
-    tools:ignore="KeyboardInaccessibleWidget"
-    tools:layout_height="?attr/actionBarSize">
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:id="@+id/findInPageContainer"
+              android:layout_width="match_parent"
+              android:layout_height="?attr/actionBarSize"
+              android:background="@drawable/layer_list_find_in_page"
+              android:orientation="horizontal"
+              android:gravity="center"
+              tools:ignore="KeyboardInaccessibleWidget"
+              tools:layout_height="?attr/actionBarSize">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:importantForAccessibility="no"
+        android:gravity="center"
+        android:layout_marginStart="20dp"
+        android:src="@drawable/ic_find_search_20_a05" />
 
     <EditText
         android:id="@+id/findInPageInput"
+        style="@style/Widget.DuckDuckGo.SearchInput"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:layout_marginStart="12dp"
         android:layout_marginEnd="12dp"
-        android:background="?attr/colorPrimary"
-        android:fontFamily="sans-serif-medium"
         android:hint="@string/findInPageHint"
-        android:imeOptions="flagNoExtractUi"
-        android:inputType="text"
-        android:selectAllOnFocus="true"
-        android:textColor="?attr/omnibarTextColor"
-        android:textColorHint="?attr/omnibarHintColor"
-        android:textSize="13sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/findInPageMatches"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5"
-        tools:text="Search term" />
+        tools:text="Search term"/>
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        app:typography="body2"
+        app:textType="secondary"
         android:id="@+id/findInPageMatches"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="10dp"
-        android:textColor="?attr/omnibarTextColor"
-        tools:text="1/10" />
+        tools:text="1/10"/>
 
     <ImageView
         android:id="@+id/previousSearchTermButton"
-        android:layout_width="36dp"
-        android:layout_height="match_parent"
-        android:layout_marginStart="6dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/keyline_2"
+        android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/previousSearchTermDescription"
-        android:src="@drawable/ic_keyboard_arrow_up_24dp"/>
+        android:src="@drawable/ic_chevron_up_24"/>
 
     <ImageView
         android:id="@+id/nextSearchTermButton"
-        android:layout_width="36dp"
-        android:layout_marginStart="6dp"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/keyline_2"
+        android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/nextSearchTermDescription"
-        android:src="@drawable/ic_keyboard_arrow_down_24dp"/>
+        android:src="@drawable/ic_chevron_down_24"/>
 
     <ImageView
         android:id="@+id/closeFindInPagePanel"
-        android:layout_width="36dp"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/closeFindInPageButtonDescription"
-        android:padding="6dp"
-        android:src="@drawable/ic_close_24dp"/>
+        android:padding="@dimen/keyline_2"
+        android:layout_marginEnd="12dp"
+        android:src="@drawable/ic_close_24"/>
 
 </LinearLayout>
