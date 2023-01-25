@@ -26,9 +26,11 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.R.layout
 import com.duckduckgo.app.browser.databinding.ViewItemDownloadsEmptyBinding
 import com.duckduckgo.app.browser.databinding.ViewItemDownloadsHeaderBinding
+import com.duckduckgo.app.browser.databinding.ViewItemDownloadsNotifyMeBinding
 import com.duckduckgo.app.downloads.DownloadViewItem.Empty
 import com.duckduckgo.app.downloads.DownloadViewItem.Header
 import com.duckduckgo.app.downloads.DownloadViewItem.Item
+import com.duckduckgo.app.downloads.DownloadViewItem.NotifyMe
 import com.duckduckgo.app.global.formatters.data.DataSizeFormatter
 import com.duckduckgo.downloads.store.DownloadStatus.FINISHED
 import com.duckduckgo.mobile.android.databinding.RowTwoLineItemBinding
@@ -43,6 +45,7 @@ class DownloadsAdapter @Inject constructor(
 
     private val items = mutableListOf<DownloadViewItem>()
     private lateinit var downloadsItemListener: DownloadsItemListener
+    private lateinit var downloadsNotifyMeListener: DownloadsNotifyMeListener
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -58,6 +61,10 @@ class DownloadsAdapter @Inject constructor(
                 listener = downloadsItemListener,
                 formatter = dataSizeFormatter,
             )
+            VIEW_TYPE_NOTIFY_ME -> NotifyMeViewHolder(
+                binding = ViewItemDownloadsNotifyMeBinding.inflate(inflater, parent, false),
+                listener = downloadsNotifyMeListener,
+            )
 
             else -> throw IllegalArgumentException()
         }
@@ -71,6 +78,7 @@ class DownloadsAdapter @Inject constructor(
             VIEW_TYPE_EMPTY -> (holder as EmptyViewHolder)
             VIEW_TYPE_HEADER -> (holder as HeaderViewHolder).bind(items[position] as Header)
             VIEW_TYPE_ITEM -> (holder as ItemViewHolder).bind(items[position] as Item)
+            VIEW_TYPE_NOTIFY_ME -> (holder as NotifyMeViewHolder)
         }
     }
 
@@ -79,6 +87,7 @@ class DownloadsAdapter @Inject constructor(
             is Empty -> VIEW_TYPE_EMPTY
             is Header -> VIEW_TYPE_HEADER
             is Item -> VIEW_TYPE_ITEM
+            is NotifyMe -> VIEW_TYPE_NOTIFY_ME
         }
     }
 
@@ -94,6 +103,10 @@ class DownloadsAdapter @Inject constructor(
 
     fun setListener(listener: DownloadsItemListener) {
         this.downloadsItemListener = listener
+    }
+
+    fun setNotifyMeListener(listener: DownloadsNotifyMeListener) {
+        this.downloadsNotifyMeListener = listener
     }
 
     class EmptyViewHolder(val binding: ViewItemDownloadsEmptyBinding) :
@@ -169,6 +182,20 @@ class DownloadsAdapter @Inject constructor(
         }
     }
 
+    class NotifyMeViewHolder(val binding: ViewItemDownloadsNotifyMeBinding, val listener: DownloadsNotifyMeListener) :
+        RecyclerView.ViewHolder(binding.root) {
+
+        init {
+            binding.root.onCloseButtonClicked {
+                listener.onCloseClicked()
+            }
+
+            binding.root.onNotifyMeButtonClicked {
+                listener.onNotifyMeButtonClicked()
+            }
+        }
+    }
+
     class DiffCallback(
         private val old: List<DownloadViewItem>,
         private val new: List<DownloadViewItem>,
@@ -201,5 +228,6 @@ class DownloadsAdapter @Inject constructor(
         const val VIEW_TYPE_EMPTY = 0
         const val VIEW_TYPE_HEADER = 1
         const val VIEW_TYPE_ITEM = 2
+        const val VIEW_TYPE_NOTIFY_ME = 3
     }
 }
