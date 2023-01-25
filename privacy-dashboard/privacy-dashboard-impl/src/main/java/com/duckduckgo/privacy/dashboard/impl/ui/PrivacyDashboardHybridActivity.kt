@@ -141,8 +141,9 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
     private fun openSettings(target: String) {
         if (target == "cpm") {
             startActivity(autoconsentNav.openAutoconsentSettings(this))
+        } else {
+            finish()
         }
-        finish()
     }
 
     @SuppressLint("SetJavaScriptEnabled")
