@@ -17,11 +17,11 @@
   -->
 
 <com.google.android.material.appbar.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
-     xmlns:app="http://schemas.android.com/apk/res-auto"
-     xmlns:tools="http://schemas.android.com/tools"
-     android:layout_width="match_parent"
-     android:layout_height="wrap_content"
-     android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/default_toolbar"
@@ -29,7 +29,7 @@
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/toolbarBgColor"
         android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
-        app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu" >
+        app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/toolbarContainer"
@@ -41,33 +41,34 @@
                 android:id="@+id/app_icon"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toBottomOf="@id/app_tracked_ago"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toTopOf="@id/app_name"
                 app:srcCompat="@drawable/tracking_network_logo_google_llc" />
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:id="@+id/app_name"
-                style="@style/TextAppearance.DuckDuckGo.Body1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/keyline_3"
-                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@+id/app_tracked_ago"
                 app:layout_constraintStart_toEndOf="@+id/app_icon"
-                app:layout_constraintTop_toTopOf="@+id/app_icon"
-                tools:text="Uber"/>
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed"
+                app:typography="h2"
+                tools:text="Uber" />
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:id="@+id/app_tracked_ago"
-                style="@style/TextAppearance.DuckDuckGo.Body2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/keyline_3"
-                android:textColor="?secondaryTextColor"
-                app:layout_constraintBottom_toBottomOf="@+id/app_icon"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/app_icon"
                 app:layout_constraintTop_toBottomOf="@+id/app_name"
-                tools:text="2m ago"/>
+                app:textType="secondary"
+                app:typography="body2"
+                tools:text="2m ago" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

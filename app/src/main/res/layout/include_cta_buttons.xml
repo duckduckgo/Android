@@ -20,36 +20,25 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:gravity="end"
     android:orientation="horizontal">
 
-    <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostLarge
+    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
         android:id="@+id/ctaDismissButton"
-        android:layout_width="match_parent"
-        android:layout_height="36dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="22dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="16dp"
-        android:layout_weight="1"
-        android:background="@drawable/button_outlined_bg"
-        android:foreground="?attr/selectableItemBackgroundBorderless"
-        android:textColor="?attr/buttonOutlinedTextColor"
-        android:textSize="13sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_4"
+        android:layout_marginEnd="@dimen/keyline_2"
+        android:layout_marginBottom="@dimen/keyline_4"
         tools:text="@string/surveyCtaDismissButton" />
 
-    <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostLarge
+    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
         android:id="@+id/ctaOkButton"
-        android:layout_width="match_parent"
-        android:layout_height="36dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="22dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:layout_weight="1"
-        android:background="@drawable/button_contained_bg"
-        android:foreground="?attr/selectableItemBackgroundBorderless"
-        android:textColor="@color/white"
-        android:textSize="13sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_4"
+        android:layout_marginEnd="@dimen/keyline_4"
+        android:layout_marginBottom="@dimen/keyline_4"
         tools:text="@string/surveyCtaLaunchButton" />
 
 </LinearLayout>

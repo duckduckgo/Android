@@ -32,7 +32,7 @@
         android:visibility="gone"
         tools:ignore="ContentDescription" />
 
-    <ImageButton
+    <FrameLayout
         android:id="@+id/microphone"
         android:layout_width="56dp"
         android:layout_height="56dp"
@@ -41,6 +41,14 @@
         android:clickable="false"
         android:focusable="false"
         android:padding="16dp"
-        android:src="@drawable/ic_microphone_dark"
-        tools:ignore="ContentDescription" />
+        tools:ignore="ContentDescription">
+
+            <ImageView
+                android:layout_width="@dimen/keyline_6"
+                android:layout_height="@dimen/keyline_6"
+                android:src="@drawable/ic_microphone_dark"
+                android:layout_gravity="center"
+                tools:ignore="ContentDescription" />
+
+    </FrameLayout>
 </merge>

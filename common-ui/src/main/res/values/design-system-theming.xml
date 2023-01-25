@@ -76,10 +76,12 @@
         <item name="autoCompleteTextViewStyle">@style/Widget.DuckDuckGo.AutoCompleteTextView</item>
         <item name="alertDialogTheme">@style/AlertDialogTheme</item>
         <item name="android:alertDialogTheme">@style/AlertDialogTheme</item>
-        <item name="materialAlertDialogTheme">@style/AlertDialogTheme</item>
+        <item name="materialAlertDialogTheme">@style/Widget.DuckDuckGo.Dialog</item>
         <item name="materialButtonStyle">@style/Widget.DuckDuckGo.DaxButton.TextButton.Primary</item>
         <item name="materialButtonOutlinedStyle">@style/Widget.DuckDuckGo.DaxButton.Secondary</item>
         <item name="borderlessButtonStyle">@style/Widget.DuckDuckGo.DaxButton.Ghost</item>
+        <item name="materialCardViewStyle">@style/Widget.DuckDuckGo.CardView</item>
+        <item name="materialDividerStyle">@style/Widget.DuckDuckGo.ListDivider</item>
 
         <!-- Design System Components -->
         <item name="daxButtonPrimary">@style/Widget.DuckDuckGo.DaxButton.TextButton.Primary</item>
@@ -97,8 +99,11 @@
         <item name="primaryButtonRoundedStyle">@style/Widget.DuckDuckGo.Button.Rounded</item>
         <item name="secondaryButtonRoundedStyle">@style/Widget.DuckDuckGo.Button.Secondary.Rounded</item>
         <item name="primaryButtonLowercaseStyle">@style/Widget.DuckDuckGo.Button.Primary.Lowercase</item>
+
         <item name="oneLineListItemStyle">@style/Widget.DuckDuckGo.OneLineListItem</item>
         <item name="twoLineListItemStyle">@style/Widget.DuckDuckGo.TwoLineListItem</item>
+
+        <item name="cardViewStyle">@style/Widget.DuckDuckGo.CardView</item>
     </style>
 
     <style name="Theme.DuckDuckGo" parent="Base.Theme.DuckDuckGo">
@@ -128,50 +133,43 @@
 
         <!--controls the ripple coloring-->
         <item name="colorControlHighlight">?attr/daxColorRipple</item>
+
+        <!--Design System Colors theme independent-->
+        <item name="daxColorDim">@color/black60</item>
+        <item name="daxColorWhite">@color/white</item>
+        <item name="daxColorBlack">@color/black84</item>
+        <item name="preferredStatusBarColor">?attr/daxColorSurface</item>
+        <item name="preferredNavigationBarColor">?attr/daxColorSurface</item>
+
+        <!--Refactoring colors (can be replaced once reviewed)-->
+        <item name="toolbarBgColor">?attr/daxColorSurface</item>
+        <item name="toolbarIconColor">?attr/daxColorPrimaryIcon</item>
     </style>
 
     <!-- The app theme will mostly contain values for colour attributes -->
     <style name="Theme.DuckDuckGo.Dark" parent="Theme.DuckDuckGo">
 
         <item name="preferDarkStatusBarIcons">false</item>
-        <item name="preferredStatusBarColor">?attr/toolbarBgColor</item>
         <item name="preferDarkNavigationBarIcons">false</item>
-        <item name="preferredNavigationBarColor">@color/black</item>
 
         <!-- Legacy colors to remove-->
-        <item name="colorPrimary">@color/darkThemePrimary</item>
-        <item name="colorPrimaryDark">@color/darkThemePrimaryDark</item>
         <item name="daxLogoTextColor">@color/white</item>
         <item name="normalTextColor">@color/white</item>
         <item name="secondaryTextColor">@color/gray50</item>
-        <item name="accentTextColor">@color/gray30</item>
         <item name="primaryIconColor">@color/gray20</item>
         <item name="primaryIconDisabledColor">@color/gray60</item>
         <item name="secondaryIconColor">@color/gray70</item>
-        <item name="accentIconColor">@color/gray80</item>
-        <item name="chipBackgroundColor">@color/gray90</item>
         <item name="listItemPrimaryTextColor">@color/white</item>
         <item name="listItemSecondaryTextColor">@color/grayishTwo</item>
         <item name="listItemDisabledColor">@color/warGreyTwo</item>
         <item name="subtitleTextColor">@color/grayishTwo</item>
-        <item name="toolbarIconColor">@color/white</item>
-        <item name="toolbarTextColor">@color/white</item>
-        <item name="toolbarBgColor">@color/newBlack</item>
-        <item name="toolbarBgBorderColor">@color/toolbarBorderColorDark</item>
         <item name="dialogBgColor">@color/almostBlackDark</item>
         <item name="browserIconColorSelector">@color/browser_icon_color_selector_dark</item>
         <item name="browserMenuTextColor">@color/white</item>
         <item name="browserMenuTextColorDisabled">@color/warGreyTwo</item>
-        <item name="cookiesRoundedFieldBackgroundColor">@color/almostBlackDark</item>
-        <item name="omnibarRoundedFieldBackgroundColor">@color/almostBlack</item>
-        <item name="omnibarTextColor">@color/white</item>
-        <item name="omnibarHintColor">@color/paleBrownishGray</item>
         <item name="omnibarLogoLetterTextColor">@color/midGray</item>
         <item name="autoCompleteTextColor">@color/white</item>
         <item name="autoCompleteSubtitleTextColor">@color/grayish</item>
-        <item name="tabTitleTextColor">@color/white</item>
-        <item name="tabTitleTextColorLegacy">@color/midnight</item>
-        <item name="tabSubtitleTextColor">@color/coolGray</item>
         <item name="tabSelectedBorderColor">@color/skyBlue</item>
         <item name="tabsFireTextColor">@color/white</item>
         <item name="tabCardBackgroundColor">@color/almostBlack</item>
@@ -210,7 +208,6 @@
         <item name="privacyDashboardLogoLetterTextColor">@color/subtleGray</item>
 
         <item name="emailButtonRippleColor">@color/white</item>
-        <item name="quickAccessItemTitleTextColor">@color/white</item>
 
         <item name="savedSiteEditTextUnderlineColor">@color/whiteSemiTransparent</item>
         <item name="android:textColorAlertDialogListItem">?attr/normalTextColor</item>
@@ -227,7 +224,6 @@
         <item name="dialogPrimaryButtonColor">@color/cornflowerBlue</item>
         <item name="dialogSecondaryButtonColor">?attr/dialogBgColor</item>
 
-        <item name="sectionDividerColor">@color/gray80</item>
         <item name="bottomShadowBackground">@null</item>
         <item name="appTPHeaderBackground">@color/darkThemePrimaryDark</item>
 
@@ -243,13 +239,17 @@
         <item name="daxColorBackgroundInverted">@color/gray0</item>
         <item name="daxColorSurface">@color/gray90</item>
         <item name="daxColorContainer">@color/white12</item>
+        <item name="daxColorWindow">@color/gray85</item>
         <item name="daxColorPrimaryText">@color/white84</item>
+        <item name="daxColorPrimaryInvertedText">@color/black84</item>
         <item name="daxColorSecondaryText">@color/white60</item>
+        <item name="daxColorSecondaryInvertedText">@color/black60</item>
         <item name="daxColorPrimaryIcon">@color/white84</item>
-        <item name="daxColorDestructive">@color/red30</item>
+        <item name="daxColorDestructive">@color/alertRedOnDarkDefault</item>
+        <item name="daxColorIconDisabled">@color/white40</item>
         <item name="daxColorContainerDisabled">@color/white18</item>
         <item name="daxColorTextDisabled">@color/white36</item>
-        <item name="daxColorLines">@color/white12</item>
+        <item name="daxColorLines">@color/white9</item>
         <item name="daxColorAccentBlue">@color/blue30</item>
         <item name="daxColorAccentYellow">@color/yellow50</item>
         <item name="daxColorRipple">@color/white12</item>
@@ -260,16 +260,16 @@
         <item name="daxColorButtonPrimaryContainerPressed">@color/blue50</item>
         <item name="daxColorButtonSecondaryContainer">@android:color/transparent</item>
         <item name="daxColorButtonSecondaryContainerPressed">@color/blue30</item>
-        <item name="daxColorButtonDestructiveContainer">@color/red30</item>
-        <item name="daxColorButtonDestructiveContainerPressed">@color/red50</item>
+        <item name="daxColorButtonDestructiveContainer">@color/alertRedOnDarkDefault</item>
+        <item name="daxColorButtonDestructiveContainerPressed">@color/alertRedOnDarkPressed</item>
         <item name="daxColorButtonDestructiveGhostContainer">@android:color/transparent</item>
-        <item name="daxColorButtonDestructiveGhostContainerPressed">@color/red30_18</item>
+        <item name="daxColorButtonDestructiveGhostContainerPressed">@color/alertRedOnDarkDefault_18</item>
         <item name="daxColorButtonPrimaryText">@color/black84</item>
         <item name="daxColorButtonPrimaryTextPressed">@color/black84</item>
         <item name="daxColorButtonSecondaryText">@color/blue30</item>
         <item name="daxColorButtonSecondaryTextPressed">@color/blue20</item>
-        <item name="daxColorButtonDestructiveGhostText">@color/red30</item>
-        <item name="daxColorButtonDestructiveGhostTextPressed">@color/red20</item>
+        <item name="daxColorButtonDestructiveGhostText">@color/alertRedOnDarkDefault</item>
+        <item name="daxColorButtonDestructiveGhostTextPressed">@color/alertRedOnDarkTextPressed</item>
 
         <!-- Switch -->
         <item name="daxColorSwitchTrackOn">?attr/daxColorAccentBlue</item>
@@ -281,13 +281,15 @@
         <item name="daxColorSliderTrackInactive">@color/gray40_50</item>
         <item name="daxColorSliderActive">?attr/daxColorAccentBlue</item>
 
+        <!-- Text Input -->
+        <item name="daxColorTextInputFocusedOutline">?attr/daxColorAccentBlue</item>
+        <item name="daxColorTextInputEnabledOutline">@color/white30</item>
+
     </style>
 
     <style name="Theme.DuckDuckGo.Light" parent="Theme.DuckDuckGo">
         <item name="preferDarkStatusBarIcons">true</item>
-        <item name="preferredStatusBarColor">@color/white</item>
         <item name="preferDarkNavigationBarIcons">true</item>
-        <item name="preferredNavigationBarColor">@color/white</item>
 
         <!-- Legacy colors to remove-->
         <item name="colorPrimary">@color/lightThemePrimary</item>
@@ -295,30 +297,16 @@
         <item name="daxLogoTextColor">@color/almostBlackDark</item>
         <item name="normalTextColor">@color/almostBlackDark</item>
         <item name="secondaryTextColor">@color/warmerGray</item>
-        <item name="accentTextColor">@color/gray70</item>
         <item name="primaryIconColor">@color/gray95</item>
         <item name="primaryIconDisabledColor">@color/gray50</item>
         <item name="secondaryIconColor">@color/gray40</item>
-        <item name="accentIconColor">@color/gray30</item>
-        <item name="chipBackgroundColor">@color/gray20</item>
-        <item name="toolbarIconColor">@color/almostBlackDark</item>
-        <item name="toolbarTextColor">@color/almostBlackDark</item>
-        <item name="toolbarBgColor">@color/white</item>
-        <item name="toolbarBgBorderColor">@color/toolbarBorderColorLight</item>
         <item name="dialogBgColor">@color/white</item>
         <item name="browserIconColorSelector">@color/browser_icon_color_selector_light</item>
         <item name="browserMenuTextColor">@color/almostBlackDark</item>
         <item name="browserMenuTextColorDisabled">@color/pinkish_grey_two</item>
-        <item name="cookiesRoundedFieldBackgroundColor">@color/whiteFive</item>
-        <item name="omnibarRoundedFieldBackgroundColor">@color/whiteFour</item>
-        <item name="omnibarTextColor">@color/almostBlackDark</item>
-        <item name="omnibarHintColor">@color/brownishGrayTwo</item>
         <item name="omnibarLogoLetterTextColor">@color/whiteFour</item>
         <item name="autoCompleteTextColor">@color/almostBlackDark</item>
         <item name="autoCompleteSubtitleTextColor">@color/warmerGray</item>
-        <item name="tabTitleTextColor">@color/almostBlackDark</item>
-        <item name="tabTitleTextColorLegacy">@color/almostBlackDark</item>
-        <item name="tabSubtitleTextColor">@color/warmerGray</item>
         <item name="tabSelectedBorderColor">@color/cornflowerBlue</item>
         <item name="tabsFireTextColor">@color/warmerGray</item>
         <item name="tabCardBackgroundColor">@color/white</item>
@@ -357,9 +345,8 @@
         <item name="privacyDashboardLogoLetterTextColor">@color/whiteFour</item>
 
         <item name="emailButtonRippleColor">@color/subtleGrayTwo</item>
-        <item name="quickAccessItemTitleTextColor">@color/brownishGrayTwo</item>
 
-        <item name="savedSiteEditTextUnderlineColor">@color/dimmed</item>
+        <item name="savedSiteEditTextUnderlineColor">@color/black60</item>
         <item name="lightContainerBackground">@color/whiteThree</item>
 
         <item name="listItemPrimaryTextColor">@color/almostBlackDark</item>
@@ -376,7 +363,6 @@
         <item name="dialogPrimaryButtonColor">@color/cornflowerBlue</item>
         <item name="dialogSecondaryButtonColor">?attr/dialogBgColor</item>
 
-        <item name="sectionDividerColor">@color/gray30</item>
         <item name="bottomShadowBackground">@drawable/divider_shadow_background</item>
 
         <item name="tooltipPanelBackgroundColor">@color/tooltipPanelBackgroundColorLight</item>
@@ -392,13 +378,17 @@
         <item name="daxColorBackgroundInverted">@color/gray100</item>
         <item name="daxColorSurface">@color/white</item>
         <item name="daxColorContainer">@color/black6</item>
+        <item name="daxColorWindow">@color/white</item>
         <item name="daxColorPrimaryText">@color/black84</item>
+        <item name="daxColorPrimaryInvertedText">@color/white84</item>
         <item name="daxColorSecondaryText">@color/black60</item>
+        <item name="daxColorSecondaryInvertedText">@color/white60</item>
         <item name="daxColorPrimaryIcon">@color/black84</item>
-        <item name="daxColorDestructive">@color/red50</item>
+        <item name="daxColorIconDisabled">@color/black40</item>
+        <item name="daxColorDestructive">@color/alertRedOnLightDefault</item>
         <item name="daxColorContainerDisabled">@color/black6</item>
         <item name="daxColorTextDisabled">@color/black36</item>
-        <item name="daxColorLines">@color/black18</item>
+        <item name="daxColorLines">@color/black9</item>
         <item name="daxColorAccentBlue">@color/blue50</item>
         <item name="daxColorAccentYellow">@color/yellow50</item>
         <item name="daxColorRipple">@color/black6</item>
@@ -409,16 +399,16 @@
         <item name="daxColorButtonPrimaryContainerPressed">@color/blue70</item>
         <item name="daxColorButtonSecondaryContainer">@android:color/transparent</item>
         <item name="daxColorButtonSecondaryContainerPressed">@color/blue50</item>
-        <item name="daxColorButtonDestructiveContainer">@color/red70</item>
-        <item name="daxColorButtonDestructiveContainerPressed">@color/red70</item>
+        <item name="daxColorButtonDestructiveContainer">@color/alertRedOnLightDefault</item>
+        <item name="daxColorButtonDestructiveContainerPressed">@color/alertRedOnLightPressed</item>
         <item name="daxColorButtonDestructiveGhostContainer">@android:color/transparent</item>
-        <item name="daxColorButtonDestructiveGhostContainerPressed">@color/red60_12</item>
+        <item name="daxColorButtonDestructiveGhostContainerPressed">@color/alertRedOnLightDefault</item>
         <item name="daxColorButtonPrimaryText">@color/white</item>
         <item name="daxColorButtonPrimaryTextPressed">@color/white</item>
         <item name="daxColorButtonSecondaryText">@color/blue50</item>
         <item name="daxColorButtonSecondaryTextPressed">@color/blue70</item>
-        <item name="daxColorButtonDestructiveGhostText">@color/red50</item>
-        <item name="daxColorButtonDestructiveGhostTextPressed">@color/red70</item>
+        <item name="daxColorButtonDestructiveGhostText">@color/alertRedOnLightDefault</item>
+        <item name="daxColorButtonDestructiveGhostTextPressed">@color/alertRedOnLightPressed</item>
 
         <!-- Switch -->
         <item name="daxColorSwitchTrackOn">?attr/daxColorAccentBlue</item>
@@ -429,6 +419,10 @@
         <!-- Slider -->
         <item name="daxColorSliderTrackInactive">@color/gray60_50</item>
         <item name="daxColorSliderActive">?attr/daxColorAccentBlue</item>
+
+        <!-- Text Input -->
+        <item name="daxColorTextInputFocusedOutline">?attr/daxColorAccentBlue</item>
+        <item name="daxColorTextInputEnabledOutline">@color/black30</item>
 
     </style>
 

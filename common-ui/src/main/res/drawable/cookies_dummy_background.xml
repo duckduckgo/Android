@@ -10,14 +10,14 @@
   ~ Unless required by applicable law or agreed to in writing, software
   ~ distributed under the License is distributed on an "AS IS" BASIS,
   ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
+  ~ See the License for the specific language governaing permissions and
   ~ limitations under the License.
   -->
 
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="?attr/cookiesRoundedFieldBackgroundColor" />
+    <solid android:color="?attr/daxColorSurface" />
     <stroke
         android:width="1dp"
-        android:color="?attr/cookiesRoundedFieldBackgroundColor" />
-    <corners android:radius="20dp" />
+        android:color="?attr/daxColorSurface" />
+    <corners android:radius="@dimen/smallShapeCornerRadius" />
 </shape>

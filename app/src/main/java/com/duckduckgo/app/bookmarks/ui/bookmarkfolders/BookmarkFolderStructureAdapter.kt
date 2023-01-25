@@ -17,14 +17,13 @@
 package com.duckduckgo.app.bookmarks.ui.bookmarkfolders
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.bookmarks.model.BookmarkFolderItem
-import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ItemBookmarkFolderBinding
-import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.mobile.android.ui.view.toPx
 
 class BookmarkFolderStructureAdapter(
@@ -33,12 +32,10 @@ class BookmarkFolderStructureAdapter(
 ) : ListAdapter<BookmarkFolderItem, FolderViewHolder>(BookmarkFolderStructureDiffCallback()) {
 
     companion object {
-        const val VERTICAL_PADDING_DP = 8
         const val PADDING_INCREMENT_DP = 16
         const val WIDTH_FACTOR = 0.5
     }
 
-    private val verticalPaddingPx = VERTICAL_PADDING_DP.toPx()
     private val paddingIncrementPx = PADDING_INCREMENT_DP.toPx()
 
     private val maxWidth = viewWidth * WIDTH_FACTOR
@@ -49,7 +46,7 @@ class BookmarkFolderStructureAdapter(
         viewType: Int,
     ): FolderViewHolder {
         val binding = ItemBookmarkFolderBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return FolderViewHolder(binding, viewModel, paddingIncrementPx, maxPadding, verticalPaddingPx)
+        return FolderViewHolder(binding, viewModel, paddingIncrementPx, maxPadding)
     }
 
     override fun onBindViewHolder(
@@ -65,20 +62,13 @@ class FolderViewHolder(
     private val viewModel: BookmarkFoldersViewModel,
     private val paddingIncrement: Int,
     private val maxPadding: Int,
-    private val verticalPadding: Int,
 ) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(item: BookmarkFolderItem) {
-        binding.name.text = item.bookmarkFolder.name
+        binding.bookmarkFolderItem.setPrimaryText(item.bookmarkFolder.name)
         setPadding(item.depth)
 
-        if (item.isSelected) {
-            binding.icon.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_check_action)
-            binding.iconContainer.setBackgroundResource(R.drawable.selected_icon_background)
-        } else {
-            binding.icon.setImageResource(R.drawable.ic_folder)
-            binding.iconContainer.setBackgroundResource(CommonR.drawable.list_item_image_circular_background)
-        }
+        binding.selectedFolderContainer.visibility = if (item.isSelected) View.VISIBLE else View.GONE
 
         itemView.setOnClickListener {
             viewModel.onItemSelected(item.bookmarkFolder)
@@ -90,7 +80,7 @@ class FolderViewHolder(
         if (leftPadding > maxPadding) {
             leftPadding = maxPadding
         }
-        binding.root.setPadding(leftPadding, verticalPadding, paddingIncrement, verticalPadding)
+        binding.root.setPadding(leftPadding, 0, paddingIncrement, 0)
     }
 }
 

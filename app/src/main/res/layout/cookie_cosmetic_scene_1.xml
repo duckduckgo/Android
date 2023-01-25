@@ -15,22 +15,21 @@
   -->
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="@dimen/omnibarCookieAnimationBannerHeight"
-    xmlns:tools="http://schemas.android.com/tools">
+             android:layout_width="wrap_content"
+             android:layout_height="@dimen/omnibarCookieAnimationBannerHeight"
+             xmlns:tools="http://schemas.android.com/tools" xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/cookiesManagedText"
+        app:typography="body1"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:gravity="center"
-        android:maxLines="1"
+        android:textAlignment="textEnd"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
-        android:text="@string/autoconsentCosmeticNoticeAnimationText"
-        android:textAlignment="textEnd"
-        android:textColor="?attr/omnibarTextColor"
-        android:textSize="16sp"
+        android:maxLines="1"
+        android:gravity="center"
         android:visibility="invisible"
+        android:text="@string/autoconsentCosmeticNoticeAnimationText"
         tools:ignore="RtlCompat" />
 </FrameLayout>

@@ -14,20 +14,20 @@
   ~ limitations under the License.
   -->
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/quickAccessFaviconContainer"
-    style="@style/SearchWidgetFavoriteContainer">
+    style="@style/SearchWidgetFavoriteContainer"
+    android:orientation="vertical">
 
     <ImageView
         android:id="@+id/quickAccessFavicon"
         style="@style/SearchWidgetFavoriteFavicon"
-        android:background="@drawable/search_widget_favorite_favicon_daynight_background"/>
+        android:background="@drawable/search_widget_favorite_favicon_daynight_background" />
 
     <TextView
         android:id="@+id/quickAccessTitle"
-        tools:text="Super long favorite title"
         style="@style/SearchWidgetFavoriteTitle"
-        android:textColor="@color/favoriteTitleTextColor"/>
+        tools:text="Super long favorite title" />
 
-</FrameLayout>
+</LinearLayout>

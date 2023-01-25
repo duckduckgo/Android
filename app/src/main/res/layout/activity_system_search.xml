@@ -37,14 +37,13 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="?attr/toolbarBgColor"
+                android:background="?attr/daxColorSurface"
                 app:contentInsetEnd="0dp"
                 app:contentInsetStart="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_scrollFlags="scroll|enterAlways"
                 app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -61,50 +60,39 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:importantForAccessibility="no"
-                        android:src="@drawable/ic_ddg_logo"
                         android:padding="4dp"
+                        android:src="@drawable/ic_ddg_logo"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
-                    <androidx.appcompat.widget.AppCompatEditText
+                    <EditText
                         android:id="@+id/omnibarTextInput"
-                        style="@style/Base.V7.Widget.AppCompat.EditText"
+                        style="@style/Widget.DuckDuckGo.SearchInput"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
-                        android:layout_marginStart="8dp"
-                        android:background="@null"
-                        android:fontFamily="sans-serif"
-                        android:hint="@string/systemSearchOmnibarInputHint"
-                        android:imeOptions="flagNoExtractUi|actionGo|flagNoPersonalizedLearning"
-                        android:inputType="textUri|textNoSuggestions"
-                        android:maxLines="1"
-                        android:selectAllOnFocus="true"
-                        android:textColor="?attr/omnibarTextColor"
-                        android:textColorHint="?attr/omnibarHintColor"
-                        android:textCursorDrawable="@drawable/text_cursor"
-                        android:textSize="16sp"
-                        android:textStyle="normal"
+                        android:layout_marginStart="4dp"
+                        android:hint="@string/omnibarInputHint"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@id/voiceSearchButton"
                         app:layout_constraintStart_toEndOf="@id/logo"
-                        app:layout_constraintTop_toTopOf="parent"
-                        tools:text="https://duckduckgo.com/?q=areallylongexampleexample">
+                        app:layout_constraintTop_toTopOf="parent">
 
                         <requestFocus />
 
-                    </androidx.appcompat.widget.AppCompatEditText>
+                    </EditText>
 
-                    <com.duckduckgo.mobile.android.ui.view.button.IconButton
+                    <ImageView
                         android:id="@+id/voiceSearchButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:background="?selectableItemBackground"
                         android:contentDescription="@string/voiceSearchIconContentDescription"
-                        android:padding="@dimen/keyline_2"
+                        android:padding="@dimen/toolbarIconPadding"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@+id/clearTextButton"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:srcCompat="@drawable/ic_microphone"/>
+                        app:srcCompat="@drawable/ic_microphone_24" />
 
                     <ImageView
                         android:id="@+id/clearTextButton"
@@ -112,8 +100,9 @@
                         android:layout_height="wrap_content"
                         android:background="?selectableItemBackground"
                         android:contentDescription="@string/clearButtonContentDescription"
-                        android:padding="3dp"
-                        android:src="@drawable/ic_close"
+                        android:padding="@dimen/toolbarIconPadding"
+                        android:visibility="invisible"
+                        android:src="@drawable/ic_close_24"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
@@ -127,7 +116,7 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <include layout="@layout/include_quick_access_items"/>
+    <include layout="@layout/include_quick_access_items" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/results"
@@ -142,9 +131,9 @@
             android:id="@+id/resultsContent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="?attr/daxColorSurface"
+            android:backgroundTint="?attr/daxColorSurface"
             android:clipToPadding="false"
-            android:background="?toolbarBgColor"
-            android:backgroundTint="?toolbarBgColor"
             android:elevation="4dp">
 
             <androidx.recyclerview.widget.RecyclerView
@@ -157,7 +146,7 @@
                 tools:itemCount="4"
                 tools:listitem="@layout/item_autocomplete_search_suggestion" />
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:id="@+id/deviceLabel"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -166,13 +155,11 @@
                 android:paddingEnd="16dp"
                 android:paddingBottom="2dp"
                 android:text="@string/systemSearchDeviceAppLabel"
-                android:textColor="?normalTextColor"
-                android:textSize="13sp"
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/autocompleteSuggestions"
-                app:textAllCaps="true" />
+                app:typography="caption_allCaps" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/deviceAppSuggestions"

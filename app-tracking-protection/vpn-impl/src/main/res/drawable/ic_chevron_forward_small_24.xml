@@ -20,7 +20,7 @@
     android:viewportWidth="8"
     android:viewportHeight="14">
     <path
-        android:fillColor="@color/primary_icon_color_selector"
+        android:fillColor="?attr/daxColorPrimaryIcon"
         android:fillType="evenOdd"
         android:pathData="M0.293,0.293C0.683,-0.098 1.317,-0.098 1.707,0.293L7.707,6.293C8.098,6.683 8.098,7.317 7.707,7.707L1.707,13.707C1.317,14.098 0.683,14.098 0.293,13.707C-0.098,13.317 -0.098,12.683 0.293,12.293L5.586,7L0.293,1.707C-0.098,1.317 -0.098,0.683 0.293,0.293Z" />
 </vector>

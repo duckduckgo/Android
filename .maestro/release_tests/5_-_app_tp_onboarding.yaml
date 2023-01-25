@@ -16,6 +16,7 @@ appId: com.duckduckgo.mobile.android
     index: 0
 - scroll
 - scroll
+- scroll
 - assertVisible: "Block app trackers on your device"
 - tapOn: "App Tracking Protection"
 - assertVisible: "One easy step for better app privacy!"

@@ -121,11 +121,6 @@ class ManuallyDisableAppProtectionDialog : DialogFragment() {
         private const val KEY_APP_PACKAGE_NAME = "KEY_APP_PACKAGE_NAME"
         private const val KEY_APP_NAME = "KEY_APP_NAME"
 
-        const val NO_REASON_NEEDED = 0
-        const val STOPPED_WORKING = 1
-        const val TRACKING_OK = 2
-        const val DONT_USE = 3
-
         fun instance(appInfo: TrackingProtectionAppInfo): ManuallyDisableAppProtectionDialog {
             return ManuallyDisableAppProtectionDialog().also { fragment ->
                 val bundle = Bundle()

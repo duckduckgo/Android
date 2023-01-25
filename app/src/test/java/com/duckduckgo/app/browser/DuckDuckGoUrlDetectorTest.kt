@@ -29,7 +29,7 @@ class DuckDuckGoUrlDetectorTest {
 
     @Before
     fun setup() {
-        testee = DuckDuckGoUrlDetector()
+        testee = DuckDuckGoUrlDetectorImpl()
     }
 
     @Test

@@ -24,9 +24,7 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
     implementation KotlinX.coroutines.core
-    implementation Google.android.material
     implementation AndroidX.appCompat
-    implementation AndroidX.constraintLayout
 }
 
 

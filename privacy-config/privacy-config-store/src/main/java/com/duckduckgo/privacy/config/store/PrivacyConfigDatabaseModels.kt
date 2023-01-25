@@ -20,7 +20,6 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
 import com.duckduckgo.privacy.config.api.AmpLinkException
-import com.duckduckgo.privacy.config.api.AutofillException
 import com.duckduckgo.privacy.config.api.ContentBlockingException
 import com.duckduckgo.privacy.config.api.DrmException
 import com.duckduckgo.privacy.config.api.GpcException
@@ -82,16 +81,6 @@ data class HttpsExceptionEntity(
 
 fun HttpsExceptionEntity.toHttpsException(): HttpsException {
     return HttpsException(domain = this.domain, reason = this.reason)
-}
-
-@Entity(tableName = "autofill_exceptions")
-data class AutofillExceptionEntity(
-    @PrimaryKey val domain: String,
-    val reason: String,
-)
-
-fun AutofillExceptionEntity.toAutofillException(): AutofillException {
-    return AutofillException(domain = this.domain, reason = this.reason)
 }
 
 @Entity(tableName = "gpc_header_enabled_sites")

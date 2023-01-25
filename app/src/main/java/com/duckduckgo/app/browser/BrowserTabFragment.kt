@@ -48,7 +48,6 @@ import android.widget.Toast
 import androidx.annotation.AnyThread
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
-import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
@@ -93,6 +92,9 @@ import com.duckduckgo.app.browser.DownloadConfirmationFragment.DownloadConfirmat
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.autofill.AutofillCredentialsSelectionResultHandler
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
+import com.duckduckgo.app.browser.databinding.ContentSiteLocationPermissionDialogBinding
+import com.duckduckgo.app.browser.databinding.ContentSystemLocationPermissionDialogBinding
+import com.duckduckgo.app.browser.databinding.HttpAuthenticationBinding
 import com.duckduckgo.app.browser.downloader.BlobConverterInjector
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
@@ -119,7 +121,8 @@ import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
-import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment
+import com.duckduckgo.app.browser.ui.dialogs.AutomaticFireproofDialogOptions
+import com.duckduckgo.app.browser.ui.dialogs.LaunchInExternalAppOptions
 import com.duckduckgo.app.browser.urlextraction.DOMUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebView
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
@@ -152,8 +155,6 @@ import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.global.view.toggleFullScreen
 import com.duckduckgo.app.location.data.LocationPermissionType
-import com.duckduckgo.app.location.ui.SiteLocationPermissionDialog
-import com.duckduckgo.app.location.ui.SystemLocationPermissionDialog
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.statistics.VariantManager
@@ -192,6 +193,10 @@ import com.duckduckgo.mobile.android.ui.view.*
 import com.duckduckgo.mobile.android.ui.view.DaxDialog
 import com.duckduckgo.mobile.android.ui.view.DaxDialogListener
 import com.duckduckgo.mobile.android.ui.view.KeyboardAwareEditText
+import com.duckduckgo.mobile.android.ui.view.dialog.CustomAlertDialogBuilder
+import com.duckduckgo.mobile.android.ui.view.dialog.DaxAlertDialog
+import com.duckduckgo.mobile.android.ui.view.dialog.StackedAlertDialogBuilder
+import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
@@ -200,6 +205,7 @@ import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
+import java.util.EventListener
 import javax.inject.Inject
 import javax.inject.Provider
 import kotlin.coroutines.CoroutineContext
@@ -224,8 +230,6 @@ class BrowserTabFragment :
     CoroutineScope,
     TrackersAnimatorListener,
     DownloadConfirmationDialogListener,
-    SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
-    SystemLocationPermissionDialog.SystemLocationPermissionDialogListener,
     SitePermissionsGrantedListener {
 
     private val supervisorJob = SupervisorJob()
@@ -530,13 +534,13 @@ class BrowserTabFragment :
         it?.let { renderer.renderCtaViewState(it) }
     }
 
-    private var alertDialog: AlertDialog? = null
+    private var alertDialog: DaxAlertDialog? = null
 
     private var appLinksSnackBar: Snackbar? = null
 
-    private var loginDetectionDialog: AlertDialog? = null
+    private var loginDetectionDialog: DaxAlertDialog? = null
 
-    private var automaticFireproofDialog: AlertDialog? = null
+    private var automaticFireproofDialog: DaxAlertDialog? = null
 
     private var emailAutofillTooltipDialog: EmailAutofillTooltipFragment? = null
 
@@ -668,7 +672,6 @@ class BrowserTabFragment :
 
     override fun onPause() {
         dismissDownloadFragment()
-        dismissAuthenticationDialog()
         super.onPause()
     }
 
@@ -683,13 +686,6 @@ class BrowserTabFragment :
         webView?.stopNestedScroll()
         webView?.stopLoading()
         super.onDestroyView()
-    }
-
-    private fun dismissAuthenticationDialog() {
-        if (isAdded) {
-            val fragment = parentFragmentManager.findFragmentByTag(AUTHENTICATION_DIALOG_TAG) as? HttpAuthenticationDialogFragment
-            fragment?.dismiss()
-        }
     }
 
     private fun dismissDownloadFragment() {
@@ -1132,12 +1128,40 @@ class BrowserTabFragment :
             if (deniedForever) {
                 viewModel.onSystemLocationPermissionDeniedOneTime()
             } else {
-                val dialog = SystemLocationPermissionDialog.instance(domain)
-                dialog.show(childFragmentManager, SystemLocationPermissionDialog.SYSTEM_LOCATION_PERMISSION_TAG)
+                showSystemLocationPermissionDialog(domain)
             }
         } else {
             viewModel.onSystemLocationPermissionGranted()
         }
+    }
+
+    private fun showSystemLocationPermissionDialog(domain: String) {
+        val binding = ContentSystemLocationPermissionDialogBinding.inflate(layoutInflater)
+
+        val originUrl = domain.websiteFromGeoLocationsApiOrigin()
+        val subtitle = getString(R.string.preciseLocationSystemDialogSubtitle, originUrl, originUrl)
+        binding.systemPermissionDialogSubtitle.text = subtitle
+
+        val dialog = CustomAlertDialogBuilder(requireActivity())
+            .setView(binding)
+            .build()
+
+        binding.allowLocationPermission.setOnClickListener {
+            viewModel.onSystemLocationPermissionAllowed()
+            dialog.dismiss()
+        }
+
+        binding.denyLocationPermission.setOnClickListener {
+            viewModel.onSystemLocationPermissionNotAllowed()
+            dialog.dismiss()
+        }
+
+        binding.neverAllowLocationPermission.setOnClickListener {
+            viewModel.onSystemLocationPermissionNeverAllowed()
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     private fun requestLocationPermissions() {
@@ -1151,8 +1175,44 @@ class BrowserTabFragment :
     }
 
     private fun askSiteLocationPermission(domain: String) {
-        val dialog = SiteLocationPermissionDialog.instance(domain, false, tabId)
-        dialog.show(childFragmentManager, SiteLocationPermissionDialog.SITE_LOCATION_PERMISSION_TAG)
+        val binding = ContentSiteLocationPermissionDialogBinding.inflate(layoutInflater)
+
+        val title = domain.websiteFromGeoLocationsApiOrigin()
+        binding.sitePermissionDialogTitle.text = title
+        binding.sitePermissionDialogSubtitle.text = if (title == DDG_DOMAIN) {
+            getString(R.string.preciseLocationDDGDialogSubtitle)
+        } else {
+            getString(R.string.preciseLocationSiteDialogSubtitle)
+        }
+        lifecycleScope.launch {
+            faviconManager.loadToViewFromLocalOrFallback(tabId, domain, binding.sitePermissionDialogFavicon)
+        }
+
+        val dialog = CustomAlertDialogBuilder(requireActivity())
+            .setView(binding)
+            .build()
+
+        binding.siteAllowAlwaysLocationPermission.setOnClickListener {
+            viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ALWAYS)
+            dialog.dismiss()
+        }
+
+        binding.siteAllowOnceLocationPermission.setOnClickListener {
+            viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ONCE)
+            dialog.dismiss()
+        }
+
+        binding.siteDenyOnceLocationPermission.setOnClickListener {
+            viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.DENY_ONCE)
+            dialog.dismiss()
+        }
+
+        binding.siteDenyAlwaysLocationPermission.setOnClickListener {
+            viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.DENY_ALWAYS)
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     private fun launchBrokenSiteFeedback(data: BrokenSiteData) {
@@ -1355,22 +1415,30 @@ class BrowserTabFragment :
         context: Context,
         fireproofWebsite: FireproofWebsiteEntity,
     ) {
-        val isShowing = loginDetectionDialog?.isShowing
+        val isShowing = loginDetectionDialog?.isShowing()
 
         if (isShowing != true) {
-            loginDetectionDialog = AlertDialog.Builder(context)
+            loginDetectionDialog = TextAlertDialogBuilder(context)
                 .setTitle(getString(R.string.fireproofWebsiteLoginDialogTitle, fireproofWebsite.website()))
                 .setMessage(R.string.fireproofWebsiteLoginDialogDescription)
-                .setPositiveButton(R.string.fireproofWebsiteLoginDialogPositive) { _, _ ->
-                    viewModel.onUserConfirmedFireproofDialog(fireproofWebsite.domain)
-                }.setNegativeButton(R.string.fireproofWebsiteLoginDialogNegative) { dialog, _ ->
-                    dialog.dismiss()
-                    viewModel.onUserDismissedFireproofLoginDialog()
-                }.setOnCancelListener {
-                    viewModel.onUserDismissedFireproofLoginDialog()
-                }.show()
+                .setPositiveButton(R.string.fireproofWebsiteLoginDialogPositive).setNegativeButton(R.string.fireproofWebsiteLoginDialogNegative)
+                .addEventListener(
+                    object : TextAlertDialogBuilder.EventListener() {
+                        override fun onPositiveButtonClicked() {
+                            viewModel.onUserConfirmedFireproofDialog(fireproofWebsite.domain)
+                        }
 
-            viewModel.onFireproofLoginDialogShown()
+                        override fun onNegativeButtonClicked() {
+                            viewModel.onUserDismissedFireproofLoginDialog()
+                        }
+
+                        override fun onDialogShown() {
+                            viewModel.onFireproofLoginDialogShown()
+                        }
+                    },
+                )
+                .build()
+            loginDetectionDialog!!.show()
         }
     }
 
@@ -1378,67 +1446,95 @@ class BrowserTabFragment :
         context: Context,
         fireproofWebsite: FireproofWebsiteEntity,
     ) {
-        val isShowing = automaticFireproofDialog?.isShowing
+        val isShowing = automaticFireproofDialog?.isShowing()
 
         if (isShowing != true) {
-            automaticFireproofDialog = AlertDialog.Builder(context)
-                .setTitle(getString(R.string.automaticFireproofWebsiteLoginDialogTitle))
-                .setMessage(R.string.automaticFireproofWebsiteLoginDialogDescription)
-                .setPositiveButton(R.string.automaticFireproofWebsiteLoginDialogFirstOption) { _, _ ->
-                    viewModel.onUserEnabledAutomaticFireproofLoginDialog(fireproofWebsite.domain)
-                }.setNegativeButton(R.string.automaticFireproofWebsiteLoginDialogSecondOption) { _, _ ->
-                    viewModel.onUserFireproofSiteInAutomaticFireproofLoginDialog(fireproofWebsite.domain)
-                }.setNeutralButton(R.string.automaticFireproofWebsiteLoginDialogThirdOption) { dialog, _ ->
-                    dialog.dismiss()
-                    viewModel.onUserDismissedAutomaticFireproofLoginDialog()
-                }.setOnCancelListener { it.dismiss() }
-                .show()
+            automaticFireproofDialog = StackedAlertDialogBuilder(context)
+                .setTitle(R.string.automaticFireproofWebsiteLoginDialogTitle)
+                .setMessage(getString(R.string.automaticFireproofWebsiteLoginDialogDescription))
+                .setStackedButtons(AutomaticFireproofDialogOptions.asOptions())
+                .addEventListener(
+                    object : StackedAlertDialogBuilder.EventListener() {
+                        override fun onButtonClicked(position: Int) {
+                            when (AutomaticFireproofDialogOptions.getOptionFromPosition(position)) {
+                                AutomaticFireproofDialogOptions.ALWAYS -> {
+                                    viewModel.onUserEnabledAutomaticFireproofLoginDialog(fireproofWebsite.domain)
+                                }
 
-            viewModel.onFireproofLoginDialogShown()
+                                AutomaticFireproofDialogOptions.FIREPROOF_THIS_SITE -> {
+                                    viewModel.onUserFireproofSiteInAutomaticFireproofLoginDialog(fireproofWebsite.domain)
+                                }
+
+                                AutomaticFireproofDialogOptions.NOT_NOW -> {
+                                    viewModel.onUserDismissedAutomaticFireproofLoginDialog()
+                                }
+                            }
+                        }
+
+                        override fun onDialogShown() {
+                            viewModel.onFireproofLoginDialogShown()
+                        }
+                    },
+                )
+                .build()
+            alertDialog!!.show()
         }
     }
 
     private fun askToDisableLoginDetection(context: Context) {
-        AlertDialog.Builder(context)
+        TextAlertDialogBuilder(context)
             .setTitle(getString(R.string.disableLoginDetectionDialogTitle))
             .setMessage(R.string.disableLoginDetectionDialogDescription)
-            .setPositiveButton(R.string.disableLoginDetectionDialogPositive) { _, _ ->
-                viewModel.onUserConfirmedDisableLoginDetectionDialog()
-            }
-            .setNegativeButton(R.string.disableLoginDetectionDialogNegative) { dialog, _ ->
-                dialog.dismiss()
-                viewModel.onUserDismissedDisableLoginDetectionDialog()
-            }.setOnCancelListener {
-                viewModel.onUserDismissedDisableLoginDetectionDialog()
-            }.show()
+            .setPositiveButton(R.string.disableLoginDetectionDialogPositive)
+            .setNegativeButton(R.string.disableLoginDetectionDialogNegative)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onUserConfirmedDisableLoginDetectionDialog()
+                    }
 
-        viewModel.onDisableLoginDetectionDialogShown()
+                    override fun onNegativeButtonClicked() {
+                        viewModel.onUserDismissedDisableLoginDetectionDialog()
+                    }
+
+                    override fun onDialogShown() {
+                        viewModel.onDisableLoginDetectionDialogShown()
+                    }
+                },
+            )
+            .show()
     }
 
     private fun launchExternalAppDialog(
         context: Context,
         onClick: () -> Unit,
     ) {
-        val isShowing = alertDialog?.isShowing
+        val isShowing = alertDialog?.isShowing()
 
         if (isShowing != true) {
-            alertDialog = AlertDialog.Builder(context)
+            alertDialog = StackedAlertDialogBuilder(context)
                 .setTitle(R.string.launchingExternalApp)
                 .setMessage(getString(R.string.confirmOpenExternalApp))
-                .setPositiveButton(R.string.open) { _, _ ->
-                    onClick()
-                }
-                .setNeutralButton(R.string.closeTab) { dialog, _ ->
-                    dialog.dismiss()
-                    launch {
-                        viewModel.closeCurrentTab()
-                        destroyWebView()
-                    }
-                }
-                .setNegativeButton(R.string.cancel) { dialog, _ ->
-                    dialog.dismiss()
-                }
-                .show()
+                .setStackedButtons(LaunchInExternalAppOptions.asOptions())
+                .addEventListener(
+                    object : StackedAlertDialogBuilder.EventListener() {
+                        override fun onButtonClicked(position: Int) {
+                            when (LaunchInExternalAppOptions.getOptionFromPosition(position)) {
+                                LaunchInExternalAppOptions.OPEN -> onClick()
+                                LaunchInExternalAppOptions.CLOSE_TAB -> {
+                                    launch {
+                                        viewModel.closeCurrentTab()
+                                        destroyWebView()
+                                    }
+                                }
+
+                                LaunchInExternalAppOptions.CANCEL -> {} // no-op
+                            }
+                        }
+                    },
+                )
+                .build()
+            alertDialog!!.show()
         }
     }
 
@@ -1471,12 +1567,34 @@ class BrowserTabFragment :
     }
 
     private fun showAuthenticationDialog(request: BasicAuthenticationRequest) {
-        activity?.supportFragmentManager?.let { fragmentManager ->
-            val dialog = HttpAuthenticationDialogFragment.createHttpAuthenticationDialog(request.site)
-            dialog.show(fragmentManager, AUTHENTICATION_DIALOG_TAG)
-            dialog.listener = viewModel
-            dialog.request = request
-        }
+        val authDialogBinding = HttpAuthenticationBinding.inflate(layoutInflater)
+        authDialogBinding.httpAuthInformationText.text = getString(R.string.authenticationDialogMessage, request.site)
+        CustomAlertDialogBuilder(requireActivity())
+            .setPositiveButton(R.string.authenticationDialogPositiveButton)
+            .setNegativeButton(R.string.authenticationDialogNegativeButton)
+            .setView(authDialogBinding)
+            .addEventListener(
+                object : CustomAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.handleAuthentication(
+                            request,
+                            BasicAuthenticationCredentials(
+                                username = authDialogBinding.usernameInput.text,
+                                password = authDialogBinding.passwordInput.text,
+                            ),
+                        )
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        viewModel.cancelAuthentication(request)
+                    }
+
+                    override fun onDialogShown() {
+                        authDialogBinding.usernameInput.showKeyboardDelayed()
+                    }
+                },
+            )
+            .show()
     }
 
     private fun saveBasicAuthCredentials(
@@ -2376,18 +2494,20 @@ class BrowserTabFragment :
         context: Context,
         cta: Cta,
     ) {
-        AlertDialog.Builder(context)
+        TextAlertDialogBuilder(context)
             .setTitle(R.string.hideTipsTitle)
             .setMessage(getString(R.string.hideTipsText))
-            .setPositiveButton(R.string.hideTipsButton) { dialog, _ ->
-                dialog.dismiss()
-                launch {
-                    ctaViewModel.hideTipsForever(cta)
-                }
-            }
-            .setNegativeButton(android.R.string.no) { dialog, _ ->
-                dialog.dismiss()
-            }
+            .setPositiveButton(R.string.hideTipsButton)
+            .setNegativeButton(android.R.string.no)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        launch {
+                            ctaViewModel.hideTipsForever(cta)
+                        }
+                    }
+                },
+            )
             .show()
     }
 
@@ -2415,6 +2535,7 @@ class BrowserTabFragment :
         private const val URL_EXTRA_ARG = "URL_EXTRA_ARG"
         private const val SKIP_HOME_ARG = "SKIP_HOME_ARG"
         private const val FAVORITES_ONBOARDING_ARG = "FAVORITES_ONBOARDING_ARG"
+        private const val DDG_DOMAIN = "duckduckgo.com"
 
         private const val ADD_SAVED_SITE_FRAGMENT_TAG = "ADD_SAVED_SITE"
         private const val KEYBOARD_DELAY = 200L
@@ -2425,7 +2546,6 @@ class BrowserTabFragment :
 
         private const val URL_BUNDLE_KEY = "url"
 
-        private const val AUTHENTICATION_DIALOG_TAG = "AUTH_DIALOG_TAG"
         private const val DOWNLOAD_CONFIRMATION_TAG = "DOWNLOAD_CONFIRMATION_TAG"
         private const val DAX_DIALOG_DIALOG_TAG = "DAX_DIALOG_TAG"
 
@@ -2600,9 +2720,6 @@ class BrowserTabFragment :
                     pixel.fire(AppPixelName.MENU_ACTION_AUTOFILL_PRESSED)
                     viewModel.onAutofillMenuSelected()
                 }
-            }
-            view.menuScrollableContent.setOnScrollChangeListener { _, _, _, _, _ ->
-                view.dividerShadow.isVisible = view.menuScrollableContent.canScrollVertically(-1)
             }
             browserMenu.setOnClickListener {
                 viewModel.onBrowserMenuClicked()
@@ -3190,25 +3307,6 @@ class BrowserTabFragment :
         } else {
             viewModel.ctaViewState.observe(viewLifecycleOwner, ctaViewStateObserver)
         }
-    }
-
-    override fun onSiteLocationPermissionSelected(
-        domain: String,
-        permission: LocationPermissionType,
-    ) {
-        viewModel.onSiteLocationPermissionSelected(domain, permission)
-    }
-
-    override fun onSystemLocationPermissionAllowed() {
-        viewModel.onSystemLocationPermissionAllowed()
-    }
-
-    override fun onSystemLocationPermissionNotAllowed() {
-        viewModel.onSystemLocationPermissionNotAllowed()
-    }
-
-    override fun onSystemLocationPermissionNeverAllowed() {
-        viewModel.onSystemLocationPermissionNeverAllowed()
     }
 
     override fun permissionsGrantedOnWhereby() {

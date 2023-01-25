@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+<!--
   ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +16,7 @@
   -->
 
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:color="?attr/daxColorAccentBlue" android:state_focused="true"/>
-    <item android:color="?attr/daxColorLines"/>
+    <item android:color="?attr/daxColorTextInputFocusedOutline" android:state_hovered="true" />
+    <item android:color="?attr/daxColorTextInputFocusedOutline" android:state_focused="true" />
+    <item android:color="?attr/daxColorTextInputEnabledOutline" />
 </selector>

@@ -48,9 +48,15 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.ui.WhitelistActivity
 import com.duckduckgo.app.settings.SettingsViewModel.AutomaticallyClearData
 import com.duckduckgo.app.settings.SettingsViewModel.Command
+import com.duckduckgo.app.settings.clear.AppLinkSettingType
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
+import com.duckduckgo.app.settings.clear.FireAnimation.HeroAbstract.getAnimationForIndex
+import com.duckduckgo.app.settings.clear.FireAnimation.None
+import com.duckduckgo.app.settings.clear.getAppLinkSettingForIndex
+import com.duckduckgo.app.settings.clear.getClearWhatOptionForIndex
+import com.duckduckgo.app.settings.clear.getClearWhenForIndex
 import com.duckduckgo.app.settings.extension.InternalFeaturePlugin
 import com.duckduckgo.app.sitepermissions.SitePermissionsActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -61,7 +67,11 @@ import com.duckduckgo.autofill.api.AutofillSettingsActivityLauncher
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.macos_impl.MacOsActivity
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
+import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme.DARK
+import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme.LIGHT
+import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme.SYSTEM_DEFAULT
 import com.duckduckgo.mobile.android.ui.sendThemeChangedBroadcast
+import com.duckduckgo.mobile.android.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnOnboardingActivity
@@ -72,13 +82,7 @@ import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
-class SettingsActivity :
-    DuckDuckGoActivity(),
-    SettingsAutomaticallyClearWhatFragment.Listener,
-    SettingsAutomaticallyClearWhenFragment.Listener,
-    SettingsThemeSelectorFragment.Listener,
-    SettingsAppLinksSelectorFragment.Listener,
-    SettingsFireAnimationSelectorFragment.Listener {
+class SettingsActivity : DuckDuckGoActivity() {
 
     private val viewModel: SettingsViewModel by bindViewModel()
     private val binding: ActivitySettingsBinding by viewBinding()
@@ -159,7 +163,7 @@ class SettingsActivity :
 
         with(viewsAppearance) {
             selectedThemeSetting.setClickListener { viewModel.userRequestedToChangeTheme() }
-            changeAppIconLabel.setClickListener { viewModel.userRequestedToChangeIcon() }
+            changeAppIconSetting.setOnClickListener { viewModel.userRequestedToChangeIcon() }
             selectedFireAnimationSetting.setClickListener { viewModel.userRequestedToChangeFireAnimation() }
             accessibilitySetting.setClickListener { viewModel.onAccessibilitySettingClicked() }
         }
@@ -288,9 +292,9 @@ class SettingsActivity :
     private fun updateSelectedTheme(selectedTheme: DuckDuckGoTheme) {
         val subtitle = getString(
             when (selectedTheme) {
-                DuckDuckGoTheme.DARK -> R.string.settingsDarkTheme
-                DuckDuckGoTheme.LIGHT -> R.string.settingsLightTheme
-                DuckDuckGoTheme.SYSTEM_DEFAULT -> R.string.settingsSystemTheme
+                DARK -> R.string.settingsDarkTheme
+                LIGHT -> R.string.settingsLightTheme
+                SYSTEM_DEFAULT -> R.string.settingsSystemTheme
             },
         )
         viewsAppearance.selectedThemeSetting.setSecondaryText(subtitle)
@@ -319,14 +323,58 @@ class SettingsActivity :
     }
 
     private fun launchAutomaticallyClearWhatDialog(option: ClearWhatOption) {
-        val dialog = SettingsAutomaticallyClearWhatFragment.create(option)
-        dialog.show(supportFragmentManager, CLEAR_WHAT_DIALOG_TAG)
+        val currentOption = option.getOptionIndex()
+        RadioListAlertDialogBuilder(this)
+            .setTitle(R.string.settingsAutomaticallyClearWhatDialogTitle)
+            .setOptions(
+                listOf(
+                    R.string.settingsAutomaticallyClearWhatOptionNone,
+                    R.string.settingsAutomaticallyClearWhatOptionTabs,
+                    R.string.settingsAutomaticallyClearWhatOptionTabsAndData,
+                ),
+                currentOption,
+            )
+            .setPositiveButton(R.string.settingsAutomaticallyClearingDialogSave)
+            .setNegativeButton(R.string.cancel)
+            .addEventListener(
+                object : RadioListAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked(selectedItem: Int) {
+                        val clearWhatSelected = selectedItem.getClearWhatOptionForIndex()
+                        viewModel.onAutomaticallyWhatOptionSelected(clearWhatSelected)
+                    }
+                },
+            )
+            .show()
         pixel.fire(AppPixelName.AUTOMATIC_CLEAR_DATA_WHAT_SHOWN)
     }
 
     private fun launchAutomaticallyClearWhenDialog(option: ClearWhenOption) {
-        val dialog = SettingsAutomaticallyClearWhenFragment.create(option)
-        dialog.show(supportFragmentManager, CLEAR_WHEN_DIALOG_TAG)
+        val currentOption = option.getOptionIndex()
+        val clearWhenOptions = mutableListOf(
+            R.string.settingsAutomaticallyClearWhenAppExitOnly,
+            R.string.settingsAutomaticallyClearWhenAppExit5Minutes,
+            R.string.settingsAutomaticallyClearWhenAppExit15Minutes,
+            R.string.settingsAutomaticallyClearWhenAppExit30Minutes,
+            R.string.settingsAutomaticallyClearWhenAppExit60Minutes,
+        )
+        if (appBuildConfig.isDebug) {
+            clearWhenOptions.add(R.string.settingsAutomaticallyClearWhenAppExit5Seconds)
+        }
+        RadioListAlertDialogBuilder(this)
+            .setTitle(R.string.settingsAutomaticallyClearWhenDialogTitle)
+            .setOptions(clearWhenOptions, currentOption)
+            .setPositiveButton(R.string.settingsAutomaticallyClearingDialogSave)
+            .setNegativeButton(R.string.cancel)
+            .addEventListener(
+                object : RadioListAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked(selectedItem: Int) {
+                        val clearWhenSelected = selectedItem.getClearWhenForIndex()
+                        viewModel.onAutomaticallyWhenOptionSelected(clearWhenSelected)
+                        Timber.d("Option selected: $clearWhenSelected")
+                    }
+                },
+            )
+            .show()
         pixel.fire(AppPixelName.AUTOMATIC_CLEAR_DATA_WHEN_SHOWN)
     }
 
@@ -431,18 +479,92 @@ class SettingsActivity :
     }
 
     private fun launchFireAnimationSelector(animation: FireAnimation) {
-        val dialog = SettingsFireAnimationSelectorFragment.create(animation)
-        dialog.show(supportFragmentManager, FIRE_ANIMATION_SELECTOR_TAG)
+        val currentAnimationOption = animation.getOptionIndex()
+
+        RadioListAlertDialogBuilder(this)
+            .setTitle(R.string.settingsSelectFireAnimationDialog)
+            .setOptions(
+                listOf(
+                    R.string.settingsHeroFireAnimation,
+                    R.string.settingsHeroWaterAnimation,
+                    R.string.settingsHeroAbstractAnimation,
+                    R.string.settingsNoneAnimation,
+                ),
+                currentAnimationOption,
+            )
+            .setPositiveButton(R.string.settingsSelectFireAnimationDialogSave)
+            .setNegativeButton(R.string.cancel)
+            .addEventListener(
+                object : RadioListAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked(selectedItem: Int) {
+                        val selectedAnimation = selectedItem.getAnimationForIndex()
+
+                        viewModel.onFireAnimationSelected(selectedAnimation)
+                    }
+
+                    override fun onRadioItemSelected(selectedItem: Int) {
+                        val selectedAnimation = selectedItem.getAnimationForIndex()
+                        if (selectedAnimation != None) {
+                            startActivity(FireAnimationActivity.intent(baseContext, selectedAnimation))
+                        }
+                    }
+                },
+            )
+            .show()
     }
 
     private fun launchThemeSelector(theme: DuckDuckGoTheme) {
-        val dialog = SettingsThemeSelectorFragment.create(theme)
-        dialog.show(supportFragmentManager, THEME_SELECTOR_TAG)
+        val currentTheme = theme.getOptionIndex()
+        RadioListAlertDialogBuilder(this)
+            .setTitle(R.string.settingsTheme)
+            .setOptions(
+                listOf(
+                    R.string.settingsSystemTheme,
+                    R.string.settingsLightTheme,
+                    R.string.settingsDarkTheme,
+                ),
+                currentTheme,
+            )
+            .setPositiveButton(R.string.settingsThemeDialogSave)
+            .setNegativeButton(R.string.cancel)
+            .addEventListener(
+                object : RadioListAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked(selectedItem: Int) {
+                        val selectedTheme = when (selectedItem) {
+                            2 -> LIGHT
+                            3 -> DARK
+                            else -> SYSTEM_DEFAULT
+                        }
+                        viewModel.onThemeSelected(selectedTheme)
+                    }
+                },
+            )
+            .show()
     }
 
     private fun launchAppLinksSettingSelector(appLinkSettingType: AppLinkSettingType) {
-        val dialog = SettingsAppLinksSelectorFragment.create(appLinkSettingType)
-        dialog.show(supportFragmentManager, THEME_SELECTOR_TAG)
+        val currentAppLinkSetting = appLinkSettingType.getOptionIndex()
+        RadioListAlertDialogBuilder(this)
+            .setTitle(R.string.settingsTitleAppLinksDialog)
+            .setOptions(
+                listOf(
+                    R.string.settingsAppLinksAskEveryTime,
+                    R.string.settingsAppLinksAlways,
+                    R.string.settingsAppLinksNever,
+                ),
+                currentAppLinkSetting,
+            )
+            .setPositiveButton(R.string.dialogSave)
+            .setNegativeButton(R.string.cancel)
+            .addEventListener(
+                object : RadioListAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked(selectedItem: Int) {
+                        val selectedAppLinkSetting = selectedItem.getAppLinkSettingForIndex()
+                        viewModel.onAppLinksSettingChanged(selectedAppLinkSetting)
+                    }
+                },
+            )
+            .show()
     }
 
     private fun launchGlobalPrivacyControl() {
@@ -482,26 +604,6 @@ class SettingsActivity :
     private fun launchAddHomeScreenWidget() {
         pixel.fire(AppPixelName.SETTINGS_ADD_HOME_SCREEN_WIDGET_CLICKED)
         addWidgetLauncher.launchAddWidget(this)
-    }
-
-    override fun onThemeSelected(selectedTheme: DuckDuckGoTheme) {
-        viewModel.onThemeSelected(selectedTheme)
-    }
-
-    override fun onAppLinkSettingSelected(selectedSetting: AppLinkSettingType) {
-        viewModel.onAppLinksSettingChanged(selectedSetting)
-    }
-
-    override fun onAutomaticallyClearWhatOptionSelected(clearWhatSetting: ClearWhatOption) {
-        viewModel.onAutomaticallyWhatOptionSelected(clearWhatSetting)
-    }
-
-    override fun onAutomaticallyClearWhenOptionSelected(clearWhenSetting: ClearWhenOption) {
-        viewModel.onAutomaticallyWhenOptionSelected(clearWhenSetting)
-    }
-
-    override fun onFireAnimationSelected(selectedFireAnimation: FireAnimation) {
-        viewModel.onFireAnimationSelected(selectedFireAnimation)
     }
 
     @Suppress("DEPRECATION")
@@ -545,10 +647,6 @@ class SettingsActivity :
     }
 
     companion object {
-        private const val FIRE_ANIMATION_SELECTOR_TAG = "FIRE_ANIMATION_SELECTOR_DIALOG_FRAGMENT"
-        private const val THEME_SELECTOR_TAG = "THEME_SELECTOR_DIALOG_FRAGMENT"
-        private const val CLEAR_WHAT_DIALOG_TAG = "CLEAR_WHAT_DIALOG_FRAGMENT"
-        private const val CLEAR_WHEN_DIALOG_TAG = "CLEAR_WHEN_DIALOG_FRAGMENT"
         private const val FEEDBACK_REQUEST_CODE = 100
         private const val CHANGE_APP_ICON_REQUEST_CODE = 101
         private const val PRIVACY_POLICY_WEB_LINK = "https://duckduckgo.com/privacy"
