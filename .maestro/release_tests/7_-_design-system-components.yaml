@@ -1,0 +1,30 @@
+appId: com.duckduckgo.mobile.android
+---
+- launchApp:
+    clearState: true
+    stopApp: true
+- assertVisible:
+    text: ".*Not to worry! Searching and browsing privately.*"
+- tapOn: "let's do it!"
+- tapOn: "cancel"
+- assertVisible:
+    text: ".*I'll also upgrade the security of your connection if possible.*"
+- assertVisible:
+      text: ".*I'll also upgrade the security of your connection if possible.*"
+- tapOn:
+      id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+- tapOn:
+      text: "Settings"
+      index: 0
+- scrollUntilVisible:
+  element:
+      text: "Set of components designed following our Design System"
+  direction: DOWN
+- assertVisible: "Set of components designed following our Design System"
+- tapOn: "App Components Design Preview"
+- assertVisible: "COLOR PALETTE"
+- tapOn: "TYPOGRAPHY"
+- scrollUntilVisible:
+    element:
+        text: "Text Appearance Body 1 set manually"
+    direction: DOWN
