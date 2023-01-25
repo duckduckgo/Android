@@ -2688,6 +2688,46 @@
       ]
     },
     {
+      "name": "Test page cosmetic CMP",
+      "cosmetic": true,
+      "prehideSelectors": [
+        "#privacy-test-page-cmp-test-prehide"
+      ],
+      "detectCmp": [
+        {
+          "exists": "#privacy-test-page-cmp-test-banner"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "#privacy-test-page-cmp-test-banner"
+        }
+      ],
+      "optIn": [
+        {
+          "waitFor": "#accept-all"
+        },
+        {
+          "click": "#accept-all"
+        }
+      ],
+      "optOut": [
+        {
+          "hide": [
+            "#privacy-test-page-cmp-test-banner"
+          ]
+        }
+      ],
+      "test": [
+        {
+          "wait": 500
+        },
+        {
+          "eval": "window.results.results[0] === 'banner_hidden'"
+        }
+      ]
+    },
+    {
       "name": "Test page CMP",
       "prehideSelectors": [
         "#reject-all"
