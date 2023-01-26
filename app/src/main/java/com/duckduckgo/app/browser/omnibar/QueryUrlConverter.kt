@@ -65,7 +65,7 @@ class QueryUrlConverter @Inject constructor(private val requestRewriter: Request
     private fun convertUri(input: String): String {
         val uri = Uri.parse(input).withScheme()
 
-        if (uri.host == Url.HOST) {
+        if (requestRewriter.shouldRewriteRequest(uri)) {
             return requestRewriter.rewriteRequestWithCustomQueryParams(uri).toString()
         }
 
