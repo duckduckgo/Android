@@ -9,22 +9,118 @@ appId: com.duckduckgo.mobile.android
 - tapOn: "cancel"
 - assertVisible:
     text: ".*I'll also upgrade the security of your connection if possible.*"
-- assertVisible:
-      text: ".*I'll also upgrade the security of your connection if possible.*"
 - tapOn:
       id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
 - tapOn:
       text: "Settings"
       index: 0
 - scrollUntilVisible:
-  element:
+    element:
       text: "Set of components designed following our Design System"
-  direction: DOWN
+    direction: DOWN
 - assertVisible: "Set of components designed following our Design System"
 - tapOn: "App Components Design Preview"
 - assertVisible: "COLOR PALETTE"
 - tapOn: "TYPOGRAPHY"
 - scrollUntilVisible:
     element:
-        text: "Text Appearance Body 1 set manually"
+      text: "Text Appearance Caption"
     direction: DOWN
+- tapOn: "BUTTONS"
+- tapOn: "Primary Large"
+- tapOn: "Secondary Small"
+- tapOn: "Destructive Small"
+- tapOn: "TEXT INPUT"
+- tapOn: "DIALOGS"
+- tapOn: "Text Alert Dialog With Image"
+- assertVisible: "Keep Using"
+- tapOn: "Keep Using"
+- tapOn: "Stacked Text Alert Dialog With 4 buttons"
+- assertVisible: "Keep Using"
+- tapOn: "Keep Using"
+- tapOn: "Single Choice Alert Dialog"
+- assertVisible: "Option"
+- tapOn: "Option"
+- tapOn: "Keep Using"
+- scrollUntilVisible:
+    element:
+      text: "Promo Bottom Sheet with image"
+    direction: DOWN
+- tapOn: "Action Bottom Sheet"
+- assertVisible: "Primary Item"
+- tapOn: "Primary Item"
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/touch_outside"
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/actionBottomSheetButtonWithTitle"
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/item_container"
+    index: 0
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/touch_outside"
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/promoBottomSheetButtonWithTitle"
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/bottomSheetPromoPrimaryButton"
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/touch_outside"
+- scrollUntilVisible:
+    element:
+      text: "Cookie Consent dialog with animation"
+    direction: DOWN
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/animated_button"
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/primaryCta"
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/no_hide_button"
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/primaryCta"
+- tapOn: "CARDS"
+- tapOn: "Primary"
+- tapOn: "INTERACTIVE"
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/switch_one"
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/radio_button_two"
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/checkbox_one"
+- tapOn:
+    point: "50%,75%"
+- tapOn: "MESSAGING"
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/close"
+    index: 0
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/close"
+    index: 0
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/close"
+    index: 0
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/secondaryActionButton"
+    index: 0
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/primaryActionButton"
+    index: 0
+- tapOn: "LIST ITEMS"
+- scrollUntilVisible:
+    element:
+      text: "This is a test"
+    direction: DOWN
+- tapOn: "Others"
+- scrollUntilVisible:
+    element:
+      text: "Enable Dark Theme"
+    direction: UP
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/trailingSwitch"
+- tapOn: "Typography"
+- tapOn: "BUTTONS"
+- tapOn: "TEXT INPUT"
+- tapOn: "DIALOGS"
+- tapOn: "CARDS"
+- tapOn: "INTERACTIVE"
+- tapOn: "MESSAGING"
+- tapOn: "LIST ITEMS"
+- tapOn: "OTHERS"
