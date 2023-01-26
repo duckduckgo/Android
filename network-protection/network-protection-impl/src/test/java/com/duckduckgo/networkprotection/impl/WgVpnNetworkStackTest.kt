@@ -26,7 +26,6 @@ import com.duckduckgo.networkprotection.impl.configuration.WgTunnelDataProvider
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelDataProvider.WgTunnelData
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ServerDetails
-import com.wireguard.config.BadConfigException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -36,6 +35,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -216,7 +216,6 @@ class WgVpnNetworkStackTest {
     fun whenNoWgTunnelDataThenOnStartVpnReturnsFailure() = runTest {
         val result = testee.onStartVpn(mock())
         assertTrue(result.isFailure)
-        assertTrue(result.exceptionOrNull() is BadConfigException)
 
         verifyNoInteractions(networkProtectionRepository)
     }
@@ -241,5 +240,46 @@ class WgVpnNetworkStackTest {
 
         verify(networkProtectionRepository).serverDetails = null
         verifyNoMoreInteractions(networkProtectionRepository)
+    }
+
+    @Test
+    fun whenWgTunnelDataProviderThrowsExceptionThenOnPrepareShouldReturnFailure() = runTest {
+        whenever(wgTunnelDataProvider.get()).thenReturn(null)
+
+        assertTrue(testee.onPrepareVpn().isFailure)
+    }
+
+    @Test
+    fun whenWgProtocolStartWgReturnsFailureThenOnStartVpnShouldReturnFailure() = runTest {
+        whenever(wgProtocol.startWg(any(), any())).thenReturn(Result.failure(java.lang.IllegalStateException()))
+        whenever(wgTunnelDataProvider.get()).thenReturn(
+            WgTunnelData(
+                userSpaceConfig = "testuserspaceconfig",
+                serverIP = "10.10.10.10",
+                serverLocation = "Stockholm, Sweden",
+                tunnelAddress = emptyMap(),
+            ),
+        )
+
+        testee.onPrepareVpn()
+
+        assertTrue(testee.onStartVpn(mock()).isFailure)
+    }
+
+    @Test
+    fun whenWgProtocolStartWgReturnsSuccessThenOnStartVpnShouldReturnSuccess() = runTest {
+        whenever(wgProtocol.startWg(any(), any())).thenReturn(Result.success(Unit))
+        whenever(wgTunnelDataProvider.get()).thenReturn(
+            WgTunnelData(
+                userSpaceConfig = "testuserspaceconfig",
+                serverIP = "10.10.10.10",
+                serverLocation = "Stockholm, Sweden",
+                tunnelAddress = emptyMap(),
+            ),
+        )
+
+        testee.onPrepareVpn()
+
+        assertTrue(testee.onStartVpn(mock()).isSuccess)
     }
 }

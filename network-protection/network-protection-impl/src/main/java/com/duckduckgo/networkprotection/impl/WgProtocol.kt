@@ -34,9 +34,9 @@ interface WgProtocol {
     fun startWg(
         tunFd: Int,
         configString: String,
-    )
+    ): Result<Unit>
 
-    fun stopWg()
+    fun stopWg(): Result<Unit>
     fun getStatistics(): NetworkProtectionStatistics // TODO: Expose API to Make this consumable from activities
 }
 
@@ -52,23 +52,26 @@ class RealWgProtocol @Inject constructor(
     override fun startWg(
         tunFd: Int,
         configString: String,
-    ) {
+    ): Result<Unit> {
         val level = if (appBuildConfig.isDebug) Log.VERBOSE else Log.ASSERT
         wgTunnel = goBackend.wgTurnOn(INTERFACE_NAME, tunFd, configString, level, appBuildConfig.sdkInt)
-        if (wgTunnel < 0) {
+        return if (wgTunnel < 0) {
             logcat(LogPriority.ERROR) { "Wireguard tunnel failed to start: check config / tunFd" }
+            Result.failure(java.lang.IllegalStateException("Wireguard failed to connect to backend"))
         } else {
             logcat { "Protecting V4 and V6 wg-sockets" }
             socketProtector.get().protect(goBackend.wgGetSocketV4(wgTunnel))
             socketProtector.get().protect(goBackend.wgGetSocketV6(wgTunnel))
+            Result.success(Unit)
         }
     }
 
-    override fun stopWg() {
+    override fun stopWg(): Result<Unit> {
         if (wgTunnel != -1) {
             goBackend.wgTurnOff(wgTunnel)
             wgTunnel = -1
         }
+        return Result.success(Unit)
     }
 
     override fun getStatistics(): NetworkProtectionStatistics =

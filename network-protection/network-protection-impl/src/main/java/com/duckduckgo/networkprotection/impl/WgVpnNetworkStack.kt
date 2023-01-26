@@ -31,12 +31,9 @@ import com.duckduckgo.networkprotection.impl.configuration.WgTunnelDataProvider.
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ServerDetails
 import com.squareup.anvil.annotations.ContributesMultibinding
-import com.wireguard.config.BadConfigException
-import com.wireguard.config.BadConfigException.Location.TOP_LEVEL
-import com.wireguard.config.BadConfigException.Reason
-import com.wireguard.config.BadConfigException.Section.CONFIG
 import dagger.Lazy
 import dagger.SingleInstanceIn
+import logcat.LogPriority
 import javax.inject.Inject
 import logcat.asLog
 import logcat.logcat
@@ -83,6 +80,11 @@ class WgVpnNetworkStack @Inject constructor(
             wgTunnelData = configProvider.get().get()
             logcat { "Received config from BE: $wgTunnelData" }
 
+            if (wgTunnelData == null) {
+                logcat(LogPriority.ERROR) { "Unable to construct wgTunnelData" }
+                return Result.failure(java.lang.IllegalStateException("Unable to construct wgTunnelData"))
+            }
+
             networkProtectionRepository.get().serverDetails = ServerDetails(
                 ipAddress = wgTunnelData!!.serverIP,
                 location = wgTunnelData!!.serverLocation,
@@ -97,7 +99,8 @@ class WgVpnNetworkStack @Inject constructor(
                     appExclusionList = exclusionListProvider.getExclusionList(),
                 ),
             ).also { logcat { "Returning VPN configuration: ${it.getOrNull()}" } }
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
+            logcat(LogPriority.ERROR) { "onPrepareVpn failed due to ${e.asLog()}" }
             Result.failure(e)
         }
     }
@@ -119,34 +122,39 @@ class WgVpnNetworkStack @Inject constructor(
 
     private fun turnOnNative(tunfd: Int): Result<Unit> {
         if (wgTunnelData == null) {
-            return Result.failure(BadConfigException(CONFIG, TOP_LEVEL, Reason.MISSING_SECTION, "Config could not be empty."))
+            return Result.failure(java.lang.IllegalStateException("Tunnel data not available when attempting to start wg."))
         }
-        logcat { "Thread: Started turnOnNative" }
-        wgProtocol.get().startWg(
+
+        val result = wgProtocol.get().startWg(
             tunfd,
             wgTunnelData!!.userSpaceConfig.also {
                 logcat { "WgUserspace config: $it" }
             },
         )
-        logcat { "Thread: Completed turnOnNative" }
+        return if (result.isFailure) {
+            logcat(LogPriority.ERROR) { "Failed to turnOnNative due to ${result.exceptionOrNull()}" }
+            result
+        } else {
+            logcat { "Completed turnOnNative" }
 
-        // Only update if enabledTimeInMillis has been reset
-        if (networkProtectionRepository.get().enabledTimeInMillis == -1L) {
-            networkProtectionRepository.get().enabledTimeInMillis = currentTimeProvider.get()
+            // Only update if enabledTimeInMillis has been reset
+            if (networkProtectionRepository.get().enabledTimeInMillis == -1L) {
+                networkProtectionRepository.get().enabledTimeInMillis = currentTimeProvider.get()
+            }
+            Result.success(Unit)
         }
-        return Result.success(Unit)
     }
 
     private fun turnOffNative(reason: VpnStopReason): Result<Unit> {
         logcat { "turnOffNative wg" }
 
-        logcat { "Thread: Started turnOffNative" }
+        logcat { "Started turnOffNative" }
         kotlin.runCatching {
             wgProtocol.get().stopWg()
         }.onFailure {
-            logcat { "WG network: ${it.asLog()}" }
+            logcat(LogPriority.ERROR) { "WG network: ${it.asLog()}" }
         }
-        logcat { "Thread: Completed turnOffNative" }
+        logcat { "Completed turnOffNative" }
 
         networkProtectionRepository.get().serverDetails = null
 

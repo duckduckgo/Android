@@ -26,7 +26,7 @@ import java.net.InetAddress
 import javax.inject.Inject
 
 interface WgTunnelDataProvider {
-    suspend fun get(): WgTunnelData
+    suspend fun get(): WgTunnelData?
     data class WgTunnelData(
         val userSpaceConfig: String,
         val serverLocation: String?,
@@ -41,29 +41,33 @@ class RealWgTunnelDataProvider @Inject constructor(
     private val wgServerDataProvider: WgServerDataProvider,
 ) : WgTunnelDataProvider {
 
-    override suspend fun get(): WgTunnelData {
+    override suspend fun get(): WgTunnelData? {
         val serverData = wgServerDataProvider.get(deviceKeys.publicKey)
-        return Config.Builder()
-            .setInterface(
-                Interface.Builder()
-                    .parsePrivateKey(deviceKeys.privateKey)
-                    .parseAddresses(serverData.address)
-                    .build(),
-            )
-            .addPeer(
-                Peer.Builder()
-                    .parsePublicKey(serverData.publicKey)
-                    .parseAllowedIPs(serverData.allowedIPs)
-                    .parseEndpoint(serverData.publicEndpoint)
-                    .build(),
-            )
-            .build().run {
-                WgTunnelData(
-                    userSpaceConfig = this.toWgUserspaceString(),
-                    serverLocation = serverData.location,
-                    serverIP = kotlin.runCatching { InetAddress.getByName(peers[0].endpoint?.host).hostAddress }.getOrNull(),
-                    tunnelAddress = getInterface().addresses.associate { Pair(it.address, it.mask) },
+        return try {
+            Config.Builder()
+                .setInterface(
+                    Interface.Builder()
+                        .parsePrivateKey(deviceKeys.privateKey)
+                        .parseAddresses(serverData.address)
+                        .build(),
                 )
-            }
+                .addPeer(
+                    Peer.Builder()
+                        .parsePublicKey(serverData.publicKey)
+                        .parseAllowedIPs(serverData.allowedIPs)
+                        .parseEndpoint(serverData.publicEndpoint)
+                        .build(),
+                )
+                .build().run {
+                    WgTunnelData(
+                        userSpaceConfig = this.toWgUserspaceString(),
+                        serverLocation = serverData.location,
+                        serverIP = kotlin.runCatching { InetAddress.getByName(peers[0].endpoint?.host).hostAddress }.getOrNull(),
+                        tunnelAddress = getInterface().addresses.associate { Pair(it.address, it.mask) },
+                    )
+                }
+        } catch (e: Throwable) {
+            null
+        }
     }
 }
