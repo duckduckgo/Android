@@ -53,15 +53,9 @@ class DeviceShieldEnabledNotificationBuilder {
         fun buildDeviceShieldEnabledNotification(
             context: Context,
             deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification,
-            notificationPressHandler: OngoingNotificationPressedHandler,
+            pendingIntent: PendingIntent?,
         ): Notification {
             registerOngoingNotificationChannel(context)
-
-            val privacyReportIntent = DeviceShieldTrackerActivity.intent(context = context, onLaunchCallback = notificationPressHandler)
-            val vpnShowDashboardPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
-                addNextIntentWithParentStack(privacyReportIntent)
-                getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-            }
 
             val notificationLayout = RemoteViews(context.packageName, R.layout.notification_device_shield_enabled)
             notificationLayout.setTextViewText(R.id.deviceShieldNotificationHeader, deviceShieldNotification.title)
@@ -69,7 +63,7 @@ class DeviceShieldEnabledNotificationBuilder {
             return NotificationCompat.Builder(context, VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_device_shield_notification_logo)
                 .setStyle(NotificationCompat.DecoratedCustomViewStyle())
-                .setContentIntent(vpnShowDashboardPendingIntent)
+                .setContentIntent(pendingIntent)
                 .setCustomContentView(notificationLayout)
                 .setOngoing(true)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
