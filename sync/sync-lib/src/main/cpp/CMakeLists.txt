@@ -5,7 +5,7 @@ macro(add_sodium_arch _KEY _VALUE)
     set("SODIUM_ARCH_${_KEY}" "${_VALUE}")
 endmacro(add_sodium_arch)
 
-add_sodium_arch("armeabi-v7a" "x86")
+add_sodium_arch("armeabi-v7a" "armeabi-v7a")
 add_sodium_arch("arm64-v8a" "arm64-v8a")
 add_sodium_arch("x86" "x86")
 add_sodium_arch("x86_64" "x86_64")
