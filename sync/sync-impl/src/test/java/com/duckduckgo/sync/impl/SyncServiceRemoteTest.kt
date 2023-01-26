@@ -28,6 +28,12 @@ import com.duckduckgo.sync.TestSyncFixtures.deviceId
 import com.duckduckgo.sync.TestSyncFixtures.deviceLogoutBody
 import com.duckduckgo.sync.TestSyncFixtures.deviceLogoutResponse
 import com.duckduckgo.sync.TestSyncFixtures.deviceName
+import com.duckduckgo.sync.TestSyncFixtures.hashedPassword
+import com.duckduckgo.sync.TestSyncFixtures.loginError
+import com.duckduckgo.sync.TestSyncFixtures.loginFailedInvalidResponse
+import com.duckduckgo.sync.TestSyncFixtures.loginRequestBody
+import com.duckduckgo.sync.TestSyncFixtures.loginSuccess
+import com.duckduckgo.sync.TestSyncFixtures.loginSuccessResponse
 import com.duckduckgo.sync.TestSyncFixtures.logoutError
 import com.duckduckgo.sync.TestSyncFixtures.logoutSuccess
 import com.duckduckgo.sync.TestSyncFixtures.signUpRequest
@@ -136,5 +142,29 @@ class SyncServiceRemoteTest {
         val result = syncRemote.deleteAccount(token)
 
         assertEquals(deleteAccountInvalid, result)
+    }
+
+    @Test
+    fun whenLoginSucceedsThenReturnLoginSuccess() {
+        val syncRemote = SyncServiceRemote(syncService)
+        val call: Call<LoginResponse> = mock()
+        whenever(syncService.login(loginRequestBody)).thenReturn(call)
+        whenever(call.execute()).thenReturn(loginSuccessResponse)
+
+        val result = syncRemote.login(userId, hashedPassword, deviceId, deviceName)
+
+        assertEquals(loginSuccess, result)
+    }
+
+    @Test
+    fun whenLoginIsInvalidThenReturnError() {
+        val syncRemote = SyncServiceRemote(syncService)
+        val call: Call<LoginResponse> = mock()
+        whenever(syncService.login(loginRequestBody)).thenReturn(call)
+        whenever(call.execute()).thenReturn(loginFailedInvalidResponse)
+
+        val result = syncRemote.login(userId, hashedPassword, deviceId, deviceName)
+
+        assertEquals(loginError, result)
     }
 }

@@ -31,7 +31,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
 class SyncInitialSetupViewModel
@@ -107,7 +106,7 @@ constructor(
     }
 
     fun loginAccountClicked() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(dispatchers.io()) {
             val result = syncRepository.login()
             if (result is Error) {
                 command.send(Command.ShowMessage("$result"))

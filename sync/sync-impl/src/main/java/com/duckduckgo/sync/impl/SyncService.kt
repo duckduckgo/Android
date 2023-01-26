@@ -81,7 +81,7 @@ data class LoginResponse(
 data class Device(
     val device_id: String,
     val device_name: String,
-    val jw_iat: String
+    val jw_iat: String,
 )
 
 data class ErrorResponse(

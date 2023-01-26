@@ -94,7 +94,7 @@ class AppSyncDeviceIdsTest {
             override var secretKey: String? = "secretKey"
             override var recoveryCode: String? = "recoveryCode"
 
-            override fun clearAll() {
+            override fun clearAll(keepRecoveryCode: Boolean) {
                 /* no-op */
             }
         }
@@ -110,7 +110,7 @@ class AppSyncDeviceIdsTest {
             override var secretKey: String? = null
             override var recoveryCode: String? = null
 
-            override fun clearAll() {
+            override fun clearAll(keepRecoveryCode: Boolean) {
                 /* no-op */
             }
         }
