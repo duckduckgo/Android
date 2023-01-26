@@ -24,7 +24,6 @@ import com.duckduckgo.downloads.store.DownloadStatus
 import com.duckduckgo.downloads.store.DownloadsDatabase
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import java.io.File
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -57,9 +56,6 @@ class DefaultDownloadsRepository @Inject constructor(
     }
 
     override suspend fun delete(downloadId: Long) {
-        downloadsDatabase.downloadsDao().getDownloadItem(downloadId)?.let {
-            File(it.filePath).delete()
-        }
         downloadsDatabase.downloadsDao().delete(downloadId)
         urlFileDownloadCallManager.remove(downloadId)
     }
@@ -71,7 +67,6 @@ class DefaultDownloadsRepository @Inject constructor(
 
     override suspend fun deleteAll() {
         downloadsDatabase.downloadsDao().getDownloads().forEach {
-            File(it.filePath).delete()
             urlFileDownloadCallManager.remove(it.downloadId)
         }
         downloadsDatabase.downloadsDao().delete()
