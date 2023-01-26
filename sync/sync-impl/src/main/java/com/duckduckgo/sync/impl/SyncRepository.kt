@@ -31,8 +31,8 @@ interface SyncRepository {
     fun getAccountInfo(): AccountInfo
     fun storeRecoveryCode()
     fun removeAccount()
-    fun logout(): Result
-    fun deleteAccount(): Result
+    fun logout(): Result<Boolean>
+    fun deleteAccount(): Result<Boolean>
     fun latestToken(): String
 }
 
@@ -66,6 +66,7 @@ class AppSyncRepository @Inject constructor(
                 Timber.i("SYNC signup failed $result")
                 result
             }
+
             is Result.Success -> {
                 syncStore.userId = userId
                 syncStore.deviceId = deviceId
@@ -102,7 +103,7 @@ class AppSyncRepository @Inject constructor(
         syncStore.clearAll()
     }
 
-    override fun logout(): Result {
+    override fun logout(): Result<Boolean> {
         val token =
             syncStore.token.takeUnless { it.isNullOrEmpty() }
                 ?: return Result.Error(reason = "Token Empty")
@@ -110,29 +111,34 @@ class AppSyncRepository @Inject constructor(
             syncStore.deviceId.takeUnless { it.isNullOrEmpty() }
                 ?: return Result.Error(reason = "Device Id Empty")
 
-        val result = syncApi.logout(token, deviceId)
+        return when (val result = syncApi.logout(token, deviceId)) {
+            is Result.Error -> {
+                Timber.i("SYNC logout failed $result")
+                result
+            }
 
-        if (result is Result.Success) {
-            syncStore.clearAll()
-        } else {
-            Timber.i("SYNC logout failed $result")
+            is Result.Success -> {
+                syncStore.clearAll()
+                Result.Success(true)
+            }
         }
-        return result
     }
 
-    override fun deleteAccount(): Result {
+    override fun deleteAccount(): Result<Boolean> {
         val token =
             syncStore.token.takeUnless { it.isNullOrEmpty() }
                 ?: return Result.Error(reason = "Token Empty")
 
-        val result = syncApi.deleteAccount(token)
-
-        if (result is Result.Success) {
-            syncStore.clearAll()
-        } else {
-            Timber.i("SYNC deleteAccount failed $result")
+        return when (val result = syncApi.deleteAccount(token)) {
+            is Result.Error -> {
+                Timber.i("SYNC deleteAccount failed $result")
+                result
+            }
+            is Result.Success -> {
+                syncStore.clearAll()
+                Result.Success(true)
+            }
         }
-        return result
     }
 
     override fun latestToken(): String {
@@ -165,7 +171,10 @@ data class RecoveryCode(
 sealed class Result<out R> {
 
     data class Success<out T>(val data: T) : Result<T>()
-    data class Error(val code: Int = -1, val reason: String) : Result<Nothing>()
+    data class Error(
+        val code: Int = -1,
+        val reason: String,
+    ) : Result<Nothing>()
 
     override fun toString(): String {
         return when (this) {

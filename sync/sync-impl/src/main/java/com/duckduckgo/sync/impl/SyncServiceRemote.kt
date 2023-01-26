@@ -21,8 +21,8 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import retrofit2.Response
 import javax.inject.Inject
+import retrofit2.Response
 
 interface SyncApi {
     fun createAccount(
@@ -35,10 +35,10 @@ interface SyncApi {
 
     fun logout(
         token: String,
-        deviceId: String
-    ): Result
+        deviceId: String,
+    ): Result<Logout>
 
-    fun deleteAccount(token: String): Result
+    fun deleteAccount(token: String): Result<Boolean>
 }
 
 @ContributesBinding(AppScope::class)
@@ -77,6 +77,36 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
         }
     }
 
+    override fun logout(
+        token: String,
+        deviceId: String,
+    ): Result<Logout> {
+        val response = runCatching {
+            val logoutCall = syncService.logout("Bearer $token", Logout(deviceId))
+            logoutCall.execute()
+        }.getOrElse { throwable ->
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            val deviceIdResponse = response.body()?.device_id.takeUnless { it.isNullOrEmpty() } ?: throw IllegalStateException("Token not found")
+            Result.Success(Logout(deviceIdResponse))
+        }
+    }
+
+    override fun deleteAccount(token: String): Result<Boolean> {
+        val response = runCatching {
+            val deleteAccountCall = syncService.deleteAccount("Bearer $token")
+            deleteAccountCall.execute()
+        }.getOrElse { throwable ->
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            Result.Success(true)
+        }
+    }
+
     private fun <T, R> onSuccess(
         response: Response<T?>,
         onSuccess: (T?) -> Result<R>,
@@ -93,37 +123,6 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
             }
         }.getOrElse {
             return Result.Error(reason = response.message())
-        }
-    }
-
-    override fun logout(
-        token: String,
-        deviceId: String
-    ): Result {
-        val response = runCatching {
-            val logoutCall = syncService.logout("Bearer $token", Logout(deviceId))
-            logoutCall.execute()
-        }
-            .getOrElse { throwable ->
-                return Result.Error(reason = throwable.message.toString())
-            }
-
-        return onSuccess(response) {
-            Result.Success("")
-        }
-    }
-
-    override fun deleteAccount(token: String): Result {
-        val response = runCatching {
-            val deleteAccountCall = syncService.deleteAccount("Bearer $token")
-            deleteAccountCall.execute()
-        }
-            .getOrElse { throwable ->
-                return Result.Error(reason = throwable.message.toString())
-            }
-
-        return onSuccess(response) {
-            Result.Success("")
         }
     }
 

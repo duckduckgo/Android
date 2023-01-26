@@ -24,7 +24,6 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.SyncRepository
 import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -86,7 +85,7 @@ constructor(
         viewModelScope.launch(dispatchers.io()) {
             val result = syncRepository.logout()
             if (result is Error) {
-                command.send(Command.ShowMessage("${result.code}-${result.reason}"))
+                command.send(Command.ShowMessage("$result"))
             }
             updateViewState()
         }
@@ -96,7 +95,7 @@ constructor(
         viewModelScope.launch(dispatchers.io()) {
             val result = syncRepository.deleteAccount()
             if (result is Error) {
-                command.send(Command.ShowMessage("${result.code}-${result.reason}"))
+                command.send(Command.ShowMessage("$result"))
             }
             updateViewState()
         }
@@ -114,5 +113,4 @@ constructor(
             ),
         )
     }
-
 }

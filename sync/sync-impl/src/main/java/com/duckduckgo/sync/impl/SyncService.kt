@@ -21,7 +21,6 @@ import com.duckduckgo.di.scopes.AppScope
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.Header
-import retrofit2.http.Headers
 import retrofit2.http.POST
 
 @ContributesServiceApi(AppScope::class)
@@ -31,7 +30,6 @@ interface SyncService {
     fun signup(
         @Body request: Signup,
     ): Call<AccountCreatedResponse>
-
 
     @POST("https://dev-sync-use.duckduckgo.com/sync/logout-device")
     fun logout(
