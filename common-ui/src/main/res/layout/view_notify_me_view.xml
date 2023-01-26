@@ -60,7 +60,7 @@
             app:typography="body2"
             tools:text="Get a notification when downloads complete." />
 
-        <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimarySmall
+        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
             android:id="@+id/notifyMeButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
