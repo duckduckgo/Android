@@ -169,6 +169,7 @@
     <style name="Widget.DuckDuckGo.DaxButton.TextButton" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="android:textAppearance">?attr/textAppearanceButton</item>
         <item name="shapeAppearance">?shapeAppearanceSmallComponent</item>
+        <item name="iconPadding">@dimen/keyline_2</item>
     </style>
 
     <style name="Widget.DuckDuckGo.DaxButton.TextButton.Primary">
@@ -191,6 +192,7 @@
         <item name="strokeColor">@color/button_secondary_stroke_selector</item>
         <item name="rippleColor">@color/button_secondary_ripple_selector</item>
         <item name="iconTint">@color/button_secondary_text_color_selector</item>
+        <item name="iconPadding">@dimen/keyline_2</item>
     </style>
 
     <style name="Widget.DuckDuckGo.DaxButton.Ghost" parent="Widget.MaterialComponents.Button.TextButton">
@@ -198,6 +200,7 @@
         <item name="backgroundTint">@color/button_ghost_container_selector</item>
         <item name="rippleColor">@color/button_ghost_ripple_selector</item>
         <item name="iconTint">@color/button_secondary_text_color_selector</item>
+        <item name="iconPadding">@dimen/keyline_2</item>
     </style>
 
     <style name="Widget.DuckDuckGo.DaxButton.DestructiveGhost" parent="Widget.MaterialComponents.Button.TextButton">
@@ -205,6 +208,7 @@
         <item name="backgroundTint">@color/button_destructive_ghost_container_selector</item>
         <item name="rippleColor">@color/button_desctructive_ghost_ripple_selector</item>
         <item name="iconTint">@color/button_destructive_ghost_text_color_selector</item>
+        <item name="iconPadding">@dimen/keyline_2</item>
     </style>
 
     <style name="Widget.DuckDuckGo.Button" parent="Widget.AppCompat.Button.Borderless">
