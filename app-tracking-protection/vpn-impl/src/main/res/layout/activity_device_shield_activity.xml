@@ -42,6 +42,14 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
+                <com.duckduckgo.mobile.android.ui.view.NotifyMeView
+                    android:id="@+id/deviceShieldTrackerNotifyMe"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/keyline_4"
+                    app:subtitleText="@string/appTrackingProtectionNotifyMeSubtitle"
+                    app:titleText="@string/appTrackingProtectionNotifyMeTitle" />
+
                 <com.duckduckgo.mobile.android.ui.view.InfoPanel
                     android:id="@+id/deviceShieldTrackerLabelEnabled"
                     style="@style/Widget.DuckDuckGo.InfoPanel"
