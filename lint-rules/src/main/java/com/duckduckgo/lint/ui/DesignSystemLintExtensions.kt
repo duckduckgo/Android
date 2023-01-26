@@ -89,6 +89,15 @@ class DesignSystemLintExtensions {
     }
 }
 
+private val REGEX_HEX_COLOR = Regex("^#[0-9a-fA-F]{8}$|#[0-9a-fA-F]{6}$|#[0-9a-fA-F]{4}$|#[0-9a-fA-F]{3}$")
+
+internal fun String.isColorHexcode() = REGEX_HEX_COLOR.containsMatchIn(this)
+
+/**
+ * "mds" is used as an allowlist filter, where we'll assume that the resource contains theme-friendly colors
+ *  or it's an exception to the rule.
+ */
+internal fun String.isHardcodedColorResInXml() = startsWith("@color/") && !contains("dax")
 
 internal fun Attr.belongsToItem() = ownerElement.nodeName == "item"
 
