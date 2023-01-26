@@ -66,6 +66,7 @@ interface Site {
     var consentManaged: Boolean
     var consentOptOutFailed: Boolean
     var consentSelfTestFailed: Boolean
+    var consentCosmeticHide: Boolean?
 }
 
 fun Site.orderedTrackerBlockedEntities(): List<Entity> = trackingEvents

@@ -60,7 +60,7 @@ class SelfTestResultMessageHandlerPluginTest {
 
         selfTestPlugin.process(selfTestPlugin.supportedTypes.first(), message, webView, mockCallback)
 
-        verify(mockCallback).onResultReceived(consentManaged = true, optOutFailed = false, selfTestFailed = true)
+        verify(mockCallback).onResultReceived(consentManaged = true, optOutFailed = false, selfTestFailed = true, isCosmetic = null)
 
         val anotherMessage = """
             {"type":"${selfTestPlugin.supportedTypes}", "cmp": "test", "result": false, "url": "http://example.com"}
@@ -68,6 +68,6 @@ class SelfTestResultMessageHandlerPluginTest {
 
         selfTestPlugin.process(selfTestPlugin.supportedTypes.first(), anotherMessage, webView, mockCallback)
 
-        verify(mockCallback).onResultReceived(consentManaged = true, optOutFailed = false, selfTestFailed = false)
+        verify(mockCallback).onResultReceived(consentManaged = true, optOutFailed = false, selfTestFailed = false, isCosmetic = null)
     }
 }

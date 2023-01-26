@@ -18,6 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="autoconsentTitle">Cookiepop-ups beheren</string>
-    <string name="autoconsentDescription">Wanneer DuckDuckGo pop-ups voor cookietoestemming op bezochte websites detecteert, kunnen we proberen automatisch je cookievoorkeuren in te stellen om het aantal cookies tot een minimum te beperken en je privacy te garanderen. De pop-ups worden vervolgens gesloten.</string>
+    <string name="autoconsentDescription">Wanneer DuckDuckGo pop-ups voor cookietoestemming op bezochte websites detecteert, kunnen we proberen automatisch je cookievoorkeuren in te stellen om het aantal cookies tot een minimum te beperken en je privacy te maximaliseren. De pop-ups worden vervolgens gesloten. Sommige sites bieden geen optie om cookievoorkeuren te beheren, zodat we pop-ups zoals deze alleen kunnen verbergen.</string>
     <string name="autoconsentToggle">Laat DuckDuckGo pop-ups voor cookietoestemming beheren</string>
 </resources>

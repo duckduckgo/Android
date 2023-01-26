@@ -17,6 +17,7 @@
 package com.duckduckgo.privacy.dashboard.impl.ui
 
 import android.webkit.WebView
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.CookiePromptManagementState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.EntityViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.ProtectionStatusViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.RequestDataViewState
@@ -32,6 +33,7 @@ class PrivacyDashboardRenderer(
     private val onBrokenSiteClicked: () -> Unit,
     private val onPrivacyProtectionsClicked: (Boolean) -> Unit,
     private val onUrlClicked: (String) -> Unit,
+    private val onOpenSettings: (String) -> Unit,
     private val onClose: () -> Unit,
 ) {
 
@@ -46,6 +48,9 @@ class PrivacyDashboardRenderer(
                 },
                 onUrlClicked = {
                     onUrlClicked(it)
+                },
+                onOpenSettings = {
+                    onOpenSettings(it)
                 },
                 onClose = { onClose() },
             ),
@@ -63,6 +68,11 @@ class PrivacyDashboardRenderer(
         val requestDataJson = requestDataAdapter.toJson(viewState.requestData)
 
         onPrivacyProtectionSettingChanged(viewState.userChangedValues)
+
+        val cookiePromptManagementStatusAdapter = moshi.adapter(CookiePromptManagementState::class.java)
+        val cookiePromptManagementStatusJson = cookiePromptManagementStatusAdapter.toJson(viewState.cookiePromptManagementStatus)
+        webView.evaluateJavascript("javascript:onChangeConsentManaged($cookiePromptManagementStatusJson);", null)
+
         if (viewState.siteViewState.locale != lastSeenPrivacyDashboardViewState?.siteViewState?.locale) {
             webView.evaluateJavascript("javascript:onChangeLocale($siteViewStateJson);", null)
         }

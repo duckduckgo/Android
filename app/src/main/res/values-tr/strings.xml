@@ -398,7 +398,7 @@
     <string name="systemSearchOnboardingButtonOk">Anladım</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">GİZLE</string>
+    <string name="daxDialogHideButton">Gizle</string>
     <string name="daxDialogPhew">Uf!</string>
     <string name="daxDialogNext">Sonraki</string>
     <string name="daxDialogHighFive">Çak Bir Beşlik!</string>
@@ -652,7 +652,8 @@
     <string name="autoconsentSecondaryCta">Hayır Teşekkürler</string>
 
     <string name="autoconsentSetting">Çerez Açılır Pencerelerini Yönetin</string>
-    <string name="autoconsentAnimationText">Yönetilen Çerezler</string>
+    <string name="autoconsentCosmeticNoticeAnimationText">Açılır Pencere Gizli</string>
+    <string name="autoconsentManagedNoticeAnimationText">Yönetilen Çerezler</string>
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Site İzinleri</string>

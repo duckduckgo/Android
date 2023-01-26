@@ -398,7 +398,7 @@
     <string name="systemSearchOnboardingButtonOk">Ik snap het</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">VERBERGEN</string>
+    <string name="daxDialogHideButton">Verbergen</string>
     <string name="daxDialogPhew">Opluchting!</string>
     <string name="daxDialogNext">Volgende</string>
     <string name="daxDialogHighFive">High Five!</string>
@@ -652,7 +652,8 @@
     <string name="autoconsentSecondaryCta">Nee, bedankt</string>
 
     <string name="autoconsentSetting">Cookiepop-ups beheren</string>
-    <string name="autoconsentAnimationText">Beheerde cookies</string>
+    <string name="autoconsentCosmeticNoticeAnimationText">Pop-up verborgen</string>
+    <string name="autoconsentManagedNoticeAnimationText">Beheerde cookies</string>
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Sitetoestemmingen</string>

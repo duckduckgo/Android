@@ -18,6 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="autoconsentTitle">Administrer popup-vinduer om informasjonskapsler</string>
-    <string name="autoconsentDescription">Når DuckDuckGo oppdager popup-vinduer om samtykke til informasjonskapsler på nettsteder du besøker, kan vi automatisk angi innstillingene for å minimere informasjonskapslene og maksimere personvernet, og deretter lukke popup-vinduene.</string>
+    <string name="autoconsentDescription">Når DuckDuckGo oppdager popup-vinduer om samtykke til informasjonskapsler på nettsteder du besøker, kan vi automatisk angi innstillingene for å minimere informasjonskapslene og maksimere personvernet, og deretter lukke popup-vinduene. Noen nettsteder tilbyr ikke noe alternativ for å administrere preferanser for informasjonskapsler, så slike popup-vinduer kan vi bare skjule.</string>
     <string name="autoconsentToggle">La DuckDuckGo administrere popup-vinduer om samtykke til informasjonskapsler</string>
 </resources>

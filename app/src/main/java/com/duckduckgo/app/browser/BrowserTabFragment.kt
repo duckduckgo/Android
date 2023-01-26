@@ -474,9 +474,9 @@ class BrowserTabFragment :
             // }
         }
 
-        override fun onPopUpHandled() {
+        override fun onPopUpHandled(isCosmetic: Boolean) {
             launch {
-                context?.let { animatorHelper.createCookiesAnimation(it, omnibarViews(), cookieDummyView, cookieAnimation, scene_root) }
+                context?.let { animatorHelper.createCookiesAnimation(it, omnibarViews(), cookieDummyView, cookieAnimation, scene_root, isCosmetic) }
             }
         }
 
@@ -484,8 +484,9 @@ class BrowserTabFragment :
             consentManaged: Boolean,
             optOutFailed: Boolean,
             selfTestFailed: Boolean,
+            isCosmetic: Boolean?,
         ) {
-            viewModel.onAutoconsentResultReceived(consentManaged, optOutFailed, selfTestFailed)
+            viewModel.onAutoconsentResultReceived(consentManaged, optOutFailed, selfTestFailed, isCosmetic)
         }
     }
 

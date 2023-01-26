@@ -28419,8 +28419,10 @@ var windowsIncomingVisibilitySchema = _zod.z.object({
 exports.windowsIncomingVisibilitySchema = windowsIncomingVisibilitySchema;
 var cookiePromptManagementStatusSchema = _zod.z.object({
   consentManaged: _zod.z["boolean"](),
+  cosmetic: _zod.z["boolean"]().optional(),
   optoutFailed: _zod.z["boolean"]().optional(),
-  selftestFailed: _zod.z["boolean"]().optional()
+  selftestFailed: _zod.z["boolean"]().optional(),
+  configurable: _zod.z["boolean"]().optional()
 });
 exports.cookiePromptManagementStatusSchema = cookiePromptManagementStatusSchema;
 var refreshAliasResponseSchema = _zod.z.object({
@@ -28532,6 +28534,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.getBackgroundTabData = exports.fetch = exports.backgroundMessage = exports.PrivacyDashboardJavascriptInterface = void 0;
+exports.onChangeConsentManaged = onChangeConsentManaged;
 exports.onChangeLocale = onChangeLocale;
 exports.onChangeProtectionStatus = onChangeProtectionStatus;
 exports.onChangeRequestData = onChangeRequestData;
@@ -28565,7 +28568,7 @@ var upgradedHttps;
 var protections;
 var isPendingUpdates;
 var parentEntity;
-var cookiePromptManagementStatus;
+var cookiePromptManagementStatus = {};
 
 /** @type {string | undefined} */
 var locale;
@@ -28699,6 +28702,29 @@ function onChangeLocale(payload) {
 }
 
 /**
+ * {@inheritDoc common.onChangeConsentManaged}
+ * @type {import("./common.es6").onChangeConsentManaged}
+ * @group Android -> JavaScript Interface
+ * @example On Android, it might look something like this:
+ *
+ * ```kotlin
+ * // kotlin
+ * webView.evaluateJavascript("javascript:onChangeConsentManaged(${cookiePromptManagementStatusAsJsonString});", null)
+ * ```
+ */
+function onChangeConsentManaged(payload) {
+  var _channel3;
+  var parsed = _schema.cookiePromptManagementStatusSchema.safeParse(payload);
+  if (!parsed.success) {
+    console.error('could not parse incoming data from onChangeConsentManaged');
+    console.error(parsed.error);
+    return;
+  }
+  Object.assign(cookiePromptManagementStatus, parsed.data);
+  (_channel3 = channel) === null || _channel3 === void 0 ? void 0 : _channel3.send('updateTabData');
+}
+
+/**
  * This describes the JavaScript Interface, `PrivacyDashboard`, that gets added to the `window` object by Android.
  *
  * The Privacy Dashboard communicates with Android by calling methods on that global object.
@@ -28784,9 +28810,29 @@ var PrivacyDashboardJavascriptInterface = /*#__PURE__*/function () {
     value: function openInNewTab(payload) {
       window.PrivacyDashboard.openInNewTab(JSON.stringify(payload));
     }
+
+    /**
+     * {@inheritDoc common.openSettings}
+     * @type {import("./common.es6").openSettings}
+     * @example
+     * ```js
+     * const payload = JSON.stringify({
+     *     "target": "cpm"
+     * });
+     * window.PrivacyDashboard.openSettings(payload)
+     * ```
+     */
+  }, {
+    key: "openSettings",
+    value: function openSettings(payload) {
+      window.PrivacyDashboard.openSettings(JSON.stringify(payload));
+    }
   }]);
   return PrivacyDashboardJavascriptInterface;
 }();
+/**
+ * @type {PrivacyDashboardJavascriptInterface}
+ */
 exports.PrivacyDashboardJavascriptInterface = PrivacyDashboardJavascriptInterface;
 var privacyDashboardApi;
 
@@ -28831,6 +28877,12 @@ function _fetchAndroid() {
       privacyDashboardApi.showBreakageForm();
       return true; // Return true to prevent HTML form from showing
     }
+
+    if (message instanceof _common.OpenSettingsMessages) {
+      privacyDashboardApi.openSettings({
+        target: message.target
+      });
+    }
   });
   return _fetchAndroid.apply(this, arguments);
 }
@@ -28851,10 +28903,11 @@ function setup() {
   window.onChangeProtectionStatus = onChangeProtectionStatus;
   window.onChangeLocale = onChangeLocale;
   window.onChangeRequestData = onChangeRequestData;
+  window.onChangeConsentManaged = onChangeConsentManaged;
   window.onChangeAllowedPermissions = function (data) {
-    var _channel3;
+    var _channel4;
     permissionsData = data;
-    (_channel3 = channel) === null || _channel3 === void 0 ? void 0 : _channel3.send('updateTabData', {
+    (_channel4 = channel) === null || _channel4 === void 0 ? void 0 : _channel4.send('updateTabData', {
       via: 'onChangeAllowedPermissions'
     });
   };
@@ -28864,31 +28917,24 @@ function setup() {
     resolveInitialRender();
   };
   window.onChangeCertificateData = function (data) {
-    var _channel4;
+    var _channel5;
     certificateData = data.secCertificateViewModels;
-    (_channel4 = channel) === null || _channel4 === void 0 ? void 0 : _channel4.send('updateTabData', {
+    (_channel5 = channel) === null || _channel5 === void 0 ? void 0 : _channel5.send('updateTabData', {
       via: 'onChangeCertificateData'
     });
   };
   window.onIsPendingUpdates = function (data) {
-    var _channel5;
+    var _channel6;
     isPendingUpdates = data;
-    (_channel5 = channel) === null || _channel5 === void 0 ? void 0 : _channel5.send('updateTabData', {
+    (_channel6 = channel) === null || _channel6 === void 0 ? void 0 : _channel6.send('updateTabData', {
       via: 'onIsPendingUpdates'
     });
   };
   window.onChangeParentEntity = function (data) {
-    var _channel6;
-    parentEntity = data;
-    (_channel6 = channel) === null || _channel6 === void 0 ? void 0 : _channel6.send('updateTabData', {
-      via: 'onChangeParentEntity'
-    });
-  };
-  window.onChangeConsentManaged = function (data) {
     var _channel7;
-    cookiePromptManagementStatus = data;
+    parentEntity = data;
     (_channel7 = channel) === null || _channel7 === void 0 ? void 0 : _channel7.send('updateTabData', {
-      via: 'onChangeConsentManaged'
+      via: 'onChangeParentEntity'
     });
   };
 
@@ -28921,7 +28967,7 @@ var fetch = new Proxy(fetchAndroid, {
 });
 exports.fetch = fetch;
 
-},{"../../../schema/__generated__/schema.parsers":61,"../ui/views/utils/utils":121,"./common.es6":65,"./utils/request-details":71}],64:[function(require,module,exports){
+},{"../../../schema/__generated__/schema.parsers":61,"../ui/views/utils/utils":123,"./common.es6":65,"./utils/request-details":71}],64:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -29251,14 +29297,16 @@ function _getBackgroundTabData() {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.UpdatePermissionMessage = exports.SubmitBrokenSiteReportMessage = exports.SetListsMessage = exports.SearchMessage = exports.RefreshEmailAliasMessage = exports.OpenOptionsMessage = exports.CloseMessage = exports.CheckBrokenSiteReportHandledMessage = void 0;
+exports.UpdatePermissionMessage = exports.SubmitBrokenSiteReportMessage = exports.SetListsMessage = exports.SearchMessage = exports.RefreshEmailAliasMessage = exports.OpenSettingsMessages = exports.OpenOptionsMessage = exports.CloseMessage = exports.CheckBrokenSiteReportHandledMessage = void 0;
 exports.assert = assert;
 exports.fetcher = fetcher;
 exports.getContentHeightForScreenShot = exports.getContentHeight = void 0;
+exports.onChangeConsentManaged = onChangeConsentManaged;
 exports.onChangeLocale = onChangeLocale;
 exports.onChangeProtectionStatus = onChangeProtectionStatus;
 exports.openInNewTab = openInNewTab;
 exports.openOptions = openOptions;
+exports.openSettings = openSettings;
 exports.refreshAlias = refreshAlias;
 exports.search = search;
 exports.setLists = setLists;
@@ -29407,10 +29455,54 @@ function assert(condition) {
 function onChangeLocale(payload) {}
 
 /**
+ * Sets the current status of the Cookie Prompt Management.
+ *
+ * Platforms can provide this data to indicate that a Cookie Prompt was managed successfully.
+ *
+ * Note: if {@link "Generated Schema Definitions".CookiePromptManagementStatus.configurable} is `true`
+ * in the payload, the dashboard will use the secondary screen. If it is absent, or `false`, it will
+ * only show the row in the main nav, but it will not be clickable
+ *
+ * ### Example Payloads:
+ *
+ * Please see the schema definition for {@link "Generated Schema Definitions".CookiePromptManagementStatus}
+ *
+ * **None-Configurable**
+ *
+ * This would show the 4th row in the dashboard, but it would not be clickable
+ *
+ * ```
+ * [[include:cpm.json]]```
+ *
+ * **Configurable**
+ *
+ * This would allow the link to be clicked, and it would show the secondary screen
+ *
+ * ```
+ * [[include:cpm-secondary.json]]```
+ *
+ *
+ *
+ * @param {import('../../../schema/__generated__/schema.types').CookiePromptManagementStatus} payload
+ */
+function onChangeConsentManaged(payload) {}
+
+/**
  * Calling this method should close the dashboard and open the given URL in a **new tab**.
  * @param {{url: string}} payload
  */
 function openInNewTab(payload) {}
+
+/**
+ * Calling this method should open the settings at the 'target' provided
+ *
+ * Supported targets:
+ *
+ * - `cpm` - used from the Cookie Prompt Management screen when user taps 'disable in settings'
+ *
+ * @param {{target: 'cpm'}} payload
+ */
+function openSettings(payload) {}
 
 /**
  * Communicate the size of the dashboard so that native sides can
@@ -29605,13 +29697,34 @@ var SearchMessage = /*#__PURE__*/function (_Msg8) {
   }
   return _createClass(SearchMessage);
 }(Msg);
+exports.SearchMessage = SearchMessage;
+var OpenSettingsMessages = /*#__PURE__*/function (_Msg9) {
+  _inherits(OpenSettingsMessages, _Msg9);
+  var _super9 = _createSuper(OpenSettingsMessages);
+  /**
+   * @param {object} params
+   * @param {'cpm'} params.target
+   */
+  function OpenSettingsMessages(params) {
+    var _this5;
+    _classCallCheck(this, OpenSettingsMessages);
+    _this5 = _super9.call(this);
+    /**
+     * A string representing different settings screens that can be opened
+     * @type {'cpm'}
+     */
+    _this5.target = params.target;
+    return _this5;
+  }
+  return _createClass(OpenSettingsMessages);
+}(Msg);
 /**
  * @template {SetListsMessage|SubmitBrokenSiteReportMessage|UpdatePermissionMessage|CheckBrokenSiteReportHandledMessage|CloseMessage|RefreshEmailAliasMessage|OpenOptionsMessage} T
  * @template {unknown} [Response=unknown]
  * @param {T} message
  * @returns {Promise<any>}
  */
-exports.SearchMessage = SearchMessage;
+exports.OpenSettingsMessages = OpenSettingsMessages;
 function fetcher(_x) {
   return _fetcher.apply(this, arguments);
 }
@@ -29728,6 +29841,13 @@ function _fetch() {
         return false;
       }
     }
+    if (message instanceof _common.OpenSettingsMessages) {
+      if (overrides.platform === 'ios' || overrides.platform === 'android') {
+        return true;
+      } else {
+        return false;
+      }
+    }
     console.log('fetch - Not implemented', message);
   });
   return _fetch.apply(this, arguments);
@@ -29748,7 +29868,6 @@ function getBackgroundTabData() {
 }
 function _getBackgroundTabData() {
   _getBackgroundTabData = _asyncToGenerator(function* () {
-    console.log(overrides.requests);
     return {
       tab: overrides.tab,
       emailProtectionUserData: overrides.emailProtectionUserData
@@ -29876,9 +29995,11 @@ exports.backgroundMessage = void 0;
 exports.fetch = fetch;
 exports.firstRenderComplete = firstRenderComplete;
 exports.getBackgroundTabData = void 0;
+exports.onChangeConsentManaged = onChangeConsentManaged;
 exports.onChangeLocale = onChangeLocale;
 exports.onChangeProtectionStatus = onChangeProtectionStatus;
 exports.onChangeRequestData = onChangeRequestData;
+exports.privacyDashboardOpenSettings = privacyDashboardOpenSettings;
 exports.privacyDashboardOpenUrlInNewTab = privacyDashboardOpenUrlInNewTab;
 exports.privacyDashboardSetSize = privacyDashboardSetSize;
 exports.privacyDashboardSubmitBrokenSiteReport = privacyDashboardSubmitBrokenSiteReport;
@@ -29914,7 +30035,7 @@ var upgradedHttps;
 var protections;
 var isPendingUpdates;
 var parentEntity;
-var cookiePromptManagementStatus;
+var cookiePromptManagementStatus = {};
 
 /** @type {string | undefined} */
 var locale;
@@ -30026,6 +30147,29 @@ function onChangeLocale(payload) {
   (_channel2 = channel) === null || _channel2 === void 0 ? void 0 : _channel2.send('updateTabData');
 }
 
+/**
+ * {@inheritDoc common.onChangeConsentManaged}
+ * @type {import("./common.es6").onChangeConsentManaged}
+ * @group macOS -> JavaScript Interface
+ * @example On macOS and iOS, it might look something like this:
+ *
+ * ```swift
+ * // swift
+ * evaluate(js: "window.onChangeConsentManaged(\(cookiePromptManagementStatus))", in: webView)
+ * ```
+ */
+function onChangeConsentManaged(payload) {
+  var _channel3;
+  var parsed = _schema.cookiePromptManagementStatusSchema.safeParse(payload);
+  if (!parsed.success) {
+    console.error('could not parse incoming data from onChangeConsentManaged');
+    console.error(parsed.error);
+    return;
+  }
+  Object.assign(cookiePromptManagementStatus, parsed.data);
+  (_channel3 = channel) === null || _channel3 === void 0 ? void 0 : _channel3.send('updateTabData');
+}
+
 // -----------------------------------------------------------------------------
 
 /**
@@ -30071,6 +30215,12 @@ function _fetch() {
         _iterator.f();
       }
     }
+    if (message instanceof _common.OpenSettingsMessages) {
+      privacyDashboardOpenSettings({
+        target: message.target
+      });
+      return;
+    }
     if (message instanceof _common.UpdatePermissionMessage) {
       window.webkit.messageHandlers.privacyDashboardSetPermission.postMessage({
         permission: message.id,
@@ -30103,6 +30253,17 @@ function privacyDashboardOpenUrlInNewTab(args) {
 }
 
 /**
+ * {@inheritDoc common.openSettings}
+ * @type {import("./common.es6").openSettings}
+ * @category Webkit Message Handlers
+ */
+function privacyDashboardOpenSettings(args) {
+  window.webkit.messageHandlers.privacyDashboardOpenSettings.postMessage({
+    target: args.target
+  });
+}
+
+/**
  * {@inheritDoc common.submitBrokenSiteReport}
  * @type {import("./common.es6").submitBrokenSiteReport}
  * @category Webkit Message Handlers
@@ -30131,9 +30292,9 @@ function privacyDashboardSetSize(payload) {
 function setupShared() {
   window.onChangeRequestData = onChangeRequestData;
   window.onChangeAllowedPermissions = function (data) {
-    var _channel3;
+    var _channel4;
     permissionsData = data;
-    (_channel3 = channel) === null || _channel3 === void 0 ? void 0 : _channel3.send('updateTabData');
+    (_channel4 = channel) === null || _channel4 === void 0 ? void 0 : _channel4.send('updateTabData');
   };
   window.onChangeUpgradedHttps = function (data) {
     upgradedHttps = data;
@@ -30143,25 +30304,21 @@ function setupShared() {
   window.onChangeProtectionStatus = onChangeProtectionStatus;
   window.onChangeLocale = onChangeLocale;
   window.onChangeCertificateData = function (data) {
-    var _channel4;
-    certificateData = data.secCertificateViewModels;
-    (_channel4 = channel) === null || _channel4 === void 0 ? void 0 : _channel4.send('updateTabData');
-  };
-  window.onIsPendingUpdates = function (data) {
     var _channel5;
-    isPendingUpdates = data;
+    certificateData = data.secCertificateViewModels;
     (_channel5 = channel) === null || _channel5 === void 0 ? void 0 : _channel5.send('updateTabData');
   };
-  window.onChangeParentEntity = function (data) {
+  window.onIsPendingUpdates = function (data) {
     var _channel6;
-    parentEntity = data;
+    isPendingUpdates = data;
     (_channel6 = channel) === null || _channel6 === void 0 ? void 0 : _channel6.send('updateTabData');
   };
-  window.onChangeConsentManaged = function (data) {
+  window.onChangeParentEntity = function (data) {
     var _channel7;
-    cookiePromptManagementStatus = data;
+    parentEntity = data;
     (_channel7 = channel) === null || _channel7 === void 0 ? void 0 : _channel7.send('updateTabData');
   };
+  window.onChangeConsentManaged = onChangeConsentManaged;
   (0, _utils.setupGlobalOpenerListener)(function (href) {
     privacyDashboardOpenUrlInNewTab({
       url: href
@@ -30198,7 +30355,7 @@ function firstRenderComplete() {
   }
 }
 
-},{"../../../schema/__generated__/schema.parsers":61,"../ui/environment-check":83,"../ui/views/utils/utils":121,"./common.es6":65,"./utils/request-details":71}],70:[function(require,module,exports){
+},{"../../../schema/__generated__/schema.parsers":61,"../ui/environment-check":83,"../ui/views/utils/utils":123,"./common.es6":65,"./utils/request-details":71}],70:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -30249,6 +30406,7 @@ function getOverrides(searchString) {
       overrides.tab.url = match.url;
       overrides.tab.upgradedHttps = match.upgradedHttps;
       overrides.tab.certificate = match.certificate;
+      overrides.tab.cookiePromptManagementStatus = match.cookiePromptManagementStatus;
     }
   }
   var platformParam = params.get('platform');
@@ -30299,9 +30457,16 @@ function getOverrides(searchString) {
   if (params.get('consentManaged')) {
     overrides.tab.cookiePromptManagementStatus = {
       consentManaged: true,
+      cosmetic: false,
       optoutFailed: false,
-      selftestFailed: false
+      configurable: false
     };
+    if (params.get('consentConfigurable')) {
+      overrides.tab.cookiePromptManagementStatus.configurable = true;
+    }
+    if (params.get('consentCosmetic')) {
+      overrides.tab.cookiePromptManagementStatus.cosmetic = true;
+    }
   }
 
   // browser-specific overrides
@@ -30331,7 +30496,7 @@ function getOverrides(searchString) {
   return overrides;
 }
 
-},{"../../ui/environment-check":83,"../../ui/views/tests/generate-data":119,"./request-details":71}],71:[function(require,module,exports){
+},{"../../ui/environment-check":83,"../../ui/views/tests/generate-data":121,"./request-details":71}],71:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -30815,13 +30980,14 @@ function TrackerUrl(url, category) {
 });
 exports.TrackerUrl = TrackerUrl;
 
-},{"../../../../schema/__generated__/schema.parsers":61,"../../ui/models/mixins/normalize-company-name.es6.js":88}],72:[function(require,module,exports){
+},{"../../../../schema/__generated__/schema.parsers":61,"../../ui/models/mixins/normalize-company-name.es6.js":89}],72:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.OpenInNewTab = OpenInNewTab;
+exports.OpenSettings = OpenSettings;
 exports.SetSize = SetSize;
 exports.SubmitBrokenSiteReport = SubmitBrokenSiteReport;
 exports.backgroundMessage = void 0;
@@ -30948,6 +31114,12 @@ function _fetch() {
       });
       return;
     }
+    if (message instanceof _common.OpenSettingsMessages) {
+      OpenSettings({
+        target: message.target
+      });
+      return;
+    }
     if (message instanceof _common.SetListsMessage) {
       var _iterator = _createForOfIteratorHelper(message.lists),
         _step;
@@ -31030,6 +31202,25 @@ function OpenInNewTab(args) {
  */
 function SetSize(payload) {
   windowsPostMessage('SetSize', payload);
+}
+
+/**
+ * {@inheritDoc common.openSettings}
+ * @type {import("./common.es6").openSettings}
+ * @group JavaScript -> Windows Messages
+ *
+ * @example
+ *
+ * ```javascript
+ * window.chrome.webview.postMessage({
+ *     Feature: 'PrivacyDashboard',
+ *     Name: 'OpenSettings',
+ *     Data: { target: 'cpm' }
+ * })
+ * ```
+ */
+function OpenSettings(args) {
+  windowsPostMessage('OpenSettings', args);
 }
 var getBackgroundTabData = function getBackgroundTabData() {
   return new Promise(function (resolve) {
@@ -31118,7 +31309,7 @@ function firstRenderComplete() {
   }
 }
 
-},{"../../../schema/__generated__/schema.parsers":61,"../ui/views/utils/utils":121,"./common.es6":65,"./utils/request-details":71,"zod":56}],73:[function(require,module,exports){
+},{"../../../schema/__generated__/schema.parsers":61,"../ui/views/utils/utils":123,"./common.es6":65,"./utils/request-details":71,"zod":56}],73:[function(require,module,exports){
 "use strict";
 
 window.onunhandledrejection = function (event) {
@@ -31135,7 +31326,7 @@ try {
   console.error('start up error', e);
 }
 
-},{"../pages/popup.es6.js":92,"./loadcss.js":74}],74:[function(require,module,exports){
+},{"../pages/popup.es6.js":93,"./loadcss.js":74}],74:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -31223,7 +31414,7 @@ var ns = {
 };
 exports.ns = ns;
 
-},{"../../../locales/bg/connection.json":122,"../../../locales/bg/ctascreens.json":123,"../../../locales/bg/permissions.json":124,"../../../locales/bg/report.json":125,"../../../locales/bg/shared.json":126,"../../../locales/bg/site.json":127,"../../../locales/cs/connection.json":128,"../../../locales/cs/ctascreens.json":129,"../../../locales/cs/permissions.json":130,"../../../locales/cs/report.json":131,"../../../locales/cs/shared.json":132,"../../../locales/cs/site.json":133,"../../../locales/da/connection.json":134,"../../../locales/da/ctascreens.json":135,"../../../locales/da/permissions.json":136,"../../../locales/da/report.json":137,"../../../locales/da/shared.json":138,"../../../locales/da/site.json":139,"../../../locales/de/connection.json":140,"../../../locales/de/ctascreens.json":141,"../../../locales/de/permissions.json":142,"../../../locales/de/report.json":143,"../../../locales/de/shared.json":144,"../../../locales/de/site.json":145,"../../../locales/el/connection.json":146,"../../../locales/el/ctascreens.json":147,"../../../locales/el/permissions.json":148,"../../../locales/el/report.json":149,"../../../locales/el/shared.json":150,"../../../locales/el/site.json":151,"../../../locales/en/connection.json":152,"../../../locales/en/ctascreens.json":153,"../../../locales/en/permissions.json":154,"../../../locales/en/report.json":155,"../../../locales/en/shared.json":156,"../../../locales/en/site.json":157,"../../../locales/es/connection.json":158,"../../../locales/es/ctascreens.json":159,"../../../locales/es/permissions.json":160,"../../../locales/es/report.json":161,"../../../locales/es/shared.json":162,"../../../locales/es/site.json":163,"../../../locales/et/connection.json":164,"../../../locales/et/ctascreens.json":165,"../../../locales/et/permissions.json":166,"../../../locales/et/report.json":167,"../../../locales/et/shared.json":168,"../../../locales/et/site.json":169,"../../../locales/fi/connection.json":170,"../../../locales/fi/ctascreens.json":171,"../../../locales/fi/permissions.json":172,"../../../locales/fi/report.json":173,"../../../locales/fi/shared.json":174,"../../../locales/fi/site.json":175,"../../../locales/fr/connection.json":176,"../../../locales/fr/ctascreens.json":177,"../../../locales/fr/permissions.json":178,"../../../locales/fr/report.json":179,"../../../locales/fr/shared.json":180,"../../../locales/fr/site.json":181,"../../../locales/hr/connection.json":182,"../../../locales/hr/ctascreens.json":183,"../../../locales/hr/permissions.json":184,"../../../locales/hr/report.json":185,"../../../locales/hr/shared.json":186,"../../../locales/hr/site.json":187,"../../../locales/hu/connection.json":188,"../../../locales/hu/ctascreens.json":189,"../../../locales/hu/permissions.json":190,"../../../locales/hu/report.json":191,"../../../locales/hu/shared.json":192,"../../../locales/hu/site.json":193,"../../../locales/it/connection.json":194,"../../../locales/it/ctascreens.json":195,"../../../locales/it/permissions.json":196,"../../../locales/it/report.json":197,"../../../locales/it/shared.json":198,"../../../locales/it/site.json":199,"../../../locales/lt/connection.json":200,"../../../locales/lt/ctascreens.json":201,"../../../locales/lt/permissions.json":202,"../../../locales/lt/report.json":203,"../../../locales/lt/shared.json":204,"../../../locales/lt/site.json":205,"../../../locales/lv/connection.json":206,"../../../locales/lv/ctascreens.json":207,"../../../locales/lv/permissions.json":208,"../../../locales/lv/report.json":209,"../../../locales/lv/shared.json":210,"../../../locales/lv/site.json":211,"../../../locales/nb/connection.json":212,"../../../locales/nb/ctascreens.json":213,"../../../locales/nb/permissions.json":214,"../../../locales/nb/report.json":215,"../../../locales/nb/shared.json":216,"../../../locales/nb/site.json":217,"../../../locales/nl/connection.json":218,"../../../locales/nl/ctascreens.json":219,"../../../locales/nl/permissions.json":220,"../../../locales/nl/report.json":221,"../../../locales/nl/shared.json":222,"../../../locales/nl/site.json":223,"../../../locales/pl/connection.json":224,"../../../locales/pl/ctascreens.json":225,"../../../locales/pl/permissions.json":226,"../../../locales/pl/report.json":227,"../../../locales/pl/shared.json":228,"../../../locales/pl/site.json":229,"../../../locales/pt/connection.json":230,"../../../locales/pt/ctascreens.json":231,"../../../locales/pt/permissions.json":232,"../../../locales/pt/report.json":233,"../../../locales/pt/shared.json":234,"../../../locales/pt/site.json":235,"../../../locales/ro/connection.json":236,"../../../locales/ro/ctascreens.json":237,"../../../locales/ro/permissions.json":238,"../../../locales/ro/report.json":239,"../../../locales/ro/shared.json":240,"../../../locales/ro/site.json":241,"../../../locales/ru/connection.json":242,"../../../locales/ru/ctascreens.json":243,"../../../locales/ru/permissions.json":244,"../../../locales/ru/report.json":245,"../../../locales/ru/shared.json":246,"../../../locales/ru/site.json":247,"../../../locales/sk/connection.json":248,"../../../locales/sk/ctascreens.json":249,"../../../locales/sk/permissions.json":250,"../../../locales/sk/report.json":251,"../../../locales/sk/shared.json":252,"../../../locales/sk/site.json":253,"../../../locales/sl/connection.json":254,"../../../locales/sl/ctascreens.json":255,"../../../locales/sl/permissions.json":256,"../../../locales/sl/report.json":257,"../../../locales/sl/shared.json":258,"../../../locales/sl/site.json":259,"../../../locales/sv/connection.json":260,"../../../locales/sv/ctascreens.json":261,"../../../locales/sv/permissions.json":262,"../../../locales/sv/report.json":263,"../../../locales/sv/shared.json":264,"../../../locales/sv/site.json":265,"../../../locales/tr/connection.json":266,"../../../locales/tr/ctascreens.json":267,"../../../locales/tr/permissions.json":268,"../../../locales/tr/report.json":269,"../../../locales/tr/shared.json":270,"../../../locales/tr/site.json":271,"i18next":40,"i18next-icu":39}],76:[function(require,module,exports){
+},{"../../../locales/bg/connection.json":124,"../../../locales/bg/ctascreens.json":125,"../../../locales/bg/permissions.json":126,"../../../locales/bg/report.json":127,"../../../locales/bg/shared.json":128,"../../../locales/bg/site.json":129,"../../../locales/cs/connection.json":130,"../../../locales/cs/ctascreens.json":131,"../../../locales/cs/permissions.json":132,"../../../locales/cs/report.json":133,"../../../locales/cs/shared.json":134,"../../../locales/cs/site.json":135,"../../../locales/da/connection.json":136,"../../../locales/da/ctascreens.json":137,"../../../locales/da/permissions.json":138,"../../../locales/da/report.json":139,"../../../locales/da/shared.json":140,"../../../locales/da/site.json":141,"../../../locales/de/connection.json":142,"../../../locales/de/ctascreens.json":143,"../../../locales/de/permissions.json":144,"../../../locales/de/report.json":145,"../../../locales/de/shared.json":146,"../../../locales/de/site.json":147,"../../../locales/el/connection.json":148,"../../../locales/el/ctascreens.json":149,"../../../locales/el/permissions.json":150,"../../../locales/el/report.json":151,"../../../locales/el/shared.json":152,"../../../locales/el/site.json":153,"../../../locales/en/connection.json":154,"../../../locales/en/ctascreens.json":155,"../../../locales/en/permissions.json":156,"../../../locales/en/report.json":157,"../../../locales/en/shared.json":158,"../../../locales/en/site.json":159,"../../../locales/es/connection.json":160,"../../../locales/es/ctascreens.json":161,"../../../locales/es/permissions.json":162,"../../../locales/es/report.json":163,"../../../locales/es/shared.json":164,"../../../locales/es/site.json":165,"../../../locales/et/connection.json":166,"../../../locales/et/ctascreens.json":167,"../../../locales/et/permissions.json":168,"../../../locales/et/report.json":169,"../../../locales/et/shared.json":170,"../../../locales/et/site.json":171,"../../../locales/fi/connection.json":172,"../../../locales/fi/ctascreens.json":173,"../../../locales/fi/permissions.json":174,"../../../locales/fi/report.json":175,"../../../locales/fi/shared.json":176,"../../../locales/fi/site.json":177,"../../../locales/fr/connection.json":178,"../../../locales/fr/ctascreens.json":179,"../../../locales/fr/permissions.json":180,"../../../locales/fr/report.json":181,"../../../locales/fr/shared.json":182,"../../../locales/fr/site.json":183,"../../../locales/hr/connection.json":184,"../../../locales/hr/ctascreens.json":185,"../../../locales/hr/permissions.json":186,"../../../locales/hr/report.json":187,"../../../locales/hr/shared.json":188,"../../../locales/hr/site.json":189,"../../../locales/hu/connection.json":190,"../../../locales/hu/ctascreens.json":191,"../../../locales/hu/permissions.json":192,"../../../locales/hu/report.json":193,"../../../locales/hu/shared.json":194,"../../../locales/hu/site.json":195,"../../../locales/it/connection.json":196,"../../../locales/it/ctascreens.json":197,"../../../locales/it/permissions.json":198,"../../../locales/it/report.json":199,"../../../locales/it/shared.json":200,"../../../locales/it/site.json":201,"../../../locales/lt/connection.json":202,"../../../locales/lt/ctascreens.json":203,"../../../locales/lt/permissions.json":204,"../../../locales/lt/report.json":205,"../../../locales/lt/shared.json":206,"../../../locales/lt/site.json":207,"../../../locales/lv/connection.json":208,"../../../locales/lv/ctascreens.json":209,"../../../locales/lv/permissions.json":210,"../../../locales/lv/report.json":211,"../../../locales/lv/shared.json":212,"../../../locales/lv/site.json":213,"../../../locales/nb/connection.json":214,"../../../locales/nb/ctascreens.json":215,"../../../locales/nb/permissions.json":216,"../../../locales/nb/report.json":217,"../../../locales/nb/shared.json":218,"../../../locales/nb/site.json":219,"../../../locales/nl/connection.json":220,"../../../locales/nl/ctascreens.json":221,"../../../locales/nl/permissions.json":222,"../../../locales/nl/report.json":223,"../../../locales/nl/shared.json":224,"../../../locales/nl/site.json":225,"../../../locales/pl/connection.json":226,"../../../locales/pl/ctascreens.json":227,"../../../locales/pl/permissions.json":228,"../../../locales/pl/report.json":229,"../../../locales/pl/shared.json":230,"../../../locales/pl/site.json":231,"../../../locales/pt/connection.json":232,"../../../locales/pt/ctascreens.json":233,"../../../locales/pt/permissions.json":234,"../../../locales/pt/report.json":235,"../../../locales/pt/shared.json":236,"../../../locales/pt/site.json":237,"../../../locales/ro/connection.json":238,"../../../locales/ro/ctascreens.json":239,"../../../locales/ro/permissions.json":240,"../../../locales/ro/report.json":241,"../../../locales/ro/shared.json":242,"../../../locales/ro/site.json":243,"../../../locales/ru/connection.json":244,"../../../locales/ru/ctascreens.json":245,"../../../locales/ru/permissions.json":246,"../../../locales/ru/report.json":247,"../../../locales/ru/shared.json":248,"../../../locales/ru/site.json":249,"../../../locales/sk/connection.json":250,"../../../locales/sk/ctascreens.json":251,"../../../locales/sk/permissions.json":252,"../../../locales/sk/report.json":253,"../../../locales/sk/shared.json":254,"../../../locales/sk/site.json":255,"../../../locales/sl/connection.json":256,"../../../locales/sl/ctascreens.json":257,"../../../locales/sl/permissions.json":258,"../../../locales/sl/report.json":259,"../../../locales/sl/shared.json":260,"../../../locales/sl/site.json":261,"../../../locales/sv/connection.json":262,"../../../locales/sv/ctascreens.json":263,"../../../locales/sv/permissions.json":264,"../../../locales/sv/report.json":265,"../../../locales/sv/shared.json":266,"../../../locales/sv/site.json":267,"../../../locales/tr/connection.json":268,"../../../locales/tr/ctascreens.json":269,"../../../locales/tr/permissions.json":270,"../../../locales/tr/report.json":271,"../../../locales/tr/shared.json":272,"../../../locales/tr/site.json":273,"i18next":40,"i18next-icu":39}],76:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -32122,6 +32313,31 @@ BreakageFormModel.prototype = _jquery["default"].extend({}, _model["default"].pr
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.CookiePromptModel = CookiePromptModel;
+var _jquery = _interopRequireDefault(require("jquery"));
+var _model = _interopRequireDefault(require("../base/model.es6"));
+var _common = require("../../browser/common.es6");
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+/** @this {any} */
+function CookiePromptModel(attrs) {
+  this.isCosmetic = attrs.isCosmetic;
+  _model["default"].call(this, attrs);
+}
+CookiePromptModel.prototype = _jquery["default"].extend({}, _model["default"].prototype, {
+  modelName: 'cookiePrompt',
+  openSettings: function openSettings(category) {
+    this.fetch(new _common.OpenSettingsMessages({
+      target: 'cpm'
+    }));
+  }
+});
+
+},{"../../browser/common.es6":65,"../base/model.es6":78,"jquery":46}],87:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports.CtaRotationModel = CtaRotationModel;
 exports.constants = void 0;
 var _jquery = _interopRequireDefault(require("jquery"));
@@ -32170,7 +32386,7 @@ CtaRotationModel.prototype = _jquery["default"].extend({}, _model["default"].pro
   }
 });
 
-},{"../base/model.es6":78,"../templates/cta-rotation.es6":95,"jquery":46}],87:[function(require,module,exports){
+},{"../base/model.es6":78,"../templates/cta-rotation.es6":96,"jquery":46}],88:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -32249,7 +32465,7 @@ EmailProtectionModel.prototype = _jquery["default"].extend({}, _model["default"]
 var _default = EmailProtectionModel;
 exports["default"] = _default;
 
-},{"../../browser/common.es6":65,"../base/model.es6":78,"jquery":46,"zod":56}],88:[function(require,module,exports){
+},{"../../browser/common.es6":65,"../base/model.es6":78,"jquery":46,"zod":56}],89:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -32274,7 +32490,7 @@ function removeTLD(entityName) {
   return entityName.replace(/\.[a-z]+$/i, '');
 }
 
-},{}],89:[function(require,module,exports){
+},{}],90:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -32311,7 +32527,7 @@ Search.prototype = _jquery["default"].extend({}, _model["default"].prototype, {
 var _default = Search;
 exports["default"] = _default;
 
-},{"../../browser/common.es6":65,"../base/model.es6":78,"jquery":46}],90:[function(require,module,exports){
+},{"../../browser/common.es6":65,"../base/model.es6":78,"jquery":46}],91:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -32349,7 +32565,7 @@ SiteCompanyList.prototype = _jquery["default"].extend({}, _model["default"].prot
 var _default = SiteCompanyList;
 exports["default"] = _default;
 
-},{"../../browser/communication.es6.js":66,"../base/model.es6":78,"./mixins/normalize-company-name.es6":88,"jquery":46}],91:[function(require,module,exports){
+},{"../../browser/communication.es6.js":66,"../base/model.es6":78,"./mixins/normalize-company-name.es6":89,"jquery":46}],92:[function(require,module,exports){
 "use strict";
 
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
@@ -32689,7 +32905,7 @@ Site.prototype = _jquery["default"].extend({}, _model["default"].prototype, {
 var _default = Site;
 exports["default"] = _default;
 
-},{"../../../data/constants":62,"../../browser/common.es6":65,"../../browser/communication.es6.js":66,"../base/localize.es6":75,"../base/model.es6":78,"../platform-features":93,"jquery":46}],92:[function(require,module,exports){
+},{"../../../data/constants":62,"../../browser/common.es6":65,"../../browser/communication.es6.js":66,"../base/localize.es6":75,"../base/model.es6":78,"../platform-features":94,"jquery":46}],93:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -32735,7 +32951,7 @@ function initPopup() {
   return new Trackers();
 }
 
-},{"../base/page.es6.js":80,"./../models/background-message.es6.js":84,"./../models/site.es6.js":91,"./../templates/site.es6.js":111,"./../views/site.es6.js":117,"jquery":46}],93:[function(require,module,exports){
+},{"../base/page.es6.js":80,"./../models/background-message.es6.js":84,"./../models/site.es6.js":92,"./../templates/site.es6.js":112,"./../views/site.es6.js":119,"jquery":46}],94:[function(require,module,exports){
 "use strict";
 
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
@@ -32796,7 +33012,7 @@ function PlatformFeatures(params) {
 });
 exports.PlatformFeatures = PlatformFeatures;
 
-},{}],94:[function(require,module,exports){
+},{}],95:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -32846,7 +33062,7 @@ function _default() {
   }), _localize.i18n.t('report:tellUsMoreDesc.title'), _localize.i18n.t('report:sendReport.title'), _localize.i18n.t('report:reportsAreAnonymousDesc.title'));
 }
 
-},{"../base/localize.es6":75,"./shared/hero.es6.js":103,"./shared/top-nav":108,"bel":31}],95:[function(require,module,exports){
+},{"../base/localize.es6":75,"./shared/hero.es6.js":103,"./shared/top-nav":109,"bel":31}],96:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -32896,7 +33112,7 @@ function emailSvg() {
 var _default = ctaRotationView;
 exports["default"] = _default;
 
-},{"../base/localize.es6":75,"bel":31,"bel/raw":32}],96:[function(require,module,exports){
+},{"../base/localize.es6":75,"bel":31,"bel/raw":32}],97:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -32931,7 +33147,7 @@ function checkMarkIcon() {
   return (0, _bel["default"])(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\">\n        <path d=\"M11.809 6.2501C12.0851 5.94141 12.0588 5.46727 11.7501 5.19108C11.4414 4.91488 10.9673 4.94122 10.6911 5.24991L7.0255 9.34675L5.33049 7.27508C5.06819 6.9545 4.59568 6.90724 4.27509 7.16954C3.95451 7.43183 3.90726 7.90435 4.16955 8.22494L6.41955 10.9749C6.55833 11.1446 6.76436 11.245 6.98346 11.2498C7.20256 11.2547 7.41282 11.1634 7.55895 11.0001L11.809 6.2501Z\" />\n        <path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M8 0C3.58172 0 0 3.58172 0 8C0 12.4183 3.58172 16 8 16C12.4183 16 16 12.4183 16 8C16 3.58172 12.4183 0 8 0ZM1.5 8C1.5 4.41015 4.41015 1.5 8 1.5C11.5899 1.5 14.5 4.41015 14.5 8C14.5 11.5899 11.5899 14.5 8 14.5C4.41015 14.5 1.5 11.5899 1.5 8Z\" />\n    </svg>"])));
 }
 
-},{"../base/localize.es6":75,"bel":31}],97:[function(require,module,exports){
+},{"../base/localize.es6":75,"bel":31}],98:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -33100,7 +33316,7 @@ function blockSvg() {
   return (0, _bel["default"])(_templateObject15 || (_templateObject15 = _taggedTemplateLiteral(["\n        <svg viewBox=\"0 0 32 32\" fill=\"none\">\n            <circle fill=\"white\" cx=\"16\" cy=\"16\" r=\"15\" />\n            <path fill=\"#EE1025\" fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M28 16C28 22.6274 22.6274 28 16 28C9.37258 28 4 22.6274 4 16C4 9.37258 9.37258 4 16 4C22.6274 4 28 9.37258 28 16ZM24 16C24 20.4183 20.4183 24 16 24C14.5164 24 13.1271 23.5961 11.9361 22.8924L22.8924 11.9361C23.5961 13.1271 24 14.5164 24 16ZM9.10763 20.0639L20.0639 9.10763C18.8729 8.40386 17.4836 8 16 8C11.5817 8 8 11.5817 8 16C8 17.4836 8.40386 18.8729 9.10763 20.0639Z\"/>\n        </svg>\n    "])));
 }
 
-},{"../base/localize.es6":75,"../base/view.es6":82,"../models/mixins/normalize-company-name.es6":88,"./shared/utils.es6":110,"bel":31,"bel/raw":32,"jquery":46}],98:[function(require,module,exports){
+},{"../base/localize.es6":75,"../base/view.es6":82,"../models/mixins/normalize-company-name.es6":89,"./shared/utils.es6":111,"bel":31,"bel/raw":32,"jquery":46}],99:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -33220,7 +33436,7 @@ function renderConnectionDescription(site) {
   return _localizeEs.i18n.t('connection:secureConnectionDesc.title');
 }
 
-},{"../base/localize.es6.js":75,"./shared/hero.es6.js":103,"./shared/top-nav":108,"bel":31}],99:[function(require,module,exports){
+},{"../base/localize.es6.js":75,"./shared/hero.es6.js":103,"./shared/top-nav":109,"bel":31}],100:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -33233,7 +33449,7 @@ var _localizeEs = require("../base/localize.es6.js");
 var _requestDetails = require("../../browser/utils/request-details");
 var _heroEs = require("./shared/hero.es6.js");
 var _pageTrackersEs = require("./page-trackers.es6.js");
-var _aboutLink = require("./shared/about-link");
+var _links = require("./shared/links");
 var _platformLimitations = require("./shared/platform-limitations");
 var _topNav = require("./shared/top-nav");
 var _templateObject, _templateObject2, _templateObject3, _templateObject4, _templateObject5;
@@ -33277,7 +33493,7 @@ function sectionsFromSiteNonTracker(site) {
     heading: function heading() {
       return (0, _bel["default"])(_templateObject5 || (_templateObject5 = _taggedTemplateLiteral(["\n                <div>\n                    <p>", "</p>\n                    ", "\n                </div>\n                "])), _localizeEs.ns.site('sectionHeadingAdAttribution.title', {
         domain: site.tab.domain
-      }), (0, _aboutLink.adAttributionLink)());
+      }), (0, _links.adAttributionLink)());
     },
     companies: requestDetails.allowed.adClickAttribution.sortedByPrevalence()
   }, {
@@ -33308,7 +33524,7 @@ function sectionsFromSiteNonTracker(site) {
   }]);
 }
 
-},{"../../browser/utils/request-details":71,"../base/localize.es6.js":75,"./page-trackers.es6.js":100,"./shared/about-link":102,"./shared/hero.es6.js":103,"./shared/platform-limitations":104,"./shared/top-nav":108,"bel":31}],100:[function(require,module,exports){
+},{"../../browser/utils/request-details":71,"../base/localize.es6.js":75,"./page-trackers.es6.js":101,"./shared/hero.es6.js":103,"./shared/links":104,"./shared/platform-limitations":105,"./shared/top-nav":109,"bel":31}],101:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -33414,7 +33630,7 @@ function sectionsFromSiteTrackers(site) {
   return sections;
 }
 
-},{"../../../data/constants":62,"../base/localize.es6":75,"./shared/hero.es6.js":103,"./shared/platform-limitations":104,"./shared/top-nav":108,"./shared/utils.es6.js":110,"bel":31}],101:[function(require,module,exports){
+},{"../../../data/constants":62,"../base/localize.es6":75,"./shared/hero.es6.js":103,"./shared/platform-limitations":105,"./shared/top-nav":109,"./shared/utils.es6.js":111,"bel":31}],102:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -33436,29 +33652,7 @@ function cogIcon() {
   return (0, _bel["default"])(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n    <path class=\"settings-cog\" fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M3.43351 13.1462C3.06364 14.0391 3.48767 15.0628 4.3806 15.4327L5.30448 15.8154C6.19741 16.1853 7.2211 15.7612 7.59096 14.8683L7.84778 14.2483C7.89842 14.2495 7.94918 14.2501 8.00007 14.2501C8.05068 14.2501 8.10118 14.2495 8.15154 14.2483L8.40831 14.8682C8.77818 15.7611 9.80187 16.1852 10.6948 15.8153L11.6187 15.4326C12.5116 15.0628 12.9356 14.0391 12.5658 13.1461L12.3093 12.527C12.3828 12.457 12.4546 12.3853 12.5247 12.3118L13.1437 12.5682C14.0366 12.9381 15.0603 12.514 15.4302 11.6211L15.8129 10.6972C16.1827 9.8043 15.7587 8.7806 14.8658 8.41074L14.2482 8.15493C14.2494 8.10345 14.2501 8.05185 14.2501 8.00011C14.2501 7.94964 14.2495 7.89928 14.2483 7.84905L14.8659 7.59324C15.7588 7.22337 16.1828 6.19968 15.8129 5.30675L15.4303 4.38287C15.0604 3.48994 14.0367 3.06592 13.1438 3.43578L12.5273 3.69115C12.4568 3.61712 12.3845 3.54482 12.3105 3.47432L12.5658 2.85787C12.9357 1.96494 12.5117 0.94124 11.6188 0.571378L10.6949 0.188694C9.80195 -0.181168 8.77825 0.242858 8.40839 1.13579L8.15316 1.75196C8.10226 1.75073 8.05122 1.75011 8.00007 1.75011C7.94864 1.75011 7.89734 1.75074 7.84616 1.75198L7.59089 1.13569C7.22102 0.242766 6.19733 -0.181263 5.3044 0.1886L4.38052 0.571284C3.4876 0.941146 3.06357 1.96484 3.43343 2.85777L3.68905 3.47488C3.61513 3.54532 3.54293 3.61755 3.47254 3.69151L2.85533 3.43585C1.9624 3.06599 0.938705 3.49002 0.568843 4.38295L0.186159 5.30683C-0.183704 6.19975 0.240324 7.22345 1.13325 7.59331L1.75185 7.84955C1.75067 7.89961 1.75007 7.9498 1.75007 8.00011C1.75007 8.05168 1.7507 8.10312 1.75194 8.15443L1.13335 8.41066C0.240417 8.78052 -0.18361 9.80422 0.186252 10.6971L0.568936 11.621C0.938798 12.514 1.96249 12.938 2.85542 12.5681L3.47512 12.3114C3.54507 12.3848 3.6168 12.4565 3.69022 12.5265L3.43351 13.1462ZM1.61161 6.43846C1.35648 6.33279 1.23533 6.0403 1.34101 5.78518L1.72369 4.8613C1.82937 4.60618 2.12185 4.48503 2.37697 4.5907L3.47809 5.0468C3.69752 5.13769 3.94855 5.05988 4.09713 4.87459C4.32641 4.58865 4.58647 4.32845 4.87227 4.099C5.05738 3.95039 5.13507 3.69948 5.04422 3.48016L4.58828 2.37941C4.4826 2.12429 4.60375 1.83181 4.85888 1.72613L5.78276 1.34345C6.03788 1.23777 6.33036 1.35893 6.43604 1.61405L6.89159 2.71385C6.98246 2.93322 7.21488 3.05571 7.45092 3.02993C7.63126 3.01022 7.81448 3.00011 8.00007 3.00011C8.18541 3.00011 8.3684 3.0102 8.54851 3.02985C8.78452 3.0556 9.01691 2.93311 9.10776 2.71377L9.56324 1.61414C9.66891 1.35902 9.9614 1.23787 10.2165 1.34354L11.1404 1.72623C11.3955 1.8319 11.5167 2.12439 11.411 2.37951L10.9553 3.47967C10.8644 3.69901 10.9422 3.94995 11.1273 4.09856C11.4132 4.32802 11.6734 4.58826 11.9027 4.87425C12.0513 5.05952 12.3023 5.13731 12.5217 5.04642L13.6221 4.59063C13.8773 4.48495 14.1697 4.6061 14.2754 4.86122L14.6581 5.7851C14.7638 6.04023 14.6426 6.33271 14.3875 6.43839L13.2866 6.89438C13.0674 6.98521 12.9449 7.21748 12.9705 7.45343C12.99 7.63298 13.0001 7.81537 13.0001 8.00011C13.0001 8.18597 12.9899 8.36945 12.9702 8.55005C12.9443 8.78611 13.0668 9.01859 13.2862 9.10947L14.3874 9.56559C14.6425 9.67126 14.7637 9.96375 14.658 10.2189L14.2753 11.1427C14.1696 11.3979 13.8772 11.519 13.622 11.4133L12.5195 10.9566C12.3002 10.8658 12.0493 10.9435 11.9007 11.1285C11.6715 11.4139 11.4117 11.6736 11.1262 11.9026C10.941 12.0511 10.8632 12.3021 10.9541 12.5215L11.4109 13.6245C11.5166 13.8796 11.3954 14.1721 11.1403 14.2778L10.2164 14.6604C9.96132 14.7661 9.66884 14.645 9.56316 14.3898L9.1062 13.2866C9.01536 13.0673 8.78307 12.9449 8.54711 12.9705C8.36745 12.9901 8.18493 13.0001 8.00007 13.0001C7.81497 13.0001 7.63221 12.9901 7.45233 12.9705C7.21634 12.9447 6.984 13.0672 6.89316 13.2865L6.43611 14.3899C6.33044 14.6451 6.03796 14.7662 5.78283 14.6605L4.85895 14.2779C4.60383 14.1722 4.48268 13.8797 4.58836 13.6246L5.04545 12.521C5.13632 12.3017 5.05857 12.0507 4.87337 11.9021C4.58799 11.6731 4.32826 11.4135 4.09918 11.1282C3.95057 10.9431 3.69967 10.8654 3.48037 10.9563L2.37707 11.4133C2.12194 11.5189 1.82946 11.3978 1.72379 11.1427L1.3411 10.2188C1.23543 9.96367 1.35658 9.67119 1.6117 9.56551L2.71385 9.10898C2.93323 9.01811 3.05572 8.78566 3.02992 8.54962C3.01019 8.36916 3.00007 8.18582 3.00007 8.00011C3.00007 7.81552 3.01007 7.63327 3.02957 7.45386C3.0552 7.21793 2.93271 6.98568 2.71345 6.89486L1.61161 6.43846ZM6.12508 8.00008C6.12508 6.96455 6.96455 6.12508 8.00008 6.12508C9.03562 6.12508 9.87508 6.96455 9.87508 8.00008C9.87508 9.03562 9.03562 9.87508 8.00008 9.87508C6.96455 9.87508 6.12508 9.03562 6.12508 8.00008ZM8.00008 4.87508C6.27419 4.87508 4.87508 6.27419 4.87508 8.00008C4.87508 9.72597 6.27419 11.1251 8.00008 11.1251C9.72597 11.1251 11.1251 9.72597 11.1251 8.00008C11.1251 6.27419 9.72597 4.87508 8.00008 4.87508Z\"\n         fill-opacity=\"0.8\"\n     />\n</svg>\n"])));
 }
 
-},{"../base/localize.es6":75,"bel":31}],102:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.aboutLink = aboutLink;
-exports.adAttributionLink = adAttributionLink;
-var _bel = _interopRequireDefault(require("bel"));
-var _localize = require("../../base/localize.es6");
-var _templateObject, _templateObject2;
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(0); } return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
-function aboutLink() {
-  var text = _localize.ns.site('trackerAboutLink.title');
-  return (0, _bel["default"])(_templateObject || (_templateObject = _taggedTemplateLiteral(["<a class=\"about-link link-action link-action--text-short\" href=\"https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/\" target=\"_blank\">", "</a>"])), text);
-}
-function adAttributionLink() {
-  var text = _localize.ns.site('trackerAdLink.title');
-  return (0, _bel["default"])(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["<a class=\"ad-link link-action link-action--text-micro\" href=\"https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection\" target=\"_blank\">", "</a>"])), text);
-}
-
-},{"../../base/localize.es6":75,"bel":31}],103:[function(require,module,exports){
+},{"../base/localize.es6":75,"bel":31}],103:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -33469,7 +33663,7 @@ exports.heroFromTabTrackers = heroFromTabTrackers;
 exports.heroTemplate = heroTemplate;
 exports.largeHeroIcon = largeHeroIcon;
 var _bel = _interopRequireDefault(require("bel"));
-var _aboutLink = require("./about-link");
+var _links = require("./links");
 var _trackerNetworksText = require("./tracker-networks-text.es6");
 var _thirdpartyText = require("./thirdparty-text.es6");
 var _templateObject, _templateObject2, _templateObject3;
@@ -33483,7 +33677,7 @@ function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(
  * @param {HTMLElement} [opts.children]
  */
 function heroTemplate(opts) {
-  return (0, _bel["default"])(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n        <div class=\"key-insight\" data-suffix=", ">\n            ", "\n            ", "\n            ", "\n            ", "\n        </div>\n    "])), opts.suffix, opts.icon, opts.summary ? (0, _bel["default"])(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["<p class=\"token-title-3\">", "</p>"])), opts.summary) : null, opts.suffix === 'about-link' ? (0, _aboutLink.aboutLink)() : null, opts.children ? opts.children : null);
+  return (0, _bel["default"])(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n        <div class=\"key-insight\" data-suffix=", ">\n            ", "\n            ", "\n            ", "\n            ", "\n        </div>\n    "])), opts.suffix, opts.icon, opts.summary ? (0, _bel["default"])(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["<p class=\"token-title-3\">", "</p>"])), opts.summary) : null, opts.suffix === 'about-link' ? (0, _links.aboutLink)() : null, opts.children ? opts.children : null);
 }
 
 /**
@@ -33530,7 +33724,39 @@ function largeHeroIcon(ops) {
   return (0, _bel["default"])(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["<div class=\"large-icon-container hero-icon--", "\"></div>"])), ops.status);
 }
 
-},{"./about-link":102,"./thirdparty-text.es6":106,"./tracker-networks-text.es6":109,"bel":31}],104:[function(require,module,exports){
+},{"./links":104,"./thirdparty-text.es6":107,"./tracker-networks-text.es6":110,"bel":31}],104:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.aboutLink = aboutLink;
+exports.adAttributionLink = adAttributionLink;
+exports.disableInSettingsLink = disableInSettingsLink;
+var _bel = _interopRequireDefault(require("bel"));
+var _localize = require("../../base/localize.es6");
+var _templateObject, _templateObject2, _templateObject3;
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(0); } return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
+function aboutLink() {
+  var text = _localize.ns.site('trackerAboutLink.title');
+  return (0, _bel["default"])(_templateObject || (_templateObject = _taggedTemplateLiteral(["<a class=\"about-link link-action link-action--text-short\" href=\"https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/\" target=\"_blank\">", "</a>"])), text);
+}
+function adAttributionLink() {
+  var text = _localize.ns.site('trackerAdLink.title');
+  return (0, _bel["default"])(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["<a class=\"link-action link-action--text-micro\" href=\"https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection\" target=\"_blank\">", "</a>"])), text);
+}
+
+/**
+ * @param {() => void} cb
+ * @returns {HTMLElement}
+ */
+function disableInSettingsLink(cb) {
+  var text = _localize.ns.site('cookiesMinimizedSettings.title');
+  return (0, _bel["default"])(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["<a class=\"link-action link-action--text-micro\" href=\"javascript:void(0)\"  onclick=", ">", "</a>"])), cb, text);
+}
+
+},{"../../base/localize.es6":75,"bel":31}],105:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -33546,7 +33772,7 @@ function platformLimitations() {
   return (0, _bel["default"])(_templateObject || (_templateObject = _taggedTemplateLiteral(["<p class=\"platform-limitations border--top--inner\">", "</p>"])), _localize.ns.site('trackerLimitationsNote.title'));
 }
 
-},{"../../base/localize.es6":75,"bel":31}],105:[function(require,module,exports){
+},{"../../base/localize.es6":75,"bel":31}],106:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -33594,7 +33820,7 @@ function protectionToggle(model) {
   return (0, _bel["default"])(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["<div class=\"site-info__protection-wrapper\">\n        <ul class=\"default-list\">\n            <li class=\"site-info__li--toggle ", "\">\n                <p class=\"site-info__protection\"><span role=\"text\">", "</span></p>\n                <div class=\"site-info__toggle-container js-site-toggle-parent\">", "</div>\n            </li>\n        </ul>\n    </div>"])), active ? 'is-active' : '', (0, _raw["default"])(text), protectionToggle);
 }
 
-},{"../../base/localize.es6":75,"../../environment-check":83,"./toggle-button.es6":107,"bel":31,"bel/raw":32}],106:[function(require,module,exports){
+},{"../../base/localize.es6":75,"../../environment-check":83,"./toggle-button.es6":108,"bel":31,"bel/raw":32}],107:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -33713,7 +33939,7 @@ function unreachable(x) {
   throw new Error("Didn't expect to get here with value " + x);
 }
 
-},{"../../../browser/utils/request-details":71,"../../base/localize.es6":75}],107:[function(require,module,exports){
+},{"../../../browser/utils/request-details":71,"../../base/localize.es6":75}],108:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -33747,7 +33973,7 @@ function toggleButton(isActiveBoolean, klass, disabled) {
   return (0, _bel["default"])(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["\n    <button class='toggle-button ", "'\n        type='button'\n        role=\"switch\"\n        aria-checked='", "'\n        aria-label='", "'\n        ", "\n    >\n        <div class='toggle-button__track'></div>\n        <div class='toggle-button__handle'></div>\n    </button>"])), klass, isActiveBoolean, label, disabled ? 'disabled' : '');
 }
 
-},{"../../base/localize.es6":75,"../../environment-check":83,"bel":31}],108:[function(require,module,exports){
+},{"../../base/localize.es6":75,"../../environment-check":83,"bel":31}],109:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -33804,7 +34030,7 @@ function close() {
   return (0, _bel["default"])(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["\n        <a href=\"javascript:void(0)\"\n            class=\"top-nav__done js-sliding-subview-done js-site-done link-action link-action--dark\"\n            role=\"button\"\n        >\n            ", "\n        </a>"])), textLabel);
 }
 
-},{"../../base/localize.es6":75,"../../environment-check":83,"bel":31}],109:[function(require,module,exports){
+},{"../../base/localize.es6":75,"../../environment-check":83,"bel":31}],110:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -33937,7 +34163,7 @@ function unreachable(x) {
   throw new Error("Didn't expect to get here with value" + x);
 }
 
-},{"../../../browser/utils/request-details":71,"../../base/localize.es6":75}],110:[function(require,module,exports){
+},{"../../../browser/utils/request-details":71,"../../base/localize.es6":75}],111:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -33954,7 +34180,7 @@ function getColorId(value) {
   return Math.abs(sum % colorCount + 1);
 }
 
-},{}],111:[function(require,module,exports){
+},{}],112:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -34062,7 +34288,7 @@ function localizePermissions(permissions) {
   });
 }
 
-},{"../base/localize.es6":75,"./shared/protection-toggle":105,"./shared/top-nav":108,"bel":31}],112:[function(require,module,exports){
+},{"../base/localize.es6":75,"./shared/protection-toggle":106,"./shared/top-nav":109,"bel":31}],113:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -34081,7 +34307,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
 function BreakageForm(ops) {
   this.model = ops.model;
   this.template = ops.template;
-  this.$root = (0, _jquery["default"])('.js-breakage-form');
+  // this.$root = $('.js-breakage-form')
   // @ts-ignore
   _slidingSubviewEs["default"].call(this, ops);
   // @ts-ignore
@@ -34107,7 +34333,64 @@ _slidingSubviewEs["default"].prototype, {
 var _default = BreakageForm;
 exports["default"] = _default;
 
-},{"./sliding-subview.es6.js":118,"jquery":46}],113:[function(require,module,exports){
+},{"./sliding-subview.es6.js":120,"jquery":46}],114:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.CookiePromptView = CookiePromptView;
+var _jquery = _interopRequireDefault(require("jquery"));
+var _bel = _interopRequireDefault(require("bel"));
+var _topNav = require("../templates/shared/top-nav");
+var _hero = require("../templates/shared/hero.es6");
+var _links = require("../templates/shared/links");
+var _localize = require("../base/localize.es6");
+var _slidingSubviewEs = _interopRequireDefault(require("./sliding-subview.es6.js"));
+var _templateObject;
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(0); } return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
+/**
+ * @param {object} ops
+ * @param {import('../models/cookie-prompt.es6').CookiePromptModel & import("../base/model.es6.js").baseModelMethods} ops.model
+ * @constructor
+ */
+function CookiePromptView(ops) {
+  var _this = this;
+  this.model = ops.model;
+  this.template = template;
+  this.links = {
+    disable: function disable(e) {
+      e.preventDefault();
+      _this.model.openSettings('cpm');
+    }
+  };
+  _slidingSubviewEs["default"].call(this, ops);
+}
+CookiePromptView.prototype = _jquery["default"].extend({},
+// @ts-ignore
+_slidingSubviewEs["default"].prototype);
+
+/**
+ * @this {CookiePromptView}
+ * @returns {HTMLElement}
+ */
+function template() {
+  var summary = this.model.isCosmetic ? _localize.ns.site('cookiesHiddenSummary.title') : _localize.ns.site('cookiesMinimizedSummary.title');
+  var icon = (0, _hero.largeHeroIcon)({
+    status: this.model.isCosmetic ? 'cookies-hidden' : 'cookies-managed'
+  });
+  var hero = (0, _hero.heroTemplate)({
+    icon: icon,
+    summary: summary,
+    suffix: 'none'
+  });
+  return (0, _bel["default"])(_templateObject || (_templateObject = _taggedTemplateLiteral(["<section class='sliding-subview'>\n    <div class='card' data-page='cookie-prompt'>\n        ", "\n        <div class='padding-x-double'>\n            ", "\n        </div>\n        <div class='padding-x-double'>        \n            <div class='padding-y border--top--inner text--center'>\n                ", "\n            </div>\n        </div>\n    </div>\n</section>\n    "])), (0, _topNav.topNav)({
+    view: 'secondary'
+  }), hero, (0, _links.disableInSettingsLink)(this.links.disable));
+}
+
+},{"../base/localize.es6":75,"../templates/shared/hero.es6":103,"../templates/shared/links":104,"../templates/shared/top-nav":109,"./sliding-subview.es6.js":120,"bel":31,"jquery":46}],115:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -34127,7 +34410,7 @@ CtaRotationView.prototype = _jquery["default"].extend({}, _viewEs["default"].pro
 var _default = CtaRotationView;
 exports["default"] = _default;
 
-},{"../base/view.es6.js":82,"jquery":46}],114:[function(require,module,exports){
+},{"../base/view.es6.js":82,"jquery":46}],116:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -34183,7 +34466,7 @@ EmailProtectionView.prototype = _jquery["default"].extend({}, _viewEs["default"]
 var _default = EmailProtectionView;
 exports["default"] = _default;
 
-},{"../base/view.es6.js":82,"jquery":46}],115:[function(require,module,exports){
+},{"../base/view.es6.js":82,"jquery":46}],117:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -34200,7 +34483,7 @@ var _platformFeatures = require("../platform-features");
 var _communication = require("../../browser/communication.es6");
 var _environmentCheck = require("../environment-check");
 var _utils = require("./utils/utils");
-var _templateObject, _templateObject2, _templateObject3, _templateObject4, _templateObject5, _templateObject6, _templateObject7;
+var _templateObject, _templateObject2, _templateObject3, _templateObject4, _templateObject5, _templateObject6, _templateObject7, _templateObject8;
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(0); } return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
 function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
@@ -34238,6 +34521,16 @@ function MainNavView(ops) {
     nonTrackers: function nonTrackers(e) {
       _this.model.send('navigate', {
         target: 'nonTrackers'
+      });
+    },
+    consentManaged: function consentManaged(e) {
+      _this.model.send('navigate', {
+        target: 'consentManaged'
+      });
+    },
+    cookieHidden: function cookieHidden(e) {
+      _this.model.send('navigate', {
+        target: 'cookieHidden'
       });
     }
   };
@@ -34319,25 +34612,33 @@ MainNavView.prototype = _jquery["default"].extend({}, _viewEs["default"].prototy
  * @returns {HTMLElement}
  */
 function template() {
-  var _model$tab, _model$tab$cookieProm;
+  var _model$tab$cookieProm, _model$tab, _model$tab$cookieProm2;
   /** @type {import('../models/site.es6.js').PublicSiteModel} */
   var model = this.model;
-  var consentRow = (0, _bel["default"])(_templateObject || (_templateObject = _taggedTemplateLiteral(["<li class=\"main-nav__row\">", "</li>"])), renderCookieConsentManaged(model));
-  return (0, _bel["default"])(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["\n    <ul class='default-list card-list--bordered main-nav token-body-em js-site-main-nav'>\n        <li class='main-nav__row'>\n            ", "\n        </li>\n        <li class='main-nav__row js-site-show-page-trackers'>\n            ", "\n        </li>\n        <li class='main-nav__row js-site-show-page-non-trackers'>\n            ", "\n        </li>\n        ", "\n    </ul>\n    "])), renderConnection(model, this.nav.connection), renderTrackerNetworksNew(model, this.nav.trackers), renderThirdPartyNew(model, this.nav.nonTrackers), (_model$tab = model.tab) !== null && _model$tab !== void 0 && (_model$tab$cookieProm = _model$tab.cookiePromptManagementStatus) !== null && _model$tab$cookieProm !== void 0 && _model$tab$cookieProm.consentManaged ? consentRow : null);
+  var consentCb = (_model$tab$cookieProm = model.tab.cookiePromptManagementStatus) !== null && _model$tab$cookieProm !== void 0 && _model$tab$cookieProm.cosmetic ? this.nav.cookieHidden : this.nav.consentManaged;
+  var consentRow = (0, _bel["default"])(_templateObject || (_templateObject = _taggedTemplateLiteral(["<li class=\"main-nav__row\">", "</li>"])), renderCookieConsentManaged(model, consentCb));
+  return (0, _bel["default"])(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["\n    <ul class='default-list card-list--bordered main-nav token-body-em js-site-main-nav'>\n        <li class='main-nav__row'>\n            ", "\n        </li>\n        <li class='main-nav__row'>\n            ", "\n        </li>\n        <li class='main-nav__row'>\n            ", "\n        </li>\n        ", "\n    </ul>\n    "])), renderConnection(model, this.nav.connection), renderTrackerNetworksNew(model, this.nav.trackers), renderThirdPartyNew(model, this.nav.nonTrackers), (_model$tab = model.tab) !== null && _model$tab !== void 0 && (_model$tab$cookieProm2 = _model$tab.cookiePromptManagementStatus) !== null && _model$tab$cookieProm2 !== void 0 && _model$tab$cookieProm2.consentManaged ? consentRow : null);
 }
 /**
  * @param {import('../models/site.es6.js').PublicSiteModel} model
  */
-function renderCookieConsentManaged(model) {
+function renderCookieConsentManaged(model, cb) {
   var _model$tab2;
   if (!((_model$tab2 = model.tab) !== null && _model$tab2 !== void 0 && _model$tab2.cookiePromptManagementStatus)) return null;
-  var _model$tab$cookieProm2 = model.tab.cookiePromptManagementStatus,
-    consentManaged = _model$tab$cookieProm2.consentManaged,
-    optoutFailed = _model$tab$cookieProm2.optoutFailed;
+  var _model$tab$cookieProm3 = model.tab.cookiePromptManagementStatus,
+    consentManaged = _model$tab$cookieProm3.consentManaged,
+    cosmetic = _model$tab$cookieProm3.cosmetic,
+    optoutFailed = _model$tab$cookieProm3.optoutFailed,
+    configurable = _model$tab$cookieProm3.configurable;
   if (consentManaged && !optoutFailed) {
-    return (0, _bel["default"])(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["\n            <div class=\"main-nav__item\">\n                <span class=\"main-nav__icon icon-small--secure\"></span>\n                <span class=\"main-nav__text\">", "</span>\n            </div>\n        "])), _localize.i18n.t('site:cookiesMinimized.title'));
+    var text = cosmetic ? _localize.i18n.t('site:cookiesHidden.title') : _localize.i18n.t('site:cookiesMinimized.title');
+    if (configurable) {
+      return (0, _bel["default"])(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["\n                <a href=\"javascript:void(0)\"\n                    class=\"main-nav__item main-nav__item--link link-action link-action--dark\"\n                    role=\"button\"\n                    draggable=\"false\"\n                    onclick=", "\n                    >\n                    <span class=\"main-nav__icon ", "\"></span>\n                    <span class=\"main-nav__text\">", "</span>\n                    <span class=\"main-nav__chev\"></span>\n                </a>\n            "])), cb, cosmetic ? 'icon-small--info' : 'icon-small--secure', text);
+    } else {
+      return (0, _bel["default"])(_templateObject4 || (_templateObject4 = _taggedTemplateLiteral(["\n            <div class=\"main-nav__item\">\n                <span class=\"main-nav__icon icon-small--secure\"></span>\n                <span class=\"main-nav__text\">", "</span>\n            </div>\n        "])), text);
+    }
   }
-  return (0, _bel["default"])(_templateObject4 || (_templateObject4 = _taggedTemplateLiteral([""])));
+  return (0, _bel["default"])(_templateObject5 || (_templateObject5 = _taggedTemplateLiteral([""])));
 }
 /**
  * @param {import('../models/site.es6.js').PublicSiteModel} model
@@ -34351,7 +34652,7 @@ function renderConnection(model, cb) {
   if (model.httpsState === 'upgraded' && /^https/.exec(model.tab.url) && Array.isArray(model.tab.certificate) && model.tab.certificate.length > 0) {
     icon = 'icon-small--secure';
   }
-  return (0, _bel["default"])(_templateObject5 || (_templateObject5 = _taggedTemplateLiteral(["\n        <a href=\"javascript:void(0)\" \n            class=\"main-nav__item main-nav__item--link link-action link-action--dark\" \n            role=\"button\" \n            draggable=\"false\"\n            aria-label=\"View Connection Information\"\n            onclick=", "\n            >\n            <span class=\"main-nav__icon ", "\"></span>\n            <span class=\"main-nav__text\">", "</span>\n            <span class=\"main-nav__chev\"></span>\n        </a>"])), cb, icon, model.httpsStatusText);
+  return (0, _bel["default"])(_templateObject6 || (_templateObject6 = _taggedTemplateLiteral(["\n        <a href=\"javascript:void(0)\" \n            class=\"main-nav__item main-nav__item--link link-action link-action--dark\" \n            role=\"button\" \n            draggable=\"false\"\n            aria-label=\"View Connection Information\"\n            onclick=", "\n            >\n            <span class=\"main-nav__icon ", "\"></span>\n            <span class=\"main-nav__text\">", "</span>\n            <span class=\"main-nav__chev\"></span>\n        </a>"])), cb, icon, model.httpsStatusText);
 }
 /**
  * @param {import('../models/site.es6.js').PublicSiteModel} model
@@ -34360,7 +34661,7 @@ function renderTrackerNetworksNew(model, cb) {
   var _trackerNetworksText = (0, _trackerNetworksText2.trackerNetworksText)(model.tab.requestDetails, model.protectionsEnabled),
     title = _trackerNetworksText.title,
     icon = _trackerNetworksText.icon;
-  return (0, _bel["default"])(_templateObject6 || (_templateObject6 = _taggedTemplateLiteral(["\n        <a href=\"javascript:void(0)\" \n            class=\"main-nav__item main-nav__item--link link-action link-action--dark\" \n            role=\"button\" \n            draggable=\"false\"\n            aria-label=\"View Tracker Companies\"\n            onclick=", "\n            >\n            <span class=\"main-nav__icon icon-small--", "\"></span>\n            <span class=\"main-nav__text\">", "</span>\n            <span class=\"main-nav__chev\"></span>\n        </a>"])), cb, icon, title);
+  return (0, _bel["default"])(_templateObject7 || (_templateObject7 = _taggedTemplateLiteral(["\n        <a href=\"javascript:void(0)\" \n            class=\"main-nav__item main-nav__item--link link-action link-action--dark\" \n            role=\"button\" \n            draggable=\"false\"\n            aria-label=\"View Tracker Companies\"\n            onclick=", "\n            >\n            <span class=\"main-nav__icon icon-small--", "\"></span>\n            <span class=\"main-nav__text\">", "</span>\n            <span class=\"main-nav__chev\"></span>\n        </a>"])), cb, icon, title);
 }
 
 /**
@@ -34370,10 +34671,10 @@ function renderThirdPartyNew(model, cb) {
   var _thirdpartyText = (0, _thirdpartyText2.thirdpartyText)(model.tab.requestDetails, model.protectionsEnabled),
     title = _thirdpartyText.title,
     icon = _thirdpartyText.icon;
-  return (0, _bel["default"])(_templateObject7 || (_templateObject7 = _taggedTemplateLiteral(["\n        <a href=\"javascript:void(0)\" \n            class=\"main-nav__item main-nav__item--link link-action link-action--dark\" \n            role=\"button\" \n            draggable=\"false\"\n            aria-label=\"View Non-Tracker Companies\"\n            onclick=", "\n            >\n            <span class=\"main-nav__icon icon-small--", "\"></span>\n            <span class=\"main-nav__text\">", "</span>\n            <span class=\"main-nav__chev\"></span>\n        </a>"])), cb, icon, title);
+  return (0, _bel["default"])(_templateObject8 || (_templateObject8 = _taggedTemplateLiteral(["\n        <a href=\"javascript:void(0)\" \n            class=\"main-nav__item main-nav__item--link link-action link-action--dark\" \n            role=\"button\" \n            draggable=\"false\"\n            aria-label=\"View Non-Tracker Companies\"\n            onclick=", "\n            >\n            <span class=\"main-nav__icon icon-small--", "\"></span>\n            <span class=\"main-nav__text\">", "</span>\n            <span class=\"main-nav__chev\"></span>\n        </a>"])), cb, icon, title);
 }
 
-},{"../../browser/communication.es6":66,"../base/localize.es6":75,"../base/view.es6.js":82,"../environment-check":83,"../platform-features":93,"../templates/shared/thirdparty-text.es6":106,"../templates/shared/tracker-networks-text.es6":109,"./utils/utils":121,"bel":31,"jquery":46}],116:[function(require,module,exports){
+},{"../../browser/communication.es6":66,"../base/localize.es6":75,"../base/view.es6.js":82,"../environment-check":83,"../platform-features":94,"../templates/shared/thirdparty-text.es6":107,"../templates/shared/tracker-networks-text.es6":110,"./utils/utils":123,"bel":31,"jquery":46}],118:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -34430,7 +34731,7 @@ Search.prototype = _jquery["default"].extend({}, _view["default"].prototype, {
 var _default = Search;
 exports["default"] = _default;
 
-},{"../base/view.es6":82,"jquery":46}],117:[function(require,module,exports){
+},{"../base/view.es6":82,"jquery":46}],119:[function(require,module,exports){
 "use strict";
 
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
@@ -34455,6 +34756,7 @@ var _keyInsights = require("../templates/key-insights");
 var _breakageForm = require("../models/breakage-form.es6");
 var _protectionToggle = require("../templates/shared/protection-toggle");
 var _platformFeatures = require("../platform-features");
+var _cookiePrompt = require("../models/cookie-prompt.es6");
 var _utils = require("./utils/utils.js");
 var _breakageFormEs = _interopRequireDefault(require("./../views/breakage-form.es6.js"));
 var _pageConnectionEs = _interopRequireDefault(require("./../templates/page-connection.es6.js"));
@@ -34464,6 +34766,7 @@ var _search3 = _interopRequireDefault(require("./search.es6"));
 var _ctaRotation3 = _interopRequireDefault(require("./cta-rotation.es6"));
 var _trackerNetworksEs = _interopRequireDefault(require("./../views/tracker-networks.es6.js"));
 var _mainNav = require("./main-nav");
+var _cookiePrompt2 = require("./cookie-prompt");
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { "default": obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj["default"] = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
@@ -34543,7 +34846,7 @@ Site.prototype = _jquery["default"].extend({}, _view["default"].prototype, {
   },
   _handleEvents: function _handleEvents(event) {
     if (event.action === 'navigate') {
-      var _event$data, _event$data2, _event$data3;
+      var _event$data, _event$data2, _event$data3, _event$data4, _event$data5;
       if (((_event$data = event.data) === null || _event$data === void 0 ? void 0 : _event$data.target) === 'connection') {
         this._showPageConnection();
       }
@@ -34552,6 +34855,12 @@ Site.prototype = _jquery["default"].extend({}, _view["default"].prototype, {
       }
       if (((_event$data3 = event.data) === null || _event$data3 === void 0 ? void 0 : _event$data3.target) === 'nonTrackers') {
         this._showPageNonTrackers();
+      }
+      if (((_event$data4 = event.data) === null || _event$data4 === void 0 ? void 0 : _event$data4.target) === 'consentManaged') {
+        this._showPageConsent(false);
+      }
+      if (((_event$data5 = event.data) === null || _event$data5 === void 0 ? void 0 : _event$data5.target) === 'cookieHidden') {
+        this._showPageConsent(true);
       }
     }
   },
@@ -34598,6 +34907,17 @@ Site.prototype = _jquery["default"].extend({}, _view["default"].prototype, {
     if (this.$body.hasClass('is-disabled')) return;
     this.views.slidingSubview = new _trackerNetworksEs["default"]({
       template: _pageConnectionEs["default"]
+    });
+  },
+  /**
+   * @param {boolean} isCosmetic
+   */
+  _showPageConsent: function _showPageConsent(isCosmetic) {
+    this.views.slidingSubview = new _cookiePrompt2.CookiePromptView({
+      model: new _cookiePrompt.CookiePromptModel({
+        site: this.model,
+        isCosmetic: isCosmetic
+      })
     });
   },
   _done: function _done() {
@@ -34663,7 +34983,7 @@ function blur(target) {
 var _default = Site;
 exports["default"] = _default;
 
-},{"../../browser/communication.es6.js":66,"../base/view.es6":82,"../environment-check.js":83,"../models/breakage-form.es6":85,"../models/cta-rotation.es6":86,"../models/email-protection.es6":87,"../models/search.es6":89,"../platform-features":93,"../templates/cta-rotation.es6":95,"../templates/email-protection.es6":96,"../templates/key-insights":97,"../templates/page-non-trackers.es6.js":99,"../templates/page-trackers.es6.js":100,"../templates/search.es6":101,"../templates/shared/hero.es6":103,"../templates/shared/protection-toggle":105,"./../templates/breakage-form.es6.js":94,"./../templates/page-connection.es6.js":98,"./../views/breakage-form.es6.js":112,"./../views/tracker-networks.es6.js":120,"./cta-rotation.es6":113,"./email-protection.es6":114,"./main-nav":115,"./search.es6":116,"./utils/utils.js":121,"jquery":46}],118:[function(require,module,exports){
+},{"../../browser/communication.es6.js":66,"../base/view.es6":82,"../environment-check.js":83,"../models/breakage-form.es6":85,"../models/cookie-prompt.es6":86,"../models/cta-rotation.es6":87,"../models/email-protection.es6":88,"../models/search.es6":90,"../platform-features":94,"../templates/cta-rotation.es6":96,"../templates/email-protection.es6":97,"../templates/key-insights":98,"../templates/page-non-trackers.es6.js":100,"../templates/page-trackers.es6.js":101,"../templates/search.es6":102,"../templates/shared/hero.es6":103,"../templates/shared/protection-toggle":106,"./../templates/breakage-form.es6.js":95,"./../templates/page-connection.es6.js":99,"./../views/breakage-form.es6.js":113,"./../views/tracker-networks.es6.js":122,"./cookie-prompt":114,"./cta-rotation.es6":115,"./email-protection.es6":116,"./main-nav":117,"./search.es6":118,"./utils/utils.js":123,"jquery":46}],120:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -34760,7 +35080,7 @@ SlidingSubview.prototype = _jquery["default"].extend({}, _viewEs["default"].prot
 var _default = SlidingSubview;
 exports["default"] = _default;
 
-},{"../base/view.es6.js":82,"../environment-check.js":83,"./utils/utils.js":121,"jquery":46}],119:[function(require,module,exports){
+},{"../base/view.es6.js":82,"../environment-check.js":83,"./utils/utils.js":123,"jquery":46}],121:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -35035,7 +35355,7 @@ var MockData = /*#__PURE__*/function () {
    * @param {any[]} [params.permissions]
    * @param {boolean} [params.specialDomainName]
    * @param {boolean} [params.emailUser]
-   * @param {boolean} [params.consentManaged]
+   * @param {import('../../../../../schema/__generated__/schema.types').CookiePromptManagementStatus} [params.cookiePromptManagementStatus]
    */
   function MockData(params) {
     var _params$upgradedHttps;
@@ -35054,15 +35374,7 @@ var MockData = /*#__PURE__*/function () {
     this.allowlisted = params.allowlisted;
     this.specialDomainName = params.specialDomainName;
     this.emailUser = params.emailUser;
-    this.consentManaged = params.consentManaged;
-    if (this.consentManaged) {
-      /** @type {import('../../../../../schema/__generated__/schema.types').CookiePromptManagementStatus} */
-      this.cookiePromptManagementStatus = {
-        consentManaged: true,
-        optoutFailed: false,
-        selftestFailed: false
-      };
-    }
+    this.cookiePromptManagementStatus = params.cookiePromptManagementStatus;
 
     /** @type {Protections} */
     this.protections = _requestDetails.Protections["default"]();
@@ -35131,7 +35443,26 @@ var dataStates = {
   'consent-managed': new MockData({
     url: 'https://example.com',
     requests: [],
-    consentManaged: true
+    cookiePromptManagementStatus: {
+      consentManaged: true
+    }
+  }),
+  'consent-managed-configurable': new MockData({
+    url: 'https://example.com',
+    requests: [],
+    cookiePromptManagementStatus: {
+      consentManaged: true,
+      configurable: true
+    }
+  }),
+  'consent-managed-configurable-cosmetic': new MockData({
+    url: 'https://example.com',
+    requests: [],
+    cookiePromptManagementStatus: {
+      consentManaged: true,
+      configurable: true,
+      cosmetic: true
+    }
   }),
   'locale-pl': new MockData({
     localeSettings: {
@@ -35346,7 +35677,7 @@ function protectionsOff(requests) {
   });
 }
 
-},{"../../../../../schema/__fixtures__/request-data-cnn.json":59,"../../../../../schema/__fixtures__/request-data-google.json":60,"../../../../../schema/__generated__/schema.parsers":61,"../../../browser/utils/request-details":71}],120:[function(require,module,exports){
+},{"../../../../../schema/__fixtures__/request-data-cnn.json":59,"../../../../../schema/__fixtures__/request-data-google.json":60,"../../../../../schema/__generated__/schema.parsers":61,"../../../browser/utils/request-details":71}],122:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -35454,7 +35785,7 @@ _slidingSubviewEs["default"].prototype, {
 var _default = TrackerNetworks;
 exports["default"] = _default;
 
-},{"./../models/site-company-list.es6.js":90,"./../models/site.es6.js":91,"./sliding-subview.es6.js":118,"jquery":46}],121:[function(require,module,exports){
+},{"./../models/site-company-list.es6.js":91,"./../models/site.es6.js":92,"./sliding-subview.es6.js":120,"jquery":46}],123:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -35565,7 +35896,7 @@ function setupGlobalOpenerListener(cb) {
   });
 }
 
-},{"@material/ripple":28,"@material/switch":29}],122:[function(require,module,exports){
+},{"@material/ripple":28,"@material/switch":29}],124:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -35662,7 +35993,7 @@ module.exports={
   }
 }
 
-},{}],123:[function(require,module,exports){
+},{}],125:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -35699,7 +36030,7 @@ module.exports={
   }
 }
 
-},{}],124:[function(require,module,exports){
+},{}],126:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -35743,7 +36074,7 @@ module.exports={
     "note" : "A permission setting that always blocks the website from using this permission"
   }
 }
-},{}],125:[function(require,module,exports){
+},{}],127:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -35816,7 +36147,7 @@ module.exports={
   }
 }
 
-},{}],126:[function(require,module,exports){
+},{}],128:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -35833,7 +36164,7 @@ module.exports={
   }
 }
 
-},{}],127:[function(require,module,exports){
+},{}],129:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -35919,6 +36250,22 @@ module.exports={
   "cookiesMinimized" : {
     "title" : "Бисквитките са настроени",
     "note" : "Title for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesHidden" : {
+    "title" : "Изскачащият прозорец за бисквитки е скрит",
+    "note" : "Title for when we have cosmetically hidden a cookie banner"
+  },
+  "cookiesHiddenSummary" : {
+    "title" : "Успяхме само да скрием изскачащия прозорец за съгласие за бисквитките на този сайт, тъй като не бяха предоставени опции за управление на предпочитанията за бисквитките. Останалите ни защити срещу проследяване в мрежата все още са в сила.",
+    "note" : "A longer explanation that we have cosmetically hidden a cookie banner"
+  },
+  "cookiesMinimizedSummary" : {
+    "title" : "Настроихме предпочитанията Ви за бисквитките, за да увеличим поверителността, и затворихме изскачащия прозорец за съгласие.",
+    "note" : "A longer explanation that we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesMinimizedSettings" : {
+    "title" : "Промяна в настройките",
+    "note" : "Button text for allowing the settings to be opened"
   },
   "connectionSecure" : {
     "title" : "Връзката е криптирана",
@@ -36066,10 +36413,22 @@ module.exports={
   "navigationBack" : {
     "title" : "Обратно",
     "note" : "Aria label and visible text for iOS on top bar navigation"
+  },
+  "enableProtectionsSwitch" : {
+    "title" : "Активиране на защити",
+    "note" : "Aria label for the switch that allows the user to turn protections on"
+  },
+  "disableProtectionsSwitch" : {
+    "title" : "Деактивиране на защити",
+    "note" : "Aria label for the switch that allows the user to turn protections off"
+  },
+  "errorMessage" : {
+    "title" : "Възникна проблем и не успяхме да заредим това съдържание. Опитайте да презаредите страницата.",
+    "note" : "Message shown to the user when an error has occurred and the UI cannot be displayed"
   }
 }
 
-},{}],128:[function(require,module,exports){
+},{}],130:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -36166,7 +36525,7 @@ module.exports={
   }
 }
 
-},{}],129:[function(require,module,exports){
+},{}],131:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -36203,7 +36562,7 @@ module.exports={
   }
 }
 
-},{}],130:[function(require,module,exports){
+},{}],132:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -36247,7 +36606,7 @@ module.exports={
     "note" : "A permission setting that always blocks the website from using this permission"
   }
 }
-},{}],131:[function(require,module,exports){
+},{}],133:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -36320,7 +36679,7 @@ module.exports={
   }
 }
 
-},{}],132:[function(require,module,exports){
+},{}],134:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -36337,7 +36696,7 @@ module.exports={
   }
 }
 
-},{}],133:[function(require,module,exports){
+},{}],135:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -36423,6 +36782,22 @@ module.exports={
   "cookiesMinimized" : {
     "title" : "O cookies je postaráno!",
     "note" : "Title for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesHidden" : {
+    "title" : "Skryté vyskakovací okno pro souhlas s cookies",
+    "note" : "Title for when we have cosmetically hidden a cookie banner"
+  },
+  "cookiesHiddenSummary" : {
+    "title" : "Na tomto webu se nám povedlo vyskakovací okno pro souhlas s cookies jen skrýt, protože neobsahovalo žádné možnosti pro nastavení předvoleb souborů cookie. Naše další ochranné prvky proti sledování na webu ale běží dál.",
+    "note" : "A longer explanation that we have cosmetically hidden a cookie banner"
+  },
+  "cookiesMinimizedSummary" : {
+    "title" : "Tvoje předvolby souborů cookie jsme nastavili na co největší ochranu soukromí a vyskakovací okno se žádostí o souhlas jsme zavřeli.",
+    "note" : "A longer explanation that we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesMinimizedSettings" : {
+    "title" : "Změnit nastavení",
+    "note" : "Button text for allowing the settings to be opened"
   },
   "connectionSecure" : {
     "title" : "Připojení je šifrované",
@@ -36570,10 +36945,22 @@ module.exports={
   "navigationBack" : {
     "title" : "Zpět",
     "note" : "Aria label and visible text for iOS on top bar navigation"
+  },
+  "enableProtectionsSwitch" : {
+    "title" : "Zapnout ochranné prvky",
+    "note" : "Aria label for the switch that allows the user to turn protections on"
+  },
+  "disableProtectionsSwitch" : {
+    "title" : "Vypnout ochranné prvky",
+    "note" : "Aria label for the switch that allows the user to turn protections off"
+  },
+  "errorMessage" : {
+    "title" : "Něco se pokazilo a nepodařilo se nám tento obsah načíst. Zkus stránku načíst znovu.",
+    "note" : "Message shown to the user when an error has occurred and the UI cannot be displayed"
   }
 }
 
-},{}],134:[function(require,module,exports){
+},{}],136:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -36670,7 +37057,7 @@ module.exports={
   }
 }
 
-},{}],135:[function(require,module,exports){
+},{}],137:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -36707,7 +37094,7 @@ module.exports={
   }
 }
 
-},{}],136:[function(require,module,exports){
+},{}],138:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -36751,7 +37138,7 @@ module.exports={
     "note" : "A permission setting that always blocks the website from using this permission"
   }
 }
-},{}],137:[function(require,module,exports){
+},{}],139:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -36824,7 +37211,7 @@ module.exports={
   }
 }
 
-},{}],138:[function(require,module,exports){
+},{}],140:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -36841,7 +37228,7 @@ module.exports={
   }
 }
 
-},{}],139:[function(require,module,exports){
+},{}],141:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -36927,6 +37314,22 @@ module.exports={
   "cookiesMinimized" : {
     "title" : "Administrerede cookies",
     "note" : "Title for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesHidden" : {
+    "title" : "Pop op-vindue om cookies skjult",
+    "note" : "Title for when we have cosmetically hidden a cookie banner"
+  },
+  "cookiesHiddenSummary" : {
+    "title" : "Vi var kun i stand til at skjule pop op-vinduet med samtykke til cookies på dette websted, fordi der ikke var nogen muligheder for at administrere cookiepræferencer. Vores andre beskyttelser mod sporing gælder stadig.",
+    "note" : "A longer explanation that we have cosmetically hidden a cookie banner"
+  },
+  "cookiesMinimizedSummary" : {
+    "title" : "Vi har sat dine cookie-indstillinger til at maksimere fortrolighed og lukket pop op-vinduet med samtykke.",
+    "note" : "A longer explanation that we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesMinimizedSettings" : {
+    "title" : "Ændring i indstillinger",
+    "note" : "Button text for allowing the settings to be opened"
   },
   "connectionSecure" : {
     "title" : "Forbindelsen er krypteret",
@@ -37074,10 +37477,22 @@ module.exports={
   "navigationBack" : {
     "title" : "Tilbage",
     "note" : "Aria label and visible text for iOS on top bar navigation"
+  },
+  "enableProtectionsSwitch" : {
+    "title" : "Aktivér beskyttelser",
+    "note" : "Aria label for the switch that allows the user to turn protections on"
+  },
+  "disableProtectionsSwitch" : {
+    "title" : "Deaktiver beskyttelser",
+    "note" : "Aria label for the switch that allows the user to turn protections off"
+  },
+  "errorMessage" : {
+    "title" : "Noget gik galt, og vi kunne ikke indlæse dette indhold. Prøv at genindlæse siden.",
+    "note" : "Message shown to the user when an error has occurred and the UI cannot be displayed"
   }
 }
 
-},{}],140:[function(require,module,exports){
+},{}],142:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -37174,7 +37589,7 @@ module.exports={
   }
 }
 
-},{}],141:[function(require,module,exports){
+},{}],143:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -37211,7 +37626,7 @@ module.exports={
   }
 }
 
-},{}],142:[function(require,module,exports){
+},{}],144:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -37255,7 +37670,7 @@ module.exports={
     "note" : "A permission setting that always blocks the website from using this permission"
   }
 }
-},{}],143:[function(require,module,exports){
+},{}],145:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -37328,7 +37743,7 @@ module.exports={
   }
 }
 
-},{}],144:[function(require,module,exports){
+},{}],146:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -37345,7 +37760,7 @@ module.exports={
   }
 }
 
-},{}],145:[function(require,module,exports){
+},{}],147:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -37431,6 +37846,22 @@ module.exports={
   "cookiesMinimized" : {
     "title" : "Cookies verwaltet",
     "note" : "Title for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesHidden" : {
+    "title" : "Cookie-Pop-up ausgeblendet",
+    "note" : "Title for when we have cosmetically hidden a cookie banner"
+  },
+  "cookiesHiddenSummary" : {
+    "title" : "Wir konnten das Pop-up-Fenster mit der Cookie-Zustimmung auf dieser Website nur ausblenden, weil es keine Optionen zur Verwaltung der Cookie-Einstellungen gab. Unsere anderen Web-Tracking-Schutzmaßnahmen werden weiterhin angewendet.",
+    "note" : "A longer explanation that we have cosmetically hidden a cookie banner"
+  },
+  "cookiesMinimizedSummary" : {
+    "title" : "Wir haben deine Cookie-Einstellungen so eingestellt, dass die Privatsphäre maximiert wird, und das Zustimmungs-Pop-up geschlossen.",
+    "note" : "A longer explanation that we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesMinimizedSettings" : {
+    "title" : "In Einstellungen ändern",
+    "note" : "Button text for allowing the settings to be opened"
   },
   "connectionSecure" : {
     "title" : "Die Verbindung ist verschlüsselt",
@@ -37578,10 +38009,22 @@ module.exports={
   "navigationBack" : {
     "title" : "Zurück",
     "note" : "Aria label and visible text for iOS on top bar navigation"
+  },
+  "enableProtectionsSwitch" : {
+    "title" : "Schutz aktivieren",
+    "note" : "Aria label for the switch that allows the user to turn protections on"
+  },
+  "disableProtectionsSwitch" : {
+    "title" : "Schutz deaktivieren",
+    "note" : "Aria label for the switch that allows the user to turn protections off"
+  },
+  "errorMessage" : {
+    "title" : "Etwas ist schiefgelaufen und wir konnten diesen Inhalt nicht laden. Versuche, die Seite neu zu laden.",
+    "note" : "Message shown to the user when an error has occurred and the UI cannot be displayed"
   }
 }
 
-},{}],146:[function(require,module,exports){
+},{}],148:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -37678,7 +38121,7 @@ module.exports={
   }
 }
 
-},{}],147:[function(require,module,exports){
+},{}],149:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -37715,7 +38158,7 @@ module.exports={
   }
 }
 
-},{}],148:[function(require,module,exports){
+},{}],150:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -37759,7 +38202,7 @@ module.exports={
     "note" : "A permission setting that always blocks the website from using this permission"
   }
 }
-},{}],149:[function(require,module,exports){
+},{}],151:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -37832,7 +38275,7 @@ module.exports={
   }
 }
 
-},{}],150:[function(require,module,exports){
+},{}],152:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -37849,7 +38292,7 @@ module.exports={
   }
 }
 
-},{}],151:[function(require,module,exports){
+},{}],153:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -37935,6 +38378,22 @@ module.exports={
   "cookiesMinimized" : {
     "title" : "Διαχειριζόμενα cookies",
     "note" : "Title for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesHidden" : {
+    "title" : "Κρυφό αναδυόμενο παράθυρο cookie",
+    "note" : "Title for when we have cosmetically hidden a cookie banner"
+  },
+  "cookiesHiddenSummary" : {
+    "title" : "Μπορέσαμε να αποκρύψουμε μόνο το αναδυόμενο παράθυρο συναίνεσης cookie στον ιστότοπο αυτό επειδή δεν παρέχονται επιλογές για διαχείριση των προτιμήσεων cookie. Οι άλλες Προστασίες παρακολούθησης ιστού εξακολουθούν να ισχύουν.",
+    "note" : "A longer explanation that we have cosmetically hidden a cookie banner"
+  },
+  "cookiesMinimizedSummary" : {
+    "title" : "Ρυθμίσαμε τις προτιμήσεις σας σχετικά με τα cookies ώστε να μεγιστοποιήσουμε το απόρρητο και κλείσαμε το αναδυόμενο παράθυρο συγκατάθεσης.",
+    "note" : "A longer explanation that we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesMinimizedSettings" : {
+    "title" : "Αλλαγή στις ρυθμίσεις",
+    "note" : "Button text for allowing the settings to be opened"
   },
   "connectionSecure" : {
     "title" : "Η σύνδεση είναι κρυπτογραφημένη",
@@ -38082,10 +38541,22 @@ module.exports={
   "navigationBack" : {
     "title" : "Πίσω",
     "note" : "Aria label and visible text for iOS on top bar navigation"
+  },
+  "enableProtectionsSwitch" : {
+    "title" : "Ενεργοποίηση προστασίας",
+    "note" : "Aria label for the switch that allows the user to turn protections on"
+  },
+  "disableProtectionsSwitch" : {
+    "title" : "Απενεργοποίηση προστασίας",
+    "note" : "Aria label for the switch that allows the user to turn protections off"
+  },
+  "errorMessage" : {
+    "title" : "Κάτι πήγε λάθος και δεν μπορέσαμε να φορτώσουμε το περιεχόμενο αυτό. Προσπαθήστε να επαναλάβετε τη φόρτωση της σελίδας.",
+    "note" : "Message shown to the user when an error has occurred and the UI cannot be displayed"
   }
 }
 
-},{}],152:[function(require,module,exports){
+},{}],154:[function(require,module,exports){
 module.exports={
     "smartling": {
         "string_format" : "icu",
@@ -38181,7 +38652,7 @@ module.exports={
     }
 }
 
-},{}],153:[function(require,module,exports){
+},{}],155:[function(require,module,exports){
 module.exports={
     "smartling": {
         "string_format" : "icu",
@@ -38217,7 +38688,7 @@ module.exports={
     }
 }
 
-},{}],154:[function(require,module,exports){
+},{}],156:[function(require,module,exports){
 module.exports={
     "smartling": {
         "string_format" : "icu",
@@ -38260,7 +38731,7 @@ module.exports={
         "note": "A permission setting that always blocks the website from using this permission"
     }
 }
-},{}],155:[function(require,module,exports){
+},{}],157:[function(require,module,exports){
 module.exports={
     "smartling": {
         "string_format" : "icu",
@@ -38332,7 +38803,7 @@ module.exports={
     }
 }
 
-},{}],156:[function(require,module,exports){
+},{}],158:[function(require,module,exports){
 module.exports={
     "smartling": {
         "string_format" : "icu",
@@ -38344,7 +38815,7 @@ module.exports={
     }
 }
 
-},{}],157:[function(require,module,exports){
+},{}],159:[function(require,module,exports){
 module.exports={
     "smartling": {
         "string_format" : "icu",
@@ -38429,6 +38900,22 @@ module.exports={
     "cookiesMinimized": {
         "title": "Cookies Managed",
         "note": "Title for when we have set the cookie privacy settings on this website to maximize privacy"
+    },
+    "cookiesHidden": {
+        "title": "Cookie Pop-up Hidden",
+        "note": "Title for when we have cosmetically hidden a cookie banner"
+    },
+    "cookiesHiddenSummary": {
+        "title": "We were only able to hide the cookie consent pop-up on this site because no options were provided to manage cookie preferences. Our other Web Tracking Protections still apply.",
+        "note": "A longer explanation that we have cosmetically hidden a cookie banner"
+    },
+    "cookiesMinimizedSummary": {
+        "title": "We set your cookie preferences to maximize privacy and closed the consent pop-up.",
+        "note": "A longer explanation that we have set the cookie privacy settings on this website to maximize privacy"
+    },
+    "cookiesMinimizedSettings": {
+        "title": "Disable in Settings",
+        "note": "Button text for allowing the settings to be opened"
     },
     "connectionSecure": {
         "title": "Connection Is Encrypted",
@@ -38591,7 +39078,7 @@ module.exports={
     }
 }
 
-},{}],158:[function(require,module,exports){
+},{}],160:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -38688,7 +39175,7 @@ module.exports={
   }
 }
 
-},{}],159:[function(require,module,exports){
+},{}],161:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -38725,7 +39212,7 @@ module.exports={
   }
 }
 
-},{}],160:[function(require,module,exports){
+},{}],162:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -38769,7 +39256,7 @@ module.exports={
     "note" : "A permission setting that always blocks the website from using this permission"
   }
 }
-},{}],161:[function(require,module,exports){
+},{}],163:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -38842,7 +39329,7 @@ module.exports={
   }
 }
 
-},{}],162:[function(require,module,exports){
+},{}],164:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -38859,7 +39346,7 @@ module.exports={
   }
 }
 
-},{}],163:[function(require,module,exports){
+},{}],165:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -38945,6 +39432,22 @@ module.exports={
   "cookiesMinimized" : {
     "title" : "Cookies gestionadas",
     "note" : "Title for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesHidden" : {
+    "title" : "Ventana emergente de cookies oculta",
+    "note" : "Title for when we have cosmetically hidden a cookie banner"
+  },
+  "cookiesHiddenSummary" : {
+    "title" : "En este sitio solo hemos podido ocultar la ventana emergente de consentimiento de cookies porque no se han proporcionado opciones para gestionar las preferencias de cookies. Nuestras otras protecciones de rastreo web siguen en funcionamiento.",
+    "note" : "A longer explanation that we have cosmetically hidden a cookie banner"
+  },
+  "cookiesMinimizedSummary" : {
+    "title" : "Hemos configurado tus preferencias de cookies para maximizar la privacidad y hemos cerrado la ventana emergente de consentimiento.",
+    "note" : "A longer explanation that we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesMinimizedSettings" : {
+    "title" : "Cambio en los ajustes",
+    "note" : "Button text for allowing the settings to be opened"
   },
   "connectionSecure" : {
     "title" : "La conexión está cifrada",
@@ -39092,10 +39595,22 @@ module.exports={
   "navigationBack" : {
     "title" : "Volver",
     "note" : "Aria label and visible text for iOS on top bar navigation"
+  },
+  "enableProtectionsSwitch" : {
+    "title" : "Activar protecciones",
+    "note" : "Aria label for the switch that allows the user to turn protections on"
+  },
+  "disableProtectionsSwitch" : {
+    "title" : "Desactivar protecciones",
+    "note" : "Aria label for the switch that allows the user to turn protections off"
+  },
+  "errorMessage" : {
+    "title" : "Se ha producido un error y no hemos podido cargar este contenido. Intenta volver a cargar la página.",
+    "note" : "Message shown to the user when an error has occurred and the UI cannot be displayed"
   }
 }
 
-},{}],164:[function(require,module,exports){
+},{}],166:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -39192,7 +39707,7 @@ module.exports={
   }
 }
 
-},{}],165:[function(require,module,exports){
+},{}],167:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -39229,7 +39744,7 @@ module.exports={
   }
 }
 
-},{}],166:[function(require,module,exports){
+},{}],168:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -39273,7 +39788,7 @@ module.exports={
     "note" : "A permission setting that always blocks the website from using this permission"
   }
 }
-},{}],167:[function(require,module,exports){
+},{}],169:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -39346,7 +39861,7 @@ module.exports={
   }
 }
 
-},{}],168:[function(require,module,exports){
+},{}],170:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -39363,7 +39878,7 @@ module.exports={
   }
 }
 
-},{}],169:[function(require,module,exports){
+},{}],171:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -39449,6 +39964,22 @@ module.exports={
   "cookiesMinimized" : {
     "title" : "Hallatavad küpsised",
     "note" : "Title for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesHidden" : {
+    "title" : "Küpsiste hüpikaken peidetud",
+    "note" : "Title for when we have cosmetically hidden a cookie banner"
+  },
+  "cookiesHiddenSummary" : {
+    "title" : "Me saime sellel saidil küpsiste nõusoleku hüpikakna ainult peita, sest küpsise-eelistuste haldamiseks ei antud mingeid valikuid. Meie muud veebijälgimise kaitsemeetodid toimivad endiselt.",
+    "note" : "A longer explanation that we have cosmetically hidden a cookie banner"
+  },
+  "cookiesMinimizedSummary" : {
+    "title" : "Me seadistasime sinu küpsiste eelistused maksimeerima privaatsust ja sulgesime nõusoleku hüpikakna.",
+    "note" : "A longer explanation that we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesMinimizedSettings" : {
+    "title" : "Muuda seadetes",
+    "note" : "Button text for allowing the settings to be opened"
   },
   "connectionSecure" : {
     "title" : "Ühendus on krüptitud",
@@ -39596,10 +40127,22 @@ module.exports={
   "navigationBack" : {
     "title" : "Tagasi",
     "note" : "Aria label and visible text for iOS on top bar navigation"
+  },
+  "enableProtectionsSwitch" : {
+    "title" : "Luba kaitse",
+    "note" : "Aria label for the switch that allows the user to turn protections on"
+  },
+  "disableProtectionsSwitch" : {
+    "title" : "Keela kaitse",
+    "note" : "Aria label for the switch that allows the user to turn protections off"
+  },
+  "errorMessage" : {
+    "title" : "Midagi läks valesti ja me ei saanud seda sisu laadida. Proovi leht uuesti laadida.",
+    "note" : "Message shown to the user when an error has occurred and the UI cannot be displayed"
   }
 }
 
-},{}],170:[function(require,module,exports){
+},{}],172:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -39696,7 +40239,7 @@ module.exports={
   }
 }
 
-},{}],171:[function(require,module,exports){
+},{}],173:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -39733,7 +40276,7 @@ module.exports={
   }
 }
 
-},{}],172:[function(require,module,exports){
+},{}],174:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -39777,7 +40320,7 @@ module.exports={
     "note" : "A permission setting that always blocks the website from using this permission"
   }
 }
-},{}],173:[function(require,module,exports){
+},{}],175:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -39850,7 +40393,7 @@ module.exports={
   }
 }
 
-},{}],174:[function(require,module,exports){
+},{}],176:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -39867,7 +40410,7 @@ module.exports={
   }
 }
 
-},{}],175:[function(require,module,exports){
+},{}],177:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -39953,6 +40496,22 @@ module.exports={
   "cookiesMinimized" : {
     "title" : "Hallitut evästeet",
     "note" : "Title for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesHidden" : {
+    "title" : "Evästeponnahdusikkuna piilotettu",
+    "note" : "Title for when we have cosmetically hidden a cookie banner"
+  },
+  "cookiesHiddenSummary" : {
+    "title" : "Pystyimme vain piilottamaan tämän sivuston evästeponnahdusikkunan, koska evästeasetusten hallintaan ei tarjottu vaihtoehtoja. Muut verkkoseurantasuojamme ovat edelleen käytössä.",
+    "note" : "A longer explanation that we have cosmetically hidden a cookie banner"
+  },
+  "cookiesMinimizedSummary" : {
+    "title" : "Olemme asettaneet evästeasetukset maksimoimaan tietosuojan ja sulkeneet suostumuksen ponnahdusikkunan.",
+    "note" : "A longer explanation that we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesMinimizedSettings" : {
+    "title" : "Muuta asetuksissa",
+    "note" : "Button text for allowing the settings to be opened"
   },
   "connectionSecure" : {
     "title" : "Yhteys on salattu",
@@ -40100,10 +40659,22 @@ module.exports={
   "navigationBack" : {
     "title" : "Takaisin",
     "note" : "Aria label and visible text for iOS on top bar navigation"
+  },
+  "enableProtectionsSwitch" : {
+    "title" : "Ota suojaukset käyttöön",
+    "note" : "Aria label for the switch that allows the user to turn protections on"
+  },
+  "disableProtectionsSwitch" : {
+    "title" : "Poista suojaukset käytöstä",
+    "note" : "Aria label for the switch that allows the user to turn protections off"
+  },
+  "errorMessage" : {
+    "title" : "Jokin meni vikaan, emmekä voineet ladata tätä sisältöä. Yritä ladata sivu uudelleen.",
+    "note" : "Message shown to the user when an error has occurred and the UI cannot be displayed"
   }
 }
 
-},{}],176:[function(require,module,exports){
+},{}],178:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -40200,7 +40771,7 @@ module.exports={
   }
 }
 
-},{}],177:[function(require,module,exports){
+},{}],179:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -40237,7 +40808,7 @@ module.exports={
   }
 }
 
-},{}],178:[function(require,module,exports){
+},{}],180:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -40281,7 +40852,7 @@ module.exports={
     "note" : "A permission setting that always blocks the website from using this permission"
   }
 }
-},{}],179:[function(require,module,exports){
+},{}],181:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -40354,7 +40925,7 @@ module.exports={
   }
 }
 
-},{}],180:[function(require,module,exports){
+},{}],182:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -40371,7 +40942,7 @@ module.exports={
   }
 }
 
-},{}],181:[function(require,module,exports){
+},{}],183:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -40457,6 +41028,22 @@ module.exports={
   "cookiesMinimized" : {
     "title" : "Cookies gérés",
     "note" : "Title for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesHidden" : {
+    "title" : "Fenêtre contextuelle des cookies masquée",
+    "note" : "Title for when we have cosmetically hidden a cookie banner"
+  },
+  "cookiesHiddenSummary" : {
+    "title" : "Nous n'avons pu masquer que la fenêtre contextuelle de consentement aux cookies sur ce site car aucune option n'a été fournie pour gérer les préférences en matière de cookies. Nos autres protections contre le suivi Web s'appliquent toujours.",
+    "note" : "A longer explanation that we have cosmetically hidden a cookie banner"
+  },
+  "cookiesMinimizedSummary" : {
+    "title" : "Nous avons défini vos préférences en matière de cookies pour renforcer la confidentialité de vos données et nous avons fermé la fenêtre contextuelle de consentement.",
+    "note" : "A longer explanation that we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesMinimizedSettings" : {
+    "title" : "Modifier dans les paramètres",
+    "note" : "Button text for allowing the settings to be opened"
   },
   "connectionSecure" : {
     "title" : "La connexion est chiffrée",
@@ -40604,10 +41191,22 @@ module.exports={
   "navigationBack" : {
     "title" : "Retour",
     "note" : "Aria label and visible text for iOS on top bar navigation"
+  },
+  "enableProtectionsSwitch" : {
+    "title" : "Activer les protections",
+    "note" : "Aria label for the switch that allows the user to turn protections on"
+  },
+  "disableProtectionsSwitch" : {
+    "title" : "Désactiver les protections",
+    "note" : "Aria label for the switch that allows the user to turn protections off"
+  },
+  "errorMessage" : {
+    "title" : "Une erreur s'est produite et nous n'avons pas pu charger ce contenu. Essayez d'actualiser la page.",
+    "note" : "Message shown to the user when an error has occurred and the UI cannot be displayed"
   }
 }
 
-},{}],182:[function(require,module,exports){
+},{}],184:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -40704,7 +41303,7 @@ module.exports={
   }
 }
 
-},{}],183:[function(require,module,exports){
+},{}],185:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -40741,7 +41340,7 @@ module.exports={
   }
 }
 
-},{}],184:[function(require,module,exports){
+},{}],186:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -40785,7 +41384,7 @@ module.exports={
     "note" : "A permission setting that always blocks the website from using this permission"
   }
 }
-},{}],185:[function(require,module,exports){
+},{}],187:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -40858,7 +41457,7 @@ module.exports={
   }
 }
 
-},{}],186:[function(require,module,exports){
+},{}],188:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -40875,7 +41474,7 @@ module.exports={
   }
 }
 
-},{}],187:[function(require,module,exports){
+},{}],189:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -40961,6 +41560,22 @@ module.exports={
   "cookiesMinimized" : {
     "title" : "Upravlja se kolačićima",
     "note" : "Title for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesHidden" : {
+    "title" : "Skočni prozor kolačića je sakriven",
+    "note" : "Title for when we have cosmetically hidden a cookie banner"
+  },
+  "cookiesHiddenSummary" : {
+    "title" : "Uspjeli smo sakriti skočni prozor pristanka na kolačiće samo na ovoj web lokaciji, jer nisu pružene opcije za upravljanje preferencijama kolačića. Ostale naše zaštite od web-praćenja i dalje vrijede.",
+    "note" : "A longer explanation that we have cosmetically hidden a cookie banner"
+  },
+  "cookiesMinimizedSummary" : {
+    "title" : "Odredili smo tvoje postavke kolačića kako bismo maksimizirali privatnost te smo zatvorili skočni prozor za pristanak.",
+    "note" : "A longer explanation that we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesMinimizedSettings" : {
+    "title" : "Promjena postavki",
+    "note" : "Button text for allowing the settings to be opened"
   },
   "connectionSecure" : {
     "title" : "Veza je šifrirana",
@@ -41108,10 +41723,22 @@ module.exports={
   "navigationBack" : {
     "title" : "Natrag",
     "note" : "Aria label and visible text for iOS on top bar navigation"
+  },
+  "enableProtectionsSwitch" : {
+    "title" : "Omogući zaštite",
+    "note" : "Aria label for the switch that allows the user to turn protections on"
+  },
+  "disableProtectionsSwitch" : {
+    "title" : "Onemogući zaštite",
+    "note" : "Aria label for the switch that allows the user to turn protections off"
+  },
+  "errorMessage" : {
+    "title" : "Nešto nije bilo u redu i nismo mogli učitati ovaj sadržaj. Pokušajte ponovo učitati stranicu.",
+    "note" : "Message shown to the user when an error has occurred and the UI cannot be displayed"
   }
 }
 
-},{}],188:[function(require,module,exports){
+},{}],190:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -41208,7 +41835,7 @@ module.exports={
   }
 }
 
-},{}],189:[function(require,module,exports){
+},{}],191:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -41245,7 +41872,7 @@ module.exports={
   }
 }
 
-},{}],190:[function(require,module,exports){
+},{}],192:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -41289,7 +41916,7 @@ module.exports={
     "note" : "A permission setting that always blocks the website from using this permission"
   }
 }
-},{}],191:[function(require,module,exports){
+},{}],193:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -41362,7 +41989,7 @@ module.exports={
   }
 }
 
-},{}],192:[function(require,module,exports){
+},{}],194:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -41379,7 +42006,7 @@ module.exports={
   }
 }
 
-},{}],193:[function(require,module,exports){
+},{}],195:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -41465,6 +42092,22 @@ module.exports={
   "cookiesMinimized" : {
     "title" : "Kezelt sütik",
     "note" : "Title for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesHidden" : {
+    "title" : "Felugró sütiablak elrejtve",
+    "note" : "Title for when we have cosmetically hidden a cookie banner"
+  },
+  "cookiesHiddenSummary" : {
+    "title" : "Ezen a webhelyen csak a sütik elfogadására szolgáló felugró ablakot tudtuk elrejteni, mert nem volt lehetőség a sütikre vonatkozó beállítások kezelésére. A webes követés elleni egyéb védelmi módszereink továbbra is működnek.",
+    "note" : "A longer explanation that we have cosmetically hidden a cookie banner"
+  },
+  "cookiesMinimizedSummary" : {
+    "title" : "A sütibeállításokat az adatvédelem maximalizálására állítottuk be, és bezártuk a beleegyezést kérő felugró ablakot.",
+    "note" : "A longer explanation that we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesMinimizedSettings" : {
+    "title" : "Módosítás a beállításokban",
+    "note" : "Button text for allowing the settings to be opened"
   },
   "connectionSecure" : {
     "title" : "A kapcsolat titkosított",
@@ -41612,10 +42255,22 @@ module.exports={
   "navigationBack" : {
     "title" : "Vissza",
     "note" : "Aria label and visible text for iOS on top bar navigation"
+  },
+  "enableProtectionsSwitch" : {
+    "title" : "Védelmek engedélyezése",
+    "note" : "Aria label for the switch that allows the user to turn protections on"
+  },
+  "disableProtectionsSwitch" : {
+    "title" : "Védelmek letiltása",
+    "note" : "Aria label for the switch that allows the user to turn protections off"
+  },
+  "errorMessage" : {
+    "title" : "Hiba történt, ezért nem tudtuk betölteni a tartalmat. Próbálkozz az oldal újbóli betöltésével.",
+    "note" : "Message shown to the user when an error has occurred and the UI cannot be displayed"
   }
 }
 
-},{}],194:[function(require,module,exports){
+},{}],196:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -41712,7 +42367,7 @@ module.exports={
   }
 }
 
-},{}],195:[function(require,module,exports){
+},{}],197:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -41749,7 +42404,7 @@ module.exports={
   }
 }
 
-},{}],196:[function(require,module,exports){
+},{}],198:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -41793,7 +42448,7 @@ module.exports={
     "note" : "A permission setting that always blocks the website from using this permission"
   }
 }
-},{}],197:[function(require,module,exports){
+},{}],199:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -41866,7 +42521,7 @@ module.exports={
   }
 }
 
-},{}],198:[function(require,module,exports){
+},{}],200:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -41883,7 +42538,7 @@ module.exports={
   }
 }
 
-},{}],199:[function(require,module,exports){
+},{}],201:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -41969,6 +42624,22 @@ module.exports={
   "cookiesMinimized" : {
     "title" : "Cookie gestiti",
     "note" : "Title for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesHidden" : {
+    "title" : "Popup dei cookie nascosto",
+    "note" : "Title for when we have cosmetically hidden a cookie banner"
+  },
+  "cookiesHiddenSummary" : {
+    "title" : "Siamo riusciti a nascondere solo il popup per il consenso ai cookie su questo sito, perché non erano disponibili le opzioni di gestione delle preferenze sui cookie. Le altre nostre protezioni dal tracciamento web restano comunque valide.",
+    "note" : "A longer explanation that we have cosmetically hidden a cookie banner"
+  },
+  "cookiesMinimizedSummary" : {
+    "title" : "Abbiamo configurato le preferenze dei cookie in modo da massimizzare la privacy e abbiamo chiuso il pop-up di consenso.",
+    "note" : "A longer explanation that we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesMinimizedSettings" : {
+    "title" : "Modifica in Impostazioni",
+    "note" : "Button text for allowing the settings to be opened"
   },
   "connectionSecure" : {
     "title" : "La connessione è crittografata",
@@ -42116,10 +42787,22 @@ module.exports={
   "navigationBack" : {
     "title" : "Indietro",
     "note" : "Aria label and visible text for iOS on top bar navigation"
+  },
+  "enableProtectionsSwitch" : {
+    "title" : "Abilita protezioni",
+    "note" : "Aria label for the switch that allows the user to turn protections on"
+  },
+  "disableProtectionsSwitch" : {
+    "title" : "Disabilita protezioni",
+    "note" : "Aria label for the switch that allows the user to turn protections off"
+  },
+  "errorMessage" : {
+    "title" : "Si è verificato un errore e non siamo riusciti a caricare questo contenuto. Prova a ricaricare la pagina.",
+    "note" : "Message shown to the user when an error has occurred and the UI cannot be displayed"
   }
 }
 
-},{}],200:[function(require,module,exports){
+},{}],202:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -42216,7 +42899,7 @@ module.exports={
   }
 }
 
-},{}],201:[function(require,module,exports){
+},{}],203:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -42253,7 +42936,7 @@ module.exports={
   }
 }
 
-},{}],202:[function(require,module,exports){
+},{}],204:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -42297,7 +42980,7 @@ module.exports={
     "note" : "A permission setting that always blocks the website from using this permission"
   }
 }
-},{}],203:[function(require,module,exports){
+},{}],205:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -42370,7 +43053,7 @@ module.exports={
   }
 }
 
-},{}],204:[function(require,module,exports){
+},{}],206:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -42387,7 +43070,7 @@ module.exports={
   }
 }
 
-},{}],205:[function(require,module,exports){
+},{}],207:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -42473,6 +43156,22 @@ module.exports={
   "cookiesMinimized" : {
     "title" : "Slapukai valdomi",
     "note" : "Title for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesHidden" : {
+    "title" : "Iškylantysis slapukų langas paslėptas",
+    "note" : "Title for when we have cosmetically hidden a cookie banner"
+  },
+  "cookiesHiddenSummary" : {
+    "title" : "Sutikimo su slapukais iškylantįjį langą šioje svetainėje galėjome paslėpti tik todėl, kad nepateikta jokių parinkčių slapukų nuostatoms tvarkyti. Kitos mūsų žiniatinklio stebėjimo apsaugos priemonės vis dar taikomos.",
+    "note" : "A longer explanation that we have cosmetically hidden a cookie banner"
+  },
+  "cookiesMinimizedSummary" : {
+    "title" : "Nustatėme slapukų nuostatas, kad būtų užtikrintas kuo didesnis privatumas, ir uždarėme iššokantįjį sutikimo langą.",
+    "note" : "A longer explanation that we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesMinimizedSettings" : {
+    "title" : "Nustatymų keitimas",
+    "note" : "Button text for allowing the settings to be opened"
   },
   "connectionSecure" : {
     "title" : "Ryšys užšifruotas",
@@ -42620,10 +43319,22 @@ module.exports={
   "navigationBack" : {
     "title" : "Atgal",
     "note" : "Aria label and visible text for iOS on top bar navigation"
+  },
+  "enableProtectionsSwitch" : {
+    "title" : "Įjungti apsaugos priemones",
+    "note" : "Aria label for the switch that allows the user to turn protections on"
+  },
+  "disableProtectionsSwitch" : {
+    "title" : "Išjungti apsaugos priemones",
+    "note" : "Aria label for the switch that allows the user to turn protections off"
+  },
+  "errorMessage" : {
+    "title" : "Kažkas nepavyko ir negalėjome įkelti šio turinio. Pabandykite iš naujo įkelti puslapį.",
+    "note" : "Message shown to the user when an error has occurred and the UI cannot be displayed"
   }
 }
 
-},{}],206:[function(require,module,exports){
+},{}],208:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -42720,7 +43431,7 @@ module.exports={
   }
 }
 
-},{}],207:[function(require,module,exports){
+},{}],209:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -42757,7 +43468,7 @@ module.exports={
   }
 }
 
-},{}],208:[function(require,module,exports){
+},{}],210:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -42801,7 +43512,7 @@ module.exports={
     "note" : "A permission setting that always blocks the website from using this permission"
   }
 }
-},{}],209:[function(require,module,exports){
+},{}],211:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -42874,7 +43585,7 @@ module.exports={
   }
 }
 
-},{}],210:[function(require,module,exports){
+},{}],212:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -42891,7 +43602,7 @@ module.exports={
   }
 }
 
-},{}],211:[function(require,module,exports){
+},{}],213:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -42977,6 +43688,22 @@ module.exports={
   "cookiesMinimized" : {
     "title" : "Pārvaldītie sīkfaili",
     "note" : "Title for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesHidden" : {
+    "title" : "Sīkfailu uznirstošais logs paslēpts",
+    "note" : "Title for when we have cosmetically hidden a cookie banner"
+  },
+  "cookiesHiddenSummary" : {
+    "title" : "Šajā vietnē mēs varējām tikai paslēpt sīkfailu piekrišanas uznirstošo logu, jo nebija pieejamas sīkfailu preferenču pārvaldīšanas opcijas. Joprojām ir spēkā citi mūsu tīmekļa izsekošanas aizsardzības līdzekļi.",
+    "note" : "A longer explanation that we have cosmetically hidden a cookie banner"
+  },
+  "cookiesMinimizedSummary" : {
+    "title" : "Mēs esam iestatījuši sīkfailu preferences, lai maksimāli palielinātu konfidencialitāti, un aizvēruši piekrišanas uznirstošo logu.",
+    "note" : "A longer explanation that we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesMinimizedSettings" : {
+    "title" : "Mainīt iestatījumos",
+    "note" : "Button text for allowing the settings to be opened"
   },
   "connectionSecure" : {
     "title" : "Savienojums ir šifrēts",
@@ -43124,10 +43851,22 @@ module.exports={
   "navigationBack" : {
     "title" : "Atpakaļ",
     "note" : "Aria label and visible text for iOS on top bar navigation"
+  },
+  "enableProtectionsSwitch" : {
+    "title" : "Iespējot aizsardzību",
+    "note" : "Aria label for the switch that allows the user to turn protections on"
+  },
+  "disableProtectionsSwitch" : {
+    "title" : "Atspējot aizsardzību",
+    "note" : "Aria label for the switch that allows the user to turn protections off"
+  },
+  "errorMessage" : {
+    "title" : "Radās problēma, un mums neizdevās ielādēt šo saturu. Mēģiniet pārlādēt lapu.",
+    "note" : "Message shown to the user when an error has occurred and the UI cannot be displayed"
   }
 }
 
-},{}],212:[function(require,module,exports){
+},{}],214:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -43224,7 +43963,7 @@ module.exports={
   }
 }
 
-},{}],213:[function(require,module,exports){
+},{}],215:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -43261,7 +44000,7 @@ module.exports={
   }
 }
 
-},{}],214:[function(require,module,exports){
+},{}],216:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -43305,7 +44044,7 @@ module.exports={
     "note" : "A permission setting that always blocks the website from using this permission"
   }
 }
-},{}],215:[function(require,module,exports){
+},{}],217:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -43378,7 +44117,7 @@ module.exports={
   }
 }
 
-},{}],216:[function(require,module,exports){
+},{}],218:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -43395,7 +44134,7 @@ module.exports={
   }
 }
 
-},{}],217:[function(require,module,exports){
+},{}],219:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -43481,6 +44220,22 @@ module.exports={
   "cookiesMinimized" : {
     "title" : "Informasjonskapsler administrert",
     "note" : "Title for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesHidden" : {
+    "title" : "Popup-vindu om informasjonskapsler skjult",
+    "note" : "Title for when we have cosmetically hidden a cookie banner"
+  },
+  "cookiesHiddenSummary" : {
+    "title" : "Popup-vinduet om informasjonskapselsamtykke på dette nettstedet ga ingen alternativer for preferanser, så vi har bare skjult det. Våre andre nettsporingsbeskyttelser gjelder fortsatt.",
+    "note" : "A longer explanation that we have cosmetically hidden a cookie banner"
+  },
+  "cookiesMinimizedSummary" : {
+    "title" : "Vi har angitt informasjonskapselpreferansene dine for å maksimere personvernet, og lukket samtykke-popupen.",
+    "note" : "A longer explanation that we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesMinimizedSettings" : {
+    "title" : "Endre i innstillinger",
+    "note" : "Button text for allowing the settings to be opened"
   },
   "connectionSecure" : {
     "title" : "Tilkoblingen er kryptert",
@@ -43628,10 +44383,22 @@ module.exports={
   "navigationBack" : {
     "title" : "Tilbake",
     "note" : "Aria label and visible text for iOS on top bar navigation"
+  },
+  "enableProtectionsSwitch" : {
+    "title" : "Aktiver beskyttelse",
+    "note" : "Aria label for the switch that allows the user to turn protections on"
+  },
+  "disableProtectionsSwitch" : {
+    "title" : "Deaktiver beskyttelse",
+    "note" : "Aria label for the switch that allows the user to turn protections off"
+  },
+  "errorMessage" : {
+    "title" : "Noe gikk galt, så vi kunne ikke laste dette innholdet. Prøv å laste siden på nytt.",
+    "note" : "Message shown to the user when an error has occurred and the UI cannot be displayed"
   }
 }
 
-},{}],218:[function(require,module,exports){
+},{}],220:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -43728,7 +44495,7 @@ module.exports={
   }
 }
 
-},{}],219:[function(require,module,exports){
+},{}],221:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -43765,7 +44532,7 @@ module.exports={
   }
 }
 
-},{}],220:[function(require,module,exports){
+},{}],222:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -43809,7 +44576,7 @@ module.exports={
     "note" : "A permission setting that always blocks the website from using this permission"
   }
 }
-},{}],221:[function(require,module,exports){
+},{}],223:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -43882,7 +44649,7 @@ module.exports={
   }
 }
 
-},{}],222:[function(require,module,exports){
+},{}],224:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -43899,7 +44666,7 @@ module.exports={
   }
 }
 
-},{}],223:[function(require,module,exports){
+},{}],225:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -43985,6 +44752,22 @@ module.exports={
   "cookiesMinimized" : {
     "title" : "Beheerde cookies",
     "note" : "Title for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesHidden" : {
+    "title" : "Cookiepop-up verborgen",
+    "note" : "Title for when we have cosmetically hidden a cookie banner"
+  },
+  "cookiesHiddenSummary" : {
+    "title" : "We konden de pop-up voor cookietoestemming op deze site alleen verbergen omdat er geen opties waren om cookievoorkeuren te beheren. De rest van onze bescherming tegen webtracking is nog steeds van toepassing.",
+    "note" : "A longer explanation that we have cosmetically hidden a cookie banner"
+  },
+  "cookiesMinimizedSummary" : {
+    "title" : "We hebben je cookievoorkeuren ingesteld voor maximale privacy en het pop-upvenster waarin om toestemming wordt gevraagd gesloten.",
+    "note" : "A longer explanation that we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesMinimizedSettings" : {
+    "title" : "Wijzigen in Instellingen",
+    "note" : "Button text for allowing the settings to be opened"
   },
   "connectionSecure" : {
     "title" : "Verbinding is versleuteld",
@@ -44132,10 +44915,22 @@ module.exports={
   "navigationBack" : {
     "title" : "Terug",
     "note" : "Aria label and visible text for iOS on top bar navigation"
+  },
+  "enableProtectionsSwitch" : {
+    "title" : "Bescherming inschakelen",
+    "note" : "Aria label for the switch that allows the user to turn protections on"
+  },
+  "disableProtectionsSwitch" : {
+    "title" : "Bescherming uitschakelen",
+    "note" : "Aria label for the switch that allows the user to turn protections off"
+  },
+  "errorMessage" : {
+    "title" : "Er is iets misgegaan en we kunnen deze inhoud niet laden. Probeer de pagina opnieuw te laden.",
+    "note" : "Message shown to the user when an error has occurred and the UI cannot be displayed"
   }
 }
 
-},{}],224:[function(require,module,exports){
+},{}],226:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -44232,7 +45027,7 @@ module.exports={
   }
 }
 
-},{}],225:[function(require,module,exports){
+},{}],227:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -44269,7 +45064,7 @@ module.exports={
   }
 }
 
-},{}],226:[function(require,module,exports){
+},{}],228:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -44313,7 +45108,7 @@ module.exports={
     "note" : "A permission setting that always blocks the website from using this permission"
   }
 }
-},{}],227:[function(require,module,exports){
+},{}],229:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -44386,7 +45181,7 @@ module.exports={
   }
 }
 
-},{}],228:[function(require,module,exports){
+},{}],230:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -44403,7 +45198,7 @@ module.exports={
   }
 }
 
-},{}],229:[function(require,module,exports){
+},{}],231:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -44489,6 +45284,22 @@ module.exports={
   "cookiesMinimized" : {
     "title" : "Zarządzane pliki cookie",
     "note" : "Title for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesHidden" : {
+    "title" : "Ukryte wyskakujące okienka dotyczące plików cookie",
+    "note" : "Title for when we have cosmetically hidden a cookie banner"
+  },
+  "cookiesHiddenSummary" : {
+    "title" : "Na tej stronie udało nam się ukryć okienko z prośbą o zgodę na używanie plików cookie, ponieważ nie zawierało ono opcji pozwalających na zarządzanie preferencjami dotyczącymi plików cookie. Pozostałe zabezpieczenia dotyczące śledzenia w sieci nadal działają.",
+    "note" : "A longer explanation that we have cosmetically hidden a cookie banner"
+  },
+  "cookiesMinimizedSummary" : {
+    "title" : "Ustawiliśmy preferencje dotyczące plików cookie, aby zmaksymalizować prywatność, i zamknęliśmy wyskakujące okienko zgody.",
+    "note" : "A longer explanation that we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesMinimizedSettings" : {
+    "title" : "Zmiana ustawień",
+    "note" : "Button text for allowing the settings to be opened"
   },
   "connectionSecure" : {
     "title" : "Połączenie jest szyfrowane",
@@ -44636,10 +45447,22 @@ module.exports={
   "navigationBack" : {
     "title" : "Wstecz",
     "note" : "Aria label and visible text for iOS on top bar navigation"
+  },
+  "enableProtectionsSwitch" : {
+    "title" : "Włącz ochronę",
+    "note" : "Aria label for the switch that allows the user to turn protections on"
+  },
+  "disableProtectionsSwitch" : {
+    "title" : "Wyłącz ochronę",
+    "note" : "Aria label for the switch that allows the user to turn protections off"
+  },
+  "errorMessage" : {
+    "title" : "Coś poszło nie tak i nie udało się załadować tej zawartości. Spróbuj ponownie załadować stronę.",
+    "note" : "Message shown to the user when an error has occurred and the UI cannot be displayed"
   }
 }
 
-},{}],230:[function(require,module,exports){
+},{}],232:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -44736,7 +45559,7 @@ module.exports={
   }
 }
 
-},{}],231:[function(require,module,exports){
+},{}],233:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -44773,7 +45596,7 @@ module.exports={
   }
 }
 
-},{}],232:[function(require,module,exports){
+},{}],234:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -44817,7 +45640,7 @@ module.exports={
     "note" : "A permission setting that always blocks the website from using this permission"
   }
 }
-},{}],233:[function(require,module,exports){
+},{}],235:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -44890,9 +45713,9 @@ module.exports={
   }
 }
 
-},{}],234:[function(require,module,exports){
-arguments[4][162][0].apply(exports,arguments)
-},{"dup":162}],235:[function(require,module,exports){
+},{}],236:[function(require,module,exports){
+arguments[4][164][0].apply(exports,arguments)
+},{"dup":164}],237:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -44978,6 +45801,22 @@ module.exports={
   "cookiesMinimized" : {
     "title" : "Cookies geridos",
     "note" : "Title for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesHidden" : {
+    "title" : "Pop-up de cookies ocultado",
+    "note" : "Title for when we have cosmetically hidden a cookie banner"
+  },
+  "cookiesHiddenSummary" : {
+    "title" : "Só conseguimos ocultar o pop-up de consentimento de cookies neste site porque não foi disponibilizada nenhuma opção para gerir preferências de cookies. As nossas restantes proteções contra o rastreamento na Internet ainda se aplicam.",
+    "note" : "A longer explanation that we have cosmetically hidden a cookie banner"
+  },
+  "cookiesMinimizedSummary" : {
+    "title" : "Definimos as tuas preferências de cookies para maximizar a privacidade e fechamos o pop-up de consentimento.",
+    "note" : "A longer explanation that we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesMinimizedSettings" : {
+    "title" : "Alterar nas Definições",
+    "note" : "Button text for allowing the settings to be opened"
   },
   "connectionSecure" : {
     "title" : "A ligação está encriptada",
@@ -45125,10 +45964,22 @@ module.exports={
   "navigationBack" : {
     "title" : "Retroceder",
     "note" : "Aria label and visible text for iOS on top bar navigation"
+  },
+  "enableProtectionsSwitch" : {
+    "title" : "Ativar proteções",
+    "note" : "Aria label for the switch that allows the user to turn protections on"
+  },
+  "disableProtectionsSwitch" : {
+    "title" : "Desativar proteções",
+    "note" : "Aria label for the switch that allows the user to turn protections off"
+  },
+  "errorMessage" : {
+    "title" : "Algo correu mal e não conseguimos carregar este conteúdo. Tenta recarregar a página.",
+    "note" : "Message shown to the user when an error has occurred and the UI cannot be displayed"
   }
 }
 
-},{}],236:[function(require,module,exports){
+},{}],238:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -45225,7 +46076,7 @@ module.exports={
   }
 }
 
-},{}],237:[function(require,module,exports){
+},{}],239:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -45262,7 +46113,7 @@ module.exports={
   }
 }
 
-},{}],238:[function(require,module,exports){
+},{}],240:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -45306,7 +46157,7 @@ module.exports={
     "note" : "A permission setting that always blocks the website from using this permission"
   }
 }
-},{}],239:[function(require,module,exports){
+},{}],241:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -45379,7 +46230,7 @@ module.exports={
   }
 }
 
-},{}],240:[function(require,module,exports){
+},{}],242:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -45396,7 +46247,7 @@ module.exports={
   }
 }
 
-},{}],241:[function(require,module,exports){
+},{}],243:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -45482,6 +46333,22 @@ module.exports={
   "cookiesMinimized" : {
     "title" : "Modulele cookie au fost gestionate",
     "note" : "Title for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesHidden" : {
+    "title" : "Fereastră pop-up privind modulele cookie ascunsă",
+    "note" : "Title for when we have cosmetically hidden a cookie banner"
+  },
+  "cookiesHiddenSummary" : {
+    "title" : "Am reușit să ascundem pe acest site fereastra pop-up privind consimțământul aferent modulelor cookie, deoarece nu au fost oferite opțiuni pentru gestionarea preferințelor privind modulele cookie. Se aplică în continuare celelalte instrumente ale noastre de protecție cu privire la urmărirea pe internet.",
+    "note" : "A longer explanation that we have cosmetically hidden a cookie banner"
+  },
+  "cookiesMinimizedSummary" : {
+    "title" : "Am setat preferințele tale privind modulele cookie pentru a maximiza confidențialitatea și am închis fereastra pop-up de consimțământ.",
+    "note" : "A longer explanation that we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesMinimizedSettings" : {
+    "title" : "Schimbă în setări",
+    "note" : "Button text for allowing the settings to be opened"
   },
   "connectionSecure" : {
     "title" : "Conexiunea este criptată",
@@ -45629,10 +46496,22 @@ module.exports={
   "navigationBack" : {
     "title" : "Înapoi",
     "note" : "Aria label and visible text for iOS on top bar navigation"
+  },
+  "enableProtectionsSwitch" : {
+    "title" : "Activează protecțiile",
+    "note" : "Aria label for the switch that allows the user to turn protections on"
+  },
+  "disableProtectionsSwitch" : {
+    "title" : "Dezactivează protecțiile",
+    "note" : "Aria label for the switch that allows the user to turn protections off"
+  },
+  "errorMessage" : {
+    "title" : "Ceva nu a mers bine și nu am putut încărca acest conținut. Încearcă să reîncarci pagina.",
+    "note" : "Message shown to the user when an error has occurred and the UI cannot be displayed"
   }
 }
 
-},{}],242:[function(require,module,exports){
+},{}],244:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -45729,7 +46608,7 @@ module.exports={
   }
 }
 
-},{}],243:[function(require,module,exports){
+},{}],245:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -45766,7 +46645,7 @@ module.exports={
   }
 }
 
-},{}],244:[function(require,module,exports){
+},{}],246:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -45810,7 +46689,7 @@ module.exports={
     "note" : "A permission setting that always blocks the website from using this permission"
   }
 }
-},{}],245:[function(require,module,exports){
+},{}],247:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -45883,7 +46762,7 @@ module.exports={
   }
 }
 
-},{}],246:[function(require,module,exports){
+},{}],248:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -45900,7 +46779,7 @@ module.exports={
   }
 }
 
-},{}],247:[function(require,module,exports){
+},{}],249:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -45986,6 +46865,22 @@ module.exports={
   "cookiesMinimized" : {
     "title" : "Kуки-файлы выбраны",
     "note" : "Title for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesHidden" : {
+    "title" : "Всплывающее окно куки-файлов скрыто",
+    "note" : "Title for when we have cosmetically hidden a cookie banner"
+  },
+  "cookiesHiddenSummary" : {
+    "title" : "Всплывающее окно куки-файлов скрыто, поскольку не предусмотрена возможность выбора куки. Остальные средства защиты от отслеживания онлайн по-прежнему активны.",
+    "note" : "A longer explanation that we have cosmetically hidden a cookie banner"
+  },
+  "cookiesMinimizedSummary" : {
+    "title" : "Заданные нами параметры максимально защищают вашу конфиденциальность и блокируют всплывающее окно настроек куки-файлов.",
+    "note" : "A longer explanation that we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesMinimizedSettings" : {
+    "title" : "Изменить в «Настройках»",
+    "note" : "Button text for allowing the settings to be opened"
   },
   "connectionSecure" : {
     "title" : "Соединение зашифровано",
@@ -46133,10 +47028,22 @@ module.exports={
   "navigationBack" : {
     "title" : "Назад",
     "note" : "Aria label and visible text for iOS on top bar navigation"
+  },
+  "enableProtectionsSwitch" : {
+    "title" : "Включить защиту",
+    "note" : "Aria label for the switch that allows the user to turn protections on"
+  },
+  "disableProtectionsSwitch" : {
+    "title" : "Отключить защиту",
+    "note" : "Aria label for the switch that allows the user to turn protections off"
+  },
+  "errorMessage" : {
+    "title" : "Что-то сработало не так: не удалось загрузить этот контент. Перезагрузите страницу.",
+    "note" : "Message shown to the user when an error has occurred and the UI cannot be displayed"
   }
 }
 
-},{}],248:[function(require,module,exports){
+},{}],250:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -46233,7 +47140,7 @@ module.exports={
   }
 }
 
-},{}],249:[function(require,module,exports){
+},{}],251:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -46270,7 +47177,7 @@ module.exports={
   }
 }
 
-},{}],250:[function(require,module,exports){
+},{}],252:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -46314,7 +47221,7 @@ module.exports={
     "note" : "A permission setting that always blocks the website from using this permission"
   }
 }
-},{}],251:[function(require,module,exports){
+},{}],253:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -46387,7 +47294,7 @@ module.exports={
   }
 }
 
-},{}],252:[function(require,module,exports){
+},{}],254:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -46404,7 +47311,7 @@ module.exports={
   }
 }
 
-},{}],253:[function(require,module,exports){
+},{}],255:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -46490,6 +47397,22 @@ module.exports={
   "cookiesMinimized" : {
     "title" : "Spravované súbory cookie",
     "note" : "Title for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesHidden" : {
+    "title" : "Kontextové okno pre súbory cookie je skryté",
+    "note" : "Title for when we have cosmetically hidden a cookie banner"
+  },
+  "cookiesHiddenSummary" : {
+    "title" : "Na tejto lokalite sme mohli kontextové okno so súhlasom pre súbory cookie iba skryť, pretože k dispozícii neboli žiadne možnosti na správu preferencií súborov cookie. Naša ďalšia ochrana pred sledovaním webu stále platí.",
+    "note" : "A longer explanation that we have cosmetically hidden a cookie banner"
+  },
+  "cookiesMinimizedSummary" : {
+    "title" : "Nastavili sme vaše nastavenia súborov cookie na maximalizáciu ochrany súkromia a zatvorili sme automaticky zobrazované okno so súhlasom.",
+    "note" : "A longer explanation that we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesMinimizedSettings" : {
+    "title" : "Zmena nastavení",
+    "note" : "Button text for allowing the settings to be opened"
   },
   "connectionSecure" : {
     "title" : "Pripojenie je šifrované",
@@ -46637,10 +47560,22 @@ module.exports={
   "navigationBack" : {
     "title" : "Späť",
     "note" : "Aria label and visible text for iOS on top bar navigation"
+  },
+  "enableProtectionsSwitch" : {
+    "title" : "Povolenie ochrany",
+    "note" : "Aria label for the switch that allows the user to turn protections on"
+  },
+  "disableProtectionsSwitch" : {
+    "title" : "Zakázanie ochrany",
+    "note" : "Aria label for the switch that allows the user to turn protections off"
+  },
+  "errorMessage" : {
+    "title" : "Došlo k chybe a my sme nemohli načítať tento obsah. Skúste znovu načítať stránku.",
+    "note" : "Message shown to the user when an error has occurred and the UI cannot be displayed"
   }
 }
 
-},{}],254:[function(require,module,exports){
+},{}],256:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -46737,7 +47672,7 @@ module.exports={
   }
 }
 
-},{}],255:[function(require,module,exports){
+},{}],257:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -46774,7 +47709,7 @@ module.exports={
   }
 }
 
-},{}],256:[function(require,module,exports){
+},{}],258:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -46818,7 +47753,7 @@ module.exports={
     "note" : "A permission setting that always blocks the website from using this permission"
   }
 }
-},{}],257:[function(require,module,exports){
+},{}],259:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -46891,7 +47826,7 @@ module.exports={
   }
 }
 
-},{}],258:[function(require,module,exports){
+},{}],260:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -46908,7 +47843,7 @@ module.exports={
   }
 }
 
-},{}],259:[function(require,module,exports){
+},{}],261:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -46994,6 +47929,22 @@ module.exports={
   "cookiesMinimized" : {
     "title" : "Upravljani piškotki",
     "note" : "Title for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesHidden" : {
+    "title" : "Pojavno okno za piškotke je skrito",
+    "note" : "Title for when we have cosmetically hidden a cookie banner"
+  },
+  "cookiesHiddenSummary" : {
+    "title" : "Na tem spletnem mestu smo lahko le skrili pojavno okno s soglasjem za piškotke, ker ni bilo na voljo nobenih možnosti za upravljanje nastavitev piškotkov. Naša preostala zaščita pred spletnim sledenjem se še vedno izvaja.",
+    "note" : "A longer explanation that we have cosmetically hidden a cookie banner"
+  },
+  "cookiesMinimizedSummary" : {
+    "title" : "Nastavili smo vaše nastavitve piškotkov za čim večjo zasebnost in zaprli pojavno okno za soglasje.",
+    "note" : "A longer explanation that we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesMinimizedSettings" : {
+    "title" : "Sprememba nastavitev",
+    "note" : "Button text for allowing the settings to be opened"
   },
   "connectionSecure" : {
     "title" : "Povezava je šifrirana",
@@ -47141,10 +48092,22 @@ module.exports={
   "navigationBack" : {
     "title" : "Nazaj",
     "note" : "Aria label and visible text for iOS on top bar navigation"
+  },
+  "enableProtectionsSwitch" : {
+    "title" : "Omogoči zaščito",
+    "note" : "Aria label for the switch that allows the user to turn protections on"
+  },
+  "disableProtectionsSwitch" : {
+    "title" : "Onemogoči zaščito",
+    "note" : "Aria label for the switch that allows the user to turn protections off"
+  },
+  "errorMessage" : {
+    "title" : "Nekaj je šlo narobe in te vsebine nismo mogli naložiti. Poskusite znova naložiti stran.",
+    "note" : "Message shown to the user when an error has occurred and the UI cannot be displayed"
   }
 }
 
-},{}],260:[function(require,module,exports){
+},{}],262:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -47241,7 +48204,7 @@ module.exports={
   }
 }
 
-},{}],261:[function(require,module,exports){
+},{}],263:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -47278,7 +48241,7 @@ module.exports={
   }
 }
 
-},{}],262:[function(require,module,exports){
+},{}],264:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -47322,7 +48285,7 @@ module.exports={
     "note" : "A permission setting that always blocks the website from using this permission"
   }
 }
-},{}],263:[function(require,module,exports){
+},{}],265:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -47395,7 +48358,7 @@ module.exports={
   }
 }
 
-},{}],264:[function(require,module,exports){
+},{}],266:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -47412,7 +48375,7 @@ module.exports={
   }
 }
 
-},{}],265:[function(require,module,exports){
+},{}],267:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -47498,6 +48461,22 @@ module.exports={
   "cookiesMinimized" : {
     "title" : "Cookies hanteras",
     "note" : "Title for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesHidden" : {
+    "title" : "Popup-fönster för cookies dolt",
+    "note" : "Title for when we have cosmetically hidden a cookie banner"
+  },
+  "cookiesHiddenSummary" : {
+    "title" : "Vi kunde dölja popup-fönstret för samtycke till cookies på den här webbplatsen eftersom det inte erbjöds några alternativ för att hantera inställningar för cookies. Våra övriga webbspårningsskydd gäller fortfarande.",
+    "note" : "A longer explanation that we have cosmetically hidden a cookie banner"
+  },
+  "cookiesMinimizedSummary" : {
+    "title" : "Vi har konfigurerat dina cookieinställningar för att maximera din integritet och stängt popup-fönstret för samtycke.",
+    "note" : "A longer explanation that we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesMinimizedSettings" : {
+    "title" : "Ändra inställningar",
+    "note" : "Button text for allowing the settings to be opened"
   },
   "connectionSecure" : {
     "title" : "Anslutningen är krypterad",
@@ -47645,10 +48624,22 @@ module.exports={
   "navigationBack" : {
     "title" : "Tillbaka",
     "note" : "Aria label and visible text for iOS on top bar navigation"
+  },
+  "enableProtectionsSwitch" : {
+    "title" : "Aktivera skydd",
+    "note" : "Aria label for the switch that allows the user to turn protections on"
+  },
+  "disableProtectionsSwitch" : {
+    "title" : "Inaktivera skydd",
+    "note" : "Aria label for the switch that allows the user to turn protections off"
+  },
+  "errorMessage" : {
+    "title" : "Något gick fel och vi kunde inte läsa in detta innehåll. Försök läsa in sidan igen.",
+    "note" : "Message shown to the user when an error has occurred and the UI cannot be displayed"
   }
 }
 
-},{}],266:[function(require,module,exports){
+},{}],268:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -47745,7 +48736,7 @@ module.exports={
   }
 }
 
-},{}],267:[function(require,module,exports){
+},{}],269:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -47782,7 +48773,7 @@ module.exports={
   }
 }
 
-},{}],268:[function(require,module,exports){
+},{}],270:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -47826,7 +48817,7 @@ module.exports={
     "note" : "A permission setting that always blocks the website from using this permission"
   }
 }
-},{}],269:[function(require,module,exports){
+},{}],271:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -47899,7 +48890,7 @@ module.exports={
   }
 }
 
-},{}],270:[function(require,module,exports){
+},{}],272:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -47916,7 +48907,7 @@ module.exports={
   }
 }
 
-},{}],271:[function(require,module,exports){
+},{}],273:[function(require,module,exports){
 module.exports={
   "smartling" : {
     "string_format" : "icu",
@@ -48002,6 +48993,22 @@ module.exports={
   "cookiesMinimized" : {
     "title" : "Yönetilen Çerezler",
     "note" : "Title for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesHidden" : {
+    "title" : "Çerez Açılır Penceresi Gizli",
+    "note" : "Title for when we have cosmetically hidden a cookie banner"
+  },
+  "cookiesHiddenSummary" : {
+    "title" : "Çerez tercihlerini yönetmek için herhangi bir seçenek sunulmadığından, bu sitede yalnızca çerez onayı açılır penceresini gizleyebildik. Diğer Web İzleme Korumalarımız hâlâ geçerlidir.",
+    "note" : "A longer explanation that we have cosmetically hidden a cookie banner"
+  },
+  "cookiesMinimizedSummary" : {
+    "title" : "Çerez tercihlerinizi gizliliği en üst düzeye çıkaracak şekilde ayarladık ve onay açılır penceresini kapattık.",
+    "note" : "A longer explanation that we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesMinimizedSettings" : {
+    "title" : "Ayarlarda Değişiklik",
+    "note" : "Button text for allowing the settings to be opened"
   },
   "connectionSecure" : {
     "title" : "Bağlantı Şifrelenmiştir",
@@ -48149,6 +49156,18 @@ module.exports={
   "navigationBack" : {
     "title" : "Geri",
     "note" : "Aria label and visible text for iOS on top bar navigation"
+  },
+  "enableProtectionsSwitch" : {
+    "title" : "Korumaları Etkinleştir",
+    "note" : "Aria label for the switch that allows the user to turn protections on"
+  },
+  "disableProtectionsSwitch" : {
+    "title" : "Korumaları Devre Dışı Bırak",
+    "note" : "Aria label for the switch that allows the user to turn protections off"
+  },
+  "errorMessage" : {
+    "title" : "Bir şeyler ters gitti ve bu içeriği yükleyemedik. Sayfayı yeniden yüklemeyi deneyin.",
+    "note" : "Message shown to the user when an error has occurred and the UI cannot be displayed"
   }
 }
 

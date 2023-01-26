@@ -1678,10 +1678,11 @@ class BrowserTabViewModel @Inject constructor(
         onSiteChanged()
     }
 
-    fun onAutoconsentResultReceived(consentManaged: Boolean, optOutFailed: Boolean, selfTestFailed: Boolean) {
+    fun onAutoconsentResultReceived(consentManaged: Boolean, optOutFailed: Boolean, selfTestFailed: Boolean, isCosmetic: Boolean?) {
         site?.consentManaged = consentManaged
         site?.consentOptOutFailed = optOutFailed
         site?.consentSelfTestFailed = selfTestFailed
+        site?.consentCosmeticHide = isCosmetic
     }
 
     private fun onSiteChanged() {

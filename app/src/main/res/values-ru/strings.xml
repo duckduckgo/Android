@@ -398,7 +398,7 @@
     <string name="systemSearchOnboardingButtonOk">Понятно</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">СКРЫТЬ</string>
+    <string name="daxDialogHideButton">Скрыть</string>
     <string name="daxDialogPhew">Уф!</string>
     <string name="daxDialogNext">Далее</string>
     <string name="daxDialogHighFive">Дай пять!</string>
@@ -660,7 +660,8 @@
     <string name="autoconsentSecondaryCta">Нет, спасибо</string>
 
     <string name="autoconsentSetting">Управление окнами выбора куки-файлов</string>
-    <string name="autoconsentAnimationText">Kуки-файлы выбраны</string>
+    <string name="autoconsentCosmeticNoticeAnimationText">Всплывающее окно скрыто</string>
+    <string name="autoconsentManagedNoticeAnimationText">Kуки-файлы выбраны</string>
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Разрешения для сайтов</string>

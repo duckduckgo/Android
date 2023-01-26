@@ -67,7 +67,21 @@ class OptOutAndAutoconsentDoneMessageHandlerPluginTest {
     fun whenProcessOptOutIfResultIsFailsThenSendResultWithFailure() {
         handler.process(getOptOut(), optOutMessage(result = false, selfTest = false), webView, mockCallback)
 
-        verify(mockCallback).onResultReceived(consentManaged = true, optOutFailed = true, selfTestFailed = false)
+        verify(mockCallback).onResultReceived(consentManaged = true, optOutFailed = true, selfTestFailed = false, isCosmetic = null)
+    }
+
+    @Test
+    fun whenProcessAutoconsentDoneIfCosmeticThenResultSentWithCosmeticSetToTrue() {
+        handler.process(getAutoconsentType(), autoconsentDoneMessage(cosmetic = true), webView, mockCallback)
+
+        verify(mockCallback).onResultReceived(consentManaged = true, optOutFailed = false, selfTestFailed = false, isCosmetic = true)
+    }
+
+    @Test
+    fun whenProcessAutoconsentDoneIfNotCosmeticThenResultSentWithCosmeticSetToFalse() {
+        handler.process(getAutoconsentType(), autoconsentDoneMessage(cosmetic = false), webView, mockCallback)
+
+        verify(mockCallback).onResultReceived(consentManaged = true, optOutFailed = false, selfTestFailed = false, isCosmetic = false)
     }
 
     @Test
@@ -102,9 +116,9 @@ class OptOutAndAutoconsentDoneMessageHandlerPluginTest {
         """.trimIndent()
     }
 
-    private fun autoconsentDoneMessage(url: String = "http://www.example.com"): String {
+    private fun autoconsentDoneMessage(url: String = "http://www.example.com", cosmetic: Boolean = false): String {
         return """
-            {"type":"${getAutoconsentType()}", "cmp": "test", "url": "$url"}
+            {"type":"${getAutoconsentType()}", "cmp": "test", "url": "$url", "isCosmetic": $cosmetic}
         """.trimIndent()
     }
 }

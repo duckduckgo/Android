@@ -4120,10 +4120,11 @@ class BrowserTabViewModelTest {
     @Test
     fun whenOnAutoconsentResultReceivedThenSiteUpdated() {
         updateUrl("http://www.example.com/", "http://twitter.com/explore", true)
-        testee.onAutoconsentResultReceived(consentManaged = true, optOutFailed = true, selfTestFailed = true)
+        testee.onAutoconsentResultReceived(consentManaged = true, optOutFailed = true, selfTestFailed = true, isCosmetic = true)
         assertTrue(testee.siteLiveData.value?.consentManaged!!)
         assertTrue(testee.siteLiveData.value?.consentOptOutFailed!!)
         assertTrue(testee.siteLiveData.value?.consentSelfTestFailed!!)
+        assertTrue(testee.siteLiveData.value?.consentCosmeticHide!!)
     }
 
     @Test
