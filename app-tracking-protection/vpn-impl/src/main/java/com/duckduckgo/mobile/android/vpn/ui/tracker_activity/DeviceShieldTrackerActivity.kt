@@ -16,9 +16,11 @@
 
 package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.VpnService
 import android.os.Build
 import android.os.Bundle
@@ -26,6 +28,7 @@ import android.os.ResultReceiver
 import android.provider.Settings
 import android.view.Menu
 import android.widget.CompoundButton
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -62,6 +65,7 @@ import com.duckduckgo.mobile.android.vpn.ui.alwayson.AlwaysOnAlertDialogFragment
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity
 import com.duckduckgo.mobile.android.vpn.ui.report.DeviceShieldAppTrackersInfo
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.BannerState
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.NotifyMeState
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.ViewEvent
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.ViewEvent.StartVpn
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.DisableVpnDialogOptions
@@ -131,6 +135,15 @@ class DeviceShieldTrackerActivity :
         deviceShieldPixels.didShowSummaryTrackerActivity()
     }
 
+    @SuppressLint("InlinedApi")
+    private fun notificationsPermissionsGranted(): Boolean {
+        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.TIRAMISU) {
+            return ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+        }
+
+        return true
+    }
+
     private fun bindViews() {
         binding.ctaTrackerFaq.setClickListener {
             viewModel.onViewEvent(ViewEvent.LaunchDeviceShieldFAQ)
@@ -145,7 +158,7 @@ class DeviceShieldTrackerActivity :
         }
 
         binding.ctaManageViewAllApps.setClickListener {
-            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchTrackingProtectionExclusionListActivity)
+            viewModel.onViewEvent(ViewEvent.LaunchTrackingProtectionExclusionListActivity)
         }
 
         binding.ctaRemoveFeature.setClickListener {
@@ -154,6 +167,14 @@ class DeviceShieldTrackerActivity :
 
         binding.ctaShowAll.setClickListener {
             viewModel.onViewEvent(ViewEvent.LaunchMostRecentActivity)
+        }
+
+        binding.deviceShieldTrackerNotifyMe.onNotifyMeButtonClicked {
+            viewModel.onViewEvent(ViewEvent.OpenSettings)
+        }
+
+        binding.deviceShieldTrackerNotifyMe.onCloseButtonClicked {
+            viewModel.onViewEvent(ViewEvent.DismissNotifyMe)
         }
     }
 
@@ -194,7 +215,12 @@ class DeviceShieldTrackerActivity :
                     DeviceShieldTrackerActivityViewModel.TrackerCountInfo(trackers, apps)
                 }
                 .combine(viewModel.getRunningState()) { trackerCountInfo, runningState ->
-                    DeviceShieldTrackerActivityViewModel.TrackerActivityViewState(trackerCountInfo, runningState, viewModel.bannerState())
+                    DeviceShieldTrackerActivityViewModel.TrackerActivityViewState(
+                        trackerCountInfo,
+                        runningState,
+                        viewModel.bannerState(),
+                        viewModel.notifyMeState(notificationsPermissionsGranted()),
+                    )
                 }
                 .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                 .collect { renderViewState(it) }
@@ -258,6 +284,8 @@ class DeviceShieldTrackerActivity :
             is DeviceShieldTrackerActivityViewModel.Command.ShowAppTpEnabledCta -> showAppTpEnabledCta()
             is DeviceShieldTrackerActivityViewModel.Command.LaunchTrackingProtectionExclusionListActivity ->
                 launchTrackingProtectionExclusionListActivity()
+            is DeviceShieldTrackerActivityViewModel.Command.OpenNotificationsSettings -> openSettings()
+            is DeviceShieldTrackerActivityViewModel.Command.UpdateNotifyMeView -> updateNotifyMeView(it.notifyMeState)
         }
     }
 
@@ -489,6 +517,7 @@ class DeviceShieldTrackerActivity :
 
         updateCounts(state.trackerCountInfo)
         updateRunningState(state.runningState, state.bannerState)
+        updateNotifyMeView(state.notifyMeState)
     }
 
     private fun updateCounts(trackerCountInfo: DeviceShieldTrackerActivityViewModel.TrackerCountInfo) {
@@ -558,6 +587,23 @@ class DeviceShieldTrackerActivity :
                 show()
             }
         }
+    }
+
+    private fun updateNotifyMeView(notifyMeState: NotifyMeState) {
+        if (notifyMeState.visible) {
+            binding.deviceShieldTrackerNotifyMe.show()
+        } else {
+            binding.deviceShieldTrackerNotifyMe.gone()
+        }
+    }
+
+    private fun openSettings() {
+        // This is called when "Notify Me" button is tapped and that button is displayed only on Android 13+.
+        @SuppressLint("InlinedApi")
+        val settingsIntent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            .putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+        startActivity(settingsIntent)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

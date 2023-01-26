@@ -19,8 +19,6 @@ package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.room.Room
-import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
@@ -29,11 +27,9 @@ import com.duckduckgo.mobile.android.vpn.network.VpnDetector
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
-import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.BannerState
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.ViewEvent
-import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -345,13 +341,63 @@ class DeviceShieldTrackerActivityViewModelTest {
         assertEquals(BannerState.OnboardingBanner, bannerState)
     }
 
-    private fun createInMemoryDb(): VpnDatabase {
-        AndroidThreeTen.init(InstrumentationRegistry.getInstrumentation().targetContext)
-        return Room.inMemoryDatabaseBuilder(
-            InstrumentationRegistry.getInstrumentation().targetContext,
-            VpnDatabase::class.java,
-        )
-            .allowMainThreadQueries()
-            .build()
+    @Test
+    fun whenOpenSettingsViewEventThenCommandIsOpenNotificationsSettings() = runBlocking {
+        viewModel.commands().test {
+            viewModel.onViewEvent(ViewEvent.OpenSettings)
+
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.OpenNotificationsSettings, awaitItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDismissNotifyMeThenSaveToVpnStoreAndCommandIsUpdateNotifyMeView() = runBlocking {
+        viewModel.commands().test {
+            viewModel.onViewEvent(ViewEvent.DismissNotifyMe)
+
+            verify(vpnStore).dismissNotifyMeInAppTp()
+
+            assertEquals(
+                DeviceShieldTrackerActivityViewModel.Command.UpdateNotifyMeView(
+                    DeviceShieldTrackerActivityViewModel.NotifyMeState(visible = false),
+                ),
+                awaitItem(),
+            )
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNotifyMeStateCalledWithNotificationsNotAllowedAndNotifyMeNotDismissedThenNotifyMeIsVisible() = runBlocking {
+        val notificationsAllowed = false
+        val notifyMeDismissed = false
+        whenever(vpnStore.isNotifyMeInAppTpDismissed()).thenReturn(notifyMeDismissed)
+
+        val result = viewModel.notifyMeState(notificationsAllowed)
+
+        assertEquals(DeviceShieldTrackerActivityViewModel.NotifyMeState(visible = true), result)
+    }
+
+    @Test
+    fun whenNotifyMeStateCalledWithNotificationsNotAllowedAndNotifyMeDismissedThenNotifyMeIsNotVisible() = runBlocking {
+        val notificationsAllowed = false
+        val notifyMeDismissed = true
+        whenever(vpnStore.isNotifyMeInAppTpDismissed()).thenReturn(notifyMeDismissed)
+
+        val result = viewModel.notifyMeState(notificationsAllowed)
+
+        assertEquals(DeviceShieldTrackerActivityViewModel.NotifyMeState(visible = false), result)
+    }
+
+    @Test
+    fun whenNotifyMeStateCalledWithNotificationsAllowedThenNotifyMeIsNotVisible() = runBlocking {
+        val notificationsAllowed = true
+
+        val result = viewModel.notifyMeState(notificationsAllowed)
+
+        assertEquals(DeviceShieldTrackerActivityViewModel.NotifyMeState(visible = false), result)
     }
 }

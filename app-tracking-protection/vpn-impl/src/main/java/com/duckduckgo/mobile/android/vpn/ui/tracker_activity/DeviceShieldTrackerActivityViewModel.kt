@@ -154,7 +154,14 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
             ViewEvent.PromoteAlwaysOnCancelled -> onAlwaysOnPromotionDialogCancelled()
             is ViewEvent.AlwaysOnInitialState -> onAlwaysOnInitialState(viewEvent.alwaysOnState)
             ViewEvent.LaunchTrackingProtectionExclusionListActivity -> sendCommand(Command.LaunchTrackingProtectionExclusionListActivity)
+            ViewEvent.OpenSettings -> sendCommand(Command.OpenNotificationsSettings)
+            ViewEvent.DismissNotifyMe -> saveAndUpdateNotifyMeView()
         }
+    }
+
+    private fun saveAndUpdateNotifyMeView() {
+        vpnStore.dismissNotifyMeInAppTp()
+        sendCommand(Command.UpdateNotifyMeView(NotifyMeState(visible = false)))
     }
 
     private fun launchVpn() {
@@ -210,6 +217,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         val trackerCountInfo: TrackerCountInfo,
         val runningState: VpnState,
         val bannerState: BannerState,
+        val notifyMeState: NotifyMeState,
     )
 
     internal data class TrackerCountInfo(
@@ -225,6 +233,14 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         }
     }
 
+    data class NotifyMeState(
+        val visible: Boolean = true,
+    )
+
+    fun notifyMeState(granted: Boolean): NotifyMeState {
+        return NotifyMeState(visible = !granted && !vpnStore.isNotifyMeInAppTpDismissed())
+    }
+
     sealed class ViewEvent {
         object LaunchExcludedApps : ViewEvent()
         object LaunchDeviceShieldFAQ : ViewEvent()
@@ -238,6 +254,9 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         object PromoteAlwaysOnOpenSettings : ViewEvent()
         object PromoteAlwaysOnCancelled : ViewEvent()
         data class AlwaysOnInitialState(val alwaysOnState: VpnStateMonitor.AlwaysOnState) : ViewEvent()
+
+        object OpenSettings : ViewEvent()
+        object DismissNotifyMe : ViewEvent()
     }
 
     sealed class Command {
@@ -260,6 +279,8 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         object CloseScreen : Command()
         object OpenVpnSettings : Command()
         object ShowAppTpEnabledCta : Command()
+        object OpenNotificationsSettings : Command()
+        data class UpdateNotifyMeView(val notifyMeState: NotifyMeState) : Command()
     }
 }
 
