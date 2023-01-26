@@ -14,14 +14,13 @@
   ~ limitations under the License.
   -->
 
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.duckduckgo.mobile.android.ui.view.shape.DaxBubbleCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardBackgroundColor="?toolbarBgColor"
-    app:cardCornerRadius="6dp"
-    app:cardElevation="4dp">
+    android:layout_margin="@dimen/keyline_4"
+    app:cardElevation="@dimen/modalCardHeaderElevation">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -73,4 +72,4 @@
             app:layout_constraintTop_toBottomOf="@+id/notifyMeMessageSubtitle" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-</com.google.android.material.card.MaterialCardView>
+</com.duckduckgo.mobile.android.ui.view.shape.DaxBubbleCardView>
