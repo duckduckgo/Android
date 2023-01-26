@@ -64,8 +64,6 @@ class AtbAndAppVersionPixelRemovalInterceptor @Inject constructor() : Intercepto
             AppPixelName.EMAIL_USE_ADDRESS.pixelName,
             AppPixelName.EMAIL_COPIED_TO_CLIPBOARD.pixelName,
             "m_atp_unprotected_apps_bucket_",
-            AppPixelName.FACEBOOK_LOGIN_ERROR_BREAKAGE_INVESTIGATION.pixelName,
-            AppPixelName.FACEBOOK_LOGIN_BREAKAGE_INVESTIGATION.pixelName,
         )
     }
 }
