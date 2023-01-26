@@ -18,11 +18,10 @@ appId: com.duckduckgo.mobile.android
     text: "HIDE TIPS FOREVER"
 - tapOn:
     text: "HIDE TIPS FOREVER"
-- swipe:
-    start: 100,1000
-    end: 100,200
-- assertVisible:
-    id: "ad-id-5"
+- scrollUntilVisible:
+    element:
+      id: "ad-id-5"
+    direction: DOWN
 - tapOn:
     id: "ad-id-5"
 - assertVisible:
@@ -105,9 +104,6 @@ appId: com.duckduckgo.mobile.android
 - action: back
 - tapOn:
     id: "com.android.systemui:id/recent_apps"
-- swipe:
-    start: 100,500
-    end: 100,200
 - launchApp:
     clearState: false
 - assertVisible:
