@@ -18,6 +18,7 @@ package com.duckduckgo.sync
 
 import com.duckduckgo.sync.crypto.AccountKeys
 import com.duckduckgo.sync.impl.AccountCreatedResponse
+import com.duckduckgo.sync.impl.Logout
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Signup
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -66,8 +67,27 @@ object TestSyncFixtures {
         invalidCodeErr,
         "{\"error\":\"$invalidMessageErr\"}".toResponseBody(),
     )
-
     val accountCreatedSuccess = Result.Success(AccountCreatedResponse(user_id = userId, token = token))
     val accountCreatedFailInvalid = Result.Error(code = invalidCodeErr, reason = invalidMessageErr)
     val accountCreatedFailDupUser = Result.Error(code = duplicateUsercCodeErr, reason = duplicateUserMessageErr)
+
+    val deviceLogoutBody = Logout(deviceId)
+    val deviceLoggedOutBody = Logout(deviceId)
+    val deviceLogoutResponse = Response.success(deviceLoggedOutBody)
+    const val wrongCredentialsCodeErr = 401
+    const val wrongCredentialsMessageErr = "invalid_login_credentials"
+    val logoutError = Response.error<Logout>(
+        wrongCredentialsCodeErr,
+        "{\"error\": \"$wrongCredentialsMessageErr\"}".toResponseBody(),
+    )
+    val logoutSuccess = Result.Success(deviceLoggedOutBody)
+    val logoutInvalid = Result.Error(code = wrongCredentialsCodeErr, reason = wrongCredentialsMessageErr)
+
+    val deleteAccountResponse = Response.success<Void>(null)
+    val deleteAccountError = Response.error<Void>(
+        wrongCredentialsCodeErr,
+        "{\"error\": \"$wrongCredentialsMessageErr\"}".toResponseBody(),
+    )
+    val deleteAccountSuccess = Result.Success(true)
+    val deleteAccountInvalid = Result.Error(code = wrongCredentialsCodeErr, reason = wrongCredentialsMessageErr)
 }

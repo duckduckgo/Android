@@ -20,14 +20,26 @@ import com.duckduckgo.sync.TestSyncFixtures.accountCreatedFailDupUser
 import com.duckduckgo.sync.TestSyncFixtures.accountCreatedFailInvalid
 import com.duckduckgo.sync.TestSyncFixtures.accountCreatedSuccess
 import com.duckduckgo.sync.TestSyncFixtures.accountKeys
+import com.duckduckgo.sync.TestSyncFixtures.deleteAccountError
+import com.duckduckgo.sync.TestSyncFixtures.deleteAccountInvalid
+import com.duckduckgo.sync.TestSyncFixtures.deleteAccountResponse
+import com.duckduckgo.sync.TestSyncFixtures.deleteAccountSuccess
 import com.duckduckgo.sync.TestSyncFixtures.deviceId
+import com.duckduckgo.sync.TestSyncFixtures.deviceLogoutBody
+import com.duckduckgo.sync.TestSyncFixtures.deviceLogoutResponse
 import com.duckduckgo.sync.TestSyncFixtures.deviceName
+import com.duckduckgo.sync.TestSyncFixtures.logoutError
+import com.duckduckgo.sync.TestSyncFixtures.logoutSuccess
 import com.duckduckgo.sync.TestSyncFixtures.signUpRequest
 import com.duckduckgo.sync.TestSyncFixtures.signupFailDuplicatedUser
 import com.duckduckgo.sync.TestSyncFixtures.signupFailInvalid
 import com.duckduckgo.sync.TestSyncFixtures.signupSuccess
+import com.duckduckgo.sync.TestSyncFixtures.token
+import com.duckduckgo.sync.TestSyncFixtures.userId
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.mockito.ArgumentMatchers.anyString
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import retrofit2.Call
@@ -76,5 +88,53 @@ class SyncServiceRemoteTest {
         }
 
         assertEquals(accountCreatedFailDupUser, result)
+    }
+
+    @Test
+    fun whenLogoutSucceedsThenReturnLogoutSuccess() {
+        val syncRemote = SyncServiceRemote(syncService)
+        val call: Call<Logout> = mock()
+        whenever(syncService.logout(anyString(), eq(deviceLogoutBody))).thenReturn(call)
+        whenever(call.execute()).thenReturn(deviceLogoutResponse)
+
+        val result = syncRemote.logout(token, deviceId)
+
+        assertEquals(logoutSuccess, result)
+    }
+
+    @Test
+    fun whenLogoutIsInvalidThenReturnError() {
+        val syncRemote = SyncServiceRemote(syncService)
+        val call: Call<Logout> = mock()
+        whenever(syncService.logout(anyString(), eq(deviceLogoutBody))).thenReturn(call)
+        whenever(call.execute()).thenReturn(logoutError)
+
+        val result = syncRemote.logout(token, deviceId)
+
+        assertEquals(deleteAccountInvalid, result)
+    }
+
+    @Test
+    fun whenDeleteAccountSucceedsThenReturnDeleteAccountSuccess() {
+        val syncRemote = SyncServiceRemote(syncService)
+        val call: Call<Void> = mock()
+        whenever(syncService.deleteAccount(anyString())).thenReturn(call)
+        whenever(call.execute()).thenReturn(deleteAccountResponse)
+
+        val result = syncRemote.deleteAccount(token)
+
+        assertEquals(deleteAccountSuccess, result)
+    }
+
+    @Test
+    fun whenDeleteAccountIsInvalidThenReturnError() {
+        val syncRemote = SyncServiceRemote(syncService)
+        val call: Call<Void> = mock()
+        whenever(syncService.deleteAccount(anyString())).thenReturn(call)
+        whenever(call.execute()).thenReturn(deleteAccountError)
+
+        val result = syncRemote.deleteAccount(token)
+
+        assertEquals(deleteAccountInvalid, result)
     }
 }

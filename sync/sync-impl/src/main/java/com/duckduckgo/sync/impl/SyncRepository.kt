@@ -104,19 +104,16 @@ class AppSyncRepository @Inject constructor(
     }
 
     override fun logout(): Result<Boolean> {
-        val token =
-            syncStore.token.takeUnless { it.isNullOrEmpty() }
-                ?: return Result.Error(reason = "Token Empty")
-        val deviceId =
-            syncStore.deviceId.takeUnless { it.isNullOrEmpty() }
-                ?: return Result.Error(reason = "Device Id Empty")
+        val token = syncStore.token.takeUnless { it.isNullOrEmpty() }
+            ?: return Result.Error(reason = "Token Empty")
+        val deviceId = syncStore.deviceId.takeUnless { it.isNullOrEmpty() }
+            ?: return Result.Error(reason = "Device Id Empty")
 
         return when (val result = syncApi.logout(token, deviceId)) {
             is Result.Error -> {
                 Timber.i("SYNC logout failed $result")
                 result
             }
-
             is Result.Success -> {
                 syncStore.clearAll()
                 Result.Success(true)
@@ -134,6 +131,7 @@ class AppSyncRepository @Inject constructor(
                 Timber.i("SYNC deleteAccount failed $result")
                 result
             }
+
             is Result.Success -> {
                 syncStore.clearAll()
                 Result.Success(true)
