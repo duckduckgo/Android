@@ -30,4 +30,8 @@
     <string name="netpManagementConnectionDetailsHeader">Connection Details</string>
     <string name="netpManagementConnectionDetailsLocation">Location</string>
     <string name="netpManagementConnectionDetailsIp">IP Address</string>
+
+    <!-- NetP enabled notification -->
+    <string name="netpEnabledNotificationTitle">"Network Protection is enabled and routing traffic through the VPN."</string>
+
 </resources>

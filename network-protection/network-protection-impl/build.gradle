@@ -48,8 +48,11 @@ dependencies {
     implementation Square.retrofit2.converter.moshi
 
     testImplementation project(path: ':common-test')
+    testImplementation project(':vpn-api-test')
     testImplementation CashApp.turbine
     testImplementation Testing.junit4
+    testImplementation AndroidX.archCore.testing
+    testImplementation AndroidX.test.ext.junit
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.robolectric
 }
@@ -57,5 +60,10 @@ android {
     namespace 'com.duckduckgo.networkprotection.impl'
     anvil {
         generateDaggerFactories = true // default is false
+    }
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
     }
 }
