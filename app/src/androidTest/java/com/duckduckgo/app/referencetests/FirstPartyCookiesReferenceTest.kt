@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.referencetests
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.os.Build
@@ -68,6 +69,7 @@ import org.threeten.bp.temporal.ChronoUnit
 
 @ExperimentalCoroutinesApi
 @RunWith(Parameterized::class)
+@SuppressLint("NoHardcodedCoroutineDispatcher")
 class FirstPartyCookiesReferenceTest(private val testCase: TestCase) {
 
     private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext

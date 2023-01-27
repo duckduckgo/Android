@@ -32,7 +32,7 @@ android {
 
     lint {
         abortOnError true
-        ignoreTestSources true
+        ignoreTestSources false
     }
 
     buildTypes {

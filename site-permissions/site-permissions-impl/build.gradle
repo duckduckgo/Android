@@ -46,6 +46,7 @@ dependencies {
     testImplementation project(path: ':common-test')
     testImplementation CashApp.turbine
     testImplementation Testing.junit4
+    testImplementation AndroidX.test.ext.junit
     testImplementation Testing.mockito.kotlin
     testImplementation Testing.robolectric
     testImplementation (KotlinX.coroutines.test) {

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.cookies.impl
 
+import android.annotation.SuppressLint
 import android.webkit.CookieManager
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
@@ -45,6 +46,7 @@ import org.junit.Test
 import org.mockito.kotlin.*
 
 @ExperimentalCoroutinesApi
+@SuppressLint("NoHardcodedCoroutineDispatcher")
 class SQLCookieRemoverTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext

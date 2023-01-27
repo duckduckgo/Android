@@ -16,6 +16,7 @@
 
 package com.duckduckgo.adclick.impl
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.adclick.impl.pixels.AdClickPixelName
 import com.duckduckgo.adclick.impl.pixels.AdClickPixels
@@ -31,11 +32,8 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
 
-@RunWith(RobolectricTestRunner::class)
-@Config(manifest = Config.NONE)
+@RunWith(AndroidJUnit4::class)
 class DuckDuckGoAdClickManagerTest {
 
     private val mockAdClickData: AdClickData = mock()

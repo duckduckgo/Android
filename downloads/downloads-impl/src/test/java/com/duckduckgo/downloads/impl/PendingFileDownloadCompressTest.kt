@@ -16,6 +16,7 @@
 
 package com.duckduckgo.downloads.impl
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.downloads.api.FileDownloader
 import java.io.File
 import org.junit.Assert.assertEquals
@@ -23,11 +24,8 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
 
-@RunWith(RobolectricTestRunner::class)
-@Config(manifest = Config.NONE)
+@RunWith(AndroidJUnit4::class)
 class PendingFileDownloadCompressTest {
 
     @Test
