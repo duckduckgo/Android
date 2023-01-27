@@ -1477,7 +1477,7 @@ class BrowserTabFragment :
                     },
                 )
                 .build()
-            alertDialog!!.show()
+            automaticFireproofDialog!!.show()
         }
     }
 
