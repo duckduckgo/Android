@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (c) 2020 DuckDuckGo
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2021 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -15,13 +14,6 @@
   ~ limitations under the License.
   -->
 
-<ripple xmlns:android="http://schemas.android.com/apk/res/android"
-    android:color="@color/warmBlue">
-    <item>
-        <shape android:shape="rectangle">
-            <solid android:color="@color/accentBlue"/>
-            <corners android:radius="2dp"/>
-        </shape>
-
-    </item>
-</ripple>
+<resources>
+    <attr name="appTPHeaderBackground" format="color" />
+</resources>

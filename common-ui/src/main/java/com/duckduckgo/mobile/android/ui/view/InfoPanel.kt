@@ -106,7 +106,7 @@ class InfoPanel : FrameLayout {
                     Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
                 )
                 setSpan(
-                    ForegroundColorSpan(context.getColorFromAttr(R.attr.normalTextColor)),
+                    ForegroundColorSpan(context.getColorFromAttr(R.attr.daxColorPrimaryText)),
                     fullText.getSpanStart(it),
                     fullText.getSpanEnd(it),
                     Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,

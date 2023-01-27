@@ -27,7 +27,7 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?toolbarBgColor"
+        android:background="?daxColorSurface"
         android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
 
         <FrameLayout
@@ -38,7 +38,7 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="?attr/toolbarBgColor"
+                android:background="?attr/daxColorSurface"
                 android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
                 app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu" />
 

@@ -5,6 +5,6 @@
     android:viewportHeight="24">
   <path
       android:pathData="M12,24C18.6274,24 24,18.6274 24,12C24,5.3726 18.6274,0 12,0C5.3726,0 0,5.3726 0,12C0,18.6274 5.3726,24 12,24Z"
-      android:fillColor="?attr/toolbarIconColor"
+      android:fillColor="?attr/daxColorPrimaryIcon"
       android:fillType="evenOdd"/>
 </vector>

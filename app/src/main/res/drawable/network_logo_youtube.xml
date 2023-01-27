@@ -24,12 +24,12 @@
       android:fillColor="?attr/daxColorSurface"/>
   <path
       android:pathData="M14.627,12.089l-4.179,-2.396v4.793l4.179,-2.397z"
-      android:fillColor="?attr/toolbarIconColor"
+      android:fillColor="?attr/daxColorPrimaryIcon"
       android:fillType="nonZero"
       android:strokeColor="#00000000"/>
   <path
       android:pathData="M12,24c6.627,0 12,-5.373 12,-12S18.627,0 12,0 0,5.373 0,12s5.373,12 12,12zM19.645,8.249c-0.186,-0.69 -0.724,-1.23 -1.413,-1.414 -0.926,-0.357 -9.893,-0.532 -12.495,0.01 -0.689,0.187 -1.229,0.725 -1.413,1.414 -0.418,1.833 -0.45,5.796 0.01,7.67 0.187,0.69 0.724,1.23 1.414,1.414 1.833,0.422 10.548,0.481 12.494,0 0.69,-0.187 1.229,-0.724 1.413,-1.413 0.446,-1.998 0.477,-5.715 -0.01,-7.681z"
-      android:fillColor="?attr/toolbarIconColor"
+      android:fillColor="?attr/daxColorPrimaryIcon"
       android:fillType="evenOdd"
       android:strokeColor="#00000000"/>
 </vector>

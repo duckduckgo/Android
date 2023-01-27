@@ -52,8 +52,8 @@
         <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.DuckDuckGo.LargeComponent</item>
 
         <!-- Android Components -->
-        <item name="actionOverflowMenuStyle">@style/PopUpOverflowMenu</item>
-        <item name="actionOverflowButtonStyle">@style/PopUpOverflowButton</item>
+        <item name="actionOverflowMenuStyle">@style/Widget.DuckDuckGo.PopUpOverflowMenu</item>
+        <item name="actionOverflowButtonStyle">@style/Widget.DuckDuckGo.OverflowButton</item>
         <item name="bottomSheetDialogTheme">@style/Widget.DuckDuckGo.BottomSheetDialog</item>
         <item name="tabStyle">@style/Widget.DuckDuckGo.TabLayout</item>
         <item name="radioButtonStyle">@style/Widget.DuckDuckGo.RadioButton</item>
@@ -62,9 +62,8 @@
         <item name="snackbarStyle">@style/Widget.DuckDuckGo.Snackbar</item>
         <item name="snackbarButtonStyle">@style/Widget.DuckDuckGo.SnackbarButton</item>
         <item name="snackbarTextViewStyle">@style/Widget.DuckDuckGo.SnackbarText</item>
-        <item name="autoCompleteTextViewStyle">@style/Widget.DuckDuckGo.AutoCompleteTextView</item>
-        <item name="alertDialogTheme">@style/AlertDialogTheme</item>
-        <item name="android:alertDialogTheme">@style/AlertDialogTheme</item>
+        <item name="alertDialogTheme">@style/Widget.DuckDuckGo.LegacyDialog</item>
+        <item name="android:alertDialogTheme">@style/Widget.DuckDuckGo.LegacyDialog</item>
         <item name="materialAlertDialogTheme">@style/Widget.DuckDuckGo.Dialog</item>
         <item name="materialButtonStyle">@style/Widget.DuckDuckGo.DaxButton.TextButton.Primary</item>
         <item name="materialButtonOutlinedStyle">@style/Widget.DuckDuckGo.DaxButton.Secondary</item>
@@ -113,105 +112,28 @@
         <!--controls the ripple coloring-->
         <item name="colorControlHighlight">?attr/daxColorRipple</item>
 
+        <item name="android:textColorAlertDialogListItem">?attr/daxColorPrimaryText</item>
         <!--Design System Colors theme independent-->
         <item name="daxColorDim">@color/black60</item>
         <item name="daxColorWhite">@color/white</item>
         <item name="daxColorBlack">@color/black84</item>
         <item name="preferredStatusBarColor">?attr/daxColorSurface</item>
         <item name="preferredNavigationBarColor">?attr/daxColorSurface</item>
-
-        <!--Refactoring colors (can be replaced once reviewed)-->
-        <item name="toolbarBgColor">?attr/daxColorSurface</item>
-        <item name="toolbarIconColor">?attr/daxColorPrimaryIcon</item>
     </style>
 
     <!-- The app theme will mostly contain values for colour attributes -->
     <style name="Theme.DuckDuckGo.Dark" parent="Theme.DuckDuckGo">
-
         <item name="preferDarkStatusBarIcons">false</item>
         <item name="preferDarkNavigationBarIcons">false</item>
 
-        <!-- Legacy colors to remove-->
-        <item name="daxLogoTextColor">@color/white</item>
-        <item name="normalTextColor">@color/white</item>
-        <item name="secondaryTextColor">@color/gray50</item>
-        <item name="primaryIconColor">@color/gray20</item>
-        <item name="primaryIconDisabledColor">@color/gray60</item>
-        <item name="secondaryIconColor">@color/gray70</item>
-        <item name="listItemPrimaryTextColor">@color/white</item>
-        <item name="listItemSecondaryTextColor">@color/grayishTwo</item>
-        <item name="listItemDisabledColor">@color/warGreyTwo</item>
-        <item name="subtitleTextColor">@color/grayishTwo</item>
-        <item name="dialogBgColor">@color/almostBlackDark</item>
-        <item name="browserIconColorSelector">@color/browser_icon_color_selector_dark</item>
-        <item name="browserMenuTextColor">@color/white</item>
-        <item name="browserMenuTextColorDisabled">@color/warGreyTwo</item>
-        <item name="omnibarLogoLetterTextColor">@color/midGray</item>
-        <item name="autoCompleteTextColor">@color/white</item>
-        <item name="autoCompleteSubtitleTextColor">@color/grayish</item>
-        <item name="tabSelectedBorderColor">@color/skyBlue</item>
-        <item name="tabsFireTextColor">@color/white</item>
-        <item name="tabCardBackgroundColor">@color/almostBlack</item>
-        <item name="whitelistTextColor">@color/white</item>
-        <item name="bookmarkIconColor">@color/white</item>
-        <item name="websiteListFaviconBackground">@color/almostBlack</item>
-        <item name="listItemImageBackground">@color/almostBlack</item>
-        <item name="savedSiteEmptyTextColor">@color/white</item>
-        <item name="fireproofWebsiteTitleTextColor">@color/white</item>
-        <item name="deviceShieldExcludedAppNameTextColor">@color/white</item>
-        <item name="settingsItemTextColor">@color/white</item>
-        <item name="settingsItemTextColorDisabled">@color/warGreyTwo</item>
-        <item name="settingsMinorTextColor">@color/grayishTwo</item>
-        <item name="buttonOutlinedTextColor">@color/pinkishGrayThree</item>
-        <item name="buttonOutlinedBorderColor">@color/brownishGrayTwo</item>
-        <item name="callToActionTitleColor">@color/white</item>
-        <item name="callToActionSubtitleColor">@color/grayishThree</item>
-        <item name="daxDialogBackgroundColor">@color/charcoalGrey</item>
-        <item name="daxDialogSecondaryButtonTextColor">@color/white</item>
-        <item name="daxDialogSecondaryButtonRippleColor">@color/white</item>
-
-        <item name="brokenSiteSelectionTextColor">@color/white</item>
-        <item name="brokenSiteOutlinedColor">@color/grayish</item>
-        <item name="brokenSitesButtonDisabledBackgroundColor">@color/greyishBrownTwo</item>
-        <item name="brokenSitesButtonDisabledTextColor">@color/warGreyTwo</item>
-        <item name="brokenSitesButtonRippleColor">@color/white</item>
-        <item name="topCallToActionDescriptionColor">@color/grayish</item>
-        <item name="topCallToActionBackgroundColor">@color/greyishBrownTwo</item>
-
-        <item name="feedbackAnonymousFeedbackLabelColor">@color/grayish</item>
-        <item name="feedbackListItemBackgroundColor">@color/almostBlack</item>
-        <item name="feedbackListItemSeparatorColor">@color/charcoalGrey</item>
-        <item name="feedbackEditTextBackgroundColor">@color/almostBlack</item>
-        <item name="feedbackEditTextHintColor">@color/grayish</item>
-
-        <item name="privacyDashboardLogoLetterTextColor">@color/subtleGray</item>
-
-        <item name="emailButtonRippleColor">@color/white</item>
-
-        <item name="savedSiteEditTextUnderlineColor">@color/whiteSemiTransparent</item>
-        <item name="android:textColorAlertDialogListItem">?attr/normalTextColor</item>
-        <item name="lightContainerBackground">@color/almostBlack</item>
-
-        <item name="listItemBackgroundColor">@color/almostBlack</item>
-        <item name="listItemSeparatorColor">@color/charcoalGrey</item>
-        <item name="textInputOutlinedBoxColor">@color/grayish</item>
-        <item name="textInputOutlinedBoxColorHighlight">@color/cornflowerBlue</item>
-        <item name="splitterColor">@color/gray85</item>
-        <item name="secondaryButtonPressedColor">@color/black36</item>
-        <item name="primaryButtonDisabledColor">@color/gray85</item>
-
-        <item name="dialogPrimaryButtonColor">@color/cornflowerBlue</item>
-        <item name="dialogSecondaryButtonColor">?attr/dialogBgColor</item>
-
-        <item name="bottomShadowBackground">@null</item>
-        <item name="appTPHeaderBackground">@color/darkThemePrimaryDark</item>
-
-        <item name="tooltipPanelBackgroundColor">@color/tooltipPanelBackgroundColorDark</item>
-        <item name="alertPanelBackgroundColor">@color/alertPanelBackgroundColorDark</item>
-
+        <!-- Feature specific colors -->
+        <!-- Autofill -->
         <item name="autofillDialogTitleColor">@color/white</item>
         <item name="autofillDialogOnboardingExplanationColor">@color/gray50</item>
         <item name="autofillCredentialListSubtitleColor">@color/paleBrownishGray</item>
+
+        <!-- App Tracking Protection -->
+        <item name="appTPHeaderBackground">@color/black</item>
 
         <!-- Design System Reference Colors Dark -->
         <item name="daxColorBackground">@color/gray100</item>
@@ -264,92 +186,23 @@
         <item name="daxColorTextInputFocusedOutline">?attr/daxColorAccentBlue</item>
         <item name="daxColorTextInputEnabledOutline">@color/white30</item>
 
+        <!-- InfoPanel Input -->
+        <item name="daxInfoPanelTooltipBackgroundColor">@color/daxInfoPanelTooltipBackgroundColorDark</item>
+        <item name="daxInfoPanelAlertBackgroundColor">@color/daxInfoPanelAlertBackgroundColorDark</item>
+
     </style>
 
     <style name="Theme.DuckDuckGo.Light" parent="Theme.DuckDuckGo">
         <item name="preferDarkStatusBarIcons">true</item>
         <item name="preferDarkNavigationBarIcons">true</item>
 
-        <!-- Legacy colors to remove-->
-        <item name="colorPrimary">@color/lightThemePrimary</item>
-        <item name="colorPrimaryDark">@color/lightThemePrimaryDark</item>
-        <item name="daxLogoTextColor">@color/almostBlackDark</item>
-        <item name="normalTextColor">@color/almostBlackDark</item>
-        <item name="secondaryTextColor">@color/warmerGray</item>
-        <item name="primaryIconColor">@color/gray95</item>
-        <item name="primaryIconDisabledColor">@color/gray50</item>
-        <item name="secondaryIconColor">@color/gray40</item>
-        <item name="dialogBgColor">@color/white</item>
-        <item name="browserIconColorSelector">@color/browser_icon_color_selector_light</item>
-        <item name="browserMenuTextColor">@color/almostBlackDark</item>
-        <item name="browserMenuTextColorDisabled">@color/pinkish_grey_two</item>
-        <item name="omnibarLogoLetterTextColor">@color/whiteFour</item>
-        <item name="autoCompleteTextColor">@color/almostBlackDark</item>
-        <item name="autoCompleteSubtitleTextColor">@color/warmerGray</item>
-        <item name="tabSelectedBorderColor">@color/cornflowerBlue</item>
-        <item name="tabsFireTextColor">@color/warmerGray</item>
-        <item name="tabCardBackgroundColor">@color/white</item>
-        <item name="bookmarkIconColor">@color/almostBlackDark</item>
-        <item name="savedSiteEmptyTextColor">@color/almostBlackDark</item>
-        <item name="whitelistTextColor">@color/almostBlack</item>
-        <item name="websiteListFaviconBackground">@color/whiteSix</item>
-        <item name="listItemImageBackground">@color/whiteSix</item>
-        <item name="fireproofWebsiteTitleTextColor">@color/almostBlack</item>
-        <item name="deviceShieldExcludedAppNameTextColor">@color/almostBlack</item>
-        <item name="settingsItemTextColor">@color/almostBlackDark</item>
-        <item name="settingsItemTextColorDisabled">@color/pinkish_grey_two</item>
-        <item name="settingsMinorTextColor">@color/warmerGray</item>
-        <item name="buttonOutlinedTextColor">@color/cornflowerBlue</item>
-        <item name="buttonOutlinedBorderColor">@color/grayishThree</item>
-        <item name="callToActionTitleColor">@color/almostBlackDark</item>
-        <item name="callToActionSubtitleColor">@color/brownishGrayTwo</item>
-        <item name="daxDialogBackgroundColor">@color/white</item>
-        <item name="daxDialogSecondaryButtonTextColor">@color/almostBlackDark</item>
-        <item name="daxDialogSecondaryButtonRippleColor">@color/subtleGrayTwo</item>
-
-        <item name="brokenSiteSelectionTextColor">@color/almostBlackDark</item>
-        <item name="brokenSiteOutlinedColor">@color/grayishThree</item>
-        <item name="brokenSitesButtonDisabledBackgroundColor">@color/subtleGrayTwo</item>
-        <item name="brokenSitesButtonDisabledTextColor">@color/white</item>
-        <item name="brokenSitesButtonRippleColor">@color/subtleGrayTwo</item>
-        <item name="topCallToActionDescriptionColor">@color/almostBlackDark</item>
-        <item name="topCallToActionBackgroundColor">@color/white</item>
-
-        <item name="feedbackAnonymousFeedbackLabelColor">@color/warmerGray</item>
-        <item name="feedbackListItemBackgroundColor">@color/whiteFive</item>
-        <item name="feedbackListItemSeparatorColor">@color/whiteSix</item>
-        <item name="feedbackEditTextBackgroundColor">@color/whiteFive</item>
-        <item name="feedbackEditTextHintColor">@color/warmerGray</item>
-
-        <item name="privacyDashboardLogoLetterTextColor">@color/whiteFour</item>
-
-        <item name="emailButtonRippleColor">@color/subtleGrayTwo</item>
-
-        <item name="savedSiteEditTextUnderlineColor">@color/black60</item>
-        <item name="lightContainerBackground">@color/whiteThree</item>
-
-        <item name="listItemPrimaryTextColor">@color/almostBlackDark</item>
-        <item name="listItemSecondaryTextColor">@color/warmerGray</item>
-        <item name="listItemDisabledColor">@color/warGreyTwo</item>
-        <item name="listItemBackgroundColor">@color/whiteFive</item>
-        <item name="listItemSeparatorColor">@color/whiteSix</item>
-        <item name="textInputOutlinedBoxColor">@color/grayishThree</item>
-        <item name="textInputOutlinedBoxColorHighlight">@color/cornflowerBlue</item>
-        <item name="splitterColor">@color/gray25</item>
-        <item name="secondaryButtonPressedColor">@color/black18</item>
-        <item name="primaryButtonDisabledColor">@color/gray30</item>
-
-        <item name="dialogPrimaryButtonColor">@color/cornflowerBlue</item>
-        <item name="dialogSecondaryButtonColor">?attr/dialogBgColor</item>
-
-        <item name="bottomShadowBackground">@drawable/divider_shadow_background</item>
-
-        <item name="tooltipPanelBackgroundColor">@color/tooltipPanelBackgroundColorLight</item>
-        <item name="alertPanelBackgroundColor">@color/alertPanelBackgroundColorLight</item>
-
+        <!-- Feature specific colors -->
+        <!-- Autofill -->
         <item name="autofillDialogTitleColor">@color/gray90</item>
         <item name="autofillDialogOnboardingExplanationColor">@color/gray70</item>
         <item name="autofillCredentialListSubtitleColor">@color/brownishGrayTwo</item>
+
+        <!-- App Tracking Protection -->
         <item name="appTPHeaderBackground">@color/light_blue</item>
 
         <!-- Design System Reference Colors Light -->
@@ -403,6 +256,10 @@
         <item name="daxColorTextInputFocusedOutline">?attr/daxColorAccentBlue</item>
         <item name="daxColorTextInputEnabledOutline">@color/black30</item>
 
+        <!-- Info Panel -->
+        <item name="daxInfoPanelTooltipBackgroundColor">@color/daxInfoPanelTooltipBackgroundColorLight</item>
+        <item name="daxInfoPanelAlertBackgroundColor">@color/daxInfoPanelAlertBackgroundColorLight</item>
+
     </style>
 
     <style name="Theme.DuckDuckGo.Survey" parent="Theme.DuckDuckGo.Light">
@@ -413,13 +270,22 @@
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
 
-        <item name="colorPrimary">@color/darkThemePrimary</item>
-        <item name="colorPrimaryDark">@color/darkThemePrimaryDark</item>
+        <item name="colorPrimary">@color/newBlack</item>
+        <item name="colorPrimaryDark">@color/black</item>
         <item name="colorAccent">@color/cornflowerBlue</item>
-        <item name="toolbarIconColor">@color/white</item>
+        <item name="daxColorPrimaryIcon">@color/white</item>
     </style>
 
     <style name="Theme.DuckDuckGo.SplashScreen" parent="Theme.DuckDuckGo.Light"/>
+
+    <style name="Theme.AppCompat.Transparent.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
 
     <style name="ShapeAppearance.DuckDuckGo.SmallComponent" parent="ShapeAppearance.MaterialComponents.SmallComponent">
         <item name="cornerFamily">rounded</item>
