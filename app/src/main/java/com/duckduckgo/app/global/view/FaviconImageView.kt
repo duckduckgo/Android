@@ -79,7 +79,7 @@ fun generateDefaultDrawable(
         private val letter
             get() = baseHost.firstOrNull()?.toString()?.uppercase(Locale.getDefault()) ?: ""
 
-        private val faviconDefaultCornerRadius = context.resources.getDimension(CommonR.dimen.savedSiteGridItemCornerRadiusFavicon)
+        private val faviconDefaultCornerRadius = context.resources.getDimension(CommonR.dimen.mediumShapeCornerRadius)
         private val faviconDefaultSize = context.resources.getDimension(CommonR.dimen.savedSiteGridItemFavicon)
 
         private val palette = listOf(

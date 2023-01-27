@@ -317,7 +317,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             refreshOnboardingToggleText(viewState.expanded)
         } else {
             systemSearchOnboarding.onboarding.visibility = View.GONE
-            binding.results.elevation = resources.getDimension(CommonR.dimen.systemSearchResultsElevation)
+            binding.results.elevation = resources.getDimension(CommonR.dimen.keyline_1)
         }
     }
 

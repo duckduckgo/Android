@@ -17,13 +17,13 @@
 
 <resources>
 
-    <attr name="tooltipPanelBackgroundColor" format="color" />
-    <color name="tooltipPanelBackgroundColorLight">@color/blue0_50</color>
-    <color name="tooltipPanelBackgroundColorDark">@color/blue50_14</color>
+    <attr name="daxInfoPanelTooltipBackgroundColor" format="color" />
+    <color name="daxInfoPanelTooltipBackgroundColorLight">@color/blue0_50</color>
+    <color name="daxInfoPanelTooltipBackgroundColorDark">@color/blue50_14</color>
 
-    <attr name="alertPanelBackgroundColor" format="color" />
-    <color name="alertPanelBackgroundColorLight">@color/yellow10</color>
-    <color name="alertPanelBackgroundColorDark">@color/yellow50_14</color>
+    <attr name="daxInfoPanelAlertBackgroundColor" format="color" />
+    <color name="daxInfoPanelAlertBackgroundColorLight">@color/yellow10</color>
+    <color name="daxInfoPanelAlertBackgroundColorDark">@color/yellow50_14</color>
 
     <!--Panel view-->
     <declare-styleable name="InfoPanel">

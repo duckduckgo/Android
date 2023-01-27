@@ -17,18 +17,18 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/quickAccessFaviconContainer"
-    style="@style/SearchWidgetFavoriteContainer"
+    style="@style/Widget.DuckDuckGo.SearchWidgetFavoriteContainer"
     android:orientation="vertical"
     tools:ignore="DeprecatedWidgetInXml">
 
     <ImageView
         android:id="@+id/quickAccessFavicon"
-        style="@style/SearchWidgetFavoriteFavicon"
+        style="@style/Widget.DuckDuckGo.SearchWidgetFavoriteFavicon"
         android:background="@drawable/search_widget_favorite_favicon_light_background" />
 
     <TextView
         android:id="@+id/quickAccessTitle"
-        style="@style/SearchWidgetFavoriteTitle"
+        style="@style/Widget.DuckDuckGo.SearchWidgetFavoriteTitle"
         android:textColor="@color/black60"
         tools:text="Super long favorite title" />
 

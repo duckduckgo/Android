@@ -52,7 +52,7 @@ class ChangeIconActivity : DuckDuckGoActivity() {
 
     private fun configureRecycler() {
         binding.appIconsList.layoutManager = GridLayoutManager(this, 4)
-        binding.appIconsList.addItemDecoration(ItemOffsetDecoration(this, CommonR.dimen.changeAppIconListPadding))
+        binding.appIconsList.addItemDecoration(ItemOffsetDecoration(this, CommonR.dimen.keyline_1))
         binding.appIconsList.adapter = iconsAdapter
     }
 
