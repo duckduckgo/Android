@@ -54,7 +54,7 @@ class VpnEnabledNotificationBuilder {
         ): Notification {
             registerOngoingNotificationChannel(context)
 
-            val notificationLayout = RemoteViews(context.packageName, R.layout.notification_device_shield_enabled)
+            val notificationLayout = RemoteViews(context.packageName, R.layout.notification_vpn_enabled)
             notificationLayout.setTextViewText(R.id.deviceShieldNotificationHeader, vpnEnabledNotificationContent.title)
 
             return NotificationCompat.Builder(context, VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
