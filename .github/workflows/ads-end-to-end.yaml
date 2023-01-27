@@ -1,9 +1,8 @@
 name: Android Design System End-to-End tests
 
 on:
-  pull_request:
-    paths:
-      - 'common-ui/src/main/java/com/duckduckgo/mobile/android/ui/**'
+  schedule:
+    - cron: '0 4 * * *' # run at 5 AM UTC
   workflow_dispatch:
 
 concurrency:
@@ -61,3 +60,14 @@ jobs:
           name: ${{ github.sha }}
           app-file: apk/release.apk
           workspace: .maestro/ads_preview_flows
+
+      - name: Create Asana task when workflow failed
+        if: ${{ failure() }}
+        uses: honeycombio/gha-create-asana-task@main
+        with:
+          asana-secret: ${{ secrets.GH_ASANA_SECRET }}
+          asana-workspace-id: ${{ secrets.GH_ASANA_WORKSPACE_ID }}
+          asana-project-id: ${{ secrets.GH_ASANA_AOR_PROJECT_ID }}
+          asana-section-id: ${{ secrets.GH_ASANA_INCOMING_ID }}
+          asana-task-name: GH Workflow Failure - ADS Preview test
+          asana-task-description: The ADS Preview end to end workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
