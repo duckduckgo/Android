@@ -33,8 +33,8 @@ import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.Server
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
-import logcat.LogPriority
 import javax.inject.Inject
+import logcat.LogPriority
 import logcat.asLog
 import logcat.logcat
 
