@@ -16,7 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.service.notification
 
-import android.text.SpannableStringBuilder
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -29,27 +29,27 @@ import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerDao
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
-import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
-import com.duckduckgo.mobile.android.vpn.ui.notification.OngoingNotificationPressedHandler
 import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.mock
 
 @RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalCoroutinesApi::class)
 class AppTpEnabledNotificationContentPluginTest {
+
+    @get:Rule
+    @Suppress("unused")
+    var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
@@ -57,7 +57,6 @@ class AppTpEnabledNotificationContentPluginTest {
     private lateinit var appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository
     private lateinit var db: VpnDatabase
     private lateinit var vpnTrackerDao: VpnTrackerDao
-    private val deviceShieldPixels: DeviceShieldPixels = mock()
 
     private lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
     private val resources = InstrumentationRegistry.getInstrumentation().targetContext.resources
@@ -65,8 +64,9 @@ class AppTpEnabledNotificationContentPluginTest {
 
     @Before
     fun setup() {
-        AndroidThreeTen.init(InstrumentationRegistry.getInstrumentation().targetContext)
-        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, VpnDatabase::class.java)
+        val context = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext
+        AndroidThreeTen.init(context)
+        db = Room.inMemoryDatabaseBuilder(context, VpnDatabase::class.java)
             .allowMainThreadQueries()
             .build()
         vpnTrackerDao = db.vpnTrackerDao()
@@ -77,12 +77,11 @@ class AppTpEnabledNotificationContentPluginTest {
         }
 
         plugin = AppTpEnabledNotificationContentPlugin(
-            InstrumentationRegistry.getInstrumentation().targetContext,
+            context,
             resources,
             appTrackerBlockingStatsRepository,
             vpnFeaturesRegistry,
-            OngoingNotificationPressedHandler(deviceShieldPixels),
-        )
+        ) { null }
     }
 
     @After
@@ -92,13 +91,11 @@ class AppTpEnabledNotificationContentPluginTest {
 
     @Test
     fun getInitialContentThenReturnsCorrectNotificationContent() {
-        assertEquals(
-            VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent(
-                title = SpannableStringBuilder("App Tracking Protection is enabled and blocking tracking attempts across your apps"),
-                message = SpannableStringBuilder(),
-            ),
-            plugin.getInitialContent(),
-        )
+        val content = plugin.getInitialContent()
+
+        content!!.assertTitleEquals("App Tracking Protection is enabled and blocking tracking attempts across your apps")
+        content.assertMessageEquals("")
+        assertNull(content.notificationAction)
     }
 
     @Test
@@ -134,11 +131,11 @@ class AppTpEnabledNotificationContentPluginTest {
     }
 
     @Test
-    @Ignore("This test is flaky, it fails sometimes, investigating why")
     fun getUpdateContentOneCompanyThenReturnsCorrectUpdatedNotificationContent() = runTest {
         plugin.getUpdatedContent().test {
             vpnTrackerDao.insert(aTrackerAndCompany())
 
+            skipItems(1)
             val item = awaitItem()
 
             item.assertTitleEquals("Tracking attempts blocked in 1 app (past hour).")
@@ -155,6 +152,7 @@ class AppTpEnabledNotificationContentPluginTest {
         plugin.getUpdatedContent().test {
             vpnTrackerDao.insert(aTrackerAndCompany())
 
+            skipItems(1)
             val item = awaitItem()
 
             item.assertTitleEquals("")
@@ -165,7 +163,6 @@ class AppTpEnabledNotificationContentPluginTest {
     }
 
     @Test
-    @Ignore("This test is flaky, it fails sometimes, investigating why")
     fun getUpdateContentMultipleDifferentAppsThenReturnsCorrectUpdatedNotificationContent() = runTest {
         plugin.getUpdatedContent().test {
             vpnTrackerDao.insert(
@@ -215,7 +212,6 @@ class AppTpEnabledNotificationContentPluginTest {
     }
 
     @Test
-    @Ignore("This test is flaky, it fails sometimes, investigating why")
     fun getUpdateContentMultipleSameThenReturnsCorrectUpdatedNotificationContent() = runTest {
         plugin.getUpdatedContent().test {
             vpnTrackerDao.insert(aTrackerAndCompany())
@@ -249,18 +245,15 @@ class AppTpEnabledNotificationContentPluginTest {
         }
     }
 
-    @Test(expected = Throwable::class)
-    fun getOnPressNotificationIntentReturnsIntent() {
-        // Throwable is a proxy for trying to create the intent (and failing in this test). As the parent activity won't be found in a JVM test
-        // it will throw
-        plugin.getOnPressNotificationIntent()
+    @Test
+    fun isActiveWhenAppTpEnabledThenReturnsTrue() {
+        assertTrue(plugin.isActive())
     }
 
     @Test
-    fun getOnPressNotificationIntentAppTpNotEnabledReturnsNull() {
+    fun isActiveWhenAppTpNotEnabledThenReturnsFalse() {
         vpnFeaturesRegistry.unregisterFeature(AppTpVpnFeature.APPTP_VPN)
-        val intent = plugin.getOnPressNotificationIntent()
-        assertNull(intent)
+        assertFalse(plugin.isActive())
     }
 
     private fun aTrackerAndCompany(

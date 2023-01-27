@@ -31,8 +31,10 @@ import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin
 import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
+import com.duckduckgo.mobile.android.vpn.ui.notification.NotificationActionReportIssue
 import com.duckduckgo.mobile.android.vpn.ui.notification.OngoingNotificationPressedHandler
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
+import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -45,14 +47,18 @@ class AppTpEnabledNotificationContentPlugin @Inject constructor(
     private val resources: Resources,
     private val repository: AppTrackerBlockingStatsRepository,
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
-    private val notificationPressHandler: OngoingNotificationPressedHandler,
+    appTpEnabledNotificationIntentProvider: IntentProvider,
 ) : VpnEnabledNotificationContentPlugin {
+
+    private val notificationPendingIntent by lazy { appTpEnabledNotificationIntentProvider.getOnPressNotificationIntent() }
 
     override fun getInitialContent(): VpnEnabledNotificationContent? {
         return if (vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)) {
             return VpnEnabledNotificationContent(
                 title = SpannableStringBuilder(resources.getString(R.string.atp_OnInitialNotification)),
                 message = SpannableStringBuilder(),
+                onNotificationPressIntent = notificationPendingIntent,
+                notificationAction = null,
             )
         } else {
             null
@@ -67,7 +73,8 @@ class AppTpEnabledNotificationContentPlugin @Inject constructor(
         return repository.getVpnTrackers({ dateOfLastHour() })
             .map { trackersBlocked ->
                 val trackingApps = trackersBlocked.trackingApps()
-                val notificationText = if (!vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)) {
+                val isEnabled = vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)
+                val notificationText = if (!isEnabled) {
                     ""
                 } else if (trackersBlocked.isEmpty() || trackingApps.isEmpty()) {
                     resources.getString(R.string.atp_OnNoTrackersNotificationHeader)
@@ -77,23 +84,37 @@ class AppTpEnabledNotificationContentPlugin @Inject constructor(
                 VpnEnabledNotificationContent(
                     title = SpannableStringBuilder(HtmlCompat.fromHtml(notificationText, HtmlCompat.FROM_HTML_MODE_LEGACY)),
                     message = SpannableStringBuilder(),
+                    notificationAction = NotificationActionReportIssue.mangeRecentAppsNotificationAction(context),
+                    onNotificationPressIntent = if (isEnabled) notificationPendingIntent else null,
                 )
             }
     }
 
-    override fun getOnPressNotificationIntent(): PendingIntent? {
-        return if (vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)) {
-            val privacyReportIntent = DeviceShieldTrackerActivity.intent(context = context, onLaunchCallback = notificationPressHandler)
-            TaskStackBuilder.create(context).run {
-                addNextIntentWithParentStack(privacyReportIntent)
-                getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-            }
-        } else {
-            null
-        }
-    }
-
     override fun getPriority(): VpnEnabledNotificationContentPlugin.VpnEnabledNotificationPriority {
         return VpnEnabledNotificationContentPlugin.VpnEnabledNotificationPriority.NORMAL
+    }
+
+    override fun isActive(): Boolean {
+        return vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)
+    }
+
+    // This fun interface is provided just for testing purposes
+    fun interface IntentProvider {
+        fun getOnPressNotificationIntent(): PendingIntent?
+    }
+}
+
+// This class is created only for testing/mocking purposes to avoid crashing JVM test when getting the pending intent
+@ContributesBinding(VpnScope::class)
+class AppTpEnabledNotificationIntentProvider @Inject constructor(
+    private val context: Context,
+    private val notificationPressHandler: OngoingNotificationPressedHandler,
+) : AppTpEnabledNotificationContentPlugin.IntentProvider {
+    override fun getOnPressNotificationIntent(): PendingIntent? {
+        val privacyReportIntent = DeviceShieldTrackerActivity.intent(context = context, onLaunchCallback = notificationPressHandler)
+        return TaskStackBuilder.create(context).run {
+            addNextIntentWithParentStack(privacyReportIntent)
+            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        }
     }
 }

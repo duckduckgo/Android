@@ -23,9 +23,7 @@ import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
-import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldEnabledNotificationBuilder
-import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationFactory
-import com.duckduckgo.mobile.android.vpn.ui.notification.OngoingNotificationPressedHandler
+import com.duckduckgo.mobile.android.vpn.ui.notification.VpnEnabledNotificationBuilder
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -38,7 +36,6 @@ class VpnTrackerNotificationUpdates @Inject constructor(
     private val context: Context,
     private val dispatcherProvider: DispatcherProvider,
     private val notificationManager: NotificationManagerCompat,
-    private val ongoingNotificationPressedHandler: OngoingNotificationPressedHandler,
     private val vpnEnabledNotificationContentPluginPoint: PluginPoint<VpnEnabledNotificationContentPlugin>,
 ) : VpnServiceCallbacks {
 
@@ -46,12 +43,11 @@ class VpnTrackerNotificationUpdates @Inject constructor(
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         job += coroutineScope.launch(dispatcherProvider.io()) {
-            vpnEnabledNotificationContentPluginPoint.getHighestPriorityPlugin().getUpdatedContent().collectLatest { content ->
-                val deviceShieldNotification = content?.let {
-                    DeviceShieldNotificationFactory.DeviceShieldNotification.from(it)
-                } ?: DeviceShieldNotificationFactory.DeviceShieldNotification()
+            val notificationContentFlow = vpnEnabledNotificationContentPluginPoint.getHighestPriorityPlugin().getUpdatedContent()
+            notificationContentFlow.collectLatest { content ->
+                val vpnNotification = content ?: VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent.EMPTY
 
-                updateNotification(deviceShieldNotification)
+                updateNotification(vpnNotification)
             }
         }
     }
@@ -63,9 +59,10 @@ class VpnTrackerNotificationUpdates @Inject constructor(
         job.cancel()
     }
 
-    private fun updateNotification(deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification) {
-        val notification = DeviceShieldEnabledNotificationBuilder
-            .buildTrackersBlockedNotification(context, deviceShieldNotification, ongoingNotificationPressedHandler)
+    private fun updateNotification(
+        vpnNotification: VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent,
+    ) {
+        val notification = VpnEnabledNotificationBuilder.buildVpnEnabledUpdateNotification(context, vpnNotification)
         notificationManager.notify(TrackerBlockingVpnService.VPN_FOREGROUND_SERVICE_ID, notification)
     }
 }

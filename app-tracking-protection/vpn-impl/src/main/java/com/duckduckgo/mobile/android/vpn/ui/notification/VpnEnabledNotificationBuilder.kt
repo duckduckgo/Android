@@ -19,16 +19,14 @@ package com.duckduckgo.mobile.android.vpn.ui.notification
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.Context
 import android.os.Build
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
-import androidx.core.app.TaskStackBuilder
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
+import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin
 
-class DeviceShieldEnabledNotificationBuilder {
+class VpnEnabledNotificationBuilder {
 
     companion object {
 
@@ -50,54 +48,47 @@ class DeviceShieldEnabledNotificationBuilder {
             }
         }
 
-        fun buildDeviceShieldEnabledNotification(
+        fun buildVpnEnabledNotification(
             context: Context,
-            deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification,
-            pendingIntent: PendingIntent?,
+            vpnEnabledNotificationContent: VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent,
         ): Notification {
             registerOngoingNotificationChannel(context)
 
             val notificationLayout = RemoteViews(context.packageName, R.layout.notification_device_shield_enabled)
-            notificationLayout.setTextViewText(R.id.deviceShieldNotificationHeader, deviceShieldNotification.title)
+            notificationLayout.setTextViewText(R.id.deviceShieldNotificationHeader, vpnEnabledNotificationContent.title)
 
             return NotificationCompat.Builder(context, VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_device_shield_notification_logo)
                 .setStyle(NotificationCompat.DecoratedCustomViewStyle())
-                .setContentIntent(pendingIntent)
+                .setContentIntent(vpnEnabledNotificationContent.onNotificationPressIntent)
                 .setCustomContentView(notificationLayout)
                 .setOngoing(true)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
+                .addAction(vpnEnabledNotificationContent.notificationAction)
                 .setChannelId(VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
                 .setCategory(NotificationCompat.CATEGORY_SERVICE)
                 .build()
         }
 
-        fun buildTrackersBlockedNotification(
+        fun buildVpnEnabledUpdateNotification(
             context: Context,
-            deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification,
-            notificationPressHandler: OngoingNotificationPressedHandler,
+            vpnNotification: VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent,
         ): Notification {
             registerOngoingNotificationChannel(context)
 
-            val privacyReportIntent = DeviceShieldTrackerActivity.intent(context = context, onLaunchCallback = notificationPressHandler)
-            val vpnShowDashboardPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
-                addNextIntentWithParentStack(privacyReportIntent)
-                getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-            }
-
             val notificationLayout = RemoteViews(context.packageName, R.layout.notification_device_shield_trackers)
-            notificationLayout.setTextViewText(R.id.deviceShieldNotificationHeader, deviceShieldNotification.title)
-            notificationLayout.setTextViewText(R.id.deviceShieldNotificationMessage, deviceShieldNotification.message)
+            notificationLayout.setTextViewText(R.id.deviceShieldNotificationHeader, vpnNotification.title)
+            notificationLayout.setTextViewText(R.id.deviceShieldNotificationMessage, vpnNotification.message)
 
             return NotificationCompat.Builder(context, VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_device_shield_notification_logo)
                 .setStyle(NotificationCompat.DecoratedCustomViewStyle())
-                .setContentIntent(vpnShowDashboardPendingIntent)
+                .setContentIntent(vpnNotification.onNotificationPressIntent)
                 .setCustomContentView(notificationLayout)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setSilent(true)
                 .setOngoing(true)
-                .addAction(NotificationActionReportIssue.mangeRecentAppsNotificationAction(context))
+                .addAction(vpnNotification.notificationAction)
                 .setChannelId(VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
                 .setCategory(NotificationCompat.CATEGORY_SERVICE)
                 .build()

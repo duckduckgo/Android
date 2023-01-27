@@ -18,6 +18,7 @@ package com.duckduckgo.mobile.android.vpn.service
 
 import android.app.PendingIntent
 import android.text.SpannableStringBuilder
+import androidx.core.app.NotificationCompat
 import kotlinx.coroutines.flow.Flow
 
 interface VpnEnabledNotificationContentPlugin {
@@ -39,13 +40,6 @@ interface VpnEnabledNotificationContentPlugin {
     fun getUpdatedContent(): Flow<VpnEnabledNotificationContent?>
 
     /**
-     * This method will be called when the user clicks on the notification.
-     *
-     * @return shall return the intent to be launched when the user clicks on the notification or null if the plugin does not want to handle the click.
-     */
-    fun getOnPressNotificationIntent(): PendingIntent?
-
-    /**
      * The VPN will call this method to select what plugin will be displayed in the notification.
      * To select a proper priority:
      * - check the priority of any other plugins
@@ -55,10 +49,29 @@ interface VpnEnabledNotificationContentPlugin {
      */
     fun getPriority(): VpnEnabledNotificationPriority
 
+    /**
+     * The VPN will call this method to know whether this plugin is active or not.
+     *
+     * @return `true` if the plugin is active, `false` otherwise.
+     */
+    fun isActive(): Boolean
+
     data class VpnEnabledNotificationContent(
         val title: SpannableStringBuilder,
         val message: SpannableStringBuilder,
-    )
+        val onNotificationPressIntent: PendingIntent?,
+        val notificationAction: NotificationCompat.Action?,
+    ) {
+        companion object {
+            val EMPTY = VpnEnabledNotificationContent(
+                title = SpannableStringBuilder(),
+                message = SpannableStringBuilder(),
+                onNotificationPressIntent = null,
+                notificationAction = null,
+            )
+        }
+    }
+
     enum class VpnEnabledNotificationPriority {
         LOW,
         NORMAL,
