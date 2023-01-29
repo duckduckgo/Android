@@ -18,7 +18,6 @@ package com.duckduckgo.sync.impl.di
 
 import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.impl.SyncService
 import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.crypto.SyncNativeLib
 import com.duckduckgo.sync.store.EncryptedSharedPrefsProvider
