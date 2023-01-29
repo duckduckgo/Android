@@ -35,10 +35,7 @@ interface SyncRepository {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
-class AppSyncRepository
-@Inject
-constructor(
+class AppSyncRepository @Inject constructor(
     private val syncDeviceIds: SyncDeviceIds,
     private val nativeLib: SyncLib,
     private val syncApi: SyncApi,
