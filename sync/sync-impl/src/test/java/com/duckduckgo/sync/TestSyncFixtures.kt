@@ -16,15 +16,15 @@
 
 package com.duckduckgo.sync
 
+import com.duckduckgo.sync.crypto.AccountKeys
+import com.duckduckgo.sync.crypto.DecryptResult
+import com.duckduckgo.sync.crypto.LoginKeys
 import com.duckduckgo.sync.impl.AccountCreatedResponse
 import com.duckduckgo.sync.impl.Login
 import com.duckduckgo.sync.impl.LoginResponse
 import com.duckduckgo.sync.impl.Logout
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Signup
-import com.duckduckgo.sync.crypto.AccountKeys
-import com.duckduckgo.sync.crypto.DecryptResult
-import com.duckduckgo.sync.crypto.LoginKeys
 import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.Response
 
