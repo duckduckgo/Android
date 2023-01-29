@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.lib
+package com.duckduckgo.sync.crypto
 
 import android.content.Context
 import android.util.Base64

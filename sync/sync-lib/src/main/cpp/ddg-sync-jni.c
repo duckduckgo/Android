@@ -6,7 +6,7 @@
 #include "DDGSyncCrypto.h"
 
 JNIEXPORT jint JNICALL
-Java_com_duckduckgo_sync_lib_SyncNativeLib_generateAccountKeys(JNIEnv* env, jclass class,
+Java_com_duckduckgo_sync_crypto_SyncNativeLib_generateAccountKeys(JNIEnv* env, jclass class,
     jbyteArray primaryKey,
     jbyteArray secretKey,
     jbyteArray protectedSecretKey,
@@ -44,7 +44,7 @@ Java_com_duckduckgo_sync_lib_SyncNativeLib_generateAccountKeys(JNIEnv* env, jcla
 }
 
 JNIEXPORT jint JNICALL
-Java_com_duckduckgo_sync_lib_SyncNativeLib_prepareForLogin(
+Java_com_duckduckgo_sync_crypto_SyncNativeLib_prepareForLogin(
     JNIEnv *env,
     jclass clazz,
     jbyteArray passwordHash,
@@ -71,7 +71,7 @@ Java_com_duckduckgo_sync_lib_SyncNativeLib_prepareForLogin(
 }
 
 JNIEXPORT jint JNICALL
-Java_com_duckduckgo_sync_lib_SyncNativeLib_decrypt(
+Java_com_duckduckgo_sync_crypto_SyncNativeLib_decrypt(
     JNIEnv *env,
     jclass clazz,
     jbyteArray rawBytes,
@@ -102,7 +102,7 @@ Java_com_duckduckgo_sync_lib_SyncNativeLib_decrypt(
 }
 
 JNIEXPORT jint JNICALL
-Java_com_duckduckgo_sync_lib_SyncNativeLib_getPrimaryKeySize(
+Java_com_duckduckgo_sync_crypto_SyncNativeLib_getPrimaryKeySize(
     JNIEnv *env,
     jclass clazz
 ) {
@@ -110,7 +110,7 @@ Java_com_duckduckgo_sync_lib_SyncNativeLib_getPrimaryKeySize(
 }
 
 JNIEXPORT jint JNICALL
-Java_com_duckduckgo_sync_lib_SyncNativeLib_getSecretKeySize(
+Java_com_duckduckgo_sync_crypto_SyncNativeLib_getSecretKeySize(
     JNIEnv *env,
     jclass clazz
 ) {
@@ -118,7 +118,7 @@ Java_com_duckduckgo_sync_lib_SyncNativeLib_getSecretKeySize(
 }
 
 JNIEXPORT jint JNICALL
-Java_com_duckduckgo_sync_lib_SyncNativeLib_getProtectedSecretKeySize(
+Java_com_duckduckgo_sync_crypto_SyncNativeLib_getProtectedSecretKeySize(
     JNIEnv *env,
     jclass clazz
 ) {
@@ -126,7 +126,7 @@ Java_com_duckduckgo_sync_lib_SyncNativeLib_getProtectedSecretKeySize(
 }
 
 JNIEXPORT jint JNICALL
-Java_com_duckduckgo_sync_lib_SyncNativeLib_getPasswordHashSize(
+Java_com_duckduckgo_sync_crypto_SyncNativeLib_getPasswordHashSize(
     JNIEnv *env,
     jclass clazz
 ) {
@@ -134,7 +134,7 @@ Java_com_duckduckgo_sync_lib_SyncNativeLib_getPasswordHashSize(
 }
 
 JNIEXPORT jint JNICALL
-Java_com_duckduckgo_sync_lib_SyncNativeLib_getStretchedPrimaryKeySize(
+Java_com_duckduckgo_sync_crypto_SyncNativeLib_getStretchedPrimaryKeySize(
     JNIEnv *env,
     jclass clazz
 ) {
@@ -142,7 +142,7 @@ Java_com_duckduckgo_sync_lib_SyncNativeLib_getStretchedPrimaryKeySize(
 }
 
 JNIEXPORT jint JNICALL
-Java_com_duckduckgo_sync_lib_SyncNativeLib_getEncryptedExtraBytes(
+Java_com_duckduckgo_sync_crypto_SyncNativeLib_getEncryptedExtraBytes(
     JNIEnv *env,
     jclass clazz
 ) {
