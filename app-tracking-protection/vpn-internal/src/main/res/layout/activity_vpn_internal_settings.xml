@@ -81,13 +81,6 @@
                     app:showSwitch="true"/>
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-                    android:id="@+id/vpnConnectivityChecksToggle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:primaryText="VPN connectivity checks"
-                    app:showSwitch="true"/>
-
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                     android:id="@+id/openBetaToggle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -206,20 +199,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryText="Health"/>
-
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-                    android:id="@+id/badHealthMonitorToggle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:primaryText="Bad health monitoring"
-                    app:showSwitch="true"/>
-
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-                    android:id="@+id/badHealthMitigationToggle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:primaryText="Bad health mitigation action"
-                    app:showSwitch="true"/>
 
         </LinearLayout>
     </ScrollView>

@@ -64,9 +64,8 @@ class AppTpEnabledNotificationContentPluginTest {
 
     @Before
     fun setup() {
-        val context = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext
-        AndroidThreeTen.init(context)
-        db = Room.inMemoryDatabaseBuilder(context, VpnDatabase::class.java)
+        AndroidThreeTen.init(InstrumentationRegistry.getInstrumentation().targetContext)
+        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, VpnDatabase::class.java)
             .allowMainThreadQueries()
             .build()
         vpnTrackerDao = db.vpnTrackerDao()
@@ -77,7 +76,7 @@ class AppTpEnabledNotificationContentPluginTest {
         }
 
         plugin = AppTpEnabledNotificationContentPlugin(
-            context,
+            InstrumentationRegistry.getInstrumentation().targetContext.applicationContext,
             resources,
             appTrackerBlockingStatsRepository,
             vpnFeaturesRegistry,
@@ -86,7 +85,7 @@ class AppTpEnabledNotificationContentPluginTest {
 
     @After
     fun after() {
-        db.close()
+        kotlin.runCatching { db.close() }
     }
 
     @Test
@@ -217,8 +216,7 @@ class AppTpEnabledNotificationContentPluginTest {
             vpnTrackerDao.insert(aTrackerAndCompany())
             vpnTrackerDao.insert(aTrackerAndCompany())
 
-            skipItems(1)
-            val item = awaitItem()
+            val item = expectMostRecentItem()
 
             item.assertTitleEquals("Tracking attempts blocked in 1 app (past hour).")
             item.assertMessageEquals("")
@@ -235,8 +233,7 @@ class AppTpEnabledNotificationContentPluginTest {
             vpnTrackerDao.insert(aTrackerAndCompany())
             vpnTrackerDao.insert(aTrackerAndCompany())
 
-            skipItems(1)
-            val item = awaitItem()
+            val item = expectMostRecentItem()
 
             item.assertTitleEquals("")
             item.assertMessageEquals("")

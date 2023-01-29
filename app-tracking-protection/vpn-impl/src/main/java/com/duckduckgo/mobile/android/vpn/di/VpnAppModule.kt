@@ -73,12 +73,6 @@ object VpnAppModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideAppHealthDatabase(context: Context): AppHealthDatabase {
-        return AppHealthDatabase.create(context)
-    }
-
-    @SingleInstanceIn(AppScope::class)
-    @Provides
     fun provideVpnRemoveConfigDatabase(context: Context): VpnRemoteConfigDatabase {
         return VpnRemoteConfigDatabase.create(context)
     }
@@ -95,11 +89,6 @@ object VpnAppModule {
     @SingleInstanceIn(AppScope::class)
     fun providesResources(context: Context): Resources {
         return context.resources
-    }
-
-    @Provides
-    fun provideAppHealthTriggersRepository(appHealthDatabase: AppHealthDatabase): AppHealthTriggersRepository {
-        return AppHealthTriggersRepositoryImpl(appHealthDatabase)
     }
 
     @Provides

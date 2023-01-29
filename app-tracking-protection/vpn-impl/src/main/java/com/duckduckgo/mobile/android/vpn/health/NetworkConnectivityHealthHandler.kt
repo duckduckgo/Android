@@ -21,8 +21,6 @@ import android.net.ConnectivityManager
 import com.duckduckgo.app.global.extensions.isAirplaneModeOn
 import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
-import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
@@ -47,8 +45,6 @@ private const val WWW_DUCKDUCKGO_COM = "www.duckduckgo.com"
 class NetworkConnectivityHealthHandler @Inject constructor(
     private val context: Context,
     private val pixel: DeviceShieldPixels,
-    private val healthMetricCounter: HealthMetricCounter,
-    private val appTpFeatureConfig: AppTpFeatureConfig,
     private val trackerBlockingVpnService: Provider<TrackerBlockingVpnService>,
 ) : VpnServiceCallbacks {
     private val connectivityManager = context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -62,12 +58,6 @@ class NetworkConnectivityHealthHandler @Inject constructor(
                     if (hasDeviceConnectivity()) {
                         logcat { "Active VPN network does not have connectivity" }
                         pixel.reportVpnConnectivityError()
-                        if (appTpFeatureConfig.isEnabled(AppTpSetting.ConnectivityChecks)) {
-                            logcat { "AppTpSetting.ConnectivityChecks is enabled, logging health event" }
-                            healthMetricCounter.onVpnConnectivityError()
-                        } else {
-                            logcat { "AppTpSetting.ConnectivityChecks is disabled" }
-                        }
                     } else {
                         logcat { "Device doesn't have connectivity either" }
                         pixel.reportDeviceConnectivityError()
