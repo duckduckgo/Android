@@ -26,20 +26,16 @@
     android:paddingBottom="8dp"
     android:gravity="center">
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/tracker_domain"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_weight="1"
         android:ellipsize="end"
-        android:fontFamily="sans-serif"
         android:maxLines="1"
         android:orientation="vertical"
         android:singleLine="true"
-        android:textColor="?normalTextColor"
-        android:textSize="16sp"
-        android:textStyle="normal"
         tools:text="Facebook" />
 
     <androidx.appcompat.widget.AppCompatCheckBox
@@ -49,6 +45,6 @@
         android:layout_gravity="center"
         android:button="@null"
         android:drawableEnd="?android:attr/listChoiceIndicatorMultiple"
-        android:theme="@style/PopUpMenuCheckBoxTheme" />
+        android:theme="@style/Widget.DuckDuckGo.PopUpMenuCheckBox" />
 
 </LinearLayout>

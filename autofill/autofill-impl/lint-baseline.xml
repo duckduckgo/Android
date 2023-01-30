@@ -1,15 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 7.0.4" type="baseline" client="gradle" name="AGP (7.0.4)" variant="all" version="7.0.4">
+<issues format="6" by="lint 7.2.2" type="baseline" client="gradle" dependencies="false" name="AGP (7.2.2)" variant="all" version="7.2.2">
+
+    <issue
+        id="VectorRaster"
+        message="Limit vector icons sizes to 200×200 to keep icon drawing fast; see https://developer.android.com/studio/write/vector-asset-studio#when for more"
+        errorLine1="    android:width=&quot;220dp&quot;"
+        errorLine2="                   ~~~~~">
+        <location
+            file="src/main/res/drawable/ic_autofill_keychain.xml"
+            line="2"
+            column="20"/>
+    </issue>
 
     <issue
         id="NotifyDataSetChanged"
         message="It will always be more efficient to use more specific change events if you can. Rely on `notifyDataSetChanged` as a last resort."
-        errorLine1="        notifyDataSetChanged()"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="                    notifyDataSetChanged()"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/duckduckgo/autofill/ui/credential/management/AutofillManagementRecyclerAdapter.kt"
-            line="78"
-            column="9"/>
+            file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/selecting/CredentialsPickerRecyclerAdapter.kt"
+            line="73"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="UseCompoundDrawables"
+        message="This tag and its children can be replaced by one `&lt;TextView/>` and a compound drawable"
+        errorLine1="    &lt;LinearLayout"
+        errorLine2="     ~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/content_autofill_save_new_credentials.xml"
+            line="45"
+            column="6"/>
     </issue>
 
     <issue
@@ -19,75 +41,206 @@
         errorLine2="     ~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/content_autofill_select_credentials_tooltip.xml"
-            line="27"
+            line="29"
             column="6"/>
     </issue>
 
     <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/daxDialogBackgroundColor` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
-        errorLine1="    android:background=&quot;?attr/daxDialogBackgroundColor&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        id="UseCompoundDrawables"
+        message="This tag and its children can be replaced by one `&lt;TextView/>` and a compound drawable"
+        errorLine1="    &lt;LinearLayout"
+        errorLine2="     ~~~~~~~~~~~~">
         <location
-            file="src/main/res/layout/content_autofill_save_credentials_tooltip.xml"
-            line="23"
+            file="src/main/res/layout/content_autofill_update_existing_credentials.xml"
+            line="29"
+            column="6"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (986 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="      android:pathData=&quot;M210.006,115.384L205.043,107.331C204.74,106.79 204.089,106.495 203.406,106.561C203,106.613 202.653,106.859 202.39,107.149L201.31,108.459C200.893,108.936 200.313,109.111 199.721,109.009L196.783,108.352C196.19,108.25 195.757,107.748 195.582,107.169L195.122,105.412C194.947,104.832 194.534,104.395 193.921,104.229L191.048,103.552C190.436,103.386 189.811,103.645 189.458,104.103L188.379,105.412C187.961,105.89 187.382,106.065 186.789,105.963L183.851,105.305C183.239,105.139 182.826,104.702 182.651,104.123L182.274,102.41C182.163,101.812 181.666,101.33 181.074,101.228L177.672,100.429C175.094,99.803 172.888,98.082 171.872,95.649C169.679,90.482 165.137,86.376 159.241,84.996C149.415,82.698 139.606,88.822 137.288,98.584C134.989,108.41 141.113,118.219 150.875,120.538C156.771,121.917 162.602,120.295 166.852,116.693C168.877,115.028 171.555,114.359 174.113,114.921L201.181,121.281C202.238,121.524 203.371,121.322 204.323,120.753L209.475,117.581C210.254,117.135 210.516,116.143 210.006,115.384Z&quot;"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/ic_autofill_keychain.xml"
+            line="24"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (986 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="      android:pathData=&quot;M210.006,115.384L205.043,107.331C204.74,106.79 204.089,106.495 203.406,106.561C203,106.613 202.653,106.859 202.39,107.149L201.31,108.459C200.893,108.936 200.313,109.111 199.721,109.009L196.783,108.352C196.19,108.25 195.757,107.748 195.582,107.169L195.122,105.412C194.947,104.832 194.534,104.395 193.921,104.229L191.048,103.552C190.436,103.386 189.811,103.645 189.458,104.103L188.379,105.412C187.961,105.89 187.382,106.065 186.789,105.963L183.851,105.305C183.239,105.139 182.826,104.702 182.651,104.123L182.274,102.41C182.163,101.812 181.666,101.33 181.074,101.228L177.672,100.429C175.094,99.803 172.888,98.082 171.872,95.649C169.679,90.482 165.137,86.376 159.241,84.996C149.415,82.698 139.606,88.822 137.288,98.584C134.989,108.41 141.113,118.219 150.875,120.538C156.771,121.917 162.602,120.295 166.852,116.693C168.877,115.028 171.555,114.359 174.113,114.921L201.181,121.281C202.238,121.524 203.371,121.322 204.323,120.753L209.475,117.581C210.254,117.135 210.516,116.143 210.006,115.384Z&quot;"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/ic_autofill_keychain.xml"
+            line="27"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (1196 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="      android:pathData=&quot;M183.937,142.085C184.388,141.949 184.793,141.897 185.193,142.057C185.908,142.333 186.296,142.918 186.317,143.684L186.632,153.563C186.647,154.542 185.902,155.329 184.987,155.325L178.663,155.55C177.556,155.603 176.441,155.168 175.57,154.377L154.393,134.506C152.406,132.578 149.642,131.798 146.905,132.273C141.176,133.302 135.009,131.724 130.409,127.424C122.743,120.188 122.32,108.094 129.557,100.428C136.793,92.763 148.887,92.34 156.552,99.576C161.153,103.876 163.129,109.951 162.432,115.781C162.142,118.538 163.171,121.247 165.223,123.156L167.875,125.656C168.352,126.074 168.482,126.737 168.316,127.349L167.778,129.057C167.612,129.669 167.742,130.332 168.22,130.75L170.478,132.877C170.955,133.295 171.632,133.441 172.192,133.202L173.891,132.548C174.45,132.309 175.127,132.455 175.604,132.873L177.863,135C178.34,135.418 178.535,136.062 178.368,136.674L177.87,138.51C177.703,139.122 177.834,139.786 178.311,140.203L180.569,142.33C181.066,142.812 181.743,142.959 182.302,142.72L183.937,142.085ZM136.094,113.695C138.249,115.713 141.591,115.616 143.545,113.481C145.582,111.39 145.486,108.048 143.331,106.03C141.175,104.012 137.898,104.089 135.88,106.244C133.862,108.399 133.958,111.742 136.094,113.695Z&quot;"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/ic_autofill_keychain.xml"
+            line="30"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `?attr/colorPrimaryDark` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
+        errorLine1="    android:background=&quot;?attr/colorPrimaryDark&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_autofill_management_disabled.xml"
+            line="20"
             column="5"/>
     </issue>
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/daxDialogBackgroundColor` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
-        errorLine1="    android:background=&quot;?attr/daxDialogBackgroundColor&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        message="Possible overdraw: Root element paints background `?attr/colorPrimaryDark` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
+        errorLine1="    android:background=&quot;?attr/colorPrimaryDark&quot;>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_autofill_management_edit_mode.xml"
+            line="21"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `?attr/colorPrimaryDark` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
+        errorLine1="    android:background=&quot;?attr/colorPrimaryDark&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_autofill_management_locked.xml"
+            line="21"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.credentialManagementEditButtonDelete` appears to be unused"
+        errorLine1="    &lt;string name=&quot;credentialManagementEditButtonDelete&quot;>Delete&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings-autofill-impl.xml"
+            line="56"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="AlwaysShowAction"
+        message="Prefer &quot;`ifRoom`&quot; instead of &quot;`always`&quot;"
+        errorLine1="        app:showAsAction=&quot;always&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/autofill_list_mode_menu.xml"
+            line="25"
+            column="9"/>
+        <location
+            file="src/main/res/menu/autofill_list_mode_menu.xml"
+            line="31"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="AlwaysShowAction"
+        message="Prefer &quot;`ifRoom`&quot; instead of &quot;`always`&quot;"
+        errorLine1="        app:showAsAction=&quot;always&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/autofill_view_mode_menu.xml"
+            line="33"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="    &lt;ImageView"
+        errorLine2="     ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/content_autofill_save_new_credentials.xml"
+            line="39"
+            column="6"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="        &lt;ImageView"
+        errorLine2="         ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/content_autofill_save_new_credentials.xml"
+            line="56"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="    &lt;ImageView"
+        errorLine2="     ~~~~~~~~~">
         <location
             file="src/main/res/layout/content_autofill_select_credentials_tooltip.xml"
             line="23"
-            column="5"/>
+            column="6"/>
     </issue>
 
     <issue
-        id="ButtonStyle"
-        message="Buttons in button bars should be borderless; use `style=&quot;?android:attr/buttonBarButtonStyle&quot;` (and `?android:attr/buttonBarStyle` on the parent)"
-        errorLine1="        &lt;Button"
-        errorLine2="         ~~~~~~">
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="    &lt;ImageView"
+        errorLine2="     ~~~~~~~~~">
         <location
-            file="src/main/res/layout/fragment_autofill_management_edit_mode.xml"
-            line="77"
+            file="src/main/res/layout/content_autofill_update_existing_credentials.xml"
+            line="23"
+            column="6"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="        &lt;ImageView"
+        errorLine2="         ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/content_autofill_update_existing_credentials.xml"
+            line="40"
             column="10"/>
     </issue>
 
     <issue
-        id="ButtonStyle"
-        message="Buttons in button bars should be borderless; use `style=&quot;?android:attr/buttonBarButtonStyle&quot;` (and `?android:attr/buttonBarStyle` on the parent)"
-        errorLine1="        &lt;Button"
-        errorLine2="         ~~~~~~">
+        id="RtlEnabled"
+        message="The project references RTL attributes, but does not explicitly enable or disable RTL support with `android:supportsRtl` in the manifest">
         <location
-            file="src/main/res/layout/fragment_autofill_management_edit_mode.xml"
-            line="83"
-            column="10"/>
+            file="src/main/AndroidManifest.xml"/>
     </issue>
 
     <issue
-        id="ButtonStyle"
-        message="Buttons in button bars should be borderless; use `style=&quot;?android:attr/buttonBarButtonStyle&quot;` (and `?android:attr/buttonBarStyle` on the parent)"
-        errorLine1="            &lt;Button"
-        errorLine2="             ~~~~~~">
+        id="InvalidColorAttribute"
+        message="@colors are not allowed, used ?attr/daxColor instead"
+        errorLine1="            android:background=&quot;#F00&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/res/layout/fragment_autofill_management_edit_mode.xml"
-            line="97"
-            column="14"/>
+            file="src/main/res/layout/content_autofill_save_new_credentials.xml"
+            line="27"
+            column="13"/>
     </issue>
 
     <issue
-        id="ButtonStyle"
-        message="Buttons in button bars should be borderless; use `style=&quot;?android:attr/buttonBarButtonStyle&quot;` (and `?android:attr/buttonBarStyle` on the parent)"
-        errorLine1="            &lt;Button"
-        errorLine2="             ~~~~~~">
+        id="InvalidColorAttribute"
+        message="@colors are not allowed, used ?attr/daxColor instead"
+        errorLine1="            android:background=&quot;#F00&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/res/layout/fragment_autofill_management_edit_mode.xml"
-            line="103"
-            column="14"/>
+            file="src/main/res/layout/content_autofill_save_new_credentials.xml"
+            line="35"
+            column="13"/>
     </issue>
-
 
 </issues>

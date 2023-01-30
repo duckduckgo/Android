@@ -29,17 +29,6 @@
     <attr name="daxButtonDestructive" format="reference"/>
     <attr name="daxButtonGhostDestructive" format="reference"/>
 
-    <attr name="primaryButtonLargeStyle" format="reference"/>
-    <attr name="primaryButtonSmallStyle" format="reference"/>
-    <attr name="secondaryButtonLargeStyle" format="reference"/>
-    <attr name="secondaryButtonSmallStyle" format="reference"/>
-    <attr name="ghostButtonLargeStyle" format="reference"/>
-    <attr name="ghostButtonSmallStyle" format="reference"/>
     <attr name="radioButtonStyle" format="reference"/>
-
-    // Deprecated - This will be removed once we migrate all Components to the new Design System Spec"
-    <attr name="primaryButtonRoundedStyle" format="reference"/>
-    <attr name="secondaryButtonRoundedStyle" format="reference"/>
-    <attr name="primaryButtonLowercaseStyle" format="reference"/>
 
 </resources>

@@ -22,7 +22,7 @@
     <group>
         <clip-path android:pathData="M54,0L54,0A54,54 0,0 1,108 54L108,54A54,54 0,0 1,54 108L54,108A54,54 0,0 1,0 54L0,54A54,54 0,0 1,54 0z" />
         <path
-            android:fillColor="?attr/listItemImageBackground"
+            android:fillColor="?attr/daxColorContainer"
             android:pathData="M0,0h108v108h-108z" />
         <group>
             <clip-path android:pathData="M18,23h72v85h-72z" />

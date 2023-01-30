@@ -20,7 +20,7 @@
     <item>
         <shape android:shape="oval">
             <solid
-                android:color="?attr/tabCardBackgroundColor"
+                android:color="?attr/daxColorPrimaryInvertedText"
                 tools:color="#F00" />
             <size
                 android:width="9dp"
@@ -31,7 +31,7 @@
     <item android:gravity="center">
         <shape android:shape="oval">
 
-            <solid android:color="@color/cornflowerBlue" />
+            <solid android:color="?attr/daxColorAccentBlue" />
             <size
                 android:width="6dp"
                 android:height="6dp" />

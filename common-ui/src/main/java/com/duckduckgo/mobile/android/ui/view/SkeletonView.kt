@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,28 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.ui.view.button
+package com.duckduckgo.mobile.android.ui.view
 
 import android.content.Context
 import android.util.AttributeSet
+import androidx.appcompat.widget.AppCompatTextView
 import com.duckduckgo.mobile.android.R
-import com.google.android.material.button.MaterialButton
 
-@Deprecated("This will be removed once we migrate all Components to the new Design System Spec")
-class ButtonPrimaryRounded @JvmOverloads constructor(
-    ctx: Context,
-    attrs: AttributeSet,
-    defStyleAttr: Int = R.attr.primaryButtonRoundedStyle,
-) : MaterialButton(
-    ctx,
-    attrs,
-    defStyleAttr,
-)
+class SkeletonView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = R.style.Widget_DuckDuckGo_SkeletonView,
+) : AppCompatTextView(context, attrs, defStyleAttr) {
+
+    init {
+        context.obtainStyledAttributes(
+            attrs,
+            R.styleable.SkeletonView,
+            0,
+            R.style.Widget_DuckDuckGo_SkeletonView,
+        ).apply {
+            background = getDrawable(R.styleable.SkeletonView_android_background)
+            recycle()
+        }
+    }
+}

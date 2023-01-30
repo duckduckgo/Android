@@ -21,7 +21,94 @@ import com.android.tools.lint.checks.infrastructure.TestLintTask.lint
 import org.junit.Test
 
 @Suppress("UnstableApiUsage")
-class DeprecatedSwitchUsedInXmlDetectorTest {
+class DeprecatedAndroidWidgetsUsedInXmlDetectorTest {
+    @Test
+    fun whenAndroidButtonFoundThenFailWithError() {
+        lint()
+            .files(
+                TestFiles.xml(
+                    "res/layout/buttons.xml",
+                    """
+                <android.support.design.widget.CoordinatorLayout
+                    xmlns:android="http://schemas.android.com/apk/res/android"
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                    xmlns:tools="http://schemas.android.com/tools"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#eeeeee">
+
+                  <android.support.design.bottomappbar.BottomAppBar
+                      android:id="@+id/bottom_app_bar"
+                      style="@style/Widget.MaterialComponents.BottomAppBar"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_gravity="bottom"
+                      app:navigationIcon="@drawable/ic_menu_black_24dp"/>
+
+                  <Button
+                      android:id="@+id/fab"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:tint="@android:color/white"
+                      app:layout_anchor="@id/bottom_app_bar"
+                      app:srcCompat="@drawable/ic_add_black_24dp"
+                      tools:ignore="RtlHardcoded"/>
+                </android.support.design.widget.CoordinatorLayout>
+            """
+                ).indented()
+            )
+            .issues(DeprecatedAndroidWidgetsUsedInXmlDetector.DEPRECATED_WIDGET_IN_XML)
+            .run()
+            .expect(
+                """
+                res/layout/buttons.xml:17: Error: Always favor the use of the Design System Component [DeprecatedWidgetInXml]
+                  <Button
+                   ~~~~~~
+                1 errors, 0 warnings     
+            """.trimMargin()
+            )
+    }
+
+    @Test
+    fun whenAndroidButtonNotFoundThenSucceed() {
+        lint()
+            .files(
+                TestFiles.xml(
+                    "res/layout/buttons.xml",
+                    """
+                <android.support.design.widget.CoordinatorLayout
+                    xmlns:android="http://schemas.android.com/apk/res/android"
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                    xmlns:tools="http://schemas.android.com/tools"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#eeeeee">
+
+                  <android.support.design.bottomappbar.BottomAppBar
+                      android:id="@+id/bottom_app_bar"
+                      style="@style/Widget.MaterialComponents.BottomAppBar"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_gravity="bottom"
+                      app:navigationIcon="@drawable/ic_menu_black_24dp"/>
+
+                  <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryLarge
+                      android:id="@+id/fab"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:tint="@android:color/white"
+                      app:layout_anchor="@id/bottom_app_bar"
+                      app:srcCompat="@drawable/ic_add_black_24dp"
+                      tools:ignore="RtlHardcoded"/>
+                </android.support.design.widget.CoordinatorLayout>
+            """
+                ).indented()
+            )
+            .allowCompilationErrors()
+            .issues(DeprecatedAndroidWidgetsUsedInXmlDetector.DEPRECATED_WIDGET_IN_XML)
+            .run()
+            .expectClean()
+    }
 
     @Test
     fun whenAppCompatSwitchFoundThenFailWithError() {
@@ -59,11 +146,11 @@ class DeprecatedSwitchUsedInXmlDetectorTest {
             """
                 ).indented()
             )
-            .issues(DeprecatedSwitchUsedInXmlDetector.DEPRECATED_SWITCH_IN_XML)
+            .issues(DeprecatedAndroidWidgetsUsedInXmlDetector.DEPRECATED_WIDGET_IN_XML)
             .run()
             .expect(
                 """
-                res/layout/switch.xml:17: Error: Always favor the use of the Design System Component SwitchView [AndroidSwitchInXml]
+                res/layout/switch.xml:17: Error: Always favor the use of the Design System Component [DeprecatedWidgetInXml]
                 <androidx.appcompat.widget.SwitchCompat
                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 1 errors, 0 warnings
@@ -109,14 +196,14 @@ class DeprecatedSwitchUsedInXmlDetectorTest {
             """
                 ).indented()
             )
-            .issues(DeprecatedSwitchUsedInXmlDetector.DEPRECATED_SWITCH_IN_XML)
+            .issues(DeprecatedAndroidWidgetsUsedInXmlDetector.DEPRECATED_WIDGET_IN_XML)
             .run()
             .expect(
                 """
-                res/layout/switch.xml:17: Error: Always favor the use of the Design System Component SwitchView [AndroidSwitchInXml]
+                res/layout/switch.xml:17: Error: Always favor the use of the Design System Component [DeprecatedWidgetInXml]
                     <com.google.android.material.switchmaterial.SwitchMaterial
                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                1 errors, 0 warnings      
+                1 errors, 0 warnings
             """.trimMargin()
             )
     }
@@ -157,11 +244,11 @@ class DeprecatedSwitchUsedInXmlDetectorTest {
             """
                 ).indented()
             )
-            .issues(DeprecatedSwitchUsedInXmlDetector.DEPRECATED_SWITCH_IN_XML)
+            .issues(DeprecatedAndroidWidgetsUsedInXmlDetector.DEPRECATED_WIDGET_IN_XML)
             .run()
             .expect(
                 """
-                res/layout/switch.xml:17: Error: Always favor the use of the Design System Component SwitchView [AndroidSwitchInXml]
+                res/layout/switch.xml:17: Error: Always favor the use of the Design System Component [DeprecatedWidgetInXml]
                 <Switch
                  ~~~~~~
                 1 errors, 0 warnings
@@ -204,7 +291,7 @@ class DeprecatedSwitchUsedInXmlDetectorTest {
                 ).indented()
             )
             .allowCompilationErrors()
-            .issues(DeprecatedSwitchUsedInXmlDetector.DEPRECATED_SWITCH_IN_XML)
+            .issues(DeprecatedAndroidWidgetsUsedInXmlDetector.DEPRECATED_WIDGET_IN_XML)
             .run()
             .expectClean()
     }

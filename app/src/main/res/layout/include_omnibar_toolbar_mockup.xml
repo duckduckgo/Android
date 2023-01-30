@@ -27,7 +27,7 @@
         android:id="@+id/appBarLayoutMockup"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?toolbarBgColor"
+        android:background="?daxColorSurface"
         android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
 
         <FrameLayout

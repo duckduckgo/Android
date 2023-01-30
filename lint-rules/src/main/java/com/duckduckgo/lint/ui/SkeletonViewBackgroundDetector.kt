@@ -16,7 +16,17 @@
 
 package com.duckduckgo.lint.ui
 
-import com.android.resources.ResourceFolderType
+import com.android.SdkConstants.ANDROID_URI
+import com.android.SdkConstants.ATTR_BACKGROUND
+import com.android.SdkConstants.ATTR_LAYOUT_HEIGHT
+import com.android.SdkConstants.ATTR_LAYOUT_WIDTH
+import com.android.SdkConstants.ATTR_STYLE
+import com.android.SdkConstants.ATTR_TEXT_ALL_CAPS
+import com.android.SdkConstants.ATTR_TEXT_APPEARANCE
+import com.android.SdkConstants.ATTR_TEXT_COLOR
+import com.android.SdkConstants.ATTR_TEXT_STYLE
+import com.android.SdkConstants.ATTR_TINT
+import com.android.SdkConstants.VIEW
 import com.android.tools.lint.detector.api.Category.Companion.CUSTOM_LINT_CHECKS
 import com.android.tools.lint.detector.api.Implementation
 import com.android.tools.lint.detector.api.Issue
@@ -27,54 +37,45 @@ import com.android.tools.lint.detector.api.TextFormat
 import com.android.tools.lint.detector.api.XmlContext
 import org.w3c.dom.Element
 
-@Suppress("UnstableApiUsage")
-class DeprecatedSwitchUsedInXmlDetector : LayoutDetector() {
+class SkeletonViewBackgroundDetector : LayoutDetector() {
 
-    override fun getApplicableElements() = SWITCHES
-
-    override fun appliesTo(folderType: ResourceFolderType): Boolean {
-        return folderType == ResourceFolderType.LAYOUT
-    }
+    override fun getApplicableElements() = listOf(SKELETON_VIEW)
 
     override fun visitElement(
         context: XmlContext,
         element: Element
     ) {
-        reportUsage(context, element)
+        if (element.hasAttributeNS(ANDROID_URI, ATTR_BACKGROUND)){
+            reportIssue(context, element, ATTR_BACKGROUND)
+        }
     }
-
-    private fun reportUsage(
-        context: XmlContext,
-        element: Element
-    ) {
+    private fun reportIssue(context: XmlContext, element: Element, property: String){
         context.report(
-            issue = DEPRECATED_SWITCH_IN_XML,
+            issue = INVALID_SKELETON_VIEW_BACKGROUND,
             location = context.getNameLocation(element),
-            message = DEPRECATED_SWITCH_IN_XML.getExplanation(TextFormat.RAW)
+            message = property + " " + INVALID_SKELETON_VIEW_BACKGROUND.getExplanation(TextFormat.RAW)
         )
     }
 
     companion object {
 
-        private const val APP_COMPAT_SWITCH = "androidx.appcompat.widget.SwitchCompat"
-        private const val MATERIAL_SWITCH = "com.google.android.material.switchmaterial.SwitchMaterial"
-        private const val SWITCH = "Switch"
+        private const val SKELETON_VIEW = "com.duckduckgo.mobile.android.ui.view.SkeletonView"
 
-        val SWITCHES = listOf(APP_COMPAT_SWITCH, MATERIAL_SWITCH, SWITCH)
-        val DEPRECATED_SWITCH_IN_XML = Issue
+        val INVALID_SKELETON_VIEW_BACKGROUND = Issue
             .create(
-                id = "AndroidSwitchInXml",
-                briefDescription = "Default Android Switch used instead of Design System Component",
-                explanation = "Always favor the use of the Design System Component SwitchView",
-                moreInfo = "https://app.asana.com/0/1202857801505092/list",
+                id = "InvalidSkeletonViewBackground",
+                briefDescription = "Skeleton View already has an internal background defined",
+                explanation = "Skeleton View already has an internal background defined",
+                moreInfo = "https://app.asana.com/0/1202857801505092/1202928695963077",
                 category = CUSTOM_LINT_CHECKS,
                 priority = 10,
                 severity = Severity.ERROR,
                 androidSpecific = true,
                 implementation = Implementation(
-                    DeprecatedSwitchUsedInXmlDetector::class.java,
+                    SkeletonViewBackgroundDetector::class.java,
                     Scope.RESOURCE_FILE_SCOPE
                 )
             )
     }
 }
+
