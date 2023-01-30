@@ -21,7 +21,6 @@ import android.webkit.ValueCallback
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.cookies.api.RemoveCookiesStrategy
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
@@ -64,7 +63,7 @@ class WebViewCookieManagerTest {
     fun whenCookiesRemovedThenInternalCookiesRecreated() = runTest {
         givenCookieManagerWithCookies(ddgCookie, externalHostCookie)
 
-        withContext(Dispatchers.Main) {
+        withContext(coroutineRule.testDispatcherProvider.main()) {
             testee.removeExternalCookies()
         }
 
@@ -75,7 +74,7 @@ class WebViewCookieManagerTest {
     fun whenCookiesStoredThenRemoveCookiesExecuted() = runTest {
         givenCookieManagerWithCookies(ddgCookie, externalHostCookie)
 
-        withContext(Dispatchers.Main) {
+        withContext(coroutineRule.testDispatcherProvider.main()) {
             testee.removeExternalCookies()
         }
 
@@ -86,7 +85,7 @@ class WebViewCookieManagerTest {
     fun whenCookiesStoredThenFlushBeforeAndAfterInteractingWithCookieManager() = runTest {
         givenCookieManagerWithCookies(ddgCookie, externalHostCookie)
 
-        withContext(Dispatchers.Main) {
+        withContext(coroutineRule.testDispatcherProvider.main()) {
             testee.removeExternalCookies()
         }
 
@@ -103,7 +102,7 @@ class WebViewCookieManagerTest {
     fun whenNoCookiesThenRemoveProcessNotExecuted() = runTest {
         givenCookieManagerWithCookies()
 
-        withContext(Dispatchers.Main) {
+        withContext(coroutineRule.testDispatcherProvider.main()) {
             testee.removeExternalCookies()
         }
 

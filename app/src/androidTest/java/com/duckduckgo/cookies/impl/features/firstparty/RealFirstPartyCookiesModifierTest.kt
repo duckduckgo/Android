@@ -16,6 +16,7 @@
 
 package com.duckduckgo.cookies.impl.features.firstparty
 
+import android.annotation.SuppressLint
 import android.database.sqlite.SQLiteDatabase
 import android.os.Build
 import android.webkit.CookieManager
@@ -56,6 +57,7 @@ import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.temporal.ChronoUnit
 
 @ExperimentalCoroutinesApi
+@SuppressLint("NoHardcodedCoroutineDispatcher")
 class RealFirstPartyCookiesModifierTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
