@@ -37,7 +37,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority
+import logcat.asLog
+import logcat.logcat
 
 private const val WWW_DUCKDUCKGO_COM = "www.duckduckgo.com"
 
@@ -58,16 +60,16 @@ class NetworkConnectivityHealthHandler @Inject constructor(
                 delay(15_000)
                 if (!hasVpnConnectivity() && !context.isAirplaneModeOn()) {
                     if (hasDeviceConnectivity()) {
-                        Timber.d("Active VPN network does not have connectivity")
+                        logcat { "Active VPN network does not have connectivity" }
                         pixel.reportVpnConnectivityError()
                         if (appTpFeatureConfig.isEnabled(AppTpSetting.ConnectivityChecks)) {
-                            Timber.d("AppTpSetting.ConnectivityChecks is enabled, logging health event")
+                            logcat { "AppTpSetting.ConnectivityChecks is enabled, logging health event" }
                             healthMetricCounter.onVpnConnectivityError()
                         } else {
-                            Timber.d("AppTpSetting.ConnectivityChecks is disabled")
+                            logcat { "AppTpSetting.ConnectivityChecks is disabled" }
                         }
                     } else {
-                        Timber.d("Device doesn't have connectivity either")
+                        logcat { "Device doesn't have connectivity either" }
                         pixel.reportDeviceConnectivityError()
                     }
                 }
@@ -85,10 +87,10 @@ class NetworkConnectivityHealthHandler @Inject constructor(
             try {
                 socket = activeNetwork.socketFactory.createSocket()
                 socket.connect(InetSocketAddress(WWW_DUCKDUCKGO_COM, 443), 5000)
-                Timber.v("Validated $activeNetwork VPN network has connectivity to $WWW_DUCKDUCKGO_COM")
+                logcat { "Validated $activeNetwork VPN network has connectivity to $WWW_DUCKDUCKGO_COM" }
                 return true
             } catch (t: Throwable) {
-                Timber.e(t, "No connectivity for network $activeNetwork")
+                logcat(LogPriority.ERROR) { t.asLog() }
                 return false
             } finally {
                 runCatching { socket?.close() }
@@ -106,10 +108,10 @@ class NetworkConnectivityHealthHandler @Inject constructor(
                 socket = SocketChannel.open().socket()
                 trackerBlockingVpnService.get().protect(socket)
                 socket.connect(InetSocketAddress(WWW_DUCKDUCKGO_COM, 443), 5000)
-                Timber.v("Validated $activeNetwork device network has connectivity to $WWW_DUCKDUCKGO_COM")
+                logcat { "Validated $activeNetwork device network has connectivity to $WWW_DUCKDUCKGO_COM" }
                 return true
             } catch (t: Throwable) {
-                Timber.e(t, "No connectivity for network $activeNetwork")
+                logcat(LogPriority.ERROR) { t.asLog() }
                 return false
             } finally {
                 runCatching { socket?.close() }

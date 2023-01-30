@@ -242,8 +242,6 @@
     <string name="atp_FAQSixthText">App Tracking Protection kjører på enheten og sender ikke personopplysninger fra enheten til DuckDuckGo.</string>
 
     <!--  App Tracking Protection Waitlist -->
-    <string name="atp_WaitlistActivityTitle">Beskyttelse mot appsporing</string>
-    <string name="atp_WaitlistActivityWaitlistTitle">Venteliste for App Tracking Protection</string>
     <string name="atp_WaitlistNotificationTitle">Invitasjonen til App Tracking Protection er kommet!</string>
     <string name="atp_WaitlistNotificationDescription">Du satte deg på ventelisten og ba oss om å varsle deg når det var din tur til å prøve App Tracking Protection-funksjonen. Trykk for se invitasjonen din.</string>
     <string name="atp_WaitlistStatusNotJoined">Ett enkelt trinn til bedre personvern for apper!</string>
@@ -262,7 +260,6 @@
     <string name="atp_WaitlistErrorJoining">Det oppstod en feil under registrering for ventelisten. Prøv igjen senere.</string>
     <string name="atp_WaitlistJoinedWithNotification">Vi sender deg et varsel når App Tracking Protection er klar for deg.\n\n<annotation type="beta_link">Finn ut mer om betaversjonen</annotation></string>
     <string name="atp_WaitlistJoinedWithoutNotification">Invitasjonen til å prøve App Tracking Protection kommer hit. Sjekk igjen snart, eller la oss sende et varsel til deg når det er din tur\n\n<annotation type="notify_me_link">Varsle meg</annotation>\n\n <annotation type="beta_link">Finn ut mer om betaversjonen</annotation></string>
-    <string name="atp_WaitlistRedeemCodeActivityTitle">Skriv inn invitasjonskoden</string>
     <string name="atp_WaitlistRedeemedCodeStatus">Godkjent! Du er med.</string>
     <string name="atp_WaitlistBetaBlogPost">https://spreadprivacy.com/introducing-app-tracking-protection</string>
 

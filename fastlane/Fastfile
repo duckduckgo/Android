@@ -20,7 +20,9 @@
     releaseNotesFileHiring = "../app/version/release-notes-hiring"
     releaseNotesFileSuffix = "../app/version/release-notes-suffix"
     releaseNotesLocales= ["en-US", "en-GB", "en-CA"]
+    releaseNotesMaxLength = 500
     errorMessageCancelled = "Release cancelled 😢"
+    aarbExecutable = "AndroidAsanaBridge"
     asanaBridgeInstallationProblem = "Android Asana Release Bridge not installed or configured correctly - see https://app.asana.com/0/0/1203116937958001/f for instructions"
 
 default_platform(:android)
@@ -35,7 +37,10 @@ platform :android do
     releaseNotesHiring = File.read(releaseNotesFileHiring)
 
     formatted = "#{releaseNotesBodyHeader}\n#{releaseNotesBody}#{releaseNotesHiring}\n\n#{releaseNotesSuffixHeader}\n#{releaseNotesSuffix}"
+
+    validateReleaseNotes(releaseNotes: formatted)
     UI.message("\n#{formatted}")
+
     formatted
 
   end
@@ -230,7 +235,7 @@ platform :android do
             existingReleaseNotes = File.read(releaseNotesFileBody)
 
             # This handles the flow when no options were passed. We will prompt the user for input.
-            if notes_type == nil && custom_release_notes == nil then
+            releaseNotes = if (notes_type == nil && custom_release_notes == nil) then
                 commits = changelog_from_git_commits(
                     between: [last_git_tag, "HEAD"],
                     pretty: "- %s",
@@ -244,7 +249,7 @@ platform :android do
                     "Bug fixes and other improvements",
                     ]
 
-                rl = retrieve_notes_for_type(
+                retrieve_notes_for_type(
                     notes_type: choice,
                     existingReleaseNotes: existingReleaseNotes
                 )
@@ -264,6 +269,17 @@ platform :android do
                     )
                 end
 
+            end
+
+            validateReleaseNotes(releaseNotes: releaseNotes)
+            releaseNotes
+        end
+
+        desc "Validates the release notes to ensure they are suitable for the Play Store"
+        private_lane :validateReleaseNotes do |options|
+            releaseNotesLength = options[:releaseNotes].length
+            if (releaseNotesLength > releaseNotesMaxLength)
+                UI.user_error!("Release notes are too long for Play Store (#{releaseNotesLength} characters). Max size allowed: #{releaseNotesMaxLength}")
             end
         end
 
@@ -344,19 +360,18 @@ platform :android do
 
     desc "Prepares the Asana release board with a new release task, tags tasks waiting for release etc.."
     lane :asana_release_prep do
-        bridgeLocation = ENV["ANDROID_ASANA_BRIDGE"]
-        if bridgeLocation == nil then
-            UI.error("#{asanaBridgeInstallationProblem}. Install the tool, then set ANDROID_ASANA_BRIDGE environment variable to point to the directory of the tool.")
-        elsif !File.exists?(bridgeLocation) then
-            UI.error("#{asanaBridgeInstallationProblem}. Ensure it is located at #{bridgeLocation} as specified by the environment variable ANDROID_ASANA_BRIDGE")
+        begin
+            sh aarbExecutable, "action=verify"
+        rescue => ex
+            UI.user_error!("#{aarbExecutable} not installed. Install the tool and ensure it can be executed by executing `#{aarbExecutable}`")
+        end
+
+        newVersion = determine_version_number()
+        if UI.confirm("About to create a new release task for #{newVersion}. Ready to continue?")
+            UI.message("Creating release task...")
+            sh aarbExecutable, "version=#{newVersion}", "action=createRelease,tagPendingTasks,addLinksToDescription,removePendingTasks", "board=real"
         else
-            newVersion = determine_version_number()
-            if UI.confirm("About to create a new release task for #{newVersion}. Ready to continue?")
-                UI.message("Creating release task...")
-                sh "#{bridgeLocation}", "version=#{newVersion}", "action=createRelease,tagPendingTasks,addLinksToDescription,removePendingTasks", "board=real"
-            else
-                UI.error(errorMessageCancelled)
-            end
+            UI.error(errorMessageCancelled)
         end
     end
 

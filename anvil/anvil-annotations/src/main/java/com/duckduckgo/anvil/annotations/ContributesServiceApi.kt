@@ -19,12 +19,12 @@ package com.duckduckgo.anvil.annotations
 import kotlin.reflect.KClass
 
 /**
- * Anvil annotation to generate plugin points
+ * Anvil annotation to generate a Retrofit service interface implementation.
  *
  * Usage:
  * ```kotlin
- * @ContributesPluginPoint(SomeDaggerScope::class)
- * interface MyPlugin {
+ * @ContributesServiceApi(SomeDaggerScope::class)
+ * interface MyServiceApi {
  *
  * }
  * ```

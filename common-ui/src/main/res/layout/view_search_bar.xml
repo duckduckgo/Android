@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:padding="@dimen/keyline_2"
-            app:srcCompat="@drawable/ic_back_24"/>
+            app:srcCompat="@drawable/ic_arrow_left_24"/>
 
     </FrameLayout>
 
@@ -50,8 +50,8 @@
         android:inputType="textUri|textNoSuggestions"
         android:maxLines="1"
         android:selectAllOnFocus="true"
-        android:textColor="?attr/omnibarTextColor"
-        android:textColorHint="?attr/omnibarHintColor"
+        android:textColor="?attr/daxColorPrimaryText"
+        android:textColorHint="?attr/daxColorSecondaryText"
         android:textCursorDrawable="@drawable/text_cursor"
         android:textSize="16sp"
         android:textStyle="normal"
@@ -71,7 +71,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_close_24dp"
+        app:srcCompat="@drawable/ic_close_24"
         tools:visibility="visible"/>
 
 </merge>

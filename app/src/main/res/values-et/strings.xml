@@ -398,7 +398,7 @@
     <string name="systemSearchOnboardingButtonOk">Sain aru</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">PEIDA</string>
+    <string name="daxDialogHideButton">Peida</string>
     <string name="daxDialogPhew">Huh!</string>
     <string name="daxDialogNext">Järgmine</string>
     <string name="daxDialogHighFive">Viska viis!</string>
@@ -652,7 +652,8 @@
     <string name="autoconsentSecondaryCta">Ei aitäh</string>
 
     <string name="autoconsentSetting">Halda küpsiste hüpikaknaid</string>
-    <string name="autoconsentAnimationText">Hallatavad küpsised</string>
+    <string name="autoconsentCosmeticNoticeAnimationText">Hüpikaken on peidetud</string>
+    <string name="autoconsentManagedNoticeAnimationText">Hallatavad küpsised</string>
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Saidi load</string>

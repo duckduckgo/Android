@@ -266,16 +266,6 @@ interface DeviceShieldPixels {
     fun didChooseToContinueFromVpnConflictDialog()
 
     /**
-     * Will fire when the user presses "notify me" CTA in the waitlist dialog
-     */
-    fun didPressWaitlistDialogNotifyMe()
-
-    /**
-     * Will fire when the user presses dismisses the waitlist dialog
-     */
-    fun didPressWaitlistDialogDismiss()
-
-    /**
      * Will send CPU usage alert
      */
     fun sendCPUUsageAlert(cpuThresholdPassed: Int)
@@ -376,6 +366,8 @@ interface DeviceShieldPixels {
     fun reportUnprotectedAppsBucket(bucketSize: Int)
 
     fun didPressOnAppTpEnabledCtaButton()
+
+    fun reportErrorCreatingVpnNetworkStack()
 }
 
 @ContributesBinding(AppScope::class)
@@ -660,14 +652,6 @@ class RealDeviceShieldPixels @Inject constructor(
         firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_CONTINUE_VPN_CONFLICT_DIALOG)
     }
 
-    override fun didPressWaitlistDialogNotifyMe() {
-        firePixel(DeviceShieldPixelNames.ATP_DID_PRESS_WAITLIST_DIALOG_NOTIFY_ME)
-    }
-
-    override fun didPressWaitlistDialogDismiss() {
-        firePixel(DeviceShieldPixelNames.ATP_DID_PRESS_WAITLIST_DIALOG_DISMISS)
-    }
-
     override fun sendCPUUsageAlert(cpuThresholdPassed: Int) {
         firePixel(String.format(DeviceShieldPixelNames.ATP_APP_CPU_MONITOR_REPORT.pixelName, cpuThresholdPassed))
     }
@@ -818,6 +802,11 @@ class RealDeviceShieldPixels @Inject constructor(
 
     override fun didPressOnAppTpEnabledCtaButton() {
         firePixel(DeviceShieldPixelNames.ATP_DID_PRESS_APPTP_ENABLED_CTA_BUTTON)
+    }
+
+    override fun reportErrorCreatingVpnNetworkStack() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_REPORT_VPN_NETWORK_STACK_CREATE_ERROR_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_REPORT_VPN_NETWORK_STACK_CREATE_ERROR)
     }
 
     private fun firePixel(

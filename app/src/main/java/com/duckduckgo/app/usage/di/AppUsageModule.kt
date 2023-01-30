@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.usage.di
 
-import androidx.lifecycle.LifecycleObserver
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.usage.app.AppDaysUsedDao
 import com.duckduckgo.app.usage.app.AppDaysUsedDatabaseRepository
 import com.duckduckgo.app.usage.app.AppDaysUsedRecorder
@@ -38,7 +38,7 @@ class AppUsageModule {
     fun appDaysUsedRecorderObserver(
         appDaysUsedRepository: AppDaysUsedRepository,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
-    ): LifecycleObserver {
+    ): MainProcessLifecycleObserver {
         return AppDaysUsedRecorder(appDaysUsedRepository, appCoroutineScope)
     }
 

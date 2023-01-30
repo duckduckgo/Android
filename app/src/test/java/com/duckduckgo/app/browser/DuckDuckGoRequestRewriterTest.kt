@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser
 
 import android.net.Uri
+import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.global.AppUrl.ParamKey
 import com.duckduckgo.app.referral.AppReferrerDataStore
@@ -44,7 +45,7 @@ class DuckDuckGoRequestRewriterTest {
     fun before() {
         whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
         whenever(mockAppReferrerDataStore.installedFromEuAuction).thenReturn(false)
-        testee = DuckDuckGoRequestRewriter(DuckDuckGoUrlDetector(), mockStatisticsStore, mockVariantManager, mockAppReferrerDataStore)
+        testee = DuckDuckGoRequestRewriter(DuckDuckGoUrlDetectorImpl(), mockStatisticsStore, mockVariantManager, mockAppReferrerDataStore)
         builder = Uri.Builder()
     }
 
@@ -89,5 +90,32 @@ class DuckDuckGoRequestRewriterTest {
 
         val uri = builder.build()
         assertTrue(uri.queryParameterNames.contains(ParamKey.HIDE_SERP))
+    }
+
+    @Test
+    fun whenShouldRewriteRequestAndUrlIsSerpQueryThenReturnTrue() {
+        val uri = "http://duckduckgo.com/?q=weather".toUri()
+        assertTrue(testee.shouldRewriteRequest(uri))
+    }
+
+    @Test
+    fun whenShouldRewriteRequestAndUrlIsSerpQueryWithSourceAndAtbThenReturnFalse() {
+        val uri = "http://duckduckgo.com/?q=weather&atb=test&t=test".toUri()
+        assertFalse(testee.shouldRewriteRequest(uri))
+    }
+
+    @Test
+    fun whenShouldRewriteRequestAndUrlIsADuckDuckGoStaticUrlThenReturnTrue() {
+        val uri = "http://duckduckgo.com/settings".toUri()
+        assertTrue(testee.shouldRewriteRequest(uri))
+
+        val uri2 = "http://duckduckgo.com/params".toUri()
+        assertTrue(testee.shouldRewriteRequest(uri2))
+    }
+
+    @Test
+    fun whenShouldRewriteRequestAndUrlIsDuckDuckGoEmailThenReturnFalse() {
+        val uri = "http://duckduckgo.com/email".toUri()
+        assertFalse(testee.shouldRewriteRequest(uri))
     }
 }

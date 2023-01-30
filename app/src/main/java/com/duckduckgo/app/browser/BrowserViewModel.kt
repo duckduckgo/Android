@@ -22,10 +22,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
-import com.duckduckgo.app.browser.rating.ui.AppEnjoymentDialogFragment
-import com.duckduckgo.app.browser.rating.ui.GiveFeedbackDialogFragment
-import com.duckduckgo.app.browser.rating.ui.RateAppDialogFragment
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.DispatcherProvider
@@ -35,7 +33,17 @@ import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.AppPixelName.APP_ENJOYMENT_DIALOG_SHOWN
+import com.duckduckgo.app.pixels.AppPixelName.APP_ENJOYMENT_DIALOG_USER_ENJOYING
+import com.duckduckgo.app.pixels.AppPixelName.APP_ENJOYMENT_DIALOG_USER_NOT_ENJOYING
+import com.duckduckgo.app.pixels.AppPixelName.APP_FEEDBACK_DIALOG_SHOWN
+import com.duckduckgo.app.pixels.AppPixelName.APP_FEEDBACK_DIALOG_USER_DECLINED_FEEDBACK
+import com.duckduckgo.app.pixels.AppPixelName.APP_FEEDBACK_DIALOG_USER_GAVE_FEEDBACK
+import com.duckduckgo.app.pixels.AppPixelName.APP_RATING_DIALOG_SHOWN
+import com.duckduckgo.app.pixels.AppPixelName.APP_RATING_DIALOG_USER_DECLINED_RATING
+import com.duckduckgo.app.pixels.AppPixelName.APP_RATING_DIALOG_USER_GAVE_RATING
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.di.scopes.ActivityScope
@@ -53,12 +61,10 @@ class BrowserViewModel @Inject constructor(
     private val dataClearer: DataClearer,
     private val appEnjoymentPromptEmitter: AppEnjoymentPromptEmitter,
     private val appEnjoymentUserEventRecorder: AppEnjoymentUserEventRecorder,
+    private val defaultBrowserDetector: DefaultBrowserDetector,
     private val dispatchers: DispatcherProvider,
     private val pixel: Pixel,
-) : AppEnjoymentDialogFragment.Listener,
-    RateAppDialogFragment.Listener,
-    GiveFeedbackDialogFragment.Listener,
-    ViewModel(),
+) : ViewModel(),
     CoroutineScope {
 
     override val coroutineContext: CoroutineContext
@@ -157,6 +163,13 @@ class BrowserViewModel @Inject constructor(
         tabRepository.selectByUrlOrNewTab(queryUrlConverter.convertQueryToUrl(query))
     }
 
+    fun launchFromThirdParty() {
+        pixel.fire(
+            AppPixelName.APP_THIRD_PARTY_LAUNCH,
+            mapOf(PixelParameter.DEFAULT_BROWSER to defaultBrowserDetector.isDefaultBrowser().toString()),
+        )
+    }
+
     suspend fun onTabsUpdated(tabs: List<TabEntity>?) {
         if (tabs.isNullOrEmpty()) {
             Timber.i("Tabs list is null or empty; adding default tab")
@@ -184,44 +197,55 @@ class BrowserViewModel @Inject constructor(
         appEnjoymentPromptEmitter.promptType.removeObserver(appEnjoymentObserver)
     }
 
-    override fun onUserSelectedAppIsEnjoyed(promptCount: PromptCount) {
+    private fun firePixelWithPromptCount(name: Pixel.PixelName, promptCount: PromptCount) {
+        val formattedPixelName = String.format(name.pixelName, promptCount.value)
+        pixel.fire(formattedPixelName)
+    }
+
+    fun onAppEnjoymentDialogShown(promptCount: PromptCount) {
+        firePixelWithPromptCount(APP_ENJOYMENT_DIALOG_SHOWN, promptCount)
+    }
+
+    fun onAppRatingDialogShown(promptCount: PromptCount) {
+        firePixelWithPromptCount(APP_RATING_DIALOG_SHOWN, promptCount)
+    }
+
+    fun onGiveFeedbackDialogShown(promptCount: PromptCount) {
+        firePixelWithPromptCount(APP_FEEDBACK_DIALOG_SHOWN, promptCount)
+    }
+
+    fun onUserSelectedAppIsEnjoyed(promptCount: PromptCount) {
+        firePixelWithPromptCount(APP_ENJOYMENT_DIALOG_USER_ENJOYING, promptCount)
         appEnjoymentUserEventRecorder.onUserEnjoyingApp(promptCount)
     }
 
-    override fun onUserSelectedAppIsNotEnjoyed(promptCount: PromptCount) {
+    fun onUserSelectedAppIsNotEnjoyed(promptCount: PromptCount) {
+        firePixelWithPromptCount(APP_ENJOYMENT_DIALOG_USER_NOT_ENJOYING, promptCount)
         appEnjoymentUserEventRecorder.onUserNotEnjoyingApp(promptCount)
     }
 
-    override fun onUserSelectedToRateApp(promptCount: PromptCount) {
+    fun onUserSelectedToRateApp(promptCount: PromptCount) {
+        firePixelWithPromptCount(APP_RATING_DIALOG_USER_GAVE_RATING, promptCount)
         command.value = Command.LaunchPlayStore
 
         launch { appEnjoymentUserEventRecorder.onUserSelectedToRateApp(promptCount) }
     }
 
-    override fun onUserDeclinedToRateApp(promptCount: PromptCount) {
+    fun onUserDeclinedToRateApp(promptCount: PromptCount) {
+        firePixelWithPromptCount(APP_RATING_DIALOG_USER_DECLINED_RATING, promptCount)
         launch { appEnjoymentUserEventRecorder.userDeclinedToRateApp(promptCount) }
     }
 
-    override fun onUserSelectedToGiveFeedback(promptCount: PromptCount) {
+    fun onUserSelectedToGiveFeedback(promptCount: PromptCount) {
+        firePixelWithPromptCount(APP_FEEDBACK_DIALOG_USER_GAVE_FEEDBACK, promptCount)
         command.value = Command.LaunchFeedbackView
 
         launch { appEnjoymentUserEventRecorder.onUserSelectedToGiveFeedback(promptCount) }
     }
 
-    override fun onUserDeclinedToGiveFeedback(promptCount: PromptCount) {
+    fun onUserDeclinedToGiveFeedback(promptCount: PromptCount) {
+        firePixelWithPromptCount(APP_FEEDBACK_DIALOG_USER_DECLINED_FEEDBACK, promptCount)
         launch { appEnjoymentUserEventRecorder.onUserDeclinedToGiveFeedback(promptCount) }
-    }
-
-    override fun onUserCancelledAppEnjoymentDialog(promptCount: PromptCount) {
-        launch { appEnjoymentUserEventRecorder.onUserDeclinedToSayIfEnjoyingApp(promptCount) }
-    }
-
-    override fun onUserCancelledRateAppDialog(promptCount: PromptCount) {
-        onUserDeclinedToRateApp(promptCount)
-    }
-
-    override fun onUserCancelledGiveFeedbackDialog(promptCount: PromptCount) {
-        onUserDeclinedToGiveFeedback(promptCount)
     }
 
     fun onOpenShortcut(url: String) {

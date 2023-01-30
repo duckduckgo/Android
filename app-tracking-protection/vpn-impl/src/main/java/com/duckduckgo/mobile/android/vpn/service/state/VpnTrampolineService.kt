@@ -20,7 +20,7 @@ import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
-import timber.log.Timber
+import logcat.logcat
 
 /**
  * This is a trampoline service that is used to start the VPN service.
@@ -30,12 +30,12 @@ import timber.log.Timber
 internal class VpnTrampolineService : Service() {
 
     override fun onCreate() {
-        Timber.d("onCreate")
+        logcat { "onCreate" }
         super.onCreate()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Timber.d("onStartCommand")
+        logcat { "onStartCommand" }
         return super.onStartCommand(intent, flags, startId).also {
             TrackerBlockingVpnService.startVpnService(this)
             stopSelf()
@@ -43,17 +43,17 @@ internal class VpnTrampolineService : Service() {
     }
 
     override fun onBind(intent: Intent?): IBinder? {
-        Timber.d("Bound to VPN")
+        logcat { "Bound to VPN" }
         return null
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
-        Timber.d("Unbound from VPN")
+        logcat { "Unbound from VPN" }
         return super.onUnbind(intent)
     }
 
     override fun onDestroy() {
-        Timber.d("onDestroy")
+        logcat { "onDestroy" }
         super.onDestroy()
     }
 }

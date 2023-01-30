@@ -16,9 +16,9 @@
 
 package com.duckduckgo.app.tabs.db
 
-import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
@@ -31,7 +31,7 @@ import kotlinx.coroutines.withContext
 class TabsDbSanitizer @Inject constructor(
     private val tabRepository: TabRepository,
     private val dispatchers: DispatcherProvider,
-) : DefaultLifecycleObserver {
+) : MainProcessLifecycleObserver {
 
     override fun onStart(owner: LifecycleOwner) {
         runBlocking {

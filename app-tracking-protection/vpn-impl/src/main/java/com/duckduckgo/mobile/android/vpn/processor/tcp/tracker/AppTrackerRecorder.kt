@@ -30,7 +30,7 @@ import java.util.concurrent.Executors
 import javax.inject.Inject
 import kotlin.random.Random
 import kotlinx.coroutines.*
-import timber.log.Timber
+import logcat.logcat
 
 interface AppTrackerRecorder {
     fun insertTracker(vpnTracker: VpnTracker)
@@ -53,7 +53,7 @@ class BatchedAppTrackerRecorder @Inject constructor(vpnDatabase: VpnDatabase) : 
     private val periodicInsertionJob = ConflatedJob()
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        Timber.i("Batched app tracker recorder starting")
+        logcat { "Batched app tracker recorder starting" }
 
         periodicInsertionJob += coroutineScope.launch(insertionDispatcher) {
             while (isActive) {
@@ -67,7 +67,7 @@ class BatchedAppTrackerRecorder @Inject constructor(vpnDatabase: VpnDatabase) : 
         coroutineScope: CoroutineScope,
         vpnStopReason: VpnStopReason,
     ) {
-        Timber.i("Batched app tracker recorder stopped")
+        logcat { "Batched app tracker recorder stopped" }
         periodicInsertionJob.cancel()
         coroutineScope.launch(insertionDispatcher) {
             flushInMemoryTrackersToDatabase()
@@ -86,7 +86,7 @@ class BatchedAppTrackerRecorder @Inject constructor(vpnDatabase: VpnDatabase) : 
         }
 
         dao.insert(toInsert)
-        Timber.v("Inserted %d trackers from memory into db", toInsert.size)
+        logcat { "Inserted ${toInsert.size} trackers from memory into db" }
     }
 
     override fun insertTracker(vpnTracker: VpnTracker) {

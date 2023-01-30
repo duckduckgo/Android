@@ -38,7 +38,7 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.logcat
 
 @SingleInstanceIn(AppScope::class)
 @ContributesMultibinding(
@@ -65,15 +65,15 @@ class NewAppBroadcastReceiver @Inject constructor(
     }
 
     private fun restartVpn(packageName: String) {
-        Timber.d("Newly installed package $packageName")
+        logcat { "Newly installed package $packageName" }
 
         val pendingResult = goAsync()
         goAsync(pendingResult) {
             if (isGame(packageName) || isInExclusionList(packageName)) {
-                Timber.i("Newly installed package $packageName is in exclusion list, disabling/re-enabling vpn")
+                logcat { "Newly installed package $packageName is in exclusion list, disabling/re-enabling vpn" }
                 vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
             } else {
-                Timber.i("Newly installed package $packageName not in exclusion list")
+                logcat { "Newly installed package $packageName not in exclusion list" }
             }
         }
     }
@@ -103,7 +103,7 @@ class NewAppBroadcastReceiver @Inject constructor(
     }
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        Timber.v("New app receiver started")
+        logcat { "New app receiver started" }
         register()
     }
 
@@ -111,7 +111,7 @@ class NewAppBroadcastReceiver @Inject constructor(
         coroutineScope: CoroutineScope,
         vpnStopReason: VpnStopReason,
     ) {
-        Timber.v("New app receiver stopped")
+        logcat { "New app receiver stopped" }
         unregister()
     }
 }

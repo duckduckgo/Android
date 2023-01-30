@@ -22,11 +22,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.get
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoFragment
 import com.duckduckgo.app.global.FragmentViewModelFactory
@@ -44,6 +46,7 @@ import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldActivit
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldActivityFeedViewModel.Command.TrackerListDisplayed
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldActivityFeedViewModel.TrackerFeedViewState
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
+import com.google.android.material.divider.MaterialDividerItemDecoration
 import com.google.android.material.snackbar.Snackbar
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -82,6 +85,10 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
         with(binding.activityRecyclerView) {
             layoutManager = StickyHeadersLinearLayoutManager<TrackerFeedAdapter>(this@DeviceShieldActivityFeedFragment.requireContext())
             adapter = trackerFeedAdapter
+            val divider = MaterialDividerItemDecoration(requireActivity(), LinearLayoutManager.VERTICAL)
+            divider.isLastItemDecorated = false
+            divider.dividerInsetStart = resources.getDimensionPixelSize(R.dimen.apps_protection_state_insetPadding)
+            addItemDecoration(divider)
         }
 
         lifecycleScope.launch {

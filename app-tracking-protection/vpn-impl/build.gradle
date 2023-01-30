@@ -47,6 +47,7 @@ dependencies {
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':vpn-store')
     implementation project(path: ':vpn-api')
+    implementation project(path: ':app-tracking-api')
     implementation project(path: ':app-store')
     implementation project(path: ':di')
     implementation project(path: ':common')
@@ -67,7 +68,7 @@ dependencies {
     implementation AndroidX.constraintLayout
 
     implementation AndroidX.lifecycle.viewModelKtx
-    implementation AndroidX.lifecycle.runtimeKtx
+    implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.lifecycle.commonJava8
     implementation AndroidX.lifecycle.liveDataKtx
 
@@ -101,7 +102,7 @@ dependencies {
     implementation "com.jakewharton.threetenabp:threetenabp:_"
     testImplementation "org.threeten:threetenbp:_"
 
-    implementation JakeWharton.timber
+    implementation "com.squareup.logcat:logcat:_"
 
     implementation 'nl.dionsegijn:konfetti:1.2.5'
 

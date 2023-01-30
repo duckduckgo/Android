@@ -242,8 +242,6 @@
     <string name="atp_FAQSixthText">Η Προστασία παρακολούθησης από εφαρμογές λειτουργεί στη συσκευή σας και δεν αποστέλλει τα προσωπικά δεδομένα σας εκτός της συσκευής σας, στο DuckDuckGo.</string>
 
     <!--  App Tracking Protection Waitlist -->
-    <string name="atp_WaitlistActivityTitle">Προστασία παρακολούθησης από εφαρμογές</string>
-    <string name="atp_WaitlistActivityWaitlistTitle">Λίστα αναμονής για την Προστασία παρακολούθησης από εφαρμογές</string>
     <string name="atp_WaitlistNotificationTitle">Η πρόσκλησή σας για την Προστασία παρακολούθησης από εφαρμογές είναι εδώ!</string>
     <string name="atp_WaitlistNotificationDescription">Εγγραφήκατε στη λίστα αναμονής και μας ζητήσατε να σας ενημερώσουμε για το πότε θα είναι η σειρά σας να δοκιμάσετε τη λειτουργία μας Προστασία παρακολούθησης από εφαρμογές. Πατήστε για να δείτε την πρόσκλησή σας.</string>
     <string name="atp_WaitlistStatusNotJoined">Ένα εύκολο βήμα για καλύτερο απόρρητο των εφαρμογών!</string>
@@ -262,7 +260,6 @@
     <string name="atp_WaitlistErrorJoining">Προέκυψε σφάλμα κατά την εγγραφή στη Λίστα αναμονής. Ξαναπροσπαθήστε αργότερα.</string>
     <string name="atp_WaitlistJoinedWithNotification">Θα σας στείλουμε ειδοποίηση όταν&lt;br/&gt; θα είναι έτοιμη για σας η Προστασία παρακολούθησης από εφαρμογές.<annotation type="beta_link">Μάθετε περισσότερα σχετικά με την έκδοση beta</annotation></string>
     <string name="atp_WaitlistJoinedWithoutNotification">Η πρόσκλησή σας για να δοκιμάσετε την Προστασία παρακολούθησης από εφαρμογές θα σταλεί εδώ. Ελέγξτε πάλι σύντομα. Διαφορετικά, μπορούμε να σας στείλουμε ειδοποίηση όταν έρθει η σειρά σας.\n\n<annotation type="notify_me_link">Να ειδοποιηθώ</annotation>\n\n<annotation type="beta_link">Μάθετε περισσότερα σχετικά με την έκδοση beta</annotation></string>
-    <string name="atp_WaitlistRedeemCodeActivityTitle">Εισαγάγετε τον Κωδικό πρόσκλησής σας</string>
     <string name="atp_WaitlistRedeemedCodeStatus">Τέλεια! Τα καταφέρατε!</string>
     <string name="atp_WaitlistBetaBlogPost">https://spreadprivacy.com/introducing-app-tracking-protection</string>
 

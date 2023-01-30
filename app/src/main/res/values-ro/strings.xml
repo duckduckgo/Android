@@ -398,7 +398,7 @@
     <string name="systemSearchOnboardingButtonOk">Am înțeles</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">ASCUNDE</string>
+    <string name="daxDialogHideButton">Ascunde</string>
     <string name="daxDialogPhew">Pfiu!</string>
     <string name="daxDialogNext">Următorul</string>
     <string name="daxDialogHighFive">Bate palma!</string>
@@ -656,7 +656,8 @@
     <string name="autoconsentSecondaryCta">Nu, mulțumesc</string>
 
     <string name="autoconsentSetting">Gestionează ferestrele pop-up cu privire la modulele cookie</string>
-    <string name="autoconsentAnimationText">Modulele cookie au fost gestionate</string>
+    <string name="autoconsentCosmeticNoticeAnimationText">Pop-up ascuns</string>
+    <string name="autoconsentManagedNoticeAnimationText">Modulele cookie au fost gestionate</string>
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Permisiuni pentru site</string>

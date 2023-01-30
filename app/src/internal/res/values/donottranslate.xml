@@ -18,8 +18,8 @@
     <!-- Developer settings -->
     <string name="devSettingsTitle">Developer Settings</string>
     <string name="devSettingsSubtitle">Features useful for devs and debugging</string>
-    <string name="devSettingsScreenPrivacySection">PRIVACY</string>
-    <string name="devSettingsScreenGeneralSection">GENERAL</string>
+    <string name="devSettingsScreenPrivacySection">Privacy</string>
+    <string name="devSettingsScreenGeneralSection">General</string>
     <string name="devSettingsScreenTdsVersion">TDS version</string>
     <string name="devSettingsScreenTdsVersionSubtitle">Use next TDS version</string>
     <string name="devSettingsScreenTdsWait">Please wait while we download the tds version</string>
@@ -31,8 +31,10 @@
     <string name="devSettingsClearSavedSitesSubtitle">Click here to clear all bookmarks, folders and favorites</string>
     <string name="devSettingsClearSavedSitesConfirmation">Saved sites cleared</string>
 
-    <string name="devSettingsScreenUserAgentSection">USER AGENT</string>
+    <string name="devSettingsScreenUserAgentSection">User Agent</string>
     <string name="devSettingsScreenUserAgentOverride">Override UserAgent</string>
+    <string name="devSettingsScreenPrivacyRemoteConfigUrlOverride">Override Privacy Remote Config URL</string>
+    <string name="devSettingsScreenPrivacyRemoteConfigUrlOverrideSubtitle">Click here to customize the Privacy Remote Config URL</string>
     <string name="devSettingsScreenUserAgentSelectorTitle">UserAgent</string>
     <string name="devSettingsScreenUserAgentNoAppId">Omit DuckDuckGo AppId</string>
     <string name="devSettingsScreenUserAgentNoVersion">Omit Webview Version</string>
@@ -43,8 +45,8 @@
     <!-- Privacy Audit settings -->
     <string name="auditSettingsTitle">Audit Settings</string>
     <string name="auditSettingsSubtitle">Features useful for doing our privacy audit</string>
-    <string name="auditSettingsScreenPrivacyAuditSection">PRIVACY AUDIT</string>
-    <string name="auditSettingsScreenRefTestsSection">REFERENCE TESTS</string>
+    <string name="auditSettingsScreenPrivacyAuditSection">Privacy Audit</string>
+    <string name="auditSettingsScreenRefTestsSection">Reference Tests</string>
     <string name="auditStep1Title">Step 1: Visit cnn.com</string>
     <string name="auditStep1Subtitle">Add as bookmark. Visit bookmarks Activity</string>
     <string name="auditStep2Title">Step 2: Visit gizmodo.com</string>

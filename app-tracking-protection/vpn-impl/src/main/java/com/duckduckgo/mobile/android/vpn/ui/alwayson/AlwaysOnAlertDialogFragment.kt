@@ -33,7 +33,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.logcat
 
 private enum class FragmentType {
     ALWAYS_ON,
@@ -49,7 +49,7 @@ class AlwaysOnAlertDialogFragment private constructor() : BottomSheetDialogFragm
     private lateinit var listener: Listener
     private lateinit var fragmentType: FragmentType
 
-    override fun getTheme(): Int = R.style.AlwaysOnBottomSheetDialogTheme
+    override fun getTheme(): Int = com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_BottomSheetDialogCollapsed
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -72,7 +72,7 @@ class AlwaysOnAlertDialogFragment private constructor() : BottomSheetDialogFragm
                 if (this::listener.isInitialized) {
                     listener.onCanceled()
                 } else {
-                    Timber.e("Listener not initialized")
+                    logcat { "Listener not initialized" }
                 }
                 animatedClosed()
             }
@@ -81,7 +81,7 @@ class AlwaysOnAlertDialogFragment private constructor() : BottomSheetDialogFragm
                 if (this::listener.isInitialized) {
                     listener.onCanceled()
                 } else {
-                    Timber.e("Listener not initialized")
+                    logcat { "Listener not initialized" }
                 }
             }
             binding.goToSettingsButton.setOnClickListener {
@@ -89,7 +89,7 @@ class AlwaysOnAlertDialogFragment private constructor() : BottomSheetDialogFragm
                 if (this::listener.isInitialized) {
                     listener.onGoToSettingsClicked()
                 } else {
-                    Timber.e("Listener not initialized")
+                    logcat { "Listener not initialized" }
                 }
             }
         }

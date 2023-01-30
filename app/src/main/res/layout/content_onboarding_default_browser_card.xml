@@ -41,17 +41,15 @@
             card_view:layout_constraintStart_toStartOf="parent"
             card_view:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            card_view:typography="body1"
             android:id="@+id/instructions"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginEnd="20dp"
-            android:fontFamily="sans-serif-medium"
             android:gravity="center"
             android:text="@string/defaultBrowserInstructions"
             android:textAlignment="center"
-            android:textColor="@color/almostBlack"
-            android:textSize="15sp"
             card_view:layout_constraintBottom_toBottomOf="@id/logo"
             card_view:layout_constraintEnd_toEndOf="parent"
             card_view:layout_constraintStart_toEndOf="@id/logo"

@@ -20,8 +20,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
-import android.widget.TextView
 import androidx.annotation.StringRes
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
@@ -47,10 +47,9 @@ import com.duckduckgo.app.sitepermissions.SitePermissionsListViewType.SITE_ALLOW
 import com.duckduckgo.app.sitepermissions.SitePermissionsListViewType.TOGGLE
 import com.duckduckgo.mobile.android.databinding.RowOneLineListItemBinding
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
+import com.duckduckgo.mobile.android.ui.view.PopupMenuItemView
 import com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
-import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
-import com.duckduckgo.mobile.android.ui.view.show
+import com.duckduckgo.mobile.android.ui.view.setEnabledOpacity
 import kotlinx.coroutines.launch
 
 class SitePermissionsAdapter(
@@ -62,7 +61,12 @@ class SitePermissionsAdapter(
     private var items: List<SitePermissionListItem> = listOf()
     private var sitesEmpty: Boolean = true
 
-    fun updateItems(sites: List<String>, isLocationEnabled: Boolean, isCameraEnabled: Boolean, isMicEnabled: Boolean) {
+    fun updateItems(
+        sites: List<String>,
+        isLocationEnabled: Boolean,
+        isCameraEnabled: Boolean,
+        isMicEnabled: Boolean,
+    ) {
         val listItems = mutableListOf<SitePermissionListItem>()
         listItems.add(SitePermissionsDescription())
         listItems.add(SitePermissionsHeader(R.string.sitePermissionsSettingsEnablePermissionTitle))
@@ -81,7 +85,10 @@ class SitePermissionsAdapter(
         notifyDataSetChanged()
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): RecyclerView.ViewHolder =
         when (SitePermissionsListViewType.values()[viewType]) {
             DESCRIPTION -> {
                 val binding = ViewSitePermissionsDescriptionBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -109,7 +116,10 @@ class SitePermissionsAdapter(
             }
         }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int,
+    ) {
         when (val item = items[position]) {
             is SitePermissionsHeader -> (holder as SitePermissionsHeaderViewHolder).bind(item.title, sitesEmpty)
             is SitePermissionToggle -> (holder as SitePermissionToggleViewHolder).bind(item) { _, isChecked ->
@@ -136,26 +146,32 @@ class SitePermissionsAdapter(
         private val layoutInflater: LayoutInflater,
         private val viewModel: SitePermissionsViewModel,
     ) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(title: Int, isListEmpty: Boolean) {
+        fun bind(
+            title: Int,
+            isListEmpty: Boolean,
+        ) {
             when (title) {
                 R.string.sitePermissionsSettingsAllowedSitesTitle -> {
-                    binding.overflowMenu.apply {
-                        show()
+                    binding.sitePermissionsSectionHeader.apply {
+                        showOverflowMenuIcon(true)
                         setOnClickListener { showOverflowMenu(isListEmpty) }
                     }
                 }
-                else -> binding.overflowMenu.gone()
+                else -> binding.sitePermissionsSectionHeader.showOverflowMenuIcon(false)
             }
-            binding.sitePermissionsSectionTitle.setText(title)
+            binding.sitePermissionsSectionHeader.setText(title)
         }
 
         private fun showOverflowMenu(removeDisabled: Boolean) {
             val popupMenu = PopupMenu(layoutInflater, layout.popup_window_remove_all_menu)
-            val menuItem = popupMenu.contentView.findViewById<TextView>(R.id.removeAll)
-            if (removeDisabled) menuItem.isEnabled = false
+            val menuItem = popupMenu.contentView.findViewById<PopupMenuItemView>(R.id.removeAll)
+            if (removeDisabled) {
+                menuItem.isEnabled = false
+                menuItem.setEnabledOpacity(false)
+            }
             popupMenu.apply {
                 onMenuItemClicked(menuItem) { viewModel.removeAllSitesSelected() }
-                show(binding.root, binding.overflowMenu)
+                show(binding.root, binding.sitePermissionsSectionHeader)
             }
         }
     }
@@ -165,34 +181,37 @@ class SitePermissionsAdapter(
             item: SitePermissionToggle,
             listener: CompoundButton.OnCheckedChangeListener,
         ) {
-            binding.sitePermissionsToggle.setText(item.text)
-            binding.sitePermissionsToggle.quietlySetIsChecked(item.enable, listener)
+            val context = binding.root.context
+            binding.sitePermissionToggle.setPrimaryText(context.getString(item.text))
+            binding.sitePermissionToggle.quietlySetIsChecked(item.enable, listener)
             val iconRes = when (item.text) {
                 R.string.sitePermissionsSettingsLocation -> {
                     if (item.enable) {
-                        R.drawable.ic_location
+                        R.drawable.ic_location_24
                     } else {
-                        R.drawable.ic_location_disabled
+                        R.drawable.ic_location_blocked_24
                     }
                 }
                 R.string.sitePermissionsSettingsCamera -> {
                     if (item.enable) {
-                        R.drawable.ic_camera
+                        R.drawable.ic_camera_24
                     } else {
-                        R.drawable.ic_camera_disabled
+                        R.drawable.ic_camera_blocked_24
                     }
                 }
                 R.string.sitePermissionsSettingsMicrophone -> {
                     if (item.enable) {
-                        R.drawable.ic_microphone
+                        R.drawable.ic_microphone_24
                     } else {
-                        R.drawable.ic_microphone_disabled
+                        R.drawable.ic_microphone_blocked_24
                     }
                 }
                 else -> null
             }
             iconRes?.let {
-                binding.sitePermissionToggleIcon.setImageResource(it)
+                AppCompatResources.getDrawable(context, it)?.let { drawable ->
+                    binding.sitePermissionToggle.setLeadingIconDrawable(drawable)
+                }
             }
         }
     }
@@ -222,7 +241,11 @@ class SitePermissionsAdapter(
 sealed class SitePermissionListItem(val viewType: SitePermissionsListViewType) {
     class SitePermissionsDescription : SitePermissionListItem(DESCRIPTION)
     data class SitePermissionsHeader(@StringRes val title: Int) : SitePermissionListItem(HEADER)
-    data class SitePermissionToggle(@StringRes val text: Int, val enable: Boolean) : SitePermissionListItem(TOGGLE)
+    data class SitePermissionToggle(
+        @StringRes val text: Int,
+        val enable: Boolean,
+    ) : SitePermissionListItem(TOGGLE)
+
     class Divider : SitePermissionListItem(DIVIDER)
     data class SiteAllowedItem(val domain: String) : SitePermissionListItem(SITE_ALLOWED_ITEM)
     class EmptySites : SitePermissionListItem(SITES_EMPTY)

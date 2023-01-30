@@ -398,7 +398,7 @@
     <string name="systemSearchOnboardingButtonOk">Razumem</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">SKRIJ</string>
+    <string name="daxDialogHideButton">Skrij se</string>
     <string name="daxDialogPhew">Fuj!</string>
     <string name="daxDialogNext">Naslednji</string>
     <string name="daxDialogHighFive">Petka!</string>
@@ -660,7 +660,8 @@
     <string name="autoconsentSecondaryCta">Ne, hvala</string>
 
     <string name="autoconsentSetting">Upravljanje pojavnih oken za piškotke</string>
-    <string name="autoconsentAnimationText">Upravljani piškotki</string>
+    <string name="autoconsentCosmeticNoticeAnimationText">Pojavno okno je skrito</string>
+    <string name="autoconsentManagedNoticeAnimationText">Upravljani piškotki</string>
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Dovoljenja za spletno mesto</string>

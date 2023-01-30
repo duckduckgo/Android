@@ -33,9 +33,15 @@ interface JobCleaner {
         private const val FAVORITES_ONBOARDING_WORK_TAG = "FavoritesOnboardingWorker"
         private const val EMAIL_WAITLIST_SYNC_WORK_TAG = "EmailWaitlistWorker"
         private const val MACOS_WAITLIST_SYNC_WORK_TAG = "MacOsWaitlistWorker"
+        private const val APP_TP_WAITLIST_SYNC_WORK_TAG = "AppTPWaitlistWorker"
 
         fun allDeprecatedNotificationWorkTags() = listOf(STICKY_SEARCH_CONTINUOUS_APP_USE_REQUEST_TAG, USE_OUR_APP_WORK_REQUEST_TAG)
-        fun allDeprecatedWorkerTags() = listOf(FAVORITES_ONBOARDING_WORK_TAG, EMAIL_WAITLIST_SYNC_WORK_TAG)
+        fun allDeprecatedWorkerTags() = listOf(
+            FAVORITES_ONBOARDING_WORK_TAG,
+            EMAIL_WAITLIST_SYNC_WORK_TAG,
+            MACOS_WAITLIST_SYNC_WORK_TAG,
+            APP_TP_WAITLIST_SYNC_WORK_TAG,
+        )
     }
 }
 

@@ -30,4 +30,5 @@
     android:layout_height="wrap_content"
     android:drawablePadding="@dimen/keyline_1"
     android:background="@drawable/chip_background"
-    android:textAppearance="@style/TextAppearance.DuckDuckGo.Body2"/>
+    android:textAppearance="@style/Typography.DuckDuckGo.Body2"
+    android:textColor="?attr/daxColorPrimaryText"/>

@@ -64,5 +64,12 @@
     <string name="credentialManagementViewMenuDelete">Verwijderen</string>
 
     <string name="credentialManagementSuggestionsLabel">Aanbevolen</string>
+    <string name="credentialManagementNoLoginsSavedTitle">Nog geen aanmeldgegevens opgeslagen</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Aanmeldgegevens worden alleen op dit apparaat veilig opgeslagen.</string>
+
+    <string name="autofillManagementAddLogin">Aanmeldgegevens toevoegen</string>
+    <string name="autofillManagementSearchLogins">Zoeken</string>
+    <string name="autofillManagementSearchClearDescription">Zoekinvoer wissen</string>
+    <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Geen resultaten voor \'%1$s\'</string>
 
 </resources>

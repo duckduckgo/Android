@@ -32,7 +32,8 @@ dependencies {
     implementation project(':library-loader-api')
 
     implementation Kotlin.stdlib.jdk7
-    implementation JakeWharton.timber
+    implementation "com.squareup.logcat:logcat:_"
+    implementation "com.duckduckgo.netguard:netguard-android:_"
 
     implementation Google.dagger
     implementation AndroidX.core.ktx
@@ -49,12 +50,6 @@ dependencies {
 }
 
 android {
-    externalNativeBuild {
-
-        cmake {
-            path "CMakeLists.txt"
-        }
-    }
     anvil {
         generateDaggerFactories = true // default is false
     }

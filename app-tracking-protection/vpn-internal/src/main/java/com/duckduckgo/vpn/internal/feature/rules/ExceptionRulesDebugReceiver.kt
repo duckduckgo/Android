@@ -21,15 +21,17 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRule
 import com.squareup.anvil.annotations.ContributesMultibinding
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.logcat
 
 /**
  * This receiver allows to add exclusion rules to appTP
@@ -77,24 +79,29 @@ class ExceptionRulesDebugReceiverRegister @Inject constructor(
     private val context: Context,
     private val exclusionRulesRepository: ExclusionRulesRepository,
     private val dispatchers: DispatcherProvider,
+    private val appBuildConfig: AppBuildConfig,
 ) : VpnServiceCallbacks {
 
     private val exceptionRulesSavedState = mutableListOf<AppTrackerExceptionRule>()
+    private val shouldSaveRules = AtomicBoolean(true)
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        Timber.i("Debug receiver ExceptionRulesDebugReceiver registered")
+        // only for debug builds
+        if (appBuildConfig.isDebug) {
+            logcat { "Debug receiver ExceptionRulesDebugReceiver registered" }
 
-        saveExceptionRulesState(coroutineScope)
+            ExceptionRulesDebugReceiver(context) { intent ->
+                val appId = kotlin.runCatching { intent.getStringExtra("app") }.getOrNull()
+                val domain = kotlin.runCatching { intent.getStringExtra("domain") }.getOrNull()
 
-        ExceptionRulesDebugReceiver(context) { intent ->
-            val appId = kotlin.runCatching { intent.getStringExtra("app") }.getOrNull()
-            val domain = kotlin.runCatching { intent.getStringExtra("domain") }.getOrNull()
+                logcat { "Excluding $domain for app $appId" }
 
-            Timber.i("Excluding %s for app %s", domain, appId)
-
-            if (appId != null && domain != null) {
-                coroutineScope.launch(dispatchers.io()) {
-                    exclusionRulesRepository.upsertRule(appId, domain)
+                if (appId != null && domain != null) {
+                    coroutineScope.launch(dispatchers.io()) {
+                        // first save the current state, just once
+                        saveExceptionRulesState()
+                        exclusionRulesRepository.upsertRule(appId, domain)
+                    }
                 }
             }
         }
@@ -104,18 +111,22 @@ class ExceptionRulesDebugReceiverRegister @Inject constructor(
         coroutineScope: CoroutineScope,
         vpnStopReason: VpnStopReason,
     ) {
-        Timber.i("Debug receiver ExceptionRulesDebugReceiver restoring exception rules")
+        // only for debug builds
+        if (appBuildConfig.isDebug) {
+            logcat { "Debug receiver ExceptionRulesDebugReceiver restoring exception rules" }
 
-        coroutineScope.launch(dispatchers.io()) {
-            exclusionRulesRepository.deleteAllTrackerRules()
-            exclusionRulesRepository.insertTrackerRules(exceptionRulesSavedState).also {
-                exceptionRulesSavedState.clear()
+            coroutineScope.launch(dispatchers.io()) {
+                exclusionRulesRepository.deleteAllTrackerRules()
+                exclusionRulesRepository.insertTrackerRules(exceptionRulesSavedState).also {
+                    exceptionRulesSavedState.clear()
+                }
+                shouldSaveRules.set(true)
             }
         }
     }
 
-    private fun saveExceptionRulesState(coroutineScope: CoroutineScope) {
-        coroutineScope.launch(dispatchers.io()) {
+    private suspend fun saveExceptionRulesState() {
+        if (shouldSaveRules.compareAndSet(true, false)) {
             exceptionRulesSavedState.clear()
             exceptionRulesSavedState.addAll(exclusionRulesRepository.getAllTrackerRules())
         }

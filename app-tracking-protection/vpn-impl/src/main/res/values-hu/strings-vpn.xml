@@ -242,8 +242,6 @@
     <string name="atp_FAQSixthText">Az alkalmazáskövetés elleni védelem a készülékeden működik, és nem küld személyes adatokat a készülékedről a DuckDuckGónak.</string>
 
     <!--  App Tracking Protection Waitlist -->
-    <string name="atp_WaitlistActivityTitle">Alkalmazáskövetés elleni védelem</string>
-    <string name="atp_WaitlistActivityWaitlistTitle">Alkalmazáskövetés elleni védelem várólistája</string>
     <string name="atp_WaitlistNotificationTitle">Megérkezett az alkalmazáskövetés elleni védelmi meghívója!</string>
     <string name="atp_WaitlistNotificationDescription">Feliratkoztál a várólistára, és arra kértél minket, hogy értesítsünk, amikor rád kerül a sor, hogy kipróbálhasd az alkalmazáskövetés elleni védelmi funkciót. Koppints a meghívó megtekintéséhez.</string>
     <string name="atp_WaitlistStatusNotJoined">Egyetlen egyszerű lépés az alkalmazások jobb védelme érdekében!</string>
@@ -262,7 +260,6 @@
     <string name="atp_WaitlistErrorJoining">Hiba történt a várólistához való csatlakozás közben. Kérjük, próbáld újra később.</string>
     <string name="atp_WaitlistJoinedWithNotification">Értesítést küldünk, amikor az alkalmazáskövetés elleni védelem készen áll számodra.\n\n<annotation type="beta_link">További információ a bétaverzióról</annotation></string>
     <string name="atp_WaitlistJoinedWithoutNotification">Ide érkezik az alkalmazáskövetés elleni védelem kipróbálására szóló meghívód. Nézz vissza hamarosan, vagy küldhetünk neked értesítést, amikor sorra kerülsz\n\n<annotation type="notify_me_link">Értesítést kérek</annotation>\n\n<annotation type="beta_link">További információ a bétaverzióról</annotation></string>
-    <string name="atp_WaitlistRedeemCodeActivityTitle">Meghívókód megadása</string>
     <string name="atp_WaitlistRedeemedCodeStatus">Sikerült! Bent vagy.</string>
     <string name="atp_WaitlistBetaBlogPost">https://spreadprivacy.com/introducing-app-tracking-protection</string>
 

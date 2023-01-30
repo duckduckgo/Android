@@ -19,18 +19,13 @@ package com.duckduckgo.autoconsent.impl.ui
 import android.webkit.WebView
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
-import com.duckduckgo.autoconsent.impl.pixels.AutoconsentPixelName.AUTOCONSENT_DISABLED
-import com.duckduckgo.autoconsent.impl.pixels.AutoconsentPixelName.AUTOCONSENT_ENABLED
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
 
 @ExperimentalCoroutinesApi
 class AutoconsentSettingsViewModelTest {
@@ -39,9 +34,8 @@ class AutoconsentSettingsViewModelTest {
     var coroutineRule = CoroutineTestRule()
 
     private val autoconsent: Autoconsent = FakeAutoconsent()
-    private val pixel: Pixel = mock()
 
-    private val viewModel = AutoconsentSettingsViewModel(autoconsent, pixel)
+    private val viewModel = AutoconsentSettingsViewModel(autoconsent)
 
     @Test
     fun whenViewModelCreatedThenEmitViewState() = runTest {
@@ -56,7 +50,6 @@ class AutoconsentSettingsViewModelTest {
         viewModel.viewState.test {
             assertFalse(awaitItem().autoconsentEnabled)
             viewModel.onUserToggleAutoconsent(true)
-            verify(pixel).fire(AUTOCONSENT_ENABLED)
             assertTrue(autoconsent.isSettingEnabled())
             assertTrue(awaitItem().autoconsentEnabled)
             cancelAndIgnoreRemainingEvents()
@@ -68,7 +61,6 @@ class AutoconsentSettingsViewModelTest {
         viewModel.viewState.test {
             viewModel.onUserToggleAutoconsent(false)
             assertFalse(awaitItem().autoconsentEnabled)
-            verify(pixel).fire(AUTOCONSENT_DISABLED)
             cancelAndIgnoreRemainingEvents()
         }
     }

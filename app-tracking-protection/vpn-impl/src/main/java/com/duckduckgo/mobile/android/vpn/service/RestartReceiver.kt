@@ -30,7 +30,7 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesMultibinding(
     scope = VpnScope::class,
@@ -52,7 +52,7 @@ class RestartReceiver @Inject constructor(
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         if (appBuildConfig.isInternalBuild()) {
-            Timber.v("Starting vpn-service receiver")
+            logcat { "Starting vpn-service receiver" }
             unregister()
             context.registerReceiver(this, IntentFilter("vpn-service"))
         }

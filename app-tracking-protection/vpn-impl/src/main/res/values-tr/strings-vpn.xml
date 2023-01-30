@@ -242,8 +242,6 @@
     <string name="atp_FAQSixthText">Uygulama İzleme Koruması, cihazınızda çalışır ve kişisel verilerinizi cihazınızdan DuckDuckGo\'ya göndermez.</string>
 
     <!--  App Tracking Protection Waitlist -->
-    <string name="atp_WaitlistActivityTitle">Uygulama İzleme Koruması</string>
-    <string name="atp_WaitlistActivityWaitlistTitle">Uygulama İzleme Koruması bekleme listesi</string>
     <string name="atp_WaitlistNotificationTitle">Uygulama İzleme Koruması Davetiyeniz Burada!</string>
     <string name="atp_WaitlistNotificationDescription">Bekleme listesine katılarak Uygulama İzleme Koruması özelliğini deneme sırası size geldiğinde sizi bilgilendirmemizi istediniz. Davetiyenizi görüntülemek için dokunun.</string>
     <string name="atp_WaitlistStatusNotJoined">Daha iyi uygulama gizliliği için tek bir kolay adım!</string>
@@ -262,7 +260,6 @@
     <string name="atp_WaitlistErrorJoining">Bekleme listesine katılırken bir hata oluştu. Lütfen daha sonra tekrar deneyin.</string>
     <string name="atp_WaitlistJoinedWithNotification">&lt;br/&gt;Uygulama İzleme Koruması sizin için hazır olduğunda bildirim alacaksınız.\n\n<annotation type="beta_link">Beta hakkında daha fazla bilgi edinin</annotation></string>
     <string name="atp_WaitlistJoinedWithoutNotification">Uygulama İzleme Koruması\'nı denemek için davetiyeniz buraya gelecektir. Yakında tekrar kontrol edin veya sıra size geldiğinde size bir bildirim gönderebiliriz\n\n<annotation type="notify_me_link">Bana bildirim gönder</annotation>\n\n<annotation type="beta_link">Beta hakkında daha fazla bilgi edinin</annotation></string>
-    <string name="atp_WaitlistRedeemCodeActivityTitle">Davet Kodunuzu Girin</string>
     <string name="atp_WaitlistRedeemedCodeStatus">Başarılı! Katıldın.</string>
     <string name="atp_WaitlistBetaBlogPost">https://spreadprivacy.com/introducing-app-tracking-protection</string>
 

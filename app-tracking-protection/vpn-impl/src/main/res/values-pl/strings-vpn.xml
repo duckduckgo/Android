@@ -254,8 +254,6 @@
     <string name="atp_FAQSixthText">Ochrona przed śledzeniem przez aplikacje działa na Twoim urządzeniu i nie wysyła Twoich danych osobowych poza urządzenie do DuckDuckGo.</string>
 
     <!--  App Tracking Protection Waitlist -->
-    <string name="atp_WaitlistActivityTitle">Ochrona przed śledzeniem przez aplikacje</string>
-    <string name="atp_WaitlistActivityWaitlistTitle">Lista oczekujących na ochronę przed śledzeniem przez aplikacje</string>
     <string name="atp_WaitlistNotificationTitle">Oto Twoje zaproszenie do ochrony przed śledzeniem przez aplikacje!</string>
     <string name="atp_WaitlistNotificationDescription">Jesteś już na liście oczekujących i powiadomimy Cię, gdy nadejdzie Twoja kolej na wypróbowanie funkcji ochrony przed śledzeniem przez aplikacje. Dotknij, aby wyświetlić swoje zaproszenie.</string>
     <string name="atp_WaitlistStatusNotJoined">Jeden prosty krok ku większej ochronie prywatności w aplikacjach!</string>
@@ -274,7 +272,6 @@
     <string name="atp_WaitlistErrorJoining">Wystąpił błąd podczas dołączania do listy oczekujących, spróbuj ponownie później</string>
     <string name="atp_WaitlistJoinedWithNotification">Wyślemy Ci powiadomienie, gdy&lt;br/&gt; ochrona przed śledzeniem przez aplikacje będzie gotowa.<annotation type="beta_link"> Dowiedz się więcej o wersji beta</annotation></string>
     <string name="atp_WaitlistJoinedWithoutNotification">Twoje zaproszenie do wypróbowania ochrony przed śledzeniem przez aplikacje pojawi się tutaj. Sprawdź ponownie później. Możemy też wysłać Ci powiadomienie, gdy nadejdzie Twoja kolej.\n\n<annotation type="notify_me_link">Powiadom mnie</annotation>\n\n<annotation type="beta_link">Dowiedz się więcej o wersji beta</annotation></string>
-    <string name="atp_WaitlistRedeemCodeActivityTitle">Wprowadź swój kod zaproszenia</string>
     <string name="atp_WaitlistRedeemedCodeStatus">Udało się! Wszystko gotowe.</string>
     <string name="atp_WaitlistBetaBlogPost">https://spreadprivacy.com/introducing-app-tracking-protection</string>
 

@@ -21,10 +21,8 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.net.Uri
 import android.os.Debug
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.traces.api.StartupTraces
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -35,20 +33,15 @@ import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = LifecycleObserver::class,
+    boundType = MainProcessLifecycleObserver::class,
 )
-class AppStartUpTracer @Inject constructor() : ContentProvider(), LifecycleEventObserver {
+class AppStartUpTracer @Inject constructor() : ContentProvider(), MainProcessLifecycleObserver {
 
     // content provide shall have empty constructor
     private val startupTraces: StartupTraces by lazy { RealStartupTraces(context!!.applicationContext) }
 
-    override fun onStateChanged(
-        source: LifecycleOwner,
-        event: Lifecycle.Event,
-    ) {
-        if (event == Lifecycle.Event.ON_START) {
-            Debug.stopMethodTracing()
-        }
+    override fun onStart(owner: LifecycleOwner) {
+        Debug.stopMethodTracing()
     }
 
     override fun onCreate(): Boolean {

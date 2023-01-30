@@ -13,7 +13,7 @@ ext {
 }
 
 android {
-    ndkVersion '21.0.6113669'
+    ndkVersion '21.4.7075529'
     defaultConfig {
         applicationId "com.duckduckgo.mobile.android"
         minSdk min_sdk
@@ -176,6 +176,7 @@ dependencies {
     implementation project(':app-store')
     implementation project(':common-ui')
     implementation project(':di')
+    implementation project(':app-tracking-api')
     implementation project(':vpn-impl')
     implementation project(':vpn-api')
     implementation project(':vpn-store')
@@ -186,6 +187,8 @@ dependencies {
     implementation project(':privacy-config-api')
     implementation project(':privacy-config-impl')
     implementation project(':privacy-config-store')
+    internalImplementation project(':privacy-config-internal')
+
     implementation project(':anrs-api')
     implementation project(':anrs-store')
     implementation project(':anrs-impl')
@@ -239,6 +242,13 @@ dependencies {
     implementation project(':fingerprint-protection-impl')
     implementation project(':fingerprint-protection-store')
 
+    implementation project(':element-hiding-impl')
+    implementation project(':element-hiding-store')
+
+    implementation project(':request-filterer-api')
+    implementation project(':request-filterer-impl')
+    implementation project(':request-filterer-store')
+
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
     debugImplementation Square.leakCanary.android
@@ -282,7 +292,7 @@ dependencies {
     implementation AndroidX.fragment.ktx
 
     // ViewModel and LiveData
-    implementation AndroidX.lifecycle.runtimeKtx
+    implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.lifecycle.viewModelKtx
     implementation AndroidX.lifecycle.liveDataKtx
     implementation AndroidX.lifecycle.process

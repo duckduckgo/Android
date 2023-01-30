@@ -29,6 +29,7 @@ dependencies {
     implementation KotlinX.coroutines.core
 
     implementation JakeWharton.timber
+    implementation Square.okHttp3.okHttp
     // Room
     implementation AndroidX.room.runtime
 

@@ -1,0 +1,56 @@
+appId: com.duckduckgo.mobile.android
+---
+- launchApp:
+      clearState: true
+      stopApp: true
+- assertVisible:
+    text: ".*Not to worry! Searching and browsing privately.*"
+- tapOn: "let's do it!"
+- tapOn: "cancel"
+- assertVisible:
+    text: ".*I'll also upgrade the security of your connection if possible.*"
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+- tapOn:
+    text: "Settings"
+    index: 0
+- scroll
+- scroll
+- scroll
+- assertVisible: "Block app trackers on your device"
+- tapOn: "App Tracking Protection"
+- assertVisible: "One easy step for better app privacy!"
+- assertVisible: "Continue"
+- tapOn: "Continue"
+- assertVisible: "How does it work?"
+- assertVisible: "Continue"
+- tapOn: "Continue"
+- assertVisible: "Who sees your data?"
+- assertVisible:
+    text: "Enable App Tracking Protection"
+    index: 1
+- tapOn:
+    text: "Enable App Tracking Protection"
+    index: 1
+- assertVisible: "Connection request"
+- tapOn: "OK"
+- assertVisible:
+      text: "Good news! App Tracking Protection is now enabled.*"
+- assertVisible: "Got it!"
+- tapOn: "Got it!"
+- assertVisible: "During beta, protection for some apps is automatically disabled. View apps"
+- assertVisible: "Blocked tracking attempts will appear here"
+- assertVisible:
+    id: "com.duckduckgo.mobile.android:id/activity_apps"
+    index: 0
+- assertVisible:
+    id: "com.duckduckgo.mobile.android:id/activity_apps"
+    index: 1
+- scroll
+- assertVisible: "ABOUT"
+- assertVisible: "What are app trackers?"
+- assertVisible: "App Tracking Protection FAQ"
+- assertVisible: "MANAGE"
+- assertVisible: "Having issues with an app?"
+- assertVisible: "View Apps"
+- assertVisible: "Disable and Delete Data"

@@ -16,13 +16,14 @@
 
 package com.duckduckgo.app.global
 
-import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.di.AppComponent
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.DaggerAppComponent
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.app.lifecycle.VpnProcessLifecycleObserver
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.di.DaggerMap
 import com.duckduckgo.mobile.android.vpn.service.VpnUncaughtExceptionHandler
@@ -51,7 +52,10 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
     lateinit var referralStateListener: AppInstallationReferrerStateListener
 
     @Inject
-    lateinit var lifecycleObserverPluginPoint: PluginPoint<LifecycleObserver>
+    lateinit var primaryLifecycleObserverPluginPoint: PluginPoint<MainProcessLifecycleObserver>
+
+    @Inject
+    lateinit var vpnLifecycleObserverPluginPoint: PluginPoint<VpnProcessLifecycleObserver>
 
     @Inject
     lateinit var activityLifecycleCallbacks: PluginPoint<com.duckduckgo.app.global.ActivityLifecycleCallbacks>
@@ -81,7 +85,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
 
         // Deprecated, we need to move all these into AppLifecycleEventObserver
         ProcessLifecycleOwner.get().lifecycle.apply {
-            lifecycleObserverPluginPoint.getPlugins().forEach {
+            primaryLifecycleObserverPluginPoint.getPlugins().forEach {
                 Timber.d("Registering application lifecycle observer: ${it.javaClass.canonicalName}")
                 addObserver(it)
             }
@@ -93,13 +97,20 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
     }
 
     override fun onSecondaryProcessCreate(shortProcessName: String) {
-        configureLogging()
-        Timber.d("onSecondaryProcessCreate $shortProcessName")
         runInSecondaryProcessNamed(VPN_PROCESS_NAME) {
             Timber.d("Init for secondary process $shortProcessName")
             configureDependencyInjection()
             configureUncaughtExceptionHandlerVpn()
             initializeDateLibrary()
+
+            // ProcessLifecycleOwner doesn't know about secondary processes, so the callbacks are our own callbacks and limited to onCreate which
+            // is good enough.
+            // See https://developer.android.com/reference/android/arch/lifecycle/ProcessLifecycleOwner#get
+            ProcessLifecycleOwner.get().lifecycle.apply {
+                vpnLifecycleObserverPluginPoint.getPlugins().forEach {
+                    it.onVpnProcessCreated()
+                }
+            }
         }
     }
 

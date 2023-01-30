@@ -64,5 +64,12 @@
     <string name="credentialManagementViewMenuDelete">Slett</string>
 
     <string name="credentialManagementSuggestionsLabel">Forslag</string>
+    <string name="credentialManagementNoLoginsSavedTitle">Ingen pålogginger er lagret ennå</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Pålogginger lagres sikkert og bare på denne enheten.</string>
+
+    <string name="autofillManagementAddLogin">Legg til pålogging</string>
+    <string name="autofillManagementSearchLogins">Søk</string>
+    <string name="autofillManagementSearchClearDescription">Tøm søkefeltet</string>
+    <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Ingen resultater for «%1$s»</string>
 
 </resources>

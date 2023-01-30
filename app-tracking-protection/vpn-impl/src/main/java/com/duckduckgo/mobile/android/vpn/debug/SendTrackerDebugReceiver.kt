@@ -35,8 +35,8 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import logcat.logcat
 import org.threeten.bp.LocalDateTime
-import timber.log.Timber
 
 /**
  * This receiver allows sending fake trackers, to do so, in the command line:
@@ -61,11 +61,11 @@ class SendTrackerDebugReceiver @Inject constructor(
     private fun register() {
         unregister()
         if (!appBuildConfig.isDebug) {
-            Timber.i("Will not register SendTrackerDebugReceiver, not in DEBUG mode")
+            logcat { "Will not register SendTrackerDebugReceiver, not in DEBUG mode" }
             return
         }
 
-        Timber.i("Debug receiver SendTrackerDebugReceiver registered")
+        logcat { "Debug receiver SendTrackerDebugReceiver registered" }
         context.registerReceiver(this, IntentFilter(INTENT_ACTION))
     }
 
@@ -77,7 +77,7 @@ class SendTrackerDebugReceiver @Inject constructor(
         GlobalScope.launch(dispatchers.io()) {
             val times = intent.getStringExtra("times")?.toInt() ?: 1
             val hoursAgo = intent.getStringExtra("hago")?.toLong() ?: 0L
-            Timber.i("Inserting %d trackers into the DB", times)
+            logcat { "Inserting $times trackers into the DB" }
 
             val insertionList = mutableListOf<VpnTracker>()
             for (i in 0 until times) {
@@ -101,7 +101,7 @@ class SendTrackerDebugReceiver @Inject constructor(
     }
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        Timber.v("Send tracker receiver started")
+        logcat { "Send tracker receiver started" }
         register()
     }
 
@@ -109,7 +109,7 @@ class SendTrackerDebugReceiver @Inject constructor(
         coroutineScope: CoroutineScope,
         vpnStopReason: VpnStopReason,
     ) {
-        Timber.v("Send tracker receiver stopped")
+        logcat { "Send tracker receiver stopped" }
         unregister()
     }
 

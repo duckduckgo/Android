@@ -14,17 +14,45 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    tools:context="com.duckduckgo.autofill.ui.credential.management.AutofillManagementActivity">
+    tools:context=".ui.credential.management.AutofillManagementActivity">
 
-    <include
-        android:id="@+id/includeToolbar"
-        layout="@layout/include_default_toolbar" />
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?toolbarBgColor"
+        android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/toolbarBgColor"
+                android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
+                app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu" />
+
+            <com.duckduckgo.mobile.android.ui.view.SearchBarView
+                android:id="@+id/search_bar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/keyline_2"
+                android:visibility="gone"
+                app:searchHint="@string/autofillManagementSearchLogins"
+                app:clearActionContentDescription="@string/autofillManagementSearchClearDescription"/>
+        </FrameLayout>
+    </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_container_view"

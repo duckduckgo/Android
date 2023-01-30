@@ -20,8 +20,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Base64
-import android.view.View
-import androidx.appcompat.app.AlertDialog
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.flowWithLifecycle
@@ -30,6 +28,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.mobile.android.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategorySingleChoiceViewModel.Command
@@ -88,21 +87,28 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
     }
 
     private fun configureListeners() {
-        val categories = viewModel.shuffledCategories.map { getString(it.category) }.toTypedArray()
-        binding.categoriesSelection.setOnClickListener {
-            AlertDialog.Builder(this)
+        val categories = viewModel.shuffledCategories.map { it.category }
+        binding.categoriesSelection.onAction {
+            RadioListAlertDialogBuilder(this)
                 .setTitle(getString(R.string.atp_ReportBreakageCategoriesTitle))
-                .setSingleChoiceItems(categories, viewModel.indexSelected) { _, newIndex ->
-                    viewModel.onCategoryIndexChanged(newIndex)
-                }
-                .setPositiveButton(getString(android.R.string.yes)) { dialog, _ ->
-                    viewModel.onCategoryAccepted()
-                    dialog.dismiss()
-                }
-                .setNegativeButton(getString(android.R.string.no)) { dialog, _ ->
-                    viewModel.onCategorySelectionCancelled()
-                    dialog.dismiss()
-                }
+                .setOptions(categories, viewModel.indexSelected + 1)
+                .setPositiveButton(android.R.string.ok)
+                .setNegativeButton(android.R.string.cancel)
+                .addEventListener(
+                    object : RadioListAlertDialogBuilder.EventListener() {
+                        override fun onRadioItemSelected(selectedItem: Int) {
+                            viewModel.onCategoryIndexChanged(selectedItem - 1)
+                        }
+
+                        override fun onPositiveButtonClicked(selectedItem: Int) {
+                            viewModel.onCategoryAccepted()
+                        }
+
+                        override fun onNegativeButtonClicked() {
+                            viewModel.onCategorySelectionCancelled()
+                        }
+                    },
+                )
                 .show()
         }
         binding.ctaNextFormSubmit.setOnClickListener { viewModel.onSubmitPressed() }
@@ -150,8 +156,7 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
     private fun render(viewState: ViewState) {
         val category =
             viewState.categorySelected?.let { getString(viewState.categorySelected.category) }.orEmpty()
-        binding.categoriesSelection.setText(category)
-        binding.otherCategoryDescription.visibility = if (viewState.indexSelected == 8) View.VISIBLE else View.GONE
+        binding.categoriesSelection.text = category
         binding.ctaNextFormSubmit.isEnabled = viewState.submitAllowed
     }
 

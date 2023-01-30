@@ -3240,6 +3240,42 @@
       },
       "default": "block",
       "CDN": false
+    },
+    "com.fake.cdn.ignore": {
+      "owner": {
+        "name": "CDN",
+        "displayName": "CDN"
+      },
+      "app": {
+        "score": 86,
+        "prevalence": 0.067
+      },
+      "default": "ignore",
+      "CDN": true
+    },
+    "com.fake.tracker.block": {
+      "owner": {
+        "name": "CDN",
+        "displayName": "CDN"
+      },
+      "app": {
+        "score": 86,
+        "prevalence": 0.067
+      },
+      "default": "block",
+      "CDN": false
+    },
+    "com.fake.cdn.block": {
+      "owner": {
+        "name": "CDN",
+        "displayName": "CDN"
+      },
+      "app": {
+        "score": 86,
+        "prevalence": 0.067
+      },
+      "default": "block",
+      "CDN": true
     }
   },
   "packageNames": {

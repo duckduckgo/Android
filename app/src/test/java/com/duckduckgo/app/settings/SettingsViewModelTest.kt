@@ -26,6 +26,7 @@ import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.SettingsViewModel.Command
 import com.duckduckgo.app.settings.SettingsViewModel.Companion.EMAIL_PROTECTION_URL
+import com.duckduckgo.app.settings.clear.AppLinkSettingType
 import com.duckduckgo.app.settings.clear.ClearWhatOption.CLEAR_NONE
 import com.duckduckgo.app.settings.clear.ClearWhenOption.APP_EXIT_ONLY
 import com.duckduckgo.app.settings.clear.FireAnimation
@@ -35,7 +36,7 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.api.Autoconsent
-import com.duckduckgo.autofill.store.AutofillStore
+import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
@@ -43,9 +44,6 @@ import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
-import com.duckduckgo.mobile.android.vpn.waitlist.AppTrackingProtectionWaitlistDataStore
-import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateRepository
-import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistStateRepository
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import kotlin.time.ExperimentalTime
@@ -87,8 +85,6 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var mockFireAnimationLoader: FireAnimationLoader
 
-    private lateinit var appTPRepository: AtpWaitlistStateRepository
-
     @Mock
     private lateinit var mockGpc: Gpc
 
@@ -116,17 +112,12 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var appTpFeatureConfig: AppTpFeatureConfig
 
-    private lateinit var appTrackingProtectionWaitlistDataStore: FakeAppTrackingProtectionWaitlistDataStore
-
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
-
-        appTrackingProtectionWaitlistDataStore = FakeAppTrackingProtectionWaitlistDataStore()
-        appTPRepository = WaitlistStateRepository(appTrackingProtectionWaitlistDataStore, appTpFeatureConfig)
 
         whenever(appTpFeatureConfig.isEnabled(AppTpSetting.OpenBeta)).thenReturn(false)
         whenever(mockAppSettingsDataStore.automaticallyClearWhenOption).thenReturn(APP_EXIT_ONLY)
@@ -144,7 +135,6 @@ class SettingsViewModelTest {
             mockDefaultBrowserDetector,
             mockVariantManager,
             mockFireAnimationLoader,
-            appTPRepository,
             mockDeviceShieldOnboarding,
             mockGpc,
             mockFeatureToggle,
@@ -728,17 +718,5 @@ class SettingsViewModelTest {
     private fun givenThemeSelected(theme: DuckDuckGoTheme) {
         whenever(mockThemeSettingsDataStore.theme).thenReturn(theme)
         whenever(mockThemeSettingsDataStore.isCurrentlySelected(theme)).thenReturn(true)
-    }
-}
-
-private class FakeAppTrackingProtectionWaitlistDataStore : AppTrackingProtectionWaitlistDataStore {
-    override var inviteCode: String? = null
-    override var waitlistTimestamp: Int = -1
-    override var waitlistToken: String? = null
-    override var sendNotification: Boolean = false
-    override var lastUsedDate: String? = null
-
-    override fun canUseEncryption(): Boolean {
-        return false
     }
 }

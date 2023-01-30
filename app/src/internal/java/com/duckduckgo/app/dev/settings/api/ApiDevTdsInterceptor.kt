@@ -18,6 +18,7 @@ package com.duckduckgo.app.dev.settings.api
 
 import com.duckduckgo.app.dev.settings.db.DevSettingsDataStore
 import com.duckduckgo.app.global.api.ApiInterceptorPlugin
+import com.duckduckgo.app.trackerdetection.api.TDS_URL
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -53,7 +54,6 @@ class ApiDevTdsInterceptor @Inject constructor(
     }
 
     companion object {
-        private const val TDS_URL = "https://staticcdn.duckduckgo.com/trackerblocking/v2.1/"
         private const val NEXT_TDS = "tds-next.json"
         private const val TDS = "tds.json"
     }

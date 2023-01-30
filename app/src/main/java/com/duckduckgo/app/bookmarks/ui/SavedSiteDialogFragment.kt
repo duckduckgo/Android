@@ -24,7 +24,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.EditText
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.DialogFragment
@@ -39,7 +38,7 @@ import com.duckduckgo.app.browser.databinding.DialogFragmentSavedSiteBinding
 import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.mobile.android.ui.view.showKeyboard
-import kotlinx.android.synthetic.main.include_find_in_page.*
+import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
 
 abstract class SavedSiteDialogFragment : DialogFragment() {
 
@@ -66,7 +65,7 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
 
     private fun populateFolderNameFromIntent(data: Intent) {
         data.getStringExtra(KEY_BOOKMARK_FOLDER_NAME)?.let { name ->
-            binding.savedSiteLocation.setText(name)
+            binding.savedSiteLocation.text = name
         }
     }
 
@@ -79,7 +78,7 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setStyle(STYLE_NO_TITLE, R.style.SavedSiteFullScreenDialog)
+        setStyle(STYLE_NO_TITLE, CommonR.style.Widget_DuckDuckGo_DialogFullScreen)
     }
 
     override fun onCreateView(
@@ -90,7 +89,7 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
         _binding = DialogFragmentSavedSiteBinding.inflate(inflater, container, false)
         configureClickListeners()
         arguments?.getString(KEY_BOOKMARK_FOLDER_NAME)?.let { name ->
-            binding.savedSiteLocation.setText(name)
+            binding.savedSiteLocation.text = name
         }
         configureToolbar(binding.savedSiteAppBar.toolbar)
         configureUI()
@@ -139,7 +138,7 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
     }
 
     private fun configureUpNavigation(toolbar: Toolbar) {
-        toolbar.setNavigationIcon(CommonR.drawable.ic_back_24)
+        toolbar.setNavigationIcon(CommonR.drawable.ic_arrow_left_24)
         toolbar.setNavigationOnClickListener {
             dismiss()
         }
@@ -166,8 +165,7 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
         }
     }
 
-    private fun showKeyboard(inputEditText: EditText) {
-        inputEditText.setSelection(inputEditText.text.length)
+    private fun showKeyboard(inputEditText: DaxTextInput) {
         inputEditText.showKeyboard()
         dialog?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
     }

@@ -26,7 +26,18 @@ import okio.ByteString.Companion.decodeBase64
 class DataUriParser @Inject constructor() {
 
     fun generate(url: String): ParseResult {
-        val result = MIME_TYPE_REGEX.find(url)
+        val offset = url.indexOf(',')
+        if (offset == -1) {
+            return ParseResult.Invalid
+        }
+
+        val data = url.substring(offset + 1)
+        if (data.isEmpty()) {
+            return ParseResult.Invalid
+        }
+
+        val prefix = url.substring(0, offset)
+        val result = MIME_TYPE_REGEX.find(prefix)
         if (result == null || result.groupValues.size < 5) {
             return ParseResult.Invalid
         }
@@ -34,7 +45,6 @@ class DataUriParser @Inject constructor() {
         val mimeType = result.groupValues[REGEX_GROUP_MIMETYPE]
         val fileTypeGeneral = result.groupValues[REGEX_GROUP_FILE_TYPE_GENERAL]
         val fileTypeSpecific = result.groupValues[REGEX_GROUP_FILE_TYPE_SPECIFIC]
-        val data = result.groupValues[REGEX_GROUP_DATA]
 
         val suffix = parseSuffix(mimeType, url, data)
         val filename = UUID.randomUUID().toString()
@@ -73,12 +83,11 @@ class DataUriParser @Inject constructor() {
     }
 
     companion object {
-        private val MIME_TYPE_REGEX = Regex("data:(((.+)/(.+))?;.*)?,(.+)")
+        private val MIME_TYPE_REGEX = Regex("data:(((.+)/(.+))?;.*)?")
 
         private const val REGEX_GROUP_MIMETYPE = 2
         private const val REGEX_GROUP_FILE_TYPE_GENERAL = 3
         private const val REGEX_GROUP_FILE_TYPE_SPECIFIC = 4
-        private const val REGEX_GROUP_DATA = 5
 
         private const val MAX_LENGTH_FOR_MIME_TYPE_DETECTION = 20
     }

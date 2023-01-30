@@ -14,26 +14,19 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="24dp"
-    android:paddingStart="16dp"
-    android:paddingEnd="16dp"
-    android:paddingBottom="24dp">
+    android:padding="@dimen/keyline_4">
 
-    <com.google.android.material.textview.MaterialTextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/fireproofWebsiteEmptyHint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fontFamily="sans-serif"
-        android:lineSpacingExtra="4sp"
         android:gravity="center"
-        android:textColor="?attr/fireproofWebsiteTitleTextColor"
-        android:textSize="16sp"
-        android:textStyle="normal"
         android:text="@string/fireproofWebsiteEmptyListHint"
-        tools:text="Lorem ipsum dolor sit amet" />
+        app:textType="secondary"
+        app:typography="body2" />
 
-</LinearLayout>
+</FrameLayout>

@@ -167,6 +167,8 @@ class SiteMonitor(
 
     override var consentSelfTestFailed: Boolean = false
 
+    override var consentCosmeticHide: Boolean? = false
+
     companion object {
         private val specialDomainTypes = setOf(
             TrackerStatus.AD_ALLOWED,

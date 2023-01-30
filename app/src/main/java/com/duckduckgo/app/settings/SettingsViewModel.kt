@@ -26,6 +26,7 @@ import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName.*
+import com.duckduckgo.app.settings.clear.AppLinkSettingType
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
@@ -37,7 +38,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.api.Autoconsent
-import com.duckduckgo.autofill.store.AutofillStore
+import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
@@ -45,8 +46,6 @@ import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
-import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateRepository
-import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import javax.inject.Inject
@@ -69,7 +68,6 @@ class SettingsViewModel @Inject constructor(
     private val defaultWebBrowserCapability: DefaultBrowserDetector,
     private val variantManager: VariantManager,
     private val fireAnimationLoader: FireAnimationLoader,
-    private val atpRepository: AtpWaitlistStateRepository,
     private val vpnStore: VpnStore,
     private val gpc: Gpc,
     private val featureToggle: FeatureToggle,
@@ -95,7 +93,6 @@ class SettingsViewModel @Inject constructor(
         val appIcon: AppIcon = AppIcon.DEFAULT,
         val globalPrivacyControlEnabled: Boolean = false,
         val appLinksSettingType: AppLinkSettingType = AppLinkSettingType.ASK_EVERYTIME,
-        val appTrackingProtectionWaitlistState: WaitlistState = WaitlistState.NotJoinedQueue,
         val appTrackingProtectionOnboardingShown: Boolean = false,
         val appTrackingProtectionEnabled: Boolean = false,
         val emailAddress: String? = null,
@@ -127,7 +124,6 @@ class SettingsViewModel @Inject constructor(
         object LaunchGlobalPrivacyControl : Command()
         object LaunchAutoconsent : Command()
         object LaunchAppTPTrackersScreen : Command()
-        object LaunchAppTPWaitlist : Command()
         object LaunchAppTPOnboarding : Command()
         object UpdateTheme : Command()
         data class ShowClearWhatDialog(val option: ClearWhatOption) : Command()
@@ -167,7 +163,6 @@ class SettingsViewModel @Inject constructor(
                     appLinksSettingType = getAppLinksSettingsState(settingsDataStore.appLinksEnabled, settingsDataStore.showAppLinksPrompt),
                     appTrackingProtectionOnboardingShown = vpnStore.didShowOnboarding(),
                     appTrackingProtectionEnabled = vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN),
-                    appTrackingProtectionWaitlistState = atpRepository.getState(),
                     emailAddress = emailManager.getEmailAddress(),
                     showAutofill = autofillStore.autofillAvailable,
                     autoconsentEnabled = autoconsent.isSettingEnabled(),
@@ -293,14 +288,10 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onAppTPSettingClicked() {
-        if (atpRepository.getState() == WaitlistState.InBeta) {
-            if (vpnStore.didShowOnboarding()) {
-                viewModelScope.launch { command.send(Command.LaunchAppTPTrackersScreen) }
-            } else {
-                viewModelScope.launch { command.send(Command.LaunchAppTPOnboarding) }
-            }
+        if (vpnStore.didShowOnboarding()) {
+            viewModelScope.launch { command.send(Command.LaunchAppTPTrackersScreen) }
         } else {
-            viewModelScope.launch { command.send(Command.LaunchAppTPWaitlist) }
+            viewModelScope.launch { command.send(Command.LaunchAppTPOnboarding) }
         }
     }
 
@@ -471,10 +462,4 @@ class SettingsViewModel @Inject constructor(
     companion object {
         const val EMAIL_PROTECTION_URL = "https://duckduckgo.com/email"
     }
-}
-
-enum class AppLinkSettingType {
-    ASK_EVERYTIME,
-    ALWAYS,
-    NEVER,
 }

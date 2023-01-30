@@ -29,6 +29,7 @@ import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVA
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_ALLOWLIST_REMOVE
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_OPENED
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenSettings
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenURL
 import java.util.*
 import javax.inject.Inject
@@ -52,6 +53,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     private val requestDataViewStateMapper: RequestDataViewStateMapper,
     private val protectionStatusViewStateMapper: ProtectionStatusViewStateMapper,
     private val privacyDashboardPayloadAdapter: PrivacyDashboardPayloadAdapter,
+    private val autoconsentStatusViewStateMapper: AutoconsentStatusViewStateMapper,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -59,6 +61,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     sealed class Command {
         class LaunchReportBrokenSite(val data: BrokenSiteData) : Command()
         class OpenURL(val url: String) : Command()
+        class OpenSettings(val target: String) : Command()
     }
 
     data class ViewState(
@@ -66,6 +69,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         val userChangedValues: Boolean = false,
         val requestData: RequestDataViewState,
         val protectionStatus: ProtectionStatusViewState,
+        val cookiePromptManagementStatus: CookiePromptManagementState,
     )
 
     data class ProtectionStatusViewState(
@@ -110,7 +114,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
 
     data class SiteViewState(
         val url: String,
-        val domain: String,
+        val domain: String?,
         val upgradedHttps: Boolean,
         val parentEntity: EntityViewState?,
         val secCertificateViewModels: List<CertificateViewState?> = emptyList(),
@@ -144,6 +148,13 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     data class EntityViewState(
         val displayName: String,
         val prevalence: Double,
+    )
+
+    data class CookiePromptManagementState(
+        val consentManaged: Boolean = false,
+        val optoutFailed: Boolean? = false,
+        val configurable: Boolean? = true,
+        val cosmetic: Boolean? = false,
     )
 
     val viewState = MutableStateFlow<ViewState?>(null)
@@ -182,6 +193,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                     siteViewState = siteViewStateMapper.mapFromSite(site),
                     requestData = requestDataViewStateMapper.mapFromSite(site),
                     protectionStatus = protectionStatusViewStateMapper.mapFromSite(site),
+                    cookiePromptManagementStatus = autoconsentStatusViewStateMapper.mapFromSite(site),
                 ),
             )
         }
@@ -191,12 +203,14 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         Timber.i("PrivacyDashboard: onPrivacyProtectionsClicked $enabled")
 
         viewModelScope.launch(dispatcher.io()) {
-            if (enabled) {
-                userWhitelistDao.delete(currentViewState().siteViewState.domain)
-                pixel.fire(PRIVACY_DASHBOARD_ALLOWLIST_REMOVE)
-            } else {
-                userWhitelistDao.insert(currentViewState().siteViewState.domain)
-                pixel.fire(PRIVACY_DASHBOARD_ALLOWLIST_ADD)
+            currentViewState().siteViewState.domain?.let { domain ->
+                if (enabled) {
+                    userWhitelistDao.delete(domain)
+                    pixel.fire(PRIVACY_DASHBOARD_ALLOWLIST_REMOVE)
+                } else {
+                    userWhitelistDao.insert(domain)
+                    pixel.fire(PRIVACY_DASHBOARD_ALLOWLIST_ADD)
+                }
             }
             delay(CLOSE_DASHBOARD_ON_INTERACTION_DELAY)
             withContext(dispatcher.main()) {
@@ -220,6 +234,14 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         viewModelScope.launch(dispatcher.io()) {
             privacyDashboardPayloadAdapter.onUrlClicked(payload).takeIf { it.isNotEmpty() }?.let {
                 command.send(OpenURL(it))
+            }
+        }
+    }
+
+    fun onOpenSettings(payload: String) {
+        viewModelScope.launch(dispatcher.io()) {
+            privacyDashboardPayloadAdapter.onOpenSettings(payload).takeIf { it.isNotEmpty() }?.let {
+                command.send(OpenSettings(it))
             }
         }
     }

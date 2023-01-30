@@ -1,108 +1,444 @@
 {
-  "rules": [
-    "android.service.ims",
-    "android.telephony.ims.RcsFeature",
-    "arun.com.chromer",
-    "com.aloha.browser",
-    "com.alohamobile.browser",
-    "com.alohamobile.browser.lite",
-    "com.android.browser",
-    "com.android.captiveportallogin",
-    "com.android.carrierconfig",
-    "com.android.chrome",
-    "com.android.ims.rcsmanager",
-    "com.android.mms.service",
-    "com.android.service.ims.presence",
-    "com.android.service.ims.rcsservice",
-    "com.android.service.ims.RcsServiceApp",
-    "com.att.callprotect",
-    "com.avast.android.secure.browser",
-    "com.avg.android.secure.browser",
-    "com.baidu.searchbox",
-    "com.brave.browser",
-    "com.brave.browser_beta",
-    "com.brave.browser_nightly",
-    "com.cake.browser",
-    "com.cbq.CBMobile",
-    "com.chrome.beta",
-    "com.chrome.canary",
-    "com.chrome.dev",
-    "com.cliqz.browser",
-    "com.cloudmosa.puffinFree",
-    "com.coccoc.trinhduyet",
-    "com.dolphin.browser.zero",
-    "com.duckduckgo.mobile.android",
-    "com.duckduckgo.mobile.android.debug",
-    "com.duckduckgo.mobile.android.vpn",
-    "com.duckduckgo.mobile.android.vpn.debug",
-    "com.ecosia.android",
-    "com.flynx",
-    "com.ghostery.android.ghostery",
-    "com.google.android.apps.carrier.carrierwifi",
-    "com.google.android.apps.chrome",
-    "com.google.android.apps.searchlite",
-    "com.google.android.backuptransport",
-    "com.google.android.carrier",
-    "com.google.android.carriersetup",
-    "com.google.android.gms",
-    "com.google.android.googlequicksearchbox",
-    "com.google.android.gsf.login",
-    "com.google.android.ims",
-    "com.google.android.projection.gearhead",
-    "com.google.android.wfcactivation",
-    "com.google.ims",
-    "com.gsm.service.rcs",
-    "com.hsv.freeadblockerbrowser",
-    "com.kiwibrowser.browser",
-    "com.linkbubble.playstore",
-    "com.mi.globalbrowser",
-    "com.microsoft.bing",
-    "com.microsoft.emmx",
-    "com.mx.browser",
-    "com.nationaledtech.spinbrowser",
-    "com.naver.whale",
-    "com.nhn.android.search",
-    "com.opera.browser",
-    "com.opera.browser.beta",
-    "com.opera.mini.native",
-    "com.opera.mini.native.beta",
-    "com.opera.touch",
-    "com.qualcomm.qti.ims",
-    "com.qualcomm.qti.uceShimService",
-    "com.qwant.liberty",
-    "com.qwantjunior.mobile",
-    "com.sec.android.app.sbrowser",
-    "com.sec.android.app.sbrowser.beta",
-    "com.transsion.phoenix",
-    "com.TWCableTV",
-    "com.uc.browser.en",
-    "com.UCMobile.intl",
-    "com.ucturbo",
-    "com.vivaldi.browser",
-    "com.vivaldi.browser.snapshot",
-    "com.yahoo.mobile.client.android.search",
-    "cz.seznam.sbrowser",
-    "eddy.browser.lionpro",
-    "fast.private.secure.browser",
-    "jp.hazuki.yuzubrowser",
-    "mobi.mgeek.TunnyBrowser",
-    "net.fast.web.browser",
-    "org.adblockplus.browser",
-    "org.adblockplus.browser.beta",
-    "org.chromium.chrome",
-    "org.codeaurora.ims",
-    "org.mozilla.fenix",
-    "org.mozilla.fennec",
-    "org.mozilla.fennec_aurora",
-    "org.mozilla.fennec_fdroid",
-    "org.mozilla.firefox",
-    "org.mozilla.firefox_beta",
-    "org.mozilla.focus",
-    "org.mozilla.klar",
-    "org.mozilla.rocket",
-    "org.torproject.torbrowser",
-    "org.torproject.torbrowser_alpha",
-    "ru.yandex.searchplugin",
-    "sa.gov.nic.tawakkalna"
+  "unprotectedApps": [
+    {
+      "packageName": "android.service.ims",
+      "reason": "App is a system app that supports other apps and system functions"
+    },
+    {
+      "packageName": "android.telephony.ims.RcsFeature",
+      "reason": "App is a system app that supports other apps and system functions"
+    },
+    {
+      "packageName": "arun.com.chromer",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.TWCableTV",
+      "reason": "App doesn't run over any VPN connection"
+    },
+    {
+      "packageName": "com.UCMobile.intl",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.aloha.browser",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.alohamobile.browser",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.alohamobile.browser.lite",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.android.browser",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.android.captiveportallogin",
+      "reason": "App is a system app that supports other apps and system functions"
+    },
+    {
+      "packageName": "com.android.carrierconfig",
+      "reason": "App is a system app that supports other apps and system functions"
+    },
+    {
+      "packageName": "com.android.chrome",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.android.ims.rcsmanager",
+      "reason": "App is a system app that supports other apps and system functions"
+    },
+    {
+      "packageName": "com.android.mms.service",
+      "reason": "App is a system app that supports other apps and system functions"
+    },
+    {
+      "packageName": "com.android.service.ims.RcsServiceApp",
+      "reason": "App is a system app that supports other apps and system functions"
+    },
+    {
+      "packageName": "com.android.service.ims.presence",
+      "reason": "App is a system app that supports other apps and system functions"
+    },
+    {
+      "packageName": "com.android.service.ims.rcsservice",
+      "reason": "App is a system app that supports other apps and system functions"
+    },
+    {
+      "packageName": "com.android.vending",
+      "reason": "Users report app issues with AppTP enabled"
+    },
+    {
+      "packageName": "com.att.callprotect",
+      "reason": "Users report app issues with AppTP enabled"
+    },
+    {
+      "packageName": "com.avast.android.secure.browser",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.avg.android.secure.browser",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.baidu.searchbox",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.brave.browser",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.brave.browser_beta",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.brave.browser_nightly",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.cake.browser",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.cbq.CBMobile",
+      "reason": "App doesn't run over any VPN connection"
+    },
+    {
+      "packageName": "com.chrome.beta",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.chrome.canary",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.chrome.dev",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.cliqz.browser",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.cloudmosa.puffinFree",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.coccoc.trinhduyet",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.dolphin.browser.zero",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.duckduckgo.mobile.android",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.duckduckgo.mobile.android.debug",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.duckduckgo.mobile.android.vpn",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.duckduckgo.mobile.android.vpn.debug",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.ecosia.android",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.flynx",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.ghostery.android.ghostery",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.google.android.apps.carrier.carrierwifi",
+      "reason": "App is a system app that supports other apps and system functions"
+    },
+    {
+      "packageName": "com.google.android.apps.chrome",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.google.android.apps.chromecast.app",
+      "reason": "Users report app issues with AppTP enabled"
+    },
+    {
+      "packageName": "com.google.android.apps.searchlite",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.google.android.backuptransport",
+      "reason": "App is a system app that supports other apps and system functions"
+    },
+    {
+      "packageName": "com.google.android.carrier",
+      "reason": "App is a system app that supports other apps and system functions"
+    },
+    {
+      "packageName": "com.google.android.carriersetup",
+      "reason": "App is a system app that supports other apps and system functions"
+    },
+    {
+      "packageName": "com.google.android.gm",
+      "reason": "Users report app issues with AppTP enabled"
+    },
+    {
+      "packageName": "com.google.android.gms",
+      "reason": "App is a system app that supports other apps and system functions"
+    },
+    {
+      "packageName": "com.google.android.googlequicksearchbox",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.google.android.gsf.login",
+      "reason": "App is a system app that supports other apps and system functions"
+    },
+    {
+      "packageName": "com.google.android.ims",
+      "reason": "App is a system app that supports other apps and system functions"
+    },
+    {
+      "packageName": "com.google.android.projection.gearhead",
+      "reason": "Users report app issues with AppTP enabled"
+    },
+    {
+      "packageName": "com.google.android.wfcactivation",
+      "reason": "App is a system app that supports other apps and system functions"
+    },
+    {
+      "packageName": "com.google.android.youtube",
+      "reason": "Users report app issues with AppTP enabled"
+    },
+    {
+      "packageName": "com.google.ims",
+      "reason": "App is a system app that supports other apps and system functions"
+    },
+    {
+      "packageName": "com.gsm.service.rcs",
+      "reason": "App is a system app that supports other apps and system functions"
+    },
+    {
+      "packageName": "com.hsv.freeadblockerbrowser",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.kiwibrowser.browser",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.linkbubble.playstore",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.mi.globalbrowser",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.microsoft.bing",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.microsoft.emmx",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.mx.browser",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.nationaledtech.spinbrowser",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.naver.whale",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.nhn.android.search",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.opera.browser",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.opera.browser.beta",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.opera.mini.native",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.opera.mini.native.beta",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.opera.touch",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.qualcomm.qti.ims",
+      "reason": "App is a system app that supports other apps and system functions"
+    },
+    {
+      "packageName": "com.qualcomm.qti.uceShimService",
+      "reason": "App is a system app that supports other apps and system functions"
+    },
+    {
+      "packageName": "com.qwant.liberty",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.qwantjunior.mobile",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.sec.android.app.sbrowser",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.sec.android.app.sbrowser.beta",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.transsion.phoenix",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.uc.browser.en",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.ucturbo",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.vivaldi.browser",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.vivaldi.browser.snapshot",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "com.whatsapp",
+      "reason": "Users report app issues with AppTP enabled"
+    },
+    {
+      "packageName": "com.yahoo.mobile.client.android.search",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "cz.seznam.sbrowser",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "eddy.browser.lionpro",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "fast.private.secure.browser",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "io.github.forkmaintainers.iceraven",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "jp.hazuki.yuzubrowser",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "mobi.mgeek.TunnyBrowser",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "net.fast.web.browser",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "org.adblockplus.browser",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "org.adblockplus.browser.beta",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "org.chromium.chrome",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "org.codeaurora.ims",
+      "reason": "App is a system app that supports other apps and system functions"
+    },
+    {
+      "packageName": "org.mozilla.fenix",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "org.mozilla.fennec",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "org.mozilla.fennec_aurora",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "org.mozilla.fennec_fdroid",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "org.mozilla.firefox",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "org.mozilla.firefox_beta",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "org.mozilla.focus",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "org.mozilla.klar",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "org.mozilla.rocket",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "org.torproject.torbrowser",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "org.torproject.torbrowser_alpha",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "ru.yandex.searchplugin",
+      "reason": "App loads websites"
+    },
+    {
+      "packageName": "sa.gov.nic.tawakkalna",
+      "reason": "App doesn't run over any VPN connection"
+    }
   ]
 }

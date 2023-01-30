@@ -32,11 +32,12 @@ dependencies {
     implementation project(path: ':common')
     implementation project(path: ':common-ui')
     implementation project(path: ':browser-api')
+    implementation project(path: ':autoconsent-api')
     implementation project(path: ':app-build-config-api')
 
     implementation Google.dagger
     implementation AndroidX.appCompat
-    implementation AndroidX.lifecycle.runtimeKtx
+    implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.lifecycle.viewModelKtx
     implementation Google.android.material
 

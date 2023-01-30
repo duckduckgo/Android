@@ -116,7 +116,6 @@ sealed class DaxDialogCta(
             val dialog = TypewriterDaxDialog.newInstance(
                 daxText = context.getString(R.string.daxSerpCtaText),
                 primaryButtonText = context.getString(R.string.daxDialogPhew),
-                toolbarDimmed = false,
                 hideButtonText = context.getString(R.string.daxDialogHideButton),
             )
             dialog.setDaxDialogListener(daxDialogListener)
@@ -341,10 +340,10 @@ sealed class BubbleCta(
 
     override fun showCta(view: View) {
         val daxText = view.context.getString(description)
+        view.primaryCta.hide()
+        view.hiddenTextCta.text = daxText.html(view.context)
         view.show()
         view.alpha = 1f
-        view.hiddenTextCta.text = daxText.html(view.context)
-        view.primaryCta.hide()
         view.dialogTextCta.startTypingAnimation(daxText, true)
     }
 

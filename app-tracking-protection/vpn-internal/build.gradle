@@ -53,7 +53,7 @@ dependencies {
     implementation AndroidX.constraintLayout
 
     implementation AndroidX.lifecycle.viewModelKtx
-    implementation AndroidX.lifecycle.runtimeKtx
+    implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.lifecycle.commonJava8
     implementation AndroidX.work.runtimeKtx
     implementation AndroidX.appCompat
@@ -67,7 +67,7 @@ dependencies {
 
     implementation KotlinX.coroutines.core
 
-    implementation JakeWharton.timber
+    implementation "com.squareup.logcat:logcat:_"
 
     // Room
     implementation AndroidX.room.runtime

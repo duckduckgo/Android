@@ -23,8 +23,8 @@ import com.duckduckgo.mobile.android.vpn.store.AppHealthTriggersRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
+import logcat.logcat
 import org.json.JSONObject
-import timber.log.Timber
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -40,7 +40,7 @@ class BadHealthMitigationSettingPlugin @Inject constructor(
         @Suppress("NAME_SHADOWING")
         val name = appTpSettingValueOf(name.value)
         if (name == settingName) {
-            Timber.d("Received configuration: $jsonString")
+            logcat { "Received configuration: $jsonString" }
             jsonAdapter.fromJson(jsonString)?.let { config ->
                 appTpFeatureConfig.edit { setEnabled(settingName, config.state == "enabled") }
                 config.settings?.let { handleSettings(it) }

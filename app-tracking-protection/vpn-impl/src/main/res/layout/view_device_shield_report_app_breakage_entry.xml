@@ -15,49 +15,45 @@
   -->
 
 <LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:paddingStart="@dimen/keyline_2"
-    android:paddingTop="@dimen/keyline_2"
-    android:paddingEnd="@dimen/keyline_4"
-    android:paddingBottom="@dimen/keyline_2"
-    android:gravity="center"
-    android:background="?selectableItemBackground"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:orientation="horizontal"
+        android:paddingTop="@dimen/keyline_2"
+        android:paddingEnd="@dimen/keyline_4"
+        android:paddingBottom="@dimen/keyline_2"
+        android:gravity="center"
+        android:background="?selectableItemBackground"
 >
     <RadioButton
         android:id="@+id/deviceShieldInstalledAppSelector"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/keyline_2"
     />
 
     <ImageView
         android:id="@+id/deviceShieldInstalledAppEntryIcon"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="@dimen/keyline_2"
+        android:layout_width="@dimen/listItemImageContainerSize"
+        android:layout_height="@dimen/listItemImageContainerSize"
         android:layout_marginTop="@dimen/keyline_2"
         android:layout_marginBottom="@dimen/keyline_2"
         android:importantForAccessibility="no"
         android:src="@drawable/ic_globe_gray_16dp"
     />
 
-    <TextView
-        android:id="@+id/deviceShieldInstalledAppEntryName"
-        style="@style/TextAppearance.AppCompat.Body1"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_4"
-        android:layout_marginEnd="@dimen/keyline_2"
-        android:layout_weight="1"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:orientation="vertical"
-        android:singleLine="true"
-        android:textColor="?normalTextColor"
-        tools:text="Facebook"/>
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            android:id="@+id/deviceShieldInstalledAppEntryName"
+            app:typography="body1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginEnd="@dimen/keyline_2"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:orientation="vertical"
+            android:singleLine="true"
+            tools:text="Facebook"/>
 
 </LinearLayout>

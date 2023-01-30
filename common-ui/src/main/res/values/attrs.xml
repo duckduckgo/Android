@@ -20,22 +20,14 @@
     <attr name="headerDescriptionColor" format="color" />
     <attr name="dialogBgColor" format="color" />
     <attr name="toolbarIconColor" format="color" />
-    <attr name="toolbarTextColor" format="color" />
     <attr name="toolbarBgColor" format="color" />
     <attr name="toolbarBgBorderColor" format="color" />
     <attr name="browserIconColorSelector" format="color" />
     <attr name="browserMenuTextColor" format="color" />
     <attr name="browserMenuTextColorDisabled" format="color" />
-    <attr name="omnibarRoundedFieldBackgroundColor" format="color" />
-    <attr name="cookiesRoundedFieldBackgroundColor" format="color" />
-    <attr name="omnibarTextColor" format="color" />
-    <attr name="omnibarHintColor" format="color" />
     <attr name="omnibarLogoLetterTextColor" format="color" />
     <attr name="autoCompleteTextColor" format="color" />
     <attr name="autoCompleteSubtitleTextColor" format="color" />
-    <attr name="tabTitleTextColor" format="color" />
-    <attr name="tabTitleTextColorLegacy" format="color" />
-    <attr name="tabSubtitleTextColor" format="color" />
     <attr name="tabSelectedBorderColor" format="color" />
     <attr name="tabsFireTextColor" format="color" />
     <attr name="tabCardBackgroundColor" format="color" />
@@ -46,7 +38,6 @@
     <attr name="settingsItemTextColor" format="color" />
     <attr name="settingsItemTextColorDisabled" format="color" />
     <attr name="settingsMinorTextColor" format="color" />
-    <attr name="sectionDividerColor" format="color" />
     <attr name="buttonOutlinedBorderColor" format="color" />
     <attr name="buttonOutlinedTextColor" format="color" />
     <attr name="callToActionTitleColor" format="color" />
@@ -70,7 +61,6 @@
     <attr name="fireproofWebsiteTitleTextColor" format="color" />
     <attr name="emailButtonRippleColor" format="color" />
     <attr name="deviceShieldExcludedAppNameTextColor" format="color" />
-    <attr name="quickAccessItemTitleTextColor" format="color" />
     <attr name="listItemImageBackground" format="color" />
     <attr name="lightContainerBackground" format="color" />
 
@@ -84,11 +74,9 @@
 
     <attr name="normalTextColor" format="color" />
     <attr name="secondaryTextColor" format="color"/>
-    <attr name="accentTextColor" format="color" />
     <attr name="primaryIconColor" format="color" />
     <attr name="primaryIconDisabledColor" format="color" />
     <attr name="secondaryIconColor" format="color" />
-    <attr name="accentIconColor" format="color" />
     <attr name="splitterColor" format="color" />
 
     <attr name="secondaryButtonPressedColor" format="color" />

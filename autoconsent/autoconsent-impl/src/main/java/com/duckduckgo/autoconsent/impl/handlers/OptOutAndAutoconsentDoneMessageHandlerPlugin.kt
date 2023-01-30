@@ -58,7 +58,7 @@ class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor(
             val message: OptOutResultMessage = parseOptOutMessage(jsonString) ?: return
 
             if (!message.result) {
-                autoconsentCallback.onResultReceived(consentManaged = true, optOutFailed = true, selfTestFailed = false)
+                autoconsentCallback.onResultReceived(consentManaged = true, optOutFailed = true, selfTestFailed = false, isCosmetic = null)
             } else if (message.scheduleSelfTest) {
                 selfTest = true
             }
@@ -72,8 +72,8 @@ class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor(
             val message: AutoconsentDoneMessage = parseAutoconsentDoneMessage(jsonString) ?: return
             message.url.toUri().host ?: return
 
-            autoconsentCallback.onPopUpHandled()
-            autoconsentCallback.onResultReceived(consentManaged = true, optOutFailed = false, selfTestFailed = false)
+            autoconsentCallback.onPopUpHandled(message.isCosmetic)
+            autoconsentCallback.onResultReceived(consentManaged = true, optOutFailed = false, selfTestFailed = false, isCosmetic = message.isCosmetic)
 
             if (selfTest) {
                 appCoroutineScope.launch(dispatcherProvider.main()) {
@@ -98,7 +98,7 @@ class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor(
 
     data class OptOutResultMessage(val type: String, val cmp: String, val result: Boolean, val scheduleSelfTest: Boolean, val url: String)
 
-    data class AutoconsentDoneMessage(val type: String, val cmp: String, val url: String)
+    data class AutoconsentDoneMessage(val type: String, val cmp: String, val url: String, val isCosmetic: Boolean)
 
     companion object {
         const val OPT_OUT = "optOutResult"

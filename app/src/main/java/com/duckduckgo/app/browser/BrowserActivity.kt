@@ -38,9 +38,6 @@ import com.duckduckgo.app.browser.BrowserViewModel.Command.Query
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
 import com.duckduckgo.app.browser.databinding.ActivityBrowserBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBinding
-import com.duckduckgo.app.browser.rating.ui.AppEnjoymentDialogFragment
-import com.duckduckgo.app.browser.rating.ui.GiveFeedbackDialogFragment
-import com.duckduckgo.app.browser.rating.ui.RateAppDialogFragment
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -52,6 +49,7 @@ import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.intentText
+import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.global.sanitize
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.FireDialog
@@ -68,6 +66,7 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
@@ -184,6 +183,8 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
             Timber.i("Automatic data clearer not yet finished, so deferring processing of intent")
             lastIntent = intent
         }
+
+        viewModel.launchFromThirdParty()
     }
 
     private fun initializeServiceWorker() {
@@ -387,9 +388,9 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
             is Query -> currentTab?.submitQuery(command.query)
             is Refresh -> currentTab?.onRefreshRequested()
             is Command.LaunchPlayStore -> launchPlayStore()
-            is Command.ShowAppEnjoymentPrompt -> showAppEnjoymentPrompt(AppEnjoymentDialogFragment.create(command.promptCount, viewModel))
-            is Command.ShowAppRatingPrompt -> showAppEnjoymentPrompt(RateAppDialogFragment.create(command.promptCount, viewModel))
-            is Command.ShowAppFeedbackPrompt -> showAppEnjoymentPrompt(GiveFeedbackDialogFragment.create(command.promptCount, viewModel))
+            is Command.ShowAppEnjoymentPrompt -> showAppEnjoymentDialog(command.promptCount)
+            is Command.ShowAppRatingPrompt -> showAppRatingDialog(command.promptCount)
+            is Command.ShowAppFeedbackPrompt -> showGiveFeedbackDialog(command.promptCount)
             is Command.LaunchFeedbackView -> startActivity(FeedbackActivity.intent(this))
         }
     }
@@ -571,6 +572,78 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
 
     private val Intent.launchedFromRecents: Boolean
         get() = (flags and Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) == Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY
+
+    private fun showAppEnjoymentDialog(promptCount: PromptCount) {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.appEnjoymentDialogTitle)
+            .setMessage(R.string.appEnjoymentDialogMessage)
+            .setPositiveButton(R.string.appEnjoymentDialogPositiveButton)
+            .setNegativeButton(R.string.appEnjoymentDialogNegativeButton)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onUserSelectedAppIsEnjoyed(promptCount)
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        viewModel.onUserSelectedAppIsNotEnjoyed(promptCount)
+                    }
+
+                    override fun onDialogShown() {
+                        viewModel.onAppEnjoymentDialogShown(promptCount)
+                    }
+                },
+            )
+            .show()
+    }
+
+    private fun showAppRatingDialog(promptCount: PromptCount) {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.rateAppDialogTitle)
+            .setMessage(R.string.rateAppDialogMessage)
+            .setPositiveButton(R.string.rateAppDialogPositiveButton)
+            .setNegativeButton(R.string.rateAppDialogNegativeButton)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onUserSelectedToRateApp(promptCount)
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        viewModel.onUserDeclinedToRateApp(promptCount)
+                    }
+
+                    override fun onDialogShown() {
+                        viewModel.onAppRatingDialogShown(promptCount)
+                    }
+                },
+            )
+            .show()
+    }
+
+    private fun showGiveFeedbackDialog(promptCount: PromptCount) {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.giveFeedbackDialogTitle)
+            .setMessage(R.string.giveFeedbackDialogMessage)
+            .setPositiveButton(R.string.giveFeedbackDialogPositiveButton)
+            .setNegativeButton(R.string.giveFeedbackDialogNegativeButton)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onUserSelectedToGiveFeedback(promptCount)
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        viewModel.onUserDeclinedToGiveFeedback(promptCount)
+                    }
+
+                    override fun onDialogShown() {
+                        viewModel.onGiveFeedbackDialogShown(promptCount)
+                    }
+                },
+            )
+            .show()
+    }
 
     private fun showAppEnjoymentPrompt(prompt: DialogFragment) {
         (supportFragmentManager.findFragmentByTag(APP_ENJOYMENT_DIALOG_TAG) as? DialogFragment)?.dismissNow()

@@ -46,7 +46,7 @@ constructor(
             0,
             R.style.Widget_DuckDuckGo_MenuItemView,
         )
-        binding.label.text = attributes.getString(R.styleable.MenuItemView_labelText) ?: ""
+        binding.label.text = attributes.getString(R.styleable.MenuItemView_primaryText) ?: ""
         binding.icon.setImageResource(
             attributes.getResourceId(
                 R.styleable.MenuItemView_iconDrawable,

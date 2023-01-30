@@ -1,10 +1,10 @@
 plugins {
-    id("de.fayard.refreshVersions") version "0.40.2"
+    id("de.fayard.refreshVersions") version "0.51.0"
 }
 
 rootDir.eachFile(groovy.io.FileType.DIRECTORIES) { File parent ->
 
-    String[] ignoreFolders = ["buildSrc", "fastlane", "submodules", "node_modules", "gradle", "build"]
+    String[] ignoreFolders = ["buildSrc", "fastlane", "submodules", "node_modules", "gradle", "build", ".maestro"]
     if (!parent.name.startsWith(".") && !ignoreFolders.contains(parent.name)) {
         Boolean shouldAddProject = false
         parent.eachFile {

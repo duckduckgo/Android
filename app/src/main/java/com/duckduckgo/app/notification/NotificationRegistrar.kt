@@ -24,12 +24,11 @@ import android.content.Context
 import android.os.Build.VERSION_CODES.O
 import androidx.annotation.VisibleForTesting
 import androidx.core.app.NotificationManagerCompat
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.notification.model.Channel
 import com.duckduckgo.app.notification.model.NotificationPlugin
 import com.duckduckgo.app.notification.model.SchedulableNotificationPlugin
@@ -38,7 +37,6 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.R as VpnR
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -47,7 +45,7 @@ import timber.log.Timber
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = LifecycleObserver::class,
+    boundType = MainProcessLifecycleObserver::class,
 )
 class NotificationRegistrar @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
@@ -59,14 +57,14 @@ class NotificationRegistrar @Inject constructor(
     private val schedulableNotificationPluginPoint: PluginPoint<SchedulableNotificationPlugin>,
     private val notificationPluginPoint: PluginPoint<NotificationPlugin>,
     private val appBuildConfig: AppBuildConfig,
-) : DefaultLifecycleObserver {
+) : MainProcessLifecycleObserver {
 
     object NotificationId {
         const val ClearData = 100
         const val PrivacyProtection = 101
         const val Article = 103 // 102 was used for the search notification hence using 103 moving forward
         const val AppFeature = 104
-        const val EmailWaitlist = 106 // 105 was used for the UOA notification
+        // 105 and 106 where already used previously
     }
 
     object ChannelType {
@@ -74,11 +72,6 @@ class NotificationRegistrar @Inject constructor(
             "com.duckduckgo.tutorials",
             R.string.notificationChannelTutorials,
             NotificationManagerCompat.IMPORTANCE_DEFAULT,
-        )
-        val APP_TP_WAITLIST = Channel(
-            "com.duckduckgo.apptp",
-            VpnR.string.atp_WaitlistActivityWaitlistTitle,
-            NotificationManagerCompat.IMPORTANCE_HIGH,
         )
         // Do not add new channels here, instead follow https://app.asana.com/0/1125189844152671/1201842645469204
     }
@@ -100,7 +93,6 @@ class NotificationRegistrar @Inject constructor(
 
     private val channels = listOf(
         ChannelType.TUTORIALS,
-        ChannelType.APP_TP_WAITLIST,
     )
 
     private fun registerApp() {
@@ -128,6 +120,12 @@ class NotificationRegistrar @Inject constructor(
             list.toList()
         }
         manager.createNotificationChannels(notificationChannels + pluginChannels)
+
+        // TODO this is hack because we don't have a good way to remove channels when we no longer use them
+        // if we don't call deleteNotificationChannel() method, the channel only disappears on fresh installs, not app updates
+        // See https://app.asana.com/0/1125189844152671/1201842645469204 for more info
+        // This was the AppTP waitlist notification channel
+        manager.deleteNotificationChannel("com.duckduckgo.apptp")
     }
 
     @VisibleForTesting

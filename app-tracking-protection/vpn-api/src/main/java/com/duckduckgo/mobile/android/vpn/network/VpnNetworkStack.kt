@@ -17,6 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.network
 
 import android.os.ParcelFileDescriptor
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import java.net.InetAddress
 
 interface VpnNetworkStack {
@@ -34,8 +35,10 @@ interface VpnNetworkStack {
      * Called before the vpn tunnel is created and before the vpn is started.
      *
      * @return VpnTunnelConfig that will be used to configures the VPN's tunnel.
+     *
+     * The signature of this method is [suspend] to allow for asynchronous operations when creating the [VpnTunnelConfig].
      */
-    fun onPrepareVpn(): Result<VpnTunnelConfig>
+    suspend fun onPrepareVpn(): Result<VpnTunnelConfig>
 
     /**
      * Called before the VPN is started
@@ -49,7 +52,7 @@ interface VpnNetworkStack {
      *
      * @return `true` if the VPN is successfully stopped, `false` otherwise
      */
-    fun onStopVpn(): Result<Unit>
+    fun onStopVpn(reason: VpnStopReason): Result<Unit>
 
     /**
      * Clean when the networking layer is destroyed. You can use this method to clean up resources
@@ -67,11 +70,37 @@ interface VpnNetworkStack {
      * @param dns the additional dns servers you wish to add to the VPN service
      * @param routes the additional routes you wish to add to the VPN service. The key contains the InetAddress of the route and
      * value should be the mask width.
+     * @param appExclusionList the list of apps you wish to exclude from the VPN tunnel
      */
     data class VpnTunnelConfig(
         val mtu: Int,
         val addresses: Map<InetAddress, Int>,
         val dns: Set<InetAddress>,
         val routes: Map<InetAddress, Int>,
+        val appExclusionList: Set<String>,
     )
+
+    companion object EmptyVpnNetworkStack : VpnNetworkStack {
+        override val name = "empty"
+
+        override fun onCreateVpn(): Result<Unit> {
+            return Result.failure(Exception("EmptyVpnNetworkStack"))
+        }
+
+        override suspend fun onPrepareVpn(): Result<VpnTunnelConfig> {
+            return Result.failure(Exception("EmptyVpnNetworkStack"))
+        }
+
+        override fun onStartVpn(tunfd: ParcelFileDescriptor): Result<Unit> {
+            return Result.failure(Exception("EmptyVpnNetworkStack"))
+        }
+
+        override fun onStopVpn(reason: VpnStopReason): Result<Unit> {
+            return Result.failure(Exception("EmptyVpnNetworkStack"))
+        }
+
+        override fun onDestroyVpn(): Result<Unit> {
+            return Result.failure(Exception("EmptyVpnNetworkStack"))
+        }
+    }
 }

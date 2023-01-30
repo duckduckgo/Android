@@ -37,9 +37,8 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesBinding(AppScope::class)
 class RealVpnStateMonitor @Inject constructor(
@@ -50,28 +49,18 @@ class RealVpnStateMonitor @Inject constructor(
 
     override fun getStateFlow(vpnFeature: VpnFeature): Flow<VpnState> {
         return database.vpnServiceStateDao().getStateStats().map { mapState(it) }
-            .filter { it.state != INVALID }
-            .onEach { Timber.v("service $it") }
-            .combine(
-                vpnFeaturesRegistry.registryChanges()
-                    .filter { it.first == vpnFeature.featureName }
-                    .onStart {
-                        // when all app processes are killed and user opens the app, the VPN can take some time to start
-                        // we delay a bit here to give the VPN time to start then we call isFeatureRegistered()
-                        delay(1000)
-                        emit(vpnFeature.featureName to vpnFeaturesRegistry.isFeatureRegistered(vpnFeature))
-                    }
-                    .onEach { Timber.v("feature $it") },
-            ) { vpnState, feature ->
-                val isFeatureEnabled = feature.second
-                val isVpnEnabled = vpnState.state == VpnRunningState.ENABLED
+            .filter {
+                // we only care about the following states
+                (it.state == VpnRunningState.ENABLED) || (it.state == VpnRunningState.ENABLING) || (it.state == VpnRunningState.DISABLED)
+            }
+            .onEach { logcat { "service state value $it" } }
+            .map { vpnState ->
+                val isFeatureEnabled = vpnFeaturesRegistry.isFeatureRegistered(vpnFeature)
 
-                if (!isVpnEnabled) {
-                    vpnState
-                } else if (isFeatureEnabled) {
-                    vpnState.copy(state = VpnRunningState.ENABLED)
-                } else {
+                if (!isFeatureEnabled) {
                     vpnState.copy(state = VpnRunningState.DISABLED)
+                } else {
+                    vpnState
                 }
             }
             .onStart {
@@ -105,13 +94,5 @@ class RealVpnStateMonitor @Inject constructor(
             else -> VpnStateMonitor.AlwaysOnState.DEFAULT
         }
         return VpnState(runningState, stoppingReason, alwaysOnState)
-    }
-
-    private fun AlwaysOnState.asAlwaysOnStateModel(): VpnStateMonitor.AlwaysOnState {
-        return when (this) {
-            AlwaysOnState.ALWAYS_ON_ENABLED -> VpnStateMonitor.AlwaysOnState.ALWAYS_ON_ENABLED
-            AlwaysOnState.ALWAYS_ON_ENABLED_LOCKED_DOWN -> VpnStateMonitor.AlwaysOnState.ALWAYS_ON_LOCKED_DOWN
-            else -> VpnStateMonitor.AlwaysOnState.DEFAULT
-        }
     }
 }

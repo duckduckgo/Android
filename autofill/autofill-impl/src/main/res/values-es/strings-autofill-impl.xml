@@ -64,5 +64,12 @@
     <string name="credentialManagementViewMenuDelete">Eliminar</string>
 
     <string name="credentialManagementSuggestionsLabel">Sugerencias</string>
+    <string name="credentialManagementNoLoginsSavedTitle">Aún no hay inicios de sesión guardados</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Los inicios de sesión se almacenan de forma segura únicamente en este dispositivo.</string>
+
+    <string name="autofillManagementAddLogin">Añadir inicio de sesión</string>
+    <string name="autofillManagementSearchLogins">Buscar</string>
+    <string name="autofillManagementSearchClearDescription">Borrar búsqueda</string>
+    <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Sin resultados para «%1$s»</string>
 
 </resources>

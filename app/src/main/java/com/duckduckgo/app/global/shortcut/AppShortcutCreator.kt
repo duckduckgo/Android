@@ -26,12 +26,11 @@ import androidx.annotation.RequiresApi
 import androidx.annotation.UiThread
 import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.graphics.drawable.IconCompat
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
@@ -47,7 +46,7 @@ import timber.log.Timber
 class AppShortcutCreatorModule {
     @Provides
     @IntoSet
-    fun provideAppShortcutCreatorObserver(appShortcutCreator: AppShortcutCreator, appBuildConfig: AppBuildConfig): LifecycleObserver {
+    fun provideAppShortcutCreatorObserver(appShortcutCreator: AppShortcutCreator, appBuildConfig: AppBuildConfig): MainProcessLifecycleObserver {
         return AppShortcutCreatorLifecycleObserver(appShortcutCreator, appBuildConfig)
     }
 }
@@ -55,7 +54,7 @@ class AppShortcutCreatorModule {
 class AppShortcutCreatorLifecycleObserver(
     private val appShortcutCreator: AppShortcutCreator,
     private val appBuildConfig: AppBuildConfig,
-) : DefaultLifecycleObserver {
+) : MainProcessLifecycleObserver {
     @UiThread
     @Suppress("NewApi") // we use appBuildConfig
     override fun onCreate(owner: LifecycleOwner) {

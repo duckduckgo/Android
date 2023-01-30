@@ -254,8 +254,6 @@
     <string name="atp_FAQSixthText">Ochrana pred sledovaním aplikácií funguje vo vašom zariadení a neodosiela vaše osobné údaje zo zariadenia do DuckDuckGo.</string>
 
     <!--  App Tracking Protection Waitlist -->
-    <string name="atp_WaitlistActivityTitle">Ochrana pred sledovaním činnosti v aplikáciách</string>
-    <string name="atp_WaitlistActivityWaitlistTitle">Zoznam čakateľov na ochranu pred sledovaním aplikácií</string>
     <string name="atp_WaitlistNotificationTitle">Vaša pozvánka na ochranu pred sledovaním aplikácie je tu!</string>
     <string name="atp_WaitlistNotificationDescription">Pridali ste sa na zoznam čakateľov a požiadali ste nás, aby sme vás upozornili, keď na vás príde rad a budete si môcť vyskúšať našu ochranu e‑mailu. Klepnutím zobrazíte vašu pozvánku.</string>
     <string name="atp_WaitlistStatusNotJoined">Jeden jednoduchý krok pre lepšie súkromie aplikácie!</string>
@@ -274,7 +272,6 @@
     <string name="atp_WaitlistErrorJoining">Počas pridávania na zoznam čakateľov došlo k chybe. Skúste to znova neskôr.</string>
     <string name="atp_WaitlistJoinedWithNotification">Keď budete mať pripravenú ochranu e‑mailu,&lt;br/&gt;pošleme vám upozornenie.<annotation type="beta_link"> Viac informácií o beta verzii </annotation></string>
     <string name="atp_WaitlistJoinedWithoutNotification">Pozvánka na vyskúšanie ochrany sledovania aplikácií vám príde sem. Čoskoro sa vráťte, alebo vám môžeme poslať upozornenie, keď na vás príde rad\n\n<annotation type="notify_me_link">Oznamte mi</annotation>\n\n<annotation type="beta_link">Zistite viac o beta</annotation> verzii.</string>
-    <string name="atp_WaitlistRedeemCodeActivityTitle">Zadajte svoj pozývací kód</string>
     <string name="atp_WaitlistRedeemedCodeStatus">Úspech! Ste v hre.</string>
     <string name="atp_WaitlistBetaBlogPost">https://spreadprivacy.com/introducing-app-tracking-protection</string>
 

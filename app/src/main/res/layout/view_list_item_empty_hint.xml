@@ -14,11 +14,19 @@
   ~ limitations under the License.
   -->
 
-<com.google.android.material.textview.MaterialTextView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/listItemEmptyHintTitle"
-    style="@style/Widget.DuckDuckGo.ListItem.EmptyHint"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:text="@string/whitelistNoEntries"
-    tools:text="Lorem ipsum dolor sit amet" />
+    android:padding="@dimen/keyline_4">
+
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        android:id="@+id/listItemEmptyHintTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/whitelistNoEntries"
+        app:textType="secondary"
+        app:typography="body2" />
+
+</FrameLayout>

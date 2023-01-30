@@ -30,7 +30,9 @@ import java.lang.Thread.UncaughtExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority
+import logcat.asLog
+import logcat.logcat
 
 class VpnUncaughtExceptionHandler(
     private val originalHandler: UncaughtExceptionHandler?,
@@ -44,7 +46,7 @@ class VpnUncaughtExceptionHandler(
         thread: Thread,
         throwable: Throwable,
     ) {
-        Timber.e(throwable, "VPN uncaughtException")
+        logcat(LogPriority.ERROR) { throwable.asLog() }
         recordExceptionAndAllowCrash(thread, throwable)
     }
 
@@ -57,7 +59,7 @@ class VpnUncaughtExceptionHandler(
                 uncaughtExceptionRepository.recordUncaughtException(originalException, UncaughtExceptionSource.GLOBAL)
                 offlinePixelCountDataStore.applicationCrashCount += 1
             } catch (e: Throwable) {
-                Timber.e(e, "Failed to record exception")
+                logcat(LogPriority.ERROR) { e.asLog() }
             } finally {
                 originalHandler?.uncaughtException(thread, originalException)
             }

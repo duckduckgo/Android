@@ -242,8 +242,6 @@
     <string name="atp_FAQSixthText">App Tracking Protection funziona sul tuo dispositivo e non invia i tuoi dati personali dal tuo dispositivo a DuckDuckGo.</string>
 
     <!--  App Tracking Protection Waitlist -->
-    <string name="atp_WaitlistActivityTitle">Protezione dal tracciamento delle app</string>
-    <string name="atp_WaitlistActivityWaitlistTitle">Lista d\'attesa App Tracking Protection</string>
     <string name="atp_WaitlistNotificationTitle">Il tuo invito App Tracking Protection è arrivato.</string>
     <string name="atp_WaitlistNotificationDescription">Hai effettuato l\'iscrizione alla lista d\'attesa e ci hai chiesto di avvisarti quando sarà il tuo turno di provare la nostra funzionalità App Tracking Protection. Tocca per visualizzare l\'invito.</string>
     <string name="atp_WaitlistStatusNotJoined">Un passaggio semplice per migliorare la privacy delle app!</string>
@@ -262,7 +260,6 @@
     <string name="atp_WaitlistErrorJoining">Si è verificato un errore durante l\'iscrizione alla lista d\'attesa, riprova più tardi</string>
     <string name="atp_WaitlistJoinedWithNotification">Ti invieremo una notifica quando la funzione App Tracking Protection sarà pronta per te.<annotation type="beta_link">Ulteriori informazioni sulla versione beta</annotation></string>
     <string name="atp_WaitlistJoinedWithoutNotification">L\'invito a provare App Tracking Protection arriverà qui. Ricontrolla a breve. Oppure possiamo inviarti una notifica quando sarà il momento\n\n<annotation type="notify_me_link">Avvisami</annotation>\n\n<annotation type="beta_link">Scopri di più sulla versione beta</annotation></string>
-    <string name="atp_WaitlistRedeemCodeActivityTitle">Inserisci il tuo codice di invito</string>
     <string name="atp_WaitlistRedeemedCodeStatus">Ecco fatto.</string>
     <string name="atp_WaitlistBetaBlogPost">https://spreadprivacy.com/presentazione-app-tracking-protection</string>
 

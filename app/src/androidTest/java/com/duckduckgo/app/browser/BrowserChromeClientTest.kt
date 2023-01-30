@@ -144,7 +144,7 @@ class BrowserChromeClientTest {
     @Test
     fun whenOnProgressChangedCalledThenListenerInstructedToUpdateProgress() {
         testee.onProgressChanged(webView, 10)
-        verify(mockWebViewClientListener).progressChanged(10)
+        verify(mockWebViewClientListener).progressChanged(20) // Value should come from the webView instance
     }
 
     @UiThreadTest
@@ -152,6 +152,16 @@ class BrowserChromeClientTest {
     fun whenOnProgressChangedCalledThenListenerInstructedToUpdateNavigationState() {
         testee.onProgressChanged(webView, 10)
         verify(mockWebViewClientListener).navigationStateChanged(any())
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnProgressChangedCalledAndValueIsZeroThenNothingCalled() {
+        val mockWebView: WebView = mock()
+        whenever(mockWebView.progress).thenReturn(0)
+        testee.onProgressChanged(mockWebView, 10)
+        verify(mockWebViewClientListener, never()).navigationStateChanged(any())
+        verify(mockWebViewClientListener, never()).progressChanged(any())
     }
 
     @UiThreadTest
@@ -292,6 +302,10 @@ class BrowserChromeClientTest {
     private class TestWebView(context: Context) : WebView(context) {
         override fun getUrl(): String {
             return "https://example.com"
+        }
+
+        override fun getProgress(): Int {
+            return 20
         }
     }
 }

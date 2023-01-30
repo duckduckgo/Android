@@ -18,17 +18,17 @@ package com.duckduckgo.autofill.store
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.autofill.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
-import com.duckduckgo.autofill.InternalTestUserChecker
-import com.duckduckgo.autofill.domain.app.LoginCredentials
-import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult
-import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult.ExactMatch
-import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult.NoMatch
-import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult.UrlOnlyMatch
-import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult.UsernameMatch
-import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult.UsernameMissing
+import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
+import com.duckduckgo.autofill.api.InternalTestUserChecker
+import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult
+import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult.ExactMatch
+import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult.NoMatch
+import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult.UrlOnlyMatch
+import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult.UsernameMatch
+import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult.UsernameMissing
+import com.duckduckgo.autofill.api.ui.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.autofill.store.urlmatcher.AutofillDomainNameUrlMatcher
-import com.duckduckgo.autofill.ui.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.securestorage.api.SecureStorage
 import com.duckduckgo.securestorage.api.WebsiteLoginDetails
 import com.duckduckgo.securestorage.api.WebsiteLoginDetailsWithCredentials

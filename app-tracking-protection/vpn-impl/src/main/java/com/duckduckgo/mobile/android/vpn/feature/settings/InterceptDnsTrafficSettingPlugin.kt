@@ -21,7 +21,7 @@ import com.duckduckgo.mobile.android.vpn.feature.*
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -36,7 +36,7 @@ class InterceptDnsTrafficSettingPlugin @Inject constructor(
         @Suppress("NAME_SHADOWING")
         val name = appTpSettingValueOf(name.value)
         if (name == settingName) {
-            Timber.d("Received configuration: $jsonString")
+            logcat { "Received configuration: $jsonString" }
             jsonAdapter.fromJson(jsonString)?.let { config ->
                 appTpFeatureConfig.edit { setEnabled(settingName, config.state == "enabled") }
             }

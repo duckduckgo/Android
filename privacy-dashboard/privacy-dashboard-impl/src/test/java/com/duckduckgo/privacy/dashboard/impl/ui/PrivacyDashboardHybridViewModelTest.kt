@@ -70,6 +70,7 @@ class PrivacyDashboardHybridViewModelTest {
         requestDataViewStateMapper = AppSiteRequestDataViewStateMapper(),
         protectionStatusViewStateMapper = AppProtectionStatusViewStateMapper(contentBlocking, unprotectedTemporary),
         privacyDashboardPayloadAdapter = mock(),
+        autoconsentStatusViewStateMapper = CookiePromptManagementStatusViewStateMapper(),
     )
 
     @Test

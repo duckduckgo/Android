@@ -22,7 +22,6 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
-import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewPropertyAnimatorCompat
 import androidx.lifecycle.ViewModelProvider
@@ -32,7 +31,6 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.extensions.html
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.mobile.android.R as CommonR
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.content_onboarding_welcome.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
@@ -148,10 +146,7 @@ class WelcomePage : OnboardingPageFragment() {
             ctaText = it.getString(R.string.onboardingDaxText)
             hiddenTextCta.text = ctaText.html(it)
             dialogTextCta.textInDialog = ctaText.html(it)
-            dialogTextCta.setTextColor(ContextCompat.getColor(it, CommonR.color.grayishBrown))
-            cardView.backgroundTintList = ContextCompat.getColorStateList(it, CommonR.color.white)
         }
-        triangle.setImageResource(R.drawable.ic_triangle_bubble_white)
     }
 
     private fun setSkipAnimationListener() {

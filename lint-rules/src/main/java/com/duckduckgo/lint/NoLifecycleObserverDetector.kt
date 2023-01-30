@@ -33,22 +33,28 @@ import java.util.*
 class NoLifecycleObserverDetector : Detector(), SourceCodeScanner {
     override fun getApplicableUastTypes() = listOf(UClass::class.java)
 
-    override fun createUastHandler(context: JavaContext): UElementHandler = NoInternalImportHandler(context)
+    override fun createUastHandler(context: JavaContext): UElementHandler = InternalDetectorHandler(context)
 
-    internal class NoInternalImportHandler(private val context: JavaContext) : UElementHandler() {
+    internal class InternalDetectorHandler(private val context: JavaContext) : UElementHandler() {
         override fun visitClass(node: UClass) {
-            if (node.extendsListTypes.any { it.className == "LifecycleObserver" }) {
+            if (node.extendsListTypes.any { bannedObserverClassNames.contains(it.className) }) {
                 context.report(NO_LIFECYCLE_OBSERVER_ISSUE, node, context.getNameLocation(node), "LifecycleObserver should not be directly extended")
             }
         }
     }
 
     companion object {
+        private val bannedObserverClassNames = listOf(
+            "LifecycleEventObserver",
+            "LifecycleObserver",
+            "DefaultLifecycleObserver",
+            "FullLifecycleObserver",
+        )
         val NO_LIFECYCLE_OBSERVER_ISSUE = Issue.create("NoLifecycleObserver",
-            "The LifecycleObserver type should not be extended.",
+            "The LifecycleObserver classes should not be extended.",
             """
-                The LifecycleObserver should not be used.
-                Use DefaultLifecycleObserver instead.
+                Use MainProcessLifecycleObserver instead if you want to observe the lifecycle of the main process application.
+                Use VpnProcessLifecycleObserver instead if you want to observe the onCreate lifecycle of the vpn process application.
             """.trimIndent(),
             Category.CORRECTNESS, 10, ERROR,
             Implementation(NoLifecycleObserverDetector::class.java, EnumSet.of(JAVA_FILE, TEST_SOURCES))

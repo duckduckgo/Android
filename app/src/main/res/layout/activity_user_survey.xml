@@ -18,10 +18,8 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.duckduckgo.app.feedback.ui.common.FeedbackActivity">
+    android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/surveyActivityContainerViewGroup"
@@ -29,37 +27,31 @@
         android:layout_height="match_parent"
         android:background="@drawable/survey_background">
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/title"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-medium"
-            android:gravity="center_horizontal"
-            android:letterSpacing="0.18"
-            android:paddingStart="30dp"
-            android:paddingEnd="30dp"
-            android:paddingTop="22dp"
-            android:paddingBottom="22dp"
+            android:layout_height="56dp"
+            android:gravity="center"
+            android:paddingStart="@dimen/keyline_4"
+            android:paddingEnd="@dimen/keyline_4"
             android:text="@string/surveyTitle"
-            android:textAllCaps="true"
-            android:textColor="@color/white"
-            android:textSize="12sp"
-            android:textStyle="normal"
+            android:textColor="?daxColorWhite"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:typography="h2" />
 
-        <com.duckduckgo.mobile.android.ui.view.button.IconButton
+        <ImageView
             android:id="@+id/dismissButton"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            app:srcCompat="@drawable/ic_close_24dp"
-            app:backgroundTint="@color/carolinaBlue"
+            android:layout_marginEnd="@dimen/keyline_4"
+            android:background="?attr/selectableItemBackgroundBorderless"
             app:contentDescription="@string/surveyDismissContentDescription"
             app:layout_constraintBottom_toBottomOf="@id/title"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/title" />
+            app:layout_constraintTop_toTopOf="@id/title"
+            app:srcCompat="@drawable/ic_close_24"
+            app:tint="?attr/daxColorWhite" />
 
         <WebView
             android:id="@+id/webView"
@@ -72,12 +64,12 @@
 
         <ProgressBar
             android:id="@+id/progress"
-            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:indeterminateTint="@color/white"
+            android:indeterminateTint="?daxColorWhite"
             android:indeterminateTintMode="src_in"
-            android:secondaryProgressTint="@color/white"
+            android:secondaryProgressTint="?daxColorWhite"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -86,7 +78,6 @@
 
         <LinearLayout
             android:id="@+id/errorView"
-            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -94,34 +85,29 @@
             android:paddingTop="16dp"
             android:paddingEnd="30dp"
             android:paddingBottom="16dp"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/title"
             app:layout_constraintVertical_bias="0.34">
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:fontFamily="sans-serif-medium"
-                android:lineSpacingExtra="-4sp"
                 android:text="@string/surveyLoadingErrorTitle"
                 android:textAlignment="center"
-                android:textColor="@color/white"
-                android:textSize="28sp"
-                android:textStyle="normal" />
+                android:textColor="?daxColorWhite"
+                app:typography="h1" />
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif"
-                android:lineSpacingExtra="8sp"
                 android:text="@string/surveyLoadingErrorText"
                 android:textAlignment="center"
-                android:textColor="@color/white"
-                android:textSize="16sp"
-                android:textStyle="normal" />
+                android:textColor="?daxColorWhite"
+                app:typography="body1" />
 
         </LinearLayout>
 

@@ -23,9 +23,11 @@ import retrofit2.http.GET
 
 @ContributesServiceApi(AppScope::class)
 interface TrackerListService {
-    @GET("https://staticcdn.duckduckgo.com/trackerblocking/v3/tds.json")
+    @GET("${TDS_URL}tds.json")
     fun tds(): Call<TdsJson>
 
     @GET("/contentblocking/trackers-unprotected-temporary.txt")
     fun temporaryWhitelist(): Call<String>
 }
+
+const val TDS_URL = "https://staticcdn.duckduckgo.com/trackerblocking/v3/"

@@ -47,8 +47,8 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
+import logcat.logcat
 import org.threeten.bp.LocalDateTime
-import timber.log.Timber
 
 @ContributesViewModel(FragmentScope::class)
 class DeviceShieldActivityFeedViewModel @Inject constructor(
@@ -66,8 +66,6 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
     private val tickerChannel = MutableStateFlow(System.currentTimeMillis())
     private var tickerJob: Job? = null
 
-    private val refreshVpnRunningState = MutableStateFlow(System.currentTimeMillis())
-
     sealed class Command {
         data class ShowProtectedAppsList(
             val vpnState: VpnState,
@@ -83,7 +81,7 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
 
     private fun startTickerRefresher() {
-        Timber.i("startTickerRefresher")
+        logcat { "startTickerRefresher" }
         tickerJob?.cancel()
         tickerJob = viewModelScope.launch {
             while (isActive) {
@@ -96,7 +94,6 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
     private suspend fun getRunningState(): Flow<VpnState> = withContext(dispatcherProvider.io()) {
         return@withContext vpnStateMonitor
             .getStateFlow(AppTpVpnFeature.APPTP_VPN)
-            .combine(refreshVpnRunningState.asStateFlow()) { state, _ -> state }
     }
 
     suspend fun getMostRecentTrackers(

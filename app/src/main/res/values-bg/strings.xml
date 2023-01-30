@@ -398,7 +398,7 @@
     <string name="systemSearchOnboardingButtonOk">Разбрах</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">СКРИЙ</string>
+    <string name="daxDialogHideButton">Скрий</string>
     <string name="daxDialogPhew">Слава Богу!</string>
     <string name="daxDialogNext">Следващ</string>
     <string name="daxDialogHighFive">Дай пет!</string>
@@ -652,7 +652,8 @@
     <string name="autoconsentSecondaryCta">Не, благодаря</string>
 
     <string name="autoconsentSetting">Управление на изскачащите прозорци за бисквитки</string>
-    <string name="autoconsentAnimationText">Бисквитките са настроени</string>
+    <string name="autoconsentCosmeticNoticeAnimationText">Изскачащият прозорец е скрит</string>
+    <string name="autoconsentManagedNoticeAnimationText">Бисквитките са настроени</string>
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Разрешения за сайтове</string>

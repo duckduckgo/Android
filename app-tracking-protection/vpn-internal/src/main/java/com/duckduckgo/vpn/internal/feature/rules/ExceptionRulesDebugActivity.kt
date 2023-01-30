@@ -39,7 +39,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.logcat
 
 @InjectWith(ActivityScope::class)
 class ExceptionRulesDebugActivity : DuckDuckGoActivity(), RuleTrackerView.RuleTrackerListener {
@@ -156,7 +156,7 @@ class ExceptionRulesDebugActivity : DuckDuckGoActivity(), RuleTrackerView.RuleTr
         lifecycleScope.launch(dispatchers.io()) {
             val tag = (view.tag as String?).orEmpty()
             val (appPackageName, domain) = tag.split("_")
-            Timber.v("$appPackageName / $domain enabled: $enabled")
+            logcat { "$appPackageName / $domain enabled: $enabled" }
             if (enabled) {
                 sendBroadcast(ExceptionRulesDebugReceiver.ruleIntent(appPackageName, domain))
             } else {

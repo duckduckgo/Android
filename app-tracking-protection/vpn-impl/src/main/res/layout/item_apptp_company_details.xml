@@ -17,102 +17,103 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:orientation="vertical"
-              android:paddingStart="16dp"
-              android:paddingTop="8dp"
-              android:paddingEnd="16dp">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="@dimen/keyline_4"
+    android:paddingTop="@dimen/keyline_2"
+    android:paddingEnd="@dimen/keyline_4">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingTop="@dimen/keyline_2"
+        android:paddingBottom="@dimen/keyline_1">
+
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            android:id="@+id/tracking_company_name"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingTop="@dimen/keyline_2"
-            android:paddingBottom="@dimen/keyline_1">
-
-        <TextView
-                android:id="@+id/tracking_company_name"
-                style="@style/TextAppearance.DuckDuckGo.Body1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:textColor="?normalTextColor"
-                android:textStyle="bold"
-                app:layout_constraintStart_toEndOf="@+id/tracking_company_icon"
-                app:layout_constraintTop_toTopOf="@+id/tracking_company_icon"
-                tools:text="Google"/>
+            android:layout_marginStart="@dimen/keyline_4"
+            app:layout_constraintBottom_toTopOf="@+id/tracking_company_attempts"
+            app:layout_constraintStart_toEndOf="@+id/tracking_company_icon"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
+            app:typography="body1_bold"
+            tools:text="Google" />
 
         <ImageView
-                android:id="@+id/tracking_company_icon"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/tracking_network_logo_google_llc"/>
+            android:id="@+id/tracking_company_icon"
+            android:layout_width="@dimen/listItemImageContainerSize"
+            android:layout_height="@dimen/listItemImageContainerSize"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/tracking_network_logo_google_llc" />
 
         <ImageView
-                android:id="@+id/tracking_company_block"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="20dp"
-                app:layout_constraintStart_toStartOf="@+id/tracking_company_icon"
-                app:layout_constraintTop_toTopOf="@+id/tracking_company_icon"
-                app:srcCompat="@drawable/ic_block"/>
+            android:id="@+id/tracking_company_block"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            app:layout_constraintStart_toStartOf="@+id/tracking_company_icon"
+            app:layout_constraintTop_toTopOf="@+id/tracking_company_icon"
+            app:srcCompat="@drawable/ic_block" />
 
-        <TextView
-                android:id="@+id/tracking_company_attempts"
-                style="@style/TextAppearance.DuckDuckGo.Body2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/tracking_company_icon"
-                tools:text="6 attempts. Known to collect:"/>
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            android:id="@+id/tracking_company_attempts"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_4"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tracking_company_icon"
+            app:layout_constraintTop_toBottomOf="@+id/tracking_company_name"
+            app:typography="body2"
+            tools:text="6 attempts. Known to collect:" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout
-            android:id="@+id/tracking_company_top_signals"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="56dp"
-            android:layout_marginTop="@dimen/keyline_1"
-            android:orientation="vertical"/>
+        android:id="@+id/tracking_company_top_signals"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="56dp"
+        android:layout_marginTop="@dimen/keyline_1"
+        android:orientation="vertical" />
 
-    <TextView
-            android:id="@+id/tracking_company_show_more"
-            style="@style/TextAppearance.DuckDuckGo.Body2"
-            android:background="?selectableItemBackground"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/keyline_1"
-            android:layout_marginTop="@dimen/keyline_2"
-            android:layout_marginStart="56dp"
-            tools:text="Show 7 more"/>
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        android:id="@+id/tracking_company_show_more"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="56dp"
+        android:layout_marginTop="@dimen/keyline_2"
+        android:background="?selectableItemBackground"
+        android:padding="@dimen/keyline_1"
+        app:typography="body2"
+        tools:text="Show 7 more" />
 
     <LinearLayout
-            android:id="@+id/tracking_company_bottom_signals"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="56dp"
-            android:orientation="vertical"
-            android:visibility="gone"/>
+        android:id="@+id/tracking_company_bottom_signals"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="56dp"
+        android:orientation="vertical"
+        android:visibility="gone" />
 
-    <TextView
-            android:id="@+id/tracking_company_show_less"
-            style="@style/TextAppearance.DuckDuckGo.Body2"
-            android:background="?selectableItemBackground"
-            android:text="@string/atp_CompanyDetailsTrackingShowLess"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/keyline_1"
-            android:layout_marginTop="@dimen/keyline_2"
-            android:layout_marginStart="56dp"
-            android:visibility="gone"/>
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        android:id="@+id/tracking_company_show_less"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="56dp"
+        android:layout_marginTop="@dimen/keyline_2"
+        android:background="?selectableItemBackground"
+        android:padding="@dimen/keyline_1"
+        android:text="@string/atp_CompanyDetailsTrackingShowLess"
+        android:visibility="gone"
+        app:typography="body2" />
 
 </LinearLayout>

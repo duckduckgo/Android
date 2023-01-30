@@ -254,8 +254,6 @@
     <string name="atp_FAQSixthText">Apsauga nuo programėlių sekimo veikia jūsų prietaise ir nesiunčia jūsų asmeninių duomenų iš prietaiso į „DuckDuckGo“.</string>
 
     <!--  App Tracking Protection Waitlist -->
-    <string name="atp_WaitlistActivityTitle">Programų sekimo apsauga</string>
-    <string name="atp_WaitlistActivityWaitlistTitle">Apsaugos nuo programėlių sekimo laukiančiųjų sąrašas</string>
     <string name="atp_WaitlistNotificationTitle">Jūsų apsaugos nuo programėlių sekimo kvietimas yra čia!</string>
     <string name="atp_WaitlistNotificationDescription">Jūs prisijungėte prie laukimo sąrašo ir paprašėte mūsų informuoti jus, kai ateis eilė išbandyti mūsų el. pašto apsaugos funkciją. Bakstelėkite norėdami peržiūrėti savo kvietimą.</string>
     <string name="atp_WaitlistStatusNotJoined">Vienas paprastas žingsnis siekiant geresnio programos privatumo!</string>
@@ -274,7 +272,6 @@
     <string name="atp_WaitlistErrorJoining">Prisijungiant prie laukimo sąrašo įvyko klaida, bandykite dar kartą vėliau</string>
     <string name="atp_WaitlistJoinedWithNotification">Atsiųsime jums pranešimą, kai&lt;br/&gt; el. pašto apsauga bus parengta.<annotation type="beta_link"> Sužinokite daugiau apie beta versiją </annotation></string>
     <string name="atp_WaitlistJoinedWithoutNotification">Jūsų kviečiama išbandyti apsauga nuo programėlių sekimo pasirodys čia. Netrukus sugrįžkite arba galime atsiųsti jums pranešimą, kai ateis jūsų eilė\n\n<annotation type="notify_me_link">Pranešti man</annotation>\n\n<annotation type="beta_link">Sužinoti daugiau apie beta versiją</annotation></string>
-    <string name="atp_WaitlistRedeemCodeActivityTitle">Įveskite kvietimo kodą</string>
     <string name="atp_WaitlistRedeemedCodeStatus">Pavyko! Jūs prisijungėte.</string>
     <string name="atp_WaitlistBetaBlogPost">https://spreadprivacy.com/introducing-app-tracking-protection</string>
 

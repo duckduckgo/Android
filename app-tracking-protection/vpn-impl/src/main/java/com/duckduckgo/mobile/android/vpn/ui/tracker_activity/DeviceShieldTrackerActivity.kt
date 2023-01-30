@@ -39,6 +39,8 @@ import com.duckduckgo.mobile.android.ui.view.InfoPanel.Companion.APPTP_SETTINGS_
 import com.duckduckgo.mobile.android.ui.view.InfoPanel.Companion.REPORT_ISSUES_ANNOTATION
 import com.duckduckgo.mobile.android.ui.view.SwitchView
 import com.duckduckgo.mobile.android.ui.view.TypewriterDaxDialog
+import com.duckduckgo.mobile.android.ui.view.dialog.StackedAlertDialogBuilder
+import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.view.show
@@ -62,6 +64,7 @@ import com.duckduckgo.mobile.android.vpn.ui.report.DeviceShieldAppTrackersInfo
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.BannerState
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.ViewEvent
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.ViewEvent.StartVpn
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.DisableVpnDialogOptions
 import com.google.android.material.snackbar.Snackbar
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -71,17 +74,14 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import logcat.logcat
 import nl.dionsegijn.konfetti.models.Shape
 import nl.dionsegijn.konfetti.models.Size
-import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
 class DeviceShieldTrackerActivity :
     DuckDuckGoActivity(),
-    DeviceShieldActivityFeedFragment.DeviceShieldActivityFeedListener,
-    AppTPDisableConfirmationDialog.Listener,
-    AppTPVpnConflictDialog.Listener,
-    VpnRemoveFeatureConfirmationDialog.Listener {
+    DeviceShieldActivityFeedFragment.DeviceShieldActivityFeedListener {
 
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels
@@ -247,8 +247,8 @@ class DeviceShieldTrackerActivity :
             is DeviceShieldTrackerActivityViewModel.Command.LaunchManageAppsProtection -> launchManageAppsProtection()
             is DeviceShieldTrackerActivityViewModel.Command.LaunchMostRecentActivity -> launchMostRecentActivity()
             is DeviceShieldTrackerActivityViewModel.Command.ShowDisableVpnConfirmationDialog -> launchDisableConfirmationDialog()
-            is DeviceShieldTrackerActivityViewModel.Command.ShowVpnConflictDialog -> launchVPNConflictDialog(false)
-            is DeviceShieldTrackerActivityViewModel.Command.ShowVpnAlwaysOnConflictDialog -> launchVPNConflictDialog(true)
+            is DeviceShieldTrackerActivityViewModel.Command.ShowVpnConflictDialog -> showVpnConflictDialog()
+            is DeviceShieldTrackerActivityViewModel.Command.ShowVpnAlwaysOnConflictDialog -> showAlwaysOnConflictDialog()
             is DeviceShieldTrackerActivityViewModel.Command.ShowAlwaysOnPromotionDialog -> launchAlwaysOnPromotionDialog()
             is DeviceShieldTrackerActivityViewModel.Command.ShowAlwaysOnLockdownWarningDialog -> launchAlwaysOnLockdownEnabledDialog()
             is DeviceShieldTrackerActivityViewModel.Command.VPNPermissionNotGranted -> quietlyToggleAppTpSwitch(false)
@@ -273,30 +273,88 @@ class DeviceShieldTrackerActivity :
     private fun launchDisableConfirmationDialog() {
         deviceShieldSwitch.quietlySetIsChecked(true, enableAppTPSwitchListener)
         deviceShieldPixels.didShowDisableTrackingProtectionDialog()
-        val dialog = AppTPDisableConfirmationDialog.instance(this)
-        dialog.show(
-            supportFragmentManager,
-            AppTPDisableConfirmationDialog.TAG_APPTP_DISABLE_DIALOG,
-        )
+
+        StackedAlertDialogBuilder(this)
+            .setTitle(R.string.atp_DisableConfirmationDialogTitle)
+            .setMessage(getString(R.string.atp_DisableConfirmationDialogMessage))
+            .setStackedButtons(DisableVpnDialogOptions.asOptions())
+            .addEventListener(
+                object : StackedAlertDialogBuilder.EventListener() {
+                    override fun onButtonClicked(position: Int) {
+                        when (DisableVpnDialogOptions.getOptionFromPosition(position)) {
+                            DisableVpnDialogOptions.DISABLE_APP -> onOpenAppProtection()
+                            DisableVpnDialogOptions.DISABLE_VPN -> onTurnAppTrackingProtectionOff()
+                            DisableVpnDialogOptions.CANCEL -> onDisableDialogCancelled()
+                        }
+                    }
+                },
+            )
+            .show()
     }
 
     private fun launchRemoveFeatureConfirmationDialog() {
         deviceShieldPixels.didShowRemoveTrackingProtectionFeatureDialog()
-        val dialog = VpnRemoveFeatureConfirmationDialog.instance(this)
-        dialog.show(
-            supportFragmentManager,
-            VpnRemoveFeatureConfirmationDialog.TAG_VPN_REMOVE_FEATURE_DIALOG,
-        )
+
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.atp_RemoveFeatureDialogTitle)
+            .setMessage(R.string.atp_RemoveFeatureDialogMessage)
+            .setPositiveButton(R.string.atp_RemoveFeatureDialogRemove)
+            .setNegativeButton(R.string.atp_RemoveFeatureDialogCancel)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.removeFeature()
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        deviceShieldPixels.didChooseToCancelRemoveTrakcingProtectionDialog()
+                    }
+                },
+            )
+            .show()
     }
 
-    private fun launchVPNConflictDialog(isAlwaysOn: Boolean) {
+    private fun showVpnConflictDialog() {
         quietlyToggleAppTpSwitch(false)
         deviceShieldPixels.didShowVpnConflictDialog()
-        val dialog = AppTPVpnConflictDialog.instance(this, isAlwaysOn)
-        dialog.show(
-            supportFragmentManager,
-            AppTPVpnConflictDialog.TAG_VPN_CONFLICT_DIALOG,
-        )
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.atp_VpnConflictDialogTitle)
+            .setMessage(R.string.atp_VpnConflictDialogMessage)
+            .setPositiveButton(R.string.atp_VpnConflictDialogGotIt)
+            .setNegativeButton(R.string.atp_VpnConflictDialogCancel)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        onVpnConflictDialogContinue()
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        onVpnConflictDialogDismiss()
+                    }
+                },
+            )
+            .show()
+    }
+
+    private fun showAlwaysOnConflictDialog() {
+        deviceShieldPixels.didShowVpnConflictDialog()
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.atp_VpnConflictAlwaysOnDialogTitle)
+            .setMessage(R.string.atp_VpnConflictDialogAlwaysOnMessage)
+            .setPositiveButton(R.string.atp_VpnConflictDialogOpenSettings)
+            .setNegativeButton(R.string.atp_VpnConflictDialogCancel)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        onVpnConflictDialogGoToSettings()
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        onVpnConflictDialogDismiss()
+                    }
+                },
+            )
+            .show()
     }
 
     private fun launchAlwaysOnPromotionDialog() {
@@ -333,26 +391,26 @@ class DeviceShieldTrackerActivity :
         ).show(supportFragmentManager, TAG_APPTP_PROMOTE_ALWAYS_ON_DIALOG)
     }
 
-    override fun onOpenAppProtection() {
+    fun onOpenAppProtection() {
         deviceShieldPixels.didChooseToDisableOneAppFromDialog()
         viewModel.onViewEvent(ViewEvent.LaunchExcludedApps)
     }
 
-    override fun onTurnAppTrackingProtectionOff() {
+    fun onTurnAppTrackingProtectionOff() {
         quietlyToggleAppTpSwitch(false)
         deviceShieldPixels.didChooseToDisableTrackingProtectionFromDialog()
         viewModel.onAppTpManuallyDisabled()
     }
 
-    override fun onDisableDialogCancelled() {
+    fun onDisableDialogCancelled() {
         deviceShieldPixels.didChooseToCancelTrackingProtectionDialog()
     }
 
-    override fun onVpnConflictDialogDismiss() {
+    fun onVpnConflictDialogDismiss() {
         deviceShieldPixels.didChooseToDismissVpnConflictDialog()
     }
 
-    override fun onVpnConflictDialogGoToSettings() {
+    fun onVpnConflictDialogGoToSettings() {
         deviceShieldPixels.didChooseToOpenSettingsFromVpnConflictDialog()
         openVPNSettings()
     }
@@ -368,17 +426,9 @@ class DeviceShieldTrackerActivity :
         startActivity(intent)
     }
 
-    override fun onVpnConflictDialogContinue() {
+    fun onVpnConflictDialogContinue() {
         deviceShieldPixels.didChooseToContinueFromVpnConflictDialog()
         checkVPNPermission()
-    }
-
-    override fun OnRemoveFeatureDialogCancel() {
-        deviceShieldPixels.didChooseToCancelRemoveTrakcingProtectionDialog()
-    }
-
-    override fun onRemoveFeature() {
-        viewModel.removeFeature()
     }
 
     private fun checkVPNPermission() {
@@ -434,7 +484,7 @@ class DeviceShieldTrackerActivity :
         if (::deviceShieldSwitch.isInitialized) {
             quietlyToggleAppTpSwitch(state.runningState.state == VpnRunningState.ENABLED)
         } else {
-            Timber.v("switch view reference not yet initialized; cache value until menu populated")
+            logcat { "switch view reference not yet initialized; cache value until menu populated" }
         }
 
         updateCounts(state.trackerCountInfo)

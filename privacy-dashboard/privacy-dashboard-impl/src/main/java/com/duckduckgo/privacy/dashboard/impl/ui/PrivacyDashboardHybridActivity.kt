@@ -36,6 +36,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.tabId
+import com.duckduckgo.autoconsent.api.AutoconsentNav
 import com.duckduckgo.browser.api.brokensite.BrokenSiteNav
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.store.AppTheme
@@ -43,6 +44,7 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.privacy.dashboard.impl.databinding.ActivityPrivacyHybridDashboardBinding
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenSettings
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenURL
 import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
@@ -59,6 +61,9 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var rendererFactory: PrivacyDashboardRendererFactory
+
+    @Inject
+    lateinit var autoconsentNav: AutoconsentNav
 
     @Inject
     lateinit var brokenSiteNav: BrokenSiteNav
@@ -84,6 +89,9 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                 },
                 onUrlClicked = { payload ->
                     viewModel.onUrlClicked(payload)
+                },
+                onOpenSettings = { payload ->
+                    viewModel.onOpenSettings(payload)
                 },
                 onBrokenSiteClicked = { viewModel.onReportBrokenSiteSelected() },
                 onClose = { this@PrivacyDashboardHybridActivity.finish() },
@@ -121,12 +129,21 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                 startActivity(brokenSiteNav.navigate(this, it.data))
             }
             is OpenURL -> openUrl(it.url)
+            is OpenSettings -> openSettings(it.target)
         }
     }
 
     private fun openUrl(url: String) {
         startActivity(browserNav.openInNewTab(this, url))
         finish()
+    }
+
+    private fun openSettings(target: String) {
+        if (target == "cpm") {
+            startActivity(autoconsentNav.openAutoconsentSettings(this))
+        } else {
+            finish()
+        }
     }
 
     @SuppressLint("SetJavaScriptEnabled")

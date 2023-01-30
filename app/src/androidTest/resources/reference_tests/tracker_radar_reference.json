@@ -63,6 +63,10 @@
                 {
                     "action": "ignore",
                     "rule": "tracker\\.test\\/breakage"
+                },
+                {
+                    "action": "unsupported-action",
+                    "rule": "tracker\\.test\\/unsupported-action"
                 }
             ]
         },
@@ -82,6 +86,10 @@
             "rules": [
                 {
                     "rule": "ignore\\.test\\/tracker"
+                },
+                {
+                    "action": "unsupported-action",
+                    "rule": "ignore\\.test/unsupported-action"
                 }
             ]
         },

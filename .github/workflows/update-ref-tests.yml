@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: ${{ github.head_ref || github.ref_name }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -44,6 +44,7 @@ jobs:
         run: copy-files-from-to
 
       - name: Create PR
+        id: create-pr
         if: ${{ steps.update-check.outcome == 'failure' }}
         uses: peter-evans/create-pull-request@v4
         with:
@@ -58,4 +59,34 @@ jobs:
             - Automated reference tests dependency update
             
             This PR updates the reference tests dependency to the latest available version and copies the necessary files.
+            If tests have failed, see https://app.asana.com/0/0/1203766026095653/f for further information on what to do next.
+            
             - [ ] All tests must pass
+
+      - name: Create Asana task when workflow succeeded
+        if: ${{ steps.update-check.outcome == 'failure' }}
+        uses: honeycombio/gha-create-asana-task@main
+        with:
+          asana-secret: ${{ secrets.GH_ASANA_SECRET }}
+          asana-workspace-id: ${{ secrets.GH_ASANA_WORKSPACE_ID }}
+          asana-project-id: ${{ secrets.GH_ASANA_AOR_PROJECT_ID }}
+          asana-section-id: ${{ secrets.GH_ASANA_INCOMING_ID }}
+          asana-task-name: Update reference tests to latest version
+          asana-task-description: |
+            Reference tests have been updated and a PR created.
+            
+            If tests failed check out https://app.asana.com/0/0/1203766026095653/f for further information on what to do next.
+            
+            See ${{ steps.create-pr.outputs.pull-request-url }}
+
+      - name: Create Asana task when workflow failed
+        if: ${{ failure() }}
+        uses: honeycombio/gha-create-asana-task@main
+        with:
+          asana-secret: ${{ secrets.GH_ASANA_SECRET }}
+          asana-workspace-id: ${{ secrets.GH_ASANA_WORKSPACE_ID }}
+          asana-project-id: ${{ secrets.GH_ASANA_AOR_PROJECT_ID }}
+          asana-section-id: ${{ secrets.GH_ASANA_INCOMING_ID }}
+          asana-task-name: GH Workflow Failure - Update reference tests
+          asana-task-description: The update reference tests workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+

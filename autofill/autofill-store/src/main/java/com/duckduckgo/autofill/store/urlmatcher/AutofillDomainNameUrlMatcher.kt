@@ -17,7 +17,7 @@
 package com.duckduckgo.autofill.store.urlmatcher
 
 import com.duckduckgo.app.global.extractDomain
-import com.duckduckgo.autofill.ui.urlmatcher.AutofillUrlMatcher
+import com.duckduckgo.autofill.api.ui.urlmatcher.AutofillUrlMatcher
 import javax.inject.Inject
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import timber.log.Timber

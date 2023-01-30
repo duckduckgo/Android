@@ -41,7 +41,7 @@ import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesMultibinding(
     scope = VpnScope::class,
@@ -102,7 +102,7 @@ class AlwaysOnLockDownDetector @Inject constructor(
             resultCode: Int,
             resultData: Bundle?,
         ) {
-            Timber.v("Lockdown notification pressed")
+            logcat { "Lockdown notification pressed" }
         }
     }
 }

@@ -398,7 +398,7 @@
     <string name="systemSearchOnboardingButtonOk">Sapratu</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">PASLĒPT</string>
+    <string name="daxDialogHideButton">Paslēpt</string>
     <string name="daxDialogPhew">Pē!</string>
     <string name="daxDialogNext">Nākamais</string>
     <string name="daxDialogHighFive">Dod pieci!</string>
@@ -656,7 +656,8 @@
     <string name="autoconsentSecondaryCta">Nē, paldies</string>
 
     <string name="autoconsentSetting">Pārvaldīt sīkfailu uznirstošos logus</string>
-    <string name="autoconsentAnimationText">Pārvaldītie sīkfaili</string>
+    <string name="autoconsentCosmeticNoticeAnimationText">Uznirstošais logs paslēpts</string>
+    <string name="autoconsentManagedNoticeAnimationText">Pārvaldītie sīkfaili</string>
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Vietnes atļaujas</string>

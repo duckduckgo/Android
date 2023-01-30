@@ -242,8 +242,6 @@
     <string name="atp_FAQSixthText">Rakenduse jälgimise kaitse töötab seadmes ja ei saada sinu isikuandmeid seadmest välja DuckDuckGo\'le.</string>
 
     <!--  App Tracking Protection Waitlist -->
-    <string name="atp_WaitlistActivityTitle">Rakenduse jälgimise kaitse</string>
-    <string name="atp_WaitlistActivityWaitlistTitle">Rakenduse jälgimise kaitse ootenimekiri</string>
     <string name="atp_WaitlistNotificationTitle">Sinu rakenduse jälgimise kaitse kutse on siin.</string>
     <string name="atp_WaitlistNotificationDescription">Liitusid ootenimekirjaga ja palusid meil sind teavitada, kui on sinu kord proovida meie rakenduse jälgimise kaitse funktsiooni. Kutse vaatamiseks puuduta siin.</string>
     <string name="atp_WaitlistStatusNotJoined">Üks lihtne samm parema rakenduse privaatsuse saavutamiseks.</string>
@@ -262,7 +260,6 @@
     <string name="atp_WaitlistErrorJoining">Ooteloendiga liitumisel tekkis tõrge, proovige hiljem uuesti</string>
     <string name="atp_WaitlistJoinedWithNotification">Saadame sulle teate, kui rakenduse jälgimise kaitse on sinu jaoks valmis.\n\n<annotation type="beta_link">Beetaversiooni lisateave</annotation></string>
     <string name="atp_WaitlistJoinedWithoutNotification">Sinu kutse proovida rakenduse jälgimise kaitset saabub siia. Vaata peagi tagasi või saadame sulle teate, kui on sinu kord\n\n<annotation type="notify_me_link">Teavita mind</annotation>\n\n<annotation type="beta_link">Beetaversiooni lisateave</annotation></string>
-    <string name="atp_WaitlistRedeemCodeActivityTitle">Sisesta oma kutsekood</string>
     <string name="atp_WaitlistRedeemedCodeStatus">Edu! Oled liitunud.</string>
     <string name="atp_WaitlistBetaBlogPost">https://spreadprivacy.com/introducing-app-tracking-protection</string>
 

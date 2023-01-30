@@ -36,7 +36,7 @@ class SelfTestResultMessageHandlerPlugin @Inject constructor() : MessageHandlerP
         if (supportedTypes.contains(messageType)) {
             try {
                 val message: SelfTestResultMessage = parseMessage(jsonString) ?: return
-                autoconsentCallback.onResultReceived(consentManaged = true, optOutFailed = false, selfTestFailed = message.result)
+                autoconsentCallback.onResultReceived(consentManaged = true, optOutFailed = false, selfTestFailed = message.result, isCosmetic = null)
             } catch (e: Exception) {
                 Timber.d(e.localizedMessage)
             }

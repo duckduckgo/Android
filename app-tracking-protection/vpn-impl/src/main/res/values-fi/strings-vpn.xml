@@ -242,8 +242,6 @@
     <string name="atp_FAQSixthText">App Tracking Protection toimii laitteessasi, eikä lähetä henkilökohtaisia tietojasi laitteeltasi DuckDuckGolle.</string>
 
     <!--  App Tracking Protection Waitlist -->
-    <string name="atp_WaitlistActivityTitle">Sovellusten seurantasuojaus</string>
-    <string name="atp_WaitlistActivityWaitlistTitle">App Tracking Protection -jonotuslista</string>
     <string name="atp_WaitlistNotificationTitle">App Tracking Protection -kutsusi on täällä!</string>
     <string name="atp_WaitlistNotificationDescription">Liityit odotuslistalle ja pyysit meitä ilmoittamaan, kun on sinun vuorosi kokeilla App Tracking Protection -ominaisuuttamme. Näytä kutsu napauttamalla.</string>
     <string name="atp_WaitlistStatusNotJoined">Yksi helppo askel kohti parempaa sovellusten tietosuojaa!</string>
@@ -262,7 +260,6 @@
     <string name="atp_WaitlistErrorJoining">Odotuslistalle liityttäessä tapahtui virhe, yritä myöhemmin uudelleen</string>
     <string name="atp_WaitlistJoinedWithNotification">Lähetämme sinulle ilmoituksen, kun App Tracking Protection on valmis sinua varten.\n\n<annotation type="beta_link">Lue lisää beetaversiosta</annotation></string>
     <string name="atp_WaitlistJoinedWithoutNotification">Kutsu kokeilla App Tracking Protectionia saapuu tähän osoitteeseen. Palaa pian takaisin, tai voimme lähettää sinulle ilmoituksen, kun on sinun vuorosi\n\n<annotation type="notify_me_link">Ilmoita minulle</annotation>\n\n<annotation type="beta_link">Lue lisää beetaversiosta</annotation></string>
-    <string name="atp_WaitlistRedeemCodeActivityTitle">Anna kutsukoodisi</string>
     <string name="atp_WaitlistRedeemedCodeStatus">Onnistui! Pääsit mukaan.</string>
     <string name="atp_WaitlistBetaBlogPost">https://spreadprivacy.com/introducing-app-tracking-protection</string>
 

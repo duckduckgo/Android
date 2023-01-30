@@ -21,13 +21,13 @@ import android.content.SharedPreferences
 import androidx.annotation.UiThread
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
-import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import timber.log.Timber
 
-interface AppInstallStore : DefaultLifecycleObserver {
+interface AppInstallStore : MainProcessLifecycleObserver {
     var installTimestamp: Long
 
     var widgetInstalled: Boolean

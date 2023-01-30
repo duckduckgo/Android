@@ -16,9 +16,8 @@
 
 package com.duckduckgo.deviceauth.impl
 
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.deviceauth.api.AutofillAuthorizationGracePeriod
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -28,12 +27,12 @@ import timber.log.Timber
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = LifecycleObserver::class,
+    boundType = MainProcessLifecycleObserver::class,
 )
 @SingleInstanceIn(AppScope::class)
 class AutofillGracePeriodLifecycleObserver @Inject constructor(
     private val gracePeriod: AutofillAuthorizationGracePeriod,
-) : DefaultLifecycleObserver {
+) : MainProcessLifecycleObserver {
 
     override fun onStop(owner: LifecycleOwner) {
         super.onStop(owner)

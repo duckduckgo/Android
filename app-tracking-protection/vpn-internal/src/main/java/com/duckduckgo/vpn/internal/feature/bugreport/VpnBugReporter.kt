@@ -22,7 +22,7 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateCollector
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.logcat
 
 interface VpnBugReporter {
     suspend fun generateBugReport(): String
@@ -37,7 +37,7 @@ class RealVpnBugReporter @Inject constructor(
         return withContext(dispatcherProvider.io()) {
             val state = vpnStateCollector.collectVpnState()
             val bugreport = state.toString(2)
-            Timber.v("AppTP bugreport generated: $bugreport")
+            logcat { "AppTP bugreport generated: $bugreport" }
 
             bugreport
         }

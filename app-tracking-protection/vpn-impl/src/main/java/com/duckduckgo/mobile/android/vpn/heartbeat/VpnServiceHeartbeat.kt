@@ -34,7 +34,7 @@ import dagger.SingleInstanceIn
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.*
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesMultibinding(
     scope = VpnScope::class,
@@ -50,7 +50,7 @@ class VpnServiceHeartbeat @Inject constructor(
     private var job = ConflatedJob()
 
     private suspend fun storeHeartbeat(type: String) = withContext(dispatcherProvider.io()) {
-        Timber.v("(${Process.myPid()}) - Sending heartbeat $type")
+        logcat { "(${Process.myPid()}) - Sending heartbeat $type" }
         vpnDatabase.vpnHeartBeatDao().insertType(type)
     }
 
@@ -59,7 +59,7 @@ class VpnServiceHeartbeat @Inject constructor(
     }
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        Timber.v("onVpnStarted called")
+        logcat { "onVpnStarted called" }
         job += coroutineScope.launch {
             while (true) {
                 storeHeartbeat(VpnServiceHeartbeatMonitor.DATA_HEART_BEAT_TYPE_ALIVE)
@@ -72,12 +72,12 @@ class VpnServiceHeartbeat @Inject constructor(
         coroutineScope: CoroutineScope,
         vpnStopReason: VpnStopReason,
     ) {
-        Timber.v("onVpnStopped called")
+        logcat { "onVpnStopped called" }
         when (vpnStopReason) {
-            ERROR -> Timber.v("HB monitor: sudden vpn stopped $vpnStopReason")
-            RESTART -> Timber.v("HB monitor: restarting vpn $vpnStopReason")
+            ERROR -> logcat { "HB monitor: sudden vpn stopped $vpnStopReason" }
+            RESTART -> logcat { "HB monitor: restarting vpn $vpnStopReason" }
             SELF_STOP, REVOKED, UNKNOWN -> {
-                Timber.v("HB monitor: self stopped or revoked: $vpnStopReason")
+                logcat { "HB monitor: self stopped or revoked: $vpnStopReason" }
                 coroutineScope.launch { storeHeartbeat(VpnServiceHeartbeatMonitor.DATA_HEART_BEAT_TYPE_STOPPED) }
             }
         }

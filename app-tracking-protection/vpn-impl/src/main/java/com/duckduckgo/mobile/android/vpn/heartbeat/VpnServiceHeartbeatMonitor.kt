@@ -19,22 +19,18 @@ package com.duckduckgo.mobile.android.vpn.heartbeat
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.*
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ReceiverScope
 import com.duckduckgo.mobile.android.vpn.dao.HeartBeatEntity
 import com.duckduckgo.mobile.android.vpn.dao.VpnHeartBeatDao
-import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
-import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
-import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -44,14 +40,15 @@ import dagger.multibindings.IntoSet
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority
+import logcat.logcat
 
 @Module
 @ContributesTo(AppScope::class)
 class VpnServiceHeartbeatMonitorModule {
     @Provides
     @IntoSet
-    fun provideVpnServiceHeartbeatMonitor(workManager: WorkManager): LifecycleObserver {
+    fun provideVpnServiceHeartbeatMonitor(workManager: WorkManager): MainProcessLifecycleObserver {
         return VpnServiceHeartbeatMonitor(workManager)
     }
 
@@ -61,7 +58,7 @@ class VpnServiceHeartbeatMonitorModule {
 
 class VpnServiceHeartbeatMonitor(
     private val workManager: WorkManager,
-) : DefaultLifecycleObserver {
+) : MainProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
         startHeartbeatMonitor(workManager)
@@ -73,7 +70,7 @@ class VpnServiceHeartbeatMonitor(
         private const val WORKER_HEART_BEAT_MONITOR_TAG = "VpnServiceHeartbeatMonitorWorker"
 
         fun startHeartbeatMonitor(workManager: WorkManager) {
-            Timber.v("(Re)Scheduling the VpnServiceHeartbeatMonitor worker")
+            logcat { "(Re)Scheduling the VpnServiceHeartbeatMonitor worker" }
             workManager.cancelAllWorkByTag(WORKER_HEART_BEAT_MONITOR_TAG)
 
             val request = PeriodicWorkRequestBuilder<VpnServiceHeartbeatMonitorWorker>(15, TimeUnit.MINUTES)
@@ -101,27 +98,16 @@ class VpnServiceHeartbeatMonitorWorker(
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
 
-    @Inject
-    lateinit var trackerBlockingStatsRepository: AppTrackerBlockingStatsRepository
-
-    @Inject
-    lateinit var appTpFeatureConfig: AppTpFeatureConfig
-
     override suspend fun doWork(): Result = withContext(dispatcherProvider.io()) {
         val lastHeartBeat = vpnHeartBeatDao.hearBeats().maxByOrNull { it.timestamp }
 
-        Timber.d("HB monitor checking last HB: $lastHeartBeat")
+        logcat { "HB monitor checking last HB: $lastHeartBeat" }
         if (lastHeartBeat?.isAlive() == true && !TrackerBlockingVpnService.isServiceRunning(context)) {
-            Timber.w("HB monitor: VPN stopped, restarting it")
+            logcat(LogPriority.WARN) { "HB monitor: VPN stopped, restarting it" }
 
             deviceShieldPixels.suddenKillBySystem()
             deviceShieldPixels.automaticRestart()
             TrackerBlockingVpnService.startService(context)
-        } else if (didNotBlockRecently()) {
-            deviceShieldPixels.automaticRestart()
-            // we have not blocked anything "recently", assuming something is wrong with the VPN service
-            Timber.d("HB monitor: VPN not blocking anything, restarting it")
-            TrackerBlockingVpnService.restartVpnService(context)
         }
 
         return@withContext Result.success()
@@ -129,19 +115,6 @@ class VpnServiceHeartbeatMonitorWorker(
 
     private fun HeartBeatEntity.isAlive(): Boolean {
         return VpnServiceHeartbeatMonitor.DATA_HEART_BEAT_TYPE_ALIVE == type
-    }
-
-    private suspend fun didNotBlockRecently(): Boolean {
-        fun isFeatureDisabled(): Boolean {
-            return !appTpFeatureConfig.isEnabled(AppTpSetting.CheckBlockingFunction)
-        }
-
-        if (isFeatureDisabled()) return false
-
-        val timeWindow = AppTrackerBlockingStatsRepository.TimeWindow(3, TimeUnit.HOURS)
-        // if we ever blocked trackers, and we have not blocked anything in the last 3 hours, we assume something is wrong
-        return trackerBlockingStatsRepository.containsVpnTrackers() &&
-            trackerBlockingStatsRepository.getVpnTrackersSync({ timeWindow.asString() }).isEmpty()
     }
 }
 
@@ -157,7 +130,7 @@ class VpnHeartbeatDeviceBootMonitor : BroadcastReceiver() {
         AndroidInjection.inject(this, context)
 
         if (intent.action == "android.intent.action.BOOT_COMPLETED") {
-            Timber.v("Checking if VPN was running before device BOOT")
+            logcat { "Checking if VPN was running before device BOOT" }
 
             VpnServiceHeartbeatMonitor.startHeartbeatMonitor(workManager)
         }

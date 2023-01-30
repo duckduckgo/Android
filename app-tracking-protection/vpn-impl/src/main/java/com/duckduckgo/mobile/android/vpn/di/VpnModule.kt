@@ -31,7 +31,7 @@ object VpnModule {
 
     @SingleInstanceIn(VpnScope::class)
     @Provides
-    fun providesAppNameResolver(packageManager: PackageManager): AppNameResolver = AppNameResolver(packageManager)
+    fun providesAppNameResolver(packageManager: PackageManager): AppNameResolver = RealAppNameResolver(packageManager)
 
     @Provides
     fun providesDispatcherProvider(): VpnDispatcherProvider {

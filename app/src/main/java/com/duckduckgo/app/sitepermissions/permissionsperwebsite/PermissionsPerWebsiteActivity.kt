@@ -32,13 +32,18 @@ import com.duckduckgo.app.global.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command.GoBackToSitePermissions
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command.ShowPermissionSettingSelectionDialog
+import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSettingOption.ALLOW
+import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSettingOption.ASK
+import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSettingOption.Companion.getPermissionSettingOptionFromPosition
+import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSettingOption.DENY
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
-class PermissionsPerWebsiteActivity : DuckDuckGoActivity(), PermissionsSettingsSelectorFragment.Listener {
+class PermissionsPerWebsiteActivity : DuckDuckGoActivity() {
 
     private val viewModel: PermissionsPerWebsiteViewModel by bindViewModel()
     private val binding: ActivityPermissionPerWebsiteBinding by viewBinding()
@@ -74,7 +79,10 @@ class PermissionsPerWebsiteActivity : DuckDuckGoActivity(), PermissionsSettingsS
     private fun setViews() {
         setupToolbar(toolbar)
         supportActionBar?.title = url.websiteFromGeoLocationsApiOrigin()
-        binding.sitePermissionsSectionTitle.text = String.format(getString(R.string.permissionPerWebsiteText), url.websiteFromGeoLocationsApiOrigin())
+        binding.sitePermissionsSectionHeader.primaryText = String.format(
+            getString(R.string.permissionPerWebsiteText),
+            url.websiteFromGeoLocationsApiOrigin(),
+        )
         binding.permissionsPerWebsiteRecyclerView.adapter = adapter
     }
 
@@ -104,23 +112,46 @@ class PermissionsPerWebsiteActivity : DuckDuckGoActivity(), PermissionsSettingsS
         adapter.updateItems(permissionsSettings)
     }
 
-    private fun showPermissionSettingSelectionDialog(setting: WebsitePermissionSetting) {
-        val dialog = PermissionsSettingsSelectorFragment.create(setting, url.websiteFromGeoLocationsApiOrigin())
-        dialog.show(supportFragmentManager, PERMISSIONS_SETTING_SELECTOR_DIALOG_TAG)
+    private fun showPermissionSettingSelectionDialog(currentOption: WebsitePermissionSetting) {
+        val dialogTitle = String.format(
+            getString(R.string.permissionsPerWebsiteSelectorDialogTitle),
+            getString(currentOption.title),
+            url.websiteFromGeoLocationsApiOrigin(),
+        )
+        RadioListAlertDialogBuilder(this)
+            .setTitle(dialogTitle)
+            .setOptions(
+                listOf(
+                    ASK.stringRes,
+                    DENY.stringRes,
+                    ALLOW.stringRes,
+                ),
+                currentOption.setting.order,
+            )
+            .setPositiveButton(R.string.dialogSave)
+            .setNegativeButton(R.string.cancel)
+            .addEventListener(
+                object : RadioListAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked(selectedItem: Int) {
+                        val permissionSettingSelected = selectedItem.getPermissionSettingOptionFromPosition()
+                        val newPermissionSetting = WebsitePermissionSetting(currentOption.icon, currentOption.title, permissionSettingSelected)
+                        viewModel.onPermissionSettingSelected(newPermissionSetting, url)
+                    }
+                },
+            )
+            .show()
     }
 
     companion object {
         private const val EXTRA_URL = "URL"
-        private const val PERMISSIONS_SETTING_SELECTOR_DIALOG_TAG = "PERMISSIONS_SETTING_SELECTOR_DIALOG_TAG"
 
-        fun intent(context: Context, url: String): Intent {
+        fun intent(
+            context: Context,
+            url: String,
+        ): Intent {
             val intent = Intent(context, PermissionsPerWebsiteActivity::class.java)
             intent.putExtra(EXTRA_URL, url)
             return intent
         }
-    }
-
-    override fun onPermissionSettingSelected(websitePermissionSetting: WebsitePermissionSetting) {
-        viewModel.onPermissionSettingSelected(websitePermissionSetting, url)
     }
 }

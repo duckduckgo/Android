@@ -31,7 +31,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority
+import logcat.logcat
 
 @InjectWith(ReceiverScope::class)
 class VpnReminderReceiver : BroadcastReceiver() {
@@ -47,17 +48,17 @@ class VpnReminderReceiver : BroadcastReceiver() {
     ) {
         AndroidInjection.inject(this, context)
 
-        Timber.i("VpnReminderReceiver onReceive ${intent.action}")
+        logcat { "VpnReminderReceiver onReceive ${intent.action}" }
         val pendingResult = goAsync()
 
         if (intent.action == ACTION_VPN_REMINDER_RESTART) {
-            Timber.v("Vpn will restart because the user asked it")
+            logcat { "Vpn will restart because the user asked it" }
             deviceShieldPixels.enableFromReminderNotification()
             goAsync(pendingResult) {
                 vpnFeaturesRegistry.registerFeature(AppTpVpnFeature.APPTP_VPN)
             }
         } else {
-            Timber.w("VpnReminderReceiver: unknown action")
+            logcat(LogPriority.WARN) { "VpnReminderReceiver: unknown action" }
             pendingResult?.finish()
         }
     }

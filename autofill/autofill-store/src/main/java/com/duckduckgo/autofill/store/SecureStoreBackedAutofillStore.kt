@@ -19,14 +19,15 @@ package com.duckduckgo.autofill.store
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.extractSchemeAndDomain
-import com.duckduckgo.autofill.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
-import com.duckduckgo.autofill.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType.Password
-import com.duckduckgo.autofill.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType.Username
-import com.duckduckgo.autofill.InternalTestUserChecker
-import com.duckduckgo.autofill.domain.app.LoginCredentials
-import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult
-import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult.NoMatch
-import com.duckduckgo.autofill.ui.urlmatcher.AutofillUrlMatcher
+import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
+import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType.Password
+import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType.Username
+import com.duckduckgo.autofill.api.InternalTestUserChecker
+import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.api.store.AutofillStore
+import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult
+import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult.NoMatch
+import com.duckduckgo.autofill.api.ui.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.securestorage.api.SecureStorage
 import com.duckduckgo.securestorage.api.WebsiteLoginDetails
 import com.duckduckgo.securestorage.api.WebsiteLoginDetailsWithCredentials
@@ -123,7 +124,11 @@ class SecureStoreBackedAutofillStore(
             domainTitle = credentials.domainTitle,
             lastUpdatedMillis = lastUpdatedTimeProvider.getInMillis(),
         )
-        val webSiteLoginCredentials = WebsiteLoginDetailsWithCredentials(loginDetails, password = credentials.password)
+        val webSiteLoginCredentials = WebsiteLoginDetailsWithCredentials(
+            details = loginDetails,
+            password = credentials.password,
+            notes = credentials.notes,
+        )
 
         return withContext(dispatcherProvider.io()) {
             secureStorage.addWebsiteLoginDetailsWithCredentials(webSiteLoginCredentials)?.toLoginCredentials().also {
@@ -180,6 +185,10 @@ class SecureStoreBackedAutofillStore(
             .map { list ->
                 list.map { it.toLoginCredentials() }
             }
+    }
+
+    override suspend fun getCredentialCount(): Flow<Int> {
+        return secureStorage.websiteLoginDetailsWithCredentials().map { it.size }
     }
 
     override suspend fun deleteCredentials(id: Long) {

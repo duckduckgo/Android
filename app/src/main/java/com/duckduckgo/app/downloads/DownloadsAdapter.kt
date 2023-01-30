@@ -103,7 +103,7 @@ class DownloadsAdapter @Inject constructor(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: Header) {
-            binding.downloadsHeaderTextView.text = item.text
+            binding.downloadsHeaderTextView.primaryText = item.text
         }
     }
 
@@ -131,7 +131,7 @@ class DownloadsAdapter @Inject constructor(
                 else -> context.getString(R.string.downloadsStateInProgress)
             }
             twoListItem.setSecondaryText(subtitle)
-            twoListItem.setLeadingIcon(R.drawable.ic_file)
+            twoListItem.setLeadingIcon(R.drawable.ic_document_24)
 
             twoListItem.setClickListener {
                 if (item.downloadItem.contentLength > 0) {
@@ -139,7 +139,7 @@ class DownloadsAdapter @Inject constructor(
                 }
             }
 
-            twoListItem.setTrailingIcon(R.drawable.ic_overflow)
+            twoListItem.setTrailingIcon(com.duckduckgo.mobile.android.R.drawable.ic_menu_vertical_24)
             twoListItem.setTrailingIconClickListener { view ->
                 showPopupMenu(view, item)
             }

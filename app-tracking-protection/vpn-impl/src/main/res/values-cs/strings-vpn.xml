@@ -254,8 +254,6 @@
     <string name="atp_FAQSixthText">App Tracking Protection funguje ve tvém zařízení a neodesílá osobní údaje ze zařízení do služby DuckDuckGo.</string>
 
     <!--  App Tracking Protection Waitlist -->
-    <string name="atp_WaitlistActivityTitle">Ochrana před sledováním aplikace</string>
-    <string name="atp_WaitlistActivityWaitlistTitle">Čekací seznam App Tracking Protection</string>
     <string name="atp_WaitlistNotificationTitle">Tvoje pozvánka do App Tracking Protection je tady!</string>
     <string name="atp_WaitlistNotificationDescription">Přidal(a) ses na seznam čekajících a požádal(a) nás, abychom tě upozornili, až budeš na řadě a budeš moct vyzkoušet App Tracking Protection. Klepnutím zobrazíš pozvánku.</string>
     <string name="atp_WaitlistStatusNotJoined">Jeden snadný krok pro větší soukromí v aplikacích!</string>
@@ -274,7 +272,6 @@
     <string name="atp_WaitlistErrorJoining">Při připojení k pořadníku došlo k chybě, zkuste to znovu později</string>
     <string name="atp_WaitlistJoinedWithNotification">Jakmile bude App Tracking Protection pro tebe připravena, pošleme ti upozornění.<annotation type="beta_link">Další informace o beta verzi</annotation></string>
     <string name="atp_WaitlistJoinedWithoutNotification">Pozvánka do App Tracking Protection ti přijde sem. Brzy si to zkontroluj nebo ti můžeme poslat upozornění, až na tebe přijde řada\n\n<annotation type="notify_me_link">Dejte mi vědět</annotation>\n\n<annotation type="beta_link">Více informací o beta verzi</annotation></string>
-    <string name="atp_WaitlistRedeemCodeActivityTitle">Zadej svůj pozvánkový kód</string>
     <string name="atp_WaitlistRedeemedCodeStatus">Úspěch! Podařilo se.</string>
     <string name="atp_WaitlistBetaBlogPost">https://spreadprivacy.com/introducing-app-tracking-protection</string>
 

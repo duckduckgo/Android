@@ -398,7 +398,7 @@
     <string name="systemSearchOnboardingButtonOk">Verstanden</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">AUSBLENDEN</string>
+    <string name="daxDialogHideButton">Ausblenden</string>
     <string name="daxDialogPhew">Puh!</string>
     <string name="daxDialogNext">Weiter</string>
     <string name="daxDialogHighFive">Schlag ein!</string>
@@ -652,7 +652,8 @@
     <string name="autoconsentSecondaryCta">Nein, danke</string>
 
     <string name="autoconsentSetting">Cookie-Pop-ups verwalten</string>
-    <string name="autoconsentAnimationText">Cookies verwaltet</string>
+    <string name="autoconsentCosmeticNoticeAnimationText">Pop-up ausgeblendet</string>
+    <string name="autoconsentManagedNoticeAnimationText">Cookies verwaltet</string>
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Website-Berechtigungen</string>

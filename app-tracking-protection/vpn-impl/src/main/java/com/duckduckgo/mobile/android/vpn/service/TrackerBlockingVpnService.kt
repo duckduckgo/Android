@@ -16,6 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.service
 
+import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.app.Service
 import android.content.ComponentName
@@ -30,16 +31,20 @@ import androidx.core.content.ContextCompat
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.extensions.getPrivateDnsServerName
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
 import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
+import com.duckduckgo.mobile.android.vpn.integration.VpnNetworkStackProvider
+import com.duckduckgo.mobile.android.vpn.model.AlwaysOnState
+import com.duckduckgo.mobile.android.vpn.model.VpnServiceState
+import com.duckduckgo.mobile.android.vpn.model.VpnServiceState.ENABLED
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceState.ENABLING
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceStateStats
-import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
+import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack.VpnTunnelConfig
 import com.duckduckgo.mobile.android.vpn.network.util.asRoute
 import com.duckduckgo.mobile.android.vpn.network.util.getActiveNetwork
@@ -55,9 +60,12 @@ import com.duckduckgo.mobile.android.vpn.ui.notification.OngoingNotificationPres
 import dagger.android.AndroidInjection
 import java.net.Inet4Address
 import java.net.InetAddress
+import java.util.concurrent.Executors
 import javax.inject.Inject
 import kotlinx.coroutines.*
-import timber.log.Timber
+import logcat.LogPriority
+import logcat.asLog
+import logcat.logcat
 
 @Suppress("NoHardcodedCoroutineDispatcher")
 @InjectWith(VpnScope::class)
@@ -65,9 +73,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
 
     @Inject
     lateinit var vpnPreferences: VpnPreferences
-
-    @Inject
-    lateinit var deviceShieldExcludedApps: TrackingProtectionAppsRepository
 
     @Inject
     lateinit var deviceShieldNotificationFactory: DeviceShieldNotificationFactory
@@ -94,11 +99,15 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
 
     @Inject lateinit var appTpFeatureConfig: AppTpFeatureConfig
 
-    @Inject lateinit var vpnNetworkStack: VpnNetworkStack
+    @Inject lateinit var vpnNetworkStackProvider: VpnNetworkStackProvider
 
     @Inject lateinit var vpnServiceStateStatsDao: VpnServiceStateStatsDao
 
     private var restartRequested = false
+
+    private val startVpnLock = Object()
+
+    private val alwaysOnStateJob = ConflatedJob()
 
     private val isInterceptDnsTrafficEnabled by lazy {
         appTpFeatureConfig.isEnabled(AppTpSetting.InterceptDnsTraffic)
@@ -120,17 +129,21 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         appTpFeatureConfig.isEnabled(AppTpSetting.StartVpnErrorHandling)
     }
 
+    private val vpnNetworkStack by lazy {
+        vpnNetworkStackProvider.provideNetworkStack()
+    }
+
     private val vpnStateServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(
             name: ComponentName?,
             service: IBinder?,
         ) {
-            Timber.d("Connected to state monitor service")
+            logcat { "Connected to state monitor service" }
             vpnStateServiceReference = service
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
-            Timber.d("Disconnected from state monitor service")
+            logcat { "Disconnected from state monitor service" }
             vpnStateServiceReference = null
         }
     }
@@ -159,22 +172,25 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         super.onCreate()
         AndroidInjection.inject(this)
 
-        Timber.d("VPN log onCreate, creating the ${vpnNetworkStack.name} network stack")
-        vpnNetworkStack.onCreateVpn().getOrThrow()
+        logcat { "VPN log onCreate, creating the ${vpnNetworkStack.name} network stack" }
+        vpnNetworkStack.onCreateVpn().getOrNull()?.let {
+            // report and proceed
+            deviceShieldPixels.reportErrorCreatingVpnNetworkStack()
+        }
     }
 
     override fun onBind(intent: Intent?): IBinder {
-        Timber.d("VPN log onBind invoked")
+        logcat { "VPN log onBind invoked" }
         return binder
     }
 
     override fun onUnbind(p0: Intent?): Boolean {
-        Timber.d("VPN log onUnbind invoked")
+        logcat { "VPN log onUnbind invoked" }
         return super.onUnbind(p0)
     }
 
     override fun onDestroy() {
-        Timber.d("VPN log onDestroy")
+        logcat { "VPN log onDestroy" }
         vpnNetworkStack.onDestroyVpn()
         super.onDestroy()
 
@@ -189,7 +205,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         flags: Int,
         startId: Int,
     ): Int {
-        Timber.d("VPN log onStartCommand: ${intent?.action}")
+        logcat { "VPN log onStartCommand: ${intent?.action}" }
 
         var returnCode: Int = Service.START_NOT_STICKY
 
@@ -208,61 +224,82 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
                 restartRequested = true
                 launch { stopVpn(VpnStopReason.RESTART) }
             }
-            else -> Timber.e("Unknown intent action: $action")
+            else -> logcat(LogPriority.ERROR) { "Unknown intent action: $action" }
         }
 
         return returnCode
     }
 
     private suspend fun startVpn() = withContext(Dispatchers.IO) {
-        Timber.d("VPN log: Starting VPN")
+        logcat { "VPN log: Starting VPN" }
 
-        // We need to rethink how to log this state. This will likely change.
-        vpnServiceStateStatsDao.insert(VpnServiceStateStats(state = ENABLING))
+        synchronized(startVpnLock) {
+            val currStateStats = vpnServiceStateStatsDao.getLastStateStats()
+            // We don't check for ENABLED state here because it break when the app is updated
+            // (See: https://app.asana.com/0/488551667048375/1203621692416589/f)
+            if (currStateStats?.state == ENABLING) {
+                // Sometimes onStartCommand gets called twice - this is a safety rail against that
+                logcat(LogPriority.WARN) { "VPN is already being started, abort" }
+                return@withContext
+            }
+
+            vpnServiceStateStatsDao.insert(createVpnState(state = ENABLING))
+
+            vpnServiceCallbacksPluginPoint.getPlugins().forEach {
+                logcat { "VPN log: onVpnStarting ${it.javaClass} callback" }
+                it.onVpnStarting(this)
+            }
+        }
+
         vpnNetworkStack.onPrepareVpn().getOrNull().also {
             if (it != null) {
                 createTunnelInterface(it)
             } else {
-                Timber.e("Failed to obtain config needed to establish the TUN interface")
+                logcat(LogPriority.ERROR) { "Failed to obtain config needed to establish the TUN interface" }
                 stopVpn(VpnStopReason.ERROR, false)
+                return@withContext
             }
         }
 
         if (tunInterface == null) {
-            Timber.e("Failed to establish the TUN interface")
+            logcat(LogPriority.ERROR) { "Failed to establish the TUN interface" }
             deviceShieldPixels.vpnEstablishTunInterfaceError()
             return@withContext
         }
 
         if (isInterceptDnsTrafficEnabled) {
             applicationContext.getActiveNetwork()?.let { an ->
-                Timber.v("Setting underlying network $an")
+                logcat { "Setting underlying network $an" }
                 setUnderlyingNetworks(arrayOf(an))
             }
         } else {
-            Timber.v("NetworkSwitchHandling disabled...skip setting underlying network")
+            logcat { "NetworkSwitchHandling disabled...skip setting underlying network" }
         }
 
         if (isStartVpnErrorHandlingEnabled) {
-            Timber.d("Enable new error handling for onStartVpn")
+            logcat { "Enable new error handling for onStartVpn" }
             vpnNetworkStack.onStartVpn(tunInterface!!).getOrElse {
-                Timber.e("Failed to start VPN")
+                logcat(LogPriority.ERROR) { "Failed to start VPN" }
                 stopVpn(VpnStopReason.ERROR, false)
                 return@withContext
             }
         } else {
-            Timber.d("Reverted error handling for onStartVpn")
+            logcat { "Reverted error handling for onStartVpn" }
             vpnNetworkStack.onStartVpn(tunInterface!!).getOrThrow()
         }
 
         vpnServiceCallbacksPluginPoint.getPlugins().forEach {
-            Timber.v("VPN log: starting ${it.javaClass} callback")
+            logcat { "VPN log: onVpnStarted ${it.javaClass} callback" }
             it.onVpnStarted(this)
         }
 
         Intent(applicationContext, VpnStateMonitorService::class.java).also {
             bindService(it, vpnStateServiceConnection, Context.BIND_AUTO_CREATE)
         }
+
+        // lastly set the VPN state to enabled
+        vpnServiceStateStatsDao.insert(createVpnState(state = ENABLED))
+        alwaysOnStateJob += launch { monitorVpnAlwaysOnState() }
     }
 
     private suspend fun createTunnelInterface(tunnelConfig: VpnTunnelConfig) {
@@ -286,7 +323,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
                     // we need to make sure that all DNS traffic goes through the VPN. Specifically when the DNS server is on the local network
                     dnsList.filterIsInstance<Inet4Address>().forEach { addr ->
                         addr.asRoute()?.let {
-                            Timber.d("Adding DNS address $it to VPN routes")
+                            logcat { "Adding DNS address $it to VPN routes" }
                             vpnRoutes.add(it)
                         }
                     }
@@ -297,7 +334,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
                         if (!it.isLoopbackAddress) {
                             addRoute(route.address, route.maskWidth)
                         } else {
-                            Timber.w("Tried to add loopback address $it to VPN routes")
+                            logcat(LogPriority.WARN) { "Tried to add loopback address $it to VPN routes" }
                         }
                     }
                 }
@@ -320,11 +357,11 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             // Set DNS
             dnsList.forEach { addr ->
                 if (isIpv6SupportEnabled || addr is Inet4Address) {
-                    Timber.v("Adding DNS $addr")
+                    logcat { "Adding DNS $addr" }
                     runCatching {
                         addDnsServer(addr)
                     }.onFailure { t ->
-                        Timber.e(t, "Error setting DNS $addr")
+                        logcat(LogPriority.ERROR) { "Error setting DNS $addr: ${t.asLog()}" }
                         if (addr.isLoopbackAddress) {
                             deviceShieldPixels.reportLoopbackDnsError()
                         } else if (addr.isAnyLocalAddress) {
@@ -336,16 +373,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
                 }
             }
 
-            // Can either route all apps through VPN and exclude a few (better for prod), or exclude all apps and include a few (better for dev)
-            val limitingToTestApps = false
-            if (limitingToTestApps) {
-                safelyAddAllowedApps(INCLUDED_APPS_FOR_TESTING)
-                Timber.w("Limiting VPN to test apps only:\n${INCLUDED_APPS_FOR_TESTING.joinToString(separator = "\n") { it }}")
-            } else {
-                safelyAddDisallowedApps(
-                    deviceShieldExcludedApps.getExclusionAppsList(),
-                )
-            }
+            safelyAddDisallowedApps(tunnelConfig.appExclusionList.toList())
 
             // Apparently we always need to call prepare, even tho not clear in docs
             // without this prepare, establish() returns null after device reboot
@@ -354,7 +382,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         }
 
         if (tunInterface == null) {
-            Timber.e("VPN log: Failed to establish VPN tunnel")
+            logcat(LogPriority.ERROR) { "VPN log: Failed to establish VPN tunnel" }
             stopVpn(VpnStopReason.ERROR, false)
         }
     }
@@ -398,7 +426,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         if (appBuildConfig.isInternalBuild() && isAlwaysSetDNSEnabled) {
             if (dns.isEmpty()) {
                 kotlin.runCatching {
-                    Timber.d("Adding cloudflare DNS")
+                    logcat { "Adding cloudflare DNS" }
                     dns.add(InetAddress.getByName("1.1.1.1"))
                     dns.add(InetAddress.getByName("1.0.0.1"))
                     if (isIpv6SupportEnabled) {
@@ -406,72 +434,76 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
                         dns.add(InetAddress.getByName("2606:4700:4700::1001"))
                     }
                 }.onFailure {
-                    Timber.w(it, "Error adding fallback DNS")
+                    logcat(LogPriority.WARN) { "Error adding fallback DNS: ${it.asLog()}" }
                 }
             }
 
             // always add ipv4 DNS
             if (!dns.containsIpv4()) {
-                Timber.d("DNS set does not contain IPv4, adding cloudflare")
+                logcat { "DNS set does not contain IPv4, adding cloudflare" }
                 kotlin.runCatching {
                     dns.add(InetAddress.getByName("1.1.1.1"))
                     dns.add(InetAddress.getByName("1.0.0.1"))
                 }.onFailure {
-                    Timber.w(it, "Error adding fallback DNS")
+                    logcat(LogPriority.WARN) { "Error adding fallback DNS ${it.asLog()}" }
                 }
             }
         }
 
         if (!dns.containsIpv4()) {
             // never allow IPv6-only DNS
-            Timber.v("No IPv4 DNS found, return empty DNS list")
+            logcat { "No IPv4 DNS found, return empty DNS list" }
             return setOf()
         }
 
         return dns.toSet()
     }
 
-    private fun Builder.safelyAddAllowedApps(apps: List<String>) {
-        for (app in apps) {
-            try {
-                addAllowedApplication(app)
-            } catch (e: PackageManager.NameNotFoundException) {
-                Timber.w("Package name not found: %s", app)
-            }
-        }
-    }
-
     private fun Builder.safelyAddDisallowedApps(apps: List<String>) {
         for (app in apps) {
             try {
-                Timber.v("Excluding app from VPN: $app")
+                logcat { "Excluding app from VPN: $app" }
                 addDisallowedApplication(app)
             } catch (e: PackageManager.NameNotFoundException) {
-                Timber.w("Package name not found: %s", app)
+                logcat(LogPriority.WARN) { "Package name not found: $app" }
             }
         }
     }
 
-    private suspend fun stopVpn(reason: VpnStopReason, shouldStopCallbacks: Boolean = true) = withContext(Dispatchers.IO) {
-        Timber.d("VPN log: Stopping VPN. $reason")
+    private suspend fun stopVpn(
+        reason: VpnStopReason,
+        hasVpnAlreadyStarted: Boolean = true,
+    ) = withContext(Dispatchers.IO) {
+        logcat { "VPN log: Stopping VPN. $reason" }
 
-        vpnNetworkStack.onStopVpn()
+        vpnNetworkStack.onStopVpn(reason)
 
         tunInterface?.close()
         tunInterface = null
 
+        alwaysOnStateJob.cancel()
+
         sendStopPixels(reason)
 
-        if (shouldStopCallbacks) {
+        // If VPN has been started, then onVpnStopped must be called. Else, an error might have occurred before start so we call onVpnStartFailed
+        if (hasVpnAlreadyStarted) {
             vpnServiceCallbacksPluginPoint.getPlugins().forEach {
-                Timber.v("VPN log: stopping ${it.javaClass} callback")
+                logcat { "VPN log: stopping ${it.javaClass} callback" }
                 it.onVpnStopped(this, reason)
+            }
+        } else {
+            vpnServiceCallbacksPluginPoint.getPlugins().forEach {
+                logcat { "VPN log: onVpnStartFailed ${it.javaClass} callback" }
+                it.onVpnStartFailed(this)
             }
         }
 
         vpnStateServiceReference?.let {
             runCatching { unbindService(vpnStateServiceConnection).also { vpnStateServiceReference = null } }
         }
+
+        // Set the state to DISABLED here, then call the on stop/failure callbacks
+        vpnServiceStateStatsDao.insert(createVpnState(state = VpnServiceState.DISABLED, stopReason = reason))
 
         stopForeground(true)
         stopSelf()
@@ -493,24 +525,24 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
     }
 
     override fun onRevoke() {
-        Timber.w("VPN log onRevoke called")
+        logcat(LogPriority.WARN) { "VPN log onRevoke called" }
         launch { stopVpn(VpnStopReason.REVOKED) }
     }
 
     override fun onLowMemory() {
-        Timber.w("VPN log onLowMemory called")
+        logcat(LogPriority.WARN) { "VPN log onLowMemory called" }
     }
 
     // https://developer.android.com/reference/android/app/Service.html#onTrimMemory(int)
     override fun onTrimMemory(level: Int) {
-        Timber.d("VPN log onTrimMemory level $level called")
+        logcat { "VPN log onTrimMemory level $level called" }
 
         // Collect memory data info from memory collectors
         val memoryData = mutableMapOf<String, String>()
         memoryCollectorPluginPoint.getPlugins().forEach { memoryData.putAll(it.collectMemoryMetrics()) }
 
         if (memoryData.isEmpty()) {
-            Timber.v("VPN log nothing to send from memory collectors")
+            logcat { "VPN log nothing to send from memory collectors" }
             return
         }
 
@@ -531,6 +563,67 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             VPN_FOREGROUND_SERVICE_ID,
             DeviceShieldEnabledNotificationBuilder
                 .buildDeviceShieldEnabledNotification(applicationContext, deviceShieldNotification, ongoingNotificationPressedHandler),
+        )
+    }
+
+    private suspend fun monitorVpnAlwaysOnState() = withContext(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) {
+        suspend fun incrementalPeriodicChecks(
+            times: Int = Int.MAX_VALUE,
+            initialDelay: Long = 500, // 0.5 second
+            maxDelay: Long = 300_000, // 5 minutes
+            factor: Double = 1.05, // 5% increase
+            block: suspend () -> Unit,
+        ) {
+            var currentDelay = initialDelay
+            repeat(times - 1) {
+                try {
+                    if (isActive) block()
+                } catch (t: Throwable) {
+                    // you can log an error here and/or make a more finer-grained
+                    // analysis of the cause to see if retry is needed
+                }
+                delay(currentDelay)
+                currentDelay = (currentDelay * factor).toLong().coerceAtMost(maxDelay)
+            }
+        }
+
+        val vpnState = createVpnState(ENABLED)
+
+        @SuppressLint("NewApi") // IDE doesn't get we use appBuildConfig
+        if (appBuildConfig.sdkInt >= 29) {
+            incrementalPeriodicChecks {
+                if (vpnServiceStateStatsDao.getLastStateStats()?.state == ENABLED) {
+                    if (vpnState.alwaysOnState.alwaysOnEnabled) deviceShieldPixels.reportAlwaysOnEnabledDaily()
+                    if (vpnState.alwaysOnState.alwaysOnLockedDown) deviceShieldPixels.reportAlwaysOnLockdownEnabledDaily()
+
+                    vpnServiceStateStatsDao.insert(vpnState).also { logcat { "VPN: log, state: $vpnState" } }
+                }
+            }
+        }
+    }
+
+    @SuppressLint("NewApi")
+    private fun createVpnState(
+        state: VpnServiceState,
+        stopReason: VpnStopReason = VpnStopReason.UNKNOWN,
+    ): VpnServiceStateStats {
+        fun VpnStopReason.asVpnStoppingReason(): VpnStoppingReason {
+            return when (this) {
+                VpnStopReason.RESTART -> VpnStoppingReason.RESTART
+                VpnStopReason.SELF_STOP -> VpnStoppingReason.SELF_STOP
+                VpnStopReason.REVOKED -> VpnStoppingReason.REVOKED
+                VpnStopReason.ERROR -> VpnStoppingReason.ERROR
+                VpnStopReason.UNKNOWN -> VpnStoppingReason.UNKNOWN
+            }
+        }
+
+        val isAlwaysOnEnabled = if (appBuildConfig.sdkInt >= 29) isAlwaysOn else false
+        val isLockdownEnabled = if (appBuildConfig.sdkInt >= 29) isLockdownEnabled else false
+
+        return VpnServiceStateStats(
+            state = state,
+            alwaysOnState = AlwaysOnState(isAlwaysOnEnabled, isLockdownEnabled),
+            stopReason = stopReason.asVpnStoppingReason(),
         )
     }
 
@@ -626,7 +719,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             }
         }
 
-        internal fun restartService(context: Context) {
+        private fun restartService(context: Context) {
             val applicationContext = context.applicationContext
 
             restartIntent(applicationContext).run {
@@ -634,20 +727,24 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             }
         }
 
-        internal suspend fun restartVpnService(
+        internal fun restartVpnService(
             context: Context,
             forceGc: Boolean = false,
-        ) = withContext(Dispatchers.Default) {
+            forceRestart: Boolean = false,
+        ) {
             val applicationContext = context.applicationContext
             if (isServiceRunning(applicationContext)) {
-                Timber.v("VPN log: stopping service")
+                logcat { "VPN log: stopping service" }
 
                 restartService(applicationContext)
 
                 if (forceGc) {
-                    Timber.d("Forcing a garbage collection to run while VPN is restarting")
+                    logcat { "Forcing a garbage collection to run while VPN is restarting" }
                     System.gc()
                 }
+            } else if (forceRestart) {
+                logcat { "VPN log: starting service" }
+                startVpnService(applicationContext)
             }
         }
 
@@ -656,16 +753,4 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         private const val ACTION_RESTART_VPN = "ACTION_RESTART_VPN"
         private const val ACTION_ALWAYS_ON_START = "android.net.VpnService"
     }
-
-    private val INCLUDED_APPS_FOR_TESTING = listOf(
-        "com.duckduckgo.networkrequestor",
-        "com.cdrussell.networkrequestor",
-        "meteor.test.and.grade.internet.connection.speed",
-        "org.zwanoo.android.speedtest",
-        "com.netflix.Speedtest",
-        "eu.vspeed.android",
-        "net.fireprobe.android",
-        "com.philips.lighting.hue2",
-        "com.duckduckgo.mobile.android.debug",
-    )
 }

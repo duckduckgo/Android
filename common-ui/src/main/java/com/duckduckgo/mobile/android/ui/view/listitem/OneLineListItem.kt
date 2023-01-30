@@ -117,6 +117,9 @@ class OneLineListItem @JvmOverloads constructor(
         binding.leadingIconBackground.show()
     }
 
+    /** Sets visibility of the item image resource to GONE */
+    fun hideLeadingIcon() = binding.leadingIconBackground.gone()
+
     fun leadingIcon() = binding.leadingIcon
 
     /** Sets the trailing icon image resource */
@@ -143,6 +146,9 @@ class OneLineListItem @JvmOverloads constructor(
 
     /** Sets the background image type */
     fun setLeadingIconBackgroundType(value: Int) {
+        if (value == 0) {
+            binding.leadingIconBackground.setBackgroundResource(android.R.color.transparent)
+        }
         if (value == 1) {
             binding.leadingIconBackground.setBackgroundResource(R.drawable.list_item_image_circular_background)
         }

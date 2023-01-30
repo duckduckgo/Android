@@ -138,9 +138,6 @@ enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: B
     ATP_DID_RESTART_VPN_PROCESS_ON_BAD_HEALTH("m_atp_did_restart_vpn_process_on_bad_health_c"),
     ATP_DID_RESTART_VPN_PROCESS_ON_BAD_HEALTH_DAILY("m_atp_did_restart_vpn_process_on_bad_health_d"),
 
-    ATP_ENCRYPTED_IO_EXCEPTION("m_atp_ev_encrypted_io_error_c"),
-    ATP_ENCRYPTED_GENERAL_EXCEPTION("m_atp_ev_encrypted_error_c"),
-
     ATP_DID_SHOW_REPORT_BREAKAGE_APP_LIST("m_atp_imp_report_breakage_c"),
     ATP_DID_SHOW_REPORT_BREAKAGE_APP_LIST_DAILY("m_atp_imp_report_breakage_d"),
     ATP_DID_SHOW_REPORT_BREAKAGE_SINGLE_CHOICE_FORM("m_atp_imp_report_breakage_login_c"),
@@ -150,9 +147,6 @@ enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: B
     ATP_DID_CHOOSE_DISABLE_TRACKING_PROTECTION_DIALOG("m_atp_ev_selected_disable_protection_c"),
     ATP_DID_CHOOSE_DISABLE_ONE_APP_PROTECTION_DIALOG("m_atp_ev_selected_disable_app_protection_c"),
     ATP_DID_CHOOSE_CANCEL_APP_PROTECTION_DIALOG("m_atp_ev_selected_cancel_app_protection_c"),
-
-    ATP_DID_PRESS_WAITLIST_DIALOG_NOTIFY_ME("m_atp_ev_waitlist_dialog_notify_me_c"),
-    ATP_DID_PRESS_WAITLIST_DIALOG_DISMISS("m_atp_ev_waitlist_dialog_dismiss_c"),
 
     ATP_DID_SHOW_VPN_CONFLICT_DIALOG("m_atp_imp_vpn_conflict_dialog_c"),
     ATP_DID_CHOOSE_DISMISS_VPN_CONFLICT_DIALOG_DAILY("m_atp_ev_vpn_conflict_dialog_dismiss_d"),
@@ -215,6 +209,9 @@ enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: B
     ATP_REPORT_UNPROTECTED_APPS_BUCKET_DAILY("m_atp_unprotected_apps_bucket_%d_d"),
 
     ATP_DID_PRESS_APPTP_ENABLED_CTA_BUTTON("m_atp_ev_apptp_enabled_cta_button_press"),
+
+    ATP_REPORT_VPN_NETWORK_STACK_CREATE_ERROR("m_atp_ev_apptp_create_network_stack_error_c"),
+    ATP_REPORT_VPN_NETWORK_STACK_CREATE_ERROR_DAILY("m_atp_ev_apptp_create_network_stack_error_d"),
 
     ;
 }

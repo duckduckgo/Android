@@ -111,9 +111,7 @@ internal class VpnDatabaseCallback(
     private fun parseAppTrackerExclusionList(json: String): List<AppTrackerExcludedPackage> {
         val moshi = Moshi.Builder().build()
         val adapter: JsonAdapter<JsonAppTrackerExclusionList> = moshi.adapter(JsonAppTrackerExclusionList::class.java)
-        return adapter.fromJson(json)?.rules.orEmpty().map {
-            AppTrackerExcludedPackage(it)
-        }
+        return adapter.fromJson(json)?.unprotectedApps.orEmpty()
     }
 
     private fun parseJsonAppTrackerExceptionRules(json: String): List<AppTrackerExceptionRule> {

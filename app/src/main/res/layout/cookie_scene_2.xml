@@ -15,23 +15,23 @@
   -->
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="@dimen/omnibarCookieAnimationBannerHeight"
-    android:background="@drawable/cookies_text_background"
-    xmlns:tools="http://schemas.android.com/tools">
+             android:layout_width="wrap_content"
+             android:layout_height="@dimen/omnibarCookieAnimationBannerHeight"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
+             android:background="@drawable/cookies_text_background"
+             xmlns:tools="http://schemas.android.com/tools">
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/cookiesManagedText"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        app:typography="body1"
         android:textAlignment="textEnd"
-        android:textSize="16sp"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:maxLines="1"
         android:gravity="center"
         android:visibility="visible"
-        android:textColor="?attr/omnibarTextColor"
-        android:text="@string/autoconsentAnimationText"
+        android:text="@string/autoconsentManagedNoticeAnimationText"
         tools:ignore="RtlCompat" />
 </FrameLayout>

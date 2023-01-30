@@ -44,6 +44,11 @@ interface VpnFeaturesRegistry {
     fun isFeatureRegistered(feature: VpnFeature): Boolean
 
     /**
+     * @return returns `true` if there's any feature currently using the VPN, `false` otherwise
+     */
+    fun isAnyFeatureRegistered(): Boolean
+
+    /**
      * Refreshing the feature will cause the VPN to be stopped/restarted if it is enabled and the feature is already registered.
      */
     suspend fun refreshFeature(feature: VpnFeature)
@@ -56,8 +61,26 @@ interface VpnFeaturesRegistry {
      * When a VPN feature is (re)unregistered it will emit a pair with the name of the feature and `false`
      */
     fun registryChanges(): Flow<Pair<String, Boolean>>
+
+    fun getRegisteredFeatures(): List<VpnFeature>
 }
 
 interface VpnFeature {
     val featureName: String
+}
+
+/**
+ * Fake constructor for [VpnFeature] from the passed in [block] lambda
+ * instead of using the anonymous `object : VpnFeature` syntax.
+ *
+ * Usage:
+ *
+ * ```kotlin
+ * val name = VpnFeature {
+ *
+ * }
+ * ```
+ */
+fun VpnFeature(block: () -> String): VpnFeature = object : VpnFeature {
+    override val featureName: String = block()
 }

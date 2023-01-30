@@ -1,0 +1,51 @@
+appId: com.duckduckgo.mobile.android
+---
+- launchApp:
+    clearState: true
+- assertVisible:
+    text: ".*Not to worry! Searching and browsing privately.*"
+- tapOn: "let's do it!"
+- tapOn: "cancel"
+- assertVisible:
+    text: ".*I'll also upgrade the security of your connection if possible.*"
+- inputText: "https://www.search-company.site/"
+- pressKey: Enter
+- assertVisible:
+    text: ".*Got It.*"
+- tapOn:
+    text: "HIDE"
+- assertVisible:
+    text: "HIDE TIPS FOREVER"
+- tapOn:
+    text: "HIDE TIPS FOREVER"
+- assertVisible:
+    id: "ad-id-1"
+- tapOn:
+    id: "ad-id-1"
+- assertVisible:
+    text: "Publisher site"
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/omnibarIconContainer"
+- assertVisible:
+    text: "View Tracker Companies"
+- tapOn:
+    text: "View Tracker Companies"
+- assertVisible:
+    text: "The following third-party domains’ requests were blocked from loading because they were identified as tracking requests. If a company's requests are loaded, it can allow them to profile you."
+- assertVisible:
+    text: "About our Web Tracking Protections"
+- assertVisible:
+    text: ".*Ad Company"
+- assertVisible:
+    text: "convert.ad-company.site"
+- assertVisible:
+      text: "ad-company.site"
+- action: back
+- assertVisible:
+    text: "View Non-Tracker Companies"
+- tapOn:
+    text: "View Non-Tracker Companies"
+- assertVisible:
+    text: "We did not identify any requests from third-party domains."
+- assertVisible:
+    text: "About our Web Tracking Protections"

@@ -18,12 +18,11 @@ package com.duckduckgo.app.httpsupgrade
 
 import android.net.Uri
 import androidx.annotation.WorkerThread
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.global.isHttps
 import com.duckduckgo.app.global.toHttps
 import com.duckduckgo.app.httpsupgrade.store.HttpsFalsePositivesDao
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
@@ -57,7 +56,7 @@ interface HttpsUpgrader {
 )
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = LifecycleObserver::class,
+    boundType = MainProcessLifecycleObserver::class,
 )
 class HttpsUpgraderImpl @Inject constructor(
     private val bloomFactory: HttpsBloomFilterFactory,
@@ -65,7 +64,7 @@ class HttpsUpgraderImpl @Inject constructor(
     private val userAllowListDao: UserWhitelistDao,
     private val toggle: FeatureToggle,
     private val https: Https,
-) : HttpsUpgrader, DefaultLifecycleObserver {
+) : HttpsUpgrader, MainProcessLifecycleObserver {
 
     private var bloomFilter: BloomFilter? = null
     private val bloomReloadLock = ReentrantLock()

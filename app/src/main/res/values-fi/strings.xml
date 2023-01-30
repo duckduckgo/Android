@@ -398,7 +398,7 @@
     <string name="systemSearchOnboardingButtonOk">Selvä</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">PIILOTA</string>
+    <string name="daxDialogHideButton">Piilota</string>
     <string name="daxDialogPhew">Huh huh!</string>
     <string name="daxDialogNext">Seuraava</string>
     <string name="daxDialogHighFive">Ylävitonen!</string>
@@ -652,7 +652,8 @@
     <string name="autoconsentSecondaryCta">Ei kiitos</string>
 
     <string name="autoconsentSetting">Evästeiden hallinnan ponnahdusikkunat</string>
-    <string name="autoconsentAnimationText">Hallitut evästeet</string>
+    <string name="autoconsentCosmeticNoticeAnimationText">Ponnahdusikkuna piilotettu</string>
+    <string name="autoconsentManagedNoticeAnimationText">Hallitut evästeet</string>
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Sivuston käyttöoikeudet</string>

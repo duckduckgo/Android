@@ -17,15 +17,15 @@
 package com.duckduckgo.app.pixels
 
 import android.content.Context
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.*
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.browser.WebViewVersionProvider
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.DEFAULT_BROWSER
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.WEBVIEW_VERSION
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -37,7 +37,7 @@ import timber.log.Timber
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = LifecycleObserver::class,
+    boundType = MainProcessLifecycleObserver::class,
 )
 @SingleInstanceIn(AppScope::class)
 class EnqueuedPixelWorker @Inject constructor(
@@ -45,30 +45,31 @@ class EnqueuedPixelWorker @Inject constructor(
     private val pixel: Provider<Pixel>,
     private val unsentForgetAllPixelStore: UnsentForgetAllPixelStore,
     private val webViewVersionProvider: WebViewVersionProvider,
-) : LifecycleEventObserver {
+    private val defaultBrowserDetector: DefaultBrowserDetector,
+) : MainProcessLifecycleObserver {
 
     private var launchedByFireAction: Boolean = false
 
-    override fun onStateChanged(
-        source: LifecycleOwner,
-        event: Lifecycle.Event,
-    ) {
-        if (event == Lifecycle.Event.ON_CREATE) {
-            scheduleWorker(workManager)
-            launchedByFireAction = isLaunchByFireAction()
-        } else if (event == Lifecycle.Event.ON_START) {
-            if (launchedByFireAction) {
-                // skip the next on_start if branch
-                Timber.i("Suppressing app launch pixel")
-                launchedByFireAction = false
-                return
-            }
-            Timber.i("Sending app launch pixel")
-            pixel.get().fire(
-                pixel = AppPixelName.APP_LAUNCH,
-                parameters = mapOf(WEBVIEW_VERSION to webViewVersionProvider.getMajorVersion()),
-            )
+    override fun onCreate(owner: LifecycleOwner) {
+        scheduleWorker(workManager)
+        launchedByFireAction = isLaunchByFireAction()
+    }
+
+    override fun onStart(owner: LifecycleOwner) {
+        if (launchedByFireAction) {
+            // skip the next on_start if branch
+            Timber.i("Suppressing app launch pixel")
+            launchedByFireAction = false
+            return
         }
+        Timber.i("Sending app launch pixel")
+        pixel.get().fire(
+            pixel = AppPixelName.APP_LAUNCH,
+            parameters = mapOf(
+                WEBVIEW_VERSION to webViewVersionProvider.getMajorVersion(),
+                DEFAULT_BROWSER to defaultBrowserDetector.isDefaultBrowser().toString(),
+            ),
+        )
     }
 
     private fun isLaunchByFireAction(): Boolean {

@@ -17,9 +17,9 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
-import androidx.lifecycle.LifecycleObserver
 import com.duckduckgo.app.global.device.ContextDeviceInfo
 import com.duckduckgo.app.global.device.DeviceInfo
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.AtbInitializer
 import com.duckduckgo.app.statistics.AtbInitializerListener
 import com.duckduckgo.app.statistics.api.PixelSender
@@ -109,7 +109,7 @@ class StubStatisticsModule {
         statisticsDataStore: StatisticsDataStore,
         statisticsUpdater: StatisticsUpdater,
         listeners: DaggerSet<AtbInitializerListener>,
-    ): LifecycleObserver {
+    ): MainProcessLifecycleObserver {
         return AtbInitializer(appCoroutineScope, statisticsDataStore, statisticsUpdater, listeners)
     }
 

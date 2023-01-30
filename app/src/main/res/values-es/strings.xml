@@ -398,7 +398,7 @@
     <string name="systemSearchOnboardingButtonOk">Entendido</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">OCULTAR</string>
+    <string name="daxDialogHideButton">Ocultar</string>
     <string name="daxDialogPhew">¡Uf!</string>
     <string name="daxDialogNext">Siguiente</string>
     <string name="daxDialogHighFive">¡Choca esos cinco!</string>
@@ -652,7 +652,8 @@
     <string name="autoconsentSecondaryCta">No, gracias</string>
 
     <string name="autoconsentSetting">Administrar ventanas emergentes de cookies</string>
-    <string name="autoconsentAnimationText">Cookies gestionadas</string>
+    <string name="autoconsentCosmeticNoticeAnimationText">Ventana emergente oculta</string>
+    <string name="autoconsentManagedNoticeAnimationText">Cookies gestionadas</string>
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Permisos del sitio</string>

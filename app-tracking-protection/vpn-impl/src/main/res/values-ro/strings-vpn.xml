@@ -248,8 +248,6 @@
     <string name="atp_FAQSixthText">Protecția împotriva urmăririi de către aplicație funcționează pe dispozitivul tău și nu trimite datele tale personale de pe dispozitiv către DuckDuckGo.</string>
 
     <!--  App Tracking Protection Waitlist -->
-    <string name="atp_WaitlistActivityTitle">Protecția la urmărirea aplicațiilor</string>
-    <string name="atp_WaitlistActivityWaitlistTitle">Lista de așteptare pentru Protecția împotriva urmăririi de către aplicație</string>
     <string name="atp_WaitlistNotificationTitle">Invitația ta pentru Protecția împotriva urmăririi de către aplicație este aici!</string>
     <string name="atp_WaitlistNotificationDescription">Te-ai alăturat listei de așteptare și ne-ai solicitat să te anunțăm când este rândul tău să încerci funcția noastră de protecție a comunicațiilor prin e-mail. Atinge pentru a vizualiza invitația ta.</string>
     <string name="atp_WaitlistStatusNotJoined">Un pas ușor pentru o mai bună confidențialitate a aplicațiilor!</string>
@@ -268,7 +266,6 @@
     <string name="atp_WaitlistErrorJoining">A apărut o eroare la aderarea la lista de așteptare, încearcă din nou mai târziu</string>
     <string name="atp_WaitlistJoinedWithNotification">Îți vom trimite o notificare când Protecția împotriva urmăririi de către aplicație este pregătită pentru tine.\n\n<annotation type="beta_link"> Află mai multe despre versiunea beta </annotation></string>
     <string name="atp_WaitlistJoinedWithoutNotification">Invitația ta de a încerca Protecția împotriva urmăririi de către aplicație va sosi aici. Revino în curând, sau îți putem trimite o notificare când va fi rândul tău\n\n<annotation type="notify_me_link">Înștiințează-mă</annotation>\n\n<annotation type="beta_link">Află mai multe despre beta</annotation></string>
-    <string name="atp_WaitlistRedeemCodeActivityTitle">Introdu codul de invitație</string>
     <string name="atp_WaitlistRedeemedCodeStatus">Succes! Ai intrat!</string>
     <string name="atp_WaitlistBetaBlogPost">https://spreadprivacy.com/introducing-app-tracking-protection</string>
 

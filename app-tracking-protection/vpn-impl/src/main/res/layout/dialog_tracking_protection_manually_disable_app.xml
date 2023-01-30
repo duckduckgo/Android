@@ -19,13 +19,13 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    style="@style/Widget.DuckDuckGo.Dialog.Content">
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/trackingProtectionScrollView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?dialogBgColor">
+        android:layout_height="wrap_content">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -35,50 +35,43 @@
                 android:id="@+id/trackingProtectionAppIcon"
                 android:layout_width="@dimen/listItemImageContainerSize"
                 android:layout_height="@dimen/listItemImageContainerSize"
-                android:layout_marginTop="@dimen/keyline_5"
                 android:importantForAccessibility="no"
                 android:src="@drawable/ic_globe_gray_16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:id="@+id/trackingProtectionTitle"
-                style="@style/TextAppearance.AppCompat.Title"
+                app:typography="h2"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/keyline_5"
                 android:layout_marginTop="@dimen/keyline_4"
-                android:layout_marginEnd="@dimen/keyline_5"
                 android:gravity="center"
                 android:text="@string/atp_ExcludeAppsManuallyDisableAppDialogTitle"
-                android:textColor="?normalTextColor"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/trackingProtectionAppIcon" />
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:id="@+id/trackingProtectionAppLabel"
-                style="@style/TextAppearance.DuckDuckGo.Body2"
+                app:typography="body2"
+                app:textType="secondary"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/keyline_5"
                 android:layout_marginTop="@dimen/keyline_2"
-                android:layout_marginEnd="@dimen/keyline_5"
                 android:gravity="center"
                 android:text="@string/atp_ExcludeAppsManuallyDisableAppDialogLabel"
-                android:textColor="?secondaryTextColor"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/trackingProtectionTitle" />
 
-            <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimarySmall
+            <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
                 android:id="@+id/trackingProtectionExcludeAppDialogReport"
                 android:layout_width="wrap_content"
-                android:layout_height="@dimen/dialogButtonHeight"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/keyline_0"
                 android:layout_marginTop="@dimen/keyline_4"
-                android:layout_marginBottom="@dimen/keyline_5"
                 android:gravity="center|center_horizontal"
                 android:text="@string/atp_ExcludeAppsManuallyCTAReportIssue"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -87,13 +80,12 @@
                 app:layout_constraintStart_toEndOf="@id/trackingProtectionExcludeAppDialogSkip"
                 app:layout_constraintTop_toBottomOf="@+id/trackingProtectionAppLabel" />
 
-            <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostSmall
+            <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
                 android:id="@+id/trackingProtectionExcludeAppDialogSkip"
                 android:layout_width="wrap_content"
-                android:layout_height="@dimen/dialogButtonHeight"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/keyline_4"
-                android:layout_marginEnd="@dimen/keyline_0"
-                android:layout_marginBottom="@dimen/keyline_5"
+                android:layout_marginEnd="@dimen/keyline_2"
                 android:gravity="center|center_horizontal"
                 android:text="@string/atp_ExcludeAppsManuallyCTANotNow"
                 app:layout_constraintBottom_toBottomOf="parent"

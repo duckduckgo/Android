@@ -398,7 +398,7 @@
     <string name="systemSearchOnboardingButtonOk">Mám to</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">SKRÝT</string>
+    <string name="daxDialogHideButton">Skrýt</string>
     <string name="daxDialogPhew">Pche!</string>
     <string name="daxDialogNext">Další</string>
     <string name="daxDialogHighFive">Plácnutí!</string>
@@ -660,7 +660,8 @@
     <string name="autoconsentSecondaryCta">Ne, děkuji</string>
 
     <string name="autoconsentSetting">Správa vyskakovacích oken ohledně cookies</string>
-    <string name="autoconsentAnimationText">O cookies je postaráno!</string>
+    <string name="autoconsentCosmeticNoticeAnimationText">Skryté vyskakovací okno</string>
+    <string name="autoconsentManagedNoticeAnimationText">O cookies je postaráno!</string>
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Oprávnění webu</string>

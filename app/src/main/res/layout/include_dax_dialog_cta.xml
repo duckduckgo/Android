@@ -13,94 +13,72 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/daxCtaContainer"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:alpha="0">
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/logo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        app:srcCompat="@drawable/ic_dax_icon"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardView"
+<androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/daxCtaContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="24dp"
-        android:backgroundTint="?attr/daxDialogBackgroundColor"
-        app:cardCornerRadius="20dp"
-        app:layout_constraintTop_toBottomOf="@id/triangle"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/cardContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/hiddenTextCta"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="26dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="20dp"
-                android:textColor="@color/grayishBrown"
-                android:textSize="16sp"
-                android:visibility="invisible"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <com.duckduckgo.mobile.android.ui.view.TypeAnimationTextView
-                android:id="@+id/dialogTextCta"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="26dp"
-                android:layout_marginEnd="16dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:textColor="?attr/normalTextColor"
-                android:textSize="16sp"
-                app:layout_constraintBottom_toBottomOf="@id/hiddenTextCta"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.cardview.widget.CardView>
+        android:clipChildren="false"
+        android:alpha="0">
 
     <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/triangle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:elevation="6dp"
-        android:src="@drawable/ic_triangle_bubble"
-        app:layout_constraintTop_toBottomOf="@id/logo"
-        app:layout_constraintEnd_toEndOf="@id/logo"
-        app:layout_constraintStart_toStartOf="@id/logo" />
+            android:id="@+id/logo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_5"
+            app:srcCompat="@drawable/ic_dax_icon"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
 
-    <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryRounded
-        android:id="@+id/primaryCta"
-        android:layout_width="0dp"
-        android:layout_height="@dimen/legacyButtonHeight"
-        android:layout_marginTop="@dimen/keyline_4"
-        android:text="@string/onboardingLetsDoItButton"
-        app:layout_constraintEnd_toEndOf="@id/cardView"
-        app:layout_constraintStart_toStartOf="@id/cardView"
-        app:layout_constraintTop_toBottomOf="@id/cardView" />
+    <com.duckduckgo.mobile.android.ui.view.shape.DaxBubbleCardView
+            android:id="@+id/cardView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/keyline_4"
+            app:layout_constraintTop_toBottomOf="@id/logo"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintWidth_max="600dp">
+
+        <FrameLayout
+                android:id="@+id/cardContainer"
+                style="@style/Widget.DuckDuckGo.DaxDialog.Content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                    android:id="@+id/hiddenTextCta"
+                    app:typography="body1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="@dimen/keyline_1"
+                    android:visibility="invisible"
+                    tools:visibility="visible"
+                    tools:text="@string/onboardingDaxText"/>
+
+            <com.duckduckgo.mobile.android.ui.view.TypeAnimationTextView
+                    android:id="@+id/dialogTextCta"
+                    style="@style/Typography.DuckDuckGo.Body1"
+                    android:textColor="?attr/daxColorPrimaryText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true"/>
+
+        </FrameLayout>
+    </com.duckduckgo.mobile.android.ui.view.shape.DaxBubbleCardView>
+
+    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+            android:id="@+id/primaryCta"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:buttonSize="large"
+            android:layout_marginTop="@dimen/daxDialogButtonSpacing"
+            android:text="@string/onboardingLetsDoItButton"
+            app:layout_constraintEnd_toEndOf="@id/cardView"
+            app:layout_constraintStart_toStartOf="@id/cardView"
+            app:layout_constraintTop_toBottomOf="@id/cardView"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

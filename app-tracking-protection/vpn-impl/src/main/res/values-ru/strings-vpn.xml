@@ -254,8 +254,6 @@
     <string name="atp_FAQSixthText">Защита от слежки работает на вашем устройстве и не передает ваши личные данные в DuckDuckGo.</string>
 
     <!--  App Tracking Protection Waitlist -->
-    <string name="atp_WaitlistActivityTitle">Блокировка отслеживания приложениями</string>
-    <string name="atp_WaitlistActivityWaitlistTitle">Очередь на защиту от слежки</string>
     <string name="atp_WaitlistNotificationTitle">Вы получили приглашение воспользоваться защитой от слежки!</string>
     <string name="atp_WaitlistNotificationDescription">Ранее вы просили добавить вас в список ожидания, чтобы мы сообщили, когда вам станет доступна защита от слежки. Нажмите, чтобы открыть приглашение.</string>
     <string name="atp_WaitlistStatusNotJoined">Один простой шаг для надежной защиты данных!</string>
@@ -274,7 +272,6 @@
     <string name="atp_WaitlistErrorJoining">При постановке в очередь произошла ошибка. Пожалуйста, повторите попытку позже.</string>
     <string name="atp_WaitlistJoinedWithNotification">Когда защита от слежки станет доступна, мы отправим вам уведомление.\n\n<annotation type="beta_link">Подробнее о бета-версии</annotation></string>
     <string name="atp_WaitlistJoinedWithoutNotification">Приглашение тестировать защиту от слежки придет сюда. Загляните сюда позже либо дождитесь нашего уведомления, когда подойдет ваша очередь\n\n<annotation type="notify_me_link">Получить уведомление</annotation>\n\n<annotation type="beta_link">Подробнее о бета-версии...</annotation></string>
-    <string name="atp_WaitlistRedeemCodeActivityTitle">Введите код приглашения</string>
     <string name="atp_WaitlistRedeemedCodeStatus">Готово! Вы приняты.</string>
     <string name="atp_WaitlistBetaBlogPost">https://spreadprivacy.com/introducing-app-tracking-protection</string>
 

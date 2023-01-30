@@ -248,8 +248,6 @@
     <string name="atp_FAQSixthText">Lietotņu pretizsekošanas aizsardzība darbojas tavā ierīcē un nesūta tavus personiskos datus no ierīces uz DuckDuckGo.</string>
 
     <!--  App Tracking Protection Waitlist -->
-    <string name="atp_WaitlistActivityTitle">Lietotņu pretizsekošanas aizsardzība</string>
-    <string name="atp_WaitlistActivityWaitlistTitle">Lietotņu pretizsekošanas aizsardzības gaidīšanas saraksts</string>
     <string name="atp_WaitlistNotificationTitle">Tavs Lietotņu pretizsekošanas aizsardzības ielūgums ir klāt!</string>
     <string name="atp_WaitlistNotificationDescription">Tu pievienojies gaidīšanas sarakstam un lūdzi mūs informēt, kad pienāks tava kārta izmēģināt mūsu Lietotņu pretizsekošanas aizsardzības funkciju. Pieskaries, lai skatītu savu uzaicinājumu.</string>
     <string name="atp_WaitlistStatusNotJoined">Viens vienkāršs solis labākam lietotņu privātumam!</string>
@@ -268,7 +266,6 @@
     <string name="atp_WaitlistErrorJoining">Radās kļūda, pievienojoties nogaides sarakstam. Lūdzu, mēģini vēlāk vēlreiz.</string>
     <string name="atp_WaitlistJoinedWithNotification">Mēs nosūtīsim tev paziņojumu, kad varēsi izmantot Lietotņu pretizsekošanas aizsardzību.\n\n<annotation type="beta_link">Uzzināt vairāk par beta versiju</annotation></string>
     <string name="atp_WaitlistJoinedWithoutNotification">Tavs uzaicinājums izmēģināt Lietotņu pretizsekošanas aizsardzību pienāks šeit. Drīz ieskaties atkal, vai arī mēs varam tev nosūtīt paziņojumu, kad būs pienākusi tava kārta\n\n<annotation type="notify_me_link">Paziņojiet man</annotation>\n\n<annotation type="beta_link">Uzzināt vairāk par beta versiju</annotation></string>
-    <string name="atp_WaitlistRedeemCodeActivityTitle">Ievadi ielūguma kodu</string>
     <string name="atp_WaitlistRedeemedCodeStatus">Izdevās! Tu esi pievienojies.</string>
     <string name="atp_WaitlistBetaBlogPost">https://spreadprivacy.com/introducing-app-tracking-protection</string>
 

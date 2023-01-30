@@ -59,6 +59,7 @@ interface BrowserTrackersAnimatorHelper {
         cookieBackground: View,
         cookieAnimationView: LottieAnimationView,
         cookieScene: ViewGroup,
+        cookieCosmeticHide: Boolean,
     )
 
     /**
