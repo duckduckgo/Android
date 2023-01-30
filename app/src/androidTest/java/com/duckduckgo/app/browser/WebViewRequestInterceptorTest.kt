@@ -49,6 +49,7 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.ArgumentMatchers.anyMap
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.*
 
@@ -697,12 +698,12 @@ class WebViewRequestInterceptorTest {
             surrogateId = "testId",
         )
         whenever(mockRequest.isForMainFrame).thenReturn(false)
-        whenever(mockTrackerDetector.evaluate(any(), any(), eq(true), mockRequest.requestHeaders)).thenReturn(trackingEvent)
+        whenever(mockTrackerDetector.evaluate(any(), any(), eq(true), anyMap())).thenReturn(trackingEvent)
     }
 
     private fun configureNull() {
         whenever(mockRequest.isForMainFrame).thenReturn(false)
-        whenever(mockTrackerDetector.evaluate(any(), any(), eq(true), mockRequest.requestHeaders)).thenReturn(null)
+        whenever(mockTrackerDetector.evaluate(any(), any(), eq(true), anyMap())).thenReturn(null)
     }
 
     private fun configureBlockedCnameTrackingEvent() {
@@ -724,7 +725,7 @@ class WebViewRequestInterceptorTest {
             surrogateId = null,
         )
         whenever(mockRequest.isForMainFrame).thenReturn(false)
-        whenever(mockTrackerDetector.evaluate(any(), any(), eq(false), mockRequest.requestHeaders)).thenReturn(trackingEvent)
+        whenever(mockTrackerDetector.evaluate(any(), any(), eq(false), anyMap())).thenReturn(trackingEvent)
     }
 
     private fun configureUrlExistsInTheStack(uri: Uri = validUri()) {

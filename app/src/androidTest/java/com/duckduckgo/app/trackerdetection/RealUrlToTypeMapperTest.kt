@@ -81,7 +81,7 @@ class RealUrlToTypeMapperTest {
     @Test
     fun whenAcceptHeadersAreStylesheetThenReturnStylesheetType() {
         requestHeaders["Accept"] = "text/css,*/*;q=0.8"
-        assertEquals("image", testee.map("example.com/test", requestHeaders))
+        assertEquals("stylesheet", testee.map("example.com/test", requestHeaders))
     }
 
     @Test
