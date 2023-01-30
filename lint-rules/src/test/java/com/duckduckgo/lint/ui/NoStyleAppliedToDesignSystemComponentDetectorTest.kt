@@ -137,7 +137,7 @@ style="@style/Widget.DuckDuckGo.Button.Primary"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:tint="@android:color/white"
-style="@style/Widget.DuckDuckGo.Button.Primary"
+                      style="@style/Widget.DuckDuckGo.Button.Primary"
                       tools:ignore="RtlHardcoded"/>
                 </android.support.design.widget.CoordinatorLayout>
             """
@@ -148,8 +148,8 @@ style="@style/Widget.DuckDuckGo.Button.Primary"
             .expect(
                 """
                 res/layout/buttons.xml:17: Error: Design System Components should not be styled. Consider creating a new Component or use one of the Components already created [StyleInDesignSystemComponent]
-                                  <com.duckduckgo.mobile.android.ui.view.SwitchView
-                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                  <com.duckduckgo.mobile.android.ui.view.SwitchView
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 1 errors, 0 warnings
             """.trimMargin()
             )
@@ -190,9 +190,9 @@ style="@style/Widget.DuckDuckGo.Button.Primary"
             .run()
             .expect(
                 """
-                res/layout/buttons.xml:9: Error: style is defined by the DaxButton Component, you shouldn't change it [InvalidDaxButtonProperty]
-                  <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
-                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                res/layout/buttons.xml:9: Error: Design System Components should not be styled. Consider creating a new Component or use one of the Components already created [StyleInDesignSystemComponent]
+                  <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 1 errors, 0 warnings
             """.trimMargin()
             )

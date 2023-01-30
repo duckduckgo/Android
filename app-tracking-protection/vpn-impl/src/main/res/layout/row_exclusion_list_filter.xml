@@ -24,6 +24,7 @@
     android:layout_marginTop="@dimen/keyline_2"
     android:drawablePadding="@dimen/keyline_2"
     android:padding="@dimen/keyline_4"
+    android:fontFamily="@font/roboto_mono"
     app:drawableEndCompat="@drawable/ic_arrow_down"
     app:typography="body2"
     tools:text="Protection Enabled (11)" />

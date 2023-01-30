@@ -61,10 +61,10 @@ class DeprecatedAndroidWidgetsUsedInXmlDetectorTest {
             .run()
             .expect(
                 """
-                res/layout/buttons.xml:17: Error: Always favor the use of the Design System Component. ButtonPrimaryLarge, ButtonSecondaryLarge, etc... [AndroidButtonInXml]
+                res/layout/buttons.xml:17: Error: Always favor the use of the Design System Component [DeprecatedWidgetInXml]
                   <Button
                    ~~~~~~
-                1 errors, 0 warnings        
+                1 errors, 0 warnings     
             """.trimMargin()
             )
     }
@@ -150,7 +150,7 @@ class DeprecatedAndroidWidgetsUsedInXmlDetectorTest {
             .run()
             .expect(
                 """
-                res/layout/switch.xml:17: Error: Always favor the use of the Design System Component SwitchView [AndroidSwitchInXml]
+                res/layout/switch.xml:17: Error: Always favor the use of the Design System Component [DeprecatedWidgetInXml]
                 <androidx.appcompat.widget.SwitchCompat
                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 1 errors, 0 warnings
@@ -200,10 +200,10 @@ class DeprecatedAndroidWidgetsUsedInXmlDetectorTest {
             .run()
             .expect(
                 """
-                res/layout/switch.xml:17: Error: Always favor the use of the Design System Component SwitchView [AndroidSwitchInXml]
+                res/layout/switch.xml:17: Error: Always favor the use of the Design System Component [DeprecatedWidgetInXml]
                     <com.google.android.material.switchmaterial.SwitchMaterial
                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                1 errors, 0 warnings      
+                1 errors, 0 warnings
             """.trimMargin()
             )
     }
@@ -248,7 +248,7 @@ class DeprecatedAndroidWidgetsUsedInXmlDetectorTest {
             .run()
             .expect(
                 """
-                res/layout/switch.xml:17: Error: Always favor the use of the Design System Component SwitchView [AndroidSwitchInXml]
+                res/layout/switch.xml:17: Error: Always favor the use of the Design System Component [DeprecatedWidgetInXml]
                 <Switch
                  ~~~~~~
                 1 errors, 0 warnings

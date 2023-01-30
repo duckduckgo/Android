@@ -19,6 +19,7 @@ package com.duckduckgo.lint.ui
 import com.android.tools.lint.checks.infrastructure.TestFiles
 import com.android.tools.lint.checks.infrastructure.TestLintTask.lint
 import com.duckduckgo.lint.ui.DaxButtonStylingDetector.Companion.INVALID_DAX_BUTTON_PROPERTY
+import com.duckduckgo.lint.ui.DaxTextViewStylingDetector.Companion.INVALID_DAX_TEXT_VIEW_PROPERTY
 import com.duckduckgo.lint.ui.NoStyleAppliedToDesignSystemComponentDetector.Companion.STYLE_IN_DESIGN_SYSTEM_COMPONENT
 import org.junit.Test
 
@@ -48,7 +49,7 @@ class DaxTextViewStylingDetectorTest {
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/customDialogTitle" 
-                    android:textStyle="@style/Widget.DuckDuckGo.Button.Primary"
+                    android:textStyle="@style/Typography.DuckDuckGo.Body1"
                     app:textType="secondary"
                     app:typography="body1" />
  
@@ -56,51 +57,13 @@ class DaxTextViewStylingDetectorTest {
             """
                 ).indented()
             )
-            .issues(INVALID_DAX_BUTTON_PROPERTY)
+            .issues(INVALID_DAX_TEXT_VIEW_PROPERTY)
             .run()
             .expect(
                 """
-                res/layout/buttons.xml:9: Error: textStyle is defined by the DaxButton Component, you shouldn't change it [InvalidDaxButtonProperty]
-                  <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
-                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                1 errors, 0 warnings
-            """.trimMargin()
-            )
-    }
-
-    @Test
-    fun whenTextColorChangedThenFail() {
-        lint()
-            .files(
-                TestFiles.xml(
-                    "res/layout/buttons.xml",
-                    """
-                <android.support.design.widget.CoordinatorLayout
-                    xmlns:android="http://schemas.android.com/apk/res/android"
-                    xmlns:app="http://schemas.android.com/apk/res-auto"
-                    xmlns:tools="http://schemas.android.com/tools"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="#eeeeee">
-                    
-                  <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
-                      android:id="@+id/button"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:textColor="@color/red"
-                      tools:ignore="RtlHardcoded"/>
-                      
-                </android.support.design.widget.CoordinatorLayout>
-            """
-                ).indented()
-            )
-            .issues(INVALID_DAX_BUTTON_PROPERTY)
-            .run()
-            .expect(
-                """
-                res/layout/buttons.xml:9: Error: textColor is defined by the DaxButton Component, you shouldn't change it [InvalidDaxButtonProperty]
-                  <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
-                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                res/layout/buttons.xml:9: Error: textStyle is defined by the DaxTextView Component, you shouldn't change it [InvalidDaxTextViewProperty]
+                <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 1 errors, 0 warnings
             """.trimMargin()
             )
@@ -121,24 +84,29 @@ class DaxTextViewStylingDetectorTest {
                     android:layout_height="match_parent"
                     android:background="#eeeeee">
                     
-                  <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
-                      android:id="@+id/button"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:textAppearance="@style/TextAppearance.MaterialComponents.Button"
-                      tools:ignore="RtlHardcoded"/>
-                      
+                <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                    android:id="@+id/text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_2"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/customDialogTitle" 
+                    android:textAppearance="@style/Typography.DuckDuckGo.Body1"
+                    app:textType="secondary"
+                    app:typography="body1" />
+ 
                 </android.support.design.widget.CoordinatorLayout>
             """
                 ).indented()
             )
-            .issues(INVALID_DAX_BUTTON_PROPERTY)
+            .issues(INVALID_DAX_TEXT_VIEW_PROPERTY)
             .run()
             .expect(
                 """
-                res/layout/buttons.xml:9: Error: textAppearance is defined by the DaxButton Component, you shouldn't change it [InvalidDaxButtonProperty]
-                  <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
-                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                res/layout/buttons.xml:9: Error: textAppearance is defined by the DaxTextView Component, you shouldn't change it [InvalidDaxTextViewProperty]
+                <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 1 errors, 0 warnings
             """.trimMargin()
             )
@@ -159,31 +127,36 @@ class DaxTextViewStylingDetectorTest {
                     android:layout_height="match_parent"
                     android:background="#eeeeee">
                     
-                  <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
-                      android:id="@+id/button"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:textAllCaps="true"
-                      tools:ignore="RtlHardcoded"/>
-                      
+                <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                    android:id="@+id/text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_2"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/customDialogTitle" 
+                    android:textAllCaps="true"
+                    app:textType="secondary"
+                    app:typography="body1" />
+ 
                 </android.support.design.widget.CoordinatorLayout>
             """
                 ).indented()
             )
-            .issues(INVALID_DAX_BUTTON_PROPERTY)
+            .issues(INVALID_DAX_TEXT_VIEW_PROPERTY)
             .run()
             .expect(
                 """
-                res/layout/buttons.xml:9: Error: textAllCaps is defined by the DaxButton Component, you shouldn't change it [InvalidDaxButtonProperty]
-                  <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
-                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                res/layout/buttons.xml:9: Error: textAllCaps is defined by the DaxTextView Component, you shouldn't change it [InvalidDaxTextViewProperty]
+                <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 1 errors, 0 warnings
             """.trimMargin()
             )
     }
 
     @Test
-    fun whenButtonTintedThenFail() {
+    fun whenTintThenFail() {
         lint()
             .files(
                 TestFiles.xml(
@@ -197,24 +170,115 @@ class DaxTextViewStylingDetectorTest {
                     android:layout_height="match_parent"
                     android:background="#eeeeee">
                     
-                  <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
-                      android:id="@+id/button"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:tint="@color/red"
-                      tools:ignore="RtlHardcoded"/>
+                <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                    android:id="@+id/text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_2"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/customDialogTitle" 
+                    android:tint="@color/red"
+                    app:textType="secondary"
+                    app:typography="body1" />
+ 
+                </android.support.design.widget.CoordinatorLayout>
+            """
+                ).indented()
+            )
+            .issues(INVALID_DAX_TEXT_VIEW_PROPERTY)
+            .run()
+            .expect(
+                """
+                res/layout/buttons.xml:9: Error: tint is defined by the DaxTextView Component, you shouldn't change it [InvalidDaxTextViewProperty]
+                <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                1 errors, 0 warnings
+            """.trimMargin()
+            )
+    }
+
+    @Test
+    fun whenTextSizeChangedThenFail() {
+        lint()
+            .files(
+                TestFiles.xml(
+                    "res/layout/buttons.xml",
+                    """
+                <android.support.design.widget.CoordinatorLayout
+                    xmlns:android="http://schemas.android.com/apk/res/android"
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                    xmlns:tools="http://schemas.android.com/tools"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#eeeeee">
+                    
+                <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                    android:id="@+id/text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_2"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/customDialogTitle" 
+                    android:textSize="12sp"
+                    app:textType="secondary"
+                    app:typography="body1" />
                       
                 </android.support.design.widget.CoordinatorLayout>
             """
                 ).indented()
             )
-            .issues(INVALID_DAX_BUTTON_PROPERTY)
+            .issues(INVALID_DAX_TEXT_VIEW_PROPERTY)
             .run()
             .expect(
                 """
-                res/layout/buttons.xml:9: Error: tint is defined by the DaxButton Component, you shouldn't change it [InvalidDaxButtonProperty]
-                  <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
-                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                res/layout/buttons.xml:9: Error: textSize is defined by the DaxTextView Component, you shouldn't change it [InvalidDaxTextViewProperty]
+                <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                1 errors, 0 warnings
+            """.trimMargin()
+            )
+    }
+
+    @Test
+    fun whenFontChangedThenFail() {
+        lint()
+            .files(
+                TestFiles.xml(
+                    "res/layout/buttons.xml",
+                    """
+                <android.support.design.widget.CoordinatorLayout
+                    xmlns:android="http://schemas.android.com/apk/res/android"
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                    xmlns:tools="http://schemas.android.com/tools"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#eeeeee">
+                    
+                <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                    android:id="@+id/text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_2"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/customDialogTitle" 
+                    android:fontFamily="@font/roboto_mono"
+                    app:textType="secondary"
+                    app:typography="body1" />
+                      
+                </android.support.design.widget.CoordinatorLayout>
+            """
+                ).indented()
+            )
+            .issues(INVALID_DAX_TEXT_VIEW_PROPERTY)
+            .run()
+            .expect(
+                """
+                res/layout/buttons.xml:9: Error: fontFamily is defined by the DaxTextView Component, you shouldn't change it [InvalidDaxTextViewProperty]
+                <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 1 errors, 0 warnings
             """.trimMargin()
             )
@@ -235,18 +299,23 @@ class DaxTextViewStylingDetectorTest {
                     android:layout_height="match_parent"
                     android:background="#eeeeee">
                     
-                  <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
-                      android:id="@+id/button"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      tools:ignore="RtlHardcoded"/>
+                <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                    android:id="@+id/text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_2"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/customDialogTitle"
+                    app:textType="secondary"
+                    app:typography="body1" />
                       
                 </android.support.design.widget.CoordinatorLayout>
             """
                 ).indented()
             )
             .allowCompilationErrors()
-            .issues(INVALID_DAX_BUTTON_PROPERTY)
+            .issues(INVALID_DAX_TEXT_VIEW_PROPERTY)
             .run()
             .expectClean()
     }

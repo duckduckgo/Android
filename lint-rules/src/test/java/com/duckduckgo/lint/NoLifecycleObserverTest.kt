@@ -46,7 +46,7 @@ class NoLifecycleObserverTest {
     }
 
     @Test
-    fun whenDefaultLifecycleObserverExtendedThenSucceed() {
+    fun whenDefaultLifecycleObserverExtendedThenFail() {
         lint()
             .files(kt("""
               package com.duckduckgo.lint
@@ -61,7 +61,12 @@ class NoLifecycleObserverTest {
             .allowCompilationErrors()
             .issues(NoLifecycleObserverDetector.NO_LIFECYCLE_OBSERVER_ISSUE)
             .run()
-            .expectClean()
+            .expect("""
+                src/com/duckduckgo/lint/DefaultLifecycleObserver.kt:5: Error: LifecycleObserver should not be directly extended [NoLifecycleObserver]
+                  class Duck : DefaultLifecycleObserver() {
+                        ~~~~
+                1 errors, 0 warnings
+            """.trimMargin())
     }
 
     @Test
