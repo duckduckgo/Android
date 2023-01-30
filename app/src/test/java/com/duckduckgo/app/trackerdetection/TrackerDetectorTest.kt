@@ -77,11 +77,20 @@ class TrackerDetectorTest {
     fun whenTwoClientsWithSameNameAddedThenClientIsReplacedAndCountIsStillOne() {
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
         assertEquals(1, trackerDetector.clientCount)
-        assertNotNull(trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com"))
+        assertNotNull(
+            trackerDetector.evaluate(
+            "http://thirdparty.com/update.js",
+            "http://example.com/index.com",
+            requestHeaders = mapOf()
+        ))
 
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
         assertEquals(1, trackerDetector.clientCount)
-        assertNotNull(trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com"))
+        assertNotNull(trackerDetector.evaluate(
+            "http://thirdparty.com/update.js",
+            "http://example.com/index.com",
+            requestHeaders = mapOf()
+        ))
     }
 
     @Test
@@ -97,7 +106,11 @@ class TrackerDetectorTest {
             type = TrackerType.OTHER,
         )
 
-        val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
+        val actual = trackerDetector.evaluate(
+            "http://thirdparty.com/update.js",
+            "http://example.com/index.com",
+            requestHeaders = mapOf()
+        )
         assertEquals(expected, actual)
     }
 
@@ -116,7 +129,11 @@ class TrackerDetectorTest {
             type = TrackerType.OTHER,
         )
 
-        val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
+        val actual = trackerDetector.evaluate(
+            "http://thirdparty.com/update.js",
+            "http://example.com/index.com",
+            requestHeaders = mapOf()
+        )
         assertEquals(expected, actual)
     }
 
@@ -135,7 +152,11 @@ class TrackerDetectorTest {
             type = TrackerType.OTHER,
         )
 
-        val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
+        val actual = trackerDetector.evaluate(
+            "http://thirdparty.com/update.js",
+            "http://example.com/index.com",
+            requestHeaders = mapOf()
+        )
         assertEquals(expected, actual)
     }
 
@@ -153,7 +174,11 @@ class TrackerDetectorTest {
             status = TrackerStatus.BLOCKED,
             type = TrackerType.OTHER,
         )
-        val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
+        val actual = trackerDetector.evaluate(
+            "http://thirdparty.com/update.js",
+            "http://example.com/index.com",
+            requestHeaders = mapOf()
+        )
         assertEquals(expected, actual)
     }
 
@@ -171,7 +196,11 @@ class TrackerDetectorTest {
             status = TrackerStatus.USER_ALLOWED,
             type = TrackerType.OTHER,
         )
-        val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
+        val actual = trackerDetector.evaluate(
+            "http://thirdparty.com/update.js",
+            "http://example.com/index.com",
+            requestHeaders = mapOf()
+        )
         assertEquals(expected, actual)
     }
 
@@ -188,7 +217,11 @@ class TrackerDetectorTest {
             status = TrackerStatus.BLOCKED,
             type = TrackerType.OTHER,
         )
-        val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
+        val actual = trackerDetector.evaluate(
+            "http://thirdparty.com/update.js",
+            "http://example.com/index.com",
+            requestHeaders = mapOf()
+        )
         assertEquals(expected, actual)
     }
 
@@ -205,7 +238,11 @@ class TrackerDetectorTest {
             status = TrackerStatus.USER_ALLOWED,
             type = TrackerType.OTHER,
         )
-        val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
+        val actual = trackerDetector.evaluate(
+            "http://thirdparty.com/update.js",
+            "http://example.com/index.com",
+            requestHeaders = mapOf()
+        )
         assertEquals(expected, actual)
     }
 
@@ -222,7 +259,11 @@ class TrackerDetectorTest {
             status = TrackerStatus.ALLOWED,
             type = TrackerType.OTHER,
         )
-        val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
+        val actual = trackerDetector.evaluate(
+            "http://thirdparty.com/update.js",
+            "http://example.com/index.com",
+            requestHeaders = mapOf()
+        )
         assertEquals(expected, actual)
     }
 
@@ -239,7 +280,11 @@ class TrackerDetectorTest {
             status = TrackerStatus.BLOCKED,
             type = TrackerType.OTHER,
         )
-        val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
+        val actual = trackerDetector.evaluate(
+            "http://thirdparty.com/update.js",
+            "http://example.com/index.com",
+            requestHeaders = mapOf()
+        )
         assertEquals(expected, actual)
     }
 
@@ -256,7 +301,11 @@ class TrackerDetectorTest {
             status = TrackerStatus.SITE_BREAKAGE_ALLOWED,
             type = TrackerType.OTHER,
         )
-        val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
+        val actual = trackerDetector.evaluate(
+            "http://thirdparty.com/update.js",
+            "http://example.com/index.com",
+            requestHeaders = mapOf()
+        )
         assertEquals(expected, actual)
     }
 
@@ -273,53 +322,66 @@ class TrackerDetectorTest {
             status = TrackerStatus.AD_ALLOWED,
             type = TrackerType.AD,
         )
-        val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
+        val actual = trackerDetector.evaluate(
+            "http://thirdparty.com/update.js",
+            "http://example.com/index.com",
+            requestHeaders = mapOf()
+        )
         assertEquals(expected, actual)
     }
 
     @Test
     fun whenUrlHasSameDomainAsDocumentThenEvaluateReturnsNull() {
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
-        assertNull(trackerDetector.evaluate("http://example.com/update.js", "http://example.com/index.com"))
+        assertNull(trackerDetector.evaluate("http://example.com/update.js", "http://example.com/index.com", requestHeaders = mapOf()))
     }
 
     @Test
     fun whenUrlIsSubdomainOfDocumentThenEvaluateReturnsNull() {
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
-        assertNull(trackerDetector.evaluate("http://mobile.example.com/update.js", "http://example.com/index.com"))
+        assertNull(trackerDetector.evaluate(
+            "http://mobile.example.com/update.js",
+            "http://example.com/index.com",
+            requestHeaders = mapOf()
+        ))
     }
 
     @Test
     fun whenUrlIsParentOfDocumentThenEvaluateReturnsNull() {
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
-        assertNull(trackerDetector.evaluate("http://example.com/update.js", "http://mobile.example.com/index.com"))
+        assertNull(trackerDetector.evaluate(
+            "http://example.com/update.js",
+            "http://mobile.example.com/index.com",
+            requestHeaders = mapOf(),
+            ),
+        )
     }
 
     private fun alwaysMatchingClient(name: ClientName): Client {
         val client: Client = mock()
         whenever(client.name).thenReturn(name)
-        whenever(client.matches(anyString(), anyString())).thenReturn(Client.Result(matches = true, isATracker = true))
+        whenever(client.matches(anyString(), anyString(), mapOf())).thenReturn(Client.Result(matches = true, isATracker = true))
         return client
     }
 
     private fun alwaysMatchingClientWithSurrogate(name: ClientName): Client {
         val client: Client = mock()
         whenever(client.name).thenReturn(name)
-        whenever(client.matches(anyString(), anyString())).thenReturn(Client.Result(matches = true, surrogate = "testId", isATracker = true))
+        whenever(client.matches(anyString(), anyString(), mapOf())).thenReturn(Client.Result(matches = true, surrogate = "testId", isATracker = true))
         return client
     }
 
     private fun nonMatchingClientNoTracker(name: ClientName): Client {
         val client: Client = mock()
         whenever(client.name).thenReturn(name)
-        whenever(client.matches(anyString(), anyString())).thenReturn(Client.Result(matches = false, isATracker = false))
+        whenever(client.matches(anyString(), anyString(), mapOf())).thenReturn(Client.Result(matches = false, isATracker = false))
         return client
     }
 
     private fun matchingClientTrackerIgnored(name: ClientName): Client {
         val client: Client = mock()
         whenever(client.name).thenReturn(name)
-        whenever(client.matches(anyString(), anyString())).thenReturn(Client.Result(matches = false, isATracker = true))
+        whenever(client.matches(anyString(), anyString(), mapOf())).thenReturn(Client.Result(matches = false, isATracker = true))
         return client
     }
     companion object {

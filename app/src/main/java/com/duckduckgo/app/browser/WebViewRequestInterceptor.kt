@@ -243,7 +243,7 @@ class WebViewRequestInterceptor(
             return null
         }
 
-        val trackingEvent = trackerDetector.evaluate(url, documentUrl, checkFirstParty) ?: return null
+        val trackingEvent = trackerDetector.evaluate(url, documentUrl, checkFirstParty, request.requestHeaders) ?: return null
         webViewClientListener?.trackerDetected(trackingEvent)
         return trackingEvent
     }

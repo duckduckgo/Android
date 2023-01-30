@@ -33,10 +33,11 @@ class TdsClient(
     override fun matches(
         url: String,
         documentUrl: String,
+        requestHeaders: Map<String, String>,
     ): Client.Result {
         val cleanedUrl = removePortFromUrl(url)
         val tracker = trackers.firstOrNull { sameOrSubdomain(cleanedUrl, it.domain) } ?: return Client.Result(matches = false, isATracker = false)
-        val matches = matchesTrackerEntry(tracker, cleanedUrl, documentUrl)
+        val matches = matchesTrackerEntry(tracker, cleanedUrl, documentUrl, requestHeaders)
         return Client.Result(
             matches = matches.shouldBlock,
             entityName = tracker.ownerName,
@@ -50,11 +51,12 @@ class TdsClient(
         tracker: TdsTracker,
         url: String,
         documentUrl: String,
+        requestHeaders: Map<String, String>,
     ): MatchedResult {
         tracker.rules.forEach { rule ->
             val regex = ".*${rule.rule}.*".toRegex()
             if (url.matches(regex)) {
-                val type = urlToTypeMapper.map(url)
+                val type = urlToTypeMapper.map(url, requestHeaders)
 
                 if (matchedException(rule.exceptions, documentUrl, type)) {
                     return MatchedResult(shouldBlock = false, isATracker = true)
