@@ -64,7 +64,7 @@ class FireDialog(
     private val settingsDataStore: SettingsDataStore,
     private val userEventsStore: UserEventsStore,
     private val appCoroutineScope: CoroutineScope,
-) : BottomSheetDialog(context, R.style.FireDialog), CoroutineScope by MainScope() {
+) : BottomSheetDialog(context, com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_FireDialog), CoroutineScope by MainScope() {
 
     private lateinit var binding: SheetFireClearDataBinding
     private lateinit var fireCtaBinding: IncludeDaxDialogCtaBinding

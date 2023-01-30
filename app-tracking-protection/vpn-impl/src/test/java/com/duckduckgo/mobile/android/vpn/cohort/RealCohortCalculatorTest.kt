@@ -87,7 +87,7 @@ class RealCohortCalculatorTest {
     @Test
     fun whenLocalDate4WeeksAgoThenReturnWeeklyCohort() {
         val date = LocalDate.now().minusWeeks(4)
-        val year = date.year
+        val year = date.get(IsoFields.WEEK_BASED_YEAR)
         assertEquals("$year-week-${date.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)}", cohortCalculator.calculateCohortForDate(date))
     }
 

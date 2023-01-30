@@ -27,78 +27,71 @@
     android:paddingTop="8dp"
     android:paddingEnd="16dp">
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.SkeletonView
         android:id="@+id/tracker_entry_skeleton_one_imageView"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginTop="10dp"
-        android:background="@drawable/background_skeleton_ui"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.SkeletonView
         android:id="@+id/tracker_entry_skeleton_one_top_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="10dp"
-        android:background="@drawable/background_skeleton_ui"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/tracker_entry_skeleton_one_imageView"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.SkeletonView
         android:id="@+id/tracker_entry_skeleton_one_second_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="100dp"
-        android:background="@drawable/background_skeleton_ui"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/tracker_entry_skeleton_one_imageView"
         app:layout_constraintTop_toBottomOf="@+id/tracker_entry_skeleton_one_top_text" />
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.SkeletonView
         android:id="@+id/tracker_entry_skeleton_one_first_tracker"
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
-        android:background="@drawable/background_skeleton_ui"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/tracker_entry_skeleton_one_imageView"
         app:layout_constraintTop_toBottomOf="@+id/tracker_entry_skeleton_one_second_text" />
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.SkeletonView
         android:id="@+id/tracker_entry_skeleton_one_second_tracker"
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:background="@drawable/background_skeleton_ui"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/tracker_entry_skeleton_one_first_tracker"
         app:layout_constraintTop_toBottomOf="@+id/tracker_entry_skeleton_one_second_text" />
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.SkeletonView
         android:id="@+id/tracker_entry_skeleton_one_third_tracker"
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:background="@drawable/background_skeleton_ui"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/tracker_entry_skeleton_one_second_tracker"
         app:layout_constraintTop_toBottomOf="@+id/tracker_entry_skeleton_one_second_text" />
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.SkeletonView
         android:id="@+id/tracker_entry_skeleton_one_fourth_tracker"
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:background="@drawable/background_skeleton_ui"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/tracker_entry_skeleton_one_third_tracker"
         app:layout_constraintTop_toBottomOf="@+id/tracker_entry_skeleton_one_second_text" />

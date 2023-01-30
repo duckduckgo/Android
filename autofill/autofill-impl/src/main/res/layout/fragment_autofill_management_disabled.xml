@@ -35,9 +35,9 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/disabled_title"
-            style="@style/TextAppearance.DuckDuckGo.Headline2"
+            app:typography="h2"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/keyline_7"
@@ -45,14 +45,13 @@
             android:breakStrategy="balanced"
             android:gravity="center"
             android:text="@string/managementDisabledModeTitle"
-            android:textColor="?attr/normalTextColor"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/disabled_icon" />
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/disabled_subtitle"
-            style="@style/TextAppearance.DuckDuckGo.Body1"
+            app:textType="secondary"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/keyline_7"
@@ -60,14 +59,13 @@
             android:breakStrategy="balanced"
             android:gravity="center"
             android:text="@string/managementDisabledModeSubtitle"
-            android:textColor="?attr/secondaryTextColor"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/disabled_title" />
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/disabled_cta"
-            style="@style/TextAppearance.DuckDuckGo.Button1"
+            app:typography="button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_5"

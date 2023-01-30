@@ -26,228 +26,209 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/vpnTodayRunningTime"
+            app:typography="h2"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
             android:layout_marginTop="6dp"
             android:layout_marginEnd="32dp"
-            android:textSize="18sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Today, the VPN has been running for 45 min" />
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/vpnDataSentLabel"
+            app:typography="h3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
             android:layout_marginTop="20dp"
             android:layout_marginEnd="32dp"
             android:text="Data Sent:"
-            android:textSize="20sp"
-            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/vpnTodayRunningTime" />
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/vpnSentStats"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
             android:layout_marginEnd="32dp"
-            android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/vpnDataSentLabel"
             tools:text="230MB sent from the device" />
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/vpnDataReceivedLabel"
+            app:typography="h3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
             android:layout_marginTop="20dp"
             android:layout_marginEnd="32dp"
             android:text="Data Received:"
-            android:textSize="20sp"
-            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/vpnSentStats" />
 
-
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/vpnReceivedStats"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
             android:layout_marginEnd="32dp"
-            android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/vpnDataReceivedLabel"
             tools:text="1 GB received from the network" />
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/vpnAppTrackersLabel"
+            app:typography="h2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
             android:layout_marginTop="20dp"
             android:layout_marginEnd="32dp"
             android:text="App Trackers:"
-            android:textSize="20sp"
-            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/vpnReceivedStats" />
 
-
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/vpnAppTrackerCompaniesBlockedToday"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
             android:layout_marginTop="6dp"
             android:layout_marginEnd="32dp"
-            android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/vpnAppTrackersLabel"
             tools:text="26 tracker companies blocked last 24 hours" />
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/vpnAppTrackersBlockedToday"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
             android:layout_marginTop="6dp"
             android:layout_marginEnd="32dp"
-            android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/vpnAppTrackerCompaniesBlockedToday"
             tools:text="26 trackers blocked last 24 hours" />
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/vpnAppTrackerCompaniesBlockedWeek"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
             android:layout_marginTop="6dp"
             android:layout_marginEnd="32dp"
-            android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/vpnAppTrackersBlockedToday"
             tools:text="150 tracker companies blocked last week" />
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/vpnAppTrackersBlockedWeek"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
             android:layout_marginTop="6dp"
             android:layout_marginEnd="32dp"
-            android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/vpnAppTrackerCompaniesBlockedWeek"
             tools:text="457 trackers blocked last week" />
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/vpnAppLastTrackerDomain"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
             android:layout_marginTop="6dp"
             android:layout_marginEnd="32dp"
-            android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/vpnAppTrackersBlockedWeek"
             tools:text="Last tracker blocked 8h 34 min ago\ngoogle-analytics.com\n(owned by Google)" />
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/vpnWebTrackersLabel"
+            app:typography="h2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
             android:layout_marginTop="20dp"
             android:layout_marginEnd="32dp"
             android:text="Web Trackers:"
-            android:textSize="20sp"
-            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/vpnAppLastTrackerDomain" />
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/vpnWebTrackerCompaniesBlockedToday"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
             android:layout_marginTop="6dp"
             android:layout_marginEnd="32dp"
-            android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/vpnWebTrackersLabel"
             tools:text="150 tracker companies blocked last week" />
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/vpnWebTrackersBlockedToday"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
             android:layout_marginTop="6dp"
             android:layout_marginEnd="32dp"
-            android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/vpnWebTrackerCompaniesBlockedToday"
             tools:text="26 trackers blocked last 24 hours" />
 
-
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/vpnWebTrackersCompaniesBlockedWeek"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
             android:layout_marginTop="6dp"
             android:layout_marginEnd="32dp"
-            android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/vpnWebTrackersBlockedToday"
             tools:text="457 trackers blocked last week" />
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/vpnWebTrackersBlockedWeek"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
             android:layout_marginTop="6dp"
             android:layout_marginEnd="32dp"
-            android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/vpnWebTrackersCompaniesBlockedWeek"
             tools:text="457 trackers blocked last week" />
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/vpnWebLastTrackerDomain"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
             android:layout_marginTop="6dp"
             android:layout_marginEnd="32dp"
-            android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/vpnWebTrackersBlockedWeek"
             tools:text="Last tracker blocked 8h 34 min ago\ngoogle-analytics.com\n(owned by Google)" />
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/vpnUUID"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -256,15 +237,16 @@
             android:layout_marginBottom="24dp"
             android:padding="10dp"
             android:textAlignment="center"
-            android:textSize="16sp"
+            app:textType="secondary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/vpnWebLastTrackerDomain"
             tools:text="UUID is: XXXXXXXXXXXXXXXXXXX" />
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/appVersionText"
+            app:textType="secondary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"

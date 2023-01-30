@@ -635,7 +635,7 @@ class DeviceShieldTrackerActivity :
 
     private fun launchKonfetti() {
         val magenta = ResourcesCompat.getColor(getResources(), com.duckduckgo.mobile.android.R.color.magenta, null)
-        val blue = ResourcesCompat.getColor(getResources(), com.duckduckgo.mobile.android.R.color.accentBlue, null)
+        val blue = ResourcesCompat.getColor(getResources(), com.duckduckgo.mobile.android.R.color.blue30, null)
         val purple = ResourcesCompat.getColor(getResources(), com.duckduckgo.mobile.android.R.color.purple, null)
         val green = ResourcesCompat.getColor(getResources(), com.duckduckgo.mobile.android.R.color.green, null)
         val yellow = ResourcesCompat.getColor(getResources(), com.duckduckgo.mobile.android.R.color.yellow, null)

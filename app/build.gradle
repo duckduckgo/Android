@@ -106,7 +106,7 @@ android {
     }
     lint {
         abortOnError true
-        ignoreTestSources true
+        ignoreTestSources false
         baseline file("lint-baseline.xml")
     }
     testOptions {

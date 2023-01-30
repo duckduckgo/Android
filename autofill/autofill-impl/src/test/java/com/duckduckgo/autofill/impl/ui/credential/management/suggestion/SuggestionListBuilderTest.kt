@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autofill.impl.ui.credential.management.suggestion
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem
@@ -23,9 +24,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 class SuggestionListBuilderTest {
 
     val testee = SuggestionListBuilder(context = InstrumentationRegistry.getInstrumentation().targetContext)

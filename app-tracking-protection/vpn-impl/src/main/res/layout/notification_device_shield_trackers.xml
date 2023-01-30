@@ -29,6 +29,7 @@
         android:orientation="vertical">
 
         <TextView
+            tools:ignore="DeprecatedWidgetInXml"
             android:id="@+id/deviceShieldNotificationHeader"
             style="@style/TextAppearance.Compat.Notification"
             android:layout_width="wrap_content"
@@ -36,6 +37,7 @@
             tools:text="@string/atp_PrivacyReportEnabledTooltip" />
 
         <TextView
+            tools:ignore="DeprecatedWidgetInXml"
             android:id="@+id/deviceShieldNotificationMessage"
             style="@style/TextAppearance.Compat.Notification"
             android:layout_width="wrap_content"

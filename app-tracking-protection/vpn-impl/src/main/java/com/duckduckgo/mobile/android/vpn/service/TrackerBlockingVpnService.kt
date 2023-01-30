@@ -54,9 +54,7 @@ import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.prefs.VpnPreferences
 import com.duckduckgo.mobile.android.vpn.service.state.VpnStateMonitorService
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
-import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldEnabledNotificationBuilder
-import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationFactory
-import com.duckduckgo.mobile.android.vpn.ui.notification.OngoingNotificationPressedHandler
+import com.duckduckgo.mobile.android.vpn.ui.notification.VpnEnabledNotificationBuilder
 import dagger.android.AndroidInjection
 import java.net.Inet4Address
 import java.net.InetAddress
@@ -75,19 +73,16 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
     lateinit var vpnPreferences: VpnPreferences
 
     @Inject
-    lateinit var deviceShieldNotificationFactory: DeviceShieldNotificationFactory
-
-    @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels
-
-    @Inject
-    lateinit var ongoingNotificationPressedHandler: OngoingNotificationPressedHandler
 
     @Inject
     lateinit var vpnServiceCallbacksPluginPoint: PluginPoint<VpnServiceCallbacks>
 
     @Inject
     lateinit var memoryCollectorPluginPoint: PluginPoint<VpnMemoryCollectorPlugin>
+
+    @Inject
+    lateinit var vpnEnabledNotificationContentPluginPoint: PluginPoint<VpnEnabledNotificationContentPlugin>
 
     private var tunInterface: ParcelFileDescriptor? = null
 
@@ -558,11 +553,12 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
     }
 
     private fun notifyVpnStart() {
-        val deviceShieldNotification = deviceShieldNotificationFactory.createNotificationDeviceShieldEnabled()
+        val content = vpnEnabledNotificationContentPluginPoint.getHighestPriorityPlugin().getInitialContent()
+        val vpnNotification = content ?: VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent.EMPTY
+
         startForeground(
             VPN_FOREGROUND_SERVICE_ID,
-            DeviceShieldEnabledNotificationBuilder
-                .buildDeviceShieldEnabledNotification(applicationContext, deviceShieldNotification, ongoingNotificationPressedHandler),
+            VpnEnabledNotificationBuilder.buildVpnEnabledNotification(applicationContext, vpnNotification),
         )
     }
 

@@ -26,7 +26,7 @@
 
     <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/appIconsList"
-            android:padding="@dimen/changeAppIconPadding"
+            android:padding="@dimen/keyline_4"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 

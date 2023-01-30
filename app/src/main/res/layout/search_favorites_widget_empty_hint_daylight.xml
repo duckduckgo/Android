@@ -14,17 +14,19 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout android:id="@+id/emptyGridViewContainer"
-    style="@style/SearchWidgetEmptyFavoritesHintContainer"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/emptyGridViewContainer"
+    style="@style/Widget.DuckDuckGo.SearchWidgetEmptyFavoritesHintContainer"
+    tools:ignore="DeprecatedWidgetInXml">
 
     <TextView
         android:id="@+id/noFavoritesText"
-        android:text="@string/searchWidgetEmtpyFavoritesHint"
-        style="@style/SearchWidgetEmptyFavoritesHint" />
+        style="@style/Widget.DuckDuckGo.SearchWidgetEmptyFavoritesHint"
+        android:text="@string/searchWidgetEmtpyFavoritesHint" />
 
     <TextView
         android:id="@+id/addFavoriteText"
-        android:text="@string/searchWidgetEmtpyFavoritesCta"
-        style="@style/SearchWidgetEmptyFavoritesAction" />
+        style="@style/Widget.DuckDuckGo.SearchWidgetEmptyFavoritesAction"
+        android:text="@string/searchWidgetEmtpyFavoritesCta" />
 </LinearLayout>

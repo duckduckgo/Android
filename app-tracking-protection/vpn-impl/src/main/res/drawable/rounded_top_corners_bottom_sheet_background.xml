@@ -19,5 +19,5 @@
     <corners
         android:topLeftRadius="@dimen/mediumShapeCornerRadius"
         android:topRightRadius="@dimen/mediumShapeCornerRadius" />
-    <solid android:color="?attr/daxDialogBackgroundColor" />
+    <solid android:color="?attr/daxColorSurface" />
 </shape>

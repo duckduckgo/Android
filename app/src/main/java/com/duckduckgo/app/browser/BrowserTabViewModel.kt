@@ -98,8 +98,6 @@ import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.pixels.AppPixelName.FACEBOOK_LOGIN_BREAKAGE_INVESTIGATION
-import com.duckduckgo.app.pixels.AppPixelName.FACEBOOK_LOGIN_ERROR_BREAKAGE_INVESTIGATION
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -1152,28 +1150,14 @@ class BrowserTabViewModel @Inject constructor(
         command.value = ShowWebContent
     }
 
-    private fun sendBrokenFBLoginPixels(previousUrl: String?, url: String) {
-        // User lands on failed FB login due to WebView incompatibility
-        if (previousUrl != url && url.contains("LOGIN_DISABLED_FROM_WEBVIEW")) {
-            pixel.fire(FACEBOOK_LOGIN_ERROR_BREAKAGE_INVESTIGATION)
-        }
-        if (previousUrl != url && url.contains("facebook.com/login.php")) {
-            pixel.fire(FACEBOOK_LOGIN_BREAKAGE_INVESTIGATION)
-        }
-    }
-
     private fun pageChanged(
         url: String,
         title: String?,
     ) {
         Timber.v("Page changed: $url")
-        val previousUrl = site?.url
-
         hasCtaBeenShownForCurrentPage.set(false)
         buildSiteFactory(url, title)
         setAdClickActiveTabData(url)
-
-        sendBrokenFBLoginPixels(previousUrl, url)
 
         val currentOmnibarViewState = currentOmnibarViewState()
         val omnibarText = omnibarTextForUrl(url)

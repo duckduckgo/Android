@@ -16,14 +16,14 @@
 
 package com.duckduckgo.autofill.impl.ui.credential.management.suggestion
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.store.urlmatcher.AutofillDomainNameUrlMatcher
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 class SuggestionMatcherTest {
 
     private val testee = SuggestionMatcher(AutofillDomainNameUrlMatcher())

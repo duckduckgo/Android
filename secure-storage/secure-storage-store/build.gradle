@@ -45,6 +45,7 @@ dependencies {
     testImplementation project(path: ':common-test')
     testImplementation Testing.robolectric
     testImplementation AndroidX.archCore.testing
+    testImplementation AndroidX.test.ext.junit
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation (KotlinX.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023

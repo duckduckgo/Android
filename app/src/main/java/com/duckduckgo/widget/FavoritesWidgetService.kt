@@ -70,7 +70,7 @@ class FavoritesWidgetService : RemoteViewsService() {
         )
 
         private val faviconItemSize = context.resources.getDimension(CommonR.dimen.savedSiteGridItemFavicon).toInt()
-        private val faviconItemCornerRadius = context.resources.getDimension(CommonR.dimen.savedSiteGridItemCornerRadiusFavicon).toInt()
+        private val faviconItemCornerRadius = context.resources.getDimension(CommonR.dimen.mediumShapeCornerRadius).toInt()
 
         private val maxItems: Int
             get() {

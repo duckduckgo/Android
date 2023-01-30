@@ -104,4 +104,27 @@
     <!-- Card -->
     <dimen name="daxBubbleDialogDistanceFromEdge">22dp</dimen>
     <dimen name="daxBubbleDialogEdge">9dp</dimen>
+
+    <!-- Legacy Dimensions -->
+    <dimen name="omnibarCookieAnimationBannerHeight">38dp</dimen>
+    <dimen name="changeAppIconSize">75dp</dimen>
+    <dimen name="homeTabDdgLogoTopMargin">100dp</dimen>
+    <dimen name="savedSiteGridItemFavicon">56dp</dimen>
+
+    <dimen name="searchWidgetFavoritesSideMargin">6dp</dimen>
+    <dimen name="searchWidgetPadding">16dp</dimen>
+    <dimen name="searchWidgetSearchBarSideMargin">16dp</dimen>
+    <dimen name="searchWidgetFavoriteItemContainerWidth">64dp</dimen>
+    <dimen name="searchWidgetFavoriteItemContainerHeight">78dp</dimen>
+    <dimen name="searchWidgetSearchBarHeight">46dp</dimen>
+    <dimen name="searchWidgetFavoritesTopMargin">16dp</dimen>
+    <dimen name="searchWidgetFavoritesVerticalSpacing">20dp</dimen>
+    <dimen name="searchWidgetFavoritesHorizontalSpacing">4dp</dimen>
+
+    <dimen name="messageCtaCloseButtonSize">40dp</dimen>
+    <dimen name="messageCtaIllustrationSize">64dp</dimen>
+
+    <dimen name="outlinedTextPasswordIconSize">54dp</dimen>
+    <dimen name="outlinedTextPasswordEndMarginWithEndIcon">50dp</dimen>
+    <dimen name="outlinedTextPasswordEndMarginWithoutEndIcon">@dimen/keyline_1</dimen>
 </resources>

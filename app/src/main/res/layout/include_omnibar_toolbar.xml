@@ -33,13 +33,13 @@
             android:id="@+id/toolbarContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="?toolbarBgColor">
+            android:background="?daxColorSurface">
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="0dp"
                 android:layout_height="?attr/actionBarSize"
-                android:background="?attr/toolbarBgColor"
+                android:background="?attr/daxColorSurface"
                 app:contentInsetEnd="0dp"
                 app:contentInsetStart="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
