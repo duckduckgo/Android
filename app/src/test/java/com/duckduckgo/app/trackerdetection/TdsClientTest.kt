@@ -28,6 +28,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers.anyMap
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -320,7 +321,7 @@ class TdsClientTest {
 
     @Test
     fun whenUrlMatchesRuleWithTypeExceptionThenMatchesIsTrue() {
-        whenever(mockUrlToTypeMapper.map(anyString(), mapOf())).thenReturn("image")
+        whenever(mockUrlToTypeMapper.map(anyString(), anyMap())).thenReturn("image")
         val exceptions = RuleExceptions(null, listOf("image"))
         val rule = Rule("api\\.tracker\\.com\\/auth", BLOCK, exceptions, null)
         val data = listOf(TdsTracker("tracker.com", BLOCK, OWNER, CATEGORY, listOf(rule)))

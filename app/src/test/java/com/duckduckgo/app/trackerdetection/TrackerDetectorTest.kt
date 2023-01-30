@@ -32,6 +32,7 @@ import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers.anyMap
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -366,28 +367,29 @@ class TrackerDetectorTest {
     private fun alwaysMatchingClient(name: ClientName): Client {
         val client: Client = mock()
         whenever(client.name).thenReturn(name)
-        whenever(client.matches(anyString(), anyString(), mapOf())).thenReturn(Client.Result(matches = true, isATracker = true))
+        whenever(client.matches(anyString(), anyString(), anyMap())).thenReturn(Client.Result(matches = true, isATracker = true))
         return client
     }
 
     private fun alwaysMatchingClientWithSurrogate(name: ClientName): Client {
         val client: Client = mock()
         whenever(client.name).thenReturn(name)
-        whenever(client.matches(anyString(), anyString(), mapOf())).thenReturn(Client.Result(matches = true, surrogate = "testId", isATracker = true))
+        whenever(client.matches(anyString(), anyString(), anyMap()))
+            .thenReturn(Client.Result(matches = true, surrogate = "testId", isATracker = true))
         return client
     }
 
     private fun nonMatchingClientNoTracker(name: ClientName): Client {
         val client: Client = mock()
         whenever(client.name).thenReturn(name)
-        whenever(client.matches(anyString(), anyString(), mapOf())).thenReturn(Client.Result(matches = false, isATracker = false))
+        whenever(client.matches(anyString(), anyString(), anyMap())).thenReturn(Client.Result(matches = false, isATracker = false))
         return client
     }
 
     private fun matchingClientTrackerIgnored(name: ClientName): Client {
         val client: Client = mock()
         whenever(client.name).thenReturn(name)
-        whenever(client.matches(anyString(), anyString(), mapOf())).thenReturn(Client.Result(matches = false, isATracker = true))
+        whenever(client.matches(anyString(), anyString(), anyMap())).thenReturn(Client.Result(matches = false, isATracker = true))
         return client
     }
     companion object {
