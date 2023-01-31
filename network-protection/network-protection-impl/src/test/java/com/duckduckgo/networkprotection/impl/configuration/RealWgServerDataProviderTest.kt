@@ -20,6 +20,7 @@ import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.networkprotection.impl.configuration.WgServerDataProvider.WgServerData
+import java.util.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -27,49 +28,17 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class RealWgServerDataProviderTest {
-    @Mock
-    private lateinit var wgVpnControllerService: WgVpnControllerService
+class RealWgServerDataProviderTest() {
+    private val wgVpnControllerService = FakeWgVpnControllerService()
 
     @Mock
-    private lateinit var countryIsoProvider: CountryIsoProvider
+    private lateinit var deviceTimezoneProvider: DeviceTimezoneProvider
 
     @Mock
     private lateinit var appBuildConfig: AppBuildConfig
-
-    private val testServers = listOf(
-        EligibleServerInfo(
-            publicKey = "testpublickey",
-            allowedIPs = listOf("10.11.86.8/32"),
-            server = Server(
-                name = "egress.usc",
-                attributes = emptyMap(),
-                publicKey = "ovn9RpzUuvQ4XLQt6B3RKuEXGIxa5QpTnehjduZlcSE=",
-                hostnames = listOf("usc.egress.np.duck.com"),
-                ips = emptyList(),
-                port = 443,
-            ),
-        ),
-        EligibleServerInfo(
-            publicKey = "testpublickey",
-            allowedIPs = listOf("10.11.181.220/32"),
-            server = Server(
-                name = "egress.euw",
-                attributes = mapOf(
-                    "country" to "SE",
-                    "city" to "Stockholm",
-                ),
-                publicKey = "CLQMP4SFzpyvAzMj3rXwShm+3n6Yt68hGHBF67At+x0=",
-                hostnames = listOf("euw.egress.np.duck.com"),
-                ips = emptyList(),
-                port = 443,
-            ),
-        ),
-    )
 
     private lateinit var fakeWgServerDebugProvider: FakeWgServerDebugProvider
     private lateinit var testee: RealWgServerDataProvider
@@ -83,7 +52,7 @@ class RealWgServerDataProviderTest {
 
         testee = RealWgServerDataProvider(
             wgVpnControllerService,
-            countryIsoProvider,
+            deviceTimezoneProvider,
             appBuildConfig,
             object : PluginPoint<WgServerDebugProvider> {
                 override fun getPlugins(): Collection<WgServerDebugProvider> {
@@ -94,125 +63,64 @@ class RealWgServerDataProviderTest {
     }
 
     @Test
-    fun whenGetWgServerDataAndIsoIsUSThenReturnUSServerData() = runTest {
-        whenever(wgVpnControllerService.registerKey(any())).thenReturn(testServers)
-        whenever(countryIsoProvider.getCountryIso()).thenReturn("us")
-
-        assertEquals(
-            WgServerData(
-                publicKey = "ovn9RpzUuvQ4XLQt6B3RKuEXGIxa5QpTnehjduZlcSE=",
-                publicEndpoint = "usc.egress.np.duck.com:443",
-                address = "10.11.86.8/32",
-                location = null,
-            ),
-            testee.get("testpublickey"),
-        )
-    }
-
-    @Test
-    fun whenGetWgServerDataAndIsoIsNotUSThenReturnOtherServerData() = runTest {
-        whenever(wgVpnControllerService.registerKey(any())).thenReturn(testServers)
-        whenever(countryIsoProvider.getCountryIso()).thenReturn("se")
+    fun whenGetWgServerDataAndUTCEuropeThenReturnCorrectServerData() = runTest {
+        whenever(deviceTimezoneProvider.getTimeZone()).thenReturn(TimeZone.getTimeZone("GMT-0:00"))
 
         assertEquals(
             WgServerData(
                 publicKey = "CLQMP4SFzpyvAzMj3rXwShm+3n6Yt68hGHBF67At+x0=",
                 publicEndpoint = "euw.egress.np.duck.com:443",
-                address = "10.11.181.220/32",
-                location = "Stockholm, Sweden",
+                address = "",
+                location = null,
+                allowedIPs = "0.0.0.0/0,::0/0",
             ),
             testee.get("testpublickey"),
         )
     }
 
     @Test
-    fun whenNoCountryAttributeThenReturnNoLocation() = runTest {
-        whenever(wgVpnControllerService.registerKey(any())).thenReturn(
-            listOf(
-                EligibleServerInfo(
-                    publicKey = "testpublickey",
-                    allowedIPs = listOf("10.11.181.220/32"),
-                    server = Server(
-                        name = "egress.euw",
-                        attributes = mapOf(
-                            "city" to "Stockholm",
-                        ),
-                        publicKey = "CLQMP4SFzpyvAzMj3rXwShm+3n6Yt68hGHBF67At+x0=",
-                        hostnames = listOf("euw.egress.np.duck.com"),
-                        ips = emptyList(),
-                        port = 443,
-                    ),
-                ),
-            ),
-        )
-        whenever(countryIsoProvider.getCountryIso()).thenReturn("se")
+    fun whenGetWgServerDataAndUTCEastCoastThenReturnCorrectServerData() = runTest {
+        whenever(deviceTimezoneProvider.getTimeZone()).thenReturn(TimeZone.getTimeZone("GMT-4:00"))
 
-        assertNull(testee.get("testpublickey").location)
+        assertEquals(
+            WgServerData(
+                publicKey = "q3YJJUwMNP31J8qSvMdVsxASKNcjrm8ep8cLcI0qViY=",
+                publicEndpoint = "109.200.208.198:443",
+                address = "",
+                location = "Newark, United states",
+                allowedIPs = "0.0.0.0/0,::0/0",
+            ),
+            testee.get("testpublickey"),
+        )
     }
 
     @Test
-    fun whenNoCityAttributeThenReturnNoLocation() = runTest {
-        whenever(wgVpnControllerService.registerKey(any())).thenReturn(
-            listOf(
-                EligibleServerInfo(
-                    publicKey = "testpublickey",
-                    allowedIPs = listOf("10.11.181.220/32"),
-                    server = Server(
-                        name = "egress.euw",
-                        attributes = mapOf(
-                            "country" to "se",
-                        ),
-                        publicKey = "CLQMP4SFzpyvAzMj3rXwShm+3n6Yt68hGHBF67At+x0=",
-                        hostnames = listOf("euw.egress.np.duck.com"),
-                        ips = emptyList(),
-                        port = 443,
-                    ),
-                ),
-            ),
-        )
-        whenever(countryIsoProvider.getCountryIso()).thenReturn("se")
-
-        assertNull(testee.get("testpublickey").location)
-    }
-
-    @Test
-    fun whenFullCountryPassedThenReturnCorrectFullLocation() = runTest {
-        whenever(wgVpnControllerService.registerKey(any())).thenReturn(
-            listOf(
-                EligibleServerInfo(
-                    publicKey = "testpublickey",
-                    allowedIPs = listOf("10.11.181.220/32"),
-                    server = Server(
-                        name = "egress.euw",
-                        attributes = mapOf(
-                            "city" to "Stockholm",
-                            "country" to "Sweden",
-                        ),
-                        publicKey = "CLQMP4SFzpyvAzMj3rXwShm+3n6Yt68hGHBF67At+x0=",
-                        hostnames = listOf("euw.egress.np.duck.com"),
-                        ips = emptyList(),
-                        port = 443,
-                    ),
-                ),
-            ),
-        )
-        whenever(countryIsoProvider.getCountryIso()).thenReturn("se")
-
-        assertEquals("Stockholm, Sweden", testee.get("testpublickey").location)
-    }
-
-    @Test
-    fun whenInternalFlavorGetWgServerDataAndIsoIsNotUSThenReturnUSServerData() = runTest {
-        whenever(wgVpnControllerService.registerKey(any())).thenReturn(testServers)
-        whenever(countryIsoProvider.getCountryIso()).thenReturn("se")
-        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
+    fun whenGetWgServerDataAndUTCCenterUSAThenReturnCorrectServerData() = runTest {
+        whenever(deviceTimezoneProvider.getTimeZone()).thenReturn(TimeZone.getTimeZone("GMT-7:00"))
 
         assertEquals(
             WgServerData(
                 publicKey = "ovn9RpzUuvQ4XLQt6B3RKuEXGIxa5QpTnehjduZlcSE=",
-                publicEndpoint = "usc.egress.np.duck.com:443",
-                address = "10.11.86.8/32",
+                publicEndpoint = "109.200.208.196:443",
+                address = "",
+                location = "Des moines, United states",
+                allowedIPs = "0.0.0.0/0,::0/0",
+            ),
+            testee.get("testpublickey"),
+        )
+    }
+
+    @Test
+    fun whenGetWgServerDataAndUTCWestUSAThenReturnCorrectServerData() = runTest {
+        whenever(deviceTimezoneProvider.getTimeZone()).thenReturn(TimeZone.getTimeZone("GMT-10:00"))
+
+        assertEquals(
+            WgServerData(
+                publicKey = "R/BMR6Rr5rzvp7vSIWdAtgAmOLK9m7CqTcDynblM3Us=",
+                publicEndpoint = "162.245.204.100:443",
+                address = "",
                 location = null,
+                allowedIPs = "0.0.0.0/0,::0/0",
             ),
             testee.get("testpublickey"),
         )
@@ -220,89 +128,35 @@ class RealWgServerDataProviderTest {
 
     @Test
     fun whenInternalFlavorGetWgServerDataThenStoreReturnedServers() = runTest {
-        whenever(wgVpnControllerService.registerKey(any())).thenReturn(testServers)
-        whenever(countryIsoProvider.getCountryIso()).thenReturn("se")
+        whenever(deviceTimezoneProvider.getTimeZone()).thenReturn(TimeZone.getTimeZone("GMT-1:00"))
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
 
         testee.get("testpublickey")
 
         assertEquals(
-            testServers,
+            wgVpnControllerService.getServers().map { it.server },
             fakeWgServerDebugProvider.cachedServers,
         )
     }
 
     @Test
     fun whenNotInternalFlavorGetWgServerDataThenStoreReturnedServers() = runTest {
-        whenever(wgVpnControllerService.registerKey(any())).thenReturn(testServers)
-        whenever(countryIsoProvider.getCountryIso()).thenReturn("se")
+        whenever(deviceTimezoneProvider.getTimeZone()).thenReturn(TimeZone.getTimeZone("GMT-1:00"))
 
         testee.get("testpublickey")
 
         assertTrue(fakeWgServerDebugProvider.cachedServers.isEmpty())
     }
-
-    @Test
-    fun whenServerOnlyHasIpsAndNoHostnameThenPublicEndpointShouldUseIps() = runTest {
-        whenever(wgVpnControllerService.registerKey(any())).thenReturn(
-            listOf(
-                EligibleServerInfo(
-                    publicKey = "testpublickey",
-                    allowedIPs = listOf("10.11.181.220/32"),
-                    server = Server(
-                        name = "egress.euw",
-                        attributes = mapOf(
-                            "city" to "Stockholm",
-                            "country" to "Sweden",
-                        ),
-                        publicKey = "CLQMP4SFzpyvAzMj3rXwShm+3n6Yt68hGHBF67At+x0=",
-                        hostnames = emptyList(),
-                        ips = listOf("109.200.208.196"),
-                        port = 443,
-                    ),
-                ),
-            ),
-        )
-        whenever(countryIsoProvider.getCountryIso()).thenReturn("se")
-
-        assertEquals("109.200.208.196:443", testee.get("testpublickey").publicEndpoint)
-    }
-
-    @Test
-    fun whenServerHasBothIpsAndHostnamesThenPublicEndpointShouldUseIps() = runTest {
-        whenever(wgVpnControllerService.registerKey(any())).thenReturn(
-            listOf(
-                EligibleServerInfo(
-                    publicKey = "testpublickey",
-                    allowedIPs = listOf("10.11.181.220/32"),
-                    server = Server(
-                        name = "egress.euw",
-                        attributes = mapOf(
-                            "city" to "Stockholm",
-                            "country" to "Sweden",
-                        ),
-                        publicKey = "CLQMP4SFzpyvAzMj3rXwShm+3n6Yt68hGHBF67At+x0=",
-                        hostnames = listOf("euw.egress.np.duck.com"),
-                        ips = listOf("109.200.208.196"),
-                        port = 443,
-                    ),
-                ),
-            ),
-        )
-        whenever(countryIsoProvider.getCountryIso()).thenReturn("se")
-
-        assertEquals("109.200.208.196:443", testee.get("testpublickey").publicEndpoint)
-    }
 }
 
 private class FakeWgServerDebugProvider : WgServerDebugProvider {
-    val cachedServers = mutableListOf<EligibleServerInfo>()
+    val cachedServers = mutableListOf<Server>()
 
     override suspend fun getSelectedServerName(): String? {
         return "egress.usc"
     }
 
-    override suspend fun storeEligibleServers(servers: List<EligibleServerInfo>) {
+    override suspend fun storeEligibleServers(servers: List<Server>) {
         cachedServers.addAll(servers)
     }
 }

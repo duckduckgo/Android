@@ -42,7 +42,7 @@ class RealWgTunnelDataProvider @Inject constructor(
 ) : WgTunnelDataProvider {
 
     override suspend fun get(): WgTunnelData? {
-        val serverData = wgServerDataProvider.get(deviceKeys.publicKey)
+        val serverData = wgServerDataProvider.get(deviceKeys.publicKey) ?: return null
         return try {
             Config.Builder()
                 .setInterface(

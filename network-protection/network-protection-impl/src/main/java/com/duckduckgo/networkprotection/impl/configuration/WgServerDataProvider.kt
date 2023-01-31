@@ -16,8 +16,6 @@
 
 package com.duckduckgo.networkprotection.impl.configuration
 
-import android.content.Context
-import android.telephony.TelephonyManager
 import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.app.global.extensions.capitalizeFirstLetter
 import com.duckduckgo.app.global.plugins.PluginPoint
@@ -27,7 +25,10 @@ import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.networkprotection.impl.configuration.WgServerDataProvider.WgServerData
 import com.squareup.anvil.annotations.ContributesBinding
 import java.util.*
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlin.math.abs
+import logcat.logcat
 
 interface WgServerDataProvider {
     data class WgServerData(
@@ -38,29 +39,38 @@ interface WgServerDataProvider {
         val allowedIPs: String = "0.0.0.0/0,::0/0",
     )
 
-    suspend fun get(publicKey: String): WgServerData
+    suspend fun get(publicKey: String): WgServerData?
 }
 
 @ContributesBinding(VpnScope::class)
 class RealWgServerDataProvider @Inject constructor(
     private val wgVpnControllerService: WgVpnControllerService,
-    private val countryIsoProvider: CountryIsoProvider,
+    private val timezoneProvider: DeviceTimezoneProvider,
     private val appBuildConfig: AppBuildConfig,
     private val serverDebugProvider: PluginPoint<WgServerDebugProvider>,
 ) : WgServerDataProvider {
 
-    override suspend fun get(publicKey: String): WgServerData = wgVpnControllerService.registerKey(
-        RegisterKeyBody(
-            publicKey = publicKey,
-        ),
-    ).also {
-        if (appBuildConfig.isInternalBuild()) {
-            assert(serverDebugProvider.getPlugins().size <= 1) { "Only one debug server provider can be registered" }
-            serverDebugProvider.getPlugins().firstOrNull()?.let { provider ->
-                provider.storeEligibleServers(it)
+    override suspend fun get(publicKey: String): WgServerData? {
+        return wgVpnControllerService.getServers()
+            .also {
+                if (appBuildConfig.isInternalBuild()) {
+                    assert(serverDebugProvider.getPlugins().size <= 1) { "Only one debug server provider can be registered" }
+                    serverDebugProvider.getPlugins().firstOrNull()?.let { provider ->
+                        provider.storeEligibleServers(it.map { it.server })
+                    }
+                }
             }
-        }
-    }.getRelevantServer().toWgServerData()
+            .run {
+                val selectedServer = this.selectClosestServer()
+                logcat { "Closest server is: ${selectedServer.server.name}" }
+                wgVpnControllerService.registerKey(
+                    RegisterKeyBody(
+                        publicKey = publicKey,
+                        server = selectedServer.server.name,
+                    ),
+                ).firstOrNull()?.toWgServerData()
+            }
+    }
 
     private fun EligibleServerInfo.toWgServerData(): WgServerData = WgServerData(
         publicKey = server.publicKey,
@@ -90,7 +100,11 @@ class RealWgServerDataProvider @Inject constructor(
 
     private fun String.getDisplayableCountry(): String = Locale("", this).displayCountry.lowercase().capitalizeFirstLetter()
 
-    private suspend fun List<EligibleServerInfo>.getRelevantServer(): EligibleServerInfo {
+    private suspend fun List<RegisteredServerInfo>.selectClosestServer(): RegisteredServerInfo {
+        fun Server.extractRegion(): String = this.name.split(".")[1]
+
+        assert(this.isNotEmpty()) { "List of RegisteredServerInfo can't ge empty" }
+
         if (appBuildConfig.isInternalBuild()) {
             assert(serverDebugProvider.getPlugins().size <= 1) { "Only one debug server provider can be registered" }
             firstOrNull { it.server.name == serverDebugProvider.getPlugins().firstOrNull()?.getSelectedServerName() }
@@ -98,48 +112,57 @@ class RealWgServerDataProvider @Inject constructor(
             null
         }?.let { return it }
 
-        val countryCode = countryIsoProvider.getCountryIso()
-        val resultingList = if (US_COUNTRY_CODES.contains(countryCode)) {
-            this.filter {
-                it.server.name == SERVER_NAME_US
-            }
-        } else {
-            this.filter {
-                it.server.name != SERVER_NAME_US
+        val eligibleRegionsIntersection = SERVER_TIMEZONES.filter { region -> this.map { it.server.extractRegion() }.contains(region.region) }.toSet()
+        val selectedServer = timezoneProvider.getTimeZone().findClosestRegion(eligibleRegionsIntersection)
+        // Return the selected closest server or fallback to just the first element
+        return (this.firstOrNull { it.server.name.contains(selectedServer.region) } ?: this[0]).also { selected ->
+            logcat { "Selected closest server: $selected" }
+        }
+    }
+
+    private fun TimeZone.findClosestRegion(servers: Set<ServerRegions>): ServerRegions {
+        val serverTimezones = servers.sortedBy { it.offsetBoundary }.map { it.offsetBoundary }
+        var min = Int.MAX_VALUE.toLong()
+        val offset = rawOffset / TimeUnit.HOURS.toMillis(1)
+        var closest = offset
+
+        serverTimezones.forEach { tz ->
+            val diff = abs(tz - offset)
+            if (diff < min) {
+                min = diff
+                closest = tz
             }
         }
 
-        return if (resultingList.isEmpty()) {
-            this[0] // we just take the first if for some reason the usc server changes in name or disappears
-        } else {
-            resultingList[0] // if there's a lot of matches, we just take the first
-        }
+        return SERVER_TIMEZONES.find { it.offsetBoundary == closest } ?: SERVER_TIMEZONES[1] // USE by default
     }
 
     companion object {
-        private const val US_COUNTRY_CODES = "us,ca"
-        private const val SERVER_NAME_US = "egress.usc"
         private const val SERVER_ATTR_CITY = "city"
         private const val SERVER_ATTR_COUNTRY = "country"
+        private val SERVER_TIMEZONES = listOf(
+            ServerRegions("euw", 0L),
+            ServerRegions("use", -5L),
+            ServerRegions("usc", -7L),
+            ServerRegions("usw", -8L),
+        )
     }
 }
 
-interface CountryIsoProvider {
-    fun getCountryIso(): String
+internal data class ServerRegions(val region: String, val offsetBoundary: Long)
+
+interface DeviceTimezoneProvider {
+    fun getTimeZone(): TimeZone
 }
 
 @ContributesBinding(VpnScope::class)
-class SystemCountryIsoProvider @Inject constructor(
-    context: Context,
-) : CountryIsoProvider {
-    private val telephonyManager = context.applicationContext.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-
-    override fun getCountryIso(): String = telephonyManager.networkCountryIso.lowercase()
+class SystemDeviceTimezoneProvider @Inject constructor() : DeviceTimezoneProvider {
+    override fun getTimeZone(): TimeZone = TimeZone.getDefault()
 }
 
 @ContributesPluginPoint(VpnScope::class)
 interface WgServerDebugProvider {
     suspend fun getSelectedServerName(): String?
 
-    suspend fun storeEligibleServers(servers: List<EligibleServerInfo>)
+    suspend fun storeEligibleServers(servers: List<Server>)
 }

@@ -42,6 +42,7 @@ data class RegisteredServerInfo(
 
 data class RegisterKeyBody(
     val publicKey: String,
+    val server: String = "*",
 )
 
 data class EligibleServerInfo(

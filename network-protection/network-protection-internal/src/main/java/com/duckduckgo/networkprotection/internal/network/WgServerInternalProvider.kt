@@ -16,7 +16,7 @@
 
 package com.duckduckgo.networkprotection.internal.network
 
-import com.duckduckgo.networkprotection.impl.configuration.EligibleServerInfo
+import com.duckduckgo.networkprotection.impl.configuration.Server
 import com.duckduckgo.networkprotection.impl.configuration.WgServerDebugProvider
 import com.duckduckgo.networkprotection.store.remote_config.NetPEgressServer
 import com.duckduckgo.networkprotection.store.remote_config.NetPServerRepository
@@ -28,14 +28,14 @@ class WgServerInternalProvider constructor(
         return netPServerRepository.getSelectedServer()?.name
     }
 
-    override suspend fun storeEligibleServers(servers: List<EligibleServerInfo>) {
-        servers.map {
+    override suspend fun storeEligibleServers(servers: List<Server>) {
+        servers.map { server ->
             NetPEgressServer(
-                name = it.server.name,
-                publicKey = it.server.publicKey,
-                port = it.server.port,
-                hostnames = it.server.hostnames,
-                ips = it.server.ips,
+                name = server.name,
+                publicKey = server.publicKey,
+                port = server.port,
+                hostnames = server.hostnames,
+                ips = server.ips,
             )
         }.let {
             netPServerRepository.storeServers(it)
