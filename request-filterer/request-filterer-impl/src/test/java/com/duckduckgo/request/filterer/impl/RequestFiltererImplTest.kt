@@ -152,6 +152,17 @@ class RequestFiltererImplTest {
     }
 
     @Test
+    fun whenDocumentUrlMatchesPreviousETLDPlusOneThenReturnFalse() {
+        val previousUrl = "http://example.com"
+        val documentUrl = "http://test.example.com"
+        whenever(mockRequest.requestHeaders).thenReturn(mapOf(REFERER to previousUrl))
+        requestFilterer.registerOnPageCreated(previousUrl)
+        requestFilterer.registerOnPageCreated(documentUrl)
+
+        assertFalse(requestFilterer.shouldFilterOutRequest(mockRequest, documentUrl))
+    }
+
+    @Test
     fun whenRequestRefererHeaderDoesNotMatchPreviousUrlThenReturnFalse() {
         val previousUrl = "http://example.com"
         val documentUrl = "http://test.com"
