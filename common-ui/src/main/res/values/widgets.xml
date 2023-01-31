@@ -243,6 +243,25 @@
         <item name="buttonBarNeutralButtonStyle">@style/Widget.DuckDuckGo.LegacyDialogButtonStyle</item>
     </style>
 
+    <style name="Widget.DuckDuckGo.DatePicker" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:textColor">?attr/daxColorPrimaryText</item>
+        <item name="android:textColorPrimary">?attr/daxColorPrimaryText</item>
+        <item name="android:textColorSecondary">?attr/daxColorSecondaryText</item>
+        <item name="android:background">?attr/daxColorSurface</item>
+        <item name="colorAccent">?attr/daxColorAccentBlue</item>
+        <item name="android:textColorAlertDialogListItem">?attr/daxColorPrimaryText</item>
+        <item name="textColorAlertDialogListItem">?attr/daxColorPrimaryText</item>
+        <item name="android:buttonBarButtonStyle">@style/Widget.DuckDuckGo.LegacyDialogButtonStyle</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Widget.DuckDuckGo.LegacyDialogButtonStyle</item>
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.DuckDuckGo.LegacyDialogButtonStyle</item>
+        <item name="buttonBarNeutralButtonStyle">@style/Widget.DuckDuckGo.LegacyDialogButtonStyle</item>
+        <item name="colorControlActivated">?attr/daxColorAccentBlue</item>
+        <item name="colorControlHighlight">?attr/daxColorAccentBlue</item>
+        <item name="android:windowBackground">?attr/daxColorSurface</item>
+        <item name="android:textColorPrimaryInverse">?daxColorPrimaryText</item>
+        <item name="android:textColorSecondaryInverse">?daxColorPrimaryText</item>
+    </style>
+
     <style name="Widget.DuckDuckGo.LegacyDialogButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
         <item name="android:textColor">?attr/daxColorAccentBlue</item>
     </style>
