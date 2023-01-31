@@ -25,7 +25,6 @@ import com.duckduckgo.mobile.android.vpn.dao.*
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
-import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
@@ -52,7 +51,6 @@ class AppTrackerBlockingStatsRepositoryTest {
 
     @Before
     fun before() {
-        AndroidThreeTen.init(InstrumentationRegistry.getInstrumentation().targetContext)
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, VpnDatabase::class.java)
             .allowMainThreadQueries()
             .build()

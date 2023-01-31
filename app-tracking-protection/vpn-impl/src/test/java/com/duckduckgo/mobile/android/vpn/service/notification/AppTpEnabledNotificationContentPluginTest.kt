@@ -33,7 +33,6 @@ import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPl
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
-import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -64,7 +63,6 @@ class AppTpEnabledNotificationContentPluginTest {
 
     @Before
     fun setup() {
-        AndroidThreeTen.init(InstrumentationRegistry.getInstrumentation().targetContext)
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, VpnDatabase::class.java)
             .allowMainThreadQueries()
             .build()
