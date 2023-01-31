@@ -106,7 +106,7 @@ appId: com.duckduckgo.mobile.android
 - tapOn: "LIST ITEMS"
 - scrollUntilVisible:
     element:
-      text: "This is a test"
+      text: "This is a Test"
     direction: DOWN
 - tapOn: "Others"
 - scrollUntilVisible:
