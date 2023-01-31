@@ -16,6 +16,7 @@
 
 package com.duckduckgo.sync.impl
 
+import androidx.annotation.WorkerThread
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.crypto.AccountKeys
 import com.duckduckgo.sync.crypto.LoginKeys
@@ -39,6 +40,7 @@ interface SyncRepository {
 }
 
 @ContributesBinding(AppScope::class)
+@WorkerThread
 class AppSyncRepository @Inject constructor(
     private val syncDeviceIds: SyncDeviceIds,
     private val nativeLib: SyncLib,
