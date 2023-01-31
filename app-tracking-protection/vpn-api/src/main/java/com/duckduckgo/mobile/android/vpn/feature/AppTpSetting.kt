@@ -17,11 +17,9 @@
 package com.duckduckgo.mobile.android.vpn.feature
 
 enum class AppTpSetting(override val value: String, override val defaultValue: Boolean = false) : SettingName {
-    BadHealthMitigation("badHealthMitigation", defaultValue = true),
     Ipv6Support("ipv6Support"),
     PrivateDnsSupport("privateDnsSupport"),
     InterceptDnsTraffic("interceptDnsTraffic"),
-    ConnectivityChecks("connectivityChecks"),
     AlwaysSetDNS("alwaysSetDNS"),
     CPUMonitoring("cpuMonitoring"),
     ProtectGames("protectGames"),

@@ -45,7 +45,6 @@ import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.AppsProtectio
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerCompanyBadge
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem.TrackerLoadingSkeleton
-import com.jakewharton.threetenabp.AndroidThreeTen
 import java.util.concurrent.TimeUnit.DAYS
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -76,7 +75,6 @@ class DeviceShieldActivityFeedViewModelTest {
 
     @Before
     fun setup() {
-        AndroidThreeTen.init(InstrumentationRegistry.getInstrumentation().targetContext)
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, VpnDatabase::class.java)
             .allowMainThreadQueries()
             .build()

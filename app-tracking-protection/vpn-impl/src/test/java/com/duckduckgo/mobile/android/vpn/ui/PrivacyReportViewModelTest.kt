@@ -38,7 +38,6 @@ import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsReposi
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportViewModel
-import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -90,7 +89,6 @@ class PrivacyReportViewModelTest {
     }
 
     private fun prepareDb() {
-        AndroidThreeTen.init(InstrumentationRegistry.getInstrumentation().targetContext)
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, VpnDatabase::class.java)
             .allowMainThreadQueries()
             .build()
