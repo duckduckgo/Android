@@ -95,12 +95,14 @@ class NotifyMeView : FrameLayout {
     private val binding: ViewNotifyMeViewBinding by viewBinding()
 
     private val viewModel by lazy {
-        val factory = NotifyMeViewModel.Factory(findViewTreeSavedStateRegistryOwner()!!, ViewTreeLifecycleOwner.get(this))
+        val factory = NotifyMeViewModel.Factory(findViewTreeSavedStateRegistryOwner()!!)
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, factory)[NotifyMeViewModel::class.java]
     }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
+
+        ViewTreeLifecycleOwner.get(this)?.lifecycle?.addObserver(viewModel)
 
         @SuppressLint("NoHardcodedCoroutineDispatcher")
         coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
@@ -120,6 +122,8 @@ class NotifyMeView : FrameLayout {
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
+
+        ViewTreeLifecycleOwner.get(this)?.lifecycle?.removeObserver(viewModel)
 
         viewModel.removeNotifyMeListener()
 

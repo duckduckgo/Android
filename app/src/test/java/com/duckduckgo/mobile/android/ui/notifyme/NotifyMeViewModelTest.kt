@@ -16,7 +16,6 @@
 
 package com.duckduckgo.mobile.android.ui.notifyme
 
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
@@ -45,11 +44,9 @@ class NotifyMeViewModelTest {
 
     private val mockListener = mock<NotifyMeListener>()
     private val mockLifecycleOwner = mock<LifecycleOwner>()
-    private val mockLifecycle = mock<Lifecycle>()
 
     private val testee: NotifyMeViewModel by lazy {
-        whenever(mockLifecycleOwner.lifecycle).thenReturn(mockLifecycle)
-        NotifyMeViewModel(mockLifecycleOwner)
+        NotifyMeViewModel()
     }
 
     @Test

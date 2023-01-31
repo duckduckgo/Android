@@ -34,7 +34,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class NotifyMeViewModel(val lifecycleOwner: LifecycleOwner) : ViewModel(), DefaultLifecycleObserver {
+class NotifyMeViewModel() : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
         val visible: Boolean = false,
@@ -55,10 +55,6 @@ class NotifyMeViewModel(val lifecycleOwner: LifecycleOwner) : ViewModel(), Defau
     private val notificationsAllowed = MutableStateFlow(true)
 
     private val dismissCalled = MutableStateFlow(false)
-
-    init {
-        lifecycleOwner.lifecycle.addObserver(this)
-    }
 
     val viewState: StateFlow<ViewState> = combine(
         flow = notificationsAllowed,
@@ -121,14 +117,13 @@ class NotifyMeViewModel(val lifecycleOwner: LifecycleOwner) : ViewModel(), Defau
     @Suppress("UNCHECKED_CAST")
     class Factory(
         owner: SavedStateRegistryOwner,
-        val lifecycleOwner: LifecycleOwner?,
     ) : AbstractSavedStateViewModelFactory(owner, null) {
         override fun <T : ViewModel> create(
             key: String,
             modelClass: Class<T>,
             handle: SavedStateHandle,
         ): T {
-            return NotifyMeViewModel(lifecycleOwner = lifecycleOwner!!) as T
+            return NotifyMeViewModel() as T
         }
     }
 }
