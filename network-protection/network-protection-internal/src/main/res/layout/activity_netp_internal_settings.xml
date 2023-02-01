@@ -37,9 +37,9 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/toolbarBgColor"
+            android:background="?attr/daxColorSurface"
             android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
-            app:popupTheme="@style/PopUpOverflowMenu"/>
+            app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu"/>
     </com.google.android.material.appbar.AppBarLayout>
 
     <ScrollView
@@ -56,11 +56,11 @@
         >
 
             <!-- Section Config -->
-            <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/sectionConfigTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/netpDevSettingHeaderConfig"
+                app:primaryText="@string/netpDevSettingHeaderConfig"
             />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
