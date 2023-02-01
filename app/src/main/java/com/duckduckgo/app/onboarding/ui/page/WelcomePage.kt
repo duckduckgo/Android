@@ -53,8 +53,13 @@ class WelcomePage : OnboardingPageFragment() {
     lateinit var appBuildConfig: AppBuildConfig
 
     private val requestPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-        // Nothing to do at this point with the result. Proceed with the welcome animation.
-        scheduleWelcomeAnimation()
+        // In case of screen rotation while the notifications permissions prompt is shown on screen a DENY result is received
+        // as the dialog gets automatically dismissed and recreated. Proceed with the welcome animation only if the dialog is not
+        // displayed on top of the onboarding.
+        if (view?.windowVisibility == View.VISIBLE) {
+            // Nothing to do at this point with the result. Proceed with the welcome animation.
+            scheduleWelcomeAnimation()
+        }
     }
 
     private var ctaText: String = ""
