@@ -284,8 +284,8 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
     class NotifyMeComponentViewHolder(parent: ViewGroup) : ComponentViewHolder(inflate(parent, R.layout.component_notify_me)) {
         init {
             val notifyMeView: NotifyMeView = view.findViewById(R.id.notifyMe)
-            notifyMeView.setTitle("Component title")
-            notifyMeView.setSubtitle("Component subtitle")
+            notifyMeView.setPrimaryText("Component title")
+            notifyMeView.setSecondaryText("Component subtitle")
             notifyMeView.setListener(
                 object : NotifyMeListener {
                     override fun setDismissed() {

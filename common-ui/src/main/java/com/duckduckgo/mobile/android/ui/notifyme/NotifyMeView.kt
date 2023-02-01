@@ -72,8 +72,8 @@ class NotifyMeView @JvmOverloads constructor(
 
     init {
         val attributes = context.obtainStyledAttributes(attrs, R.styleable.NotifyMeView)
-        setTitle(attributes.getString(R.styleable.NotifyMeView_primaryText) ?: "")
-        setSubtitle(attributes.getString(R.styleable.NotifyMeView_secondaryText) ?: "")
+        setPrimaryText(attributes.getString(R.styleable.NotifyMeView_primaryText) ?: "")
+        setSecondaryText(attributes.getString(R.styleable.NotifyMeView_secondaryText) ?: "")
         binding.notifyMeClose.setOnClickListener {
             viewModel.onCloseButtonClicked()
         }
@@ -121,11 +121,11 @@ class NotifyMeView @JvmOverloads constructor(
         this.listener = listener
     }
 
-    fun setTitle(title: String) {
+    fun setPrimaryText(title: String) {
         binding.notifyMeMessageTitle.text = title
     }
 
-    fun setSubtitle(subtitle: String) {
+    fun setSecondaryText(subtitle: String) {
         binding.notifyMeMessageSubtitle.text = subtitle
     }
 
