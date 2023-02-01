@@ -34,7 +34,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class NotifyMeViewModel() : ViewModel(), DefaultLifecycleObserver {
+internal class NotifyMeViewModel() : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
         val visible: Boolean = false,

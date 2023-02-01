@@ -51,4 +51,13 @@ dependencies {
 
     // Lottie
     implementation "com.airbnb.android:lottie:_"
+
+    // Testing dependencies
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    implementation Testing.junit4
+    testImplementation AndroidX.test.ext.junit
+    testImplementation AndroidX.archCore.testing
+    testImplementation 'app.cash.turbine:turbine:_'
+    testImplementation Testing.robolectric
+    testImplementation project(path: ':common-test')
 }
