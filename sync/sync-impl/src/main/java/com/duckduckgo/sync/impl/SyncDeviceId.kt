@@ -20,7 +20,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Build
 import android.provider.Settings
-import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
 import java.util.*
@@ -32,7 +32,7 @@ interface SyncDeviceIds {
     fun deviceId(): String
 }
 
-@ContributesBinding(ActivityScope::class)
+@ContributesBinding(AppScope::class)
 class AppSyncDeviceIds
 @Inject
 constructor(
@@ -44,7 +44,6 @@ constructor(
         if (userId != null) return userId
 
         userId = UUID.randomUUID().toString()
-        syncStore.userId = userId
 
         return userId
     }
@@ -54,7 +53,6 @@ constructor(
         if (deviceName != null) return deviceName
 
         deviceName = "${Build.BRAND} ${Build.MODEL}"
-        syncStore.deviceName = deviceName
         return deviceName
     }
 
@@ -66,7 +64,6 @@ constructor(
         deviceName =
             Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
                 ?: "UNKNOWN"
-        syncStore.deviceId = deviceName
         return deviceName
     }
 }

@@ -19,10 +19,24 @@ package com.duckduckgo.sync.crypto
 import android.content.Context
 import android.util.Base64
 import com.duckduckgo.library.loader.LibraryLoader
+import java.util.*
 import kotlin.system.exitProcess
 import timber.log.Timber
 
-class SyncNativeLib constructor(context: Context) {
+interface SyncLib {
+    fun generateAccountKeys(
+        userId: String,
+        password: String = UUID.randomUUID().toString(),
+    ): AccountKeys
+
+    fun prepareForLogin(primaryKey: String): LoginKeys
+    fun decrypt(
+        encryptedData: String,
+        secretKey: String,
+    ): DecryptResult
+}
+
+class SyncNativeLib constructor(context: Context) : SyncLib {
 
     init {
         try {
@@ -34,14 +48,24 @@ class SyncNativeLib constructor(context: Context) {
         }
     }
 
-    fun generateAccountKeys(userId: String, password: String): AccountKeys {
+    override fun generateAccountKeys(
+        userId: String,
+        password: String,
+    ): AccountKeys {
         val primaryKey = ByteArray(getPrimaryKeySize())
         val secretKey = ByteArray(getSecretKeySize())
         val protectedSecretKey = ByteArray(getProtectedSecretKeySize())
         val passwordHash = ByteArray(getPasswordHashSize())
 
         val result: Long =
-            generateAccountKeys(primaryKey, secretKey, protectedSecretKey, passwordHash, userId, password)
+            generateAccountKeys(
+                primaryKey,
+                secretKey,
+                protectedSecretKey,
+                passwordHash,
+                userId,
+                password,
+            )
 
         return AccountKeys(
             result = result,
@@ -54,7 +78,7 @@ class SyncNativeLib constructor(context: Context) {
         )
     }
 
-    fun prepareForLogin(primaryKey: String): LoginKeys {
+    override fun prepareForLogin(primaryKey: String): LoginKeys {
         val primarKeyByteArray = primaryKey.decode()
         val passwordHash = ByteArray(getPasswordHashSize())
         val stretchedPrimaryKey = ByteArray(getStretchedPrimaryKeySize())
@@ -69,7 +93,7 @@ class SyncNativeLib constructor(context: Context) {
         )
     }
 
-    fun decrypt(
+    override fun decrypt(
         encryptedData: String,
         secretKey: String,
     ): DecryptResult {
