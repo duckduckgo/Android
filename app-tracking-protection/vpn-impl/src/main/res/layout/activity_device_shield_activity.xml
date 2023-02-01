@@ -46,8 +46,8 @@
                     android:id="@+id/deviceShieldTrackerNotifyMe"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:subtitleText="@string/appTrackingProtectionNotifyMeSubtitle"
-                    app:titleText="@string/appTrackingProtectionNotifyMeTitle" />
+                    app:primaryText="@string/appTrackingProtectionNotifyMeTitle"
+                    app:secondaryText="@string/appTrackingProtectionNotifyMeSubtitle" />
 
                 <com.duckduckgo.mobile.android.ui.view.InfoPanel
                     android:id="@+id/deviceShieldTrackerLabelEnabled"

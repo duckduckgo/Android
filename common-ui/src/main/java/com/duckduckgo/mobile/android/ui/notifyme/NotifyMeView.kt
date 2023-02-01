@@ -75,8 +75,8 @@ class NotifyMeView : FrameLayout {
 
         val attributes = context.obtainStyledAttributes(attrs, R.styleable.NotifyMeView)
 
-        setTitle(attributes.getString(R.styleable.NotifyMeView_titleText) ?: "")
-        setSubtitle(attributes.getString(R.styleable.NotifyMeView_subtitleText) ?: "")
+        setTitle(attributes.getString(R.styleable.NotifyMeView_primaryText) ?: "")
+        setSubtitle(attributes.getString(R.styleable.NotifyMeView_secondaryText) ?: "")
 
         binding.notifyMeClose.setOnClickListener {
             viewModel.onCloseButtonClicked()

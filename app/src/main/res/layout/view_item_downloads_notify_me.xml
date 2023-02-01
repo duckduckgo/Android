@@ -19,5 +19,5 @@
     android:id="@+id/downloadsNotifyMe"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:subtitleText="@string/downloadsNotifyMeSubtitle"
-    app:titleText="@string/downloadsNotifyMeTitle" />
+    app:primaryText="@string/downloadsNotifyMeTitle"
+    app:secondaryText="@string/downloadsNotifyMeSubtitle" />
