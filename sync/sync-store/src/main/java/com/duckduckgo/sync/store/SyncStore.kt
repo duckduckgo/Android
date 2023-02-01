@@ -11,7 +11,7 @@ interface SyncStore {
     var primaryKey: String?
     var secretKey: String?
     var recoveryCode: String?
-    fun clearAll()
+    fun clearAll(keepRecoveryCode: Boolean = true)
 }
 
 class SyncSharedPrefsStore
@@ -109,8 +109,12 @@ constructor(
             }
         }
 
-    override fun clearAll() {
+    override fun clearAll(keepRecoveryCode: Boolean) {
+        val recoveryCodeBackup = recoveryCode
         encryptedPreferences?.edit(commit = true) { clear() }
+        if (keepRecoveryCode) {
+            recoveryCode = recoveryCodeBackup
+        }
     }
 
     companion object {

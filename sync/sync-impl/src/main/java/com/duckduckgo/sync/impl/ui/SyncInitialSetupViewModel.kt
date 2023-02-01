@@ -49,7 +49,12 @@ constructor(
         val userId: String = "",
         val deviceName: String = "",
         val deviceId: String = "",
+        val token: String = "",
         val isSignedIn: Boolean = false,
+        val primaryKey: String = "",
+        val secretKey: String = "",
+        val protectedEncryptionKey: String = "",
+        val passwordHash: String = "",
     )
 
     sealed class Command {
@@ -80,6 +85,36 @@ constructor(
         }
     }
 
+    fun onLogoutClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            val result = syncRepository.logout()
+            if (result is Error) {
+                command.send(Command.ShowMessage("$result"))
+            }
+            updateViewState()
+        }
+    }
+
+    fun onDeleteAccountClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            val result = syncRepository.deleteAccount()
+            if (result is Error) {
+                command.send(Command.ShowMessage("$result"))
+            }
+            updateViewState()
+        }
+    }
+
+    fun loginAccountClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            val result = syncRepository.login()
+            if (result is Error) {
+                command.send(Command.ShowMessage("$result"))
+            }
+            updateViewState()
+        }
+    }
+
     private suspend fun updateViewState() {
         val accountInfo = syncRepository.getAccountInfo()
         viewState.emit(
@@ -88,6 +123,9 @@ constructor(
                 deviceName = accountInfo.deviceName,
                 deviceId = accountInfo.deviceId,
                 isSignedIn = accountInfo.isSignedIn,
+                token = syncRepository.latestToken(),
+                primaryKey = accountInfo.primaryKey,
+                secretKey = accountInfo.secretKey,
             ),
         )
     }

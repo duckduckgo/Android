@@ -20,12 +20,26 @@ import com.duckduckgo.sync.TestSyncFixtures.accountCreatedFailDupUser
 import com.duckduckgo.sync.TestSyncFixtures.accountCreatedSuccess
 import com.duckduckgo.sync.TestSyncFixtures.accountKeys
 import com.duckduckgo.sync.TestSyncFixtures.accountKeysFailed
+import com.duckduckgo.sync.TestSyncFixtures.decryptedSecretKey
+import com.duckduckgo.sync.TestSyncFixtures.deleteAccountInvalid
+import com.duckduckgo.sync.TestSyncFixtures.deleteAccountSuccess
 import com.duckduckgo.sync.TestSyncFixtures.deviceId
 import com.duckduckgo.sync.TestSyncFixtures.deviceName
+import com.duckduckgo.sync.TestSyncFixtures.failedLoginKeys
+import com.duckduckgo.sync.TestSyncFixtures.hashedPassword
+import com.duckduckgo.sync.TestSyncFixtures.invalidDecryptedSecretKey
+import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKey
+import com.duckduckgo.sync.TestSyncFixtures.loginFailed
+import com.duckduckgo.sync.TestSyncFixtures.loginSuccess
+import com.duckduckgo.sync.TestSyncFixtures.logoutInvalid
+import com.duckduckgo.sync.TestSyncFixtures.logoutSuccess
 import com.duckduckgo.sync.TestSyncFixtures.primaryKey
+import com.duckduckgo.sync.TestSyncFixtures.protectedEncryptionKey
 import com.duckduckgo.sync.TestSyncFixtures.secretKey
+import com.duckduckgo.sync.TestSyncFixtures.stretchedPrimaryKey
 import com.duckduckgo.sync.TestSyncFixtures.token
 import com.duckduckgo.sync.TestSyncFixtures.userId
+import com.duckduckgo.sync.TestSyncFixtures.validLoginKeys
 import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.store.SyncStore
 import org.junit.Assert.assertEquals
@@ -34,6 +48,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -147,5 +162,133 @@ class AppSyncRepositoryTest {
         assertEquals("", result.deviceId)
         assertEquals("", result.deviceName)
         assertFalse(result.isSignedIn)
+    }
+
+    @Test
+    fun whenLogoutSucceedsThenReturnSuccessAndRemoveData() {
+        whenever(syncStore.deviceId).thenReturn(deviceId)
+        whenever(syncStore.token).thenReturn(token)
+        whenever(syncApi.logout(token, deviceId)).thenReturn(logoutSuccess)
+
+        val syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore)
+
+        val result = syncRepo.logout()
+
+        assertTrue(result is Result.Success)
+        verify(syncStore).clearAll()
+    }
+
+    @Test
+    fun whenLogoutFailsThenReturnError() {
+        whenever(syncStore.deviceId).thenReturn(deviceId)
+        whenever(syncStore.token).thenReturn(token)
+        whenever(syncApi.logout(token, deviceId)).thenReturn(logoutInvalid)
+
+        val syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore)
+
+        val result = syncRepo.logout()
+
+        assertTrue(result is Result.Error)
+        verify(syncStore, times(0)).clearAll()
+    }
+
+    @Test
+    fun whenDeleteAccountSucceedsThenReturnSuccessAndRemoveData() {
+        whenever(syncStore.token).thenReturn(token)
+        whenever(syncApi.deleteAccount(token)).thenReturn(deleteAccountSuccess)
+
+        val syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore)
+
+        val result = syncRepo.deleteAccount()
+
+        assertTrue(result is Result.Success)
+        verify(syncStore).clearAll()
+    }
+
+    @Test
+    fun whenDeleteAccountFailsThenReturnError() {
+        whenever(syncStore.token).thenReturn(token)
+        whenever(syncApi.deleteAccount(token)).thenReturn(deleteAccountInvalid)
+
+        val syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore)
+
+        val result = syncRepo.logout()
+
+        assertTrue(result is Result.Error)
+        verify(syncStore, times(0)).clearAll()
+    }
+
+    @Test
+    fun whenLoginSucceedsThenAccountPersisted() {
+        whenever(syncStore.recoveryCode).thenReturn(jsonRecoveryKey)
+        whenever(syncDeviceIds.deviceId()).thenReturn(deviceId)
+        whenever(syncDeviceIds.deviceName()).thenReturn(deviceName)
+        whenever(nativeLib.prepareForLogin(primaryKey = primaryKey)).thenReturn(validLoginKeys)
+        whenever(nativeLib.decrypt(encryptedData = protectedEncryptionKey, secretKey = stretchedPrimaryKey)).thenReturn(decryptedSecretKey)
+        whenever(syncApi.login(userId, hashedPassword, deviceId, deviceName)).thenReturn(loginSuccess)
+
+        val syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore)
+        val result = syncRepo.login()
+
+        assertEquals(Result.Success(true), result)
+        verify(syncStore).userId = userId
+        verify(syncStore).deviceId = deviceId
+        verify(syncStore).deviceName = deviceName
+        verify(syncStore).token = token
+        verify(syncStore).primaryKey = primaryKey
+        verify(syncStore).secretKey = secretKey
+    }
+
+    @Test
+    fun whenRecoveryCodeNotFoudnThenReturnError() {
+        whenever(syncStore.recoveryCode).thenReturn(null)
+
+        val syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore)
+        val result = syncRepo.login()
+
+        assertTrue(result is Result.Error)
+    }
+
+    @Test
+    fun whenGenerateKeysFromRecoveryCodeFailsThenReturnError() {
+        whenever(syncStore.recoveryCode).thenReturn(jsonRecoveryKey)
+        whenever(syncDeviceIds.deviceId()).thenReturn(deviceId)
+        whenever(syncDeviceIds.deviceName()).thenReturn(deviceName)
+        whenever(nativeLib.prepareForLogin(primaryKey = primaryKey)).thenReturn(failedLoginKeys)
+
+        val syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore)
+        val result = syncRepo.login()
+
+        assertTrue(result is Result.Error)
+    }
+
+    @Test
+    fun whenLoginFailsThenReturnError() {
+        whenever(syncStore.recoveryCode).thenReturn(jsonRecoveryKey)
+        whenever(syncDeviceIds.deviceId()).thenReturn(deviceId)
+        whenever(syncDeviceIds.deviceName()).thenReturn(deviceName)
+        whenever(nativeLib.prepareForLogin(primaryKey = primaryKey)).thenReturn(validLoginKeys)
+        whenever(nativeLib.decrypt(encryptedData = protectedEncryptionKey, secretKey = stretchedPrimaryKey)).thenReturn(decryptedSecretKey)
+        whenever(syncApi.login(userId, hashedPassword, deviceId, deviceName)).thenReturn(loginFailed)
+
+        val syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore)
+        val result = syncRepo.login()
+
+        assertTrue(result is Result.Error)
+    }
+
+    @Test
+    fun whenDecryptSecretKeyFailsThenReturnError() {
+        whenever(syncStore.recoveryCode).thenReturn(jsonRecoveryKey)
+        whenever(syncDeviceIds.deviceId()).thenReturn(deviceId)
+        whenever(syncDeviceIds.deviceName()).thenReturn(deviceName)
+        whenever(nativeLib.prepareForLogin(primaryKey = primaryKey)).thenReturn(validLoginKeys)
+        whenever(nativeLib.decrypt(encryptedData = protectedEncryptionKey, secretKey = stretchedPrimaryKey)).thenReturn(invalidDecryptedSecretKey)
+        whenever(syncApi.login(userId, hashedPassword, deviceId, deviceName)).thenReturn(loginSuccess)
+
+        val syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore)
+        val result = syncRepo.login()
+
+        assertTrue(result is Result.Error)
     }
 }

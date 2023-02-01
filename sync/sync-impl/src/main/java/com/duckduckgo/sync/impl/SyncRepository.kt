@@ -16,8 +16,10 @@
 
 package com.duckduckgo.sync.impl
 
+import androidx.annotation.WorkerThread
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.crypto.AccountKeys
+import com.duckduckgo.sync.crypto.LoginKeys
 import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
@@ -28,12 +30,17 @@ import timber.log.Timber
 
 interface SyncRepository {
     fun createAccount(): Result<Boolean>
+    fun login(): Result<Boolean>
     fun getAccountInfo(): AccountInfo
     fun storeRecoveryCode()
     fun removeAccount()
+    fun logout(): Result<Boolean>
+    fun deleteAccount(): Result<Boolean>
+    fun latestToken(): String
 }
 
 @ContributesBinding(AppScope::class)
+@WorkerThread
 class AppSyncRepository @Inject constructor(
     private val syncDeviceIds: SyncDeviceIds,
     private val nativeLib: SyncLib,
@@ -63,6 +70,7 @@ class AppSyncRepository @Inject constructor(
                 Timber.i("SYNC signup failed $result")
                 result
             }
+
             is Result.Success -> {
                 syncStore.userId = userId
                 syncStore.deviceId = deviceId
@@ -70,6 +78,44 @@ class AppSyncRepository @Inject constructor(
                 syncStore.token = result.data.token
                 syncStore.primaryKey = account.primaryKey
                 syncStore.secretKey = account.secretKey
+                Result.Success(true)
+            }
+        }
+    }
+
+    override fun login(): Result<Boolean> {
+        val recoveryCode = getRecoveryCode() ?: return Result.Error(reason = "Not valid Or existing recovery code")
+
+        val primaryKey = recoveryCode.primaryKey
+        val userId = recoveryCode.userID
+        val deviceId = syncDeviceIds.deviceId()
+        val deviceName = syncDeviceIds.deviceName()
+
+        val preLogin: LoginKeys = nativeLib.prepareForLogin(primaryKey)
+        if (preLogin.result != 0L) return Result.Error(code = preLogin.result.toInt(), reason = "Account keys failed")
+
+        val result =
+            syncApi.login(
+                userID = userId,
+                hashedPassword = preLogin.passwordHash,
+                deviceId = deviceId,
+                deviceName = deviceName,
+            )
+
+        return when (result) {
+            is Result.Error -> {
+                result
+            }
+            is Result.Success -> {
+                val decryptResult = nativeLib.decrypt(result.data.protected_encryption_key, preLogin.stretchedPrimaryKey)
+                if (decryptResult.result != 0L) return Result.Error(code = decryptResult.result.toInt(), reason = "Decrypt failed")
+                Timber.i("SYNC decrypt: decoded secret Key: ${decryptResult.decryptedData}")
+                syncStore.userId = userId
+                syncStore.deviceId = deviceId
+                syncStore.deviceName = deviceName
+                syncStore.token = result.data.token
+                syncStore.primaryKey = preLogin.primaryKey
+                syncStore.secretKey = decryptResult.decryptedData
                 Result.Success(true)
             }
         }
@@ -83,6 +129,8 @@ class AppSyncRepository @Inject constructor(
             deviceName = syncStore.deviceName.orEmpty(),
             deviceId = syncStore.deviceId.orEmpty(),
             isSignedIn = isSignedIn(),
+            primaryKey = syncStore.primaryKey.orEmpty(),
+            secretKey = syncStore.secretKey.orEmpty(),
         )
     }
 
@@ -95,8 +143,52 @@ class AppSyncRepository @Inject constructor(
         syncStore.recoveryCode = recoveryCodeJson
     }
 
+    private fun getRecoveryCode(): RecoveryCode? {
+        val recoveryCodeJson = syncStore.recoveryCode ?: return null
+        return Adapters.recoveryCodeAdapter.fromJson(recoveryCodeJson)
+    }
+
     override fun removeAccount() {
-        syncStore.clearAll()
+        syncStore.clearAll(keepRecoveryCode = false)
+    }
+
+    override fun logout(): Result<Boolean> {
+        val token = syncStore.token.takeUnless { it.isNullOrEmpty() }
+            ?: return Result.Error(reason = "Token Empty")
+        val deviceId = syncStore.deviceId.takeUnless { it.isNullOrEmpty() }
+            ?: return Result.Error(reason = "Device Id Empty")
+
+        return when (val result = syncApi.logout(token, deviceId)) {
+            is Result.Error -> {
+                Timber.i("SYNC logout failed $result")
+                result
+            }
+            is Result.Success -> {
+                syncStore.clearAll()
+                Result.Success(true)
+            }
+        }
+    }
+
+    override fun deleteAccount(): Result<Boolean> {
+        val token =
+            syncStore.token.takeUnless { it.isNullOrEmpty() }
+                ?: return Result.Error(reason = "Token Empty")
+
+        return when (val result = syncApi.deleteAccount(token)) {
+            is Result.Error -> {
+                Timber.i("SYNC deleteAccount failed $result")
+                result
+            }
+            is Result.Success -> {
+                syncStore.clearAll()
+                Result.Success(true)
+            }
+        }
+    }
+
+    override fun latestToken(): String {
+        return syncStore.token ?: ""
     }
 
     private fun isSignedIn() = !syncStore.primaryKey.isNullOrEmpty()
@@ -115,6 +207,8 @@ data class AccountInfo(
     val deviceName: String = "",
     val deviceId: String = "",
     val isSignedIn: Boolean = false,
+    val primaryKey: String = "",
+    val secretKey: String = "",
 )
 
 data class RecoveryCode(
@@ -125,7 +219,10 @@ data class RecoveryCode(
 sealed class Result<out R> {
 
     data class Success<out T>(val data: T) : Result<T>()
-    data class Error(val code: Int = -1, val reason: String) : Result<Nothing>()
+    data class Error(
+        val code: Int = -1,
+        val reason: String,
+    ) : Result<Nothing>()
 
     override fun toString(): String {
         return when (this) {

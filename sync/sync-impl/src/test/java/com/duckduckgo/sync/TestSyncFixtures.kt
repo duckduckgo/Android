@@ -17,7 +17,12 @@
 package com.duckduckgo.sync
 
 import com.duckduckgo.sync.crypto.AccountKeys
+import com.duckduckgo.sync.crypto.DecryptResult
+import com.duckduckgo.sync.crypto.LoginKeys
 import com.duckduckgo.sync.impl.AccountCreatedResponse
+import com.duckduckgo.sync.impl.Login
+import com.duckduckgo.sync.impl.LoginResponse
+import com.duckduckgo.sync.impl.Logout
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Signup
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -30,6 +35,7 @@ object TestSyncFixtures {
     const val deviceName = "deviceName"
     const val token = "token"
     const val primaryKey = "primaryKey"
+    const val stretchedPrimaryKey = "primaryKey"
     const val secretKey = "secretKey"
     const val hashedPassword = "hashedPassword"
     const val protectedEncryptionKey = "protectedEncryptionKey"
@@ -66,8 +72,47 @@ object TestSyncFixtures {
         invalidCodeErr,
         "{\"error\":\"$invalidMessageErr\"}".toResponseBody(),
     )
-
     val accountCreatedSuccess = Result.Success(AccountCreatedResponse(user_id = userId, token = token))
     val accountCreatedFailInvalid = Result.Error(code = invalidCodeErr, reason = invalidMessageErr)
     val accountCreatedFailDupUser = Result.Error(code = duplicateUsercCodeErr, reason = duplicateUserMessageErr)
+
+    val deviceLogoutBody = Logout(deviceId)
+    val deviceLoggedOutBody = Logout(deviceId)
+    val deviceLogoutResponse = Response.success(deviceLoggedOutBody)
+    const val wrongCredentialsCodeErr = 401
+    const val wrongCredentialsMessageErr = "invalid_login_credentials"
+    val logoutError = Response.error<Logout>(
+        wrongCredentialsCodeErr,
+        "{\"error\": \"$wrongCredentialsMessageErr\"}".toResponseBody(),
+    )
+    val logoutSuccess = Result.Success(deviceLoggedOutBody)
+    val logoutInvalid = Result.Error(code = wrongCredentialsCodeErr, reason = wrongCredentialsMessageErr)
+
+    val deleteAccountResponse = Response.success<Void>(null)
+    val deleteAccountError = Response.error<Void>(
+        wrongCredentialsCodeErr,
+        "{\"error\": \"$wrongCredentialsMessageErr\"}".toResponseBody(),
+    )
+    val deleteAccountSuccess = Result.Success(true)
+    val deleteAccountInvalid = Result.Error(code = wrongCredentialsCodeErr, reason = wrongCredentialsMessageErr)
+
+    val jsonRecoveryKey = "{\"primaryKey\": \"$primaryKey\",\"userID\": \"$userId\"}"
+    val validLoginKeys = LoginKeys(result = 0L, passwordHash = hashedPassword, stretchedPrimaryKey = stretchedPrimaryKey, primaryKey = primaryKey)
+    val failedLoginKeys = LoginKeys(result = 9L, passwordHash = "", stretchedPrimaryKey = "", primaryKey = "")
+    val decryptedSecretKey = DecryptResult(result = 0L, decryptedData = secretKey)
+    val invalidDecryptedSecretKey = DecryptResult(result = 9L, decryptedData = "")
+    val loginResponseBody = LoginResponse(
+        token = token,
+        protected_encryption_key = protectedEncryptionKey,
+        devices = emptyList(),
+    )
+    val loginSuccess = Result.Success(loginResponseBody)
+    val loginError = Result.Error(code = invalidCodeErr, reason = invalidMessageErr)
+    val loginFailedInvalidResponse: Response<LoginResponse> = Response.error(
+        invalidCodeErr,
+        "{\"error\":\"$invalidMessageErr\"}".toResponseBody(),
+    )
+    val loginFailed = Result.Error(code = wrongCredentialsCodeErr, reason = wrongCredentialsMessageErr)
+    val loginRequestBody = Login(user_id = userId, hashed_password = hashedPassword, device_id = deviceId, device_name = deviceName)
+    val loginSuccessResponse: Response<LoginResponse> = Response.success(loginResponseBody)
 }

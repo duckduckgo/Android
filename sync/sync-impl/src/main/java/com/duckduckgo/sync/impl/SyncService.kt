@@ -20,6 +20,7 @@ import com.duckduckgo.anvil.annotations.ContributesServiceApi
 import com.duckduckgo.di.scopes.AppScope
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.Header
 import retrofit2.http.POST
 
 @ContributesServiceApi(AppScope::class)
@@ -29,7 +30,30 @@ interface SyncService {
     fun signup(
         @Body request: Signup,
     ): Call<AccountCreatedResponse>
+
+    @POST("https://dev-sync-use.duckduckgo.com/sync/logout-device")
+    fun logout(
+        @Header("Authorization") token: String,
+        @Body request: Logout,
+    ): Call<Logout>
+
+    @POST("https://dev-sync-use.duckduckgo.com/sync/delete-account")
+    fun deleteAccount(
+        @Header("Authorization") token: String,
+    ): Call<Void>
+
+    @POST("https://dev-sync-use.duckduckgo.com/sync/login")
+    fun login(
+        @Body request: Login,
+    ): Call<LoginResponse>
 }
+
+data class Login(
+    val user_id: String,
+    val hashed_password: String,
+    val device_id: String,
+    val device_name: String,
+)
 
 data class Signup(
     val user_id: String,
@@ -39,9 +63,25 @@ data class Signup(
     val device_name: String,
 )
 
+data class Logout(
+    val device_id: String,
+)
+
 data class AccountCreatedResponse(
     val user_id: String,
     val token: String,
+)
+
+data class LoginResponse(
+    val token: String,
+    val protected_encryption_key: String,
+    val devices: List<Device>,
+)
+
+data class Device(
+    val device_id: String,
+    val device_name: String,
+    val jw_iat: String,
 )
 
 data class ErrorResponse(
