@@ -83,6 +83,22 @@ class ContributesPluginPointCodeGenerator : CodeGenerator {
                             .addModifiers(KModifier.PRIVATE)
                             .build(),
                     )
+                    .addProperty(
+                        PropertySpec
+                            .builder(
+                                "sortedPlugins",
+                                kotlinCollectionFqName.asClassName(module).parameterizedBy(pluginClassName)
+                            )
+                            .addModifiers(KModifier.PRIVATE)
+                            .delegate(
+                                CodeBlock.builder()
+                                    .beginControlFlow("lazy")
+                                    .add("plugins.toList().sortedBy { it.javaClass.name }")
+                                    .endControlFlow()
+                                    .build()
+                            )
+                            .build()
+                    )
                     .addFunction(
                         FunSpec.builder("getPlugins")
                             .addModifiers(KModifier.OVERRIDE)
@@ -90,7 +106,7 @@ class ContributesPluginPointCodeGenerator : CodeGenerator {
                             .addComment("Sort plugins by class name to ensure execution consistency")
                             .addCode(
                                 """
-                                    return plugins.toList().sortedBy { it.javaClass.name }
+                                    return sortedPlugins
                                 """.trimIndent(),
                             )
                             .build(),
