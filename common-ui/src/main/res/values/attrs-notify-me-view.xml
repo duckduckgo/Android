@@ -17,6 +17,6 @@
 <resources>
     <declare-styleable name="NotifyMeView">
         <attr name="primaryText" />
-        <attr name="subtitleText" format="string" />
+        <attr name="secondaryText" />
     </declare-styleable>
 </resources>
