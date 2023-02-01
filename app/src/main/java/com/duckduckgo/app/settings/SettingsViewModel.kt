@@ -129,6 +129,7 @@ class SettingsViewModel @Inject constructor(
         data class ShowClearWhatDialog(val option: ClearWhatOption) : Command()
         data class ShowClearWhenDialog(val option: ClearWhenOption) : Command()
         object LaunchMacOs : Command()
+        object LaunchNotificationsSettings : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
@@ -226,6 +227,11 @@ class SettingsViewModel @Inject constructor(
     fun userRequestedToChangeTheme() {
         viewModelScope.launch { command.send(Command.LaunchThemeSettings(viewState.value.theme)) }
         pixel.fire(SETTINGS_THEME_OPENED)
+    }
+
+    fun userRequestedToChangeNotificationsSetting() {
+        viewModelScope.launch { command.send(Command.LaunchNotificationsSettings) }
+        pixel.fire(SETTINGS_NOTIFICATIONS_PRESSED)
     }
 
     fun userRequestedToChangeAppLinkSetting() {

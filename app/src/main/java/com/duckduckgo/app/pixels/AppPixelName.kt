@@ -101,6 +101,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SETTINGS_DO_NOT_SELL_SHOWN("ms_dns"),
     SETTINGS_DO_NOT_SELL_ON("ms_dns_on"),
     SETTINGS_DO_NOT_SELL_OFF("ms_dns_off"),
+    SETTINGS_NOTIFICATIONS_PRESSED("ms_notifications_setting_pressed"),
     SETTINGS_APP_LINKS_PRESSED("ms_app_links_setting_pressed"),
     SETTINGS_APP_LINKS_ASK_EVERY_TIME_SELECTED("ms_app_links_ask_every_time_setting_selected"),
     SETTINGS_APP_LINKS_ALWAYS_SELECTED("ms_app_links_always_setting_selected"),

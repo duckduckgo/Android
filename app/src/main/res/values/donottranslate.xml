@@ -28,7 +28,12 @@
     <!-- We won't have a translation for this, to be used later. -->
     <string name="trackersOverviewEmpty">No tracking requests were blocked from loading on this page. If a company\'s requests are loaded, it can allow them to profile you.</string>
 
-    <!-- Notify Me View on Downloads-->
-    <string name="downloadsNotifyMeTitle" translatable="false">Find out when downloads are ready</string>
-    <string name="downloadsNotifyMeSubtitle" translatable="false">Get a notification when downloads complete.</string>
+    <!-- Notify Me View on Downloads -->
+    <string name="downloadsNotifyMeTitle">Find out when downloads are ready</string>
+    <string name="downloadsNotifyMeSubtitle">Get a notification when downloads complete.</string>
+
+    <!-- Settings -->
+    <string name="settingsTitleNotifications">Notifications</string>
+    <string name="settingsSubtitleNotificationsDisabled">Disabled</string>
+    <string name="settingsSubtitleNotificationsEnabled">Enabled</string>
 </resources>

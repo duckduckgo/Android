@@ -714,6 +714,18 @@ class SettingsViewModelTest {
         }
     }
 
+    @Test
+    fun whenUserRequestedToChangeNotificationsSettingThenEmitLaunchNotificationsSettingsAndSendPixel() = runTest {
+        testee.commands().test {
+            testee.userRequestedToChangeNotificationsSetting()
+
+            assertEquals(Command.LaunchNotificationsSettings, awaitItem())
+            verify(mockPixel).fire(AppPixelName.SETTINGS_NOTIFICATIONS_PRESSED)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
     private fun givenSelectedFireAnimation(fireAnimation: FireAnimation) {
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(fireAnimation)
         whenever(mockAppSettingsDataStore.isCurrentlySelected(fireAnimation)).thenReturn(true)
