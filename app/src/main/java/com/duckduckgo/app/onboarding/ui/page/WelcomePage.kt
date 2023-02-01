@@ -58,7 +58,7 @@ class WelcomePage : OnboardingPageFragment() {
         // displayed on top of the onboarding.
         if (view?.windowVisibility == View.VISIBLE) {
             // Nothing to do at this point with the result. Proceed with the welcome animation.
-            scheduleWelcomeAnimation()
+            scheduleWelcomeAnimation(ANIMATION_DELAY_AFTER_NOTIFICATIONS_PERMISSIONS_HANDLED)
         }
     }
 
@@ -215,6 +215,7 @@ class WelcomePage : OnboardingPageFragment() {
         private const val MAX_ALPHA = 1f
         private const val ANIMATION_DURATION = 400L
         private const val ANIMATION_DELAY = 1400L
+        private const val ANIMATION_DELAY_AFTER_NOTIFICATIONS_PERMISSIONS_HANDLED = 400L
 
         private const val DEFAULT_BROWSER_ROLE_MANAGER_DIALOG = 101
     }
