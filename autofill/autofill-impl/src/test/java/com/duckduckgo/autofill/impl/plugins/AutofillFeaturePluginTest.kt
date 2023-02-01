@@ -16,47 +16,49 @@
 
 package com.duckduckgo.autofill.impl.plugins
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.FileUtilities
+import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.autofill.api.feature.AutofillFeatureName
+import com.duckduckgo.autofill.api.feature.AutofillSubfeature
+import com.duckduckgo.autofill.api.feature.AutofillSubfeatureName
 import com.duckduckgo.autofill.impl.feature.plugin.AutofillFeaturePlugin
-import com.duckduckgo.autofill.impl.feature.plugin.AutofillSubfeatureJsonParser
-import com.duckduckgo.autofill.store.AutofillExceptionEntity
+import com.duckduckgo.autofill.impl.feature.plugin.AutofillSubFeaturePlugin
 import com.duckduckgo.autofill.store.feature.AutofillFeatureRepository
 import com.duckduckgo.autofill.store.feature.AutofillFeatureToggleRepository
 import com.duckduckgo.autofill.store.feature.AutofillFeatureToggles
-import com.squareup.moshi.Moshi
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.anyOrNull
-import org.mockito.kotlin.argumentCaptor
+import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers.anyList
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 
+@RunWith(AndroidJUnit4::class)
 class AutofillFeaturePluginTest {
     lateinit var testee: AutofillFeaturePlugin
 
     private val mockFeatureTogglesRepository: AutofillFeatureToggleRepository = mock()
     private val mockAutofillRepository: AutofillFeatureRepository = mock()
-    private val mockAutofillSubfeatureParser: AutofillSubfeatureJsonParser = mock()
-    private val captor = argumentCaptor<List<AutofillExceptionEntity>>()
+    private val pluginPoint = FakeAutofillSubFeaturePluginPluginPoint(listOf(FakeAutofillSubFeaturePluginPlugin()))
 
     @Before
     fun before() {
         testee = AutofillFeaturePlugin(
             autofillFeatureRepository = mockAutofillRepository,
             autofillFeatureToggleRepository = mockFeatureTogglesRepository,
-            moshi = Moshi.Builder().build(),
-            autofillSubfeatureJsonParser = mockAutofillSubfeatureParser,
+            pluginPoint = pluginPoint,
         )
     }
 
     @Test
     fun whenFeatureNameDoesNotMatchAutofillThenReturnFalse() {
-        assertFalse(testee.store("non-autofill-feature", EMPTY_JSON_STRING))
+        AutofillFeatureName.values().filter { it != FEATURE_NAME }.forEach {
+            assertFalse(testee.store(it.value, EMPTY_JSON_STRING))
+        }
     }
 
     @Test
@@ -65,50 +67,69 @@ class AutofillFeaturePluginTest {
     }
 
     @Test
-    fun whenJsonSpecifiesFeatureIsEnabledThenStoreFeatureEnabled() {
-        testee.store(FEATURE_NAME_VALUE, "autofill.json".loadJson())
-        verify(mockFeatureTogglesRepository).insert(AutofillFeatureToggles(FEATURE_NAME, true, anyOrNull()))
-    }
+    fun whenFeatureNameMatchesAutofillAndIsEnabledThenStoreFeatureEnabled() {
+        val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/autofill.json")
 
-    @Test
-    fun whenJsonSpecifiesFeatureIsDisabledThenStoreFeatureDisabled() {
-        testee.store(FEATURE_NAME_VALUE, "autofill_disabled.json".loadJson())
-        verify(mockFeatureTogglesRepository).insert(AutofillFeatureToggles(FEATURE_NAME, false, anyOrNull()))
-    }
+        testee.store(FEATURE_NAME_VALUE, jsonString)
 
-    @Test
-    fun whenJsonSpecifiesNoMinimumSupportedVersionThenNullSaved() {
-        testee.store(FEATURE_NAME_VALUE, "autofill_no_min_supported_version.json".loadJson())
         verify(mockFeatureTogglesRepository).insert(AutofillFeatureToggles(FEATURE_NAME, true, null))
     }
 
     @Test
-    fun whenJsonSpecifiesMinimumSupportedVersionThenMinVersionIsSaved() {
-        testee.store(FEATURE_NAME_VALUE, "autofill_min_supported_version_specified.json".loadJson())
+    fun whenFeatureNameMatchesAutofillAndIsNotEnabledThenStoreFeatureDisabled() {
+        val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/autofill_disabled.json")
+
+        testee.store(FEATURE_NAME_VALUE, jsonString)
+
+        verify(mockFeatureTogglesRepository).insert(AutofillFeatureToggles(FEATURE_NAME, false, null))
+    }
+
+    @Test
+    fun whenFeatureNameMatchesAutofillAndHasMinSupportedVersionThenStoreMinSupportedVersion() {
+        val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/autofill_min_supported_version.json")
+
+        testee.store(FEATURE_NAME_VALUE, jsonString)
+
         verify(mockFeatureTogglesRepository).insert(AutofillFeatureToggles(FEATURE_NAME, true, 1234))
     }
 
     @Test
-    fun whenJsonHasEmptyExceptionsThenUpdatedWithEmptyList() {
-        testee.store(FEATURE_NAME_VALUE, "autofill_empty_exceptions.json".loadJson())
-        verify(mockAutofillRepository).updateAllExceptions(captor.capture())
-        assertTrue(captor.firstValue.isEmpty())
+    fun whenFeatureNameMatchesAutofillThenUpdateAllExistingExceptions() {
+        val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/autofill.json")
+
+        testee.store(FEATURE_NAME_VALUE, jsonString)
+
+        verify(mockAutofillRepository).updateAllExceptions(anyList())
     }
 
     @Test
-    fun whenJsonHasExceptionsThenExistingExceptionsCleared() {
-        testee.store(FEATURE_NAME_VALUE, "autofill_multiple_exceptions.json".loadJson())
-        verify(mockAutofillRepository).updateAllExceptions(captor.capture())
-        assertEquals(2, captor.firstValue.size)
+    fun whenPersistPrivacyConfigAndPluginMatchesFeatureNameThenStoreCalled() {
+        val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/autofill.json")
+
+        testee.store(FEATURE_NAME_VALUE, jsonString)
+
+        val plugin = pluginPoint.getPlugins().first() as FakeAutofillSubFeaturePluginPlugin
+        assertEquals(1, plugin.count)
     }
 
-    @Test
-    fun whenJsonHasEmptySettingsBlockThenSubfeatureParserNotCalled() {
-        testee.store(FEATURE_NAME_VALUE, "autofill_empty_settings.json".loadJson())
-        verify(mockAutofillSubfeatureParser, never()).processSubfeatures(anyOrNull())
+    class FakeAutofillSubFeaturePluginPluginPoint(private val plugins: List<AutofillSubFeaturePlugin>) : PluginPoint<AutofillSubFeaturePlugin> {
+        override fun getPlugins(): Collection<AutofillSubFeaturePlugin> {
+            return plugins
+        }
     }
 
-    private fun String.loadJson(): String = FileUtilities.loadText(this@AutofillFeaturePluginTest.javaClass.classLoader!!, "json/$this")
+    class FakeAutofillSubFeaturePluginPlugin : AutofillSubFeaturePlugin {
+        var count = 0
+
+        override fun store(
+            rawJson: String,
+        ): Boolean {
+            count++
+            return true
+        }
+
+        override val settingName: AutofillSubfeature = AutofillSubfeatureName.InjectCredentials
+    }
 
     companion object {
         private val FEATURE_NAME = AutofillFeatureName.Autofill

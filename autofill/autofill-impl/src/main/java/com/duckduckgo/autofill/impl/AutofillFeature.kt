@@ -17,9 +17,13 @@
 package com.duckduckgo.autofill.impl
 
 import com.duckduckgo.autofill.store.AutofillExceptionEntity
+import org.json.JSONObject
 
 data class AutofillFeature(
-    val state: String,
+    val state: String?,
     val minSupportedVersion: Int?,
     val exceptions: List<AutofillExceptionEntity>,
+    val settings: Settings?,
 )
+
+data class Settings(val features: Map<String, JSONObject>?)

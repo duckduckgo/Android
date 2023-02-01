@@ -17,6 +17,7 @@
 package com.duckduckgo.autofill.impl.feature.plugin
 
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.autofill.impl.autofillFeatureValueOf
 import com.duckduckgo.autofill.store.feature.AutofillFeatureToggleRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureTogglesPlugin
@@ -33,7 +34,7 @@ class AutofillFeatureTogglesPlugin @Inject constructor(
         featureName: String,
         defaultValue: Boolean,
     ): Boolean? {
-        val autofillElement = getAutofillElement(featureName) ?: return null
+        val autofillElement = autofillFeatureValueOf(featureName) ?: return null
         return configRepository.get(autofillElement, defaultValue) &&
             appBuildConfig.versionCode >= configRepository.getMinSupportedVersion(autofillElement)
     }

@@ -17,9 +17,9 @@
 package com.duckduckgo.autofill.impl.feature.settings
 
 import com.duckduckgo.autofill.api.feature.AutofillSubfeature
-import com.duckduckgo.autofill.api.feature.AutofillSubfeatureName.AccessCredentialManagement
-import com.duckduckgo.autofill.impl.feature.plugin.AutofillSubfeaturePlugin
-import com.duckduckgo.autofill.impl.feature.plugin.getAutofillSubfeatureElement
+import com.duckduckgo.autofill.api.feature.AutofillSubfeatureName.InjectCredentials
+import com.duckduckgo.autofill.impl.autofillSubFeatureValueOf
+import com.duckduckgo.autofill.impl.feature.plugin.AutofillSubFeaturePlugin
 import com.duckduckgo.autofill.store.feature.AutofillFeatureToggleRepository
 import com.duckduckgo.autofill.store.feature.AutofillSubfeatureToggle
 import com.duckduckgo.di.scopes.AppScope
@@ -30,29 +30,29 @@ import timber.log.Timber
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = AutofillSubfeaturePlugin::class,
+    boundType = AutofillSubFeaturePlugin::class,
 )
-class AutofillSubfeatureConfigProcessorAccessCredentialManagementScreen @Inject constructor(
+class AutofillSubFeatureConfigProcessorInjectCredentials @Inject constructor(
     private val repository: AutofillFeatureToggleRepository,
     moshi: Moshi,
-) : AutofillSubfeaturePlugin {
+) : AutofillSubFeaturePlugin {
 
     private data class JsonConfigModel(
         val state: String?,
         val minSupportedVersion: Int?,
     )
 
-    override val settingName: AutofillSubfeature = AccessCredentialManagement
+    override val settingName: AutofillSubfeature = InjectCredentials
     private val jsonAdapter = moshi.adapter(JsonConfigModel::class.java)
 
     override fun store(rawJson: String): Boolean {
-        val subfeatureElement = getAutofillSubfeatureElement(settingName.value) ?: return false
+        val subFeatureElement = autofillSubFeatureValueOf(settingName.value) ?: return false
         Timber.v("Received autofill subfeature configuration: %s", rawJson)
-        parseSubfeature(rawJson)?.let { jsonConfig ->
+        parseSubFeature(rawJson)?.let { jsonConfig ->
 
             repository.insert(
                 AutofillSubfeatureToggle(
-                    featureName = subfeatureElement,
+                    featureName = subFeatureElement,
                     enabled = jsonConfig.state == "enabled",
                     minSupportedVersion = jsonConfig.minSupportedVersion,
                 ),
@@ -63,7 +63,7 @@ class AutofillSubfeatureConfigProcessorAccessCredentialManagementScreen @Inject 
         return false
     }
 
-    private fun parseSubfeature(rawJson: String): JsonConfigModel? {
+    private fun parseSubFeature(rawJson: String): JsonConfigModel? {
         runCatching {
             return jsonAdapter.fromJson(rawJson)
         }.onFailure {
