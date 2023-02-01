@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autofill.impl.feature.plugin
 
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.autofill.api.feature.AutofillFeatureName
 import com.duckduckgo.autofill.api.feature.AutofillSubfeature
@@ -81,6 +82,11 @@ class AutofillFeaturePlugin @Inject constructor(
     }
 }
 
+@ContributesPluginPoint(
+    scope = AppScope::class,
+    boundType = AutofillSubFeaturePlugin::class,
+)
+@Suppress("unused")
 interface AutofillSubFeaturePlugin {
     fun store(rawJson: String): Boolean
     val settingName: AutofillSubfeature
