@@ -54,7 +54,11 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-class NotifyMeView : FrameLayout {
+class NotifyMeView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = R.style.Widget_DuckDuckGo_NotifyMeView,
+    ) : FrameLayout (context, attrs, defStyleAttr) {
 
     constructor(context: Context) : this(context, null)
 
