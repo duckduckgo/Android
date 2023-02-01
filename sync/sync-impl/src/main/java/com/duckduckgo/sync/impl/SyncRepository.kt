@@ -16,8 +16,10 @@
 
 package com.duckduckgo.sync.impl
 
+import androidx.annotation.WorkerThread
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.crypto.AccountKeys
+import com.duckduckgo.sync.crypto.LoginKeys
 import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
@@ -28,6 +30,7 @@ import timber.log.Timber
 
 interface SyncRepository {
     fun createAccount(): Result<Boolean>
+    fun login(): Result<Boolean>
     fun getAccountInfo(): AccountInfo
     fun storeRecoveryCode()
     fun removeAccount()
@@ -37,6 +40,7 @@ interface SyncRepository {
 }
 
 @ContributesBinding(AppScope::class)
+@WorkerThread
 class AppSyncRepository @Inject constructor(
     private val syncDeviceIds: SyncDeviceIds,
     private val nativeLib: SyncLib,
@@ -79,6 +83,44 @@ class AppSyncRepository @Inject constructor(
         }
     }
 
+    override fun login(): Result<Boolean> {
+        val recoveryCode = getRecoveryCode() ?: return Result.Error(reason = "Not valid Or existing recovery code")
+
+        val primaryKey = recoveryCode.primaryKey
+        val userId = recoveryCode.userID
+        val deviceId = syncDeviceIds.deviceId()
+        val deviceName = syncDeviceIds.deviceName()
+
+        val preLogin: LoginKeys = nativeLib.prepareForLogin(primaryKey)
+        if (preLogin.result != 0L) return Result.Error(code = preLogin.result.toInt(), reason = "Account keys failed")
+
+        val result =
+            syncApi.login(
+                userID = userId,
+                hashedPassword = preLogin.passwordHash,
+                deviceId = deviceId,
+                deviceName = deviceName,
+            )
+
+        return when (result) {
+            is Result.Error -> {
+                result
+            }
+            is Result.Success -> {
+                val decryptResult = nativeLib.decrypt(result.data.protected_encryption_key, preLogin.stretchedPrimaryKey)
+                if (decryptResult.result != 0L) return Result.Error(code = decryptResult.result.toInt(), reason = "Decrypt failed")
+                Timber.i("SYNC decrypt: decoded secret Key: ${decryptResult.decryptedData}")
+                syncStore.userId = userId
+                syncStore.deviceId = deviceId
+                syncStore.deviceName = deviceName
+                syncStore.token = result.data.token
+                syncStore.primaryKey = preLogin.primaryKey
+                syncStore.secretKey = decryptResult.decryptedData
+                Result.Success(true)
+            }
+        }
+    }
+
     override fun getAccountInfo(): AccountInfo {
         if (!isSignedIn()) return AccountInfo()
 
@@ -87,6 +129,8 @@ class AppSyncRepository @Inject constructor(
             deviceName = syncStore.deviceName.orEmpty(),
             deviceId = syncStore.deviceId.orEmpty(),
             isSignedIn = isSignedIn(),
+            primaryKey = syncStore.primaryKey.orEmpty(),
+            secretKey = syncStore.secretKey.orEmpty(),
         )
     }
 
@@ -99,8 +143,13 @@ class AppSyncRepository @Inject constructor(
         syncStore.recoveryCode = recoveryCodeJson
     }
 
+    private fun getRecoveryCode(): RecoveryCode? {
+        val recoveryCodeJson = syncStore.recoveryCode ?: return null
+        return Adapters.recoveryCodeAdapter.fromJson(recoveryCodeJson)
+    }
+
     override fun removeAccount() {
-        syncStore.clearAll()
+        syncStore.clearAll(keepRecoveryCode = false)
     }
 
     override fun logout(): Result<Boolean> {
@@ -131,7 +180,6 @@ class AppSyncRepository @Inject constructor(
                 Timber.i("SYNC deleteAccount failed $result")
                 result
             }
-
             is Result.Success -> {
                 syncStore.clearAll()
                 Result.Success(true)
@@ -159,6 +207,8 @@ data class AccountInfo(
     val deviceName: String = "",
     val deviceId: String = "",
     val isSignedIn: Boolean = false,
+    val primaryKey: String = "",
+    val secretKey: String = "",
 )
 
 data class RecoveryCode(

@@ -41,7 +41,19 @@ interface SyncService {
     fun deleteAccount(
         @Header("Authorization") token: String,
     ): Call<Void>
+
+    @POST("https://dev-sync-use.duckduckgo.com/sync/login")
+    fun login(
+        @Body request: Login,
+    ): Call<LoginResponse>
 }
+
+data class Login(
+    val user_id: String,
+    val hashed_password: String,
+    val device_id: String,
+    val device_name: String,
+)
 
 data class Signup(
     val user_id: String,
@@ -58,6 +70,18 @@ data class Logout(
 data class AccountCreatedResponse(
     val user_id: String,
     val token: String,
+)
+
+data class LoginResponse(
+    val token: String,
+    val protected_encryption_key: String,
+    val devices: List<Device>,
+)
+
+data class Device(
+    val device_id: String,
+    val device_name: String,
+    val jw_iat: String,
 )
 
 data class ErrorResponse(

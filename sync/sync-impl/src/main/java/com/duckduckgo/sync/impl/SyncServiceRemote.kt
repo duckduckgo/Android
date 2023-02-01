@@ -33,6 +33,13 @@ interface SyncApi {
         deviceName: String,
     ): Result<AccountCreatedResponse>
 
+    fun login(
+        userID: String,
+        hashedPassword: String,
+        deviceId: String,
+        deviceName: String,
+    ): Result<LoginResponse>
+
     fun logout(
         token: String,
         deviceId: String,
@@ -104,6 +111,40 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
 
         return onSuccess(response) {
             Result.Success(true)
+        }
+    }
+
+    override fun login(
+        userID: String,
+        hashedPassword: String,
+        deviceId: String,
+        deviceName: String,
+    ): Result<LoginResponse> {
+        val response = runCatching {
+            val call = syncService.login(
+                Login(
+                    user_id = userID,
+                    hashed_password = hashedPassword,
+                    device_id = deviceId,
+                    device_name = deviceName,
+                ),
+            )
+            call.execute()
+        }.getOrElse { throwable ->
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            val token = response.body()?.token ?: throw IllegalStateException("Empty token")
+            val protectedEncryptionKey = response.body()?.protected_encryption_key ?: throw IllegalStateException("Empty PEK")
+
+            Result.Success(
+                LoginResponse(
+                    token = token,
+                    protected_encryption_key = protectedEncryptionKey,
+                    devices = emptyList(),
+                ),
+            )
         }
     }
 
