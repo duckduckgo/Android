@@ -57,41 +57,8 @@ import kotlinx.coroutines.flow.onEach
 class NotifyMeView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = R.style.Widget_DuckDuckGo_NotifyMeView,
-    ) : FrameLayout (context, attrs, defStyleAttr) {
-
-    constructor(context: Context) : this(context, null)
-
-    constructor(
-        context: Context,
-        attrs: AttributeSet?,
-    ) : this(
-        context,
-        attrs,
-        R.style.Widget_DuckDuckGo_NotifyMeView,
-    )
-
-    constructor(
-        context: Context,
-        attrs: AttributeSet?,
-        defStyle: Int,
-    ) : super(context, attrs, defStyle) {
-
-        val attributes = context.obtainStyledAttributes(attrs, R.styleable.NotifyMeView)
-
-        setTitle(attributes.getString(R.styleable.NotifyMeView_primaryText) ?: "")
-        setSubtitle(attributes.getString(R.styleable.NotifyMeView_secondaryText) ?: "")
-
-        binding.notifyMeClose.setOnClickListener {
-            viewModel.onCloseButtonClicked()
-        }
-
-        binding.notifyMeButton.setOnClickListener {
-            viewModel.onNotifyMeButtonClicked()
-        }
-
-        attributes.recycle()
-    }
+    defStyle: Int = 0,
+) : FrameLayout(context, attrs, defStyle) {
 
     private var listener: NotifyMeListener? = null
     private var coroutineScope: CoroutineScope? = null
@@ -101,6 +68,19 @@ class NotifyMeView @JvmOverloads constructor(
     private val viewModel by lazy {
         val factory = NotifyMeViewModel.Factory(findViewTreeSavedStateRegistryOwner()!!)
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, factory)[NotifyMeViewModel::class.java]
+    }
+
+    init {
+        val attributes = context.obtainStyledAttributes(attrs, R.styleable.NotifyMeView)
+        setTitle(attributes.getString(R.styleable.NotifyMeView_primaryText) ?: "")
+        setSubtitle(attributes.getString(R.styleable.NotifyMeView_secondaryText) ?: "")
+        binding.notifyMeClose.setOnClickListener {
+            viewModel.onCloseButtonClicked()
+        }
+        binding.notifyMeButton.setOnClickListener {
+            viewModel.onNotifyMeButtonClicked()
+        }
+        attributes.recycle()
     }
 
     override fun onAttachedToWindow() {

@@ -538,7 +538,4 @@
         <item name="android:textColor">@color/emptyFavoriteActionTextColor</item>
     </style>
 
-    <!-- Notify Me component -->
-    <style name="Widget.DuckDuckGo.NotifyMeView"/>
-
 </resources>
