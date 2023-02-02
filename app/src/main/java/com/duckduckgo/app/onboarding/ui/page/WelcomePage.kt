@@ -215,7 +215,7 @@ class WelcomePage : OnboardingPageFragment() {
         private const val MAX_ALPHA = 1f
         private const val ANIMATION_DURATION = 400L
         private const val ANIMATION_DELAY = 1400L
-        private const val ANIMATION_DELAY_AFTER_NOTIFICATIONS_PERMISSIONS_HANDLED = 400L
+        private const val ANIMATION_DELAY_AFTER_NOTIFICATIONS_PERMISSIONS_HANDLED = 800L
 
         private const val DEFAULT_BROWSER_ROLE_MANAGER_DIALOG = 101
     }
