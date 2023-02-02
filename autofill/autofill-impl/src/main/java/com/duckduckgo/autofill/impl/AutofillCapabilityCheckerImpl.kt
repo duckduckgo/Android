@@ -89,7 +89,7 @@ class AutofillCapabilityCheckerImpl @Inject constructor(
         defaultValue: Boolean,
     ): Boolean {
         return withContext(dispatcherProvider.io()) {
-            autofillFeatureToggle.isFeatureEnabled(subfeature, defaultValue = defaultValue)
+            autofillFeatureToggle.isFeatureEnabled(subfeature.value, defaultValue) == true
         }
     }
 

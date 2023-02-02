@@ -18,11 +18,11 @@ package com.duckduckgo.autofill.api.feature
 
 interface AutofillFeatureToggle {
     /**
-     * This method takes a [featureName] and optionally a default value.
-     * @return `true` if the feature is enabled, `false` if is not
+     * This method takes a [featureName] for a corresponding [AutofillSubfeatureName] and optionally a default value.
+     * @return `true` if the feature is enabled, `false` if is not, or `null` if we have no data for the given feature.
      */
     fun isFeatureEnabled(
-        featureName: AutofillSubfeatureName,
+        featureName: String,
         defaultValue: Boolean = true,
-    ): Boolean
+    ): Boolean?
 }

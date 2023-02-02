@@ -156,8 +156,8 @@ class AutofillCapabilityCheckerAccessCredentialManagmentScreenSubFeatureTest(
     }
 
     private fun configureSubfeatureRemoteConfig(subfeatureRemotelyEnabled: Boolean) {
-        whenever(autofillFeatureToggle.isFeatureEnabled(testCase.subfeature)).thenReturn(subfeatureRemotelyEnabled)
-        whenever(autofillFeatureToggle.isFeatureEnabled(eq(testCase.subfeature), any())).thenReturn(subfeatureRemotelyEnabled)
+        whenever(autofillFeatureToggle.isFeatureEnabled(testCase.subfeature.value)).thenReturn(subfeatureRemotelyEnabled)
+        whenever(autofillFeatureToggle.isFeatureEnabled(eq(testCase.subfeature.value), any())).thenReturn(subfeatureRemotelyEnabled)
     }
 
     private fun configureInternalTester(internalTester: Boolean) {
