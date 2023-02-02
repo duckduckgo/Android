@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autofill.impl.feature
 
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.autofill.api.feature.AutofillFeatureName.Autofill
 import com.duckduckgo.autofill.api.feature.AutofillFeatureToggle
@@ -26,6 +27,7 @@ import com.duckduckgo.feature.toggles.api.FeatureToggle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
@@ -39,6 +41,10 @@ import org.mockito.kotlin.whenever
 class AutofillCapabilityCheckerAccessCredentialManagmentScreenSubFeatureTest(
     private val testCase: TestCase,
 ) {
+
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
+
     private val featureToggle: FeatureToggle = mock()
     private val autofillFeatureToggle: AutofillFeatureToggle = mock()
     private val internalTestUserChecker: InternalTestUserChecker = mock()
@@ -49,6 +55,7 @@ class AutofillCapabilityCheckerAccessCredentialManagmentScreenSubFeatureTest(
         autofillFeatureToggle = autofillFeatureToggle,
         internalTestUserChecker = internalTestUserChecker,
         autofillGlobalCapabilityChecker = autofillGlobalCapabilityChecker,
+        dispatcherProvider = coroutineTestRule.testDispatcherProvider,
     )
 
     @Test

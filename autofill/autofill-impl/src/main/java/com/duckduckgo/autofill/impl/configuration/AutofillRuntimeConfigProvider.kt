@@ -48,8 +48,8 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
         val contentScope = runtimeConfigurationWriter.generateContentScope()
         val userUnprotectedDomains = runtimeConfigurationWriter.generateUserUnprotectedDomains()
         val userPreferences = runtimeConfigurationWriter.generateUserPreferences(
-            autofillCredentials = autofillCapabilityChecker.canInjectCredentialsToWebView(),
-            credentialSaving = autofillCapabilityChecker.canSaveCredentialsFromWebView(),
+            autofillCredentials = canInjectCredentials(url),
+            credentialSaving = canSaveCredentials(url),
             showInlineKeyIcon = true,
         )
         val availableInputTypes = generateAvailableInputTypes(url)
@@ -72,7 +72,7 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
     }
 
     private suspend fun determineIfCredentialsAvailable(url: String?): AvailableInputTypeCredentials {
-        return if (url == null || !determineIfAutofillEnabled()) {
+        return if (url == null || !autofillCapabilityChecker.canInjectCredentialsToWebView(url)) {
             AvailableInputTypeCredentials(username = false, password = false)
         } else {
             val savedCredentials = autofillStore.getCredentials(url)
@@ -84,8 +84,14 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
         }
     }
 
-    private suspend fun determineIfAutofillEnabled(): Boolean {
-        return autofillCapabilityChecker.isAutofillEnabledByConfiguration() && autofillCapabilityChecker.isAutofillEnabledByUser()
+    private suspend fun canInjectCredentials(url: String?): Boolean {
+        if (url == null) return false
+        return autofillCapabilityChecker.canInjectCredentialsToWebView(url)
+    }
+
+    private suspend fun canSaveCredentials(url: String?): Boolean {
+        if (url == null) return false
+        return autofillCapabilityChecker.canSaveCredentialsFromWebView(url)
     }
 
     private fun determineIfEmailAvailable(): Boolean = emailManager.isSignedIn()

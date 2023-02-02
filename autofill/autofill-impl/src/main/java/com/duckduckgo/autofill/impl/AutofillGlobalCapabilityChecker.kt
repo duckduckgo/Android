@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autofill.impl
 
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.autofill.api.feature.AutofillFeatureName.Autofill
 import com.duckduckgo.autofill.api.store.AutofillStore
@@ -24,10 +25,11 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
 
 interface AutofillGlobalCapabilityChecker {
     suspend fun isSecureAutofillAvailable(): Boolean
-    suspend fun isAutofillEnabledByConfiguration(): Boolean
+    suspend fun isAutofillEnabledByConfiguration(url: String): Boolean
     suspend fun isAutofillEnabledByUser(): Boolean
 }
 
@@ -37,22 +39,31 @@ class AutofillGlobalCapabilityCheckerImpl @Inject constructor(
     private val internalTestUserChecker: InternalTestUserChecker,
     private val autofillStore: AutofillStore,
     private val deviceAuthenticator: DeviceAuthenticator,
+    private val autofill: com.duckduckgo.autofill.api.Autofill,
+    private val dispatcherProvider: DispatcherProvider,
 ) : AutofillGlobalCapabilityChecker {
 
     override suspend fun isSecureAutofillAvailable(): Boolean {
-        if (!autofillStore.autofillAvailable) return false
-        if (!deviceAuthenticator.hasValidDeviceAuthentication()) return false
-        return true
+        return withContext(dispatcherProvider.io()) {
+            if (!autofillStore.autofillAvailable) return@withContext false
+            if (!deviceAuthenticator.hasValidDeviceAuthentication()) return@withContext false
+            return@withContext true
+        }
     }
 
-    override suspend fun isAutofillEnabledByConfiguration(): Boolean {
-        return isInternalTester() || isGlobalFeatureEnabled()
+    override suspend fun isAutofillEnabledByConfiguration(url: String): Boolean {
+        return withContext(dispatcherProvider.io()) {
+            (isInternalTester() || isGlobalFeatureEnabled()) && !isAnException(url)
+        }
     }
 
     override suspend fun isAutofillEnabledByUser(): Boolean {
-        return autofillStore.autofillEnabled
+        return withContext(dispatcherProvider.io()) {
+            autofillStore.autofillEnabled
+        }
     }
 
+    private fun isAnException(url: String): Boolean = autofill.isAnException(url)
     private fun isInternalTester() = internalTestUserChecker.isInternalTestUser
     private fun isGlobalFeatureEnabled() = featureToggle.isFeatureEnabled(Autofill.value, defaultValue = false)
 }

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autofill.impl.feature
 
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.autofill.api.feature.AutofillFeatureToggle
 import com.duckduckgo.autofill.api.feature.AutofillSubfeatureName
@@ -26,6 +27,7 @@ import com.duckduckgo.feature.toggles.api.FeatureToggle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
@@ -39,6 +41,10 @@ import org.mockito.kotlin.whenever
 class AutofillCapabilityCheckerInjectCredentialsSubFeatureTest(
     private val testCase: TestCase,
 ) {
+
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
+
     private val featureToggle: FeatureToggle = mock()
     private val autofillFeatureToggle: AutofillFeatureToggle = mock()
     private val internalTestUserChecker: InternalTestUserChecker = mock()
@@ -49,6 +55,7 @@ class AutofillCapabilityCheckerInjectCredentialsSubFeatureTest(
         internalTestUserChecker = internalTestUserChecker,
         autofillGlobalCapabilityChecker = autofillGlobalCapabilityChecker,
         featureToggle = featureToggle,
+        dispatcherProvider = coroutineTestRule.testDispatcherProvider,
     )
 
     @Test
@@ -62,7 +69,7 @@ class AutofillCapabilityCheckerInjectCredentialsSubFeatureTest(
         assertEquals(
             String.format("Expected feature state wrong for scenario %s\n", testCase.scenario),
             testCase.expectFeatureEnabled,
-            testee.canInjectCredentialsToWebView(),
+            testee.canInjectCredentialsToWebView("example.com"),
         )
     }
 
@@ -423,7 +430,7 @@ class AutofillCapabilityCheckerInjectCredentialsSubFeatureTest(
         } else {
             isGloballyEnabled
         }
-        whenever(autofillGlobalCapabilityChecker.isAutofillEnabledByConfiguration()).thenReturn(globallyEnabled)
+        whenever(autofillGlobalCapabilityChecker.isAutofillEnabledByConfiguration(any())).thenReturn(globallyEnabled)
     }
 
     data class TestCase(

@@ -91,14 +91,14 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     override fun getAutofillData(requestString: String) {
         Timber.v("BrowserAutofill: getAutofillData called:\n%s", requestString)
         getAutofillDataJob += coroutineScope.launch(dispatcherProvider.default()) {
-            if (!autofillCapabilityChecker.canInjectCredentialsToWebView()) {
-                Timber.v("BrowserAutofill: getAutofillData called but feature is disabled")
-                return@launch
-            }
-
             val url = currentUrlProvider.currentUrl(webView)
             if (url == null) {
                 Timber.w("Can't autofill as can't retrieve current URL")
+                return@launch
+            }
+
+            if (!autofillCapabilityChecker.canInjectCredentialsToWebView(url)) {
+                Timber.v("BrowserAutofill: getAutofillData called but feature is disabled")
                 return@launch
             }
 
@@ -153,12 +153,13 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
         Timber.i("storeFormData called, credentials provided to be persisted")
 
         storeFormDataJob += coroutineScope.launch(dispatcherProvider.default()) {
-            if (!autofillCapabilityChecker.canSaveCredentialsFromWebView()) {
+            val currentUrl = currentUrlProvider.currentUrl(webView) ?: return@launch
+
+            if (!autofillCapabilityChecker.canSaveCredentialsFromWebView(currentUrl)) {
                 Timber.v("BrowserAutofill: storeFormData called but feature is disabled")
                 return@launch
             }
 
-            val currentUrl = currentUrlProvider.currentUrl(webView) ?: return@launch
             val title = autofillDomainFormatter.extractDomain(currentUrl)
 
             val request = requestParser.parseStoreFormDataRequest(data)

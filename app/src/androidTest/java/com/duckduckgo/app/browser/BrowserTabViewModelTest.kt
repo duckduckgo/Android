@@ -4494,11 +4494,9 @@ class BrowserTabViewModelTest {
     private fun accessibilityViewState() = testee.accessibilityViewState.value!!
 
     class FakeCapabilityChecker(private val enabled: Boolean) : AutofillCapabilityChecker {
-        override suspend fun isAutofillEnabledByConfiguration() = enabled
-        override suspend fun isAutofillEnabledByUser() = enabled
-        override suspend fun isSecureAutofillAvailable() = enabled
-        override suspend fun canInjectCredentialsToWebView() = enabled
-        override suspend fun canSaveCredentialsFromWebView() = enabled
+        override suspend fun isAutofillEnabledByConfiguration(url: String) = enabled
+        override suspend fun canInjectCredentialsToWebView(url: String) = enabled
+        override suspend fun canSaveCredentialsFromWebView(url: String) = enabled
         override suspend fun canAccessCredentialManagementScreen() = enabled
     }
 }

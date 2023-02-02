@@ -70,9 +70,9 @@ class AutofillStoredBackJavascriptInterfaceTest {
 
     @Before
     fun setUp() = runTest {
-        whenever(autofillCapabilityChecker.isAutofillEnabledByConfiguration()).thenReturn(true)
-        whenever(autofillCapabilityChecker.canInjectCredentialsToWebView()).thenReturn(true)
-        whenever(autofillCapabilityChecker.canSaveCredentialsFromWebView()).thenReturn(true)
+        whenever(autofillCapabilityChecker.isAutofillEnabledByConfiguration(any())).thenReturn(true)
+        whenever(autofillCapabilityChecker.canInjectCredentialsToWebView(any())).thenReturn(true)
+        whenever(autofillCapabilityChecker.canSaveCredentialsFromWebView(any())).thenReturn(true)
         testee = AutofillStoredBackJavascriptInterface(
             requestParser = requestParser,
             autofillStore = autofillStore,

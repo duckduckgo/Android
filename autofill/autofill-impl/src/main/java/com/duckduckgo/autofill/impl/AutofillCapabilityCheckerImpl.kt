@@ -16,10 +16,12 @@
 
 package com.duckduckgo.autofill.impl
 
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.autofill.api.feature.AutofillFeatureName.Autofill
 import com.duckduckgo.autofill.api.feature.AutofillFeatureToggle
+import com.duckduckgo.autofill.api.feature.AutofillSubfeatureName
 import com.duckduckgo.autofill.api.feature.AutofillSubfeatureName.AccessCredentialManagement
 import com.duckduckgo.autofill.api.feature.AutofillSubfeatureName.InjectCredentials
 import com.duckduckgo.autofill.api.feature.AutofillSubfeatureName.SaveCredentials
@@ -27,6 +29,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
 
 @ContributesBinding(AppScope::class)
 class AutofillCapabilityCheckerImpl @Inject constructor(
@@ -34,30 +37,27 @@ class AutofillCapabilityCheckerImpl @Inject constructor(
     private val autofillFeatureToggle: AutofillFeatureToggle,
     private val internalTestUserChecker: InternalTestUserChecker,
     private val autofillGlobalCapabilityChecker: AutofillGlobalCapabilityChecker,
+    private val dispatcherProvider: DispatcherProvider,
 ) : AutofillCapabilityChecker {
 
-    override suspend fun isAutofillEnabledByConfiguration(): Boolean = autofillGlobalCapabilityChecker.isAutofillEnabledByConfiguration()
-    override suspend fun isSecureAutofillAvailable(): Boolean = autofillGlobalCapabilityChecker.isSecureAutofillAvailable()
-    override suspend fun isAutofillEnabledByUser(): Boolean = autofillGlobalCapabilityChecker.isAutofillEnabledByUser()
-
-    override suspend fun canInjectCredentialsToWebView(): Boolean {
+    override suspend fun canInjectCredentialsToWebView(url: String): Boolean {
         if (!isSecureAutofillAvailable()) return false
-        if (!isAutofillEnabledByConfiguration()) return false
+        if (!isAutofillEnabledByConfiguration(url)) return false
         if (!isAutofillEnabledByUser()) return false
 
         if (isInternalTester()) return true
 
-        return autofillFeatureToggle.isFeatureEnabled(InjectCredentials, defaultValue = false)
+        return isSubfeatureEnabled(InjectCredentials, defaultValue = false)
     }
 
-    override suspend fun canSaveCredentialsFromWebView(): Boolean {
+    override suspend fun canSaveCredentialsFromWebView(url: String): Boolean {
         if (!isSecureAutofillAvailable()) return false
-        if (!isAutofillEnabledByConfiguration()) return false
+        if (!isAutofillEnabledByConfiguration(url)) return false
         if (!isAutofillEnabledByUser()) return false
 
         if (isInternalTester()) return true
 
-        return autofillFeatureToggle.isFeatureEnabled(SaveCredentials, defaultValue = false)
+        return isSubfeatureEnabled(SaveCredentials, defaultValue = false)
     }
 
     /**
@@ -69,10 +69,33 @@ class AutofillCapabilityCheckerImpl @Inject constructor(
     override suspend fun canAccessCredentialManagementScreen(): Boolean {
         if (isInternalTester()) return true
         if (!isGlobalFeatureEnabled()) return false
-
-        return autofillFeatureToggle.isFeatureEnabled(AccessCredentialManagement, defaultValue = false)
+        return isSubfeatureEnabled(AccessCredentialManagement, defaultValue = false)
     }
 
-    private fun isInternalTester() = internalTestUserChecker.isInternalTestUser
-    private fun isGlobalFeatureEnabled() = featureToggle.isFeatureEnabled(Autofill.value, defaultValue = false)
+    private suspend fun isInternalTester(): Boolean {
+        return withContext(dispatcherProvider.io()) {
+            internalTestUserChecker.isInternalTestUser
+        }
+    }
+
+    private suspend fun isGlobalFeatureEnabled(): Boolean {
+        return withContext(dispatcherProvider.io()) {
+            featureToggle.isFeatureEnabled(Autofill.value, defaultValue = false)
+        }
+    }
+
+    private suspend fun isSubfeatureEnabled(
+        subfeature: AutofillSubfeatureName,
+        defaultValue: Boolean,
+    ): Boolean {
+        return withContext(dispatcherProvider.io()) {
+            autofillFeatureToggle.isFeatureEnabled(subfeature, defaultValue = defaultValue)
+        }
+    }
+
+    override suspend fun isAutofillEnabledByConfiguration(url: String) = autofillGlobalCapabilityChecker.isAutofillEnabledByConfiguration(url)
+
+    private suspend fun isSecureAutofillAvailable() = autofillGlobalCapabilityChecker.isSecureAutofillAvailable()
+
+    private suspend fun isAutofillEnabledByUser() = autofillGlobalCapabilityChecker.isAutofillEnabledByUser()
 }

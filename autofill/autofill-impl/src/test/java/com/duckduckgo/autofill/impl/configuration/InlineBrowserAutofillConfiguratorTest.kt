@@ -19,9 +19,7 @@ package com.duckduckgo.autofill.impl.configuration
 import android.webkit.WebView
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.autofill.JavascriptInjector
-import com.duckduckgo.autofill.api.Autofill
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
-import com.duckduckgo.feature.toggles.api.FeatureToggle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -43,8 +41,6 @@ class InlineBrowserAutofillConfiguratorTest {
 
     private val autofillRuntimeConfigProvider: AutofillRuntimeConfigProvider = mock()
     private val javascriptInjector: JavascriptInjector = mock()
-    private val autofill: Autofill = mock()
-    private val featureToggle: FeatureToggle = mock()
     private val webView: WebView = mock()
     private val autofillCapabilityChecker: AutofillCapabilityChecker = mock()
 
@@ -58,7 +54,6 @@ class InlineBrowserAutofillConfiguratorTest {
             javascriptInjector,
             TestScope(),
             coroutineRule.testDispatcherProvider,
-            autofill,
             autofillCapabilityChecker,
         )
     }
@@ -72,36 +67,18 @@ class InlineBrowserAutofillConfiguratorTest {
     }
 
     @Test
-    fun whenFeatureIsEnabledAndUrlIsExceptionThenDoNotInject() = runTest {
-        givenUrlIsAnException()
-        givenFeatureIsEnabled()
-        inlineBrowserAutofillConfigurator.configureAutofillForCurrentPage(webView, "https://example.com")
-
-        verify(webView, never()).evaluateJavascript("javascript:", null)
-    }
-
-    @Test
-    fun whenFeatureIsEnabledAndUrlIsNotExceptionThenInject() = runTest {
-        givenUrlIsNotAnException()
+    fun whenFeatureIsEnabledThenInject() = runTest {
         givenFeatureIsEnabled()
         inlineBrowserAutofillConfigurator.configureAutofillForCurrentPage(webView, "https://example.com")
 
         verify(webView).evaluateJavascript("javascript:", null)
     }
 
-    private fun givenUrlIsAnException() {
-        whenever(autofill.isAnException(any())).thenReturn(true)
-    }
-
-    private fun givenUrlIsNotAnException() {
-        whenever(autofill.isAnException(any())).thenReturn(false)
-    }
-
     private suspend fun givenFeatureIsEnabled() {
-        whenever(autofillCapabilityChecker.isAutofillEnabledByConfiguration()).thenReturn(true)
+        whenever(autofillCapabilityChecker.isAutofillEnabledByConfiguration(any())).thenReturn(true)
     }
 
     private suspend fun givenFeatureIsDisabled() {
-        whenever(autofillCapabilityChecker.isAutofillEnabledByConfiguration()).thenReturn(false)
+        whenever(autofillCapabilityChecker.isAutofillEnabledByConfiguration(any())).thenReturn(false)
     }
 }

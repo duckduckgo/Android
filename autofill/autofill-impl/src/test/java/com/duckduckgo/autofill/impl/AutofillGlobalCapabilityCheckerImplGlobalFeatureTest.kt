@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autofill.impl
 
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.autofill.api.feature.AutofillFeatureName.Autofill
 import com.duckduckgo.autofill.api.feature.AutofillSubfeatureName
@@ -26,6 +27,7 @@ import com.duckduckgo.feature.toggles.api.FeatureToggle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
@@ -40,24 +42,31 @@ class AutofillGlobalCapabilityCheckerImplGlobalFeatureTest(
     private val testCase: TestCase,
 ) {
 
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
+
     private val featureToggle: FeatureToggle = mock()
     private val internalTestUserChecker: InternalTestUserChecker = mock()
     private val autofillStore: AutofillStore = mock()
     private val deviceAuthenticator: DeviceAuthenticator = mock()
+    private val exceptionChecker: com.duckduckgo.autofill.api.Autofill = mock()
 
     private val testee = AutofillGlobalCapabilityCheckerImpl(
         featureToggle = featureToggle,
         internalTestUserChecker = internalTestUserChecker,
         autofillStore = autofillStore,
         deviceAuthenticator = deviceAuthenticator,
+        autofill = exceptionChecker,
+        dispatcherProvider = coroutineTestRule.testDispatcherProvider,
     )
 
     @Test
     fun runParameterizedTests() = runTest {
         configureAsInternalTester(testCase.scenario.isInternalTester)
         configureGlobalAutofillFeatureState(testCase.scenario.isRemotelyEnabled)
+        configureIfUrlIsException(testCase.scenario.urlIsInExceptionList)
 
-        assertEquals("${testCase.scenario}", testCase.expectFeatureEnabled, testee.isAutofillEnabledByConfiguration())
+        assertEquals("${testCase.scenario}", testCase.expectFeatureEnabled, testee.isAutofillEnabledByConfiguration("example.com"))
     }
 
     companion object {
@@ -69,6 +78,7 @@ class AutofillGlobalCapabilityCheckerImplGlobalFeatureTest(
                 TestCase(
                     expectFeatureEnabled = false,
                     scenario = Scenario(
+                        urlIsInExceptionList = false,
                         isInternalTester = false,
                         isRemotelyEnabled = false,
                     ),
@@ -76,6 +86,7 @@ class AutofillGlobalCapabilityCheckerImplGlobalFeatureTest(
                 TestCase(
                     expectFeatureEnabled = true,
                     scenario = Scenario(
+                        urlIsInExceptionList = false,
                         isInternalTester = false,
                         isRemotelyEnabled = true,
                     ),
@@ -83,6 +94,7 @@ class AutofillGlobalCapabilityCheckerImplGlobalFeatureTest(
                 TestCase(
                     expectFeatureEnabled = true,
                     scenario = Scenario(
+                        urlIsInExceptionList = false,
                         isInternalTester = true,
                         isRemotelyEnabled = false,
                     ),
@@ -90,6 +102,39 @@ class AutofillGlobalCapabilityCheckerImplGlobalFeatureTest(
                 TestCase(
                     expectFeatureEnabled = true,
                     scenario = Scenario(
+                        urlIsInExceptionList = false,
+                        isInternalTester = true,
+                        isRemotelyEnabled = true,
+                    ),
+                ),
+                TestCase(
+                    expectFeatureEnabled = false,
+                    scenario = Scenario(
+                        urlIsInExceptionList = true,
+                        isInternalTester = false,
+                        isRemotelyEnabled = false,
+                    ),
+                ),
+                TestCase(
+                    expectFeatureEnabled = false,
+                    scenario = Scenario(
+                        urlIsInExceptionList = true,
+                        isInternalTester = false,
+                        isRemotelyEnabled = true,
+                    ),
+                ),
+                TestCase(
+                    expectFeatureEnabled = false,
+                    scenario = Scenario(
+                        urlIsInExceptionList = true,
+                        isInternalTester = true,
+                        isRemotelyEnabled = false,
+                    ),
+                ),
+                TestCase(
+                    expectFeatureEnabled = false,
+                    scenario = Scenario(
+                        urlIsInExceptionList = true,
                         isInternalTester = true,
                         isRemotelyEnabled = true,
                     ),
@@ -104,6 +149,10 @@ class AutofillGlobalCapabilityCheckerImplGlobalFeatureTest(
         whenever(featureToggle.isFeatureEnabled(eq(Autofill.value), any())).thenReturn(isEnabled)
     }
 
+    private fun configureIfUrlIsException(isException: Boolean) {
+        whenever(exceptionChecker.isAnException(any())).thenReturn(isException)
+    }
+
     private fun configureAsInternalTester(isInternal: Boolean) = whenever(internalTestUserChecker.isInternalTestUser).thenReturn(isInternal)
 
     data class TestCase(
@@ -115,5 +164,6 @@ class AutofillGlobalCapabilityCheckerImplGlobalFeatureTest(
     data class Scenario(
         val isInternalTester: Boolean,
         val isRemotelyEnabled: Boolean,
+        val urlIsInExceptionList: Boolean,
     )
 }

@@ -24,33 +24,22 @@ package com.duckduckgo.autofill.api
 interface AutofillCapabilityChecker {
 
     /**
-     * Whether autofill is configured to be enabled. This is a configuration value, not a user preference.
-     */
-    suspend fun isAutofillEnabledByConfiguration(): Boolean
-
-    /**
-     * Whether autofill is enabled by the user. This is a user preference.
-     */
-    suspend fun isAutofillEnabledByUser(): Boolean
-
-    /**
-     * Whether secure autofill is available. This depends on the user's device capabilities and state.
-     * Not all features of autofill require secure autofill to be available. Those that do can check this value.
-     */
-    suspend fun isSecureAutofillAvailable(): Boolean
-
-    /**
      * Whether autofill can inject credentials into a WebView.
      */
-    suspend fun canInjectCredentialsToWebView(): Boolean
+    suspend fun canInjectCredentialsToWebView(url: String): Boolean
 
     /**
      * Whether autofill can save credentials from a WebView.
      */
-    suspend fun canSaveCredentialsFromWebView(): Boolean
+    suspend fun canSaveCredentialsFromWebView(url: String): Boolean
 
     /**
      * Whether a user can access the credential management screen.
      */
     suspend fun canAccessCredentialManagementScreen(): Boolean
+
+    /**
+     * Whether autofill is configured to be enabled. This is a configuration value, not a user preference.
+     */
+    suspend fun isAutofillEnabledByConfiguration(url: String): Boolean
 }

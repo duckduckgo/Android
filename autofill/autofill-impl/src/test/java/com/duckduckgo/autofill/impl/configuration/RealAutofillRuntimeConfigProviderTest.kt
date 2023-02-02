@@ -312,10 +312,9 @@ class RealAutofillRuntimeConfigProviderTest {
     }
 
     private suspend fun configureAutofillCapabilities(enabled: Boolean) {
-        whenever(autofillCapabilityChecker.isAutofillEnabledByConfiguration()).thenReturn(enabled)
-        whenever(autofillCapabilityChecker.isAutofillEnabledByUser()).thenReturn(enabled)
-        whenever(autofillCapabilityChecker.canInjectCredentialsToWebView()).thenReturn(enabled)
-        whenever(autofillCapabilityChecker.canSaveCredentialsFromWebView()).thenReturn(enabled)
+        whenever(autofillCapabilityChecker.isAutofillEnabledByConfiguration(any())).thenReturn(enabled)
+        whenever(autofillCapabilityChecker.canInjectCredentialsToWebView(any())).thenReturn(enabled)
+        whenever(autofillCapabilityChecker.canSaveCredentialsFromWebView(any())).thenReturn(enabled)
     }
 
     private fun verifyAutofillCredentialsReturnedAs(expectedValue: Boolean) {

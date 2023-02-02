@@ -16,6 +16,8 @@
 
 package com.duckduckgo.autofill.impl
 
+import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.autofill.api.Autofill
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.autofill.api.feature.AutofillSubfeatureName
 import com.duckduckgo.autofill.api.feature.AutofillSubfeatureName.AccessCredentialManagement
@@ -25,6 +27,7 @@ import com.duckduckgo.feature.toggles.api.FeatureToggle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
@@ -37,9 +40,13 @@ class AutofillGlobalCapabilityCheckerImplUserPreferenceTest(
     private val testCase: TestCase,
 ) {
 
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
+
     private val featureToggle: FeatureToggle = mock()
     private val internalTestUserChecker: InternalTestUserChecker = mock()
     private val autofillStore: AutofillStore = mock()
+    private val autofill: Autofill = mock()
     private val deviceAuthenticator: DeviceAuthenticator = mock()
 
     private val testee = AutofillGlobalCapabilityCheckerImpl(
@@ -47,6 +54,8 @@ class AutofillGlobalCapabilityCheckerImplUserPreferenceTest(
         internalTestUserChecker = internalTestUserChecker,
         autofillStore = autofillStore,
         deviceAuthenticator = deviceAuthenticator,
+        autofill = autofill,
+        dispatcherProvider = coroutineTestRule.testDispatcherProvider,
     )
 
     @Test

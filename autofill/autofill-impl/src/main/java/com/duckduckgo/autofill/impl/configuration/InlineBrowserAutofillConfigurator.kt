@@ -20,7 +20,6 @@ import com.duckduckgo.app.autofill.JavascriptInjector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.autofill.api.Autofill
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.BrowserAutofill.Configurator
 import com.duckduckgo.di.scopes.AppScope
@@ -37,7 +36,6 @@ class InlineBrowserAutofillConfigurator @Inject constructor(
     private val javascriptInjector: JavascriptInjector,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
-    private val autofill: Autofill,
     private val autofillCapabilityChecker: AutofillCapabilityChecker,
 ) : Configurator {
     override fun configureAutofillForCurrentPage(
@@ -63,7 +61,7 @@ class InlineBrowserAutofillConfigurator @Inject constructor(
     private suspend fun canJsBeInjected(url: String?): Boolean {
         url?.let {
             // note, we don't check for autofillEnabledByUser here, as the user-facing preference doesn't cover email
-            return autofillCapabilityChecker.isAutofillEnabledByConfiguration() && !autofill.isAnException(url)
+            return autofillCapabilityChecker.isAutofillEnabledByConfiguration(it)
         }
         return false
     }
