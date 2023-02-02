@@ -27,15 +27,17 @@ import java.net.URI
 class TdsClient(
     override val name: Client.ClientName,
     private val trackers: List<TdsTracker>,
+    private val urlToTypeMapper: UrlToTypeMapper,
 ) : Client {
 
     override fun matches(
         url: String,
         documentUrl: String,
+        requestHeaders: Map<String, String>,
     ): Client.Result {
         val cleanedUrl = removePortFromUrl(url)
         val tracker = trackers.firstOrNull { sameOrSubdomain(cleanedUrl, it.domain) } ?: return Client.Result(matches = false, isATracker = false)
-        val matches = matchesTrackerEntry(tracker, cleanedUrl, documentUrl)
+        val matches = matchesTrackerEntry(tracker, cleanedUrl, documentUrl, requestHeaders)
         return Client.Result(
             matches = matches.shouldBlock,
             entityName = tracker.ownerName,
@@ -49,11 +51,14 @@ class TdsClient(
         tracker: TdsTracker,
         url: String,
         documentUrl: String,
+        requestHeaders: Map<String, String>,
     ): MatchedResult {
         tracker.rules.forEach { rule ->
             val regex = ".*${rule.rule}.*".toRegex()
             if (url.matches(regex)) {
-                if (matchedException(rule.exceptions, documentUrl)) {
+                val type = urlToTypeMapper.map(url, requestHeaders)
+
+                if (matchedException(rule.exceptions, documentUrl, type)) {
                     return MatchedResult(shouldBlock = false, isATracker = true)
                 }
                 if (rule.action == IGNORE) {
@@ -75,24 +80,28 @@ class TdsClient(
     private fun matchedException(
         exceptions: RuleExceptions?,
         documentUrl: String,
+        type: String?,
     ): Boolean {
         if (exceptions == null) return false
 
         val domains = exceptions.domains
         val types = exceptions.types
 
-        // We don't support type filtering on android so if the types exist without a domain
-        // we allow the exception through
-        if (domains.isNullOrEmpty() && !types.isNullOrEmpty()) {
-            return true
-        }
+        val matchesDomain = domains?.any { domain -> sameOrSubdomain(documentUrl, domain) }
+        val matchesType = types?.contains(type)
 
-        domains?.forEach {
-            if (sameOrSubdomain(documentUrl, it)) {
-                return true
+        return when {
+            types.isNullOrEmpty() && matchesDomain == true -> {
+                true
             }
+            domains.isNullOrEmpty() && matchesType == true -> {
+                true
+            }
+            matchesDomain == true && matchesType == true -> {
+                true
+            }
+            else -> false
         }
-        return false
     }
 
     private fun removePortFromUrl(url: String): String {

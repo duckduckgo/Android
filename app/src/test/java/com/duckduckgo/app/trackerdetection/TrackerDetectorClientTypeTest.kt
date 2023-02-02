@@ -29,6 +29,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers.anyMap
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -58,8 +59,8 @@ class TrackerDetectorClientTypeTest {
     fun before() {
         whenever(mockUserWhitelistDao.contains(any())).thenReturn(false)
 
-        whenever(mockBlockingClient.matches(eq(Url.BLOCKED), any())).thenReturn(Client.Result(matches = true, isATracker = true))
-        whenever(mockBlockingClient.matches(eq(Url.UNLISTED), any())).thenReturn(Client.Result(matches = false, isATracker = false))
+        whenever(mockBlockingClient.matches(eq(Url.BLOCKED), any(), anyMap())).thenReturn(Client.Result(matches = true, isATracker = true))
+        whenever(mockBlockingClient.matches(eq(Url.UNLISTED), any(), anyMap())).thenReturn(Client.Result(matches = false, isATracker = false))
         whenever(mockBlockingClient.name).thenReturn(Client.ClientName.TDS)
         testee.addClient(mockBlockingClient)
     }
@@ -76,7 +77,7 @@ class TrackerDetectorClientTypeTest {
             status = TrackerStatus.BLOCKED,
             type = TrackerType.OTHER,
         )
-        assertEquals(expected, testee.evaluate(url, documentUrl))
+        assertEquals(expected, testee.evaluate(url, documentUrl, requestHeaders = mapOf()))
     }
 
     @Test
@@ -91,7 +92,7 @@ class TrackerDetectorClientTypeTest {
             status = TrackerStatus.ALLOWED,
             type = TrackerType.OTHER,
         )
-        assertEquals(expected, testee.evaluate(url, documentUrl))
+        assertEquals(expected, testee.evaluate(url, documentUrl, requestHeaders = mapOf()))
     }
 
     companion object {

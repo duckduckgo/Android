@@ -64,6 +64,7 @@ class TrackerDataLoaderTest {
     private val mockTdsMetadataDao: TdsMetadataDao = mock()
     private val mockContext: Context = mock()
     private val mockAppDatabase: AppDatabase = mock()
+    private val mockUrlToTypeMapper: UrlToTypeMapper = mock()
 
     private val runnableCaptor = argumentCaptor<Runnable>()
     private val tdsMetaDataCaptor = argumentCaptor<TdsMetadata>()
@@ -81,6 +82,7 @@ class TrackerDataLoaderTest {
             context = mockContext,
             appDatabase = mockAppDatabase,
             moshi = Moshi.Builder().build(),
+            urlToTypeMapper = mockUrlToTypeMapper,
         )
     }
 
