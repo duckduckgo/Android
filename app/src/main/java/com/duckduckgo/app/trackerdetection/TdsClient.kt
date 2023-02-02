@@ -87,16 +87,21 @@ class TdsClient(
         val domains = exceptions.domains
         val types = exceptions.types
 
-        if (domains.isNullOrEmpty() && !types.isNullOrEmpty()) {
-            return !types.contains(type)
-        }
+        val matchesDomain = domains?.any { domain -> sameOrSubdomain(documentUrl, domain) }
+        val matchesType = types?.contains(type)
 
-        domains?.forEach {
-            if (sameOrSubdomain(documentUrl, it)) {
-                return true
+        return when {
+            types.isNullOrEmpty() && matchesDomain == true -> {
+                true
             }
+            domains.isNullOrEmpty() && matchesType == true -> {
+                true
+            }
+            matchesDomain == true && matchesType == true -> {
+                true
+            }
+            else -> false
         }
-        return false
     }
 
     private fun removePortFromUrl(url: String): String {

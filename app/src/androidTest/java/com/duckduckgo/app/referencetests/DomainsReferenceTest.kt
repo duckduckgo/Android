@@ -180,6 +180,14 @@ class DomainsReferenceTest(private val testCase: TestCase) {
     fun whenReferenceTestRunsItReturnsTheExpectedResult() = runBlocking<Unit> {
         whenever(mockRequest.url).thenReturn(testCase.requestURL.toUri())
 
+        if (testCase.requestType == "script") {
+            whenever(mockRequest.requestHeaders).thenReturn(mapOf(Pair("Accept", "application/javascript")))
+        }
+
+        if (testCase.requestType == "image") {
+            whenever(mockRequest.requestHeaders).thenReturn(mapOf(Pair("Accept", "image/*")))
+        }
+
         val response = testee.shouldIntercept(
             request = mockRequest,
             documentUrl = testCase.siteURL,
