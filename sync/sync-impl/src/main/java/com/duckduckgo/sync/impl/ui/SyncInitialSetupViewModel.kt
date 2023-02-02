@@ -17,35 +17,115 @@
 package com.duckduckgo.sync.impl.ui
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.impl.Result.Error
+import com.duckduckgo.sync.impl.SyncRepository
 import javax.inject.Inject
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
 class SyncInitialSetupViewModel
 @Inject
 constructor(
-    private val syncDeviceIds: SyncDeviceIds,
+    private val syncRepository: SyncRepository,
+    private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
+    private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     private val viewState = MutableStateFlow(ViewState())
     fun viewState(): Flow<ViewState> = viewState.onStart { updateViewState() }
+    fun commands(): Flow<Command> = command.receiveAsFlow()
 
     data class ViewState(
         val userId: String = "",
         val deviceName: String = "",
         val deviceId: String = "",
+        val token: String = "",
+        val isSignedIn: Boolean = false,
+        val primaryKey: String = "",
+        val secretKey: String = "",
+        val protectedEncryptionKey: String = "",
+        val passwordHash: String = "",
     )
 
+    sealed class Command {
+        data class ShowMessage(val message: String) : Command()
+    }
+
+    fun onCreateAccountClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            val result = syncRepository.createAccount()
+            if (result is Error) {
+                command.send(Command.ShowMessage("$result"))
+            }
+            updateViewState()
+        }
+    }
+
+    fun onStoreRecoveryCodeClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            syncRepository.storeRecoveryCode()
+            updateViewState()
+        }
+    }
+
+    fun onResetClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            syncRepository.removeAccount()
+            updateViewState()
+        }
+    }
+
+    fun onLogoutClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            val result = syncRepository.logout()
+            if (result is Error) {
+                command.send(Command.ShowMessage("$result"))
+            }
+            updateViewState()
+        }
+    }
+
+    fun onDeleteAccountClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            val result = syncRepository.deleteAccount()
+            if (result is Error) {
+                command.send(Command.ShowMessage("$result"))
+            }
+            updateViewState()
+        }
+    }
+
+    fun loginAccountClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            val result = syncRepository.login()
+            if (result is Error) {
+                command.send(Command.ShowMessage("$result"))
+            }
+            updateViewState()
+        }
+    }
+
     private suspend fun updateViewState() {
+        val accountInfo = syncRepository.getAccountInfo()
         viewState.emit(
             viewState.value.copy(
-                userId = syncDeviceIds.userId(),
-                deviceName = syncDeviceIds.deviceName(),
-                deviceId = syncDeviceIds.deviceId(),
+                userId = accountInfo.userId,
+                deviceName = accountInfo.deviceName,
+                deviceId = accountInfo.deviceId,
+                isSignedIn = accountInfo.isSignedIn,
+                token = syncRepository.latestToken(),
+                primaryKey = accountInfo.primaryKey,
+                secretKey = accountInfo.secretKey,
             ),
         )
     }

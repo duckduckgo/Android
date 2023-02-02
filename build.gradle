@@ -56,7 +56,7 @@ subprojects {
         }
     }
 
-    String[] allowAndroidTestsIn = ["app"]
+    String[] allowAndroidTestsIn = ["app", "sync-lib"]
     if (!allowAndroidTestsIn.contains(project.name)) {
         project.projectDir.eachFile(groovy.io.FileType.DIRECTORIES) { File parent ->
             if (parent.name == "src") {

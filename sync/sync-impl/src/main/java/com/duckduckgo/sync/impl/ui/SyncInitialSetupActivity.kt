@@ -17,6 +17,8 @@
 package com.duckduckgo.sync.impl.ui
 
 import android.os.Bundle
+import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -39,6 +41,18 @@ class SyncInitialSetupActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
         observeUiEvents()
+        configureListeners()
+    }
+
+    private fun configureListeners() {
+        binding.createAccountButton.setOnClickListener { viewModel.onCreateAccountClicked() }
+        binding.storeRecoveryCodeButton.setOnClickListener {
+            viewModel.onStoreRecoveryCodeClicked()
+        }
+        binding.resetButton.setOnClickListener { viewModel.onResetClicked() }
+        binding.loginAccountButton.setOnClickListener { viewModel.loginAccountClicked() }
+        binding.logoutButton.setOnClickListener { viewModel.onLogoutClicked() }
+        binding.deleteAccountButton.setOnClickListener { viewModel.onDeleteAccountClicked() }
     }
 
     private fun observeUiEvents() {
@@ -47,11 +61,30 @@ class SyncInitialSetupActivity : DuckDuckGoActivity() {
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { viewState -> renderViewState(viewState) }
             .launchIn(lifecycleScope)
+
+        viewModel
+            .commands()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { processCommand(it) }
+            .launchIn(lifecycleScope)
+    }
+
+    private fun processCommand(command: SyncInitialSetupViewModel.Command) {
+        when (command) {
+            is SyncInitialSetupViewModel.Command.ShowMessage -> {
+                Toast.makeText(this, command.message, Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     private fun renderViewState(viewState: ViewState) {
+        binding.uuidsViewGroup.isVisible = viewState.isSignedIn
+        binding.accountStateTextView.isVisible = viewState.isSignedIn
         binding.userIdTextView.text = viewState.userId
         binding.deviceIdTextView.text = viewState.deviceId
+        binding.tokenTextView.text = viewState.token
         binding.deviceNameTextView.text = viewState.deviceName
+        binding.primaryKeyTextView.text = viewState.primaryKey
+        binding.secretKeyTextView.text = viewState.secretKey
     }
 }
