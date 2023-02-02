@@ -19,7 +19,6 @@ package com.duckduckgo.app.trackerdetection
 import android.webkit.MimeTypeMap
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
 import javax.inject.Inject
 
 interface UrlToTypeMapper {
@@ -30,7 +29,6 @@ interface UrlToTypeMapper {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
 class RealUrlToTypeMapper @Inject constructor() : UrlToTypeMapper {
     override fun map(
         url: String,
