@@ -22,15 +22,16 @@ import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.autofill.api.feature.AutofillFeatureName
 import com.duckduckgo.autofill.api.feature.AutofillSubfeature
 import com.duckduckgo.autofill.api.feature.AutofillSubfeatureName
+import com.duckduckgo.autofill.api.feature.AutofillSubfeatureName.AccessCredentialManagement
+import com.duckduckgo.autofill.api.feature.AutofillSubfeatureName.InjectCredentials
+import com.duckduckgo.autofill.api.feature.AutofillSubfeatureName.SaveCredentials
 import com.duckduckgo.autofill.impl.feature.plugin.AutofillFeaturePlugin
 import com.duckduckgo.autofill.impl.feature.plugin.AutofillSubFeaturePlugin
 import com.duckduckgo.autofill.store.feature.AutofillFeatureRepository
 import com.duckduckgo.autofill.store.feature.AutofillFeatureToggleRepository
 import com.duckduckgo.autofill.store.feature.AutofillFeatureToggles
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyList
@@ -43,19 +44,16 @@ class AutofillFeaturePluginTest {
 
     private val mockFeatureTogglesRepository: AutofillFeatureToggleRepository = mock()
     private val mockAutofillRepository: AutofillFeatureRepository = mock()
-    private val pluginPoint = FakeAutofillSubFeaturePluginPluginPoint(listOf(FakeAutofillSubFeaturePluginPlugin()))
 
-    @Before
-    fun before() {
-        testee = AutofillFeaturePlugin(
-            autofillFeatureRepository = mockAutofillRepository,
-            autofillFeatureToggleRepository = mockFeatureTogglesRepository,
-            pluginPoint = pluginPoint,
-        )
-    }
+    private val injectCredentialsFeaturePlugin = FakeAutofillSubFeaturePluginPlugin(InjectCredentials)
+    private val accessCredentialScreenFeaturePlugin = FakeAutofillSubFeaturePluginPlugin(AccessCredentialManagement)
+    private val saveCredentialsFeaturePlugin = FakeAutofillSubFeaturePluginPlugin(SaveCredentials)
+
+    private lateinit var pluginPoint: FakeAutofillSubFeaturePluginPluginPoint
 
     @Test
     fun whenFeatureNameDoesNotMatchAutofillThenReturnFalse() {
+        configureWithAllPlugins()
         AutofillFeatureName.values().filter { it != FEATURE_NAME }.forEach {
             assertFalse(testee.store(it.value, EMPTY_JSON_STRING))
         }
@@ -63,11 +61,13 @@ class AutofillFeaturePluginTest {
 
     @Test
     fun whenFeatureNameMatchesAutofillThenReturnTrue() {
+        configureWithAllPlugins()
         assertTrue(testee.store(FEATURE_NAME_VALUE, EMPTY_JSON_STRING))
     }
 
     @Test
     fun whenFeatureNameMatchesAutofillAndIsEnabledThenStoreFeatureEnabled() {
+        configureWithAllPlugins()
         val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/autofill.json")
 
         testee.store(FEATURE_NAME_VALUE, jsonString)
@@ -77,6 +77,7 @@ class AutofillFeaturePluginTest {
 
     @Test
     fun whenFeatureNameMatchesAutofillAndIsNotEnabledThenStoreFeatureDisabled() {
+        configureWithAllPlugins()
         val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/autofill_disabled.json")
 
         testee.store(FEATURE_NAME_VALUE, jsonString)
@@ -86,6 +87,7 @@ class AutofillFeaturePluginTest {
 
     @Test
     fun whenFeatureNameMatchesAutofillAndHasMinSupportedVersionThenStoreMinSupportedVersion() {
+        configureWithAllPlugins()
         val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/autofill_min_supported_version.json")
 
         testee.store(FEATURE_NAME_VALUE, jsonString)
@@ -95,6 +97,7 @@ class AutofillFeaturePluginTest {
 
     @Test
     fun whenFeatureNameMatchesAutofillThenUpdateAllExistingExceptions() {
+        configureWithAllPlugins()
         val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/autofill.json")
 
         testee.store(FEATURE_NAME_VALUE, jsonString)
@@ -104,12 +107,75 @@ class AutofillFeaturePluginTest {
 
     @Test
     fun whenPersistPrivacyConfigAndPluginMatchesFeatureNameThenStoreCalled() {
+        configureWithPlugins(listOf(injectCredentialsFeaturePlugin))
         val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/autofill.json")
 
         testee.store(FEATURE_NAME_VALUE, jsonString)
 
         val plugin = pluginPoint.getPlugins().first() as FakeAutofillSubFeaturePluginPlugin
-        assertEquals(1, plugin.count)
+        plugin.assertPluginInvoked()
+    }
+
+    @Test
+    fun whenSettingsMissingFeaturesThenDoesNotCrash() {
+        configureWithPlugins(emptyList())
+        val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/autofill_empty_settings.json")
+        testee.store(FEATURE_NAME_VALUE, jsonString)
+    }
+
+    @Test
+    fun whenNoSubfeatureInJsonAndNoPluginsThenDoesNotCrash() {
+        configureWithPlugins(emptyList())
+        val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/autofill_empty_features.json")
+        testee.store(FEATURE_NAME_VALUE, jsonString)
+    }
+
+    @Test
+    fun whenNoSubfeaturesInJsonThenPluginDoesNotProcessConfig() {
+        configureWithPlugins(listOf(injectCredentialsFeaturePlugin))
+        val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/autofill_empty_features.json")
+        testee.store(FEATURE_NAME_VALUE, jsonString)
+        injectCredentialsFeaturePlugin.assertPluginNotInvoked()
+    }
+
+    @Test
+    fun whenOnlyPluginMatchesFeatureKeyThenProcessesConfig() {
+        configureWithPlugins(listOf(injectCredentialsFeaturePlugin))
+        val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/autofill_inject_credentials_feature_enabled.json")
+        testee.store(FEATURE_NAME_VALUE, jsonString)
+        injectCredentialsFeaturePlugin.assertPluginInvoked()
+    }
+
+    @Test
+    fun whenOnlyPluginDoesNotMatchFeatureKeyThenDoesNotProcessesIt() {
+        configureWithPlugins(listOf(accessCredentialScreenFeaturePlugin))
+        val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/autofill_inject_credentials_feature_enabled.json")
+        testee.store(FEATURE_NAME_VALUE, jsonString)
+        injectCredentialsFeaturePlugin.assertPluginNotInvoked()
+    }
+
+    @Test
+    fun whenMultiplePluginsWithOneMatchThenCorrectOneProcessesIt() {
+        configureWithAllPlugins()
+        val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/autofill_inject_credentials_feature_enabled.json")
+        testee.store(FEATURE_NAME_VALUE, jsonString)
+        injectCredentialsFeaturePlugin.assertPluginInvoked()
+        saveCredentialsFeaturePlugin.assertPluginNotInvoked()
+        accessCredentialScreenFeaturePlugin.assertPluginNotInvoked()
+    }
+
+    private fun configureWithPlugins(plugins: List<AutofillSubFeaturePlugin>) {
+        pluginPoint = FakeAutofillSubFeaturePluginPluginPoint(plugins)
+
+        testee = AutofillFeaturePlugin(
+            autofillFeatureRepository = mockAutofillRepository,
+            autofillFeatureToggleRepository = mockFeatureTogglesRepository,
+            pluginPoint = pluginPoint,
+        )
+    }
+
+    private fun configureWithAllPlugins() {
+        configureWithPlugins(listOf(injectCredentialsFeaturePlugin, saveCredentialsFeaturePlugin, accessCredentialScreenFeaturePlugin))
     }
 
     class FakeAutofillSubFeaturePluginPluginPoint(private val plugins: List<AutofillSubFeaturePlugin>) : PluginPoint<AutofillSubFeaturePlugin> {
@@ -118,7 +184,7 @@ class AutofillFeaturePluginTest {
         }
     }
 
-    class FakeAutofillSubFeaturePluginPlugin : AutofillSubFeaturePlugin {
+    class FakeAutofillSubFeaturePluginPlugin(subFeatureName: AutofillSubfeatureName) : AutofillSubFeaturePlugin {
         var count = 0
 
         override fun store(
@@ -128,7 +194,15 @@ class AutofillFeaturePluginTest {
             return true
         }
 
-        override val settingName: AutofillSubfeature = AutofillSubfeatureName.InjectCredentials
+        override val settingName: AutofillSubfeature = subFeatureName
+    }
+
+    private fun FakeAutofillSubFeaturePluginPlugin.assertPluginInvoked() {
+        assertTrue("Plugin should have been invoked but wasn't", count > 0)
+    }
+
+    private fun FakeAutofillSubFeaturePluginPlugin.assertPluginNotInvoked() {
+        assertTrue("Plugin should not have been invoked but was", count == 0)
     }
 
     companion object {
