@@ -39,7 +39,6 @@ import com.duckduckgo.mobile.android.ui.notifyme.NotifyMeListener
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.view_item_downloads_notify_me.view.*
 
 class DownloadsAdapter @Inject constructor(
     private val dataSizeFormatter: DataSizeFormatter,
@@ -192,7 +191,7 @@ class DownloadsAdapter @Inject constructor(
         RecyclerView.ViewHolder(binding.root) {
 
         init {
-            binding.root.downloadsNotifyMe.setListener(listener)
+            binding.root.setListener(listener)
         }
     }
 
