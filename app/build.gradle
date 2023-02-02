@@ -256,6 +256,10 @@ dependencies {
     implementation project(':request-filterer-impl')
     implementation project(':request-filterer-store')
 
+    implementation project(':windows-api')
+    implementation project(':windows-impl')
+    implementation project(':windows-store')
+
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
     debugImplementation Square.leakCanary.android

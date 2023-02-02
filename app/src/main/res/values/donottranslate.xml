@@ -28,4 +28,9 @@
     <!-- We won't have a translation for this, to be used later. -->
     <string name="trackersOverviewEmpty">No tracking requests were blocked from loading on this page. If a company\'s requests are loaded, it can allow them to profile you.</string>
 
+    <!-- Windows Settings -->
+    <string name="windows_settings_description">Browse privately with our app for Windows</string>
+    <string name="windows_settings_title">DuckDuckGo Desktop App</string>
+    <string name="windows_settings_description_ready">This is ready</string>
+    <string name="windows_settings_description_list">This is ready</string>
 </resources>

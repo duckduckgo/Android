@@ -79,6 +79,11 @@ import com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnOnboardingActivity
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
+import com.duckduckgo.windows.api.WindowsWaitlistState
+import com.duckduckgo.windows.api.WindowsWaitlistState.InBeta
+import com.duckduckgo.windows.api.WindowsWaitlistState.JoinedWaitlist
+import com.duckduckgo.windows.api.WindowsWaitlistState.NotJoinedQueue
+import com.duckduckgo.windows.impl.waitlist.ui.WindowsWaitlistActivity
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -207,6 +212,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             emailSetting.setClickListener { viewModel.onEmailProtectionSettingClicked() }
             macOsSetting.setClickListener { viewModel.onMacOsSettingClicked() }
             vpnSetting.setClickListener { viewModel.onAppTPSettingClicked() }
+            windowsSetting.setClickListener { viewModel.windowsSettingClicked() }
         }
     }
 
@@ -250,6 +256,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                     )
                     updateEmailSubtitle(it.emailAddress)
                     updateAutofill(it.showAutofill)
+                    updateWindowsSettings(it.windowsWaitlistState)
                     viewsCustomize.notificationsSetting.setSecondaryText(getString(it.notificationsSettingSubtitleId))
                 }
             }.launchIn(lifecycleScope)
@@ -265,6 +272,16 @@ class SettingsActivity : DuckDuckGoActivity() {
             View.VISIBLE
         } else {
             View.GONE
+        }
+    }
+
+    private fun updateWindowsSettings(waitlistState: WindowsWaitlistState) {
+        with(viewsMore) {
+            when (waitlistState) {
+                is InBeta -> windowsSetting.setSecondaryText(getString(R.string.windows_settings_description_ready))
+                is JoinedWaitlist -> windowsSetting.setSecondaryText(getString(R.string.windows_settings_description_list))
+                is NotJoinedQueue -> windowsSetting.setSecondaryText(getString(R.string.windows_settings_description))
+            }
         }
     }
 
@@ -410,6 +427,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             is Command.LaunchMacOs -> launchMacOsScreen()
             is Command.LaunchAutoconsent -> launchAutoconsent()
             is Command.LaunchNotificationsSettings -> launchNotificationsSettings()
+            is Command.LaunchWindows -> launchWindowsScreen()
             null -> TODO()
         }
     }
@@ -594,6 +612,11 @@ class SettingsActivity : DuckDuckGoActivity() {
     private fun launchMacOsScreen() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         startActivity(MacOsActivity.intent(this), options)
+    }
+
+    private fun launchWindowsScreen() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        startActivity(WindowsWaitlistActivity.intent(this), options)
     }
 
     private fun launchAutoconsent() {

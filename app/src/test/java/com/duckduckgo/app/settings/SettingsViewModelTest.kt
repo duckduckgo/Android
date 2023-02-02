@@ -47,6 +47,8 @@ import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
+import com.duckduckgo.windows.api.WindowsWaitlist
+import com.duckduckgo.windows.api.WindowsWaitlistState
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -113,6 +115,9 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var appTpFeatureConfig: AppTpFeatureConfig
 
+    @Mock
+    private lateinit var windowsWaitlist: WindowsWaitlist
+
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
@@ -129,6 +134,7 @@ class SettingsViewModelTest {
         whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
         whenever(mockAppBuildConfig.versionName).thenReturn("name")
         whenever(mockAppBuildConfig.versionCode).thenReturn(1)
+        whenever(windowsWaitlist.getWaitlistState()).thenReturn(WindowsWaitlistState.NotJoinedQueue)
 
         testee = SettingsViewModel(
             mockThemeSettingsDataStore,
@@ -145,6 +151,7 @@ class SettingsViewModelTest {
             autofillCapabilityChecker,
             vpnFeaturesRegistry,
             autoconsent,
+            windowsWaitlist,
         )
 
         runTest {
@@ -736,6 +743,17 @@ class SettingsViewModelTest {
 
         testee.viewState().test {
             assertTrue(awaitItem().appTrackingProtectionOnboardingShown)
+        }
+    }
+
+    @Test
+    fun whenWindowsSettingClickedThenEmitCommandLaunchWindows() = runTest {
+        testee.commands().test {
+            testee.windowsSettingClicked()
+
+            assertEquals(Command.LaunchWindows, awaitItem())
+
+            cancelAndConsumeRemainingEvents()
         }
     }
 

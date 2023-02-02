@@ -44,7 +44,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/ic_privacy_simplified"/>
+                    app:srcCompat="@drawable/ic_computer_mac"/>
 
             <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                     android:id="@+id/statusTitle"

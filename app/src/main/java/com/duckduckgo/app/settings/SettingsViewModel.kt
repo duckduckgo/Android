@@ -50,6 +50,8 @@ import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
+import com.duckduckgo.windows.api.WindowsWaitlist
+import com.duckduckgo.windows.api.WindowsWaitlistState
 import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
@@ -79,6 +81,7 @@ class SettingsViewModel @Inject constructor(
     private val autofillCapabilityChecker: AutofillCapabilityChecker,
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
     private val autoconsent: Autoconsent,
+    private val windowsWaitlist: WindowsWaitlist,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private var deviceShieldStatePollingJob: Job? = null
@@ -101,6 +104,7 @@ class SettingsViewModel @Inject constructor(
         val showAutofill: Boolean = false,
         val autoconsentEnabled: Boolean = false,
         @StringRes val notificationsSettingSubtitleId: Int = R.string.settingsSubtitleNotificationsDisabled,
+        val windowsWaitlistState: WindowsWaitlistState = WindowsWaitlistState.NotJoinedQueue,
     )
 
     data class AutomaticallyClearData(
@@ -132,6 +136,7 @@ class SettingsViewModel @Inject constructor(
         data class ShowClearWhatDialog(val option: ClearWhatOption) : Command()
         data class ShowClearWhenDialog(val option: ClearWhenOption) : Command()
         object LaunchMacOs : Command()
+        object LaunchWindows : Command()
         object LaunchNotificationsSettings : Command()
     }
 
@@ -170,6 +175,7 @@ class SettingsViewModel @Inject constructor(
                     emailAddress = emailManager.getEmailAddress(),
                     showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen(),
                     autoconsentEnabled = autoconsent.isSettingEnabled(),
+                    windowsWaitlistState = windowsWaitlist.getWaitlistState(),
                     notificationsSettingSubtitleId = getNotificationsSettingSubtitleId(notificationsEnabled),
                 ),
             )
@@ -285,6 +291,10 @@ class SettingsViewModel @Inject constructor(
 
     fun onMacOsSettingClicked() {
         viewModelScope.launch { command.send(Command.LaunchMacOs) }
+    }
+
+    fun windowsSettingClicked() {
+        viewModelScope.launch { command.send(Command.LaunchWindows) }
     }
 
     fun onDefaultBrowserToggled(enabled: Boolean) {
