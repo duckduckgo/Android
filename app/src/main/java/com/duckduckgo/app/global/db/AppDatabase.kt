@@ -67,7 +67,7 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
     exportSchema = true,
-    version = 44,
+    version = 45,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
