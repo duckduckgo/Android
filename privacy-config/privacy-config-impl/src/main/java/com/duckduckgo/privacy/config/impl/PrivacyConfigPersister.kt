@@ -33,6 +33,7 @@ import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.Unprote
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
+import timber.log.Timber
 
 interface PrivacyConfigPersister {
     suspend fun persistPrivacyConfig(jsonPrivacyConfig: JsonPrivacyConfig)
@@ -73,6 +74,14 @@ class RealPrivacyConfigPersister @Inject constructor(
                     }
                 }
             }
+        } else {
+            Timber.v(
+                "Privacy config persistence not required; version=(existing: %s, new: %s), hash=(existing: %s, new: %s)",
+                previousVersion,
+                newVersion,
+                previousPluginHashCode,
+                currentPluginHashCode,
+            )
         }
     }
 

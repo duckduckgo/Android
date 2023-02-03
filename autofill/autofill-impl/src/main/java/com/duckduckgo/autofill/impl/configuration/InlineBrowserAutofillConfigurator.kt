@@ -20,16 +20,15 @@ import com.duckduckgo.app.autofill.JavascriptInjector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.autofill.api.Autofill
-import com.duckduckgo.autofill.api.AutofillFeatureName
+import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.BrowserAutofill.Configurator
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 @ContributesBinding(AppScope::class)
 class InlineBrowserAutofillConfigurator @Inject constructor(
@@ -37,31 +36,33 @@ class InlineBrowserAutofillConfigurator @Inject constructor(
     private val javascriptInjector: JavascriptInjector,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
-    private val autofill: Autofill,
-    private val featureToggle: FeatureToggle,
+    private val autofillCapabilityChecker: AutofillCapabilityChecker,
 ) : Configurator {
     override fun configureAutofillForCurrentPage(
         webView: WebView,
         url: String?,
     ) {
-        if (canJsBeInjected(url)) {
-            coroutineScope.launch(dispatchers.io()) {
+        coroutineScope.launch(dispatchers.io()) {
+            if (canJsBeInjected(url)) {
+                Timber.v("Injecting autofill JS into WebView for %s", url)
+
                 val rawJs = javascriptInjector.getFunctionsJS()
                 val formatted = autofillRuntimeConfigProvider.getRuntimeConfiguration(rawJs, url)
 
                 withContext(dispatchers.main()) {
                     webView.evaluateJavascript("javascript:$formatted", null)
                 }
+            } else {
+                Timber.v("Won't inject autofill JS into WebView for: %s", url)
             }
         }
     }
 
-    private fun canJsBeInjected(url: String?): Boolean {
+    private suspend fun canJsBeInjected(url: String?): Boolean {
         url?.let {
-            return (isFeatureEnabled() && !autofill.isAnException(url))
+            // note, we don't check for autofillEnabledByUser here, as the user-facing preference doesn't cover email
+            return autofillCapabilityChecker.isAutofillEnabledByConfiguration(it)
         }
         return false
     }
-
-    private fun isFeatureEnabled() = featureToggle.isFeatureEnabled(AutofillFeatureName.Autofill.value, defaultValue = true)
 }

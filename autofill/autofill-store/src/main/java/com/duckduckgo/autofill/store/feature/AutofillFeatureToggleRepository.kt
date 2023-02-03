@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.store
+package com.duckduckgo.autofill.store.feature
 
 import android.content.Context
 

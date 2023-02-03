@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.impl
+package com.duckduckgo.autofill.api.feature
 
-import com.duckduckgo.autofill.store.AutofillExceptionEntity
-import org.json.JSONObject
-
-data class AutofillFeature(
-    val state: String?,
-    val minSupportedVersion: Int?,
-    val exceptions: List<AutofillExceptionEntity>,
-    val settings: Settings?,
-)
-
-data class Settings(val features: Map<String, JSONObject>?)
+interface AutofillFeatureToggle {
+    /**
+     * This method takes a [featureName] for a corresponding [AutofillSubfeatureName] and optionally a default value.
+     * @return `true` if the feature is enabled, `false` if is not, or `null` if we have no data for the given feature.
+     */
+    fun isFeatureEnabled(
+        featureName: String,
+        defaultValue: Boolean = true,
+    ): Boolean?
+}

@@ -34,6 +34,7 @@ interface RuntimeConfigurationWriter {
     fun generateUserUnprotectedDomains(): String
     fun generateUserPreferences(
         autofillCredentials: Boolean,
+        credentialSaving: Boolean,
         showInlineKeyIcon: Boolean,
     ): String
 }
@@ -79,6 +80,7 @@ class RealRuntimeConfigurationWriter @Inject constructor(val moshi: Moshi) : Run
 
     override fun generateUserPreferences(
         autofillCredentials: Boolean,
+        credentialSaving: Boolean,
         showInlineKeyIcon: Boolean,
     ): String {
         return """
@@ -96,7 +98,7 @@ class RealRuntimeConfigurationWriter @Inject constructor(val moshi: Moshi) : Run
                       "inputType_creditCards": false,
                       "emailProtection": true,
                       "password_generation": false,
-                      "credentials_saving": $autofillCredentials,
+                      "credentials_saving": $credentialSaving,
                       "inlineIcon_credentials": $showInlineKeyIcon
                     }
                   }

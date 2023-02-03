@@ -9,5 +9,8 @@
       "domain": "weather.com",
       "reason": "Broken videos"
     }
-  ]
+  ],
+  "settings": {
+
+  }
 }

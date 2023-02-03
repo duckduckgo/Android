@@ -22,7 +22,6 @@ import com.duckduckgo.app.global.extractSchemeAndDomain
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType.Password
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType.Username
-import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult
@@ -39,7 +38,6 @@ import timber.log.Timber
 
 class SecureStoreBackedAutofillStore(
     private val secureStorage: SecureStorage,
-    private val internalTestUserChecker: InternalTestUserChecker,
     private val lastUpdatedTimeProvider: LastUpdatedTimeProvider,
     private val autofillPrefsStore: AutofillPrefsStore,
     private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
@@ -47,7 +45,7 @@ class SecureStoreBackedAutofillStore(
 ) : AutofillStore {
 
     override val autofillAvailable: Boolean
-        get() = internalTestUserChecker.isInternalTestUser && secureStorage.canAccessSecureStorage()
+        get() = secureStorage.canAccessSecureStorage()
 
     override var autofillEnabled: Boolean
         get() = autofillPrefsStore.isEnabled

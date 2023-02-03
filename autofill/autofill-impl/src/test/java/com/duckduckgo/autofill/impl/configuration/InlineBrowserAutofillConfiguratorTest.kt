@@ -19,9 +19,7 @@ package com.duckduckgo.autofill.impl.configuration
 import android.webkit.WebView
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.autofill.JavascriptInjector
-import com.duckduckgo.autofill.api.Autofill
-import com.duckduckgo.autofill.api.AutofillFeatureName
-import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -43,9 +41,8 @@ class InlineBrowserAutofillConfiguratorTest {
 
     private val autofillRuntimeConfigProvider: AutofillRuntimeConfigProvider = mock()
     private val javascriptInjector: JavascriptInjector = mock()
-    private val autofill: Autofill = mock()
-    private val featureToggle: FeatureToggle = mock()
     private val webView: WebView = mock()
+    private val autofillCapabilityChecker: AutofillCapabilityChecker = mock()
 
     @Before
     fun before() = runTest {
@@ -57,13 +54,12 @@ class InlineBrowserAutofillConfiguratorTest {
             javascriptInjector,
             TestScope(),
             coroutineRule.testDispatcherProvider,
-            autofill,
-            featureToggle,
+            autofillCapabilityChecker,
         )
     }
 
     @Test
-    fun whenFeatureIsNotEnabledThenDoNotInject() {
+    fun whenFeatureIsNotEnabledThenDoNotInject() = runTest {
         givenFeatureIsDisabled()
         inlineBrowserAutofillConfigurator.configureAutofillForCurrentPage(webView, "https://example.com")
 
@@ -71,36 +67,18 @@ class InlineBrowserAutofillConfiguratorTest {
     }
 
     @Test
-    fun whenFeatureIsEnabledAndUrlIsExceptionThenDoNotInject() {
-        givenUrlIsAnException()
-        givenFeatureIsEnabled()
-        inlineBrowserAutofillConfigurator.configureAutofillForCurrentPage(webView, "https://example.com")
-
-        verify(webView, never()).evaluateJavascript("javascript:", null)
-    }
-
-    @Test
-    fun whenFeatureIsEnabledAndUrlIsNotExceptionThenInject() {
-        givenUrlIsNotAnException()
+    fun whenFeatureIsEnabledThenInject() = runTest {
         givenFeatureIsEnabled()
         inlineBrowserAutofillConfigurator.configureAutofillForCurrentPage(webView, "https://example.com")
 
         verify(webView).evaluateJavascript("javascript:", null)
     }
 
-    private fun givenUrlIsAnException() {
-        whenever(autofill.isAnException(any())).thenReturn(true)
+    private suspend fun givenFeatureIsEnabled() {
+        whenever(autofillCapabilityChecker.isAutofillEnabledByConfiguration(any())).thenReturn(true)
     }
 
-    private fun givenUrlIsNotAnException() {
-        whenever(autofill.isAnException(any())).thenReturn(false)
-    }
-
-    private fun givenFeatureIsEnabled() {
-        whenever(featureToggle.isFeatureEnabled(AutofillFeatureName.Autofill.value, true)).thenReturn(true)
-    }
-
-    private fun givenFeatureIsDisabled() {
-        whenever(featureToggle.isFeatureEnabled(AutofillFeatureName.Autofill.value, true)).thenReturn(false)
+    private suspend fun givenFeatureIsDisabled() {
+        whenever(autofillCapabilityChecker.isAutofillEnabledByConfiguration(any())).thenReturn(false)
     }
 }

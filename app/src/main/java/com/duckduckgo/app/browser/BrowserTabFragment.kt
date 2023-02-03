@@ -170,6 +170,7 @@ import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
+import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.AutofillSettingsActivityLauncher
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.Callback
@@ -371,6 +372,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var autofillSettingsActivityLauncher: AutofillSettingsActivityLauncher
+
+    @Inject
+    lateinit var autofillCapabilityChecker: AutofillCapabilityChecker
 
     @Inject
     lateinit var sitePermissionsDialogLauncher: SitePermissionsDialogLauncher
@@ -1053,6 +1057,11 @@ class BrowserTabFragment :
             is Command.PrintLink -> launchPrint(it.url)
             is Command.ShowSitePermissionsDialog -> showSitePermissionsDialog(it.permissionsToRequest, it.request)
             is Command.GrantSitePermissionRequest -> grantSitePermissionRequest(it.sitePermissionsToGrant, it.request)
+            is Command.ShowUserCredentialSavedOrUpdatedConfirmation -> showAuthenticationSavedOrUpdatedSnackbar(
+                loginCredentials = it.credentials,
+                messageResourceId = it.messageResourceId,
+                includeShortcutToViewCredential = it.includeShortcutToViewCredential,
+            )
             else -> {
                 // NO OP
             }
@@ -1836,7 +1845,7 @@ class BrowserTabFragment :
         setFragmentResultListener(CredentialSavePickerDialog.resultKeyUserChoseToSaveCredentials(tabId)) { _, result ->
             launch {
                 autofillCredentialsSelectionResultHandler.processSaveCredentialsResult(result, viewModel)?.let {
-                    showAuthenticationSavedOrUpdatedSnackbar(it, R.string.autofillLoginSavedSnackbarMessage)
+                    viewModel.onShowUserCredentialsSaved(it)
                 }
             }
         }
@@ -1852,7 +1861,7 @@ class BrowserTabFragment :
         setFragmentResultListener(CredentialUpdateExistingCredentialsDialog.resultKey(tabId)) { _, result ->
             launch {
                 autofillCredentialsSelectionResultHandler.processUpdateCredentialsResult(result, viewModel)?.let {
-                    showAuthenticationSavedOrUpdatedSnackbar(it, R.string.autofillLoginUpdatedSnackbarMessage)
+                    viewModel.onShowUserCredentialsUpdated(it)
                 }
             }
         }
@@ -1927,17 +1936,21 @@ class BrowserTabFragment :
         showDialogHidingPrevious(dialog, CredentialUpdateExistingCredentialsDialog.TAG)
     }
 
-    private suspend fun showAuthenticationSavedOrUpdatedSnackbar(
+    private fun showAuthenticationSavedOrUpdatedSnackbar(
         loginCredentials: LoginCredentials,
         @StringRes messageResourceId: Int,
+        includeShortcutToViewCredential: Boolean,
         delay: Long = 200,
     ) {
-        delay(delay)
-        withContext(dispatchers.main()) {
-            browserLayout.makeSnackbarWithNoBottomInset(messageResourceId, Snackbar.LENGTH_LONG)
-                .setAction(R.string.autofillSnackbarAction) {
+        lifecycleScope.launch(dispatchers.main()) {
+            delay(delay)
+            val snackbar = browserLayout.makeSnackbarWithNoBottomInset(messageResourceId, Snackbar.LENGTH_LONG)
+            if (includeShortcutToViewCredential) {
+                snackbar.setAction(R.string.autofillSnackbarAction) {
                     context?.let { startActivity(autofillSettingsActivityLauncher.intentDirectlyViewCredentials(it, loginCredentials)) }
-                }.show()
+                }
+            }
+            snackbar.show()
         }
     }
 

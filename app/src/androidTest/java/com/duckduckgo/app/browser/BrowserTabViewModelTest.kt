@@ -122,6 +122,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
+import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.store.AutofillStore
@@ -381,6 +382,8 @@ class BrowserTabViewModelTest {
 
     private val mockAppTheme: AppTheme = mock()
 
+    private val autofillCapabilityChecker: FakeCapabilityChecker = FakeCapabilityChecker(enabled = false)
+
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
@@ -486,6 +489,7 @@ class BrowserTabViewModelTest {
             autofillStore = mockAutofillStore,
             adClickManager = mockAdClickManager,
             sitePermissionsManager = mockSitePermissionsManager,
+            autofillCapabilityChecker = autofillCapabilityChecker,
         )
 
         testee.loadData("abc", null, false, false)
@@ -4222,6 +4226,46 @@ class BrowserTabViewModelTest {
         assertTrue(testee.canAutofillSelectCredentialsDialogCanAutomaticallyShow())
     }
 
+    @Test
+    fun whenShowingUserCredentialsSavedConfirmationAndCanAccessCredentialManagementScreenThenShouldShowLinkToViewCredential() = runTest {
+        autofillCapabilityChecker.enabled = true
+        testee.onShowUserCredentialsSaved(aCredential())
+        assertCommandIssued<Command.ShowUserCredentialSavedOrUpdatedConfirmation> {
+            assertTrue(this.includeShortcutToViewCredential)
+        }
+    }
+
+    @Test
+    fun whenShowingUserCredentialsSavedConfirmationAndCannotAccessCredentialManagementScreenThenShouldNotShowLinkToViewCredential() = runTest {
+        autofillCapabilityChecker.enabled = false
+        testee.onShowUserCredentialsSaved(aCredential())
+        assertCommandIssued<Command.ShowUserCredentialSavedOrUpdatedConfirmation> {
+            assertFalse(this.includeShortcutToViewCredential)
+        }
+    }
+
+    @Test
+    fun whenShowingUserCredentialsUpdatedConfirmationAndCanAccessCredentialManagementScreenThenShouldShowLinkToViewCredential() = runTest {
+        autofillCapabilityChecker.enabled = true
+        testee.onShowUserCredentialsUpdated(aCredential())
+        assertCommandIssued<Command.ShowUserCredentialSavedOrUpdatedConfirmation> {
+            assertTrue(this.includeShortcutToViewCredential)
+        }
+    }
+
+    @Test
+    fun whenShowingUserCredentialsUpdatedConfirmationAndCannotAccessCredentialManagementScreenThenShouldNotShowLinkToViewCredential() = runTest {
+        autofillCapabilityChecker.enabled = false
+        testee.onShowUserCredentialsUpdated(aCredential())
+        assertCommandIssued<Command.ShowUserCredentialSavedOrUpdatedConfirmation> {
+            assertFalse(this.includeShortcutToViewCredential)
+        }
+    }
+
+    private fun aCredential(): LoginCredentials {
+        return LoginCredentials(domain = null, username = null, password = null)
+    }
+
     private fun assertShowHistoryCommandSent(expectedStackSize: Int) {
         assertCommandIssued<ShowBackNavigationHistory> {
             assertEquals(expectedStackSize, history.size)
@@ -4488,4 +4532,11 @@ class BrowserTabViewModelTest {
     private fun globalLayoutViewState() = testee.globalLayoutState.value!!
     private fun browserGlobalLayoutViewState() = testee.globalLayoutState.value!! as BrowserTabViewModel.GlobalLayoutViewState.Browser
     private fun accessibilityViewState() = testee.accessibilityViewState.value!!
+
+    class FakeCapabilityChecker(var enabled: Boolean) : AutofillCapabilityChecker {
+        override suspend fun isAutofillEnabledByConfiguration(url: String) = enabled
+        override suspend fun canInjectCredentialsToWebView(url: String) = enabled
+        override suspend fun canSaveCredentialsFromWebView(url: String) = enabled
+        override suspend fun canAccessCredentialManagementScreen() = enabled
+    }
 }

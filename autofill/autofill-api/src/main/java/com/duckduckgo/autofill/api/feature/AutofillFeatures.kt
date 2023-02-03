@@ -14,9 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.api
+package com.duckduckgo.autofill.api.feature
 
-/** List of [AutofillFeatureName] that belong to the Autofill feature */
 enum class AutofillFeatureName(val value: String) {
     Autofill("autofill"),
+}
+
+enum class AutofillSubfeatureName(override val value: String) : AutofillSubfeature {
+    InjectCredentials("injectCredentials"),
+    SaveCredentials("saveCredentials"),
+    AccessCredentialManagement("accessCredentialManagement"),
+}
+
+interface AutofillSubfeature {
+    val value: String
 }

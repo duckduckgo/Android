@@ -18,8 +18,9 @@ package com.duckduckgo.autofill.impl.plugins
 
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.autofill.api.AutofillFeatureName
-import com.duckduckgo.autofill.store.AutofillFeatureToggleRepository
+import com.duckduckgo.autofill.api.feature.AutofillFeatureName
+import com.duckduckgo.autofill.impl.feature.plugin.AutofillFeatureTogglesPlugin
+import com.duckduckgo.autofill.store.feature.AutofillFeatureToggleRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -52,71 +53,65 @@ class AutofillFeatureTogglesPluginTest {
     }
 
     @Test
-    fun whenIsEnabledAndFeatureIsAutofillFeatureThenReturnTrueWhenEnabled() =
-        runTest {
-            giveAutofillFeatureIsEnabled()
+    fun whenIsEnabledAndFeatureIsAutofillFeatureThenReturnTrueWhenEnabled() = runTest {
+        givenAutofillFeatureIsEnabled()
 
-            val isEnabled = testee.isEnabled(AutofillFeatureName.Autofill.value, true)
+        val isEnabled = testee.isEnabled(AutofillFeatureName.Autofill.value, true)
 
-            assertTrue(isEnabled!!)
-        }
-
-    @Test
-    fun whenIsEnabledAndFeatureIsAutofillFeatureThenReturnFalseWhenDisabled() =
-        runTest {
-            givenAutofillFeatureIsDisabled()
-
-            val isEnabled = testee.isEnabled(AutofillFeatureName.Autofill.value, true)
-
-            assertFalse(isEnabled!!)
-        }
+        assertTrue(isEnabled!!)
+    }
 
     @Test
-    fun whenIsEnabledAndFeatureIsAutofillFeatureThenReturnDefaultValueIfFeatureDoesNotExist() =
-        runTest {
-            val defaultValue = true
-            givenAutofillFeatureReturnsDefaultValue(defaultValue)
+    fun whenIsEnabledAndFeatureIsAutofillFeatureThenReturnFalseWhenDisabled() = runTest {
+        givenAutofillFeatureIsDisabled()
 
-            val isEnabled =
-                testee.isEnabled(AutofillFeatureName.Autofill.value, defaultValue)
+        val isEnabled = testee.isEnabled(AutofillFeatureName.Autofill.value, true)
 
-            assertEquals(defaultValue, isEnabled)
-        }
+        assertFalse(isEnabled!!)
+    }
 
     @Test
-    fun whenIsEnabledAndFeatureIsAutofillFeatureAndAppVersionEqualToMinSupportedVersionThenReturnTrueWhenEnabled() =
-        runTest {
-            giveAutofillFeatureIsEnabled()
-            givenAppVersionIsEqualToMinSupportedVersion()
+    fun whenIsEnabledAndFeatureIsAutofillFeatureThenReturnDefaultValueIfFeatureDoesNotExist() = runTest {
+        val defaultValue = true
+        givenAutofillFeatureReturnsDefaultValue(defaultValue)
 
-            val isEnabled = testee.isEnabled(AutofillFeatureName.Autofill.value, true)
+        val isEnabled =
+            testee.isEnabled(AutofillFeatureName.Autofill.value, defaultValue)
 
-            assertTrue(isEnabled!!)
-        }
-
-    @Test
-    fun whenIsEnabledAndFeatureIsAutofillFeatureAndAppVersionIsGreaterThanMinSupportedVersionThenReturnTrueWhenEnabled() =
-        runTest {
-            giveAutofillFeatureIsEnabled()
-            givenAppVersionIsGreaterThanMinSupportedVersion()
-
-            val isEnabled = testee.isEnabled(AutofillFeatureName.Autofill.value, true)
-
-            assertTrue(isEnabled!!)
-        }
+        assertEquals(defaultValue, isEnabled)
+    }
 
     @Test
-    fun whenIsEnabledAndFeatureIsAutofillFeatureAndAppVersionIsSmallerThanMinSupportedVersionThenReturnFalseWhenEnabled() =
-        runTest {
-            giveAutofillFeatureIsEnabled()
-            givenAppVersionIsSmallerThanMinSupportedVersion()
+    fun whenIsEnabledAndFeatureIsAutofillFeatureAndAppVersionEqualToMinSupportedVersionThenReturnTrueWhenEnabled() = runTest {
+        givenAutofillFeatureIsEnabled()
+        givenAppVersionIsEqualToMinSupportedVersion()
 
-            val isEnabled = testee.isEnabled(AutofillFeatureName.Autofill.value, true)
+        val isEnabled = testee.isEnabled(AutofillFeatureName.Autofill.value, true)
 
-            assertFalse(isEnabled!!)
-        }
+        assertTrue(isEnabled!!)
+    }
 
-    private fun giveAutofillFeatureIsEnabled() {
+    @Test
+    fun whenIsEnabledAndFeatureIsAutofillFeatureAndAppVersionIsGreaterThanMinSupportedVersionThenReturnTrueWhenEnabled() = runTest {
+        givenAutofillFeatureIsEnabled()
+        givenAppVersionIsGreaterThanMinSupportedVersion()
+
+        val isEnabled = testee.isEnabled(AutofillFeatureName.Autofill.value, true)
+
+        assertTrue(isEnabled!!)
+    }
+
+    @Test
+    fun whenIsEnabledAndFeatureIsAutofillFeatureAndAppVersionIsSmallerThanMinSupportedVersionThenReturnFalseWhenEnabled() = runTest {
+        givenAutofillFeatureIsEnabled()
+        givenAppVersionIsSmallerThanMinSupportedVersion()
+
+        val isEnabled = testee.isEnabled(AutofillFeatureName.Autofill.value, true)
+
+        assertFalse(isEnabled!!)
+    }
+
+    private fun givenAutofillFeatureIsEnabled() {
         whenever(mockFeatureTogglesRepository.get(AutofillFeatureName.Autofill, true)).thenReturn(true)
     }
 
@@ -134,11 +129,7 @@ class AutofillFeatureTogglesPluginTest {
     }
 
     private fun givenAppVersionIsGreaterThanMinSupportedVersion() {
-        whenever(
-            mockFeatureTogglesRepository.getMinSupportedVersion(
-                AutofillFeatureName.Autofill,
-            ),
-        ).thenReturn(1234)
+        whenever(mockFeatureTogglesRepository.getMinSupportedVersion(AutofillFeatureName.Autofill)).thenReturn(1234)
 
         whenever(mockAppBuildConfig.versionCode).thenReturn(5678)
     }
