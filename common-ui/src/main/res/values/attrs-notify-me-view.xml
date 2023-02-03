@@ -20,5 +20,10 @@
         <attr name="secondaryText" />
         <attr name="pixelParentScreenName" format="string" />
         <attr name="sharedPrefsKeyForDismiss" format="string" />
+        <attr name="dismissIcon" format="boolean" />
+        <attr name="contentOrientation" format="enum">
+            <enum name="start" value="0" />
+            <enum name="center" value="1" />
+        </attr>
     </declare-styleable>
 </resources>

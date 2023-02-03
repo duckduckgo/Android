@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2023 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,19 +25,38 @@
     android:paddingBottom="@dimen/keyline_5">
 
     <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
-        android:id="@+id/label"
+        android:id="@+id/firstHeaderLabel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:primaryText="Notify Me View" />
+        app:primaryText="Notify Me (default) - contentOrientation=start / dismissIcon=true" />
 
     <com.duckduckgo.mobile.android.ui.notifyme.NotifyMeView
-        android:id="@+id/notifyMe"
+        android:id="@+id/notifyMeDefault"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/label" />
+        app:layout_constraintTop_toBottomOf="@+id/firstHeaderLabel" />
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+        android:id="@+id/secondHeaderLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/notifyMeDefault"
+        app:primaryText="Notify Me (variation) - contentOrientation=center / dismissIcon=false" />
+
+    <com.duckduckgo.mobile.android.ui.notifyme.NotifyMeView
+        android:id="@+id/notifyMeCenteredContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:dismissIcon="false"
+        app:contentOrientation="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/secondHeaderLabel" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
