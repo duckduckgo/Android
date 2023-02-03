@@ -36,7 +36,6 @@ import com.duckduckgo.mobile.android.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.item_autocomplete_bookmark_suggestion.*
 
 @InjectWith(ActivityScope::class)
 class FireproofWebsitesActivity : DuckDuckGoActivity() {
