@@ -208,7 +208,7 @@ class SecureStoreBackedAutofillStoreTest {
     @Test
     fun whenPasswordIsUpdatedThenUpdatedOnlyMatchingCredential() = runTest {
         setupTesteeWithAutofillAvailable()
-        val url = "https://example.com"
+        val url = "example.com"
         storeCredentials(1, url, "username1", "password123")
         storeCredentials(2, url, "username2", "password456")
         storeCredentials(3, url, "username3", "password789")
@@ -229,9 +229,28 @@ class SecureStoreBackedAutofillStoreTest {
     }
 
     @Test
-    fun whenUsernameIsUpdatedForUrlThenUpdatedOnlyMatchingCredential() = runTest {
+    fun whenDomainIsUpdatedTheCleanRawUrl() = runTest {
         setupTesteeWithAutofillAvailable()
         val url = "https://example.com"
+        storeCredentials(1, url, "username1", "password123")
+        val credentials = LoginCredentials(
+            domain = "https://www.example.com/test/path",
+            username = "username1",
+            password = "newpassword",
+            id = 1,
+        )
+
+        testee.updateCredentials(credentials)
+
+        testee.getCredentials(url).run {
+            this.assertHasLoginCredentials("www.example.com", "username1", "newpassword", UPDATED_INITIAL_LAST_UPDATED)
+        }
+    }
+
+    @Test
+    fun whenUsernameIsUpdatedForUrlThenUpdatedOnlyMatchingCredential() = runTest {
+        setupTesteeWithAutofillAvailable()
+        val url = "example.com"
         storeCredentials(1, url, null, "password123")
         storeCredentials(2, url, "username2", "password456")
         storeCredentials(3, url, "username3", "password789")
@@ -254,8 +273,8 @@ class SecureStoreBackedAutofillStoreTest {
     @Test
     fun whenUsernameMissingForAnotherUrlThenNoUpdatesMade() = runTest {
         setupTesteeWithAutofillAvailable()
-        val urlStored = "https://example.com"
-        val newDomain = "https://test.com"
+        val urlStored = "example.com"
+        val newDomain = "test.com"
         storeCredentials(1, urlStored, null, "password123")
 
         val credentials = LoginCredentials(domain = newDomain, username = "username1", password = "password123", id = 1)
@@ -270,7 +289,7 @@ class SecureStoreBackedAutofillStoreTest {
     @Test
     fun whenSaveCredentialsThenReturnSavedOnGetCredentials() = runTest {
         setupTesteeWithAutofillAvailable()
-        val url = "https://example.com"
+        val url = "example.com"
         val credentials = LoginCredentials(
             domain = url,
             username = "username1",
@@ -278,13 +297,13 @@ class SecureStoreBackedAutofillStoreTest {
         )
         testee.saveCredentials(url, credentials)
 
-        assertEquals(credentials.copy(lastUpdatedMillis = UPDATED_INITIAL_LAST_UPDATED), testee.getCredentials(url)[0])
+        assertEquals(credentials.copy(domain = "example.com", lastUpdatedMillis = UPDATED_INITIAL_LAST_UPDATED), testee.getCredentials(url)[0])
     }
 
     @Test
     fun whenSaveCredentialsForFirstTimeThenDisableShowOnboardingFlag() = runTest {
         setupTesteeWithAutofillAvailable()
-        val url = "https://example.com"
+        val url = "example.com"
         val credentials = LoginCredentials(
             domain = url,
             username = "username1",
@@ -297,7 +316,7 @@ class SecureStoreBackedAutofillStoreTest {
     @Test
     fun whenPasswordIsDeletedThenRemoveCredentialFromStore() = runTest {
         setupTesteeWithAutofillAvailable()
-        val url = "https://example.com"
+        val url = "example.com"
         storeCredentials(1, url, "username1", "password123")
         storeCredentials(2, url, "username2", "password456")
         storeCredentials(3, url, "username3", "password789")
@@ -313,7 +332,7 @@ class SecureStoreBackedAutofillStoreTest {
     @Test
     fun whenCredentialWithIdIsStoredTheReturnCredentialsOnGetCredentialsWithId() = runTest {
         setupTesteeWithAutofillAvailable()
-        val url = "https://example.com"
+        val url = "example.com"
         storeCredentials(1, url, "username1", "password123")
         storeCredentials(2, url, "username2", "password456")
 

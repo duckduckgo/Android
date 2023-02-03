@@ -23,5 +23,11 @@ interface AutofillUrlMatcher {
         savedSite: ExtractedUrlParts,
     ): Boolean
 
+    /**
+     * This method tries to clean up a raw URL.
+     * @return a `String` containing host:port for the given raw URL.
+     */
+    fun cleanRawUrl(rawUrl: String): String
+
     data class ExtractedUrlParts(val eTldPlus1: String?, val subdomain: String?)
 }

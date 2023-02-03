@@ -18,7 +18,6 @@ package com.duckduckgo.autofill.store
 
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.extractSchemeAndDomain
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType.Password
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType.Username
@@ -108,11 +107,7 @@ class SecureStoreBackedAutofillStore(
         rawUrl: String,
         credentials: LoginCredentials,
     ): LoginCredentials? {
-        val url = rawUrl.extractSchemeAndDomain()
-        if (url == null) {
-            Timber.w("Cannot save credentials as given url was in an unexpected format. Original url: %s", rawUrl)
-            return null
-        }
+        val url = autofillUrlMatcher.cleanRawUrl(rawUrl)
 
         Timber.i("Saving login credentials for %s. username=%s", url, credentials.username)
 
@@ -140,11 +135,7 @@ class SecureStoreBackedAutofillStore(
         credentials: LoginCredentials,
         updateType: CredentialUpdateType,
     ): LoginCredentials? {
-        val url = rawUrl.extractSchemeAndDomain()
-        if (url == null) {
-            Timber.w("Cannot update credentials as given url was in an unexpected format. Original url: %s", rawUrl)
-            return null
-        }
+        val url = autofillUrlMatcher.cleanRawUrl(rawUrl)
 
         val filter = when (updateType) {
             Username -> filterMatchingPassword(credentials)
@@ -194,8 +185,12 @@ class SecureStoreBackedAutofillStore(
     }
 
     override suspend fun updateCredentials(credentials: LoginCredentials): LoginCredentials? {
+        val cleanedDomain: String? = credentials.domain?.let {
+            autofillUrlMatcher.cleanRawUrl(it)
+        }
+
         return secureStorage.updateWebsiteLoginDetailsWithCredentials(
-            credentials.copy(lastUpdatedMillis = lastUpdatedTimeProvider.getInMillis())
+            credentials.copy(lastUpdatedMillis = lastUpdatedTimeProvider.getInMillis(), domain = cleanedDomain)
                 .toWebsiteLoginCredentials(),
         )?.toLoginCredentials()
     }
@@ -205,7 +200,7 @@ class SecureStoreBackedAutofillStore(
         username: String?,
         password: String?,
     ): ContainsCredentialsResult {
-        val url = rawUrl.extractSchemeAndDomain() ?: return NoMatch
+        val url = autofillUrlMatcher.cleanRawUrl(rawUrl) ?: return NoMatch
         val credentials = secureStorage.websiteLoginDetailsWithCredentialsForDomain(url).firstOrNull() ?: return NoMatch
 
         var exactMatchFound = false
