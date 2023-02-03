@@ -16,10 +16,9 @@
 
 package com.duckduckgo.mobile.android.ui.notifyme
 
+// TODO [ANA] This will be removed.
 interface NotifyMeListener {
     fun setDismissed()
 
     fun isDismissed(): Boolean
-
-    fun visibilityChanged(visible: Boolean)
 }

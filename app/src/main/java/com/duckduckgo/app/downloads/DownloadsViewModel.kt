@@ -81,17 +81,17 @@ class DownloadsViewModel @Inject constructor(
         it.mapToDownloadViewItems()
     }
 
-    private val notifyMeVisibilityChanged = MutableStateFlow(true)
+    private val showNotifyMe = MutableStateFlow(true)
 
     private val filterText = MutableStateFlow("")
 
     val viewState: StateFlow<ViewState> = combine(
         flow = downloadItems,
-        flow2 = notifyMeVisibilityChanged,
+        flow2 = showNotifyMe,
         flow3 = filterText,
-    ) { items, visible, filter ->
+    ) { items, showNotifyMe, filter ->
         val downloadItemsList = when {
-            visible -> if (items.isEmpty()) listOf(NotifyMe, Empty) else listOf(NotifyMe).plus(items)
+            showNotifyMe -> if (items.isEmpty()) listOf(NotifyMe, Empty) else listOf(NotifyMe).plus(items)
             else -> items.ifEmpty { listOf(Empty) }
         }
         val filteredItemsList = if (filter.isEmpty()) downloadItemsList else filtered(items, filter)
@@ -197,6 +197,12 @@ class DownloadsViewModel @Inject constructor(
         }
     }
 
+    override fun onItemVisibilityChanged(visible: Boolean) {
+        viewModelScope.launch {
+            showNotifyMe.emit(visible)
+        }
+    }
+
     override fun setDismissed() {
         viewModelScope.launch {
             settingsDataStore.notifyMeInDownloadsDismissed = true
@@ -205,12 +211,6 @@ class DownloadsViewModel @Inject constructor(
 
     override fun isDismissed(): Boolean {
         return settingsDataStore.notifyMeInDownloadsDismissed
-    }
-
-    override fun visibilityChanged(visible: Boolean) {
-        viewModelScope.launch {
-            notifyMeVisibilityChanged.emit(visible)
-        }
     }
 
     private fun DownloadItem.mapToDownloadViewItem(): DownloadViewItem = Item(this)

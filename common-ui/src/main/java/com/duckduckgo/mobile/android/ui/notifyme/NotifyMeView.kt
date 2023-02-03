@@ -26,9 +26,12 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.provider.Settings
 import android.util.AttributeSet
+import android.view.View
+import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.widget.FrameLayout
 import androidx.annotation.ChecksSdkIntAtLeast
 import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.ViewModelProvider
@@ -62,6 +65,8 @@ class NotifyMeView @JvmOverloads constructor(
 
     private var listener: NotifyMeListener? = null
     private var coroutineScope: CoroutineScope? = null
+    private var vtoGlobalLayoutListener: OnGlobalLayoutListener? = null
+    private var visibilityChangedListener: OnVisibilityChangedListener? = null
 
     private val binding: ViewNotifyMeViewBinding by viewBinding()
 
@@ -86,6 +91,8 @@ class NotifyMeView @JvmOverloads constructor(
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
 
+        addViewTreeObserverOnGlobalLayoutListener()
+
         ViewTreeLifecycleOwner.get(this)?.lifecycle?.addObserver(viewModel)
 
         @SuppressLint("NoHardcodedCoroutineDispatcher")
@@ -107,6 +114,8 @@ class NotifyMeView @JvmOverloads constructor(
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
 
+        removeViewTreeObserverOnGlobalLayoutListener()
+
         ViewTreeLifecycleOwner.get(this)?.lifecycle?.removeObserver(viewModel)
 
         viewModel.removeNotifyMeListener()
@@ -119,6 +128,10 @@ class NotifyMeView @JvmOverloads constructor(
 
     fun setListener(listener: NotifyMeListener?) {
         this.listener = listener
+    }
+
+    fun setOnVisibilityChange(visibilityChangedListener: OnVisibilityChangedListener) {
+        this.visibilityChangedListener = visibilityChangedListener
     }
 
     fun setPrimaryText(title: String) {
@@ -153,7 +166,8 @@ class NotifyMeView @JvmOverloads constructor(
                 ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
             viewModel.updateNotificationsPermissions(value)
         } else {
-            viewModel.updateNotificationsPermissions(true)
+            val enabled = NotificationManagerCompat.from(getActivity()).areNotificationsEnabled()
+            viewModel.updateNotificationsPermissions(enabled)
         }
     }
 
@@ -207,5 +221,30 @@ class NotifyMeView @JvmOverloads constructor(
             context = context.baseContext
         }
         throw IllegalStateException("The NotifyMeView's Context is not an Activity.")
+    }
+
+    private fun addViewTreeObserverOnGlobalLayoutListener() {
+        val tag = R.string.notifyme_button_label
+        setTag(tag, visibility)
+
+        vtoGlobalLayoutListener = OnGlobalLayoutListener {
+            val newVisibility = visibility
+            val previousVisibility = getTag(tag)
+            if (newVisibility != previousVisibility) {
+                this.visibilityChangedListener?.onVisibilityChange(this, newVisibility == VISIBLE)
+            }
+        }
+
+        viewTreeObserver.addOnGlobalLayoutListener(vtoGlobalLayoutListener)
+    }
+
+    private fun removeViewTreeObserverOnGlobalLayoutListener() {
+        if (viewTreeObserver.isAlive && vtoGlobalLayoutListener != null) {
+            viewTreeObserver.removeOnGlobalLayoutListener(vtoGlobalLayoutListener)
+        }
+    }
+
+    interface OnVisibilityChangedListener {
+        fun onVisibilityChange(v: View?, isVisible: Boolean)
     }
 }

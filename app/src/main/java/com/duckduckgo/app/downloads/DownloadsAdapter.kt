@@ -36,6 +36,7 @@ import com.duckduckgo.downloads.store.DownloadStatus.FINISHED
 import com.duckduckgo.mobile.android.databinding.RowTwoLineItemBinding
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.mobile.android.ui.notifyme.NotifyMeListener
+import com.duckduckgo.mobile.android.ui.notifyme.NotifyMeView
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import javax.inject.Inject
@@ -64,7 +65,8 @@ class DownloadsAdapter @Inject constructor(
             )
             VIEW_TYPE_NOTIFY_ME -> NotifyMeViewHolder(
                 binding = ViewItemDownloadsNotifyMeBinding.inflate(inflater, parent, false),
-                listener = notifyMeListener,
+                listener = downloadsItemListener,
+                notifyMeListener = notifyMeListener,
             )
 
             else -> throw IllegalArgumentException()
@@ -187,11 +189,24 @@ class DownloadsAdapter @Inject constructor(
         }
     }
 
-    class NotifyMeViewHolder(val binding: ViewItemDownloadsNotifyMeBinding, val listener: NotifyMeListener?) :
+    class NotifyMeViewHolder(
+        val binding: ViewItemDownloadsNotifyMeBinding,
+        val listener: DownloadsItemListener,
+        val notifyMeListener: NotifyMeListener?,
+    ) :
         RecyclerView.ViewHolder(binding.root) {
 
         init {
-            binding.root.setListener(listener)
+            // TODO [ANA] This will be removed.
+            binding.root.setListener(notifyMeListener)
+
+            binding.root.setOnVisibilityChange(
+                object : NotifyMeView.OnVisibilityChangedListener {
+                    override fun onVisibilityChange(v: View?, isVisible: Boolean) {
+                        listener.onItemVisibilityChanged(isVisible)
+                    }
+                },
+            )
         }
     }
 

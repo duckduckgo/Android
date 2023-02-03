@@ -60,7 +60,6 @@ class NotifyMeViewModelTest {
         testee.viewState.test {
             val state = awaitItem()
             assertTrue(state.visible)
-            verify(mockListener).visibilityChanged(true)
         }
     }
 
@@ -75,7 +74,6 @@ class NotifyMeViewModelTest {
         testee.viewState.test {
             val state = awaitItem()
             assertFalse(state.visible)
-            verify(mockListener).visibilityChanged(false)
         }
     }
 
@@ -90,7 +88,6 @@ class NotifyMeViewModelTest {
         testee.viewState.test {
             val state = awaitItem()
             assertFalse(state.visible)
-            verify(mockListener).visibilityChanged(false)
         }
     }
 
@@ -105,7 +102,6 @@ class NotifyMeViewModelTest {
         testee.viewState.test {
             val state = awaitItem()
             assertFalse(state.visible)
-            verify(mockListener).visibilityChanged(false)
         }
     }
 
@@ -120,7 +116,6 @@ class NotifyMeViewModelTest {
         testee.viewState.test {
             val state = awaitItem()
             assertFalse(state.visible)
-            verify(mockListener).visibilityChanged(false)
         }
     }
 
@@ -135,7 +130,6 @@ class NotifyMeViewModelTest {
         testee.viewState.test {
             val state = awaitItem()
             assertFalse(state.visible)
-            verify(mockListener).visibilityChanged(false)
         }
     }
 
@@ -150,7 +144,6 @@ class NotifyMeViewModelTest {
         testee.viewState.test {
             val state = awaitItem()
             assertFalse(state.visible)
-            verify(mockListener).visibilityChanged(false)
         }
     }
 
@@ -165,7 +158,6 @@ class NotifyMeViewModelTest {
         testee.viewState.test {
             val state = awaitItem()
             assertFalse(state.visible)
-            verify(mockListener).visibilityChanged(false)
         }
     }
 

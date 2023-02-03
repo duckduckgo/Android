@@ -27,4 +27,6 @@ interface DownloadsItemListener {
     fun onDeleteItemClicked(item: DownloadItem)
 
     fun onCancelItemClicked(item: DownloadItem)
+
+    fun onItemVisibilityChanged(visible: Boolean)
 }

@@ -61,7 +61,6 @@ internal class NotifyMeViewModel() : ViewModel(), DefaultLifecycleObserver {
         flow2 = dismissCalled,
     ) { notificationsAllowed, dismissCalled ->
         val visible = !notificationsAllowed && !(dismissCalled || listener?.isDismissed() ?: false)
-        listener?.visibilityChanged(visible)
         ViewState(visible)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 

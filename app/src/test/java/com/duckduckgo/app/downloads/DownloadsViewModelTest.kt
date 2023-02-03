@@ -82,7 +82,7 @@ class DownloadsViewModelTest {
         val visible = false
         val list = emptyList<DownloadItem>()
         whenever(mockDownloadsRepository.getDownloadsAsFlow()).thenReturn(flowOf(list))
-        testee.visibilityChanged(visible)
+        testee.onItemVisibilityChanged(visible)
 
         testee.viewState.test {
             val items = awaitItem().downloadItems
@@ -96,7 +96,7 @@ class DownloadsViewModelTest {
         val visible = true
         val list = emptyList<DownloadItem>()
         whenever(mockDownloadsRepository.getDownloadsAsFlow()).thenReturn(flowOf(list))
-        testee.visibilityChanged(visible)
+        testee.onItemVisibilityChanged(visible)
 
         testee.viewState.test {
             val items = awaitItem().downloadItems
@@ -111,7 +111,7 @@ class DownloadsViewModelTest {
         val visible = false
         val list = listOf(oneItem())
         whenever(mockDownloadsRepository.getDownloadsAsFlow()).thenReturn(flowOf(list))
-        testee.visibilityChanged(visible)
+        testee.onItemVisibilityChanged(visible)
 
         testee.viewState.test {
             val items = awaitItem().downloadItems
@@ -127,7 +127,7 @@ class DownloadsViewModelTest {
         val visible = true
         val list = listOf(oneItem())
         whenever(mockDownloadsRepository.getDownloadsAsFlow()).thenReturn(flowOf(list))
-        testee.visibilityChanged(visible)
+        testee.onItemVisibilityChanged(visible)
 
         testee.viewState.test {
             val items = awaitItem().downloadItems
@@ -165,7 +165,7 @@ class DownloadsViewModelTest {
         whenever(context.getString(CommonR.string.common_Yesterday)).thenReturn("Yesterday")
         whenever(context.getString(CommonR.string.common_PastWeek)).thenReturn("Past Week")
         whenever(context.getString(CommonR.string.common_PastMonth)).thenReturn("Past Month")
-        testee.visibilityChanged(visible)
+        testee.onItemVisibilityChanged(visible)
 
         testee.viewState.test {
             val items = awaitItem().downloadItems
@@ -248,7 +248,7 @@ class DownloadsViewModelTest {
     fun whenOnQueryTextChangeThenViewStateEmittedWithTwoFilteredItems() = runTest {
         val list = listOf(oneItem(), otherItem())
         whenever(mockDownloadsRepository.getDownloadsAsFlow()).thenReturn(flowOf(list))
-        testee.visibilityChanged(false)
+        testee.onItemVisibilityChanged(false)
 
         testee.onQueryTextChange("other")
 
@@ -266,7 +266,7 @@ class DownloadsViewModelTest {
     fun whenOnQueryTextChangeThenViewStateEmittedWithZeroFilteredItems() = runTest {
         val list = listOf(oneItem(), otherItem())
         whenever(mockDownloadsRepository.getDownloadsAsFlow()).thenReturn(flowOf(list))
-        testee.visibilityChanged(false)
+        testee.onItemVisibilityChanged(false)
 
         testee.onQueryTextChange("text_that_does_not_exist_in_list")
 

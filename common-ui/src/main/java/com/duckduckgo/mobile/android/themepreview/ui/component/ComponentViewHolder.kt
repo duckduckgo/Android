@@ -295,10 +295,6 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                     override fun isDismissed(): Boolean {
                         return false
                     }
-
-                    override fun visibilityChanged(visible: Boolean) {
-                        // no op
-                    }
                 },
             )
         }

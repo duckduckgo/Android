@@ -166,10 +166,6 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         return vpnStore.isNotifyMeInAppTpDismissed()
     }
 
-    override fun visibilityChanged(visible: Boolean) {
-        // noop
-    }
-
     private fun launchVpn() {
         sendCommand(Command.LaunchVPN)
         viewModelScope.launch(dispatcherProvider.io()) {
