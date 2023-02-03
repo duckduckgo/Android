@@ -116,7 +116,6 @@ class WindowsWaitlistActivity : DuckDuckGoActivity() {
             getText(R.string.windows_waitlist_code_description),
             listOf(Pair("beta_link", windowsSpan)),
         )
-        binding.waitlistWindows.gone()
         binding.waitListButton.gone()
         binding.footerDescription.gone()
         binding.codeFrame.show()
@@ -126,7 +125,6 @@ class WindowsWaitlistActivity : DuckDuckGoActivity() {
     }
 
     private fun renderJoinedQueue() {
-        binding.waitlistWindows.gone()
         binding.waitListButton.gone()
         binding.footerDescription.gone()
         binding.codeFrame.gone()
@@ -139,7 +137,6 @@ class WindowsWaitlistActivity : DuckDuckGoActivity() {
     private fun renderNotJoinedQueue() {
         binding.headerImage.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_computer_win)
         binding.waitListButton.show()
-        binding.waitlistWindows.show()
         binding.footerDescription.show()
         binding.codeFrame.gone()
         binding.shareImage.gone()

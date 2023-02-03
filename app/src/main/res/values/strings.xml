@@ -619,7 +619,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Browse privately with our app for Mac</string>
-    <string name="macos_settings_title">DuckDuckGo Desktop App</string>
+    <string name="macos_settings_title">DuckDuckGo Mac App</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Downloads</string>
