@@ -441,6 +441,11 @@ class BrowserTabViewModel @Inject constructor(
             val sitePermissionsToGrant: Array<String>,
             val request: PermissionRequest,
         ) : Command()
+        class ShowUserCredentialSavedOrUpdatedConfirmation(
+            val credentials: LoginCredentials,
+            val includeShortcutToViewCredential: Boolean,
+            val messageResourceId: Int,
+        ) : Command()
     }
 
     sealed class NavigationCommand : Command() {
@@ -2776,6 +2781,26 @@ class BrowserTabViewModel @Inject constructor(
 
     fun canAutofillSelectCredentialsDialogCanAutomaticallyShow(): Boolean {
         return canAutofillSelectCredentialsDialogCanAutomaticallyShow && !currentOmnibarViewState().isEditing
+    }
+
+    fun onShowUserCredentialsSaved(it: LoginCredentials) {
+        viewModelScope.launch(dispatchers.main()) {
+            command.value = ShowUserCredentialSavedOrUpdatedConfirmation(
+                credentials = it,
+                includeShortcutToViewCredential = autofillCapabilityChecker.canAccessCredentialManagementScreen(),
+                messageResourceId = R.string.autofillLoginSavedSnackbarMessage,
+            )
+        }
+    }
+
+    fun onShowUserCredentialsUpdated(it: LoginCredentials) {
+        viewModelScope.launch(dispatchers.main()) {
+            command.value = ShowUserCredentialSavedOrUpdatedConfirmation(
+                credentials = it,
+                includeShortcutToViewCredential = autofillCapabilityChecker.canAccessCredentialManagementScreen(),
+                messageResourceId = R.string.autofillLoginUpdatedSnackbarMessage,
+            )
+        }
     }
 
     companion object {

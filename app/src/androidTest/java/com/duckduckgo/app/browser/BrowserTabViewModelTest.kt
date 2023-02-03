@@ -382,7 +382,7 @@ class BrowserTabViewModelTest {
 
     private val mockAppTheme: AppTheme = mock()
 
-    private val autofillCapabilityChecker: AutofillCapabilityChecker = FakeCapabilityChecker(enabled = false)
+    private val autofillCapabilityChecker: FakeCapabilityChecker = FakeCapabilityChecker(enabled = false)
 
     @Before
     fun before() {
@@ -4226,6 +4226,46 @@ class BrowserTabViewModelTest {
         assertTrue(testee.canAutofillSelectCredentialsDialogCanAutomaticallyShow())
     }
 
+    @Test
+    fun whenShowingUserCredentialsSavedConfirmationAndCanAccessCredentialManagementScreenThenShouldShowLinkToViewCredential() = runTest {
+        autofillCapabilityChecker.enabled = true
+        testee.onShowUserCredentialsSaved(aCredential())
+        assertCommandIssued<Command.ShowUserCredentialSavedOrUpdatedConfirmation> {
+            assertTrue(this.includeShortcutToViewCredential)
+        }
+    }
+
+    @Test
+    fun whenShowingUserCredentialsSavedConfirmationAndCannotAccessCredentialManagementScreenThenShouldNotShowLinkToViewCredential() = runTest {
+        autofillCapabilityChecker.enabled = false
+        testee.onShowUserCredentialsSaved(aCredential())
+        assertCommandIssued<Command.ShowUserCredentialSavedOrUpdatedConfirmation> {
+            assertFalse(this.includeShortcutToViewCredential)
+        }
+    }
+
+    @Test
+    fun whenShowingUserCredentialsUpdatedConfirmationAndCanAccessCredentialManagementScreenThenShouldShowLinkToViewCredential() = runTest {
+        autofillCapabilityChecker.enabled = true
+        testee.onShowUserCredentialsUpdated(aCredential())
+        assertCommandIssued<Command.ShowUserCredentialSavedOrUpdatedConfirmation> {
+            assertTrue(this.includeShortcutToViewCredential)
+        }
+    }
+
+    @Test
+    fun whenShowingUserCredentialsUpdatedConfirmationAndCannotAccessCredentialManagementScreenThenShouldNotShowLinkToViewCredential() = runTest {
+        autofillCapabilityChecker.enabled = false
+        testee.onShowUserCredentialsUpdated(aCredential())
+        assertCommandIssued<Command.ShowUserCredentialSavedOrUpdatedConfirmation> {
+            assertFalse(this.includeShortcutToViewCredential)
+        }
+    }
+
+    private fun aCredential(): LoginCredentials {
+        return LoginCredentials(domain = null, username = null, password = null)
+    }
+
     private fun assertShowHistoryCommandSent(expectedStackSize: Int) {
         assertCommandIssued<ShowBackNavigationHistory> {
             assertEquals(expectedStackSize, history.size)
@@ -4493,7 +4533,7 @@ class BrowserTabViewModelTest {
     private fun browserGlobalLayoutViewState() = testee.globalLayoutState.value!! as BrowserTabViewModel.GlobalLayoutViewState.Browser
     private fun accessibilityViewState() = testee.accessibilityViewState.value!!
 
-    class FakeCapabilityChecker(private val enabled: Boolean) : AutofillCapabilityChecker {
+    class FakeCapabilityChecker(var enabled: Boolean) : AutofillCapabilityChecker {
         override suspend fun isAutofillEnabledByConfiguration(url: String) = enabled
         override suspend fun canInjectCredentialsToWebView(url: String) = enabled
         override suspend fun canSaveCredentialsFromWebView(url: String) = enabled
