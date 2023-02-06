@@ -20,7 +20,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.autofill.api.feature.AutofillFeatureName
-import com.duckduckgo.autofill.api.feature.AutofillSubfeatureName
+import com.duckduckgo.autofill.api.feature.AutofillSubfeature
 
 interface AutofillFeatureToggleStore {
     fun deleteAll()
@@ -31,12 +31,12 @@ interface AutofillFeatureToggleStore {
     ): Boolean
 
     fun get(
-        featureName: AutofillSubfeatureName,
+        featureName: AutofillSubfeature,
         defaultValue: Boolean,
     ): Boolean
 
     fun getMinSupportedVersion(featureName: AutofillFeatureName): Int
-    fun getMinSupportedVersion(featureName: AutofillSubfeatureName): Int
+    fun getMinSupportedVersion(featureName: AutofillSubfeature): Int
 
     fun insert(toggle: AutofillFeatureToggles)
     fun insert(toggle: AutofillSubfeatureToggle)
@@ -56,12 +56,12 @@ class RealAutofillFeatureToggleStore(private val context: Context) : AutofillFea
     ): Boolean = preferences.getBoolean(featureName.value, defaultValue)
 
     override fun get(
-        featureName: AutofillSubfeatureName,
+        featureName: AutofillSubfeature,
         defaultValue: Boolean,
     ): Boolean = preferences.getBoolean(featureName.value, defaultValue)
 
     override fun getMinSupportedVersion(featureName: AutofillFeatureName): Int = getMinSupportedVersion(featureName.value)
-    override fun getMinSupportedVersion(featureName: AutofillSubfeatureName): Int = getMinSupportedVersion(featureName.value)
+    override fun getMinSupportedVersion(featureName: AutofillSubfeature): Int = getMinSupportedVersion(featureName.value)
     private fun getMinSupportedVersion(key: String): Int = preferences.getInt("${key}$MIN_SUPPORTED_VERSION", 0)
 
     override fun insert(toggle: AutofillFeatureToggles) = insert(toggle.featureName.value, toggle.enabled, toggle.minSupportedVersion)
@@ -92,7 +92,7 @@ data class AutofillFeatureToggles(
 )
 
 data class AutofillSubfeatureToggle(
-    val featureName: AutofillSubfeatureName,
+    val featureName: AutofillSubfeature,
     val enabled: Boolean,
     val minSupportedVersion: Int?,
 )
