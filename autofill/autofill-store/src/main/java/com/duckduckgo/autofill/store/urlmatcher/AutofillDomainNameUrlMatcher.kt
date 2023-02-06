@@ -17,23 +17,26 @@
 package com.duckduckgo.autofill.store.urlmatcher
 
 import com.duckduckgo.app.global.extractDomain
-import com.duckduckgo.autofill.api.ui.urlmatcher.AutofillUrlMatcher
+import com.duckduckgo.autofill.api.urlmatcher.AutofillUrlMatcher
+import com.duckduckgo.autofill.api.urlmatcher.AutofillUrlMatcher.ExtractedUrlParts
 import javax.inject.Inject
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import timber.log.Timber
 
 class AutofillDomainNameUrlMatcher @Inject constructor() : AutofillUrlMatcher {
 
-    override fun extractUrlPartsForAutofill(originalUrl: String): AutofillUrlMatcher.ExtractedUrlParts {
+    override fun extractUrlPartsForAutofill(originalUrl: String?): ExtractedUrlParts {
+        if (originalUrl == null) return ExtractedUrlParts(null, null)
+
         val normalizedUrl = originalUrl.normalizeScheme()
         return try {
             val eTldPlus1 = normalizedUrl.toHttpUrl().topPrivateDomain()
             val domain = originalUrl.extractDomain()
             val subdomain = determineSubdomain(domain, eTldPlus1)
-            AutofillUrlMatcher.ExtractedUrlParts(eTldPlus1, subdomain)
+            ExtractedUrlParts(eTldPlus1, subdomain)
         } catch (e: IllegalArgumentException) {
             Timber.w("Unable to parse e-tld+1 from $originalUrl")
-            AutofillUrlMatcher.ExtractedUrlParts(null, null)
+            ExtractedUrlParts(null, null)
         }
     }
 
@@ -50,8 +53,8 @@ class AutofillDomainNameUrlMatcher @Inject constructor() : AutofillUrlMatcher {
     }
 
     override fun matchingForAutofill(
-        visitedSite: AutofillUrlMatcher.ExtractedUrlParts,
-        savedSite: AutofillUrlMatcher.ExtractedUrlParts,
+        visitedSite: ExtractedUrlParts,
+        savedSite: ExtractedUrlParts,
     ): Boolean {
         // e-tld+1 must match
         if (!identicalEffectiveTldPlusOne(visitedSite, savedSite)) return false
@@ -63,27 +66,27 @@ class AutofillDomainNameUrlMatcher @Inject constructor() : AutofillUrlMatcher {
     }
 
     private fun identicalEffectiveTldPlusOne(
-        visitedSite: AutofillUrlMatcher.ExtractedUrlParts,
-        savedSite: AutofillUrlMatcher.ExtractedUrlParts,
+        visitedSite: ExtractedUrlParts,
+        savedSite: ExtractedUrlParts,
     ): Boolean {
         return visitedSite.eTldPlus1.equals(savedSite.eTldPlus1, ignoreCase = true)
     }
 
     private fun identicalSubdomains(
-        visitedSite: AutofillUrlMatcher.ExtractedUrlParts,
-        savedSite: AutofillUrlMatcher.ExtractedUrlParts,
+        visitedSite: ExtractedUrlParts,
+        savedSite: ExtractedUrlParts,
     ): Boolean {
         return visitedSite.subdomain.equals(savedSite.subdomain, ignoreCase = true)
     }
 
     private fun specialHandlingForWwwSubdomainOnSavedSite(
-        visitedSite: AutofillUrlMatcher.ExtractedUrlParts,
-        savedSite: AutofillUrlMatcher.ExtractedUrlParts,
+        visitedSite: ExtractedUrlParts,
+        savedSite: ExtractedUrlParts,
     ): Boolean {
         return (visitedSite.subdomain == null && savedSite.subdomain.equals(WWW, ignoreCase = true))
     }
 
-    private fun savedSiteHasNoSubdomain(savedSite: AutofillUrlMatcher.ExtractedUrlParts): Boolean {
+    private fun savedSiteHasNoSubdomain(savedSite: ExtractedUrlParts): Boolean {
         return savedSite.subdomain == null
     }
 

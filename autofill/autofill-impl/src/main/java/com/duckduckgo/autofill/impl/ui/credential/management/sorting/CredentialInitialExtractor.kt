@@ -17,7 +17,7 @@
 package com.duckduckgo.autofill.impl.ui.credential.management.sorting
 
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
-import com.duckduckgo.autofill.impl.AutofillDomainFormatter
+import com.duckduckgo.autofill.api.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import java.lang.Character.*
@@ -33,7 +33,7 @@ interface InitialExtractor {
 
 @ContributesBinding(FragmentScope::class)
 class CredentialInitialExtractor @Inject constructor(
-    private val domainFormatter: AutofillDomainFormatter,
+    private val autofillUrlMatcher: AutofillUrlMatcher,
 ) : InitialExtractor {
 
     override fun extractInitial(loginCredentials: LoginCredentials): String {
@@ -65,7 +65,7 @@ class CredentialInitialExtractor @Inject constructor(
     }
 
     override fun extractInitialFromDomain(loginCredentials: LoginCredentials): String? {
-        return domainFormatter.extractDomain(loginCredentials.domain)?.firstOrNull()?.uppercaseChar()?.toString()
+        return autofillUrlMatcher.extractUrlPartsForAutofill(loginCredentials.domain).eTldPlus1?.firstOrNull()?.uppercaseChar()?.toString()
     }
 
     companion object {

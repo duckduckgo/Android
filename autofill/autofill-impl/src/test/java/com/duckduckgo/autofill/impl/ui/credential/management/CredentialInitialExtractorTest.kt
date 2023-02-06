@@ -18,9 +18,9 @@ package com.duckduckgo.autofill.impl.ui.credential.management
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
-import com.duckduckgo.autofill.impl.AutofillDomainFormatterDomainNameOnly
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialInitialExtractor
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialInitialExtractor.Companion.INITIAL_CHAR_FOR_NON_LETTERS
+import com.duckduckgo.autofill.store.urlmatcher.AutofillDomainNameUrlMatcher
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -28,7 +28,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class CredentialInitialExtractorTest {
 
-    private val testee = CredentialInitialExtractor(domainFormatter = AutofillDomainFormatterDomainNameOnly())
+    private val testee = CredentialInitialExtractor(autofillUrlMatcher = AutofillDomainNameUrlMatcher())
 
     @Test
     fun whenMissingTitleAndDomainThenPlaceholderChar() {
@@ -84,6 +84,12 @@ class CredentialInitialExtractorTest {
     fun whenTitleStartsWithANonLatinLetterThenThatLetterIsUsed() {
         val loginCredentials = creds(title = "あ")
         assertEquals("あ", testee.extractInitial(loginCredentials))
+    }
+
+    @Test
+    fun whenSubdomainIsPresentThenNotUsedForInitialExtraction() {
+        val loginCredentials = creds(domain = "a.example.com")
+        assertEquals("E", testee.extractInitial(loginCredentials))
     }
 
     private fun String.assertIsPlaceholder() {

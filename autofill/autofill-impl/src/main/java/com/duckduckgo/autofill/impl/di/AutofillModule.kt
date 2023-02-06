@@ -22,7 +22,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.autofill.api.store.AutofillStore
-import com.duckduckgo.autofill.api.ui.urlmatcher.AutofillUrlMatcher
+import com.duckduckgo.autofill.api.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.autofill.store.ALL_MIGRATIONS
 import com.duckduckgo.autofill.store.AutofillDatabase
 import com.duckduckgo.autofill.store.InternalTestUserStore

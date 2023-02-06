@@ -18,27 +18,27 @@ package com.duckduckgo.autofill.impl.ui.credential.management
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
-import com.duckduckgo.autofill.impl.AutofillDomainFormatterDomainNameOnly
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem.CredentialListItem.Credential
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem.GroupHeading
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialGrouper
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialInitialExtractor
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialListSorterByTitleAndDomain
-import org.junit.Assert.*
+import com.duckduckgo.autofill.store.urlmatcher.AutofillDomainNameUrlMatcher
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class CredentialGrouperTest {
 
-    private val domainFormatter = AutofillDomainFormatterDomainNameOnly()
-
-    private val initialExtractor = CredentialInitialExtractor(domainFormatter = domainFormatter)
+    private val autofillUrlMatcher = AutofillDomainNameUrlMatcher()
+    private val initialExtractor = CredentialInitialExtractor(autofillUrlMatcher = autofillUrlMatcher)
 
     private val testee = CredentialGrouper(
         initialExtractor = initialExtractor,
-        sorter = CredentialListSorterByTitleAndDomain(domainFormatter),
+        sorter = CredentialListSorterByTitleAndDomain(autofillUrlMatcher),
     )
 
     @Test

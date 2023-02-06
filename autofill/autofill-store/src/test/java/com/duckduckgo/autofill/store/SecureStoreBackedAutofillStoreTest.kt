@@ -26,7 +26,7 @@ import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult
 import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult.UrlOnlyMatch
 import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult.UsernameMatch
 import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult.UsernameMissing
-import com.duckduckgo.autofill.api.ui.urlmatcher.AutofillUrlMatcher
+import com.duckduckgo.autofill.api.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.autofill.store.urlmatcher.AutofillDomainNameUrlMatcher
 import com.duckduckgo.securestorage.api.SecureStorage
 import com.duckduckgo.securestorage.api.WebsiteLoginDetails

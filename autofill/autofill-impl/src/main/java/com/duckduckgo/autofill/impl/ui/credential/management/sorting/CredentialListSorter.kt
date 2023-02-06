@@ -16,8 +16,10 @@
 
 package com.duckduckgo.autofill.impl.ui.credential.management.sorting
 
+import com.duckduckgo.app.global.extractDomain
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
-import com.duckduckgo.autofill.impl.AutofillDomainFormatter
+import com.duckduckgo.autofill.api.urlmatcher.AutofillUrlMatcher
+import com.duckduckgo.autofill.api.urlmatcher.AutofillUrlMatcher.ExtractedUrlParts
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import java.text.Collator
@@ -30,7 +32,7 @@ interface CredentialListSorter {
 
 @ContributesBinding(FragmentScope::class)
 class CredentialListSorterByTitleAndDomain @Inject constructor(
-    private val domainFormatter: AutofillDomainFormatter,
+    private val autofillUrlMatcher: AutofillUrlMatcher,
 ) : CredentialListSorter {
 
     override fun sort(credentials: List<LoginCredentials>): List<LoginCredentials> {
@@ -44,39 +46,90 @@ class CredentialListSorterByTitleAndDomain @Inject constructor(
     private val credentialComparator = object : Comparator<LoginCredentials> {
 
         /**
-         * Compare two credentials by title and then domain.
+         * Sort by title if present, then by domain, then by subdomain
          */
-        override fun compare(o1: LoginCredentials?, o2: LoginCredentials?): Int {
+        override fun compare(
+            o1: LoginCredentials?,
+            o2: LoginCredentials?,
+        ): Int {
             if (o1 == null && o2 == null) return 0
             if (o1 == null) return -1
             if (o2 == null) return 1
 
-            val collator = buildCollator()
-            val title1 = (o1.domainTitle)?.uppercase()
-            val title2 = (o2.domainTitle)?.uppercase()
-            val domain1 = domainFormatter.extractDomain(o1.domain)
-            val domain2 = domainFormatter.extractDomain(o2.domain)
+            val titles = extractTitles(o1, o2)
+            val rawDomains = extractRawDomains(o1, o2)
+            val domainParts = extractDomainParts(rawDomains)
+            val bestMatches = extractBestMatches(titles, rawDomains, domainParts)
 
-            // if both titles are null, we have to compare domains
-            if (title1 == null && title2 == null) return collator.compareFields(domain1, domain2)
+            with(buildCollator()) {
+                val comparison = compareFields(bestMatches.first, bestMatches.second)
+                if (comparison != 0) {
+                    return comparison
+                }
 
-            // if first title is null, compare its domain to the second one's title
-            if (title1 == null) return collator.compareFields(domain1, title2)
-
-            // if the second title is null, compare its domain to the first one's title
-            if (title2 == null) return collator.compareFields(title1, domain2)
-
-            var fieldComparison = collator.compareFields(title1, title2)
-
-            // if titles are exactly equal, we have to compare the two domains
-            if (fieldComparison == 0) {
-                fieldComparison = collator.compareFields(domain1, domain2)
+                // couldn't sort based on title or e-tld+1, so need to look at subdomain
+                return compareFields(domainParts.first.subdomain, domainParts.second.subdomain)
             }
-            return fieldComparison
         }
     }
 
-    private fun Collator.compareFields(field1: String?, field2: String?): Int {
+    private fun extractTitles(
+        o1: LoginCredentials,
+        o2: LoginCredentials,
+    ): Pair<String?, String?> {
+        return Pair(o1.domainTitle?.uppercase(), o2.domainTitle?.uppercase())
+    }
+
+    private fun extractRawDomains(
+        o1: LoginCredentials,
+        o2: LoginCredentials,
+    ): Pair<String?, String?> {
+        return Pair(o1.domain?.extractDomain(), o2.domain?.extractDomain())
+    }
+
+    private fun extractDomainParts(rawDomains: Pair<String?, String?>): Pair<ExtractedUrlParts, ExtractedUrlParts> {
+        val domainParts1 = autofillUrlMatcher.extractUrlPartsForAutofill(rawDomains.first)
+        val domainParts2 = autofillUrlMatcher.extractUrlPartsForAutofill(rawDomains.second)
+        return Pair(domainParts1, domainParts2)
+    }
+
+    private fun extractBestMatches(
+        titles: Pair<String?, String?>,
+        rawDomains: Pair<String?, String?>,
+        domainParts: Pair<ExtractedUrlParts, ExtractedUrlParts>,
+    ): Pair<String?, String?> {
+        val identicalTitles = titles.first == titles.second
+        val bestMatch1 = getBestPrimarySortField(titles.first, rawDomains.first, domainParts.first, identicalTitles)
+        val bestMatch2 = getBestPrimarySortField(titles.second, rawDomains.second, domainParts.second, identicalTitles)
+        return Pair(bestMatch1, bestMatch2)
+    }
+
+    /**
+     * Get the best candidate to sort on between the title and the e-tld+1.
+     * If a title is present and different from the other title being compared, then title is the best thing to compare.
+     * If both titles being compared are identical, or title is missing, then we want to use the e-tld+1.
+     *
+     * If we can't use title, and we can't use e-tld+1 because it's null, then offer back the raw domain.
+     */
+    private fun getBestPrimarySortField(
+        title: String?,
+        rawDomain: String?,
+        domainParts: ExtractedUrlParts,
+        identicalTitles: Boolean,
+    ): String? {
+        if (title != null && !identicalTitles) {
+            return title
+        }
+
+        domainParts.eTldPlus1?.let { return it }
+
+        return rawDomain
+    }
+
+    private fun Collator.compareFields(
+        field1: String?,
+        field2: String?,
+    ): Int {
         if (field1 == null && field2 == null) return 0
         if (field1 == null) return -1
         if (field2 == null) return 1
