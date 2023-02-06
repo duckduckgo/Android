@@ -27,7 +27,6 @@ import android.view.KeyEvent
 import android.view.View
 import android.widget.Toast
 import androidx.annotation.VisibleForTesting
-import androidx.fragment.app.DialogFragment
 import androidx.webkit.ServiceWorkerClientCompat
 import androidx.webkit.ServiceWorkerControllerCompat
 import androidx.webkit.WebViewFeature
@@ -577,7 +576,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         TextAlertDialogBuilder(this)
             .setTitle(R.string.appEnjoymentDialogTitle)
             .setMessage(R.string.appEnjoymentDialogMessage)
-            .setCancellable(false)
+            .setCancellable(true)
             .setPositiveButton(R.string.appEnjoymentDialogPositiveButton)
             .setNegativeButton(R.string.appEnjoymentDialogNegativeButton)
             .addEventListener(
@@ -594,7 +593,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
                         viewModel.onAppEnjoymentDialogShown(promptCount)
                     }
 
-                    override fun onDialogDismissed() {
+                    override fun onDialogCancelled() {
                         viewModel.onUserCancelledAppEnjoymentDialog(promptCount)
                     }
                 },
@@ -648,11 +647,6 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
                 },
             )
             .show()
-    }
-
-    private fun showAppEnjoymentPrompt(prompt: DialogFragment) {
-        (supportFragmentManager.findFragmentByTag(APP_ENJOYMENT_DIALOG_TAG) as? DialogFragment)?.dismissNow()
-        prompt.show(supportFragmentManager, APP_ENJOYMENT_DIALOG_TAG)
     }
 
     private fun hideWebContent() {
