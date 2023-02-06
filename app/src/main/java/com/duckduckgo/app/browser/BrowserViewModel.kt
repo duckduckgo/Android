@@ -260,6 +260,4 @@ class BrowserViewModel @Inject constructor(
             pixel.fire(AppPixelName.SHORTCUT_OPENED)
         }
     }
-
-
 }

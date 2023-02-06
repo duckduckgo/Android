@@ -31,6 +31,7 @@ class TextAlertDialogBuilder(val context: Context) : DaxAlertDialog {
     abstract class EventListener {
         open fun onDialogShown() {}
         open fun onDialogDismissed() {}
+        open fun onDialogCancelled() {}
         open fun onPositiveButtonClicked() {}
         open fun onNegativeButtonClicked() {}
     }
@@ -106,9 +107,13 @@ class TextAlertDialogBuilder(val context: Context) : DaxAlertDialog {
 
         val dialogBuilder = MaterialAlertDialogBuilder(context, R.style.Widget_DuckDuckGo_Dialog)
             .setView(binding.root)
+            .setCancelable(isCancellable)
             .apply {
-                setCancelable(isCancellable)
-                setOnDismissListener { listener.onDialogDismissed() }
+                setOnKeyListener(
+                    BackKeyListener {
+                        listener.onDialogCancelled()
+                    },
+                )
             }
         dialog = dialogBuilder.create()
         setViews(binding, dialog!!)
