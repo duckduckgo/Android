@@ -25,7 +25,7 @@ data class Entity(
     @PrimaryKey var id: String,
     var title: String,
     var url: String?,
-    @Embedded var type: EntityType
+    @Embedded var type: EntityType,
 )
 
 sealed class EntityType {
@@ -36,5 +36,5 @@ sealed class EntityType {
 @Entity(tableName = "relations")
 data class Relation(
     @PrimaryKey var id: String,
-    var children: List<String>
+    var children: List<String>,
 )

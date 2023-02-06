@@ -16,27 +16,25 @@
 
 package com.duckduckgo.sync.api
 
-import java.awt.print.Book
-
 sealed class Entity(
     open val id: String,
-    open val title: String
+    open val title: String,
 ) {
     data class Bookmark(
         override val id: String,
         override val title: String,
-        val url: String
+        val url: String,
     ) : Entity(id, title)
 
     data class Favourite(
         override val id: String,
         override val title: String,
-        val url: String
+        val url: String,
     ) : Entity(id, title)
 
     data class Folder(
         override val id: String,
         override val title: String,
-        val bookmarks: List<Bookmark>
+        val bookmarks: List<Bookmark>,
     ) : Entity(id, title)
 }
