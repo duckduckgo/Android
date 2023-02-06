@@ -34,6 +34,7 @@ import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.APP_ENJOYMENT_DIALOG_SHOWN
+import com.duckduckgo.app.pixels.AppPixelName.APP_ENJOYMENT_DIALOG_USER_CANCELLED
 import com.duckduckgo.app.pixels.AppPixelName.APP_ENJOYMENT_DIALOG_USER_ENJOYING
 import com.duckduckgo.app.pixels.AppPixelName.APP_ENJOYMENT_DIALOG_USER_NOT_ENJOYING
 import com.duckduckgo.app.pixels.AppPixelName.APP_FEEDBACK_DIALOG_SHOWN
@@ -248,10 +249,17 @@ class BrowserViewModel @Inject constructor(
         launch { appEnjoymentUserEventRecorder.onUserDeclinedToGiveFeedback(promptCount) }
     }
 
+    fun onUserCancelledAppEnjoymentDialog(promptCount: PromptCount) {
+        firePixelWithPromptCount(APP_ENJOYMENT_DIALOG_USER_CANCELLED, promptCount)
+        launch { appEnjoymentUserEventRecorder.onUserDeclinedToSayIfEnjoyingApp(promptCount) }
+    }
+
     fun onOpenShortcut(url: String) {
         launch(dispatchers.io()) {
             tabRepository.selectByUrlOrNewTab(queryUrlConverter.convertQueryToUrl(url))
             pixel.fire(AppPixelName.SHORTCUT_OPENED)
         }
     }
+
+
 }

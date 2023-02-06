@@ -577,6 +577,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         TextAlertDialogBuilder(this)
             .setTitle(R.string.appEnjoymentDialogTitle)
             .setMessage(R.string.appEnjoymentDialogMessage)
+            .setCancellable(false)
             .setPositiveButton(R.string.appEnjoymentDialogPositiveButton)
             .setNegativeButton(R.string.appEnjoymentDialogNegativeButton)
             .addEventListener(
@@ -591,6 +592,10 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
 
                     override fun onDialogShown() {
                         viewModel.onAppEnjoymentDialogShown(promptCount)
+                    }
+
+                    override fun onDialogDismissed() {
+                        viewModel.onUserCancelledAppEnjoymentDialog(promptCount)
                     }
                 },
             )
