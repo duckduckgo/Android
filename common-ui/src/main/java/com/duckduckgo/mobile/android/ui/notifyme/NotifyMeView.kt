@@ -143,12 +143,12 @@ class NotifyMeView @JvmOverloads constructor(
         this.visibilityChangedListener = visibilityChangedListener
     }
 
-    fun setPrimaryText(title: String) {
-        binding.notifyMeMessageTitle.text = title
+    fun setPrimaryText(primaryText: String) {
+        binding.notifyMeMessageTitle.text = primaryText
     }
 
-    fun setSecondaryText(subtitle: String) {
-        binding.notifyMeMessageSubtitle.text = subtitle
+    fun setSecondaryText(secondaryText: String) {
+        binding.notifyMeMessageSubtitle.text = secondaryText
     }
 
     fun setPixelParentScreenName(pixelParentScreenName: String) {
@@ -159,16 +159,16 @@ class NotifyMeView @JvmOverloads constructor(
         this.sharedPrefsKeyForDismiss = sharedPrefsKeyForDismiss
     }
 
-    fun setDismissIcon(visible: Boolean) {
-        if (visible) {
+    fun setDismissIcon(dismissIcon: Boolean) {
+        if (dismissIcon) {
             binding.notifyMeClose.show()
         } else {
             binding.notifyMeClose.gone()
         }
     }
 
-    fun setContentOrientation(orientation: Orientation) {
-        if (orientation == Orientation.Center) {
+    fun setContentOrientation(contentOrientation: Orientation) {
+        if (contentOrientation == Orientation.Center) {
             binding.notifyMeButton.iconGravity = ICON_GRAVITY_TEXT_START
             binding.notifyMeButton.updateLayoutParams {
                 width = ConstraintLayout.LayoutParams.MATCH_PARENT
