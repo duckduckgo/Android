@@ -19,6 +19,7 @@ package com.duckduckgo.app.settings
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.fire.FireAnimationLoader
@@ -239,6 +240,30 @@ class SettingsViewModelTest {
             val value = expectMostRecentItem()
             val expectedEmail = "email"
             assertEquals(expectedEmail, value.emailAddress)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenStartCalledWithNotificationsEnabledThenNotificationsSettingSubtitleSetCorrectlyAsEnabled() = runTest {
+        testee.start(notificationsEnabled = true)
+
+        testee.viewState().test {
+            val value = expectMostRecentItem()
+            assertEquals(R.string.settingsSubtitleNotificationsEnabled, value.notificationsSettingSubtitleId)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenStartCalledWithNotificationsDisabledThenNotificationsSettingSubtitleSetCorrectlyAsDisabled() = runTest {
+        testee.start(notificationsEnabled = false)
+
+        testee.viewState().test {
+            val value = expectMostRecentItem()
+            assertEquals(R.string.settingsSubtitleNotificationsDisabled, value.notificationsSettingSubtitleId)
 
             cancelAndConsumeRemainingEvents()
         }

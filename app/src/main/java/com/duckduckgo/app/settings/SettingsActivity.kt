@@ -151,9 +151,8 @@ class SettingsActivity : DuckDuckGoActivity() {
     override fun onStart() {
         super.onStart()
 
-        configureNotificationsSetting()
-
-        viewModel.start()
+        val notificationsEnabled = NotificationManagerCompat.from(this).areNotificationsEnabled()
+        viewModel.start(notificationsEnabled)
         viewModel.startPollingAppTpEnableState()
     }
 
@@ -230,13 +229,6 @@ class SettingsActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun configureNotificationsSetting() {
-        val enabled = NotificationManagerCompat.from(this).areNotificationsEnabled()
-        viewsCustomize.notificationsSetting.setSecondaryText(
-            getString(if (enabled) R.string.settingsSubtitleNotificationsEnabled else R.string.settingsSubtitleNotificationsDisabled),
-        )
-    }
-
     private fun observeViewModel() {
         viewModel.viewState()
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
@@ -258,6 +250,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                     )
                     updateEmailSubtitle(it.emailAddress)
                     updateAutofill(it.showAutofill)
+                    viewsCustomize.notificationsSetting.setSecondaryText(getString(it.notificationsSettingSubtitleId))
                 }
             }.launchIn(lifecycleScope)
 
