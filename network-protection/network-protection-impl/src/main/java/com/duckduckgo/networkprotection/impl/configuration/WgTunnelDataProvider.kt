@@ -24,6 +24,9 @@ import com.wireguard.config.Interface
 import com.wireguard.config.Peer
 import java.net.InetAddress
 import javax.inject.Inject
+import logcat.LogPriority
+import logcat.asLog
+import logcat.logcat
 
 interface WgTunnelDataProvider {
     suspend fun get(): WgTunnelData?
@@ -42,8 +45,9 @@ class RealWgTunnelDataProvider @Inject constructor(
 ) : WgTunnelDataProvider {
 
     override suspend fun get(): WgTunnelData? {
-        val serverData = wgServerDataProvider.get(deviceKeys.publicKey) ?: return null
         return try {
+            // ensure we always return null on error
+            val serverData = wgServerDataProvider.get(deviceKeys.publicKey) ?: return null
             Config.Builder()
                 .setInterface(
                     Interface.Builder()
@@ -67,6 +71,7 @@ class RealWgTunnelDataProvider @Inject constructor(
                     )
                 }
         } catch (e: Throwable) {
+            logcat(LogPriority.ERROR) { "Error getting WgTunnelData: ${e.asLog()}" }
             null
         }
     }

@@ -55,6 +55,7 @@ private val SERVERS_JSON = """
                     "latitude": 33.9192,
                     "longitude": -118.4165,
                     "region": "North America",
+                    "tzOffset": -28800,
                     "state": "ca"
                   },
                   "publicKey": "R/BMR6Rr5rzvp7vSIWdAtgAmOLK9m7CqTcDynblM3Us=",
@@ -74,6 +75,7 @@ private val SERVERS_JSON = """
                     "latitude": 52.377956,
                     "longitude": 4.89707,
                     "region": "Europe",
+                    "tzOffset": 3600,
                     "state": "na"
                   },
                   "publicKey": "CLQMP4SFzpyvAzMj3rXwShm+3n6Yt68hGHBF67At+x0=",
@@ -94,6 +96,7 @@ private val SERVERS_JSON = """
                     "latitude": 51.9225,
                     "longitude": 4.4792,
                     "region": "Europe",
+                    "tzOffset": 3600,
                     "state": "na"
                   },
                   "publicKey": "4PnM/V0CodegK44rd9fKTxxS9QDVTw13j8fxKsVud3s=",
@@ -114,6 +117,7 @@ private val SERVERS_JSON = """
                     "latitude": 51.9225,
                     "longitude": 4.4792,
                     "region": "Europe",
+                    "tzOffset": 3600,
                     "state": "na"
                   },
                   "publicKey": "ocUfgaqaN/s/D3gTwJstipGh03T2v6wLL+aVtg3Viz4=",
@@ -134,6 +138,7 @@ private val SERVERS_JSON = """
                     "latitude": 40.7357,
                     "longitude": -74.1724,
                     "region": "North America",
+                    "tzOffset": -18000,
                     "state": "nj"
                   },
                   "publicKey": "q3YJJUwMNP31J8qSvMdVsxASKNcjrm8ep8cLcI0qViY=",
@@ -154,6 +159,7 @@ private val SERVERS_JSON = """
                     "latitude": 40.7357,
                     "longitude": -74.1724,
                     "region": "North America",
+                    "tzOffset": -18000,
                     "state": "nj"
                   },
                   "publicKey": "L4gDTg3KqbhjjiN99n/Zmwxwmbv+P+n8ZZVL0v34cAs=",
@@ -174,6 +180,7 @@ private val SERVERS_JSON = """
                     "latitude": 41.619549,
                     "longitude": -93.598022,
                     "region": "North America",
+                    "tzOffset": -21600,
                     "state": "IA"
                   },
                   "publicKey": "ovn9RpzUuvQ4XLQt6B3RKuEXGIxa5QpTnehjduZlcSE=",
@@ -196,6 +203,7 @@ private val SERVERS_JSON = """
                     "latitude": 33.9192,
                     "longitude": -118.4165,
                     "region": "North America",
+                    "tzOffset": -28800,
                     "state": "ca"
                   },
                   "publicKey": "8JjNmnFYZA+CnWAkbiucDrUJ70wl+Tl3O3ETkRgw028=",

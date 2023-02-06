@@ -61,7 +61,7 @@ class RealWgServerDataProvider @Inject constructor(
                 }
             }
             .run {
-                val selectedServer = this.selectClosestServer()
+                val selectedServer = this.findClosetServer(timezoneProvider.getTimeZone())
                 logcat { "Closest server is: ${selectedServer.server.name}" }
                 wgVpnControllerService.registerKey(
                     RegisterKeyBody(
@@ -87,12 +87,11 @@ class RealWgServerDataProvider @Inject constructor(
         } + ":" + port
     }
 
-    private fun Map<String, String>.extractLocation(): String? {
-        val country = this[SERVER_ATTR_COUNTRY]
-        val city = this[SERVER_ATTR_CITY]?.lowercase()?.capitalizeFirstLetter()
+    private fun Map<String, Any?>.extractLocation(): String? {
+        val serverAttributes = ServerAttributes(this)
 
-        return if (country != null && city != null) {
-            "$city, ${country.getDisplayableCountry()}"
+        return if (serverAttributes.country != null && serverAttributes.city != null) {
+            "${serverAttributes.city}, ${serverAttributes.country!!.getDisplayableCountry()}"
         } else {
             null
         }
@@ -100,56 +99,32 @@ class RealWgServerDataProvider @Inject constructor(
 
     private fun String.getDisplayableCountry(): String = Locale("", this).displayCountry.lowercase().capitalizeFirstLetter()
 
-    private suspend fun List<RegisteredServerInfo>.selectClosestServer(): RegisteredServerInfo {
-        fun Server.extractRegion(): String = this.name.split(".")[1]
-
-        assert(this.isNotEmpty()) { "List of RegisteredServerInfo can't ge empty" }
-
-        if (appBuildConfig.isInternalBuild()) {
-            assert(serverDebugProvider.getPlugins().size <= 1) { "Only one debug server provider can be registered" }
-            firstOrNull { it.server.name == serverDebugProvider.getPlugins().firstOrNull()?.getSelectedServerName() }
-        } else {
-            null
-        }?.let { return it }
-
-        val eligibleRegionsIntersection = SERVER_TIMEZONES.filter { region -> this.map { it.server.extractRegion() }.contains(region.region) }.toSet()
-        val selectedServer = timezoneProvider.getTimeZone().findClosestRegion(eligibleRegionsIntersection)
-        // Return the selected closest server or fallback to just the first element
-        return (this.firstOrNull { it.server.name.contains(selectedServer.region) } ?: this[0]).also { selected ->
-            logcat { "Selected closest server: $selected" }
-        }
-    }
-
-    private fun TimeZone.findClosestRegion(servers: Set<ServerRegions>): ServerRegions {
-        val serverTimezones = servers.sortedBy { it.offsetBoundary }.map { it.offsetBoundary }
+    private fun Collection<RegisteredServerInfo>.findClosetServer(timeZone: TimeZone): RegisteredServerInfo {
+        val serverAttributes = this.map { ServerAttributes(it.server.attributes) }.sortedBy { it.tzOffset }
         var min = Int.MAX_VALUE.toLong()
-        val offset = rawOffset / TimeUnit.HOURS.toMillis(1)
+        val offset = TimeUnit.MILLISECONDS.toSeconds(timeZone.rawOffset.toLong())
         var closest = offset
 
-        serverTimezones.forEach { tz ->
-            val diff = abs(tz - offset)
+        serverAttributes.forEach { attrs ->
+            val diff = abs(attrs.tzOffset - offset)
             if (diff < min) {
                 min = diff
-                closest = tz
+                closest = attrs.tzOffset
             }
         }
 
-        return SERVER_TIMEZONES.find { it.offsetBoundary == closest } ?: SERVER_TIMEZONES[1] // USE by default
+        return this.firstOrNull { ServerAttributes(it.server.attributes).tzOffset == closest } ?: this.first()
     }
 
-    companion object {
-        private const val SERVER_ATTR_CITY = "city"
-        private const val SERVER_ATTR_COUNTRY = "country"
-        private val SERVER_TIMEZONES = listOf(
-            ServerRegions("euw", 0L),
-            ServerRegions("use", -5L),
-            ServerRegions("usc", -7L),
-            ServerRegions("usw", -8L),
-        )
+    private data class ServerAttributes(val map: Map<String, Any?>) {
+        // withDefault wraps the map to return null for missing keys
+        private val attributes = map.withDefault { null }
+
+        val city: String? by attributes
+        val country: String? by attributes
+        val tzOffset: Long by attributes
     }
 }
-
-internal data class ServerRegions(val region: String, val offsetBoundary: Long)
 
 interface DeviceTimezoneProvider {
     fun getTimeZone(): TimeZone

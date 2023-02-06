@@ -100,10 +100,10 @@ class RealWgServerDataProviderTest() {
 
         assertEquals(
             WgServerData(
-                publicKey = "ovn9RpzUuvQ4XLQt6B3RKuEXGIxa5QpTnehjduZlcSE=",
-                publicEndpoint = "109.200.208.196:443",
+                publicKey = "R/BMR6Rr5rzvp7vSIWdAtgAmOLK9m7CqTcDynblM3Us=",
+                publicEndpoint = "162.245.204.100:443",
                 address = "",
-                location = "Des moines, United states",
+                location = null,
                 allowedIPs = "0.0.0.0/0,::0/0",
             ),
             testee.get("testpublickey"),

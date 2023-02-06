@@ -53,7 +53,7 @@ data class EligibleServerInfo(
 
 data class Server(
     val name: String,
-    val attributes: Map<String, String>,
+    val attributes: Map<String, Any>,
     val publicKey: String,
     val hostnames: List<String>,
     val ips: List<String>,
