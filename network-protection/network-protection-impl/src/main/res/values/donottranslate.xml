@@ -22,7 +22,6 @@
     <string name="netpManagementToggleTitle">Network Protection</string>
     <string name="netpManagementToggleSubtitleConnecting">Connecting…</string>
     <string name="netpManagementToggleSubtitleConnected" instruction="Placeholder is elapsed time in hh:MM:ss format.">Connected · %1$s</string>
-    <string name="netpManagementToggleSubtitleDisconnecting">Disconnecting…</string>
     <string name="netpManagementToggleSubtitleDisconnected">Not connected</string>
     <string name="netpManagementBetaDescription">DuckDuckGo Network Protection is currently in beta. Help us improve and <annotation type="report_issues_link">share feedback</annotation></string>
 
@@ -33,5 +32,10 @@
 
     <!-- NetP enabled notification -->
     <string name="netpEnabledNotificationTitle">"Network Protection is enabled and routing traffic through the VPN."</string>
+
+    <!-- Reconnect -->
+    <string name="netpMessageReconnecting">Your Network Protection connection was interrupted. Attempting to reconnect now…</string>
+    <string name="netpMessageReconnectionFailed">Network Protection was unable to connect at this time. Please try again later.</string>
+    <string name="netpMessageReconnecionSuccess">Network Protection is On. Your location and online activity are protected.</string>
 
 </resources>

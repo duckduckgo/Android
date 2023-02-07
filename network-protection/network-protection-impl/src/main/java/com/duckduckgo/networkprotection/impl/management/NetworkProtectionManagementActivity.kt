@@ -36,6 +36,9 @@ import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpManagementBinding
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.None
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowReconnecting
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowReconnectingFailed
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionDetails
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState
@@ -101,6 +104,21 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
             ConnectionState.Disconnected -> binding.renderDisconnectedState()
             else -> { }
         }
+
+        when (viewState.alertState) {
+            ShowReconnecting -> binding.renderAlertReconnecting()
+            ShowReconnectingFailed -> binding.renderAlertReconnectingFailed()
+            None -> binding.netPAlert.gone()
+        }
+    }
+    private fun ActivityNetpManagementBinding.renderAlertReconnecting() {
+        netPAlert.setText(resources.getString(R.string.netpMessageReconnecting))
+        netPAlert.show()
+    }
+
+    private fun ActivityNetpManagementBinding.renderAlertReconnectingFailed() {
+        netPAlert.setText(resources.getString(R.string.netpMessageReconnectionFailed))
+        netPAlert.show()
     }
 
     private fun ActivityNetpManagementBinding.renderConnectedState(connectionDetailsData: ConnectionDetails) {
@@ -134,6 +152,8 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
     }
 
     private fun ActivityNetpManagementBinding.renderConnectingState() {
+        netpStatusImage.setImageResource(R.drawable.illustration_vpn_off)
+        netpStatusHeader.setText(R.string.netpManagementHeadlineStatusOff)
         netpToggle.setSecondaryText(getString(R.string.netpManagementToggleSubtitleConnecting))
         netpToggle.isEnabled = false
         connectionDetails.root.gone()

@@ -16,12 +16,24 @@
 
 package com.duckduckgo.networkprotection.store
 
+import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ReconnectStatus
+import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ReconnectStatus.NotReconnecting
+import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ReconnectStatus.Reconnecting
+import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ReconnectStatus.ReconnectingFailed
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ServerDetails
 
 interface NetworkProtectionRepository {
+    var reconnectStatus: ReconnectStatus
+    var reconnectAttemptCount: Int
     var privateKey: String?
     var enabledTimeInMillis: Long
     var serverDetails: ServerDetails?
+
+    enum class ReconnectStatus {
+        NotReconnecting,
+        Reconnecting,
+        ReconnectingFailed,
+    }
 
     data class ServerDetails(
         val ipAddress: String?,
@@ -71,10 +83,34 @@ class RealNetworkProtectionRepository constructor(
             }
         }
 
+    override var reconnectStatus: ReconnectStatus
+        get() = when (networkProtectionPrefs.getInt(KEY_WG_RECONNECT_STATUS, 0)) {
+            -1 -> ReconnectingFailed
+            1 -> Reconnecting
+            else -> NotReconnecting
+        }
+        set(value) {
+            when (value) {
+                Reconnecting -> 1
+                ReconnectingFailed -> -1
+                NotReconnecting -> 0
+            }.also {
+                networkProtectionPrefs.putInt(KEY_WG_RECONNECT_STATUS, it)
+            }
+        }
+
+    override var reconnectAttemptCount: Int
+        get() = networkProtectionPrefs.getInt(KEY_WG_RECONNECT_COUNT, 0)
+        set(value) {
+            networkProtectionPrefs.putInt(KEY_WG_RECONNECT_COUNT, value)
+        }
+
     companion object {
         private const val KEY_WG_PRIVATE_KEY = "wg_private_key"
         private const val KEY_WG_SERVER_IP = "wg_server_ip"
         private const val KEY_WG_SERVER_LOCATION = "wg_server_location"
         private const val KEY_WG_SERVER_ENABLE_TIME = "wg_server_enable_time"
+        private const val KEY_WG_RECONNECT_STATUS = "wg_reconnect_status"
+        private const val KEY_WG_RECONNECT_COUNT = "wg_reconnect_count"
     }
 }
