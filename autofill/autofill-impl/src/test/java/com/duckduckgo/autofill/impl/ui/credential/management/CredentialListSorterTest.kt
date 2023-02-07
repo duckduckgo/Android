@@ -18,24 +18,61 @@ package com.duckduckgo.autofill.impl.ui.credential.management
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
-import com.duckduckgo.autofill.impl.AutofillDomainFormatterDomainNameOnly
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialListSorterByTitleAndDomain
-import org.junit.Assert.*
+import com.duckduckgo.autofill.store.urlmatcher.AutofillDomainNameUrlMatcher
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class CredentialListSorterTest {
 
-    private val domainFormatter = AutofillDomainFormatterDomainNameOnly()
+    private val autofillUrlMatcher = AutofillDomainNameUrlMatcher()
 
-    private val testee = CredentialListSorterByTitleAndDomain(domainFormatter = domainFormatter)
+    private val testee = CredentialListSorterByTitleAndDomain(autofillUrlMatcher = autofillUrlMatcher)
     private val list = mutableListOf<LoginCredentials>()
 
     @Test
     fun whenListIsEmptyThenReturnEmptyList() {
         val result = testee.sort(emptyList())
         assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun whenComparingTitlesCaseIsIgnored() {
+        val sorted = testee.sort(
+            list.also {
+                it.add(credsWithTitle("C"))
+                it.add(credsWithTitle("b"))
+                it.add(credsWithTitle("A"))
+            },
+        )
+        sorted.assertTitleOrder("A", "b", "C")
+    }
+
+    @Test
+    fun whenComparingDomainsCaseIsIgnored() {
+        val sorted = testee.sort(
+            list.also {
+                it.add(credsWithDomain("C.COM"))
+                it.add(credsWithDomain("b.com"))
+                it.add(credsWithDomain("A.Com"))
+            },
+        )
+        sorted.assertDomainOrder("A.Com", "b.com", "C.COM")
+    }
+
+    @Test
+    fun whenComparingSubdomainsCaseIsIgnored() {
+        val sorted = testee.sort(
+            list.also {
+                it.add(credsWithDomain("C.example.COM"))
+                it.add(credsWithDomain("b.example.com"))
+                it.add(credsWithDomain("A.example.Com"))
+            },
+        )
+        sorted.assertDomainOrder("A.example.Com", "b.example.com", "C.example.COM")
     }
 
     @Test
@@ -137,15 +174,15 @@ class CredentialListSorterTest {
     }
 
     @Test
-    fun whenComparingDomainsThenWwwSubdomainIgnored() {
+    fun whenComparingSubdomainsThenWwwNotTreatedAsSpecialForSorting() {
         val sorted = testee.sort(
             list.also {
-                it.add(credsWithDomain("www.a.com"))
-                it.add(credsWithDomain("http://b.com"))
-                it.add(credsWithDomain("c.com"))
+                it.add(credsWithDomain(id = 0, domain = "www.example.com"))
+                it.add(credsWithDomain(id = 1, domain = "accounts.example.com"))
+                it.add(credsWithDomain(id = 2, domain = "z.example.com"))
             },
         )
-        sorted.assertDomainOrder("www.a.com", "http://b.com", "c.com")
+        sorted.assertIdOrder(1, 0, 2)
     }
 
     @Test
@@ -244,29 +281,91 @@ class CredentialListSorterTest {
         sorted.assertDomainOrder("a", "b", "ć", "cello", "CNN", "d")
     }
 
+    @Test
+    fun whenComparingSubdomainsWithSitesFromSameDomainWithoutSubdomainThenTopSiteSortedFirst() {
+        val sorted = testee.sort(
+            list.also {
+                it.add(credsWithDomain(id = 0, domain = "www.example.com"))
+                it.add(credsWithDomain(id = 1, domain = "accounts.example.com"))
+                it.add(credsWithDomain(id = 2, domain = "example.com"))
+            },
+        )
+        sorted.assertIdOrder(2, 1, 0)
+    }
+
+    @Test
+    fun whenComparingMixtureOfTitlesSitesWithSubdomainsAndSomeWithoutThenCorrectOrder() {
+        val sorted = testee.sort(
+            list.also {
+                it.add(creds(id = 0, domain = "www.exaaaaample.com"))
+                it.add(creds(id = 1, domain = "www.example.com"))
+                it.add(creds(id = 2, domain = "accounts.example.com"))
+                it.add(creds(id = 3, domain = "example.com"))
+                it.add(creds(id = 4, title = "Example"))
+                it.add(creds(id = 5, title = "www.Example.com"))
+            },
+        )
+        sorted.assertIdOrder(0, 4, 3, 2, 1, 5)
+    }
+
     private fun List<LoginCredentials>.assertTitleOrder(vararg titles: String?) {
         assertEquals("Wrong number of titles", titles.size, this.size)
         titles.forEachIndexed { index, title ->
-            assertEquals("Title wrong at position $index", title, this[index].domainTitle)
+            assertEquals(
+                "Order is wrong.\n${titles.joinToString()} " +
+                    "[Expected]\n${this.joinToString { it.domainTitle.toString() }} " +
+                    "[Actual]\nID wrong at position $index",
+                title,
+                this[index].domainTitle,
+            )
         }
     }
 
     private fun List<LoginCredentials>.assertDomainOrder(vararg domains: String?) {
         assertEquals("Wrong number of domains", domains.size, this.size)
         domains.forEachIndexed { index, domain ->
-            assertEquals("Domain wrong at position $index", domain, this[index].domain)
+            assertEquals(
+                "Order is wrong.\n${domains.joinToString()} " +
+                    "[Expected]\n${this.joinToString { it.domain.toString() }} " +
+                    "[Actual]\nID wrong at position $index",
+                domain,
+                this[index].domain,
+            )
         }
     }
 
-    private fun creds(domain: String? = null, title: String? = null): LoginCredentials {
-        return LoginCredentials(domainTitle = title, domain = domain, username = null, password = null)
+    private fun List<LoginCredentials>.assertIdOrder(vararg ids: Long?) {
+        assertEquals("Wrong number of IDs", ids.size, this.size)
+        ids.forEachIndexed { index, id ->
+            assertEquals(
+                "Order is wrong.\n${ids.joinToString()} " +
+                    "[Expected]\n${this.joinToString { it.id.toString() }} " +
+                    "[Actual]\nID wrong at position $index",
+                id,
+                this[index].id,
+            )
+        }
     }
 
-    private fun credsWithTitle(title: String?): LoginCredentials {
-        return LoginCredentials(domainTitle = title, domain = null, username = null, password = null)
+    private fun creds(
+        domain: String? = null,
+        title: String? = null,
+        id: Long = 0,
+    ): LoginCredentials {
+        return LoginCredentials(domainTitle = title, domain = domain, id = id, username = null, password = null)
     }
 
-    private fun credsWithDomain(domain: String?): LoginCredentials {
-        return LoginCredentials(domain = domain, domainTitle = null, username = null, password = null)
+    private fun credsWithTitle(
+        title: String?,
+        id: Long = 0,
+    ): LoginCredentials {
+        return LoginCredentials(domainTitle = title, id = id, domain = null, username = null, password = null)
+    }
+
+    private fun credsWithDomain(
+        domain: String?,
+        id: Long = 0,
+    ): LoginCredentials {
+        return LoginCredentials(domain = domain, id = id, domainTitle = null, username = null, password = null)
     }
 }

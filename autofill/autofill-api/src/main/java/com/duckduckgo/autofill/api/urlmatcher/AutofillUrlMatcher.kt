@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.api.ui.urlmatcher
+package com.duckduckgo.autofill.api.urlmatcher
 
 interface AutofillUrlMatcher {
-    fun extractUrlPartsForAutofill(originalUrl: String): ExtractedUrlParts
-    fun matchingForAutofill(visitedSite: ExtractedUrlParts, savedSite: ExtractedUrlParts): Boolean
+    fun extractUrlPartsForAutofill(originalUrl: String?): ExtractedUrlParts
+    fun matchingForAutofill(
+        visitedSite: ExtractedUrlParts,
+        savedSite: ExtractedUrlParts,
+    ): Boolean
 
     data class ExtractedUrlParts(val eTldPlus1: String?, val subdomain: String?)
 }
