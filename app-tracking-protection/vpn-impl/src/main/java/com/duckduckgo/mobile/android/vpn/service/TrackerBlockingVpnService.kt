@@ -168,7 +168,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         AndroidInjection.inject(this)
 
         logcat { "VPN log onCreate, creating the ${vpnNetworkStack.name} network stack" }
-        vpnNetworkStack.onCreateVpn().getOrNull()?.let {
+        if (vpnNetworkStack.onCreateVpn().isFailure) {
             // report and proceed
             deviceShieldPixels.reportErrorCreatingVpnNetworkStack()
         }
