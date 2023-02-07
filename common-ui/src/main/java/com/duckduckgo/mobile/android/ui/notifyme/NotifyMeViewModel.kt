@@ -23,6 +23,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.mobile.android.ui.store.notifyme.NotifyMeDataStore
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -37,6 +38,7 @@ import kotlinx.coroutines.launch
 
 class NotifyMeViewModel(
     private val appBuildConfig: AppBuildConfig,
+    private val notifyMeDataStore: NotifyMeDataStore,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -46,14 +48,17 @@ class NotifyMeViewModel(
     sealed class Command {
         object UpdateNotificationsState : Command()
         object UpdateNotificationsStateOnAndroid13Plus : Command()
+        object OpenSettingsOnAndroid8Plus : Command()
         object OpenSettings : Command()
+        object CheckPermissionRationale : Command()
         object ShowPermissionRationale : Command()
         object DismissComponent : Command()
     }
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
 
-    private var listener: NotifyMeListener? = null
+    private lateinit var pixelParentScreenName: String
+    private lateinit var sharedPrefsKeyForDismiss: String
 
     private val notificationsAllowed = MutableStateFlow(true)
 
@@ -63,7 +68,7 @@ class NotifyMeViewModel(
         flow = notificationsAllowed,
         flow2 = dismissCalled,
     ) { notificationsAllowed, dismissCalled ->
-        val visible = !notificationsAllowed && !(dismissCalled || listener?.isDismissed() ?: false)
+        val visible = !notificationsAllowed && !(dismissCalled || isDismissed())
         ViewState(visible)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
@@ -86,28 +91,51 @@ class NotifyMeViewModel(
         }
     }
 
-    fun onNotifyMeButtonClicked(shouldShowRequestPermissionRationale: Boolean) {
-        if (shouldShowRequestPermissionRationale) {
-            sendCommand(Command.ShowPermissionRationale)
+    fun onNotifyMeButtonClicked() {
+        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.TIRAMISU) {
+            sendCommand(Command.CheckPermissionRationale)
         } else {
-            sendCommand(Command.OpenSettings)
+            openSettings()
         }
     }
 
     fun onCloseButtonClicked() {
         viewModelScope.launch {
             command.send(Command.DismissComponent)
-            listener?.setDismissed()
+            if (this@NotifyMeViewModel::sharedPrefsKeyForDismiss.isInitialized) {
+                notifyMeDataStore.setComponentDismissed(sharedPrefsKeyForDismiss)
+            }
             dismissCalled.emit(true)
         }
     }
 
-    fun setNotifyMeListener(listener: NotifyMeListener?) {
-        this.listener = listener
+    fun handleRequestPermissionRationale(shouldShowRationale: Boolean) {
+        if (shouldShowRationale) {
+            sendCommand(Command.ShowPermissionRationale)
+        } else {
+            openSettings()
+        }
     }
 
-    fun removeNotifyMeListener() {
-        this.listener = null
+    fun init(pixelParentScreenName: String, sharedPrefsKeyForDismiss: String) {
+        this.pixelParentScreenName = pixelParentScreenName
+        this.sharedPrefsKeyForDismiss = sharedPrefsKeyForDismiss
+    }
+
+    private fun openSettings() {
+        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.O) {
+            sendCommand(Command.OpenSettingsOnAndroid8Plus)
+        } else {
+            sendCommand(Command.OpenSettings)
+        }
+    }
+
+    private fun isDismissed(): Boolean {
+        return if (this@NotifyMeViewModel::sharedPrefsKeyForDismiss.isInitialized) {
+            notifyMeDataStore.isComponentDismissed(sharedPrefsKeyForDismiss, false)
+        } else {
+            false
+        }
     }
 
     private fun sendCommand(newCommand: Command) {
@@ -119,12 +147,14 @@ class NotifyMeViewModel(
     @Suppress("UNCHECKED_CAST")
     class Factory @Inject constructor(
         private val appBuildConfig: AppBuildConfig,
+        private val notifyMeDataStore: NotifyMeDataStore,
     ) : ViewModelProvider.NewInstanceFactory() {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return with(modelClass) {
                 when {
                     isAssignableFrom(NotifyMeViewModel::class.java) -> NotifyMeViewModel(
                         appBuildConfig,
+                        notifyMeDataStore,
                     )
                     else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
                 }

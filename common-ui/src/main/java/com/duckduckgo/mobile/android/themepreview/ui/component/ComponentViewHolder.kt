@@ -24,7 +24,6 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.mobile.android.R
-import com.duckduckgo.mobile.android.ui.notifyme.NotifyMeListener
 import com.duckduckgo.mobile.android.ui.notifyme.NotifyMeView
 import com.duckduckgo.mobile.android.ui.view.MessageCta
 import com.duckduckgo.mobile.android.ui.view.MessageCta.Message
@@ -286,17 +285,6 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             val notifyMeView: NotifyMeView = view.findViewById(R.id.notifyMe)
             notifyMeView.setPrimaryText("Component title")
             notifyMeView.setSecondaryText("Component subtitle")
-            notifyMeView.setListener(
-                object : NotifyMeListener {
-                    override fun setDismissed() {
-                        // no op
-                    }
-
-                    override fun isDismissed(): Boolean {
-                        return false
-                    }
-                },
-            )
         }
     }
 

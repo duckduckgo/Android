@@ -40,8 +40,10 @@ import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewNotifyMeViewBinding
 import com.duckduckgo.mobile.android.ui.notifyme.NotifyMeViewModel.Command
+import com.duckduckgo.mobile.android.ui.notifyme.NotifyMeViewModel.Command.CheckPermissionRationale
 import com.duckduckgo.mobile.android.ui.notifyme.NotifyMeViewModel.Command.DismissComponent
 import com.duckduckgo.mobile.android.ui.notifyme.NotifyMeViewModel.Command.OpenSettings
+import com.duckduckgo.mobile.android.ui.notifyme.NotifyMeViewModel.Command.OpenSettingsOnAndroid8Plus
 import com.duckduckgo.mobile.android.ui.notifyme.NotifyMeViewModel.Command.ShowPermissionRationale
 import com.duckduckgo.mobile.android.ui.notifyme.NotifyMeViewModel.Command.UpdateNotificationsState
 import com.duckduckgo.mobile.android.ui.notifyme.NotifyMeViewModel.Command.UpdateNotificationsStateOnAndroid13Plus
@@ -68,7 +70,9 @@ class NotifyMeView @JvmOverloads constructor(
     @Inject
     lateinit var viewModelFactory: NotifyMeViewModel.Factory
 
-    private var listener: NotifyMeListener? = null
+    private lateinit var pixelParentScreenName: String
+    private lateinit var sharedPrefsKeyForDismiss: String
+
     private var coroutineScope: CoroutineScope? = null
     private var vtoGlobalLayoutListener: OnGlobalLayoutListener? = null
     private var visibilityChangedListener: OnVisibilityChangedListener? = null
@@ -83,13 +87,13 @@ class NotifyMeView @JvmOverloads constructor(
         val attributes = context.obtainStyledAttributes(attrs, R.styleable.NotifyMeView)
         setPrimaryText(attributes.getString(R.styleable.NotifyMeView_primaryText) ?: "")
         setSecondaryText(attributes.getString(R.styleable.NotifyMeView_secondaryText) ?: "")
+        setPixelParentScreenName(attributes.getString(R.styleable.NotifyMeView_pixelParentScreenName) ?: "")
+        setSharedPrefsKeyForDismiss(attributes.getString(R.styleable.NotifyMeView_sharedPrefsKeyForDismiss) ?: "")
         binding.notifyMeClose.setOnClickListener {
             viewModel.onCloseButtonClicked()
         }
         binding.notifyMeButton.setOnClickListener {
-            @SuppressLint("InlinedApi")
-            val showRationale = ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.POST_NOTIFICATIONS)
-            viewModel.onNotifyMeButtonClicked(showRationale)
+            viewModel.onNotifyMeButtonClicked()
         }
         attributes.recycle()
     }
@@ -105,7 +109,7 @@ class NotifyMeView @JvmOverloads constructor(
         @SuppressLint("NoHardcodedCoroutineDispatcher")
         coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
-        viewModel.setNotifyMeListener(listener)
+        viewModel.init(pixelParentScreenName, sharedPrefsKeyForDismiss)
 
         viewModel.viewState
             .onEach { render(it) }
@@ -125,16 +129,8 @@ class NotifyMeView @JvmOverloads constructor(
 
         ViewTreeLifecycleOwner.get(this)?.lifecycle?.removeObserver(viewModel)
 
-        viewModel.removeNotifyMeListener()
-
-        listener = null
-
         coroutineScope?.cancel()
         coroutineScope = null
-    }
-
-    fun setListener(listener: NotifyMeListener?) {
-        this.listener = listener
     }
 
     fun setOnVisibilityChange(visibilityChangedListener: OnVisibilityChangedListener) {
@@ -147,6 +143,14 @@ class NotifyMeView @JvmOverloads constructor(
 
     fun setSecondaryText(subtitle: String) {
         binding.notifyMeMessageSubtitle.text = subtitle
+    }
+
+    fun setPixelParentScreenName(pixelParentScreenName: String) {
+        this.pixelParentScreenName = pixelParentScreenName
+    }
+
+    fun setSharedPrefsKeyForDismiss(sharedPrefsKeyForDismiss: String) {
+        this.sharedPrefsKeyForDismiss = sharedPrefsKeyForDismiss
     }
 
     private fun render(viewState: ViewState) {
@@ -162,7 +166,9 @@ class NotifyMeView @JvmOverloads constructor(
             is UpdateNotificationsState -> updateNotificationsState()
             is UpdateNotificationsStateOnAndroid13Plus -> updateNotificationsPermissionsOnAndroid13Plus()
             is OpenSettings -> openSettings()
+            is OpenSettingsOnAndroid8Plus -> openSettingsOnAndroid8Plus()
             is DismissComponent -> hideMe()
+            is CheckPermissionRationale -> checkPermissionRationale()
             is ShowPermissionRationale -> showNotificationsPermissionsPrompt()
         }
     }
@@ -180,7 +186,15 @@ class NotifyMeView @JvmOverloads constructor(
     }
 
     private fun openSettings() {
-        @SuppressLint("InlinedApi")
+        val settingsIntent = Intent(ANDROID_M_APP_NOTIFICATION_SETTINGS)
+            .putExtra(ANDROID_M_APP_PACKAGE, context.packageName)
+            .putExtra(ANDROID_M_APP_UID, context.applicationInfo.uid)
+
+        startActivity(context, settingsIntent, null)
+    }
+
+    @SuppressLint("InlinedApi")
+    private fun openSettingsOnAndroid8Plus() {
         val settingsIntent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             .putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
@@ -194,6 +208,12 @@ class NotifyMeView @JvmOverloads constructor(
 
     private fun hideMe() {
         this.gone()
+    }
+
+    private fun checkPermissionRationale() {
+        @SuppressLint("InlinedApi")
+        val showRationale = ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.POST_NOTIFICATIONS)
+        viewModel.handleRequestPermissionRationale(showRationale)
     }
 
     @SuppressLint("InlinedApi")
@@ -232,6 +252,12 @@ class NotifyMeView @JvmOverloads constructor(
         if (viewTreeObserver.isAlive && vtoGlobalLayoutListener != null) {
             viewTreeObserver.removeOnGlobalLayoutListener(vtoGlobalLayoutListener)
         }
+    }
+
+    companion object {
+        private const val ANDROID_M_APP_NOTIFICATION_SETTINGS = "android.settings.APP_NOTIFICATION_SETTINGS"
+        private const val ANDROID_M_APP_PACKAGE = "app_package"
+        private const val ANDROID_M_APP_UID = "app_uid"
     }
 
     interface OnVisibilityChangedListener {

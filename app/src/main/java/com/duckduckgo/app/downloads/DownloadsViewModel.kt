@@ -32,12 +32,10 @@ import com.duckduckgo.app.downloads.DownloadsViewModel.Command.OpenFile
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.ShareFile
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.downloads.api.DownloadsRepository
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus
-import com.duckduckgo.mobile.android.ui.notifyme.NotifyMeListener
 import java.io.File
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -58,8 +56,7 @@ class DownloadsViewModel @Inject constructor(
     private val timeDiffFormatter: TimeDiffFormatter,
     private val downloadsRepository: DownloadsRepository,
     private val dispatcher: DispatcherProvider,
-    private val settingsDataStore: SettingsDataStore,
-) : ViewModel(), DownloadsItemListener, NotifyMeListener {
+) : ViewModel(), DownloadsItemListener {
 
     data class ViewState(
         val enableSearch: Boolean = false,
@@ -201,16 +198,6 @@ class DownloadsViewModel @Inject constructor(
         viewModelScope.launch {
             showNotifyMe.emit(visible)
         }
-    }
-
-    override fun setDismissed() {
-        viewModelScope.launch {
-            settingsDataStore.notifyMeInDownloadsDismissed = true
-        }
-    }
-
-    override fun isDismissed(): Boolean {
-        return settingsDataStore.notifyMeInDownloadsDismissed
     }
 
     private fun DownloadItem.mapToDownloadViewItem(): DownloadViewItem = Item(this)

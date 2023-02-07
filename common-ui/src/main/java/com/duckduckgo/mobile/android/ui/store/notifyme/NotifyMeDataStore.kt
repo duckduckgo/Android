@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.ui.notifyme
+package com.duckduckgo.mobile.android.ui.store.notifyme
 
-// TODO [ANA] This will be removed.
-interface NotifyMeListener {
-    fun setDismissed()
+interface NotifyMeDataStore {
 
-    fun isDismissed(): Boolean
+    fun isComponentDismissed(key: String, defaultValue: Boolean): Boolean
+
+    fun setComponentDismissed(key: String)
 }

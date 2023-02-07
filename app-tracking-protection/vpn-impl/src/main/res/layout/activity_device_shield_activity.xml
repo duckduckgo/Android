@@ -46,8 +46,10 @@
                     android:id="@+id/deviceShieldTrackerNotifyMe"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    app:pixelParentScreenName="apptp"
                     app:primaryText="@string/appTrackingProtectionNotifyMeTitle"
-                    app:secondaryText="@string/appTrackingProtectionNotifyMeSubtitle" />
+                    app:secondaryText="@string/appTrackingProtectionNotifyMeSubtitle"
+                    app:sharedPrefsKeyForDismiss="key_component_dismissed_in_apptp" />
 
                 <com.duckduckgo.mobile.android.ui.view.InfoPanel
                     android:id="@+id/deviceShieldTrackerLabelEnabled"

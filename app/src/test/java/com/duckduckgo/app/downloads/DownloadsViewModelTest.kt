@@ -33,7 +33,6 @@ import com.duckduckgo.app.downloads.DownloadsViewModel.Command.ShareFile
 import com.duckduckgo.app.global.R as CommonR
 import com.duckduckgo.app.global.formatters.time.RealTimeDiffFormatter
 import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.downloads.api.DownloadsRepository
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus.FINISHED
@@ -62,8 +61,6 @@ class DownloadsViewModelTest {
 
     private val mockDownloadsRepository: DownloadsRepository = mock()
 
-    private val mockSettingsDataStore: SettingsDataStore = mock()
-
     private val context: Context = mock()
 
     private val testee: DownloadsViewModel by lazy {
@@ -72,7 +69,6 @@ class DownloadsViewModelTest {
                 FakeTimeDiffFormatter(TODAY, RealTimeDiffFormatter(context)),
                 mockDownloadsRepository,
                 coroutineRule.testDispatcherProvider,
-                mockSettingsDataStore,
             )
         model
     }
@@ -347,20 +343,6 @@ class DownloadsViewModelTest {
         testee.removeFromDownloadManager(downloadId)
 
         verify(mockDownloadsRepository).delete(downloadId)
-    }
-
-    @Test
-    fun whenSetDismissedCalledThenNotifyMeInDownloadsDismissedCalled() = runTest {
-        testee.setDismissed()
-
-        verify(mockSettingsDataStore).notifyMeInDownloadsDismissed = true
-    }
-
-    @Test
-    fun whenIsDismissedCalledThenNotifyMeInDownloadsDismissedCalled() = runTest {
-        testee.isDismissed()
-
-        verify(mockSettingsDataStore).notifyMeInDownloadsDismissed
     }
 
     private fun oneItem() =

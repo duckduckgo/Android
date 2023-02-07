@@ -115,12 +115,6 @@ class DownloadsActivity : DuckDuckGoActivity() {
         }
     }
 
-    override fun onDestroy() {
-        downloadsAdapter.removeNotifyMeListener()
-
-        super.onDestroy()
-    }
-
     private fun processCommands(command: Command) {
         when (command) {
             is OpenFile -> showOpen(command)
@@ -198,7 +192,6 @@ class DownloadsActivity : DuckDuckGoActivity() {
 
     private fun setupRecyclerView() {
         downloadsAdapter.setListener(viewModel)
-        downloadsAdapter.setNotifyMeListener(viewModel)
         binding.downloadsContentView.layoutManager = LinearLayoutManager(this)
         binding.downloadsContentView.adapter = downloadsAdapter
     }

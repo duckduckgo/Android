@@ -18,5 +18,7 @@
     <declare-styleable name="NotifyMeView">
         <attr name="primaryText" />
         <attr name="secondaryText" />
+        <attr name="pixelParentScreenName" format="string" />
+        <attr name="sharedPrefsKeyForDismiss" format="string" />
     </declare-styleable>
 </resources>

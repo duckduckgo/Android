@@ -24,7 +24,6 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.formatters.time.model.dateOfLastWeek
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.ui.notifyme.NotifyMeListener
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
 import com.duckduckgo.mobile.android.vpn.network.VpnDetector
@@ -52,7 +51,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     private val vpnFeatureRemover: VpnFeatureRemover,
     private val vpnStore: VpnStore,
     private val dispatcherProvider: DispatcherProvider,
-) : ViewModel(), NotifyMeListener {
+) : ViewModel() {
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     private val refreshVpnRunningState = MutableStateFlow(System.currentTimeMillis())
@@ -156,14 +155,6 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
             is ViewEvent.AlwaysOnInitialState -> onAlwaysOnInitialState(viewEvent.alwaysOnState)
             ViewEvent.LaunchTrackingProtectionExclusionListActivity -> sendCommand(Command.LaunchTrackingProtectionExclusionListActivity)
         }
-    }
-
-    override fun setDismissed() {
-        vpnStore.dismissNotifyMeInAppTp()
-    }
-
-    override fun isDismissed(): Boolean {
-        return vpnStore.isNotifyMeInAppTpDismissed()
     }
 
     private fun launchVpn() {

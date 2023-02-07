@@ -340,18 +340,4 @@ class DeviceShieldTrackerActivityViewModelTest {
 
         assertEquals(BannerState.OnboardingBanner, bannerState)
     }
-
-    @Test
-    fun whenSetDismissedCalledThenDismissNotifyMeInAppTpIsCalled() {
-        viewModel.setDismissed()
-
-        verify(vpnStore).dismissNotifyMeInAppTp()
-    }
-
-    @Test
-    fun whenIsDismissedCalledThenIsNotifyMeInAppTpDismissedCalled() {
-        viewModel.isDismissed()
-
-        verify(vpnStore).isNotifyMeInAppTpDismissed()
-    }
 }
