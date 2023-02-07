@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autofill.store.urlmatcher
 
+import androidx.core.net.toUri
 import com.duckduckgo.app.global.extractDomain
 import com.duckduckgo.autofill.api.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.autofill.api.urlmatcher.AutofillUrlMatcher.ExtractedUrlParts
@@ -63,6 +64,13 @@ class AutofillDomainNameUrlMatcher @Inject constructor() : AutofillUrlMatcher {
         return identicalSubdomains(visitedSite, savedSite) ||
             specialHandlingForWwwSubdomainOnSavedSite(visitedSite, savedSite) ||
             savedSiteHasNoSubdomain(savedSite)
+    }
+
+    override fun cleanRawUrl(rawUrl: String): String {
+        val uri = rawUrl.normalizeScheme().toUri()
+        val host = uri.host ?: return rawUrl
+        val port = if (uri.port != -1) ":${uri.port}" else ""
+        return "$host$port"
     }
 
     private fun identicalEffectiveTldPlusOne(
