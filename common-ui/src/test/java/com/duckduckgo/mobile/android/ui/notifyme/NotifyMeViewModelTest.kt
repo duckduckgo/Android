@@ -16,10 +16,12 @@
 
 package com.duckduckgo.mobile.android.ui.notifyme
 
+import android.os.Build
 import androidx.lifecycle.LifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -42,11 +44,12 @@ class NotifyMeViewModelTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
+    private val mockAppBuildConfig = mock<AppBuildConfig>()
     private val mockListener = mock<NotifyMeListener>()
     private val mockLifecycleOwner = mock<LifecycleOwner>()
 
     private val testee: NotifyMeViewModel by lazy {
-        NotifyMeViewModel()
+        NotifyMeViewModel(appBuildConfig = mockAppBuildConfig)
     }
 
     @Test
@@ -167,19 +170,35 @@ class NotifyMeViewModelTest {
 
         testee.commands().test {
             assertEquals(
-                NotifyMeViewModel.Command.CheckPermissions,
+                NotifyMeViewModel.Command.UpdateNotificationsState,
                 awaitItem(),
             )
         }
     }
 
     @Test
-    fun whenOnNotifyMeButtonClickedThenCheckShouldShowRequestPermissionRationaleCommandIsSent() = runTest {
-        testee.onNotifyMeButtonClicked()
+    fun whenOnNotifyMeButtonClickedWithShouldShowRequestPermissionRationaleTrueThenShowPermissionRationaleCommandIsSent() = runTest {
+        val shouldShowRequestPermissionRationale = true
+
+        testee.onNotifyMeButtonClicked(shouldShowRequestPermissionRationale)
 
         testee.commands().test {
             assertEquals(
-                NotifyMeViewModel.Command.CheckShouldShowRequestPermissionRationale,
+                NotifyMeViewModel.Command.ShowPermissionRationale,
+                awaitItem(),
+            )
+        }
+    }
+
+    @Test
+    fun whenOnNotifyMeButtonClickedWithShouldShowRequestPermissionRationaleFalseThenOpenSettingsCommandIsSent() = runTest {
+        val shouldShowRequestPermissionRationale = false
+
+        testee.onNotifyMeButtonClicked(shouldShowRequestPermissionRationale)
+
+        testee.commands().test {
+            assertEquals(
+                NotifyMeViewModel.Command.OpenSettings,
                 awaitItem(),
             )
         }
@@ -194,31 +213,35 @@ class NotifyMeViewModelTest {
         testee.commands().test {
             verify(mockListener).setDismissed()
             assertEquals(
-                NotifyMeViewModel.Command.Close,
+                NotifyMeViewModel.Command.DismissComponent,
                 awaitItem(),
             )
         }
     }
 
     @Test
-    fun whenOnPermissionRationaleNeededThenShowPermissionRationaleCommandIsSent() = runTest {
-        testee.onPermissionRationaleNeeded()
+    fun whenOnResumeCalledForAndroid13PlusThenUpdateNotificationsStateOnAndroid13PlusCommandIsSent() = runTest {
+        whenever(mockAppBuildConfig.sdkInt).thenReturn(Build.VERSION_CODES.TIRAMISU)
+
+        testee.onResume(mockLifecycleOwner)
 
         testee.commands().test {
             assertEquals(
-                NotifyMeViewModel.Command.ShowPermissionRationale,
+                NotifyMeViewModel.Command.UpdateNotificationsStateOnAndroid13Plus,
                 awaitItem(),
             )
         }
     }
 
     @Test
-    fun whenOnOpenSettingsThenOpenSettingsCommandIsSent() = runTest {
-        testee.onOpenSettings()
+    fun whenOnResumeCalledForAndroid12OrBelowThenUpdateNotificationsStateCommandIsSent() = runTest {
+        whenever(mockAppBuildConfig.sdkInt).thenReturn(Build.VERSION_CODES.S)
+
+        testee.onResume(mockLifecycleOwner)
 
         testee.commands().test {
             assertEquals(
-                NotifyMeViewModel.Command.OpenSettings,
+                NotifyMeViewModel.Command.UpdateNotificationsState,
                 awaitItem(),
             )
         }

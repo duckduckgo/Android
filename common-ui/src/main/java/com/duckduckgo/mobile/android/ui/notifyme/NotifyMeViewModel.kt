@@ -16,13 +16,14 @@
 
 package com.duckduckgo.mobile.android.ui.notifyme
 
-import androidx.lifecycle.AbstractSavedStateViewModelFactory
+import android.os.Build
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.savedstate.SavedStateRegistryOwner
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -34,18 +35,20 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-internal class NotifyMeViewModel() : ViewModel(), DefaultLifecycleObserver {
+class NotifyMeViewModel(
+    private val appBuildConfig: AppBuildConfig,
+) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
         val visible: Boolean = false,
     )
 
     sealed class Command {
-        object CheckPermissions : Command()
+        object UpdateNotificationsState : Command()
+        object UpdateNotificationsStateOnAndroid13Plus : Command()
         object OpenSettings : Command()
-        object CheckShouldShowRequestPermissionRationale : Command()
         object ShowPermissionRationale : Command()
-        object Close : Command()
+        object DismissComponent : Command()
     }
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
@@ -66,7 +69,11 @@ internal class NotifyMeViewModel() : ViewModel(), DefaultLifecycleObserver {
 
     override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
-        sendCommand(Command.CheckPermissions)
+        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.TIRAMISU) {
+            sendCommand(Command.UpdateNotificationsStateOnAndroid13Plus)
+        } else {
+            sendCommand(Command.UpdateNotificationsState)
+        }
     }
 
     fun commands(): Flow<Command> {
@@ -79,24 +86,20 @@ internal class NotifyMeViewModel() : ViewModel(), DefaultLifecycleObserver {
         }
     }
 
-    fun onNotifyMeButtonClicked() {
-        sendCommand(Command.CheckShouldShowRequestPermissionRationale)
+    fun onNotifyMeButtonClicked(shouldShowRequestPermissionRationale: Boolean) {
+        if (shouldShowRequestPermissionRationale) {
+            sendCommand(Command.ShowPermissionRationale)
+        } else {
+            sendCommand(Command.OpenSettings)
+        }
     }
 
     fun onCloseButtonClicked() {
         viewModelScope.launch {
-            command.send(Command.Close)
+            command.send(Command.DismissComponent)
             listener?.setDismissed()
             dismissCalled.emit(true)
         }
-    }
-
-    fun onPermissionRationaleNeeded() {
-        sendCommand(Command.ShowPermissionRationale)
-    }
-
-    fun onOpenSettings() {
-        sendCommand(Command.OpenSettings)
     }
 
     fun setNotifyMeListener(listener: NotifyMeListener?) {
@@ -114,15 +117,18 @@ internal class NotifyMeViewModel() : ViewModel(), DefaultLifecycleObserver {
     }
 
     @Suppress("UNCHECKED_CAST")
-    class Factory(
-        owner: SavedStateRegistryOwner,
-    ) : AbstractSavedStateViewModelFactory(owner, null) {
-        override fun <T : ViewModel> create(
-            key: String,
-            modelClass: Class<T>,
-            handle: SavedStateHandle,
-        ): T {
-            return NotifyMeViewModel() as T
+    class Factory @Inject constructor(
+        private val appBuildConfig: AppBuildConfig,
+    ) : ViewModelProvider.NewInstanceFactory() {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return with(modelClass) {
+                when {
+                    isAssignableFrom(NotifyMeViewModel::class.java) -> NotifyMeViewModel(
+                        appBuildConfig,
+                    )
+                    else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
+                }
+            } as T
         }
     }
 }

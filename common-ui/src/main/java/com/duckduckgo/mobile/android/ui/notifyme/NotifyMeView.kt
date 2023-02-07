@@ -23,13 +23,11 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Build
 import android.provider.Settings
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.widget.FrameLayout
-import androidx.annotation.ChecksSdkIntAtLeast
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -37,19 +35,22 @@ import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
-import androidx.savedstate.findViewTreeSavedStateRegistryOwner
+import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewNotifyMeViewBinding
 import com.duckduckgo.mobile.android.ui.notifyme.NotifyMeViewModel.Command
-import com.duckduckgo.mobile.android.ui.notifyme.NotifyMeViewModel.Command.CheckPermissions
-import com.duckduckgo.mobile.android.ui.notifyme.NotifyMeViewModel.Command.CheckShouldShowRequestPermissionRationale
-import com.duckduckgo.mobile.android.ui.notifyme.NotifyMeViewModel.Command.Close
+import com.duckduckgo.mobile.android.ui.notifyme.NotifyMeViewModel.Command.DismissComponent
 import com.duckduckgo.mobile.android.ui.notifyme.NotifyMeViewModel.Command.OpenSettings
 import com.duckduckgo.mobile.android.ui.notifyme.NotifyMeViewModel.Command.ShowPermissionRationale
+import com.duckduckgo.mobile.android.ui.notifyme.NotifyMeViewModel.Command.UpdateNotificationsState
+import com.duckduckgo.mobile.android.ui.notifyme.NotifyMeViewModel.Command.UpdateNotificationsStateOnAndroid13Plus
 import com.duckduckgo.mobile.android.ui.notifyme.NotifyMeViewModel.ViewState
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import dagger.android.support.AndroidSupportInjection
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -57,11 +58,15 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
+@InjectWith(ViewScope::class)
 class NotifyMeView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
 ) : FrameLayout(context, attrs, defStyle) {
+
+    @Inject
+    lateinit var viewModelFactory: NotifyMeViewModel.Factory
 
     private var listener: NotifyMeListener? = null
     private var coroutineScope: CoroutineScope? = null
@@ -70,9 +75,8 @@ class NotifyMeView @JvmOverloads constructor(
 
     private val binding: ViewNotifyMeViewBinding by viewBinding()
 
-    private val viewModel by lazy {
-        val factory = NotifyMeViewModel.Factory(findViewTreeSavedStateRegistryOwner()!!)
-        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, factory)[NotifyMeViewModel::class.java]
+    private val viewModel: NotifyMeViewModel by lazy {
+        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[NotifyMeViewModel::class.java]
     }
 
     init {
@@ -83,12 +87,15 @@ class NotifyMeView @JvmOverloads constructor(
             viewModel.onCloseButtonClicked()
         }
         binding.notifyMeButton.setOnClickListener {
-            viewModel.onNotifyMeButtonClicked()
+            @SuppressLint("InlinedApi")
+            val showRationale = ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.POST_NOTIFICATIONS)
+            viewModel.onNotifyMeButtonClicked(showRationale)
         }
         attributes.recycle()
     }
 
     override fun onAttachedToWindow() {
+        AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
         addViewTreeObserverOnGlobalLayoutListener()
@@ -108,7 +115,7 @@ class NotifyMeView @JvmOverloads constructor(
             .onEach { processCommands(it) }
             .launchIn(coroutineScope!!)
 
-        checkNotificationsPermissions()
+        updateNotificationsState()
     }
 
     override fun onDetachedFromWindow() {
@@ -152,27 +159,27 @@ class NotifyMeView @JvmOverloads constructor(
 
     private fun processCommands(command: Command) {
         when (command) {
-            is CheckPermissions -> checkNotificationsPermissions()
+            is UpdateNotificationsState -> updateNotificationsState()
+            is UpdateNotificationsStateOnAndroid13Plus -> updateNotificationsPermissionsOnAndroid13Plus()
             is OpenSettings -> openSettings()
-            is Close -> hideMe()
-            is CheckShouldShowRequestPermissionRationale -> checkRequestPermissionRationale()
+            is DismissComponent -> hideMe()
             is ShowPermissionRationale -> showNotificationsPermissionsPrompt()
         }
     }
 
-    private fun checkNotificationsPermissions() {
-        if (isAtLeastAndroid13()) {
-            val value =
-                ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
-            viewModel.updateNotificationsPermissions(value)
-        } else {
-            val enabled = NotificationManagerCompat.from(getActivity()).areNotificationsEnabled()
-            viewModel.updateNotificationsPermissions(enabled)
-        }
+    private fun updateNotificationsState() {
+        val enabled = NotificationManagerCompat.from(getActivity()).areNotificationsEnabled()
+        viewModel.updateNotificationsPermissions(enabled)
+    }
+
+    @SuppressLint("InlinedApi")
+    private fun updateNotificationsPermissionsOnAndroid13Plus() {
+        val granted =
+            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+        viewModel.updateNotificationsPermissions(granted)
     }
 
     private fun openSettings() {
-        // This gets called only on Android 13+.
         @SuppressLint("InlinedApi")
         val settingsIntent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -189,26 +196,9 @@ class NotifyMeView @JvmOverloads constructor(
         this.gone()
     }
 
-    private fun checkRequestPermissionRationale() {
-        // This gets called only on Android 13+.
-        @SuppressLint("InlinedApi")
-        val showPrompt = ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.POST_NOTIFICATIONS)
-        if (showPrompt) {
-            viewModel.onPermissionRationaleNeeded()
-        } else {
-            viewModel.onOpenSettings()
-        }
-    }
-
+    @SuppressLint("InlinedApi")
     private fun showNotificationsPermissionsPrompt() {
-        if (isAtLeastAndroid13()) {
-            ActivityCompat.requestPermissions(getActivity(), arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1)
-        }
-    }
-
-    @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.TIRAMISU)
-    private fun isAtLeastAndroid13(): Boolean {
-        return Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU
+        ActivityCompat.requestPermissions(getActivity(), arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1)
     }
 
     private fun getActivity(): Activity {
