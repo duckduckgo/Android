@@ -605,6 +605,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         TextAlertDialogBuilder(this)
             .setTitle(R.string.rateAppDialogTitle)
             .setMessage(R.string.rateAppDialogMessage)
+            .setCancellable(true)
             .setPositiveButton(R.string.rateAppDialogPositiveButton)
             .setNegativeButton(R.string.rateAppDialogNegativeButton)
             .addEventListener(
@@ -620,6 +621,9 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
                     override fun onDialogShown() {
                         viewModel.onAppRatingDialogShown(promptCount)
                     }
+                    override fun onDialogCancelled() {
+                        viewModel.onUserCancelledRateAppDialog(promptCount)
+                    }
                 },
             )
             .show()
@@ -629,6 +633,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         TextAlertDialogBuilder(this)
             .setTitle(R.string.giveFeedbackDialogTitle)
             .setMessage(R.string.giveFeedbackDialogMessage)
+            .setCancellable(true)
             .setPositiveButton(R.string.giveFeedbackDialogPositiveButton)
             .setNegativeButton(R.string.giveFeedbackDialogNegativeButton)
             .addEventListener(
@@ -643,6 +648,9 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
 
                     override fun onDialogShown() {
                         viewModel.onGiveFeedbackDialogShown(promptCount)
+                    }
+                    override fun onDialogCancelled() {
+                        viewModel.onUserCancelledGiveFeedbackDialog(promptCount)
                     }
                 },
             )
