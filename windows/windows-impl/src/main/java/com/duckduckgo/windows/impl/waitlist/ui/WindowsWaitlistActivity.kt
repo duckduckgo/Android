@@ -117,6 +117,7 @@ class WindowsWaitlistActivity : DuckDuckGoActivity() {
             listOf(Pair("beta_link", windowsSpan)),
         )
         binding.waitListButton.gone()
+        binding.lookingForMacVersionButton.gone()
         binding.footerDescription.gone()
         binding.codeFrame.show()
         binding.shareImage.show()
@@ -127,6 +128,7 @@ class WindowsWaitlistActivity : DuckDuckGoActivity() {
     private fun renderJoinedQueue() {
         binding.waitListButton.gone()
         binding.footerDescription.gone()
+        binding.lookingForMacVersionButton.gone()
         binding.codeFrame.gone()
         binding.shareImage.gone()
         binding.headerImage.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_list)
