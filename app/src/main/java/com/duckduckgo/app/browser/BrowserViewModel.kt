@@ -34,12 +34,15 @@ import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.APP_ENJOYMENT_DIALOG_SHOWN
+import com.duckduckgo.app.pixels.AppPixelName.APP_ENJOYMENT_DIALOG_USER_CANCELLED
 import com.duckduckgo.app.pixels.AppPixelName.APP_ENJOYMENT_DIALOG_USER_ENJOYING
 import com.duckduckgo.app.pixels.AppPixelName.APP_ENJOYMENT_DIALOG_USER_NOT_ENJOYING
 import com.duckduckgo.app.pixels.AppPixelName.APP_FEEDBACK_DIALOG_SHOWN
+import com.duckduckgo.app.pixels.AppPixelName.APP_FEEDBACK_DIALOG_USER_CANCELLED
 import com.duckduckgo.app.pixels.AppPixelName.APP_FEEDBACK_DIALOG_USER_DECLINED_FEEDBACK
 import com.duckduckgo.app.pixels.AppPixelName.APP_FEEDBACK_DIALOG_USER_GAVE_FEEDBACK
 import com.duckduckgo.app.pixels.AppPixelName.APP_RATING_DIALOG_SHOWN
+import com.duckduckgo.app.pixels.AppPixelName.APP_RATING_DIALOG_USER_CANCELLED
 import com.duckduckgo.app.pixels.AppPixelName.APP_RATING_DIALOG_USER_DECLINED_RATING
 import com.duckduckgo.app.pixels.AppPixelName.APP_RATING_DIALOG_USER_GAVE_RATING
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -236,6 +239,11 @@ class BrowserViewModel @Inject constructor(
         launch { appEnjoymentUserEventRecorder.userDeclinedToRateApp(promptCount) }
     }
 
+    fun onUserCancelledRateAppDialog(promptCount: PromptCount) {
+        firePixelWithPromptCount(APP_RATING_DIALOG_USER_CANCELLED, promptCount)
+        launch { appEnjoymentUserEventRecorder.userDeclinedToRateApp(promptCount) }
+    }
+
     fun onUserSelectedToGiveFeedback(promptCount: PromptCount) {
         firePixelWithPromptCount(APP_FEEDBACK_DIALOG_USER_GAVE_FEEDBACK, promptCount)
         command.value = Command.LaunchFeedbackView
@@ -246,6 +254,16 @@ class BrowserViewModel @Inject constructor(
     fun onUserDeclinedToGiveFeedback(promptCount: PromptCount) {
         firePixelWithPromptCount(APP_FEEDBACK_DIALOG_USER_DECLINED_FEEDBACK, promptCount)
         launch { appEnjoymentUserEventRecorder.onUserDeclinedToGiveFeedback(promptCount) }
+    }
+
+    fun onUserCancelledGiveFeedbackDialog(promptCount: PromptCount) {
+        firePixelWithPromptCount(APP_FEEDBACK_DIALOG_USER_CANCELLED, promptCount)
+        launch { appEnjoymentUserEventRecorder.onUserDeclinedToGiveFeedback(promptCount) }
+    }
+
+    fun onUserCancelledAppEnjoymentDialog(promptCount: PromptCount) {
+        firePixelWithPromptCount(APP_ENJOYMENT_DIALOG_USER_CANCELLED, promptCount)
+        launch { appEnjoymentUserEventRecorder.onUserDeclinedToSayIfEnjoyingApp(promptCount) }
     }
 
     fun onOpenShortcut(url: String) {
