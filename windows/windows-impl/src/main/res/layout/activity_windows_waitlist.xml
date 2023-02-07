@@ -49,10 +49,13 @@
             <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:id="@+id/statusTitle"
                 app:typography="h1"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
+                android:layout_marginStart="@dimen/keyline_5"
+                android:layout_marginEnd="@dimen/keyline_5"
                 android:text="@string/windows_waitlist_title"
+                android:textAlignment="center"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintBottom_toTopOf="@id/waitlistDescription"
@@ -78,8 +81,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
-                android:layout_marginTop="16dp"
                 android:layout_marginEnd="24dp"
+                android:layout_marginTop="16dp"
                 android:text="@string/windows_waitlist_code_description"
                 android:textAlignment="center"
                 app:layout_constraintBottom_toTopOf="@id/codeFrame"
@@ -119,12 +122,11 @@
                     android:gravity="center"
                     tools:text="F20LPOPSD"
                     android:textColor="@color/almostBlack"
-                    android:textSize="34sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
             <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
-                android:id="@+id/dax_button_ghost"
+                android:id="@+id/lookingForMacVersionButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:buttonSize="small"
@@ -143,6 +145,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
                 android:layout_marginStart="@dimen/keyline_4"
+                android:textAlignment="center"
                 android:layout_marginEnd="@dimen/keyline_4"
                 android:text="@string/windows_waitlist_footer"
                 app:layout_constraintBottom_toBottomOf="parent"
