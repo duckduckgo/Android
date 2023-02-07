@@ -109,11 +109,13 @@ class TextAlertDialogBuilder(val context: Context) : DaxAlertDialog {
             .setView(binding.root)
             .setCancelable(isCancellable)
             .apply {
-                setOnKeyListener(
-                    BackKeyListener {
-                        listener.onDialogCancelled()
-                    },
-                )
+                if (isCancellable) {
+                    setOnKeyListener(
+                        BackKeyListener {
+                            listener.onDialogCancelled()
+                        },
+                    )
+                }
             }
         dialog = dialogBuilder.create()
         setViews(binding, dialog!!)
