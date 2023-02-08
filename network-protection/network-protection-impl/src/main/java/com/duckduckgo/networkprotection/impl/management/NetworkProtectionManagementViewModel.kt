@@ -204,7 +204,9 @@ class NetworkProtectionManagementViewModel @Inject constructor(
 
     fun onStartVpn() {
         featuresRegistry.registerFeature(NetPVpnFeature.NETP_VPN)
-        networkProtectionRepository.reconnectStatus = NotReconnecting // TODO find a better place to do this
+        // TODO find a better place to reset values when manually starting or stopping NetP.
+        networkProtectionRepository.reconnectStatus = NotReconnecting
+        networkProtectionRepository.enabledTimeInMillis = -1L
         reconnectNotifications.clearNotifications()
         forceUpdateRunningState()
     }

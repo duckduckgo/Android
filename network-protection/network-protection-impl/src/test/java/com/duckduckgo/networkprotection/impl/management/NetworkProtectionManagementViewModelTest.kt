@@ -334,6 +334,7 @@ class NetworkProtectionManagementViewModelTest {
 
         verify(reconnectNotifications).clearNotifications()
         verify(networkProtectionRepository).reconnectStatus = NotReconnecting
+        verify(networkProtectionRepository).enabledTimeInMillis = -1L
     }
 
     @Test
