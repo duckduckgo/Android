@@ -16,16 +16,19 @@
 
 package com.duckduckgo.app.settings
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.view.View
 import android.widget.CompoundButton.OnCheckedChangeListener
 import android.widget.Toast
 import androidx.annotation.StringRes
+import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -147,7 +150,9 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     override fun onStart() {
         super.onStart()
-        viewModel.start()
+
+        val notificationsEnabled = NotificationManagerCompat.from(this).areNotificationsEnabled()
+        viewModel.start(notificationsEnabled)
         viewModel.startPollingAppTpEnableState()
     }
 
@@ -180,6 +185,7 @@ class SettingsActivity : DuckDuckGoActivity() {
         with(viewsCustomize) {
             autocompleteToggle.setOnCheckedChangeListener(autocompleteToggleListener)
             sitePermissions.setClickListener { viewModel.onSitePermissionsClicked() }
+            notificationsSetting.setClickListener { viewModel.userRequestedToChangeNotificationsSetting() }
             appLinksSetting.setClickListener { viewModel.userRequestedToChangeAppLinkSetting() }
         }
 
@@ -244,6 +250,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                     )
                     updateEmailSubtitle(it.emailAddress)
                     updateAutofill(it.showAutofill)
+                    viewsCustomize.notificationsSetting.setSecondaryText(getString(it.notificationsSettingSubtitleId))
                 }
             }.launchIn(lifecycleScope)
 
@@ -402,6 +409,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             is Command.LaunchAddHomeScreenWidget -> launchAddHomeScreenWidget()
             is Command.LaunchMacOs -> launchMacOsScreen()
             is Command.LaunchAutoconsent -> launchAutoconsent()
+            is Command.LaunchNotificationsSettings -> launchNotificationsSettings()
             null -> TODO()
         }
     }
@@ -593,6 +601,21 @@ class SettingsActivity : DuckDuckGoActivity() {
         startActivity(AutoconsentSettingsActivity.intent(this), options)
     }
 
+    @SuppressLint("InlinedApi")
+    private fun launchNotificationsSettings() {
+        val settingsIntent = if (appBuildConfig.sdkInt >= Build.VERSION_CODES.O) {
+            Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                .putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+        } else {
+            Intent(ANDROID_M_APP_NOTIFICATION_SETTINGS)
+                .putExtra(ANDROID_M_APP_PACKAGE, packageName)
+                .putExtra(ANDROID_M_APP_UID, applicationInfo.uid)
+        }
+
+        startActivity(settingsIntent, null)
+    }
+
     private fun launchAppTPTrackersScreen() {
         startActivity(DeviceShieldTrackerActivity.intent(this))
     }
@@ -650,6 +673,10 @@ class SettingsActivity : DuckDuckGoActivity() {
         private const val FEEDBACK_REQUEST_CODE = 100
         private const val CHANGE_APP_ICON_REQUEST_CODE = 101
         private const val PRIVACY_POLICY_WEB_LINK = "https://duckduckgo.com/privacy"
+
+        private const val ANDROID_M_APP_NOTIFICATION_SETTINGS = "android.settings.APP_NOTIFICATION_SETTINGS"
+        private const val ANDROID_M_APP_PACKAGE = "app_package"
+        private const val ANDROID_M_APP_UID = "app_uid"
 
         fun intent(context: Context): Intent {
             return Intent(context, SettingsActivity::class.java)

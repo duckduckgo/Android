@@ -192,6 +192,14 @@ class DownloadsAdapter @Inject constructor(
                     }
                 },
             )
+
+            binding.root.onNotifyMeClicked {
+                listener.onNotifyMeButtonClicked()
+            }
+
+            binding.root.onDismissClicked {
+                listener.onNotifyMeDismissButtonClicked()
+            }
         }
     }
 

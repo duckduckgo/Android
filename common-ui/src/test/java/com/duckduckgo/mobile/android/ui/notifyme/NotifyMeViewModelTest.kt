@@ -58,7 +58,7 @@ class NotifyMeViewModelTest {
 
     @Before
     fun setup() {
-        testee.init("screen_name", "shared_prefs_key")
+        testee.init("shared_prefs_key")
     }
 
     @Test

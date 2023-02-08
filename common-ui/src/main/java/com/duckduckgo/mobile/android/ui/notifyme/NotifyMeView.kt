@@ -25,13 +25,16 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.provider.Settings
 import android.util.AttributeSet
+import android.view.Gravity
 import android.view.View
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.widget.FrameLayout
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
@@ -51,6 +54,7 @@ import com.duckduckgo.mobile.android.ui.notifyme.NotifyMeViewModel.ViewState
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.google.android.material.button.MaterialButton.ICON_GRAVITY_TEXT_START
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -70,8 +74,10 @@ class NotifyMeView @JvmOverloads constructor(
     @Inject
     lateinit var viewModelFactory: NotifyMeViewModel.Factory
 
-    private lateinit var pixelParentScreenName: String
     private lateinit var sharedPrefsKeyForDismiss: String
+
+    private var onNotifyMeButtonClicked: () -> Unit = {}
+    private var onNotifyMeCloseButtonClicked: () -> Unit = {}
 
     private var coroutineScope: CoroutineScope? = null
     private var vtoGlobalLayoutListener: OnGlobalLayoutListener? = null
@@ -87,13 +93,16 @@ class NotifyMeView @JvmOverloads constructor(
         val attributes = context.obtainStyledAttributes(attrs, R.styleable.NotifyMeView)
         setPrimaryText(attributes.getString(R.styleable.NotifyMeView_primaryText) ?: "")
         setSecondaryText(attributes.getString(R.styleable.NotifyMeView_secondaryText) ?: "")
-        setPixelParentScreenName(attributes.getString(R.styleable.NotifyMeView_pixelParentScreenName) ?: "")
         setSharedPrefsKeyForDismiss(attributes.getString(R.styleable.NotifyMeView_sharedPrefsKeyForDismiss) ?: "")
+        setDismissIcon(attributes.getBoolean(R.styleable.NotifyMeView_dismissIcon, true))
+        setContentOrientation(Orientation.from(attributes.getInt(R.styleable.NotifyMeView_contentOrientation, 0)))
         binding.notifyMeClose.setOnClickListener {
             viewModel.onCloseButtonClicked()
+            onNotifyMeCloseButtonClicked.invoke()
         }
         binding.notifyMeButton.setOnClickListener {
             viewModel.onNotifyMeButtonClicked()
+            onNotifyMeButtonClicked.invoke()
         }
         attributes.recycle()
     }
@@ -109,7 +118,7 @@ class NotifyMeView @JvmOverloads constructor(
         @SuppressLint("NoHardcodedCoroutineDispatcher")
         coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
-        viewModel.init(pixelParentScreenName, sharedPrefsKeyForDismiss)
+        viewModel.init(sharedPrefsKeyForDismiss)
 
         viewModel.viewState
             .onEach { render(it) }
@@ -137,20 +146,44 @@ class NotifyMeView @JvmOverloads constructor(
         this.visibilityChangedListener = visibilityChangedListener
     }
 
-    fun setPrimaryText(title: String) {
-        binding.notifyMeMessageTitle.text = title
+    fun onDismissClicked(onNotifyMeCloseButtonClicked: () -> Unit) {
+        this.onNotifyMeCloseButtonClicked = onNotifyMeCloseButtonClicked
     }
 
-    fun setSecondaryText(subtitle: String) {
-        binding.notifyMeMessageSubtitle.text = subtitle
+    fun onNotifyMeClicked(onNotifyMeButtonClicked: () -> Unit) {
+        this.onNotifyMeButtonClicked = onNotifyMeButtonClicked
     }
 
-    fun setPixelParentScreenName(pixelParentScreenName: String) {
-        this.pixelParentScreenName = pixelParentScreenName
+    fun setPrimaryText(primaryText: String) {
+        binding.notifyMeMessageTitle.text = primaryText
+    }
+
+    fun setSecondaryText(secondaryText: String) {
+        binding.notifyMeMessageSubtitle.text = secondaryText
     }
 
     fun setSharedPrefsKeyForDismiss(sharedPrefsKeyForDismiss: String) {
         this.sharedPrefsKeyForDismiss = sharedPrefsKeyForDismiss
+    }
+
+    fun setDismissIcon(dismissIcon: Boolean) {
+        if (dismissIcon) {
+            binding.notifyMeClose.show()
+        } else {
+            binding.notifyMeClose.gone()
+        }
+    }
+
+    fun setContentOrientation(contentOrientation: Orientation) {
+        if (contentOrientation == Orientation.Center) {
+            binding.notifyMeButton.iconGravity = ICON_GRAVITY_TEXT_START
+            binding.notifyMeButton.updateLayoutParams {
+                width = ConstraintLayout.LayoutParams.MATCH_PARENT
+            }
+
+            binding.notifyMeMessageTitle.gravity = Gravity.CENTER
+            binding.notifyMeMessageSubtitle.gravity = Gravity.CENTER
+        }
     }
 
     private fun render(viewState: ViewState) {
@@ -204,10 +237,12 @@ class NotifyMeView @JvmOverloads constructor(
 
     private fun showMe() {
         this.show()
+        binding.notifyMeCard.show()
     }
 
     private fun hideMe() {
         this.gone()
+        binding.notifyMeCard.gone()
     }
 
     private fun checkPermissionRationale() {
@@ -262,5 +297,22 @@ class NotifyMeView @JvmOverloads constructor(
 
     interface OnVisibilityChangedListener {
         fun onVisibilityChange(v: View?, isVisible: Boolean)
+    }
+
+    enum class Orientation {
+        Start,
+        Center,
+        ;
+
+        companion object {
+            fun from(orientation: Int): Orientation {
+                // same order as attrs-notify-me-view.xml
+                return when (orientation) {
+                    0 -> Start
+                    1 -> Center
+                    else -> Start
+                }
+            }
+        }
     }
 }
