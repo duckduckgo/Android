@@ -74,7 +74,6 @@ class NotifyMeView @JvmOverloads constructor(
     @Inject
     lateinit var viewModelFactory: NotifyMeViewModel.Factory
 
-    private lateinit var pixelParentScreenName: String
     private lateinit var sharedPrefsKeyForDismiss: String
 
     private var onNotifyMeButtonClicked: () -> Unit = {}
@@ -94,7 +93,6 @@ class NotifyMeView @JvmOverloads constructor(
         val attributes = context.obtainStyledAttributes(attrs, R.styleable.NotifyMeView)
         setPrimaryText(attributes.getString(R.styleable.NotifyMeView_primaryText) ?: "")
         setSecondaryText(attributes.getString(R.styleable.NotifyMeView_secondaryText) ?: "")
-        setPixelParentScreenName(attributes.getString(R.styleable.NotifyMeView_pixelParentScreenName) ?: "")
         setSharedPrefsKeyForDismiss(attributes.getString(R.styleable.NotifyMeView_sharedPrefsKeyForDismiss) ?: "")
         setDismissIcon(attributes.getBoolean(R.styleable.NotifyMeView_dismissIcon, true))
         setContentOrientation(Orientation.from(attributes.getInt(R.styleable.NotifyMeView_contentOrientation, 0)))
@@ -120,7 +118,7 @@ class NotifyMeView @JvmOverloads constructor(
         @SuppressLint("NoHardcodedCoroutineDispatcher")
         coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
-        viewModel.init(pixelParentScreenName, sharedPrefsKeyForDismiss)
+        viewModel.init(sharedPrefsKeyForDismiss)
 
         viewModel.viewState
             .onEach { render(it) }
@@ -162,10 +160,6 @@ class NotifyMeView @JvmOverloads constructor(
 
     fun setSecondaryText(secondaryText: String) {
         binding.notifyMeMessageSubtitle.text = secondaryText
-    }
-
-    fun setPixelParentScreenName(pixelParentScreenName: String) {
-        this.pixelParentScreenName = pixelParentScreenName
     }
 
     fun setSharedPrefsKeyForDismiss(sharedPrefsKeyForDismiss: String) {

@@ -19,7 +19,6 @@
     android:id="@+id/downloadsNotifyMe"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:pixelParentScreenName="downloads"
     app:primaryText="@string/downloadsNotifyMeTitle"
     app:secondaryText="@string/downloadsNotifyMeSubtitle"
     app:sharedPrefsKeyForDismiss="key_component_dismissed_in_downloads" />

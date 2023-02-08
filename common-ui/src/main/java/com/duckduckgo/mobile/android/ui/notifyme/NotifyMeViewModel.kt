@@ -57,7 +57,6 @@ class NotifyMeViewModel(
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
 
-    private lateinit var pixelParentScreenName: String
     private lateinit var sharedPrefsKeyForDismiss: String
 
     private val notificationsAllowed = MutableStateFlow(true)
@@ -117,8 +116,7 @@ class NotifyMeViewModel(
         }
     }
 
-    fun init(pixelParentScreenName: String, sharedPrefsKeyForDismiss: String) {
-        this.pixelParentScreenName = pixelParentScreenName
+    fun init(sharedPrefsKeyForDismiss: String) {
         this.sharedPrefsKeyForDismiss = sharedPrefsKeyForDismiss
     }
 

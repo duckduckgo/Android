@@ -18,7 +18,6 @@
     <declare-styleable name="NotifyMeView">
         <attr name="primaryText" />
         <attr name="secondaryText" />
-        <attr name="pixelParentScreenName" format="string" />
         <attr name="sharedPrefsKeyForDismiss" format="string" />
         <attr name="dismissIcon" format="boolean" />
         <attr name="contentOrientation" format="enum">
