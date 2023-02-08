@@ -101,6 +101,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SETTINGS_DO_NOT_SELL_SHOWN("ms_dns"),
     SETTINGS_DO_NOT_SELL_ON("ms_dns_on"),
     SETTINGS_DO_NOT_SELL_OFF("ms_dns_off"),
+    SETTINGS_NOTIFICATIONS_PRESSED("ms_notifications_setting_pressed"),
     SETTINGS_APP_LINKS_PRESSED("ms_app_links_setting_pressed"),
     SETTINGS_APP_LINKS_ASK_EVERY_TIME_SELECTED("ms_app_links_ask_every_time_setting_selected"),
     SETTINGS_APP_LINKS_ALWAYS_SELECTED("ms_app_links_always_setting_selected"),
@@ -250,4 +251,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     REMOTE_MESSAGE_SECONDARY_ACTION_CLICKED("m_remote_message_secondary_action_clicked"),
 
     CREATE_BLOOM_FILTER_ERROR("m_create_bloom_filter_error"),
+
+    NOTIFY_ME_BUTTON_PRESSED("m_notify_me_component_notify_me_button_pressed"),
+    NOTIFY_ME_DISMISS_BUTTON_PRESSED("m_notify_me_component_close_button_pressed"),
 }

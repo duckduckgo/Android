@@ -44,6 +44,9 @@ interface VpnStore {
     fun didShowAppTpEnabledCta(): Boolean
     fun appTpEnabledCtaDidShow()
     fun getAndSetOnboardingSession(): Boolean
+
+    fun dismissNotifyMeInAppTp()
+    fun isNotifyMeInAppTpDismissed(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -117,13 +120,21 @@ class SharedPreferencesVpnStore @Inject constructor(
         return Instant.now().toEpochMilli() < expiryTimestamp
     }
 
+    override fun dismissNotifyMeInAppTp() {
+        preferences.edit { putBoolean(KEY_NOTIFY_ME_IN_APP_TP_DISMISSED, true) }
+    }
+
+    override fun isNotifyMeInAppTpDismissed(): Boolean {
+        return preferences.getBoolean(KEY_NOTIFY_ME_IN_APP_TP_DISMISSED, false)
+    }
+
     companion object {
         private const val DEVICE_SHIELD_ONBOARDING_STORE_PREFS = "com.duckduckgo.android.atp.onboarding.store"
 
         private const val KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED = "KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED"
         private const val KEY_APP_TP_ONBOARDING_VPN_ENABLED_CTA_SHOWN = "KEY_APP_TP_ONBOARDING_VPN_ENABLED_CTA_SHOWN"
         private const val KEY_APP_TP_ONBOARDING_BANNER_EXPIRY_TIMESTAMP = "KEY_APP_TP_ONBOARDING_BANNER_EXPIRY_TIMESTAMP"
-
+        private const val KEY_NOTIFY_ME_IN_APP_TP_DISMISSED = "KEY_NOTIFY_ME_IN_APP_TP_DISMISSED"
         private const val WINDOW_INTERVAL_HOURS = 24L
     }
 }

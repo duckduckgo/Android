@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,33 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.themepreview.ui.component
+package com.duckduckgo.mobile.android.ui.store.notifyme
 
-enum class Component {
-    BUTTON,
-    FAB,
-    CARD,
-    TOP_APP_BAR,
-    CHIP,
-    DRAWER,
-    TEXT_FIELD,
-    BOTTOM_NAVIGATION,
-    SWITCH,
-    RADIO_BUTTON,
-    CHECKBOX,
-    SLIDER,
-    BOTTOM_APP_BAR,
-    TABS,
-    SNACKBAR,
-    REMOTE_MESSAGE,
-    INFO_PANEL,
-    DIALOG,
-    BOTTOM_SHEET,
-    IMAGE,
-    SEARCH_BAR,
-    MENU_ITEM,
-    SECTION_HEADER_LIST_ITEM,
-    SINGLE_LINE_LIST_ITEM,
-    TWO_LINE_LIST_ITEM,
-    SECTION_DIVIDER,
+interface NotifyMeDataStore {
+
+    fun isComponentDismissed(key: String, defaultValue: Boolean): Boolean
+
+    fun setComponentDismissed(key: String)
 }
