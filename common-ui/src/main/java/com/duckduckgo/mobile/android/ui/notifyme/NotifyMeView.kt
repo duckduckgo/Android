@@ -237,10 +237,12 @@ class NotifyMeView @JvmOverloads constructor(
 
     private fun showMe() {
         this.show()
+        binding.notifyMeCard.show()
     }
 
     private fun hideMe() {
         this.gone()
+        binding.notifyMeCard.gone()
     }
 
     private fun checkPermissionRationale() {
