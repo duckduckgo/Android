@@ -87,7 +87,7 @@ class ContributesPluginPointCodeGenerator : CodeGenerator {
                         PropertySpec
                             .builder(
                                 "sortedPlugins",
-                                kotlinCollectionFqName.asClassName(module).parameterizedBy(pluginClassName)
+                                kotlinCollectionFqName.asClassName(module).parameterizedBy(pluginClassName),
                             )
                             .addModifiers(KModifier.PRIVATE)
                             .delegate(
@@ -95,9 +95,9 @@ class ContributesPluginPointCodeGenerator : CodeGenerator {
                                     .beginControlFlow("lazy")
                                     .add("plugins.toList().sortedBy { it.javaClass.name }")
                                     .endControlFlow()
-                                    .build()
+                                    .build(),
                             )
-                            .build()
+                            .build(),
                     )
                     .addFunction(
                         FunSpec.builder("getPlugins")
