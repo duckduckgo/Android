@@ -145,7 +145,7 @@ class DeviceShieldTrackerActivity :
         }
 
         binding.ctaManageViewAllApps.setClickListener {
-            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchTrackingProtectionExclusionListActivity)
+            viewModel.onViewEvent(ViewEvent.LaunchTrackingProtectionExclusionListActivity)
         }
 
         binding.ctaRemoveFeature.setClickListener {
@@ -154,6 +154,14 @@ class DeviceShieldTrackerActivity :
 
         binding.ctaShowAll.setClickListener {
             viewModel.onViewEvent(ViewEvent.LaunchMostRecentActivity)
+        }
+
+        binding.deviceShieldTrackerNotifyMe.onNotifyMeClicked {
+            viewModel.onViewEvent(ViewEvent.NotifyMeClicked)
+        }
+
+        binding.deviceShieldTrackerNotifyMe.onDismissClicked {
+            viewModel.onViewEvent(ViewEvent.NotifyMeDismissClicked)
         }
     }
 

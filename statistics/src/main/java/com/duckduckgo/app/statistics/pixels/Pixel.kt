@@ -78,6 +78,7 @@ interface Pixel {
         const val WEBVIEW_VERSION = "webview_version"
         const val OS_VERSION = "os_version"
         const val DEFAULT_BROWSER = "default_browser"
+        const val NOTIFY_ME_FROM_SCREEN = "from_screen"
     }
 
     object PixelValues {
@@ -99,6 +100,8 @@ interface Pixel {
         const val FIRE_ANIMATION_AIRSTREAM = "faas"
         const val FIRE_ANIMATION_WHIRLPOOL = "fawp"
         const val FIRE_ANIMATION_NONE = "fann"
+
+        const val NOTIFY_ME_DOWNLOADS_SCREEN = "downloads"
     }
 
     fun fire(

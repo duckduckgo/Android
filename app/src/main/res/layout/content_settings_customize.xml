@@ -45,6 +45,13 @@
         app:showSwitch="true" />
 
     <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+        android:id="@+id/notificationsSetting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/settingsTitleNotifications"
+        app:primaryTextTruncated="false" />
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
         android:id="@+id/appLinksSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

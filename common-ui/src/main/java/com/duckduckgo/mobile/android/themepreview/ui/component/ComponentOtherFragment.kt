@@ -18,6 +18,6 @@ package com.duckduckgo.mobile.android.themepreview.ui.component
 
 class ComponentOtherFragment : ComponentFragment() {
     override fun getComponents(): List<Component> {
-        return listOf(Component.SECTION_DIVIDER, Component.NOTIFY_ME_VIEW)
+        return listOf(Component.SECTION_DIVIDER)
     }
 }

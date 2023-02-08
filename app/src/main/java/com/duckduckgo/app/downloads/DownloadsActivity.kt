@@ -75,10 +75,8 @@ class DownloadsActivity : DuckDuckGoActivity() {
         setupToolbar(toolbar)
         setupRecyclerView()
 
-        viewModel.downloads()
-
         lifecycleScope.launch {
-            viewModel.viewState()
+            viewModel.viewState
                 .flowWithLifecycle(lifecycle, STARTED)
                 .collectLatest { render(it) }
         }
@@ -108,6 +106,7 @@ class DownloadsActivity : DuckDuckGoActivity() {
         return super.onPrepareOptionsMenu(menu)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         if (searchBar.isVisible) {
             hideSearchBar()

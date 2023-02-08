@@ -20,6 +20,8 @@ import com.duckduckgo.app.anr.AnrPixelName
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixelNames
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixelNames.ATP_DID_PRESS_NOTIFY_ME_BUTTON
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixelNames.ATP_DID_PRESS_NOTIFY_ME_DISMISS_BUTTON
 import org.junit.Assert.fail
 import org.junit.Test
 
@@ -40,7 +42,11 @@ class PixelNameTest {
         }
         DeviceShieldPixelNames.values().forEach {
             if (!existingNames.add(it.pixelName)) {
-                fail("Duplicate pixel name in DeviceShieldPixelNames: ${it.pixelName}")
+                // This if statement was added as we know these 2 pixels are duplicated in AppPixelName and DeviceShieldPixelNames.
+                // These are temporary and the below condition will be removed along with the pixels.
+                if (it != ATP_DID_PRESS_NOTIFY_ME_BUTTON && it != ATP_DID_PRESS_NOTIFY_ME_DISMISS_BUTTON) {
+                    fail("Duplicate pixel name in DeviceShieldPixelNames: ${it.pixelName}")
+                }
             }
         }
         AnrPixelName.values().forEach {

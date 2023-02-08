@@ -35,6 +35,9 @@ dependencies {
 
     implementation project(path: ':common')
     implementation project(path: ':di')
+    anvil project(path: ':anvil-compiler')
+    implementation project(path: ':anvil-annotations')
+    implementation project(path: ':app-build-config-api')
 
     implementation Kotlin.stdlib.jdk7
 
@@ -42,6 +45,7 @@ dependencies {
     implementation Google.android.material
     implementation AndroidX.constraintLayout
     implementation AndroidX.recyclerView
+    implementation AndroidX.lifecycle.viewModelKtx
     // just to get the dagger annotations
     implementation Google.dagger
 
@@ -50,4 +54,13 @@ dependencies {
 
     // Lottie
     implementation "com.airbnb.android:lottie:_"
+
+    // Testing dependencies
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    implementation Testing.junit4
+    testImplementation AndroidX.test.ext.junit
+    testImplementation AndroidX.archCore.testing
+    testImplementation 'app.cash.turbine:turbine:_'
+    testImplementation Testing.robolectric
+    testImplementation project(path: ':common-test')
 }
