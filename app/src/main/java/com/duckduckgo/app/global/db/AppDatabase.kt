@@ -64,6 +64,8 @@ import com.duckduckgo.app.usage.app.AppDaysUsedDao
 import com.duckduckgo.app.usage.app.AppDaysUsedEntity
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
+import com.duckduckgo.sync.store.Entity
+import com.duckduckgo.sync.store.Relation
 
 @Database(
     exportSchema = true,
@@ -99,6 +101,8 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
         PixelEntity::class,
         WebTrackerBlocked::class,
         AuthCookieAllowedDomainEntity::class,
+        Entity::class,
+        Relation::class
     ],
 )
 
