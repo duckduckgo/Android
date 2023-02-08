@@ -29,5 +29,9 @@ interface AutofillUrlMatcher {
      */
     fun cleanRawUrl(rawUrl: String): String
 
-    data class ExtractedUrlParts(val eTldPlus1: String?, val subdomain: String?)
+    data class ExtractedUrlParts(
+        val eTldPlus1: String?,
+        val subdomain: String?,
+        val port: Int? = null,
+    )
 }

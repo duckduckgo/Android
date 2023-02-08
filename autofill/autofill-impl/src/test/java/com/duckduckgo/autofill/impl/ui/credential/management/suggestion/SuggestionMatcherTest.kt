@@ -77,6 +77,34 @@ class SuggestionMatcherTest {
         assertEquals(1, suggestions.size)
     }
 
+    @Test
+    fun whenPortIncludedInSavedSiteAndNotInVisitedSiteThenNotASuggestion() {
+        val creds = listOf(creds("example.com:8080"))
+        val suggestions = testee.getSuggestions("example.com", creds)
+        assertEquals(0, suggestions.size)
+    }
+
+    @Test
+    fun whenPortIncludedInVisitedSiteAndNotInSavedSiteThenNotASuggestion() {
+        val creds = listOf(creds("example.com"))
+        val suggestions = testee.getSuggestions("example.com:8080", creds)
+        assertEquals(0, suggestions.size)
+    }
+
+    @Test
+    fun whenPortIncludedInVisitedSiteDiffersFromPortInSavedSiteThenNotASuggestion() {
+        val creds = listOf(creds("example.com:9000"))
+        val suggestions = testee.getSuggestions("example.com:8080", creds)
+        assertEquals(0, suggestions.size)
+    }
+
+    @Test
+    fun whenPortIncludedInVisitedSiteMatchesPortInSavedSiteThenNotASuggestion() {
+        val creds = listOf(creds("example.com:9000"))
+        val suggestions = testee.getSuggestions("example.com:9000", creds)
+        assertEquals(1, suggestions.size)
+    }
+
     private fun creds(domain: String): LoginCredentials {
         return LoginCredentials(id = 0, domain = domain, username = "username", password = "password")
     }

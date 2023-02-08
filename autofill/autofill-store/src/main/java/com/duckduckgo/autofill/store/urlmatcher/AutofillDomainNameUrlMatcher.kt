@@ -27,17 +27,19 @@ import timber.log.Timber
 class AutofillDomainNameUrlMatcher @Inject constructor() : AutofillUrlMatcher {
 
     override fun extractUrlPartsForAutofill(originalUrl: String?): ExtractedUrlParts {
-        if (originalUrl == null) return ExtractedUrlParts(null, null)
+        if (originalUrl == null) return unextractable()
 
         val normalizedUrl = originalUrl.normalizeScheme()
         return try {
-            val eTldPlus1 = normalizedUrl.toHttpUrl().topPrivateDomain()
+            val httpUrl = normalizedUrl.toHttpUrl()
+            val eTldPlus1 = httpUrl.topPrivateDomain()
             val domain = originalUrl.extractDomain()
+            val port = httpUrl.port
             val subdomain = determineSubdomain(domain, eTldPlus1)
-            ExtractedUrlParts(eTldPlus1, subdomain)
+            ExtractedUrlParts(eTldPlus1, subdomain, port)
         } catch (e: IllegalArgumentException) {
             Timber.w("Unable to parse e-tld+1 from $originalUrl")
-            ExtractedUrlParts(null, null)
+            unextractable()
         }
     }
 
@@ -57,6 +59,9 @@ class AutofillDomainNameUrlMatcher @Inject constructor() : AutofillUrlMatcher {
         visitedSite: ExtractedUrlParts,
         savedSite: ExtractedUrlParts,
     ): Boolean {
+        // ports must match (both being null is considered a match)
+        if (visitedSite.port != savedSite.port) return false
+
         // e-tld+1 must match
         if (!identicalEffectiveTldPlusOne(visitedSite, savedSite)) return false
 
@@ -103,6 +108,10 @@ class AutofillDomainNameUrlMatcher @Inject constructor() : AutofillUrlMatcher {
             return "https://$this"
         }
         return this
+    }
+
+    private fun unextractable(): ExtractedUrlParts {
+        return ExtractedUrlParts(null, null, null)
     }
 
     companion object {

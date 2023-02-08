@@ -200,7 +200,7 @@ class SecureStoreBackedAutofillStore(
         username: String?,
         password: String?,
     ): ContainsCredentialsResult {
-        val url = autofillUrlMatcher.cleanRawUrl(rawUrl) ?: return NoMatch
+        val url = autofillUrlMatcher.cleanRawUrl(rawUrl)
         val credentials = secureStorage.websiteLoginDetailsWithCredentialsForDomain(url).firstOrNull() ?: return NoMatch
 
         var exactMatchFound = false

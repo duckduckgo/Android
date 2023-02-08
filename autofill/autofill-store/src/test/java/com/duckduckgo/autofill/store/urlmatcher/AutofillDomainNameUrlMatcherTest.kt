@@ -17,6 +17,7 @@
 package com.duckduckgo.autofill.store.urlmatcher
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.autofill.api.urlmatcher.AutofillUrlMatcher.ExtractedUrlParts
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -177,6 +178,34 @@ class AutofillDomainNameUrlMatcherTest {
     }
 
     @Test
+    fun whenSavedSiteMatchesVisitedExceptForPortThenNotMatchingForAutofill() {
+        val savedSite = ExtractedUrlParts(eTldPlus1 = "example.com", subdomain = null, port = 8000)
+        val visitedSite = ExtractedUrlParts(eTldPlus1 = "example.com", subdomain = null, port = 1000)
+        assertFalse(testee.matchingForAutofill(visitedSite, savedSite))
+    }
+
+    @Test
+    fun whenSavedSiteMatchesVisitedAndEqualPortsThenMatchingForAutofill() {
+        val savedSite = ExtractedUrlParts(eTldPlus1 = "example.com", subdomain = null, port = 8000)
+        val visitedSite = ExtractedUrlParts(eTldPlus1 = "example.com", subdomain = null, port = 8000)
+        assertTrue(testee.matchingForAutofill(visitedSite, savedSite))
+    }
+
+    @Test
+    fun whenSavedSiteMatchesVisitedAndSavedSiteMissingPortThenNotMatchingForAutofill() {
+        val savedSite = ExtractedUrlParts(eTldPlus1 = "example.com", subdomain = null, port = null)
+        val visitedSite = ExtractedUrlParts(eTldPlus1 = "example.com", subdomain = null, port = 8000)
+        assertFalse(testee.matchingForAutofill(visitedSite, savedSite))
+    }
+
+    @Test
+    fun whenSavedSiteMatchesVisitedAndVisitedSiteMissingPortThenNotMatchingForAutofill() {
+        val savedSite = ExtractedUrlParts(eTldPlus1 = "example.com", subdomain = null, port = 8000)
+        val visitedSite = ExtractedUrlParts(eTldPlus1 = "example.com", subdomain = null, port = null)
+        assertFalse(testee.matchingForAutofill(visitedSite, savedSite))
+    }
+
+    @Test
     fun whenSavedSiteContainsUppercaseWwwSubdomainAndVisitedSiteDoesNotThenMatchingForAutofill() {
         val savedSite = testee.extractUrlPartsForAutofill("WWW.example.com")
         val visitedSite = testee.extractUrlPartsForAutofill("example.com")
@@ -239,6 +268,10 @@ class AutofillDomainNameUrlMatcherTest {
         assertEquals("foo.com", testee.cleanRawUrl("foo.com"))
         assertEquals("foo.com:9000", testee.cleanRawUrl("foo.com:9000"))
         assertEquals("fuu.foo.com", testee.cleanRawUrl("fuu.foo.com"))
+        assertEquals("192.168.0.1", testee.cleanRawUrl("192.168.0.1"))
+        assertEquals("192.168.0.1:9000", testee.cleanRawUrl("192.168.0.1:9000"))
+        assertEquals("192.168.0.1", testee.cleanRawUrl("http://192.168.0.1"))
+        assertEquals("192.168.0.1:9000", testee.cleanRawUrl("http://192.168.0.1:9000"))
         assertEquals("fuu.foo.com:9000", testee.cleanRawUrl("fuu.foo.com:9000"))
         assertEquals("RandomText", testee.cleanRawUrl("thisIs@RandomText"))
     }
