@@ -32,6 +32,10 @@ import com.duckduckgo.app.downloads.DownloadsViewModel.Command.OpenFile
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.ShareFile
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
+import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.NOTIFY_ME_FROM_SCREEN
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.NOTIFY_ME_DOWNLOADS_SCREEN
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.downloads.api.DownloadsRepository
 import com.duckduckgo.downloads.api.model.DownloadItem
@@ -56,6 +60,7 @@ class DownloadsViewModel @Inject constructor(
     private val timeDiffFormatter: TimeDiffFormatter,
     private val downloadsRepository: DownloadsRepository,
     private val dispatcher: DispatcherProvider,
+    private val pixel: Pixel,
 ) : ViewModel(), DownloadsItemListener {
 
     data class ViewState(
@@ -198,6 +203,14 @@ class DownloadsViewModel @Inject constructor(
         viewModelScope.launch {
             showNotifyMe.emit(visible)
         }
+    }
+
+    override fun onNotifyMeButtonClicked() {
+        pixel.fire(AppPixelName.NOTIFY_ME_BUTTON_PRESSED, mapOf(NOTIFY_ME_FROM_SCREEN to NOTIFY_ME_DOWNLOADS_SCREEN))
+    }
+
+    override fun onNotifyMeDismissButtonClicked() {
+        pixel.fire(AppPixelName.NOTIFY_ME_DISMISS_BUTTON_PRESSED, mapOf(NOTIFY_ME_FROM_SCREEN to NOTIFY_ME_DOWNLOADS_SCREEN))
     }
 
     private fun DownloadItem.mapToDownloadViewItem(): DownloadViewItem = Item(this)

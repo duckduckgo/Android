@@ -77,6 +77,9 @@ class NotifyMeView @JvmOverloads constructor(
     private lateinit var pixelParentScreenName: String
     private lateinit var sharedPrefsKeyForDismiss: String
 
+    private var onNotifyMeButtonClicked: () -> Unit = {}
+    private var onNotifyMeCloseButtonClicked: () -> Unit = {}
+
     private var coroutineScope: CoroutineScope? = null
     private var vtoGlobalLayoutListener: OnGlobalLayoutListener? = null
     private var visibilityChangedListener: OnVisibilityChangedListener? = null
@@ -97,9 +100,11 @@ class NotifyMeView @JvmOverloads constructor(
         setContentOrientation(Orientation.from(attributes.getInt(R.styleable.NotifyMeView_contentOrientation, 0)))
         binding.notifyMeClose.setOnClickListener {
             viewModel.onCloseButtonClicked()
+            onNotifyMeCloseButtonClicked.invoke()
         }
         binding.notifyMeButton.setOnClickListener {
             viewModel.onNotifyMeButtonClicked()
+            onNotifyMeButtonClicked.invoke()
         }
         attributes.recycle()
     }
@@ -141,6 +146,14 @@ class NotifyMeView @JvmOverloads constructor(
 
     fun setOnVisibilityChange(visibilityChangedListener: OnVisibilityChangedListener) {
         this.visibilityChangedListener = visibilityChangedListener
+    }
+
+    fun onDismissClicked(onNotifyMeCloseButtonClicked: () -> Unit) {
+        this.onNotifyMeCloseButtonClicked = onNotifyMeCloseButtonClicked
+    }
+
+    fun onNotifyMeClicked(onNotifyMeButtonClicked: () -> Unit) {
+        this.onNotifyMeButtonClicked = onNotifyMeButtonClicked
     }
 
     fun setPrimaryText(primaryText: String) {

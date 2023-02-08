@@ -33,6 +33,10 @@ import com.duckduckgo.app.downloads.DownloadsViewModel.Command.ShareFile
 import com.duckduckgo.app.global.R as CommonR
 import com.duckduckgo.app.global.formatters.time.RealTimeDiffFormatter
 import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
+import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.NOTIFY_ME_FROM_SCREEN
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.NOTIFY_ME_DOWNLOADS_SCREEN
 import com.duckduckgo.downloads.api.DownloadsRepository
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus.FINISHED
@@ -60,6 +64,7 @@ class DownloadsViewModelTest {
     var coroutineRule = CoroutineTestRule()
 
     private val mockDownloadsRepository: DownloadsRepository = mock()
+    private val mockPixel: Pixel = mock()
 
     private val context: Context = mock()
 
@@ -69,6 +74,7 @@ class DownloadsViewModelTest {
                 FakeTimeDiffFormatter(TODAY, RealTimeDiffFormatter(context)),
                 mockDownloadsRepository,
                 coroutineRule.testDispatcherProvider,
+                mockPixel,
             )
         model
     }
@@ -333,6 +339,24 @@ class DownloadsViewModelTest {
                 CancelDownload(item),
                 awaitItem(),
             )
+        }
+    }
+
+    @Test
+    fun whenNotifyMeButtonClickedThenPixelIsSentWithCorrectParams() = runTest {
+        testee.onNotifyMeButtonClicked()
+
+        testee.commands().test {
+            verify(mockPixel).fire(AppPixelName.NOTIFY_ME_BUTTON_PRESSED, mapOf(NOTIFY_ME_FROM_SCREEN to NOTIFY_ME_DOWNLOADS_SCREEN))
+        }
+    }
+
+    @Test
+    fun whenNotifyMeDismissButtonClickedThenPixelIsSentWithCorrectParams() = runTest {
+        testee.onNotifyMeDismissButtonClicked()
+
+        testee.commands().test {
+            verify(mockPixel).fire(AppPixelName.NOTIFY_ME_DISMISS_BUTTON_PRESSED, mapOf(NOTIFY_ME_FROM_SCREEN to NOTIFY_ME_DOWNLOADS_SCREEN))
         }
     }
 
