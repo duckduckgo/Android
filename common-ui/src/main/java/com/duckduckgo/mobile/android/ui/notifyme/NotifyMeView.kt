@@ -183,6 +183,9 @@ class NotifyMeView @JvmOverloads constructor(
 
             binding.notifyMeMessageTitle.gravity = Gravity.CENTER
             binding.notifyMeMessageSubtitle.gravity = Gravity.CENTER
+            binding.notifyMeContent.updateLayoutParams<LayoutParams> {
+                marginEnd = context.resources.getDimensionPixelSize(R.dimen.keyline_2)
+            }
         }
     }
 

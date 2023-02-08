@@ -30,21 +30,22 @@
         tools:visibility="visible">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/notifyMeContent"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:paddingStart="@dimen/keyline_4"
-            android:paddingTop="@dimen/keyline_4"
-            android:paddingEnd="@dimen/keyline_4"
+            android:paddingTop="@dimen/keyline_2"
+            android:paddingEnd="@dimen/keyline_2"
             android:paddingBottom="10dp">
 
             <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:id="@+id/notifyMeMessageTitle"
                 android:layout_width="@dimen/keyline_empty"
                 android:layout_height="wrap_content"
+                android:paddingTop="@dimen/keyline_2"
                 app:layout_constraintEnd_toStartOf="@id/notifyMeClose"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_goneMarginTop="@dimen/keyline_4"
                 app:typography="h3"
                 tools:text="Find out when downloads are ready" />
 
