@@ -65,6 +65,7 @@ import com.duckduckgo.app.usage.app.AppDaysUsedEntity
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 import com.duckduckgo.sync.store.Entity
+import com.duckduckgo.sync.store.EntityTypeConverter
 import com.duckduckgo.sync.store.Relation
 
 @Database(
@@ -119,6 +120,7 @@ import com.duckduckgo.sync.store.Relation
     UserEventTypeConverter::class,
     LocationPermissionTypeConverter::class,
     QueryParamsTypeConverter::class,
+    EntityTypeConverter::class,
 )
 abstract class AppDatabase : RoomDatabase() {
 
@@ -579,6 +581,20 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
+    val MIGRATION_44_TO_45: Migration = object : Migration(43, 44) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL(
+                "CREATE TABLE IF NOT EXISTS `entities` (`id` TEXT NOT NULL, " +
+                    "`title` TEXT NOT NULL, `url` TEXT, `type` TEXT, PRIMARY KEY(`id`))",
+            )
+
+            database.execSQL(
+                "CREATE TABLE IF NOT EXISTS `relations` (`id` TEXT NOT NULL, " +
+                    "`children` TEXT NOT NULL, PRIMARY KEY(`id`))",
+            )
+        }
+    }
+
     val BOOKMARKS_DB_ON_CREATE = object : RoomDatabase.Callback() {
         override fun onCreate(database: SupportSQLiteDatabase) {
             database.execSQL(
@@ -648,6 +664,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             MIGRATION_41_TO_42,
             MIGRATION_42_TO_43,
             MIGRATION_43_TO_44,
+            MIGRATION_44_TO_45
         )
 
     @Deprecated(

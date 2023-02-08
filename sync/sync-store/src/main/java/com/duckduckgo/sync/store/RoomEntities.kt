@@ -19,18 +19,38 @@ package com.duckduckgo.sync.store
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.TypeConverter
 
 @Entity(tableName = "entities")
 data class Entity(
     @PrimaryKey var id: String,
     var title: String,
     var url: String?,
-    @Embedded var type: EntityType,
+    var type: EntityType,
 )
 
-sealed class EntityType {
-    object Bookmark : EntityType()
-    object Folder : EntityType()
+enum class EntityType {
+    BOOKMARK,
+    FOLDER,
+    ;
+}
+
+
+class EntityTypeConverter {
+
+    @TypeConverter
+    fun toEntityType(entityType: String): EntityType {
+        return try {
+            EntityType.valueOf(entityType)
+        } catch (ex: IllegalArgumentException) {
+            EntityType.BOOKMARK
+        }
+    }
+
+    @TypeConverter
+    fun fromEntityType(entityType: EntityType): String {
+        return entityType.name
+    }
 }
 
 @Entity(tableName = "relations")
