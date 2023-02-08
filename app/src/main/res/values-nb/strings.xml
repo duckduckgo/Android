@@ -398,7 +398,7 @@
     <string name="systemSearchOnboardingButtonOk">Den er grei</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">SKJUL</string>
+    <string name="daxDialogHideButton">Skjul</string>
     <string name="daxDialogPhew">Puh!</string>
     <string name="daxDialogNext">Neste</string>
     <string name="daxDialogHighFive">High Five!</string>
@@ -652,7 +652,8 @@
     <string name="autoconsentSecondaryCta">Nei takk</string>
 
     <string name="autoconsentSetting">Administrer popup-vinduer om informasjonskapsler</string>
-    <string name="autoconsentAnimationText">Informasjonskapsler administrert</string>
+    <string name="autoconsentCosmeticNoticeAnimationText">Popup-vindu skjult</string>
+    <string name="autoconsentManagedNoticeAnimationText">Informasjonskapsler administrert</string>
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Nettstedstillatelser</string>

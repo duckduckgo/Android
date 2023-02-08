@@ -138,7 +138,7 @@ class InitMessageHandlerPluginTest {
 
         initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
 
-        verify(mockCallback).onResultReceived(consentManaged = false, optOutFailed = false, selfTestFailed = false)
+        verify(mockCallback).onResultReceived(consentManaged = false, optOutFailed = false, selfTestFailed = false, isCosmetic = false)
     }
 
     private fun message(): String {

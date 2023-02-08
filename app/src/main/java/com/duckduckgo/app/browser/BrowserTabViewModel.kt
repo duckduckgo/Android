@@ -98,8 +98,6 @@ import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.pixels.AppPixelName.FACEBOOK_LOGIN_BREAKAGE_INVESTIGATION
-import com.duckduckgo.app.pixels.AppPixelName.FACEBOOK_LOGIN_ERROR_BREAKAGE_INVESTIGATION
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -113,6 +111,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
+import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.store.AutofillStore
@@ -183,6 +182,7 @@ class BrowserTabViewModel @Inject constructor(
     private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger,
     private val settingsDataStore: SettingsDataStore,
     private val autofillStore: AutofillStore,
+    private val autofillCapabilityChecker: AutofillCapabilityChecker,
     private val adClickManager: AdClickManager,
     private val sitePermissionsManager: SitePermissionsManager,
 ) : WebViewClientListener,
@@ -440,6 +440,11 @@ class BrowserTabViewModel @Inject constructor(
         class GrantSitePermissionRequest(
             val sitePermissionsToGrant: Array<String>,
             val request: PermissionRequest,
+        ) : Command()
+        class ShowUserCredentialSavedOrUpdatedConfirmation(
+            val credentials: LoginCredentials,
+            val includeShortcutToViewCredential: Boolean,
+            val messageResourceId: Int,
         ) : Command()
     }
 
@@ -1152,28 +1157,14 @@ class BrowserTabViewModel @Inject constructor(
         command.value = ShowWebContent
     }
 
-    private fun sendBrokenFBLoginPixels(previousUrl: String?, url: String) {
-        // User lands on failed FB login due to WebView incompatibility
-        if (previousUrl != url && url.contains("LOGIN_DISABLED_FROM_WEBVIEW")) {
-            pixel.fire(FACEBOOK_LOGIN_ERROR_BREAKAGE_INVESTIGATION)
-        }
-        if (previousUrl != url && url.contains("facebook.com/login.php")) {
-            pixel.fire(FACEBOOK_LOGIN_BREAKAGE_INVESTIGATION)
-        }
-    }
-
     private fun pageChanged(
         url: String,
         title: String?,
     ) {
         Timber.v("Page changed: $url")
-        val previousUrl = site?.url
-
         hasCtaBeenShownForCurrentPage.set(false)
         buildSiteFactory(url, title)
         setAdClickActiveTabData(url)
-
-        sendBrokenFBLoginPixels(previousUrl, url)
 
         val currentOmnibarViewState = currentOmnibarViewState()
         val omnibarText = omnibarTextForUrl(url)
@@ -1678,10 +1669,11 @@ class BrowserTabViewModel @Inject constructor(
         onSiteChanged()
     }
 
-    fun onAutoconsentResultReceived(consentManaged: Boolean, optOutFailed: Boolean, selfTestFailed: Boolean) {
+    fun onAutoconsentResultReceived(consentManaged: Boolean, optOutFailed: Boolean, selfTestFailed: Boolean, isCosmetic: Boolean?) {
         site?.consentManaged = consentManaged
         site?.consentOptOutFailed = optOutFailed
         site?.consentSelfTestFailed = selfTestFailed
+        site?.consentCosmeticHide = isCosmetic
     }
 
     private fun onSiteChanged() {
@@ -2195,7 +2187,7 @@ class BrowserTabViewModel @Inject constructor(
     private suspend fun initializeViewStatesFromPersistedData() {
         withContext(dispatchers.io()) {
             val addToHomeSupported = addToHomeCapabilityDetector.isAddToHomeSupported()
-            val showAutofill = autofillStore.autofillAvailable
+            val showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen()
             val showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch()
 
             withContext(dispatchers.main()) {
@@ -2789,6 +2781,26 @@ class BrowserTabViewModel @Inject constructor(
 
     fun canAutofillSelectCredentialsDialogCanAutomaticallyShow(): Boolean {
         return canAutofillSelectCredentialsDialogCanAutomaticallyShow && !currentOmnibarViewState().isEditing
+    }
+
+    fun onShowUserCredentialsSaved(it: LoginCredentials) {
+        viewModelScope.launch(dispatchers.main()) {
+            command.value = ShowUserCredentialSavedOrUpdatedConfirmation(
+                credentials = it,
+                includeShortcutToViewCredential = autofillCapabilityChecker.canAccessCredentialManagementScreen(),
+                messageResourceId = R.string.autofillLoginSavedSnackbarMessage,
+            )
+        }
+    }
+
+    fun onShowUserCredentialsUpdated(it: LoginCredentials) {
+        viewModelScope.launch(dispatchers.main()) {
+            command.value = ShowUserCredentialSavedOrUpdatedConfirmation(
+                credentials = it,
+                includeShortcutToViewCredential = autofillCapabilityChecker.canAccessCredentialManagementScreen(),
+                messageResourceId = R.string.autofillLoginUpdatedSnackbarMessage,
+            )
+        }
     }
 
     companion object {

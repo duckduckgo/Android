@@ -26,7 +26,7 @@ import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autofill.api.Autofill
-import com.duckduckgo.autofill.api.AutofillFeatureName
+import com.duckduckgo.autofill.api.feature.AutofillFeatureName
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import java.io.BufferedReader
 import org.junit.Before

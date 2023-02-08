@@ -53,10 +53,7 @@
                 "siteURL": "https://ignore.test/",
                 "requestURL": "https://bad.third-party.site/",
                 "requestType": "script",
-                "expectAction": "block",
-                "exceptPlatforms": [
-                    "android-browser"
-                ]
+                "expectAction": "block"
             },
             {
                 "name": "notignore doesn't load tracker",

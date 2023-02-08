@@ -32,6 +32,6 @@
         android:maxLines="1"
         android:gravity="center"
         android:visibility="visible"
-        android:text="@string/autoconsentAnimationText"
+        android:text="@string/autoconsentManagedNoticeAnimationText"
         tools:ignore="RtlCompat" />
 </FrameLayout>

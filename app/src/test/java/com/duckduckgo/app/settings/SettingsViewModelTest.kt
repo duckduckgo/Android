@@ -36,7 +36,7 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.api.Autoconsent
-import com.duckduckgo.autofill.api.store.AutofillStore
+import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
@@ -101,7 +101,7 @@ class SettingsViewModelTest {
     private lateinit var mockEmailManager: EmailManager
 
     @Mock
-    private lateinit var autofillStore: AutofillStore
+    private lateinit var autofillCapabilityChecker: AutofillCapabilityChecker
 
     @Mock
     private lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
@@ -141,10 +141,14 @@ class SettingsViewModelTest {
             mockPixel,
             mockAppBuildConfig,
             mockEmailManager,
-            autofillStore,
+            autofillCapabilityChecker,
             vpnFeaturesRegistry,
             autoconsent,
         )
+
+        runTest {
+            whenever(autofillCapabilityChecker.canAccessCredentialManagementScreen()).thenReturn(true)
+        }
     }
 
     @Test
@@ -641,7 +645,7 @@ class SettingsViewModelTest {
 
     @Test
     fun whenAutofillIsAvailableTheShowAutofillTrue() = runTest {
-        whenever(autofillStore.autofillAvailable).thenReturn(true)
+        whenever(autofillCapabilityChecker.canAccessCredentialManagementScreen()).thenReturn(true)
         testee.start()
 
         testee.viewState().test {
@@ -651,7 +655,7 @@ class SettingsViewModelTest {
 
     @Test
     fun whenAutofillIsNotAvailableTheShowAutofillFalse() = runTest {
-        whenever(autofillStore.autofillAvailable).thenReturn(false)
+        whenever(autofillCapabilityChecker.canAccessCredentialManagementScreen()).thenReturn(false)
         testee.start()
 
         testee.viewState().test {

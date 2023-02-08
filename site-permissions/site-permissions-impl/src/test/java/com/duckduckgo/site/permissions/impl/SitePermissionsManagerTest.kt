@@ -18,6 +18,7 @@ package com.duckduckgo.site.permissions.impl
 
 import android.content.pm.PackageManager
 import android.webkit.PermissionRequest
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import com.nhaarman.mockitokotlin2.any
@@ -31,10 +32,9 @@ import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
 @ExperimentalCoroutinesApi
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 class SitePermissionsManagerTest {
 
     @ExperimentalCoroutinesApi

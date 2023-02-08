@@ -32,6 +32,7 @@ dependencies {
     implementation project(path: ':common')
     implementation project(path: ':common-ui')
     implementation project(path: ':browser-api')
+    implementation project(path: ':autoconsent-api')
     implementation project(path: ':app-build-config-api')
 
     implementation Google.dagger

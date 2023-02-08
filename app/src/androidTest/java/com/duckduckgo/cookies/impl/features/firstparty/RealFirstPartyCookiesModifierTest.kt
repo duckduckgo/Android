@@ -16,6 +16,7 @@
 
 package com.duckduckgo.cookies.impl.features.firstparty
 
+import android.annotation.SuppressLint
 import android.database.sqlite.SQLiteDatabase
 import android.os.Build
 import android.webkit.CookieManager
@@ -56,6 +57,7 @@ import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.temporal.ChronoUnit
 
 @ExperimentalCoroutinesApi
+@SuppressLint("NoHardcodedCoroutineDispatcher")
 class RealFirstPartyCookiesModifierTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
@@ -108,7 +110,10 @@ class RealFirstPartyCookiesModifierTest {
 
         assertNotNull(expires)
         val diff = (expires!! - expectedValue) / 1000000 // initially in microseconds
-        assertTrue(diff > -5L && diff < 5L) // Diff within +- 5 seconds
+        assertTrue(
+            "Diff was $diff, expected was +-5. Expires was $expires and expectedValue was $expectedValue",
+            diff > -5L && diff < 5L,
+        ) // Diff within +- 5 seconds
     }
 
     @Test

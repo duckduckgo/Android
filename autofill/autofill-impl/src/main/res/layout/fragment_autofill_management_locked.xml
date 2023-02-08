@@ -36,13 +36,12 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/locked_text"
-            style="@style/TextAppearance.DuckDuckGo.Headline4"
+            app:typography="h4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/managementLockedModeText"
-            android:textColor="?attr/normalTextColor"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/locked_icon" />

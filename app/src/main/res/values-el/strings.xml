@@ -398,7 +398,7 @@
     <string name="systemSearchOnboardingButtonOk">Το έπιασα</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">ΑΠΟΚΡΥΨΗ</string>
+    <string name="daxDialogHideButton">Αποκρυψη</string>
     <string name="daxDialogPhew">Φιου!</string>
     <string name="daxDialogNext">Επόμενο</string>
     <string name="daxDialogHighFive">Κόλλα πέντε!</string>
@@ -652,7 +652,8 @@
     <string name="autoconsentSecondaryCta">Όχι, ευχαριστώ</string>
 
     <string name="autoconsentSetting">Διαχείριση αναδυόμενων παραθύρων για cookies</string>
-    <string name="autoconsentAnimationText">Διαχειριζόμενα cookies</string>
+    <string name="autoconsentCosmeticNoticeAnimationText">Κρυφό αναδυόμενο παράθυρο</string>
+    <string name="autoconsentManagedNoticeAnimationText">Διαχειριζόμενα cookies</string>
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Δικαιώματα ιστότοπου</string>

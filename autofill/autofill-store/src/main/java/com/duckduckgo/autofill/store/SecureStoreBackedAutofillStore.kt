@@ -18,16 +18,14 @@ package com.duckduckgo.autofill.store
 
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.extractSchemeAndDomain
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType.Password
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType.Username
-import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult
 import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult.NoMatch
-import com.duckduckgo.autofill.api.ui.urlmatcher.AutofillUrlMatcher
+import com.duckduckgo.autofill.api.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.securestorage.api.SecureStorage
 import com.duckduckgo.securestorage.api.WebsiteLoginDetails
 import com.duckduckgo.securestorage.api.WebsiteLoginDetailsWithCredentials
@@ -39,7 +37,6 @@ import timber.log.Timber
 
 class SecureStoreBackedAutofillStore(
     private val secureStorage: SecureStorage,
-    private val internalTestUserChecker: InternalTestUserChecker,
     private val lastUpdatedTimeProvider: LastUpdatedTimeProvider,
     private val autofillPrefsStore: AutofillPrefsStore,
     private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
@@ -47,7 +44,7 @@ class SecureStoreBackedAutofillStore(
 ) : AutofillStore {
 
     override val autofillAvailable: Boolean
-        get() = internalTestUserChecker.isInternalTestUser && secureStorage.canAccessSecureStorage()
+        get() = secureStorage.canAccessSecureStorage()
 
     override var autofillEnabled: Boolean
         get() = autofillPrefsStore.isEnabled
@@ -110,11 +107,7 @@ class SecureStoreBackedAutofillStore(
         rawUrl: String,
         credentials: LoginCredentials,
     ): LoginCredentials? {
-        val url = rawUrl.extractSchemeAndDomain()
-        if (url == null) {
-            Timber.w("Cannot save credentials as given url was in an unexpected format. Original url: %s", rawUrl)
-            return null
-        }
+        val url = autofillUrlMatcher.cleanRawUrl(rawUrl)
 
         Timber.i("Saving login credentials for %s. username=%s", url, credentials.username)
 
@@ -142,11 +135,7 @@ class SecureStoreBackedAutofillStore(
         credentials: LoginCredentials,
         updateType: CredentialUpdateType,
     ): LoginCredentials? {
-        val url = rawUrl.extractSchemeAndDomain()
-        if (url == null) {
-            Timber.w("Cannot update credentials as given url was in an unexpected format. Original url: %s", rawUrl)
-            return null
-        }
+        val url = autofillUrlMatcher.cleanRawUrl(rawUrl)
 
         val filter = when (updateType) {
             Username -> filterMatchingPassword(credentials)
@@ -196,8 +185,12 @@ class SecureStoreBackedAutofillStore(
     }
 
     override suspend fun updateCredentials(credentials: LoginCredentials): LoginCredentials? {
+        val cleanedDomain: String? = credentials.domain?.let {
+            autofillUrlMatcher.cleanRawUrl(it)
+        }
+
         return secureStorage.updateWebsiteLoginDetailsWithCredentials(
-            credentials.copy(lastUpdatedMillis = lastUpdatedTimeProvider.getInMillis())
+            credentials.copy(lastUpdatedMillis = lastUpdatedTimeProvider.getInMillis(), domain = cleanedDomain)
                 .toWebsiteLoginCredentials(),
         )?.toLoginCredentials()
     }
@@ -207,7 +200,7 @@ class SecureStoreBackedAutofillStore(
         username: String?,
         password: String?,
     ): ContainsCredentialsResult {
-        val url = rawUrl.extractSchemeAndDomain() ?: return NoMatch
+        val url = autofillUrlMatcher.cleanRawUrl(rawUrl) ?: return NoMatch
         val credentials = secureStorage.websiteLoginDetailsWithCredentialsForDomain(url).firstOrNull() ?: return NoMatch
 
         var exactMatchFound = false

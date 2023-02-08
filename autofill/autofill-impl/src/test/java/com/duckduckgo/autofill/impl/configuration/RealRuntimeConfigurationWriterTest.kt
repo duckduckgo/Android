@@ -102,6 +102,7 @@ class RealRuntimeConfigurationWriterTest {
             expectedJson,
             testee.generateUserPreferences(
                 autofillCredentials = true,
+                credentialSaving = true,
                 showInlineKeyIcon = true,
             ),
         )

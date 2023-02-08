@@ -16,11 +16,19 @@
 
 package com.duckduckgo.autofill.impl
 
-import com.duckduckgo.autofill.api.AutofillFeatureName
+import com.duckduckgo.autofill.api.feature.AutofillFeatureName
+import com.duckduckgo.autofill.api.feature.AutofillSubfeatureName
 
 /**
  * Convenience method to get the [AutofillFeatureName] from its [String] value
  */
 fun autofillFeatureValueOf(value: String): AutofillFeatureName? {
     return AutofillFeatureName.values().find { it.value == value }
+}
+
+/**
+ * Convenience method to get the [AutofillSubfeatureName] from its [String] value
+ */
+fun autofillSubFeatureValueOf(featureName: String): AutofillSubfeatureName? {
+    return AutofillSubfeatureName.values().find { it.value == featureName }
 }

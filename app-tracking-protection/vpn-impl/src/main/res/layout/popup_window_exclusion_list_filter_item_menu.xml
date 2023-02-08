@@ -15,27 +15,27 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@drawable/popup_menu_bg"
-    android:orientation="vertical">
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content" xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:background="@drawable/popup_menu_bg"
+              android:orientation="vertical">
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.PopupMenuItemView
         android:id="@+id/allApps"
-        style="@style/Widget.DuckDuckGo.PopupMenuItem"
-        android:minWidth="198dp"
-        android:text="@string/atp_ExcludedAppsFilterMenuAllLabel" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/atp_ExcludedAppsFilterMenuAllLabel" />
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.PopupMenuItemView
         android:id="@+id/protectedApps"
-        style="@style/Widget.DuckDuckGo.PopupMenuItem"
-        android:minWidth="198dp"
-        android:text="@string/atp_ExcludedAppsFilterMenuProtectedLabel" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/atp_ExcludedAppsFilterMenuProtectedLabel" />
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.PopupMenuItemView
         android:id="@+id/unprotectedApps"
-        style="@style/Widget.DuckDuckGo.PopupMenuItem"
-        android:minWidth="198dp"
-        android:text="@string/atp_ExcludedAppsFilterMenuUnprotectedLabel" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/atp_ExcludedAppsFilterMenuUnprotectedLabel" />
 
 </LinearLayout>

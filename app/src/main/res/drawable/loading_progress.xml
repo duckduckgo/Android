@@ -18,7 +18,7 @@
     <item android:id="@android:id/background">
         <shape>
             <solid
-                android:color="?toolbarBgColor" />
+                android:color="?daxColorSurface" />
         </shape>
     </item>
 

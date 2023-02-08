@@ -42,6 +42,7 @@ interface TrackerDetector {
         url: String,
         documentUrl: String,
         checkFirstParty: Boolean = true,
+        requestHeaders: Map<String, String>,
     ): TrackingEvent?
 }
 
@@ -70,6 +71,7 @@ class TrackerDetectorImpl @Inject constructor(
         url: String,
         documentUrl: String,
         checkFirstParty: Boolean,
+        requestHeaders: Map<String, String>,
     ): TrackingEvent? {
         if (checkFirstParty && firstParty(url, documentUrl)) {
             Timber.v("$url is a first party url")
@@ -78,7 +80,7 @@ class TrackerDetectorImpl @Inject constructor(
 
         val result = clients
             .filter { it.name.type == BLOCKING }
-            .firstNotNullOfOrNull { it.matches(url, documentUrl) } ?: Client.Result(matches = false, isATracker = false)
+            .firstNotNullOfOrNull { it.matches(url, documentUrl, requestHeaders) } ?: Client.Result(matches = false, isATracker = false)
 
         val sameEntity = sameNetworkName(url, documentUrl)
         val entity = if (result.entityName != null) entityLookup.entityForName(result.entityName) else entityLookup.entityForUrl(url)

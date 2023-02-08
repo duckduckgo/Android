@@ -182,13 +182,6 @@ fun Uri.getEncodedQueryParameters(key: String?): List<String> {
     return Collections.unmodifiableList(values)
 }
 
-fun String.extractSchemeAndDomain(): String? {
-    val uri = this.toUri()
-    val scheme = uri.scheme ?: return "https://$this".extractSchemeAndDomain()
-    val domain = uri.domain() ?: return null
-    return "$scheme://$domain"
-}
-
 fun String.extractDomain(): String? {
     return if (this.startsWith("http")) {
         this.toUri().domain()

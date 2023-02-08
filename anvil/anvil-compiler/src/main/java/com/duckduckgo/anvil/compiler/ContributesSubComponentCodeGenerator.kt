@@ -192,6 +192,7 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
             vpnScopeFqName.asClassName(module) -> appScopeFqName
             quickSettingsScopeFqName.asClassName(module) -> appScopeFqName
             fragmentScopeFqName.asClassName(module) -> activityScopeFqName
+            viewScopeFqName.asClassName(module) -> activityScopeFqName
             else -> throw AnvilCompilationException("${this.asClassName(module)} scope is not currently supported")
         }
     }
@@ -219,5 +220,6 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
         private val receiverScopeFqName = FqName("com.duckduckgo.di.scopes.ReceiverScope")
         private val vpnScopeFqName = FqName("com.duckduckgo.di.scopes.VpnScope")
         private val quickSettingsScopeFqName = FqName("com.duckduckgo.di.scopes.QuickSettingsScope")
+        private val viewScopeFqName = FqName("com.duckduckgo.di.scopes.ViewScope")
     }
 }

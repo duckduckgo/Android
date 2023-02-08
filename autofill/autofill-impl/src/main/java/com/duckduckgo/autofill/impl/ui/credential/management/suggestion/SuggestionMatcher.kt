@@ -17,7 +17,7 @@
 package com.duckduckgo.autofill.impl.ui.credential.management.suggestion
 
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
-import com.duckduckgo.autofill.api.ui.urlmatcher.AutofillUrlMatcher
+import com.duckduckgo.autofill.api.urlmatcher.AutofillUrlMatcher
 import javax.inject.Inject
 
 class SuggestionMatcher @Inject constructor(private val autofillUrlMatcher: AutofillUrlMatcher) {

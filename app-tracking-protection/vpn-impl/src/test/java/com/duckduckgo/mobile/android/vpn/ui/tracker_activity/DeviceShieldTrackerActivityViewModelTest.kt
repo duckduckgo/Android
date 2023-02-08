@@ -19,8 +19,6 @@ package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.room.Room
-import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
@@ -29,11 +27,9 @@ import com.duckduckgo.mobile.android.vpn.network.VpnDetector
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
-import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.BannerState
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.ViewEvent
-import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -343,15 +339,5 @@ class DeviceShieldTrackerActivityViewModelTest {
         val bannerState = viewModel.bannerState()
 
         assertEquals(BannerState.OnboardingBanner, bannerState)
-    }
-
-    private fun createInMemoryDb(): VpnDatabase {
-        AndroidThreeTen.init(InstrumentationRegistry.getInstrumentation().targetContext)
-        return Room.inMemoryDatabaseBuilder(
-            InstrumentationRegistry.getInstrumentation().targetContext,
-            VpnDatabase::class.java,
-        )
-            .allowMainThreadQueries()
-            .build()
     }
 }

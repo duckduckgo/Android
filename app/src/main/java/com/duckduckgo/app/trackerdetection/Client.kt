@@ -46,5 +46,6 @@ interface Client {
     fun matches(
         url: String,
         documentUrl: String,
+        requestHeaders: Map<String, String>,
     ): Result
 }

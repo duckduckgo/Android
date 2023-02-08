@@ -22,6 +22,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.utils.ConflatedJob
+import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.Callback
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
@@ -75,6 +76,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
     private val currentUrlProvider: UrlProvider = WebViewUrlProvider(dispatcherProvider),
+    private val autofillCapabilityChecker: AutofillCapabilityChecker,
 ) : AutofillJavascriptInterface {
 
     override var callback: Callback? = null
@@ -92,6 +94,11 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
             val url = currentUrlProvider.currentUrl(webView)
             if (url == null) {
                 Timber.w("Can't autofill as can't retrieve current URL")
+                return@launch
+            }
+
+            if (!autofillCapabilityChecker.canInjectCredentialsToWebView(url)) {
+                Timber.v("BrowserAutofill: getAutofillData called but feature is disabled")
                 return@launch
             }
 
@@ -147,6 +154,12 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
 
         storeFormDataJob += coroutineScope.launch(dispatcherProvider.default()) {
             val currentUrl = currentUrlProvider.currentUrl(webView) ?: return@launch
+
+            if (!autofillCapabilityChecker.canSaveCredentialsFromWebView(currentUrl)) {
+                Timber.v("BrowserAutofill: storeFormData called but feature is disabled")
+                return@launch
+            }
+
             val title = autofillDomainFormatter.extractDomain(currentUrl)
 
             val request = requestParser.parseStoreFormDataRequest(data)

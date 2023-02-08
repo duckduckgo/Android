@@ -161,6 +161,7 @@ class FavoritesQuickAccessAdapter(
                 onMenuItemClicked(view.findViewById(R.id.delete)) { onDeleteClicked(item) }
             }
             popupMenu.showAnchoredToView(binding.root, anchor)
+            this.popupMenu = popupMenu
         }
 
         override fun onDragStarted() {

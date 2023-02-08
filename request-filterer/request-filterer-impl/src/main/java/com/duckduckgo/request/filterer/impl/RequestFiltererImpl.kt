@@ -32,6 +32,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import timber.log.Timber
 
 @ContributesBinding(AppScope::class)
@@ -59,7 +60,10 @@ class RequestFiltererImpl @Inject constructor(
         val origin = request.requestHeaders[ORIGIN]
         val referer = request.requestHeaders[REFERER]
 
-        if (documentUrl != previousPage) {
+        val currentTopDomain = documentUrl.toHttpUrl().topPrivateDomain()
+        val previousTopDomain = previousPage?.toHttpUrl()?.topPrivateDomain()
+
+        if (currentTopDomain != previousTopDomain) {
             referer?.let {
                 return compareUrl(it)
             }

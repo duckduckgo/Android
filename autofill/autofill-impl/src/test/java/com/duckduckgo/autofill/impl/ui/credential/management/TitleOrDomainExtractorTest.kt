@@ -17,44 +17,61 @@
 package com.duckduckgo.autofill.impl.ui.credential.management
 
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
-import com.duckduckgo.autofill.impl.AutofillDomainFormatter
+import com.duckduckgo.autofill.api.urlmatcher.AutofillUrlMatcher
+import com.duckduckgo.autofill.api.urlmatcher.AutofillUrlMatcher.ExtractedUrlParts
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 class TitleOrDomainExtractorTest {
 
-    private val domainFormatter: AutofillDomainFormatter = mock()
+    private val domainFormatter: AutofillUrlMatcher = mock()
     private val testee = TitleOrDomainExtractor(domainFormatter)
 
     @Test
-    fun whenTitleIsNullThenDomainIsUsed() {
+    fun whenTitleIsNullAndNoSubdomainThenDomainIsUsed() {
+        whenever(domainFormatter.extractUrlPartsForAutofill("example.com")).thenReturn(ExtractedUrlParts(eTldPlus1 = "example.com", subdomain = null))
         val result = testee.extract(creds(title = null, domain = "example.com"))
-        verify(domainFormatter).extractDomain("example.com")
+        assertEquals("example.com", result)
+    }
+
+    @Test
+    fun whenTitleIsNullAndDomainHasSubdomainThenCombinedSubdomainAndDomainIsUsed() {
+        whenever(domainFormatter.extractUrlPartsForAutofill("example.com")).thenReturn(
+            ExtractedUrlParts(eTldPlus1 = "example.com", subdomain = "foo"),
+        )
+        val result = testee.extract(creds(title = null, domain = "example.com"))
+        assertEquals("foo.example.com", result)
     }
 
     @Test
     fun whenTitleIsEmptyThenDomainIsUsed() {
+        whenever(domainFormatter.extractUrlPartsForAutofill("example.com")).thenReturn(ExtractedUrlParts(eTldPlus1 = "example.com", subdomain = null))
         val result = testee.extract(creds(title = "", domain = "example.com"))
-        verify(domainFormatter).extractDomain("example.com")
+        assertEquals("example.com", result)
     }
 
     @Test
     fun whenTitleIsBlankThenDomainIsUsed() {
+        whenever(domainFormatter.extractUrlPartsForAutofill("example.com")).thenReturn(ExtractedUrlParts(eTldPlus1 = "example.com", subdomain = null))
         val result = testee.extract(creds(title = "  ", domain = "example.com"))
-        verify(domainFormatter).extractDomain("example.com")
+        assertEquals("example.com", result)
     }
 
     @Test
     fun whenTitleIsPopulatedThenDomainNotUsed() {
         val result = testee.extract(creds(title = "Site", domain = "example.com"))
         assertEquals("Site", result)
-        verify(domainFormatter, never()).extractDomain("example.com")
+        verify(domainFormatter, never()).extractUrlPartsForAutofill("example.com")
     }
 
-    private fun creds(title: String?, domain: String?) = LoginCredentials(
+    private fun creds(
+        title: String?,
+        domain: String?,
+    ) = LoginCredentials(
         domainTitle = title,
         domain = domain,
         username = null,

@@ -57,6 +57,7 @@ class DuckDuckGoRequestRewriter(
 
     override fun shouldRewriteRequest(uri: Uri): Boolean {
         return (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(uri.toString()) || duckDuckGoUrlDetector.isDuckDuckGoStaticUrl(uri.toString())) &&
+            !duckDuckGoUrlDetector.isDuckDuckGoEmailUrl(uri.toString()) &&
             !uri.queryParameterNames.containsAll(arrayListOf(ParamKey.SOURCE, ParamKey.ATB))
     }
 

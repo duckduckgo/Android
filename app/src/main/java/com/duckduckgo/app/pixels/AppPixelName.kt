@@ -250,7 +250,4 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     REMOTE_MESSAGE_SECONDARY_ACTION_CLICKED("m_remote_message_secondary_action_clicked"),
 
     CREATE_BLOOM_FILTER_ERROR("m_create_bloom_filter_error"),
-
-    FACEBOOK_LOGIN_ERROR_BREAKAGE_INVESTIGATION("m_facebook_login_error_breakage_investigation"),
-    FACEBOOK_LOGIN_BREAKAGE_INVESTIGATION("m_facebook_login_breakage_investigation"),
 }

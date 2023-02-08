@@ -48,7 +48,7 @@ class DaxTextViewStylingDetector : LayoutDetector() {
         element: Element
     ) {
         if (element.hasAttribute(ATTR_STYLE)){
-            reportIssue(context, element, ATTR_STYLE)
+            reportInvalidPropertyIssue(context, element, ATTR_STYLE)
         }
 
         checkInvalidAttributes(context, element)
@@ -57,7 +57,7 @@ class DaxTextViewStylingDetector : LayoutDetector() {
     private fun checkInvalidAttributes(context: XmlContext, element: Element){
         INVALID_ATTRIBUTES.forEach {
             if (checkAttribute(element, it)){
-                reportIssue(context, element, it)
+                reportInvalidPropertyIssue(context, element, it)
             }
         }
     }
@@ -66,7 +66,7 @@ class DaxTextViewStylingDetector : LayoutDetector() {
         return (element.hasAttributeNS(ANDROID_URI, property))
     }
 
-    private fun reportIssue(context: XmlContext, element: Element, property: String){
+    private fun reportInvalidPropertyIssue(context: XmlContext, element: Element, property: String){
         context.report(
             issue = INVALID_DAX_TEXT_VIEW_PROPERTY,
             location = context.getNameLocation(element),
@@ -78,8 +78,8 @@ class DaxTextViewStylingDetector : LayoutDetector() {
 
         private const val DAX_TEXT_VIEW = "com.duckduckgo.mobile.android.ui.view.text.DaxTextView"
 
-        val INVALID_ATTRIBUTES = listOf(ATTR_TEXT_STYLE, ATTR_TEXT_APPEARANCE,
-            ATTR_TEXT_ALL_CAPS, ATTR_TINT, ATTR_TEXT_SIZE, ATTR_FONT, ATTR_FONT_FAMILY)
+        val INVALID_ATTRIBUTES = listOf(ATTR_TEXT_APPEARANCE,
+            ATTR_TEXT_ALL_CAPS, ATTR_TINT, ATTR_TEXT_SIZE, ATTR_TEXT_STYLE, ATTR_FONT_FAMILY)
 
         val INVALID_DAX_TEXT_VIEW_PROPERTY = Issue
             .create(

@@ -17,7 +17,8 @@
 package com.duckduckgo.autofill.impl.ui.credential.management
 
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
-import com.duckduckgo.autofill.impl.AutofillDomainFormatter
+import com.duckduckgo.autofill.api.urlmatcher.AutofillUrlMatcher
+import com.duckduckgo.autofill.api.urlmatcher.AutofillUrlMatcher.ExtractedUrlParts
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -27,14 +28,24 @@ interface LoginCredentialTitleExtractor {
 }
 
 @ContributesBinding(FragmentScope::class)
-class TitleOrDomainExtractor @Inject constructor(private val domainExtractor: AutofillDomainFormatter) : LoginCredentialTitleExtractor {
+class TitleOrDomainExtractor @Inject constructor(
+    private val urlMatcher: AutofillUrlMatcher,
+) : LoginCredentialTitleExtractor {
 
     override fun extract(credential: LoginCredentials): String {
         val title = credential.domainTitle
-        if (title != null && title.isNotBlank()) {
+        if (!title.isNullOrBlank()) {
             return title
         }
 
-        return domainExtractor.extractDomain(credential.domain) ?: ""
+        return urlMatcher.extractUrlPartsForAutofill(credential.domain).format()
+    }
+
+    private fun ExtractedUrlParts.format(): String {
+        return if (subdomain.isNullOrBlank()) {
+            eTldPlus1 ?: ""
+        } else {
+            "$subdomain.$eTldPlus1"
+        }
     }
 }

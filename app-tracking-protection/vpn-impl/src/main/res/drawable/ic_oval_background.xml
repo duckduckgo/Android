@@ -16,7 +16,7 @@
 
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="oval">
-    <solid android:color="?attr/listItemImageBackground" />
+    <solid android:color="?attr/daxColorContainer" />
     <size
         android:width="@dimen/listItemImageContainerSize"
         android:height="@dimen/listItemImageContainerSize" />

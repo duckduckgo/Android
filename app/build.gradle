@@ -106,7 +106,7 @@ android {
     }
     lint {
         abortOnError true
-        ignoreTestSources true
+        ignoreTestSources false
         baseline file("lint-baseline.xml")
     }
     testOptions {
@@ -244,6 +244,11 @@ dependencies {
 
     implementation project(':element-hiding-impl')
     implementation project(':element-hiding-store')
+
+    implementation project(':sync-api')
+    implementation project(':sync-impl')
+    implementation project(':sync-store')
+    implementation project(':sync-lib')
 
     implementation project(':request-filterer-api')
     implementation project(':request-filterer-impl')

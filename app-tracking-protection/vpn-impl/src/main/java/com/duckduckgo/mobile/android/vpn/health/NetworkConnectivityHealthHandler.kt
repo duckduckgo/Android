@@ -19,13 +19,13 @@ package com.duckduckgo.mobile.android.vpn.health
 import android.content.Context
 import android.net.ConnectivityManager
 import com.duckduckgo.app.global.extensions.isAirplaneModeOn
+import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
-import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
+import com.duckduckgo.mobile.android.vpn.service.connectivity.VpnConnectivityLossListenerPlugin
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.net.InetSocketAddress
@@ -47,9 +47,8 @@ private const val WWW_DUCKDUCKGO_COM = "www.duckduckgo.com"
 class NetworkConnectivityHealthHandler @Inject constructor(
     private val context: Context,
     private val pixel: DeviceShieldPixels,
-    private val healthMetricCounter: HealthMetricCounter,
-    private val appTpFeatureConfig: AppTpFeatureConfig,
     private val trackerBlockingVpnService: Provider<TrackerBlockingVpnService>,
+    private val vpnConnectivityLossListenerPluginPoint: PluginPoint<VpnConnectivityLossListenerPlugin>,
 ) : VpnServiceCallbacks {
     private val connectivityManager = context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     private val job = ConflatedJob()
@@ -60,24 +59,30 @@ class NetworkConnectivityHealthHandler @Inject constructor(
                 delay(15_000)
                 if (!hasVpnConnectivity() && !context.isAirplaneModeOn()) {
                     if (hasDeviceConnectivity()) {
+                        vpnConnectivityLossListenerPluginPoint.getPlugins().forEach {
+                            logcat { "Calling onVpnConnectivityLoss on $it" }
+                            it.onVpnConnectivityLoss(coroutineScope)
+                        }
                         logcat { "Active VPN network does not have connectivity" }
                         pixel.reportVpnConnectivityError()
-                        if (appTpFeatureConfig.isEnabled(AppTpSetting.ConnectivityChecks)) {
-                            logcat { "AppTpSetting.ConnectivityChecks is enabled, logging health event" }
-                            healthMetricCounter.onVpnConnectivityError()
-                        } else {
-                            logcat { "AppTpSetting.ConnectivityChecks is disabled" }
-                        }
                     } else {
                         logcat { "Device doesn't have connectivity either" }
                         pixel.reportDeviceConnectivityError()
+                    }
+                } else {
+                    vpnConnectivityLossListenerPluginPoint.getPlugins().forEach {
+                        logcat { "Calling onVpnConnected on $it" }
+                        it.onVpnConnected(coroutineScope)
                     }
                 }
             }
         }
     }
 
-    override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStateMonitor.VpnStopReason) {
+    override fun onVpnStopped(
+        coroutineScope: CoroutineScope,
+        vpnStopReason: VpnStateMonitor.VpnStopReason,
+    ) {
         job.cancel()
     }
 

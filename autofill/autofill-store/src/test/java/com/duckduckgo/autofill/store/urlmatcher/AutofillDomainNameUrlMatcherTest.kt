@@ -16,15 +16,15 @@
 
 package com.duckduckgo.autofill.store.urlmatcher
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 class AutofillDomainNameUrlMatcherTest {
 
     private val testee = AutofillDomainNameUrlMatcher()
@@ -223,5 +223,23 @@ class AutofillDomainNameUrlMatcherTest {
         val savedSite = testee.extractUrlPartsForAutofill("example.com.malicious.com")
         val visitedSite = testee.extractUrlPartsForAutofill("example.com")
         assertFalse(testee.matchingForAutofill(visitedSite, savedSite))
+    }
+
+    @Test
+    fun whenCleanRawUrlThenReturnOnlySchemeAndDomain() {
+        assertEquals("www.foo.com", testee.cleanRawUrl("https://www.foo.com/path/to/foo?key=value"))
+        assertEquals("www.fuu.foo.com", testee.cleanRawUrl("https://www.fuu.foo.com/path/to/foo?key=value"))
+        assertEquals("foo.com", testee.cleanRawUrl("http://foo.com/path/to/foo?key=value"))
+        assertEquals("fuu.foo.com", testee.cleanRawUrl("http://fuu.foo.com/path/to/foo?key=value"))
+        assertEquals("foo.com:9000", testee.cleanRawUrl("http://foo.com:9000/path/to/foo?key=value"))
+        assertEquals("fuu.foo.com:9000", testee.cleanRawUrl("http://fuu.foo.com:9000/path/to/foo?key=value"))
+        assertEquals("faa.fuu.foo.com:9000", testee.cleanRawUrl("http://faa.fuu.foo.com:9000/path/to/foo?key=value"))
+        assertEquals("foo.com", testee.cleanRawUrl("foo.com/path/to/foo"))
+        assertEquals("www.foo.com", testee.cleanRawUrl("www.foo.com/path/to/foo"))
+        assertEquals("foo.com", testee.cleanRawUrl("foo.com"))
+        assertEquals("foo.com:9000", testee.cleanRawUrl("foo.com:9000"))
+        assertEquals("fuu.foo.com", testee.cleanRawUrl("fuu.foo.com"))
+        assertEquals("fuu.foo.com:9000", testee.cleanRawUrl("fuu.foo.com:9000"))
+        assertEquals("RandomText", testee.cleanRawUrl("thisIs@RandomText"))
     }
 }

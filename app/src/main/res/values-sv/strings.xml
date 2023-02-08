@@ -398,7 +398,7 @@
     <string name="systemSearchOnboardingButtonOk">Jag fattar</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">DÖLJ</string>
+    <string name="daxDialogHideButton">Dölj</string>
     <string name="daxDialogPhew">Puh!</string>
     <string name="daxDialogNext">Nästa</string>
     <string name="daxDialogHighFive">High Five!</string>
@@ -652,7 +652,8 @@
     <string name="autoconsentSecondaryCta">Nej tack</string>
 
     <string name="autoconsentSetting">Hantera popup-fönster för cookies</string>
-    <string name="autoconsentAnimationText">Cookies hanteras</string>
+    <string name="autoconsentCosmeticNoticeAnimationText">Popup-fönster dolt</string>
+    <string name="autoconsentManagedNoticeAnimationText">Cookies hanteras</string>
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Webbplatsbehörigheter</string>
