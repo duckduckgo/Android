@@ -137,7 +137,7 @@ class WindowsWaitlistActivity : DuckDuckGoActivity() {
     private fun renderJoinedQueue() {
         binding.waitListButton.gone()
         binding.footerDescription.gone()
-        binding.lookingForMacVersionButton.gone()
+        binding.lookingForMacVersionButton.show()
         binding.codeFrame.gone()
         binding.shareImage.gone()
         binding.headerImage.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_list)
