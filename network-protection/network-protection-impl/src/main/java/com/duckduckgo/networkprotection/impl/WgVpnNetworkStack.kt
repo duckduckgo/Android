@@ -28,6 +28,7 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelDataProvider
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelDataProvider.WgTunnelData
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ServerDetails
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -51,6 +52,7 @@ class WgVpnNetworkStack @Inject constructor(
     private val netPDebugMtuProvider: PluginPoint<NetPDebugMtuProvider>,
     private val exclusionListProvider: PluginPoint<NetPDebugExclusionListProvider>,
     private val appBuildConfig: AppBuildConfig,
+    private val netpPixels: Lazy<NetworkProtectionPixels>,
 ) : VpnNetworkStack {
     private var wgTunnelData: WgTunnelData? = null
 
@@ -82,6 +84,7 @@ class WgVpnNetworkStack @Inject constructor(
 
             if (wgTunnelData == null) {
                 logcat(LogPriority.ERROR) { "Unable to construct wgTunnelData" }
+                netpPixels.get().reportErrorInRegistration()
                 return Result.failure(java.lang.IllegalStateException("Unable to construct wgTunnelData"))
             }
 
@@ -122,6 +125,7 @@ class WgVpnNetworkStack @Inject constructor(
 
     private fun turnOnNative(tunfd: Int): Result<Unit> {
         if (wgTunnelData == null) {
+            netpPixels.get().reportErrorWgInvalidState()
             return Result.failure(java.lang.IllegalStateException("Tunnel data not available when attempting to start wg."))
         }
 
@@ -133,6 +137,7 @@ class WgVpnNetworkStack @Inject constructor(
         )
         return if (result.isFailure) {
             logcat(LogPriority.ERROR) { "Failed to turnOnNative due to ${result.exceptionOrNull()}" }
+            netpPixels.get().reportErrorWgBackendCantStart()
             result
         } else {
             logcat { "Completed turnOnNative" }

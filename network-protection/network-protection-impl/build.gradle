@@ -34,6 +34,7 @@ dependencies {
     implementation project(':network-protection-api')
     implementation project(':network-protection-store')
     implementation project(':library-loader-api')
+    implementation project(':statistics')
 
     implementation AndroidX.appCompat
     implementation AndroidX.constraintLayout
@@ -46,6 +47,7 @@ dependencies {
     implementation KotlinX.coroutines.core
     implementation Square.retrofit2.retrofit
     implementation Square.retrofit2.converter.moshi
+    implementation "com.jakewharton.threetenabp:threetenabp:_"
 
     testImplementation project(path: ':common-test')
     testImplementation project(':vpn-api-test')
@@ -55,6 +57,11 @@ dependencies {
     testImplementation AndroidX.test.ext.junit
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.robolectric
+    testImplementation "org.threeten:threetenbp:_"
+
+    // WorkManager
+    implementation AndroidX.work.runtimeKtx
+    testImplementation AndroidX.work.testing
 }
 android {
     namespace 'com.duckduckgo.networkprotection.impl'

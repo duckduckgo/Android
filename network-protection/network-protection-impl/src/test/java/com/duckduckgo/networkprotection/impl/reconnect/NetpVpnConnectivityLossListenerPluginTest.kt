@@ -21,6 +21,7 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.alerts.reconnect.NetPReconnectNotifications
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ReconnectStatus
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ReconnectStatus.NotReconnecting
@@ -52,6 +53,9 @@ class NetpVpnConnectivityLossListenerPluginTest {
 
     @Mock
     private lateinit var context: Context
+
+    @Mock
+    private lateinit var netpPixels: NetworkProtectionPixels
     private lateinit var repository: NetworkProtectionRepository
     private lateinit var testee: NetpVpnConnectivityLossListenerPlugin
 
@@ -65,7 +69,7 @@ class NetpVpnConnectivityLossListenerPluginTest {
             reconnectNotifications,
             context,
             coroutineRule.testDispatcherProvider,
-        )
+        ) { netpPixels }
     }
 
     @Test
@@ -73,7 +77,8 @@ class NetpVpnConnectivityLossListenerPluginTest {
         whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(true)
         testee.onVpnConnectivityLoss(coroutineRule.testScope)
 
-        assertEquals(ReconnectStatus.Reconnecting, repository.reconnectStatus)
+        assertEquals(Reconnecting, repository.reconnectStatus)
+        verify(netpPixels).reportVpnConnectivityLoss()
         verify(reconnectNotifications).clearNotifications()
         verify(reconnectNotifications).launchReconnectingNotification(context)
         verify(vpnFeaturesRegistry).refreshFeature(NetPVpnFeature.NETP_VPN)
@@ -87,6 +92,7 @@ class NetpVpnConnectivityLossListenerPluginTest {
 
         assertEquals(ReconnectingFailed, repository.reconnectStatus)
         assertEquals(0, repository.reconnectAttemptCount)
+        verify(netpPixels).reportVpnReconnectFailed()
         verify(reconnectNotifications).clearNotifications()
         verify(reconnectNotifications).launchReconnectionFailedNotification(context)
         verify(vpnFeaturesRegistry).unregisterFeature(NetPVpnFeature.NETP_VPN)
@@ -100,6 +106,7 @@ class NetpVpnConnectivityLossListenerPluginTest {
 
         assertEquals(NotReconnecting, repository.reconnectStatus)
         verifyNoInteractions(reconnectNotifications)
+        verifyNoInteractions(netpPixels)
     }
 
     @Test
@@ -110,6 +117,7 @@ class NetpVpnConnectivityLossListenerPluginTest {
 
         assertEquals(NotReconnecting, repository.reconnectStatus)
         verifyNoInteractions(reconnectNotifications)
+        verifyNoInteractions(netpPixels)
     }
 
     @Test
@@ -122,6 +130,7 @@ class NetpVpnConnectivityLossListenerPluginTest {
         assertEquals(0, repository.reconnectAttemptCount)
         verify(reconnectNotifications).clearNotifications()
         verify(reconnectNotifications).launchReconnectedNotification(context)
+        verifyNoInteractions(netpPixels)
     }
 
     @Test
@@ -133,6 +142,7 @@ class NetpVpnConnectivityLossListenerPluginTest {
         assertEquals(NotReconnecting, repository.reconnectStatus)
         assertEquals(0, repository.reconnectAttemptCount)
         verifyNoInteractions(reconnectNotifications)
+        verifyNoInteractions(netpPixels)
     }
 
     @Test
@@ -144,6 +154,7 @@ class NetpVpnConnectivityLossListenerPluginTest {
         assertEquals(NotReconnecting, repository.reconnectStatus)
         assertEquals(0, repository.reconnectAttemptCount)
         verifyNoInteractions(reconnectNotifications)
+        verifyNoInteractions(netpPixels)
     }
 
     private class FakeNetworkProtectionRepository : NetworkProtectionRepository {

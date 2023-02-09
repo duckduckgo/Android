@@ -23,11 +23,13 @@ import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.service.connectivity.VpnConnectivityLossListenerPlugin
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.alerts.reconnect.NetPReconnectNotifications
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ReconnectStatus.NotReconnecting
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ReconnectStatus.Reconnecting
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ReconnectStatus.ReconnectingFailed
 import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.Lazy
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -45,6 +47,7 @@ class NetpVpnConnectivityLossListenerPlugin @Inject constructor(
     private val reconnectNotifications: NetPReconnectNotifications,
     private val context: Context,
     private val dispatcherProvider: DispatcherProvider,
+    private val netpPixels: Lazy<NetworkProtectionPixels>,
 ) : VpnConnectivityLossListenerPlugin {
 
     override fun onVpnConnectivityLoss(coroutineScope: CoroutineScope) {
@@ -85,10 +88,6 @@ class NetpVpnConnectivityLossListenerPlugin @Inject constructor(
     private fun successfullyRecovered() {
         resetReconnectValues()
 
-        /**
-         * TODO:
-         * - Hide banner and kill all related notification
-         */
         reconnectNotifications.clearNotifications()
         reconnectNotifications.launchReconnectedNotification(context)
         logcat { "Successfully recovered from VPN connectivity loss." }
@@ -96,11 +95,7 @@ class NetpVpnConnectivityLossListenerPlugin @Inject constructor(
 
     private fun initiateRecovery(coroutineScope: CoroutineScope) {
         logcat { "Attempting to recover from vpn connectivity loss." }
-        /**
-         * TODO:
-         * - Show notif if not yet shown
-         * - restart vpn
-         */
+        netpPixels.get().reportVpnConnectivityLoss()
         reconnectNotifications.clearNotifications()
         reconnectNotifications.launchReconnectingNotification(context)
         coroutineScope.launch {
@@ -112,11 +107,8 @@ class NetpVpnConnectivityLossListenerPlugin @Inject constructor(
         logcat { "Failed to recover from vpn connectivity loss after $MAX_RECOVERY_ATTEMPTS attempts" }
         repository.reconnectStatus = ReconnectingFailed
         resetReconnectValues()
-        /**
-         * TODO:
-         * - Replace banner and notification
-         * - stop VPN
-         */
+
+        netpPixels.get().reportVpnReconnectFailed()
         reconnectNotifications.clearNotifications()
         reconnectNotifications.launchReconnectionFailedNotification(context)
         vpnFeaturesRegistry.unregisterFeature(NetPVpnFeature.NETP_VPN)

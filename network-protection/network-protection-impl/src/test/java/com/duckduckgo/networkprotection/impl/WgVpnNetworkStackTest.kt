@@ -25,6 +25,7 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.RES
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelDataProvider
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelDataProvider.WgTunnelData
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ServerDetails
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -62,6 +63,9 @@ class WgVpnNetworkStackTest {
     @Mock
     private lateinit var appBuildConfig: AppBuildConfig
 
+    @Mock
+    private lateinit var netpPixels: NetworkProtectionPixels
+
     private lateinit var testee: WgVpnNetworkStack
 
     @Before
@@ -96,6 +100,7 @@ class WgVpnNetworkStackTest {
                 }
             },
             appBuildConfig,
+            { netpPixels },
         )
     }
 
@@ -218,6 +223,8 @@ class WgVpnNetworkStackTest {
         assertTrue(result.isFailure)
 
         verifyNoInteractions(networkProtectionRepository)
+        verify(netpPixels).reportErrorWgInvalidState()
+        verifyNoMoreInteractions(netpPixels)
     }
 
     @Test
@@ -247,6 +254,8 @@ class WgVpnNetworkStackTest {
         whenever(wgTunnelDataProvider.get()).thenReturn(null)
 
         assertTrue(testee.onPrepareVpn().isFailure)
+        verify(netpPixels).reportErrorInRegistration()
+        verifyNoMoreInteractions(netpPixels)
     }
 
     @Test
@@ -264,6 +273,8 @@ class WgVpnNetworkStackTest {
         testee.onPrepareVpn()
 
         assertTrue(testee.onStartVpn(mock()).isFailure)
+        verify(netpPixels).reportErrorWgBackendCantStart()
+        verifyNoMoreInteractions(netpPixels)
     }
 
     @Test
