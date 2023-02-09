@@ -105,7 +105,7 @@
 
                 <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                     app:typography="body1"
-                    app:textType="secondary"
+                    app:textType="primary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="3dp"
