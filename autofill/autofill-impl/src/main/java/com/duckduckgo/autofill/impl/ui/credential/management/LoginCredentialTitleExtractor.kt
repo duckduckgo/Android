@@ -18,7 +18,6 @@ package com.duckduckgo.autofill.impl.ui.credential.management
 
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.urlmatcher.AutofillUrlMatcher
-import com.duckduckgo.autofill.api.urlmatcher.AutofillUrlMatcher.ExtractedUrlParts
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -38,14 +37,8 @@ class TitleOrDomainExtractor @Inject constructor(
             return title
         }
 
-        return urlMatcher.extractUrlPartsForAutofill(credential.domain).format()
-    }
-
-    private fun ExtractedUrlParts.format(): String {
-        return if (subdomain.isNullOrBlank()) {
-            eTldPlus1 ?: ""
-        } else {
-            "$subdomain.$eTldPlus1"
-        }
+        return credential.domain?.let {
+            urlMatcher.cleanRawUrl(it)
+        } ?: ""
     }
 }
