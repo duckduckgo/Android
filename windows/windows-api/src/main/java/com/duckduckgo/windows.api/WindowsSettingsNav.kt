@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,14 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-}
+package com.duckduckgo.windows.api
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+import android.content.Context
+import android.content.Intent
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-}
-
-android {
-    namespace 'com.duckduckgo.windows.api'
-}
-
-dependencies {
-    implementation Kotlin.stdlib.jdk7
+/**
+ * Public interface to provide navigation Intents related to Windows App Settings
+ */
+interface WindowsSettingsNav {
+    fun openWindowsSettings(context: Context): Intent
 }

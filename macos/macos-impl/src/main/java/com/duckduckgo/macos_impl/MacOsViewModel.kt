@@ -22,6 +22,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.macos_impl.MacOsPixelNames.MACOS_WAITLIST_SHARE_PRESSED
+import com.duckduckgo.macos_impl.MacOsViewModel.Command.GoToWindowsClientSettings
 import com.duckduckgo.macos_impl.MacOsViewModel.Command.ShareLink
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
@@ -39,12 +40,19 @@ class MacOsViewModel @Inject constructor(
 
     sealed class Command {
         object ShareLink : Command()
+        object GoToWindowsClientSettings : Command()
     }
 
     fun onShareClicked() {
         viewModelScope.launch {
             commandChannel.send(ShareLink)
             pixel.fire(MACOS_WAITLIST_SHARE_PRESSED)
+        }
+    }
+
+    fun onGoToWindowsClicked() {
+        viewModelScope.launch {
+            commandChannel.send(GoToWindowsClientSettings)
         }
     }
 }

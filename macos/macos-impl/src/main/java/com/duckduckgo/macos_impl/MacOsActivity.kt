@@ -29,9 +29,12 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.macos_impl.MacOsViewModel.Command
+import com.duckduckgo.macos_impl.MacOsViewModel.Command.GoToWindowsClientSettings
 import com.duckduckgo.macos_impl.MacOsViewModel.Command.ShareLink
 import com.duckduckgo.macos_impl.databinding.ActivityMacosBinding
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.windows.api.WindowsSettingsNav
+import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
@@ -41,6 +44,8 @@ class MacOsActivity : DuckDuckGoActivity() {
 
     private val viewModel: MacOsViewModel by bindViewModel()
     private val binding: ActivityMacosBinding by viewBinding()
+
+    @Inject lateinit var windowsSettingsNav: WindowsSettingsNav
 
     private val toolbar
         get() = binding.includeToolbar.toolbar
@@ -60,12 +65,22 @@ class MacOsActivity : DuckDuckGoActivity() {
         binding.shareButton.setOnClickListener {
             viewModel.onShareClicked()
         }
+
+        binding.lookingForWindowsVersionButton.setOnClickListener {
+            viewModel.onGoToWindowsClicked()
+        }
     }
 
     private fun executeCommand(command: Command) {
         when (command) {
             is ShareLink -> launchSharePageChooser()
+            GoToWindowsClientSettings -> launchWindowsClientSettings()
         }
+    }
+
+    private fun launchWindowsClientSettings() {
+        startActivity(windowsSettingsNav.openWindowsSettings(this))
+        finish()
     }
 
     @SuppressLint("UnspecifiedImmutableFlag")
