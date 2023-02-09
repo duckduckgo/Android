@@ -81,22 +81,38 @@
                     android:layout_marginTop="38dp"
                     android:layout_marginEnd="24dp"
                     android:text="@string/macos_share_title"
+                    app:icon="@drawable/ic_share_android_16"
                     app:buttonSize="large"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/waitlistDescription"/>
 
+            <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
+                android:id="@+id/lookingForWindowsVersionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:buttonSize="small"
+                app:layout_constraintBottom_toTopOf="@+id/footerDescription"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:icon="@drawable/ic_platform_macos_16"
+                android:layout_marginBottom="@dimen/keyline_4"
+                android:text="@string/macos_waitlist_windows_link"/>
+
             <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
-                    android:id="@+id/footerDescription"
-                    app:typography="caption"
-                    app:textType="secondary"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="24dp"
-                    android:text="@string/macos_windows"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"/>
+                android:id="@+id/footerDescription"
+                app:typography="caption"
+                app:textType="secondary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:textAlignment="center"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:text="@string/windows_waitlist_footer"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
