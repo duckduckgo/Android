@@ -16,7 +16,7 @@
   -->
 
 <resources>
-    <string name="macos_app">DuckDuckGo Desktop App</string>
+    <string name="macos_app">DuckDuckGo App for Mac</string>
     <string name="macos_title">Get DuckDuckGo for Mac!</string>
 
     <string name="macos_share_title">Share Link</string>
