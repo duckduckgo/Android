@@ -18,21 +18,14 @@ package com.duckduckgo.windows.impl.di
 
 import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.windows.impl.waitlist.api.Url.API
-import com.duckduckgo.windows.impl.waitlist.api.WindowsWaitlistService
 import com.duckduckgo.windows.store.RealWindowsWaitlistRepository
 import com.duckduckgo.windows.store.WindowsWaitlistDataStore
 import com.duckduckgo.windows.store.WindowsWaitlistDataStoreSharedPreferences
 import com.duckduckgo.windows.store.WindowsWaitlistRepository
 import com.squareup.anvil.annotations.ContributesTo
-import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
-import javax.inject.Named
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
 
 @Module
 @ContributesTo(AppScope::class)

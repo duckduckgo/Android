@@ -23,8 +23,6 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
-import android.os.Build.VERSION
-import android.os.Build.VERSION_CODES
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.Spanned
