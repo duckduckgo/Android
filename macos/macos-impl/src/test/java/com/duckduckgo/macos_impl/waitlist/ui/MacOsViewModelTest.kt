@@ -22,6 +22,7 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.macos_impl.MacOsPixelNames.MACOS_WAITLIST_SHARE_PRESSED
 import com.duckduckgo.macos_impl.MacOsViewModel
+import com.duckduckgo.macos_impl.MacOsViewModel.Command.GoToWindowsClientSettings
 import com.duckduckgo.macos_impl.MacOsViewModel.Command.ShareLink
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -53,6 +54,14 @@ class MacOsViewModelTest {
         testee.commands.test {
             testee.onShareClicked()
             assertEquals(ShareLink, awaitItem())
+        }
+    }
+
+    @Test
+    fun whenGoToWindowsSettingsThenEmitGoToWindowsClientSettingsCommand() = runTest {
+        testee.commands.test {
+            testee.onGoToWindowsClicked()
+            assertEquals(GoToWindowsClientSettings, awaitItem())
         }
     }
 

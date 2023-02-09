@@ -39,6 +39,7 @@ import com.duckduckgo.windows.impl.waitlist.api.WindowsWaitlistStatusResponse
 import com.duckduckgo.windows.impl.waitlist.ui.RealWindowsWaitlistWorkRequestBuilder
 import com.duckduckgo.windows.impl.waitlist.ui.WindowsWaitlistViewModel
 import com.duckduckgo.windows.impl.waitlist.ui.WindowsWaitlistViewModel.Command.CopyInviteToClipboard
+import com.duckduckgo.windows.impl.waitlist.ui.WindowsWaitlistViewModel.Command.GoToMacClientSettings
 import com.duckduckgo.windows.impl.waitlist.ui.WindowsWaitlistViewModel.Command.ShareInviteCode
 import com.duckduckgo.windows.impl.waitlist.ui.WindowsWaitlistViewModel.Command.ShowErrorMessage
 import com.duckduckgo.windows.impl.waitlist.ui.WindowsWaitlistWorkRequestBuilder
@@ -214,6 +215,14 @@ class WindowsWaitlistViewModelTest {
         testee.commands.test {
             testee.onCopyToClipboard(true)
             expectNoEvents()
+        }
+    }
+
+    @Test
+    fun whenGoToMacOSSettingsClickedThenEmitCommandGoToMacClientSettings() = runTest {
+        testee.commands.test {
+            testee.onGoToMacClicked()
+            assertEquals(GoToMacClientSettings, awaitItem())
         }
     }
 
