@@ -34,7 +34,6 @@
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Kas soovid, et DuckDuckGo salvestaks sinu sisselogimisandmed?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Veel valikuid</string>
 
-    <string name="useSavedLoginDialogTitle">Kas kasutada salvestatud sisselogimist?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Kasuta saidi %1$s sisselogimismandaate</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Kasuta saidi sisselogimismandaate</string>
 

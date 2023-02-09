@@ -34,7 +34,6 @@
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Vai vēlies, lai DuckDuckGo saglabātu tavus pieteikšanās datus?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Citas iespējas</string>
 
-    <string name="useSavedLoginDialogTitle">Vai izmantot saglabātos pieteikšanās datus?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Pieteikšanās %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Pieteikšanās vietnei</string>
 

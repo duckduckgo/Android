@@ -34,7 +34,6 @@
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Haluatko, että DuckDuckGo tallentaa kirjautumistietosi?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Lisää vaihtoehtoja</string>
 
-    <string name="useSavedLoginDialogTitle">Käytä tallennettuja kirjautumistietoja?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Kirjautumistiedot kohteeseen %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Kirjautumistiedot sivustolle</string>
 
