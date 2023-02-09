@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2023 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,5 +15,6 @@
   -->
 
 <resources>
-
+    <!-- Notify Me View -->
+    <string name="notifyme_button_label">Notify me</string>
 </resources>
