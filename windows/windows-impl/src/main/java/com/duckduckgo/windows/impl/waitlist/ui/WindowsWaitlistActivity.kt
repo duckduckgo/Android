@@ -38,6 +38,7 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.macos_api.MacOsNav
 import com.duckduckgo.mobile.android.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.mobile.android.ui.view.addClickableSpan
 import com.duckduckgo.mobile.android.ui.view.gone
@@ -50,9 +51,11 @@ import com.duckduckgo.windows.impl.R
 import com.duckduckgo.windows.impl.databinding.ActivityWindowsWaitlistBinding
 import com.duckduckgo.windows.impl.waitlist.ui.WindowsWaitlistViewModel.Command
 import com.duckduckgo.windows.impl.waitlist.ui.WindowsWaitlistViewModel.Command.CopyInviteToClipboard
+import com.duckduckgo.windows.impl.waitlist.ui.WindowsWaitlistViewModel.Command.GoToMacClientSettings
 import com.duckduckgo.windows.impl.waitlist.ui.WindowsWaitlistViewModel.Command.ShareInviteCode
 import com.duckduckgo.windows.impl.waitlist.ui.WindowsWaitlistViewModel.Command.ShowErrorMessage
 import com.duckduckgo.windows.impl.waitlist.ui.WindowsWaitlistViewModel.ViewState
+import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
@@ -62,6 +65,8 @@ class WindowsWaitlistActivity : DuckDuckGoActivity() {
 
     private val viewModel: WindowsWaitlistViewModel by bindViewModel()
     private val binding: ActivityWindowsWaitlistBinding by viewBinding()
+
+    @Inject lateinit var macOSSettingsNav: MacOsNav
 
     private val toolbar
         get() = binding.includeToolbar.toolbar
@@ -91,6 +96,9 @@ class WindowsWaitlistActivity : DuckDuckGoActivity() {
             viewModel.joinTheWaitlist()
         }
         binding.shareImage.setOnClickListener { viewModel.onShareClicked() }
+        binding.lookingForMacVersionButton.setOnClickListener {
+            viewModel.onGoToMacClicked()
+        }
     }
 
     private fun render(viewState: ViewState) {
@@ -106,6 +114,7 @@ class WindowsWaitlistActivity : DuckDuckGoActivity() {
             is ShowErrorMessage -> renderErrorMessage()
             is ShareInviteCode -> launchSharePageChooser(command.inviteCode)
             is CopyInviteToClipboard -> copyToClipboard(command.inviteCode, command.onlyCode)
+            GoToMacClientSettings -> launchMacClientSettings()
         }
     }
 
@@ -139,6 +148,7 @@ class WindowsWaitlistActivity : DuckDuckGoActivity() {
     private fun renderNotJoinedQueue() {
         binding.headerImage.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_computer_win)
         binding.waitListButton.show()
+        binding.lookingForMacVersionButton.show()
         binding.footerDescription.show()
         binding.codeFrame.gone()
         binding.shareImage.gone()
@@ -192,6 +202,11 @@ class WindowsWaitlistActivity : DuckDuckGoActivity() {
 
     private fun getInviteText(inviteCode: String): Spanned {
         return HtmlCompat.fromHtml(getString(R.string.windows_waitlist_code_share_text, inviteCode), 0)
+    }
+
+    private fun launchMacClientSettings() {
+        startActivity(macOSSettingsNav.openMacOsSettings(this))
+        finish()
     }
 
     companion object {

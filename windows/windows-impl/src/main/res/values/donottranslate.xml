@@ -20,6 +20,7 @@
     <string name="windows_waitlist_title">Get early access to try DuckDuckGo for Windows!</string>
     <string name="windows_waitlist_windows">Windows coming soon!</string>
     <string name="windows_waitlist_description">DuckDuckGo for Windows comes with our default privacy protections, including private search, tracker blocking, encryption, and Cookie Consent Pop-up Management.</string>
+    <string name="windows_waitlist_mac_link">Looking for the Mac Version?</string>
     <string name="windows_join_waitlist">Join the Private Waitlist</string>
     <string name="windows_join_waitlist_error">An error happened while joining the Waitlist, please try again later</string>
     <string name="windows_waitlist_footer">You won\'t need to share any personal information to join the waitlist. You\'ll secure your place in line with a timestamp that exists solely on your device so we can notify you when it\'s your turn.</string>

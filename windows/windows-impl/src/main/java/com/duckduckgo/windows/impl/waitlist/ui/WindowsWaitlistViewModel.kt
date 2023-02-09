@@ -27,6 +27,7 @@ import com.duckduckgo.windows.impl.WindowsPixelNames.WINDOWS_WAITLIST_SHARE_PRES
 import com.duckduckgo.windows.impl.waitlist.WindowsWaitlistManager
 import com.duckduckgo.windows.impl.waitlist.api.WindowsWaitlistService
 import com.duckduckgo.windows.impl.waitlist.ui.WindowsWaitlistViewModel.Command.CopyInviteToClipboard
+import com.duckduckgo.windows.impl.waitlist.ui.WindowsWaitlistViewModel.Command.GoToMacClientSettings
 import com.duckduckgo.windows.impl.waitlist.ui.WindowsWaitlistViewModel.Command.ShareInviteCode
 import com.duckduckgo.windows.impl.waitlist.ui.WindowsWaitlistViewModel.Command.ShowErrorMessage
 import javax.inject.Inject
@@ -55,6 +56,7 @@ class WindowsWaitlistViewModel @Inject constructor(
 
     sealed class Command {
         object ShowErrorMessage : Command()
+        object GoToMacClientSettings : Command()
         data class ShareInviteCode(val inviteCode: String) : Command()
         data class CopyInviteToClipboard(val inviteCode: String, val onlyCode: Boolean) : Command()
     }
@@ -108,6 +110,12 @@ class WindowsWaitlistViewModel @Inject constructor(
             viewModelScope.launch {
                 commandChannel.send(CopyInviteToClipboard(it, onlyCode))
             }
+        }
+    }
+
+    fun onGoToMacClicked() {
+        viewModelScope.launch {
+            commandChannel.send(GoToMacClientSettings)
         }
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,18 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-}
+package com.duckduckgo.macos_impl
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+import android.content.Context
+import android.content.Intent
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.macos_api.MacOsNav
+import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-}
-
-android {
-    namespace 'com.duckduckgo.macos_api'
-}
-
-dependencies {
-    implementation Kotlin.stdlib.jdk7
+@ContributesBinding(AppScope::class)
+class MacOsNavImpl @Inject constructor() : MacOsNav {
+    override fun openMacOsSettings(context: Context): Intent {
+        return MacOsActivity.intent(context)
+    }
 }

@@ -136,7 +136,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:icon="@drawable/ic_platform_macos_16"
                 android:layout_marginBottom="@dimen/keyline_4"
-                android:text="Looking for the Mac Version?"/>
+                android:text="@string/windows_waitlist_mac_link"/>
 
             <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:id="@+id/footerDescription"
