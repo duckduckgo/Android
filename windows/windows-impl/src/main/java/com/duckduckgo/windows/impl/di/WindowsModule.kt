@@ -38,19 +38,6 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 @ContributesTo(AppScope::class)
 class WindowsModule {
 
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun apiRetrofit(@Named("api") okHttpClient: OkHttpClient): WindowsWaitlistService {
-        val moshi = Moshi.Builder().build()
-        val retrofit = Retrofit.Builder()
-            .baseUrl(API)
-            .client(okHttpClient)
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .build()
-
-        return retrofit.create(WindowsWaitlistService::class.java)
-    }
-
     @SingleInstanceIn(AppScope::class)
     @Provides
     fun provideRepository(dataStore: WindowsWaitlistDataStore): WindowsWaitlistRepository {
