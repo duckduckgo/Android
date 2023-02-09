@@ -10,3 +10,19 @@ appId: com.duckduckgo.mobile.android
     text: ".*Welcome to DuckDuckGo!.*"
 - assertVisible:
     text: ".*Not to worry! Searching and browsing privately.*"
+- tapOn: "let's do it!"
+- tapOn: "cancel"
+- assertVisible:
+      text: ".*I'll also upgrade the security of your connection if possible.*"
+- tapOn:
+      id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+- tapOn:
+      text: "Downloads"
+- assertVisible:
+    text: ".*No files downloaded yet.*"
+- assertNotVisible:
+    text: ".*Find out when downloads are ready.*"
+- assertNotVisible:
+    text: ".*Get a notification when downloads complete.*"
+- assertNotVisible:
+    text: ".*Notify Me.*"
