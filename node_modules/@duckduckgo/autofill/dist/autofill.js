@@ -3688,11 +3688,6 @@ class AndroidInterface extends _InterfacePrototype.default {
   }
 
   async setupAutofill() {}
-
-  postInit() {
-    const cleanup = this.scanner.init();
-    this.addLogoutListener(cleanup);
-  }
   /**
    * Used by the email web app
    * Settings page displays data of the logged in user data
@@ -3883,15 +3878,6 @@ class AppleDeviceInterface extends _InterfacePrototype.default {
         await this.getAddresses();
       }
     }
-  }
-
-  async postInit() {
-    if (this.isDeviceSignedIn()) {
-      this.scanner.forms.forEach(form => form.redecorateAllInputs());
-    }
-
-    const cleanup = this.scanner.init();
-    this.addLogoutListener(cleanup);
   }
   /**
    * Used by the email web app
@@ -4358,9 +4344,11 @@ var _HTMLTooltipUIController = require("../UI/controllers/HTMLTooltipUIControlle
 
 var _HTMLTooltip = require("../UI/HTMLTooltip.js");
 
+var _deviceApiCalls = require("../deviceApiCalls/__generated__/deviceApiCalls.js");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const POPUP_TYPES = {
+const TOOLTIP_TYPES = {
   EmailProtection: 'EmailProtection',
   EmailSignup: 'EmailSignup'
 };
@@ -4376,31 +4364,74 @@ class ExtensionInterface extends _InterfacePrototype.default {
       testMode: this.isTestMode()
     };
     const tooltipKinds = {
-      [POPUP_TYPES.EmailProtection]: 'legacy',
-      [POPUP_TYPES.EmailSignup]: 'emailsignup'
+      [TOOLTIP_TYPES.EmailProtection]: 'legacy',
+      [TOOLTIP_TYPES.EmailSignup]: 'emailsignup'
     };
-    const tooltipKind = tooltipKinds[this.getShowingTooltip()] || tooltipKinds[POPUP_TYPES.EmailProtection];
+    const tooltipKind = tooltipKinds[this.getActiveTooltipType()] || tooltipKinds[TOOLTIP_TYPES.EmailProtection];
     return new _HTMLTooltipUIController.HTMLTooltipUIController({
       tooltipKind,
       device: this
     }, htmlTooltipOptions);
   }
 
-  get hasDismissedEmailSignup() {
-    // TODO -- implement peristed dismissed timestamp
-    return false;
-  }
-
-  getShowingTooltip() {
+  getActiveTooltipType() {
     if (this.hasLocalAddresses) {
-      return POPUP_TYPES.EmailProtection;
+      return TOOLTIP_TYPES.EmailProtection;
     }
 
-    if (this.settings.featureToggles.emailProtection_incontext_signup && !this.hasDismissedEmailSignup) {
-      return POPUP_TYPES.EmailSignup;
+    if (this.settings.featureToggles.emailProtection_incontext_signup && this.settings.incontextSignupPermanentlyDismissed === false) {
+      return TOOLTIP_TYPES.EmailSignup;
     }
 
     return null;
+  }
+
+  onIncontextSignup() {
+    this.firePixel({
+      pixelName: 'incontext_get_email_protection'
+    });
+  }
+
+  onIncontextSignupDismissed() {
+    // Check if the email signup tooltip has previously been dismissed.
+    // If it has, make the dismissal persist and remove it from the page.
+    // If it hasn't, set a flag for next time and just hide the tooltip.
+    if (this.settings.incontextSignupInitiallyDismissed) {
+      this.settings.setIncontextSignupPermanentlyDismissed(true);
+      this.deviceApi.notify(new _deviceApiCalls.SetIncontextSignupPermanentlyDismissedAtCall({
+        value: new Date().getTime()
+      }));
+      this.removeAutofillUIFromPage();
+      this.firePixel({
+        pixelName: 'incontext_dismiss_persisted'
+      });
+    } else {
+      this.settings.setIncontextSignupInitiallyDismissed(true);
+      this.deviceApi.notify(new _deviceApiCalls.SetIncontextSignupInitiallyDismissedAtCall({
+        value: new Date().getTime()
+      }));
+      this.removeTooltip();
+      this.firePixel({
+        pixelName: 'incontext_dismiss_initial'
+      });
+    }
+  }
+
+  async resetAutofillUI(callback) {
+    this.removeAutofillUIFromPage(); // Start the setup process again
+
+    await this.refreshSettings();
+    await this.setupAutofill();
+    if (callback) await callback();
+    this.uiController = this.createUIController();
+    await this.postInit();
+  }
+
+  removeAutofillUIFromPage() {
+    var _this$uiController, _this$_scannerCleanup;
+
+    (_this$uiController = this.uiController) === null || _this$uiController === void 0 ? void 0 : _this$uiController.destroy();
+    (_this$_scannerCleanup = this._scannerCleanup) === null || _this$_scannerCleanup === void 0 ? void 0 : _this$_scannerCleanup.call(this);
   }
 
   async isEnabled() {
@@ -4425,22 +4456,42 @@ class ExtensionInterface extends _InterfacePrototype.default {
   }
 
   postInit() {
-    switch (this.getShowingTooltip()) {
-      case POPUP_TYPES.EmailProtection:
+    switch (this.getActiveTooltipType()) {
+      case TOOLTIP_TYPES.EmailProtection:
         {
-          const cleanup = this.scanner.init();
-          this.addLogoutListener(cleanup);
+          var _this$activeForm;
+
+          this._scannerCleanup = this.scanner.init();
+          this.addLogoutListener(() => {
+            this.resetAutofillUI();
+
+            if (this.globalConfig.isDDGDomain) {
+              (0, _autofillUtils.notifyWebApp)({
+                deviceSignedIn: {
+                  value: false
+                }
+              });
+            }
+          });
+
+          if ((_this$activeForm = this.activeForm) !== null && _this$activeForm !== void 0 && _this$activeForm.activeInput) {
+            var _this$activeForm2;
+
+            this.attachTooltip(this.activeForm, (_this$activeForm2 = this.activeForm) === null || _this$activeForm2 === void 0 ? void 0 : _this$activeForm2.activeInput, null, 'postSignup');
+          }
+
           break;
         }
 
-      case POPUP_TYPES.EmailSignup:
+      case TOOLTIP_TYPES.EmailSignup:
         {
-          this.scanner.init();
+          this._scannerCleanup = this.scanner.init();
           break;
         }
 
       default:
         {
+          // Don't do anyhing if we don't have a tooltip to show
           break;
         }
     }
@@ -4524,15 +4575,9 @@ class ExtensionInterface extends _InterfacePrototype.default {
 
       switch (message.type) {
         case 'ddgUserReady':
-          this.setupAutofill().then(() => {
-            this.refreshSettings().then(() => {
-              this.setupSettingsPage({
-                shouldLog: true
-              }).then(() => {
-                return this.postInit();
-              });
-            });
-          });
+          this.resetAutofillUI(() => this.setupSettingsPage({
+            shouldLog: true
+          }));
           break;
 
         case 'contextualAutofill':
@@ -4552,19 +4597,27 @@ class ExtensionInterface extends _InterfacePrototype.default {
   }
 
   addLogoutListener(handler) {
-    // Cleanup on logout events
-    chrome.runtime.onMessage.addListener((message, sender) => {
+    // Make sure there's only one log out listener attached by removing the
+    // previous logout listener first, if it exists.
+    if (this._logoutListenerHandler) {
+      chrome.runtime.onMessage.removeListener(this._logoutListenerHandler);
+    } // Cleanup on logout events
+
+
+    this._logoutListenerHandler = (message, sender) => {
       if (sender.id === chrome.runtime.id && message.type === 'logout') {
         handler();
       }
-    });
+    };
+
+    chrome.runtime.onMessage.addListener(this._logoutListenerHandler);
   }
 
 }
 
 exports.ExtensionInterface = ExtensionInterface;
 
-},{"../UI/HTMLTooltip.js":45,"../UI/controllers/HTMLTooltipUIController.js":46,"../autofill-utils.js":52,"./InterfacePrototype.js":19}],19:[function(require,module,exports){
+},{"../UI/HTMLTooltip.js":45,"../UI/controllers/HTMLTooltipUIController.js":46,"../autofill-utils.js":52,"../deviceApiCalls/__generated__/deviceApiCalls.js":56,"./InterfacePrototype.js":19}],19:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4749,9 +4802,14 @@ class InterfacePrototype {
   /** @type { PMData } */
 
 
+  onIncontextSignup() {}
+
+  onIncontextSignupDismissed() {}
   /**
    * @returns {import('../Form/matching').SupportedTypes}
    */
+
+
   getCurrentInputType() {
     throw new Error('Not implemented');
   }
@@ -4927,8 +4985,6 @@ class InterfacePrototype {
     await this.settings.refresh();
   }
 
-  postInit() {}
-
   async isEnabled() {
     return (0, _autofillUtils.autofillEnabled)(this.globalConfig);
   }
@@ -4951,6 +5007,21 @@ class InterfacePrototype {
       window.addEventListener('load', handler);
       document.addEventListener('readystatechange', handler);
     }
+  }
+
+  postInit() {
+    const cleanup = this.scanner.init();
+    this.addLogoutListener(() => {
+      cleanup();
+
+      if (this.globalConfig.isDDGDomain) {
+        (0, _autofillUtils.notifyWebApp)({
+          deviceSignedIn: {
+            value: false
+          }
+        });
+      }
+    });
   }
   /**
    * @deprecated This was a port from the macOS implementation so the API may not be suitable for all
@@ -5031,7 +5102,7 @@ class InterfacePrototype {
    * @param {import("../Form/Form").Form} form
    * @param {HTMLInputElement} input
    * @param {{ x: number; y: number; } | null} click
-   * @param {'userInitiated' | 'autoprompt'} trigger
+   * @param {import('../deviceApiCalls/__generated__/validators-ts').GetAutofillDataRequest['trigger']} trigger
    */
 
 
@@ -5040,7 +5111,7 @@ class InterfacePrototype {
 
     let trigger = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'userInitiated';
     // Avoid flashing tooltip from background tabs on macOS
-    if (document.visibilityState !== 'visible') return; // Only autoprompt on mobile devices
+    if (document.visibilityState !== 'visible' && trigger !== 'postSignup') return; // Only autoprompt on mobile devices
 
     if (trigger === 'autoprompt' && !this.globalConfig.isMobileApp) return; // Only fire autoprompt once
 
@@ -5538,8 +5609,7 @@ class WindowsInterface extends _InterfacePrototype.default {
   }
 
   postInit() {
-    const cleanup = this.scanner.init();
-    this.addLogoutListener(cleanup);
+    super.postInit();
     this.ready = true;
   }
 
@@ -6592,12 +6662,7 @@ class FormAnalyzer {
      * @type {boolean}
      */
 
-    this.isHybrid = false; // Avoid autofill on our signup page
-
-    if (window.location.href.match(/^https:\/\/(.+\.)?duckduckgo\.com\/email\/choose-address/i)) {
-      return this;
-    }
-
+    this.isHybrid = false;
     this.evaluateElAttributes(input, 3, true);
     form ? this.evaluateForm() : this.evaluatePage();
     return this;
@@ -10303,8 +10368,6 @@ exports.createScanner = createScanner;
 
 var _Form = require("./Form/Form.js");
 
-var _autofillUtils = require("./autofill-utils.js");
-
 var _selectorsCss = require("./Form/selectors-css.js");
 
 var _matching = require("./Form/matching.js");
@@ -10432,22 +10495,19 @@ class DefaultScanner {
     }
 
     return () => {
-      // remove Dax, listeners, timers, and observers
+      var _this$device$activeFo;
+
+      const activeInput = (_this$device$activeFo = this.device.activeForm) === null || _this$device$activeFo === void 0 ? void 0 : _this$device$activeFo.activeInput; // remove Dax, listeners, timers, and observers
+
       clearTimeout(this.debounceTimer);
       this.mutObs.disconnect();
       this.forms.forEach(form => {
         form.resetAllInputs();
         form.removeAllDecorations();
       });
-      this.forms.clear();
+      this.forms.clear(); // Bring the user back to the input they were interacting with
 
-      if (this.device.globalConfig.isDDGDomain) {
-        (0, _autofillUtils.notifyWebApp)({
-          deviceSignedIn: {
-            value: false
-          }
-        });
-      }
+      activeInput === null || activeInput === void 0 ? void 0 : activeInput.focus();
     };
   }
   /**
@@ -10473,6 +10533,11 @@ class DefaultScanner {
 
   findEligibleInputs(context) {
     var _context$matches;
+
+    // Avoid autofill on Email Protection web app
+    if (this.device.globalConfig.isDDGDomain) {
+      return this;
+    }
 
     if ('matches' in context && (_context$matches = context.matches) !== null && _context$matches !== void 0 && _context$matches.call(context, _selectorsCss.FORM_INPUTS_SELECTOR)) {
       this.addInput(context);
@@ -10615,7 +10680,7 @@ function createScanner(device, scannerOptions) {
   });
 }
 
-},{"./Form/Form.js":24,"./Form/matching.js":33,"./Form/selectors-css.js":34,"./autofill-utils.js":52}],41:[function(require,module,exports){
+},{"./Form/Form.js":24,"./Form/matching.js":33,"./Form/selectors-css.js":34}],41:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -10666,6 +10731,10 @@ class Settings {
 
   /** @type {boolean | null} */
 
+  /** @type {boolean | null} */
+
+  /** @type {boolean | null} */
+
   /**
    * @param {GlobalConfig} config
    * @param {DeviceApi} deviceApi
@@ -10682,6 +10751,10 @@ class Settings {
     _defineProperty(this, "_runtimeConfiguration", null);
 
     _defineProperty(this, "_enabled", null);
+
+    _defineProperty(this, "_incontextSignupInitiallyDismissed", null);
+
+    _defineProperty(this, "_incontextSignupPermanentlyDismissed", null);
 
     this.deviceApi = deviceApi;
     this.globalConfig = config;
@@ -10735,6 +10808,34 @@ class Settings {
         console.log('isDDGTestMode: getFeatureToggles: ❌', e);
       }
 
+      return null;
+    }
+  }
+  /**
+   * @returns {Promise<boolean|null>}
+   */
+
+
+  async getIncontextSignupInitiallyDismissed() {
+    try {
+      var _runtimeConfig$userPr4, _runtimeConfig$userPr5, _runtimeConfig$userPr6;
+
+      const runtimeConfig = await this._getRuntimeConfiguration();
+      const incontextSignupSettings = (0, _index.validate)((_runtimeConfig$userPr4 = runtimeConfig.userPreferences) === null || _runtimeConfig$userPr4 === void 0 ? void 0 : (_runtimeConfig$userPr5 = _runtimeConfig$userPr4.features) === null || _runtimeConfig$userPr5 === void 0 ? void 0 : (_runtimeConfig$userPr6 = _runtimeConfig$userPr5.incontextSignup) === null || _runtimeConfig$userPr6 === void 0 ? void 0 : _runtimeConfig$userPr6.settings, _validatorsZod.incontextSignupSettingsSchema);
+      return Boolean(incontextSignupSettings.initiallyDismissedAt);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  async getIncontextSignupPermanentlyDismissed() {
+    try {
+      var _runtimeConfig$userPr7, _runtimeConfig$userPr8, _runtimeConfig$userPr9;
+
+      const runtimeConfig = await this._getRuntimeConfiguration();
+      const incontextSignupSettings = (0, _index.validate)((_runtimeConfig$userPr7 = runtimeConfig.userPreferences) === null || _runtimeConfig$userPr7 === void 0 ? void 0 : (_runtimeConfig$userPr8 = _runtimeConfig$userPr7.features) === null || _runtimeConfig$userPr8 === void 0 ? void 0 : (_runtimeConfig$userPr9 = _runtimeConfig$userPr8.incontextSignup) === null || _runtimeConfig$userPr9 === void 0 ? void 0 : _runtimeConfig$userPr9.settings, _validatorsZod.incontextSignupSettingsSchema);
+      return Boolean(incontextSignupSettings.permanentlyDismissedAt);
+    } catch (e) {
       return null;
     }
   }
@@ -10793,7 +10894,9 @@ class Settings {
   async refresh() {
     this.setEnabled(await this.getEnabled());
     this.setFeatureToggles(await this.getFeatureToggles());
-    this.setAvailableInputTypes(await this.getAvailableInputTypes()); // If 'this.enabled' is a boolean it means we were able to set it correctly and therefor respect its value
+    this.setAvailableInputTypes(await this.getAvailableInputTypes());
+    this.setIncontextSignupInitiallyDismissed(await this.getIncontextSignupInitiallyDismissed());
+    this.setIncontextSignupPermanentlyDismissed(await this.getIncontextSignupPermanentlyDismissed()); // If 'this.enabled' is a boolean it means we were able to set it correctly and therefor respect its value
 
     if (typeof this.enabled === 'boolean') {
       if (!this.enabled) {
@@ -10896,6 +10999,34 @@ class Settings {
 
   setEnabled(enabled) {
     this._enabled = enabled;
+  }
+  /** @returns {boolean|null} */
+
+
+  get incontextSignupInitiallyDismissed() {
+    return this._incontextSignupInitiallyDismissed;
+  }
+  /**
+   * @param {boolean|null} incontextSignupInitiallyDismissed
+   */
+
+
+  setIncontextSignupInitiallyDismissed(incontextSignupInitiallyDismissed) {
+    this._incontextSignupInitiallyDismissed = incontextSignupInitiallyDismissed;
+  }
+  /** @returns {boolean|null} */
+
+
+  get incontextSignupPermanentlyDismissed() {
+    return this._incontextSignupPermanentlyDismissed;
+  }
+  /**
+   * @param {boolean|null} incontextSignupPermanentlyDismissed
+   */
+
+
+  setIncontextSignupPermanentlyDismissed(incontextSignupPermanentlyDismissed) {
+    this._incontextSignupPermanentlyDismissed = incontextSignupPermanentlyDismissed;
   }
 
 }
@@ -11105,10 +11236,15 @@ class EmailSignupHTMLTooltip extends _HTMLTooltip.default {
    */
   render(device) {
     this.device = device;
-    this.shadow.innerHTML = "\n".concat(this.options.css, "\n<div class=\"wrapper wrapper--email\">\n    <div class=\"tooltip tooltip--email tooltip--email-signup\" hidden>\n        <h1>\n            Protect your inbox \uD83D\uDCAA I've caught trackers hiding in 85% of emails.\n        </h1>\n        <p>\n            Want me to hide your email address and remove hidden trackers before\n            forwarding messages to your inbox?\n        </p>\n        <div class=\"notice-controls\">\n            <a href=\"https://duckduckgo.com/email/start-incontext\" target=\"_blank\" class=\"primary\">\n                Get Email Protection\n            </a>\n            <button class=\"ghost js-dismiss-email-signup\">\n                Not Now\n            </button>\n        </div>\n    </div>\n</div>");
+    this.shadow.innerHTML = "\n".concat(this.options.css, "\n<div class=\"wrapper wrapper--email\">\n    <div class=\"tooltip tooltip--email tooltip--email-signup\" hidden>\n        <h1>\n            Protect your inbox \uD83D\uDCAA I've caught trackers hiding in 85% of emails.\n        </h1>\n        <p>\n            Want me to hide your email address and remove hidden trackers before\n            forwarding messages to your inbox?\n        </p>\n        <div class=\"notice-controls\">\n            <a href=\"https://duckduckgo.com/email/start-incontext\" target=\"_blank\" class=\"primary js-get-email-signup\">\n                Get Email Protection\n            </a>\n            <button class=\"ghost js-dismiss-email-signup\">\n                ").concat(device.settings.incontextSignupInitiallyDismissed ? "Don't Ask Again" : 'Maybe Later', "\n            </button>\n        </div>\n    </div>\n</div>");
     this.tooltip = this.shadow.querySelector('.tooltip');
     this.dismissEmailSignup = this.shadow.querySelector('.js-dismiss-email-signup');
-    this.registerClickableButton(this.dismissEmailSignup, () => {// TODO: Persist dismissal
+    this.registerClickableButton(this.dismissEmailSignup, () => {
+      device.onIncontextSignupDismissed();
+    });
+    this.getEmailSignup = this.shadow.querySelector('.js-get-email-signup');
+    this.registerClickableButton(this.getEmailSignup, () => {
+      device.onIncontextSignup();
     });
     this.init();
     return this;
@@ -11468,9 +11604,22 @@ class HTMLTooltipUIController extends _UIController.UIController {
 
     _defineProperty(this, "_activeInputType", 'unknown');
 
+    _defineProperty(this, "_activeInput", void 0);
+
+    _defineProperty(this, "_activeInputOriginalAutocomplete", void 0);
+
     this._options = options;
     this._htmlTooltipOptions = Object.assign({}, _HTMLTooltip.defaultOptions, htmlTooltipOptions);
     window.addEventListener('pointerdown', this, true);
+  }
+
+  /**
+   * Cleans up after this UI controller by removing the tooltip and all
+   * listeners.
+   */
+  destroy() {
+    this.removeTooltip();
+    window.removeEventListener('pointerdown', this, true);
   }
   /**
    * @param {import('./UIController').AttachArgs} args
@@ -11491,6 +11640,9 @@ class HTMLTooltipUIController extends _UIController.UIController {
     const tooltip = this.createTooltip(getPosition, topContextData);
     this.setActiveTooltip(tooltip);
     form.showingTooltip(input);
+    this._activeInput = input;
+    this._activeInputOriginalAutocomplete = input.getAttribute('autocomplete');
+    input.setAttribute('autocomplete', 'off');
   }
   /**
    * Actually create the HTML Tooltip
@@ -11518,6 +11670,10 @@ class HTMLTooltipUIController extends _UIController.UIController {
     }
 
     if (this._options.tooltipKind === 'emailsignup') {
+      this._options.device.firePixel({
+        pixelName: 'incontext_show'
+      });
+
       return new _EmailSignupHTMLTooltop.default(config, topContextData.inputType, getPosition, tooltipOptions).render(this._options.device);
     } // collect the data for each item to display
 
@@ -11625,6 +11781,17 @@ class HTMLTooltipUIController extends _UIController.UIController {
       this._activeTooltip.remove();
 
       this._activeTooltip = null;
+    }
+
+    if (this._activeInput) {
+      if (this._activeInputOriginalAutocomplete) {
+        this._activeInput.setAttribute('autocomplete', this._activeInputOriginalAutocomplete);
+      } else {
+        this._activeInput.removeAttribute('autocomplete');
+      }
+
+      this._activeInput = null;
+      this._activeInputOriginalAutocomplete = null;
     }
   }
   /**
@@ -12079,7 +12246,7 @@ exports.UIController = void 0;
  * @property {{x: number, y: number}|null} click The click positioning
  * @property {TopContextData} topContextData
  * @property {import("../../DeviceInterface/InterfacePrototype").default} device
- * @property {'userInitiated' | 'autoprompt'} trigger
+ * @property {import('../../deviceApiCalls/__generated__/validators-ts').GetAutofillDataRequest['trigger']} trigger
  */
 
 /**
@@ -12196,7 +12363,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.buttonMatchesFormType = exports.autofillEnabled = exports.addInlineStyles = exports.SIGN_IN_MSG = exports.ADDRESS_DOMAIN = void 0;
 exports.escapeXML = escapeXML;
-exports.setValue = exports.sendAndWaitForAnswer = exports.safeExecute = exports.removeInlineStyles = exports.notifyWebApp = exports.isVisible = exports.isLikelyASubmitButton = exports.isEventWithinDax = exports.isAutofillEnabledFromProcessedConfig = exports.getText = exports.getDaxBoundingBox = exports.formatDuckAddress = void 0;
+exports.setValue = exports.sendAndWaitForAnswer = exports.safeExecute = exports.removeInlineStyles = exports.notifyWebApp = exports.isVisible = exports.isLikelyASubmitButton = exports.isIncontextSignupEnabledFromProcessedConfig = exports.isEventWithinDax = exports.isAutofillEnabledFromProcessedConfig = exports.getText = exports.getDaxBoundingBox = exports.formatDuckAddress = void 0;
 
 var _matching = require("./Form/matching.js");
 
@@ -12272,11 +12439,23 @@ const isAutofillEnabledFromProcessedConfig = processedConfig => {
   }
 
   return true;
+};
+
+exports.isAutofillEnabledFromProcessedConfig = isAutofillEnabledFromProcessedConfig;
+
+const isIncontextSignupEnabledFromProcessedConfig = processedConfig => {
+  const site = processedConfig.site;
+
+  if (site.isBroken || !site.enabledFeatures.includes('incontextSignup')) {
+    return false;
+  }
+
+  return true;
 }; // Access the original setter (needed to bypass React's implementation on mobile)
 // @ts-ignore
 
 
-exports.isAutofillEnabledFromProcessedConfig = isAutofillEnabledFromProcessedConfig;
+exports.isIncontextSignupEnabledFromProcessedConfig = isIncontextSignupEnabledFromProcessedConfig;
 const originalSet = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
 /**
  * Ensures the value is set properly and dispatches events to simulate real user action
@@ -12753,7 +12932,7 @@ exports.constants = constants;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.StoreFormDataCall = exports.SetSizeCall = exports.SendJSPixelCall = exports.SelectedDetailCall = exports.GetRuntimeConfigurationCall = exports.GetAvailableInputTypesCall = exports.GetAutofillInitDataCall = exports.GetAutofillDataCall = exports.GetAutofillCredentialsCall = exports.CloseAutofillParentCall = exports.CheckCredentialsProviderStatusCall = exports.AskToUnlockProviderCall = void 0;
+exports.StoreFormDataCall = exports.SetSizeCall = exports.SetIncontextSignupPermanentlyDismissedAtCall = exports.SetIncontextSignupInitiallyDismissedAtCall = exports.SendJSPixelCall = exports.SelectedDetailCall = exports.GetRuntimeConfigurationCall = exports.GetIncontextSignupDismissedAtCall = exports.GetAvailableInputTypesCall = exports.GetAutofillInitDataCall = exports.GetAutofillDataCall = exports.GetAutofillCredentialsCall = exports.CloseAutofillParentCall = exports.CheckCredentialsProviderStatusCall = exports.AskToUnlockProviderCall = void 0;
 
 var _validatorsZod = require("./validators.zod.js");
 
@@ -12977,8 +13156,61 @@ class SendJSPixelCall extends _deviceApi.DeviceApiCall {
   }
 
 }
+/**
+ * @extends {DeviceApiCall<setIncontextSignupInitiallyDismissedAtSchema, any>} 
+ */
+
 
 exports.SendJSPixelCall = SendJSPixelCall;
+
+class SetIncontextSignupInitiallyDismissedAtCall extends _deviceApi.DeviceApiCall {
+  constructor() {
+    super(...arguments);
+
+    _defineProperty(this, "method", "setIncontextSignupInitiallyDismissedAt");
+
+    _defineProperty(this, "paramsValidator", _validatorsZod.setIncontextSignupInitiallyDismissedAtSchema);
+  }
+
+}
+/**
+ * @extends {DeviceApiCall<setIncontextSignupPermanentlyDismissedAtSchema, any>} 
+ */
+
+
+exports.SetIncontextSignupInitiallyDismissedAtCall = SetIncontextSignupInitiallyDismissedAtCall;
+
+class SetIncontextSignupPermanentlyDismissedAtCall extends _deviceApi.DeviceApiCall {
+  constructor() {
+    super(...arguments);
+
+    _defineProperty(this, "method", "setIncontextSignupPermanentlyDismissedAt");
+
+    _defineProperty(this, "paramsValidator", _validatorsZod.setIncontextSignupPermanentlyDismissedAtSchema);
+  }
+
+}
+/**
+ * @extends {DeviceApiCall<any, getIncontextSignupDismissedAtSchema>} 
+ */
+
+
+exports.SetIncontextSignupPermanentlyDismissedAtCall = SetIncontextSignupPermanentlyDismissedAtCall;
+
+class GetIncontextSignupDismissedAtCall extends _deviceApi.DeviceApiCall {
+  constructor() {
+    super(...arguments);
+
+    _defineProperty(this, "method", "getIncontextSignupDismissedAt");
+
+    _defineProperty(this, "id", "getIncontextSignupDismissedAt");
+
+    _defineProperty(this, "resultValidator", _validatorsZod.getIncontextSignupDismissedAtSchema);
+  }
+
+}
+
+exports.GetIncontextSignupDismissedAtCall = GetIncontextSignupDismissedAtCall;
 
 },{"../../../packages/device-api":6,"./validators.zod.js":57}],57:[function(require,module,exports){
 "use strict";
@@ -12986,7 +13218,7 @@ exports.SendJSPixelCall = SendJSPixelCall;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.userPreferencesSchema = exports.triggerContextSchema = exports.storeFormDataSchema = exports.setSizeParamsSchema = exports.sendJSPixelParamsSchema = exports.selectedDetailParamsSchema = exports.runtimeConfigurationSchema = exports.providerStatusUpdatedSchema = exports.outgoingCredentialsSchema = exports.getRuntimeConfigurationResponseSchema = exports.getAvailableInputTypesResultSchema = exports.getAutofillInitDataResponseSchema = exports.getAutofillDataResponseSchema = exports.getAutofillDataRequestSchema = exports.getAutofillCredentialsResultSchema = exports.getAutofillCredentialsParamsSchema = exports.getAliasResultSchema = exports.getAliasParamsSchema = exports.genericErrorSchema = exports.credentialsSchema = exports.contentScopeSchema = exports.checkCredentialsProviderStatusResultSchema = exports.availableInputTypesSchema = exports.autofillSettingsSchema = exports.autofillFeatureTogglesSchema = exports.askToUnlockProviderResultSchema = void 0;
+exports.userPreferencesSchema = exports.triggerContextSchema = exports.storeFormDataSchema = exports.setSizeParamsSchema = exports.setIncontextSignupPermanentlyDismissedAtSchema = exports.setIncontextSignupInitiallyDismissedAtSchema = exports.sendJSPixelParamsSchema = exports.selectedDetailParamsSchema = exports.runtimeConfigurationSchema = exports.providerStatusUpdatedSchema = exports.outgoingCredentialsSchema = exports.incontextSignupSettingsSchema = exports.getRuntimeConfigurationResponseSchema = exports.getIncontextSignupDismissedAtSchema = exports.getAvailableInputTypesResultSchema = exports.getAutofillInitDataResponseSchema = exports.getAutofillDataResponseSchema = exports.getAutofillDataRequestSchema = exports.getAutofillCredentialsResultSchema = exports.getAutofillCredentialsParamsSchema = exports.getAliasResultSchema = exports.getAliasParamsSchema = exports.genericErrorSchema = exports.credentialsSchema = exports.contentScopeSchema = exports.checkCredentialsProviderStatusResultSchema = exports.availableInputTypesSchema = exports.autofillSettingsSchema = exports.autofillFeatureTogglesSchema = exports.askToUnlockProviderResultSchema = void 0;
 const credentialsSchema = null;
 exports.credentialsSchema = credentialsSchema;
 const availableInputTypesSchema = null;
@@ -13013,16 +13245,24 @@ const getAutofillInitDataResponseSchema = null;
 exports.getAutofillInitDataResponseSchema = getAutofillInitDataResponseSchema;
 const getAvailableInputTypesResultSchema = null;
 exports.getAvailableInputTypesResultSchema = getAvailableInputTypesResultSchema;
+const getIncontextSignupDismissedAtSchema = null;
+exports.getIncontextSignupDismissedAtSchema = getIncontextSignupDismissedAtSchema;
 const contentScopeSchema = null;
 exports.contentScopeSchema = contentScopeSchema;
 const userPreferencesSchema = null;
 exports.userPreferencesSchema = userPreferencesSchema;
+const incontextSignupSettingsSchema = null;
+exports.incontextSignupSettingsSchema = incontextSignupSettingsSchema;
 const runtimeConfigurationSchema = null;
 exports.runtimeConfigurationSchema = runtimeConfigurationSchema;
 const selectedDetailParamsSchema = null;
 exports.selectedDetailParamsSchema = selectedDetailParamsSchema;
 const sendJSPixelParamsSchema = null;
 exports.sendJSPixelParamsSchema = sendJSPixelParamsSchema;
+const setIncontextSignupInitiallyDismissedAtSchema = null;
+exports.setIncontextSignupInitiallyDismissedAtSchema = setIncontextSignupInitiallyDismissedAtSchema;
+const setIncontextSignupPermanentlyDismissedAtSchema = null;
+exports.setIncontextSignupPermanentlyDismissedAtSchema = setIncontextSignupPermanentlyDismissedAtSchema;
 const setSizeParamsSchema = null;
 exports.setSizeParamsSchema = setSizeParamsSchema;
 const outgoingCredentialsSchema = null;
@@ -13340,16 +13580,28 @@ class ExtensionTransport extends _index.DeviceApiTransport {
 
   async send(deviceApiCall) {
     if (deviceApiCall instanceof _deviceApiCalls.GetRuntimeConfigurationCall) {
-      return deviceApiCall.result(await extensionSpecificRuntimeConfiguration(this.config));
+      return deviceApiCall.result(await extensionSpecificRuntimeConfiguration(this));
     }
 
     if (deviceApiCall instanceof _deviceApiCalls.GetAvailableInputTypesCall) {
       return deviceApiCall.result(await extensionSpecificGetAvailableInputTypes());
+    }
+
+    if (deviceApiCall instanceof _deviceApiCalls.SetIncontextSignupInitiallyDismissedAtCall) {
+      return deviceApiCall.result(await extensionSpecificSetIncontextSignupInitiallyDismissedAtCall(deviceApiCall.params));
+    }
+
+    if (deviceApiCall instanceof _deviceApiCalls.SetIncontextSignupPermanentlyDismissedAtCall) {
+      return deviceApiCall.result(await extensionSpecificSetIncontextSignupPermanentlyDismissedAtCall(deviceApiCall.params));
+    }
+
+    if (deviceApiCall instanceof _deviceApiCalls.GetIncontextSignupDismissedAtCall) {
+      return deviceApiCall.result(await extensionSpecificGetIncontextSignupDismissedAt());
     } // TODO: unify all calls to use deviceApiCall.method instead of all these if blocks
 
 
     if (deviceApiCall instanceof _deviceApiCalls.SendJSPixelCall) {
-      return deviceApiCall.result(await extensionSpecificSendPixel(deviceApiCall.params.pixelName));
+      return deviceApiCall.result(await extensionSpecificSendPixel(deviceApiCall.params));
     }
 
     throw new Error('not implemented yet for ' + deviceApiCall.method);
@@ -13357,16 +13609,20 @@ class ExtensionTransport extends _index.DeviceApiTransport {
 
 }
 /**
- * @param {GlobalConfig} globalConfig
+ * @param {ExtensionTransport} deviceApi
  * @returns {Promise<ReturnType<GetRuntimeConfigurationCall['result']>>}
  */
 
 
 exports.ExtensionTransport = ExtensionTransport;
 
-async function extensionSpecificRuntimeConfiguration(globalConfig) {
+async function extensionSpecificRuntimeConfiguration(deviceApi) {
+  var _deviceApi$config;
+
   const contentScope = await getContentScopeConfig();
   const emailProtectionEnabled = (0, _autofillUtils.isAutofillEnabledFromProcessedConfig)(contentScope);
+  const incontextSignupEnabled = (0, _autofillUtils.isIncontextSignupEnabledFromProcessedConfig)(contentScope);
+  const incontextSignupDismissedAt = await deviceApi.send(new _deviceApiCalls.GetIncontextSignupDismissedAtCall(null));
   return {
     success: {
       // @ts-ignore
@@ -13377,14 +13633,21 @@ async function extensionSpecificRuntimeConfiguration(globalConfig) {
           autofill: {
             settings: {
               featureToggles: { ..._Settings.Settings.defaults.featureToggles,
-                emailProtection: emailProtectionEnabled
+                emailProtection: emailProtectionEnabled,
+                emailProtection_incontext_signup: incontextSignupEnabled
               }
+            }
+          },
+          incontextSignup: {
+            settings: {
+              initiallyDismissedAt: incontextSignupDismissedAt.success.initiallyDismissedAt,
+              permanentlyDismissedAt: incontextSignupDismissedAt.success.permanentlyDismissedAt
             }
           }
         }
       },
       // @ts-ignore
-      userUnprotectedDomains: globalConfig === null || globalConfig === void 0 ? void 0 : globalConfig.userUnprotectedDomains
+      userUnprotectedDomains: (_deviceApi$config = deviceApi.config) === null || _deviceApi$config === void 0 ? void 0 : _deviceApi$config.userUnprotectedDomains
     }
   };
 }
@@ -13412,17 +13675,55 @@ async function getContentScopeConfig() {
   });
 }
 /**
- * @param {import('../__generated__/validators-ts').SendJSPixelParams['pixelName']} pixelName
+ * @param {import('../__generated__/validators-ts').SendJSPixelParams} params
  */
 
 
-async function extensionSpecificSendPixel(pixelName) {
+async function extensionSpecificSendPixel(params) {
   return new Promise(resolve => {
     chrome.runtime.sendMessage({
       messageType: 'sendJSPixel',
-      options: {
-        pixelName
-      }
+      options: params
+    }, () => {
+      resolve(true);
+    });
+  });
+}
+
+async function extensionSpecificGetIncontextSignupDismissedAt() {
+  return new Promise(resolve => {
+    chrome.runtime.sendMessage({
+      messageType: 'getIncontextSignupDismissedAt'
+    }, response => {
+      resolve(response);
+    });
+  });
+}
+/**
+ * @param {import('../__generated__/validators-ts').SetIncontextSignupInitiallyDismissedAt} params
+ */
+
+
+async function extensionSpecificSetIncontextSignupInitiallyDismissedAtCall(params) {
+  return new Promise(resolve => {
+    chrome.runtime.sendMessage({
+      messageType: 'setIncontextSignupInitiallyDismissedAt',
+      options: params
+    }, () => {
+      resolve(true);
+    });
+  });
+}
+/**
+ * @param {import('../__generated__/validators-ts').SetIncontextSignupPermanentlyDismissedAt} params
+ */
+
+
+async function extensionSpecificSetIncontextSignupPermanentlyDismissedAtCall(params) {
+  return new Promise(resolve => {
+    chrome.runtime.sendMessage({
+      messageType: 'setIncontextSignupPermanentlyDismissedAt',
+      options: params
     }, () => {
       resolve(true);
     });
