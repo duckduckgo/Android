@@ -175,11 +175,7 @@ class WindowsWaitlistActivity : DuckDuckGoActivity() {
             PendingIntent.FLAG_UPDATE_CURRENT,
         )
         try {
-            if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP_MR1) {
-                startActivity(Intent.createChooser(share, getString(R.string.windows_waitlist_share_invite), pi.intentSender))
-            } else {
-                startActivity(Intent.createChooser(share, getString(R.string.windows_waitlist_share_invite)))
-            }
+            startActivity(Intent.createChooser(share, getString(R.string.windows_waitlist_share_invite)))
         } catch (e: ActivityNotFoundException) {
             Timber.w(e, "Activity not found")
         }
