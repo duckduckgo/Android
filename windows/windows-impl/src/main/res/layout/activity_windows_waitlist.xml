@@ -112,7 +112,7 @@
                     android:text="@string/windows_waitlist_code_invite"
                     android:textColor="@color/white" />
 
-                <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                <TextView
                     android:id="@+id/inviteCode"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -122,6 +122,7 @@
                     android:gravity="center"
                     tools:text="F20LPOPSD"
                     android:textColor="@color/almostBlack"
+                    android:textSize="34sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
