@@ -553,8 +553,9 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
     }
 
     private fun notifyVpnStart() {
-        val content = vpnEnabledNotificationContentPluginPoint.getHighestPriorityPlugin().getInitialContent()
-        val vpnNotification = content ?: VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent.EMPTY
+        val vpnNotification =
+            vpnEnabledNotificationContentPluginPoint.getHighestPriorityPlugin()?.getInitialContent()
+                ?: VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent.EMPTY
 
         startForeground(
             VPN_FOREGROUND_SERVICE_ID,

@@ -27,6 +27,6 @@ import com.duckduckgo.di.scopes.VpnScope
 @Suppress("unused")
 interface VpnEnabledNotificationContentPluginPoint
 
-fun PluginPoint<VpnEnabledNotificationContentPlugin>.getHighestPriorityPlugin(): VpnEnabledNotificationContentPlugin {
-    return getPlugins().filter { it.isActive() }.maxBy { it.getPriority().ordinal }
+fun PluginPoint<VpnEnabledNotificationContentPlugin>.getHighestPriorityPlugin(): VpnEnabledNotificationContentPlugin? {
+    return runCatching { getPlugins().filter { it.isActive() }.maxByOrNull { it.getPriority().ordinal } }.getOrNull()
 }

@@ -43,11 +43,13 @@ class VpnTrackerNotificationUpdates @Inject constructor(
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         job += coroutineScope.launch(dispatcherProvider.io()) {
-            val notificationContentFlow = vpnEnabledNotificationContentPluginPoint.getHighestPriorityPlugin().getUpdatedContent()
-            notificationContentFlow.collectLatest { content ->
-                val vpnNotification = content ?: VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent.EMPTY
+            val notificationContentFlow = vpnEnabledNotificationContentPluginPoint.getHighestPriorityPlugin()?.getUpdatedContent()
+            notificationContentFlow?.let {
+                it.collectLatest { content ->
+                    val vpnNotification = content ?: VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent.EMPTY
 
-                updateNotification(vpnNotification)
+                    updateNotification(vpnNotification)
+                }
             }
         }
     }
