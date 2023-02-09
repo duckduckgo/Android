@@ -108,7 +108,7 @@
                 android:layout_marginStart="@dimen/keyline_4"
                 android:textAlignment="center"
                 android:layout_marginEnd="@dimen/keyline_4"
-                android:text="@string/windows_waitlist_footer"
+                android:text="@string/macos_waitlist_footer"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
