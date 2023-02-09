@@ -23,5 +23,5 @@ import android.content.Intent
  * Public interface to provide navigation Intents related to MacOs Settings
  */
 interface MacOsNav {
-    fun openMacOsSettings(context: Context): Intent
+    fun openMacOsSettings(activityContext: Context): Intent
 }

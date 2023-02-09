@@ -23,5 +23,5 @@ import android.content.Intent
  * Public interface to provide navigation Intents related to Windows App Settings
  */
 interface WindowsSettingsNav {
-    fun openWindowsSettings(context: Context): Intent
+    fun openWindowsSettings(activityContext: Context): Intent
 }

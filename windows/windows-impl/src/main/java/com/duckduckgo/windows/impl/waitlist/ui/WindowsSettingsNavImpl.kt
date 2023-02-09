@@ -25,7 +25,7 @@ import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class WindowsSettingsNavImpl @Inject constructor() : WindowsSettingsNav {
-    override fun openWindowsSettings(context: Context): Intent {
-        return WindowsWaitlistActivity.intent(context)
+    override fun openWindowsSettings(activityContext: Context): Intent {
+        return WindowsWaitlistActivity.intent(activityContext)
     }
 }

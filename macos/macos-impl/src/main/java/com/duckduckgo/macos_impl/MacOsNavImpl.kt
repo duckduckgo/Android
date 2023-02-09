@@ -25,7 +25,7 @@ import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class MacOsNavImpl @Inject constructor() : MacOsNav {
-    override fun openMacOsSettings(context: Context): Intent {
-        return MacOsActivity.intent(context)
+    override fun openMacOsSettings(activityContext: Context): Intent {
+        return MacOsActivity.intent(activityContext)
     }
 }
