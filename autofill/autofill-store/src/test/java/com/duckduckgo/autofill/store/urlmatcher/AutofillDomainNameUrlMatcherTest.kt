@@ -150,10 +150,10 @@ class AutofillDomainNameUrlMatcherTest {
     }
 
     @Test
-    fun whenSavedSiteContainsSubdomainAndVisitedSiteDoesNotThenNoMatchingForAutofill() {
+    fun whenSavedSiteContainsSubdomainAndVisitedSiteDoesNotThenMatchingForAutofill() {
         val savedSite = testee.extractUrlPartsForAutofill("foo.example.com")
         val visitedSite = testee.extractUrlPartsForAutofill("example.com")
-        assertFalse(testee.matchingForAutofill(visitedSite, savedSite))
+        assertTrue(testee.matchingForAutofill(visitedSite, savedSite))
     }
 
     @Test
@@ -164,10 +164,10 @@ class AutofillDomainNameUrlMatcherTest {
     }
 
     @Test
-    fun whenUrlsHaveDifferentSubdomainsThenNoMatchingForAutofill() {
+    fun whenUrlsHaveDifferentSubdomainsThenMatchingForAutofill() {
         val savedSite = testee.extractUrlPartsForAutofill("bar.example.com")
         val visitedSite = testee.extractUrlPartsForAutofill("foo.example.com")
-        assertFalse(testee.matchingForAutofill(visitedSite, savedSite))
+        assertTrue(testee.matchingForAutofill(visitedSite, savedSite))
     }
 
     @Test
@@ -227,17 +227,17 @@ class AutofillDomainNameUrlMatcherTest {
     }
 
     @Test
-    fun whenSavedSiteContainNestedSubdomainsAndVisitedSiteContainsMatchingRootSubdomainThenNotMatchingForAutofill() {
+    fun whenSavedSiteContainNestedSubdomainsAndVisitedSiteContainsMatchingRootSubdomainThenMatchingForAutofill() {
         val savedSite = testee.extractUrlPartsForAutofill("a.b.example.com")
         val visitedSite = testee.extractUrlPartsForAutofill("b.example.com")
-        assertFalse(testee.matchingForAutofill(visitedSite, savedSite))
+        assertTrue(testee.matchingForAutofill(visitedSite, savedSite))
     }
 
     @Test
-    fun whenSavedSiteContainSubdomainAndVisitedSiteContainsNestedSubdomainsThenNotMatchingForAutofill() {
+    fun whenSavedSiteContainSubdomainAndVisitedSiteContainsNestedSubdomainsThenMatchingForAutofill() {
         val savedSite = testee.extractUrlPartsForAutofill("b.example.com")
         val visitedSite = testee.extractUrlPartsForAutofill("a.b.example.com")
-        assertFalse(testee.matchingForAutofill(visitedSite, savedSite))
+        assertTrue(testee.matchingForAutofill(visitedSite, savedSite))
     }
 
     @Test

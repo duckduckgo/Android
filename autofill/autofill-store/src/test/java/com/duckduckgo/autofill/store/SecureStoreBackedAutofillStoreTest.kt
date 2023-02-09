@@ -392,14 +392,14 @@ class SecureStoreBackedAutofillStoreTest {
     }
 
     @Test
-    fun whenSavedCredentialHasSubdomainAndVisitedPageDoesNotThenCredentialNotMatched() = runTest {
+    fun whenSavedCredentialHasSubdomainAndVisitedPageDoesNotThenCredentialMatched() = runTest {
         setupTesteeWithAutofillAvailable()
         val savedUrl = "https://test.example.com"
         val visitedSite = "https://example.com"
         storeCredentials(1, savedUrl, "username1", "password123")
 
         val results = testee.getCredentials(visitedSite)
-        assertEquals(0, results.size)
+        assertEquals(1, results.size)
     }
 
     @Test
@@ -414,14 +414,14 @@ class SecureStoreBackedAutofillStoreTest {
     }
 
     @Test
-    fun whenSavedCredentialHasDifferentSubdomainToVisitedPageSubdomainThenCredentialNotMatched() = runTest {
+    fun whenSavedCredentialHasDifferentSubdomainToVisitedPageSubdomainThenCredentialMatched() = runTest {
         setupTesteeWithAutofillAvailable()
         val savedUrl = "https://test.example.com"
         val visitedSite = "https://different.example.com"
         storeCredentials(1, savedUrl, "username1", "password123")
 
         val results = testee.getCredentials(visitedSite)
-        assertEquals(0, results.size)
+        assertEquals(1, results.size)
     }
 
     private fun List<LoginCredentials>.assertHasNoLoginCredentials(
