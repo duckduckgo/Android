@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 7.2.2" type="baseline" client="gradle" dependencies="false" name="AGP (7.2.2)" variant="all" version="7.2.2">
+
+    <issue
+        id="RtlEnabled"
+        message="The project references RTL attributes, but does not explicitly enable or disable RTL support with `android:supportsRtl` in the manifest">
+        <location
+            file="src/main/AndroidManifest.xml"/>
+    </issue>
+
+    <issue
+        id="DeprecatedWidgetInXml"
+        message="Always favor the use of the Design System Component"
+        errorLine1="                &lt;TextView"
+        errorLine2="                 ~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_windows_waitlist.xml"
+            line="115"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="InvalidColorAttribute"
+        message="@colors are not allowed, used ?attr/daxColor instead"
+        errorLine1="                    android:textColor=&quot;@color/almostBlack&quot;"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_windows_waitlist.xml"
+            line="124"
+            column="21"/>
+    </issue>
+
+</issues>
