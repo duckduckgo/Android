@@ -110,8 +110,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="3dp"
                     android:layout_gravity="center"
-                    android:text="@string/windows_waitlist_code_invite"
-                    android:textColor="@color/white" />
+                    android:text="@string/windows_waitlist_code_invite"/>
 
                 <TextView
                     android:id="@+id/inviteCode"
