@@ -30,8 +30,8 @@ import com.duckduckgo.app.email.db.EmailEncryptedSharedPreferences
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.Autofill
+import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.FeatureToggle
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
@@ -57,11 +57,11 @@ class EmailModule {
         emailManager: EmailManager,
         duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
         dispatcherProvider: DispatcherProvider,
-        featureToggle: FeatureToggle,
+        autofillFeature: AutofillFeature,
         javascriptInjector: JavascriptInjector,
         autofill: Autofill,
     ): EmailInjector {
-        return EmailInjectorJs(emailManager, duckDuckGoUrlDetector, dispatcherProvider, featureToggle, javascriptInjector, autofill)
+        return EmailInjectorJs(emailManager, duckDuckGoUrlDetector, dispatcherProvider, autofillFeature, javascriptInjector, autofill)
     }
 
     @Provides

@@ -21,8 +21,7 @@ import android.webkit.WebView
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autofill.api.Autofill
-import com.duckduckgo.autofill.api.feature.AutofillFeatureName
-import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.autofill.api.AutofillFeature
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 
@@ -31,7 +30,7 @@ class EmailJavascriptInterface(
     private val webView: WebView,
     private val urlDetector: DuckDuckGoUrlDetector,
     private val dispatcherProvider: DispatcherProvider,
-    private val featureToggle: FeatureToggle,
+    private val autofillFeature: AutofillFeature,
     private val autofill: Autofill,
     private val showNativeTooltip: () -> Unit,
 ) {
@@ -47,7 +46,7 @@ class EmailJavascriptInterface(
         return (url != null && urlDetector.isDuckDuckGoEmailUrl(url))
     }
 
-    private fun isFeatureEnabled() = featureToggle.isFeatureEnabled(AutofillFeatureName.Autofill.value, defaultValue = true)
+    private fun isFeatureEnabled() = autofillFeature.self().isEnabled()
 
     @JavascriptInterface
     fun isSignedIn(): String {

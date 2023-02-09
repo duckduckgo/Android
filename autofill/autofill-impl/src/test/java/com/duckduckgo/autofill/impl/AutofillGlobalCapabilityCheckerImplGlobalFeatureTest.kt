@@ -17,13 +17,11 @@
 package com.duckduckgo.autofill.impl
 
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.InternalTestUserChecker
-import com.duckduckgo.autofill.api.feature.AutofillFeatureName.Autofill
-import com.duckduckgo.autofill.api.feature.AutofillSubfeatureName
-import com.duckduckgo.autofill.api.feature.AutofillSubfeatureName.AccessCredentialManagement
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator
-import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -32,7 +30,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.mockito.kotlin.any
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -45,14 +42,14 @@ class AutofillGlobalCapabilityCheckerImplGlobalFeatureTest(
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private val featureToggle: FeatureToggle = mock()
+    private val autofillFeature: AutofillFeature = mock()
     private val internalTestUserChecker: InternalTestUserChecker = mock()
     private val autofillStore: AutofillStore = mock()
     private val deviceAuthenticator: DeviceAuthenticator = mock()
     private val exceptionChecker: com.duckduckgo.autofill.api.Autofill = mock()
 
     private val testee = AutofillGlobalCapabilityCheckerImpl(
-        featureToggle = featureToggle,
+        autofillFeature = autofillFeature,
         internalTestUserChecker = internalTestUserChecker,
         autofillStore = autofillStore,
         deviceAuthenticator = deviceAuthenticator,
@@ -145,8 +142,9 @@ class AutofillGlobalCapabilityCheckerImplGlobalFeatureTest(
     }
 
     private fun configureGlobalAutofillFeatureState(isEnabled: Boolean) {
-        whenever(featureToggle.isFeatureEnabled(Autofill.value)).thenReturn(isEnabled)
-        whenever(featureToggle.isFeatureEnabled(eq(Autofill.value), any())).thenReturn(isEnabled)
+        val toggle: Toggle = mock()
+        whenever(toggle.isEnabled()).thenReturn(isEnabled)
+        whenever(autofillFeature.self()).thenReturn(toggle)
     }
 
     private fun configureIfUrlIsException(isException: Boolean) {
@@ -156,7 +154,6 @@ class AutofillGlobalCapabilityCheckerImplGlobalFeatureTest(
     private fun configureAsInternalTester(isInternal: Boolean) = whenever(internalTestUserChecker.isInternalTestUser).thenReturn(isInternal)
 
     data class TestCase(
-        val subfeature: AutofillSubfeatureName = AccessCredentialManagement,
         val expectFeatureEnabled: Boolean,
         val scenario: Scenario,
     )

@@ -14,16 +14,21 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.impl
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+}
 
-import com.duckduckgo.autofill.store.AutofillExceptionEntity
-import org.json.JSONObject
+apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
-data class AutofillFeature(
-    val state: String?,
-    val minSupportedVersion: Int?,
-    val exceptions: List<AutofillExceptionEntity>,
-    val settings: Settings?,
-)
+dependencies {
+    implementation project(path: ':autofill-api')
 
-data class Settings(val features: Map<String, JSONObject>?)
+    implementation KotlinX.coroutines.core
+    implementation AndroidX.appCompat
+}
+
+
+android {
+  namespace 'com.duckduckgo.autofill.api.test'
+}

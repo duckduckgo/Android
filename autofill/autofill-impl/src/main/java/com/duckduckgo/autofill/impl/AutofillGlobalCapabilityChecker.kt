@@ -17,12 +17,11 @@
 package com.duckduckgo.autofill.impl
 
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.InternalTestUserChecker
-import com.duckduckgo.autofill.api.feature.AutofillFeatureName.Autofill
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
@@ -35,7 +34,7 @@ interface AutofillGlobalCapabilityChecker {
 
 @ContributesBinding(AppScope::class)
 class AutofillGlobalCapabilityCheckerImpl @Inject constructor(
-    private val featureToggle: FeatureToggle,
+    private val autofillFeature: AutofillFeature,
     private val internalTestUserChecker: InternalTestUserChecker,
     private val autofillStore: AutofillStore,
     private val deviceAuthenticator: DeviceAuthenticator,
@@ -65,5 +64,5 @@ class AutofillGlobalCapabilityCheckerImpl @Inject constructor(
 
     private fun isAnException(url: String): Boolean = autofill.isAnException(url)
     private fun isInternalTester() = internalTestUserChecker.isInternalTestUser
-    private fun isGlobalFeatureEnabled() = featureToggle.isFeatureEnabled(Autofill.value, defaultValue = false)
+    private fun isGlobalFeatureEnabled() = autofillFeature.self().isEnabled()
 }

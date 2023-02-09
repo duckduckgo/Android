@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.api.feature
+package com.duckduckgo.autofill.impl.feature.plugin
 
-enum class AutofillFeatureName(val value: String) {
-    Autofill("autofill"),
-}
+import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.autofill.api.AutofillFeature
+import com.duckduckgo.di.scopes.AppScope
 
-enum class AutofillSubfeatureName(override val value: String) : AutofillSubfeature {
-    InjectCredentials("injectCredentials"),
-    SaveCredentials("saveCredentials"),
-    AccessCredentialManagement("accessCredentialManagement"),
-}
-
-interface AutofillSubfeature {
-    val value: String
-}
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    boundType = AutofillFeature::class,
+    featureName = "autofill",
+    exceptionsStore = AutofillFeatureExceptionStore::class,
+)
+@Suppress("unused")
+private interface UnusedAutofillRemoteFeatureCodegenTrigger
