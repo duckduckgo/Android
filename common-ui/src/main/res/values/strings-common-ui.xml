@@ -14,6 +14,8 @@
   ~ limitations under the License.
   -->
 
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- Notify Me View -->
     <string name="notifyme_button_label">Notify me</string>
