@@ -138,6 +138,9 @@
     <string name="settingsAppLinksAskEveryTime">Küsi iga kord</string>
     <string name="settingsAppLinksAlways">Alati</string>
     <string name="settingsAppLinksNever">Mitte kunagi</string>
+    <string name="settingsTitleNotifications">Teavitused</string>
+    <string name="settingsSubtitleNotificationsDisabled">Keelatud</string>
+    <string name="settingsSubtitleNotificationsEnabled">Lubatud</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Salvesta</string>
@@ -674,4 +677,9 @@
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Automaatne täitmine</string>
+
+    <!-- Notify Me View on Downloads -->
+    <string name="downloadsNotifyMeTitle">Teata, kui allalaadimised valmis saavad</string>
+    <string name="downloadsNotifyMeSubtitle">Kui allalaadimine on lõpule jõudnud, saad teavituse.</string>
+
 </resources>
