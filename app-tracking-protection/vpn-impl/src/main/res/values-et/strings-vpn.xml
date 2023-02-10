@@ -406,4 +406,8 @@
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Kui rakenduse jälgimiskaitse on lubatud, võib mõnes rakenduses tekkida probleeme.\n<annotation type="learn_why_link">Loe, miks</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Teadaolevate probleemidega rakenduste kaitse on keelatud. Võid need rakendused lubada, kuid need ei pruugi töötada ootuspäraselt. <annotation type="learn_why_link">Loe, miks</annotation></string>
 
+    <!-- Notify Me View on AppTP -->
+    <string name="appTrackingProtectionNotifyMeTitle">Hoia blokeeritud jälguritel silm peal</string>
+    <string name="appTrackingProtectionNotifyMeSubtitle">Saad uuendusi blokeeritud jälgimiskatsete kohta oma teavituste sahtlis.</string>
+
 </resources>
