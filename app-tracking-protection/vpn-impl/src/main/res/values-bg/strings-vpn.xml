@@ -406,4 +406,8 @@
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">При някои приложения може да възникнат проблеми, когато защитата App Tracking Protection е активирана.\n<annotation type="learn_why_link">Научете защо</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Защитата е деактивирана за приложения с вече известни проблеми. Можете да активирате защитата за тези приложения, но те може да не работят според очакванията. <annotation type="learn_why_link">Научете защо</annotation></string>
 
+    <!-- Notify Me View on AppTP -->
+    <string name="appTrackingProtectionNotifyMeTitle">Следете блокираните тракери</string>
+    <string name="appTrackingProtectionNotifyMeSubtitle">Получавайте актуализации за блокирани опити за проследяване в чекмеджето за известия.</string>
+
 </resources>

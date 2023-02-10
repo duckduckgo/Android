@@ -426,4 +426,8 @@
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Kai kuriose programėlėse gali kilti problemų, kai įjungta programėlės sekimo apsauga.\n<annotation type="learn_why_link">Sužinokite, kodėl</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Programėlių, kuriose yra žinomų problemų, apsauga išjungta. Galite įjungti šias programėles, tačiau jos gali neveikti taip, kaip tikėtasi. <annotation type="learn_why_link">Sužinokite, kodėl</annotation></string>
 
+    <!-- Notify Me View on AppTP -->
+    <string name="appTrackingProtectionNotifyMeTitle">Stebėkite užblokuotas stebėjimo priemones</string>
+    <string name="appTrackingProtectionNotifyMeSubtitle">Gaukite naujienas apie užblokuotus stebėjimo bandymus pranešimų skiltyje.</string>
+
 </resources>
