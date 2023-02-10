@@ -138,6 +138,9 @@
     <string name="settingsAppLinksAskEveryTime">Klausti kiekvieną kartą</string>
     <string name="settingsAppLinksAlways">Visada</string>
     <string name="settingsAppLinksNever">Niekada</string>
+    <string name="settingsTitleNotifications">Pranešimai</string>
+    <string name="settingsSubtitleNotificationsDisabled">Išjungta</string>
+    <string name="settingsSubtitleNotificationsEnabled">Įjungta</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Išsaugoti</string>
@@ -682,4 +685,9 @@
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Automatinis pildymas</string>
+
+    <!-- Notify Me View on Downloads -->
+    <string name="downloadsNotifyMeTitle">Sužinokite, kada atsisiuntimai bus paruošti</string>
+    <string name="downloadsNotifyMeSubtitle">Gaukite pranešimą, kai atsisiuntimas bus baigtas.</string>
+
 </resources>
