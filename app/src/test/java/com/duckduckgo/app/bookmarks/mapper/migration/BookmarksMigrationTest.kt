@@ -20,6 +20,9 @@ import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.bookmarks.db.BookmarkEntity
+import com.duckduckgo.app.bookmarks.db.BookmarkFoldersDao
+import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.db.FavoriteEntity
 import com.duckduckgo.app.bookmarks.db.FavoritesDao
 import com.duckduckgo.app.bookmarks.migration.AppDatabaseBookmarksMigrationCallback
@@ -32,6 +35,7 @@ import com.duckduckgo.sync.store.Relation
 import com.duckduckgo.sync.store.SyncEntitiesDao
 import com.duckduckgo.sync.store.SyncRelationsDao
 import dagger.Lazy
+import junit.framework.Assert.assertFalse
 import junit.framework.Assert.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Before
@@ -58,6 +62,9 @@ class BookmarksMigrationTest {
     private lateinit var favoritesDao: FavoritesDao
     private lateinit var favoritesRepository: FavoritesRepository
 
+    private lateinit var bookmarksDao: BookmarksDao
+    private lateinit var bookmarkFoldersDao: BookmarkFoldersDao
+
     @Before
     fun setup() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext
@@ -69,18 +76,18 @@ class BookmarksMigrationTest {
         favoritesDao = appDatabase.favoritesDao()
         favoritesRepository = FavoritesDataRepository(favoritesDao, lazyFaviconManager)
 
+        bookmarksDao = appDatabase.bookmarksDao()
+        bookmarkFoldersDao = appDatabase.bookmarkFoldersDao()
+
         syncEntitiesDao = appDatabase.syncEntitiesDao()
         syncRelationsDao = appDatabase.syncRelationsDao()
     }
 
     @Test
-    fun whenFavoritesExistThenMigrationIsSuccesful() {
+    fun whenFavoritesExistThenMigrationIsSuccessful() {
         val totalFavorites = 10
         givenSomeFavorites(totalFavorites)
-
-        appDatabase.apply {
-            AppDatabaseBookmarksMigrationCallback({ this }, coroutineRule.testDispatcherProvider).migrateBookmarks()
-        }
+        whenMigrationApplied()
 
         assertTrue(syncEntitiesDao.hasEntities())
         assertTrue(syncRelationsDao.hasRelations())
@@ -96,10 +103,55 @@ class BookmarksMigrationTest {
         assertTrue(relation.id == Relation.FAVORITES_ROOT)
     }
 
-    private fun givenSomeFavorites(amount: Int){
-        for (index in 1..amount) {
+    @Test
+    fun whenBookmarksWithoutFoldersExistThenMigrationIsSuccessful(){
+        val totalBookmarks = 10
+        givenSomeBookmarks(totalBookmarks, Relation.BOOMARKS_ROOT_ID)
+
+        whenMigrationApplied()
+
+        assertTrue(syncEntitiesDao.hasEntities())
+        assertTrue(syncRelationsDao.hasRelations())
+
+        val entities = syncEntitiesDao.entities()
+        assertTrue(entities.size == totalBookmarks)
+
+        val relations = (syncRelationsDao.relations())
+        assertTrue(relations.size == 1)
+
+        val relation = relations.first()
+        assertTrue(relation.children.size == totalBookmarks )
+        assertTrue(relation.id == Relation.BOOMARKS_ROOT)
+    }
+
+    @Test
+    fun whenDataIsMigratedThenOldTablesAreDeleted() {
+        givenSomeFavorites(10)
+        givenSomeBookmarks(5, Relation.BOOMARKS_ROOT_ID)
+        whenMigrationApplied()
+
+        assertFalse(favoritesDao.userHasFavorites())
+        assertFalse(bookmarksDao.bookmarksCount() > 0)
+        assertTrue(bookmarkFoldersDao.getBookmarkFoldersSync().isEmpty())
+    }
+
+    private fun whenMigrationApplied(){
+        appDatabase.apply {
+            AppDatabaseBookmarksMigrationCallback({ this }, coroutineRule.testDispatcherProvider).runMigration()
+        }
+    }
+
+    private fun givenSomeFavorites(total: Int){
+        for (index in 1..total) {
             val favorite = FavoriteEntity(index.toLong(), "Favorite$index", "http://favexample.com", index)
             favoritesDao.insert(favorite)
+        }
+    }
+
+    private fun givenSomeBookmarks(total: Int, bookmarkFolderId: Long){
+        for (index in 1..total) {
+            val bookmark = BookmarkEntity(index.toLong(), "Bookmark$index", "http://bookmark.com", bookmarkFolderId)
+            bookmarksDao.insert(bookmark)
         }
     }
 }

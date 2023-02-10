@@ -61,5 +61,6 @@ data class Relation(
     companion object {
         const val FAVORITES_ROOT = "favorites_root"
         const val BOOMARKS_ROOT = "bookmarks_root"
+        const val BOOMARKS_ROOT_ID = 0L
     }
 }

@@ -35,86 +35,63 @@ import com.duckduckgo.sync.store.Relation
 import dagger.Lazy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.asExecutor
+import kotlinx.coroutines.flow.forEach
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AppDatabaseBookmarksMigrationCallback(
     private val appDatabase: Lazy<AppDatabase>,
     private val dispatcherProvider: DispatcherProvider
-): RoomDatabase.Callback() {
+) : RoomDatabase.Callback() {
 
     override fun onOpen(db: SupportSQLiteDatabase) {
         ioThread {
-            migrateBookmarks()
+            runMigration()
         }
     }
 
-    fun migrateBookmarks(){
+    fun runMigration() {
+        migrateFavorites()
+        migrateBookmarks()
+        cleanUpTables()
+    }
+
+    private fun migrateFavorites() {
         with(appDatabase.get()) {
-            if (favoritesDao().userHasFavorites()){
+            if (favoritesDao().userHasFavorites()) {
                 val favourites = favoritesDao().favoritesSync()
                 val favouriteChildren = mutableListOf<String>()
                 favourites.forEach {
                     syncEntitiesDao().insert(Entity(it.id.toString(), it.title, it.url, BOOKMARK))
                     favouriteChildren.add(it.id.toString())
                 }
-                syncRelationsDao().insert(Relation("favorites_root", favouriteChildren))
+                syncRelationsDao().insert(Relation(Relation.FAVORITES_ROOT, favouriteChildren))
             }
         }
     }
 
-    fun mapEntities(db: SupportSQLiteDatabase): List<Entity> {
-        val entities = mutableListOf<Entity>()
-        val folders = emptyList<BookmarkFolder>()
-        val favourites = emptyList<Favorite>()
-
-        val bookmarks = getBookmarks(db)
-
-        bookmarks.forEach {
-            entities.add(Entity(it.id.toString(), it.title.orEmpty(), it.url, BOOKMARK))
-        }
-        folders.forEach {
-            entities.add(Entity(it.id.toString(), it.name, null, FOLDER))
-        }
-        favourites.forEach {
-            entities.add(Entity(it.id.toString(), it.title, it.url, BOOKMARK))
-        }
-        return entities
-    }
-
-    private fun getBookmarks(db: SupportSQLiteDatabase): List<BookmarkEntity> {
-        val _sql = "select * from bookmarks"
-        val cursor: Cursor = db.query(SimpleSQLiteQuery(_sql))
-        val bookmarks = mutableListOf<BookmarkEntity>()
-
-        kotlin.runCatching {
-            val _cursorIndexOfId = cursor.getColumnIndexOrThrow("id")
-            val _cursorIndexOfTitle = cursor.getColumnIndexOrThrow("title")
-            val _cursorIndexOfUrl = cursor.getColumnIndexOrThrow("url")
-            val _cursorIndexOfParentId = cursor.getColumnIndexOrThrow("parentId")
-
-            while (cursor.moveToNext()) {
-                val id = cursor.getLong(_cursorIndexOfId)
-                val title = if (cursor.isNull(_cursorIndexOfTitle)) {
-                    ""
-                } else {
-                    cursor.getString(_cursorIndexOfTitle)
+    private fun migrateBookmarks() {
+        with(appDatabase.get()) {
+            if (bookmarksDao().bookmarksCount() > 0) {
+                // start from root folder
+                val bookmarksInRoot = bookmarksDao().getBookmarksByParentIdSync(Relation.BOOMARKS_ROOT_ID)
+                val boomarksInRootChildren = mutableListOf<String>()
+                bookmarksInRoot.forEach {
+                    syncEntitiesDao().insert(Entity(it.id.toString(), it.title.orEmpty(), it.url, BOOKMARK))
+                    boomarksInRootChildren.add(it.id.toString())
                 }
-                val url = cursor.getString(_cursorIndexOfUrl)
-                val parentId = cursor.getLong(_cursorIndexOfParentId)
-                bookmarks.add(BookmarkEntity(id, title, url, parentId))
+                syncRelationsDao().insert(Relation(Relation.BOOMARKS_ROOT, boomarksInRootChildren))
+
+                // continue folder by folder
             }
-            cursor.close()
         }
-        return bookmarks
     }
 
-    fun mapRelations(): List<Relation> {
-        val treeNode = getTreeFolderStructure()
-        return emptyList()
-    }
-
-    private fun getTreeFolderStructure(): TreeNode<FolderTreeItem> {
-        return TreeNode(FolderTreeItem(0, RealSavedSitesParser.BOOKMARKS_FOLDER, -1, null, 0))
+    private fun cleanUpTables(){
+        with(appDatabase.get()) {
+            favoritesDao().deleteAll()
+            bookmarksDao().deleteAll()
+            bookmarkFoldersDao().deleteAll()
+        }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
