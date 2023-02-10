@@ -100,13 +100,14 @@ class BookmarksMigrationTest {
         assertTrue(relations.size == 1)
 
         val relation = relations.first()
-        assertTrue(relation.children.size == totalFavorites )
+        assertTrue(relation.children.size == totalFavorites)
         assertTrue(relation.id == Relation.FAVORITES_ROOT)
     }
 
     @Test
-    fun whenBookmarksWithoutFoldersExistThenMigrationIsSuccessful(){
+    fun whenBookmarksWithoutFoldersExistThenMigrationIsSuccessful() {
         val totalBookmarks = 10
+
         givenSomeBookmarks(totalBookmarks, Relation.BOOMARKS_ROOT_ID)
 
         whenMigrationApplied()
@@ -121,12 +122,12 @@ class BookmarksMigrationTest {
         assertTrue(relations.size == 1)
 
         val relation = relations.first()
-        assertTrue(relation.children.size == totalBookmarks )
+        assertTrue(relation.children.size == totalBookmarks)
         assertTrue(relation.id == Relation.BOOMARKS_ROOT)
     }
 
     @Test
-    fun whenBookmarksWithFoldersExistThenMigrationIsSuccessful(){
+    fun whenBookmarksWithFoldersExistThenMigrationIsSuccessful() {
         val totalFolder = 10
         val bookmarksPerFolder = 5
         createFoldersTree(totalFolder, bookmarksPerFolder)
@@ -137,10 +138,10 @@ class BookmarksMigrationTest {
         assertTrue(syncRelationsDao.hasRelations())
 
         val entities = syncEntitiesDao.entities()
-        assertTrue(entities.size == totalFolder * bookmarksPerFolder)
+        assertTrue(entities.size == totalFolder + bookmarksPerFolder)
 
         val relations = (syncRelationsDao.relations())
-        assertTrue(relations.size == totalFolder)
+        assertTrue(relations.size == totalFolder + 1) // total folder + root folder
     }
 
     @Ignore @Test
@@ -154,31 +155,45 @@ class BookmarksMigrationTest {
         assertTrue(bookmarkFoldersDao.getBookmarkFoldersSync().isEmpty())
     }
 
-    private fun whenMigrationApplied(){
+    private fun whenMigrationApplied() {
         appDatabase.apply {
             AppDatabaseBookmarksMigrationCallback({ this }, coroutineRule.testDispatcherProvider).runMigration()
         }
     }
 
-    private fun givenSomeFavorites(total: Int){
+    private fun givenSomeFavorites(total: Int) {
+        val favorites = mutableListOf<FavoriteEntity>()
         for (index in 1..total) {
-            val favorite = FavoriteEntity(index.toLong(), "Favorite$index", "http://favexample.com", index)
-            favoritesDao.insert(favorite)
+            favorites.add(FavoriteEntity(index.toLong(), "Favorite$index", "http://favexample.com", index))
         }
+        favoritesDao.insertList(favorites)
     }
 
-    private fun givenSomeBookmarks(total: Int, bookmarkFolderId: Long){
+    private fun givenSomeBookmarks(
+        total: Int,
+        bookmarkFolderId: Long
+    ) {
+        val bookmarks = mutableListOf<BookmarkEntity>()
         for (index in 1..total) {
-            val bookmark = BookmarkEntity(index.toLong(), "Bookmark$index", "http://bookmark.com", bookmarkFolderId)
-            bookmarksDao.insert(bookmark)
+            bookmarks.add(BookmarkEntity(index.toLong(), "Bookmark$index", "http://bookmark.com", bookmarkFolderId))
         }
+        bookmarksDao.insertList(bookmarks)
     }
 
-    private fun givenAFolder(index: Int){
-        val folderEntity = BookmarkFolderEntity(index.toLong(), "folder$index", (index - 1).toLong())
+    private fun givenAFolder(index: Int) {
+        val folderEntity = if (index == Relation.BOOMARKS_ROOT_ID.toInt()){
+            BookmarkFolderEntity(Relation.BOOMARKS_ROOT_ID, "folder$index", Relation.BOOMARKS_ROOT_ID)
+        } else {
+            BookmarkFolderEntity(index.toLong(), "folder$index", (index - 1).toLong())
+        }
+
         bookmarkFoldersDao.insert(folderEntity)
     }
-    private fun createFoldersTree(totalFolders: Int, bookmarksPerFolder: Int){
+
+    private fun createFoldersTree(
+        totalFolders: Int,
+        bookmarksPerFolder: Int
+    ) {
         for (index in 1..totalFolders) {
             givenAFolder(index)
             givenSomeBookmarks(bookmarksPerFolder, index.toLong())

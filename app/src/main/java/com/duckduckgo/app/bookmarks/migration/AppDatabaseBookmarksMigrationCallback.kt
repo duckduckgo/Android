@@ -81,8 +81,13 @@ class AppDatabaseBookmarksMigrationCallback(
             val foldersInFolder = bookmarkFoldersDao().getBookmarkFoldersByParentIdSync(folderId)
             val bookmarksInFolder = bookmarksDao().getBookmarksByParentIdSync(folderId)
             val children = mutableListOf<String>()
+
             foldersInFolder.forEach {
-                entities.add(Entity("folder${it.id}", it.name, "", FOLDER))
+                if (folderId == Relation.BOOMARKS_ROOT_ID) {
+                    entities.add(Entity(Relation.BOOMARKS_ROOT, it.name, "", FOLDER))
+                } else {
+                    entities.add(Entity("folder${it.id}", it.name, "", FOLDER))
+                }
                 children.add("folder${it.id}")
             }
             bookmarksInFolder.forEach {
@@ -91,7 +96,11 @@ class AppDatabaseBookmarksMigrationCallback(
             }
 
             syncEntitiesDao().insertList(entities)
-            syncRelationsDao().insert(Relation("folder${folderId}", children))
+            if (folderId == Relation.BOOMARKS_ROOT_ID) {
+                syncRelationsDao().insert(Relation(Relation.BOOMARKS_ROOT, children))
+            } else {
+                syncRelationsDao().insert(Relation("folder${folderId}", children))
+            }
         }
     }
 
