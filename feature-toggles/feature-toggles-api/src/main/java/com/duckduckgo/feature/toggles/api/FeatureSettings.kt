@@ -18,12 +18,11 @@ package com.duckduckgo.feature.toggles.api
 object FeatureSettings {
     interface Store {
         fun store(
-            featureName: String,
             jsonString: String,
         )
     }
 
     val EMPTY_STORE = object : Store {
-        override fun store(featureName: String, jsonString: String) {}
+        override fun store(jsonString: String) {}
     }
 }

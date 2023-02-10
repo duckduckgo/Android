@@ -95,21 +95,25 @@ class FeatureTogglesTest {
         feature.suspendFun()
     }
 
-    @Test(expected = NullPointerException::class)
-    fun wheInvalidFeatureClassThenThrow() {
+    @Test(expected = IllegalArgumentException::class)
+    fun whenValidFeatureAndMissingFeatureNameBuilderParameterThenThrow() {
         FeatureToggles.Builder()
             .store(FakeToggleStore())
             .appVersionProvider { versionProvider.version }
             .build()
-            .create(InvalidTestFeature::class.java)
+            .create(TestFeature::class.java)
             .self()
     }
-}
 
-// It's invalid because it's not annotated with FeatureName to indicate global feature
-interface InvalidTestFeature {
-    @Toggle.DefaultValue(true)
-    fun self(): Toggle
+    @Test(expected = IllegalArgumentException::class)
+    fun whenValidFeatureAndMissingStoreBuilderParameterThenThrow() {
+        FeatureToggles.Builder()
+            .featureName("test")
+            .appVersionProvider { versionProvider.version }
+            .build()
+            .create(TestFeature::class.java)
+            .self()
+    }
 }
 
 interface TestFeature {
@@ -122,6 +126,8 @@ interface TestFeature {
     @Toggle.DefaultValue(true)
     fun enabledByDefault(): Toggle
     fun noDefaultValue(): Toggle
+
+    @Toggle.DefaultValue(true)
     fun wrongReturnValue(): Boolean
 
     @Toggle.DefaultValue(true)

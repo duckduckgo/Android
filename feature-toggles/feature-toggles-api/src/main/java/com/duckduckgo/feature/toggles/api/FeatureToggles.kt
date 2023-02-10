@@ -38,7 +38,19 @@ class FeatureToggles private constructor(
         fun store(store: Toggle.Store) = apply { this.store = store }
         fun appVersionProvider(appVersionProvider: () -> Int) = apply { this.appVersionProvider = appVersionProvider }
         fun featureName(featureName: String) = apply { this.featureName = featureName }
-        fun build() = FeatureToggles(this.store!!, appVersionProvider, featureName!!)
+        fun build(): FeatureToggles {
+            val missing = StringBuilder()
+            if (this.store == null) {
+                missing.append("store")
+            }
+            if (this.featureName == null) {
+                missing.append(", featureName ")
+            }
+            if (missing.isNotBlank()) {
+                throw IllegalArgumentException("This following parameters can't be null: $missing")
+            }
+            return FeatureToggles(this.store!!, appVersionProvider, featureName!!)
+        }
     }
 
     fun <T> create(toggles: Class<T>): T {

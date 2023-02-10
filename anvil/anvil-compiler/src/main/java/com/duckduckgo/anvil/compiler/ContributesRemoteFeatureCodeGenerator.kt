@@ -351,7 +351,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
     }
 
     private fun createSharedPreferencesProperty(generatedPackage: String, featureName: String, module: ModuleDescriptor): PropertySpec {
-        val filename = "$generatedPackage.$featureName.remote.feature"
+        val filename = "com.duckduckgo.feature.toggle.$featureName"
         return PropertySpec.builder("preferences", sharedPreferences.asClassName(module))
             .addModifiers(KModifier.PRIVATE)
             .getter(
@@ -395,7 +395,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
         
                     // handle settings
                     feature.settings?.let {
-                        settingsStore.store(featureName, it.toString())
+                        settingsStore.store(it.toString())
                     }
         
                     return true
@@ -432,7 +432,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                     CodeBlock.of(
                         """
                             val jsonAdapter = moshi.adapter(%T::class.java)
-                            return jsonAdapter.fromJson(preferences.getString(key, null))
+                            return kotlin.runCatching { jsonAdapter.fromJson(preferences.getString(key, null)) }.getOrNull()
                         """.trimIndent(),
                         Toggle.State::class.asClassName(),
                     ),
