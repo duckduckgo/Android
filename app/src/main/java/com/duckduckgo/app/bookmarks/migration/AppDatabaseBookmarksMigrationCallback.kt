@@ -52,8 +52,14 @@ class AppDatabaseBookmarksMigrationCallback(
                 val favourites = favoritesDao().favoritesSync()
                 val favouriteChildren = mutableListOf<String>()
                 favourites.forEach {
-                    syncEntitiesDao().insert(Entity("favorite${it.id}", it.title, it.url, BOOKMARK))
-                    favouriteChildren.add(it.id.toString())
+                    // try to purge duplicates by only adding favourites with the same url of a bookmark already added
+                    val existingBookmark = syncEntitiesDao().entityByUrl(it.url)
+                    if (existingBookmark != null) {
+                        favouriteChildren.add(existingBookmark.id)
+                    } else {
+                        syncEntitiesDao().insert(Entity("favorite${it.id}", it.title, it.url, BOOKMARK))
+                        favouriteChildren.add("favorite${it.id}")
+                    }
                 }
                 syncRelationsDao().insert(Relation(Relation.FAVORITES_ROOT, favouriteChildren))
             }

@@ -33,6 +33,9 @@ interface SyncEntitiesDao {
     @Query("select * from entities")
     fun entities(): List<Entity>
 
+    @Query("select * from entities where url = :url limit 1")
+    fun entityByUrl(url: String): Entity?
+
     @Query("select CAST(COUNT(*) AS BIT) from entities")
     fun hasEntities(): Boolean
 

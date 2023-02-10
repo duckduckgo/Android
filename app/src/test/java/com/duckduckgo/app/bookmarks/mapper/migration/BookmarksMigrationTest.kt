@@ -132,6 +132,27 @@ class BookmarksMigrationTest {
         val bookmarksPerFolder = 5
         createFoldersTree(totalFolder, bookmarksPerFolder)
 
+        val totalFavorites = 15
+        givenSomeFavorites(totalFavorites)
+
+        whenMigrationApplied()
+
+        assertTrue(syncEntitiesDao.hasEntities())
+        assertTrue(syncRelationsDao.hasRelations())
+
+        val entities = syncEntitiesDao.entities()
+        assertTrue(entities.size == totalFolder + bookmarksPerFolder + totalFavorites)
+
+        val relations = (syncRelationsDao.relations())
+        assertTrue(relations.size == totalFolder + 2) // total folder + root folder + favorites root
+    }
+
+    @Test
+    fun whenBookmarksWithFoldersAndFavoritesExistThenMigrationIsSuccessful() {
+        val totalFolder = 10
+        val bookmarksPerFolder = 5
+        createFoldersTree(totalFolder, bookmarksPerFolder)
+
         whenMigrationApplied()
 
         assertTrue(syncEntitiesDao.hasEntities())
@@ -143,6 +164,54 @@ class BookmarksMigrationTest {
         val relations = (syncRelationsDao.relations())
         assertTrue(relations.size == totalFolder + 1) // total folder + root folder
     }
+
+    @Test
+    fun whenBookmarkAndFavoriteHaveSameUrlThenBookmarkAlsoMigratedAsFavorite(){
+        bookmarksDao.insert(BookmarkEntity(1, "Bookmark1", "http://test.com", 0))
+        favoritesDao.insert(FavoriteEntity(2,"Favorite1", "http://test.com", 0))
+
+        whenMigrationApplied()
+
+        // only one entity migrated
+        assertTrue(syncEntitiesDao.entities().size == 1)
+
+        // two relations migrated, one for bookmarks and another for favorites
+        assertTrue(syncRelationsDao.relations().size == 2)
+
+        val bookmarkRelation = syncRelationsDao.relations()[0]
+        val favoriteRelation = syncRelationsDao.relations()[1]
+
+        assertTrue(bookmarkRelation.id == Relation.BOOMARKS_ROOT)
+        assertTrue(bookmarkRelation.children.size == 1)
+        assertTrue(bookmarkRelation.children[0] == "bookmark1")
+
+        assertTrue(favoriteRelation.id == Relation.FAVORITES_ROOT)
+        assertTrue(favoriteRelation.children.size == 1)
+        assertTrue(favoriteRelation.children[0] == "bookmark1")
+    }
+
+    @Test
+    fun whenBookmarkAndFavoriteHaveDifferentUrlThenBothAreMigrated(){
+        bookmarksDao.insert(BookmarkEntity(1, "Bookmark1", "http://test.com", 0))
+        favoritesDao.insert(FavoriteEntity(2,"Favorite1", "http://testee.com", 0))
+
+        whenMigrationApplied()
+
+        assertTrue(syncEntitiesDao.entities().size == 2)
+        assertTrue(syncRelationsDao.relations().size == 2)
+
+        val bookmarkRelation = syncRelationsDao.relations()[0]
+        val favoriteRelation = syncRelationsDao.relations()[1]
+
+        assertTrue(bookmarkRelation.id == Relation.BOOMARKS_ROOT)
+        assertTrue(bookmarkRelation.children.size == 1)
+        assertTrue(bookmarkRelation.children[0] == "bookmark1")
+
+        assertTrue(favoriteRelation.id == Relation.FAVORITES_ROOT)
+        assertTrue(favoriteRelation.children.size == 1)
+        assertTrue(favoriteRelation.children[0] == "favorite2")
+    }
+
 
     @Ignore @Test
     fun whenDataIsMigratedThenOldTablesAreDeleted() {
@@ -164,7 +233,7 @@ class BookmarksMigrationTest {
     private fun givenSomeFavorites(total: Int) {
         val favorites = mutableListOf<FavoriteEntity>()
         for (index in 1..total) {
-            favorites.add(FavoriteEntity(index.toLong(), "Favorite$index", "http://favexample.com", index))
+            favorites.add(FavoriteEntity(index.toLong(), "Favorite$index", "http://favexample$index.com", index))
         }
         favoritesDao.insertList(favorites)
     }
@@ -175,7 +244,7 @@ class BookmarksMigrationTest {
     ) {
         val bookmarks = mutableListOf<BookmarkEntity>()
         for (index in 1..total) {
-            bookmarks.add(BookmarkEntity(index.toLong(), "Bookmark$index", "http://bookmark.com", bookmarkFolderId))
+            bookmarks.add(BookmarkEntity(index.toLong(), "Bookmark$index", "http://bookmark$index.com", bookmarkFolderId))
         }
         bookmarksDao.insertList(bookmarks)
     }
