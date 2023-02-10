@@ -57,4 +57,9 @@ class EntityTypeConverter {
 data class Relation(
     @PrimaryKey var id: String,
     var children: List<String>,
-)
+) {
+    companion object {
+        const val FAVORITES_ROOT = "favorites_root"
+        const val BOOMARKS_ROOT = "bookmarks_root"
+    }
+}

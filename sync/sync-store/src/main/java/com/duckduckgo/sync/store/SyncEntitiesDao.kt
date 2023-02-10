@@ -27,6 +27,9 @@ interface SyncEntitiesDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(entity: Entity)
 
+    @Query("select * from entities")
+    fun entities(): List<Entity>
+
     @Query("select CAST(COUNT(*) AS BIT) from entities")
     fun hasEntities(): Boolean
 

@@ -27,6 +27,9 @@ interface SyncRelationsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(relation: Relation): Long
 
+    @Query("select * from relations")
+    fun relations(): List<Relation>
+
     @Query("select CAST(COUNT(*) AS BIT) from relations")
     fun hasRelations(): Boolean
 }

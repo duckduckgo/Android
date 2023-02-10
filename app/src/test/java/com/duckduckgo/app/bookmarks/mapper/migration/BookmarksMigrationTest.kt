@@ -20,12 +20,15 @@ import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.bookmarks.db.FavoriteEntity
 import com.duckduckgo.app.bookmarks.db.FavoritesDao
 import com.duckduckgo.app.bookmarks.migration.AppDatabaseBookmarksMigrationCallback
 import com.duckduckgo.app.bookmarks.model.FavoritesDataRepository
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
+import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.sync.store.Relation
 import com.duckduckgo.sync.store.SyncEntitiesDao
 import com.duckduckgo.sync.store.SyncRelationsDao
 import dagger.Lazy
@@ -71,8 +74,9 @@ class BookmarksMigrationTest {
     }
 
     @Test
-    fun whenFavouritesExistThenMigrateBookmarksAndRelations() {
-        favoritesRepository.insert("title", "http://example.com")
+    fun whenFavoritesExistThenMigrationIsSuccesful() {
+        val totalFavorites = 10
+        givenSomeFavorites(totalFavorites)
 
         appDatabase.apply {
             AppDatabaseBookmarksMigrationCallback({ this }, coroutineRule.testDispatcherProvider).migrateBookmarks()
@@ -80,5 +84,22 @@ class BookmarksMigrationTest {
 
         assertTrue(syncEntitiesDao.hasEntities())
         assertTrue(syncRelationsDao.hasRelations())
+
+        val entities = syncEntitiesDao.entities()
+        assertTrue(entities.size == totalFavorites)
+
+        val relations = (syncRelationsDao.relations())
+        assertTrue(relations.size == 1)
+
+        val relation = relations.first()
+        assertTrue(relation.children.size == totalFavorites )
+        assertTrue(relation.id == Relation.FAVORITES_ROOT)
+    }
+
+    private fun givenSomeFavorites(amount: Int){
+        for (index in 1..amount) {
+            val favorite = FavoriteEntity(index.toLong(), "Favorite$index", "http://favexample.com", index)
+            favoritesDao.insert(favorite)
+        }
     }
 }
