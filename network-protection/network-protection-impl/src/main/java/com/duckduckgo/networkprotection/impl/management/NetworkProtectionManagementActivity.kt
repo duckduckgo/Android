@@ -112,12 +112,12 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         }
     }
     private fun ActivityNetpManagementBinding.renderAlertReconnecting() {
-        netPAlert.setText(resources.getString(R.string.netpMessageReconnecting))
+        netPAlert.setText(resources.getString(R.string.netpBannerReconnecting))
         netPAlert.show()
     }
 
     private fun ActivityNetpManagementBinding.renderAlertReconnectingFailed() {
-        netPAlert.setText(resources.getString(R.string.netpMessageReconnectionFailed))
+        netPAlert.setText(resources.getString(R.string.netpBannerReconnectionFailed))
         netPAlert.show()
     }
 
