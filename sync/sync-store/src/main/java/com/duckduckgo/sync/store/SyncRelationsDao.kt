@@ -17,9 +17,12 @@
 package com.duckduckgo.sync.store
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SyncRelationsDao {
@@ -27,9 +30,30 @@ interface SyncRelationsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(relation: Relation): Long
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertList(relations: List<Relation>)
+
     @Query("select * from relations")
     fun relations(): List<Relation>
 
+    @Query("select * from entities inner join relations on entities.entityId = relations.entityId where relations.relationId = :folderId")
+    fun relationById(folderId: String): Flow<List<Entity>>
+
+    @Query("select * from relations where relationId = :id")
+    fun relationByIdSync(id: String): List<Relation>
+
     @Query("select CAST(COUNT(*) AS BIT) from relations")
     fun hasRelations(): Boolean
+
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    fun update(relation: Relation)
+
+    @Delete
+    fun delete(relation: Relation)
+
+    @Query("delete from relations where relationId = :id")
+    fun delete(id: String)
+
+    @Query("delete from relations where entityId = :entityId")
+    fun deleteEntity(entityId: String)
 }

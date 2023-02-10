@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 45,
-    "identityHash": "1ee661059aacfb49975bc1c8d3f6e225",
+    "identityHash": "9a00f9420acdfd601c73d0ed94c3035c",
     "entities": [
       {
         "tableName": "tds_tracker",
@@ -997,11 +997,11 @@
       },
       {
         "tableName": "entities",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `title` TEXT NOT NULL, `url` TEXT, `type` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`entityId` TEXT NOT NULL, `title` TEXT NOT NULL, `url` TEXT, `type` TEXT NOT NULL, PRIMARY KEY(`entityId`))",
         "fields": [
           {
-            "fieldPath": "id",
-            "columnName": "id",
+            "fieldPath": "entityId",
+            "columnName": "entityId",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -1026,7 +1026,7 @@
         ],
         "primaryKey": {
           "columnNames": [
-            "id"
+            "entityId"
           ],
           "autoGenerate": false
         },
@@ -1035,24 +1035,43 @@
       },
       {
         "tableName": "relations",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `children` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`relationId` TEXT NOT NULL, `entityId` TEXT NOT NULL, `title` TEXT NOT NULL, `url` TEXT, `type` TEXT NOT NULL, PRIMARY KEY(`relationId`, `entityId`))",
         "fields": [
           {
-            "fieldPath": "id",
-            "columnName": "id",
+            "fieldPath": "relationId",
+            "columnName": "relationId",
             "affinity": "TEXT",
             "notNull": true
           },
           {
-            "fieldPath": "children",
-            "columnName": "children",
+            "fieldPath": "entity.entityId",
+            "columnName": "entityId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "entity.title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "entity.url",
+            "columnName": "url",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "entity.type",
+            "columnName": "type",
             "affinity": "TEXT",
             "notNull": true
           }
         ],
         "primaryKey": {
           "columnNames": [
-            "id"
+            "relationId",
+            "entityId"
           ],
           "autoGenerate": false
         },
@@ -1063,7 +1082,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1ee661059aacfb49975bc1c8d3f6e225')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9a00f9420acdfd601c73d0ed94c3035c')"
     ]
   }
 }

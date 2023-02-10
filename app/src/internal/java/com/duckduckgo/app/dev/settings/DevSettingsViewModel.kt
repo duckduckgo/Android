@@ -52,6 +52,7 @@ class DevSettingsViewModel @Inject constructor(
         val startupTraceEnabled: Boolean = false,
         val overrideUA: Boolean = false,
         val userAgent: String = "",
+        val syncBookmarksEnabled: Boolean = false,
     )
 
     sealed class Command {
@@ -72,6 +73,7 @@ class DevSettingsViewModel @Inject constructor(
                     startupTraceEnabled = startupTraces.isTraceEnabled,
                     overrideUA = devSettingsDataStore.overrideUA,
                     userAgent = userAgentProvider.userAgent("", false),
+                    syncBookmarksEnabled = devSettingsDataStore.syncBookmarksEnabled,
                 ),
             )
         }
@@ -106,6 +108,13 @@ class DevSettingsViewModel @Inject constructor(
         devSettingsDataStore.overrideUA = enabled
         viewModelScope.launch {
             viewState.emit(currentViewState().copy(overrideUA = enabled))
+        }
+    }
+
+    fun onSyncBookmarksEnabled(enabled: Boolean) {
+        devSettingsDataStore.syncBookmarksEnabled = enabled
+        viewModelScope.launch {
+            viewState.emit(currentViewState().copy(syncBookmarksEnabled = enabled))
         }
     }
 

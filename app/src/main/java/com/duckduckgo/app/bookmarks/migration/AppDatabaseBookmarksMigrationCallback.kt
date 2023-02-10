@@ -48,21 +48,29 @@ class AppDatabaseBookmarksMigrationCallback(
 
     private fun migrateFavorites() {
         with(appDatabase.get()) {
+            val favouriteMigration = mutableListOf<Relation>()
+            val entitiesMigration = mutableListOf<Entity>()
+
+            // add favorites root folder
+            entitiesMigration.add(Entity(Relation.FAVORITES_ROOT, "Favorites", "", FOLDER))
+
             if (favoritesDao().userHasFavorites()) {
                 val favourites = favoritesDao().favoritesSync()
-                val favouriteChildren = mutableListOf<String>()
                 favourites.forEach {
                     // try to purge duplicates by only adding favourites with the same url of a bookmark already added
                     val existingBookmark = syncEntitiesDao().entityByUrl(it.url)
                     if (existingBookmark != null) {
-                        favouriteChildren.add(existingBookmark.id)
+                        favouriteMigration.add(Relation(Relation.FAVORITES_ROOT, existingBookmark))
                     } else {
-                        syncEntitiesDao().insert(Entity("favorite${it.id}", it.title, it.url, BOOKMARK))
-                        favouriteChildren.add("favorite${it.id}")
+                        val entity = Entity(Entity.generateFavoriteId(it.id), it.title, it.url, BOOKMARK)
+                        entitiesMigration.add(entity)
+                        favouriteMigration.add(Relation(Relation.FAVORITES_ROOT, entity))
                     }
                 }
-                syncRelationsDao().insert(Relation(Relation.FAVORITES_ROOT, favouriteChildren))
             }
+
+            syncEntitiesDao().insertList(entitiesMigration)
+            syncRelationsDao().insertList(favouriteMigration)
         }
     }
 
@@ -78,39 +86,44 @@ class AppDatabaseBookmarksMigrationCallback(
                     findFolderRelation(it.id)
                 }
             }
+            syncEntitiesDao().insert(Entity(Relation.BOOMARKS_ROOT, "Bookmarks", "", FOLDER))
         }
     }
 
     private fun findFolderRelation(folderId: Long) {
         with(appDatabase.get()) {
             val entities = mutableListOf<Entity>()
+            val relations = mutableListOf<Relation>()
             val foldersInFolder = bookmarkFoldersDao().getBookmarkFoldersByParentIdSync(folderId)
             val bookmarksInFolder = bookmarksDao().getBookmarksByParentIdSync(folderId)
-            val children = mutableListOf<String>()
 
             foldersInFolder.forEach {
-                if (folderId == Relation.BOOMARKS_ROOT_ID) {
-                    entities.add(Entity(Relation.BOOMARKS_ROOT, it.name, "", FOLDER))
+                val entity = Entity(Entity.generateFolderId(it.id), it.name, "", FOLDER)
+                entities.add(entity)
+
+                if (folderId == 0L) {
+                    relations.add(Relation(Relation.BOOMARKS_ROOT, entity))
                 } else {
-                    entities.add(Entity("folder${it.id}", it.name, "", FOLDER))
+                    relations.add(Relation(Entity.generateFolderId(folderId), entity))
                 }
-                children.add("folder${it.id}")
             }
             bookmarksInFolder.forEach {
-                entities.add(Entity("bookmark${it.id}", it.title.orEmpty(), it.url, BOOKMARK))
-                children.add("bookmark${it.id}")
+                val entity = Entity(Entity.generateBookmarkId(it.id), it.title.orEmpty(), it.url, BOOKMARK)
+                entities.add(entity)
+
+                if (folderId == 0L) {
+                    relations.add(Relation(Relation.BOOMARKS_ROOT, entity))
+                } else {
+                    relations.add(Relation(Entity.generateFolderId(folderId), entity))
+                }
             }
 
             if (entities.isNotEmpty()) {
                 syncEntitiesDao().insertList(entities)
             }
 
-            if (children.isNotEmpty()) {
-                if (folderId == Relation.BOOMARKS_ROOT_ID) {
-                    syncRelationsDao().insert(Relation(Relation.BOOMARKS_ROOT, children))
-                } else {
-                    syncRelationsDao().insert(Relation("folder$folderId", children))
-                }
+            if (relations.isNotEmpty()) {
+                syncRelationsDao().insertList(relations)
             }
         }
     }

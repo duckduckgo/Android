@@ -21,9 +21,13 @@ import com.duckduckgo.app.bookmarks.db.BookmarkFoldersDao
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.db.FavoritesDao
 import com.duckduckgo.app.bookmarks.model.BookmarksDataRepository
+import com.duckduckgo.app.bookmarks.model.BookmarksFacade
 import com.duckduckgo.app.bookmarks.model.BookmarksRepository
 import com.duckduckgo.app.bookmarks.model.FavoritesDataRepository
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
+import com.duckduckgo.app.bookmarks.model.RealBookmarksFacade
+import com.duckduckgo.app.bookmarks.model.RealSavedSitesRepository
+import com.duckduckgo.app.bookmarks.model.SavedSitesRepository
 import com.duckduckgo.app.bookmarks.service.RealSavedSitesExporter
 import com.duckduckgo.app.bookmarks.service.RealSavedSitesImporter
 import com.duckduckgo.app.bookmarks.service.RealSavedSitesManager
@@ -33,10 +37,14 @@ import com.duckduckgo.app.bookmarks.service.SavedSitesImporter
 import com.duckduckgo.app.bookmarks.service.SavedSitesManager
 import com.duckduckgo.app.bookmarks.service.SavedSitesParser
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.dev.settings.db.DevSettingsDataStore
+import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.store.SyncEntitiesDao
+import com.duckduckgo.sync.store.SyncRelationsDao
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Lazy
 import dagger.Module
@@ -104,5 +112,26 @@ class BookmarksModule {
         appDatabase: AppDatabase,
     ): BookmarksRepository {
         return BookmarksDataRepository(bookmarkFoldersDao, bookmarksDao, appDatabase)
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providesSavedSitesRepository(
+        syncEntitiesDao: SyncEntitiesDao,
+        syncRelationsDao: SyncRelationsDao,
+        coroutineDispatcher: DispatcherProvider = DefaultDispatcherProvider(),
+    ): SavedSitesRepository {
+        return RealSavedSitesRepository(syncEntitiesDao, syncRelationsDao, coroutineDispatcher)
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providesBookmarksFacade(
+        devSettingsDataStore: DevSettingsDataStore,
+        bookmarksRepository: BookmarksRepository,
+        favoritesRepository: FavoritesRepository,
+        savedSitesRepository: SavedSitesRepository,
+    ): BookmarksFacade {
+        return RealBookmarksFacade(devSettingsDataStore, bookmarksRepository, favoritesRepository, savedSitesRepository)
     }
 }

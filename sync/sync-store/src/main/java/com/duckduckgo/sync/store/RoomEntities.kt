@@ -16,17 +16,32 @@
 
 package com.duckduckgo.sync.store
 
+import androidx.room.Embedded
 import androidx.room.Entity
-import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
+import java.util.UUID
 
-@Entity(tableName = "entities")
+@Entity(tableName = "entities", primaryKeys = ["entityId"])
 data class Entity(
-    @PrimaryKey var id: String,
+    var entityId: String = UUID.randomUUID().toString(),
     var title: String,
     var url: String?,
     var type: EntityType,
-)
+) {
+    companion object {
+        fun generateFolderId(index: Long): String {
+            return "folder$index"
+        }
+
+        fun generateFavoriteId(index: Long): String {
+            return "favorite$index"
+        }
+
+        fun generateBookmarkId(index: Long): String {
+            return "bookmark$index"
+        }
+    }
+}
 
 enum class EntityType {
     BOOKMARK,
@@ -51,14 +66,22 @@ class EntityTypeConverter {
     }
 }
 
-@Entity(tableName = "relations")
+@Entity(tableName = "relations", primaryKeys = ["relationId", "entityId"])
 data class Relation(
-    @PrimaryKey var id: String,
-    var children: List<String>,
+    var relationId: String = UUID.randomUUID().toString(),
+    @Embedded var entity: com.duckduckgo.sync.store.Entity,
 ) {
     companion object {
         const val FAVORITES_ROOT = "favorites_root"
         const val BOOMARKS_ROOT = "bookmarks_root"
         const val BOOMARKS_ROOT_ID = 0L
+
+        fun migrateId(folderId: Long?): String {
+            return when (folderId) {
+                null -> BOOMARKS_ROOT
+                0L -> BOOMARKS_ROOT
+                else -> "folder$folderId"
+            }
+        }
     }
 }
