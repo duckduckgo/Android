@@ -27,6 +27,9 @@ interface SyncEntitiesDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(entity: Entity)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertList(entities: List<Entity>)
+
     @Query("select * from entities")
     fun entities(): List<Entity>
 

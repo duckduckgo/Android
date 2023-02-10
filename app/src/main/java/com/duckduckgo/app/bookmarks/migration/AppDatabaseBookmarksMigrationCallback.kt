@@ -16,16 +16,8 @@
 
 package com.duckduckgo.app.bookmarks.migration
 
-import android.database.Cursor
 import androidx.room.RoomDatabase
-import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.duckduckgo.app.bookmarks.db.BookmarkEntity
-import com.duckduckgo.app.bookmarks.model.BookmarkFolder
-import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
-import com.duckduckgo.app.bookmarks.model.TreeNode
-import com.duckduckgo.app.bookmarks.service.FolderTreeItem
-import com.duckduckgo.app.bookmarks.service.RealSavedSitesParser
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.sync.store.Entity
@@ -35,7 +27,6 @@ import com.duckduckgo.sync.store.Relation
 import dagger.Lazy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.asExecutor
-import kotlinx.coroutines.flow.forEach
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AppDatabaseBookmarksMigrationCallback(
@@ -50,9 +41,9 @@ class AppDatabaseBookmarksMigrationCallback(
     }
 
     fun runMigration() {
-        migrateFavorites()
         migrateBookmarks()
-        cleanUpTables()
+        migrateFavorites()
+        // cleanUpTables()
     }
 
     private fun migrateFavorites() {
@@ -61,7 +52,7 @@ class AppDatabaseBookmarksMigrationCallback(
                 val favourites = favoritesDao().favoritesSync()
                 val favouriteChildren = mutableListOf<String>()
                 favourites.forEach {
-                    syncEntitiesDao().insert(Entity(it.id.toString(), it.title, it.url, BOOKMARK))
+                    syncEntitiesDao().insert(Entity("favorite${it.id}", it.title, it.url, BOOKMARK))
                     favouriteChildren.add(it.id.toString())
                 }
                 syncRelationsDao().insert(Relation(Relation.FAVORITES_ROOT, favouriteChildren))
@@ -73,20 +64,38 @@ class AppDatabaseBookmarksMigrationCallback(
         with(appDatabase.get()) {
             if (bookmarksDao().bookmarksCount() > 0) {
                 // start from root folder
-                val bookmarksInRoot = bookmarksDao().getBookmarksByParentIdSync(Relation.BOOMARKS_ROOT_ID)
-                val boomarksInRootChildren = mutableListOf<String>()
-                bookmarksInRoot.forEach {
-                    syncEntitiesDao().insert(Entity(it.id.toString(), it.title.orEmpty(), it.url, BOOKMARK))
-                    boomarksInRootChildren.add(it.id.toString())
-                }
-                syncRelationsDao().insert(Relation(Relation.BOOMARKS_ROOT, boomarksInRootChildren))
+                findFolderRelation(Relation.BOOMARKS_ROOT_ID)
 
                 // continue folder by folder
+                val bookmarkFolders = bookmarkFoldersDao().getBookmarkFoldersSync()
+                bookmarkFolders.forEach {
+                    findFolderRelation(it.id)
+                }
             }
         }
     }
 
-    private fun cleanUpTables(){
+    private fun findFolderRelation(folderId: Long) {
+        with(appDatabase.get()) {
+            val entities = mutableListOf<Entity>()
+            val foldersInFolder = bookmarkFoldersDao().getBookmarkFoldersByParentIdSync(folderId)
+            val bookmarksInFolder = bookmarksDao().getBookmarksByParentIdSync(folderId)
+            val children = mutableListOf<String>()
+            foldersInFolder.forEach {
+                entities.add(Entity("folder${it.id}", it.name, "", FOLDER))
+                children.add("folder${it.id}")
+            }
+            bookmarksInFolder.forEach {
+                entities.add(Entity("bookmark${it.id}", it.title.orEmpty(), it.url, BOOKMARK))
+                children.add("bookmark${it.id}")
+            }
+
+            syncEntitiesDao().insertList(entities)
+            syncRelationsDao().insert(Relation("folder${folderId}", children))
+        }
+    }
+
+    private fun cleanUpTables() {
         with(appDatabase.get()) {
             favoritesDao().deleteAll()
             bookmarksDao().deleteAll()

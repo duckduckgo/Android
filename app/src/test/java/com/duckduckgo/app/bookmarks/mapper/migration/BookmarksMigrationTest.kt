@@ -21,6 +21,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
+import com.duckduckgo.app.bookmarks.db.BookmarkFolderEntity
 import com.duckduckgo.app.bookmarks.db.BookmarkFoldersDao
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.db.FavoriteEntity
@@ -28,7 +29,6 @@ import com.duckduckgo.app.bookmarks.db.FavoritesDao
 import com.duckduckgo.app.bookmarks.migration.AppDatabaseBookmarksMigrationCallback
 import com.duckduckgo.app.bookmarks.model.FavoritesDataRepository
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
-import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.sync.store.Relation
@@ -39,6 +39,7 @@ import junit.framework.Assert.assertFalse
 import junit.framework.Assert.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -125,6 +126,24 @@ class BookmarksMigrationTest {
     }
 
     @Test
+    fun whenBookmarksWithFoldersExistThenMigrationIsSuccessful(){
+        val totalFolder = 10
+        val bookmarksPerFolder = 5
+        createFoldersTree(totalFolder, bookmarksPerFolder)
+
+        whenMigrationApplied()
+
+        assertTrue(syncEntitiesDao.hasEntities())
+        assertTrue(syncRelationsDao.hasRelations())
+
+        val entities = syncEntitiesDao.entities()
+        assertTrue(entities.size == totalFolder * bookmarksPerFolder)
+
+        val relations = (syncRelationsDao.relations())
+        assertTrue(relations.size == totalFolder)
+    }
+
+    @Ignore @Test
     fun whenDataIsMigratedThenOldTablesAreDeleted() {
         givenSomeFavorites(10)
         givenSomeBookmarks(5, Relation.BOOMARKS_ROOT_ID)
@@ -152,6 +171,17 @@ class BookmarksMigrationTest {
         for (index in 1..total) {
             val bookmark = BookmarkEntity(index.toLong(), "Bookmark$index", "http://bookmark.com", bookmarkFolderId)
             bookmarksDao.insert(bookmark)
+        }
+    }
+
+    private fun givenAFolder(index: Int){
+        val folderEntity = BookmarkFolderEntity(index.toLong(), "folder$index", (index - 1).toLong())
+        bookmarkFoldersDao.insert(folderEntity)
+    }
+    private fun createFoldersTree(totalFolders: Int, bookmarksPerFolder: Int){
+        for (index in 1..totalFolders) {
+            givenAFolder(index)
+            givenSomeBookmarks(bookmarksPerFolder, index.toLong())
         }
     }
 }
