@@ -47,4 +47,4 @@ class RealFeatureToggleImpl @Inject constructor(private val featureTogglesPlugin
     boundType = FeatureTogglesPlugin::class,
 )
 @Suppress("unused")
-interface FeatureTogglesPluginPoint
+private interface FeatureTogglesPluginPoint

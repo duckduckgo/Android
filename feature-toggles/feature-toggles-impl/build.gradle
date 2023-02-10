@@ -39,6 +39,7 @@ dependencies {
     implementation AndroidX.core.ktx
 
     // Testing dependencies
+    testImplementation project(path: ':feature-toggles-test')
     testImplementation project(path: ':common-test')
     testImplementation Testing.junit4
 }
