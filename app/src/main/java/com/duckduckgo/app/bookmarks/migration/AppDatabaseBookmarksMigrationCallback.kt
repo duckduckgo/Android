@@ -101,11 +101,11 @@ class AppDatabaseBookmarksMigrationCallback(
                 children.add("bookmark${it.id}")
             }
 
-            if (entities.isNotEmpty()){
+            if (entities.isNotEmpty()) {
                 syncEntitiesDao().insertList(entities)
             }
 
-            if (children.isNotEmpty()){
+            if (children.isNotEmpty()) {
                 if (folderId == Relation.BOOMARKS_ROOT_ID) {
                     syncRelationsDao().insert(Relation(Relation.BOOMARKS_ROOT, children))
                 } else {
