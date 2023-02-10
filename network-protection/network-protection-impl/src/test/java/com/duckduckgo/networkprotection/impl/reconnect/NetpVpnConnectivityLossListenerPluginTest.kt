@@ -80,7 +80,6 @@ class NetpVpnConnectivityLossListenerPluginTest {
         assertEquals(Reconnecting, repository.reconnectStatus)
         verify(netpPixels).reportVpnConnectivityLoss()
         verify(reconnectNotifications).clearNotifications()
-        verify(reconnectNotifications).launchReconnectingNotification(context)
         verify(vpnFeaturesRegistry).refreshFeature(NetPVpnFeature.NETP_VPN)
     }
 
@@ -129,7 +128,6 @@ class NetpVpnConnectivityLossListenerPluginTest {
         assertEquals(NotReconnecting, repository.reconnectStatus)
         assertEquals(0, repository.reconnectAttemptCount)
         verify(reconnectNotifications).clearNotifications()
-        verify(reconnectNotifications).launchReconnectedNotification(context)
         verifyNoInteractions(netpPixels)
     }
 

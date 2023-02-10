@@ -89,7 +89,6 @@ class NetpVpnConnectivityLossListenerPlugin @Inject constructor(
         resetReconnectValues()
 
         reconnectNotifications.clearNotifications()
-        reconnectNotifications.launchReconnectedNotification(context)
         logcat { "Successfully recovered from VPN connectivity loss." }
     }
 
@@ -97,7 +96,6 @@ class NetpVpnConnectivityLossListenerPlugin @Inject constructor(
         logcat { "Attempting to recover from vpn connectivity loss." }
         netpPixels.get().reportVpnConnectivityLoss()
         reconnectNotifications.clearNotifications()
-        reconnectNotifications.launchReconnectingNotification(context)
         coroutineScope.launch {
             vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
         }
