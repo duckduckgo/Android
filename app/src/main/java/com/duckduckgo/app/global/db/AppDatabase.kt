@@ -67,6 +67,8 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
 import com.duckduckgo.sync.store.Entity
 import com.duckduckgo.sync.store.EntityTypeConverter
 import com.duckduckgo.sync.store.Relation
+import com.duckduckgo.sync.store.SyncEntitiesDao
+import com.duckduckgo.sync.store.SyncRelationsDao
 
 @Database(
     exportSchema = true,
@@ -103,7 +105,7 @@ import com.duckduckgo.sync.store.Relation
         WebTrackerBlocked::class,
         AuthCookieAllowedDomainEntity::class,
         Entity::class,
-        Relation::class
+        Relation::class,
     ],
 )
 
@@ -152,6 +154,10 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun pixelDao(): PendingPixelDao
     abstract fun authCookiesAllowedDomainsDao(): AuthCookiesAllowedDomainsDao
     abstract fun webTrackersBlockedDao(): WebTrackersBlockedDao
+
+    abstract fun syncEntitiesDao(): SyncEntitiesDao
+
+    abstract fun syncRelationsDao(): SyncRelationsDao
 }
 
 @Suppress("PropertyName")
@@ -581,8 +587,9 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
-    val MIGRATION_44_TO_45: Migration = object : Migration(43, 44) {
+    val MIGRATION_44_TO_45: Migration = object : Migration(44, 45) {
         override fun migrate(database: SupportSQLiteDatabase) {
+
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS `entities` (`id` TEXT NOT NULL, " +
                     "`title` TEXT NOT NULL, `url` TEXT, `type` TEXT, PRIMARY KEY(`id`))",
@@ -664,7 +671,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             MIGRATION_41_TO_42,
             MIGRATION_42_TO_43,
             MIGRATION_43_TO_44,
-            MIGRATION_44_TO_45
+            MIGRATION_44_TO_45,
         )
 
     @Deprecated(
