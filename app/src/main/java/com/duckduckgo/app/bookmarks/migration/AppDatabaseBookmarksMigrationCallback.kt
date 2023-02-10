@@ -31,7 +31,7 @@ import kotlinx.coroutines.asExecutor
 @OptIn(ExperimentalCoroutinesApi::class)
 class AppDatabaseBookmarksMigrationCallback(
     private val appDatabase: Lazy<AppDatabase>,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
 ) : RoomDatabase.Callback() {
 
     override fun onOpen(db: SupportSQLiteDatabase) {
@@ -105,7 +105,7 @@ class AppDatabaseBookmarksMigrationCallback(
             if (folderId == Relation.BOOMARKS_ROOT_ID) {
                 syncRelationsDao().insert(Relation(Relation.BOOMARKS_ROOT, children))
             } else {
-                syncRelationsDao().insert(Relation("folder${folderId}", children))
+                syncRelationsDao().insert(Relation("folder$folderId", children))
             }
         }
     }

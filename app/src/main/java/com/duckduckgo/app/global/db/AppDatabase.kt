@@ -589,7 +589,6 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
 
     val MIGRATION_44_TO_45: Migration = object : Migration(44, 45) {
         override fun migrate(database: SupportSQLiteDatabase) {
-
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS `entities` (`id` TEXT NOT NULL, " +
                     "`title` TEXT NOT NULL, `url` TEXT, `type` TEXT, PRIMARY KEY(`id`))",

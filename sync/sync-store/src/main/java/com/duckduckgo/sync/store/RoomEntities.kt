@@ -16,7 +16,6 @@
 
 package com.duckduckgo.sync.store
 
-import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
@@ -34,7 +33,6 @@ enum class EntityType {
     FOLDER,
     ;
 }
-
 
 class EntityTypeConverter {
 

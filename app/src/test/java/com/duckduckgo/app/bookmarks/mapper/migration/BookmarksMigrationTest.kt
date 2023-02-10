@@ -166,9 +166,9 @@ class BookmarksMigrationTest {
     }
 
     @Test
-    fun whenBookmarkAndFavoriteHaveSameUrlThenBookmarkAlsoMigratedAsFavorite(){
+    fun whenBookmarkAndFavoriteHaveSameUrlThenBookmarkAlsoMigratedAsFavorite() {
         bookmarksDao.insert(BookmarkEntity(1, "Bookmark1", "http://test.com", 0))
-        favoritesDao.insert(FavoriteEntity(2,"Favorite1", "http://test.com", 0))
+        favoritesDao.insert(FavoriteEntity(2, "Favorite1", "http://test.com", 0))
 
         whenMigrationApplied()
 
@@ -191,9 +191,9 @@ class BookmarksMigrationTest {
     }
 
     @Test
-    fun whenBookmarkAndFavoriteHaveDifferentUrlThenBothAreMigrated(){
+    fun whenBookmarkAndFavoriteHaveDifferentUrlThenBothAreMigrated() {
         bookmarksDao.insert(BookmarkEntity(1, "Bookmark1", "http://test.com", 0))
-        favoritesDao.insert(FavoriteEntity(2,"Favorite1", "http://testee.com", 0))
+        favoritesDao.insert(FavoriteEntity(2, "Favorite1", "http://testee.com", 0))
 
         whenMigrationApplied()
 
@@ -211,7 +211,6 @@ class BookmarksMigrationTest {
         assertTrue(favoriteRelation.children.size == 1)
         assertTrue(favoriteRelation.children[0] == "favorite2")
     }
-
 
     @Ignore @Test
     fun whenDataIsMigratedThenOldTablesAreDeleted() {
@@ -240,7 +239,7 @@ class BookmarksMigrationTest {
 
     private fun givenSomeBookmarks(
         total: Int,
-        bookmarkFolderId: Long
+        bookmarkFolderId: Long,
     ) {
         val bookmarks = mutableListOf<BookmarkEntity>()
         for (index in 1..total) {
@@ -250,7 +249,7 @@ class BookmarksMigrationTest {
     }
 
     private fun givenAFolder(index: Int) {
-        val folderEntity = if (index == Relation.BOOMARKS_ROOT_ID.toInt()){
+        val folderEntity = if (index == Relation.BOOMARKS_ROOT_ID.toInt()) {
             BookmarkFolderEntity(Relation.BOOMARKS_ROOT_ID, "folder$index", Relation.BOOMARKS_ROOT_ID)
         } else {
             BookmarkFolderEntity(index.toLong(), "folder$index", (index - 1).toLong())
@@ -261,7 +260,7 @@ class BookmarksMigrationTest {
 
     private fun createFoldersTree(
         totalFolders: Int,
-        bookmarksPerFolder: Int
+        bookmarksPerFolder: Int,
     ) {
         for (index in 1..totalFolders) {
             givenAFolder(index)

@@ -52,7 +52,7 @@ object DatabaseModule {
     fun provideAppDatabase(
         context: Context,
         migrationsProvider: MigrationsProvider,
-        databaseBookmarksMigrationCallbackProvider: AppDatabaseBookmarksMigrationCallbackProvider
+        databaseBookmarksMigrationCallbackProvider: AppDatabaseBookmarksMigrationCallbackProvider,
     ): AppDatabase {
         return Room.databaseBuilder(context, AppDatabase::class.java, "app.db")
             .addMigrations(*migrationsProvider.ALL_MIGRATIONS.toTypedArray())
@@ -66,7 +66,7 @@ object DatabaseModule {
     @Provides
     fun provideDatabaseMigrations(
         context: Context,
-        settingsDataStore: SettingsDataStore
+        settingsDataStore: SettingsDataStore,
     ): MigrationsProvider {
         return MigrationsProvider(context, settingsDataStore)
     }

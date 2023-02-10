@@ -38,5 +38,4 @@ interface SyncEntitiesDao {
 
     @Query("select CAST(COUNT(*) AS BIT) from entities")
     fun hasEntities(): Boolean
-
 }
