@@ -101,11 +101,16 @@ class AppDatabaseBookmarksMigrationCallback(
                 children.add("bookmark${it.id}")
             }
 
-            syncEntitiesDao().insertList(entities)
-            if (folderId == Relation.BOOMARKS_ROOT_ID) {
-                syncRelationsDao().insert(Relation(Relation.BOOMARKS_ROOT, children))
-            } else {
-                syncRelationsDao().insert(Relation("folder$folderId", children))
+            if (entities.isNotEmpty()){
+                syncEntitiesDao().insertList(entities)
+            }
+
+            if (children.isNotEmpty()){
+                if (folderId == Relation.BOOMARKS_ROOT_ID) {
+                    syncRelationsDao().insert(Relation(Relation.BOOMARKS_ROOT, children))
+                } else {
+                    syncRelationsDao().insert(Relation("folder$folderId", children))
+                }
             }
         }
     }
