@@ -34,6 +34,7 @@
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Хотите, чтобы DuckDuckGo сохранил логин?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Другие параметры</string>
 
+    <string name="useSavedLoginDialogTitle">Использовать сохраненный логин?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Логин для %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Логин для сайта</string>
 
