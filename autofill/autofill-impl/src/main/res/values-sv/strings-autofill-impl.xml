@@ -34,6 +34,7 @@
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Vill du att DuckDuckGo ska spara din inloggning?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Fler alternativ</string>
 
+    <string name="useSavedLoginDialogTitle">Använd sparad inloggning?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Inloggning för %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Inloggning för webbplatsen</string>
 
