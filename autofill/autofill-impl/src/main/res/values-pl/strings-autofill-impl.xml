@@ -34,6 +34,7 @@
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Czy chcesz zapisać dane logowania w DuckDuckGo?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Więcej opcji</string>
 
+    <string name="useSavedLoginDialogTitle">Czy chcesz użyć zapisanego loginu?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Zaloguj się do: %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Zaloguj się do witryny</string>
 

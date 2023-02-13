@@ -34,6 +34,7 @@
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Vuoi che DuckDuckGo salvi i dati di accesso?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Altre opzioni</string>
 
+    <string name="useSavedLoginDialogTitle">Usare i dati di accesso salvati?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Dati di accesso per %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Dati di accesso per il sito</string>
 
