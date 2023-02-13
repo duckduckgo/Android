@@ -34,6 +34,7 @@
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Dorești ca DuckDuckGo să îți salveze datele de autentificare?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Mai multe opțiuni</string>
 
+    <string name="useSavedLoginDialogTitle">Folosești datele de conectare salvate?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Autentificare pentru %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Autentificare pentru site</string>
 
