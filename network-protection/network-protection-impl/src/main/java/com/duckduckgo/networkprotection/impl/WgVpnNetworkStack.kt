@@ -70,12 +70,16 @@ class WgVpnNetworkStack @Inject constructor(
             return 1280
         }
         fun PluginPoint<NetPDebugExclusionListProvider>.getExclusionList(): Set<String> {
-            if (appBuildConfig.isInternalBuild()) {
+            val exclusionList = if (appBuildConfig.isInternalBuild()) {
                 assert(this.getPlugins().size <= 1) { "Only one NetPDebugMtuProvider should be registered" }
-                return this.getPlugins().firstOrNull()?.getExclusionList() ?: emptySet()
+                this.getPlugins().firstOrNull()?.getExclusionList() ?: emptySet()
+            } else {
+                emptySet()
             }
 
-            return emptySet()
+            return mutableSetOf("com.google.android.gms").apply {
+                addAll(exclusionList)
+            }.toSet()
         }
 
         return try {
