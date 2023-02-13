@@ -72,7 +72,6 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     private val autofillStore: AutofillStore,
     private val autofillMessagePoster: AutofillMessagePoster,
     private val autofillResponseWriter: AutofillResponseWriter,
-    private val autofillDomainFormatter: AutofillDomainFormatter,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
     private val currentUrlProvider: UrlProvider = WebViewUrlProvider(dispatcherProvider),
@@ -160,8 +159,6 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
                 return@launch
             }
 
-            val title = autofillDomainFormatter.extractDomain(currentUrl)
-
             val request = requestParser.parseStoreFormDataRequest(data)
 
             if (!request.isValid()) {
@@ -170,7 +167,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
             }
 
             val jsCredentials = JavascriptCredentials(request.credentials!!.username, request.credentials.password)
-            val credentials = jsCredentials.asLoginCredentials(currentUrl, title)
+            val credentials = jsCredentials.asLoginCredentials(currentUrl)
 
             withContext(dispatcherProvider.main()) {
                 callback?.onCredentialsAvailableToSave(currentUrl, credentials)
@@ -211,14 +208,13 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
 
     private fun JavascriptCredentials.asLoginCredentials(
         url: String,
-        title: String?,
     ): LoginCredentials {
         return LoginCredentials(
             id = null,
             domain = url,
             username = username,
             password = password,
-            domainTitle = title,
+            domainTitle = null,
         )
     }
 

@@ -34,9 +34,8 @@
             app:type="single_line"
             android:layout_marginBottom="@dimen/keyline_5"
             android:hint="@string/credentialManagementEditLoginTitleHint"
-            android:visibility="gone"
             app:editable="true"
-            app:endIconContentDescription="@string/credentialManagementEditButtonCopyUsername" />
+        />
 
         <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
             android:id="@+id/usernameEditText"

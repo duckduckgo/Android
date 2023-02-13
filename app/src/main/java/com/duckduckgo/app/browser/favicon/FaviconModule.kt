@@ -42,6 +42,7 @@ class FaviconModule {
         faviconDownloader: FaviconDownloader,
         dispatcherProvider: DispatcherProvider,
         autofillStore: AutofillStore,
+        context: Context,
     ): FaviconManager {
         return DuckDuckGoFaviconManager(
             faviconPersister,
@@ -52,6 +53,7 @@ class FaviconModule {
             faviconDownloader,
             dispatcherProvider,
             autofillStore,
+            context,
         )
     }
 
