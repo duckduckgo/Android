@@ -481,7 +481,7 @@ class BrowserTabFragment :
 
         override fun onPopUpHandled(isCosmetic: Boolean) {
             launch {
-                if (variantManager.isCookiePromptManagementExperimentEnabled() && isCosmetic) {
+                if (isCosmetic) {
                     delay(COOKIES_ANIMATION_DELAY)
                 }
                 context?.let { animatorHelper.createCookiesAnimation(it, omnibarViews(), cookieDummyView, cookieAnimation, scene_root, isCosmetic) }
