@@ -138,6 +138,9 @@
     <string name="settingsAppLinksAskEveryTime">Pytaj za każdym razem</string>
     <string name="settingsAppLinksAlways">Zawsze</string>
     <string name="settingsAppLinksNever">Nigdy</string>
+    <string name="settingsTitleNotifications">Powiadomienia</string>
+    <string name="settingsSubtitleNotificationsDisabled">Wyłączone</string>
+    <string name="settingsSubtitleNotificationsEnabled">Włączone</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Zapisz</string>
@@ -682,4 +685,9 @@
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Autouzupełnianie</string>
+
+    <!-- Notify Me View on Downloads -->
+    <string name="downloadsNotifyMeTitle">Dowiedz się, kiedy pliki do pobrania będą gotowe</string>
+    <string name="downloadsNotifyMeSubtitle">Otrzymuj powiadomienie po zakończeniu pobierania.</string>
+
 </resources>

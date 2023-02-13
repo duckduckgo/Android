@@ -138,6 +138,9 @@
     <string name="settingsAppLinksAskEveryTime">Kysy joka kerta</string>
     <string name="settingsAppLinksAlways">Aina</string>
     <string name="settingsAppLinksNever">Ei koskaan</string>
+    <string name="settingsTitleNotifications">Ilmoitukset</string>
+    <string name="settingsSubtitleNotificationsDisabled">Pois käytöstä</string>
+    <string name="settingsSubtitleNotificationsEnabled">Käytössä</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Tallenna</string>
@@ -674,4 +677,9 @@
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Automaattinen täyttö</string>
+
+    <!-- Notify Me View on Downloads -->
+    <string name="downloadsNotifyMeTitle">Saat tietää, milloin lataukset ovat valmiita</string>
+    <string name="downloadsNotifyMeSubtitle">Saat ilmoituksen, kun lataukset ovat valmiita.</string>
+
 </resources>
