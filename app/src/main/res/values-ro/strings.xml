@@ -138,6 +138,9 @@
     <string name="settingsAppLinksAskEveryTime">Întreabă de fiecare dată</string>
     <string name="settingsAppLinksAlways">Întotdeauna</string>
     <string name="settingsAppLinksNever">Niciodată</string>
+    <string name="settingsTitleNotifications">Notificări</string>
+    <string name="settingsSubtitleNotificationsDisabled">Dezactivat</string>
+    <string name="settingsSubtitleNotificationsEnabled">Activat</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Salvează</string>
@@ -678,4 +681,9 @@
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Completare automată</string>
+
+    <!-- Notify Me View on Downloads -->
+    <string name="downloadsNotifyMeTitle">Află când sunt pregătite descărcările</string>
+    <string name="downloadsNotifyMeSubtitle">Primește o notificare când s-au finalizat descărcările.</string>
+
 </resources>
