@@ -138,6 +138,9 @@
     <string name="settingsAppLinksAskEveryTime">Spør hver gang</string>
     <string name="settingsAppLinksAlways">Alltid</string>
     <string name="settingsAppLinksNever">Aldri</string>
+    <string name="settingsTitleNotifications">Varsler</string>
+    <string name="settingsSubtitleNotificationsDisabled">Deaktivert</string>
+    <string name="settingsSubtitleNotificationsEnabled">Aktivert</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Lagre</string>
@@ -674,4 +677,9 @@
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Autofyll</string>
+
+    <!-- Notify Me View on Downloads -->
+    <string name="downloadsNotifyMeTitle">Finn ut når nedlastinger er klare</string>
+    <string name="downloadsNotifyMeSubtitle">Få et varsel når nedlastinger er fullført.</string>
+
 </resources>
