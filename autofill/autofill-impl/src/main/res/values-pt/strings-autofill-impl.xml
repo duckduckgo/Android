@@ -34,6 +34,7 @@
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Queres que o DuckDuckGo guarde o teu início de sessão?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Mais opções</string>
 
+    <string name="useSavedLoginDialogTitle">Utilizar um início de sessão guardado?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Dados de início de sessão para %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Dados de início de sessão para o site</string>
 
