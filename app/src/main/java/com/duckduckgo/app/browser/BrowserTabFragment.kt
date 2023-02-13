@@ -207,7 +207,6 @@ import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
-import java.util.EventListener
 import javax.inject.Inject
 import javax.inject.Provider
 import kotlin.coroutines.CoroutineContext
@@ -483,7 +482,7 @@ class BrowserTabFragment :
         override fun onPopUpHandled(isCosmetic: Boolean) {
             launch {
                 if (variantManager.isCookiePromptManagementExperimentEnabled() && isCosmetic) {
-                    delay(400)
+                    delay(COOKIES_ANIMATION_DELAY)
                 }
                 context?.let { animatorHelper.createCookiesAnimation(it, omnibarViews(), cookieDummyView, cookieAnimation, scene_root, isCosmetic) }
             }
@@ -2574,6 +2573,8 @@ class BrowserTabFragment :
         private const val DEFAULT_CIRCLE_TARGET_TIMES_1_5 = 96
 
         private const val QUICK_ACCESS_GRID_MAX_COLUMNS = 6
+
+        private const val COOKIES_ANIMATION_DELAY = 400L
 
         fun newInstance(
             tabId: String,
