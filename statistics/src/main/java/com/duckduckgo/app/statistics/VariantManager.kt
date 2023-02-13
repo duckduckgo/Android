@@ -44,12 +44,12 @@ interface VariantManager {
             // the future if we can filter by app version
             Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
             Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
-            Variant(key = "mq", weight = 1.0, features = emptyList(), filterBy = { isNonUsOrCaCountry() }),
+            Variant(key = "mq", weight = 0.0, features = emptyList(), filterBy = { isEuropeanCountry() }),
             Variant(
                 key = "mr",
                 weight = 1.0,
                 features = listOf(VariantFeature.CookiePromptManagementExperiment),
-                filterBy = { isNonUsOrCaCountry() },
+                filterBy = { isEuropeanCountry() },
             ),
         )
 
@@ -73,9 +73,57 @@ interface VariantManager {
             "GB",
         )
 
-        private val usAndCaCountries = listOf(
-            "US",
-            "CA",
+        private val EuropeanCountries = listOf(
+            "AD",
+            "AL",
+            "AT",
+            "AZ",
+            "BA",
+            "BE",
+            "BG",
+            "BY",
+            "CH",
+            "CY",
+            "CZ",
+            "DE",
+            "DK",
+            "EE",
+            "ES",
+            "FI",
+            "FR",
+            "GE",
+            "GI",
+            "GR",
+            "HR",
+            "HU",
+            "IE",
+            "IS",
+            "IT",
+            "KZ",
+            "LI",
+            "LT",
+            "LU",
+            "LV",
+            "MC",
+            "MD",
+            "ME",
+            "MK",
+            "MT",
+            "NL",
+            "NO",
+            "PL",
+            "PT",
+            "RO",
+            "RS",
+            "RU",
+            "SE",
+            "SI",
+            "SK",
+            "SM",
+            "TR",
+            "UA",
+            "UK",
+            "VA",
         )
 
         fun referrerVariant(key: String): Variant {
@@ -90,9 +138,9 @@ interface VariantManager {
             return locale != null && locale.language == "en"
         }
 
-        private fun isNonUsOrCaCountry(): Boolean {
+        private fun isEuropeanCountry(): Boolean {
             val locale = Locale.getDefault()
-            return locale != null && !usAndCaCountries.contains(locale.country)
+            return locale != null && EuropeanCountries.contains(locale.country)
         }
 
         private fun isSerpRegionToggleCountry(): Boolean {
