@@ -406,4 +406,8 @@
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Egyes alkalmazásoknál problémák merülhetnek fel, ha az alkalmazáskövetés elleni védelem engedélyezve van.\n<annotation type="learn_why_link">Tudd meg, miért</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Az ismert problémákat tartalmazó alkalmazások védelme le van tiltva. Engedélyezheted ezeket az alkalmazásokat, de előfordulhat, hogy nem a várt módon működnek. <annotation type="learn_why_link">Tudd meg, miért</annotation></string>
 
+    <!-- Notify Me View on AppTP -->
+    <string name="appTrackingProtectionNotifyMeTitle">Blokkolt nyomkövetők szemmel tartása</string>
+    <string name="appTrackingProtectionNotifyMeSubtitle">Az értesítési fiókodban tájékoztatunk a blokkolt nyomkövetési kísérletekről.</string>
+
 </resources>
