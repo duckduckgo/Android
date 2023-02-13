@@ -73,7 +73,7 @@ interface VariantManager {
             "GB",
         )
 
-        private val EuropeanCountries = listOf(
+        private val europeanCountries = listOf(
             "AD",
             "AL",
             "AT",
@@ -140,7 +140,7 @@ interface VariantManager {
 
         private fun isEuropeanCountry(): Boolean {
             val locale = Locale.getDefault()
-            return locale != null && EuropeanCountries.contains(locale.country)
+            return locale != null && europeanCountries.contains(locale.country)
         }
 
         private fun isSerpRegionToggleCountry(): Boolean {
