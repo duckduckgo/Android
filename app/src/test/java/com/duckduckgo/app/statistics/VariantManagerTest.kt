@@ -17,6 +17,7 @@
 package com.duckduckgo.app.statistics
 
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.CookiePromptManagementExperiment
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -31,15 +32,31 @@ class VariantManagerTest {
     @Test
     fun serpControlVariantHasExpectedWeightAndNoFeatures() {
         val variant = variants.first { it.key == "sc" }
-        assertEqualsDouble(1.0, variant.weight)
+        assertEqualsDouble(0.0, variant.weight)
         assertEquals(0, variant.features.size)
     }
 
     @Test
     fun serpExperimentalVariantHasExpectedWeightAndNoFeatures() {
         val variant = variants.first { it.key == "se" }
+        assertEqualsDouble(0.0, variant.weight)
+        assertEquals(0, variant.features.size)
+    }
+
+    @Test
+    fun cookiePromptManagementControlVariantHasExpectedWeightAndNoFeatures() {
+        val variant = variants.first { it.key == "mq" }
         assertEqualsDouble(1.0, variant.weight)
         assertEquals(0, variant.features.size)
+        assertEquals(0, variant.features.size)
+    }
+
+    @Test
+    fun cookiePromptManagementExperimentalVariantHasExpectedWeightAndFeatures() {
+        val variant = variants.first { it.key == "mr" }
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(1, variant.features.size)
+        assertTrue(variant.hasFeature(CookiePromptManagementExperiment))
     }
 
     @Test

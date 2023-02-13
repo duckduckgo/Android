@@ -19,6 +19,8 @@ package com.duckduckgo.autoconsent.impl
 import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.VariantManager.Companion.ACTIVE_VARIANTS
 import com.duckduckgo.autoconsent.api.AutoconsentFeatureName
 import com.duckduckgo.autoconsent.store.AutoconsentExceptionEntity
 import com.duckduckgo.autoconsent.store.AutoconsentRepository
@@ -41,6 +43,7 @@ class RealAutoconsentTest {
     private val mockAutoconsentRepository: AutoconsentRepository = mock()
     private val mockFeatureToggle: FeatureToggle = mock()
     private val webView: WebView = WebView(InstrumentationRegistry.getInstrumentation().targetContext)
+    private val mockVariantManager: VariantManager = mock()
 
     lateinit var autoconsent: RealAutoconsent
 
@@ -55,7 +58,9 @@ class RealAutoconsentTest {
             mockFeatureToggle,
             userAllowlist,
             unprotected,
+            mockVariantManager,
         )
+        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mq" })
     }
 
     @Test
@@ -185,6 +190,54 @@ class RealAutoconsentTest {
         autoconsent.injectAutoconsent(webView, URL)
 
         assertNull(shadowOf(webView).lastEvaluatedJavascript)
+    }
+
+    @Test
+    fun whenInjectAutoconsentAndCookiePromptManagementExperimentIsEnabledAndAutoconsentIsDisabledAndAlreadyHandledThenDoNothing() {
+        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mr" })
+
+        settingsRepository.userSetting = false
+        settingsRepository.firstPopupHandled = true
+
+        autoconsent.injectAutoconsent(webView, URL)
+
+        assertNull(shadowOf(webView).lastEvaluatedJavascript)
+    }
+
+    @Test
+    fun whenInjectAutoconsentAndCookiePromptManagementExperimentIsEnabledAndAutoconsentIsEnabledAndNotAlreadyHandledThenCallEvaluate() {
+        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mr" })
+
+        settingsRepository.userSetting = true
+        settingsRepository.firstPopupHandled = false
+
+        autoconsent.injectAutoconsent(webView, URL)
+
+        assertNotNull(shadowOf(webView).lastEvaluatedJavascript)
+    }
+
+    @Test
+    fun whenInjectAutoconsentAndCookiePromptManagementExperimentIsEnabledAndAutoconsentIsEnabledAndAlreadyHandledThenCallEvaluate() {
+        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mr" })
+
+        settingsRepository.userSetting = true
+        settingsRepository.firstPopupHandled = true
+
+        autoconsent.injectAutoconsent(webView, URL)
+
+        assertNotNull(shadowOf(webView).lastEvaluatedJavascript)
+    }
+
+    @Test
+    fun whenInjectAutoconsentAndCookiePromptManagementExperimentIsEnabledAndAutoconsentIsDisabledAndNotAlreadyHandledThenCallEvaluate() {
+        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mr" })
+
+        settingsRepository.userSetting = false
+        settingsRepository.firstPopupHandled = false
+
+        autoconsent.injectAutoconsent(webView, URL)
+
+        assertNotNull(shadowOf(webView).lastEvaluatedJavascript)
     }
 
     private fun givenSettingsRepositoryAllowsInjection() {

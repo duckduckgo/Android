@@ -20,6 +20,7 @@ import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.impl.FakeSettingsRepository
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
@@ -31,6 +32,7 @@ import com.squareup.moshi.Moshi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -48,8 +50,20 @@ class InitMessageHandlerPluginTest {
     private val repository: AutoconsentRepository = mock()
     private val webView: WebView = WebView(InstrumentationRegistry.getInstrumentation().targetContext)
     private val settingsRepository = FakeSettingsRepository()
+    private val mockVariantManager: VariantManager = mock()
 
-    private val initHandlerPlugin = InitMessageHandlerPlugin(TestScope(), coroutineRule.testDispatcherProvider, settingsRepository, repository)
+    private val initHandlerPlugin = InitMessageHandlerPlugin(
+        TestScope(),
+        coroutineRule.testDispatcherProvider,
+        settingsRepository,
+        repository,
+        mockVariantManager,
+    )
+
+    @Before
+    fun setup() {
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "mq" })
+    }
 
     @Test
     fun whenProcessIfMessageTypeIsNotInitThenDoNothing() {
@@ -98,6 +112,54 @@ class InitMessageHandlerPluginTest {
         initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
 
         assertNull(shadowOf(webView).lastEvaluatedJavascript)
+    }
+
+    @Test
+    fun whenProcessIfCookiePromptManagementExperimentEnabledAndAutoconsentIsDisabledAndAlreadyHandledThenDoNothing() {
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "mr" })
+
+        settingsRepository.userSetting = false
+        settingsRepository.firstPopupHandled = true
+
+        initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
+
+        assertNull(shadowOf(webView).lastEvaluatedJavascript)
+    }
+
+    @Test
+    fun whenProcessIfCookiePromptManagementExperimentEnabledAndAutoconsentIsEnabledAndNotAlreadyHandledThenCallEvaluate() {
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "mr" })
+
+        settingsRepository.userSetting = true
+        settingsRepository.firstPopupHandled = false
+
+        initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
+
+        assertNotNull(shadowOf(webView).lastEvaluatedJavascript)
+    }
+
+    @Test
+    fun whenProcessIfCookiePromptManagementExperimentEnabledAndAutoconsentIsDisabledAndNotAlreadyHandledThenCallEvaluate() {
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "mr" })
+
+        settingsRepository.userSetting = false
+        settingsRepository.firstPopupHandled = false
+
+        initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
+
+        assertNotNull(shadowOf(webView).lastEvaluatedJavascript)
+    }
+
+    @Test
+    fun whenProcessIfCookiePromptManagementExperimentEnabledAndAutoconsentIsEnabledAndAlreadyHandledThenCallEvaluate() {
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "mr" })
+
+        settingsRepository.userSetting = true
+        settingsRepository.firstPopupHandled = true
+
+        initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
+
+        assertNotNull(shadowOf(webView).lastEvaluatedJavascript)
     }
 
     @Test
