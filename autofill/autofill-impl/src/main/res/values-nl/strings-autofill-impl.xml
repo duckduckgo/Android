@@ -34,6 +34,7 @@
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Wil je dat DuckDuckGo je login opslaat?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Meer opties</string>
 
+    <string name="useSavedLoginDialogTitle">Opgeslagen aanmeldgegevens gebruiken?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Aanmeldgegevens voor %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Aanmeldgegevens voor de website</string>
 
