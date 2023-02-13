@@ -34,6 +34,7 @@
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">A DuckDuckGo mentse a bejelentkezést?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">További lehetőségek</string>
 
+    <string name="useSavedLoginDialogTitle">Mentett bejelentkezés használata?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Bejelentkezés - %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Bejelentkezés webhelyre</string>
 
