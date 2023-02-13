@@ -28,7 +28,9 @@ import timber.log.Timber
 interface VariantManager {
 
     // variant-dependant features listed here
-    sealed class VariantFeature
+    sealed class VariantFeature {
+        object CookiePromptManagementExperiment : VariantFeature()
+    }
 
     companion object {
 
@@ -40,8 +42,15 @@ interface VariantManager {
         val ACTIVE_VARIANTS = listOf(
             // SERP variants. "sc" may also be used as a shared control for mobile experiments in
             // the future if we can filter by app version
-            Variant(key = "sc", weight = 1.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
-            Variant(key = "se", weight = 1.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
+            Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
+            Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
+            Variant(key = "mq", weight = 1.0, features = emptyList(), filterBy = { isNonUsOrCaCountry() }),
+            Variant(
+                key = "mr",
+                weight = 1.0,
+                features = listOf(VariantFeature.CookiePromptManagementExperiment),
+                filterBy = { isNonUsOrCaCountry() },
+            ),
         )
 
         val REFERRER_VARIANTS = listOf(
@@ -64,6 +73,11 @@ interface VariantManager {
             "GB",
         )
 
+        private val usAndCaCountries = listOf(
+            "US",
+            "CA",
+        )
+
         fun referrerVariant(key: String): Variant {
             val knownReferrer = REFERRER_VARIANTS.firstOrNull { it.key == key }
             return knownReferrer ?: Variant(key, features = emptyList(), filterBy = { noFilter() })
@@ -74,6 +88,11 @@ interface VariantManager {
         private fun isEnglishLocale(): Boolean {
             val locale = Locale.getDefault()
             return locale != null && locale.language == "en"
+        }
+
+        private fun isNonUsOrCaCountry(): Boolean {
+            val locale = Locale.getDefault()
+            return locale != null && !usAndCaCountries.contains(locale.country)
         }
 
         private fun isSerpRegionToggleCountry(): Boolean {
@@ -171,6 +190,9 @@ class ExperimentationVariantManager(
         return activeVariants[randomizedIndex]
     }
 }
+
+fun VariantManager.isCookiePromptManagementExperimentEnabled() =
+    this.getVariant().hasFeature(VariantManager.VariantFeature.CookiePromptManagementExperiment)
 
 /**
  * A variant which can be used for experimentation.

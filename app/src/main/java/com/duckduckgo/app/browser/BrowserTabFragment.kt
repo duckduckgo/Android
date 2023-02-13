@@ -158,6 +158,7 @@ import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.isCookiePromptManagementExperimentEnabled
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.survey.model.Survey
@@ -471,15 +472,19 @@ class BrowserTabFragment :
 
     private val autoconsentCallback = object : AutoconsentCallback {
         override fun onFirstPopUpHandled() {
-            // Remove comment to promote feature
-            // ctaViewModel.enableAutoconsentCta()
-            // launch {
-            //     viewModel.refreshCta()
-            // }
+            if (variantManager.isCookiePromptManagementExperimentEnabled()) {
+                ctaViewModel.enableAutoconsentCta()
+                launch {
+                    viewModel.refreshCta()
+                }
+            }
         }
 
         override fun onPopUpHandled(isCosmetic: Boolean) {
             launch {
+                if (variantManager.isCookiePromptManagementExperimentEnabled() && isCosmetic) {
+                    delay(400)
+                }
                 context?.let { animatorHelper.createCookiesAnimation(it, omnibarViews(), cookieDummyView, cookieAnimation, scene_root, isCosmetic) }
             }
         }
