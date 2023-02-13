@@ -138,6 +138,9 @@
     <string name="settingsAppLinksAskEveryTime">Elke keer vragen</string>
     <string name="settingsAppLinksAlways">Altijd</string>
     <string name="settingsAppLinksNever">Nooit</string>
+    <string name="settingsTitleNotifications">Meldingen</string>
+    <string name="settingsSubtitleNotificationsDisabled">Uitgeschakeld</string>
+    <string name="settingsSubtitleNotificationsEnabled">Ingeschakeld</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Opslaan</string>
@@ -674,4 +677,9 @@
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Automatisch invullen</string>
+
+    <!-- Notify Me View on Downloads -->
+    <string name="downloadsNotifyMeTitle">Blijf op de hoogte van downloads</string>
+    <string name="downloadsNotifyMeSubtitle">Ontvang een melding wanneer downloads zijn voltooid.</string>
+
 </resources>
