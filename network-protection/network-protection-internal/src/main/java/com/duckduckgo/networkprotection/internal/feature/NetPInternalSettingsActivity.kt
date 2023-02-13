@@ -19,6 +19,7 @@ package com.duckduckgo.networkprotection.internal.feature
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.appcompat.widget.PopupMenu
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -74,7 +75,7 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
                 binding.overrideMtuSelector.isEnabled = isEnabled
                 binding.overrideMtuSelector.setSecondaryText("MTU size: ${netPInternalMtuProvider.getMtu()}")
                 binding.overrideServerBackendSelector.isEnabled = isEnabled
-                binding.overrideServerBackendSelector.setSecondaryText("${serverRepository.getSelectedServer()?.name ?: "Automatic"}")
+                binding.overrideServerBackendSelector.setSecondaryText("${serverRepository.getSelectedServer()?.name ?: AUTOMATIC}")
             }
             .launchIn(lifecycleScope)
     }
@@ -102,7 +103,7 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
     private fun showMtuSelectorMenu() {
         PopupMenu(this, binding.overrideMtuSelector).apply {
             mtuSizes.forEach {
-                menu.add(it?.toString() ?: "Automatic")
+                menu.add(it?.toString() ?: AUTOMATIC)
             }
             setOnMenuItemClickListener { menuItem ->
                 val mtuSize = kotlin.runCatching { menuItem.title.toString().toInt() }.getOrNull()
@@ -119,16 +120,19 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
     }
 
     private suspend fun showServerSelectorMenu() {
+        fun MenuItem.serverName(): String? {
+            return if (title == AUTOMATIC) null else title.toString()
+        }
         val hostnames = serverRepository.getServerNames()
         PopupMenu(this, binding.overrideServerBackendSelector).apply {
-            (hostnames + "Automatic").forEach { hostname ->
+            (hostnames + AUTOMATIC).forEach { hostname ->
                 menu.add(hostname)
             }
 
             setOnMenuItemClickListener {
                 this@NetPInternalSettingsActivity.lifecycleScope.launch {
-                    serverRepository.setSelectedServer(it.title.toString())
-                    binding.overrideServerBackendSelector.setSecondaryText("${serverRepository.getSelectedServer()?.name ?: "Automatic"}")
+                    serverRepository.setSelectedServer(it.serverName())
+                    binding.overrideServerBackendSelector.setSecondaryText("${serverRepository.getSelectedServer()?.name ?: AUTOMATIC}")
                     vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
                 }
                 true
@@ -142,5 +146,7 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
         fun intent(context: Context): Intent {
             return Intent(context, NetPInternalSettingsActivity::class.java)
         }
+
+        private const val AUTOMATIC = "Automatic"
     }
 }

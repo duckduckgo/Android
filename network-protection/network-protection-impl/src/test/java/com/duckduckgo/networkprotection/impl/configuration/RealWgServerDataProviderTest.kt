@@ -147,14 +147,49 @@ class RealWgServerDataProviderTest() {
 
         assertTrue(fakeWgServerDebugProvider.cachedServers.isEmpty())
     }
+
+    @Test
+    fun whenInternalFlavorAndUserSelectedServerThenReturnUserSelectedServer() = runTest {
+        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
+        whenever(deviceTimezoneProvider.getTimeZone()).thenReturn(TimeZone.getTimeZone("GMT-10:00"))
+        fakeWgServerDebugProvider.selectedServer = "egress.euw"
+
+        assertEquals(
+            WgServerData(
+                publicKey = "CLQMP4SFzpyvAzMj3rXwShm+3n6Yt68hGHBF67At+x0=",
+                publicEndpoint = "euw.egress.np.duck.com:443",
+                address = "",
+                location = null,
+                allowedIPs = "0.0.0.0/0,::0/0",
+            ),
+            testee.get("testpublickey"),
+        )
+    }
+
+    @Test
+    fun whenInternalFlavorAndUserSelectedServerIsAutomaticThenReturnClosestServer() = runTest {
+        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
+        whenever(deviceTimezoneProvider.getTimeZone()).thenReturn(TimeZone.getTimeZone("GMT-10:00"))
+        fakeWgServerDebugProvider.selectedServer = null
+
+        assertEquals(
+            WgServerData(
+                publicKey = "R/BMR6Rr5rzvp7vSIWdAtgAmOLK9m7CqTcDynblM3Us=",
+                publicEndpoint = "162.245.204.100:443",
+                address = "",
+                location = null,
+                allowedIPs = "0.0.0.0/0,::0/0",
+            ),
+            testee.get("testpublickey"),
+        )
+    }
 }
 
 private class FakeWgServerDebugProvider : WgServerDebugProvider {
     val cachedServers = mutableListOf<Server>()
+    var selectedServer: String? = "egress.usc"
 
-    override suspend fun getSelectedServerName(): String? {
-        return "egress.usc"
-    }
+    override suspend fun getSelectedServerName(): String? = selectedServer
 
     override suspend fun storeEligibleServers(servers: List<Server>) {
         cachedServers.addAll(servers)

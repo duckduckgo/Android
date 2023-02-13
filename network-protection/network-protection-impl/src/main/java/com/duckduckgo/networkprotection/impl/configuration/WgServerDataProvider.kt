@@ -60,8 +60,19 @@ class RealWgServerDataProvider @Inject constructor(
                     }
                 }
             }
+            .filter {
+                if (appBuildConfig.isInternalBuild()) {
+                    serverDebugProvider.getPlugins().firstOrNull()?.let { provider ->
+                        provider.getSelectedServerName()?.let { selectedServer ->
+                            it.server.name == selectedServer
+                        } ?: true
+                    } ?: true
+                } else {
+                    true
+                }
+            }
             .run {
-                val selectedServer = this.findClosetServer(timezoneProvider.getTimeZone())
+                val selectedServer = this.findClosestServer(timezoneProvider.getTimeZone())
                 logcat { "Closest server is: ${selectedServer.server.name}" }
                 wgVpnControllerService.registerKey(
                     RegisterKeyBody(
@@ -99,7 +110,7 @@ class RealWgServerDataProvider @Inject constructor(
 
     private fun String.getDisplayableCountry(): String = Locale("", this).displayCountry.lowercase().capitalizeFirstLetter()
 
-    private fun Collection<RegisteredServerInfo>.findClosetServer(timeZone: TimeZone): RegisteredServerInfo {
+    private fun Collection<RegisteredServerInfo>.findClosestServer(timeZone: TimeZone): RegisteredServerInfo {
         val serverAttributes = this.map { ServerAttributes(it.server.attributes) }.sortedBy { it.tzOffset }
         var min = Int.MAX_VALUE.toLong()
         val offset = TimeUnit.MILLISECONDS.toSeconds(timeZone.rawOffset.toLong())

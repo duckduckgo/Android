@@ -27,8 +27,12 @@ class NetPServerRepository constructor(
         return serversDao.getSelectedServer()?.egressServer
     }
 
-    suspend fun setSelectedServer(name: String) {
-        serversDao.selectServer(name)
+    suspend fun setSelectedServer(name: String?) {
+        if (name.isNullOrBlank()) {
+            serversDao.clearSelectedServer()
+        } else {
+            serversDao.selectServer(name)
+        }
     }
 
     suspend fun storeServers(servers: List<NetPEgressServer>) {
