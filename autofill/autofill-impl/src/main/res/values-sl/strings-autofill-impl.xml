@@ -34,7 +34,7 @@
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Ali želite, da DuckDuckGo shrani vašo prijavo?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Več možnosti</string>
 
-    <string name="useSavedLoginDialogTitle">Želite uporabiti shranjene prijavne podatke?</string>
+    <string name="useSavedLoginDialogTitle">Želite uporabiti shranjene podatke za prijavo?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Prijava za %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Prijava za spletno mesto</string>
 

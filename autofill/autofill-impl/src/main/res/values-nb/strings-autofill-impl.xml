@@ -34,7 +34,7 @@
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Vil du at DuckDuckGo skal lagre påloggingen din?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Flere alternativer</string>
 
-    <string name="useSavedLoginDialogTitle">Vil du bruke lagret pålogging?</string>
+    <string name="useSavedLoginDialogTitle">Vil du bruke en lagret pålogging?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Pålogging for %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Pålogging for nettsted</string>
 
