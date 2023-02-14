@@ -21,8 +21,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
 import com.duckduckgo.autofill.api.Autofill
-import com.duckduckgo.autofill.api.feature.AutofillFeatureName
-import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.autofill.api.AutofillFeature
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -44,23 +44,25 @@ class EmailJavascriptInterfaceTest {
 
     private val mockEmailManager: EmailManager = mock()
     private val mockWebView: WebView = mock()
-    private val mockFeatureToggle: FeatureToggle = mock()
+    private lateinit var autofillFeature: AutofillFeature
     private val mockAutofill: Autofill = mock()
     lateinit var testee: EmailJavascriptInterface
     private var counter = 0
 
     @Before
     fun setup() {
+        autofillFeature = com.duckduckgo.autofill.api.FakeAutofillFeature.create()
+
         testee = EmailJavascriptInterface(
             mockEmailManager,
             mockWebView,
             DuckDuckGoUrlDetectorImpl(),
             coroutineRule.testDispatcherProvider,
-            mockFeatureToggle,
+            autofillFeature,
             mockAutofill,
         ) { counter++ }
 
-        whenever(mockFeatureToggle.isFeatureEnabled(AutofillFeatureName.Autofill.value)).thenReturn(true)
+        autofillFeature.self().setEnabled(Toggle.State(enable = true))
         whenever(mockAutofill.isAnException(any())).thenReturn(false)
     }
 
@@ -130,7 +132,7 @@ class EmailJavascriptInterfaceTest {
     @Test
     fun whenShowTooltipAndFeatureDisabledThenLambdaNotCalled() {
         whenever(mockWebView.url).thenReturn(NON_EMAIL_URL)
-        whenever(mockFeatureToggle.isFeatureEnabled(AutofillFeatureName.Autofill.value)).thenReturn(false)
+        autofillFeature.self().setEnabled(Toggle.State(enable = false))
 
         testee.showTooltip()
 

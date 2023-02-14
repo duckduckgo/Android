@@ -38,6 +38,7 @@ import javax.inject.Inject
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.utils.addToStdlib.ifFalse
 
 @OptIn(ExperimentalAnvilApi::class)
 @AutoService(CodeGenerator::class)
@@ -45,6 +46,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
 
     private val settingsStorePresent = AtomicBoolean(true)
     private val exceptionStorePresent = AtomicBoolean(true)
+    private val toggleStorePresent = AtomicBoolean(false)
 
     override fun isApplicable(context: AnvilContext): Boolean = true
 
@@ -177,26 +179,36 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             addType(
                 TypeSpec.classBuilder(generatedClassName)
                     .addAnnotations(
-                        listOf(
-                            AnnotationSpec
-                                .builder(ContributesMultibinding::class)
-                                .addMember("scope = %T::class", scope.asClassName())
-                                .addMember("boundType = %T::class", privacyFeaturePlugin.asClassName(module))
-                                .addMember("ignoreQualifier = true")
-                                .build(),
-                            AnnotationSpec
-                                .builder(ContributesBinding::class)
-                                .addMember("scope = %T::class", scope.asClassName())
-                                .addMember("boundType = %T::class", Toggle.Store::class.asClassName())
-                                .build(),
-                            AnnotationSpec
-                                .builder(RemoteFeatureStoreNamed::class).addMember("value = %T::class", boundType.asClassName())
-                                .build(),
-                            AnnotationSpec
-                                .builder(singleInstanceAnnotationFqName.asClassName(module))
-                                .addMember("scope = %T::class", scope.asClassName())
-                                .build(),
-                        ),
+                        buildList {
+                            add(
+                                AnnotationSpec
+                                    .builder(ContributesMultibinding::class)
+                                    .addMember("scope = %T::class", scope.asClassName())
+                                    .addMember("boundType = %T::class", privacyFeaturePlugin.asClassName(module))
+                                    .addMember("ignoreQualifier = true")
+                                    .build(),
+                            )
+                            toggleStorePresent.get().ifFalse {
+                                add(
+                                    AnnotationSpec
+                                        .builder(ContributesBinding::class)
+                                        .addMember("scope = %T::class", scope.asClassName())
+                                        .addMember("boundType = %T::class", Toggle.Store::class.asClassName())
+                                        .build(),
+                                )
+                                add(
+                                    AnnotationSpec
+                                        .builder(RemoteFeatureStoreNamed::class).addMember("value = %T::class", boundType.asClassName())
+                                        .build(),
+                                )
+                            }
+                            add(
+                                AnnotationSpec
+                                    .builder(singleInstanceAnnotationFqName.asClassName(module))
+                                    .addMember("scope = %T::class", scope.asClassName())
+                                    .build(),
+                            )
+                        },
                     )
                     .addSuperinterface(privacyFeaturePlugin.asClassName(module))
                     .addSuperinterface(Toggle.Store::class.asClassName())
@@ -724,21 +736,28 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             )
         }
         with(annotation.settingsStoreOrNull()) {
-            if (this == null) {
-                settingsStorePresent.set(false)
-            } else if (this.directSuperTypeReferences().none { it.asClassReferenceOrNull()?.fqName == FeatureSettings.Store::class.fqName }) {
+            settingsStorePresent.set(this != null)
+            if (this != null && this.directSuperTypeReferences().none { it.asClassReferenceOrNull()?.fqName == FeatureSettings.Store::class.fqName }) {
                 throw AnvilCompilationException(
                     "${vmClass.fqName} [settingsStore] must extend [FeatureSettings.Store]",
                     element = vmClass.clazz.identifyingElement,
                 )
             }
         }
-        with(annotation.exceptionsStore()) {
-            if (this == null) {
-                exceptionStorePresent.set(false)
-            } else if (this.directSuperTypeReferences().none { it.asClassReferenceOrNull()?.fqName == FeatureExceptions.Store::class.fqName }) {
+        with(annotation.exceptionsStoreOrNull()) {
+            exceptionStorePresent.set(this != null)
+            if (this != null && this.directSuperTypeReferences().none { it.asClassReferenceOrNull()?.fqName == FeatureExceptions.Store::class.fqName }) {
                 throw AnvilCompilationException(
-                    "${vmClass.fqName} [settingsStore] must extend [FeatureExceptions.Store]",
+                    "${vmClass.fqName} [exceptionsStore] must extend [FeatureExceptions.Store]",
+                    element = vmClass.clazz.identifyingElement,
+                )
+            }
+        }
+        with(annotation.toggleStoreOrNull()) {
+            toggleStorePresent.set(this != null)
+            if (this != null && this.directSuperTypeReferences().none { it.asClassReferenceOrNull()?.fqName == Toggle.Store::class.fqName }) {
+                throw AnvilCompilationException(
+                    "${vmClass.fqName} [toggleStore] must extend [Toggle.Store]",
                     element = vmClass.clazz.identifyingElement,
                 )
             }
@@ -785,8 +804,11 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
     private fun AnnotationReference.settingsStoreOrNull(): ClassReference? {
         return argumentAt("settingsStore", 3)?.value()
     }
-    private fun AnnotationReference.exceptionsStore(): ClassReference? {
+    private fun AnnotationReference.exceptionsStoreOrNull(): ClassReference? {
         return argumentAt("exceptionsStore", 4)?.value()
+    }
+    private fun AnnotationReference.toggleStoreOrNull(): ClassReference? {
+        return argumentAt("toggleStore", 5)?.value()
     }
 
     private fun ClassReference.declaredFunctions(): List<FunctionReference> {

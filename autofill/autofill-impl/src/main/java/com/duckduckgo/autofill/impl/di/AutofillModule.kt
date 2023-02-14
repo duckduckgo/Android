@@ -31,11 +31,7 @@ import com.duckduckgo.autofill.store.RealInternalTestUserStore
 import com.duckduckgo.autofill.store.RealLastUpdatedTimeProvider
 import com.duckduckgo.autofill.store.SecureStoreBackedAutofillStore
 import com.duckduckgo.autofill.store.feature.AutofillFeatureRepository
-import com.duckduckgo.autofill.store.feature.AutofillFeatureToggleRepository
-import com.duckduckgo.autofill.store.feature.AutofillFeatureToggleStore
 import com.duckduckgo.autofill.store.feature.RealAutofillFeatureRepository
-import com.duckduckgo.autofill.store.feature.RealAutofillFeatureToggleRepository
-import com.duckduckgo.autofill.store.feature.RealAutofillFeatureToggleStore
 import com.duckduckgo.autofill.store.urlmatcher.AutofillDomainNameUrlMatcher
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.securestorage.api.SecureStorage
@@ -88,17 +84,5 @@ class AutofillModule {
         dispatcherProvider: DispatcherProvider,
     ): AutofillFeatureRepository {
         return RealAutofillFeatureRepository(database, coroutineScope, dispatcherProvider)
-    }
-
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun provideAutofillFeatureToggleRepository(autofillToggleStore: AutofillFeatureToggleStore): AutofillFeatureToggleRepository {
-        return RealAutofillFeatureToggleRepository(autofillToggleStore)
-    }
-
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun provideAutofillFeatureToggleStore(context: Context): AutofillFeatureToggleStore {
-        return RealAutofillFeatureToggleStore(context)
     }
 }

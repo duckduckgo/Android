@@ -28,11 +28,17 @@ import kotlin.reflect.KClass
  *   featureName = "myFeatureName",
  *   settingsStore = MyFeatureSettingsStore::class,
  *   exceptionStore = MyFeatureExceptionStore::class,
+ *   toggleStore = MyFeatureToggleStore::class,
  * )
  * interface MyFeature {
  *
  * }
  * ```
+ * where:
+ * - `settingsStore` is optional and should be defined only when the feature contains settings
+ * - `exceptionStore` is optional and should be defined only when the feature contains exceptions
+ * - `toggleStore` is optional. If not provided the framework internally uses shared prefs. Provide it if you need specific
+ * functionalities for this store, like eg. multi-process
  */
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
@@ -48,9 +54,12 @@ annotation class ContributesRemoteFeature(
     /** The name of the remote feature */
     val featureName: String,
 
-    /** The class that implements the [RemoteFeatureSettingsStore] interface */
+    /** The class that implements the [FeatureSettings.Store] interface */
     val settingsStore: KClass<*> = Unit::class,
 
-    /** The class that implements the [RemoteFeatureExceptionStore] interface */
+    /** The class that implements the [FeatureExceptions.Store] interface */
     val exceptionsStore: KClass<*> = Unit::class,
+
+    /** The class that implements the [Toggle.Store] interface */
+    val toggleStore: KClass<*> = Unit::class,
 )
