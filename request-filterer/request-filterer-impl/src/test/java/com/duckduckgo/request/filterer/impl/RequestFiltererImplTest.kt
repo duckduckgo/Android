@@ -207,6 +207,19 @@ class RequestFiltererImplTest {
         assertFalse(requestFilterer.shouldFilterOutRequest(mockRequest, documentUrl))
     }
 
+    @Test
+    fun whenDocumentUrlIsMalformedThenReturnFalse() {
+        requestFilterer.registerOnPageCreated("http://foo.com")
+        assertFalse(requestFilterer.shouldFilterOutRequest(mockRequest, "abc123"))
+    }
+
+    @Test
+    fun whenPreviousUrlIsMalformedThenReturnFalse() {
+        requestFilterer.registerOnPageCreated("abc123")
+        requestFilterer.registerOnPageCreated("http://foo.com")
+        assertFalse(requestFilterer.shouldFilterOutRequest(mockRequest, "http://bar.com"))
+    }
+
     companion object {
         private const val WINDOW = 200
     }
