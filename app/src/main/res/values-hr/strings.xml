@@ -138,6 +138,9 @@
     <string name="settingsAppLinksAskEveryTime">Pitaj svaki puta</string>
     <string name="settingsAppLinksAlways">Uvijek</string>
     <string name="settingsAppLinksNever">Nikada</string>
+    <string name="settingsTitleNotifications">Obavijesti</string>
+    <string name="settingsSubtitleNotificationsDisabled">Onemogućeno</string>
+    <string name="settingsSubtitleNotificationsEnabled">Omogućeno</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Spremi</string>
@@ -682,4 +685,9 @@
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Automatsko popunjavanje</string>
+
+    <!-- Notify Me View on Downloads -->
+    <string name="downloadsNotifyMeTitle">Saznaj kad su preuzimanja spremna</string>
+    <string name="downloadsNotifyMeSubtitle">Primi obavijest kad se preuzimanja završe.</string>
+
 </resources>

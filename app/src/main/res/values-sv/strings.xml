@@ -138,6 +138,9 @@
     <string name="settingsAppLinksAskEveryTime">Fråga varje gång</string>
     <string name="settingsAppLinksAlways">Alltid</string>
     <string name="settingsAppLinksNever">Aldrig</string>
+    <string name="settingsTitleNotifications">Meddelanden</string>
+    <string name="settingsSubtitleNotificationsDisabled">Inaktiverad</string>
+    <string name="settingsSubtitleNotificationsEnabled">Aktiverad</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Spara</string>
@@ -674,4 +677,9 @@
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Automatisk ifyllning</string>
+
+    <!-- Notify Me View on Downloads -->
+    <string name="downloadsNotifyMeTitle">Få reda på när nerladdningar är klara</string>
+    <string name="downloadsNotifyMeSubtitle">Få ett meddelande när nerladdningar är klara.</string>
+
 </resources>

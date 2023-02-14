@@ -406,4 +406,8 @@
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Ορισμένες εφαρμογές ενδέχεται να αντιμετωπίζουν προβλήματα όταν είναι ενεργοποιημένη η Προστασία παρακολούθησης από εφαρμογές.\n<annotation type="learn_why_link">Μάθετε γιατί</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Η προστασία είναι απενεργοποιημένη για εφαρμογές με γνωστά προβλήματα. Μπορείτε να ενεργοποιήσετε τις εφαρμογές αυτές, ωστόσο ενδέχεται να μη λειτουργούν όπως αναμένεται. <annotation type="learn_why_link">Μάθετε γιατί</annotation></string>
 
+    <!-- Notify Me View on AppTP -->
+    <string name="appTrackingProtectionNotifyMeTitle">Έχετε τον νου σας στις αποκλεισμένες εφαρμογές παρακολούθησης</string>
+    <string name="appTrackingProtectionNotifyMeSubtitle">Λάβετε ενημερώσεις σχετικά με μπλοκαρισμένες προσπάθειες παρακολούθησης στην ενότητα ειδοποιήσεων.</string>
+
 </resources>

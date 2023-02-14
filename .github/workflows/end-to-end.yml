@@ -82,6 +82,16 @@ jobs:
           android-api-level: 30
           workspace: .maestro/release_tests
 
+      - name: Notifications permissions Android 13+
+        if: always()
+        uses: mobile-dev-inc/action-maestro-cloud@v1.2.3
+        with:
+          api-key: ${{ secrets.MOBILE_DEV_API_KEY }}
+          name: ${{ github.sha }}
+          app-file: apk/release.apk
+          android-api-level: 33
+          workspace: .maestro/notifications_permissions_android13_plus
+
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
         uses: honeycombio/gha-create-asana-task@main

@@ -138,6 +138,9 @@
     <string name="settingsAppLinksAskEveryTime">Kérdezzen rá minden alkalommal</string>
     <string name="settingsAppLinksAlways">Mindig</string>
     <string name="settingsAppLinksNever">Soha</string>
+    <string name="settingsTitleNotifications">Értesítések</string>
+    <string name="settingsSubtitleNotificationsDisabled">Letiltva</string>
+    <string name="settingsSubtitleNotificationsEnabled">Engedélyezve</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Mentés</string>
@@ -674,4 +677,9 @@
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Automatikus kitöltés</string>
+
+    <!-- Notify Me View on Downloads -->
+    <string name="downloadsNotifyMeTitle">Készen álló letöltések jelzése</string>
+    <string name="downloadsNotifyMeSubtitle">Értesítés a letöltések befejeződésekor.</string>
+
 </resources>

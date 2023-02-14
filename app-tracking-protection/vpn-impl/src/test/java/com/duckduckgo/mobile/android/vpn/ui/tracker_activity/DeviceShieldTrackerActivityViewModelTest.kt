@@ -29,6 +29,8 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.BannerState
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.Companion.PIXEL_PARAM_NOTIFY_ME_FROM_SCREEN_NAME
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.Companion.PIXEL_PARAM_NOTIFY_ME_FROM_SCREEN_VALUE
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.ViewEvent
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -339,5 +341,31 @@ class DeviceShieldTrackerActivityViewModelTest {
         val bannerState = viewModel.bannerState()
 
         assertEquals(BannerState.OnboardingBanner, bannerState)
+    }
+
+    @Test
+    fun whenUserClickedOnNotifyMeThenPixelIsSentWithCorrectParams() = runBlocking {
+        viewModel.commands().test {
+            viewModel.onViewEvent(ViewEvent.NotifyMeClicked)
+
+            verify(deviceShieldPixels).didPressOnNotifyMeButton(
+                mapOf(PIXEL_PARAM_NOTIFY_ME_FROM_SCREEN_NAME to PIXEL_PARAM_NOTIFY_ME_FROM_SCREEN_VALUE),
+            )
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserClickedOnDismissNotifyMeThenPixelIsSentWithCorrectParams() = runBlocking {
+        viewModel.commands().test {
+            viewModel.onViewEvent(ViewEvent.NotifyMeDismissClicked)
+
+            verify(deviceShieldPixels).didPressOnNotifyMeDismissButton(
+                mapOf(PIXEL_PARAM_NOTIFY_ME_FROM_SCREEN_NAME to PIXEL_PARAM_NOTIFY_ME_FROM_SCREEN_VALUE),
+            )
+
+            cancelAndConsumeRemainingEvents()
+        }
     }
 }

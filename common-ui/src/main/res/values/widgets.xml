@@ -538,6 +538,4 @@
         <item name="android:textColor">@color/emptyFavoriteActionTextColor</item>
     </style>
 
-
-
 </resources>

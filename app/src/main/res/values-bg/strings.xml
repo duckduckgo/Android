@@ -138,6 +138,9 @@
     <string name="settingsAppLinksAskEveryTime">Питай всеки път</string>
     <string name="settingsAppLinksAlways">Винаги</string>
     <string name="settingsAppLinksNever">Никога</string>
+    <string name="settingsTitleNotifications">Известия</string>
+    <string name="settingsSubtitleNotificationsDisabled">Деактивирано</string>
+    <string name="settingsSubtitleNotificationsEnabled">Активирано</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Запази</string>
@@ -674,4 +677,9 @@
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Автоматично попълване</string>
+
+    <!-- Notify Me View on Downloads -->
+    <string name="downloadsNotifyMeTitle">Разберете кога изтеглянето е завършено</string>
+    <string name="downloadsNotifyMeSubtitle">Получавайте известие, когато изтеглянето завърши.</string>
+
 </resources>

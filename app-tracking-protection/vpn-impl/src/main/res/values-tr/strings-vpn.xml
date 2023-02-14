@@ -406,4 +406,8 @@
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Uygulama İzleme Koruması etkinleştirildiğinde bazı uygulamalar sorun yaşayabilir. <annotation type="learn_why_link">Nedenini Öğrenin</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Bilinen sorunları olan uygulamalar için koruma devre dışı bırakılır. Bu uygulamaları etkinleştirebilirsiniz, ancak beklendiği gibi çalışmayabilirler. <annotation type="learn_why_link">Nedenini öğrenin</annotation></string>
 
+    <!-- Notify Me View on AppTP -->
+    <string name="appTrackingProtectionNotifyMeTitle">Engellenen izleyicilerden haberdar olun</string>
+    <string name="appTrackingProtectionNotifyMeSubtitle">Bildirim çekmecenizde engellenen izleme girişimleri hakkında güncellemeler alın.</string>
+
 </resources>

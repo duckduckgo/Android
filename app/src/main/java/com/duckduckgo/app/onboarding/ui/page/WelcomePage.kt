@@ -16,12 +16,15 @@
 
 package com.duckduckgo.app.onboarding.ui.page
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewPropertyAnimatorCompat
 import androidx.lifecycle.ViewModelProvider
@@ -49,6 +52,16 @@ class WelcomePage : OnboardingPageFragment() {
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
 
+    private val requestPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+        // In case of screen rotation while the notifications permissions prompt is shown on screen a DENY result is received
+        // as the dialog gets automatically dismissed and recreated. Proceed with the welcome animation only if the dialog is not
+        // displayed on top of the onboarding.
+        if (view?.windowVisibility == View.VISIBLE) {
+            // Nothing to do at this point with the result. Proceed with the welcome animation.
+            scheduleWelcomeAnimation(ANIMATION_DELAY_AFTER_NOTIFICATIONS_PERMISSIONS_HANDLED)
+        }
+    }
+
     private var ctaText: String = ""
     private var welcomeAnimation: ViewPropertyAnimatorCompat? = null
     private var typingAnimation: ViewPropertyAnimatorCompat? = null
@@ -70,13 +83,22 @@ class WelcomePage : OnboardingPageFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         configureDaxCta()
-        scheduleWelcomeAnimation()
+        requestNotificationsPermissions()
         setSkipAnimationListener()
 
         lifecycleScope.launch {
             events.asFlow()
                 .flatMapLatest { welcomePageViewModel.reduce(it) }
                 .collect(::render)
+        }
+    }
+
+    @SuppressLint("InlinedApi")
+    private fun requestNotificationsPermissions() {
+        if (appBuildConfig.sdkInt >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            requestPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            scheduleWelcomeAnimation()
         }
     }
 
@@ -193,6 +215,7 @@ class WelcomePage : OnboardingPageFragment() {
         private const val MAX_ALPHA = 1f
         private const val ANIMATION_DURATION = 400L
         private const val ANIMATION_DELAY = 1400L
+        private const val ANIMATION_DELAY_AFTER_NOTIFICATIONS_PERMISSIONS_HANDLED = 800L
 
         private const val DEFAULT_BROWSER_ROLE_MANAGER_DIALOG = 101
     }

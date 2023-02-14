@@ -63,6 +63,8 @@ interface SettingsDataStore {
     var automaticallyClearWhenOption: ClearWhenOption
     var appBackgroundedTimestamp: Long
     var appNotificationsEnabled: Boolean
+    var notifyMeInDownloadsDismissed: Boolean
+
     fun isCurrentlySelected(clearWhatOption: ClearWhatOption): Boolean
     fun isCurrentlySelected(clearWhenOption: ClearWhenOption): Boolean
     fun isCurrentlySelected(fireAnimation: FireAnimation): Boolean
@@ -188,6 +190,10 @@ class SettingsSharedPreferences @Inject constructor(
         return selectedFireAnimationSavedValue() == fireAnimation
     }
 
+    override var notifyMeInDownloadsDismissed: Boolean
+        get() = preferences.getBoolean(KEY_NOTIFY_ME_IN_DOWNLOADS_DISMISSED, false)
+        set(enabled) = preferences.edit { putBoolean(KEY_NOTIFY_ME_IN_DOWNLOADS_DISMISSED, enabled) }
+
     private fun automaticallyClearWhatSavedValue(): ClearWhatOption? {
         val savedValue = preferences.getString(KEY_AUTOMATICALLY_CLEAR_WHAT_OPTION, null) ?: return null
         return ClearWhatOption.valueOf(savedValue)
@@ -234,6 +240,7 @@ class SettingsSharedPreferences @Inject constructor(
         const val APP_LINKS_ENABLED = "APP_LINKS_ENABLED"
         const val SHOW_APP_LINKS_PROMPT = "SHOW_APP_LINKS_PROMPT"
         const val SHOW_AUTOMATIC_FIREPROOF_DIALOG = "SHOW_AUTOMATIC_FIREPROOF_DIALOG"
+        const val KEY_NOTIFY_ME_IN_DOWNLOADS_DISMISSED = "KEY_NOTIFY_ME_IN_DOWNLOADS_DISMISSED"
     }
 
     private class FireAnimationPrefsMapper {
