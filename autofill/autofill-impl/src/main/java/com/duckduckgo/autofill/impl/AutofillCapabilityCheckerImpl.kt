@@ -59,10 +59,10 @@ class AutofillCapabilityCheckerImpl @Inject constructor(
      *
      * We purposely don't couple this check against [isSecureAutofillAvailable] or [isAutofillEnabledByUser].
      */
-    override suspend fun canAccessCredentialManagementScreen(): Boolean {
-        if (isInternalTester()) return true
-        if (!isGlobalFeatureEnabled()) return false
-        return autofillFeature.accessCredentialManagement().isEnabled()
+    override suspend fun canAccessCredentialManagementScreen(): Boolean = withContext(dispatcherProvider.io()) {
+        if (isInternalTester()) return@withContext true
+        if (!isGlobalFeatureEnabled()) return@withContext false
+        return@withContext autofillFeature.accessCredentialManagement().isEnabled()
     }
 
     private suspend fun isInternalTester(): Boolean {
