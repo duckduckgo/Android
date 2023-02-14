@@ -426,4 +426,8 @@
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Pri nekaterih aplikacijah se lahko pojavijo težave, ko je omogočena zaščita pred sledenjem aplikaciji.\n<annotation type="learn_why_link">Več o tem</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Zaščita je onemogočena za aplikacije z znanimi težavami. Te aplikacije lahko omogočite, vendar morda ne bodo delovale po pričakovanjih. <annotation type="learn_why_link">Več o tem</annotation></string>
 
+    <!-- Notify Me View on AppTP -->
+    <string name="appTrackingProtectionNotifyMeTitle">Bodite pozorni na blokirane sledilnike</string>
+    <string name="appTrackingProtectionNotifyMeSubtitle">Posodobitve o blokiranih poskusih sledenja prejemajte v predal za obvestila.</string>
+
 </resources>

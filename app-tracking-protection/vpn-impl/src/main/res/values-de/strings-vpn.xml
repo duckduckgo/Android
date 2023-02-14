@@ -406,4 +406,8 @@
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Bei einigen Apps können Probleme auftreten, wenn die App Tracking Protection aktiviert ist.\n<annotation type="learn_why_link">Erfahre mehr</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Der Schutz ist für Apps mit bekannten Problemen deaktiviert. Du kannst diese Apps aktivieren, aber sie funktionieren möglicherweise nicht wie erwartet. <annotation type="learn_why_link">Erfahre mehr</annotation></string>
 
+    <!-- Notify Me View on AppTP -->
+    <string name="appTrackingProtectionNotifyMeTitle">Behalte blockierte Tracker im Auge</string>
+    <string name="appTrackingProtectionNotifyMeSubtitle">Erhalte Updates zu blockierten Tracking-Versuchen in deinem Benachrichtigungsfach.</string>
+
 </resources>

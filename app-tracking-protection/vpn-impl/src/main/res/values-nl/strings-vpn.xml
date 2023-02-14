@@ -406,4 +406,8 @@
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Sommige apps kunnen problemen ondervinden als App Tracking Protection is ingeschakeld.\n<annotation type="learn_why_link">Meer informatie</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Bescherming is uitgeschakeld voor apps met bekende problemen. Je kunt deze apps inschakelen, maar ze werken mogelijk niet zoals verwacht. <annotation type="learn_why_link">Meer informatie</annotation></string>
 
+    <!-- Notify Me View on AppTP -->
+    <string name="appTrackingProtectionNotifyMeTitle">Houd geblokkeerde trackers in de gaten</string>
+    <string name="appTrackingProtectionNotifyMeSubtitle">Ontvang meldingen over geblokkeerde trackingpogingen.</string>
+
 </resources>

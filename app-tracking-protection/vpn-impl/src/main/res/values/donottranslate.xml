@@ -17,7 +17,4 @@
 
 <resources>
 
-    <!-- Notify Me View on Downloads-->
-    <string name="appTrackingProtectionNotifyMeTitle">Keep an eye on blocked trackers</string>
-    <string name="appTrackingProtectionNotifyMeSubtitle">Get updates about blocked tracking attempts in your notification drawer.</string>
 </resources>

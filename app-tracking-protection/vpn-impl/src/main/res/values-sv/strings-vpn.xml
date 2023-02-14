@@ -406,4 +406,8 @@
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Aktivering av App Tracking Protection kan leda till problem med vissa appar.\n<annotation type="learn_why_link">Läs om varför</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Skyddet är inaktiverat för appar med kända problem. Du kan aktivera det för dessa appar, men det kan leda till att apparna inte fungerar som de ska. <annotation type="learn_why_link">Läs om varför</annotation></string>
 
+    <!-- Notify Me View on AppTP -->
+    <string name="appTrackingProtectionNotifyMeTitle">Håll ett öga på blockerade spårare</string>
+    <string name="appTrackingProtectionNotifyMeSubtitle">Få uppdateringar om blockerade spårningsförsök i dina meddelanden.</string>
+
 </resources>

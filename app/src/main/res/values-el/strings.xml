@@ -138,6 +138,9 @@
     <string name="settingsAppLinksAskEveryTime">Να γίνεται ερώτηση κάθε φορά</string>
     <string name="settingsAppLinksAlways">Πάντα</string>
     <string name="settingsAppLinksNever">Ποτέ</string>
+    <string name="settingsTitleNotifications">Ειδοποιήσεις</string>
+    <string name="settingsSubtitleNotificationsDisabled">Απενεργοποιήθηκε</string>
+    <string name="settingsSubtitleNotificationsEnabled">Ενεργοποιήθηκε</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Αποθήκευση</string>
@@ -674,4 +677,9 @@
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Αυτόματη συμπλήρωση</string>
+
+    <!-- Notify Me View on Downloads -->
+    <string name="downloadsNotifyMeTitle">Ανακαλύψτε πότε είναι έτοιμες οι λήψεις</string>
+    <string name="downloadsNotifyMeSubtitle">Λάβετε ειδοποίηση όταν ολοκληρωθούν οι λήψεις.</string>
+
 </resources>
