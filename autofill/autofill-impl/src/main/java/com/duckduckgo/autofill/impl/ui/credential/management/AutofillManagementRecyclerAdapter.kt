@@ -44,6 +44,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementR
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem.NoMatchingSearchResults
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialGrouper
 import com.duckduckgo.autofill.impl.ui.credential.management.suggestion.SuggestionListBuilder
+import com.duckduckgo.autofill.impl.ui.credential.management.viewing.extractTitle
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import kotlinx.coroutines.launch
 
@@ -51,7 +52,6 @@ class AutofillManagementRecyclerAdapter(
     val lifecycleOwner: LifecycleOwner,
     val faviconManager: FaviconManager,
     val grouper: CredentialGrouper,
-    val titleExtractor: LoginCredentialTitleExtractor,
     private val suggestionListBuilder: SuggestionListBuilder,
     private val onCredentialSelected: (credentials: LoginCredentials) -> Unit,
     private val onContextMenuItemClicked: (ContextMenuAction) -> Unit,
@@ -135,7 +135,7 @@ class AutofillManagementRecyclerAdapter(
         viewHolder: CredentialsViewHolder,
     ) {
         with(viewHolder.binding) {
-            title.text = titleExtractor.extract(loginCredentials)
+            title.text = loginCredentials.extractTitle()
             subtitle.text = loginCredentials.username
             root.setOnClickListener { onCredentialSelected(loginCredentials) }
 

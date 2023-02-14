@@ -59,7 +59,6 @@ class AutofillStoredBackJavascriptInterfaceTest {
     private val autofillMessagePoster: AutofillMessagePoster = mock()
     private val autofillResponseWriter: AutofillResponseWriter = mock()
     private val currentUrlProvider: UrlProvider = mock()
-    private val autofillDomainFormatter: AutofillDomainFormatter = AutofillDomainFormatterDomainNameOnly()
     private val autofillCapabilityChecker: AutofillCapabilityChecker = mock()
     private val coroutineScope: CoroutineScope = TestScope()
 
@@ -81,7 +80,6 @@ class AutofillStoredBackJavascriptInterfaceTest {
             coroutineScope = coroutineScope,
             currentUrlProvider = currentUrlProvider,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
-            autofillDomainFormatter = autofillDomainFormatter,
             autofillCapabilityChecker = autofillCapabilityChecker,
         )
         testee.callback = testCallback

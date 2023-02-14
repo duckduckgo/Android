@@ -41,7 +41,6 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementR
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ContextMenuAction.Delete
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ContextMenuAction.Edit
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel
-import com.duckduckgo.autofill.impl.ui.credential.management.LoginCredentialTitleExtractor
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialGrouper
 import com.duckduckgo.autofill.impl.ui.credential.management.suggestion.SuggestionListBuilder
 import com.duckduckgo.autofill.impl.ui.credential.management.suggestion.SuggestionMatcher
@@ -65,9 +64,6 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
 
     @Inject
     lateinit var credentialGrouper: CredentialGrouper
-
-    @Inject
-    lateinit var titleExtractor: LoginCredentialTitleExtractor
 
     @Inject
     lateinit var suggestionMatcher: SuggestionMatcher
@@ -240,7 +236,6 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
             this,
             faviconManager = faviconManager,
             grouper = credentialGrouper,
-            titleExtractor = titleExtractor,
             suggestionListBuilder = suggestionListBuilder,
             onCredentialSelected = this::onCredentialsSelected,
             onContextMenuItemClicked = {

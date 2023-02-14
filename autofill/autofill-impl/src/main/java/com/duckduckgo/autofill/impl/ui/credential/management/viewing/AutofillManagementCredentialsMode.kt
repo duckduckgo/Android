@@ -27,6 +27,7 @@ import android.view.View
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -35,8 +36,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoFragment
 import com.duckduckgo.app.global.FragmentViewModelFactory
+import com.duckduckgo.app.global.extractDomain
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.FragmentAutofillManagementEditModeBinding
@@ -72,6 +75,9 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
 
     @Inject
     lateinit var saveStateWatcher: SaveStateWatcher
+
+    @Inject
+    lateinit var dispatchers: DispatcherProvider
 
     // we need to revert the toolbar title when this fragment is destroyed, so will track its initial value
     private var initialActionBarTitle: String? = null
@@ -231,7 +237,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
                 lastUpdatedView.text = getString(R.string.credentialManagementEditLastUpdated, lastUpdatedDateFormatter.format(it))
             }
 
-            getActionBar()?.title = credentials.domainTitle ?: credentials.domain
+            getActionBar()?.title = credentials.extractTitle()
         }
     }
 
@@ -342,25 +348,26 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
     private fun updateToolbarForView(credentials: LoginCredentials) {
         getActionBar()?.apply {
             setHomeAsUpIndicator(com.duckduckgo.mobile.android.R.drawable.ic_arrow_left_24)
-            title = credentials.domainTitle ?: credentials.domain
+            title = credentials.extractTitle()
             setDisplayUseLogoEnabled(true)
         }
         invalidateMenu()
     }
 
     private fun loadDomainFavicon(credentials: LoginCredentials) {
-        lifecycleScope.launch {
+        lifecycleScope.launch(dispatchers.io()) {
             credentials.domain?.let {
+                val size = resources.getDimensionPixelSize(dimen.toolbarIconSize)
                 getActionBar()?.setLogo(
                     BitmapDrawable(
                         resources,
                         faviconManager.loadFromDiskWithParams(
                             tabId = null,
                             url = it,
-                            width = resources.getDimensionPixelSize(dimen.toolbarIconSize),
-                            height = resources.getDimensionPixelSize(dimen.toolbarIconSize),
+                            width = size,
+                            height = size,
                             cornerRadius = resources.getDimensionPixelSize(dimen.keyline_0),
-                        ),
+                        ) ?: faviconManager.generateDefaultFavicon(it.extractDomain().orEmpty()).toBitmap(size, size),
                     ),
                 )
             }
@@ -374,3 +381,5 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
         fun instance() = AutofillManagementCredentialsMode()
     }
 }
+
+fun LoginCredentials.extractTitle(): String? = this.domainTitle ?: this.domain
