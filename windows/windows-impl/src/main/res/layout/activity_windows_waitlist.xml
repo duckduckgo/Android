@@ -91,6 +91,25 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/statusTitle" />
 
+            <FrameLayout
+                android:id="@+id/waitlistNotifyMe"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/waitlistDescription"
+                android:visibility="gone">
+
+                <com.duckduckgo.mobile.android.ui.notifyme.NotifyMeView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="@string/waitlistNotifyMeTitle"
+                    app:secondaryText="@string/waitlistNotifyMeSubtitle"
+                    app:dismissIcon="false"
+                    app:contentOrientation="center"
+                    app:sharedPrefsKeyForDismiss="key_component_dismissed_in_downloads" />
+            </FrameLayout>
+
             <LinearLayout
                 android:id="@+id/codeFrame"
                 android:visibility="gone"
@@ -110,7 +129,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="3dp"
                     android:layout_gravity="center"
-                    android:text="@string/windows_waitlist_code_invite"/>
+                    android:text="@string/windows_waitlist_code_invite" />
 
                 <TextView
                     android:id="@+id/inviteCode"
@@ -135,7 +154,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 android:layout_marginBottom="@dimen/keyline_4"
-                android:text="@string/windows_waitlist_mac_link"/>
+                android:text="@string/windows_waitlist_mac_link" />
 
             <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:id="@+id/footerDescription"
