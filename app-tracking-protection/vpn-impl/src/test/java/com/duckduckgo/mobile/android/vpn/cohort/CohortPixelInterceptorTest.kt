@@ -18,16 +18,21 @@ package com.duckduckgo.mobile.android.vpn.cohort
 
 import com.duckduckgo.app.global.api.FakeChain
 import com.duckduckgo.app.global.api.InMemorySharedPreferences
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
+import org.mockito.Mock
+import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.threeten.bp.LocalDate
 
 class CohortPixelInterceptorTest {
+    @Mock
+    private lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
     private lateinit var cohortPixelInterceptor: CohortPixelInterceptor
     private lateinit var cohortStore: CohortStore
     private lateinit var cohortCalculator: CohortCalculator
@@ -36,12 +41,13 @@ class CohortPixelInterceptorTest {
 
     @Before
     fun setup() {
+        MockitoAnnotations.openMocks(this)
         val prefs = InMemorySharedPreferences()
         whenever(
             sharedPreferencesProvider.getSharedPreferences(eq("com.duckduckgo.mobile.atp.cohort.prefs"), eq(true), eq(true)),
         ).thenReturn(prefs)
 
-        cohortStore = RealCohortStore(sharedPreferencesProvider)
+        cohortStore = RealCohortStore(sharedPreferencesProvider, vpnFeaturesRegistry)
         cohortCalculator = RealCohortCalculator()
         cohortPixelInterceptor = CohortPixelInterceptor(cohortCalculator, cohortStore)
     }
