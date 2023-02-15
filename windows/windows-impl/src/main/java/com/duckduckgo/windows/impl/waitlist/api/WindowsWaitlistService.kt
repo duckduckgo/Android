@@ -18,6 +18,7 @@ package com.duckduckgo.windows.impl.waitlist.api
 
 import com.duckduckgo.anvil.annotations.ContributesServiceApi
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.windows.impl.waitlist.api.Url.API
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
@@ -26,14 +27,14 @@ import retrofit2.http.POST
 @ContributesServiceApi(AppScope::class)
 interface WindowsWaitlistService {
 
-    @POST("/api/auth/waitlist/windowsbrowser/join")
+    @POST("$API/api/auth/waitlist/windowsbrowser/join")
     suspend fun joinWaitlist(): WindowsWaitlistResponse
 
-    @GET("/api/auth/waitlist/windowsbrowser/status")
+    @GET("$API/api/auth/waitlist/windowsbrowser/status")
     suspend fun waitlistStatus(): WindowsWaitlistStatusResponse
 
     @FormUrlEncoded
-    @POST("/api/auth/waitlist/windowsbrowser/code")
+    @POST("$API/api/auth/waitlist/windowsbrowser/code")
     suspend fun getCode(@Field("token")token: String): WindowsInviteCodeResponse
 }
 
