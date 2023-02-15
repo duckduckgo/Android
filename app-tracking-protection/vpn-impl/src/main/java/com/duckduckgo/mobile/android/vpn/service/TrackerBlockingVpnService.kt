@@ -120,10 +120,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         appTpFeatureConfig.isEnabled(AppTpSetting.AlwaysSetDNS)
     }
 
-    private val isStartVpnErrorHandlingEnabled by lazy {
-        appTpFeatureConfig.isEnabled(AppTpSetting.StartVpnErrorHandling)
-    }
-
     private val vpnNetworkStack by lazy {
         vpnNetworkStackProvider.provideNetworkStack()
     }
@@ -271,16 +267,11 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             logcat { "NetworkSwitchHandling disabled...skip setting underlying network" }
         }
 
-        if (isStartVpnErrorHandlingEnabled) {
-            logcat { "Enable new error handling for onStartVpn" }
-            vpnNetworkStack.onStartVpn(tunInterface!!).getOrElse {
-                logcat(LogPriority.ERROR) { "Failed to start VPN" }
-                stopVpn(VpnStopReason.ERROR, false)
-                return@withContext
-            }
-        } else {
-            logcat { "Reverted error handling for onStartVpn" }
-            vpnNetworkStack.onStartVpn(tunInterface!!).getOrThrow()
+        logcat { "Enable new error handling for onStartVpn" }
+        vpnNetworkStack.onStartVpn(tunInterface!!).getOrElse {
+            logcat(LogPriority.ERROR) { "Failed to start VPN" }
+            stopVpn(VpnStopReason.ERROR, false)
+            return@withContext
         }
 
         vpnServiceCallbacksPluginPoint.getPlugins().forEach {

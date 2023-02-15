@@ -34,7 +34,6 @@ class AppTpSettingTest {
                 AppTpSetting.ProtectGames -> assertFalse(setting.defaultValue)
                 AppTpSetting.ExceptionLists -> assertTrue(setting.defaultValue)
                 AppTpSetting.OpenBeta -> assertFalse(setting.defaultValue)
-                AppTpSetting.StartVpnErrorHandling -> assertTrue(setting.defaultValue)
                 else -> throw java.lang.IllegalStateException("Missing AppTpSetting default checks")
             }
         }
