@@ -61,9 +61,7 @@ constructor(
         var deviceName = syncStore.deviceId
         if (deviceName != null) return deviceName
 
-        deviceName =
-            Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
-                ?: "UNKNOWN"
+        deviceName  = UUID.randomUUID().toString()
         return deviceName
     }
 }
