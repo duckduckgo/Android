@@ -24,16 +24,26 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.macos_impl.MacOsPixelNames.MACOS_WAITLIST_SHARE_PRESSED
 import com.duckduckgo.macos_impl.MacOsViewModel.Command.GoToWindowsClientSettings
 import com.duckduckgo.macos_impl.MacOsViewModel.Command.ShareLink
+import com.duckduckgo.windows.api.WindowsWaitlistFeature
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 @ContributesViewModel(AppScope::class)
 class MacOsViewModel @Inject constructor(
     private val pixel: Pixel,
+    private val windowsWaitlistFeature: WindowsWaitlistFeature,
 ) : ViewModel() {
+
+    private val viewStateFlow: MutableStateFlow<ViewState> = MutableStateFlow(ViewState(windowsFeatureEnabled = false))
+    val viewState: Flow<ViewState> = viewStateFlow.onStart {
+        updateViewState()
+    }
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     val commands = commandChannel.receiveAsFlow()
@@ -42,6 +52,8 @@ class MacOsViewModel @Inject constructor(
         object ShareLink : Command()
         object GoToWindowsClientSettings : Command()
     }
+
+    data class ViewState(val windowsFeatureEnabled: Boolean)
 
     fun onShareClicked() {
         viewModelScope.launch {
@@ -54,5 +66,13 @@ class MacOsViewModel @Inject constructor(
         viewModelScope.launch {
             commandChannel.send(GoToWindowsClientSettings)
         }
+    }
+
+    private suspend fun updateViewState() {
+        viewStateFlow.emit(
+            viewStateFlow.value.copy(
+                windowsFeatureEnabled = windowsWaitlistFeature.self().isEnabled(),
+            ),
+        )
     }
 }
