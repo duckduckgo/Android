@@ -16,11 +16,13 @@
 
 package com.duckduckgo.app.settings
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.fire.FireAnimationLoader
@@ -103,6 +105,7 @@ class SettingsViewModel @Inject constructor(
         val emailAddress: String? = null,
         val showAutofill: Boolean = false,
         val autoconsentEnabled: Boolean = false,
+        @StringRes val notificationsSettingSubtitleId: Int = R.string.settingsSubtitleNotificationsDisabled,
         val windowsWaitlistState: WindowsWaitlistState? = null,
     )
 
@@ -135,6 +138,7 @@ class SettingsViewModel @Inject constructor(
         data class ShowClearWhatDialog(val option: ClearWhatOption) : Command()
         data class ShowClearWhenDialog(val option: ClearWhenOption) : Command()
         object LaunchMacOs : Command()
+        object LaunchNotificationsSettings : Command()
         object LaunchWindows : Command()
     }
 
@@ -146,7 +150,7 @@ class SettingsViewModel @Inject constructor(
         pixel.fire(SETTINGS_OPENED)
     }
 
-    fun start() {
+    fun start(notificationsEnabled: Boolean = false) {
         val defaultBrowserAlready = defaultWebBrowserCapability.isDefaultBrowser()
         val variant = variantManager.getVariant()
         val savedTheme = themingDataStore.theme
@@ -173,6 +177,7 @@ class SettingsViewModel @Inject constructor(
                     emailAddress = emailManager.getEmailAddress(),
                     showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen(),
                     autoconsentEnabled = autoconsent.isSettingEnabled(),
+                    notificationsSettingSubtitleId = getNotificationsSettingSubtitleId(notificationsEnabled),
                     windowsWaitlistState = windowsSettingState(),
                 ),
             )
@@ -234,6 +239,11 @@ class SettingsViewModel @Inject constructor(
     fun userRequestedToChangeTheme() {
         viewModelScope.launch { command.send(Command.LaunchThemeSettings(viewState.value.theme)) }
         pixel.fire(SETTINGS_THEME_OPENED)
+    }
+
+    fun userRequestedToChangeNotificationsSetting() {
+        viewModelScope.launch { command.send(Command.LaunchNotificationsSettings) }
+        pixel.fire(SETTINGS_NOTIFICATIONS_PRESSED)
     }
 
     fun userRequestedToChangeAppLinkSetting() {
@@ -473,6 +483,14 @@ class SettingsViewModel @Inject constructor(
             ClearWhenOption.APP_EXIT_OR_30_MINS -> AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_30_MINS
             ClearWhenOption.APP_EXIT_OR_60_MINS -> AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_60_MINS
             else -> null
+        }
+    }
+
+    private fun getNotificationsSettingSubtitleId(notificationsEnabled: Boolean): Int {
+        return if (notificationsEnabled) {
+            R.string.settingsSubtitleNotificationsEnabled
+        } else {
+            R.string.settingsSubtitleNotificationsDisabled
         }
     }
 
