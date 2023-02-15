@@ -38,7 +38,6 @@ import com.duckduckgo.app.about.AboutDuckDuckGoActivity
 import com.duckduckgo.app.accessibility.AccessibilityActivity
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.databinding.ActivitySettingsBinding
 import com.duckduckgo.app.browser.webview.WebViewActivity
 import com.duckduckgo.app.email.ui.EmailProtectionUnsupportedActivity
@@ -258,8 +257,8 @@ class SettingsActivity : DuckDuckGoActivity() {
                     )
                     updateEmailSubtitle(it.emailAddress)
                     updateAutofill(it.showAutofill)
-                    viewsCustomize.notificationsSetting.setSecondaryText(getString(it.notificationsSettingSubtitleId))
                     updateWindowsSettings(it.windowsWaitlistState)
+                    viewsCustomize.notificationsSetting.setSecondaryText(getString(it.notificationsSettingSubtitleId))
                 }
             }.launchIn(lifecycleScope)
 
@@ -282,9 +281,9 @@ class SettingsActivity : DuckDuckGoActivity() {
 
         with(viewsMore) {
             when (waitlistState) {
-                is InBeta -> windowsSetting.setSecondaryText(getString(string.windows_settings_description_ready))
-                is JoinedWaitlist -> windowsSetting.setSecondaryText(getString(string.windows_settings_description_list))
-                is NotJoinedQueue -> windowsSetting.setSecondaryText(getString(string.windows_settings_description))
+                is InBeta -> windowsSetting.setSecondaryText(getString(R.string.windows_settings_description_ready))
+                is JoinedWaitlist -> windowsSetting.setSecondaryText(getString(R.string.windows_settings_description_list))
+                is NotJoinedQueue -> windowsSetting.setSecondaryText(getString(R.string.windows_settings_description))
                 null -> {}
             }
         }
