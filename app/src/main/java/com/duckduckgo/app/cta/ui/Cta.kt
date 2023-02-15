@@ -29,6 +29,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.model.CtaId
+import com.duckduckgo.app.cta.onboarding_experiment.TypewriterExperimentDaxDialog
 import com.duckduckgo.app.cta.ui.DaxCta.Companion.MAX_DAYS_ALLOWED
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.extensions.html
@@ -164,6 +165,50 @@ sealed class DaxDialogCta(
                     context.resources.getQuantityString(R.plurals.daxTrackersBlockedCtaZeroText, trackersFiltered.size)
                 } else {
                     context.resources.getQuantityString(R.plurals.daxTrackersBlockedCtaText, size, size)
+                }
+            return "<b>$trackersText</b>$quantityString"
+        }
+    }
+
+    class DaxTrackersBlockedExperimentCta(
+        override val onboardingStore: OnboardingStore,
+        override val appInstallStore: AppInstallStore,
+        val trackers: List<Entity>,
+        val host: String,
+    ) : DaxDialogCta(
+        CtaId.DAX_DIALOG_TRACKERS_FOUND_EXPERIMENT,
+        AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
+        AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        null,
+        Pixel.PixelValues.DAX_TRACKERS_BLOCKED_CTA, //TODO add pixel
+        onboardingStore,
+        appInstallStore,
+    ) {
+
+        override fun createCta(context: Context, daxDialogListener: DaxDialogListener): DialogFragment {
+            return TypewriterExperimentDaxDialog.newInstance(
+                daxText = getDaxText(context),
+                primaryButtonText = context.getString(R.string.onboardingLetsSeeItButton),
+            ).apply {
+                setBlockedTrackers(trackers)
+                setDaxDialogListener(daxDialogListener)
+            }
+        }
+
+        @VisibleForTesting
+        fun getDaxText(context: Context): String {
+            val trackers = trackers
+                .map { it.displayName }
+                .distinct()
+
+            val trackersFiltered = trackers.take(MAX_TRACKERS_SHOWS)
+            val trackersText = trackersFiltered.joinToString(", ")
+            val size = trackers.size - trackersFiltered.size
+            val quantityString =
+                if (size == 0) {
+                    context.resources.getQuantityString(R.plurals.daxTrackersBlockedExperimentCtaZeroText, trackersFiltered.size)
+                } else {
+                    context.resources.getQuantityString(R.plurals.daxTrackersBlockedExperimentCtaText, size, size)
                 }
             return "<b>$trackersText</b>$quantityString"
         }

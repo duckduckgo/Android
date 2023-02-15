@@ -42,6 +42,7 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.ui.store.AppTheme
+import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
@@ -289,7 +290,9 @@ class CtaViewModel @Inject constructor(
 
             // Trackers blocked
             if (!daxDialogTrackersFoundShown() && !isSerpUrl(it.url) && it.orderedTrackerBlockedEntities().isNotEmpty()) {
-                return DaxDialogCta.DaxTrackersBlockedCta(onboardingStore, appInstallStore, it.orderedTrackerBlockedEntities(), host)
+                //TODO Noelia if/else for experiment and show new flow
+                // return DaxDialogCta.DaxTrackersBlockedCta(onboardingStore, appInstallStore, it.orderedTrackerBlockedEntities(), host)
+                return DaxDialogCta.DaxTrackersBlockedExperimentCta(onboardingStore, appInstallStore, it.orderedTrackerBlockedEntities(), host)
             }
 
             // Is major network
