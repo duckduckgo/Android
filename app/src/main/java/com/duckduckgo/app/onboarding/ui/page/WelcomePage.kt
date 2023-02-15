@@ -31,12 +31,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomeBinding
 import com.duckduckgo.app.global.extensions.html
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.content_onboarding_welcome.*
-import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.flow.*
@@ -44,7 +44,7 @@ import kotlinx.coroutines.launch
 
 @ExperimentalCoroutinesApi
 @InjectWith(FragmentScope::class)
-class WelcomePage : OnboardingPageFragment() {
+class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) {
 
     @Inject
     lateinit var viewModelFactory: WelcomePageViewModelFactory
@@ -74,7 +74,7 @@ class WelcomePage : OnboardingPageFragment() {
         ViewModelProvider(this, viewModelFactory).get(WelcomePageViewModel::class.java)
     }
 
-    override fun layoutResource(): Int = R.layout.content_onboarding_welcome
+    private val binding: ContentOnboardingWelcomeBinding by viewBinding()
 
     override fun onViewCreated(
         view: View,
@@ -160,20 +160,20 @@ class WelcomePage : OnboardingPageFragment() {
             statusBarColor = Color.TRANSPARENT
             navigationBarColor = Color.BLACK
         }
-        ViewCompat.requestApplyInsets(longDescriptionContainer)
+        ViewCompat.requestApplyInsets(binding.longDescriptionContainer)
     }
 
     private fun configureDaxCta() {
         context?.let {
             ctaText = it.getString(R.string.onboardingDaxText)
-            hiddenTextCta.text = ctaText.html(it)
-            dialogTextCta.textInDialog = ctaText.html(it)
+            binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
+            binding.daxDialogCta.dialogTextCta.textInDialog = ctaText.html(it)
         }
     }
 
     private fun setSkipAnimationListener() {
-        longDescriptionContainer.setOnClickListener {
-            if (dialogTextCta.hasAnimationStarted()) {
+        binding.longDescriptionContainer.setOnClickListener {
+            if (binding.daxDialogCta.dialogTextCta.hasAnimationStarted()) {
                 finishTypingAnimation()
             } else if (!welcomeAnimationFinished) {
                 welcomeAnimation?.cancel()
@@ -184,17 +184,17 @@ class WelcomePage : OnboardingPageFragment() {
     }
 
     private fun scheduleWelcomeAnimation(startDelay: Long = ANIMATION_DELAY) {
-        welcomeAnimation = ViewCompat.animate(welcomeContent as View)
+        welcomeAnimation = ViewCompat.animate(binding.welcomeContent as View)
             .alpha(MIN_ALPHA)
             .setDuration(ANIMATION_DURATION)
             .setStartDelay(startDelay)
             .withEndAction {
-                typingAnimation = ViewCompat.animate(daxCtaContainer)
+                typingAnimation = ViewCompat.animate(binding.daxDialogCta.daxCtaContainer)
                     .alpha(MAX_ALPHA)
                     .setDuration(ANIMATION_DURATION)
                     .withEndAction {
                         welcomeAnimationFinished = true
-                        dialogTextCta.startTypingAnimation(ctaText)
+                        binding.daxDialogCta.dialogTextCta.startTypingAnimation(ctaText)
                         setPrimaryCtaListenerAfterWelcomeAlphaAnimation()
                     }
             }
@@ -202,12 +202,12 @@ class WelcomePage : OnboardingPageFragment() {
 
     private fun finishTypingAnimation() {
         welcomeAnimation?.cancel()
-        dialogTextCta.finishAnimation()
+        binding.daxDialogCta.dialogTextCta.finishAnimation()
         setPrimaryCtaListenerAfterWelcomeAlphaAnimation()
     }
 
     private fun setPrimaryCtaListenerAfterWelcomeAlphaAnimation() {
-        primaryCta.setOnClickListener { event(WelcomePageView.Event.OnPrimaryCtaClicked) }
+        binding.daxDialogCta.primaryCta.setOnClickListener { event(WelcomePageView.Event.OnPrimaryCtaClicked) }
     }
 
     companion object {
