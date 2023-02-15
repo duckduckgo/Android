@@ -26,4 +26,4 @@ import com.duckduckgo.windows.api.WindowsWaitlistFeature
     featureName = "windowsWaitlist",
 )
 @Suppress("unused")
-private interface WindowsWaitlistFeatureDI
+private interface UnusedWindowsWaitlistFeatureCodegenTrigger
