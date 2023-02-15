@@ -50,7 +50,7 @@ interface OnboardingExperimentAnimationHelper {
     )
 }
 
-@ContributesBinding(AppScope::class)
+@ContributesBinding(FragmentScope::class)
 class LottieOnboardingExperimentAnimationHelper @Inject constructor(val appTheme: AppTheme) : OnboardingExperimentAnimationHelper {
 
     override fun startTrackersOnboardingAnimationForStep(
@@ -78,26 +78,26 @@ class LottieOnboardingExperimentAnimationHelper @Inject constructor(val appTheme
         when (step) {
             SHOW_TRACKERS -> {
                 // val animationRawRes = getAnimationRawRes(logos, appTheme) will determine number of trackers
-                val res = if (appTheme.isLightModeEnabled()) R.raw.trackers_light_full else R.raw.trackers_dark_full
+                val res = if (appTheme.isLightModeEnabled()) R.raw.tracker_onboarding_3_light_full else R.raw.tracker_onboarding_3_dark_full
                 holder.setAnimation(res)
                 holder.setMinAndMaxFrame(0, 116)
                 Timber.i("Onboarding step: TRACKERS")
             }
             BLOCK_TRACKERS -> {
                 // val animationRawRes = getAnimationRawRes(logos, appTheme) will determine number of trackers
-                val res = if (appTheme.isLightModeEnabled()) R.raw.trackers_light_full else R.raw.trackers_dark_full
+                val res = if (appTheme.isLightModeEnabled()) R.raw.tracker_onboarding_3_light_full else R.raw.tracker_onboarding_3_dark_full
                 holder.setAnimation(res)
                 holder.setMinAndMaxFrame(116, 177)
                 Timber.i("Onboarding step: BLOCK_TRACKERS")
             }
             PRIVACY_SHIELD -> {
-                val res = if (appTheme.isLightModeEnabled()) R.raw.trackers_light_full else R.raw.trackers_dark_full
+                val res = if (appTheme.isLightModeEnabled()) R.raw.tracker_onboarding_3_light_full else R.raw.tracker_onboarding_3_dark_full
                 holder.setAnimation(res)
-                holder.progress = 1.0f
+                holder.setMinFrame(177)
                 Timber.i("Onboarding step: PRIVACY_SHIELD")
             }
             FULL -> {
-                val res = if (appTheme.isLightModeEnabled()) R.raw.trackers_light_full else R.raw.trackers_dark_full
+                val res = if (appTheme.isLightModeEnabled()) R.raw.tracker_onboarding_3_light_full else R.raw.tracker_onboarding_3_dark_full
                 holder.setAnimation(res)
                 Timber.i("Onboarding step: FULL_FLOW")
             }

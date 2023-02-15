@@ -16,7 +16,9 @@
 
 package com.duckduckgo.app.cta.onboarding_experiment
 
+import android.animation.Animator
 import android.app.Dialog
+import android.content.Context
 import android.content.DialogInterface
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -25,11 +27,14 @@ import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewDaxDialogExperimentBinding
+import com.duckduckgo.app.cta.onboarding_experiment.animation.LottieOnboardingExperimentAnimationHelper
+import com.duckduckgo.app.cta.onboarding_experiment.animation.OnboardingExperimentStep.BLOCK_TRACKERS
+import com.duckduckgo.app.cta.onboarding_experiment.animation.OnboardingExperimentStep.PRIVACY_SHIELD
+import com.duckduckgo.app.cta.onboarding_experiment.animation.OnboardingExperimentStep.SHOW_TRACKERS
 import com.duckduckgo.app.global.extensions.html
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.di.scopes.FragmentScope
@@ -38,12 +43,16 @@ import com.duckduckgo.mobile.android.ui.view.DaxDialogListener
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import dagger.android.support.AndroidSupportInjection
+import timber.log.Timber
+import timber.log.Timber.Forest
+import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class TypewriterExperimentDaxDialog : DialogFragment(R.layout.view_dax_dialog_experiment), DaxDialog {
 
-    // @Inject
-    // lateinit var animatorHelper: LottieOnboardingExperimentAnimationHelper
+    @Inject
+    lateinit var animatorHelper: LottieOnboardingExperimentAnimationHelper
 
     private val binding: ViewDaxDialogExperimentBinding by viewBinding()
 
@@ -58,6 +67,11 @@ class TypewriterExperimentDaxDialog : DialogFragment(R.layout.view_dax_dialog_ex
 
     fun setBlockedTrackers(blockedTrackers: List<Entity>) {
         trackers = blockedTrackers
+    }
+
+    override fun onAttach(context: Context) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -117,7 +131,7 @@ class TypewriterExperimentDaxDialog : DialogFragment(R.layout.view_dax_dialog_ex
     private fun setStepOneView() {
         setDialog()
         setListeners()
-        // animatorHelper.startTrackersOnboardingAnimationForStep(binding.onboardingTrackersBlockedAnim, FULL, trackers)
+        animatorHelper.startTrackersOnboardingAnimationForStep(binding.onboardingTrackersBlockedAnim, SHOW_TRACKERS, trackers)
         binding.dialogText.startTypingAnimation(daxText, true)
     }
 
@@ -133,14 +147,10 @@ class TypewriterExperimentDaxDialog : DialogFragment(R.layout.view_dax_dialog_ex
 
     private fun setListeners() {
         with(binding) {
-
             primaryCta.setOnClickListener {
                 dialogText.cancelAnimation()
-                Toast.makeText(context, "primaryCta selected", Toast.LENGTH_SHORT).show()
-                // daxDialogListener?.onDaxDialogPrimaryCtaClick()
-                // dismiss()
+                setStepTwoView()
             }
-
             dialogContainer.setOnClickListener {
                 dialogText.finishAnimation()
                 dismiss()
@@ -152,15 +162,40 @@ class TypewriterExperimentDaxDialog : DialogFragment(R.layout.view_dax_dialog_ex
         binding.onboardingStepTwoText.show()
         binding.primaryCta.gone()
         binding.onboardingStepOneText.gone()
+        with(binding.onboardingTrackersBlockedAnim) {
+            animatorHelper.startTrackersOnboardingAnimationForStep(this, BLOCK_TRACKERS, trackers)
+            addAnimatorListener(
+                object : Animator.AnimatorListener {
+                    override fun onAnimationRepeat(animation: Animator) {}
+                    override fun onAnimationCancel(animation: Animator) {}
+                    override fun onAnimationStart(animation: Animator) {}
+                    override fun onAnimationEnd(animation: Animator) {
+                        setStepThreeView()
+                    }
+                },
+            )
+        }
     }
 
     private fun setStepThreeView() {
-        binding.onboardingStepTwoText.gone()
-
+        binding.cardView.gone()
+        binding.logo.gone()
+        with(binding.onboardingTrackersBlockedAnim) {
+            animatorHelper.startTrackersOnboardingAnimationForStep(this, PRIVACY_SHIELD, trackers)
+            addAnimatorListener(
+                object : Animator.AnimatorListener {
+                    override fun onAnimationRepeat(animation: Animator) {}
+                    override fun onAnimationCancel(animation: Animator) {}
+                    override fun onAnimationStart(animation: Animator) {}
+                    override fun onAnimationEnd(animation: Animator) {
+                        dismiss()
+                    }
+                },
+            )
+        }
     }
 
     companion object {
-
         fun newInstance(
             daxText: String,
             primaryButtonText: String,
