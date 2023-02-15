@@ -20,6 +20,8 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
@@ -52,6 +54,7 @@ interface CohortStore {
 )
 class RealCohortStore @Inject constructor(
     private val sharedPreferencesProvider: VpnSharedPreferencesProvider,
+    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
 ) : CohortStore, VpnServiceCallbacks {
 
     private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
@@ -70,10 +73,12 @@ class RealCohortStore @Inject constructor(
     }
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        // skip if already stored
-        getCohortStoredLocalDate()?.let { return }
+        if (vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)) {
+            // skip if already stored
+            getCohortStoredLocalDate()?.let { return }
 
-        setCohortLocalDate(LocalDate.now())
+            setCohortLocalDate(LocalDate.now())
+        }
     }
 
     override fun onVpnStopped(
