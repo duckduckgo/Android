@@ -107,7 +107,7 @@
                     app:secondaryText="@string/waitlistNotifyMeSubtitle"
                     app:dismissIcon="false"
                     app:contentOrientation="center"
-                    app:sharedPrefsKeyForDismiss="key_component_dismissed_in_downloads" />
+                    app:sharedPrefsKeyForDismiss="key_component_dismissed_in_windows_waitlist" />
             </FrameLayout>
 
             <LinearLayout
