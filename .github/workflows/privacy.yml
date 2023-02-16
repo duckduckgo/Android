@@ -3,7 +3,7 @@ name: Privacy Tests
 on:
   push:
   pull_request:
-    types: [ labeled ]
+    types: [ synchronize, labeled ]
   schedule:
     - cron: '0 3 * * *' # run at 3 AM UTC
   workflow_dispatch:
