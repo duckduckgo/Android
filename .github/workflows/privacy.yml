@@ -1,6 +1,7 @@
 name: Privacy Tests
 
 on:
+  push:
   pull_request:
     types: [ labeled ]
   schedule:
