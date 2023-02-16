@@ -14,14 +14,13 @@ concurrency:
 
 jobs:
   privacy_tests:
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'content scope scripts') || github.event.schedule == '0 3 * * *' }}
     name: Privacy Tests
     runs-on: ubuntu-latest
 
     steps:
       - name: Test
-        run: |
-         x=${{ toJson(github.event.pull_request.labels.*.name) }}
-         echo $x
+        run: echo ${{ github.repository }}
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
