@@ -20,7 +20,7 @@ jobs:
 
     steps:
       - name: Test
-        run: echo ${{ github.repository }}
+        run: echo ${{ contains(github.event.pull_request.labels.*.name, 'content scope scripts') || github.event.schedule == '0 3 * * *' }}
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
