@@ -21,7 +21,6 @@
         <activity
             android:name=".management.NetworkProtectionManagementActivity"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
-            android:screenOrientation="portrait"
             android:exported="false" />
     </application>
 </manifest>
