@@ -16,7 +16,10 @@
 
 package com.duckduckgo.sync.impl.ui
 
+import android.R.id
+import android.graphics.Bitmap
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
@@ -25,12 +28,17 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.ui.view.hide
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.databinding.ActivitySyncSetupBinding
 import com.duckduckgo.sync.impl.databinding.ItemConnectedDeviceBinding
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ReadQR
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ShowMessage
+import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ShowQR
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.ViewState
+import com.google.zxing.BarcodeFormat.QR_CODE
+import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanIntentResult
 import com.journeyapps.barcodescanner.ScanOptions
@@ -62,6 +70,9 @@ class SyncInitialSetupActivity : DuckDuckGoActivity() {
     }
 
     private fun configureListeners() {
+        binding.showQRCode.setOnClickListener {
+            viewModel.onShowQRClicked()
+        }
         binding.createAccountButton.setOnClickListener { viewModel.onCreateAccountClicked() }
         binding.readQRButton.setOnClickListener { viewModel.onReadQRClicked() }
         binding.storeRecoveryCodeButton.setOnClickListener {
@@ -95,6 +106,17 @@ class SyncInitialSetupActivity : DuckDuckGoActivity() {
 
             ReadQR -> {
                 barcodeLauncher.launch(getScanOptions())
+            }
+
+            is ShowQR -> {
+                try {
+                    val barcodeEncoder = BarcodeEncoder()
+                    val bitmap: Bitmap = barcodeEncoder.encodeBitmap(command.string, QR_CODE, 400, 400)
+                    binding.qrCodeImageView.show()
+                    binding.qrCodeImageView.setImageBitmap(bitmap)
+                    binding.showQRCode.hide()
+                } catch (e: Exception) {
+                }
             }
         }
     }

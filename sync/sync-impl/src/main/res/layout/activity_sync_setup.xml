@@ -16,6 +16,7 @@
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:scrollbarAlwaysDrawVerticalTrack="true"
@@ -166,6 +167,21 @@
             android:layout_margin="10dp"
             android:layout_height="wrap_content"
             android:text="Read QR code" />
+
+        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+            android:id="@+id/showQRCode"
+            android:layout_width="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_height="wrap_content"
+            android:text="Show QR code" />
+
+        <ImageView
+            android:id="@+id/qrCodeImageView"
+            android:layout_width="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            tools:ignore="ContentDescription" />
 
         <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
             android:id="@+id/storeRecoveryCodeButton"

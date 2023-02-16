@@ -38,6 +38,7 @@ interface SyncRepository {
     fun logout(deviceId: String): Result<Boolean>
     fun deleteAccount(): Result<Boolean>
     fun latestToken(): String
+    fun getRecoveryCode(): String?
     fun getConnectedDevices(): Result<List<ConnectedDevice>>
 }
 
@@ -86,7 +87,7 @@ class AppSyncRepository @Inject constructor(
     }
 
     override fun login(): Result<Boolean> {
-        val recoveryCode = getRecoveryCode() ?: return Result.Error(reason = "Not valid Or existing recovery code")
+        val recoveryCode = getRecoveryCodeObject() ?: return Result.Error(reason = "Not valid Or existing recovery code")
 
         val primaryKey = recoveryCode.primaryKey
         val userId = recoveryCode.userID
@@ -146,7 +147,11 @@ class AppSyncRepository @Inject constructor(
         syncStore.recoveryCode = recoveryCodeJson
     }
 
-    private fun getRecoveryCode(): RecoveryCode? {
+    override fun getRecoveryCode(): String? {
+        return syncStore.recoveryCode
+    }
+
+    private fun getRecoveryCodeObject(): RecoveryCode? {
         val recoveryCodeJson = syncStore.recoveryCode ?: return null
         return Adapters.recoveryCodeAdapter.fromJson(recoveryCodeJson)
     }
