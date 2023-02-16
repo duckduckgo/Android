@@ -133,7 +133,7 @@ class TrackingProtectionAppViewHolder(val binding: RowExclusionListAppBinding) :
                 )
                 binding.deviceShieldAppEntryWarningIcon.show()
             } else {
-                binding.deviceShieldAppExclusionReason.text = itemView.context.getString(R.string.atp_ExcludedReasonManuallyEnabled)
+                binding.deviceShieldAppExclusionReason.text = context.getString(R.string.atp_ExcludedReasonManuallyEnabled)
                 binding.deviceShieldAppExclusionReason.show()
                 binding.deviceShieldAppEntryWarningIcon.setImageDrawable(
                     ContextCompat.getDrawable(
