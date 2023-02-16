@@ -19,7 +19,9 @@ jobs:
 
     steps:
       - name: Test
-        run: echo ${{ github.event.label.name }}
+        run: |
+         x=${{ toJson(github.event.pull_request.labels.*.name) }}
+         echo $x
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
