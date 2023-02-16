@@ -25,6 +25,7 @@ import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncRepository
+import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ReadQR
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -62,6 +63,7 @@ constructor(
 
     sealed class Command {
         data class ShowMessage(val message: String) : Command()
+        object ReadQR : Command()
     }
 
     fun onCreateAccountClicked() {
@@ -159,5 +161,11 @@ constructor(
                 secretKey = accountInfo.secretKey,
             ),
         )
+    }
+
+    fun onReadQRClicked() {
+        viewModelScope.launch {
+            command.send(ReadQR)
+        }
     }
 }

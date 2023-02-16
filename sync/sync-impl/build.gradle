@@ -44,6 +44,7 @@ dependencies {
     implementation "com.squareup.moshi:moshi-kotlin:_"
     implementation Google.dagger
     implementation AndroidX.core.ktx
+    implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
 
     // Testing dependencies
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"

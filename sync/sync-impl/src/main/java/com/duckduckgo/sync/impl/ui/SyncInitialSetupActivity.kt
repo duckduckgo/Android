@@ -28,7 +28,12 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.databinding.ActivitySyncSetupBinding
 import com.duckduckgo.sync.impl.databinding.ItemConnectedDeviceBinding
+import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ReadQR
+import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.ViewState
+import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanIntentResult
+import com.journeyapps.barcodescanner.ScanOptions
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -36,6 +41,17 @@ import kotlinx.coroutines.flow.onEach
 class SyncInitialSetupActivity : DuckDuckGoActivity() {
     private val binding: ActivitySyncSetupBinding by viewBinding()
     private val viewModel: SyncInitialSetupViewModel by bindViewModel()
+
+    // Register the launcher and result handler
+    private val barcodeLauncher = registerForActivityResult(
+        ScanContract(),
+    ) { result: ScanIntentResult ->
+        if (result.contents == null) {
+            Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show()
+        } else {
+            Toast.makeText(this, "Scanned: " + result.contents, Toast.LENGTH_LONG).show()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +63,7 @@ class SyncInitialSetupActivity : DuckDuckGoActivity() {
 
     private fun configureListeners() {
         binding.createAccountButton.setOnClickListener { viewModel.onCreateAccountClicked() }
+        binding.readQRButton.setOnClickListener { viewModel.onReadQRClicked() }
         binding.storeRecoveryCodeButton.setOnClickListener {
             viewModel.onStoreRecoveryCodeClicked()
         }
@@ -72,10 +89,25 @@ class SyncInitialSetupActivity : DuckDuckGoActivity() {
 
     private fun processCommand(command: SyncInitialSetupViewModel.Command) {
         when (command) {
-            is SyncInitialSetupViewModel.Command.ShowMessage -> {
+            is ShowMessage -> {
                 Toast.makeText(this, command.message, Toast.LENGTH_LONG).show()
             }
+
+            ReadQR -> {
+                barcodeLauncher.launch(getScanOptions())
+            }
         }
+    }
+
+    private fun getScanOptions(): ScanOptions {
+        val options = ScanOptions()
+        options.setDesiredBarcodeFormats(ScanOptions.QR_CODE)
+        options.setPrompt("Scan a barcode")
+        options.setCameraId(0) // Use a specific camera of the device
+        options.setBeepEnabled(false)
+        options.setBarcodeImageEnabled(true)
+        barcodeLauncher.launch(options)
+        return options
     }
 
     private fun renderViewState(viewState: ViewState) {
