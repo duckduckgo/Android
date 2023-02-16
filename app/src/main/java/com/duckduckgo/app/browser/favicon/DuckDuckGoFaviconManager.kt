@@ -16,7 +16,9 @@
 
 package com.duckduckgo.app.browser.favicon
 
+import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.widget.ImageView
 import androidx.core.net.toUri
@@ -30,6 +32,7 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.global.touchFaviconLocation
+import com.duckduckgo.app.global.view.generateDefaultDrawable
 import com.duckduckgo.app.global.view.loadFavicon
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.autofill.api.store.AutofillStore
@@ -45,6 +48,7 @@ class DuckDuckGoFaviconManager constructor(
     private val faviconDownloader: FaviconDownloader,
     private val dispatcherProvider: DispatcherProvider,
     private val autofillStore: AutofillStore,
+    private val context: Context,
 ) : FaviconManager {
 
     private val tempFaviconCache: HashMap<String, Pair<String, MutableList<String>>> = hashMapOf()
@@ -202,6 +206,12 @@ class DuckDuckGoFaviconManager constructor(
 
     override suspend fun deleteAllTemp() {
         faviconPersister.deleteAll(FAVICON_TEMP_DIR)
+    }
+
+    override fun generateDefaultFavicon(
+        domain: String,
+    ): Drawable {
+        return generateDefaultDrawable(context, domain)
     }
 
     private suspend fun saveFavicon(

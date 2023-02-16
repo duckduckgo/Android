@@ -138,6 +138,9 @@
     <string name="settingsAppLinksAskEveryTime">Her seferinde sor</string>
     <string name="settingsAppLinksAlways">Her zaman</string>
     <string name="settingsAppLinksNever">Hiçbir zaman</string>
+    <string name="settingsTitleNotifications">Bildirimler</string>
+    <string name="settingsSubtitleNotificationsDisabled">Devre Dışı</string>
+    <string name="settingsSubtitleNotificationsEnabled">Etkin</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Kaydet</string>
@@ -674,4 +677,9 @@
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Otomatik Doldurma</string>
+
+    <!-- Notify Me View on Downloads -->
+    <string name="downloadsNotifyMeTitle">İndirmeler hazır olduğunda bildirim alın</string>
+    <string name="downloadsNotifyMeSubtitle">İndirmeler tamamlandığında bir bildirim alın.</string>
+
 </resources>

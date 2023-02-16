@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.favicon
 
 import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.widget.ImageView
 import java.io.File
 
@@ -72,6 +73,10 @@ interface FaviconManager {
     )
 
     suspend fun deleteAllTemp()
+
+    fun generateDefaultFavicon(
+        domain: String,
+    ): Drawable
 }
 
 sealed class FaviconSource {

@@ -138,6 +138,9 @@
     <string name="settingsAppLinksAskEveryTime">Jautāt katru reizi</string>
     <string name="settingsAppLinksAlways">Vienmēr</string>
     <string name="settingsAppLinksNever">Nekad</string>
+    <string name="settingsTitleNotifications">Paziņojumi</string>
+    <string name="settingsSubtitleNotificationsDisabled">Atspējots</string>
+    <string name="settingsSubtitleNotificationsEnabled">Iespējots</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Saglabāt</string>
@@ -678,4 +681,9 @@
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Automātiska aizpilde</string>
+
+    <!-- Notify Me View on Downloads -->
+    <string name="downloadsNotifyMeTitle">Uzzini, kad lejupielādes ir gatavas</string>
+    <string name="downloadsNotifyMeSubtitle">Saņem paziņojumu, kad lejupielāde ir pabeigta.</string>
+
 </resources>

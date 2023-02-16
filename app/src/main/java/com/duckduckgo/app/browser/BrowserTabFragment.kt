@@ -158,6 +158,7 @@ import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.isCookiePromptManagementExperimentEnabled
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.survey.model.Survey
@@ -206,7 +207,6 @@ import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
-import java.util.EventListener
 import javax.inject.Inject
 import javax.inject.Provider
 import kotlin.coroutines.CoroutineContext
@@ -471,15 +471,19 @@ class BrowserTabFragment :
 
     private val autoconsentCallback = object : AutoconsentCallback {
         override fun onFirstPopUpHandled() {
-            // Remove comment to promote feature
-            // ctaViewModel.enableAutoconsentCta()
-            // launch {
-            //     viewModel.refreshCta()
-            // }
+            if (variantManager.isCookiePromptManagementExperimentEnabled()) {
+                ctaViewModel.enableAutoconsentCta()
+                launch {
+                    viewModel.refreshCta()
+                }
+            }
         }
 
         override fun onPopUpHandled(isCosmetic: Boolean) {
             launch {
+                if (isCosmetic) {
+                    delay(COOKIES_ANIMATION_DELAY)
+                }
                 context?.let { animatorHelper.createCookiesAnimation(it, omnibarViews(), cookieDummyView, cookieAnimation, scene_root, isCosmetic) }
             }
         }
@@ -2569,6 +2573,8 @@ class BrowserTabFragment :
         private const val DEFAULT_CIRCLE_TARGET_TIMES_1_5 = 96
 
         private const val QUICK_ACCESS_GRID_MAX_COLUMNS = 6
+
+        private const val COOKIES_ANIMATION_DELAY = 400L
 
         fun newInstance(
             tabId: String,

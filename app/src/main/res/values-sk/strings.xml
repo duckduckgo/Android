@@ -138,6 +138,9 @@
     <string name="settingsAppLinksAskEveryTime">Vždy sa opýtať</string>
     <string name="settingsAppLinksAlways">Vždy</string>
     <string name="settingsAppLinksNever">Nikdy</string>
+    <string name="settingsTitleNotifications">Oznámenia</string>
+    <string name="settingsSubtitleNotificationsDisabled">Zakázané</string>
+    <string name="settingsSubtitleNotificationsEnabled">Povolené</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Uložiť</string>
@@ -682,4 +685,9 @@
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Automatické vypĺňanie</string>
+
+    <!-- Notify Me View on Downloads -->
+    <string name="downloadsNotifyMeTitle">Zistite, kedy budú stiahnuté súbory pripravené</string>
+    <string name="downloadsNotifyMeSubtitle">Dostávajte upozornenia po dokončení sťahovania.</string>
+
 </resources>

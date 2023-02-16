@@ -9,7 +9,7 @@ buildscript {
         gradle_plugin = "7.2.2" // When updating, also update lint_version
         lint_version = "30.2.2" // This value must always be gradle_plugin + 23
         min_sdk = 23
-        target_sdk = 32
+        target_sdk = 33
         compile_sdk = 33
         fladle_version = "0.17.4"
         kotlinter_version = "3.12.0"
@@ -98,7 +98,8 @@ subprojects {
                             throw new GradleException("Invalid dependency $projectPath -> $dependencyPath. " +
                                     "Only :app module can depend on 'impl' modules")
                         }
-                        if (projectPath.endsWith("api") && dependencyPath.endsWith("api")) {
+                        // API modules can depend on :feature-toggles-api
+                        if (projectPath.endsWith("api") && dependencyPath.endsWith("api") && dependencyPath != ":feature-toggles-api") {
                             throw new GradleException("Invalid dependency $projectPath -> $dependencyPath. " +
                                     "'api' modules can't depend on other 'api' modules")
                         }

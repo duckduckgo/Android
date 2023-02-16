@@ -34,7 +34,7 @@
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Skal DuckDuckGo gemme dit login?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Flere muligheder</string>
 
-    <string name="useSavedLoginDialogTitle">Brug gemt login?</string>
+    <string name="useSavedLoginDialogTitle">Brug et gemt login?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Login til %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Login til websted</string>
 

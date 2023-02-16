@@ -31,5 +31,6 @@
         android:gravity="center"
         android:visibility="invisible"
         android:text="@string/autoconsentCosmeticNoticeAnimationText"
+        android:ellipsize="end"
         tools:ignore="RtlCompat" />
 </FrameLayout>

@@ -58,7 +58,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="32dp"
-            android:layout_marginEnd="@dimen/keyline_3"
+            android:layout_marginEnd="20dp"
             android:hint="@string/brokenSitesCategoriesHint"
             app:editable="false"
             app:endIcon="@drawable/ic_chevron_down_24_small"

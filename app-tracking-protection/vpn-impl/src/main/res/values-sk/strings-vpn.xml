@@ -426,4 +426,8 @@
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Pri niektorých aplikáciách môžu nastať problémy, keď je zapnutá ochrana aplikácií pred sledovaním.\n<annotation type="learn_why_link">Zistite, prečo</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Ochrana je zakázaná pre aplikácie so známymi problémami. Tieto aplikácie môžete povoliť, ale nemusia fungovať podľa očakávania. <annotation type="learn_why_link">Zistite, prečo</annotation></string>
 
+    <!-- Notify Me View on AppTP -->
+    <string name="appTrackingProtectionNotifyMeTitle">Dávajte pozor na zablokované sledovacie zariadenia</string>
+    <string name="appTrackingProtectionNotifyMeSubtitle">Získajte aktualizácie o zablokovaných pokusoch o sledovanie v zásuvke oznámení.</string>
+
 </resources>

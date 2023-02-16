@@ -43,7 +43,7 @@ import javax.inject.Inject
 import timber.log.Timber
 
 @InjectWith(FragmentScope::class)
-class DefaultBrowserPage : OnboardingPageFragment() {
+class DefaultBrowserPage : OnboardingPageFragment(R.layout.content_onboarding_default_browser) {
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
@@ -68,8 +68,6 @@ class DefaultBrowserPage : OnboardingPageFragment() {
     private val viewModel: DefaultBrowserPageViewModel by lazy {
         ViewModelProvider(this, viewModelFactory).get(DefaultBrowserPageViewModel::class.java)
     }
-
-    override fun layoutResource(): Int = R.layout.content_onboarding_default_browser
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
         super.setUserVisibleHint(isVisibleToUser)

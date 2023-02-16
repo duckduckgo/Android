@@ -137,6 +137,9 @@
     <string name="settingsAppLinksAskEveryTime">Ask every time</string>
     <string name="settingsAppLinksAlways">Always</string>
     <string name="settingsAppLinksNever">Never</string>
+    <string name="settingsTitleNotifications">Notifications</string>
+    <string name="settingsSubtitleNotificationsDisabled">Disabled</string>
+    <string name="settingsSubtitleNotificationsEnabled">Enabled</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Save</string>
@@ -675,4 +678,9 @@
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Autofill</string>
+
+    <!-- Notify Me View on Downloads -->
+    <string name="downloadsNotifyMeTitle">Find out when downloads are ready</string>
+    <string name="downloadsNotifyMeSubtitle">Get a notification when downloads complete.</string>
+
 </resources>

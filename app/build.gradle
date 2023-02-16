@@ -165,6 +165,7 @@ dependencies {
     implementation project(':autofill-api')
     implementation project(':autofill-impl')
     implementation project(':autofill-store')
+    testImplementation project(':autofill-test')
 
     anvil project(':anvil-compiler')
     implementation project(':anvil-annotations')
@@ -183,6 +184,7 @@ dependencies {
     internalImplementation project(':vpn-internal')
 
     implementation project(':feature-toggles-api')
+    testImplementation project(':feature-toggles-test')
     implementation project(':feature-toggles-impl')
     implementation project(':privacy-config-api')
     implementation project(':privacy-config-impl')

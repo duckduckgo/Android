@@ -138,6 +138,9 @@
     <string name="settingsAppLinksAskEveryTime">Spørg hver gang</string>
     <string name="settingsAppLinksAlways">Altid</string>
     <string name="settingsAppLinksNever">Aldrig</string>
+    <string name="settingsTitleNotifications">Meddelelser</string>
+    <string name="settingsSubtitleNotificationsDisabled">Deaktiveret</string>
+    <string name="settingsSubtitleNotificationsEnabled">Aktiveret</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Gem</string>
@@ -674,4 +677,9 @@
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Automatisk udfyldning</string>
+
+    <!-- Notify Me View on Downloads -->
+    <string name="downloadsNotifyMeTitle">Find ud af, hvornår downloads er klar</string>
+    <string name="downloadsNotifyMeSubtitle">Få en meddelelse, når downloads er gennemført.</string>
+
 </resources>

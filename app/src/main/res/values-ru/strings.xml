@@ -138,6 +138,9 @@
     <string name="settingsAppLinksAskEveryTime">Спрашивать каждый раз</string>
     <string name="settingsAppLinksAlways">Всегда</string>
     <string name="settingsAppLinksNever">Никогда</string>
+    <string name="settingsTitleNotifications">Уведомления</string>
+    <string name="settingsSubtitleNotificationsDisabled">Отключено</string>
+    <string name="settingsSubtitleNotificationsEnabled">Включено</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Сохранить</string>
@@ -682,4 +685,9 @@
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Автозаполнение</string>
+
+    <!-- Notify Me View on Downloads -->
+    <string name="downloadsNotifyMeTitle">Уведомления о готовых загрузках</string>
+    <string name="downloadsNotifyMeSubtitle">Получайте уведомления по окончании загрузок.</string>
+
 </resources>

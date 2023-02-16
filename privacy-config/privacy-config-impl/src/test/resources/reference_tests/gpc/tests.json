@@ -23,6 +23,33 @@
                 "exceptPlatforms": []
             },
             {
+                "name": "Header not injected on platforms using gpcHeaderEnabledSites - domain is excluded from gpcHeaderEnabledSites",
+                "siteURL": "http://anotherexample.com",
+                "requestURL": "http://anotherexample.com",
+                "requestType": "main_frame",
+                "gpcUserSettingOn": true,
+                "expectGPCHeader": false,
+                "exceptPlatforms": [
+                    "web-extension",
+                    "safari-extension",
+                    "windows-browser",
+                    "android-browser"
+                ]
+            },
+            {
+                "name": "Header injected on platforms not using gpcHeaderEnabledSites - domain is excluded from gpcHeaderEnabledSites",
+                "siteURL": "http://anotherexample.com",
+                "requestURL": "http://anotherexample.com",
+                "requestType": "main_frame",
+                "gpcUserSettingOn": true,
+                "expectGPCHeader": true,
+                "exceptPlatforms": [
+                    "ios-browser",
+                    "macos-browser",
+                    "android-browser"
+                ]
+            },
+            {
                 "name": "Header not injected - privacy config local exception (gpc/exceptions)",
                 "siteURL": "https://www.washingtonpost.com/",
                 "requestURL": "https://www.washingtonpost.com/",
@@ -99,6 +126,14 @@
                 "frameURL": "https://subframe.com",
                 "gpcUserSettingOn": true,
                 "expectGPCAPI": true,
+                "exceptPlatforms": []
+            },
+            {
+                "name": "API injected - domain is excluded from gpcHeaderEnabledSites, JavaScript API should still work",
+                "siteURL": "http://anotherexample.com",
+                "gpcUserSettingOn": true,
+                "expectGPCAPI": true,
+                "expectGPCAPIValue": "true",
                 "exceptPlatforms": []
             },
             {

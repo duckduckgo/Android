@@ -17,12 +17,16 @@
 package com.duckduckgo.mobile.android.vpn.cohort
 
 import com.duckduckgo.app.global.api.InMemorySharedPreferences
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
+import org.mockito.Mock
+import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -30,19 +34,21 @@ import org.threeten.bp.LocalDate
 
 @ExperimentalCoroutinesApi
 class RealCohortStoreTest {
-
+    @Mock
+    private lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
     private val sharedPreferencesProvider = mock<VpnSharedPreferencesProvider>()
 
     private lateinit var cohortStore: CohortStore
 
     @Before
     fun setup() {
+        MockitoAnnotations.openMocks(this)
         val prefs = InMemorySharedPreferences()
         whenever(
             sharedPreferencesProvider.getSharedPreferences(eq("com.duckduckgo.mobile.atp.cohort.prefs"), eq(true), eq(true)),
         ).thenReturn(prefs)
 
-        cohortStore = RealCohortStore(sharedPreferencesProvider)
+        cohortStore = RealCohortStore(sharedPreferencesProvider, vpnFeaturesRegistry)
     }
 
     @Test
@@ -60,6 +66,7 @@ class RealCohortStoreTest {
 
     @Test
     fun whenInitialCohortFirstCalledThenStoreInitialCohort() {
+        whenever(vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)).thenReturn(true)
         (cohortStore as RealCohortStore).onVpnStarted(TestScope())
 
         assertEquals(LocalDate.now(), cohortStore.getCohortStoredLocalDate())
@@ -67,11 +74,20 @@ class RealCohortStoreTest {
 
     @Test
     fun whenInitialCohortSubsequentCalledThenNoop() {
+        whenever(vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)).thenReturn(true)
         val date = LocalDate.now().plusDays(3)
         cohortStore.setCohortLocalDate(date)
 
         (cohortStore as RealCohortStore).onVpnStarted(TestScope())
 
         assertEquals(date, cohortStore.getCohortStoredLocalDate())
+    }
+
+    @Test
+    fun whenAppTpNotRegisteredThenDoNothingWithCohort() {
+        whenever(vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)).thenReturn(false)
+        (cohortStore as RealCohortStore).onVpnStarted(TestScope())
+
+        assertNull(cohortStore.getCohortStoredLocalDate())
     }
 }

@@ -138,6 +138,9 @@
     <string name="settingsAppLinksAskEveryTime">Vprašaj vsakič</string>
     <string name="settingsAppLinksAlways">Vedno</string>
     <string name="settingsAppLinksNever">Nikoli</string>
+    <string name="settingsTitleNotifications">Obvestila</string>
+    <string name="settingsSubtitleNotificationsDisabled">Onemogočeno</string>
+    <string name="settingsSubtitleNotificationsEnabled">Omogočeno</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Shrani</string>
@@ -682,4 +685,9 @@
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Samodejno izpolnjevanje</string>
+
+    <!-- Notify Me View on Downloads -->
+    <string name="downloadsNotifyMeTitle">Ugotovite, kdaj so prenosi pripravljeni</string>
+    <string name="downloadsNotifyMeSubtitle">Prejmite obvestilo, ko so prenosi končani.</string>
+
 </resources>

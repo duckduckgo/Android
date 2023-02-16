@@ -63,6 +63,7 @@ interface Pixel {
         const val SHOWED_BOOKMARKS = "sb"
         const val DEFAULT_BROWSER_BEHAVIOUR_TRIGGERED = "bt"
         const val DEFAULT_BROWSER_SET_FROM_ONBOARDING = "fo"
+        const val DEFAULT_BROWSER_SET_ON_ANDROID_13_OR_ABOVE = "os_version_13_or_above"
         const val DEFAULT_BROWSER_SET_ORIGIN = "dbo"
         const val CTA_SHOWN = "cta"
         const val SERP_QUERY_CHANGED = "1"
@@ -77,6 +78,7 @@ interface Pixel {
         const val WEBVIEW_VERSION = "webview_version"
         const val OS_VERSION = "os_version"
         const val DEFAULT_BROWSER = "default_browser"
+        const val NOTIFY_ME_FROM_SCREEN = "from_screen"
     }
 
     object PixelValues {
@@ -98,6 +100,8 @@ interface Pixel {
         const val FIRE_ANIMATION_AIRSTREAM = "faas"
         const val FIRE_ANIMATION_WHIRLPOOL = "fawp"
         const val FIRE_ANIMATION_NONE = "fann"
+
+        const val NOTIFY_ME_DOWNLOADS_SCREEN = "downloads"
     }
 
     fun fire(

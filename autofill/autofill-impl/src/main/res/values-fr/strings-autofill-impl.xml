@@ -34,7 +34,7 @@
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Voulez-vous que DuckDuckGo enregistre votre identifiant ?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Plus d\'options</string>
 
-    <string name="useSavedLoginDialogTitle">Utiliser l\'identifiant enregistré ?</string>
+    <string name="useSavedLoginDialogTitle">Utiliser un identifiant enregistré ?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Identifiant pour %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Identifiant pour le site</string>
 

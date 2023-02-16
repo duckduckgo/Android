@@ -60,15 +60,17 @@ class RequestFiltererImpl @Inject constructor(
         val origin = request.requestHeaders[ORIGIN]
         val referer = request.requestHeaders[REFERER]
 
-        val currentTopDomain = documentUrl.toHttpUrl().topPrivateDomain()
-        val previousTopDomain = previousPage?.toHttpUrl()?.topPrivateDomain()
+        runCatching {
+            val currentTopDomain = documentUrl.toHttpUrl().topPrivateDomain()
+            val previousTopDomain = previousPage?.toHttpUrl()?.topPrivateDomain()
 
-        if (currentTopDomain != previousTopDomain) {
-            referer?.let {
-                return compareUrl(it)
-            }
-            origin?.let {
-                return compareUrl(it)
+            if (currentTopDomain != previousTopDomain) {
+                referer?.let {
+                    return compareUrl(it)
+                }
+                origin?.let {
+                    return compareUrl(it)
+                }
             }
         }
         return false

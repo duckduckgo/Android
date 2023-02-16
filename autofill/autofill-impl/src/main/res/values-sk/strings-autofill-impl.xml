@@ -34,7 +34,7 @@
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Chcete, aby DuckDuckGo uložil vaše prihlasovacie údaje?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Ďalšie možnosti</string>
 
-    <string name="useSavedLoginDialogTitle">Použiť uložené prihlásenie?</string>
+    <string name="useSavedLoginDialogTitle">Použiť uložené prihlasovacie údaje?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Prihlásenie pre %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Prihlásenie na stránky</string>
 
