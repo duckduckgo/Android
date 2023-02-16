@@ -47,19 +47,19 @@ interface FavoritesRepository {
 }
 
 sealed class SavedSite(
-    open val id: Long,
+    open val id: String,
     open val title: String,
     open val url: String,
 ) : Serializable {
     data class Favorite(
-        override val id: Long,
+        override val id: String,
         override val title: String,
         override val url: String,
         val position: Int,
     ) : SavedSite(id, title, url)
 
     data class Bookmark(
-        override val id: Long,
+        override val id: String,
         override val title: String,
         override val url: String,
         val parentId: Long,
