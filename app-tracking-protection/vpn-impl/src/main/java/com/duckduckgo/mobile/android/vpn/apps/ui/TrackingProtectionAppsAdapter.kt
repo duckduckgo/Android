@@ -123,7 +123,7 @@ class TrackingProtectionAppViewHolder(val binding: RowExclusionListAppBinding) :
         if (excludedAppInfo.isProblematic()) {
             if (excludedAppInfo.isExcluded) {
                 binding.deviceShieldAppExclusionReason.text =
-                    getAppExcludingReasonText(itemView.context, excludedAppInfo.knownProblem)
+                    getAppExcludingReasonText(context, excludedAppInfo.knownProblem)
                 binding.deviceShieldAppExclusionReason.show()
                 binding.deviceShieldAppEntryWarningIcon.setImageDrawable(
                     ContextCompat.getDrawable(
