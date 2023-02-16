@@ -811,6 +811,7 @@ class SettingsViewModelTest {
             cancelAndConsumeRemainingEvents()
         }
     }
+
     @Test
     fun whenNetPVpnStateIsEnabledThenViewStateNetPStateShouldBeConnected() = runTest {
         whenever(mockVpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(flowOf(VpnState(state = VpnRunningState.ENABLED)))
