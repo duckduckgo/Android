@@ -166,12 +166,6 @@ class WindowsWaitlistActivity : DuckDuckGoActivity() {
             putExtra(Intent.EXTRA_TITLE, getString(R.string.windows_waitlist_share_invite))
         }
 
-        val pi = PendingIntent.getBroadcast(
-            this,
-            0,
-            Intent(this, WindowsInviteShareBroadcastReceiver::class.java),
-            PendingIntent.FLAG_UPDATE_CURRENT,
-        )
         try {
             startActivity(Intent.createChooser(share, getString(R.string.windows_waitlist_share_invite)))
         } catch (e: ActivityNotFoundException) {
