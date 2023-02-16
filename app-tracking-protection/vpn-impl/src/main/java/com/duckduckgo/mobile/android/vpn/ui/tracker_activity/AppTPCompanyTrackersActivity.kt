@@ -51,7 +51,6 @@ import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPCompanyTracker
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPCompanyTrackersViewModel.ViewState
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.include_company_trackers_toolbar.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -94,7 +93,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         with(binding.includeToolbar) {
             setupToolbar(defaultToolbar)
-            app_name.text = getAppName()
+            appName.text = getAppName()
             Glide.with(applicationContext)
                 .load(packageManager.safeGetApplicationIcon(getPackage()))
                 .error(TextDrawable.asIconDrawable(getAppName()))
