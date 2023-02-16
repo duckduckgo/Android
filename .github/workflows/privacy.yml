@@ -19,7 +19,7 @@ jobs:
 
     steps:
       - name: Test
-        run: echo ${{ contains(github.event.pull_request.labels.*.name, 'content scope scripts') }}
+        run: echo ${{ contains(github.event.*.labels.*.name, 'content scope scripts') }}
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
