@@ -99,12 +99,6 @@ class WindowsWaitlistViewModel @Inject constructor(
         }
     }
 
-    fun onDialogDismissed() {
-        viewModelScope.launch {
-            viewStateFlow.emit(ViewState(waitlistManager.getState()))
-        }
-    }
-
     fun onCopyToClipboard(onlyCode: Boolean) {
         waitlistManager.getInviteCode()?.let {
             viewModelScope.launch {
