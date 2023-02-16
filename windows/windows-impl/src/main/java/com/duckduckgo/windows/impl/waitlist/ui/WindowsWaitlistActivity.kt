@@ -17,7 +17,6 @@
 package com.duckduckgo.windows.impl.waitlist.ui
 
 import android.annotation.SuppressLint
-import android.app.PendingIntent
 import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.ClipboardManager
