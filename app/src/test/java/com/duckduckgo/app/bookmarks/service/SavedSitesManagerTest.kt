@@ -23,6 +23,7 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import java.util.UUID
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -108,10 +109,10 @@ class SavedSitesManagerTest {
     }
 
     private fun aBookmark(): SavedSite.Bookmark {
-        return SavedSite.Bookmark(0, "title", "url", 0)
+        return SavedSite.Bookmark(UUID.randomUUID().toString(), "title", "url", UUID.randomUUID().toString())
     }
 
     private fun aFavorite(): SavedSite.Favorite {
-        return SavedSite.Favorite(0, "title", "url", 0)
+        return SavedSite.Favorite(UUID.randomUUID().toString(), "title", "url", 0)
     }
 }

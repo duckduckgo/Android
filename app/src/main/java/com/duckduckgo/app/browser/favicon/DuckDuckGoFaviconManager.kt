@@ -23,7 +23,7 @@ import android.net.Uri
 import android.widget.ImageView
 import androidx.core.net.toUri
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
-import com.duckduckgo.app.bookmarks.model.FavoritesRepository
+import com.duckduckgo.app.bookmarks.model.SavedSitesRepository
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.FAVICON_PERSISTED_DIR
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.FAVICON_TEMP_DIR
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.NO_SUBFOLDER
@@ -44,7 +44,7 @@ class DuckDuckGoFaviconManager constructor(
     private val bookmarksDao: BookmarksDao,
     private val fireproofWebsiteRepository: FireproofWebsiteRepository,
     private val locationPermissionsRepository: LocationPermissionsRepository,
-    private val favoritesRepository: FavoritesRepository,
+    private val savedSitesRepository: SavedSitesRepository,
     private val faviconDownloader: FaviconDownloader,
     private val dispatcherProvider: DispatcherProvider,
     private val autofillStore: AutofillStore,
@@ -292,10 +292,11 @@ class DuckDuckGoFaviconManager constructor(
         val query = "%$domain%"
 
         return withContext(dispatcherProvider.io()) {
+            // TODO:
             bookmarksDao.bookmarksCountByUrl(query) +
                 locationPermissionsRepository.permissionEntitiesCountByDomain(query) +
                 fireproofWebsiteRepository.fireproofWebsitesCountByDomain(domain) +
-                favoritesRepository.favoritesCountByDomain(query) +
+                savedSitesRepository.getFavoritesCountByDomain(query) +
                 autofillStore.getCredentials(domain).size
         }
     }

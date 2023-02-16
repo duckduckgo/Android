@@ -2,12 +2,13 @@ package com.duckduckgo.app.bookmarks.service
 
 import android.content.ContentResolver
 import android.net.Uri
-import com.duckduckgo.app.bookmarks.db.BookmarkEntity
-import com.duckduckgo.app.bookmarks.db.BookmarksDao
-import com.duckduckgo.app.bookmarks.db.FavoriteEntity
-import com.duckduckgo.app.bookmarks.db.FavoritesDao
-import com.duckduckgo.app.bookmarks.model.BookmarksRepository
 import com.duckduckgo.app.bookmarks.model.SavedSite
+import com.duckduckgo.app.bookmarks.model.SavedSitesRepository
+import com.duckduckgo.sync.store.Entity
+import com.duckduckgo.sync.store.EntityType.BOOKMARK
+import com.duckduckgo.sync.store.Relation
+import com.duckduckgo.sync.store.SyncEntitiesDao
+import com.duckduckgo.sync.store.SyncRelationsDao
 import org.jsoup.Jsoup
 
 /*
@@ -37,9 +38,9 @@ sealed class ImportSavedSitesResult {
 
 class RealSavedSitesImporter(
     private val contentResolver: ContentResolver,
-    private val bookmarksDao: BookmarksDao,
-    private val favoritesDao: FavoritesDao,
-    private val bookmarksRepository: BookmarksRepository,
+    private val syncEntitiesDao: SyncEntitiesDao,
+    private val syncRelationsDao: SyncRelationsDao,
+    private val savedSitesRepository: SavedSitesRepository,
     private val savedSitesParser: SavedSitesParser,
 ) : SavedSitesImporter {
 
@@ -52,22 +53,27 @@ class RealSavedSitesImporter(
         return try {
             val savedSites = contentResolver.openInputStream(uri).use { stream ->
                 val document = Jsoup.parse(stream, Charsets.UTF_8.name(), BASE_URI)
-                savedSitesParser.parseHtml(document, bookmarksRepository)
+                savedSitesParser.parseHtml(document, savedSitesRepository)
             }
 
             savedSites.filterIsInstance<SavedSite.Bookmark>().map {
-                BookmarkEntity(title = it.title, url = it.url, parentId = it.parentId)
+                Relation(it.parentId, Entity(title = it.title, url = it.url, type = BOOKMARK))
             }.also {
                 it.asSequence().chunked(IMPORT_BATCH_SIZE).forEach { chunk ->
-                    bookmarksDao.insertList(chunk)
+                    syncRelationsDao.insertList(chunk)
+                    syncEntitiesDao.insertList(chunk.map { it.entity })
                 }
             }
 
             savedSites.filterIsInstance<SavedSite.Favorite>().filter { it.url.isNotEmpty() }.map { site ->
-                FavoriteEntity(title = site.title.takeIf { it.isNotEmpty() } ?: site.url, url = site.url, position = site.position)
+                Relation(
+                    relationId = Relation.FAVORITES_ROOT,
+                    Entity(title = site.title.takeIf { it.isNotEmpty() } ?: site.url, url = site.url, type = BOOKMARK),
+                )
             }.also {
                 it.asSequence().chunked(IMPORT_BATCH_SIZE).forEach { chunk ->
-                    favoritesDao.insertList(chunk)
+                    syncRelationsDao.insertList(chunk)
+                    syncEntitiesDao.insertList(chunk.map { it.entity })
                 }
             }
 

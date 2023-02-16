@@ -28,8 +28,6 @@ import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.db.FavoriteEntity
 import com.duckduckgo.app.bookmarks.db.FavoritesDao
 import com.duckduckgo.app.bookmarks.migration.AppDatabaseBookmarksMigrationCallback
-import com.duckduckgo.app.bookmarks.model.FavoritesDataRepository
-import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.sync.store.EntityType.BOOKMARK
@@ -63,9 +61,8 @@ class BookmarksMigrationTest {
 
     private val mockFaviconManager: FaviconManager = mock()
     private val lazyFaviconManager = Lazy { mockFaviconManager }
-    private lateinit var favoritesDao: FavoritesDao
-    private lateinit var favoritesRepository: FavoritesRepository
 
+    private lateinit var favoritesDao: FavoritesDao
     private lateinit var bookmarksDao: BookmarksDao
     private lateinit var bookmarkFoldersDao: BookmarkFoldersDao
 
@@ -78,8 +75,6 @@ class BookmarksMigrationTest {
             .build()
 
         favoritesDao = appDatabase.favoritesDao()
-        favoritesRepository = FavoritesDataRepository(favoritesDao, lazyFaviconManager)
-
         bookmarksDao = appDatabase.bookmarksDao()
         bookmarkFoldersDao = appDatabase.bookmarkFoldersDao()
 

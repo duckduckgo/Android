@@ -55,6 +55,7 @@ import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder.Event
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.sync.store.Relation
 import com.google.android.material.snackbar.Snackbar
 import java.text.SimpleDateFormat
 import java.util.*
@@ -110,8 +111,8 @@ class BookmarksActivity : DuckDuckGoActivity() {
         intent.extras?.getString(KEY_BOOKMARK_FOLDER_NAME)
             ?: getString(R.string.bookmarksActivityTitle)
 
-    private fun getParentFolderId() = intent.extras?.getLong(KEY_BOOKMARK_FOLDER_ID)
-        ?: ROOT_FOLDER_ID
+    private fun getParentFolderId() = intent.extras?.getString(KEY_BOOKMARK_FOLDER_ID)
+        ?: Relation.BOOMARKS_ROOT
 
     override fun onActivityResult(
         requestCode: Int,
@@ -129,6 +130,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
                     }
                 }
             }
+
             EXPORT_BOOKMARKS_REQUEST_CODE -> {
                 if (resultCode == RESULT_OK) {
                     val selectedFile = data?.data
@@ -140,8 +142,8 @@ class BookmarksActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun setupBookmarksRecycler(parentId: Long) {
-        if (parentId == ROOT_FOLDER_ID) {
+    private fun setupBookmarksRecycler(parentId: String) {
+        if (parentId == Relation.BOOMARKS_ROOT) {
             bookmarksAdapter = BookmarksAdapter(layoutInflater, viewModel, this, faviconManager, dispatchers)
             favoritesAdapter = FavoritesAdapter(layoutInflater, viewModel, this, faviconManager, dispatchers)
             bookmarkFoldersAdapter = BookmarkFoldersAdapter(layoutInflater, viewModel, parentId)
@@ -154,12 +156,12 @@ class BookmarksActivity : DuckDuckGoActivity() {
         contentBookmarksBinding.recycler.itemAnimator = null
     }
 
-    private fun observeViewModel(parentId: Long) {
+    private fun observeViewModel(parentId: String) {
         viewModel.viewState.observe(
             this,
         ) { viewState ->
             viewState?.let { state ->
-                if (parentId == ROOT_FOLDER_ID) {
+                if (parentId == Relation.BOOMARKS_ROOT) {
                     favoritesAdapter.setItems(state.favorites.map { FavoritesAdapter.FavoriteItem(it) })
                 }
                 bookmarksAdapter.setItems(state.bookmarks.map { BookmarksAdapter.BookmarkItem(it) }, state.bookmarkFolders.isEmpty())
@@ -190,6 +192,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
             is ImportSavedSitesResult.Error -> {
                 showMessage(getString(R.string.importBookmarksError))
             }
+
             is ImportSavedSitesResult.Success -> {
                 if (result.savedSites.isEmpty()) {
                     showMessage(getString(R.string.importBookmarksEmpty))
@@ -205,9 +208,11 @@ class BookmarksActivity : DuckDuckGoActivity() {
             is ExportSavedSitesResult.Error -> {
                 showMessage(getString(R.string.exportBookmarksError))
             }
+
             ExportSavedSitesResult.NoSavedSitesExported -> {
                 showMessage(getString(R.string.exportBookmarksEmpty))
             }
+
             ExportSavedSitesResult.Success -> {
                 showMessage(getString(R.string.exportBookmarksSuccess))
             }
@@ -242,6 +247,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
                     IMPORT_BOOKMARKS_REQUEST_CODE,
                 )
             }
+
             R.id.bookmark_export -> {
                 val intent = Intent()
                     .setType("text/html")
@@ -251,6 +257,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
 
                 startActivityForResult(intent, EXPORT_BOOKMARKS_REQUEST_CODE)
             }
+
             R.id.action_add_folder -> {
                 val parentId = getParentFolderId()
                 val parentFolderName = getParentFolderName()
@@ -307,7 +314,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     private fun setSearchMenuItemVisibility() {
-        searchMenuItem?.isVisible = viewModel.viewState.value?.enableSearch == true || getParentFolderId() != ROOT_FOLDER_ID
+        searchMenuItem?.isVisible = viewModel.viewState.value?.enableSearch == true || getParentFolderId() != Relation.BOOMARKS_ROOT
     }
 
     private fun showEditSavedSiteDialog(savedSite: SavedSite) {
@@ -421,7 +428,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
             val intent = Intent(context, BookmarksActivity::class.java)
             bookmarkFolder?.let {
                 val bundle = Bundle()
-                bundle.putLong(KEY_BOOKMARK_FOLDER_ID, bookmarkFolder.id)
+                bundle.putString(KEY_BOOKMARK_FOLDER_ID, bookmarkFolder.id)
                 bundle.putString(KEY_BOOKMARK_FOLDER_NAME, bookmarkFolder.name)
                 intent.putExtras(bundle)
             }

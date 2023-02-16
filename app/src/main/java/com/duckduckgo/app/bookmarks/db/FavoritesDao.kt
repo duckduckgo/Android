@@ -17,7 +17,6 @@
 package com.duckduckgo.app.bookmarks.db
 
 import androidx.room.*
-import com.duckduckgo.app.bookmarks.model.SavedSite
 import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
 

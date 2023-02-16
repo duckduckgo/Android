@@ -25,6 +25,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+import com.duckduckgo.sync.store.Relation
 
 class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
 
@@ -76,7 +77,7 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
 
         when (savedSite) {
             is SavedSite.Bookmark -> {
-                val parentId = arguments?.getLong(AddBookmarkFolderDialogFragment.KEY_PARENT_FOLDER_ID) ?: 0
+                val parentId = arguments?.getString(AddBookmarkFolderDialogFragment.KEY_PARENT_FOLDER_ID) ?: Relation.BOOMARKS_ROOT
                 listener?.onSavedSiteEdited(
                     savedSite.copy(title = updatedTitle, url = updatedUrl, parentId = parentId),
                 )
@@ -124,13 +125,13 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
 
         fun instance(
             savedSite: SavedSite,
-            parentFolderId: Long = 0,
+            parentFolderId: String = Relation.BOOMARKS_ROOT,
             parentFolderName: String? = null,
         ): EditSavedSiteDialogFragment {
             val dialog = EditSavedSiteDialogFragment()
             val bundle = Bundle()
             bundle.putSerializable(KEY_SAVED_SITE, savedSite)
-            bundle.putLong(AddBookmarkFolderDialogFragment.KEY_PARENT_FOLDER_ID, parentFolderId)
+            bundle.putString(AddBookmarkFolderDialogFragment.KEY_PARENT_FOLDER_ID, parentFolderId)
             bundle.putString(AddBookmarkFolderDialogFragment.KEY_PARENT_FOLDER_NAME, parentFolderName)
             dialog.arguments = bundle
             return dialog

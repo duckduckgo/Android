@@ -22,7 +22,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.model.BookmarkFolderItem
-import com.duckduckgo.app.bookmarks.model.BookmarksRepository
+import com.duckduckgo.app.bookmarks.model.SavedSitesRepository
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment.AddBookmarkFolderListener
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersViewModel.Command.NewFolderCreatedUpdateTheStructure
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersViewModel.Command.SelectFolder
@@ -34,7 +34,7 @@ import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
 class BookmarkFoldersViewModel @Inject constructor(
-    val bookmarksRepository: BookmarksRepository,
+    val savedSitesRepository: SavedSitesRepository,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel(), AddBookmarkFolderListener {
 
@@ -60,8 +60,9 @@ class BookmarkFoldersViewModel @Inject constructor(
         currentFolder: BookmarkFolder?,
     ) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            val folderStructure = bookmarksRepository.getFlatFolderStructure(selectedFolderId, currentFolder, rootFolderName)
-            onFolderStructureCreated(folderStructure)
+            // TODO: flat folder structure
+            // val folderStructure = savedSitesRepository.getFlatFolderStructure(selectedFolderId, currentFolder, rootFolderName)
+            // onFolderStructureCreated(folderStructure)
         }
     }
 
@@ -71,12 +72,13 @@ class BookmarkFoldersViewModel @Inject constructor(
         currentFolder: BookmarkFolder?,
     ) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            val folderStructure = bookmarksRepository.getFlatFolderStructure(
-                selectedFolderId,
-                currentFolder,
-                rootFolderName,
-            )
-            onFolderStructureCreated(folderStructure)
+            // TODO: flat folder structure
+            // val folderStructure = bookmarksRepository.getFlatFolderStructure(
+            //     selectedFolderId,
+            //     currentFolder,
+            //     rootFolderName,
+            // )
+            // onFolderStructureCreated(folderStructure)
         }
     }
 
@@ -90,7 +92,7 @@ class BookmarkFoldersViewModel @Inject constructor(
 
     override fun onBookmarkFolderAdded(bookmarkFolder: BookmarkFolder) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            bookmarksRepository.insert(bookmarkFolder)
+            savedSitesRepository.insert(bookmarkFolder)
         }
         command.value = NewFolderCreatedUpdateTheStructure
     }

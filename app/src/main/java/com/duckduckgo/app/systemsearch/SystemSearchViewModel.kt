@@ -22,8 +22,8 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
-import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.model.SavedSite
+import com.duckduckgo.app.bookmarks.model.SavedSitesRepository
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
@@ -59,7 +59,7 @@ class SystemSearchViewModel @Inject constructor(
     private val autoComplete: AutoComplete,
     private val deviceAppLookup: DeviceAppLookup,
     private val pixel: Pixel,
-    private val favoritesRepository: FavoritesRepository,
+    private val savedSitesRepository: SavedSitesRepository,
     private val faviconManager: FaviconManager,
     private val appSettingsPreferencesStore: SettingsDataStore,
     private val dispatchers: DispatcherProvider,
@@ -107,7 +107,7 @@ class SystemSearchViewModel @Inject constructor(
         configureResults()
         refreshAppList()
         viewModelScope.launch {
-            favoritesRepository.favorites().collect { favorite ->
+            savedSitesRepository.getFavorites().collect { favorite ->
                 latestQuickAccessItems = Suggestions.QuickAccessItems(favorite.map { FavoritesQuickAccessAdapter.QuickAccessFavorite(it) })
                 resultsViewState.postValue(latestQuickAccessItems)
             }
@@ -285,7 +285,7 @@ class SystemSearchViewModel @Inject constructor(
 
     fun onQuickAccessListChanged(newList: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
         viewModelScope.launch(dispatchers.io()) {
-            favoritesRepository.updateWithPosition(newList.map { it.favorite })
+            savedSitesRepository.updateWithPosition(newList.map { it.favorite })
         }
     }
 
@@ -312,7 +312,7 @@ class SystemSearchViewModel @Inject constructor(
         when (savedSite) {
             is SavedSite.Favorite -> {
                 viewModelScope.launch(dispatchers.io()) {
-                    favoritesRepository.update(savedSite)
+                    savedSitesRepository.update(savedSite)
                 }
             }
             else -> throw IllegalArgumentException("Illegal SavedSite to edit received")
@@ -323,7 +323,7 @@ class SystemSearchViewModel @Inject constructor(
         when (savedSite) {
             is SavedSite.Favorite -> {
                 viewModelScope.launch(dispatchers.io() + NonCancellable) {
-                    favoritesRepository.delete(savedSite)
+                    savedSitesRepository.delete(savedSite)
                 }
             }
             else -> throw IllegalArgumentException("Illegal SavedSite to delete received")
@@ -334,7 +334,7 @@ class SystemSearchViewModel @Inject constructor(
         when (savedSite) {
             is SavedSite.Favorite -> {
                 viewModelScope.launch(dispatchers.io()) {
-                    favoritesRepository.insert(savedSite)
+                    savedSitesRepository.insert(savedSite)
                 }
             }
             else -> throw IllegalArgumentException("Illegal SavedSite to delete received")

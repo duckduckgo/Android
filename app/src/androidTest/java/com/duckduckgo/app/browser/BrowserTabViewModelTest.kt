@@ -147,6 +147,7 @@ import dagger.Lazy
 import io.reactivex.Observable
 import java.io.File
 import java.util.Locale
+import java.util.UUID
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -181,7 +182,6 @@ import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.whenever
-import java.util.UUID
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -1589,7 +1589,12 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenNoSiteAndUserSelectsToAddBookmarkThenBookmarkIsNotAdded() = runTest {
-        val bookmark = Bookmark(id = UUID.randomUUID().toString(), title = "A title", url = "www.example.com", parentId = UUID.randomUUID().toString())
+        val bookmark = Bookmark(
+            id = UUID.randomUUID().toString(),
+            title = "A title",
+            url = "www.example.com",
+            parentId = UUID.randomUUID().toString(),
+        )
         whenever(mockSavedSitesRepository.insertBookmark(anyString(), anyString())).thenReturn(bookmark)
 
         testee.onBookmarkMenuClicked()

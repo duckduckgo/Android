@@ -19,11 +19,13 @@ package com.duckduckgo.app.bookmarks.service
 import android.content.ContentResolver
 import android.net.Uri
 import androidx.annotation.VisibleForTesting
-import com.duckduckgo.app.bookmarks.model.BookmarksRepository
-import com.duckduckgo.app.bookmarks.model.FavoritesRepository
+import com.duckduckgo.app.bookmarks.model.BookmarkFolder
+import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
+import com.duckduckgo.app.bookmarks.model.SavedSitesRepository
 import com.duckduckgo.app.bookmarks.model.TreeNode
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.sync.store.Relation
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
@@ -41,15 +43,14 @@ sealed class ExportSavedSitesResult {
 
 class RealSavedSitesExporter(
     private val contentResolver: ContentResolver,
-    private val favoritesRepository: FavoritesRepository,
-    private val bookmarksRepository: BookmarksRepository,
+    private val savedSitesRepository: SavedSitesRepository,
     private val savedSitesParser: SavedSitesParser,
     private val dispatcher: DispatcherProvider = DefaultDispatcherProvider(),
 ) : SavedSitesExporter {
 
     override suspend fun export(uri: Uri): ExportSavedSitesResult {
         val favorites = withContext(dispatcher.io()) {
-            favoritesRepository.favoritesSync()
+            savedSitesRepository.getFavoritesSync()
         }
         val treeStructure = withContext(dispatcher.io()) {
             getTreeFolderStructure()
@@ -85,17 +86,18 @@ class RealSavedSitesExporter(
 
     @VisibleForTesting
     fun getTreeFolderStructure(): TreeNode<FolderTreeItem> {
-        val node = TreeNode(FolderTreeItem(0, RealSavedSitesParser.BOOKMARKS_FOLDER, -1, null, 0))
-        populateNode(node, 0, 1)
+        val node = TreeNode(FolderTreeItem(Relation.BOOMARKS_ROOT, RealSavedSitesParser.BOOKMARKS_FOLDER, "", null, 0))
+        populateNode(node, Relation.BOOMARKS_ROOT, 1)
         return node
     }
 
     private fun populateNode(
         parentNode: TreeNode<FolderTreeItem>,
-        parentId: Long,
+        parentId: String,
         currentDepth: Int,
     ) {
-        val bookmarkFolders = bookmarksRepository.getBookmarkFoldersByParentId(parentId)
+        // val bookmarkFolders = savedSitesRepository.getBookmarkFoldersByParentId(parentId)
+        val bookmarkFolders = emptyList<BookmarkFolder>()
 
         bookmarkFolders.forEach { bookmarkFolder ->
             val childNode = TreeNode(FolderTreeItem(bookmarkFolder.id, bookmarkFolder.name, bookmarkFolder.parentId, null, currentDepth))
@@ -103,7 +105,8 @@ class RealSavedSitesExporter(
             populateNode(childNode, bookmarkFolder.id, currentDepth + 1)
         }
 
-        val bookmarks = bookmarksRepository.getBookmarksByParentId(parentId)
+        // val bookmarks = bookmarksRepository.getBookmarksByParentId(parentId)
+        val bookmarks = emptyList<Bookmark>()
 
         bookmarks.forEach { bookmark ->
             bookmark.title?.let { title ->
@@ -115,9 +118,9 @@ class RealSavedSitesExporter(
 }
 
 data class FolderTreeItem(
-    val id: Long = 0,
+    val id: String,
     val name: String,
-    val parentId: Long,
+    val parentId: String,
     val url: String?,
     val depth: Int,
 )

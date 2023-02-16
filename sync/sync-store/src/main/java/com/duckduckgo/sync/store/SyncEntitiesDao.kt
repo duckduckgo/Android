@@ -80,4 +80,13 @@ interface SyncEntitiesDao {
 
     @Query("select * from entities where type = :type")
     fun entitiesByType(type: EntityType): Flow<List<Entity>>
+
+    @Query("select * from entities where type = :type")
+    fun entitiesByTypeSync(type: EntityType): List<Entity>
+
+    @Query("delete from entities where entityId != :bookmarksRoot AND entityId != :favoritesRoot")
+    fun deleteAll(
+        bookmarksRoot: String = Relation.BOOMARKS_ROOT,
+        favoritesRoot: String = Relation.FAVORITES_ROOT,
+    )
 }

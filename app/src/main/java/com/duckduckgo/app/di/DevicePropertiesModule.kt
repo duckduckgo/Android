@@ -17,8 +17,7 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
-import com.duckduckgo.app.bookmarks.model.BookmarksRepository
-import com.duckduckgo.app.bookmarks.model.FavoritesRepository
+import com.duckduckgo.app.bookmarks.model.SavedSitesRepository
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.store.AndroidAppProperties
@@ -62,8 +61,7 @@ object DevicePropertiesModule {
     @SingleInstanceIn(AppScope::class)
     fun providesUserBrowserProperties(
         themingDataStore: ThemingDataStore,
-        bookmarksRepository: BookmarksRepository,
-        favoritesRepository: FavoritesRepository,
+        savedSitesRepository: SavedSitesRepository,
         appInstallStore: AppInstallStore,
         widgetCapabilities: WidgetCapabilities,
         emailManager: EmailManager,
@@ -72,8 +70,7 @@ object DevicePropertiesModule {
     ): UserBrowserProperties {
         return AndroidUserBrowserProperties(
             themingDataStore,
-            bookmarksRepository,
-            favoritesRepository,
+            savedSitesRepository,
             appInstallStore,
             widgetCapabilities,
             emailManager,

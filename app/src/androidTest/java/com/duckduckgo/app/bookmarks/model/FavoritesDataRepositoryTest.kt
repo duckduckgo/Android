@@ -50,7 +50,7 @@ class FavoritesDataRepositoryTest {
     private val lazyFaviconManager = Lazy { mockFaviconManager }
     private lateinit var db: AppDatabase
     private lateinit var favoritesDao: FavoritesDao
-    private lateinit var repository: FavoritesRepository
+    private lateinit var repository: SavedSitesRepository
 
     @Before
     fun before() {
@@ -58,7 +58,7 @@ class FavoritesDataRepositoryTest {
             .allowMainThreadQueries()
             .build()
         favoritesDao = db.favoritesDao()
-        repository = FavoritesDataRepository(favoritesDao, lazyFaviconManager)
+        repository = RealSavedSitesRepository(favoritesDao, lazyFaviconManager)
     }
 
     @Test

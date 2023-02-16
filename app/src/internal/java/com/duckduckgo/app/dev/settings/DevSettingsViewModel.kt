@@ -19,8 +19,7 @@ package com.duckduckgo.app.dev.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.bookmarks.model.BookmarksRepository
-import com.duckduckgo.app.bookmarks.model.FavoritesRepository
+import com.duckduckgo.app.bookmarks.model.SavedSitesRepository
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.dev.settings.db.DevSettingsDataStore
 import com.duckduckgo.app.dev.settings.db.UAOverride
@@ -42,8 +41,7 @@ class DevSettingsViewModel @Inject constructor(
     private val devSettingsDataStore: DevSettingsDataStore,
     private val startupTraces: StartupTraces,
     private val userAgentProvider: UserAgentProvider,
-    private val bookmarksRepository: BookmarksRepository,
-    private val favoritesRepository: FavoritesRepository,
+    private val savedSitesRepository: SavedSitesRepository,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
@@ -51,7 +49,7 @@ class DevSettingsViewModel @Inject constructor(
         val nextTdsEnabled: Boolean = false,
         val startupTraceEnabled: Boolean = false,
         val overrideUA: Boolean = false,
-        val userAgent: String = ""
+        val userAgent: String = "",
     )
 
     sealed class Command {
@@ -130,8 +128,7 @@ class DevSettingsViewModel @Inject constructor(
 
     fun clearSavedSites() {
         viewModelScope.launch(dispatcherProvider.io()) {
-            favoritesRepository.deleteAll()
-            bookmarksRepository.deleteAll()
+            savedSitesRepository.deleteAll()
             command.send(Command.ShowSavedSitesClearedConfirmation)
         }
     }

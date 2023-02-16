@@ -62,4 +62,10 @@ interface SyncRelationsDao {
 
     @Query("select * from relations where type = :type")
     fun entitiesByType(type: EntityType): Flow<List<Relation>>
+
+    @Query("select count(*) from relations WHERE url LIKE :domain AND relationId == :relationId")
+    fun relationsCountByUrl(domain: String, relationId: String = Relation.FAVORITES_ROOT): Int
+
+    @Query("delete from relations")
+    fun deleteAll()
 }

@@ -29,12 +29,13 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.mobile.android.databinding.RowTwoLineItemBinding
 import com.duckduckgo.mobile.android.databinding.ViewSectionHeaderBinding
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
+import com.duckduckgo.sync.store.Relation
 import timber.log.Timber
 
 class BookmarkFoldersAdapter(
     private val layoutInflater: LayoutInflater,
     private val viewModel: BookmarksViewModel,
-    private val parentId: Long,
+    private val parentId: String,
 ) : ListAdapter<BookmarkFoldersAdapter.BookmarkFoldersItemTypes, BookmarkFolderScreenViewHolders>(BookmarkFoldersDiffCallback()) {
 
     companion object {
@@ -54,7 +55,7 @@ class BookmarkFoldersAdapter(
 
     private fun generateNewList(value: List<BookmarkFoldersItemTypes>): List<BookmarkFoldersItemTypes> {
         Timber.d("Bookmarks: generateNewList")
-        return if (parentId == 0L) {
+        return if (parentId == Relation.BOOMARKS_ROOT) {
             listOf(Header) + value
         } else {
             value

@@ -26,10 +26,10 @@ import com.duckduckgo.sync.store.EntityType.FOLDER
 import com.duckduckgo.sync.store.Relation
 import com.duckduckgo.sync.store.SyncEntitiesDao
 import com.duckduckgo.sync.store.SyncRelationsDao
+import java.io.Serializable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import java.io.Serializable
 
 interface SavedSitesRepository {
 
@@ -43,9 +43,14 @@ interface SavedSitesRepository {
 
     fun getFavorites(): Flow<List<Favorite>>
 
+    fun getFavoritesSync(): List<Favorite>
+
+    fun getFavoritesCountByDomain(domain: String): Int
+
     fun getFavorite(url: String): Favorite?
 
     fun hasBookmarks(): Boolean
+    fun hasFavorites(): Boolean
 
     fun insertBookmark(
         url: String,
@@ -69,6 +74,9 @@ interface SavedSitesRepository {
     fun delete(folder: BookmarkFolder)
 
     fun getFolder(folderId: String): BookmarkFolder
+    fun deleteAll()
+    fun bookmarksCount(): Long
+    fun favoritesCount(): Long
 }
 
 class RealSavedSitesRepository(
@@ -107,6 +115,14 @@ class RealSavedSitesRepository(
             .flowOn(dispatcherProvider.io())
     }
 
+    override fun getFavoritesSync(): List<Favorite> {
+        return syncRelationsDao.relationByIdSync(Relation.FAVORITES_ROOT).mapToFavorites()
+    }
+
+    override fun getFavoritesCountByDomain(domain: String): Int {
+        return syncRelationsDao.relationsCountByUrl(domain)
+    }
+
     override fun getFavorite(url: String): Favorite? {
         return syncEntitiesDao.favorite(url = url)?.mapToFavorite()
     }
@@ -126,7 +142,11 @@ class RealSavedSitesRepository(
     }
 
     override fun hasBookmarks(): Boolean {
-        return syncEntitiesDao.hasEntitiesByType(BOOKMARK)
+        return bookmarksCount() > 0
+    }
+
+    override fun hasFavorites(): Boolean {
+        return favoritesCount() > 0
     }
 
     override fun insertBookmark(
@@ -160,7 +180,6 @@ class RealSavedSitesRepository(
     }
 
     override fun delete(savedSite: SavedSite) {
-        // we delete by url until Bookmark takes String as id instead of Long
         val entity = syncEntitiesDao.entityByUrl(savedSite.url)
         if (entity != null) {
             syncEntitiesDao.delete(entity)
@@ -199,15 +218,34 @@ class RealSavedSitesRepository(
         return BookmarkFolder(folderId, entity.title, folderId)
     }
 
+    override fun deleteAll() {
+        syncRelationsDao.deleteAll()
+        syncEntitiesDao.deleteAll()
+    }
+
+    override fun bookmarksCount(): Long {
+        return syncEntitiesDao.entitiesByTypeSync(BOOKMARK).size.toLong()
+    }
+
+    override fun favoritesCount(): Long {
+        return syncRelationsDao.relationByIdSync(Relation.FAVORITES_ROOT).size.toLong()
+    }
+
     override fun updateWithPosition(favorites: List<Favorite>) {
         // reorder the list of the relation
     }
 
     private fun Entity.mapToBookmark(relationId: String): Bookmark = Bookmark(this.entityId, this.title, this.url.orEmpty(), relationId)
-    private fun Relation.mapToBookmark(relationId: String): Bookmark = Bookmark(this.entity.entityId, this.entity.title, this.entity.url.orEmpty(), relationId)
+    private fun Relation.mapToBookmark(relationId: String): Bookmark =
+        Bookmark(this.entity.entityId, this.entity.title, this.entity.url.orEmpty(), relationId)
+
+    private fun Relation.mapToFavorite(position: Int): Favorite =
+        Favorite(this.entity.entityId, this.entity.title, this.entity.url.orEmpty(), position)
+
     private fun Entity.mapToFavorite(): Favorite = Favorite(this.entityId, this.title, this.url.orEmpty(), 0)
     private fun Entity.mapIndexedToFavorite(index: Int): Favorite = Favorite(this.entityId, this.title, this.url.orEmpty(), index)
     private fun List<Relation>.mapToBookmarks(): List<Bookmark> = this.map { it.mapToBookmark(it.relationId) }
+    private fun List<Relation>.mapToFavorites(): List<Favorite> = this.mapIndexed { index, relation -> relation.mapToFavorite(index) }
 }
 
 sealed class SavedSite(
