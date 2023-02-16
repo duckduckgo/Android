@@ -1,4 +1,4 @@
-name: NetP Nightly Release
+name: NetP Canary Release
 
 on:
   push:
@@ -57,7 +57,7 @@ jobs:
         with:
           appName: avianasanchez/ddg-netp
           token: ${{secrets.APP_CENTER_TOKEN}}
-          group: Internal
+          group: Canary
           file: ${{steps.sign_app.outputs.signedReleaseFile}}
           notifyTesters: true
           debug: true
