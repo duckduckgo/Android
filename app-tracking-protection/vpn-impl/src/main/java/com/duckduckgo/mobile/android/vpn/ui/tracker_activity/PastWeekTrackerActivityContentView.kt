@@ -18,12 +18,11 @@ package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.LayoutInflater
-import android.view.View
 import android.widget.FrameLayout
 import androidx.core.view.isVisible
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.R
-import kotlinx.android.synthetic.main.view_device_shield_past_week_activity_content.view.*
+import com.duckduckgo.mobile.android.vpn.databinding.ViewDeviceShieldPastWeekActivityContentBinding
 
 class PastWeekTrackerActivityContentView : FrameLayout {
 
@@ -46,36 +45,34 @@ class PastWeekTrackerActivityContentView : FrameLayout {
         attributes.recycle()
     }
 
-    private val root: View by lazy {
-        LayoutInflater.from(context).inflate(R.layout.view_device_shield_past_week_activity_content, this, true)
-    }
+    private val binding: ViewDeviceShieldPastWeekActivityContentBinding by viewBinding()
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        root.isVisible = true
+        binding.root.isVisible = true
     }
 
     var count: String
         get() {
-            return root.content_text.text.toString()
+            return binding.contentText.text.toString()
         }
         set(value) {
-            root.content_text.text = value
+            binding.contentText.text = value
         }
 
     var text: String
         get() {
-            return root.content_title.text.toString()
+            return binding.contentTitle.text.toString()
         }
         set(value) {
-            root.content_title.text = value
+            binding.contentTitle.text = value
         }
 
     var footer: String
         get() {
-            return root.content_footer.text.toString()
+            return binding.contentFooter.text.toString()
         }
         set(value) {
-            root.content_footer.text = value
+            binding.contentFooter.text = value
         }
 }
