@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   privacy_tests:
-    if: ${{ contains( github.event.pull_request.labels.*.name, 'content scope scripts') || github.event.schedule == '0 3 * * *' }}
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'content scope scripts') }}
     name: Privacy Tests
     runs-on: ubuntu-latest
 
