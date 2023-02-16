@@ -17,14 +17,12 @@
 package com.duckduckgo.mobile.android.vpn.breakage
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.global.extensions.safeGetApplicationIcon
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
-import com.duckduckgo.mobile.android.vpn.R
-import kotlinx.android.synthetic.main.view_device_shield_report_app_breakage_entry.view.*
+import com.duckduckgo.mobile.android.vpn.databinding.ViewDeviceShieldReportAppBreakageEntryBinding
 
 class ReportBreakageAppListAdapter(private val listener: Listener) : RecyclerView.Adapter<ReportBreakageAppListViewHolder>() {
 
@@ -43,8 +41,7 @@ class ReportBreakageAppListAdapter(private val listener: Listener) : RecyclerVie
         viewType: Int,
     ): ReportBreakageAppListViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val view = inflater.inflate(R.layout.view_device_shield_report_app_breakage_entry, parent, false)
-        return ReportBreakageAppListViewHolder(view)
+        return ReportBreakageAppListViewHolder(binding = ViewDeviceShieldReportAppBreakageEntryBinding.inflate(inflater, parent, false))
     }
 
     override fun onBindViewHolder(
@@ -97,24 +94,24 @@ class ReportBreakageAppListAdapter(private val listener: Listener) : RecyclerVie
     }
 }
 
-class ReportBreakageAppListViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+class ReportBreakageAppListViewHolder(val binding: ViewDeviceShieldReportAppBreakageEntryBinding) : RecyclerView.ViewHolder(binding.root) {
     fun bind(
         installedApp: InstalledApp,
         position: Int,
         listener: ReportBreakageAppListAdapter.Listener,
     ) {
-        itemView.deviceShieldInstalledAppEntryName.text = installedApp.name
+        binding.deviceShieldInstalledAppEntryName.text = installedApp.name
 
-        itemView.deviceShieldInstalledAppSelector.quietlySetIsChecked(installedApp.isSelected) { _, _ ->
+        binding.deviceShieldInstalledAppSelector.quietlySetIsChecked(installedApp.isSelected) { _, _ ->
             listener.onInstalledAppSelected(installedApp, position)
         }
 
         // also set the listener in the container view
-        itemView.setOnClickListener {
+        binding.root.setOnClickListener {
             listener.onInstalledAppSelected(installedApp, position)
         }
 
         val appIcon = itemView.context.packageManager.safeGetApplicationIcon(installedApp.packageName)
-        itemView.deviceShieldInstalledAppEntryIcon.setImageDrawable(appIcon)
+        binding.deviceShieldInstalledAppEntryIcon.setImageDrawable(appIcon)
     }
 }
