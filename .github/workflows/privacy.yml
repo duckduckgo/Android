@@ -1,6 +1,8 @@
 name: Privacy Tests
 
 on:
+  pull_request:
+    types: [ labeled ]
   schedule:
     - cron: '0 3 * * *' # run at 3 AM UTC
   workflow_dispatch:
@@ -11,6 +13,7 @@ concurrency:
 
 jobs:
   privacy_tests:
+    if: ${{ github.event.label.name == 'content scope scripts' || github.event.schedule == '0 3 * * *' }}
     name: Privacy Tests
     runs-on: ubuntu-latest
 
