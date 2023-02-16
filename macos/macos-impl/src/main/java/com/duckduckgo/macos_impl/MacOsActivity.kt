@@ -74,7 +74,7 @@ class MacOsActivity : DuckDuckGoActivity() {
     private fun executeCommand(command: Command) {
         when (command) {
             is ShareLink -> launchSharePageChooser()
-            GoToWindowsClientSettings -> launchWindowsClientSettings()
+            is GoToWindowsClientSettings -> launchWindowsClientSettings()
         }
     }
 

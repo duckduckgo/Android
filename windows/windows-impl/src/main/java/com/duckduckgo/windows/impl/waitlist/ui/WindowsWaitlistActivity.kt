@@ -112,7 +112,7 @@ class WindowsWaitlistActivity : DuckDuckGoActivity() {
             is ShowErrorMessage -> renderErrorMessage()
             is ShareInviteCode -> launchSharePageChooser(command.inviteCode)
             is CopyInviteToClipboard -> copyToClipboard(command.inviteCode, command.onlyCode)
-            GoToMacClientSettings -> launchMacClientSettings()
+            is GoToMacClientSettings -> launchMacClientSettings()
         }
     }
 
