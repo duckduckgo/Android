@@ -157,19 +157,6 @@ class WindowsWaitlistViewModelTest {
     }
 
     @Test
-    fun whenOnDialogDismissedThenEmitWaitlistState() = runTest {
-        givenJoinWaitlistSuccessful()
-
-        testee.viewState.test {
-            assert(awaitItem().waitlist is NotJoinedQueue)
-
-            testee.onDialogDismissed()
-
-            assert(awaitItem().waitlist is JoinedWaitlist)
-        }
-    }
-
-    @Test
     fun whenOnShareClickedAndInviteCodeExistsThenEmitCommandShareInviteCodeWithCorrectCode() = runTest {
         whenever(mockWindowsWaitlistManager.getInviteCode()).thenReturn("inviteCode")
 
