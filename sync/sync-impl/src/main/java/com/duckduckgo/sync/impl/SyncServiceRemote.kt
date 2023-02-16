@@ -23,6 +23,7 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import javax.inject.Inject
 import retrofit2.Response
+import timber.log.Timber
 
 interface SyncApi {
     fun createAccount(
@@ -147,13 +148,15 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
             )
             call.execute()
         }.getOrElse { throwable ->
+            Timber.i("SYNC apilogin $throwable")
             return Result.Error(reason = throwable.message.toString())
         }
 
         return onSuccess(response) {
+            Timber.i("SYNC apilogin sucess")
             val token = response.body()?.token ?: throw IllegalStateException("Empty token")
             val protectedEncryptionKey = response.body()?.protected_encryption_key ?: throw IllegalStateException("Empty PEK")
-
+            Timber.i("SYNC apilogin body ok")
             Result.Success(
                 LoginResponse(
                     token = token,

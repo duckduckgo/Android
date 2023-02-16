@@ -44,6 +44,7 @@ import com.journeyapps.barcodescanner.ScanIntentResult
 import com.journeyapps.barcodescanner.ScanOptions
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
 class SyncInitialSetupActivity : DuckDuckGoActivity() {
@@ -57,7 +58,8 @@ class SyncInitialSetupActivity : DuckDuckGoActivity() {
         if (result.contents == null) {
             Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show()
         } else {
-            Toast.makeText(this, "Scanned: " + result.contents, Toast.LENGTH_LONG).show()
+            Timber.i("SYNC contents ${result.contents}")
+            viewModel.onQRScanned(result.contents)
         }
     }
 

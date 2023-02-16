@@ -32,6 +32,7 @@ import timber.log.Timber
 interface SyncRepository {
     fun createAccount(): Result<Boolean>
     fun login(): Result<Boolean>
+    fun login(recoveryCode: String): Result<Boolean>
     fun getAccountInfo(): AccountInfo
     fun storeRecoveryCode()
     fun removeAccount()
@@ -95,6 +96,7 @@ class AppSyncRepository @Inject constructor(
         val deviceName = syncDeviceIds.deviceName()
 
         val preLogin: LoginKeys = nativeLib.prepareForLogin(primaryKey)
+        Timber.i("SYNC prelogin ${preLogin.passwordHash} and ${preLogin.stretchedPrimaryKey}")
         if (preLogin.result != 0L) return Result.Error(code = preLogin.result.toInt(), reason = "Account keys failed")
 
         val result =
@@ -110,6 +112,50 @@ class AppSyncRepository @Inject constructor(
                 result
             }
 
+            is Result.Success -> {
+                val decryptResult = nativeLib.decrypt(result.data.protected_encryption_key, preLogin.stretchedPrimaryKey)
+                if (decryptResult.result != 0L) return Result.Error(code = decryptResult.result.toInt(), reason = "Decrypt failed")
+                Timber.i("SYNC decrypt: decoded secret Key: ${decryptResult.decryptedData}")
+                syncStore.userId = userId
+                syncStore.deviceId = deviceId
+                syncStore.deviceName = deviceName
+                syncStore.token = result.data.token
+                syncStore.primaryKey = preLogin.primaryKey
+                syncStore.secretKey = decryptResult.decryptedData
+                Result.Success(true)
+            }
+        }
+    }
+
+    override fun login(recoveryCodeJson: String): Result<Boolean> {
+        val recoveryCode = Adapters.recoveryCodeAdapter.fromJson(recoveryCodeJson) ?: return Result.Error(reason = "Failed reading json")
+        Timber.i("SYNC recoveryCode $recoveryCode")
+        val primaryKey = recoveryCode.primaryKey
+        Timber.i("SYNC primarykey $primaryKey")
+        val userId = recoveryCode.userID
+        Timber.i("SYNC userId $userId")
+        val deviceId = syncDeviceIds.deviceId()
+        val deviceName = syncDeviceIds.deviceName()
+
+        Timber.i("SYNC prelogin")
+        val preLogin: LoginKeys = nativeLib.prepareForLogin(primaryKey)
+        Timber.i("SYNC prelogin ${preLogin.passwordHash} and ${preLogin.stretchedPrimaryKey}")
+        if (preLogin.result != 0L) return Result.Error(code = preLogin.result.toInt(), reason = "Account keys failed")
+
+        Timber.i("SYNC apilogin")
+        val result =
+            syncApi.login(
+                userID = userId,
+                hashedPassword = preLogin.passwordHash,
+                deviceId = deviceId,
+                deviceName = deviceName,
+            )
+        Timber.i("SYNC apilogin $result")
+
+        return when (result) {
+            is Result.Error -> {
+                result
+            }
             is Result.Success -> {
                 val decryptResult = nativeLib.decrypt(result.data.protected_encryption_key, preLogin.stretchedPrimaryKey)
                 if (decryptResult.result != 0L) return Result.Error(code = decryptResult.result.toInt(), reason = "Decrypt failed")

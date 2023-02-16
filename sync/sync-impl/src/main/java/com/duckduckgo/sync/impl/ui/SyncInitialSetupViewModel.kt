@@ -166,15 +166,25 @@ constructor(
     }
 
     fun onReadQRClicked() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatchers.io())  {
             command.send(ReadQR)
         }
     }
 
     fun onShowQRClicked() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatchers.io()) {
             val recoveryCode = syncRepository.getRecoveryCode() ?: return@launch
             command.send(ShowQR(recoveryCode))
+        }
+    }
+
+    fun onQRScanned(contents: String) {
+        viewModelScope.launch(dispatchers.io()) {
+            val result = syncRepository.login(contents)
+            if (result is Error) {
+                command.send(Command.ShowMessage("$result"))
+            }
+            updateViewState()
         }
     }
 }
