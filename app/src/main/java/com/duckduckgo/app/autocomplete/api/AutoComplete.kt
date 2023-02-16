@@ -24,6 +24,7 @@ import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.model.SavedSite
+import com.duckduckgo.app.bookmarks.model.SavedSitesRepository
 import com.duckduckgo.app.global.UriString
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.toStringDropScheme
@@ -60,7 +61,7 @@ interface AutoComplete {
 class AutoCompleteApi @Inject constructor(
     private val autoCompleteService: AutoCompleteService,
     private val bookmarksDao: BookmarksDao,
-    private val favoritesRepository: FavoritesRepository,
+    private val repository: SavedSitesRepository,
 ) : AutoComplete {
 
     override fun autoComplete(query: String): Observable<AutoCompleteResult> {
@@ -111,7 +112,7 @@ class AutoCompleteApi @Inject constructor(
             .toObservable()
 
     private fun getAutoCompleteFavoritesResults(query: String) =
-        favoritesRepository.favoritesObservable()
+        repository.getFavorites().favoritesObservable()
             .map { rankFavorites(query, it) }
             .flattenAsObservable { it }
             .map {

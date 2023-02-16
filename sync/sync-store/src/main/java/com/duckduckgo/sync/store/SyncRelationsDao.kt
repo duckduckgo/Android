@@ -39,6 +39,9 @@ interface SyncRelationsDao {
     @Query("select * from entities inner join relations on entities.entityId = relations.entityId where relations.relationId = :folderId")
     fun relationById(folderId: String): Flow<List<Entity>>
 
+    @Query("select * from relations where relations.entityId = :entityId")
+    fun relationParentById(entityId: String): Relation
+
     @Query("select * from relations where relationId = :id")
     fun relationByIdSync(id: String): List<Relation>
 
@@ -56,4 +59,7 @@ interface SyncRelationsDao {
 
     @Query("delete from relations where entityId = :entityId")
     fun deleteEntity(entityId: String)
+
+    @Query("select * from relations where type = :type")
+    fun entitiesByType(type: EntityType): Flow<List<Relation>>
 }

@@ -27,7 +27,6 @@ interface DevSettingsDataStore {
     var nextTdsEnabled: Boolean
     var overrideUA: Boolean
     var selectedUA: UAOverride
-    var syncBookmarksEnabled: Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -51,17 +50,11 @@ class DevSettingsSharedPreferences @Inject constructor(private val context: Cont
         val savedValue = preferences.getString(KEY_SELECTED_UA, null) ?: return UAOverride.DDG
         return UAOverride.valueOf(savedValue)
     }
-
-    override var syncBookmarksEnabled: Boolean
-        get() = preferences.getBoolean(KEY_SYNC_BOOKMARKS, true)
-        set(enabled) = preferences.edit { putBoolean(KEY_SYNC_BOOKMARKS, enabled) }
-
     companion object {
         const val FILENAME = "com.duckduckgo.app.dev_settings_activity.dev_settings"
         const val KEY_NEXT_TDS_ENABLED = "KEY_NEXT_TDS_ENABLED"
         const val KEY_OVERRIDE_UA = "KEY_OVERRIDE_UA"
         const val KEY_SELECTED_UA = "KEY_SELECTED_UA"
-        const val KEY_SYNC_BOOKMARKS = "KEY_SYNC_BOOKMARKS"
     }
 }
 

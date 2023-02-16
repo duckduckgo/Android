@@ -19,9 +19,9 @@ package com.duckduckgo.app.bookmarks.model
 import java.io.Serializable
 
 data class BookmarkFolder(
-    val id: Long = 0,
+    val id: String,
     val name: String,
-    val parentId: Long,
+    val parentId: String,
     val numBookmarks: Int = 0,
     val numFolders: Int = 0,
 ) : Serializable

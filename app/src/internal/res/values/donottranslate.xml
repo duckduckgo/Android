@@ -42,8 +42,6 @@
     <string name="devSettingsScreenUserAgentFirefox">Firefox</string>
     <string name="devSettingsScreenUserAgentDuckDuckGo">DDG Default</string>
     <string name="devSettingsScreenUserAgentWebView">UA WebView</string>
-    <string name="devSettingsScreenSync">Sync</string>
-    <string name="devSettingsScreenSyncBookmarksOverride">Use Sync Bookmarks Data Model</string>
 
     <!-- Privacy Audit settings -->
     <string name="auditSettingsTitle">Audit Settings</string>
