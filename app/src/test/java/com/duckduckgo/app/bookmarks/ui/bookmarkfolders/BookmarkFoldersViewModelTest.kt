@@ -22,7 +22,8 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.model.BookmarkFolderItem
-import com.duckduckgo.app.bookmarks.model.BookmarksRepository
+import com.duckduckgo.app.bookmarks.model.SavedSitesRepository
+import com.duckduckgo.sync.store.Relation
 import junit.framework.TestCase.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -49,7 +50,7 @@ class BookmarkFoldersViewModelTest {
     @Suppress("unused")
     val coroutineRule = CoroutineTestRule()
 
-    private val bookmarksRepository: BookmarksRepository = mock()
+    private val savedSitesRepository: SavedSitesRepository = mock()
 
     private val viewStateObserver: Observer<BookmarkFoldersViewModel.ViewState> = mock()
     private val commandObserver: Observer<BookmarkFoldersViewModel.Command> = mock()
@@ -60,12 +61,12 @@ class BookmarkFoldersViewModelTest {
         ArgumentCaptor.forClass(BookmarkFoldersViewModel.Command::class.java)
 
     private val folderStructure = mutableListOf(
-        BookmarkFolderItem(1, BookmarkFolder(1, "folder", 0), true),
-        BookmarkFolderItem(1, BookmarkFolder(2, "a folder", 0), false),
+        BookmarkFolderItem(1, BookmarkFolder("folder1", "folder", Relation.BOOMARKS_ROOT), true),
+        BookmarkFolderItem(1, BookmarkFolder("folder2", "a folder", Relation.BOOMARKS_ROOT), false),
     )
 
     private val testee: BookmarkFoldersViewModel by lazy {
-        val model = BookmarkFoldersViewModel(bookmarksRepository, coroutineRule.testDispatcherProvider)
+        val model = BookmarkFoldersViewModel(savedSitesRepository, coroutineRule.testDispatcherProvider)
         model.viewState.observeForever(viewStateObserver)
         model.command.observeForever(commandObserver)
         model
@@ -73,18 +74,18 @@ class BookmarkFoldersViewModelTest {
 
     @Before
     fun before() = runTest {
-        whenever(bookmarksRepository.getFlatFolderStructure(anyLong(), any(), anyString())).thenReturn(folderStructure)
+        whenever(savedSitesRepository.getFlatFolderStructure(anyLong(), any(), anyString())).thenReturn(folderStructure)
     }
 
     @Test
     fun whenFetchBookmarkFoldersThenCallRepoAndUpdateViewState() = runTest {
         val selectedFolderId = 0L
         val rootFolderName = "Bookmarks"
-        val folder = BookmarkFolder(2, "a folder", 1)
+        val folder = BookmarkFolder("folder2", "a folder", "folder1")
 
         testee.fetchBookmarkFolders(selectedFolderId, rootFolderName, folder)
 
-        verify(bookmarksRepository).getFlatFolderStructure(selectedFolderId, folder, rootFolderName)
+        verify(savedSitesRepository).getFlatFolderStructure(selectedFolderId, folder, rootFolderName)
         verify(viewStateObserver, times(2)).onChanged(viewStateCaptor.capture())
 
         assertEquals(emptyList<BookmarkFolderItem>(), viewStateCaptor.allValues[0].folderStructure)
@@ -93,7 +94,7 @@ class BookmarkFoldersViewModelTest {
 
     @Test
     fun whenItemSelectedThenIssueSelectFolderCommand() = runTest {
-        val folder = BookmarkFolder(2, "a folder", 1)
+        val folder = BookmarkFolder("folder2", "a folder", "folder1")
 
         testee.onItemSelected(folder)
 
@@ -104,14 +105,14 @@ class BookmarkFoldersViewModelTest {
 
     @Test
     fun newFolderAddedThenCallRepoAndUpdateViewState() = runTest {
-        val newFolder = BookmarkFolder(3, "new folder", 1)
+        val newFolder = BookmarkFolder("folder3", "new folder", "folder1")
         val selectedFolderId = 0L
         val rootFolderName = "Bookmarks"
 
         testee.newFolderAdded(rootFolderName, selectedFolderId, newFolder)
         folderStructure.add(BookmarkFolderItem(1, newFolder))
 
-        verify(bookmarksRepository).getFlatFolderStructure(selectedFolderId, newFolder, rootFolderName)
+        verify(savedSitesRepository).getFlatFolderStructure(selectedFolderId, newFolder, rootFolderName)
         verify(viewStateObserver, times(2)).onChanged(viewStateCaptor.capture())
 
         assertEquals(emptyList<BookmarkFolderItem>(), viewStateCaptor.allValues[0].folderStructure)

@@ -26,6 +26,7 @@ import com.duckduckgo.sync.store.EntityType.FOLDER
 import com.duckduckgo.sync.store.Relation
 import com.duckduckgo.sync.store.SyncEntitiesDao
 import com.duckduckgo.sync.store.SyncRelationsDao
+import io.reactivex.Single
 import java.io.Serializable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -37,11 +38,22 @@ interface SavedSitesRepository {
 
     suspend fun getFolderContent(parentId: String): Flow<Pair<List<Bookmark>, List<BookmarkFolder>>>
 
+    suspend fun getFlatFolderStructure(
+        selectedFolderId: Long,
+        currentFolder: BookmarkFolder?,
+        rootFolderName: String): List<BookmarkFolderItem>
+
+    suspend fun insertFolderBranch(branchToInsert: BookmarkFolderBranch)
+
     fun getBookmarks(): Flow<List<Bookmark>>
+
+    fun getBookmarksObservable(): Single<List<Bookmark>>
 
     fun getBookmark(url: String): Bookmark?
 
     fun getFavorites(): Flow<List<Favorite>>
+
+    fun getFavoritesObservable(): Single<List<Favorite>>
 
     fun getFavoritesSync(): List<Favorite>
 
@@ -73,6 +85,8 @@ interface SavedSitesRepository {
 
     fun delete(folder: BookmarkFolder)
 
+    fun deleteFolderBranch(folder: BookmarkFolder): BookmarkFolderBranch
+
     fun getFolder(folderId: String): BookmarkFolder
     fun deleteAll()
     fun bookmarksCount(): Long
@@ -85,7 +99,6 @@ class RealSavedSitesRepository(
     private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
 ) : SavedSitesRepository {
 
-    // this signature will change when the migration can happen, using our own Entities data model
     override suspend fun getFolderContent(parentId: String): Flow<Pair<List<Bookmark>, List<BookmarkFolder>>> {
         val bookmarks = mutableListOf<Bookmark>()
         val folders = mutableListOf<BookmarkFolder>()
@@ -103,6 +116,18 @@ class RealSavedSitesRepository(
             .flowOn(dispatcherProvider.io())
     }
 
+    override suspend fun getFlatFolderStructure(
+        selectedFolderId: Long,
+        currentFolder: BookmarkFolder?,
+        rootFolderName: String
+    ): List<BookmarkFolderItem> {
+        return emptyList()
+    }
+
+   override suspend fun insertFolderBranch(branchToInsert: BookmarkFolderBranch) {
+
+   }
+
     override fun getFavorites(): Flow<List<Favorite>> {
         val favorites = mutableListOf<Favorite>()
         return syncRelationsDao.relationById(Relation.FAVORITES_ROOT)
@@ -113,6 +138,16 @@ class RealSavedSitesRepository(
                 favorites
             }
             .flowOn(dispatcherProvider.io())
+    }
+
+    override fun getFavoritesObservable(): Single<List<Favorite>> {
+        val favorites = mutableListOf<Favorite>()
+        return syncRelationsDao.relationByIdObservable(Relation.FAVORITES_ROOT).map { relations ->
+            relations.forEachIndexed { index, entity ->
+                favorites.add(entity.mapIndexedToFavorite(index))
+            }
+            favorites
+        }
     }
 
     override fun getFavoritesSync(): List<Favorite> {
@@ -128,7 +163,11 @@ class RealSavedSitesRepository(
     }
 
     override fun getBookmarks(): Flow<List<Bookmark>> {
-        return syncRelationsDao.entitiesByType(BOOKMARK).map { relations -> relations.mapToBookmarks() }
+        return syncRelationsDao.entitiesByType(BOOKMARK).map { entities -> entities.mapToBookmarks() }
+    }
+
+    override fun getBookmarksObservable(): Single<List<Bookmark>> {
+        return syncRelationsDao.entitiesByTypeObservable(BOOKMARK).map { entities -> entities.mapToBookmarks() }
     }
 
     override fun getBookmark(url: String): Bookmark? {
@@ -211,6 +250,17 @@ class RealSavedSitesRepository(
 
         syncRelationsDao.delete(folder.id)
         syncEntitiesDao.deleteList(entities.toList())
+    }
+
+    override fun deleteFolderBranch(folder: BookmarkFolder): BookmarkFolderBranch {
+        // deletes folder and everything underneath, folders and bookmarks
+        val entities = mutableListOf<Entity>()
+        val relations = mutableListOf<Relation>()
+        val relation = syncRelationsDao.relationById(folder.id).map {
+
+
+        }
+        return BookmarkFolderBranch(emptyList(), emptyList())
     }
 
     override fun getFolder(folderId: String): BookmarkFolder {

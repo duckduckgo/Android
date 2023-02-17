@@ -22,6 +22,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -38,6 +39,9 @@ interface SyncRelationsDao {
 
     @Query("select * from entities inner join relations on entities.entityId = relations.entityId where relations.relationId = :folderId")
     fun relationById(folderId: String): Flow<List<Entity>>
+
+    @Query("select * from entities inner join relations on entities.entityId = relations.entityId where relations.relationId = :folderId")
+    fun relationByIdObservable(folderId: String): Single<List<Entity>>
 
     @Query("select * from relations where relations.entityId = :entityId")
     fun relationParentById(entityId: String): Relation
@@ -62,6 +66,9 @@ interface SyncRelationsDao {
 
     @Query("select * from relations where type = :type")
     fun entitiesByType(type: EntityType): Flow<List<Relation>>
+
+    @Query("select * from relations where type = :type")
+    fun entitiesByTypeObservable(type: EntityType): Single<List<Relation>>
 
     @Query("select count(*) from relations WHERE url LIKE :domain AND relationId == :relationId")
     fun relationsCountByUrl(domain: String, relationId: String = Relation.FAVORITES_ROOT): Int

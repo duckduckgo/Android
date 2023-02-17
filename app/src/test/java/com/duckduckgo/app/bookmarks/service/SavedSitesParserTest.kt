@@ -21,6 +21,7 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.app.bookmarks.model.*
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
+import com.duckduckgo.sync.store.Relation
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -48,22 +49,19 @@ class SavedSitesParserTest {
 
     private lateinit var parser: RealSavedSitesParser
 
-    private var mockBookmarksRepository: BookmarksRepository = mock()
+    private var mockSavedSitesRepository: SavedSitesRepository = mock()
 
     @Before
     fun before() {
         parser = RealSavedSitesParser()
-        runBlocking {
-            whenever(mockBookmarksRepository.insert(any<BookmarkFolder>())).thenReturn(0L)
-        }
     }
 
     @Test
     fun whenSomeBookmarksExistThenHtmlIsGenerated() = runTest {
-        val bookmark = SavedSite.Bookmark(id = 1, title = "example", url = "www.example.com", 0)
-        val favorite = SavedSite.Favorite(id = 1, title = "example", url = "www.example.com", 0)
+        val bookmark = SavedSite.Bookmark(id = "bookmark1", title = "example", url = "www.example.com", Relation.BOOMARKS_ROOT)
+        val favorite = SavedSite.Favorite(id = "fav1", title = "example", url = "www.example.com", 0)
 
-        val node = TreeNode(FolderTreeItem(0, RealSavedSitesParser.BOOKMARKS_FOLDER, -1, null, 0))
+        val node = TreeNode(FolderTreeItem(Relation.BOOMARKS_ROOT, RealSavedSitesParser.BOOKMARKS_FOLDER, "", null, 0))
         node.add(TreeNode(FolderTreeItem(bookmark.id, bookmark.title, bookmark.parentId, bookmark.url, 1)))
 
         val result = parser.generateHtml(node, listOf(favorite))
@@ -90,7 +88,7 @@ class SavedSitesParserTest {
 
     @Test
     fun whenNoSavedSitesExistThenNothingIsGenerated() = runTest {
-        val node = TreeNode(FolderTreeItem(0, RealSavedSitesParser.BOOKMARKS_FOLDER, -1, null, 0))
+        val node = TreeNode(FolderTreeItem(Relation.BOOMARKS_ROOT, RealSavedSitesParser.BOOKMARKS_FOLDER, "", null, 0))
 
         val result = parser.generateHtml(node, emptyList())
         val expectedHtml = ""
@@ -103,7 +101,7 @@ class SavedSitesParserTest {
         val inputStream = FileUtilities.loadResource(javaClass.classLoader!!, "bookmarks/bookmarks_invalid.html")
         val document = Jsoup.parse(inputStream, Charsets.UTF_8.name(), "duckduckgo.com")
 
-        val bookmarks = parser.parseHtml(document, mockBookmarksRepository)
+        val bookmarks = parser.parseHtml(document, mockSavedSitesRepository)
 
         Assert.assertTrue(bookmarks.isEmpty())
     }
@@ -113,7 +111,7 @@ class SavedSitesParserTest {
         val inputStream = FileUtilities.loadResource(javaClass.classLoader!!, "bookmarks/bookmarks_firefox.html")
         val document = Jsoup.parse(inputStream, Charsets.UTF_8.name(), "duckduckgo.com")
 
-        val bookmarks = parser.parseHtml(document, mockBookmarksRepository)
+        val bookmarks = parser.parseHtml(document, mockSavedSitesRepository)
 
         assertEquals(17, bookmarks.size)
 
@@ -131,7 +129,7 @@ class SavedSitesParserTest {
         val inputStream = FileUtilities.loadResource(javaClass.classLoader!!, "bookmarks/bookmarks_brave.html")
         val document = Jsoup.parse(inputStream, Charsets.UTF_8.name(), "duckduckgo.com")
 
-        val bookmarks = parser.parseHtml(document, mockBookmarksRepository)
+        val bookmarks = parser.parseHtml(document, mockSavedSitesRepository)
 
         assertEquals(12, bookmarks.size)
 
@@ -152,7 +150,7 @@ class SavedSitesParserTest {
         val inputStream = FileUtilities.loadResource(javaClass.classLoader!!, "bookmarks/bookmarks_chrome.html")
         val document = Jsoup.parse(inputStream, Charsets.UTF_8.name(), "duckduckgo.com")
 
-        val bookmarks = parser.parseHtml(document, mockBookmarksRepository)
+        val bookmarks = parser.parseHtml(document, mockSavedSitesRepository)
 
         assertEquals(12, bookmarks.size)
 
@@ -173,7 +171,7 @@ class SavedSitesParserTest {
         val inputStream = FileUtilities.loadResource(javaClass.classLoader!!, "bookmarks/bookmarks_ddg_android.html")
         val document = Jsoup.parse(inputStream, Charsets.UTF_8.name(), "duckduckgo.com")
 
-        val bookmarks = parser.parseHtml(document, mockBookmarksRepository)
+        val bookmarks = parser.parseHtml(document, mockSavedSitesRepository)
 
         assertEquals(13, bookmarks.size)
 
@@ -195,7 +193,7 @@ class SavedSitesParserTest {
         val inputStream = FileUtilities.loadResource(javaClass.classLoader!!, "bookmarks/bookmarks_ddg_macos.html")
         val document = Jsoup.parse(inputStream, Charsets.UTF_8.name(), "duckduckgo.com")
 
-        val bookmarks = parser.parseHtml(document, mockBookmarksRepository)
+        val bookmarks = parser.parseHtml(document, mockSavedSitesRepository)
 
         assertEquals(13, bookmarks.size)
 
@@ -216,7 +214,7 @@ class SavedSitesParserTest {
         val inputStream = FileUtilities.loadResource(javaClass.classLoader!!, "bookmarks/bookmarks_safari.html")
         val document = Jsoup.parse(inputStream, Charsets.UTF_8.name(), "duckduckgo.com")
 
-        val bookmarks = parser.parseHtml(document, mockBookmarksRepository)
+        val bookmarks = parser.parseHtml(document, mockSavedSitesRepository)
 
         assertEquals(14, bookmarks.size)
 
@@ -237,7 +235,7 @@ class SavedSitesParserTest {
         val inputStream = FileUtilities.loadResource(javaClass.classLoader!!, "bookmarks/bookmarks_favorites_ddg.html")
         val document = Jsoup.parse(inputStream, Charsets.UTF_8.name(), "duckduckgo.com")
 
-        val savedSites = parser.parseHtml(document, mockBookmarksRepository)
+        val savedSites = parser.parseHtml(document, mockSavedSitesRepository)
 
         val favorites = savedSites.filterIsInstance<SavedSite.Favorite>()
         val bookmarks = savedSites.filterIsInstance<SavedSite.Bookmark>()
@@ -285,10 +283,10 @@ class SavedSitesParserTest {
                     val link = linkItem.attr("href")
                     val title = linkItem.text()
                     if (inFavorite) {
-                        savedSites.add(SavedSite.Favorite(0, title = title, url = link, favorites))
+                        savedSites.add(SavedSite.Favorite("favorite1", title = title, url = link, favorites))
                         favorites++
                     } else {
-                        savedSites.add(SavedSite.Bookmark(0, title = title, url = link, parentId = 0))
+                        savedSites.add(SavedSite.Bookmark("bookmark1", title = title, url = link, parentId = Relation.BOOMARKS_ROOT))
                     }
                 }
             }

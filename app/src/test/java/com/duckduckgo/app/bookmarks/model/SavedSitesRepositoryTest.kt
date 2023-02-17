@@ -35,6 +35,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.UUID
 
 @RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -62,7 +63,7 @@ class SavedSitesRepositoryTest {
 
     @Test
     fun whenNoDataThenFolderContentisEmpty() = runTest {
-        repository.getFolderContent(0).test {
+        repository.getFolderContent(Relation.BOOMARKS_ROOT).test {
             val result = awaitItem()
             assert(result.first.isEmpty())
             assert(result.second.isEmpty())
@@ -79,7 +80,7 @@ class SavedSitesRepositoryTest {
         val relation = givenFolderWithContent(Relation.BOOMARKS_ROOT, entities)
         syncRelationsDao.insertList(relation)
 
-        repository.getFolderContent(Relation.BOOMARKS_ROOT_ID).test {
+        repository.getFolderContent(Relation.BOOMARKS_ROOT).test {
             val result = awaitItem()
             assert(result.first.size == totalBookmarks)
             assert(result.second.isEmpty())
@@ -101,7 +102,7 @@ class SavedSitesRepositoryTest {
         val relation = givenFolderWithContent(Relation.BOOMARKS_ROOT, entities.plus(folders))
         syncRelationsDao.insertList(relation)
 
-        repository.getFolderContent(Relation.BOOMARKS_ROOT_ID).test {
+        repository.getFolderContent(Relation.BOOMARKS_ROOT).test {
             val result = awaitItem()
             assert(result.first.size == totalBookmarks)
             assert(result.second.size == totalFolders)
@@ -123,7 +124,7 @@ class SavedSitesRepositoryTest {
         val relation = givenFolderWithContent(Relation.BOOMARKS_ROOT, entities.plus(folders))
         syncRelationsDao.insertList(relation)
 
-        repository.getFolderContent(12).test {
+        repository.getFolderContent("12").test {
             val result = awaitItem()
             assert(result.first.isEmpty())
             assert(result.second.isEmpty())

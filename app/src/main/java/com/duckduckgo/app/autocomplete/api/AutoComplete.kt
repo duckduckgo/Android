@@ -23,6 +23,7 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.A
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.model.SavedSite
+import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
 import com.duckduckgo.app.bookmarks.model.SavedSitesRepository
 import com.duckduckgo.app.global.UriString
 import com.duckduckgo.app.global.baseHost
@@ -59,7 +60,6 @@ interface AutoComplete {
 @ContributesBinding(AppScope::class)
 class AutoCompleteApi @Inject constructor(
     private val autoCompleteService: AutoCompleteService,
-    private val bookmarksDao: BookmarksDao,
     private val repository: SavedSitesRepository,
 ) : AutoComplete {
 
@@ -71,20 +71,18 @@ class AutoCompleteApi @Inject constructor(
         val savedSitesObservable = getAutoCompleteBookmarkResults(query)
             .zipWith(
                 getAutoCompleteFavoritesResults(query),
-                { bookmarks, favorites ->
-                    (favorites + bookmarks).take(2)
-                },
-            )
+            ) { bookmarks, favorites ->
+                (favorites + bookmarks).take(2)
+            }
 
         return savedSitesObservable.zipWith(
             getAutoCompleteSearchResults(query),
-            { bookmarksResults, searchResults ->
-                AutoCompleteResult(
-                    query = query,
-                    suggestions = (bookmarksResults + searchResults).distinctBy { it.phrase },
-                )
-            },
-        )
+        ) { bookmarksResults, searchResults ->
+            AutoCompleteResult(
+                query = query,
+                suggestions = (bookmarksResults + searchResults).distinctBy { it.phrase },
+            )
+        }
     }
 
     private fun getAutoCompleteSearchResults(query: String) =
@@ -98,7 +96,7 @@ class AutoCompleteApi @Inject constructor(
             .toObservable()
 
     private fun getAutoCompleteBookmarkResults(query: String) =
-        bookmarksDao.bookmarksObservable()
+        repository.getBookmarksObservable()
             .map { rankBookmarks(query, it) }
             .flattenAsObservable { it }
             .map {
@@ -111,7 +109,7 @@ class AutoCompleteApi @Inject constructor(
             .toObservable()
 
     private fun getAutoCompleteFavoritesResults(query: String) =
-        repository.getFavorites().favoritesObservable()
+        repository.getFavoritesObservable()
             .map { rankFavorites(query, it) }
             .flattenAsObservable { it }
             .map {
@@ -125,10 +123,9 @@ class AutoCompleteApi @Inject constructor(
 
     private fun rankBookmarks(
         query: String,
-        bookmarks: List<BookmarkEntity>,
+        bookmarks: List<Bookmark>,
     ): List<SavedSite> {
         return bookmarks.asSequence()
-            .map { SavedSite.Bookmark(it.id, it.title ?: "", it.url, it.parentId) }
             .sortByRank(query)
     }
 
