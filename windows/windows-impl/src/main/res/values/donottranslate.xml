@@ -27,7 +27,7 @@
     <string name="windows_waitlist_on_the_list_title">You\'re on the list!</string>
     <string name="windows_waitlist_on_the_list_notification">We\'ll send you a notification when your copy of DuckDuckGo for Windows is ready for download. </string>
 
-    <string name="notification_channel_windows_waitlist">Windows waitlist</string>
+    <string name="notification_channel_windows_waitlist">Waitlist invites</string>
     <string name="windows_notification_title">Start testing DuckDuckGo for Windows!</string>
     <string name="windows_notification_text">Open your invite</string>
 
