@@ -148,7 +148,8 @@ class WindowsWaitlistActivity : DuckDuckGoActivity() {
             override fun onVisibilityChange(v: View?, isVisible: Boolean) {
                 binding.waitlistDescription.text = getJoinedQueueDescriptionText(isVisible)
             }
-        },)
+        },
+        )
     }
 
     private fun renderNotJoinedQueue() {
