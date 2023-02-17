@@ -18,14 +18,15 @@
 <resources>
     <string name="windows_app">DuckDuckGo App for Windows</string>
     <string name="windows_waitlist_title">Get early access to try DuckDuckGo for Windows!</string>
-    <string name="windows_waitlist_description">DuckDuckGo for Windows comes with our default privacy protections, including private search, tracker blocking, forced encryption, and cookie pop-up blocker.</string>
+    <string name="windows_waitlist_description">DuckDuckGo for Windows has what you need to browse with more privacy — private search, tracker blocking, forced encryption, and cookie pop-up blocking, plus more best-in-class protections on the way.</string>
     <string name="windows_waitlist_mac_link">Looking for the Mac Version?</string>
     <string name="windows_join_waitlist">Join the Private Waitlist</string>
     <string name="windows_join_waitlist_error">An error happened while joining the Waitlist, please try again later</string>
     <string name="windows_waitlist_footer">You won\'t need to share any personal information to join the waitlist. You\'ll secure your place in line with a timestamp that exists solely on your device so we can notify you when it\'s your turn.</string>
 
     <string name="windows_waitlist_on_the_list_title">You\'re on the list!</string>
-    <string name="windows_waitlist_on_the_list_notification">Your invite to try DuckDuckGo for Windows will arrive here. Check back soon, or we can send you a notification when it\'s your turn.</string>
+    <string name="windows_waitlist_on_the_list_notification_enabled">We\'ll send you a notification when your copy of DuckDuckGo for Windows is ready to download.</string>
+    <string name="windows_waitlist_on_the_list_notification_disabled">Your invite to try DuckDuckGo for Windows will arrive here. Check back soon, or we can send you a notification when it\'s your turn.</string>
 
     <string name="notification_channel_windows_waitlist">Waitlist invites</string>
     <string name="windows_notification_title">Start testing DuckDuckGo for Windows!</string>
@@ -42,5 +43,5 @@
     <string name="windows_waitlist_share_invite">Share your invite</string>
 
     <string name="waitlistNotifyMeTitle">Know the instant you’re invited</string>
-    <string name="waitlistNotifyMeSubtitle">We can notify you when it’s your turn, but notifications are currently disabled for DuckDuckGo.</string>
+    <string name="waitlistNotifyMeSubtitle">Get a notification when your copy of DuckDuckGo for Windows is ready for download.</string>
 </resources>
