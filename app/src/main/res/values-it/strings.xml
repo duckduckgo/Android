@@ -675,9 +675,6 @@
     <string name="permissionsPerWebsiteAskDisabledSetting">\"Chiedi\" disattivato per tutti i siti</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Autorizzazione %1$s per %2$s</string>
 
-    <!-- Autofill -->
-    <string name="autofillSettingsDisplayName">Compilazione automatica</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Scopri quando i download sono pronti</string>
     <string name="downloadsNotifyMeSubtitle">Ricevi una notifica al termine dei download.</string>
