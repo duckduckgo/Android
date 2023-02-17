@@ -53,6 +53,15 @@ class RealWgProtocol @Inject constructor(
         tunFd: Int,
         configString: String,
     ): Result<Unit> {
+        return runCatching {
+            safelyStartWg(tunFd, configString)
+        }.getOrDefault(Result.failure(java.lang.IllegalStateException("Wireguard failed to start")))
+    }
+
+    private fun safelyStartWg(
+        tunFd: Int,
+        configString: String,
+    ): Result<Unit> {
         val level = if (appBuildConfig.isDebug) Log.VERBOSE else Log.ASSERT
         wgTunnel = goBackend.wgTurnOn(INTERFACE_NAME, tunFd, configString, level, appBuildConfig.sdkInt)
         return if (wgTunnel < 0) {
@@ -67,6 +76,12 @@ class RealWgProtocol @Inject constructor(
     }
 
     override fun stopWg(): Result<Unit> {
+        return runCatching {
+            safeStopWg()
+        }.getOrDefault(Result.failure(java.lang.IllegalStateException("Wireguard failed to stop")))
+    }
+
+    private fun safeStopWg(): Result<Unit> {
         if (wgTunnel != -1) {
             goBackend.wgTurnOff(wgTunnel)
             wgTunnel = -1
@@ -75,7 +90,9 @@ class RealWgProtocol @Inject constructor(
     }
 
     override fun getStatistics(): NetworkProtectionStatistics =
-        goBackend.wgGetConfig(wgTunnel)?.toNetworkProtectionStatistics() ?: NetworkProtectionStatistics()
+        runCatching {
+            goBackend.wgGetConfig(wgTunnel)?.toNetworkProtectionStatistics()
+        }.getOrNull() ?: NetworkProtectionStatistics()
 
     private fun String.toNetworkProtectionStatistics(): NetworkProtectionStatistics {
         logcat { "Full config $this" }
