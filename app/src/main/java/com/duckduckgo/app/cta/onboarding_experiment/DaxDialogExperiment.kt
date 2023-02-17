@@ -44,9 +44,11 @@ import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import dagger.android.support.AndroidSupportInjection
-import timber.log.Timber
-import timber.log.Timber.Forest
 import javax.inject.Inject
+
+interface DaxDialogExperimentListener : DaxDialogListener {
+    fun onPrivacyShieldClick()
+}
 
 @InjectWith(FragmentScope::class)
 class TypewriterExperimentDaxDialog : DialogFragment(R.layout.view_dax_dialog_experiment), DaxDialog {
@@ -58,11 +60,11 @@ class TypewriterExperimentDaxDialog : DialogFragment(R.layout.view_dax_dialog_ex
 
     private var daxText: String = ""
     private var primaryButtonText: String = ""
-    private var daxDialogListener: DaxDialogListener? = null
+    private var daxDialogListener: DaxDialogExperimentListener? = null
     private var trackers: List<Entity> = listOf()
 
     override fun setDaxDialogListener(listener: DaxDialogListener?) {
-        daxDialogListener = listener
+        daxDialogListener = listener as DaxDialogExperimentListener?
     }
 
     fun setBlockedTrackers(blockedTrackers: List<Entity>) {
@@ -152,8 +154,17 @@ class TypewriterExperimentDaxDialog : DialogFragment(R.layout.view_dax_dialog_ex
                 setStepTwoView()
             }
             dialogContainer.setOnClickListener {
+                if (dialogText.hasAnimationFinished()) {
+                    dismiss()
+                } else {
+                    dialogText.finishAnimation()
+                }
+            }
+            cardView.setOnClickListener {
                 dialogText.finishAnimation()
-                dismiss()
+            }
+            onboardingTrackersBlockedAnim.setOnClickListener {
+                dialogText.finishAnimation()
             }
         }
     }
@@ -181,6 +192,7 @@ class TypewriterExperimentDaxDialog : DialogFragment(R.layout.view_dax_dialog_ex
         binding.cardView.gone()
         binding.logo.gone()
         with(binding.onboardingTrackersBlockedAnim) {
+            setOnClickListener { daxDialogListener?.onPrivacyShieldClick() }
             animatorHelper.startTrackersOnboardingAnimationForStep(this, PRIVACY_SHIELD, trackers)
             addAnimatorListener(
                 object : Animator.AnimatorListener {
