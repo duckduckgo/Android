@@ -10,7 +10,7 @@
     <path
         android:pathData="M24,12c0,6.627 -5.373,12 -12,12S0,18.627 0,12 5.373,0 12,0s12,5.373 12,12Z">
       <aapt:attr name="android:fillColor">
-        <gradient 
+        <gradient
             android:centerX="6.375"
             android:centerY="25.849"
             android:gradientRadius="23.786"
@@ -25,7 +25,7 @@
     <path
         android:pathData="M24,12c0,6.627 -5.373,12 -12,12S0,18.627 0,12 5.373,0 12,0s12,5.373 12,12Z">
       <aapt:attr name="android:fillColor">
-        <gradient 
+        <gradient
             android:centerX="-4.021"
             android:centerY="1.729"
             android:gradientRadius="10.632"

@@ -180,7 +180,7 @@ sealed class DaxDialogCta(
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
-        Pixel.PixelValues.DAX_TRACKERS_BLOCKED_CTA, //TODO add pixel
+        Pixel.PixelValues.DAX_TRACKERS_BLOCKED_EXPERIMENT_CTA,
         onboardingStore,
         appInstallStore,
     ) {

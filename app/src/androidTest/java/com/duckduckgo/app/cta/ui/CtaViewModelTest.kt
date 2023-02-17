@@ -702,6 +702,12 @@ class CtaViewModelTest {
         assertNull(fireDialogCta)
     }
 
+    @Test
+    fun whenPrivacyShieldModalIsSelectedThenPixelIsFired() = runTest {
+        testee.onUserClickOnboardingPrivacyShield()
+        verify(mockPixel).fire(ONBOARDING_PRIVACY_SHIELD_BUTTON)
+    }
+
     private suspend fun givenDaxOnboardingActive() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
     }

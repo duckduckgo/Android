@@ -446,7 +446,7 @@ class BrowserTabViewModel @Inject constructor(
             val includeShortcutToViewCredential: Boolean,
             val messageResourceId: Int,
         ) : Command()
-        object LaunchPrivacyDashboard: Command()
+        object LaunchPrivacyDashboard : Command()
     }
 
     sealed class NavigationCommand : Command() {

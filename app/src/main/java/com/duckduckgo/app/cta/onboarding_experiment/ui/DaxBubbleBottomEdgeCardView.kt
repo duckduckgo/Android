@@ -21,7 +21,6 @@ import android.content.res.ColorStateList
 import android.util.AttributeSet
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.view.getColorFromAttr
-import com.duckduckgo.mobile.android.ui.view.shape.DaxBubbleEdgeTreatment
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.shape.ShapeAppearanceModel
 

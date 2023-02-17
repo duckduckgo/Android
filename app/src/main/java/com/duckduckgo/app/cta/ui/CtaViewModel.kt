@@ -293,9 +293,9 @@ class CtaViewModel @Inject constructor(
 
             // Trackers blocked
             if (!daxDialogTrackersFoundShown() && !isSerpUrl(it.url) && it.orderedTrackerBlockedEntities().isNotEmpty()) {
-                //TODO Noelia if/else for experiment and show new flow
-                // return DaxDialogCta.DaxTrackersBlockedCta(onboardingStore, appInstallStore, it.orderedTrackerBlockedEntities(), host)
-                return DaxDialogCta.DaxTrackersBlockedExperimentCta(onboardingStore, appInstallStore, it.orderedTrackerBlockedEntities(), host)
+                // TODO Onboarding experiment: if/else for variants and show new flow
+                return DaxDialogCta.DaxTrackersBlockedCta(onboardingStore, appInstallStore, it.orderedTrackerBlockedEntities(), host)
+                // return DaxDialogCta.DaxTrackersBlockedExperimentCta(onboardingStore, appInstallStore, it.orderedTrackerBlockedEntities(), host)
             }
 
             // Is major network
