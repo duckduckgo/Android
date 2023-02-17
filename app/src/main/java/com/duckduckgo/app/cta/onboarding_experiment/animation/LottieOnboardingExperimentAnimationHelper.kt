@@ -63,7 +63,7 @@ class LottieOnboardingExperimentAnimationHelper @Inject constructor(val appTheme
 
         with(holder) {
             setCacheComposition(false) // ensure assets are not cached
-            setAnimationForStep(holder, step)
+            setAnimationForStep(holder, step, logos.size)
             maintainOriginalImageBounds = true
             setImageAssetDelegate(OnboardingExperimentTrackersLottieAssetDelegate(context, logos))
             removeAllAnimatorListeners()
@@ -74,31 +74,30 @@ class LottieOnboardingExperimentAnimationHelper @Inject constructor(val appTheme
     private fun setAnimationForStep(
         holder: LottieAnimationView,
         step: OnboardingExperimentStep,
+        numberOfTrackers: Int,
     ) {
         when (step) {
             SHOW_TRACKERS -> {
-                // val animationRawRes = getAnimationRawRes(logos, appTheme) will determine number of trackers
-                val res = if (appTheme.isLightModeEnabled()) R.raw.tracker_onboarding_3_light_full else R.raw.tracker_onboarding_3_dark_full
-                holder.setAnimation(res)
+                val animationRawRes = getAnimationRawRes(numberOfTrackers)
+                holder.setAnimation(animationRawRes)
                 holder.setMinAndMaxFrame(0, 116)
                 Timber.i("Onboarding step: TRACKERS")
             }
             BLOCK_TRACKERS -> {
-                // val animationRawRes = getAnimationRawRes(logos, appTheme) will determine number of trackers
-                val res = if (appTheme.isLightModeEnabled()) R.raw.tracker_onboarding_3_light_full else R.raw.tracker_onboarding_3_dark_full
-                holder.setAnimation(res)
+                val animationRawRes = getAnimationRawRes(numberOfTrackers)
+                holder.setAnimation(animationRawRes)
                 holder.setMinAndMaxFrame(116, 177)
                 Timber.i("Onboarding step: BLOCK_TRACKERS")
             }
             PRIVACY_SHIELD -> {
-                val res = if (appTheme.isLightModeEnabled()) R.raw.tracker_onboarding_3_light_full else R.raw.tracker_onboarding_3_dark_full
-                holder.setAnimation(res)
+                val animationRawRes = getAnimationRawRes(numberOfTrackers)
+                holder.setAnimation(animationRawRes)
                 holder.setMinFrame(177)
                 Timber.i("Onboarding step: PRIVACY_SHIELD")
             }
             FULL -> {
-                val res = if (appTheme.isLightModeEnabled()) R.raw.tracker_onboarding_3_light_full else R.raw.tracker_onboarding_3_dark_full
-                holder.setAnimation(res)
+                val animationRawRes = getAnimationRawRes(numberOfTrackers)
+                holder.setAnimation(animationRawRes)
                 Timber.i("Onboarding step: FULL_FLOW")
             }
         }
@@ -140,16 +139,11 @@ class LottieOnboardingExperimentAnimationHelper @Inject constructor(val appTheme
         return sortedWith(compareBy { "AEIOU".contains(it.displayName.take(1)) })
     }
 
-    private fun getAnimationRawRes(
-        logos: List<TrackerLogo>,
-        theme: AppTheme,
-    ): Int {
-        val trackers = logos.size
-        return when {
-            trackers == 1 -> if (theme.isLightModeEnabled()) R.raw.light_trackers_1 else R.raw.dark_trackers_1
-            trackers == 2 -> if (theme.isLightModeEnabled()) R.raw.light_trackers_2 else R.raw.dark_trackers_2
-            trackers >= 3 -> if (theme.isLightModeEnabled()) R.raw.light_trackers else R.raw.dark_trackers
-            else -> TODO()
+    private fun getAnimationRawRes(numberOfTrackers: Int): Int {
+        return when (numberOfTrackers) {
+            1 -> if (appTheme.isLightModeEnabled()) R.raw.tracker_onboarding_1_light_full else R.raw.tracker_onboarding_1_dark_full
+            2 -> if (appTheme.isLightModeEnabled()) R.raw.tracker_onboarding_2_light_full else R.raw.tracker_onboarding_2_dark_full
+            else -> if (appTheme.isLightModeEnabled()) R.raw.tracker_onboarding_3_light_full else R.raw.tracker_onboarding_3_dark_full
         }
     }
 
@@ -162,5 +156,5 @@ enum class OnboardingExperimentStep {
     SHOW_TRACKERS,
     BLOCK_TRACKERS,
     PRIVACY_SHIELD,
-    FULL
+    FULL,
 }
