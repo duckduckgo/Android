@@ -25,7 +25,7 @@ import com.duckduckgo.autofill.impl.ui.credential.selecting.CredentialsPickerRec
 import com.duckduckgo.autofill.impl.ui.credential.selecting.CredentialsPickerRecyclerAdapter.ListItem.CredentialSecondaryType
 import com.duckduckgo.autofill.impl.ui.credential.selecting.CredentialsPickerRecyclerAdapter.ListItem.GroupHeading
 import com.duckduckgo.autofill.impl.ui.credential.selecting.CredentialsPickerRecyclerAdapter.ListItem.VerticalSpacing
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -33,7 +33,7 @@ interface AutofillSelectCredentialsListBuilder {
     fun buildFlatList(sortedGroups: Groups): List<ListItem>
 }
 
-@ContributesBinding(AppScope::class)
+@ContributesBinding(FragmentScope::class)
 class RealAutofillSelectCredentialsListBuilder @Inject constructor(
     private val context: Context,
 ) : AutofillSelectCredentialsListBuilder {
