@@ -675,9 +675,6 @@
     <string name="permissionsPerWebsiteAskDisabledSetting">A funcionalidade \"Perguntar\" foi desativada para todos os sites</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Permissão para %2$s utilizar %1$s</string>
 
-    <!-- Autofill -->
-    <string name="autofillSettingsDisplayName">Preenchimento automático</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Saber quando as transferências estão prontas</string>
     <string name="downloadsNotifyMeSubtitle">Receba uma notificação quando as transferências estiverem concluídas.</string>

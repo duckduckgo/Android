@@ -679,9 +679,6 @@
     <string name="permissionsPerWebsiteAskDisabledSetting">„Întreabă” este dezactivat pentru toate site-urile</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Permisiune %1$s pentru %2$s</string>
 
-    <!-- Autofill -->
-    <string name="autofillSettingsDisplayName">Completare automată</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Află când sunt pregătite descărcările</string>
     <string name="downloadsNotifyMeSubtitle">Primește o notificare când s-au finalizat descărcările.</string>
