@@ -144,11 +144,12 @@ class WindowsWaitlistActivity : DuckDuckGoActivity() {
         binding.headerImage.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_list)
         binding.statusTitle.text = getString(R.string.windows_waitlist_on_the_list_title)
         binding.waitlistDescription.text = getJoinedQueueDescriptionText(binding.waitlistNotifyMe.isVisible)
-        binding.waitlistNotifyMe.setOnVisibilityChange(object : NotifyMeView.OnVisibilityChangedListener {
-            override fun onVisibilityChange(v: View?, isVisible: Boolean) {
-                binding.waitlistDescription.text = getJoinedQueueDescriptionText(isVisible)
-            }
-        },
+        binding.waitlistNotifyMe.setOnVisibilityChange(
+            object : NotifyMeView.OnVisibilityChangedListener {
+                override fun onVisibilityChange(v: View?, isVisible: Boolean) {
+                    binding.waitlistDescription.text = getJoinedQueueDescriptionText(isVisible)
+                }
+            },
         )
     }
 
