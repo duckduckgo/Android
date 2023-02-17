@@ -20,6 +20,9 @@ import android.content.Context
 import android.net.Uri
 import android.view.View
 import android.view.accessibility.AccessibilityNodeInfo
+import android.widget.Button
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
@@ -39,13 +42,11 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.mobile.android.ui.store.AppTheme
 import com.duckduckgo.mobile.android.ui.view.DaxDialogListener
 import com.duckduckgo.mobile.android.ui.view.LottieDaxDialog
+import com.duckduckgo.mobile.android.ui.view.TypeAnimationTextView
 import com.duckduckgo.mobile.android.ui.view.TypewriterDaxDialog
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.hide
 import com.duckduckgo.mobile.android.ui.view.show
-import kotlinx.android.synthetic.main.include_cta_buttons.view.*
-import kotlinx.android.synthetic.main.include_cta_content.view.*
-import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.*
 
 interface DialogCta {
     fun createCta(context: Context, daxDialogListener: DaxDialogListener): DialogFragment
@@ -290,9 +291,9 @@ sealed class DaxBubbleCta(
         val daxText = view.context.getString(description)
         view.show()
         view.alpha = 1f
-        view.hiddenTextCta.text = daxText.html(view.context)
-        view.primaryCta.hide()
-        view.dialogTextCta.startTypingAnimation(daxText, true)
+        view.findViewById<TextView>(R.id.hiddenTextCta).text = daxText.html(view.context)
+        view.findViewById<View>(R.id.primaryCta).hide()
+        view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).startTypingAnimation(daxText, true)
     }
 
     override fun pixelCancelParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
@@ -340,11 +341,11 @@ sealed class BubbleCta(
 
     override fun showCta(view: View) {
         val daxText = view.context.getString(description)
-        view.primaryCta.hide()
-        view.hiddenTextCta.text = daxText.html(view.context)
+        view.findViewById<View>(R.id.primaryCta).hide()
+        view.findViewById<TextView>(R.id.hiddenTextCta).text = daxText.html(view.context)
         view.show()
         view.alpha = 1f
-        view.dialogTextCta.startTypingAnimation(daxText, true)
+        view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).startTypingAnimation(daxText, true)
     }
 
     override fun pixelCancelParameters(): Map<String, String> = emptyMap()
@@ -370,7 +371,7 @@ sealed class BubbleCta(
                     }
                 }
             // Using braille unicode inside textview (to simulate the overflow icon), override description for accessibility
-            view.dialogTextCta.accessibilityDelegate = accessibilityDelegate
+            view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).accessibilityDelegate = accessibilityDelegate
         }
     }
 }
@@ -390,9 +391,9 @@ sealed class DaxFireDialogCta(
         val daxText = view.context.getString(description)
         view.show()
         view.alpha = 1f
-        view.hiddenTextCta.text = daxText.html(view.context)
-        view.primaryCta.gone()
-        view.dialogTextCta.startTypingAnimation(daxText, true)
+        view.findViewById<TextView>(R.id.hiddenTextCta).text = daxText.html(view.context)
+        view.findViewById<View>(R.id.primaryCta).gone()
+        view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).startTypingAnimation(daxText, true)
     }
 
     override fun pixelCancelParameters(): Map<String, String> = emptyMap()
@@ -429,11 +430,11 @@ sealed class HomePanelCta(
 ) : Cta, ViewCta {
 
     override fun showCta(view: View) {
-        view.ctaIcon.setImageResource(image)
-        view.ctaTitle.text = view.context.getString(title)
-        view.ctaSubtitle.text = view.context.getString(description)
-        view.ctaOkButton.text = view.context.getString(okButton)
-        view.ctaDismissButton.text = view.context.getString(dismissButton)
+        view.findViewById<ImageView>(R.id.ctaIcon).setImageResource(image)
+        view.findViewById<TextView>(R.id.ctaTitle).text = view.context.getString(title)
+        view.findViewById<TextView>(R.id.ctaSubtitle).text = view.context.getString(description)
+        view.findViewById<Button>(R.id.ctaOkButton).text = view.context.getString(okButton)
+        view.findViewById<Button>(R.id.ctaDismissButton).text = view.context.getString(dismissButton)
         view.show()
     }
 
