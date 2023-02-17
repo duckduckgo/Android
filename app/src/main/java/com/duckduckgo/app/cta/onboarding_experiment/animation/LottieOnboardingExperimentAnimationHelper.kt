@@ -17,6 +17,7 @@
 package com.duckduckgo.app.cta.onboarding_experiment.animation
 
 import android.content.Context
+import androidx.annotation.DrawableRes
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo
@@ -29,12 +30,11 @@ import com.duckduckgo.app.cta.onboarding_experiment.animation.OnboardingExperime
 import com.duckduckgo.app.cta.onboarding_experiment.animation.OnboardingExperimentStep.PRIVACY_SHIELD
 import com.duckduckgo.app.cta.onboarding_experiment.animation.OnboardingExperimentStep.SHOW_TRACKERS
 import com.duckduckgo.app.trackerdetection.model.Entity
-import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.store.AppTheme
 import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
 import timber.log.Timber
+import java.util.*
 import javax.inject.Inject
 
 /** Public interface for the Onboarding Experiment Animation Helper */
@@ -107,6 +107,14 @@ class LottieOnboardingExperimentAnimationHelper @Inject constructor(val appTheme
      * Methods duplicated from BrowserLottieTrackersAnimationHelper
      */
 
+    private fun getAnimationRawRes(numberOfTrackers: Int): Int {
+        return when (numberOfTrackers) {
+            1 -> if (appTheme.isLightModeEnabled()) R.raw.tracker_onboarding_1_light_full else R.raw.tracker_onboarding_1_dark_full
+            2 -> if (appTheme.isLightModeEnabled()) R.raw.tracker_onboarding_2_light_full else R.raw.tracker_onboarding_2_dark_full
+            else -> if (appTheme.isLightModeEnabled()) R.raw.tracker_onboarding_3_light_full else R.raw.tracker_onboarding_3_dark_full
+        }
+    }
+
     private fun getLogos(
         context: Context,
         entities: List<Entity>,
@@ -118,7 +126,7 @@ class LottieOnboardingExperimentAnimationHelper @Inject constructor(val appTheme
             .take(MAX_LOGOS_SHOWN + 1)
             .sortedWithDisplayNamesStartingWithVowelsToTheEnd()
             .map {
-                val resId = TrackersRenderer().networkLogoIcon(context, it.name)
+                val resId = networkFullColorLogoIcon(context, it.name)
                 if (resId == null) {
                     LetterLogo(it.displayName.take(1))
                 } else {
@@ -139,12 +147,12 @@ class LottieOnboardingExperimentAnimationHelper @Inject constructor(val appTheme
         return sortedWith(compareBy { "AEIOU".contains(it.displayName.take(1)) })
     }
 
-    private fun getAnimationRawRes(numberOfTrackers: Int): Int {
-        return when (numberOfTrackers) {
-            1 -> if (appTheme.isLightModeEnabled()) R.raw.tracker_onboarding_1_light_full else R.raw.tracker_onboarding_1_dark_full
-            2 -> if (appTheme.isLightModeEnabled()) R.raw.tracker_onboarding_2_light_full else R.raw.tracker_onboarding_2_dark_full
-            else -> if (appTheme.isLightModeEnabled()) R.raw.tracker_onboarding_3_light_full else R.raw.tracker_onboarding_3_dark_full
-        }
+    @DrawableRes
+    private fun networkFullColorLogoIcon( //fixme move it to TrackersRender class in case experiment is implemented
+        context: Context,
+        networkName: String,
+    ): Int? {
+        return TrackersRenderer().networkIcon(context, networkName, "network_full_color_logo_")
     }
 
     companion object {

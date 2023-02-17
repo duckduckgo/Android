@@ -29,7 +29,7 @@ class TrackersRenderer {
         return networkIcon(context, networkName, "network_logo_")
     }
 
-    private fun networkIcon(
+    fun networkIcon(
         context: Context,
         networkName: String,
         prefix: String,

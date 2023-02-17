@@ -26,6 +26,7 @@ import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
+import androidx.core.graphics.toColorInt
 import com.airbnb.lottie.ImageAssetDelegate
 import com.airbnb.lottie.LottieImageAsset
 import com.duckduckgo.app.browser.R
@@ -37,8 +38,8 @@ import com.duckduckgo.mobile.android.ui.view.getColorFromAttr
 import com.duckduckgo.mobile.android.ui.view.toPx
 
 internal class OnboardingExperimentTrackersLottieAssetDelegate(
-    val context: Context,
-    val logos: List<TrackerLogo>,
+    private val context: Context,
+    private val logos: List<TrackerLogo>,
 ) : ImageAssetDelegate {
 
     override fun fetchBitmap(asset: LottieImageAsset?): Bitmap? {
@@ -63,23 +64,18 @@ internal class OnboardingExperimentTrackersLottieAssetDelegate(
                         ContextCompat.getDrawable(context, R.drawable.network_logo_blank)!!.toBitmap(),
                     )
             }
-
-            "image_3" ->
-                kotlin.runCatching { logos[3].asDrawable(context) }
-                    .getOrNull()
-
             else -> null
         }
     }
 
     private fun TrackerLogo.asDrawable(context: Context): Bitmap {
-        return kotlin.runCatching {
+        return kotlin.run {
             when (this) {
                 is ImageLogo -> ContextCompat.getDrawable(context, resId)!!.toBitmap()
                 is LetterLogo -> generateDefaultDrawable(context, this.trackerLetter).toBitmap(24.toPx(), 24.toPx())
                 is StackedLogo -> ContextCompat.getDrawable(context, this.resId)!!.toBitmap()
             }
-        }.getOrThrow()
+        }
     }
 
     private fun generateDefaultDrawable(
@@ -87,20 +83,39 @@ internal class OnboardingExperimentTrackersLottieAssetDelegate(
         letter: String,
     ): Drawable {
         return object : Drawable() {
+            private val palette = listOf(
+                "#94B3AF",
+                "#727998",
+                "#645468",
+                "#4D5F7F",
+                "#855DB6",
+                "#5E5ADB",
+                "#678FFF",
+                "#6BB4EF",
+                "#4A9BAE",
+                "#66C4C6",
+                "#55D388",
+                "#99DB7A",
+                "#ECCC7B",
+                "#E7A538",
+                "#DD6B4C",
+                "#D65D62",
+            )
 
             private val backgroundPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                color = context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorPrimaryIcon)
+                val index = (0..15).random()
+                color = palette[index].toColorInt()
             }
 
             private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                color = context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorSurface)
+                color = context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorWhite)
                 typeface = Typeface.SANS_SERIF
             }
 
             override fun draw(canvas: Canvas) {
                 val centerX = bounds.width() * 0.5f
                 val centerY = bounds.height() * 0.5f
-                textPaint.textSize = (bounds.width() * 0.7f).toFloat()
+                textPaint.textSize = (bounds.width() * 0.7f)
                 textPaint.typeface = Typeface.DEFAULT_BOLD
                 val textWidth: Float = textPaint.measureText(letter) * 0.5f
                 val textBaseLineHeight = textPaint.fontMetrics.ascent * -0.4f
