@@ -92,7 +92,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/statusTitle" />
 
             <FrameLayout
-                android:id="@+id/waitlistNotifyMe"
+                android:id="@+id/waitlistNotifyMeContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -101,6 +101,7 @@
                 android:visibility="gone">
 
                 <com.duckduckgo.mobile.android.ui.notifyme.NotifyMeView
+                    android:id="@+id/waitlistNotifyMe"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryText="@string/waitlistNotifyMeTitle"
