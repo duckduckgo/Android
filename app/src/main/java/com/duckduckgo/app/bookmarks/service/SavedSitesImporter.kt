@@ -56,24 +56,21 @@ class RealSavedSitesImporter(
                 savedSitesParser.parseHtml(document, savedSitesRepository)
             }
 
-            savedSites.filterIsInstance<SavedSite.Bookmark>().map {
-                Relation(it.parentId, Entity(title = it.title, url = it.url, type = BOOKMARK))
-            }.also {
-                it.asSequence().chunked(IMPORT_BATCH_SIZE).forEach { chunk ->
-                    syncRelationsDao.insertList(chunk)
-                    syncEntitiesDao.insertList(chunk.map { it.entity })
+            savedSites.filterIsInstance<SavedSite.Bookmark>().map { bookmark ->
+                Pair(Relation(bookmark.parentId, bookmark.id), Entity(bookmark.id, title = bookmark.title, url = bookmark.url, type = BOOKMARK))
+            }.also { pairs ->
+                pairs.asSequence().chunked(IMPORT_BATCH_SIZE).forEach { chunk ->
+                    syncRelationsDao.insertList(chunk.map { it.first })
+                    syncEntitiesDao.insertList(chunk.map { it.second })
                 }
             }
 
-            savedSites.filterIsInstance<SavedSite.Favorite>().filter { it.url.isNotEmpty() }.map { site ->
-                Relation(
-                    relationId = Relation.FAVORITES_ROOT,
-                    Entity(title = site.title.takeIf { it.isNotEmpty() } ?: site.url, url = site.url, type = BOOKMARK),
-                )
-            }.also {
-                it.asSequence().chunked(IMPORT_BATCH_SIZE).forEach { chunk ->
-                    syncRelationsDao.insertList(chunk)
-                    syncEntitiesDao.insertList(chunk.map { it.entity })
+            savedSites.filterIsInstance<SavedSite.Favorite>().filter { it.url.isNotEmpty() }.map { favorite ->
+                Pair(Relation(Relation.FAVORITES_ROOT, favorite.id), Entity(favorite.id, title = favorite.title, url = favorite.url, type = BOOKMARK))
+            }.also { pairs ->
+                pairs.asSequence().chunked(IMPORT_BATCH_SIZE).forEach { chunk ->
+                    syncRelationsDao.insertList(chunk.map { it.first })
+                    syncEntitiesDao.insertList(chunk.map { it.second })
                 }
             }
 

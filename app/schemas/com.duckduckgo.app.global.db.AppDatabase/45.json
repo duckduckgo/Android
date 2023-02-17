@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 45,
-    "identityHash": "9a00f9420acdfd601c73d0ed94c3035c",
+    "identityHash": "cfc445de6e73db67bb56198800ac7efb",
     "entities": [
       {
         "tableName": "tds_tracker",
@@ -1035,7 +1035,7 @@
       },
       {
         "tableName": "relations",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`relationId` TEXT NOT NULL, `entityId` TEXT NOT NULL, `title` TEXT NOT NULL, `url` TEXT, `type` TEXT NOT NULL, PRIMARY KEY(`relationId`, `entityId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`relationId` TEXT NOT NULL, `entityId` TEXT NOT NULL, PRIMARY KEY(`relationId`, `entityId`))",
         "fields": [
           {
             "fieldPath": "relationId",
@@ -1044,26 +1044,8 @@
             "notNull": true
           },
           {
-            "fieldPath": "entity.entityId",
+            "fieldPath": "entityId",
             "columnName": "entityId",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "entity.title",
-            "columnName": "title",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "entity.url",
-            "columnName": "url",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "entity.type",
-            "columnName": "type",
             "affinity": "TEXT",
             "notNull": true
           }
@@ -1082,7 +1064,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9a00f9420acdfd601c73d0ed94c3035c')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'cfc445de6e73db67bb56198800ac7efb')"
     ]
   }
 }

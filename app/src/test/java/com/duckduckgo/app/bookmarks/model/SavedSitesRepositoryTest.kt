@@ -208,7 +208,7 @@ class SavedSitesRepositoryTest {
     ): List<Relation> {
         val relations = mutableListOf<Relation>()
         entities.forEach {
-            relations.add(Relation(folderId, it))
+            relations.add(Relation(folderId, it.entityId))
         }
         return relations
     }

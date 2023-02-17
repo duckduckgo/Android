@@ -16,12 +16,14 @@
 
 package com.duckduckgo.sync.store
 
+import android.database.Observable
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -80,6 +82,9 @@ interface SyncEntitiesDao {
 
     @Query("select * from entities where type = :type")
     fun entitiesByType(type: EntityType): Flow<List<Entity>>
+
+    @Query("select * from entities where type = :type")
+    fun entitiesByTypeObservable(type: EntityType): Single<List<Entity>>
 
     @Query("select * from entities where type = :type")
     fun entitiesByTypeSync(type: EntityType): List<Entity>

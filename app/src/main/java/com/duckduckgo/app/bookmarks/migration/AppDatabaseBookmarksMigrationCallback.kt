@@ -60,11 +60,11 @@ class AppDatabaseBookmarksMigrationCallback(
                     // try to purge duplicates by only adding favourites with the same url of a bookmark already added
                     val existingBookmark = syncEntitiesDao().entityByUrl(it.url)
                     if (existingBookmark != null) {
-                        favouriteMigration.add(Relation(Relation.FAVORITES_ROOT, existingBookmark))
+                        favouriteMigration.add(Relation(Relation.FAVORITES_ROOT, existingBookmark.entityId))
                     } else {
                         val entity = Entity(Entity.generateFavoriteId(it.id), it.title, it.url, BOOKMARK)
                         entitiesMigration.add(entity)
-                        favouriteMigration.add(Relation(Relation.FAVORITES_ROOT, entity))
+                        favouriteMigration.add(Relation(Relation.FAVORITES_ROOT, entity.entityId))
                     }
                 }
             }
@@ -102,9 +102,9 @@ class AppDatabaseBookmarksMigrationCallback(
                 entities.add(entity)
 
                 if (folderId == 0L) {
-                    relations.add(Relation(Relation.BOOMARKS_ROOT, entity))
+                    relations.add(Relation(Relation.BOOMARKS_ROOT, entity.entityId))
                 } else {
-                    relations.add(Relation(Entity.generateFolderId(folderId), entity))
+                    relations.add(Relation(Entity.generateFolderId(folderId), entity.entityId))
                 }
             }
             bookmarksInFolder.forEach {
@@ -112,9 +112,9 @@ class AppDatabaseBookmarksMigrationCallback(
                 entities.add(entity)
 
                 if (folderId == 0L) {
-                    relations.add(Relation(Relation.BOOMARKS_ROOT, entity))
+                    relations.add(Relation(Relation.BOOMARKS_ROOT, entity.entityId))
                 } else {
-                    relations.add(Relation(Entity.generateFolderId(folderId), entity))
+                    relations.add(Relation(Entity.generateFolderId(folderId), entity.entityId))
                 }
             }
 

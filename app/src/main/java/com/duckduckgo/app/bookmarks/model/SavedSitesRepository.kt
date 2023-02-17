@@ -105,11 +105,11 @@ class RealSavedSitesRepository(
         val folders = mutableListOf<BookmarkFolder>()
 
         return syncRelationsDao.relationById(parentId).map { entities ->
-            entities.forEachIndexed { index, entity ->
+            entities.forEach { entity ->
                 if (entity.type == FOLDER) {
-                    folders.add(BookmarkFolder(entity.entityId, entity.title, parentId))
+                    folders.add(entity.mapToBookmarkFolder(parentId))
                 } else {
-                    bookmarks.add(Bookmark(entity.entityId, entity.title, entity.url!!, parentId))
+                    bookmarks.add(entity.mapToBookmark(parentId))
                 }
             }
             Pair(bookmarks, folders)
@@ -126,14 +126,15 @@ class RealSavedSitesRepository(
     }
 
     override suspend fun insertFolderBranch(branchToInsert: BookmarkFolderBranch) {
+
     }
 
     override fun getFavorites(): Flow<List<Favorite>> {
         val favorites = mutableListOf<Favorite>()
         return syncRelationsDao.relationById(Relation.FAVORITES_ROOT)
-            .map { entities ->
-                entities.forEachIndexed { index, entity ->
-                    favorites.add(entity.mapIndexedToFavorite(index))
+            .map { relations ->
+                relations.forEachIndexed { index, relation ->
+                    favorites.add(relation.mapToFavorite(index))
                 }
                 favorites
             }
@@ -144,7 +145,7 @@ class RealSavedSitesRepository(
         val favorites = mutableListOf<Favorite>()
         return syncRelationsDao.relationByIdObservable(Relation.FAVORITES_ROOT).map { relations ->
             relations.forEachIndexed { index, entity ->
-                favorites.add(entity.mapIndexedToFavorite(index))
+                favorites.add(entity.mapToFavorite(index))
             }
             favorites
         }
@@ -163,11 +164,11 @@ class RealSavedSitesRepository(
     }
 
     override fun getBookmarks(): Flow<List<Bookmark>> {
-        return syncRelationsDao.entitiesByType(BOOKMARK).map { entities -> entities.mapToBookmarks() }
+        return syncEntitiesDao.entitiesByType(BOOKMARK).map { entities -> entities.mapToBookmarks() }
     }
 
     override fun getBookmarksObservable(): Single<List<Bookmark>> {
-        return syncRelationsDao.entitiesByTypeObservable(BOOKMARK).map { entities -> entities.mapToBookmarks() }
+        return syncEntitiesDao.entitiesByTypeObservable(BOOKMARK).map { entities -> entities.mapToBookmarks() }
     }
 
     override fun getBookmark(url: String): Bookmark? {
@@ -194,7 +195,7 @@ class RealSavedSitesRepository(
     ): Bookmark {
         val entity = Entity(title = title, url = url, type = BOOKMARK)
         syncEntitiesDao.insert(entity)
-        syncRelationsDao.insert(Relation(Relation.BOOMARKS_ROOT, entity))
+        syncRelationsDao.insert(Relation(Relation.BOOMARKS_ROOT, entity.entityId))
         return entity.mapToBookmark(Relation.BOOMARKS_ROOT)
     }
 
@@ -206,10 +207,10 @@ class RealSavedSitesRepository(
         if (existentBookmark == null) {
             val entity = Entity(title = title, url = url, type = BOOKMARK)
             syncEntitiesDao.insert(entity)
-            syncRelationsDao.insert(Relation(Relation.BOOMARKS_ROOT, entity))
-            syncRelationsDao.insert(Relation(Relation.FAVORITES_ROOT, entity))
+            syncRelationsDao.insert(Relation(Relation.BOOMARKS_ROOT, entity.entityId))
+            syncRelationsDao.insert(Relation(Relation.FAVORITES_ROOT, entity.entityId))
         } else {
-            syncRelationsDao.insert(Relation(Relation.FAVORITES_ROOT, existentBookmark))
+            syncRelationsDao.insert(Relation(Relation.FAVORITES_ROOT, existentBookmark.entityId))
         }
         return getFavorite(url)!!
     }
@@ -236,7 +237,7 @@ class RealSavedSitesRepository(
     override fun insert(folder: BookmarkFolder) {
         val entity = Entity(entityId = folder.id, title = folder.name, url = "", type = FOLDER)
         syncEntitiesDao.insert(entity)
-        syncRelationsDao.insert(Relation(folder.parentId, entity))
+        syncRelationsDao.insert(Relation(folder.parentId, entity.entityId))
     }
 
     override fun update(folder: BookmarkFolder) {
@@ -247,7 +248,7 @@ class RealSavedSitesRepository(
         val relations = syncRelationsDao.relationByIdSync(folder.id)
         val entities = mutableListOf<Entity>()
         relations.forEach {
-            entities.add(it.entity)
+            entities.add(it)
         }
 
         syncRelationsDao.delete(folder.id)
@@ -286,16 +287,11 @@ class RealSavedSitesRepository(
     }
 
     private fun Entity.mapToBookmark(relationId: String): Bookmark = Bookmark(this.entityId, this.title, this.url.orEmpty(), relationId)
-    private fun Relation.mapToBookmark(relationId: String): Bookmark =
-        Bookmark(this.entity.entityId, this.entity.title, this.entity.url.orEmpty(), relationId)
-
-    private fun Relation.mapToFavorite(position: Int): Favorite =
-        Favorite(this.entity.entityId, this.entity.title, this.entity.url.orEmpty(), position)
-
-    private fun Entity.mapToFavorite(): Favorite = Favorite(this.entityId, this.title, this.url.orEmpty(), 0)
-    private fun Entity.mapIndexedToFavorite(index: Int): Favorite = Favorite(this.entityId, this.title, this.url.orEmpty(), index)
-    private fun List<Relation>.mapToBookmarks(): List<Bookmark> = this.map { it.mapToBookmark(it.relationId) }
-    private fun List<Relation>.mapToFavorites(): List<Favorite> = this.mapIndexed { index, relation -> relation.mapToFavorite(index) }
+    private fun Entity.mapToBookmarkFolder(relationId: String): BookmarkFolder =
+        BookmarkFolder(this.entityId, this.title, relationId)
+    private fun Entity.mapToFavorite(index: Int = 0): Favorite = Favorite(this.entityId, this.title, this.url.orEmpty(), index)
+    private fun List<Entity>.mapToBookmarks(folderId: String = Relation.BOOMARKS_ROOT): List<Bookmark> = this.map { it.mapToBookmark(folderId) }
+    private fun List<Entity>.mapToFavorites(): List<Favorite> = this.mapIndexed { index, relation -> relation.mapToFavorite(index) }
 }
 
 sealed class SavedSite(

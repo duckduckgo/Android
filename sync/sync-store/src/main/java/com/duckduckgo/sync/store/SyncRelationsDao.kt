@@ -41,13 +41,15 @@ interface SyncRelationsDao {
     fun relationById(folderId: String): Flow<List<Entity>>
 
     @Query("select * from entities inner join relations on entities.entityId = relations.entityId where relations.relationId = :folderId")
+    fun relationByIdSync(folderId: String): List<Entity>
+
+    @Query("select * from entities inner join relations on entities.entityId = relations.entityId where relations.relationId = :folderId")
     fun relationByIdObservable(folderId: String): Single<List<Entity>>
 
     @Query("select * from relations where relations.entityId = :entityId")
     fun relationParentById(entityId: String): Relation
 
-    @Query("select * from relations where relationId = :id")
-    fun relationByIdSync(id: String): List<Relation>
+
 
     @Query("select CAST(COUNT(*) AS BIT) from relations")
     fun hasRelations(): Boolean
@@ -64,13 +66,7 @@ interface SyncRelationsDao {
     @Query("delete from relations where entityId = :entityId")
     fun deleteEntity(entityId: String)
 
-    @Query("select * from relations where type = :type")
-    fun entitiesByType(type: EntityType): Flow<List<Relation>>
-
-    @Query("select * from relations where type = :type")
-    fun entitiesByTypeObservable(type: EntityType): Single<List<Relation>>
-
-    @Query("select count(*) from relations WHERE url LIKE :domain AND relationId == :relationId")
+    @Query("select count(*) from entities inner join relations on entities.entityId = relations.entityId where entities.url LIKE :domain AND relationId == :relationId")
     fun relationsCountByUrl(domain: String, relationId: String = Relation.FAVORITES_ROOT): Int
 
     @Query("delete from relations")

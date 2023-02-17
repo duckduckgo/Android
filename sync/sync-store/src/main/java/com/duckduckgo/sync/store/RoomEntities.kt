@@ -69,7 +69,7 @@ class EntityTypeConverter {
 @Entity(tableName = "relations", primaryKeys = ["relationId", "entityId"])
 data class Relation(
     var relationId: String = UUID.randomUUID().toString(),
-    @Embedded var entity: com.duckduckgo.sync.store.Entity,
+    var entityId: String,
 ) {
     companion object {
         const val FAVORITES_ROOT = "favorites_root"
