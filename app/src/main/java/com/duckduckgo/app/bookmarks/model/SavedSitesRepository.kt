@@ -41,7 +41,8 @@ interface SavedSitesRepository {
     suspend fun getFlatFolderStructure(
         selectedFolderId: Long,
         currentFolder: BookmarkFolder?,
-        rootFolderName: String): List<BookmarkFolderItem>
+        rootFolderName: String,
+    ): List<BookmarkFolderItem>
 
     suspend fun insertFolderBranch(branchToInsert: BookmarkFolderBranch)
 
@@ -119,14 +120,13 @@ class RealSavedSitesRepository(
     override suspend fun getFlatFolderStructure(
         selectedFolderId: Long,
         currentFolder: BookmarkFolder?,
-        rootFolderName: String
+        rootFolderName: String,
     ): List<BookmarkFolderItem> {
         return emptyList()
     }
 
-   override suspend fun insertFolderBranch(branchToInsert: BookmarkFolderBranch) {
-
-   }
+    override suspend fun insertFolderBranch(branchToInsert: BookmarkFolderBranch) {
+    }
 
     override fun getFavorites(): Flow<List<Favorite>> {
         val favorites = mutableListOf<Favorite>()
@@ -234,7 +234,9 @@ class RealSavedSitesRepository(
     }
 
     override fun insert(folder: BookmarkFolder) {
-        syncEntitiesDao.insert(Entity(entityId = folder.id, title = folder.name, url = "", type = FOLDER))
+        val entity = Entity(entityId = folder.id, title = folder.name, url = "", type = FOLDER)
+        syncEntitiesDao.insert(entity)
+        syncRelationsDao.insert(Relation(folder.parentId, entity))
     }
 
     override fun update(folder: BookmarkFolder) {
@@ -257,8 +259,6 @@ class RealSavedSitesRepository(
         val entities = mutableListOf<Entity>()
         val relations = mutableListOf<Relation>()
         val relation = syncRelationsDao.relationById(folder.id).map {
-
-
         }
         return BookmarkFolderBranch(emptyList(), emptyList())
     }

@@ -25,7 +25,6 @@ import com.duckduckgo.app.bookmarks.db.*
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.sync.store.Entity
 import com.duckduckgo.sync.store.EntityType.BOOKMARK
-import com.duckduckgo.sync.store.EntityType.FOLDER
 import com.duckduckgo.sync.store.Relation
 import com.duckduckgo.sync.store.SyncEntitiesDao
 import com.duckduckgo.sync.store.SyncRelationsDao
@@ -36,7 +35,6 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.mock
 
 @ExperimentalCoroutinesApi
 class BookmarksDataRepositoryTest {
@@ -68,7 +66,7 @@ class BookmarksDataRepositoryTest {
 
     @Test
     fun whenInsertBookmarkFolderThenReturnId() = runTest {
-        val id = repository.insert(BookmarkFolder(id = 1, name = "name", parentId = 0))
+        val id = repository.insert(BookmarkFolder(id = "folder1", name = "name", parentId = Relation.BOOMARKS_ROOT))
         assertEquals(1, id)
     }
 

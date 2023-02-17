@@ -18,9 +18,9 @@ package com.duckduckgo.app.bookmarks.service
 
 import com.duckduckgo.app.bookmarks.model.*
 import com.duckduckgo.sync.store.Relation
+import java.util.UUID
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
-import java.util.UUID
 
 interface SavedSitesParser {
     fun generateHtml(

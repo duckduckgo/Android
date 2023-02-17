@@ -27,6 +27,7 @@ import com.duckduckgo.app.bookmarks.model.SavedSitesRepository
 import com.duckduckgo.sync.store.Relation
 import io.reactivex.Observable
 import io.reactivex.Single
+import java.util.UUID
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -34,7 +35,6 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
-import java.util.UUID
 
 @RunWith(AndroidJUnit4::class)
 class AutoCompleteApiTest {

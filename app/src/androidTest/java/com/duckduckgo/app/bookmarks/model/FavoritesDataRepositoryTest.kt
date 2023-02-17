@@ -20,17 +20,13 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.bookmarks.db.FavoriteEntity
-import com.duckduckgo.app.bookmarks.db.FavoritesDao
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
-import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.sync.store.Entity
 import com.duckduckgo.sync.store.EntityType.BOOKMARK
 import com.duckduckgo.sync.store.Relation
 import com.duckduckgo.sync.store.SyncEntitiesDao
 import com.duckduckgo.sync.store.SyncRelationsDao
-import dagger.Lazy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -38,8 +34,6 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mockito.verify
-import org.mockito.kotlin.mock
 
 @ExperimentalCoroutinesApi
 class FavoritesDataRepositoryTest {
