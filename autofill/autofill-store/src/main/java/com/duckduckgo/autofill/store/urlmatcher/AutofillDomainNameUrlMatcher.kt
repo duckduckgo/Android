@@ -63,12 +63,7 @@ class AutofillDomainNameUrlMatcher @Inject constructor() : AutofillUrlMatcher {
         if (visitedSite.port != savedSite.port) return false
 
         // e-tld+1 must match
-        if (!identicalEffectiveTldPlusOne(visitedSite, savedSite)) return false
-
-        // any of these rules can match
-        return identicalSubdomains(visitedSite, savedSite) ||
-            specialHandlingForWwwSubdomainOnSavedSite(visitedSite, savedSite) ||
-            savedSiteHasNoSubdomain(savedSite)
+        return identicalEffectiveTldPlusOne(visitedSite, savedSite)
     }
 
     override fun cleanRawUrl(rawUrl: String): String {
@@ -85,24 +80,6 @@ class AutofillDomainNameUrlMatcher @Inject constructor() : AutofillUrlMatcher {
         return visitedSite.eTldPlus1.equals(savedSite.eTldPlus1, ignoreCase = true)
     }
 
-    private fun identicalSubdomains(
-        visitedSite: ExtractedUrlParts,
-        savedSite: ExtractedUrlParts,
-    ): Boolean {
-        return visitedSite.subdomain.equals(savedSite.subdomain, ignoreCase = true)
-    }
-
-    private fun specialHandlingForWwwSubdomainOnSavedSite(
-        visitedSite: ExtractedUrlParts,
-        savedSite: ExtractedUrlParts,
-    ): Boolean {
-        return (visitedSite.subdomain == null && savedSite.subdomain.equals(WWW, ignoreCase = true))
-    }
-
-    private fun savedSiteHasNoSubdomain(savedSite: ExtractedUrlParts): Boolean {
-        return savedSite.subdomain == null
-    }
-
     private fun String.normalizeScheme(): String {
         if (!startsWith("https://") && !startsWith("http://")) {
             return "https://$this"
@@ -112,9 +89,5 @@ class AutofillDomainNameUrlMatcher @Inject constructor() : AutofillUrlMatcher {
 
     private fun unextractable(): ExtractedUrlParts {
         return ExtractedUrlParts(null, null, null)
-    }
-
-    companion object {
-        private const val WWW = "www"
     }
 }
