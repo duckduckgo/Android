@@ -234,11 +234,11 @@ class RealSavedSitesRepository(
     }
 
     override fun insert(folder: BookmarkFolder) {
-        syncEntitiesDao.insert(Entity(title = folder.name, url = "", type = FOLDER))
+        syncEntitiesDao.insert(Entity(entityId = folder.id, title = folder.name, url = "", type = FOLDER))
     }
 
     override fun update(folder: BookmarkFolder) {
-        syncEntitiesDao.update(Entity(title = folder.name, url = "", type = FOLDER))
+        syncEntitiesDao.update(Entity(entityId = folder.id, title = folder.name, url = "", type = FOLDER))
     }
 
     override fun delete(folder: BookmarkFolder) {

@@ -24,8 +24,8 @@ import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
-import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
+import com.duckduckgo.app.bookmarks.model.SavedSitesRepository
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.onboarding.store.*
@@ -58,7 +58,7 @@ class SystemSearchViewModelTest {
     private val mockUserStageStore: UserStageStore = mock()
     private val mockDeviceAppLookup: DeviceAppLookup = mock()
     private val mockAutoComplete: AutoComplete = mock()
-    private val mockFavoritesRepository: FavoritesRepository = mock()
+    private val mocksavedSitesRepository: SavedSitesRepository = mock()
     private val mockFaviconManager: FaviconManager = mock()
     private val mockPixel: Pixel = mock()
     private val mockSettingsStore: SettingsDataStore = mock()
@@ -74,14 +74,14 @@ class SystemSearchViewModelTest {
         whenever(mockAutoComplete.autoComplete(BLANK_QUERY)).thenReturn(Observable.just(autocompleteBlankResult))
         whenever(mockDeviceAppLookup.query(QUERY)).thenReturn(appQueryResult)
         whenever(mockDeviceAppLookup.query(BLANK_QUERY)).thenReturn(appBlankResult)
-        whenever(mockFavoritesRepository.favorites()).thenReturn(flowOf())
+        whenever(mocksavedSitesRepository.getFavorites()).thenReturn(flowOf())
         doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
         testee = SystemSearchViewModel(
             mockUserStageStore,
             mockAutoComplete,
             mockDeviceAppLookup,
             mockPixel,
-            mockFavoritesRepository,
+            mocksavedSitesRepository,
             mockFaviconManager,
             mockSettingsStore,
             coroutineRule.testDispatcherProvider,
@@ -291,7 +291,7 @@ class SystemSearchViewModelTest {
 
     @Test
     fun whenQuickAccessItemClickedThenLaunchBrowser() {
-        val quickAccessItem = QuickAccessFavorite(Favorite(1, "title", "http://example.com", 0))
+        val quickAccessItem = QuickAccessFavorite(Favorite("favorite1", "title", "http://example.com", 0))
 
         testee.onQuickAccessItemClicked(quickAccessItem)
 
@@ -301,7 +301,7 @@ class SystemSearchViewModelTest {
 
     @Test
     fun whenQuickAccessItemClickedThenPixelSent() {
-        val quickAccessItem = QuickAccessFavorite(Favorite(1, "title", "http://example.com", 0))
+        val quickAccessItem = QuickAccessFavorite(Favorite("favorite1", "title", "http://example.com", 0))
 
         testee.onQuickAccessItemClicked(quickAccessItem)
 
@@ -310,7 +310,7 @@ class SystemSearchViewModelTest {
 
     @Test
     fun whenQuickAccessItemEditRequestedThenLaunchEditDialog() {
-        val quickAccessItem = QuickAccessFavorite(Favorite(1, "title", "http://example.com", 0))
+        val quickAccessItem = QuickAccessFavorite(Favorite("favorite1", "title", "http://example.com", 0))
 
         testee.onEditQuickAccessItemRequested(quickAccessItem)
 
@@ -320,7 +320,7 @@ class SystemSearchViewModelTest {
 
     @Test
     fun whenQuickAccessItemDeleteRequestedThenShowDeleteConfirmation() {
-        val quickAccessItem = QuickAccessFavorite(Favorite(1, "title", "http://example.com", 0))
+        val quickAccessItem = QuickAccessFavorite(Favorite("favorite1", "title", "http://example.com", 0))
 
         testee.onDeleteQuickAccessItemRequested(quickAccessItem)
 
@@ -330,51 +330,51 @@ class SystemSearchViewModelTest {
 
     @Test
     fun whenQuickAccessEditedThenRepositoryUpdated() {
-        val savedSite = Favorite(1, "title", "http://example.com", 0)
+        val savedSite = Favorite("favorite1", "title", "http://example.com", 0)
 
         testee.onSavedSiteEdited(savedSite)
 
-        verify(mockFavoritesRepository).update(savedSite)
+        verify(mocksavedSitesRepository).update(savedSite)
     }
 
     @Test
     fun whenQuickAccessDeleteRequestedThenRepositoryUpdated() = runTest {
-        val savedSite = Favorite(1, "title", "http://example.com", 0)
+        val savedSite = Favorite("favorite1", "title", "http://example.com", 0)
 
         testee.onDeleteQuickAccessItemRequested(QuickAccessFavorite(savedSite))
 
-        verify(mockFavoritesRepository).delete(savedSite)
+        verify(mocksavedSitesRepository).delete(savedSite)
     }
 
     @Test
     fun whenQuickAccessInsertedThenRepositoryUpdated() {
-        val savedSite = Favorite(1, "title", "http://example.com", 0)
+        val savedSite = Favorite("favorite1", "title", "http://example.com", 0)
 
         testee.insertQuickAccessItem(savedSite)
 
-        verify(mockFavoritesRepository).insert(savedSite)
+        verify(mocksavedSitesRepository).insert(savedSite)
     }
 
     @Test
     fun whenQuickAccessListChangedThenRepositoryUpdated() {
-        val savedSite = Favorite(1, "title", "http://example.com", 0)
+        val savedSite = Favorite("favorute1", "title", "http://example.com", 0)
         val savedSites = listOf(QuickAccessFavorite(savedSite))
 
         testee.onQuickAccessListChanged(savedSites)
 
-        verify(mockFavoritesRepository).updateWithPosition(listOf(savedSite))
+        verify(mocksavedSitesRepository).updateWithPosition(listOf(savedSite))
     }
 
     @Test
     fun whenUserHasFavoritesThenInitialStateShowsFavorites() {
-        val savedSite = Favorite(1, "title", "http://example.com", 0)
-        whenever(mockFavoritesRepository.favorites()).thenReturn(flowOf(listOf(savedSite)))
+        val savedSite = Favorite("favorite1", "title", "http://example.com", 0)
+        whenever(mocksavedSitesRepository.getFavorites()).thenReturn(flowOf(listOf(savedSite)))
         testee = SystemSearchViewModel(
             mockUserStageStore,
             mockAutoComplete,
             mockDeviceAppLookup,
             mockPixel,
-            mockFavoritesRepository,
+            mocksavedSitesRepository,
             mockFaviconManager,
             mockSettingsStore,
             coroutineRule.testDispatcherProvider,
