@@ -129,6 +129,7 @@ import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.browser.webview.enableDarkMode
 import com.duckduckgo.app.browser.webview.enableLightMode
+import com.duckduckgo.app.cta.onboarding_experiment.DaxDialogExperimentListener
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.cta.ui.DaxDialogCta.DaxAutoconsentCta
 import com.duckduckgo.app.cta.ui.DaxDialogCta.DaxTrackersBlockedCta
@@ -1066,6 +1067,7 @@ class BrowserTabFragment :
                 messageResourceId = it.messageResourceId,
                 includeShortcutToViewCredential = it.includeShortcutToViewCredential,
             )
+            is Command.LaunchPrivacyDashboard -> browserActivity?.launchPrivacyDashboard()
             else -> {
                 // NO OP
             }
@@ -3136,7 +3138,7 @@ class BrowserTabFragment :
             }
         }
 
-        private val daxListener = object : DaxDialogListener {
+        private val daxListener = object : DaxDialogExperimentListener {
             override fun onDaxDialogDismiss() {
                 viewModel.onDaxDialogDismissed()
             }
@@ -3151,6 +3153,10 @@ class BrowserTabFragment :
 
             override fun onDaxDialogSecondaryCtaClick() {
                 viewModel.onUserClickCtaSecondaryButton()
+            }
+
+            override fun onPrivacyShieldClick() {
+                viewModel.onUserClickOnboardingPrivacyShieldModal()
             }
         }
 

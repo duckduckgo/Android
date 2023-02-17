@@ -42,7 +42,6 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.ui.store.AppTheme
-import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
@@ -170,6 +169,10 @@ class CtaViewModel @Inject constructor(
         cta.okPixel?.let {
             pixel.fire(it, cta.pixelOkParameters())
         }
+    }
+
+    fun onUserClickOnboardingPrivacyShield() {
+        pixel.fire(AppPixelName.ONBOARDING_PRIVACY_SHIELD_BUTTON)
     }
 
     suspend fun refreshCta(
