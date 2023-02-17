@@ -33,9 +33,9 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.store.AppTheme
 import com.squareup.anvil.annotations.ContributesBinding
-import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
+import timber.log.Timber
 
 /** Public interface for the Onboarding Experiment Animation Helper */
 interface OnboardingExperimentAnimationHelper {
@@ -46,7 +46,7 @@ interface OnboardingExperimentAnimationHelper {
     fun startTrackersOnboardingAnimationForStep(
         holder: LottieAnimationView,
         step: OnboardingExperimentStep,
-        trackers: List<Entity>
+        trackers: List<Entity>,
     )
 }
 
@@ -148,7 +148,7 @@ class LottieOnboardingExperimentAnimationHelper @Inject constructor(val appTheme
     }
 
     @DrawableRes
-    private fun networkFullColorLogoIcon( //fixme move it to TrackersRender class in case experiment is implemented
+    private fun networkFullColorLogoIcon( // fixme move it to TrackersRender class in case experiment is implemented
         context: Context,
         networkName: String,
     ): Int? {

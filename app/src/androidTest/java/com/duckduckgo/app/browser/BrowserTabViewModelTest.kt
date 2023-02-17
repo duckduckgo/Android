@@ -4262,6 +4262,14 @@ class BrowserTabViewModelTest {
         }
     }
 
+    @Test
+    fun whenUserClickedPrivacyShieldFromOnboardingDialogThenLaunchPrivacyDashboardCommand() {
+        val cta = DaxDialogCta.DaxTrackersBlockedExperimentCta(mockOnboardingStore, mockAppInstallStore, emptyList(), "")
+        setCta(cta)
+        testee.onUserClickOnboardingPrivacyShieldModal()
+        assertCommandIssued<Command.LaunchPrivacyDashboard>()
+    }
+
     private fun aCredential(): LoginCredentials {
         return LoginCredentials(domain = null, username = null, password = null)
     }
