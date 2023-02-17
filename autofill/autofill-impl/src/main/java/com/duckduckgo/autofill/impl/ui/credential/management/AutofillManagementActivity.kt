@@ -33,7 +33,6 @@ import com.duckduckgo.autofill.api.AutofillSettingsActivityLauncher
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ActivityAutofillSettingsBinding
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitCredentialMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitDisabledMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitListMode
@@ -248,7 +247,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
     }
 
     private fun resetToolbar() {
-        setTitle(R.string.managementScreenTitle)
+        setTitle(R.string.autofillManagementScreenTitle)
         binding.toolbar.menu.clear()
         hideSearchBar()
         supportActionBar?.setHomeAsUpIndicator(com.duckduckgo.mobile.android.R.drawable.ic_arrow_left_24)
