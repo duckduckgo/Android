@@ -98,7 +98,7 @@ class AppDatabaseBookmarksMigrationCallback(
             val bookmarksInFolder = bookmarksDao().getBookmarksByParentIdSync(folderId)
 
             foldersInFolder.forEach {
-                val entity = Entity(Entity.generateFolderId(it.id), it.name, "", FOLDER)
+                val entity = Entity(it.id, it.name, "", FOLDER)
                 entities.add(entity)
 
                 if (folderId == 0L) {

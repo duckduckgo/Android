@@ -28,6 +28,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityBookmarkFoldersBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.store.Relation
 
 @InjectWith(ActivityScope::class)
 class BookmarkFoldersActivity : DuckDuckGoActivity() {
@@ -89,7 +90,7 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
         when (item.itemId) {
             R.id.action_add_folder -> {
                 val dialog = AddBookmarkFolderDialogFragment.instance(
-                    ROOT_FOLDER_ID,
+                    Relation.BOOMARKS_ROOT,
                     getString(R.string.bookmarksActivityTitle),
                 )
                 dialog.show(supportFragmentManager, ADD_BOOKMARK_FOLDER_FRAGMENT_TAG)

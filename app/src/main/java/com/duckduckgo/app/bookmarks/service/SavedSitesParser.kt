@@ -17,8 +17,10 @@
 package com.duckduckgo.app.bookmarks.service
 
 import com.duckduckgo.app.bookmarks.model.*
+import com.duckduckgo.sync.store.Relation
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
+import java.util.UUID
 
 interface SavedSitesParser {
     fun generateHtml(
@@ -28,7 +30,7 @@ interface SavedSitesParser {
 
     suspend fun parseHtml(
         document: Document,
-        bookmarksRepository: BookmarksRepository,
+        savedSitesRepository: SavedSitesRepository,
     ): List<SavedSite>
 }
 
@@ -119,7 +121,7 @@ class RealSavedSitesParser : SavedSitesParser {
 
     override suspend fun parseHtml(
         document: Document,
-        bookmarksRepository: BookmarksRepository,
+        savedSitesRepository: SavedSitesRepository,
     ): List<SavedSite> {
         val body = document.select("body").first() ?: return emptyList()
         val children = body.childNodes()
@@ -131,13 +133,13 @@ class RealSavedSitesParser : SavedSitesParser {
         if (children.size > 1) {
             rootElement = Element("DL").appendChildren(children)
         }
-        return parseElement(rootElement, 0, bookmarksRepository, mutableListOf(), false)
+        return parseElement(rootElement, "", savedSitesRepository, mutableListOf(), false)
     }
 
     private suspend fun parseElement(
         documentElement: Element,
-        parentId: Long,
-        bookmarksRepository: BookmarksRepository,
+        parentId: String,
+        savedSitesRepository: SavedSitesRepository,
         savedSites: MutableList<SavedSite>,
         inFavorite: Boolean,
     ): List<SavedSite> {
@@ -156,11 +158,12 @@ class RealSavedSitesParser : SavedSitesParser {
                         val folderName = folder.text()
 
                         if (folderName == FAVORITES_FOLDER || folderName == BOOKMARKS_FOLDER) {
-                            parseElement(element, 0, bookmarksRepository, savedSites, folderName == FAVORITES_FOLDER)
+                            parseElement(element, Relation.BOOMARKS_ROOT, savedSitesRepository, savedSites, folderName == FAVORITES_FOLDER)
                         } else {
-                            val bookmarkFolder = BookmarkFolder(name = folderName, parentId = parentId)
-                            val id = bookmarksRepository.insert(bookmarkFolder)
-                            parseElement(element, id, bookmarksRepository, savedSites, false)
+                            val bookmarkFolder = BookmarkFolder(name = folderName, parentId = parentId, id = UUID.randomUUID().toString())
+                            savedSitesRepository.insert(bookmarkFolder)
+                            val folder = savedSitesRepository.getFolder(bookmarkFolder.id)
+                            parseElement(element, folder.id, savedSitesRepository, savedSites, false)
                         }
                     } else {
                         val linkItem = element.select("a")
@@ -168,10 +171,10 @@ class RealSavedSitesParser : SavedSitesParser {
                             val link = linkItem.attr("href")
                             val title = linkItem.text()
                             if (inFavorite) {
-                                savedSites.add(SavedSite.Favorite(0, title = title, url = link, favorites))
+                                savedSites.add(SavedSite.Favorite(UUID.randomUUID().toString(), title = title, url = link, favorites))
                                 favorites++
                             } else {
-                                val bookmark = SavedSite.Bookmark(0, title = title, url = link, parentId = parentId)
+                                val bookmark = SavedSite.Bookmark(UUID.randomUUID().toString(), title = title, url = link, parentId = parentId)
                                 savedSites.add(bookmark)
                             }
                         }
