@@ -94,7 +94,6 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:icon="@drawable/ic_platform_windows_16"
                 android:layout_marginBottom="@dimen/keyline_4"
                 android:text="@string/macos_waitlist_windows_link"/>
 
