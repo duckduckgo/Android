@@ -82,7 +82,7 @@ fun TextView.addClickableLink(
             )
             setSpan(
                 ForegroundColorSpan(
-                    ContextCompat.getColor(context, R.color.cornflowerBlue),
+                    context.getColorFromAttr(R.attr.daxColorAccentBlue),
                 ),
                 fullText.getSpanStart(it),
                 fullText.getSpanEnd(it),
@@ -114,7 +114,7 @@ fun TextView.addClickableSpan(
                 )
                 setSpan(
                     ForegroundColorSpan(
-                        ContextCompat.getColor(context, R.color.cornflowerBlue),
+                        context.getColorFromAttr(R.attr.daxColorAccentBlue),
                     ),
                     fullText.getSpanStart(it),
                     fullText.getSpanEnd(it),
