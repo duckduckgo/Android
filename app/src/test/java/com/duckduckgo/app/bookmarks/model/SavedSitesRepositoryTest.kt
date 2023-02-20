@@ -21,6 +21,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.sync.store.Entity
@@ -31,6 +32,7 @@ import com.duckduckgo.sync.store.SyncEntitiesDao
 import com.duckduckgo.sync.store.SyncRelationsDao
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert
@@ -315,6 +317,37 @@ class SavedSitesRepositoryTest {
         givenNoFavoritesStored()
     }
 
+    @Test
+    fun whenInsertBookmarkThenPopulateDB() = runTest {
+        givenNoBookmarksStored()
+
+        val bookmark = repository.insert(Bookmark(id = "bookmark1", title = "title", url = "foo.com", parentId = Relation.BOOMARKS_ROOT))
+
+        Assert.assertEquals(listOf(bookmark), repository.getBookmarks().first())
+    }
+
+    @Test
+    fun whenInsertBookmarkByTitleAndUrlThenPopulateDB() = runTest {
+        val bookmark = repository.insert(Bookmark(id = "bookmark1", title = "title", url = "foo.com", parentId = Relation.BOOMARKS_ROOT))
+        val bookmarkInserted = repository.getBookmark(bookmark.url)
+
+        Assert.assertEquals(bookmark, bookmarkInserted)
+    }
+
+    @Test
+    fun whenUpdateBookmarkThenUpdateBookmarkInDB() = runTest {
+        givenNoBookmarksStored()
+
+        val bookmark = repository.insert(Bookmark(id = "bookmark1", title = "title", url = "foo.com", parentId = Relation.BOOMARKS_ROOT))
+        val updatedBookmark = SavedSite.Bookmark(id = bookmark.id, title = "new title", url = "example.com", parentId = "folder2")
+
+        repository.update(updatedBookmark)
+        val bookmarkList = repository.getBookmarks().first()
+
+        Assert.assertTrue(bookmarkList.size == 1)
+        Assert.assertEquals(updatedBookmark, bookmarkList.first())
+    }
+
     @After
     fun after() {
         db.close()
@@ -341,6 +374,18 @@ class SavedSitesRepositoryTest {
 
         syncEntitiesDao.insert(entity2)
         syncRelationsDao.insert(Relation(relationId = Relation.FAVORITES_ROOT, entityId = entity2.entityId))
+    }
+
+    private fun givenNoBookmarksStored() {
+        Assert.assertFalse(repository.hasBookmarks())
+    }
+
+    private fun givenBookmarkStored(vararg bookmark: Bookmark) {
+        bookmark.forEach {
+            val entity = Entity(it.id, it.title, it.url, type = BOOKMARK)
+            syncEntitiesDao.insert(entity)
+            syncRelationsDao.insert(Relation(relationId = Relation.BOOMARKS_ROOT, entityId = entity.entityId))
+        }
     }
 
     private fun givenSomeBookmarks(

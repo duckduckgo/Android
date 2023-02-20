@@ -65,18 +65,6 @@ class BookmarksDataRepositoryTest {
     }
 
     @Test
-    fun whenInsertBookmarkFolderThenReturnId() = runTest {
-        val id = repository.insert(BookmarkFolder(id = "folder1", name = "name", parentId = Relation.BOOMARKS_ROOT))
-        assertEquals(1, id)
-    }
-
-    @Test
-    fun whenInsertBookmarkThenPopulateDB() = runTest {
-        repository.insert(bookmark)
-        assertEquals(listOf(bookmarkEntity), repository.getBookmarks().first())
-    }
-
-    @Test
     fun whenInsertBookmarkByTitleAndUrlThenPopulateDB() = runTest {
         repository.insertBookmark(title = bookmark.title, url = bookmark.url)
         assertEquals(listOf(bookmarkEntity), repository.getBookmarks().first())

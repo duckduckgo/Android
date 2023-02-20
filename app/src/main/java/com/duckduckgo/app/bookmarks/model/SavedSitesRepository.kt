@@ -175,11 +175,11 @@ class RealSavedSitesRepository(
 
     override fun getBookmark(url: String): Bookmark? {
         val bookmark = syncEntitiesDao.entityByUrl(url)
-        if (bookmark != null) {
+        return if (bookmark != null) {
             val relation = syncRelationsDao.relationParentById(bookmark.entityId)
-            return bookmark.mapToBookmark(relation.relationId)
+            bookmark.mapToBookmark(relation.relationId)
         } else {
-            return null
+            null
         }
     }
 
