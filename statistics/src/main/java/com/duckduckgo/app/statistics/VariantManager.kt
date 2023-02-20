@@ -91,6 +91,7 @@ interface VariantManager {
             "ES",
             "FI",
             "FR",
+            "GB",
             "GE",
             "GI",
             "GR",
