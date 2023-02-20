@@ -57,7 +57,10 @@ class RealSavedSitesImporter(
             }
 
             savedSites.filterIsInstance<SavedSite.Bookmark>().map { bookmark ->
-                Pair(Relation(bookmark.parentId, bookmark.id), Entity(bookmark.id, title = bookmark.title, url = bookmark.url, type = BOOKMARK))
+                Pair(
+                    Relation(relationId = bookmark.parentId, entityId = bookmark.id),
+                    Entity(bookmark.id, title = bookmark.title, url = bookmark.url, type = BOOKMARK),
+                )
             }.also { pairs ->
                 pairs.asSequence().chunked(IMPORT_BATCH_SIZE).forEach { chunk ->
                     syncRelationsDao.insertList(chunk.map { it.first })
@@ -66,7 +69,10 @@ class RealSavedSitesImporter(
             }
 
             savedSites.filterIsInstance<SavedSite.Favorite>().filter { it.url.isNotEmpty() }.map { favorite ->
-                Pair(Relation(Relation.FAVORITES_ROOT, favorite.id), Entity(favorite.id, title = favorite.title, url = favorite.url, type = BOOKMARK))
+                Pair(
+                    Relation(relationId = Relation.FAVORITES_ROOT, entityId = favorite.id),
+                    Entity(favorite.id, title = favorite.title, url = favorite.url, type = BOOKMARK),
+                )
             }.also { pairs ->
                 pairs.asSequence().chunked(IMPORT_BATCH_SIZE).forEach { chunk ->
                     syncRelationsDao.insertList(chunk.map { it.first })

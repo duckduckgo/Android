@@ -21,6 +21,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.sync.store.Entity
 import com.duckduckgo.sync.store.EntityType.BOOKMARK
@@ -28,9 +29,11 @@ import com.duckduckgo.sync.store.EntityType.FOLDER
 import com.duckduckgo.sync.store.Relation
 import com.duckduckgo.sync.store.SyncEntitiesDao
 import com.duckduckgo.sync.store.SyncRelationsDao
+import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.After
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -177,9 +180,167 @@ class SavedSitesRepositoryTest {
         assert(repository.getBookmark("https://favorite.com") == null)
     }
 
+    @Test
+    fun whenInsertFavoriteThenReturnSavedSite() {
+        givenNoFavoritesStored()
+
+        val savedSite = repository.insertFavorite(title = "title", url = "http://example.com")
+
+        assertEquals("title", savedSite.title)
+        assertEquals("http://example.com", savedSite.url)
+        assertEquals(0, savedSite.position)
+    }
+
+    @Test
+    fun whenInsertFavoriteWithoutTitleThenSavedSiteUsesUrlAsTitle() {
+        givenNoFavoritesStored()
+
+        val savedSite = repository.insertFavorite(title = "", url = "http://example.com")
+
+        assertEquals("http://example.com", savedSite.title)
+        assertEquals("http://example.com", savedSite.url)
+        assertEquals(0, savedSite.position)
+    }
+
+    @Test
+    fun whenUserHasFavoritesAndInsertFavoriteThenSavedSiteUsesNextPosition() {
+        givenSomeFavoritesStored()
+
+        val savedSite = repository.insertFavorite(title = "Favorite", url = "http://favexample.com")
+
+        Assert.assertEquals("Favorite", savedSite.title)
+        Assert.assertEquals("http://favexample.com", savedSite.url)
+        Assert.assertEquals(2, savedSite.position)
+    }
+
+    @Test
+    fun whenDataSourceChangesThenNewListReceived() {
+        givenNoFavoritesStored()
+
+        repository.insertFavorite(title = "Favorite", url = "http://favexample.com")
+
+        val testObserver = repository.getFavoritesObservable().test()
+        val lastState = testObserver.assertNoErrors().values().last()
+
+        Assert.assertEquals(1, lastState.size)
+        Assert.assertEquals("Favorite", lastState.first().title)
+        Assert.assertEquals("http://favexample.com", lastState.first().url)
+        Assert.assertEquals(0, lastState.first().position)
+    }
+
+    @Test
+    fun whenFavoriteUpdatedThenDatabaseChanged() {
+        val favorite = Favorite("favorite1", "Favorite", "http://favexample.com", 1)
+        givenFavoriteStored(favorite)
+        val updatedFavorite = favorite.copy(position = 3)
+
+        repository.update(updatedFavorite)
+
+        assertFavoriteExistsInDb(updatedFavorite)
+    }
+
+    @Test
+    fun whenListReceivedThenUpdateItemsWithNewPositionInDatabase() {
+        val favorite = Favorite("favorite1", "Favorite", "http://favexample.com", 1)
+        val favorite2 = Favorite("favorite2", "Favorite2", "http://favexample2.com", 2)
+
+        givenFavoriteStored(favorite, favorite2)
+
+        repository.updateWithPosition(listOf(favorite2, favorite))
+
+        assertFavoriteExistsInDb(favorite2.copy(position = 1))
+        assertFavoriteExistsInDb(favorite.copy(position = 2))
+    }
+
+    @Test
+    fun whenFavoriteDeletedThenDatabaseUpdated() = runTest {
+        val favorite = Favorite("favorite1", "Favorite", "http://favexample.com", 1)
+        givenFavoriteStored(favorite)
+
+        repository.delete(favorite)
+
+        Assert.assertNull(repository.getFavorite(favorite.url))
+    }
+
+    @Test
+    fun whenUserHasFavoritesThenReturnTrue() = runTest {
+        val favorite = Favorite("favorite1", "Favorite", "http://favexample.com", 1)
+
+        givenFavoriteStored(favorite)
+
+        Assert.assertTrue(repository.hasFavorites())
+    }
+
+    @Test
+    fun whenFavoriteByUrlRequestedAndAvailableThenReturnFavorite() = runTest {
+        givenNoFavoritesStored()
+
+        val favorite = repository.insert(Favorite(id = "favorite1", title = "title", url = "www.website.com", position = 0))
+        val otherFavorite = repository.insert(Favorite(id = "favorite2", title = "other title", url = "www.other-website.com", position = 1))
+
+        val result = repository.getFavorite("www.website.com")
+
+        Assert.assertEquals(favorite, result)
+    }
+
+    @Test
+    fun whenFavoriteByUrlRequestedAndNotAvailableThenReturnNull() = runTest {
+        givenNoFavoritesStored()
+
+        val favorite = repository.insert(Favorite(id = "favorite1", title = "title", url = "www.website.com", position = 1))
+        val otherFavorite = repository.insert(Favorite(id = "favorite2", title = "other title", url = "www.other-website.com", position = 2))
+
+        val result = repository.getFavorite("www.test.com")
+
+        Assert.assertNull(result)
+    }
+
+    @Test
+    fun whenFavoriteByUrlRequestedAndNoFavoritesAvailableThenReturnNull() = runTest {
+        val result = repository.getFavorite("www.test.com")
+
+        Assert.assertNull(result)
+    }
+
+    @Test
+    fun whenAllFavoritesDeletedThenDeleteAllFavorites() = runTest {
+        val favorite = Favorite("favorite1", "Favorite", "http://favexample.com", 1)
+        val favorite2 = Favorite("favorite2", "Favorite2", "http://favexample2.com", 2)
+
+        givenFavoriteStored(favorite)
+        givenFavoriteStored(favorite2)
+
+        repository.deleteAll()
+
+        givenNoFavoritesStored()
+    }
+
     @After
     fun after() {
         db.close()
+    }
+
+    private fun givenNoFavoritesStored() {
+        Assert.assertFalse(repository.hasFavorites())
+    }
+
+    private fun givenFavoriteStored(vararg favorite: Favorite) {
+        favorite.forEach {
+            val entity = Entity(it.id, it.title, it.url, type = BOOKMARK)
+            syncEntitiesDao.insert(entity)
+            syncRelationsDao.insert(Relation(relationId = Relation.FAVORITES_ROOT, entityId = entity.entityId))
+        }
+    }
+
+    private fun givenSomeFavoritesStored() {
+        val entity1 = Entity(title = "title", url = "http://example.com", type = BOOKMARK)
+        val entity2 = Entity(title = "title2", url = "http://examples.com", type = BOOKMARK)
+
+        syncEntitiesDao.insert(entity1)
+        syncRelationsDao.insert(Relation(relationId = Relation.FAVORITES_ROOT, entityId = entity1.entityId))
+
+        syncEntitiesDao.insert(entity2)
+        syncRelationsDao.insert(Relation(relationId = Relation.FAVORITES_ROOT, entityId = entity2.entityId))
     }
 
     private fun givenSomeBookmarks(
@@ -208,9 +369,15 @@ class SavedSitesRepositoryTest {
     ): List<Relation> {
         val relations = mutableListOf<Relation>()
         entities.forEach {
-            relations.add(Relation(folderId, it.entityId))
+            relations.add(Relation(relationId = folderId, entityId = it.entityId))
         }
         return relations
+    }
+
+    private fun assertFavoriteExistsInDb(favorite: Favorite) {
+        val storedFavorite = syncEntitiesDao.favorite(url = favorite.url) ?: error("Favorite not found in database")
+        Assert.assertEquals(storedFavorite.title, favorite.title)
+        Assert.assertEquals(storedFavorite.url, favorite.url)
     }
 
     private fun givenEmptyDBState() {

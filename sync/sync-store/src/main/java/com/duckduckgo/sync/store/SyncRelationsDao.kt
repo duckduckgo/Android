@@ -49,8 +49,6 @@ interface SyncRelationsDao {
     @Query("select * from relations where relations.entityId = :entityId")
     fun relationParentById(entityId: String): Relation
 
-
-
     @Query("select CAST(COUNT(*) AS BIT) from relations")
     fun hasRelations(): Boolean
 
@@ -66,7 +64,9 @@ interface SyncRelationsDao {
     @Query("delete from relations where entityId = :entityId")
     fun deleteEntity(entityId: String)
 
-    @Query("select count(*) from entities inner join relations on entities.entityId = relations.entityId where entities.url LIKE :domain AND relationId == :relationId")
+    @Query(
+        "select count(*) from entities inner join relations on entities.entityId = relations.entityId where entities.url LIKE :domain AND relationId == :relationId",
+    )
     fun relationsCountByUrl(domain: String, relationId: String = Relation.FAVORITES_ROOT): Int
 
     @Query("delete from relations")

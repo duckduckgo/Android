@@ -28,7 +28,6 @@ import com.duckduckgo.sync.store.Relation
 import com.duckduckgo.sync.store.SyncEntitiesDao
 import com.duckduckgo.sync.store.SyncRelationsDao
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -61,119 +60,6 @@ class FavoritesDataRepositoryTest {
     }
 
     @Test
-    fun whenInsertFavoriteThenReturnSavedSite() {
-        givenNoFavoritesStored()
-
-        val savedSite = repository.insertFavorite("title", "http://example.com")
-
-        assertEquals("title", savedSite.title)
-        assertEquals("http://example.com", savedSite.url)
-        assertEquals(1, savedSite.position)
-    }
-
-    @Test
-    fun whenInsertFavoriteWithoutTitleThenSavedSiteUsesUrlAsTitle() {
-        givenNoFavoritesStored()
-
-        val savedSite = repository.insertFavorite("", "http://example.com")
-
-        assertEquals("http://example.com", savedSite.title)
-        assertEquals("http://example.com", savedSite.url)
-        assertEquals(1, savedSite.position)
-    }
-
-    @Test
-    fun whenUserHasFavoritesAndInsertFavoriteThenSavedSiteUsesNextPosition() {
-        givenMoreFavoritesStored()
-
-        val savedSite = repository.insertFavorite("Favorite", "http://favexample.com")
-
-        assertEquals("Favorite", savedSite.title)
-        assertEquals("http://favexample.com", savedSite.url)
-        assertEquals(2, savedSite.position)
-    }
-
-    @Test
-    fun whenDataSourceChangesThenNewListReceived() {
-        givenNoFavoritesStored()
-
-        repository.insertFavorite("Favorite", "http://favexample.com")
-
-        val testObserver = repository.getFavoritesObservable().test()
-        val lastState = testObserver.assertNoErrors().values().last()
-        assertEquals(1, lastState.size)
-        assertEquals(Favorite("favorite1", "Favorite", "http://favexample.com", 1), lastState.first())
-    }
-
-    @Test
-    fun whenFavoriteUpdatedThenDatabaseChanged() {
-        val favorite = Favorite("favorite1", "Favorite", "http://favexample.com", 1)
-        givenFavorite(favorite)
-        val updatedFavorite = favorite.copy(position = 3)
-
-        repository.update(updatedFavorite)
-
-        assertFavoriteExistsInDb(updatedFavorite)
-    }
-
-    @Test
-    fun whenListReceivedThenUpdateItemsWithNewPositionInDatabase() {
-        val favorite = Favorite("favorite1", "Favorite", "http://favexample.com", 1)
-        val favorite2 = Favorite("favorite2", "Favorite2", "http://favexample2.com", 2)
-        givenFavorite(favorite, favorite2)
-
-        repository.updateWithPosition(listOf(favorite2, favorite))
-
-        assertFavoriteExistsInDb(favorite2.copy(position = 0))
-        assertFavoriteExistsInDb(favorite.copy(position = 1))
-    }
-
-    @Test
-    fun whenFavoriteDeletedThenDatabaseUpdated() = runTest {
-        val favorite = Favorite("favorite1", "Favorite", "http://favexample.com", 1)
-        givenFavorite(favorite)
-
-        repository.delete(favorite)
-
-        assertNull(repository.getFavorite(favorite.url))
-    }
-
-    @Test
-    fun whenUserHasFavoritesThenReturnTrue() = runTest {
-        val favorite = Favorite("favorite1", "Favorite", "http://favexample.com", 1)
-
-        givenFavorite(favorite)
-
-        assertTrue(repository.hasFavorites())
-    }
-
-    @Test
-    fun whenFavoriteByUrlRequestedAndAvailableThenReturnFavorite() = runTest {
-        val favorite = Favorite(id = "favorite1", title = "title", url = "www.website.com", position = 1)
-        val otherFavorite = Favorite(id = "favorite2", title = "other title", url = "www.other-website.com", position = 2)
-
-        repository.insert(favorite)
-        repository.insert(otherFavorite)
-
-        val result = repository.getFavorite("www.website.com")
-
-        assertEquals(favorite, result)
-    }
-
-    @Test
-    fun whenFavoriteByUrlRequestedAndNotAvailableThenReturnNull() = runTest {
-        val favorite = Favorite(id = "favorite1", title = "title", url = "www.website.com", position = 1)
-        val otherFavorite = Favorite(id = "favorite2", title = "other title", url = "www.other-website.com", position = 2)
-
-        repository.insert(favorite)
-        repository.insert(otherFavorite)
-
-        val result = repository.getFavorite("www.test.com")
-
-        assertNull(result)
-    }
-
-    @Test
     fun whenFavoriteByUrlRequestedAndNoFavoritesAvailableThenReturnNull() = runTest {
         val result = repository.getFavorite("www.test.com")
 
@@ -184,7 +70,7 @@ class FavoritesDataRepositoryTest {
         favorite.forEach {
             val entity = Entity(it.id, it.title, it.url, type = BOOKMARK)
             syncEntitiesDao.insert(entity)
-            syncRelationsDao.insert(Relation(Relation.FAVORITES_ROOT, entity))
+            syncRelationsDao.insert(Relation(Relation.FAVORITES_ROOT, entity.entityId))
         }
     }
 
@@ -193,10 +79,10 @@ class FavoritesDataRepositoryTest {
         val entity2 = Entity(title = "title2", url = "http://examples.com", type = BOOKMARK)
 
         syncEntitiesDao.insert(entity1)
-        syncRelationsDao.insert(Relation(Relation.FAVORITES_ROOT, entity1))
+        syncRelationsDao.insert(Relation(Relation.FAVORITES_ROOT, entity1.entityId))
 
         syncEntitiesDao.insert(entity2)
-        syncRelationsDao.insert(Relation(Relation.FAVORITES_ROOT, entity2))
+        syncRelationsDao.insert(Relation(Relation.FAVORITES_ROOT, entity2.entityId))
     }
 
     private fun givenNoFavoritesStored() {

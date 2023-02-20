@@ -171,10 +171,10 @@ class BookmarksMigrationTest {
         val favorites = syncRelationsDao.relationByIdSync(Relation.FAVORITES_ROOT)
 
         assertTrue(bookmarks.size == 1)
-        assertTrue(bookmarks.first().entity.entityId == "bookmark1")
+        assertTrue(bookmarks.first().entityId == "bookmark1")
 
         assertTrue(favorites.size == 1)
-        assertTrue(favorites.first().entity.entityId == "bookmark1")
+        assertTrue(favorites.first().entityId == "bookmark1")
     }
 
     @Test
@@ -191,10 +191,10 @@ class BookmarksMigrationTest {
         val favorites = syncRelationsDao.relationByIdSync(Relation.FAVORITES_ROOT)
 
         assertTrue(bookmarks.size == 1)
-        assertTrue(bookmarks.first().entity.entityId == "bookmark1")
+        assertTrue(bookmarks.first().entityId == "bookmark1")
 
         assertTrue(favorites.size == 1)
-        assertTrue(favorites.first().entity.entityId == "favorite2")
+        assertTrue(favorites.first().entityId == "favorite2")
     }
 
     @Ignore @Test

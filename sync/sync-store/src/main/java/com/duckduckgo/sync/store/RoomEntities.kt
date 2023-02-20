@@ -16,8 +16,8 @@
 
 package com.duckduckgo.sync.store
 
-import androidx.room.Embedded
 import androidx.room.Entity
+import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
 import java.util.UUID
 
@@ -66,8 +66,9 @@ class EntityTypeConverter {
     }
 }
 
-@Entity(tableName = "relations", primaryKeys = ["relationId", "entityId"])
+@Entity(tableName = "relations")
 data class Relation(
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
     var relationId: String = UUID.randomUUID().toString(),
     var entityId: String,
 ) {
@@ -75,13 +76,5 @@ data class Relation(
         const val FAVORITES_ROOT = "favorites_root"
         const val BOOMARKS_ROOT = "bookmarks_root"
         const val BOOMARKS_ROOT_ID = 0L
-
-        fun migrateId(folderId: Long?): String {
-            return when (folderId) {
-                null -> BOOMARKS_ROOT
-                0L -> BOOMARKS_ROOT
-                else -> "folder$folderId"
-            }
-        }
     }
 }

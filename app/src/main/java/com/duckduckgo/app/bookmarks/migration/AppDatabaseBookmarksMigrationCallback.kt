@@ -60,11 +60,11 @@ class AppDatabaseBookmarksMigrationCallback(
                     // try to purge duplicates by only adding favourites with the same url of a bookmark already added
                     val existingBookmark = syncEntitiesDao().entityByUrl(it.url)
                     if (existingBookmark != null) {
-                        favouriteMigration.add(Relation(Relation.FAVORITES_ROOT, existingBookmark.entityId))
+                        favouriteMigration.add(Relation(relationId = Relation.FAVORITES_ROOT, entityId = existingBookmark.entityId))
                     } else {
                         val entity = Entity(Entity.generateFavoriteId(it.id), it.title, it.url, BOOKMARK)
                         entitiesMigration.add(entity)
-                        favouriteMigration.add(Relation(Relation.FAVORITES_ROOT, entity.entityId))
+                        favouriteMigration.add(Relation(relationId = Relation.FAVORITES_ROOT, entityId = entity.entityId))
                     }
                 }
             }
@@ -102,9 +102,9 @@ class AppDatabaseBookmarksMigrationCallback(
                 entities.add(entity)
 
                 if (folderId == 0L) {
-                    relations.add(Relation(Relation.BOOMARKS_ROOT, entity.entityId))
+                    relations.add(Relation(relationId = Relation.BOOMARKS_ROOT, entityId = entity.entityId))
                 } else {
-                    relations.add(Relation(Entity.generateFolderId(folderId), entity.entityId))
+                    relations.add(Relation(relationId = Entity.generateFolderId(folderId), entityId = entity.entityId))
                 }
             }
             bookmarksInFolder.forEach {
@@ -112,9 +112,9 @@ class AppDatabaseBookmarksMigrationCallback(
                 entities.add(entity)
 
                 if (folderId == 0L) {
-                    relations.add(Relation(Relation.BOOMARKS_ROOT, entity.entityId))
+                    relations.add(Relation(relationId = Relation.BOOMARKS_ROOT, entityId = entity.entityId))
                 } else {
-                    relations.add(Relation(Entity.generateFolderId(folderId), entity.entityId))
+                    relations.add(Relation(relationId = Entity.generateFolderId(folderId), entityId = entity.entityId))
                 }
             }
 
