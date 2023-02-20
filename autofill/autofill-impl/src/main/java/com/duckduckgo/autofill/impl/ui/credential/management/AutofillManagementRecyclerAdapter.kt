@@ -19,14 +19,18 @@ package com.duckduckgo.autofill.impl.ui.credential.management
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
+import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ItemRowAutofillCredentialsManagementScreenBinding
@@ -43,15 +47,20 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementR
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem.GroupHeading
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem.NoMatchingSearchResults
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialGrouper
+import com.duckduckgo.autofill.impl.ui.credential.management.sorting.InitialExtractor
 import com.duckduckgo.autofill.impl.ui.credential.management.suggestion.SuggestionListBuilder
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.extractTitle
+import com.duckduckgo.mobile.android.R.dimen
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class AutofillManagementRecyclerAdapter(
-    val lifecycleOwner: LifecycleOwner,
-    val faviconManager: FaviconManager,
-    val grouper: CredentialGrouper,
+    private val lifecycleOwner: LifecycleOwner,
+    private val dispatchers: DispatcherProvider,
+    private val faviconManager: FaviconManager,
+    private val grouper: CredentialGrouper,
+    private val initialExtractor: InitialExtractor,
     private val suggestionListBuilder: SuggestionListBuilder,
     private val onCredentialSelected: (credentials: LoginCredentials) -> Unit,
     private val onContextMenuItemClicked: (ContextMenuAction) -> Unit,
@@ -190,14 +199,31 @@ class AutofillManagementRecyclerAdapter(
     }
 
     private fun ItemRowAutofillCredentialsManagementScreenBinding.updateFavicon(credentials: LoginCredentials) {
-        val domain = credentials.domain
-        if (domain == null) {
-            favicon.setImageBitmap(null)
-        } else {
-            lifecycleOwner.lifecycleScope.launch {
-                faviconManager.loadToViewFromLocalOrFallback(url = domain, view = favicon)
+        lifecycleOwner.lifecycleScope.launch(dispatchers.io()) {
+            val domain = credentials.domain
+            val bitmap = if (domain.isNullOrBlank()) {
+                generateDefaultFavicon(
+                    credentials,
+                    root.resources.getDimensionPixelSize(dimen.toolbarIconSize),
+                )
+            } else {
+                faviconManager.loadFromDisk(tabId = null, url = domain) ?: generateDefaultFavicon(
+                    credentials,
+                    root.resources.getDimensionPixelSize(dimen.toolbarIconSize),
+                )
+            }
+            withContext(dispatchers.main()) {
+                favicon.setImageDrawable(BitmapDrawable(root.resources, bitmap))
             }
         }
+    }
+
+    private fun generateDefaultFavicon(
+        credentials: LoginCredentials,
+        size: Int,
+    ): Bitmap {
+        val faviconPlaceholderLetter = initialExtractor.extractInitial(credentials)
+        return faviconManager.generateDefaultFavicon(placeholder = faviconPlaceholderLetter, credentials.domain ?: "").toBitmap(size, size)
     }
 
     @SuppressLint("NotifyDataSetChanged")

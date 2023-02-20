@@ -38,7 +38,7 @@ class AutofillDomainNameUrlMatcher @Inject constructor() : AutofillUrlMatcher {
             val subdomain = determineSubdomain(domain, eTldPlus1)
             ExtractedUrlParts(eTldPlus1, subdomain, port)
         } catch (e: IllegalArgumentException) {
-            Timber.w("Unable to parse e-tld+1 from $originalUrl")
+            Timber.d("Unable to parse e-tld+1 from [%s]", originalUrl)
             unextractable()
         }
     }

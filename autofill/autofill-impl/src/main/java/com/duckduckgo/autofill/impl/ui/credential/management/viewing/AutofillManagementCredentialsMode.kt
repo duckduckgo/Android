@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autofill.impl.ui.credential.management.viewing
 
+import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
@@ -39,7 +40,6 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoFragment
 import com.duckduckgo.app.global.FragmentViewModelFactory
-import com.duckduckgo.app.global.extractDomain
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.FragmentAutofillManagementEditModeBinding
@@ -51,6 +51,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialModeCommand
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialModeCommand.ShowEditCredentialMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialModeCommand.ShowManualCredentialMode
+import com.duckduckgo.autofill.impl.ui.credential.management.sorting.InitialExtractor
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.R.dimen
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
@@ -59,6 +60,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @InjectWith(FragmentScope::class)
@@ -78,6 +80,9 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
 
     @Inject
     lateinit var dispatchers: DispatcherProvider
+
+    @Inject
+    lateinit var initialExtractor: InitialExtractor
 
     // we need to revert the toolbar title when this fragment is destroyed, so will track its initial value
     private var initialActionBarTitle: String? = null
@@ -356,22 +361,39 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
 
     private fun loadDomainFavicon(credentials: LoginCredentials) {
         lifecycleScope.launch(dispatchers.io()) {
-            credentials.domain?.let {
-                val size = resources.getDimensionPixelSize(dimen.toolbarIconSize)
-                getActionBar()?.setLogo(
-                    BitmapDrawable(
-                        resources,
-                        faviconManager.loadFromDiskWithParams(
-                            tabId = null,
-                            url = it,
-                            width = size,
-                            height = size,
-                            cornerRadius = resources.getDimensionPixelSize(dimen.keyline_0),
-                        ) ?: faviconManager.generateDefaultFavicon(it.extractDomain().orEmpty()).toBitmap(size, size),
-                    ),
-                )
+            val favicon = generateFaviconFromDomain(credentials)
+
+            withContext(dispatchers.main()) {
+                getActionBar()?.setLogo(favicon)
             }
         }
+    }
+
+    private suspend fun generateFaviconFromDomain(credentials: LoginCredentials): BitmapDrawable {
+        val size = resources.getDimensionPixelSize(dimen.toolbarIconSize)
+        val domain = credentials.domain
+        return if (domain == null) {
+            BitmapDrawable(resources, generateDefaultFavicon(credentials, size))
+        } else {
+            BitmapDrawable(
+                resources,
+                faviconManager.loadFromDiskWithParams(
+                    tabId = null,
+                    url = domain,
+                    width = size,
+                    height = size,
+                    cornerRadius = resources.getDimensionPixelSize(dimen.keyline_0),
+                ) ?: generateDefaultFavicon(credentials, size),
+            )
+        }
+    }
+
+    private fun generateDefaultFavicon(
+        credentials: LoginCredentials,
+        size: Int,
+    ): Bitmap {
+        val faviconPlaceholderLetter = initialExtractor.extractInitial(credentials)
+        return faviconManager.generateDefaultFavicon(placeholder = faviconPlaceholderLetter, domain = credentials.domain ?: "").toBitmap(size, size)
     }
 
     private fun getActionBar(): ActionBar? = (activity as AppCompatActivity).supportActionBar

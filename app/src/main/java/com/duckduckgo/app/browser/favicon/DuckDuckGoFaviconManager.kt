@@ -209,9 +209,10 @@ class DuckDuckGoFaviconManager constructor(
     }
 
     override fun generateDefaultFavicon(
+        placeholder: String?,
         domain: String,
     ): Drawable {
-        return generateDefaultDrawable(context, domain)
+        return generateDefaultDrawable(context, domain, placeholder)
     }
 
     private suspend fun saveFavicon(
