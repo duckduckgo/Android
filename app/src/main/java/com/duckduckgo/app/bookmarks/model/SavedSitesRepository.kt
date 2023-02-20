@@ -235,9 +235,31 @@ class RealSavedSitesRepository(
     }
 
     override fun update(savedSite: SavedSite) {
-        val entity = syncEntitiesDao.entityByUrl(savedSite.url)
+        when (savedSite){
+            is Bookmark -> updateBookmark(savedSite)
+            is Favorite -> updateFavorite(savedSite)
+        }
+    }
+
+    private fun updateBookmark(bookmark: Bookmark){
+        val entity = syncEntitiesDao.entityById(bookmark.id)
+
         if (entity != null) {
-            syncEntitiesDao.update(Entity(entity.entityId, savedSite.title, savedSite.url, BOOKMARK))
+            val relation = syncRelationsDao.relationParentById(entity.entityId)
+            if (relation.relationId != bookmark.parentId){
+                // bookmark moved to another folder
+                syncRelationsDao.delete(relation.relationId)
+                syncRelationsDao.insert(Relation(relationId = bookmark.parentId, entityId = entity.entityId))
+            }
+            syncEntitiesDao.update(Entity(entity.entityId, bookmark.title, bookmark.url, BOOKMARK))
+        }
+    }
+
+    private fun updateFavorite(favorite: Favorite){
+        val entity = syncEntitiesDao.entityById(favorite.id)
+
+        if (entity != null) {
+            syncEntitiesDao.update(Entity(entity.entityId, favorite.title, favorite.url, BOOKMARK))
         }
     }
 

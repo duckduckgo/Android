@@ -335,17 +335,28 @@ class SavedSitesRepositoryTest {
     }
 
     @Test
-    fun whenUpdateBookmarkThenUpdateBookmarkInDB() = runTest {
+    fun whenUpdateBookmarkUrlThenUpdateBookmarkInDB() = runTest {
         givenNoBookmarksStored()
 
         val bookmark = repository.insert(Bookmark(id = "bookmark1", title = "title", url = "foo.com", parentId = Relation.BOOMARKS_ROOT))
-        val updatedBookmark = SavedSite.Bookmark(id = bookmark.id, title = "new title", url = "example.com", parentId = "folder2")
+        val updatedBookmark = Bookmark(id = bookmark.id, title = "new title", url = "example.com", parentId = Relation.BOOMARKS_ROOT)
 
         repository.update(updatedBookmark)
-        val bookmarkList = repository.getBookmarks().first()
+        val bookmarkUpdated = repository.getBookmark(updatedBookmark.url)!!
 
-        Assert.assertTrue(bookmarkList.size == 1)
-        Assert.assertEquals(updatedBookmark, bookmarkList.first())
+        Assert.assertEquals(updatedBookmark.id, bookmarkUpdated.id)
+    }
+    @Test
+    fun whenUpdateBookmarkFolderThenUpdateBookmarkInDB() = runTest {
+        givenNoBookmarksStored()
+
+        val bookmark = repository.insert(Bookmark(id = "bookmark1", title = "title", url = "foo.com", parentId = Relation.BOOMARKS_ROOT))
+        val updatedBookmark = Bookmark(id = bookmark.id, title = "title", url = "foo.com", parentId = "folder2")
+
+        repository.update(updatedBookmark)
+        val bookmarkUpdated = repository.getBookmark(bookmark.url)!!
+
+        Assert.assertEquals(updatedBookmark.id, bookmarkUpdated.id)
     }
 
     @After
