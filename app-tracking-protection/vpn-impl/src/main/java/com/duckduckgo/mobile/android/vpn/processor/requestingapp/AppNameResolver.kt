@@ -24,8 +24,15 @@ import logcat.logcat
 private const val UNKNOWN = "unknown"
 
 interface AppNameResolver {
+    /**
+     * @return the [OriginatingApp] for a given packageID or [OriginatingApp.unknown] when packageID is not known
+     */
     fun getAppNameForPackageId(packageId: String): OriginatingApp
-    fun getPackageIdForUid(uid: Int): String
+
+    /**
+     * @return returns the package name for a given UID or `null` if it is unknown
+     */
+    fun getPackageIdForUid(uid: Int): String?
 
     data class OriginatingApp(
         val packageId: String,
@@ -58,19 +65,19 @@ internal class RealAppNameResolver(private val packageManager: PackageManager) :
         }
     }
 
-    override fun getPackageIdForUid(uid: Int): String {
+    override fun getPackageIdForUid(uid: Int): String? {
         val packages: Array<String>?
 
         try {
             packages = packageManager.getPackagesForUid(uid)
         } catch (e: SecurityException) {
             logcat(LogPriority.ERROR) { e.asLog() }
-            return UNKNOWN
+            return null
         }
 
         if (packages.isNullOrEmpty()) {
             logcat(LogPriority.WARN) { "Failed to get package ID for UID: $uid" }
-            return UNKNOWN
+            return null
         }
 
         if (packages.size > 1) {
@@ -81,6 +88,6 @@ internal class RealAppNameResolver(private val packageManager: PackageManager) :
             logcat { sb.toString() }
         }
 
-        return packages.first()
+        return packages.firstOrNull()
     }
 }

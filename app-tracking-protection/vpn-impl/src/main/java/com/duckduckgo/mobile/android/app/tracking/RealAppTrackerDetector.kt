@@ -43,7 +43,8 @@ class RealAppTrackerDetector constructor(
     private val appNamesCache = LruCache<String, AppNameResolver.OriginatingApp>(100)
 
     override fun evaluate(domain: String, uid: Int): AppTrackerDetector.AppTracker? {
-        val packageId = appNameResolver.getPackageIdForUid(uid)
+        // `null` means unknown package ID, do not block
+        val packageId = appNameResolver.getPackageIdForUid(uid) ?: return null
 
         if (VpnExclusionList.isDdgApp(packageId)) {
             logcat { "shouldAllowDomain: DDG app is always allowed" }
