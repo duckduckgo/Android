@@ -38,10 +38,6 @@ android {
     }
 }
 
-ext {
-    workManager = "2.5.0-beta01"
-}
-
 dependencies {
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
@@ -113,7 +109,7 @@ dependencies {
 
     // WorkManager
     implementation AndroidX.work.runtimeKtx
-    implementation "androidx.work:work-multiprocess:$workManager"
+    implementation "androidx.work:work-multiprocess:_"
     testImplementation AndroidX.work.testing
     implementation AndroidX.work.rxJava2
 
