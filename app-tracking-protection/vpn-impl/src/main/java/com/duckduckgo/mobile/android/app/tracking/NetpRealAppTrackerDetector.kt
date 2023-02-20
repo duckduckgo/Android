@@ -58,7 +58,8 @@ class NetpRealAppTrackerDetector constructor(
             return null
         }
 
-        val packageId = appNameResolver.getPackageIdForUid(uid)
+        // `null` package ID means unknown app, return null to not block
+        val packageId = appNameResolver.getPackageIdForUid(uid) ?: return null
 
         if (VpnExclusionList.isDdgApp(packageId) || packageId.isInExclusionList()) {
             logcat { "shouldAllowDomain: $packageId is excluded, allowing $domain" }
@@ -116,7 +117,7 @@ class NetpRealAppTrackerDetector constructor(
         }
 
         return appTrackerRepository.getManualAppExclusionList().firstOrNull { it.packageId == this }?.let {
-            // if app is defined as "unprotected" by the user, then it exclusion list
+            // if app is defined as "unprotected" by the user, then it is in exclusion list
             return !it.isProtected
             // else, app is in the exclusion list
         } ?: appTrackerRepository.getAppExclusionList().map { it.packageId }.contains(this)
