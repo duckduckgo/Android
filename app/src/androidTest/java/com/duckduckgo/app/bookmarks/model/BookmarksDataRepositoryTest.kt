@@ -64,53 +64,6 @@ class BookmarksDataRepositoryTest {
         repository = RealSavedSitesRepository(syncEntitiesDao, syncRelationsDao)
     }
 
-    @Test
-    fun whenInsertBookmarkByTitleAndUrlThenPopulateDB() = runTest {
-        repository.insertBookmark(title = bookmark.title, url = bookmark.url)
-        assertEquals(listOf(bookmarkEntity), repository.getBookmarks().first())
-    }
-
-    @Test
-    fun whenUpdateBookmarkThenUpdateBookmarkInDB() = runTest {
-        repository.insert(bookmark)
-
-        val updatedBookmark = SavedSite.Bookmark(id = bookmark.id, title = "new title", url = "example.com", parentId = "folder2")
-
-        repository.update(updatedBookmark)
-        val bookmarkList = repository.getBookmarks().first()
-
-        assertTrue(bookmarkList.size == 1)
-        assertEquals(updatedBookmark, bookmarkList.first())
-    }
-
-    @Test
-    fun whenDeleteBookmarkThenRemoveBookmarkFromDB() = runTest {
-        repository.insert(bookmark)
-        repository.delete(bookmark)
-        assertFalse(repository.hasBookmarks())
-    }
-
-    @Test
-    fun whenGetBookmarkFoldersByParentIdThenReturnBookmarkFoldersForParentId() = runTest {
-        val folder = BookmarkFolder(id = "folder1", name = "name", parentId = "folder2")
-        repository.insert(folder)
-
-        val folders = repository.getFolder("folder1")
-
-        assertEquals(folder, folders)
-    }
-
-    @Test
-    fun whenGetBookmarksByParentIdThenReturnBookmarksForParentId() = runTest {
-        val bookmark = SavedSite.Bookmark(id = "folder1", title = "name", url = "foo.com", parentId = "folder2")
-        repository.insert(bookmark)
-        repository.getFolderContent("folder2").test {
-            val result = awaitItem()
-            assertTrue(result.first.size == 1)
-            assertTrue(result.second.isEmpty())
-            assertEquals(result.first.first(), bookmark)
-        }
-    }
 
     // @Test
     // fun whenGetBookmarkFolderBranchThenReturnFoldersAndBookmarksForBranch() = runTest {

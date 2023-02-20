@@ -359,6 +359,65 @@ class SavedSitesRepositoryTest {
         Assert.assertEquals(updatedBookmark.id, bookmarkUpdated.id)
     }
 
+    @Test
+    fun whenDeleteBookmarkThenRemoveBookmarkFromDB() = runTest {
+        givenNoBookmarksStored()
+
+        val bookmark = repository.insert(Bookmark(id = "bookmark1", title = "title", url = "foo.com", parentId = Relation.BOOMARKS_ROOT))
+        repository.delete(bookmark)
+
+        Assert.assertFalse(repository.hasBookmarks())
+    }
+
+    @Test
+    fun whenBookmarkAddedToRootThenGetFolderReturnsRootFolder() = runTest {
+        val bookmark = repository.insertBookmark(title = "name", url = "foo.com")
+        repository.getFolderContent(bookmark.parentId).test {
+            val result = awaitItem()
+            Assert.assertTrue(result.first.size == 1)
+            Assert.assertTrue(result.first.first().id == bookmark.id)
+            Assert.assertTrue(result.second.size == 1)
+            Assert.assertEquals(result.second.first().id, Relation.BOOMARKS_ROOT)
+        }
+    }
+
+    @Test
+    fun whenGetBookmarkFoldersByParentIdThenReturnBookmarkFoldersForParentId() = runTest {
+        val folder = repository.insert(BookmarkFolder(id = "folder1", name = "name", parentId = "folder2"))
+        val folderInserted = repository.getFolder(folder.id)
+
+        Assert.assertEquals(folder, folderInserted)
+    }
+
+    @Test
+    fun whenBookmarkAddedToFolderThenGetFolderReturnsFolder() = runTest {
+        givenNoBookmarksStored()
+
+        repository.insertBookmark(title = "root", url = "foo.com")
+        val folder = repository.insert(BookmarkFolder(id = "folder2", name = "folder2", parentId = Relation.BOOMARKS_ROOT))
+
+        val bookmarkOne = repository.insertBookmark(title = "one", url = "fooone.com")
+        repository.update(bookmarkOne.copy(parentId = folder.id))
+        val bookmarkTwo = repository.insertBookmark(title = "two", url = "footwo.com")
+        repository.update(bookmarkTwo.copy(parentId = folder.id))
+
+        repository.getFolderContent(folder.id).test {
+            val result = awaitItem()
+            Assert.assertTrue(result.first.size == 2)
+            Assert.assertTrue(result.second.size == 1)
+            Assert.assertEquals(result.second.first().id, folder.id)
+        }
+    }
+
+    @Test
+    fun whenGetBookmarkFolderBranchThenReturnFoldersAndBookmarksForBranch() = runTest {
+        // add new data structure with folders, bookmarks and relations
+        // insertFolderBranch uses this data
+        // getFolderBranch should return not just one level of folder, but all of them
+
+    }
+
+
     @After
     fun after() {
         db.close()

@@ -31,12 +31,13 @@ import java.io.Serializable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import java.util.*
 
 interface SavedSitesRepository {
 
     // getFavorites and getFolderContent will be the same once we can merge Favorites / Bookmarks
 
-    suspend fun getFolderContent(parentId: String): Flow<Pair<List<Bookmark>, List<BookmarkFolder>>>
+    suspend fun getFolderContent(folderId: String): Flow<Pair<List<Bookmark>, List<BookmarkFolder>>>
 
     suspend fun getFlatFolderStructure(
         selectedFolderId: Long,
@@ -81,7 +82,7 @@ interface SavedSitesRepository {
 
     fun updateWithPosition(favorites: List<Favorite>)
 
-    fun insert(folder: BookmarkFolder)
+    fun insert(folder: BookmarkFolder): BookmarkFolder
     fun update(folder: BookmarkFolder)
 
     fun delete(folder: BookmarkFolder)
@@ -100,16 +101,17 @@ class RealSavedSitesRepository(
     private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
 ) : SavedSitesRepository {
 
-    override suspend fun getFolderContent(parentId: String): Flow<Pair<List<Bookmark>, List<BookmarkFolder>>> {
+    override suspend fun getFolderContent(folderId: String): Flow<Pair<List<Bookmark>, List<BookmarkFolder>>> {
         val bookmarks = mutableListOf<Bookmark>()
         val folders = mutableListOf<BookmarkFolder>()
+        folders.add(getFolder(folderId))
 
-        return syncRelationsDao.relationById(parentId).map { entities ->
+        return syncRelationsDao.relationById(folderId).map { entities ->
             entities.forEach { entity ->
                 if (entity.type == FOLDER) {
-                    folders.add(entity.mapToBookmarkFolder(parentId))
+                    folders.add(entity.mapToBookmarkFolder(folderId))
                 } else {
-                    bookmarks.add(entity.mapToBookmark(parentId))
+                    bookmarks.add(entity.mapToBookmark(folderId))
                 }
             }
             Pair(bookmarks, folders)
@@ -126,6 +128,7 @@ class RealSavedSitesRepository(
     }
 
     override suspend fun insertFolderBranch(branchToInsert: BookmarkFolderBranch) {
+
     }
 
     override fun getFavorites(): Flow<List<Favorite>> {
@@ -263,10 +266,11 @@ class RealSavedSitesRepository(
         }
     }
 
-    override fun insert(folder: BookmarkFolder) {
-        val entity = Entity(entityId = folder.id, title = folder.name, url = "", type = FOLDER)
+    override fun insert(folder: BookmarkFolder): BookmarkFolder {
+        val entity = Entity(title = folder.name, url = "", type = FOLDER)
         syncEntitiesDao.insert(entity)
-        syncRelationsDao.insert(Relation(relationId = folder.parentId, entityId = entity.entityId))
+        syncRelationsDao.insert(Relation(relationId = folder.id, entityId = entity.entityId))
+        return getFolder(entity.entityId)
     }
 
     override fun update(folder: BookmarkFolder) {
@@ -339,7 +343,7 @@ sealed class SavedSite(
         override val id: String,
         override val title: String,
         override val url: String,
-        val parentId: String,
+        val parentId: String = Relation.BOOMARKS_ROOT,
     ) : SavedSite(id, title, url)
 }
 
