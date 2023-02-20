@@ -37,6 +37,8 @@
     <string name="useSavedLoginDialogTitle">Utilizar um início de sessão guardado?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Dados de início de sessão para %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Dados de início de sessão para o site</string>
+    <string name="useSavedLoginDialogGroupThisWebsite">Deste site</string>
+    <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">De %1$s</string>
 
     <string name="updateLoginDialogTitle">Atualizar palavra-passe?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Atualizar palavra-passe</string>

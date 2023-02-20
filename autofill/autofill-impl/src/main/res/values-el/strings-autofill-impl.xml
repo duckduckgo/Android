@@ -37,6 +37,8 @@
     <string name="useSavedLoginDialogTitle">Χρήση αποθηκευμένων στοιχείων σύνδεσης;</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Σύνδεση για %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Σύνδεση για τον ιστότοπο</string>
+    <string name="useSavedLoginDialogGroupThisWebsite">Από αυτόν τον ιστότοπο</string>
+    <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Από %1$s</string>
 
     <string name="updateLoginDialogTitle">Ενημέρωση κωδικού πρόσβασης;</string>
     <string name="updateLoginDialogButtonUpdatePassword">Ενημέρωση κωδικού πρόσβασης</string>
