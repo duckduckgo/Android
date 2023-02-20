@@ -37,6 +37,8 @@
     <string name="useSavedLoginDialogTitle">Да се използват ли запазените данни за вход?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Вход за %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Вход за сайта</string>
+    <string name="useSavedLoginDialogGroupThisWebsite">От този уебсайт</string>
+    <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">От %1$s</string>
 
     <string name="updateLoginDialogTitle">Актуализиране на паролата?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Актуализиране на паролата</string>

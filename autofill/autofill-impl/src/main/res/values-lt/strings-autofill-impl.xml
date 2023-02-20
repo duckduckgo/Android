@@ -37,6 +37,8 @@
     <string name="useSavedLoginDialogTitle">Naudoti išsaugotą prisijungimą?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Prisijungimas prie %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Prisijungimas prie svetainės</string>
+    <string name="useSavedLoginDialogGroupThisWebsite">Iš šios svetainės</string>
+    <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Iš %1$s</string>
 
     <string name="updateLoginDialogTitle">Atnaujinti slaptažodį?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Atnaujinti slaptažodį</string>

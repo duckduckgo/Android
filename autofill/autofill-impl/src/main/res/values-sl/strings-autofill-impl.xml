@@ -37,6 +37,8 @@
     <string name="useSavedLoginDialogTitle">Želite uporabiti shranjene podatke za prijavo?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Prijava za %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Prijava za spletno mesto</string>
+    <string name="useSavedLoginDialogGroupThisWebsite">S tega spletnega mesta</string>
+    <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">S spletnega mesta %1$s</string>
 
     <string name="updateLoginDialogTitle">Želite posodobiti geslo?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Posodobitev gesla</string>
