@@ -44,4 +44,6 @@ enum class NetworkProtectionPixelNames(
     NETP_WG_ERROR_INVALID_STATE_DAILY("m_netp_ev_wireguard_error_invalid_state_d", enqueue = true),
     NETP_WG_ERROR_CANT_START_WG_BACKEND("m_netp_ev_wireguard_error_cannot_start_wireguard_backend_c", enqueue = true),
     NETP_WG_ERROR_CANT_START_WG_BACKEND_DAILY("m_netp_ev_wireguard_error_cannot_start_wireguard_backend_d", enqueue = true),
+    NETP_WG_ERROR_FAILED_TO_LOAD_WG_LIBRARY("m_netp_ev_wireguard_error_unable_to_load_wireguard_library_c", enqueue = true),
+    NETP_WG_ERROR_FAILED_TO_LOAD_WG_LIBRARY_DAILY("m_netp_ev_wireguard_error_unable_to_load_wireguard_library_d", enqueue = true),
 }

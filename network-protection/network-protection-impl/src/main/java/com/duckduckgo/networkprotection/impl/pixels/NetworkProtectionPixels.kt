@@ -31,6 +31,8 @@ import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_VPN_RECONNECT_FAILED_DAILY
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_WG_ERROR_CANT_START_WG_BACKEND
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_WG_ERROR_CANT_START_WG_BACKEND_DAILY
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_WG_ERROR_FAILED_TO_LOAD_WG_LIBRARY
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_WG_ERROR_FAILED_TO_LOAD_WG_LIBRARY_DAILY
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_WG_ERROR_INVALID_STATE
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_WG_ERROR_INVALID_STATE_DAILY
 import com.squareup.anvil.annotations.ContributesBinding
@@ -81,6 +83,13 @@ interface NetworkProtectionPixels {
      * count -> fire a pixel on every call
      */
     fun reportVpnReconnectFailed()
+
+    /**
+     * This fun will fire two pixels
+     * daily -> fire only once a day no matter how many times we call this fun
+     * count -> fire a pixel on every call
+     */
+    fun reportWireguardLibraryLoadFailed()
 }
 
 @ContributesBinding(AppScope::class)
@@ -124,6 +133,11 @@ class RealNetworkProtectionPixel @Inject constructor(
     override fun reportVpnReconnectFailed() {
         tryToFireDailyPixel(NETP_VPN_RECONNECT_FAILED_DAILY)
         firePixel(NETP_VPN_RECONNECT_FAILED)
+    }
+
+    override fun reportWireguardLibraryLoadFailed() {
+        tryToFireDailyPixel(NETP_WG_ERROR_FAILED_TO_LOAD_WG_LIBRARY_DAILY)
+        firePixel(NETP_WG_ERROR_FAILED_TO_LOAD_WG_LIBRARY)
     }
 
     private fun firePixel(

@@ -25,6 +25,8 @@ import androidx.annotation.RequiresApi
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.library.loader.LibraryLoader
 import com.duckduckgo.mobile.android.app.tracking.AppTrackerDetector
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
+import dagger.Lazy
 import dagger.SingleInstanceIn
 import java.net.InetSocketAddress
 import javax.inject.Inject
@@ -37,12 +39,15 @@ import logcat.logcat
 class GoBackend @Inject constructor(
     private val context: Context,
     private val appTrackerDetector: AppTrackerDetector,
+    pixels: Lazy<NetworkProtectionPixels>,
 ) {
     init {
         try {
             logcat { "Loading wireguard-go library" }
             LibraryLoader.loadLibrary(context, "wg-go")
         } catch (ignored: Throwable) {
+            pixels.get().reportWireguardLibraryLoadFailed()
+            Thread.sleep(100)
             logcat(LogPriority.ERROR) { "Error loading wireguard-go library: ${ignored.asLog()}" }
             exitProcess(1)
         }

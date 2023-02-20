@@ -107,4 +107,13 @@ class RealNetworkProtectionPixelTest {
         verify(pixel).enqueueFire("m_netp_ev_vpn_reconnect_failed_d")
         verify(pixel, times(2)).enqueueFire("m_netp_ev_vpn_reconnect_failed_c")
     }
+
+    @Test
+    fun whenReportWireguardLibraryLoadFailedCalledTwiceThenFireCountPixelTwiceAndDailyPixelOnce() {
+        testee.reportWireguardLibraryLoadFailed()
+        testee.reportWireguardLibraryLoadFailed()
+
+        verify(pixel).enqueueFire("m_netp_ev_wireguard_error_unable_to_load_wireguard_library_d")
+        verify(pixel, times(2)).enqueueFire("m_netp_ev_wireguard_error_unable_to_load_wireguard_library_c")
+    }
 }

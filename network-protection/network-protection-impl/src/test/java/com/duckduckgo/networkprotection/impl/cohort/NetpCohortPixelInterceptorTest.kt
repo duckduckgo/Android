@@ -72,6 +72,30 @@ class NetpCohortPixelInterceptorTest {
         Assert.assertEquals(null, result.body)
     }
 
+    @Test
+    fun whenCohortLocalDateIsNotSetThenSendExemptedBackendApiErrorNetpPixelUrl() {
+        whenever(netpCohortStore.cohortLocalDate).thenReturn(null)
+        val pixelUrl = String.format(PIXEL_TEMPLATE, "m_netp_ev_backend_api_error_device_registration_failed_c")
+
+        val result = testee.intercept(FakeChain(pixelUrl))
+
+        Assert.assertEquals(pixelUrl, result.request.url.toString())
+        Assert.assertEquals("", result.message)
+        Assert.assertEquals(null, result.body)
+    }
+
+    @Test
+    fun whenCohortLocalDateIsNotSetThenSendExemptedWgErrorNetpPixelUrl() {
+        whenever(netpCohortStore.cohortLocalDate).thenReturn(null)
+        val pixelUrl = String.format(PIXEL_TEMPLATE, "m_netp_ev_wireguard_error_unable_to_load_wireguard_library_d")
+
+        val result = testee.intercept(FakeChain(pixelUrl))
+
+        Assert.assertEquals(pixelUrl, result.request.url.toString())
+        Assert.assertEquals("", result.message)
+        Assert.assertEquals(null, result.body)
+    }
+
     companion object {
         private const val PIXEL_TEMPLATE = "https://improving.duckduckgo.com/t/%s_android_phone?appVersion=5.135.0&test=1"
     }
