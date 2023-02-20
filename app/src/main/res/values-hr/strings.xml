@@ -683,9 +683,6 @@
     <string name="permissionsPerWebsiteAskDisabledSetting">Opcija \"Pitaj\" onemogućena je za sve web lokacije</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s dopuštenje za %2$s</string>
 
-    <!-- Autofill -->
-    <string name="autofillSettingsDisplayName">Automatsko popunjavanje</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Saznaj kad su preuzimanja spremna</string>
     <string name="downloadsNotifyMeSubtitle">Primi obavijest kad se preuzimanja završe.</string>

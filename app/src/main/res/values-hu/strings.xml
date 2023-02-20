@@ -675,9 +675,6 @@
     <string name="permissionsPerWebsiteAskDisabledSetting">A „Rákérdezés” minden webhelyen letiltva</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s engedély a(z) %2$s számára</string>
 
-    <!-- Autofill -->
-    <string name="autofillSettingsDisplayName">Automatikus kitöltés</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Készen álló letöltések jelzése</string>
     <string name="downloadsNotifyMeSubtitle">Értesítés a letöltések befejeződésekor.</string>

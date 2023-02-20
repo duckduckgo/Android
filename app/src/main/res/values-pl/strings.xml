@@ -683,9 +683,6 @@
     <string name="permissionsPerWebsiteAskDisabledSetting">Wyłączono opcję „Pytaj” dla wszystkich witryn</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Pozwolenie dla witryny %2$s na dostęp do urządzenia: %1$s</string>
 
-    <!-- Autofill -->
-    <string name="autofillSettingsDisplayName">Autouzupełnianie</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Dowiedz się, kiedy pliki do pobrania będą gotowe</string>
     <string name="downloadsNotifyMeSubtitle">Otrzymuj powiadomienie po zakończeniu pobierania.</string>
