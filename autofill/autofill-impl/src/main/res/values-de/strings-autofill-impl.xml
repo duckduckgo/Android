@@ -17,7 +17,7 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="managementScreenTitle">Anmeldedaten automatisch ausfüllen</string>
+    <string name="autofillManagementScreenTitle">Anmeldedaten automatisch ausfüllen</string>
 
     <string name="managementLockedModeText">Autovervollständigen freischalten</string>
 

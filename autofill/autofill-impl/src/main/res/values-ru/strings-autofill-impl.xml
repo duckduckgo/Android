@@ -17,7 +17,7 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="managementScreenTitle">Логины для автозаполнения</string>
+    <string name="autofillManagementScreenTitle">Логины для автозаполнения</string>
 
     <string name="managementLockedModeText">Разблокировать автозаполнение</string>
 

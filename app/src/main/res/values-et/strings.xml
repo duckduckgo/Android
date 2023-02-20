@@ -675,9 +675,6 @@
     <string name="permissionsPerWebsiteAskDisabledSetting">„Küsi“ on kõigil saitidel keelatud</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Luba %1$s saidile %2$s</string>
 
-    <!-- Autofill -->
-    <string name="autofillSettingsDisplayName">Automaatne täitmine</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Teata, kui allalaadimised valmis saavad</string>
     <string name="downloadsNotifyMeSubtitle">Kui allalaadimine on lõpule jõudnud, saad teavituse.</string>

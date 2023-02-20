@@ -675,9 +675,6 @@
     <string name="permissionsPerWebsiteAskDisabledSetting">Η επιλογή «Να γίνεται ερώτηση» είναι απενεργοποιημένη για όλους τους ιστότοπους</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s άδεια για %2$s</string>
 
-    <!-- Autofill -->
-    <string name="autofillSettingsDisplayName">Αυτόματη συμπλήρωση</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Ανακαλύψτε πότε είναι έτοιμες οι λήψεις</string>
     <string name="downloadsNotifyMeSubtitle">Λάβετε ειδοποίηση όταν ολοκληρωθούν οι λήψεις.</string>

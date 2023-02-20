@@ -675,9 +675,6 @@
     <string name="permissionsPerWebsiteAskDisabledSetting">«Spør» er deaktivert for alle nettsteder</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$stillatelse for %2$s</string>
 
-    <!-- Autofill -->
-    <string name="autofillSettingsDisplayName">Autofyll</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Finn ut når nedlastinger er klare</string>
     <string name="downloadsNotifyMeSubtitle">Få et varsel når nedlastinger er fullført.</string>

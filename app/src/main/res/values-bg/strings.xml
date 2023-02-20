@@ -675,9 +675,6 @@
     <string name="permissionsPerWebsiteAskDisabledSetting">Опцията „Питай“ е деактивирана за всички сайтове</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s разрешение за %2$s</string>
 
-    <!-- Autofill -->
-    <string name="autofillSettingsDisplayName">Автоматично попълване</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Разберете кога изтеглянето е завършено</string>
     <string name="downloadsNotifyMeSubtitle">Получавайте известие, когато изтеглянето завърши.</string>
