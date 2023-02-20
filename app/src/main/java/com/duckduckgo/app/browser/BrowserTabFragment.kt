@@ -1191,7 +1191,7 @@ class BrowserTabFragment :
         val binding = ContentSiteLocationPermissionDialogBinding.inflate(layoutInflater)
 
         val title = domain.websiteFromGeoLocationsApiOrigin()
-        binding.sitePermissionDialogTitle.text = title
+        binding.sitePermissionDialogTitle.text = getString(R.string.preciseLocationSiteDialogTitle, title)
         binding.sitePermissionDialogSubtitle.text = if (title == DDG_DOMAIN) {
             getString(R.string.preciseLocationDDGDialogSubtitle)
         } else {
