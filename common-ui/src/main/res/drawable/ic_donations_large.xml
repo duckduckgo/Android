@@ -1,0 +1,78 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="101dp"
+    android:height="100dp"
+    android:viewportWidth="101"
+    android:viewportHeight="100">
+  <path
+      android:pathData="M87.5,50H63.5C61.84,50 60.5,48.66 60.5,47C60.5,45.34 61.84,44 63.5,44H87.5C89.16,44 90.5,45.34 90.5,47C90.5,48.66 89.16,50 87.5,50Z"
+      android:strokeAlpha="0.3"
+      android:fillColor="#ABABAB"
+      android:fillType="evenOdd"
+      android:fillAlpha="0.3"/>
+  <path
+      android:pathData="M84.5,82H66.5C64.29,82 62.5,80.21 62.5,78V50H88.5V78C88.5,80.21 86.71,82 84.5,82Z"
+      android:strokeAlpha="0.3"
+      android:fillColor="#ABABAB"
+      android:fillType="evenOdd"
+      android:fillAlpha="0.3"/>
+  <path
+      android:pathData="M37.5,54H13.5C11.84,54 10.5,52.66 10.5,51C10.5,49.34 11.84,48 13.5,48H37.5C39.16,48 40.5,49.34 40.5,51C40.5,52.66 39.16,54 37.5,54Z"
+      android:strokeAlpha="0.3"
+      android:fillColor="#ABABAB"
+      android:fillType="evenOdd"
+      android:fillAlpha="0.3"/>
+  <path
+      android:pathData="M34.5,82H16.5C14.29,82 12.5,80.21 12.5,78V54H38.5V78C38.5,80.21 36.71,82 34.5,82Z"
+      android:strokeAlpha="0.3"
+      android:fillColor="#ABABAB"
+      android:fillType="evenOdd"
+      android:fillAlpha="0.3"/>
+  <path
+      android:pathData="M81.85,18.83C82.22,19.57 81.92,20.47 81.18,20.84L75.17,23.84C74.43,24.21 73.53,23.91 73.16,23.17C72.79,22.43 73.09,21.53 73.83,21.16L79.84,18.16C80.58,17.79 81.48,18.09 81.85,18.83Z"
+      android:strokeAlpha="0.6"
+      android:fillColor="#ABABAB"
+      android:fillType="evenOdd"
+      android:fillAlpha="0.6"/>
+  <path
+      android:pathData="M76,31C76,30.17 76.68,29.5 77.5,29.5H84.51C85.34,29.5 86.01,30.17 86.01,31C86.01,31.83 85.34,32.5 84.51,32.5H77.5C76.68,32.5 76,31.83 76,31Z"
+      android:strokeAlpha="0.6"
+      android:fillColor="#ABABAB"
+      android:fillType="evenOdd"
+      android:fillAlpha="0.6"/>
+  <path
+      android:pathData="M20.15,18.83C20.52,18.09 21.42,17.79 22.16,18.16L28.17,21.16C28.91,21.53 29.21,22.43 28.84,23.17C28.47,23.91 27.57,24.21 26.83,23.84L20.82,20.84C20.08,20.47 19.78,19.57 20.15,18.83Z"
+      android:strokeAlpha="0.6"
+      android:fillColor="#ABABAB"
+      android:fillType="evenOdd"
+      android:fillAlpha="0.6"/>
+  <path
+      android:pathData="M15.99,31C15.99,30.17 16.66,29.5 17.49,29.5H24.5C25.32,29.5 26,30.17 26,31C26,31.83 25.32,32.5 24.5,32.5H17.49C16.66,32.5 15.99,31.83 15.99,31Z"
+      android:strokeAlpha="0.6"
+      android:fillColor="#ABABAB"
+      android:fillType="evenOdd"
+      android:fillAlpha="0.6"/>
+  <path
+      android:pathData="M77.5,48H23.5C21.84,48 20.5,46.66 20.5,45V43C20.5,41.34 21.84,40 23.5,40H77.5C79.16,40 80.5,41.34 80.5,43V45C80.5,46.66 79.16,48 77.5,48Z"
+      android:fillColor="#7BD66D"
+      android:fillType="evenOdd"/>
+  <path
+      android:pathData="M72.5,82H28.5C26.29,82 24.5,80.21 24.5,78V48H76.5V78C76.5,80.21 74.71,82 72.5,82Z"
+      android:fillColor="#7BD66D"
+      android:fillType="evenOdd"/>
+  <path
+      android:pathData="M24.5,54H76.5V48H24.5V54Z"
+      android:fillColor="#63C853"
+      android:fillType="evenOdd"/>
+  <path
+      android:pathData="M60.5,36H56.5V32C56.5,29.79 58.29,28 60.5,28C62.71,28 64.5,29.79 64.5,32C64.5,34.21 62.71,36 60.5,36ZM44.5,36H40.5C38.29,36 36.5,34.21 36.5,32C36.5,29.79 38.29,28 40.5,28C42.71,28 44.5,29.79 44.5,32V36ZM60.5,24C56.08,24 52.5,27.58 52.5,32V36H48.5V32C48.5,27.58 44.92,24 40.5,24C36.08,24 32.5,27.58 32.5,32C32.5,36.42 36.08,40 40.5,40H44.5H46.5V82H54.5V40H56.5H60.5C64.92,40 68.5,36.42 68.5,32C68.5,27.58 64.92,24 60.5,24Z"
+      android:fillColor="#399F29"
+      android:fillType="evenOdd"/>
+  <path
+      android:pathData="M30.5,54H34.5V40H30.5V54Z"
+      android:fillColor="#399F29"
+      android:fillType="evenOdd"/>
+  <path
+      android:pathData="M35.5,66H29.5C28.95,66 28.5,65.55 28.5,65V55C28.5,54.45 28.95,54 29.5,54H35.5C36.05,54 36.5,54.45 36.5,55V65C36.5,65.55 36.05,66 35.5,66Z"
+      android:fillColor="#ffffff"
+      android:fillType="evenOdd"/>
+</vector>

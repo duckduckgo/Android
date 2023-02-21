@@ -1,0 +1,18 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="16dp"
+    android:height="16dp"
+    android:viewportWidth="16"
+    android:viewportHeight="16">
+  <path
+      android:pathData="M7.5,1.5H1.5V7.5H7.5V1.5Z"
+      android:fillColor="?attr/daxColorPrimaryIcon"/>
+  <path
+      android:pathData="M7.5,8.5H1.5V14.5H7.5V8.5Z"
+      android:fillColor="?attr/daxColorPrimaryIcon"/>
+  <path
+      android:pathData="M8.5,1.5H14.5V7.5H8.5V1.5Z"
+      android:fillColor="?attr/daxColorPrimaryIcon"/>
+  <path
+      android:pathData="M14.5,8.5H8.5V14.5H14.5V8.5Z"
+      android:fillColor="?attr/daxColorPrimaryIcon"/>
+</vector>

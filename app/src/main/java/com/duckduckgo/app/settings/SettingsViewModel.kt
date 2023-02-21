@@ -50,6 +50,9 @@ import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
+import com.duckduckgo.windows.api.WindowsWaitlist
+import com.duckduckgo.windows.api.WindowsWaitlistFeature
+import com.duckduckgo.windows.api.WindowsWaitlistState
 import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
@@ -79,6 +82,8 @@ class SettingsViewModel @Inject constructor(
     private val autofillCapabilityChecker: AutofillCapabilityChecker,
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
     private val autoconsent: Autoconsent,
+    private val windowsWaitlist: WindowsWaitlist,
+    private val windowsFeature: WindowsWaitlistFeature,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private var deviceShieldStatePollingJob: Job? = null
@@ -101,6 +106,7 @@ class SettingsViewModel @Inject constructor(
         val showAutofill: Boolean = false,
         val autoconsentEnabled: Boolean = false,
         @StringRes val notificationsSettingSubtitleId: Int = R.string.settingsSubtitleNotificationsDisabled,
+        val windowsWaitlistState: WindowsWaitlistState? = null,
     )
 
     data class AutomaticallyClearData(
@@ -133,6 +139,7 @@ class SettingsViewModel @Inject constructor(
         data class ShowClearWhenDialog(val option: ClearWhenOption) : Command()
         object LaunchMacOs : Command()
         object LaunchNotificationsSettings : Command()
+        object LaunchWindows : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
@@ -171,6 +178,7 @@ class SettingsViewModel @Inject constructor(
                     showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen(),
                     autoconsentEnabled = autoconsent.isSettingEnabled(),
                     notificationsSettingSubtitleId = getNotificationsSettingSubtitleId(notificationsEnabled),
+                    windowsWaitlistState = windowsSettingState(),
                 ),
             )
         }
@@ -285,6 +293,10 @@ class SettingsViewModel @Inject constructor(
 
     fun onMacOsSettingClicked() {
         viewModelScope.launch { command.send(Command.LaunchMacOs) }
+    }
+
+    fun windowsSettingClicked() {
+        viewModelScope.launch { command.send(Command.LaunchWindows) }
     }
 
     fun onDefaultBrowserToggled(enabled: Boolean) {
@@ -405,6 +417,11 @@ class SettingsViewModel @Inject constructor(
                 ),
             )
         }
+    }
+
+    private fun windowsSettingState(): WindowsWaitlistState? {
+        if (!windowsFeature.self().isEnabled()) return null
+        return windowsWaitlist.getWaitlistState()
     }
 
     fun onThemeSelected(selectedTheme: DuckDuckGoTheme) {
