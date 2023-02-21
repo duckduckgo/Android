@@ -176,11 +176,11 @@ sealed class DaxDialogCta(
         val trackers: List<Entity>,
         val host: String,
     ) : DaxDialogCta(
-        CtaId.DAX_DIALOG_TRACKERS_FOUND_EXPERIMENT,
+        CtaId.DAX_DIALOG_TRACKERS_FOUND,
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
-        Pixel.PixelValues.DAX_TRACKERS_BLOCKED_EXPERIMENT_CTA,
+        Pixel.PixelValues.DAX_TRACKERS_BLOCKED_CTA,
         onboardingStore,
         appInstallStore,
     ) {
