@@ -120,8 +120,7 @@ class CtaViewModelTest {
     @Mock
     private lateinit var mockAppTheme: AppTheme
 
-    @Mock
-    private lateinit var mockVariantManager: VariantManager
+    private var mockVariantManager: VariantManager = mock()
 
     private val requiredDaxOnboardingCtas: List<CtaId> = listOf(
         CtaId.DAX_INTRO,
@@ -147,6 +146,7 @@ class CtaViewModelTest {
         whenever(mockUserWhitelistDao.contains(any())).thenReturn(false)
         whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(db.dismissedCtaDao().dismissedCtas())
         whenever(mockTabRepository.flowTabs).thenReturn(db.tabsDao().flowTabs())
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "za" })
 
         testee = CtaViewModel(
             appInstallStore = mockAppInstallStore,
@@ -461,6 +461,44 @@ class CtaViewModelTest {
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
 
         assertTrue(value is DaxDialogCta.DaxTrackersBlockedCta)
+    }
+
+    @Test
+    fun givenExperimentVariantWhenRefreshCtaWhileBrowsingThenReturnTrackersBlockedCta() = runTest {
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zb" })
+        givenDaxOnboardingActive()
+        val trackingEvent = TrackingEvent(
+            documentUrl = "test.com",
+            trackerUrl = "test.com",
+            categories = null,
+            entity = TestEntity("test", "test", 9.0),
+            surrogateId = null,
+            status = TrackerStatus.BLOCKED,
+            type = TrackerType.OTHER,
+        )
+        val site = site(url = "http://www.cnn.com", trackerCount = 1, events = listOf(trackingEvent))
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
+
+        assertTrue(value is DaxDialogCta.DaxTrackersBlockedExperimentCta)
+    }
+
+    @Test
+    fun givenExperimentVariantWhenRefreshCtaWhileBrowsingAndTrackersAreNotMajorThenReturnTrackersBlockedCta() = runTest {
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zb" })
+        givenDaxOnboardingActive()
+        val trackingEvent = TrackingEvent(
+            documentUrl = "test.com",
+            trackerUrl = "test.com",
+            categories = null,
+            entity = TestEntity("test", "test", 0.123),
+            surrogateId = null,
+            status = TrackerStatus.BLOCKED,
+            type = TrackerType.OTHER,
+        )
+        val site = site(url = "http://www.cnn.com", trackerCount = 1, events = listOf(trackingEvent))
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
+
+        assertTrue(value is DaxDialogCta.DaxTrackersBlockedExperimentCta)
     }
 
     @Test

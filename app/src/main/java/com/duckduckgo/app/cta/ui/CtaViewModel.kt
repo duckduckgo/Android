@@ -36,7 +36,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature
+import com.duckduckgo.app.statistics.isOptimiseOnboardingExperimentEnabled
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
@@ -296,7 +296,7 @@ class CtaViewModel @Inject constructor(
 
             // Trackers blocked
             if (!daxDialogTrackersFoundShown() && !isSerpUrl(it.url) && it.orderedTrackerBlockedEntities().isNotEmpty()) {
-                return if (variantManager.getVariant().hasFeature(VariantFeature.OptimiseOnboardingExperiment)) {
+                return if (variantManager.isOptimiseOnboardingExperimentEnabled()) {
                     DaxDialogCta.DaxTrackersBlockedExperimentCta(onboardingStore, appInstallStore, it.orderedTrackerBlockedEntities(), host)
                 } else {
                     DaxDialogCta.DaxTrackersBlockedCta(onboardingStore, appInstallStore, it.orderedTrackerBlockedEntities(), host)
