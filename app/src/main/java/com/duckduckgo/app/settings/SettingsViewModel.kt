@@ -51,6 +51,7 @@ import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.windows.api.WindowsWaitlist
+import com.duckduckgo.windows.api.WindowsWaitlistFeature
 import com.duckduckgo.windows.api.WindowsWaitlistState
 import javax.inject.Inject
 import kotlinx.coroutines.Job
@@ -82,6 +83,7 @@ class SettingsViewModel @Inject constructor(
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
     private val autoconsent: Autoconsent,
     private val windowsWaitlist: WindowsWaitlist,
+    private val windowsFeature: WindowsWaitlistFeature,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private var deviceShieldStatePollingJob: Job? = null
@@ -104,7 +106,7 @@ class SettingsViewModel @Inject constructor(
         val showAutofill: Boolean = false,
         val autoconsentEnabled: Boolean = false,
         @StringRes val notificationsSettingSubtitleId: Int = R.string.settingsSubtitleNotificationsDisabled,
-        val windowsWaitlistState: WindowsWaitlistState = WindowsWaitlistState.NotJoinedQueue,
+        val windowsWaitlistState: WindowsWaitlistState? = null,
     )
 
     data class AutomaticallyClearData(
@@ -136,8 +138,8 @@ class SettingsViewModel @Inject constructor(
         data class ShowClearWhatDialog(val option: ClearWhatOption) : Command()
         data class ShowClearWhenDialog(val option: ClearWhenOption) : Command()
         object LaunchMacOs : Command()
-        object LaunchWindows : Command()
         object LaunchNotificationsSettings : Command()
+        object LaunchWindows : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
@@ -175,8 +177,8 @@ class SettingsViewModel @Inject constructor(
                     emailAddress = emailManager.getEmailAddress(),
                     showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen(),
                     autoconsentEnabled = autoconsent.isSettingEnabled(),
-                    windowsWaitlistState = windowsWaitlist.getWaitlistState(),
                     notificationsSettingSubtitleId = getNotificationsSettingSubtitleId(notificationsEnabled),
+                    windowsWaitlistState = windowsSettingState(),
                 ),
             )
         }
@@ -415,6 +417,11 @@ class SettingsViewModel @Inject constructor(
                 ),
             )
         }
+    }
+
+    private fun windowsSettingState(): WindowsWaitlistState? {
+        if (!windowsFeature.self().isEnabled()) return null
+        return windowsWaitlist.getWaitlistState()
     }
 
     fun onThemeSelected(selectedTheme: DuckDuckGoTheme) {

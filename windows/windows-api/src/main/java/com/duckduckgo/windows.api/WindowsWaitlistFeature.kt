@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,11 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-}
+package com.duckduckgo.windows.api
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+import com.duckduckgo.feature.toggles.api.Toggle
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-}
-
-android {
-    namespace 'com.duckduckgo.windows.api'
-}
-
-dependencies {
-    implementation Kotlin.stdlib.jdk7
-    api project(path: ':feature-toggles-api')
+interface WindowsWaitlistFeature {
+    @Toggle.DefaultValue(false)
+    fun self(): Toggle
 }

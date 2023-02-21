@@ -22,6 +22,7 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -31,6 +32,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.macos_impl.MacOsViewModel.Command
 import com.duckduckgo.macos_impl.MacOsViewModel.Command.GoToWindowsClientSettings
 import com.duckduckgo.macos_impl.MacOsViewModel.Command.ShareLink
+import com.duckduckgo.macos_impl.MacOsViewModel.ViewState
 import com.duckduckgo.macos_impl.databinding.ActivityMacosBinding
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.windows.api.WindowsSettingsNav
@@ -53,12 +55,18 @@ class MacOsActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { render(it) }
+            .launchIn(lifecycleScope)
         viewModel.commands.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { executeCommand(it) }
             .launchIn(lifecycleScope)
 
         setContentView(binding.root)
         setupToolbar(toolbar)
         configureUiEventHandlers()
+    }
+
+    private fun render(viewState: ViewState) {
+        binding.lookingForWindowsVersionButton.isVisible = viewState.windowsFeatureEnabled
     }
 
     private fun configureUiEventHandlers() {

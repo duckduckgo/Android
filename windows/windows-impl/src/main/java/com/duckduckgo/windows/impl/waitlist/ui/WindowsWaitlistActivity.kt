@@ -29,6 +29,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -36,6 +37,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.macos_api.MacOsNav
+import com.duckduckgo.mobile.android.ui.notifyme.NotifyMeView
 import com.duckduckgo.mobile.android.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.mobile.android.ui.view.addClickableSpan
 import com.duckduckgo.mobile.android.ui.view.gone
@@ -123,6 +125,7 @@ class WindowsWaitlistActivity : DuckDuckGoActivity() {
             listOf(Pair("beta_link", windowsSpan)),
         )
         binding.waitListButton.gone()
+        binding.waitlistNotifyMeContainer.gone()
         binding.lookingForMacVersionButton.gone()
         binding.footerDescription.gone()
         binding.codeFrame.show()
@@ -133,23 +136,40 @@ class WindowsWaitlistActivity : DuckDuckGoActivity() {
 
     private fun renderJoinedQueue() {
         binding.waitListButton.gone()
-        binding.footerDescription.gone()
-        binding.lookingForMacVersionButton.show()
         binding.codeFrame.gone()
         binding.shareImage.gone()
+        binding.waitlistNotifyMeContainer.show()
+        binding.lookingForMacVersionButton.show()
+        binding.footerDescription.gone()
         binding.headerImage.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_list)
         binding.statusTitle.text = getString(R.string.windows_waitlist_on_the_list_title)
-        binding.waitlistDescription.text = getText(R.string.windows_waitlist_on_the_list_notification)
+        binding.waitlistDescription.text = getJoinedQueueDescriptionText(binding.waitlistNotifyMe.isVisible)
+        binding.waitlistNotifyMe.setOnVisibilityChange(
+            object : NotifyMeView.OnVisibilityChangedListener {
+                override fun onVisibilityChange(v: View?, isVisible: Boolean) {
+                    binding.waitlistDescription.text = getJoinedQueueDescriptionText(isVisible)
+                }
+            },
+        )
     }
 
     private fun renderNotJoinedQueue() {
         binding.headerImage.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_computer_win)
         binding.waitListButton.show()
+        binding.waitlistNotifyMeContainer.gone()
         binding.lookingForMacVersionButton.show()
         binding.footerDescription.show()
         binding.codeFrame.gone()
         binding.shareImage.gone()
         binding.waitlistDescription.text = getText(R.string.windows_waitlist_description)
+    }
+
+    private fun getJoinedQueueDescriptionText(notifyMeVisible: Boolean): String {
+        return if (notifyMeVisible) {
+            getString(R.string.windows_waitlist_on_the_list_notification_disabled)
+        } else {
+            getString(R.string.windows_waitlist_on_the_list_notification_enabled)
+        }
     }
 
     private fun renderErrorMessage() {
