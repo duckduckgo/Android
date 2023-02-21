@@ -83,28 +83,38 @@ internal class OnboardingExperimentTrackersLottieAssetDelegate(
         letter: String,
     ): Drawable {
         return object : Drawable() {
-            private val palette = listOf(
-                "#94B3AF",
-                "#727998",
-                "#645468",
-                "#4D5F7F",
-                "#855DB6",
-                "#5E5ADB",
-                "#678FFF",
-                "#6BB4EF",
-                "#4A9BAE",
-                "#66C4C6",
-                "#55D388",
-                "#99DB7A",
-                "#ECCC7B",
-                "#E7A538",
-                "#DD6B4C",
-                "#D65D62",
+            val palette = mapOf(
+                "A" to "#94B3AF",
+                "B" to "#727998",
+                "C" to "#645468",
+                "D" to "#4D5F7F",
+                "E" to "#855DB6",
+                "F" to "#5E5ADB",
+                "G" to "#678FFF",
+                "H" to "#6BB4EF",
+                "I" to "#4A9BAE",
+                "J" to "#66C4C6",
+                "K" to "#55D388",
+                "L" to "#99DB7A",
+                "M" to "#ECCC7B",
+                "N" to "#E7A538",
+                "O" to "#DD6B4C",
+                "P" to "#D65D62",
+                "Q" to "#94B3AF",
+                "R" to "#727998",
+                "S" to "#645468",
+                "T" to "#4D5F7F",
+                "U" to "#855DB6",
+                "V" to "#5E5ADB",
+                "W" to "#678FFF",
+                "X" to "#6BB4EF",
+                "Y" to "#4A9BAE",
+                "Z" to "#66C4C6"
             )
 
             private val backgroundPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                val index = (0..15).random()
-                color = palette[index].toColorInt()
+                val defaultColor = "#94B3AF".toColorInt()
+                color = palette[letter]?.toColorInt() ?: defaultColor
             }
 
             private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {

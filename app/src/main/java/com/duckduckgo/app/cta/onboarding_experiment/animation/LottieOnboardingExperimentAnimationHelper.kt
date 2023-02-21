@@ -26,9 +26,10 @@ import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo.LetterLogo
 import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo.StackedLogo
 import com.duckduckgo.app.browser.omnibar.animations.TrackersRenderer
 import com.duckduckgo.app.cta.onboarding_experiment.animation.OnboardingExperimentStep.BLOCK_TRACKERS
-import com.duckduckgo.app.cta.onboarding_experiment.animation.OnboardingExperimentStep.FULL
 import com.duckduckgo.app.cta.onboarding_experiment.animation.OnboardingExperimentStep.PRIVACY_SHIELD
 import com.duckduckgo.app.cta.onboarding_experiment.animation.OnboardingExperimentStep.SHOW_TRACKERS
+import com.duckduckgo.app.cta.onboarding_experiment.animation.OnboardingExperimentStep.SHOW_TRACKERS_EXPANDED
+import com.duckduckgo.app.cta.onboarding_experiment.animation.OnboardingExperimentStep.TRACKERS_HAND_LOOP
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.store.AppTheme
@@ -78,27 +79,27 @@ class LottieOnboardingExperimentAnimationHelper @Inject constructor(val appTheme
     ) {
         when (step) {
             SHOW_TRACKERS -> {
-                val animationRawRes = getAnimationRawRes(numberOfTrackers)
-                holder.setAnimation(animationRawRes)
-                holder.setMinAndMaxFrame(0, 116)
+                holder.setAnimation(getAnimationRawRes(numberOfTrackers))
+                holder.setMinAndMaxFrame(0, 45)
                 Timber.i("Onboarding step: TRACKERS")
             }
+            SHOW_TRACKERS_EXPANDED -> {
+                holder.setAnimation(getAnimationRawRes(numberOfTrackers))
+                holder.setMinAndMaxFrame(46, 71)
+                Timber.i("Onboarding step: TRACKERS")
+            }
+            TRACKERS_HAND_LOOP -> {
+                holder.setMinAndMaxFrame(72, 119)
+                Timber.i("Onboarding step: TRACKERS HAND LOOP")
+            }
             BLOCK_TRACKERS -> {
-                val animationRawRes = getAnimationRawRes(numberOfTrackers)
-                holder.setAnimation(animationRawRes)
-                holder.setMinAndMaxFrame(116, 177)
+                holder.setMinAndMaxFrame(120, 199)
                 Timber.i("Onboarding step: BLOCK_TRACKERS")
             }
             PRIVACY_SHIELD -> {
-                val animationRawRes = getAnimationRawRes(numberOfTrackers)
-                holder.setAnimation(animationRawRes)
-                holder.setMinFrame(177)
+                holder.setAnimation(getAnimationRawRes(numberOfTrackers))
+                holder.setMinFrame(200)
                 Timber.i("Onboarding step: PRIVACY_SHIELD")
-            }
-            FULL -> {
-                val animationRawRes = getAnimationRawRes(numberOfTrackers)
-                holder.setAnimation(animationRawRes)
-                Timber.i("Onboarding step: FULL_FLOW")
             }
         }
     }
@@ -162,7 +163,8 @@ class LottieOnboardingExperimentAnimationHelper @Inject constructor(val appTheme
 
 enum class OnboardingExperimentStep {
     SHOW_TRACKERS,
+    SHOW_TRACKERS_EXPANDED,
+    TRACKERS_HAND_LOOP,
     BLOCK_TRACKERS,
     PRIVACY_SHIELD,
-    FULL,
 }
