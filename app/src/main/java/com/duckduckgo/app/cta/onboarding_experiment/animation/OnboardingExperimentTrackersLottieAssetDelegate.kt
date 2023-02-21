@@ -109,7 +109,7 @@ internal class OnboardingExperimentTrackersLottieAssetDelegate(
                 "W" to "#678FFF",
                 "X" to "#6BB4EF",
                 "Y" to "#4A9BAE",
-                "Z" to "#66C4C6"
+                "Z" to "#66C4C6",
             )
 
             private val backgroundPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
