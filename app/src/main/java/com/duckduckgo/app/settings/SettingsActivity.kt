@@ -29,6 +29,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -275,12 +276,15 @@ class SettingsActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun updateWindowsSettings(waitlistState: WindowsWaitlistState) {
+    private fun updateWindowsSettings(waitlistState: WindowsWaitlistState?) {
+        viewsMore.windowsSetting.isVisible = waitlistState != null
+
         with(viewsMore) {
             when (waitlistState) {
                 is InBeta -> windowsSetting.setSecondaryText(getString(R.string.windows_settings_description_ready))
                 is JoinedWaitlist -> windowsSetting.setSecondaryText(getString(R.string.windows_settings_description_list))
                 is NotJoinedQueue -> windowsSetting.setSecondaryText(getString(R.string.windows_settings_description))
+                null -> {}
             }
         }
     }
