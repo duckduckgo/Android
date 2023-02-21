@@ -17,24 +17,25 @@
 package com.duckduckgo.app.cta.onboarding_experiment
 
 import android.animation.Animator
+import android.animation.ValueAnimator
 import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.view.Gravity
 import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewDaxDialogExperimentBinding
 import com.duckduckgo.app.cta.onboarding_experiment.animation.LottieOnboardingExperimentAnimationHelper
+import com.duckduckgo.app.cta.onboarding_experiment.animation.OnboardingExperimentStep
 import com.duckduckgo.app.cta.onboarding_experiment.animation.OnboardingExperimentStep.BLOCK_TRACKERS
 import com.duckduckgo.app.cta.onboarding_experiment.animation.OnboardingExperimentStep.PRIVACY_SHIELD
 import com.duckduckgo.app.cta.onboarding_experiment.animation.OnboardingExperimentStep.SHOW_TRACKERS
+import com.duckduckgo.app.cta.onboarding_experiment.animation.OnboardingExperimentStep.SHOW_TRACKERS_EXPANDED
+import com.duckduckgo.app.cta.onboarding_experiment.animation.OnboardingExperimentStep.TRACKERS_HAND_LOOP
 import com.duckduckgo.app.global.extensions.html
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.di.scopes.FragmentScope
@@ -78,16 +79,10 @@ class TypewriterExperimentDaxDialog : DialogFragment(R.layout.view_dax_dialog_ex
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
-        val window = dialog.window
-        val attributes = window?.attributes
-
-        attributes?.gravity = Gravity.BOTTOM
-        window?.attributes = attributes
-        window?.setFlags(
-            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-        )
-        window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.window?.apply {
+            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            statusBarColor = Color.TRANSPARENT
+        }
         return dialog
     }
 
@@ -104,13 +99,7 @@ class TypewriterExperimentDaxDialog : DialogFragment(R.layout.view_dax_dialog_ex
     }
 
     override fun getTheme(): Int {
-        return com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_DaxDialog
-    }
-
-    override fun onStart() {
-        super.onStart()
-        dialog?.window?.attributes?.dimAmount = 0f
-        dialog?.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        return com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_DaxDialogFragment
     }
 
     override fun onViewCreated(
@@ -133,13 +122,21 @@ class TypewriterExperimentDaxDialog : DialogFragment(R.layout.view_dax_dialog_ex
     private fun setStepOneView() {
         setDialog()
         setListeners()
-        animatorHelper.startTrackersOnboardingAnimationForStep(binding.onboardingTrackersBlockedAnim, SHOW_TRACKERS, trackers)
+        setLottieViewAnimation(SHOW_TRACKERS, this::setExpandedTrackersAndShowDialog)
+    }
+
+    private fun setExpandedTrackersAndShowDialog() {
+        setLottieViewAnimation(SHOW_TRACKERS_EXPANDED, this::setHandLoop)
+        binding.cardView.animate().alpha(1.0f).duration = 1000
+        binding.logo.animate().alpha(1.0f).duration = 1000
         binding.dialogText.startTypingAnimation(daxText, true)
     }
 
     private fun setDialog() {
         context?.let {
             with(binding) {
+                cardView.alpha = 0.0f
+                logo.alpha = 0.0f
                 hiddenText.text = daxText.html(it)
                 primaryCta.text = primaryButtonText
                 dialogText.typingDelayInMs = DEFAULT_TYPING_DELAY
@@ -169,38 +166,34 @@ class TypewriterExperimentDaxDialog : DialogFragment(R.layout.view_dax_dialog_ex
         }
     }
 
+    private fun setHandLoop() {
+        setLottieViewAnimation(TRACKERS_HAND_LOOP, loop = true)
+    }
+
     private fun setStepTwoView() {
         binding.onboardingStepTwoText.show()
         binding.primaryCta.gone()
         binding.onboardingStepOneText.gone()
-        with(binding.onboardingTrackersBlockedAnim) {
-            animatorHelper.startTrackersOnboardingAnimationForStep(this, BLOCK_TRACKERS, trackers)
-            addAnimatorListener(
-                object : Animator.AnimatorListener {
-                    override fun onAnimationRepeat(animation: Animator) {}
-                    override fun onAnimationCancel(animation: Animator) {}
-                    override fun onAnimationStart(animation: Animator) {}
-                    override fun onAnimationEnd(animation: Animator) {
-                        setStepThreeView()
-                    }
-                },
-            )
-        }
+        setLottieViewAnimation(BLOCK_TRACKERS, this::setStepThreeView)
     }
 
     private fun setStepThreeView() {
         binding.cardView.gone()
         binding.logo.gone()
+        setLottieViewAnimation(PRIVACY_SHIELD, this::dismiss)
+    }
+
+    private fun setLottieViewAnimation(step: OnboardingExperimentStep, onAnimationEnd: (() -> Unit)? = null, loop: Boolean = false) {
         with(binding.onboardingTrackersBlockedAnim) {
-            setOnClickListener { daxDialogListener?.onPrivacyShieldClick() }
-            animatorHelper.startTrackersOnboardingAnimationForStep(this, PRIVACY_SHIELD, trackers)
+            animatorHelper.startTrackersOnboardingAnimationForStep(binding.onboardingTrackersBlockedAnim, step, trackers)
+            repeatCount = if (loop) ValueAnimator.INFINITE else 0
             addAnimatorListener(
                 object : Animator.AnimatorListener {
                     override fun onAnimationRepeat(animation: Animator) {}
                     override fun onAnimationCancel(animation: Animator) {}
                     override fun onAnimationStart(animation: Animator) {}
                     override fun onAnimationEnd(animation: Animator) {
-                        dismiss()
+                        onAnimationEnd?.invoke()
                     }
                 },
             )
