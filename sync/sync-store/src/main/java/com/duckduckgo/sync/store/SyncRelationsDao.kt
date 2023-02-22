@@ -43,6 +43,9 @@ interface SyncRelationsDao {
     @Query("select * from entities inner join relations on entities.entityId = relations.entityId where relations.relationId = :folderId")
     fun relationByIdSync(folderId: String): List<Entity>
 
+    @Query("select * from relations where relations.relationId = :folderId")
+    fun relationsByIdSync(folderId: String): List<Relation>
+
     @Query("select * from entities inner join relations on entities.entityId = relations.entityId where relations.relationId = :folderId")
     fun relationByIdObservable(folderId: String): Single<List<Entity>>
 

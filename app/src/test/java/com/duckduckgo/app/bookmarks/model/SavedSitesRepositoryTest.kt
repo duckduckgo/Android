@@ -411,6 +411,20 @@ class SavedSitesRepositoryTest {
     }
 
     @Test
+    fun whenInsertBranchFolderThenAllEntitiesAreInsertedCorrectly() = runTest {
+        val parentFolder = BookmarkFolder("folder1", "Parent Folder", Relation.BOOMARKS_ROOT)
+        val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1")
+        val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2")
+        val folderBranch = FolderBranch(listOf(childBookmark), listOf(parentFolder, childFolder))
+
+        repository.insertFolderBranch(folderBranch)
+
+        assertEquals(repository.getFolder(parentFolder.id), parentFolder)
+        assertEquals(repository.getFolder(childFolder.id), childFolder)
+        assertEquals(repository.getBookmark(childBookmark.url), childBookmark)
+    }
+
+    @Test
     fun whenGetBookmarkFolderBranchThenReturnFoldersAndBookmarksForBranch() = runTest {
         val parentFolder = BookmarkFolder("folder1", "Parent Folder", Relation.BOOMARKS_ROOT)
         val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1")
