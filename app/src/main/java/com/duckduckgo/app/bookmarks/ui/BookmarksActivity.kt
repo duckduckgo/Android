@@ -31,6 +31,7 @@ import androidx.recyclerview.widget.ConcatAdapter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.model.BookmarkFolderBranch
+import com.duckduckgo.app.bookmarks.model.FolderBranch
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.service.ExportSavedSitesResult
 import com.duckduckgo.app.bookmarks.service.ImportSavedSitesResult
@@ -341,7 +342,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
 
     private fun confirmDeleteBookmarkFolder(
         bookmarkFolder: BookmarkFolder,
-        folderBranch: BookmarkFolderBranch,
+        folderBranch: FolderBranch,
     ) {
         val message = getString(R.string.bookmarkDeleteConfirmationMessage, bookmarkFolder.name).html(this)
         Snackbar.make(

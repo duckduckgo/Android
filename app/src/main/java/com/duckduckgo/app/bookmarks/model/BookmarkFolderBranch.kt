@@ -20,12 +20,6 @@ import com.duckduckgo.sync.store.Entity
 import com.duckduckgo.sync.store.Relation
 
 data class BookmarkFolderBranch(
-    val bookmarkEntities: List<Entity>,
-    val bookmarkFolderEntities: List<Entity>,
-)
-
-data class EntityFolderBranch(
     val bookmarks: List<Entity>,
-    val folder: List<Entity>,
-    val relations: List<Relation>,
+    val folders: List<Entity>,
 )

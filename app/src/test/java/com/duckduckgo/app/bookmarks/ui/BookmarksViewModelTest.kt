@@ -22,6 +22,7 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.model.*
+import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
 import com.duckduckgo.app.bookmarks.service.SavedSitesManager
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.pixels.AppPixelName
@@ -248,11 +249,12 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenDeleteEmptyBookmarkFolderRequestedThenDeleteFolderAndIssueConfirmDeleteBookmarkFolderCommand() = runTest {
-        val bookmarkFolderBranch = BookmarkFolderBranch(
-            listOf(bookmarkEntity),
-            listOf(Entity(bookmarkFolder.id, bookmarkFolder.name, bookmarkFolder.parentId, type = FOLDER)),
-        )
-        whenever(savedSitesRepository.deleteFolderBranch(any())).thenReturn(bookmarkFolderBranch)
+        val parentFolder = BookmarkFolder("folder1", "Parent Folder", Relation.BOOMARKS_ROOT)
+        val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1")
+        val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2")
+        val folderBranch = FolderBranch(listOf(childBookmark), listOf(parentFolder, childFolder))
+
+        whenever(savedSitesRepository.deleteFolderBranch(any())).thenReturn(folderBranch)
 
         testee.onDeleteBookmarkFolderRequested(bookmarkFolder)
 
@@ -260,16 +262,17 @@ class BookmarksViewModelTest {
 
         verify(commandObserver).onChanged(commandCaptor.capture())
         assertEquals(bookmarkFolder, (commandCaptor.value as BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder).bookmarkFolder)
-        assertEquals(bookmarkFolderBranch, (commandCaptor.value as BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder).folderBranch)
+        assertEquals(folderBranch, (commandCaptor.value as BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder).folderBranch)
     }
 
     @Test
     fun whenDeleteNonEmptyBookmarkFolderRequestedThenIssueDeleteBookmarkFolderCommand() = runTest {
-        val bookmarkFolderBranch = BookmarkFolderBranch(
-            listOf(bookmarkEntity),
-            listOf(Entity(bookmarkFolder.id, bookmarkFolder.name, bookmarkFolder.parentId, type = FOLDER)),
-        )
-        whenever(savedSitesRepository.deleteFolderBranch(any())).thenReturn(bookmarkFolderBranch)
+        val parentFolder = BookmarkFolder("folder1", "Parent Folder", Relation.BOOMARKS_ROOT)
+        val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1")
+        val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2")
+        val folderBranch = FolderBranch(listOf(childBookmark), listOf(parentFolder, childFolder))
+
+        whenever(savedSitesRepository.deleteFolderBranch(any())).thenReturn(folderBranch)
 
         val nonEmptyBookmarkFolder = bookmarkFolder.copy(numBookmarks = 1)
         testee.onDeleteBookmarkFolderRequested(nonEmptyBookmarkFolder)
@@ -280,13 +283,13 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenInsertRecentlyDeletedBookmarksAndFoldersThenInsertCachedFolderBranch() = runTest {
-        val bookmarkFolderBranch = BookmarkFolderBranch(
-            listOf(bookmarkEntity),
-            listOf(Entity(bookmarkFolder.id, bookmarkFolder.name, bookmarkFolder.parentId, type = FOLDER)),
-        )
+        val parentFolder = BookmarkFolder("folder1", "Parent Folder", Relation.BOOMARKS_ROOT)
+        val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1")
+        val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2")
+        val folderBranch = FolderBranch(listOf(childBookmark), listOf(parentFolder, childFolder))
 
-        testee.insertDeletedFolderBranch(bookmarkFolderBranch)
+        testee.insertDeletedFolderBranch(folderBranch)
 
-        verify(savedSitesRepository).insertFolderBranch(bookmarkFolderBranch)
+        verify(savedSitesRepository).insertFolderBranch(folderBranch)
     }
 }

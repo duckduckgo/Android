@@ -346,6 +346,7 @@ class SavedSitesRepositoryTest {
 
         Assert.assertEquals(updatedBookmark.id, bookmarkUpdated.id)
     }
+
     @Test
     fun whenUpdateBookmarkFolderThenUpdateBookmarkInDB() = runTest {
         givenNoBookmarksStored()
@@ -411,12 +412,18 @@ class SavedSitesRepositoryTest {
 
     @Test
     fun whenGetBookmarkFolderBranchThenReturnFoldersAndBookmarksForBranch() = runTest {
-        // add new data structure with folders, bookmarks and relations
-        // insertFolderBranch uses this data
-        // getFolderBranch should return not just one level of folder, but all of them
+        val parentFolder = BookmarkFolder("folder1", "Parent Folder", Relation.BOOMARKS_ROOT)
+        val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1")
+        val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2")
+        val folderBranch = FolderBranch(listOf(childBookmark), listOf(parentFolder, childFolder))
 
+        repository.insertFolderBranch(folderBranch)
+
+        val branch = repository.getFolderBranch(BookmarkFolder(parentFolder.id, parentFolder.name, parentFolder.parentId))
+
+        assertEquals(listOf(childBookmark), branch.bookmarks)
+        assertEquals(listOf(parentFolder, childFolder), branch.folders)
     }
-
 
     @After
     fun after() {

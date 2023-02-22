@@ -66,7 +66,7 @@ class BookmarksViewModel @Inject constructor(
         class DeleteBookmarkFolder(val bookmarkFolder: BookmarkFolder) : Command()
         class ConfirmDeleteBookmarkFolder(
             val bookmarkFolder: BookmarkFolder,
-            val folderBranch: BookmarkFolderBranch,
+            val folderBranch: FolderBranch,
         ) : Command()
 
         data class ImportedSavedSites(val importSavedSitesResult: ImportSavedSitesResult) : Command()
@@ -216,8 +216,8 @@ class BookmarksViewModel @Inject constructor(
 
     fun onBookmarkFolderDeleted(bookmarkFolder: BookmarkFolder) {
         viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
-            // val folderBranch = savedSitesRepository.deleteFolderBranch(bookmarkFolder)
-            // command.postValue(ConfirmDeleteBookmarkFolder(bookmarkFolder, folderBranch))
+            val folderBranch = savedSitesRepository.deleteFolderBranch(bookmarkFolder)
+            command.postValue(ConfirmDeleteBookmarkFolder(bookmarkFolder, folderBranch))
         }
     }
 
@@ -240,9 +240,9 @@ class BookmarksViewModel @Inject constructor(
         )
     }
 
-    fun insertDeletedFolderBranch(folderBranch: BookmarkFolderBranch) {
+    fun insertDeletedFolderBranch(folderBranch: FolderBranch) {
         viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
-            // savedSitesRepository.insertFolderBranch(folderBranch)
+            savedSitesRepository.insertFolderBranch(folderBranch)
         }
     }
 }

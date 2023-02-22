@@ -26,8 +26,10 @@ import com.duckduckgo.app.bookmarks.db.BookmarkFolderEntity
 import com.duckduckgo.app.bookmarks.db.BookmarkFoldersDao
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.model.*
+import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.sync.store.Relation
 import dagger.Lazy
 import java.io.File
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -51,9 +53,7 @@ class SavedSitesExporterTest {
     private lateinit var bookmarksDao: BookmarksDao
     private lateinit var bookmarkFoldersDao: BookmarkFoldersDao
     private val mockFaviconManager: FaviconManager = mock()
-    private val lazyFaviconManager = Lazy { mockFaviconManager }
-    private lateinit var favoritesRepository: FavoritesRepository
-    private lateinit var bookmarksRepository: BookmarksRepository
+    private lateinit var savedSitesRepository: SavedSitesRepository
     private lateinit var exporter: RealSavedSitesExporter
 
     private lateinit var filesDir: File
@@ -66,10 +66,9 @@ class SavedSitesExporterTest {
             .build()
         bookmarksDao = db.bookmarksDao()
         bookmarkFoldersDao = db.bookmarkFoldersDao()
-        favoritesRepository = FavoritesDataRepository(db.favoritesDao(), lazyFaviconManager)
-        bookmarksRepository = BookmarksDataRepository(bookmarkFoldersDao, bookmarksDao, db)
+        savedSitesRepository = RealSavedSitesRepository(db.syncEntitiesDao(), db.syncRelationsDao())
         filesDir = context.filesDir
-        exporter = RealSavedSitesExporter(context.contentResolver, favoritesRepository, bookmarksRepository, RealSavedSitesParser())
+        exporter = RealSavedSitesExporter(context.contentResolver, savedSitesRepository, RealSavedSitesParser())
     }
 
     @After
@@ -112,8 +111,8 @@ class SavedSitesExporterTest {
 
     @Test
     fun whenSomeFavoritesExistThenExportingSucceeds() = runTest {
-        val favorite = SavedSite.Favorite(id = 1, title = "example", url = "www.example.com", position = 0)
-        favoritesRepository.insert(favorite)
+        val favorite = SavedSite.Favorite(id = "favorite1", title = "example", url = "www.example.com", position = 0)
+        savedSitesRepository.insert(favorite)
 
         val testFile = File(filesDir, "test_favorites.html")
         val localUri = Uri.fromFile(testFile)
@@ -126,14 +125,13 @@ class SavedSitesExporterTest {
 
     @Test
     fun whenGetTreeStructureThenReturnTraversableTree() = runTest {
-        val root = BookmarkFolderEntity(id = 0, name = "DuckDuckGo Bookmarks", parentId = -1)
-        val parentFolder = BookmarkFolderEntity(id = 1, name = "name", parentId = 0)
-        val childFolder = BookmarkFolderEntity(id = 2, name = "another name", parentId = 1)
-        val childBookmark = BookmarkEntity(id = 1, title = "title", url = "www.example.com", parentId = 1)
+        val root = BookmarkFolder(Relation.BOOMARKS_ROOT, "DuckDuckGo FolBookmarksder", "")
+        val parentFolder = BookmarkFolder("folder1", "DuckDuckGo FolBookmarksder", Relation.BOOMARKS_ROOT)
+        val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1")
+        val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2")
+        val folderBranch = FolderBranch(listOf(childBookmark), listOf(root, parentFolder, childFolder))
 
-        val folderList = listOf(parentFolder, childFolder)
-
-        bookmarksRepository.insertFolderBranch(BookmarkFolderBranch(listOf(childBookmark), folderList))
+        savedSitesRepository.insertFolderBranch(folderBranch)
 
         val itemList = listOf(root, parentFolder, childFolder, childBookmark)
         val preOrderList = listOf(childFolder, childBookmark, parentFolder, root)
@@ -176,10 +174,10 @@ class SavedSitesExporterTest {
             Assert.assertEquals(entity.parentId, node.value.parentId)
 
             when (node.value.parentId) {
-                -1L -> {
+                "" -> {
                     Assert.assertEquals(0, node.value.depth)
                 }
-                0L -> {
+                Relation.BOOMARKS_ROOT -> {
                     Assert.assertEquals(1, node.value.depth)
                 }
                 else -> {
