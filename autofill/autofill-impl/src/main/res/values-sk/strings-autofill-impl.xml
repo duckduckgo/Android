@@ -37,6 +37,8 @@
     <string name="useSavedLoginDialogTitle">Použiť uložené prihlasovacie údaje?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Prihlásenie pre %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Prihlásenie na stránky</string>
+    <string name="useSavedLoginDialogGroupThisWebsite">Z tejto webovej lokality</string>
+    <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Z adresy %1$s</string>
 
     <string name="updateLoginDialogTitle">Aktualizovať heslo?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Aktualizovať heslo</string>

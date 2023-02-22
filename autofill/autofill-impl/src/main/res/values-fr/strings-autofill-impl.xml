@@ -37,6 +37,8 @@
     <string name="useSavedLoginDialogTitle">Utiliser un identifiant enregistré ?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Identifiant pour %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Identifiant pour le site</string>
+    <string name="useSavedLoginDialogGroupThisWebsite">À partir de ce site Web</string>
+    <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">À partir de %1$s</string>
 
     <string name="updateLoginDialogTitle">Modifier le mot de passe ?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Modifier le mot de passe</string>

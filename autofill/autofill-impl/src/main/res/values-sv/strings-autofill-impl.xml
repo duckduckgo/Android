@@ -37,6 +37,8 @@
     <string name="useSavedLoginDialogTitle">Använd sparad inloggning?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Inloggning för %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Inloggning för webbplatsen</string>
+    <string name="useSavedLoginDialogGroupThisWebsite">Från den här webbplatsen</string>
+    <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Från %1$s</string>
 
     <string name="updateLoginDialogTitle">Uppdatera lösenord?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Uppdatera lösenord</string>
