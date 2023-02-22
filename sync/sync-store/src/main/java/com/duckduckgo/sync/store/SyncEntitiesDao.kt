@@ -40,6 +40,9 @@ interface SyncEntitiesDao {
     @Delete
     fun delete(entity: Entity)
 
+    @Query("delete from entities where entityId = :id")
+    fun delete(id: String)
+
     @Query("delete from entities where url = :url")
     fun deleteByUrl(url: String)
 
@@ -77,7 +80,7 @@ interface SyncEntitiesDao {
     ): Entity?
 
     @Query("select * from entities where entityId = :id")
-    fun entityById(id: String): Entity
+    fun entityById(id: String): Entity?
 
     @Query("select * from entities where type = :type")
     fun entitiesByType(type: EntityType): Flow<List<Entity>>

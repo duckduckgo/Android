@@ -55,7 +55,7 @@ class BookmarkFoldersViewModel @Inject constructor(
     }
 
     fun fetchBookmarkFolders(
-        selectedFolderId: Long,
+        selectedFolderId: String,
         rootFolderName: String,
         currentFolder: BookmarkFolder?,
     ) {
@@ -68,7 +68,7 @@ class BookmarkFoldersViewModel @Inject constructor(
 
     fun newFolderAdded(
         rootFolderName: String,
-        selectedFolderId: Long,
+        selectedFolderId: String,
         currentFolder: BookmarkFolder?,
     ) {
         viewModelScope.launch(dispatcherProvider.io()) {

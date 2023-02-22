@@ -50,7 +50,7 @@ interface SyncRelationsDao {
     fun relationByIdObservable(folderId: String): Single<List<Entity>>
 
     @Query("select * from relations where relations.entityId = :entityId")
-    fun relationParentById(entityId: String): Relation
+    fun relationParentById(entityId: String): Relation?
 
     @Query("select CAST(COUNT(*) AS BIT) from relations")
     fun hasRelations(): Boolean

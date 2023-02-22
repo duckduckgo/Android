@@ -50,7 +50,7 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
         val currentFolder = intent.extras?.getSerializable(KEY_CURRENT_FOLDER)
 
         viewModel.fetchBookmarkFolders(
-            intent.extras?.getLong(KEY_BOOKMARK_FOLDER_ID) ?: 0,
+            intent.extras?.getString(KEY_BOOKMARK_FOLDER_ID) ?: Relation.BOOMARKS_ROOT,
             getString(R.string.bookmarksSectionTitle),
             currentFolder as BookmarkFolder?,
         )
@@ -113,7 +113,7 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
     private fun setNewlyCreatedSelectedFolderResult() {
         viewModel.newFolderAdded(
             rootFolderName = getString(R.string.bookmarksSectionTitle),
-            selectedFolderId = intent.extras?.getLong(KEY_BOOKMARK_FOLDER_ID) ?: 0,
+            selectedFolderId = intent.extras?.getString(KEY_BOOKMARK_FOLDER_ID) ?: Relation.BOOMARKS_ROOT,
             currentFolder = intent.extras?.getSerializable(KEY_CURRENT_FOLDER) as BookmarkFolder?,
         )
     }
@@ -124,18 +124,17 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
         const val KEY_CURRENT_FOLDER = "KEY_CURRENT_FOLDER"
         const val KEY_ADD_FOLDER_FLAG = "KEY_ADD_FOLDER_FLAG"
 
-        private const val ROOT_FOLDER_ID = 0L
         private const val ADD_BOOKMARK_FOLDER_FRAGMENT_TAG = "ADD_BOOKMARK_FOLDER"
 
         fun intent(
             context: Context,
-            parentFolderId: Long,
+            parentFolderId: String,
             currentFolder: BookmarkFolder? = null,
             showAddFolderMenu: Boolean = false,
         ): Intent {
             val intent = Intent(context, BookmarkFoldersActivity::class.java)
             val bundle = Bundle()
-            bundle.putLong(KEY_BOOKMARK_FOLDER_ID, parentFolderId)
+            bundle.putString(KEY_BOOKMARK_FOLDER_ID, parentFolderId)
             bundle.putBoolean(KEY_ADD_FOLDER_FLAG, showAddFolderMenu)
             currentFolder?.let {
                 bundle.putSerializable(KEY_CURRENT_FOLDER, it)

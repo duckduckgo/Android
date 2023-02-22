@@ -31,6 +31,7 @@ import com.duckduckgo.sync.store.Relation
 import com.duckduckgo.sync.store.SyncEntitiesDao
 import com.duckduckgo.sync.store.SyncRelationsDao
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertNull
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -377,8 +378,7 @@ class SavedSitesRepositoryTest {
             val result = awaitItem()
             Assert.assertTrue(result.first.size == 1)
             Assert.assertTrue(result.first.first().id == bookmark.id)
-            Assert.assertTrue(result.second.size == 1)
-            Assert.assertEquals(result.second.first().id, Relation.BOOMARKS_ROOT)
+            Assert.assertTrue(result.second.isEmpty())
         }
     }
 
@@ -391,6 +391,14 @@ class SavedSitesRepositoryTest {
     }
 
     @Test
+    fun whenBookmarkFolderInsertedButWrongIdThenNothingIsRetrieved() = runTest {
+        repository.insert(BookmarkFolder(id = "folder1", name = "name", parentId = "folder2"))
+        val folderInserted = repository.getFolder("folder2")
+
+        Assert.assertNull(folderInserted)
+    }
+
+    @Test
     fun whenBookmarkAddedToFolderThenGetFolderReturnsFolder() = runTest {
         givenNoBookmarksStored()
 
@@ -399,14 +407,37 @@ class SavedSitesRepositoryTest {
 
         val bookmarkOne = repository.insertBookmark(title = "one", url = "fooone.com")
         repository.update(bookmarkOne.copy(parentId = folder.id))
+
         val bookmarkTwo = repository.insertBookmark(title = "two", url = "footwo.com")
         repository.update(bookmarkTwo.copy(parentId = folder.id))
 
         repository.getFolderContent(folder.id).test {
             val result = awaitItem()
             Assert.assertTrue(result.first.size == 2)
+            Assert.assertTrue(result.second.isEmpty())
+        }
+    }
+
+    @Test
+    fun whenBookmarkAndFolderAddedToFolderThenGetFolderReturnsFolder() = runTest {
+        givenNoBookmarksStored()
+
+        repository.insertBookmark(title = "root", url = "foo.com")
+        val folder = repository.insert(BookmarkFolder(id = "folder2", name = "folder2", parentId = Relation.BOOMARKS_ROOT))
+
+        val bookmarkOne = repository.insertBookmark(title = "one", url = "fooone.com")
+        repository.update(bookmarkOne.copy(parentId = folder.id))
+
+        val bookmarkTwo = repository.insertBookmark(title = "two", url = "footwo.com")
+        repository.update(bookmarkTwo.copy(parentId = folder.id))
+
+        repository.insert(BookmarkFolder(id = "folder3", name = "folder2", parentId = "folder2"))
+
+        repository.getFolderContent(folder.id).test {
+            val result = awaitItem()
+            Assert.assertTrue(result.first.size == 2)
             Assert.assertTrue(result.second.size == 1)
-            Assert.assertEquals(result.second.first().id, folder.id)
+            Assert.assertEquals(result.second.first().id, "folder3")
         }
     }
 
@@ -425,7 +456,7 @@ class SavedSitesRepositoryTest {
     }
 
     @Test
-    fun whenGetBookmarkFolderBranchThenReturnFoldersAndBookmarksForBranch() = runTest {
+    fun whenChildFolderWithBookmarkThenGetFolderBranchReturnsFolderBranch() = runTest {
         val parentFolder = BookmarkFolder("folder1", "Parent Folder", Relation.BOOMARKS_ROOT)
         val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1")
         val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2")
@@ -433,10 +464,125 @@ class SavedSitesRepositoryTest {
 
         repository.insertFolderBranch(folderBranch)
 
-        val branch = repository.getFolderBranch(BookmarkFolder(parentFolder.id, parentFolder.name, parentFolder.parentId))
+        val branch = repository.getFolderBranch(parentFolder)
 
         assertEquals(listOf(childBookmark), branch.bookmarks)
         assertEquals(listOf(parentFolder, childFolder), branch.folders)
+    }
+
+    @Test
+    fun whenChildFoldersWithBookmarksThenGetFolderBranchReturnsFolderBranch() = runTest {
+        val parentFolder = BookmarkFolder("folder1", "Parent Folder", Relation.BOOMARKS_ROOT)
+        val parentBookmark = Bookmark("bookmark1", "title1", "www.example1.com", "folder1")
+        val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1")
+        val childBookmark = Bookmark("bookmark2", "title2", "www.example2.com", "folder2")
+        val childSecondFolder = BookmarkFolder("folder3", "Parent Folder", "folder2")
+        val childThirdBookmark = Bookmark("bookmark3", "title3", "www.example3.com", "folder3")
+        val childFourthBookmark = Bookmark("bookmark4", "title4", "www.example4.com", "folder3")
+        val childThirdFolder = BookmarkFolder("folder4", "Parent Folder", "folder3")
+        val childFourthFolder = BookmarkFolder("folder5", "Parent Folder", "folder3")
+        val folderBranch = FolderBranch(
+            listOf(parentBookmark, childBookmark, childThirdBookmark, childFourthBookmark),
+            listOf(parentFolder, childFolder, childSecondFolder, childThirdFolder, childFourthFolder),
+        )
+
+        repository.insertFolderBranch(folderBranch)
+
+        val branch = repository.getFolderBranch(parentFolder)
+
+        assertEquals(listOf(parentBookmark, childBookmark, childThirdBookmark, childFourthBookmark), branch.bookmarks)
+        assertEquals(listOf(parentFolder, childFolder, childSecondFolder, childThirdFolder, childFourthFolder), branch.folders)
+    }
+
+    @Test
+    fun whenChildFoldersWithBookmarksInRootThenGetFolderBranchReturnsFolderBranch() = runTest {
+        val parentFolder = BookmarkFolder("folder1", "Parent Folder", Relation.BOOMARKS_ROOT)
+        val parentBookmark = Bookmark("bookmark1", "title1", "www.example1.com", Relation.BOOMARKS_ROOT)
+        val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1")
+        val childBookmark = Bookmark("bookmark2", "title2", "www.example2.com", "folder2")
+        val childSecondFolder = BookmarkFolder("folder3", "Parent Folder", "folder2")
+        val childThirdBookmark = Bookmark("bookmark3", "title3", "www.example3.com", "folder3")
+        val childFourthBookmark = Bookmark("bookmark4", "title4", "www.example4.com", "folder3")
+        val childThirdFolder = BookmarkFolder("folder4", "Parent Folder", "folder3")
+        val childFourthFolder = BookmarkFolder("folder5", "Parent Folder", "folder3")
+        val folderBranch = FolderBranch(
+            listOf(parentBookmark, childBookmark, childThirdBookmark, childFourthBookmark),
+            listOf(parentFolder, childFolder, childSecondFolder, childThirdFolder, childFourthFolder),
+        )
+
+        repository.insertFolderBranch(folderBranch)
+
+        val branch = repository.getFolderBranch(parentFolder)
+
+        assertEquals(listOf(childBookmark, childThirdBookmark, childFourthBookmark), branch.bookmarks)
+        assertEquals(listOf(parentFolder, childFolder, childSecondFolder, childThirdFolder, childFourthFolder), branch.folders)
+    }
+
+    @Test
+    fun whenBranchFolderDeletedThenNothingIsRetrieved() = runTest {
+        val parentFolder = BookmarkFolder("folder1", "Parent Folder", Relation.BOOMARKS_ROOT)
+        val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1")
+        val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2")
+        val folderBranch = FolderBranch(listOf(childBookmark), listOf(parentFolder, childFolder))
+
+        repository.insertFolderBranch(folderBranch)
+
+        assertEquals(repository.getFolder(parentFolder.id), parentFolder)
+        assertEquals(repository.getFolder(childFolder.id), childFolder)
+        assertEquals(repository.getBookmark(childBookmark.url), childBookmark)
+
+        repository.deleteFolderBranch(parentFolder)
+
+        assertNull(repository.getFolder(parentFolder.id))
+        assertNull(repository.getFolder(childFolder.id))
+        assertNull(repository.getBookmark(childBookmark.url))
+    }
+
+
+    @Test
+    fun whenBuildFlatStructureThenReturnFolderListWithDepth() = runTest {
+        val rootFolder = BookmarkFolder(id = Relation.BOOMARKS_ROOT, name = "root", parentId = "")
+        val parentFolder = BookmarkFolder(id = "folder1", name = "name", parentId = Relation.BOOMARKS_ROOT)
+        val childFolder = BookmarkFolder(id = "folder2", name = "another name", parentId = "folder1")
+        val folder = BookmarkFolder(id = "folder3", name = "folder name", parentId = Relation.BOOMARKS_ROOT)
+
+        repository.insert(rootFolder)
+        repository.insert(parentFolder)
+        repository.insert(childFolder)
+        repository.insert(folder)
+
+        val flatStructure = repository.getFlatFolderStructure(folder.id, null, rootFolder.id)
+
+        val items = listOf(
+            BookmarkFolderItem(0, rootFolder, false),
+            BookmarkFolderItem(1, parentFolder, false),
+            BookmarkFolderItem(1, folder, true),
+            BookmarkFolderItem(2, childFolder, false),
+        )
+
+        assertEquals(items, flatStructure)
+    }
+
+    @Test
+    fun whenBuildFlatStructureThenReturnFolderListWithDepthWithoutCurrentFolderBranch() = runTest {
+        val rootFolder = BookmarkFolder(id = Relation.BOOMARKS_ROOT, name = "root", parentId = "")
+        val parentFolder = BookmarkFolder(id = "folder1", name = "name", parentId = Relation.BOOMARKS_ROOT)
+        val childFolder = BookmarkFolder(id = "folder2", name = "another name", parentId = parentFolder.id)
+        val folder = BookmarkFolder(id = "folder3", name = "folder name", parentId = Relation.BOOMARKS_ROOT)
+
+        repository.insert(rootFolder)
+        repository.insert(parentFolder)
+        repository.insert(childFolder)
+        repository.insert(folder)
+
+        val flatStructure = repository.getFlatFolderStructure(folder.id, parentFolder, rootFolder.id)
+
+        val items = listOf(
+            BookmarkFolderItem(0, rootFolder, false),
+            BookmarkFolderItem(1, folder, true),
+        )
+
+        assertEquals(items, flatStructure)
     }
 
     @After

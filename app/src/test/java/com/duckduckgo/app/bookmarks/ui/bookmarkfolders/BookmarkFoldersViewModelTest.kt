@@ -74,12 +74,12 @@ class BookmarkFoldersViewModelTest {
 
     @Before
     fun before() = runTest {
-        whenever(savedSitesRepository.getFlatFolderStructure(anyLong(), any(), anyString())).thenReturn(folderStructure)
+        whenever(savedSitesRepository.getFlatFolderStructure(anyString(), any(), anyString())).thenReturn(folderStructure)
     }
 
     @Test
     fun whenFetchBookmarkFoldersThenCallRepoAndUpdateViewState() = runTest {
-        val selectedFolderId = 0L
+        val selectedFolderId = Relation.BOOMARKS_ROOT
         val rootFolderName = "Bookmarks"
         val folder = BookmarkFolder("folder2", "a folder", "folder1")
 
@@ -106,7 +106,7 @@ class BookmarkFoldersViewModelTest {
     @Test
     fun newFolderAddedThenCallRepoAndUpdateViewState() = runTest {
         val newFolder = BookmarkFolder("folder3", "new folder", "folder1")
-        val selectedFolderId = 0L
+        val selectedFolderId = Relation.BOOMARKS_ROOT
         val rootFolderName = "Bookmarks"
 
         testee.newFolderAdded(rootFolderName, selectedFolderId, newFolder)

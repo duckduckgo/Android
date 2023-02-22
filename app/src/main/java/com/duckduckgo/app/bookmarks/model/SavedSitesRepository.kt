@@ -36,14 +36,12 @@ import java.util.*
 
 interface SavedSitesRepository {
 
-    // getFavorites and getFolderContent will be the same once we can merge Favorites / Bookmarks
-
     suspend fun getFolderContent(folderId: String): Flow<Pair<List<Bookmark>, List<BookmarkFolder>>>
 
     suspend fun getFlatFolderStructure(
-        selectedFolderId: Long,
+        selectedFolderId: String,
         currentFolder: BookmarkFolder?,
-        rootFolderName: String,
+        rootFolderId: String,
     ): List<BookmarkFolderItem>
 
     suspend fun insertFolderBranch(branchToInsert: FolderBranch)
@@ -91,8 +89,7 @@ interface SavedSitesRepository {
     fun update(folder: BookmarkFolder)
 
     fun delete(folder: BookmarkFolder)
-
-    fun getFolder(folderId: String): BookmarkFolder
+    fun getFolder(folderId: String): BookmarkFolder?
     fun deleteAll()
     fun bookmarksCount(): Long
     fun favoritesCount(): Long
@@ -107,7 +104,6 @@ class RealSavedSitesRepository(
     override suspend fun getFolderContent(folderId: String): Flow<Pair<List<Bookmark>, List<BookmarkFolder>>> {
         val bookmarks = mutableListOf<Bookmark>()
         val folders = mutableListOf<BookmarkFolder>()
-        folders.add(getFolder(folderId))
 
         return syncRelationsDao.relationById(folderId).map { entities ->
             entities.forEach { entity ->
@@ -123,11 +119,37 @@ class RealSavedSitesRepository(
     }
 
     override suspend fun getFlatFolderStructure(
-        selectedFolderId: Long,
+        selectedFolderId: String,
         currentFolder: BookmarkFolder?,
-        rootFolderName: String,
+        rootFolderId: String,
     ): List<BookmarkFolderItem> {
-        return emptyList()
+        val rootFolder = getFolder(rootFolderId)
+        return if (rootFolder != null){
+            val rootFolderItem = BookmarkFolderItem(0, rootFolder, rootFolder.id == selectedFolderId)
+            val folders = mutableListOf(rootFolderItem)
+            val folderDepth = traverseFolderWithDepth(1, folders, rootFolderId, selectedFolderId)
+            folderDepth
+        } else {
+            emptyList()
+        }
+    }
+
+    private fun traverseFolderWithDepth(
+        depth: Int = 0,
+        folders: MutableList<BookmarkFolderItem>,
+        folderId: String,
+        selectedFolderId: String
+    ): List<BookmarkFolderItem> {
+        val folderContent = folderContent(folderId)
+
+        folders.addAll(folderContent.second.map {
+            BookmarkFolderItem(depth, it, it.id == selectedFolderId)
+        })
+
+        folderContent.second.forEach {
+            traverseFolderWithDepth(depth + 1, folders, it.id, selectedFolderId)
+        }
+        return folders
     }
 
     override suspend fun insertFolderBranch(branchToInsert: FolderBranch) {
@@ -143,8 +165,7 @@ class RealSavedSitesRepository(
 
     override fun getFolderBranch(folder: BookmarkFolder): FolderBranch {
         val bookmarks = mutableListOf<Bookmark>()
-        val folders = mutableListOf<BookmarkFolder>()
-
+        val folders = mutableListOf(folder)
         val folderContent = traverseBranch(bookmarks, folders, folder.id)
         return FolderBranch(folderContent.first, folderContent.second)
     }
@@ -169,23 +190,28 @@ class RealSavedSitesRepository(
         val folders = mutableListOf<BookmarkFolder>()
         syncRelationsDao.relationsByIdSync(folderId).forEach { relation ->
             val entity = syncEntitiesDao.entityById(relation.entityId)
-            if (entity.type == FOLDER) {
-                folders.add(entity.mapToBookmarkFolder(folderId))
-            } else {
-                bookmarks.add(entity.mapToBookmark(folderId))
+            entity?.let {
+                if (entity.type == FOLDER) {
+                    folders.add(entity.mapToBookmarkFolder(folderId))
+                } else {
+                    bookmarks.add(entity.mapToBookmark(folderId))
+                }
             }
         }
         return Pair(bookmarks, folders)
     }
 
     override fun deleteFolderBranch(folder: BookmarkFolder): FolderBranch {
-        // deletes folder and everything underneath, folders and bookmarks
-        val entities = mutableListOf<Entity>()
-        val relations = mutableListOf<Relation>()
-        val relation = syncRelationsDao.relationById(folder.id).map {
-
+        val folderContent = getFolderBranch(folder)
+        folderContent.folders.forEach {
+            delete(it)
         }
-        return FolderBranch(emptyList(), emptyList())
+        folderContent.bookmarks.forEach {
+            delete(it)
+        }
+
+        delete(folder)
+        return folderContent
     }
 
     override fun getFavorites(): Flow<List<Favorite>> {
@@ -236,8 +262,9 @@ class RealSavedSitesRepository(
     override fun getBookmark(url: String): Bookmark? {
         val bookmark = syncEntitiesDao.entityByUrl(url)
         return if (bookmark != null) {
-            val relation = syncRelationsDao.relationParentById(bookmark.entityId)
-            bookmark.mapToBookmark(relation.relationId)
+            syncRelationsDao.relationParentById(bookmark.entityId)?.let {
+                bookmark.mapToBookmark(it.relationId)
+            }
         } else {
             null
         }
@@ -297,10 +324,9 @@ class RealSavedSitesRepository(
     }
 
     override fun delete(savedSite: SavedSite) {
-        val entity = syncEntitiesDao.entityByUrl(savedSite.url)
-        if (entity != null) {
-            syncEntitiesDao.delete(entity)
-            syncRelationsDao.deleteEntity(entity.entityId)
+        syncEntitiesDao.entityByUrl(savedSite.url)?.let {
+            syncEntitiesDao.delete(it)
+            syncRelationsDao.deleteEntity(it.entityId)
         }
     }
 
@@ -312,16 +338,15 @@ class RealSavedSitesRepository(
     }
 
     private fun updateBookmark(bookmark: Bookmark) {
-        val entity = syncEntitiesDao.entityById(bookmark.id)
-
-        if (entity != null) {
-            val relation = syncRelationsDao.relationParentById(entity.entityId)
-            if (relation.relationId != bookmark.parentId) {
-                // bookmark moved to another folder
-                syncRelationsDao.delete(relation.relationId)
-                syncRelationsDao.insert(Relation(relationId = bookmark.parentId, entityId = entity.entityId))
+        syncEntitiesDao.entityById(bookmark.id)?.let { entity ->
+            syncRelationsDao.relationParentById(entity.entityId)?.let { relation ->
+                if (relation.relationId != bookmark.parentId) {
+                    // bookmark moved to another folder
+                    syncRelationsDao.delete(relation.relationId)
+                    syncRelationsDao.insert(Relation(relationId = bookmark.parentId, entityId = relation.entityId))
+                }
+                syncEntitiesDao.update(Entity(relation.entityId, bookmark.title, bookmark.url, BOOKMARK))
             }
-            syncEntitiesDao.update(Entity(entity.entityId, bookmark.title, bookmark.url, BOOKMARK))
         }
     }
 
@@ -353,12 +378,17 @@ class RealSavedSitesRepository(
 
         syncRelationsDao.delete(folder.id)
         syncEntitiesDao.deleteList(entities.toList())
+        syncEntitiesDao.delete(folder.id)
     }
 
-    override fun getFolder(folderId: String): BookmarkFolder {
+    override fun getFolder(folderId: String): BookmarkFolder? {
         val entity = syncEntitiesDao.entityById(folderId)
         val relation = syncRelationsDao.relationParentById(folderId)
-        return BookmarkFolder(folderId, entity.title, relation.relationId)
+        return if (entity != null && relation != null) {
+            BookmarkFolder(folderId, entity.title, relation.relationId)
+        } else {
+            null
+        }
     }
 
     override fun deleteAll() {

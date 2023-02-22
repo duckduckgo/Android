@@ -147,7 +147,7 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
     private fun configureClickListeners() {
         binding.savedSiteLocation.setOnClickListener {
             context?.let { context ->
-                arguments?.getLong(KEY_BOOKMARK_FOLDER_ID)?.let {
+                arguments?.getString(KEY_BOOKMARK_FOLDER_ID)?.let {
                     if (arguments?.getSerializable(KEY_CURRENT_FOLDER) != null) {
                         launcher.launch(
                             BookmarkFoldersActivity.intent(
