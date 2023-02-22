@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="windows_app">DuckDuckGo-app til Windows</string>
+    <string name="windows_waitlist_title">Få tidlig adgang til at prøve DuckDuckGo til Windows!</string>
+    <string name="windows_waitlist_description">DuckDuckGo til Windows har alt det, du har brug for for at surfe med mere privatliv – privat søgning, blokering af trackere, tvungen kryptering og blokering af cookie pop op-vinduer, plus flere af vores bedste privatlivsartikler i klassen, der er på vej.</string>
+    <string name="windows_waitlist_mac_link">Leder du efter Mac-versionen?</string>
+    <string name="windows_join_waitlist">Slut dig til den private venteliste</string>
+    <string name="windows_join_waitlist_error">Der opstod en fejl, da du sluttede dig til ventelisten. Prøv igen senere</string>
+    <string name="windows_waitlist_footer">Du behøver ikke at dele nogen personlige oplysninger for at komme på ventelisten. Du sikrer din plads i køen med et tidsstempel, der udelukkende findes på din enhed, så vi kan give dig besked, når det er din tur.</string>
+
+    <string name="windows_waitlist_on_the_list_title">Du er på listen!</string>
+    <string name="windows_waitlist_on_the_list_notification_enabled">Vi sender dig en meddelelse, når din kopi af DuckDuckGo til Windows er klar til download.</string>
+    <string name="windows_waitlist_on_the_list_notification_disabled">Din invitation til at prøve DuckDuckGo til Windows sendes hertil. Kom snart tilbage. Vi kan også sende dig en meddelelse, når det er din tur.</string>
+
+    <string name="notification_channel_windows_waitlist">Invitationer til venteliste</string>
+    <string name="windows_notification_title">Begynd at teste DuckDuckGo til Windows!</string>
+    <string name="windows_notification_text">Åbn din invitation</string>
+
+    <string name="windows_waitlist_code_title">Du er inviteret!</string>
+    <string name="windows_waitlist_code_invite">Invitationskode</string>`
+    <string name="windows_waitlist_code_description">Er du klar til at bruge DuckDuckGo på Windows?\n\n<b>Trin 1</b>\nBesøg denne URL på din Windows-enhed for at downloade:\n<b><annotation type="beta_link">duckduckgo.com/windows</annotation></b>\n\n<b>Trin 2</b>\nÅbn DuckDuckGo-installationsprogrammet i Downloads, vælg Installer, og indtast derefter din invitationskode.</string>
+    <string name="windows_waitlist_code_share_text"><![CDATA[Er du klar til at bruge DuckDuckGo på Windows?<br/><br/><b>Trin 1</b><br/>Besøg denne URL på din Windows-enhed for at downloade:<br/><a href=\"https://duckduckgo.com/windows\"><b>https://duckduckgo.com/windows</b></a><br/><br/><b>Trin 2</b><br/>Åbn DuckDuckGo-installationsprogrammet, vælg Installer, og indtast derefter din invitationskode.<br/><br/>Invitationskode: %1$s]]></string>
+
+    <string name="windows_waitlist_clipboard_invite_copied">Invitation kopieret til udklipsholder</string>
+    <string name="windows_waitlist_clipboard_code_copied">Kode kopieret til udklipsholder</string>
+
+    <string name="windows_waitlist_share_invite">Del din invitation</string>
+
+    <string name="waitlistNotifyMeTitle">Få besked det øjeblik, du bliver inviteret</string>
+    <string name="waitlistNotifyMeSubtitle">Få en besked, når din kopi af DuckDuckGo til Windows er klar til download.</string>
+</resources>
