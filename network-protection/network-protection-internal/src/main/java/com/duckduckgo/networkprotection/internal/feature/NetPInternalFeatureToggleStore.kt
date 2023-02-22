@@ -21,6 +21,8 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.store.remote_config.NetPConfigToggle
 import com.duckduckgo.networkprotection.store.remote_config.NetPConfigTogglesDao
 import com.squareup.anvil.annotations.ContributesBinding
@@ -29,54 +31,51 @@ import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import logcat.logcat
 
-@ContributesBinding(
-    scope = AppScope::class,
-    boundType = NetPFeatureConfig::class,
-)
+@ContributesBinding(AppScope::class)
+@RemoteFeatureStoreNamed(NetPInternalFeatureToggles::class)
 @SingleInstanceIn(AppScope::class)
-class NetPFeatureConfigImpl @Inject constructor(
+class NetPInternalFeatureToggleStore @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val appBuildConfig: AppBuildConfig,
     private val togglesDao: NetPConfigTogglesDao,
-    dispatcherProvider: DispatcherProvider,
-) : NetPFeatureConfig, NetPFeatureConfig.Editor {
+    private val dispatcherProvider: DispatcherProvider,
+) : Toggle.Store {
 
-    private val togglesCache = ConcurrentHashMap<String, Boolean>()
+    private val togglesCache = ConcurrentHashMap<String, Toggle.State>()
 
     init {
         coroutineScope.launch(dispatcherProvider.io()) {
             togglesDao.getConfigToggles().forEach {
-                togglesCache[it.name] = it.enabled
+                togglesCache[it.name] = it.asToggleState()
             }
         }
     }
 
-    override fun isEnabled(settingName: SettingName): Boolean {
-        return togglesCache[settingName.value] ?: settingName.defaultValue
+    override fun set(key: String, state: Toggle.State) {
+        togglesCache[key] = state
+        persistToggle(state.asNetPConfigToggle(key))
     }
 
-    override fun edit(): NetPFeatureConfig.Editor {
-        return this
+    override fun get(key: String): Toggle.State? {
+        return togglesCache[key]
     }
 
-    override fun setEnabled(settingName: SettingName, enabled: Boolean, isManualOverride: Boolean) {
-        val toggle = togglesDao.getConfigToggles().firstOrNull { it.name == settingName.value }
-        if (toggle == null || !shouldSkipInsert(toggle.isManualOverride, isManualOverride)) {
-            togglesCache[settingName.value] = enabled
-            persistToggle(NetPConfigToggle(settingName.value, enabled, isManualOverride))
-        } else {
-            logcat { "Skip setEnabled($settingName, $enabled, $isManualOverride)" }
-        }
+    private fun NetPConfigToggle.asToggleState(): Toggle.State {
+        return Toggle.State(
+            enable = this.enabled,
+        )
     }
 
-    private fun shouldSkipInsert(oldManualOverride: Boolean, newManualOverride: Boolean): Boolean {
-        return appBuildConfig.flavor == BuildFlavor.INTERNAL && (oldManualOverride && !newManualOverride)
+    private fun Toggle.State.asNetPConfigToggle(key: String): NetPConfigToggle {
+        return NetPConfigToggle(
+            name = key,
+            enabled = enable,
+        )
     }
 
     private fun persistToggle(toggle: NetPConfigToggle) {
-        coroutineScope.launch {
+        coroutineScope.launch(dispatcherProvider.io()) {
             // Remote configs will not override any value that has isManualOverride = true
             // But this is only for INTERNAL builds, because we have internal settings
             // In any other build that is not internal isManualOverride is always false

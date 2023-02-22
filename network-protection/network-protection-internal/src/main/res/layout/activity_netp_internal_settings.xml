@@ -67,7 +67,7 @@
                 android:id="@+id/overrideMtuSelector"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryText="MTU Size"/>
+                app:primaryText="@string/netpMtuSize"/>
 
             <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
                 android:id="@+id/overrideServerBackendSelector"
@@ -79,8 +79,16 @@
                 android:id="@+id/excludeSystemAppsToggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryText="Exclude System Apps"
+                app:primaryText="@string/netpExcludeAllSystemApps"
                 app:showSwitch="true"
+            />
+
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+                android:id="@+id/systemAppsItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/netpSystemAppsExclusionList"
+                app:showSwitch="false"
             />
 
         </LinearLayout>

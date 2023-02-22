@@ -17,4 +17,7 @@
 <resources>
     <string name="netpDevSettingsTitle">NetP Dev Settings</string>
     <string name="netpDevSettingHeaderConfig">Config</string>
+    <string name="netpSystemAppsExclusionList">Manage System Apps Exclusion</string>
+    <string name="netpExcludeAllSystemApps">Exclude All System Apps</string>
+    <string name="netpMtuSize">MTU Size</string>
 </resources>

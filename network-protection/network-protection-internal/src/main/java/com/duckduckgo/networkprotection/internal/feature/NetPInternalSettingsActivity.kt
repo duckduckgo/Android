@@ -27,10 +27,12 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
+import com.duckduckgo.networkprotection.internal.feature.system_apps.NetPSystemAppsExclusionListActivity
 import com.duckduckgo.networkprotection.internal.network.NetPInternalMtuProvider
 import com.duckduckgo.networkprotection.store.remote_config.NetPServerRepository
 import javax.inject.Inject
@@ -43,7 +45,7 @@ import om.duckduckgo.networkprotection.internal.databinding.ActivityNetpInternal
 @InjectWith(ActivityScope::class)
 class NetPInternalSettingsActivity : DuckDuckGoActivity() {
 
-    @Inject lateinit var netPFeatureConfig: NetPFeatureConfig
+    @Inject lateinit var netPInternalFeatureToggles: NetPInternalFeatureToggles
 
     @Inject lateinit var vpnStateMonitor: VpnStateMonitor
 
@@ -72,6 +74,7 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
             .map { it.state == VpnStateMonitor.VpnRunningState.ENABLED }
             .onEach { isEnabled ->
                 binding.excludeSystemAppsToggle.isEnabled = isEnabled
+                binding.systemAppsItem.isEnabled = isEnabled && !netPInternalFeatureToggles.excludeSystemApps().isEnabled()
                 binding.overrideMtuSelector.isEnabled = isEnabled
                 binding.overrideMtuSelector.setSecondaryText("MTU size: ${netPInternalMtuProvider.getMtu()}")
                 binding.overrideServerBackendSelector.isEnabled = isEnabled
@@ -81,13 +84,12 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun setupConfigSection() {
-        with(NetPSetting.ExcludeSystemApps) {
-            binding.excludeSystemAppsToggle.setIsChecked(netPFeatureConfig.isEnabled(this))
+        with(netPInternalFeatureToggles.excludeSystemApps()) {
+            binding.excludeSystemAppsToggle.setIsChecked(this.isEnabled())
             binding.excludeSystemAppsToggle.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked) {
-                    sendBroadcast(VpnRemoteFeatureReceiver.enableIntent(this))
-                } else {
-                    sendBroadcast(VpnRemoteFeatureReceiver.disableIntent(this))
+                this.setEnabled(Toggle.State(enable = isChecked))
+                lifecycleScope.launch {
+                    vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
                 }
             }
         }
@@ -97,6 +99,9 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
             lifecycleScope.launch {
                 showServerSelectorMenu()
             }
+        }
+        binding.systemAppsItem.setOnClickListener {
+            startActivity(NetPSystemAppsExclusionListActivity.intent(this))
         }
     }
 

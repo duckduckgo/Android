@@ -13,6 +13,11 @@
             android:process=":vpn"
             android:label="@string/netpDevSettingsTitle"
             android:exported="false" />
+        <activity
+            android:name="com.duckduckgo.networkprotection.internal.feature.system_apps.NetPSystemAppsExclusionListActivity"
+            android:process=":vpn"
+            android:label="@string/netpSystemAppsExclusionList"
+            android:exported="false" />
     </application>
 
 </manifest>

@@ -16,22 +16,28 @@
 
 package com.duckduckgo.networkprotection.internal.network
 
+import android.content.SharedPreferences
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
+import androidx.core.content.edit
 import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.networkprotection.impl.NetPDebugExclusionListProvider
-import com.duckduckgo.networkprotection.internal.feature.NetPFeatureConfig
-import com.duckduckgo.networkprotection.internal.feature.NetPSetting
+import com.duckduckgo.networkprotection.internal.feature.NetPInternalFeatureToggles
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(VpnScope::class)
 class NetPInternalExclusionListProvider @Inject constructor(
     private val packageManager: PackageManager,
-    private val netPFeatureConfig: NetPFeatureConfig,
+    private val netPInternalFeatureToggles: NetPInternalFeatureToggles,
+    private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
 ) : NetPDebugExclusionListProvider {
+    private val preferences: SharedPreferences
+        get() = vpnSharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = true, migrate = false)
+
     override fun getExclusionList(): Set<String> {
-        if (!netPFeatureConfig.isEnabled(NetPSetting.ExcludeSystemApps)) return emptySet()
+        if (!netPInternalFeatureToggles.excludeSystemApps().isEnabled()) return excludeManuallySelectedApps()
 
         // returns the list of system apps for now
         return packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
@@ -40,4 +46,18 @@ class NetPInternalExclusionListProvider @Inject constructor(
             .map { it.packageName }
             .toSet()
     }
+
+    internal fun excludeSystemApp(packageName: String) {
+        preferences.edit { putBoolean(packageName, true) }
+    }
+
+    internal fun includeSystemApp(packageName: String) {
+        preferences.edit { remove(packageName) }
+    }
+
+    private fun excludeManuallySelectedApps(): Set<String> {
+        return preferences.all.keys
+    }
 }
+
+private const val FILENAME = "com.duckduckgo.netp.internal.excluded_system_apps.v1"
