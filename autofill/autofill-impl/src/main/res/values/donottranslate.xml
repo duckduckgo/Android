@@ -15,6 +15,4 @@
   -->
 
 <resources>
-    <string name="useSavedLoginDialogGroupThisWebsite">From This Website</string>
-    <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">From %1$s</string>
 </resources>

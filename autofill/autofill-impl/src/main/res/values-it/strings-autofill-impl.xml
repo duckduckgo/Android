@@ -37,6 +37,8 @@
     <string name="useSavedLoginDialogTitle">Usare i dati di accesso salvati?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Dati di accesso per %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Dati di accesso per il sito</string>
+    <string name="useSavedLoginDialogGroupThisWebsite">Da questo sito web</string>
+    <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Da %1$s</string>
 
     <string name="updateLoginDialogTitle">Aggiornare password?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Aggiorna password</string>
