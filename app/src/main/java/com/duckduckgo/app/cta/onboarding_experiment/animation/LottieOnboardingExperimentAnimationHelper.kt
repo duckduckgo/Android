@@ -84,7 +84,6 @@ class LottieOnboardingExperimentAnimationHelper @Inject constructor(val appTheme
                 Timber.i("Onboarding step: TRACKERS")
             }
             SHOW_TRACKERS_EXPANDED -> {
-                holder.setAnimation(getAnimationRawRes(numberOfTrackers))
                 holder.setMinAndMaxFrame(46, 71)
                 Timber.i("Onboarding step: TRACKERS")
             }
