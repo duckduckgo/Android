@@ -180,10 +180,15 @@ class TypewriterExperimentDaxDialog : DialogFragment(R.layout.view_dax_dialog_ex
     private fun setStepThreeView() {
         binding.cardView.gone()
         binding.logo.gone()
+        binding.onboardingTrackersBlockedAnim.setOnClickListener { daxDialogListener?.onPrivacyShieldClick() }
         setLottieViewAnimation(PRIVACY_SHIELD, this::dismiss)
     }
 
-    private fun setLottieViewAnimation(step: OnboardingExperimentStep, onAnimationEnd: (() -> Unit)? = null, loop: Boolean = false) {
+    private fun setLottieViewAnimation(
+        step: OnboardingExperimentStep,
+        onAnimationEnd: (() -> Unit)? = null,
+        loop: Boolean = false,
+    ) {
         with(binding.onboardingTrackersBlockedAnim) {
             animatorHelper.startTrackersOnboardingAnimationForStep(binding.onboardingTrackersBlockedAnim, step, trackers)
             repeatCount = if (loop) ValueAnimator.INFINITE else 0
