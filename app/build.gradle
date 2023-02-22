@@ -247,10 +247,10 @@ dependencies {
     implementation project(':element-hiding-impl')
     implementation project(':element-hiding-store')
 
-    implementation project(':sync-api')
-    implementation project(':sync-impl')
-    implementation project(':sync-store')
-    implementation project(':sync-lib')
+    internalImplementation project(':sync-api')
+    internalImplementation project(':sync-impl')
+    internalImplementation project(':sync-store')
+    internalImplementation project(':sync-lib')
 
     implementation project(':request-filterer-api')
     implementation project(':request-filterer-impl')
