@@ -17,8 +17,10 @@
 package com.duckduckgo.app.trackerdetection
 
 import android.net.Uri
+import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.trackerdetection.db.TdsCnameEntityDao
 import com.duckduckgo.app.trackerdetection.model.TdsCnameEntity
+import com.duckduckgo.app.userwhitelist.api.UserWhiteListRepository
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
@@ -35,10 +37,11 @@ class CloakedCnameDetectorImplTest {
     private val mockCnameEntityDao: TdsCnameEntityDao = mock()
     private val mockTrackerAllowList: TrackerAllowlist = mock()
     private val mockUri: Uri = mock()
+    private val mockUserWhiteListRepository: UserWhiteListRepository = mock()
 
     @Before
     fun setup() {
-        testee = CloakedCnameDetectorImpl(mockCnameEntityDao, mockTrackerAllowList)
+        testee = CloakedCnameDetectorImpl(mockCnameEntityDao, mockTrackerAllowList, mockUserWhiteListRepository)
     }
 
     @Test
@@ -90,5 +93,12 @@ class CloakedCnameDetectorImplTest {
     fun whenRequestUrlIsInAllowListThenReturnNull() {
         whenever(mockTrackerAllowList.isAnException(anyString(), anyString())).thenReturn(true)
         assertEquals(null, testee.detectCnameCloakedHost("foo.com", mockUri))
+    }
+
+    @Test
+    fun whenDetectCnameCloakedHostAndUrlIsInUserAllowListThenReturnNull() {
+        whenever(mockUri.domain()).thenReturn("test.com")
+        whenever(mockUserWhiteListRepository.userWhiteList).thenReturn(listOf("test.com"))
+        assertNull(testee.detectCnameCloakedHost("foo.com", mockUri))
     }
 }
