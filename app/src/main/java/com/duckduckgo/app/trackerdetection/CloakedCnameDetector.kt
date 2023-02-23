@@ -42,7 +42,8 @@ class CloakedCnameDetectorImpl @Inject constructor(
 
     override fun detectCnameCloakedHost(documentUrl: String?, url: Uri): String? {
         if (documentUrl != null && trackerAllowlist.isAnException(documentUrl, url.toString()) ||
-            userWhiteListRepository.userWhiteList.contains(url.domain())) return null
+            userWhiteListRepository.userWhiteList.contains(url.domain())
+        ) { return null }
 
         url.host?.let { host ->
             tdsCnameEntityDao.get(host)?.let { cnameEntity ->
