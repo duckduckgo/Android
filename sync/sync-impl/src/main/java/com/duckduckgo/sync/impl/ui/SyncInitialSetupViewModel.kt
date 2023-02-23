@@ -25,11 +25,13 @@ import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncRepository
+import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ReadConnectQR
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ReadQR
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ShowQR
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
@@ -65,6 +67,7 @@ constructor(
     sealed class Command {
         data class ShowMessage(val message: String) : Command()
         object ReadQR : Command()
+        object ReadConnectQR : Command()
         data class ShowQR(val string: String) : Command()
     }
 
@@ -188,10 +191,45 @@ constructor(
         }
     }
 
+    fun onConnectQRScanned(contents: String) {
+        viewModelScope.launch(dispatchers.io()) {
+            val result = syncRepository.connectDevice(contents)
+            when(result) {
+                is Error -> {
+                    command.send(Command.ShowMessage("$result"))
+                }
+                is Success -> {
+                    command.send(Command.ShowMessage("${result.data}"))
+                }
+            }
+        }
+    }
+
     fun onConnectStart() {
         viewModelScope.launch(dispatchers.io()) {
             val qrCode = syncRepository.getLinkingQR()
             command.send(ShowQR(qrCode))
+            var polling = true
+            while(polling) {
+                delay(7000)
+                when(val result = syncRepository.pollConnectionKeys()) {
+                    is Error -> {
+                        command.send(Command.ShowMessage("$result"))
+                    }
+                    is Success -> {
+                        command.send(Command.ShowMessage(result.data))
+                        polling = false
+                    }
+                }
+            }
+        }
+    }
+
+    fun onReadConnectQRClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            viewModelScope.launch(dispatchers.io()) {
+                command.send(ReadConnectQR)
+            }
         }
     }
 }

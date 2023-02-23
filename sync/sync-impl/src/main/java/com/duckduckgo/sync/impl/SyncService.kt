@@ -23,6 +23,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.Path
 
 @ContributesServiceApi(AppScope::class)
 interface SyncService {
@@ -52,6 +53,17 @@ interface SyncService {
     fun getDevices(
         @Header("Authorization") token: String,
     ): Call<DeviceResponse>
+
+    @POST("https://dev-sync-use.duckduckgo.com/sync/connect")
+    fun connect(
+        @Header("Authorization") token: String,
+        @Body request: Connect,
+    ): Call<Void>
+
+    @GET("https://dev-sync-use.duckduckgo.com/sync/connect/{device_id}")
+    fun connectDevice(
+        @Path("device_id") deviceId: String,
+    ): Call<ConnectKeys>
 }
 
 data class Login(
@@ -71,6 +83,15 @@ data class Signup(
 
 data class Logout(
     val device_id: String,
+)
+
+data class ConnectKeys(
+    val encrypted_recovery_key: String,
+)
+
+data class Connect(
+    val device_id: String,
+    val encrypted_recovery_key: String,
 )
 
 data class AccountCreatedResponse(

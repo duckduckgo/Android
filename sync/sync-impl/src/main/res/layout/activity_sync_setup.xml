@@ -176,6 +176,13 @@
             android:text="Show QR code" />
 
         <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+            android:id="@+id/readConnectQRCode"
+            android:layout_width="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_height="wrap_content"
+            android:text="Connect (read QR)" />
+
+        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
             android:id="@+id/connectQRCode"
             android:layout_width="wrap_content"
             android:layout_margin="10dp"

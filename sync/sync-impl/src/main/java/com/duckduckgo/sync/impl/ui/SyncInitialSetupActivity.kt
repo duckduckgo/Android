@@ -31,6 +31,7 @@ import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.databinding.ActivitySyncSetupBinding
 import com.duckduckgo.sync.impl.databinding.ItemConnectedDeviceBinding
+import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ReadConnectQR
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ReadQR
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ShowQR
@@ -58,6 +59,18 @@ class SyncInitialSetupActivity : DuckDuckGoActivity() {
         }
     }
 
+    // Register the launcher and result handler
+    private val barcodeConnectLauncher = registerForActivityResult(
+        ScanContract(),
+    ) { result: ScanIntentResult ->
+        if (result.contents == null) {
+            Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show()
+        } else {
+            Timber.i("SYNC contents ${result.contents}")
+            viewModel.onConnectQRScanned(result.contents)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -80,6 +93,7 @@ class SyncInitialSetupActivity : DuckDuckGoActivity() {
         binding.logoutButton.setOnClickListener { viewModel.onLogoutClicked() }
         binding.deleteAccountButton.setOnClickListener { viewModel.onDeleteAccountClicked() }
         binding.connectQRCode.setOnClickListener { viewModel.onConnectStart() }
+        binding.readConnectQRCode.setOnClickListener { viewModel.onReadConnectQRClicked() }
     }
 
     private fun observeUiEvents() {
@@ -115,6 +129,10 @@ class SyncInitialSetupActivity : DuckDuckGoActivity() {
                     binding.showQRCode.hide()
                 } catch (e: Exception) {
                 }
+            }
+
+            ReadConnectQR -> {
+                barcodeConnectLauncher.launch(getScanOptions())
             }
         }
     }

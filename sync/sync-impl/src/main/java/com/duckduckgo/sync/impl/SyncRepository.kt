@@ -49,6 +49,9 @@ interface SyncRepository {
     fun getRecoveryCode(): String?
     fun getConnectedDevices(): Result<List<ConnectedDevice>>
     fun getLinkingQR(): String
+    fun connectDevice(contents: String): Result<Boolean>
+
+    fun pollConnectionKeys(): Result<String>
 }
 
 @ContributesBinding(AppScope::class)
@@ -150,7 +153,33 @@ class AppSyncRepository @Inject constructor(
     override fun getLinkingQR(): String {
         val prepareForConnect = nativeLib.prepareForConnect()
         val deviceId = syncDeviceIds.deviceId()
+        syncStore.deviceId = deviceId
         return Adapters.connectCodeAdapter.toJson(ConnectCode(prepareForConnect.publicKey, deviceId))
+    }
+
+    override fun connectDevice(contents: String): Result<Boolean> {
+        val connectKeys = Adapters.connectCodeAdapter.fromJson(contents) ?: return Result.Error(reason = "Error reading json")
+        val primaryKey = syncStore.primaryKey ?: return Result.Error(reason = "Error reading PK")
+        val userId = syncStore.userId ?: return Result.Error(reason = "Error reading UserId")
+        val token = syncStore.token ?: return Result.Error(reason = "Error token")
+
+        val seal = nativeLib.seal("$userId;$primaryKey", connectKeys.publicKey)
+
+        return syncApi.connect(token = token, deviceId = connectKeys.deviceId, publicKey = seal)
+    }
+
+    override fun pollConnectionKeys(): Result<String> {
+        val deviceId = syncStore.deviceId!!
+        val result = syncApi.connectDevice(deviceId)
+
+        return when (result) {
+            is Result.Error -> {
+                result
+            }
+            is Result.Success -> {
+                result
+            }
+        }
     }
 
     override fun removeAccount() {
