@@ -17,6 +17,7 @@
 package com.duckduckgo.privacy.config.impl.features.trackingparameters
 
 import android.net.Uri
+import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import com.duckduckgo.app.global.UriString
 import com.duckduckgo.app.global.domain
@@ -48,6 +49,7 @@ class RealTrackingParameters @Inject constructor(
 
     override var lastCleanedUrl: String? = null
 
+    @VisibleForTesting
     fun isAnException(initiatingUrl: String?, url: String, uri: Uri = url.toUri()): Boolean {
         return matches(initiatingUrl) || matches(url) ||
             unprotectedTemporary.isAnException(url) ||
