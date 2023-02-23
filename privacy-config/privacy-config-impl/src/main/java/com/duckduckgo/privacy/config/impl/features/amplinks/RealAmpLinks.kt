@@ -16,7 +16,10 @@
 
 package com.duckduckgo.privacy.config.impl.features.amplinks
 
+import androidx.core.net.toUri
 import com.duckduckgo.app.global.UriString
+import com.duckduckgo.app.global.domain
+import com.duckduckgo.app.userwhitelist.api.UserWhiteListRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.AmpLinkInfo
@@ -35,6 +38,7 @@ class RealAmpLinks @Inject constructor(
     private val ampLinksRepository: AmpLinksRepository,
     private val featureToggle: FeatureToggle,
     private val unprotectedTemporary: UnprotectedTemporary,
+    private val userWhiteListRepository: UserWhiteListRepository,
 ) : AmpLinks {
 
     private var lastExtractedUrl: String? = null
@@ -42,7 +46,8 @@ class RealAmpLinks @Inject constructor(
     override var lastAmpLinkInfo: AmpLinkInfo? = null
 
     override fun isAnException(url: String): Boolean {
-        return matches(url) || unprotectedTemporary.isAnException(url)
+        return matches(url) || unprotectedTemporary.isAnException(url) ||
+            userWhiteListRepository.userWhiteList.contains(url.toUri().domain())
     }
 
     private fun matches(url: String): Boolean {

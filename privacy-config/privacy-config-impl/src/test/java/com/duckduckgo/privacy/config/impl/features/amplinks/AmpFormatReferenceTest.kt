@@ -17,6 +17,7 @@
 package com.duckduckgo.privacy.config.impl.features.amplinks
 
 import com.duckduckgo.app.FileUtilities
+import com.duckduckgo.app.userwhitelist.api.UserWhiteListRepository
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.AmpLinkException
 import com.duckduckgo.privacy.config.api.AmpLinkType
@@ -45,11 +46,12 @@ class AmpFormatReferenceTest(private val testCase: TestCase) {
     private val mockRepository: AmpLinksRepository = mock()
     private val mockUnprotectedTemporary: UnprotectedTemporary = mock()
     private val mockFeatureToggle: FeatureToggle = mock()
+    private val mockUserWhiteListRepository: UserWhiteListRepository = mock()
 
     @Before
     fun setup() {
         mockAmpLinks()
-        testee = RealAmpLinks(mockRepository, mockFeatureToggle, mockUnprotectedTemporary)
+        testee = RealAmpLinks(mockRepository, mockFeatureToggle, mockUnprotectedTemporary, mockUserWhiteListRepository)
         whenever(mockUnprotectedTemporary.isAnException(any())).thenReturn(false)
         whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.AmpLinksFeatureName.value, true)).thenReturn(true)
     }
