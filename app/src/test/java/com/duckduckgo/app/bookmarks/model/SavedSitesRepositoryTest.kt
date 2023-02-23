@@ -595,7 +595,31 @@ class SavedSitesRepositoryTest {
         assertEquals(items, flatStructure)
     }
 
+    @Test
+    fun whenRootFolderHasBookmarksAndFoldersThenDataWithNumbersIsRetrieved() = runTest {
+        val totalBookmarks = 10
+        val totalFolders = 3
 
+        val entities = givenSomeBookmarks(totalBookmarks)
+        syncEntitiesDao.insertList(entities)
+
+        val folders = givenSomeFolders(totalFolders)
+        syncEntitiesDao.insertList(folders)
+
+        val relation = givenFolderWithContent(Relation.BOOMARKS_ROOT, entities.plus(folders))
+        syncRelationsDao.insertList(relation)
+
+        repository.getFolderEntityContent(Relation.BOOMARKS_ROOT).test {
+            val result = awaitItem()
+            assert(result.first.size == totalBookmarks)
+            assert(result.second.size == totalFolders)
+
+            val firstFolder()
+            assert(result.second.first().numBookmarks == totalFolders)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
 
     @After
     fun after() {

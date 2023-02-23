@@ -78,3 +78,13 @@ data class Relation(
         const val BOOMARKS_ROOT_ID = 0L
     }
 }
+
+data class EntityContent (
+    var entityId: String,
+    var title: String,
+    var url: String?,
+    var type: EntityType,
+    var relationId: String,
+    var numBookmarks: Int,
+    var numFolders: Int
+)

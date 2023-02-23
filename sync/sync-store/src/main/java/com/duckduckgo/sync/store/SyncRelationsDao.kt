@@ -37,6 +37,12 @@ interface SyncRelationsDao {
     @Query("select * from relations")
     fun relations(): List<Relation>
 
+    @Query("select *, " +
+        "(select count(*) from relations inner join entities on relations.entityId = entities.entityId where entities.type = 'BOOKMARK' and relations.relationId = :folderId) as numBookmarks, " +
+        "(select count(*) from relations inner join entities on relations.entityId = entities.entityId where entities.type = 'FOLDER' and relations.relationId = :folderId) as numFolders " +
+        "from entities inner join relations on entities.entityId = relations.entityId where relations.relationId = :folderId")
+    fun folderContent(folderId: String): Flow<List<EntityContent>>
+
     @Query("select * from entities inner join relations on entities.entityId = relations.entityId where relations.relationId = :folderId")
     fun relationById(folderId: String): Flow<List<Entity>>
 
@@ -70,7 +76,10 @@ interface SyncRelationsDao {
     @Query(
         "select count(*) from entities inner join relations on entities.entityId = relations.entityId where entities.url LIKE :domain AND relationId == :relationId",
     )
-    fun relationsCountByUrl(domain: String, relationId: String = Relation.FAVORITES_ROOT): Int
+    fun relationsCountByUrl(
+        domain: String,
+        relationId: String = Relation.FAVORITES_ROOT
+    ): Int
 
     @Query("delete from relations")
     fun deleteAll()

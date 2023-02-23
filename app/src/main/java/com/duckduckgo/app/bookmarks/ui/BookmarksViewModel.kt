@@ -38,6 +38,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.store.Relation
 import javax.inject.Inject
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -82,11 +83,11 @@ class BookmarksViewModel @Inject constructor(
 
     init {
         viewState.value = ViewState()
-        viewModelScope.launch {
-            savedSitesRepository.getFavorites().collect {
-                onFavoritesChanged(it)
-            }
-        }
+        // viewModelScope.launch {
+        //     savedSitesRepository.getFavorites().collect {
+        //         onFavoritesChanged(it)
+        //     }
+        // }
     }
 
     override fun onSavedSiteEdited(savedSite: SavedSite) {
@@ -192,9 +193,13 @@ class BookmarksViewModel @Inject constructor(
 
     fun fetchBookmarksAndFolders(parentId: String = Relation.BOOMARKS_ROOT) {
         viewModelScope.launch {
-            savedSitesRepository.getFolderContent(parentId).collect { bookmarksAndFolders ->
-                onBookmarkItemsChanged(bookmarks = bookmarksAndFolders.first, bookmarkFolders = bookmarksAndFolders.second)
+            savedSitesRepository.getSavedSites(parentId).collect {
+                onSavedSitesItemsChanged(it.favorites, it.bookmarks, it.folders)
             }
+
+            // savedSitesRepository.getFolderContent(parentId).collect { bookmarksAndFolders ->
+            //     onBookmarkItemsChanged(bookmarks = bookmarksAndFolders.first, bookmarkFolders = bookmarksAndFolders.second)
+            // }
         }
     }
 
@@ -227,6 +232,15 @@ class BookmarksViewModel @Inject constructor(
         } else {
             command.value = DeleteBookmarkFolder(bookmarkFolder)
         }
+    }
+
+    private fun onSavedSitesItemsChanged(favorites: List<Favorite>, bookmarks: List<Bookmark>, bookmarkFolders: List<BookmarkFolder>){
+        viewState.value = viewState.value?.copy(
+            favorites = favorites,
+            bookmarks = bookmarks,
+            bookmarkFolders = bookmarkFolders,
+            enableSearch = bookmarks.size + bookmarkFolders.size >= MIN_ITEMS_FOR_SEARCH,
+        )
     }
 
     private fun onBookmarkItemsChanged(

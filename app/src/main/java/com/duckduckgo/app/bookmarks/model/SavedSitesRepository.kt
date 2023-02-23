@@ -22,6 +22,8 @@ import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.sync.store.Entity
+import com.duckduckgo.sync.store.EntityContent
+import com.duckduckgo.sync.store.EntityType
 import com.duckduckgo.sync.store.EntityType.BOOKMARK
 import com.duckduckgo.sync.store.EntityType.FOLDER
 import com.duckduckgo.sync.store.Relation
@@ -30,11 +32,16 @@ import com.duckduckgo.sync.store.SyncRelationsDao
 import io.reactivex.Single
 import java.io.Serializable
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import java.util.*
 
 interface SavedSitesRepository {
+
+    suspend fun getSavedSites(folderId: String): Flow<SavedSites>
+
+    suspend fun getFolderEntityContent(folderId: String): Flow<Pair<List<Bookmark>, List<BookmarkFolder>>>
 
     suspend fun getFolderContent(folderId: String): Flow<Pair<List<Bookmark>, List<BookmarkFolder>>>
 
@@ -101,6 +108,34 @@ class RealSavedSitesRepository(
     private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
 ) : SavedSitesRepository {
 
+    override suspend fun getSavedSites(folderId: String): Flow<SavedSites> {
+        return if (folderId == Relation.BOOMARKS_ROOT) {
+            getFavorites().combine(getFolderContent(folderId)) { favorites, folderContent ->
+                SavedSites(favorites.distinct(), folderContent.first, folderContent.second)
+            }
+        } else {
+            getFolderContent(folderId).map {
+                SavedSites(emptyList(), it.first, it.second)
+            }
+        }
+    }
+
+    override suspend fun getFolderEntityContent(folderId: String): Flow<Pair<List<Bookmark>, List<BookmarkFolder>>> {
+        val bookmarks = mutableListOf<Bookmark>()
+        val folders = mutableListOf<BookmarkFolder>()
+        return syncRelationsDao.folderContent(folderId).map { entities ->
+            entities.forEach { entity ->
+                if (entity.type == FOLDER) {
+                    folders.add( BookmarkFolder(entity.entityId, entity.title, entity.relationId, entity.numBookmarks, entity.numFolders))
+                } else {
+                    bookmarks.add(Bookmark(entity.entityId, entity.title, entity.url.orEmpty(), entity.relationId))
+                }
+            }
+            Pair(bookmarks.distinct(), folders.distinct())
+        }
+            .flowOn(dispatcherProvider.io())
+    }
+
     override suspend fun getFolderContent(folderId: String): Flow<Pair<List<Bookmark>, List<BookmarkFolder>>> {
         val bookmarks = mutableListOf<Bookmark>()
         val folders = mutableListOf<BookmarkFolder>()
@@ -113,7 +148,7 @@ class RealSavedSitesRepository(
                     bookmarks.add(entity.mapToBookmark(folderId))
                 }
             }
-            Pair(bookmarks, folders)
+            Pair(bookmarks.distinct(), folders.distinct())
         }
             .flowOn(dispatcherProvider.io())
     }
@@ -382,6 +417,7 @@ class RealSavedSitesRepository(
             entities.add(it)
         }
 
+        syncRelationsDao.deleteEntity(folder.id)
         syncRelationsDao.delete(folder.id)
         syncEntitiesDao.deleteList(entities.toList())
         syncEntitiesDao.delete(folder.id)
@@ -423,6 +459,12 @@ class RealSavedSitesRepository(
     private fun List<Entity>.mapToFavorites(): List<Favorite> = this.mapIndexed { index, relation -> relation.mapToFavorite(index) }
 }
 
+data class SavedSites(
+    val favorites: List<Favorite>,
+    val bookmarks: List<Bookmark>,
+    val folders: List<BookmarkFolder>
+)
+
 sealed class SavedSite(
     open val id: String,
     open val title: String,
@@ -448,4 +490,3 @@ data class FolderBranch(
     val bookmarks: List<Bookmark>,
     val folders: List<BookmarkFolder>,
 )
-
