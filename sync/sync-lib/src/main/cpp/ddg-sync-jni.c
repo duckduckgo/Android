@@ -44,6 +44,26 @@ Java_com_duckduckgo_sync_crypto_SyncNativeLib_generateAccountKeys(JNIEnv* env, j
 }
 
 JNIEXPORT jint JNICALL
+Java_com_duckduckgo_sync_crypto_SyncNativeLib_prepareForConnect(JNIEnv* env, jclass class,
+    jbyteArray publicKey,
+    jbyteArray secretKey) {
+
+    // Get pointers to the arrays
+    jbyte* publicKeyElements = (*env)->GetByteArrayElements(env, publicKey, NULL);
+    jbyte* secretKeyElements = (*env)->GetByteArrayElements(env, secretKey, NULL);
+
+    jint result = ddgSyncPrepareForConnect(
+        (unsigned char*) publicKeyElements,
+        (unsigned char*) secretKeyElements);
+
+    // Release the arrays
+    (*env)->ReleaseByteArrayElements(env, publicKey, publicKeyElements, JNI_COMMIT);
+    (*env)->ReleaseByteArrayElements(env, secretKey, secretKeyElements, JNI_COMMIT);
+
+    return result;
+}
+
+JNIEXPORT jint JNICALL
 Java_com_duckduckgo_sync_crypto_SyncNativeLib_prepareForLogin(
     JNIEnv *env,
     jclass clazz,
@@ -179,3 +199,20 @@ Java_com_duckduckgo_sync_crypto_SyncNativeLib_getEncryptedExtraBytes(
 ) {
     return DDGSYNCCRYPTO_ENCRYPTED_EXTRA_BYTES_SIZE;
 }
+
+JNIEXPORT jint JNICALL
+Java_com_duckduckgo_sync_crypto_SyncNativeLib_getPublicKeyBytes(
+    JNIEnv *env,
+    jclass clazz
+) {
+    return DDGSYNCCRYPTO_PUBLIC_KEY;
+}
+
+JNIEXPORT jint JNICALL
+Java_com_duckduckgo_sync_crypto_SyncNativeLib_getPrivateKeyBytes(
+    JNIEnv *env,
+    jclass clazz
+) {
+    return DDGSYNCCRYPTO_PRIVATE_KEY;
+}
+

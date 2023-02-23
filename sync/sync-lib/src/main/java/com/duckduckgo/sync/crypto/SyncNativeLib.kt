@@ -21,7 +21,6 @@ import android.util.Base64
 import com.duckduckgo.library.loader.LibraryLoader
 import java.util.*
 import kotlin.system.exitProcess
-import okio.ByteString.Companion.encode
 import timber.log.Timber
 
 interface SyncLib {
@@ -35,6 +34,8 @@ interface SyncLib {
         encryptedData: String,
         secretKey: String,
     ): DecryptResult
+
+    fun prepareForConnect(): ConnectKeys
 
     fun encrypt(
         rawData: String,
@@ -115,6 +116,23 @@ class SyncNativeLib constructor(context: Context) : SyncLib {
         )
     }
 
+    override fun prepareForConnect(): ConnectKeys {
+        val publicKey = ByteArray(getPublicKeyBytes())
+        val privateKey = ByteArray(getPrivateKeyBytes())
+
+        val result: Long =
+            prepareForConnect(
+                publicKey,
+                privateKey,
+            )
+
+        return ConnectKeys(
+            result = result,
+            publicKey = publicKey.encode(),
+            secretKey = privateKey.encode(),
+        )
+    }
+
     override fun encrypt(
         rawData: String,
         secretKey: String,
@@ -148,6 +166,11 @@ class SyncNativeLib constructor(context: Context) : SyncLib {
         password: String,
     ): Long
 
+    private external fun prepareForConnect(
+        publicKey: ByteArray,
+        secretKey: ByteArray,
+    ): Long
+
     private external fun prepareForLogin(
         passwordHash: ByteArray,
         stretchedPrimaryKey: ByteArray,
@@ -172,6 +195,8 @@ class SyncNativeLib constructor(context: Context) : SyncLib {
     private external fun getPasswordHashSize(): Int
     private external fun getStretchedPrimaryKeySize(): Int
     private external fun getEncryptedExtraBytes(): Int
+    private external fun getPublicKeyBytes(): Int
+    private external fun getPrivateKeyBytes(): Int
 }
 
 class AccountKeys(
@@ -182,6 +207,12 @@ class AccountKeys(
     val passwordHash: String,
     val userId: String,
     val password: String,
+)
+
+class ConnectKeys(
+    val result: Long,
+    val publicKey: String,
+    val secretKey: String,
 )
 
 class LoginKeys(

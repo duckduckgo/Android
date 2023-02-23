@@ -117,6 +117,17 @@ DDGSyncCryptoResult ddgSyncPrepareForLogin(
     return DDGSYNCCRYPTO_OK;
 }
 
+DDGSyncCryptoResult ddgSyncPrepareForConnect(
+    unsigned char primaryKey[DDGSYNCCRYPTO_PUBLIC_KEY],
+    unsigned char secretKey[DDGSYNCCRYPTO_PRIVATE_KEY]) {
+
+    if (0 != crypto_box_keypair(primaryKey, secretKey)) {
+        return DDGSYNCCRYPTO_CONNECT_KEY_FAILED;
+    }
+
+    return DDGSYNCCRYPTO_OK;
+}
+
 DDGSyncCryptoResult ddgSyncEncrypt(
     unsigned char *encryptedBytes,
     unsigned char *rawBytes,

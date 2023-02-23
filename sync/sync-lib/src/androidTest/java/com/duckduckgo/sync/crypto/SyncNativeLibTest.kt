@@ -116,6 +116,13 @@ class SyncNativeLibTest {
         assertEquals(whatToEncrypt, decryptedResult.decryptedData)
     }
 
+    @Test
+    fun whenPrepareForConnectThenResultSuccess() {
+        val syncNativeLib = SyncNativeLib(InstrumentationRegistry.getInstrumentation().targetContext)
+        val prepareForConnect = syncNativeLib.prepareForConnect()
+        assertEquals(0L, prepareForConnect.result)
+    }
+
     companion object {
         private const val aUserId = "user"
         private const val aPassword = "password"
