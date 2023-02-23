@@ -84,20 +84,19 @@ class LottieOnboardingExperimentAnimationHelper @Inject constructor(val appTheme
                 Timber.i("Onboarding step: TRACKERS")
             }
             SHOW_TRACKERS_EXPANDED -> {
-                holder.setMinAndMaxFrame(46, 71)
-                Timber.i("Onboarding step: TRACKERS")
+                holder.setMinAndMaxFrame(46, 93)
+                Timber.i("Onboarding step: TRACKERS_EXPANDED")
             }
             TRACKERS_HAND_LOOP -> {
-                holder.setMinAndMaxFrame(72, 119)
+                holder.setMinAndMaxFrame(94, 144)
                 Timber.i("Onboarding step: TRACKERS HAND LOOP")
             }
             BLOCK_TRACKERS -> {
-                holder.setMinAndMaxFrame(120, 199)
+                holder.setMinAndMaxFrame(145, 224)
                 Timber.i("Onboarding step: BLOCK_TRACKERS")
             }
             PRIVACY_SHIELD -> {
-                holder.setAnimation(getAnimationRawRes(numberOfTrackers))
-                holder.setMinFrame(200)
+                holder.setMinAndMaxFrame(225, 419)
                 Timber.i("Onboarding step: PRIVACY_SHIELD")
             }
         }
