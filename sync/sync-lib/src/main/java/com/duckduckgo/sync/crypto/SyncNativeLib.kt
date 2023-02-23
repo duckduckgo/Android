@@ -41,6 +41,14 @@ interface SyncLib {
         rawData: String,
         secretKey: String,
     ): EncryptResult
+
+    fun seal(message: String, publicKey: String): String
+
+    fun sealOpen(
+        cypherTextBytes: String,
+        primaryKey: String,
+        secretKey: String,
+    ): String
 }
 
 class SyncNativeLib constructor(context: Context) : SyncLib {
@@ -149,6 +157,34 @@ class SyncNativeLib constructor(context: Context) : SyncLib {
         )
     }
 
+    override fun seal(
+        message: String,
+        publicKey: String,
+    ): String {
+        val messageBytes = message.decode()
+        val publicKeyBytes = publicKey.decode()
+        val sealedData = ByteArray(messageBytes.size + getSealBytes())
+
+        val result: Int = seal(sealedData, publicKeyBytes, messageBytes)
+
+        return sealedData.encode()
+    }
+
+    override fun sealOpen(
+        cypherText: String,
+        primaryKey: String,
+        secretKey: String,
+    ): String {
+        val primaryKeyBytes = primaryKey.decode()
+        val secretKeyBytes = secretKey.decode()
+        val cypherTextBytes = cypherText.decode()
+        val rawBytes = ByteArray(cypherTextBytes.size - getSealBytes())
+
+        val result: Int = sealOpen(cypherTextBytes, primaryKeyBytes, secretKeyBytes, rawBytes)
+
+        return rawBytes.encode()
+    }
+
     private fun ByteArray.encode(): String {
         return Base64.encodeToString(this, Base64.NO_WRAP)
     }
@@ -189,6 +225,19 @@ class SyncNativeLib constructor(context: Context) : SyncLib {
         secretKey: ByteArray,
     ): Long
 
+    private external fun seal(
+        sealedBytes: ByteArray,
+        primaryKey: ByteArray,
+        messageBytes: ByteArray,
+    ): Int
+
+    private external fun sealOpen(
+        cyphertext: ByteArray,
+        primaryKey: ByteArray,
+        secretKey: ByteArray,
+        rawBytes: ByteArray,
+    ): Int
+
     private external fun getPrimaryKeySize(): Int
     private external fun getSecretKeySize(): Int
     private external fun getProtectedSecretKeySize(): Int
@@ -197,6 +246,7 @@ class SyncNativeLib constructor(context: Context) : SyncLib {
     private external fun getEncryptedExtraBytes(): Int
     private external fun getPublicKeyBytes(): Int
     private external fun getPrivateKeyBytes(): Int
+    private external fun getSealBytes(): Int
 }
 
 class AccountKeys(

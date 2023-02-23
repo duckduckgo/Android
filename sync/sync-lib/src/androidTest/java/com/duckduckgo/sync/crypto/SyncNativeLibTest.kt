@@ -123,6 +123,15 @@ class SyncNativeLibTest {
         assertEquals(0L, prepareForConnect.result)
     }
 
+    @Test
+    fun whenSealThenSuccess() {
+        val syncNativeLib = SyncNativeLib(InstrumentationRegistry.getInstrumentation().targetContext)
+        val prepareForConnect = syncNativeLib.prepareForConnect()
+        val result = syncNativeLib.seal("hola", prepareForConnect.publicKey)
+        val result2 = syncNativeLib.sealOpen(result, prepareForConnect.publicKey, prepareForConnect.secretKey)
+        assertEquals("hola", result2)
+    }
+
     companion object {
         private const val aUserId = "user"
         private const val aPassword = "password"
