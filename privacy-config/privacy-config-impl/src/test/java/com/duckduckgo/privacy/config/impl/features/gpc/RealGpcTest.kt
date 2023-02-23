@@ -16,7 +16,10 @@
 
 package com.duckduckgo.privacy.config.impl.features.gpc
 
+import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.global.domain
+import com.duckduckgo.app.userwhitelist.api.UserWhiteListRepository
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.GpcException
 import com.duckduckgo.privacy.config.api.GpcHeaderEnabledSite
@@ -39,6 +42,7 @@ class RealGpcTest {
     private val mockGpcRepository: GpcRepository = mock()
     private val mockFeatureToggle: FeatureToggle = mock()
     private val mockUnprotectedTemporary: UnprotectedTemporary = mock()
+    private val mockUserWhiteListRepository: UserWhiteListRepository = mock()
     lateinit var testee: RealGpc
 
     @Before
@@ -51,7 +55,7 @@ class RealGpcTest {
         whenever(mockGpcRepository.headerEnabledSites).thenReturn(headers)
 
         testee =
-            RealGpc(mockFeatureToggle, mockGpcRepository, mockUnprotectedTemporary)
+            RealGpc(mockFeatureToggle, mockGpcRepository, mockUnprotectedTemporary, mockUserWhiteListRepository)
     }
 
     @Test
@@ -197,6 +201,14 @@ class RealGpcTest {
         whenever(mockUnprotectedTemporary.isAnException(VALID_CONSUMER_URL)).thenReturn(true)
 
         assertFalse(testee.canGpcBeUsedByUrl(VALID_CONSUMER_URL))
+    }
+
+    @Test
+    fun whenIsExceptionCalledAndDomainIsInUserAllowListThenReturnTrue() {
+        val mockUri: Uri = mock()
+        whenever(mockUri.domain()).thenReturn("test.com")
+        whenever(mockUserWhiteListRepository.userWhiteList).thenReturn(listOf("test.com"))
+        assertTrue(testee.isAnException("test.com", mockUri))
     }
 
     private fun givenFeatureAndGpcAreEnabled() {
