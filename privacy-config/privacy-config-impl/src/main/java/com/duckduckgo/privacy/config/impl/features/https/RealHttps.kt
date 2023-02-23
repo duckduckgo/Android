@@ -16,7 +16,10 @@
 
 package com.duckduckgo.privacy.config.impl.features.https
 
+import androidx.core.net.toUri
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
+import com.duckduckgo.app.global.domain
+import com.duckduckgo.app.userwhitelist.api.UserWhiteListRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.Https
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
@@ -30,10 +33,12 @@ import javax.inject.Inject
 class RealHttps @Inject constructor(
     private val httpsRepository: HttpsRepository,
     private val unprotectedTemporary: UnprotectedTemporary,
+    private val userWhiteListRepository: UserWhiteListRepository,
 ) : Https {
 
     override fun isAnException(url: String): Boolean {
-        return unprotectedTemporary.isAnException(url) || matches(url)
+        return unprotectedTemporary.isAnException(url) || matches(url) ||
+            userWhiteListRepository.userWhiteList.contains(url.toUri().domain())
     }
 
     private fun matches(url: String): Boolean {
