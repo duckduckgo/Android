@@ -538,7 +538,6 @@ class SavedSitesRepositoryTest {
         assertNull(repository.getBookmark(childBookmark.url))
     }
 
-
     @Test
     fun whenBuildFlatStructureThenReturnFolderListWithDepth() = runTest {
         val rootFolder = BookmarkFolder(id = Relation.BOOMARKS_ROOT, name = "root", parentId = "")
@@ -564,6 +563,17 @@ class SavedSitesRepositoryTest {
     }
 
     @Test
+    fun whenFolderIsDeletedThenRemovedFromDb() {
+        val rootFolder = BookmarkFolder(id = Relation.BOOMARKS_ROOT, name = "root", parentId = "")
+        repository.insert(rootFolder)
+
+        assertEquals(repository.getFolder(rootFolder.id), rootFolder)
+
+        repository.delete(rootFolder)
+        assertNull(repository.getFolder(rootFolder.id))
+    }
+
+    @Test
     fun whenBuildFlatStructureThenReturnFolderListWithDepthWithoutCurrentFolderBranch() = runTest {
         val rootFolder = BookmarkFolder(id = Relation.BOOMARKS_ROOT, name = "root", parentId = "")
         val parentFolder = BookmarkFolder(id = "folder1", name = "name", parentId = Relation.BOOMARKS_ROOT)
@@ -584,6 +594,8 @@ class SavedSitesRepositoryTest {
 
         assertEquals(items, flatStructure)
     }
+
+
 
     @After
     fun after() {

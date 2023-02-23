@@ -60,9 +60,8 @@ class BookmarkFoldersViewModel @Inject constructor(
         currentFolder: BookmarkFolder?,
     ) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            // TODO: flat folder structure
-            // val folderStructure = savedSitesRepository.getFlatFolderStructure(selectedFolderId, currentFolder, rootFolderName)
-            // onFolderStructureCreated(folderStructure)
+            val folderStructure = savedSitesRepository.getFlatFolderStructure(selectedFolderId, currentFolder, rootFolderName)
+            onFolderStructureCreated(folderStructure)
         }
     }
 
@@ -72,13 +71,12 @@ class BookmarkFoldersViewModel @Inject constructor(
         currentFolder: BookmarkFolder?,
     ) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            // TODO: flat folder structure
-            // val folderStructure = bookmarksRepository.getFlatFolderStructure(
-            //     selectedFolderId,
-            //     currentFolder,
-            //     rootFolderName,
-            // )
-            // onFolderStructureCreated(folderStructure)
+            val folderStructure = savedSitesRepository.getFlatFolderStructure(
+                selectedFolderId,
+                currentFolder,
+                rootFolderName,
+            )
+            onFolderStructureCreated(folderStructure)
         }
     }
 

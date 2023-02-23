@@ -124,7 +124,7 @@ class RealSavedSitesRepository(
         rootFolderId: String,
     ): List<BookmarkFolderItem> {
         val rootFolder = getFolder(rootFolderId)
-        return if (rootFolder != null){
+        return if (rootFolder != null) {
             val rootFolderItem = BookmarkFolderItem(0, rootFolder, rootFolder.id == selectedFolderId)
             val folders = mutableListOf(rootFolderItem)
             val folderDepth = traverseFolderWithDepth(1, folders, rootFolderId, selectedFolderId)
@@ -134,6 +134,10 @@ class RealSavedSitesRepository(
         }
     }
 
+    //method to return all folders with the current one selected
+
+    //method to return all folders, wiht the current one selected but removing the branch under the current folder
+
     private fun traverseFolderWithDepth(
         depth: Int = 0,
         folders: MutableList<BookmarkFolderItem>,
@@ -142,9 +146,11 @@ class RealSavedSitesRepository(
     ): List<BookmarkFolderItem> {
         val folderContent = folderContent(folderId)
 
-        folders.addAll(folderContent.second.map {
-            BookmarkFolderItem(depth, it, it.id == selectedFolderId)
-        })
+        folders.addAll(
+            folderContent.second.map {
+                BookmarkFolderItem(depth, it, it.id == selectedFolderId)
+            },
+        )
 
         folderContent.second.forEach {
             traverseFolderWithDepth(depth + 1, folders, it.id, selectedFolderId)
