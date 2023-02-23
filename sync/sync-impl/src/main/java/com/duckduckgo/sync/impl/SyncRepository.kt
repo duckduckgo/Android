@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl
 import androidx.annotation.WorkerThread
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.crypto.AccountKeys
+import com.duckduckgo.sync.crypto.ConnectKeys
 import com.duckduckgo.sync.crypto.LoginKeys
 import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.impl.Result.Error
@@ -47,6 +48,7 @@ interface SyncRepository {
     fun latestToken(): String
     fun getRecoveryCode(): String?
     fun getConnectedDevices(): Result<List<ConnectedDevice>>
+    fun getLinkingQR(): String
 }
 
 @ContributesBinding(AppScope::class)
@@ -143,6 +145,12 @@ class AppSyncRepository @Inject constructor(
         val primaryKey = syncStore.primaryKey ?: return null
         val userID = syncStore.userId ?: return null
         return Adapters.recoveryCodeAdapter.toJson(LinkCode(RecoveryCode(primaryKey, userID)))
+    }
+
+    override fun getLinkingQR(): String {
+        val prepareForConnect = nativeLib.prepareForConnect()
+        val deviceId = syncDeviceIds.deviceId()
+        return Adapters.connectCodeAdapter.toJson(ConnectCode(prepareForConnect.publicKey, deviceId))
     }
 
     override fun removeAccount() {
@@ -262,6 +270,9 @@ class AppSyncRepository @Inject constructor(
         companion object {
             private val moshi = Moshi.Builder().build()
             val recoveryCodeAdapter: JsonAdapter<LinkCode> = moshi.adapter(LinkCode::class.java)
+
+            val connectCodeAdapter: JsonAdapter<ConnectCode> =
+                moshi.adapter(ConnectCode::class.java)
         }
     }
 }
@@ -287,6 +298,11 @@ data class RecoveryCode(
 data class ConnectedDevice(
     val thisDevice: Boolean = false,
     val deviceName: String,
+    val deviceId: String,
+)
+
+data class ConnectCode(
+    val publicKey: String,
     val deviceId: String,
 )
 

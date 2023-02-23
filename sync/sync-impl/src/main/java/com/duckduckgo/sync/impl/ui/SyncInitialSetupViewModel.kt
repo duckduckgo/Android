@@ -187,4 +187,11 @@ constructor(
             updateViewState()
         }
     }
+
+    fun onConnectStart() {
+        viewModelScope.launch(dispatchers.io()) {
+            val qrCode = syncRepository.getLinkingQR()
+            command.send(ShowQR(qrCode))
+        }
+    }
 }

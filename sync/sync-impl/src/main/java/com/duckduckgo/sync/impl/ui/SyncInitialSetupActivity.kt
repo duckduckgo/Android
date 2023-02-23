@@ -79,6 +79,7 @@ class SyncInitialSetupActivity : DuckDuckGoActivity() {
         binding.loginAccountButton.setOnClickListener { viewModel.loginAccountClicked() }
         binding.logoutButton.setOnClickListener { viewModel.onLogoutClicked() }
         binding.deleteAccountButton.setOnClickListener { viewModel.onDeleteAccountClicked() }
+        binding.connectQRCode.setOnClickListener { viewModel.onConnectStart() }
     }
 
     private fun observeUiEvents() {
