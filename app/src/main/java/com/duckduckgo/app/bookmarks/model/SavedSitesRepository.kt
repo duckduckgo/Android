@@ -33,6 +33,7 @@ import io.reactivex.Single
 import java.io.Serializable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import java.util.*
@@ -110,11 +111,11 @@ class RealSavedSitesRepository(
 
     override suspend fun getSavedSites(folderId: String): Flow<SavedSites> {
         return if (folderId == Relation.BOOMARKS_ROOT) {
-            getFavorites().combine(getFolderContent(folderId)) { favorites, folderContent ->
+            getFavorites().combine(getFolderEntityContent(folderId)) { favorites, folderContent ->
                 SavedSites(favorites.distinct(), folderContent.first, folderContent.second)
             }
         } else {
-            getFolderContent(folderId).map {
+            getFolderEntityContent(folderId).map {
                 SavedSites(emptyList(), it.first, it.second)
             }
         }
@@ -123,12 +124,14 @@ class RealSavedSitesRepository(
     override suspend fun getFolderEntityContent(folderId: String): Flow<Pair<List<Bookmark>, List<BookmarkFolder>>> {
         val bookmarks = mutableListOf<Bookmark>()
         val folders = mutableListOf<BookmarkFolder>()
-        return syncRelationsDao.folderContent(folderId).map { entities ->
+        return syncRelationsDao.relationById(folderId).map { entities ->
             entities.forEach { entity ->
                 if (entity.type == FOLDER) {
-                    folders.add( BookmarkFolder(entity.entityId, entity.title, entity.relationId, entity.numBookmarks, entity.numFolders))
+                    val numFolders = syncRelationsDao.getEntitiesInFolder(entity.entityId, FOLDER)
+                    val numBookmarks = syncRelationsDao.getEntitiesInFolder(entity.entityId, BOOKMARK)
+                    folders.add(BookmarkFolder(entity.entityId, entity.title, folderId, numBookmarks, numFolders))
                 } else {
-                    bookmarks.add(Bookmark(entity.entityId, entity.title, entity.url.orEmpty(), entity.relationId))
+                    bookmarks.add(Bookmark(entity.entityId, entity.title, entity.url.orEmpty(), folderId))
                 }
             }
             Pair(bookmarks.distinct(), folders.distinct())

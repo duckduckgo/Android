@@ -600,22 +600,20 @@ class SavedSitesRepositoryTest {
         val totalBookmarks = 10
         val totalFolders = 3
 
-        val entities = givenSomeBookmarks(totalBookmarks)
-        syncEntitiesDao.insertList(entities)
+        val rootFolder = BookmarkFolder(id = Relation.BOOMARKS_ROOT, name = "root", parentId = "")
+        repository.insert(rootFolder)
 
-        val folders = givenSomeFolders(totalFolders)
-        syncEntitiesDao.insertList(folders)
+        val parentFolder = BookmarkFolder(id = "folder1", name = "name", parentId = Relation.BOOMARKS_ROOT)
+        repository.insert(parentFolder)
 
-        val relation = givenFolderWithContent(Relation.BOOMARKS_ROOT, entities.plus(folders))
-        syncRelationsDao.insertList(relation)
+        givenFolderWithEntities(parentFolder.id, totalBookmarks, totalFolders )
 
-        repository.getFolderEntityContent(Relation.BOOMARKS_ROOT).test {
+        repository.getFolderEntityContent(parentFolder.id).test {
             val result = awaitItem()
-            assert(result.first.size == totalBookmarks)
-            assert(result.second.size == totalFolders)
 
-            val firstFolder()
-            assert(result.second.first().numBookmarks == totalFolders)
+            val parentFolder = result.second.first()
+            assert(parentFolder.numBookmarks == 10)
+            assert(parentFolder.numFolders == 3)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -653,14 +651,6 @@ class SavedSitesRepositoryTest {
         Assert.assertFalse(repository.hasBookmarks())
     }
 
-    private fun givenBookmarkStored(vararg bookmark: Bookmark) {
-        bookmark.forEach {
-            val entity = Entity(it.id, it.title, it.url, type = BOOKMARK)
-            syncEntitiesDao.insert(entity)
-            syncRelationsDao.insert(Relation(relationId = Relation.BOOMARKS_ROOT, entityId = entity.entityId))
-        }
-    }
-
     private fun givenSomeBookmarks(
         total: Int,
     ): List<Entity> {
@@ -679,6 +669,15 @@ class SavedSitesRepositoryTest {
             entities.add(Entity(Entity.generateFolderId(index.toLong()), "entity$index", "https://testUrl$index", FOLDER))
         }
         return entities
+    }
+
+    private fun givenFolderWithEntities(folderId: String, bookmarks: Int, folders: Int){
+        val bookmarks = givenSomeBookmarks(bookmarks)
+        val folders = givenSomeFolders(folders)
+        val folderContent = givenFolderWithContent(folderId, bookmarks.plus(folders))
+        syncEntitiesDao.insertList(bookmarks)
+        syncEntitiesDao.insertList(folders)
+        syncRelationsDao.insertList(folderContent)
     }
 
     private fun givenFolderWithContent(

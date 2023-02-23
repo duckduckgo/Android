@@ -16,6 +16,7 @@
 
 package com.duckduckgo.sync.store
 
+import androidx.core.location.LocationRequestCompat.Quality
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -37,11 +38,8 @@ interface SyncRelationsDao {
     @Query("select * from relations")
     fun relations(): List<Relation>
 
-    @Query("select *, " +
-        "(select count(*) from relations inner join entities on relations.entityId = entities.entityId where entities.type = 'BOOKMARK' and relations.relationId = :folderId) as numBookmarks, " +
-        "(select count(*) from relations inner join entities on relations.entityId = entities.entityId where entities.type = 'FOLDER' and relations.relationId = :folderId) as numFolders " +
-        "from entities inner join relations on entities.entityId = relations.entityId where relations.relationId = :folderId")
-    fun folderContent(folderId: String): Flow<List<EntityContent>>
+    @Query("select count(*) from  entities inner join relations on entities.entityId = relations.entityId and entities.type = :type and relations.relationId = :folderId ")
+    fun getEntitiesInFolder(folderId: String, type: EntityType): Int
 
     @Query("select * from entities inner join relations on entities.entityId = relations.entityId where relations.relationId = :folderId")
     fun relationById(folderId: String): Flow<List<Entity>>
