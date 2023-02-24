@@ -28,7 +28,6 @@ import com.duckduckgo.app.browser.omnibar.animations.TrackersRenderer
 import com.duckduckgo.app.cta.onboarding_experiment.animation.OnboardingExperimentStep.BLOCK_TRACKERS
 import com.duckduckgo.app.cta.onboarding_experiment.animation.OnboardingExperimentStep.PRIVACY_SHIELD
 import com.duckduckgo.app.cta.onboarding_experiment.animation.OnboardingExperimentStep.SHOW_TRACKERS
-import com.duckduckgo.app.cta.onboarding_experiment.animation.OnboardingExperimentStep.SHOW_TRACKERS_EXPANDED
 import com.duckduckgo.app.cta.onboarding_experiment.animation.OnboardingExperimentStep.TRACKERS_HAND_LOOP
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.di.scopes.FragmentScope
@@ -80,23 +79,19 @@ class LottieOnboardingExperimentAnimationHelper @Inject constructor(val appTheme
         when (step) {
             SHOW_TRACKERS -> {
                 holder.setAnimation(getAnimationRawRes(numberOfTrackers))
-                holder.setMinAndMaxFrame(0, 45)
+                holder.setMinAndMaxFrame(0, 93)
                 Timber.i("Onboarding step: TRACKERS")
-            }
-            SHOW_TRACKERS_EXPANDED -> {
-                holder.setMinAndMaxFrame(46, 93)
-                Timber.i("Onboarding step: TRACKERS_EXPANDED")
             }
             TRACKERS_HAND_LOOP -> {
                 holder.setMinAndMaxFrame(94, 144)
                 Timber.i("Onboarding step: TRACKERS HAND LOOP")
             }
             BLOCK_TRACKERS -> {
-                holder.setMinAndMaxFrame(145, 224)
+                holder.setMinAndMaxFrame(171, 250)
                 Timber.i("Onboarding step: BLOCK_TRACKERS")
             }
             PRIVACY_SHIELD -> {
-                holder.setMinAndMaxFrame(225, 419)
+                holder.setMinAndMaxFrame(251, 445)
                 Timber.i("Onboarding step: PRIVACY_SHIELD")
             }
         }
@@ -161,7 +156,6 @@ class LottieOnboardingExperimentAnimationHelper @Inject constructor(val appTheme
 
 enum class OnboardingExperimentStep {
     SHOW_TRACKERS,
-    SHOW_TRACKERS_EXPANDED,
     TRACKERS_HAND_LOOP,
     BLOCK_TRACKERS,
     PRIVACY_SHIELD,

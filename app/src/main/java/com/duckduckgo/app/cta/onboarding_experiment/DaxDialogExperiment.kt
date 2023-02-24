@@ -34,7 +34,6 @@ import com.duckduckgo.app.cta.onboarding_experiment.animation.OnboardingExperime
 import com.duckduckgo.app.cta.onboarding_experiment.animation.OnboardingExperimentStep.BLOCK_TRACKERS
 import com.duckduckgo.app.cta.onboarding_experiment.animation.OnboardingExperimentStep.PRIVACY_SHIELD
 import com.duckduckgo.app.cta.onboarding_experiment.animation.OnboardingExperimentStep.SHOW_TRACKERS
-import com.duckduckgo.app.cta.onboarding_experiment.animation.OnboardingExperimentStep.SHOW_TRACKERS_EXPANDED
 import com.duckduckgo.app.cta.onboarding_experiment.animation.OnboardingExperimentStep.TRACKERS_HAND_LOOP
 import com.duckduckgo.app.global.extensions.html
 import com.duckduckgo.app.trackerdetection.model.Entity
@@ -122,14 +121,7 @@ class TypewriterExperimentDaxDialog : DialogFragment(R.layout.view_dax_dialog_ex
     private fun setStepOneView() {
         setDialog()
         setListeners()
-        setLottieViewAnimation(SHOW_TRACKERS, this::setExpandedTrackersAndShowDialog)
-    }
-
-    private fun setExpandedTrackersAndShowDialog() {
-        setLottieViewAnimation(SHOW_TRACKERS_EXPANDED, this::setHandLoop)
-        binding.cardView.animate().alpha(1.0f).duration = 1000
-        binding.logo.animate().alpha(1.0f).duration = 1000
-        binding.dialogText.startTypingAnimation(daxText, true)
+        setLottieViewAnimation(SHOW_TRACKERS, this::setHandLoop)
     }
 
     private fun setDialog() {
@@ -148,6 +140,7 @@ class TypewriterExperimentDaxDialog : DialogFragment(R.layout.view_dax_dialog_ex
         with(binding) {
             primaryCta.setOnClickListener {
                 dialogText.cancelAnimation()
+                daxDialogListener?.onDaxDialogPrimaryCtaClick()
                 setStepTwoView()
             }
             dialogContainer.setOnClickListener {
@@ -168,6 +161,9 @@ class TypewriterExperimentDaxDialog : DialogFragment(R.layout.view_dax_dialog_ex
 
     private fun setHandLoop() {
         setLottieViewAnimation(TRACKERS_HAND_LOOP, loop = true)
+        binding.cardView.animate().alpha(1.0f).duration = 1000
+        binding.logo.animate().alpha(1.0f).duration = 1000
+        binding.dialogText.startTypingAnimation(daxText, true)
     }
 
     private fun setStepTwoView() {
