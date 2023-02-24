@@ -16,10 +16,7 @@
 
 package com.duckduckgo.privacy.config.impl.features.contentblocking
 
-import androidx.core.net.toUri
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
-import com.duckduckgo.app.global.domain
-import com.duckduckgo.app.userwhitelist.api.UserWhiteListRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.ContentBlocking
@@ -36,12 +33,11 @@ class RealContentBlocking @Inject constructor(
     private val contentBlockingRepository: ContentBlockingRepository,
     private val featureToggle: FeatureToggle,
     private val unprotectedTemporary: UnprotectedTemporary,
-    private val userWhiteListRepository: UserWhiteListRepository,
 ) : ContentBlocking {
 
     override fun isAnException(url: String): Boolean {
         return if (featureToggle.isFeatureEnabled(PrivacyFeatureName.ContentBlockingFeatureName.value, true)) {
-            unprotectedTemporary.isAnException(url) || matches(url) || userWhiteListRepository.userWhiteList.contains(url.toUri().domain())
+            unprotectedTemporary.isAnException(url) || matches(url)
         } else {
             false
         }
