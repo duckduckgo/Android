@@ -16,13 +16,11 @@
 
 package com.duckduckgo.mobile.android.ui.notifyme
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.provider.Settings
 import android.util.AttributeSet
 import android.view.Gravity
@@ -30,9 +28,7 @@ import android.view.View
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.widget.FrameLayout
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.ViewModelProvider

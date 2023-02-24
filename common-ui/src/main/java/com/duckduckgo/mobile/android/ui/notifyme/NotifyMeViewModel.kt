@@ -73,10 +73,6 @@ class NotifyMeViewModel(
 
     override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
-        // if (appBuildConfig.sdkInt >= Build.VERSION_CODES.TIRAMISU) {
-        //     sendCommand(Command.UpdateNotificationsStateOnAndroid13Plus)
-        // } else {
-        // }
         sendCommand(Command.UpdateNotificationsState)
     }
 
@@ -91,10 +87,6 @@ class NotifyMeViewModel(
     }
 
     fun onNotifyMeButtonClicked() {
-        // if (appBuildConfig.sdkInt >= Build.VERSION_CODES.TIRAMISU) {
-        //     sendCommand(Command.CheckPermissionRationale)
-        // } else {
-        // }
         openSettings()
     }
 

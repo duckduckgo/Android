@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.onboarding.ui.page
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.content.Intent
@@ -95,10 +94,6 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
 
     @SuppressLint("InlinedApi")
     private fun requestNotificationsPermissions() {
-        // if (appBuildConfig.sdkInt >= android.os.Build.VERSION_CODES.TIRAMISU) {
-        //     requestPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
-        // } else {
-        // }
         scheduleWelcomeAnimation()
     }
 
