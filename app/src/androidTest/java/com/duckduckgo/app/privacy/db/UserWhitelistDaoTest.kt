@@ -71,7 +71,7 @@ class UserWhitelistDaoTest {
     @Test
     fun whenElementAddedThenFlowListSizeIsOne() = runBlocking {
         dao.insert(DOMAIN)
-        assertEquals(1, dao.allFlow().first().size)
+        assertEquals(1, dao.allDomainsFlow().first().size)
     }
 
     @Test

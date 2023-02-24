@@ -27,7 +27,6 @@ import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 @ContributesBinding(AppScope::class)
@@ -65,10 +64,6 @@ class RealUserAllowListRepository @Inject constructor(
     }
 
     private fun all(): Flow<List<String>> {
-        return dao.allFlow().map { userWhiteListedDomainList ->
-            userWhiteListedDomainList.map { userWhiteListedDomain ->
-                userWhiteListedDomain.domain
-            }
-        }
+        return dao.allDomainsFlow()
     }
 }
