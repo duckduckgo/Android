@@ -49,8 +49,7 @@ interface SavedSitesRepository {
 
     suspend fun getFlatFolderStructure(
         selectedFolderId: String,
-        currentFolder: BookmarkFolder?,
-        rootFolderId: String,
+        currentFolder: BookmarkFolder?
     ): List<BookmarkFolderItem>
 
     suspend fun insertFolderBranch(branchToInsert: FolderBranch)
@@ -123,33 +122,27 @@ class RealSavedSitesRepository(
     }
 
     override suspend fun getFolderEntityContent(folderId: String): Flow<Pair<List<Bookmark>, List<BookmarkFolder>>> {
-        val bookmarks = mutableListOf<Bookmark>()
-        val folders = mutableListOf<BookmarkFolder>()
-        Timber.d("Saved sites bookmarks: $bookmarks")
-        Timber.d("Saved sites folders: $folders")
         return syncRelationsDao.relationById(folderId).map { entities ->
-            Timber.d("Saved sites total: $entities")
+            val bookmarks = mutableListOf<Bookmark>()
+            val folders = mutableListOf<BookmarkFolder>()
             entities.map { entity ->
                 if (entity.type == FOLDER) {
-                    val numFolders = syncRelationsDao.getEntitiesInFolder(entity.entityId, FOLDER)
-                    val numBookmarks = syncRelationsDao.getEntitiesInFolder(entity.entityId, BOOKMARK)
+                    val numFolders = syncRelationsDao.getEntitiesCountInFolder(entity.entityId, FOLDER)
+                    val numBookmarks = syncRelationsDao.getEntitiesCountInFolder(entity.entityId, BOOKMARK)
                     folders.add(BookmarkFolder(entity.entityId, entity.title, folderId, numBookmarks, numFolders))
                 } else {
                     bookmarks.add(Bookmark(entity.entityId, entity.title, entity.url.orEmpty(), folderId))
                 }
             }
-            Timber.d("Saved sites bookmarks: $bookmarks")
-            Timber.d("Saved sites folders: $folders")
             Pair(bookmarks.distinct(), folders.distinct())
         }
             .flowOn(dispatcherProvider.io())
     }
 
     override suspend fun getFolderContent(folderId: String): Flow<Pair<List<Bookmark>, List<BookmarkFolder>>> {
-        val bookmarks = mutableListOf<Bookmark>()
-        val folders = mutableListOf<BookmarkFolder>()
-
         return syncRelationsDao.relationById(folderId).map { entities ->
+            val bookmarks = mutableListOf<Bookmark>()
+            val folders = mutableListOf<BookmarkFolder>()
             entities.forEach { entity ->
                 if (entity.type == FOLDER) {
                     folders.add(entity.mapToBookmarkFolder(folderId))
@@ -164,23 +157,18 @@ class RealSavedSitesRepository(
 
     override suspend fun getFlatFolderStructure(
         selectedFolderId: String,
-        currentFolder: BookmarkFolder?,
-        rootFolderId: String,
+        currentFolder: BookmarkFolder?
     ): List<BookmarkFolderItem> {
-        val rootFolder = getFolder(rootFolderId)
+        val rootFolder = getFolder(Relation.BOOMARKS_ROOT)
         return if (rootFolder != null) {
             val rootFolderItem = BookmarkFolderItem(0, rootFolder, rootFolder.id == selectedFolderId)
             val folders = mutableListOf(rootFolderItem)
-            val folderDepth = traverseFolderWithDepth(1, folders, rootFolderId, selectedFolderId)
+            val folderDepth = traverseFolderWithDepth(1, folders, Relation.BOOMARKS_ROOT, selectedFolderId)
             folderDepth
         } else {
             emptyList()
         }
     }
-
-    //method to return all folders with the current one selected
-
-    //method to return all folders, wiht the current one selected but removing the branch under the current folder
 
     private fun traverseFolderWithDepth(
         depth: Int = 0,
@@ -188,15 +176,8 @@ class RealSavedSitesRepository(
         folderId: String,
         selectedFolderId: String
     ): List<BookmarkFolderItem> {
-        val folderContent = folderContent(folderId)
-
-        folders.addAll(
-            folderContent.second.map {
-                BookmarkFolderItem(depth, it, it.id == selectedFolderId)
-            },
-        )
-
-        folderContent.second.forEach {
+        getFolders(folderId).map {
+            folders.add(BookmarkFolderItem(depth, it, it.id == selectedFolderId))
             traverseFolderWithDepth(depth + 1, folders, it.id, selectedFolderId)
         }
         return folders
@@ -235,17 +216,20 @@ class RealSavedSitesRepository(
         return Pair(bookmarks, folders)
     }
 
+    private fun getFolders(folderId: String): List<BookmarkFolder> {
+        return syncRelationsDao.getEntitiesInFolder(folderId, FOLDER).map { entity ->
+            entity.mapToBookmarkFolder(folderId)
+        }
+    }
+
     private fun folderContent(folderId: String): Pair<List<Bookmark>, List<BookmarkFolder>> {
         val bookmarks = mutableListOf<Bookmark>()
         val folders = mutableListOf<BookmarkFolder>()
-        syncRelationsDao.relationsByIdSync(folderId).forEach { relation ->
-            val entity = syncEntitiesDao.entityById(relation.entityId)
-            entity?.let {
-                if (entity.type == FOLDER) {
-                    folders.add(entity.mapToBookmarkFolder(folderId))
-                } else {
-                    bookmarks.add(entity.mapToBookmark(folderId))
-                }
+        syncRelationsDao.relationByIdSync(folderId).forEach { entity ->
+            if (entity.type == FOLDER) {
+                folders.add(entity.mapToBookmarkFolder(folderId))
+            } else {
+                bookmarks.add(entity.mapToBookmark(folderId))
             }
         }
         return Pair(bookmarks, folders)
@@ -435,8 +419,11 @@ class RealSavedSitesRepository(
     override fun getFolder(folderId: String): BookmarkFolder? {
         val entity = syncEntitiesDao.entityById(folderId)
         val relation = syncRelationsDao.relationParentById(folderId)
+
         return if (entity != null && relation != null) {
             BookmarkFolder(folderId, entity.title, relation.relationId)
+        } else if (entity != null && relation == null) {
+            BookmarkFolder(folderId, entity.title, "")
         } else {
             null
         }

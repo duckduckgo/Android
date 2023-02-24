@@ -31,6 +31,7 @@ import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
 class BookmarkFoldersViewModel @Inject constructor(
@@ -56,25 +57,24 @@ class BookmarkFoldersViewModel @Inject constructor(
 
     fun fetchBookmarkFolders(
         selectedFolderId: String,
-        rootFolderName: String,
         currentFolder: BookmarkFolder?,
     ) {
+        Timber.d("Saved sites: selectedFolderId $selectedFolderId")
+        Timber.d("Saved sites: currentFolder $currentFolder")
         viewModelScope.launch(dispatcherProvider.io()) {
-            val folderStructure = savedSitesRepository.getFlatFolderStructure(selectedFolderId, currentFolder, rootFolderName)
+            val folderStructure = savedSitesRepository.getFlatFolderStructure(selectedFolderId, currentFolder)
             onFolderStructureCreated(folderStructure)
         }
     }
 
     fun newFolderAdded(
-        rootFolderName: String,
         selectedFolderId: String,
         currentFolder: BookmarkFolder?,
     ) {
         viewModelScope.launch(dispatcherProvider.io()) {
             val folderStructure = savedSitesRepository.getFlatFolderStructure(
                 selectedFolderId,
-                currentFolder,
-                rootFolderName,
+                currentFolder
             )
             onFolderStructureCreated(folderStructure)
         }

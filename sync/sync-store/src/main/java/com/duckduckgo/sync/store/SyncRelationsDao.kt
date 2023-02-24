@@ -16,7 +16,6 @@
 
 package com.duckduckgo.sync.store
 
-import androidx.core.location.LocationRequestCompat.Quality
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -38,17 +37,17 @@ interface SyncRelationsDao {
     @Query("select * from relations")
     fun relations(): List<Relation>
 
-    @Query("select count(*) from  entities inner join relations on entities.entityId = relations.entityId and entities.type = :type and relations.relationId = :folderId ")
-    fun getEntitiesInFolder(folderId: String, type: EntityType): Int
+    @Query("select count(*) from  entities inner join relations on entities.entityId = relations.entityId and entities.type = :type and relations.relationId = :folderId")
+    fun getEntitiesCountInFolder(folderId: String, type: EntityType): Int
+
+    @Query("select * from  entities inner join relations on entities.entityId = relations.entityId and entities.type = :type and relations.relationId = :folderId")
+    fun getEntitiesInFolder(folderId: String, type: EntityType): List<Entity>
 
     @Query("select * from entities inner join relations on entities.entityId = relations.entityId where relations.relationId = :folderId")
     fun relationById(folderId: String): Flow<List<Entity>>
 
     @Query("select * from entities inner join relations on entities.entityId = relations.entityId where relations.relationId = :folderId")
     fun relationByIdSync(folderId: String): List<Entity>
-
-    @Query("select * from relations where relations.relationId = :folderId")
-    fun relationsByIdSync(folderId: String): List<Relation>
 
     @Query("select * from entities inner join relations on entities.entityId = relations.entityId where relations.relationId = :folderId")
     fun relationByIdObservable(folderId: String): Single<List<Entity>>

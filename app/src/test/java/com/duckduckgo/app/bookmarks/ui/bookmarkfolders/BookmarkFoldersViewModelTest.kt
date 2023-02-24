@@ -74,7 +74,7 @@ class BookmarkFoldersViewModelTest {
 
     @Before
     fun before() = runTest {
-        whenever(savedSitesRepository.getFlatFolderStructure(anyString(), any(), anyString())).thenReturn(folderStructure)
+        whenever(savedSitesRepository.getFlatFolderStructure(anyString(), any())).thenReturn(folderStructure)
     }
 
     @Test
@@ -83,9 +83,9 @@ class BookmarkFoldersViewModelTest {
         val rootFolderName = "Bookmarks"
         val folder = BookmarkFolder("folder2", "a folder", "folder1")
 
-        testee.fetchBookmarkFolders(selectedFolderId, rootFolderName, folder)
+        testee.fetchBookmarkFolders(selectedFolderId, folder)
 
-        verify(savedSitesRepository).getFlatFolderStructure(selectedFolderId, folder, rootFolderName)
+        verify(savedSitesRepository).getFlatFolderStructure(selectedFolderId, folder)
         verify(viewStateObserver, times(2)).onChanged(viewStateCaptor.capture())
 
         assertEquals(emptyList<BookmarkFolderItem>(), viewStateCaptor.allValues[0].folderStructure)
@@ -107,12 +107,11 @@ class BookmarkFoldersViewModelTest {
     fun newFolderAddedThenCallRepoAndUpdateViewState() = runTest {
         val newFolder = BookmarkFolder("folder3", "new folder", "folder1")
         val selectedFolderId = Relation.BOOMARKS_ROOT
-        val rootFolderName = "Bookmarks"
 
-        testee.newFolderAdded(rootFolderName, selectedFolderId, newFolder)
+        testee.newFolderAdded(selectedFolderId, newFolder)
         folderStructure.add(BookmarkFolderItem(1, newFolder))
 
-        verify(savedSitesRepository).getFlatFolderStructure(selectedFolderId, newFolder, rootFolderName)
+        verify(savedSitesRepository).getFlatFolderStructure(selectedFolderId, newFolder)
         verify(viewStateObserver, times(2)).onChanged(viewStateCaptor.capture())
 
         assertEquals(emptyList<BookmarkFolderItem>(), viewStateCaptor.allValues[0].folderStructure)
