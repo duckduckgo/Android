@@ -23,12 +23,12 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.domain
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import java.util.concurrent.CopyOnWriteArrayList
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import java.util.concurrent.CopyOnWriteArrayList
-import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class RealUserAllowListRepository @Inject constructor(
@@ -65,10 +65,8 @@ class RealUserAllowListRepository @Inject constructor(
     }
 
     private fun all(): Flow<List<String>> {
-        return dao.allFlow().map {
-            userWhiteListedDomainList ->
-            userWhiteListedDomainList.map {
-                userWhiteListedDomain ->
+        return dao.allFlow().map { userWhiteListedDomainList ->
+            userWhiteListedDomainList.map { userWhiteListedDomain ->
                 userWhiteListedDomain.domain
             }
         }
