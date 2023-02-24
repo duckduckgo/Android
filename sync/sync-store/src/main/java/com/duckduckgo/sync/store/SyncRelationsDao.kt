@@ -38,22 +38,10 @@ interface SyncRelationsDao {
     fun relations(): List<Relation>
 
     @Query("select count(*) from  entities inner join relations on entities.entityId = relations.entityId and entities.type = :type and relations.relationId = :folderId")
-    fun getEntitiesCountInFolder(folderId: String, type: EntityType): Int
-
-    @Query("select * from  entities inner join relations on entities.entityId = relations.entityId and entities.type = :type and relations.relationId = :folderId")
-    fun getEntitiesInFolder(folderId: String, type: EntityType): List<Entity>
-
-    @Query("select * from entities inner join relations on entities.entityId = relations.entityId where relations.relationId = :folderId")
-    fun relationById(folderId: String): Flow<List<Entity>>
-
-    @Query("select * from entities inner join relations on entities.entityId = relations.entityId where relations.relationId = :folderId")
-    fun relationByIdSync(folderId: String): List<Entity>
-
-    @Query("select * from entities inner join relations on entities.entityId = relations.entityId where relations.relationId = :folderId")
-    fun relationByIdObservable(folderId: String): Single<List<Entity>>
+    fun countEntitiesInFolder(folderId: String, type: EntityType): Int
 
     @Query("select * from relations where relations.entityId = :entityId")
-    fun relationParentById(entityId: String): Relation?
+    fun relationByEntityId(entityId: String): Relation?
 
     @Query("select CAST(COUNT(*) AS BIT) from relations")
     fun hasRelations(): Boolean
@@ -64,16 +52,16 @@ interface SyncRelationsDao {
     @Delete
     fun delete(relation: Relation)
 
-    @Query("delete from relations where relationId = :id")
-    fun delete(id: String)
+    @Query("delete from relations where relationId = :relationId")
+    fun delete(relationId: String)
 
     @Query("delete from relations where entityId = :entityId")
-    fun deleteEntity(entityId: String)
+    fun deleteRelationByEntity(entityId: String)
 
     @Query(
         "select count(*) from entities inner join relations on entities.entityId = relations.entityId where entities.url LIKE :domain AND relationId == :relationId",
     )
-    fun relationsCountByUrl(
+    fun countRelationsByUrl(
         domain: String,
         relationId: String = Relation.FAVORITES_ROOT
     ): Int

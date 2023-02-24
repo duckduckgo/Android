@@ -62,7 +62,7 @@ class BookmarkFoldersViewModel @Inject constructor(
         Timber.d("Saved sites: selectedFolderId $selectedFolderId")
         Timber.d("Saved sites: currentFolder $currentFolder")
         viewModelScope.launch(dispatcherProvider.io()) {
-            val folderStructure = savedSitesRepository.getFlatFolderStructure(selectedFolderId, currentFolder)
+            val folderStructure = savedSitesRepository.getFolderTree(selectedFolderId, currentFolder)
             onFolderStructureCreated(folderStructure)
         }
     }
@@ -72,7 +72,7 @@ class BookmarkFoldersViewModel @Inject constructor(
         currentFolder: BookmarkFolder?,
     ) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            val folderStructure = savedSitesRepository.getFlatFolderStructure(
+            val folderStructure = savedSitesRepository.getFolderTree(
                 selectedFolderId,
                 currentFolder
             )

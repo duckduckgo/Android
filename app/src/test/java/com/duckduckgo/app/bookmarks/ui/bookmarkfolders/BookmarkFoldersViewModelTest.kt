@@ -31,7 +31,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.*
 
@@ -74,7 +73,7 @@ class BookmarkFoldersViewModelTest {
 
     @Before
     fun before() = runTest {
-        whenever(savedSitesRepository.getFlatFolderStructure(anyString(), any())).thenReturn(folderStructure)
+        whenever(savedSitesRepository.getFolderTree(anyString(), any())).thenReturn(folderStructure)
     }
 
     @Test
@@ -85,7 +84,7 @@ class BookmarkFoldersViewModelTest {
 
         testee.fetchBookmarkFolders(selectedFolderId, folder)
 
-        verify(savedSitesRepository).getFlatFolderStructure(selectedFolderId, folder)
+        verify(savedSitesRepository).getFolderTree(selectedFolderId, folder)
         verify(viewStateObserver, times(2)).onChanged(viewStateCaptor.capture())
 
         assertEquals(emptyList<BookmarkFolderItem>(), viewStateCaptor.allValues[0].folderStructure)
@@ -111,7 +110,7 @@ class BookmarkFoldersViewModelTest {
         testee.newFolderAdded(selectedFolderId, newFolder)
         folderStructure.add(BookmarkFolderItem(1, newFolder))
 
-        verify(savedSitesRepository).getFlatFolderStructure(selectedFolderId, newFolder)
+        verify(savedSitesRepository).getFolderTree(selectedFolderId, newFolder)
         verify(viewStateObserver, times(2)).onChanged(viewStateCaptor.capture())
 
         assertEquals(emptyList<BookmarkFolderItem>(), viewStateCaptor.allValues[0].folderStructure)

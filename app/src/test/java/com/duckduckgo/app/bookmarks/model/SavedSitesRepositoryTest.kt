@@ -31,6 +31,7 @@ import com.duckduckgo.sync.store.Relation
 import com.duckduckgo.sync.store.SyncEntitiesDao
 import com.duckduckgo.sync.store.SyncRelationsDao
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertNotNull
 import junit.framework.TestCase.assertNull
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -233,9 +234,14 @@ class SavedSitesRepositoryTest {
 
     @Test
     fun whenFavoriteUpdatedThenDatabaseChanged() {
-        val favorite = Favorite("favorite1", "Favorite", "http://favexample.com", 1)
-        givenFavoriteStored(favorite)
-        val updatedFavorite = favorite.copy(position = 3)
+        val favoriteone = Favorite("favorite1", "Favorite", "http://favexample.com", 0)
+        val favoritetwo = Favorite("favorite1", "Favorite", "http://favexample.com", 1)
+        val favoritethree = Favorite("favorite1", "Favorite", "http://favexample.com", 2)
+        givenFavoriteStored(favoriteone)
+        givenFavoriteStored(favoritetwo)
+        givenFavoriteStored(favoritethree)
+
+        val updatedFavorite = favoriteone.copy(position = 2)
 
         repository.update(updatedFavorite)
 
@@ -244,15 +250,15 @@ class SavedSitesRepositoryTest {
 
     @Test
     fun whenListReceivedThenUpdateItemsWithNewPositionInDatabase() {
-        val favorite = Favorite("favorite1", "Favorite", "http://favexample.com", 1)
-        val favorite2 = Favorite("favorite2", "Favorite2", "http://favexample2.com", 2)
+        val favorite = Favorite("favorite1", "Favorite", "http://favexample.com", 0)
+        val favorite2 = Favorite("favorite2", "Favorite2", "http://favexample2.com", 1)
 
         givenFavoriteStored(favorite, favorite2)
 
         repository.updateWithPosition(listOf(favorite2, favorite))
 
         assertFavoriteExistsInDb(favorite2.copy(position = 1))
-        assertFavoriteExistsInDb(favorite.copy(position = 2))
+        assertFavoriteExistsInDb(favorite.copy(position = 0))
     }
 
     @Test
@@ -290,8 +296,8 @@ class SavedSitesRepositoryTest {
     fun whenFavoriteByUrlRequestedAndNotAvailableThenReturnNull() = runTest {
         givenNoFavoritesStored()
 
-        val favorite = repository.insert(Favorite(id = "favorite1", title = "title", url = "www.website.com", position = 1))
-        val otherFavorite = repository.insert(Favorite(id = "favorite2", title = "other title", url = "www.other-website.com", position = 2))
+        repository.insert(Favorite(id = "favorite1", title = "title", url = "www.website.com", position = 1))
+        repository.insert(Favorite(id = "favorite2", title = "other title", url = "www.other-website.com", position = 2))
 
         val result = repository.getFavorite("www.test.com")
 
@@ -550,13 +556,13 @@ class SavedSitesRepositoryTest {
         repository.insert(childFolder)
         repository.insert(folder)
 
-        val flatStructure = repository.getFlatFolderStructure(folder.id, null, rootFolder.id)
+        val flatStructure = repository.getFolderTree(folder.id, null)
 
         val items = listOf(
             BookmarkFolderItem(0, rootFolder, false),
             BookmarkFolderItem(1, parentFolder, false),
-            BookmarkFolderItem(1, folder, true),
             BookmarkFolderItem(2, childFolder, false),
+            BookmarkFolderItem(1, folder, true),
         )
 
         assertEquals(items, flatStructure)
@@ -585,7 +591,7 @@ class SavedSitesRepositoryTest {
         repository.insert(childFolder)
         repository.insert(folder)
 
-        val flatStructure = repository.getFlatFolderStructure(folder.id, parentFolder, rootFolder.id)
+        val flatStructure = repository.getFolderTree(folder.id, parentFolder)
 
         val items = listOf(
             BookmarkFolderItem(0, rootFolder, false),
@@ -608,7 +614,7 @@ class SavedSitesRepositoryTest {
 
         givenFolderWithEntities(parentFolder.id, totalBookmarks, totalFolders )
 
-        repository.getFolderEntityContent(parentFolder.id).test {
+        repository.getFolderContent(parentFolder.id).test {
             val result = awaitItem()
 
             val parentFolder = result.second.first()
@@ -692,9 +698,15 @@ class SavedSitesRepositoryTest {
     }
 
     private fun assertFavoriteExistsInDb(favorite: Favorite) {
-        val storedFavorite = syncEntitiesDao.favorite(url = favorite.url) ?: error("Favorite not found in database")
-        Assert.assertEquals(storedFavorite.title, favorite.title)
+        val favorites = syncEntitiesDao.entitiesInFolderSync(Relation.FAVORITES_ROOT).mapIndexed { index, entity ->
+            Favorite(entity.entityId, entity.title, entity.url.orEmpty(), index)
+        }
+        val storedFavorite = favorites.firstOrNull { it.url == favorite.url }
+
+        assertNotNull(storedFavorite)
+        Assert.assertEquals(storedFavorite!!.title, favorite.title)
         Assert.assertEquals(storedFavorite.url, favorite.url)
+        Assert.assertEquals(storedFavorite.position, favorite.position)
     }
 
     private fun givenEmptyDBState() {

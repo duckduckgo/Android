@@ -37,6 +37,18 @@ interface SyncEntitiesDao {
     @Query("select * from entities")
     fun entities(): List<Entity>
 
+    @Query("select * from  entities inner join relations on entities.entityId = relations.entityId and entities.type = :type and relations.relationId = :folderId")
+    fun entitiesInFolder(folderId: String, type: EntityType): List<Entity>
+
+    @Query("select * from entities inner join relations on entities.entityId = relations.entityId where relations.relationId = :folderId")
+    fun entitiesInFolder(folderId: String): Flow<List<Entity>>
+
+    @Query("select * from entities inner join relations on entities.entityId = relations.entityId where relations.relationId = :folderId")
+    fun entitiesInFolderSync(folderId: String): List<Entity>
+
+    @Query("select * from entities inner join relations on entities.entityId = relations.entityId where relations.relationId = :folderId")
+    fun entitiesInFolderObservable(folderId: String): Single<List<Entity>>
+
     @Delete
     fun delete(entity: Entity)
 
@@ -57,27 +69,6 @@ interface SyncEntitiesDao {
 
     @Query("select CAST(COUNT(*) AS BIT) from entities")
     fun hasEntities(): Boolean
-
-    @Query("select CAST(COUNT(*) AS BIT) from entities where type = :type")
-    fun hasEntitiesByType(type: EntityType): Boolean
-
-    @Query("select * from entities where entityId in (:entitiesIds)")
-    fun entitiesByIds(entitiesIds: List<String>): List<Entity>
-
-    @Query(
-        "select * from entities inner join relations on entities.entityId = relations.entityId" +
-            " where relations.relationId= :folderId",
-    )
-    fun entitiesByFolderId(folderId: String): Flow<List<Entity>>
-
-    @Query(
-        "select * from entities inner join relations on entities.entityId = relations.entityId " +
-            "where relations.relationId= :folderId and entities.url = :url",
-    )
-    fun favorite(
-        folderId: String = Relation.FAVORITES_ROOT,
-        url: String,
-    ): Entity?
 
     @Query("select * from entities where entityId = :id")
     fun entityById(id: String): Entity?
