@@ -85,7 +85,7 @@ class HttpsUpgraderImpl @Inject constructor(
         }
 
         if (https.isAnException(uri.toString())) {
-            Timber.d("$host is in the remote exception list and so not upgradable")
+            Timber.d("$host is in the exception list and so not upgradable")
             return false
         }
 
