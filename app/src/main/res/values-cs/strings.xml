@@ -683,9 +683,6 @@
     <string name="permissionsPerWebsiteAskDisabledSetting">Možnost „Zeptat se“ je u všech webů vypnutá</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s – povolení pro web %2$s</string>
 
-    <!-- Autofill -->
-    <string name="autofillSettingsDisplayName">Automaticky vyplnit</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Zjisti, až budou soubory ke stažení připraveny</string>
     <string name="downloadsNotifyMeSubtitle">Dostávej oznámení, jakmile skončí stahování.</string>

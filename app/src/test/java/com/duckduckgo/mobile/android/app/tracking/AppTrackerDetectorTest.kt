@@ -123,11 +123,19 @@ class AppTrackerDetectorTest {
         assertNull(appTrackerDetector.evaluate(TEST_APP_TRACKER.hostname, APP_UID))
     }
 
+    @Test
     fun whenEvaluateNonTrackerThenReturnNull() {
         whenever(appTrackerRepository.findTracker(TEST_APP_TRACKER.hostname, APP_PACKAGE_ID)).thenReturn(AppTrackerType.NotTracker)
         whenever(appNameResolver.getPackageIdForUid(APP_UID)).thenReturn(APP_ORIGINATING_APP.packageId)
 
         whenever(vpnAppTrackerBlockingDao.getRuleByTrackerDomain(TEST_APP_TRACKER.hostname)).thenReturn(null)
+
+        assertNull(appTrackerDetector.evaluate(TEST_APP_TRACKER.hostname, APP_UID))
+    }
+
+    @Test
+    fun whenNullPackageIdThenEvaluateReturnsNull() {
+        whenever(appNameResolver.getPackageIdForUid(APP_UID)).thenReturn(null)
 
         assertNull(appTrackerDetector.evaluate(TEST_APP_TRACKER.hostname, APP_UID))
     }

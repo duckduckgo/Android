@@ -17,7 +17,7 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="managementScreenTitle">Girişleri Otomatik Doldur</string>
+    <string name="autofillManagementScreenTitle">Girişleri Otomatik Doldur</string>
 
     <string name="managementLockedModeText">Otomatik Doldurmayı Aç</string>
 
@@ -37,6 +37,8 @@
     <string name="useSavedLoginDialogTitle">Kayıtlı Giriş kullanılsın mı?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">%1$s için giriş yapın</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Site için giriş yapın</string>
+    <string name="useSavedLoginDialogGroupThisWebsite">Bu Web Sitesinden</string>
+    <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">%1$s adresinden</string>
 
     <string name="updateLoginDialogTitle">Şifre Güncellensin mi?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Şifreyi Güncelle</string>

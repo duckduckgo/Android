@@ -17,7 +17,7 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="managementScreenTitle">Sisesta sisselogimisandmed automaatselt</string>
+    <string name="autofillManagementScreenTitle">Sisesta sisselogimisandmed automaatselt</string>
 
     <string name="managementLockedModeText">Ava automaatne täitmine</string>
 
@@ -37,6 +37,8 @@
     <string name="useSavedLoginDialogTitle">Kas kasutada salvestatud sisselogimisandmeid?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Kasuta saidi %1$s sisselogimismandaate</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Kasuta saidi sisselogimismandaate</string>
+    <string name="useSavedLoginDialogGroupThisWebsite">Sellelt veebisaidilt</string>
+    <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Saidilt %1$s</string>
 
     <string name="updateLoginDialogTitle">Kas värskendada parooli?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Värskenda parooli</string>

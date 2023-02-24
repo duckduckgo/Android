@@ -17,7 +17,7 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="managementScreenTitle">Automātiski aizpildīt pieteikšanās datus</string>
+    <string name="autofillManagementScreenTitle">Automātiski aizpildīt pieteikšanās datus</string>
 
     <string name="managementLockedModeText">Atbloķēt automātisko aizpildi</string>
 
@@ -37,6 +37,8 @@
     <string name="useSavedLoginDialogTitle">Vai izmantot saglabātos pieteikšanās datus?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Pieteikšanās %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Pieteikšanās vietnei</string>
+    <string name="useSavedLoginDialogGroupThisWebsite">No šīs vietnes</string>
+    <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">No %1$s</string>
 
     <string name="updateLoginDialogTitle">Atjaunināt paroli?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Atjaunināt paroli</string>

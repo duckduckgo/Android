@@ -45,6 +45,7 @@ import com.duckduckgo.autofill.impl.ui.credential.dialog.animateClosed
 import com.duckduckgo.autofill.impl.ui.credential.selecting.AutofillSelectCredentialsDialogFragment.DialogEvent.Dismissed
 import com.duckduckgo.autofill.impl.ui.credential.selecting.AutofillSelectCredentialsDialogFragment.DialogEvent.Selected
 import com.duckduckgo.autofill.impl.ui.credential.selecting.AutofillSelectCredentialsDialogFragment.DialogEvent.Shown
+import com.duckduckgo.autofill.impl.ui.credential.selecting.CredentialsPickerRecyclerAdapter.ListItem
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -71,6 +72,12 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
     @Inject
     lateinit var faviconManager: FaviconManager
 
+    @Inject
+    lateinit var autofillSelectCredentialsGrouper: AutofillSelectCredentialsGrouper
+
+    @Inject
+    lateinit var autofillSelectCredentialsListBuilder: AutofillSelectCredentialsListBuilder
+
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
@@ -90,8 +97,9 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
 
     private fun configureViews(binding: ContentAutofillSelectCredentialsTooltipBinding) {
         (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_EXPANDED
-        configureSiteDetails(binding)
-        configureRecyclerView(binding)
+        val originalUrl = getOriginalUrl()
+        configureSiteDetails(originalUrl, binding)
+        configureRecyclerView(originalUrl, binding)
         configureCloseButton(binding)
     }
 
@@ -99,8 +107,10 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         binding.closeButton.setOnClickListener { (dialog as BottomSheetDialog).animateClosed() }
     }
 
-    private fun configureSiteDetails(binding: ContentAutofillSelectCredentialsTooltipBinding) {
-        val originalUrl = getOriginalUrl()
+    private fun configureSiteDetails(
+        originalUrl: String,
+        binding: ContentAutofillSelectCredentialsTooltipBinding,
+    ) {
         val url = originalUrl.extractDomain() ?: originalUrl
 
         binding.siteName.text = url
@@ -110,16 +120,19 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         }
     }
 
-    private fun configureRecyclerView(binding: ContentAutofillSelectCredentialsTooltipBinding) {
-        binding.availableCredentialsRecycler.adapter = configureAdapter()
+    private fun configureRecyclerView(
+        originalUrl: String,
+        binding: ContentAutofillSelectCredentialsTooltipBinding,
+    ) {
+        binding.availableCredentialsRecycler.adapter = configureAdapter(getAvailableCredentials(originalUrl))
     }
 
-    private fun configureAdapter(): CredentialsPickerRecyclerAdapter {
+    private fun configureAdapter(credentials: List<ListItem>): CredentialsPickerRecyclerAdapter {
         return CredentialsPickerRecyclerAdapter(
             lifecycleOwner = this,
             faviconManager = faviconManager,
             credentialTextExtractor = CredentialTextExtractor(requireContext()),
-            credentials = getAvailableCredentials(),
+            listItems = credentials,
         ) { selectedCredentials ->
 
             pixelNameDialogEvent(Selected)?.let { pixel.fire(it) }
@@ -171,7 +184,12 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         object Selected : DialogEvent
     }
 
-    private fun getAvailableCredentials() = arguments?.getParcelableArrayList<LoginCredentials>(CredentialAutofillPickerDialog.KEY_CREDENTIALS)!!
+    private fun getAvailableCredentials(originalUrl: String): List<ListItem> {
+        val unsortedCredentials = arguments?.getParcelableArrayList<LoginCredentials>(CredentialAutofillPickerDialog.KEY_CREDENTIALS)!!
+        val grouped = autofillSelectCredentialsGrouper.group(originalUrl, unsortedCredentials)
+        return autofillSelectCredentialsListBuilder.buildFlatList(grouped)
+    }
+
     private fun getOriginalUrl() = arguments?.getString(CredentialAutofillPickerDialog.KEY_URL)!!
     private fun getTriggerType() = arguments?.getSerializable(CredentialAutofillPickerDialog.KEY_TRIGGER_TYPE) as LoginTriggerType
     private fun getTabId() = arguments?.getString(CredentialAutofillPickerDialog.KEY_TAB_ID)!!

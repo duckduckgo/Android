@@ -20,9 +20,12 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.macos_impl.MacOsPixelNames.MACOS_WAITLIST_SHARE_PRESSED
 import com.duckduckgo.macos_impl.MacOsViewModel
+import com.duckduckgo.macos_impl.MacOsViewModel.Command.GoToWindowsClientSettings
 import com.duckduckgo.macos_impl.MacOsViewModel.Command.ShareLink
+import com.duckduckgo.windows.api.WindowsWaitlistFeature
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -32,6 +35,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
@@ -41,11 +45,12 @@ class MacOsViewModelTest {
     var coroutineRule = CoroutineTestRule()
 
     private var mockPixel: Pixel = mock()
+    private var mockWindowsWaitlistFeature: WindowsWaitlistFeature = mock()
     private lateinit var testee: MacOsViewModel
 
     @Before
     fun before() {
-        testee = MacOsViewModel(mockPixel)
+        testee = MacOsViewModel(mockPixel, mockWindowsWaitlistFeature)
     }
 
     @Test
@@ -57,9 +62,28 @@ class MacOsViewModelTest {
     }
 
     @Test
+    fun whenGoToWindowsSettingsThenEmitGoToWindowsClientSettingsCommand() = runTest {
+        testee.commands.test {
+            testee.onGoToWindowsClicked()
+            assertEquals(GoToWindowsClientSettings, awaitItem())
+        }
+    }
+
+    @Test
     fun whenOnShareClickedAThenPixelFired() = runTest {
         testee.onShareClicked()
 
         verify(mockPixel).fire(MACOS_WAITLIST_SHARE_PRESSED)
+    }
+
+    @Test
+    fun whenWindowsWaitlistDisabledThenStateHidden() = runTest {
+        val mockToggle: Toggle = mock()
+        whenever(mockToggle.isEnabled()).thenReturn(false)
+        whenever(mockWindowsWaitlistFeature.self()).thenReturn(mockToggle)
+
+        testee.viewState.test {
+            assertFalse(awaitItem().windowsFeatureEnabled)
+        }
     }
 }

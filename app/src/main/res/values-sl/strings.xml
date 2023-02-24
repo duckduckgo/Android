@@ -683,9 +683,6 @@
     <string name="permissionsPerWebsiteAskDisabledSetting">Poziv »Vprašaj« je onemogočen za vsa spletna mesta</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s dovoljenje za %2$s</string>
 
-    <!-- Autofill -->
-    <string name="autofillSettingsDisplayName">Samodejno izpolnjevanje</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Ugotovite, kdaj so prenosi pripravljeni</string>
     <string name="downloadsNotifyMeSubtitle">Prejmite obvestilo, ko so prenosi končani.</string>

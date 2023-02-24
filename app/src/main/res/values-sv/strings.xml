@@ -675,9 +675,6 @@
     <string name="permissionsPerWebsiteAskDisabledSetting">”Fråga” inaktiverat för alla webbplatser</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s-behörighet för %2$s</string>
 
-    <!-- Autofill -->
-    <string name="autofillSettingsDisplayName">Automatisk ifyllning</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Få reda på när nerladdningar är klara</string>
     <string name="downloadsNotifyMeSubtitle">Få ett meddelande när nerladdningar är klara.</string>

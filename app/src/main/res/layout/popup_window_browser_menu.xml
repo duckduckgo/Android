@@ -207,7 +207,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:iconDrawable="@drawable/ic_key_16"
-                app:primaryText="@string/managementScreenTitle" />
+                app:primaryText="@string/autofillManagementScreenTitle" />
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
                 android:id="@+id/downloadsMenuItem"

@@ -675,9 +675,6 @@
     <string name="permissionsPerWebsiteAskDisabledSetting">„Fragen“ für alle Seiten deaktiviert</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s-Berechtigung für %2$s</string>
 
-    <!-- Autofill -->
-    <string name="autofillSettingsDisplayName">Autovervollständigen</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Erfahre, wann Downloads bereit sind</string>
     <string name="downloadsNotifyMeSubtitle">Erhalte eine Benachrichtigung, wenn Downloads abgeschlossen sind.</string>

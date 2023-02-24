@@ -30,7 +30,6 @@ import android.view.View
 import android.widget.TextView
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
-import androidx.core.content.ContextCompat
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.spans.DuckDuckGoClickableSpan
 
@@ -82,7 +81,7 @@ fun TextView.addClickableLink(
             )
             setSpan(
                 ForegroundColorSpan(
-                    ContextCompat.getColor(context, R.color.cornflowerBlue),
+                    context.getColorFromAttr(R.attr.daxColorAccentBlue),
                 ),
                 fullText.getSpanStart(it),
                 fullText.getSpanEnd(it),
@@ -114,7 +113,7 @@ fun TextView.addClickableSpan(
                 )
                 setSpan(
                     ForegroundColorSpan(
-                        ContextCompat.getColor(context, R.color.cornflowerBlue),
+                        context.getColorFromAttr(R.attr.daxColorAccentBlue),
                     ),
                     fullText.getSpanStart(it),
                     fullText.getSpanEnd(it),

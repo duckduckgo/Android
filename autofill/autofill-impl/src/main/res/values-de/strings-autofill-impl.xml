@@ -17,7 +17,7 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="managementScreenTitle">Anmeldedaten automatisch ausfüllen</string>
+    <string name="autofillManagementScreenTitle">Anmeldedaten automatisch ausfüllen</string>
 
     <string name="managementLockedModeText">Autovervollständigen freischalten</string>
 
@@ -37,6 +37,8 @@
     <string name="useSavedLoginDialogTitle">Gespeicherte Anmeldedaten verwenden?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Anmeldedaten für %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Anmeldedaten für Website</string>
+    <string name="useSavedLoginDialogGroupThisWebsite">Von dieser Website</string>
+    <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Von %1$s</string>
 
     <string name="updateLoginDialogTitle">Passwort aktualisieren?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Passwort aktualisieren</string>

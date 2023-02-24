@@ -675,9 +675,6 @@
     <string name="permissionsPerWebsiteAskDisabledSetting">Kysy-toiminto poistettu käytöstä kaikilta sivustoilta</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s: käyttöoikeus – lupa %2$s</string>
 
-    <!-- Autofill -->
-    <string name="autofillSettingsDisplayName">Automaattinen täyttö</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Saat tietää, milloin lataukset ovat valmiita</string>
     <string name="downloadsNotifyMeSubtitle">Saat ilmoituksen, kun lataukset ovat valmiita.</string>

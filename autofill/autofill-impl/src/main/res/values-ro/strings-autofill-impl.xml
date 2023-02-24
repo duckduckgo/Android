@@ -17,7 +17,7 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="managementScreenTitle">Completare automată la autentificare</string>
+    <string name="autofillManagementScreenTitle">Completare automată la autentificare</string>
 
     <string name="managementLockedModeText">Deblochează completarea automată</string>
 
@@ -37,6 +37,8 @@
     <string name="useSavedLoginDialogTitle">Folosești datele de conectare salvate?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Autentificare pentru %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Autentificare pentru site</string>
+    <string name="useSavedLoginDialogGroupThisWebsite">De pe acest site web</string>
+    <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Din %1$s</string>
 
     <string name="updateLoginDialogTitle">Actualizezi parola?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Actualizează parola</string>

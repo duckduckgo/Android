@@ -18,7 +18,7 @@ plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id 'com.squareup.anvil'
-    id 'kotlin-android-extensions'
+    id 'kotlin-parcelize'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -36,10 +36,6 @@ android {
             includeAndroidResources = true
         }
     }
-}
-
-ext {
-    workManager = "2.5.0-beta01"
 }
 
 dependencies {
@@ -113,7 +109,7 @@ dependencies {
 
     // WorkManager
     implementation AndroidX.work.runtimeKtx
-    implementation "androidx.work:work-multiprocess:$workManager"
+    implementation "androidx.work:work-multiprocess:_"
     testImplementation AndroidX.work.testing
     implementation AndroidX.work.rxJava2
 

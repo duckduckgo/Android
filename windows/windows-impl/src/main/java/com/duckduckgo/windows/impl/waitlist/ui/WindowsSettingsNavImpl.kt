@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,26 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.impl
+package com.duckduckgo.windows.impl.waitlist.ui
 
-import androidx.core.net.toUri
-import com.duckduckgo.app.global.baseHost
-import com.duckduckgo.di.scopes.FragmentScope
+import android.content.Context
+import android.content.Intent
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.windows.api.WindowsSettingsNav
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
-interface AutofillDomainFormatter {
-    fun extractDomain(url: String?): String?
-}
-
-@ContributesBinding(FragmentScope::class)
-class AutofillDomainFormatterDomainNameOnly @Inject constructor() : AutofillDomainFormatter {
-    override fun extractDomain(url: String?): String? {
-        val domain = url?.toUri()?.baseHost
-        return if (domain.isNullOrBlank()) {
-            null
-        } else {
-            domain
-        }
+@ContributesBinding(AppScope::class)
+class WindowsSettingsNavImpl @Inject constructor() : WindowsSettingsNav {
+    override fun openWindowsSettings(activityContext: Context): Intent {
+        return WindowsWaitlistActivity.intent(activityContext)
     }
 }

@@ -44,7 +44,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/ic_privacy_simplified"/>
+                    app:srcCompat="@drawable/ic_computer_mac"/>
 
             <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                     android:id="@+id/statusTitle"
@@ -86,17 +86,16 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/waitlistDescription"/>
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
-                    android:id="@+id/footerDescription"
-                    app:typography="caption"
-                    app:textType="secondary"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="24dp"
-                    android:text="@string/macos_windows"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"/>
+            <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
+                android:id="@+id/lookingForWindowsVersionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:buttonSize="small"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginBottom="@dimen/keyline_4"
+                android:text="@string/macos_waitlist_windows_link"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

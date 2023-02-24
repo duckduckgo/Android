@@ -17,7 +17,7 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="managementScreenTitle">Логины для автозаполнения</string>
+    <string name="autofillManagementScreenTitle">Логины для автозаполнения</string>
 
     <string name="managementLockedModeText">Разблокировать автозаполнение</string>
 
@@ -37,6 +37,8 @@
     <string name="useSavedLoginDialogTitle">Использовать сохраненный логин?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Логин для %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Логин для сайта</string>
+    <string name="useSavedLoginDialogGroupThisWebsite">С этого сайта</string>
+    <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">С %1$s</string>
 
     <string name="updateLoginDialogTitle">Обновить пароль?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Обновить пароль</string>

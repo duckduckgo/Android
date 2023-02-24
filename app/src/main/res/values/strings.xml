@@ -619,7 +619,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Browse privately with our app for Mac</string>
-    <string name="macos_settings_title">DuckDuckGo Desktop App</string>
+    <string name="macos_settings_title">DuckDuckGo Mac App</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Downloads</string>
@@ -675,9 +675,6 @@
     <string name="permissionsPerWebsiteAllowSetting">Allow</string>
     <string name="permissionsPerWebsiteAskDisabledSetting">\"Ask\" disabled for all sites</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s permission for %2$s</string>
-
-    <!-- Autofill -->
-    <string name="autofillSettingsDisplayName">Autofill</string>
 
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Find out when downloads are ready</string>

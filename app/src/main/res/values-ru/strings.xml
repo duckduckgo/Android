@@ -683,9 +683,6 @@
     <string name="permissionsPerWebsiteAskDisabledSetting">«Запросить» отключено для всех сайтов</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Разрешение на доступ %2$s к %1$s</string>
 
-    <!-- Autofill -->
-    <string name="autofillSettingsDisplayName">Автозаполнение</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Уведомления о готовых загрузках</string>
     <string name="downloadsNotifyMeSubtitle">Получайте уведомления по окончании загрузок.</string>
