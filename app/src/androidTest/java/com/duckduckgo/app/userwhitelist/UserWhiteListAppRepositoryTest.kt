@@ -23,6 +23,8 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertFalse
+import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import org.junit.After
@@ -65,8 +67,20 @@ class UserWhiteListAppRepositoryTest {
     @Test
     fun whenDbContainsUserWhiteListedDomainsThenUpdateUserWhiteList() {
         assertEquals(0, repository.userWhiteList.size)
-        dao.insert("www.example.com")
+        dao.insert("example.com")
         assertEquals(1, repository.userWhiteList.size)
-        assertEquals("www.example.com", repository.userWhiteList.first())
+        assertEquals("example.com", repository.userWhiteList.first())
+    }
+
+    @Test
+    fun whenDbContainsUserWhiteListedDomainThenIsUrlInAllowListReturnsTrue() {
+        dao.insert("example.com")
+        assertTrue(repository.isUrlInAllowList("https://example.com"))
+    }
+
+    @Test
+    fun whenDbDoesNotContainUserWhiteListedDomainThenIsUrlInAllowListReturnsFalse() {
+        dao.insert("example.com")
+        assertFalse(repository.isUrlInAllowList("https://foo.com"))
     }
 }

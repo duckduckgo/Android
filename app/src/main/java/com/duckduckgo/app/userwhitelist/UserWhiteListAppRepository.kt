@@ -16,8 +16,11 @@
 
 package com.duckduckgo.app.userwhitelist
 
+import android.net.Uri
+import androidx.core.net.toUri
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.userwhitelist.api.UserWhiteListRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -37,6 +40,13 @@ class UserWhiteListAppRepository @Inject constructor(
 
     private val dao = appDatabase.userWhitelistDao()
     override val userWhiteList = CopyOnWriteArrayList<String>()
+    override fun isUrlInAllowList(url: String): Boolean {
+        return isUriInAllowList(url.toUri())
+    }
+
+    override fun isUriInAllowList(uri: Uri): Boolean {
+        return userWhiteList.contains(uri.domain())
+    }
 
     init {
         coroutineScope.launch(dispatcherProvider.io()) {

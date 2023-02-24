@@ -16,11 +16,8 @@
 
 package com.duckduckgo.privacy.config.impl.features.gpc
 
-import android.net.Uri
 import androidx.annotation.VisibleForTesting
-import androidx.core.net.toUri
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
-import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.userwhitelist.api.UserWhiteListRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
@@ -86,9 +83,8 @@ class RealGpc @Inject constructor(
     }
 
     @VisibleForTesting
-    fun isAnException(url: String, uri: Uri = url.toUri()): Boolean {
-        return matches(url) || unprotectedTemporary.isAnException(url) ||
-            userWhiteListRepository.userWhiteList.contains(uri.domain())
+    fun isAnException(url: String): Boolean {
+        return matches(url) || unprotectedTemporary.isAnException(url) || userWhiteListRepository.isUrlInAllowList(url)
     }
 
     private fun matches(url: String): Boolean {

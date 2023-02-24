@@ -97,8 +97,7 @@ class CloakedCnameDetectorImplTest {
 
     @Test
     fun whenDetectCnameCloakedHostAndUrlIsInUserAllowListThenReturnNull() {
-        whenever(mockUri.domain()).thenReturn("test.com")
-        whenever(mockUserWhiteListRepository.userWhiteList).thenReturn(listOf("test.com"))
+        whenever(mockUserWhiteListRepository.isUriInAllowList(any())).thenReturn(true)
         assertNull(testee.detectCnameCloakedHost("foo.com", mockUri))
     }
 }

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autoconsent.impl
 
+import android.net.Uri
 import android.webkit.WebView
 import androidx.core.net.toUri
 import com.duckduckgo.app.global.domain
@@ -62,4 +63,12 @@ class FakeUnprotected(private val exceptionList: List<String>) : UnprotectedTemp
         get() = exceptionList.map { UnprotectedTemporaryException(domain = it, reason = "A reason") }
 }
 
-class FakeUserAllowlist(override val userWhiteList: List<String>) : UserWhiteListRepository
+class FakeUserAllowlist(override val userWhiteList: List<String>) : UserWhiteListRepository {
+    override fun isUrlInAllowList(url: String): Boolean {
+        return false
+    }
+
+    override fun isUriInAllowList(uri: Uri): Boolean {
+        return false
+    }
+}

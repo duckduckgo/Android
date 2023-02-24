@@ -16,9 +16,7 @@
 
 package com.duckduckgo.privacy.config.impl.features.gpc
 
-import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.userwhitelist.api.UserWhiteListRepository
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.GpcException
@@ -33,6 +31,7 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -205,10 +204,8 @@ class RealGpcTest {
 
     @Test
     fun whenIsExceptionCalledAndDomainIsInUserAllowListThenReturnTrue() {
-        val mockUri: Uri = mock()
-        whenever(mockUri.domain()).thenReturn("test.com")
-        whenever(mockUserWhiteListRepository.userWhiteList).thenReturn(listOf("test.com"))
-        assertTrue(testee.isAnException("test.com", mockUri))
+        whenever(mockUserWhiteListRepository.isUrlInAllowList(anyString())).thenReturn(true)
+        assertTrue(testee.isAnException("test.com"))
     }
 
     private fun givenFeatureAndGpcAreEnabled() {

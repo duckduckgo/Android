@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.features.trackingparameters
+package com.duckduckgo.privacy.config.impl.features.amplinks
 
 import com.duckduckgo.app.userwhitelist.api.UserWhiteListRepository
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
-import com.duckduckgo.privacy.config.store.features.trackingparameters.TrackingParametersRepository
+import com.duckduckgo.privacy.config.store.features.amplinks.AmpLinksRepository
 import junit.framework.TestCase.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -27,22 +27,22 @@ import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-class RealTrackingParametersTest {
+class RealAmpLinksTest {
 
-    private lateinit var testee: RealTrackingParameters
-    private val mockTrackingParametersRepository: TrackingParametersRepository = mock()
+    private lateinit var testee: RealAmpLinks
+    private val mockAmpLinksRepository: AmpLinksRepository = mock()
     private val mockFeatureToggle: FeatureToggle = mock()
     private val mockUnprotectedTemporary: UnprotectedTemporary = mock()
     private val mockUserWhiteListRepository: UserWhiteListRepository = mock()
 
     @Before
     fun setup() {
-        testee = RealTrackingParameters(mockTrackingParametersRepository, mockFeatureToggle, mockUnprotectedTemporary, mockUserWhiteListRepository)
+        testee = RealAmpLinks(mockAmpLinksRepository, mockFeatureToggle, mockUnprotectedTemporary, mockUserWhiteListRepository)
     }
 
     @Test
     fun whenIsExceptionCalledAndDomainIsInUserAllowListThenReturnTrue() {
         whenever(mockUserWhiteListRepository.isUrlInAllowList(anyString())).thenReturn(true)
-        assertTrue(testee.isAnException("foo.com", "test.com"))
+        assertTrue(testee.isAnException("test.com"))
     }
 }

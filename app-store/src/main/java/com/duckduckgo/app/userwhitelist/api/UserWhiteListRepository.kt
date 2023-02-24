@@ -16,7 +16,11 @@
 
 package com.duckduckgo.app.userwhitelist.api
 
+import android.net.Uri
+
 interface UserWhiteListRepository {
 
     val userWhiteList: List<String>
+    fun isUrlInAllowList(url: String): Boolean
+    fun isUriInAllowList(uri: Uri): Boolean
 }

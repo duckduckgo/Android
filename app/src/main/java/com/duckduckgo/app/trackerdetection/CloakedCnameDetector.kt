@@ -18,7 +18,6 @@ package com.duckduckgo.app.trackerdetection
 
 import android.net.Uri
 import com.duckduckgo.app.global.UrlScheme
-import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.trackerdetection.db.TdsCnameEntityDao
 import com.duckduckgo.app.userwhitelist.api.UserWhiteListRepository
 import com.duckduckgo.di.scopes.AppScope
@@ -42,7 +41,7 @@ class CloakedCnameDetectorImpl @Inject constructor(
 
     override fun detectCnameCloakedHost(documentUrl: String?, url: Uri): String? {
         if (documentUrl != null && trackerAllowlist.isAnException(documentUrl, url.toString()) ||
-            userWhiteListRepository.userWhiteList.contains(url.domain())
+            userWhiteListRepository.isUriInAllowList(url)
         ) { return null }
 
         url.host?.let { host ->

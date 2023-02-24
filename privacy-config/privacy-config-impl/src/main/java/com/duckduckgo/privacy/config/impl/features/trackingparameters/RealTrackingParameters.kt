@@ -18,9 +18,7 @@ package com.duckduckgo.privacy.config.impl.features.trackingparameters
 
 import android.net.Uri
 import androidx.annotation.VisibleForTesting
-import androidx.core.net.toUri
 import com.duckduckgo.app.global.UriString
-import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.global.replaceQueryParameters
 import com.duckduckgo.app.userwhitelist.api.UserWhiteListRepository
 import com.duckduckgo.di.scopes.AppScope
@@ -50,10 +48,8 @@ class RealTrackingParameters @Inject constructor(
     override var lastCleanedUrl: String? = null
 
     @VisibleForTesting
-    fun isAnException(initiatingUrl: String?, url: String, uri: Uri = url.toUri()): Boolean {
-        return matches(initiatingUrl) || matches(url) ||
-            unprotectedTemporary.isAnException(url) ||
-            userWhiteListRepository.userWhiteList.contains(uri.domain())
+    fun isAnException(initiatingUrl: String?, url: String): Boolean {
+        return matches(initiatingUrl) || matches(url) || unprotectedTemporary.isAnException(url) || userWhiteListRepository.isUrlInAllowList(url)
     }
 
     private fun matches(url: String?): Boolean {
