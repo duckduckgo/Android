@@ -216,9 +216,9 @@ class NotifyMeView @JvmOverloads constructor(
 
     @SuppressLint("InlinedApi")
     private fun updateNotificationsPermissionsOnAndroid13Plus() {
-        val granted =
-            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
-        viewModel.updateNotificationsPermissions(granted)
+        // val granted =
+        //     ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+        // viewModel.updateNotificationsPermissions(granted)
     }
 
     private fun openSettings() {
@@ -249,14 +249,14 @@ class NotifyMeView @JvmOverloads constructor(
     }
 
     private fun checkPermissionRationale() {
-        @SuppressLint("InlinedApi")
-        val showRationale = ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.POST_NOTIFICATIONS)
-        viewModel.handleRequestPermissionRationale(showRationale)
+        // @SuppressLint("InlinedApi")
+        // val showRationale = ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.POST_NOTIFICATIONS)
+        // viewModel.handleRequestPermissionRationale(showRationale)
     }
 
     @SuppressLint("InlinedApi")
     private fun showNotificationsPermissionsPrompt() {
-        ActivityCompat.requestPermissions(getActivity(), arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1)
+        // ActivityCompat.requestPermissions(getActivity(), arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1)
     }
 
     private fun getActivity(): Activity {

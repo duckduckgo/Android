@@ -91,7 +91,7 @@ class WelcomePageViewModel(
         emit(WelcomePageView.State.Finish)
     }
 
-    private fun AppBuildConfig.isAndroid13OrAbove(): Boolean = sdkInt >= android.os.Build.VERSION_CODES.TIRAMISU
+    private fun AppBuildConfig.isAndroid13OrAbove(): Boolean = false
 }
 
 @Suppress("UNCHECKED_CAST")

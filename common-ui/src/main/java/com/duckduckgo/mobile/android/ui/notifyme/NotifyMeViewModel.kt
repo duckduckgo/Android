@@ -73,11 +73,11 @@ class NotifyMeViewModel(
 
     override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
-        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.TIRAMISU) {
-            sendCommand(Command.UpdateNotificationsStateOnAndroid13Plus)
-        } else {
-            sendCommand(Command.UpdateNotificationsState)
-        }
+        // if (appBuildConfig.sdkInt >= Build.VERSION_CODES.TIRAMISU) {
+        //     sendCommand(Command.UpdateNotificationsStateOnAndroid13Plus)
+        // } else {
+        // }
+        sendCommand(Command.UpdateNotificationsState)
     }
 
     fun commands(): Flow<Command> {
@@ -91,11 +91,11 @@ class NotifyMeViewModel(
     }
 
     fun onNotifyMeButtonClicked() {
-        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.TIRAMISU) {
-            sendCommand(Command.CheckPermissionRationale)
-        } else {
-            openSettings()
-        }
+        // if (appBuildConfig.sdkInt >= Build.VERSION_CODES.TIRAMISU) {
+        //     sendCommand(Command.CheckPermissionRationale)
+        // } else {
+        // }
+        openSettings()
     }
 
     fun onCloseButtonClicked() {

@@ -199,7 +199,7 @@ class DefaultBrowserPageViewModel @Inject constructor(
         }
     }
 
-    private fun AppBuildConfig.isAndroid13OrAbove(): Boolean = sdkInt >= android.os.Build.VERSION_CODES.TIRAMISU
+    private fun AppBuildConfig.isAndroid13OrAbove(): Boolean = false
 
     companion object {
         const val MAX_DIALOG_ATTEMPTS = 2
