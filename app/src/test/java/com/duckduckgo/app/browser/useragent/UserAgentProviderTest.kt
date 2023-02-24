@@ -240,8 +240,6 @@ class UserAgentProviderTest {
     }
 
     internal class FakeUserAllowListRepo : UserAllowListRepository {
-        override val userAllowList: List<String> = emptyList()
-
         override fun isUrlInUserAllowList(url: String): Boolean = false
 
         override fun isUriInUserAllowList(uri: Uri): Boolean = false
