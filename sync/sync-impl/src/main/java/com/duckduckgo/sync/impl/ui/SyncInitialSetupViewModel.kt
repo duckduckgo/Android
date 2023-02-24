@@ -208,6 +208,7 @@ constructor(
     fun onConnectStart() {
         viewModelScope.launch(dispatchers.io()) {
             val qrCode = syncRepository.getLinkingQR()
+            updateViewState()
             command.send(ShowQR(qrCode))
             var polling = true
             while(polling) {
@@ -217,8 +218,9 @@ constructor(
                         command.send(Command.ShowMessage("$result"))
                     }
                     is Success -> {
-                        command.send(Command.ShowMessage(result.data))
+                        command.send(Command.ShowMessage(result.data.toString()))
                         polling = false
+                        updateViewState()
                     }
                 }
             }

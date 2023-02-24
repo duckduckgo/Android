@@ -127,9 +127,15 @@ class SyncNativeLibTest {
     fun whenSealThenSuccess() {
         val syncNativeLib = SyncNativeLib(InstrumentationRegistry.getInstrumentation().targetContext)
         val prepareForConnect = syncNativeLib.prepareForConnect()
-        val result = syncNativeLib.seal("hola", prepareForConnect.publicKey)
+        val result = syncNativeLib.seal("hola-1324-2342", prepareForConnect.publicKey)
         val result2 = syncNativeLib.sealOpen(result, prepareForConnect.publicKey, prepareForConnect.secretKey)
-        assertEquals("hola", result2)
+        assertEquals("hola-1324-2342", result2)
+    }
+
+    @Test
+    fun whenDecodeEncodeThenReturnSameValue() {
+        val decoded = "hola-1213-1231-123".toByteArray()
+        assertEquals("hola-1213-1231-123", String(decoded))
     }
 
     companion object {

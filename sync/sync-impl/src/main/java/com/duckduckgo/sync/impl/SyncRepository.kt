@@ -51,7 +51,7 @@ interface SyncRepository {
     fun getLinkingQR(): String
     fun connectDevice(contents: String): Result<Boolean>
 
-    fun pollConnectionKeys(): Result<String>
+    fun pollConnectionKeys(): Result<Boolean>
 }
 
 @ContributesBinding(AppScope::class)
@@ -154,7 +154,9 @@ class AppSyncRepository @Inject constructor(
         val prepareForConnect = nativeLib.prepareForConnect()
         val deviceId = syncDeviceIds.deviceId()
         syncStore.deviceId = deviceId
-        return Adapters.connectCodeAdapter.toJson(ConnectCode(prepareForConnect.publicKey, deviceId))
+        syncStore.primaryKey = prepareForConnect.publicKey
+        syncStore.secretKey = prepareForConnect.secretKey
+        return Adapters.connectCodeAdapter.toJson(ConnectCode(deviceId = deviceId, publicKey = prepareForConnect.publicKey))
     }
 
     override fun connectDevice(contents: String): Result<Boolean> {
@@ -168,7 +170,7 @@ class AppSyncRepository @Inject constructor(
         return syncApi.connect(token = token, deviceId = connectKeys.deviceId, publicKey = seal)
     }
 
-    override fun pollConnectionKeys(): Result<String> {
+    override fun pollConnectionKeys(): Result<Boolean> {
         val deviceId = syncStore.deviceId!!
         val result = syncApi.connectDevice(deviceId)
 
@@ -177,7 +179,49 @@ class AppSyncRepository @Inject constructor(
                 result
             }
             is Result.Success -> {
+                val sealOpen = nativeLib.sealOpen(result.data, syncStore.primaryKey!!, syncStore.secretKey!!)
+                val split = sealOpen.split(";")
+                syncStore.userId = split.first()
+                syncStore.primaryKey = split.last()
+                return login(syncStore.userId!!, syncStore.primaryKey!!)
+            }
+        }
+    }
+
+    private fun login(
+        userId: String,
+        primaryKey: String,
+    ): Result<Boolean> {
+        val deviceId = syncDeviceIds.deviceId()
+        val deviceName = syncDeviceIds.deviceName()
+
+        val preLogin: LoginKeys = nativeLib.prepareForLogin(primaryKey)
+        Timber.i("SYNC prelogin ${preLogin.passwordHash} and ${preLogin.stretchedPrimaryKey}")
+        if (preLogin.result != 0L) return Result.Error(code = preLogin.result.toInt(), reason = "Account keys failed")
+
+        val result =
+            syncApi.login(
+                userID = userId,
+                hashedPassword = preLogin.passwordHash,
+                deviceId = deviceId,
+                deviceName = deviceName,
+            )
+
+        return when (result) {
+            is Result.Error -> {
                 result
+            }
+            is Result.Success -> {
+                val decryptResult = nativeLib.decrypt(result.data.protected_encryption_key, preLogin.stretchedPrimaryKey)
+                if (decryptResult.result != 0L) return Result.Error(code = decryptResult.result.toInt(), reason = "Decrypt failed")
+                Timber.i("SYNC decrypt: decoded secret Key: ${decryptResult.decryptedData}")
+                syncStore.userId = userId
+                syncStore.deviceId = deviceId
+                syncStore.deviceName = deviceName
+                syncStore.token = result.data.token
+                syncStore.primaryKey = preLogin.primaryKey
+                syncStore.secretKey = decryptResult.decryptedData
+                Result.Success(true)
             }
         }
     }
@@ -331,8 +375,8 @@ data class ConnectedDevice(
 )
 
 data class ConnectCode(
-    val publicKey: String,
     val deviceId: String,
+    val publicKey: String,
 )
 
 sealed class Result<out R> {

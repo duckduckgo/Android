@@ -84,17 +84,17 @@ class SyncNativeLib constructor(context: Context) : SyncLib {
 
         return AccountKeys(
             result = result,
-            primaryKey = primaryKey.encode(),
-            secretKey = secretKey.encode(),
-            protectedSecretKey = protectedSecretKey.encode(),
-            passwordHash = passwordHash.encode(),
+            primaryKey = primaryKey.encodeKey(),
+            secretKey = secretKey.encodeKey(),
+            protectedSecretKey = protectedSecretKey.encodeKey(),
+            passwordHash = passwordHash.encodeKey(),
             userId = userId,
             password = password,
         )
     }
 
     override fun prepareForLogin(primaryKey: String): LoginKeys {
-        val primarKeyByteArray = primaryKey.decode()
+        val primarKeyByteArray = primaryKey.decodeKey()
         val passwordHash = ByteArray(getPasswordHashSize())
         val stretchedPrimaryKey = ByteArray(getStretchedPrimaryKeySize())
 
@@ -102,8 +102,8 @@ class SyncNativeLib constructor(context: Context) : SyncLib {
 
         return LoginKeys(
             result = result,
-            passwordHash = passwordHash.encode(),
-            stretchedPrimaryKey = stretchedPrimaryKey.encode(),
+            passwordHash = passwordHash.encodeKey(),
+            stretchedPrimaryKey = stretchedPrimaryKey.encodeKey(),
             primaryKey = primaryKey,
         )
     }
@@ -112,15 +112,15 @@ class SyncNativeLib constructor(context: Context) : SyncLib {
         encryptedData: String,
         secretKey: String,
     ): DecryptResult {
-        val encryptedDataByteArray = encryptedData.decode()
-        val secretKeyByteArray = secretKey.decode()
+        val encryptedDataByteArray = encryptedData.decodeKey()
+        val secretKeyByteArray = secretKey.decodeKey()
         val decryptedData = ByteArray(encryptedDataByteArray.size - getEncryptedExtraBytes())
 
         val result: Long = decrypt(decryptedData, encryptedDataByteArray, secretKeyByteArray)
 
         return DecryptResult(
             result = result,
-            decryptedData = decryptedData.encode(),
+            decryptedData = decryptedData.encodeKey(),
         )
     }
 
@@ -136,8 +136,8 @@ class SyncNativeLib constructor(context: Context) : SyncLib {
 
         return ConnectKeys(
             result = result,
-            publicKey = publicKey.encode(),
-            secretKey = privateKey.encode(),
+            publicKey = publicKey.encodeKey(),
+            secretKey = privateKey.encodeKey(),
         )
     }
 
@@ -161,13 +161,13 @@ class SyncNativeLib constructor(context: Context) : SyncLib {
         message: String,
         publicKey: String,
     ): String {
-        val messageBytes = message.decode()
-        val publicKeyBytes = publicKey.decode()
+        val messageBytes = message.decodeText()
+        val publicKeyBytes = publicKey.decodeKey()
         val sealedData = ByteArray(messageBytes.size + getSealBytes())
 
         val result: Int = seal(sealedData, publicKeyBytes, messageBytes)
 
-        return sealedData.encode()
+        return sealedData.encodeKey()
     }
 
     override fun sealOpen(
@@ -175,22 +175,29 @@ class SyncNativeLib constructor(context: Context) : SyncLib {
         primaryKey: String,
         secretKey: String,
     ): String {
-        val primaryKeyBytes = primaryKey.decode()
-        val secretKeyBytes = secretKey.decode()
-        val cypherTextBytes = cypherText.decode()
+        val primaryKeyBytes = primaryKey.decodeKey()
+        val secretKeyBytes = secretKey.decodeKey()
+        val cypherTextBytes = cypherText.decodeKey()
         val rawBytes = ByteArray(cypherTextBytes.size - getSealBytes())
 
         val result: Int = sealOpen(cypherTextBytes, primaryKeyBytes, secretKeyBytes, rawBytes)
 
-        return rawBytes.encode()
+        return rawBytes.encodeText()
     }
 
-    private fun ByteArray.encode(): String {
+    private fun ByteArray.encodeKey(): String {
         return Base64.encodeToString(this, Base64.NO_WRAP)
     }
-
-    private fun String.decode(): ByteArray {
+    private fun String.decodeKey(): ByteArray {
         return Base64.decode(this, Base64.NO_WRAP)
+    }
+
+    private fun ByteArray.encodeText(): String {
+        return String(this)
+    }
+
+    private fun String.decodeText(): ByteArray {
+        return this.toByteArray()
     }
 
     private external fun generateAccountKeys(
