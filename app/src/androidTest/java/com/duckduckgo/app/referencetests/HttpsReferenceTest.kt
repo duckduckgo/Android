@@ -39,6 +39,7 @@ import com.duckduckgo.app.httpsupgrade.store.HttpsFalsePositivesDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.api.ActionJsonAdapter
+import com.duckduckgo.app.userwhitelist.api.UserWhiteListRepository
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Https
 import com.duckduckgo.privacy.config.api.HttpsException
@@ -91,6 +92,7 @@ class HttpsReferenceTest(private val testCase: TestCase) {
     private var mockFeatureToggle: FeatureToggle = mock()
     private val mockHttpsRepository: HttpsRepository = mock()
     private val mockUnprotectedTemporaryRepository: UnprotectedTemporaryRepository = mock()
+    private val mockUserWhiteListRepository: UserWhiteListRepository = mock()
 
     companion object {
         private val moshi = Moshi.Builder()
@@ -176,7 +178,7 @@ class HttpsReferenceTest(private val testCase: TestCase) {
         whenever(mockHttpsRepository.exceptions).thenReturn(CopyOnWriteArrayList(httpsExceptions))
         whenever(mockUnprotectedTemporaryRepository.exceptions).thenReturn(exceptionsUnprotectedTemporary)
 
-        https = RealHttps(mockHttpsRepository, RealUnprotectedTemporary(mockUnprotectedTemporaryRepository))
+        https = RealHttps(mockHttpsRepository, RealUnprotectedTemporary(mockUnprotectedTemporaryRepository), mockUserWhiteListRepository)
     }
 
     private fun initialiseBloomFilter() {

@@ -121,6 +121,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
+import com.duckduckgo.app.userwhitelist.api.UserWhiteListRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
@@ -330,6 +331,9 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var mockSitePermissionsManager: SitePermissionsManager
 
+    @Mock
+    private lateinit var mockUserWhiteListRepository: UserWhiteListRepository
+
     private lateinit var remoteMessagingModel: RemoteMessagingModel
 
     private val lazyFaviconManager = Lazy { mockFaviconManager }
@@ -471,7 +475,7 @@ class BrowserTabViewModelTest {
             navigationAwareLoginDetector = mockNavigationAwareLoginDetector,
             userEventsStore = mockUserEventsStore,
             fileDownloader = mockFileDownloader,
-            gpc = RealGpc(mockFeatureToggle, mockGpcRepository, mockUnprotectedTemporary),
+            gpc = RealGpc(mockFeatureToggle, mockGpcRepository, mockUnprotectedTemporary, mockUserWhiteListRepository),
             fireproofDialogsEventHandler = fireproofDialogsEventHandler,
             emailManager = mockEmailManager,
             favoritesRepository = mockFavoritesRepository,
