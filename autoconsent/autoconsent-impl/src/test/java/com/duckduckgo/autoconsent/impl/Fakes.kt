@@ -63,7 +63,7 @@ class FakeUnprotected(private val exceptionList: List<String>) : UnprotectedTemp
         get() = exceptionList.map { UnprotectedTemporaryException(domain = it, reason = "A reason") }
 }
 
-class FakeUserAllowlist : UserAllowListRepository {
+class FakeUserAllowlist(private val userAllowList: List<String>) : UserAllowListRepository {
     override fun isUrlInUserAllowList(url: String): Boolean {
         return false
     }
@@ -77,6 +77,6 @@ class FakeUserAllowlist : UserAllowListRepository {
     }
 
     override fun domainsInUserAllowList(): List<String> {
-        return listOf()
+        return userAllowList
     }
 }
