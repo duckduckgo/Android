@@ -65,7 +65,7 @@ class FakeUnprotected(private val exceptionList: List<String>) : UnprotectedTemp
 
 class FakeUserAllowlist(private val userAllowList: List<String>) : UserAllowListRepository {
     override fun isUrlInUserAllowList(url: String): Boolean {
-        return false
+        return userAllowList.contains(url.toUri().domain())
     }
 
     override fun isUriInUserAllowList(uri: Uri): Boolean {
@@ -77,6 +77,6 @@ class FakeUserAllowlist(private val userAllowList: List<String>) : UserAllowList
     }
 
     override fun domainsInUserAllowList(): List<String> {
-        return userAllowList
+        return emptyList()
     }
 }
