@@ -36,6 +36,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import timber.log.Timber
 import java.util.*
 
 interface SavedSitesRepository {
@@ -124,8 +125,11 @@ class RealSavedSitesRepository(
     override suspend fun getFolderEntityContent(folderId: String): Flow<Pair<List<Bookmark>, List<BookmarkFolder>>> {
         val bookmarks = mutableListOf<Bookmark>()
         val folders = mutableListOf<BookmarkFolder>()
+        Timber.d("Saved sites bookmarks: $bookmarks")
+        Timber.d("Saved sites folders: $folders")
         return syncRelationsDao.relationById(folderId).map { entities ->
-            entities.forEach { entity ->
+            Timber.d("Saved sites total: $entities")
+            entities.map { entity ->
                 if (entity.type == FOLDER) {
                     val numFolders = syncRelationsDao.getEntitiesInFolder(entity.entityId, FOLDER)
                     val numBookmarks = syncRelationsDao.getEntitiesInFolder(entity.entityId, BOOKMARK)
@@ -134,6 +138,8 @@ class RealSavedSitesRepository(
                     bookmarks.add(Bookmark(entity.entityId, entity.title, entity.url.orEmpty(), folderId))
                 }
             }
+            Timber.d("Saved sites bookmarks: $bookmarks")
+            Timber.d("Saved sites folders: $folders")
             Pair(bookmarks.distinct(), folders.distinct())
         }
             .flowOn(dispatcherProvider.io())
