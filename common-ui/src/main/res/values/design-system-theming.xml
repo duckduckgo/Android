@@ -23,7 +23,7 @@
     <attr name="preferredNavigationBarColor" format="color" />
 
     <!-- The platform theme is where OS version specific flags are used. -->
-    <style name="Platform.V23.Theme.DuckDuckGo" parent="Theme.MaterialComponents.Light.NoActionBar"/>
+    <style name="Platform.V23.Theme.DuckDuckGo" parent="Theme.MaterialComponents.DayNight.NoActionBar"/>
 
     <style name="Platform.Theme.DuckDuckGo" parent="Platform.V23.Theme.DuckDuckGo">
         <item name="android:windowActivityTransitions" tools:ignore="NewApi">true</item>
@@ -124,6 +124,7 @@
 
     <!-- The app theme will mostly contain values for colour attributes -->
     <style name="Theme.DuckDuckGo.Dark" parent="Theme.DuckDuckGo">
+        <item name="android:isLightTheme" tools:ignore="NewApi">false</item>
         <item name="preferDarkStatusBarIcons">false</item>
         <item name="preferDarkNavigationBarIcons">false</item>
 
@@ -194,6 +195,7 @@
     </style>
 
     <style name="Theme.DuckDuckGo.Light" parent="Theme.DuckDuckGo">
+        <item name="android:isLightTheme" tools:ignore="NewApi">true</item>
         <item name="preferDarkStatusBarIcons">true</item>
         <item name="preferDarkNavigationBarIcons">true</item>
 

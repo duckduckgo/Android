@@ -18,7 +18,7 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="Platform.V23.Theme.DuckDuckGo" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="Platform.V23.Theme.DuckDuckGo" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Controls whether status bar icons are light/dark - `minSdkVersion 23`-->
         <item name="android:windowLightStatusBar">?attr/preferDarkStatusBarIcons</item>
         <item name="preferDarkNavigationBarIcons">false</item>
