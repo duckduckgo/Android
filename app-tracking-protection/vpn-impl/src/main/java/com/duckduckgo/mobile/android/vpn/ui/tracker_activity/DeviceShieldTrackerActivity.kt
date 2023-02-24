@@ -101,7 +101,7 @@ class DeviceShieldTrackerActivity :
 
     private val feedConfig = DeviceShieldActivityFeedFragment.ActivityFeedConfig(
         maxRows = MIN_ROWS_FOR_ALL_ACTIVITY,
-        timeWindow = 5,
+        timeWindow = 7,
         timeWindowUnits = TimeUnit.DAYS,
         showTimeWindowHeadings = false,
     )
