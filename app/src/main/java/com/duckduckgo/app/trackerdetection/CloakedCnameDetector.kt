@@ -18,8 +18,8 @@ package com.duckduckgo.app.trackerdetection
 
 import android.net.Uri
 import com.duckduckgo.app.global.UrlScheme
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.trackerdetection.db.TdsCnameEntityDao
-import com.duckduckgo.app.userwhitelist.api.UserWhiteListRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.squareup.anvil.annotations.ContributesBinding
@@ -36,12 +36,12 @@ interface CloakedCnameDetector {
 class CloakedCnameDetectorImpl @Inject constructor(
     private val tdsCnameEntityDao: TdsCnameEntityDao,
     private val trackerAllowlist: TrackerAllowlist,
-    private val userWhiteListRepository: UserWhiteListRepository,
+    private val userAllowListRepository: UserAllowListRepository,
 ) : CloakedCnameDetector {
 
     override fun detectCnameCloakedHost(documentUrl: String?, url: Uri): String? {
         if (documentUrl != null && trackerAllowlist.isAnException(documentUrl, url.toString()) ||
-            userWhiteListRepository.isUriInAllowList(url)
+            userAllowListRepository.isUriInUserAllowList(url)
         ) { return null }
 
         url.host?.let { host ->

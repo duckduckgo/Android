@@ -16,7 +16,7 @@
 
 package com.duckduckgo.privacy.config.impl.features.trackingparameters
 
-import com.duckduckgo.app.userwhitelist.api.UserWhiteListRepository
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.trackingparameters.TrackingParametersRepository
@@ -33,16 +33,16 @@ class RealTrackingParametersTest {
     private val mockTrackingParametersRepository: TrackingParametersRepository = mock()
     private val mockFeatureToggle: FeatureToggle = mock()
     private val mockUnprotectedTemporary: UnprotectedTemporary = mock()
-    private val mockUserWhiteListRepository: UserWhiteListRepository = mock()
+    private val mockUserAllowListRepository: UserAllowListRepository = mock()
 
     @Before
     fun setup() {
-        testee = RealTrackingParameters(mockTrackingParametersRepository, mockFeatureToggle, mockUnprotectedTemporary, mockUserWhiteListRepository)
+        testee = RealTrackingParameters(mockTrackingParametersRepository, mockFeatureToggle, mockUnprotectedTemporary, mockUserAllowListRepository)
     }
 
     @Test
     fun whenIsExceptionCalledAndDomainIsInUserAllowListThenReturnTrue() {
-        whenever(mockUserWhiteListRepository.isUrlInAllowList(anyString())).thenReturn(true)
+        whenever(mockUserAllowListRepository.isUrlInUserAllowList(anyString())).thenReturn(true)
         assertTrue(testee.isAnException("foo.com", "test.com"))
     }
 }

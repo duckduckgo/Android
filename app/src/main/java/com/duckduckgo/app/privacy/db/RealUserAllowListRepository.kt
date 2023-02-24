@@ -16,15 +16,61 @@
 
 package com.duckduckgo.app.privacy.db
 
+import android.net.Uri
+import androidx.core.net.toUri
+import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.global.domain
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class RealUserAllowListRepository @Inject constructor(
-    private val userWhitelistDao: UserWhitelistDao,
+    appDatabase: AppDatabase,
+    coroutineScope: CoroutineScope,
+    dispatcherProvider: DispatcherProvider,
 ) : UserAllowListRepository {
-    override fun isDomainInUserAllowList(domain: String): Boolean = userWhitelistDao.contains(domain)
 
-    override fun domainsInUserAllowList(): List<String> = userWhitelistDao.allDomains()
+    private val dao = appDatabase.userWhitelistDao()
+    private val userAllowList = CopyOnWriteArrayList<String>()
+    override fun isUrlInUserAllowList(url: String): Boolean {
+        return isUriInUserAllowList(url.toUri())
+    }
+
+    override fun isUriInUserAllowList(uri: Uri): Boolean {
+        return isDomainInUserAllowList(uri.domain())
+    }
+
+    override fun isDomainInUserAllowList(domain: String?): Boolean {
+        return userAllowList.contains(domain)
+    }
+
+    override fun domainsInUserAllowList(): List<String> {
+        return userAllowList
+    }
+
+    init {
+        coroutineScope.launch(dispatcherProvider.io()) {
+            all().collect { list ->
+                userAllowList.clear()
+                userAllowList.addAll(list)
+            }
+        }
+    }
+
+    private fun all(): Flow<List<String>> {
+        return dao.allFlow().map {
+            userWhiteListedDomainList ->
+            userWhiteListedDomainList.map {
+                userWhiteListedDomain ->
+                userWhiteListedDomain.domain
+            }
+        }
+    }
 }

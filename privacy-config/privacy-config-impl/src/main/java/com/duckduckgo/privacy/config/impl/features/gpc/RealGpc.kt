@@ -18,7 +18,7 @@ package com.duckduckgo.privacy.config.impl.features.gpc
 
 import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
-import com.duckduckgo.app.userwhitelist.api.UserWhiteListRepository
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
@@ -35,7 +35,7 @@ class RealGpc @Inject constructor(
     private val featureToggle: FeatureToggle,
     private val gpcRepository: GpcRepository,
     private val unprotectedTemporary: UnprotectedTemporary,
-    private val userWhiteListRepository: UserWhiteListRepository,
+    private val userAllowListRepository: UserAllowListRepository,
 ) : Gpc {
 
     override fun isEnabled(): Boolean {
@@ -84,7 +84,7 @@ class RealGpc @Inject constructor(
 
     @VisibleForTesting
     fun isAnException(url: String): Boolean {
-        return matches(url) || unprotectedTemporary.isAnException(url) || userWhiteListRepository.isUrlInAllowList(url)
+        return matches(url) || unprotectedTemporary.isAnException(url) || userAllowListRepository.isUrlInUserAllowList(url)
     }
 
     private fun matches(url: String): Boolean {

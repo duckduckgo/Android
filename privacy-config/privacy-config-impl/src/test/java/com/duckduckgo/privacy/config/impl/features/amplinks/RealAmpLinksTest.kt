@@ -16,7 +16,7 @@
 
 package com.duckduckgo.privacy.config.impl.features.amplinks
 
-import com.duckduckgo.app.userwhitelist.api.UserWhiteListRepository
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.amplinks.AmpLinksRepository
@@ -33,16 +33,16 @@ class RealAmpLinksTest {
     private val mockAmpLinksRepository: AmpLinksRepository = mock()
     private val mockFeatureToggle: FeatureToggle = mock()
     private val mockUnprotectedTemporary: UnprotectedTemporary = mock()
-    private val mockUserWhiteListRepository: UserWhiteListRepository = mock()
+    private val mockUserAllowListRepository: UserAllowListRepository = mock()
 
     @Before
     fun setup() {
-        testee = RealAmpLinks(mockAmpLinksRepository, mockFeatureToggle, mockUnprotectedTemporary, mockUserWhiteListRepository)
+        testee = RealAmpLinks(mockAmpLinksRepository, mockFeatureToggle, mockUnprotectedTemporary, mockUserAllowListRepository)
     }
 
     @Test
     fun whenIsExceptionCalledAndDomainIsInUserAllowListThenReturnTrue() {
-        whenever(mockUserWhiteListRepository.isUrlInAllowList(anyString())).thenReturn(true)
+        whenever(mockUserAllowListRepository.isUrlInUserAllowList(anyString())).thenReturn(true)
         assertTrue(testee.isAnException("test.com"))
     }
 }
