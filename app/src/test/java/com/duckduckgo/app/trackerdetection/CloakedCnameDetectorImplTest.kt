@@ -17,7 +17,6 @@
 package com.duckduckgo.app.trackerdetection
 
 import android.net.Uri
-import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.trackerdetection.db.TdsCnameEntityDao
 import com.duckduckgo.app.trackerdetection.model.TdsCnameEntity
 import com.duckduckgo.app.userwhitelist.api.UserWhiteListRepository
