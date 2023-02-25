@@ -66,6 +66,9 @@ class WgVpnNetworkStackTest {
     @Mock
     private lateinit var netpPixels: NetworkProtectionPixels
 
+    @Mock
+    private lateinit var internalIPProvider: NetPDebugInternalIPProvider
+
     private lateinit var testee: WgVpnNetworkStack
 
     @Before
@@ -101,6 +104,7 @@ class WgVpnNetworkStackTest {
             },
             appBuildConfig,
             { netpPixels },
+            { internalIPProvider },
         )
     }
 

@@ -53,6 +53,7 @@ class WgVpnNetworkStack @Inject constructor(
     private val exclusionListProvider: PluginPoint<NetPDebugExclusionListProvider>,
     private val appBuildConfig: AppBuildConfig,
     private val netpPixels: Lazy<NetworkProtectionPixels>,
+    private val netPDebugInternalIPProvider: Lazy<NetPDebugInternalIPProvider>,
 ) : VpnNetworkStack {
     private var wgTunnelData: WgTunnelData? = null
 
@@ -69,6 +70,7 @@ class WgVpnNetworkStack @Inject constructor(
 
             return 1280
         }
+
         fun PluginPoint<NetPDebugExclusionListProvider>.getExclusionList(): Set<String> {
             val exclusionList = if (appBuildConfig.isInternalBuild()) {
                 assert(this.getPlugins().size <= 1) { "Only one NetPDebugMtuProvider should be registered" }
@@ -96,6 +98,8 @@ class WgVpnNetworkStack @Inject constructor(
                 ipAddress = wgTunnelData!!.serverIP,
                 location = wgTunnelData!!.serverLocation,
             )
+
+            netPDebugInternalIPProvider.get().internalIP = wgTunnelData!!.tunnelAddress.keys.joinToString(", ") { it.hostAddress }
 
             Result.success(
                 VpnTunnelConfig(
@@ -183,4 +187,8 @@ interface NetPDebugMtuProvider {
 @ContributesPluginPoint(VpnScope::class)
 interface NetPDebugExclusionListProvider {
     fun getExclusionList(): Set<String>
+}
+
+interface NetPDebugInternalIPProvider {
+    var internalIP: String?
 }

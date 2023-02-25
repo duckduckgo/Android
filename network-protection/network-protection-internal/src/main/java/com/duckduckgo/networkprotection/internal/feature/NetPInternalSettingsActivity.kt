@@ -28,11 +28,14 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.internal.feature.system_apps.NetPSystemAppsExclusionListActivity
+import com.duckduckgo.networkprotection.internal.network.NetPInternalIPProvider
 import com.duckduckgo.networkprotection.internal.network.NetPInternalMtuProvider
 import com.duckduckgo.networkprotection.store.remote_config.NetPServerRepository
 import javax.inject.Inject
@@ -54,6 +57,8 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
     @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
     @Inject lateinit var serverRepository: NetPServerRepository
+
+    @Inject lateinit var internalIPProvider: NetPInternalIPProvider
 
     private val binding: ActivityNetpInternalSettingsBinding by viewBinding()
 
@@ -79,6 +84,14 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
                 binding.overrideMtuSelector.setSecondaryText("MTU size: ${netPInternalMtuProvider.getMtu()}")
                 binding.overrideServerBackendSelector.isEnabled = isEnabled
                 binding.overrideServerBackendSelector.setSecondaryText("${serverRepository.getSelectedServer()?.name ?: AUTOMATIC}")
+                if (isEnabled) {
+                    internalIPProvider.internalIP?.let {
+                        binding.internalIp.show()
+                        binding.internalIp.setSecondaryText(it)
+                    } ?: binding.internalIp.gone()
+                } else {
+                    binding.internalIp.gone()
+                }
             }
             .launchIn(lifecycleScope)
     }

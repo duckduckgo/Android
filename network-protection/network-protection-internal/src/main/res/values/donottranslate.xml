@@ -20,4 +20,5 @@
     <string name="netpSystemAppsExclusionList">Manage System Apps Exclusion</string>
     <string name="netpExcludeAllSystemApps">Exclude All System Apps</string>
     <string name="netpMtuSize">MTU Size</string>
+    <string name="netpDevSettingInternalIP">Internal IP</string>
 </resources>
