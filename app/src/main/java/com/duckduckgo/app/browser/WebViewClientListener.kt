@@ -63,6 +63,9 @@ interface WebViewClientListener {
         isForMainFrame: Boolean,
     ): Boolean
 
+    //Blob. Handle download file request
+    fun handleDownloadFileAppLink(dataUrl: String, mimeType: String): Boolean
+
     fun handleNonHttpAppLink(nonHttpAppLink: SpecialUrlDetector.UrlType.NonHttpAppLink): Boolean
     fun handleCloakedAmpLink(initialUrl: String)
     fun startProcessingTrackingLink()

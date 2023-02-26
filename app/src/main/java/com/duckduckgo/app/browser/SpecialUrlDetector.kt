@@ -60,6 +60,8 @@ interface SpecialUrlDetector {
         class ExtractedAmpLink(val extractedUrl: String) : UrlType()
         class CloakedAmpLink(val ampUrl: String) : UrlType()
         class TrackingParameterLink(val cleanedUrl: String) : UrlType()
+        //Blob. Handle download file request
+        class DownloadFileLink(val dataUrl: String, val contentType: String) : UrlType()
     }
 }
 
@@ -81,6 +83,7 @@ class SpecialUrlDetectorImpl(
             SMSTO_SCHEME -> buildSmsTo(uriString)
             HTTP_SCHEME, HTTPS_SCHEME, DATA_SCHEME -> processUrl(initiatingUrl, uriString)
             JAVASCRIPT_SCHEME, ABOUT_SCHEME, FILE_SCHEME, SITE_SCHEME -> UrlType.SearchQuery(uriString)
+            APP_SCHEME -> buildDownloadFile(uri) //Blob. Handle download file request
             null -> UrlType.SearchQuery(uriString)
             else -> checkForIntent(scheme, uriString)
         }
@@ -96,6 +99,28 @@ class SpecialUrlDetectorImpl(
     private fun buildSms(uriString: String): UrlType = UrlType.Sms(uriString.removePrefix("$SMS_SCHEME:").truncate(SMS_MAX_LENGTH))
 
     private fun buildSmsTo(uriString: String): UrlType = UrlType.Sms(uriString.removePrefix("$SMSTO_SCHEME:").truncate(SMS_MAX_LENGTH))
+
+    //Blob. Handle download file request. Retrieve file data from the link
+    private fun buildDownloadFile(uri: Uri): UrlType {
+        var action = uri.schemeSpecificPart
+        var fileData = ""
+        var contentType = ""
+        if (action.indexOf('/') > -1) {
+            action = action.substring(0, action.indexOf('/'))
+        }
+        when (action.lowercase()) {
+            "download-file" -> {
+                val keyData = uri.schemeSpecificPart.substring(action.length + 1)
+                val items = keyData.split('&')
+                if (items.size == 2) {
+                    contentType = items[0]
+                    fileData = items[1]
+                }
+            }
+
+        }
+        return UrlType.DownloadFileLink(fileData, contentType)
+    }
 
     @Suppress("NewApi") // we use appBuildConfig
     override fun processUrl(initiatingUrl: String?, uriString: String): UrlType {
@@ -215,6 +240,7 @@ class SpecialUrlDetectorImpl(
         private const val JAVASCRIPT_SCHEME = "javascript"
         private const val FILE_SCHEME = "file"
         private const val SITE_SCHEME = "site"
+        private const val APP_SCHEME = "ddg" //Blob. Handle download file request
         private const val EXTRA_FALLBACK_URL = "browser_fallback_url"
         const val SMS_MAX_LENGTH = 400
         const val PHONE_MAX_LENGTH = 20

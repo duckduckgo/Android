@@ -357,6 +357,9 @@ class BrowserTabViewModel @Inject constructor(
             val fileChooserParams: WebChromeClient.FileChooserParams,
         ) : Command()
 
+        //Blob. Handle download file request
+        class HandleDownloadFileAppLink(val dataUrl: String, val mimeType: String) : Command()
+
         class HandleNonHttpAppLink(
             val nonHttpAppLink: NonHttpAppLink,
             val headers: Map<String, String>,
@@ -1628,6 +1631,13 @@ class BrowserTabViewModel @Inject constructor(
     @AnyThread
     override fun sendSmsRequested(telephoneNumber: String) {
         command.postValue(SendSms(telephoneNumber))
+    }
+
+    //Blob. Handle download file request
+    @AnyThread
+    override fun handleDownloadFileAppLink(dataUrl: String, mimeType: String): Boolean {
+        command.postValue(HandleDownloadFileAppLink(dataUrl, mimeType))
+        return true
     }
 
     override fun surrogateDetected(surrogate: SurrogateResponse) {

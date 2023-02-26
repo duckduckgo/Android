@@ -997,6 +997,11 @@ class BrowserTabFragment :
                 openAppLink(it.appLink)
             }
 
+            //Blob. Handle download file request
+            is Command.HandleDownloadFileAppLink -> {
+                requestFileDownload(it.dataUrl, null, it.mimeType, true)
+            }
+
             is Command.HandleNonHttpAppLink -> {
                 openExternalDialog(
                     intent = it.nonHttpAppLink.intent,

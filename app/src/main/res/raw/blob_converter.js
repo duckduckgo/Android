@@ -26,17 +26,22 @@
         if (this.status == 200) {
             var blob = this.response;
             var reader = new FileReader();
-            reader.readAsDataURL(blob);
             reader.onloadend = function() {
                 dataUrl = reader.result;
-                BlobConverter.convertBlobToDataUri(dataUrl, '%contentType%');
+                window.location.href='ddg:download-file/%contentType%&'+encodeURIComponent(dataUrl);
             }
             reader.onerror = function() {
-                BlobConverter.convertBlobToDataUri('error', '%contentType%');
+                console.error('error, download file of type %contentType%');
+                alert('${getString(R.string.downloadsDownloadGenericErrorMessage)}')
             }
+            reader.readAsDataURL(blob);
         } else {
-            BlobConverter.convertBlobToDataUri('error', '%contentType%');
+            console.error('error, download file of type %contentType%');
+            alert('${getString(R.string.downloadsDownloadGenericErrorMessage)}')
         }
+    };
+    xhr.onerror = function() {
+        alert('${getString(R.string.downloadsDownloadGenericErrorMessage)}')
     };
     xhr.send();
 })();

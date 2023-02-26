@@ -147,6 +147,14 @@ class BrowserWebViewClient(
                     }
                     true
                 }
+                //Blob. Handle download file request
+                is SpecialUrlDetector.UrlType.DownloadFileLink -> {
+                    Timber.i("Found blob download file app link for ${urlType.dataUrl}")
+                    webViewClientListener?.let { listener ->
+                        return listener.handleDownloadFileAppLink(urlType.dataUrl, urlType.contentType)
+                    }
+                    true
+                }
                 is SpecialUrlDetector.UrlType.Unknown -> {
                     Timber.w("Unable to process link type for ${urlType.uriString}")
                     webView.originalUrl?.let {
