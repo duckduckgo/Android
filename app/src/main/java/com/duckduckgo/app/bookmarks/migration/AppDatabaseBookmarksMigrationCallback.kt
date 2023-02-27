@@ -20,10 +20,10 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.sync.store.Entity
-import com.duckduckgo.sync.store.EntityType.BOOKMARK
-import com.duckduckgo.sync.store.EntityType.FOLDER
-import com.duckduckgo.sync.store.Relation
+import com.duckduckgo.savedsites.store.Entity
+import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
+import com.duckduckgo.savedsites.store.EntityType.FOLDER
+import com.duckduckgo.savedsites.store.Relation
 import dagger.Lazy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.asExecutor

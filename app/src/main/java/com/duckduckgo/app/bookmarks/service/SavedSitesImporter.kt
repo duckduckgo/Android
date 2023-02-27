@@ -7,8 +7,6 @@ import com.duckduckgo.app.bookmarks.model.SavedSitesRepository
 import com.duckduckgo.sync.store.Entity
 import com.duckduckgo.sync.store.EntityType.BOOKMARK
 import com.duckduckgo.sync.store.Relation
-import com.duckduckgo.sync.store.SyncEntitiesDao
-import com.duckduckgo.sync.store.SyncRelationsDao
 import org.jsoup.Jsoup
 
 /*

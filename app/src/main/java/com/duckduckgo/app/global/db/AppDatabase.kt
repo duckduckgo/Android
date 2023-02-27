@@ -64,11 +64,11 @@ import com.duckduckgo.app.usage.app.AppDaysUsedDao
 import com.duckduckgo.app.usage.app.AppDaysUsedEntity
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
-import com.duckduckgo.sync.store.Entity
-import com.duckduckgo.sync.store.EntityTypeConverter
-import com.duckduckgo.sync.store.Relation
-import com.duckduckgo.sync.store.SyncEntitiesDao
-import com.duckduckgo.sync.store.SyncRelationsDao
+import com.duckduckgo.savedsites.store.Entity
+import com.duckduckgo.savedsites.store.EntityTypeConverter
+import com.duckduckgo.savedsites.store.Relation
+import com.duckduckgo.savedsites.store.SyncEntitiesDao
+import com.duckduckgo.savedsites.store.SyncRelationsDao
 
 @Database(
     exportSchema = true,

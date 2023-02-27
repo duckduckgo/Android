@@ -14,85 +14,29 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.bookmarks.model
+package com.duckduckgo.sync.impl
 
-import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
-import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.sync.store.Entity
-import com.duckduckgo.sync.store.EntityType.BOOKMARK
-import com.duckduckgo.sync.store.EntityType.FOLDER
-import com.duckduckgo.sync.store.Relation
-import com.duckduckgo.sync.store.SyncEntitiesDao
-import com.duckduckgo.sync.store.SyncRelationsDao
+import com.duckduckgo.savedsites.BookmarkFolder
+import com.duckduckgo.savedsites.BookmarkFolderItem
+import com.duckduckgo.savedsites.FolderBranch
+import com.duckduckgo.savedsites.SavedSite
+import com.duckduckgo.savedsites.SavedSite.Bookmark
+import com.duckduckgo.savedsites.SavedSite.Favorite
+import com.duckduckgo.savedsites.SavedSites
+import com.duckduckgo.savedsites.SavedSitesRepository
+import com.duckduckgo.savedsites.store.Entity
+import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
+import com.duckduckgo.savedsites.store.EntityType.FOLDER
+import com.duckduckgo.savedsites.store.Relation
+import com.duckduckgo.savedsites.store.SyncEntitiesDao
+import com.duckduckgo.savedsites.store.SyncRelationsDao
 import io.reactivex.Single
-import java.io.Serializable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-
-interface SavedSitesRepository {
-
-    suspend fun getSavedSites(folderId: String): Flow<SavedSites>
-
-    suspend fun getFolderContent(folderId: String): Flow<Pair<List<Bookmark>, List<BookmarkFolder>>>
-
-    suspend fun getFolderTree(
-        selectedFolderId: String,
-        currentFolder: BookmarkFolder?,
-    ): List<BookmarkFolderItem>
-
-    suspend fun insertFolderBranch(branchToInsert: FolderBranch)
-
-    fun deleteFolderBranch(folder: BookmarkFolder): FolderBranch
-
-    fun getFolderBranch(folder: BookmarkFolder): FolderBranch
-
-    fun getBookmarks(): Flow<List<Bookmark>>
-
-    fun getBookmarksObservable(): Single<List<Bookmark>>
-
-    fun getBookmark(url: String): Bookmark?
-
-    fun getFavorites(): Flow<List<Favorite>>
-
-    fun getFavoritesObservable(): Single<List<Favorite>>
-
-    fun getFavoritesSync(): List<Favorite>
-
-    fun getFavoritesCountByDomain(domain: String): Int
-
-    fun getFavorite(url: String): Favorite?
-
-    fun hasBookmarks(): Boolean
-    fun hasFavorites(): Boolean
-
-    fun insertBookmark(
-        url: String,
-        title: String,
-    ): Bookmark
-
-    fun insertFavorite(
-        url: String,
-        title: String,
-    ): Favorite
-
-    fun insert(savedSite: SavedSite): SavedSite
-    fun delete(savedSite: SavedSite)
-    fun update(savedSite: SavedSite)
-    fun updateWithPosition(favorites: List<Favorite>)
-
-    fun insert(folder: BookmarkFolder): BookmarkFolder
-    fun update(folder: BookmarkFolder)
-
-    fun delete(folder: BookmarkFolder)
-    fun getFolder(folderId: String): BookmarkFolder?
-    fun deleteAll()
-    fun bookmarksCount(): Long
-    fun favoritesCount(): Long
-}
 
 class RealSavedSitesRepository(
     private val syncEntitiesDao: SyncEntitiesDao,
@@ -454,36 +398,6 @@ class RealSavedSitesRepository(
     private fun Entity.mapToFavorite(index: Int = 0): Favorite = Favorite(this.entityId, this.title, this.url.orEmpty(), index)
     private fun List<Entity>.mapToBookmarks(folderId: String = Relation.BOOMARKS_ROOT): List<Bookmark> = this.map { it.mapToBookmark(folderId) }
     private fun List<Entity>.mapToFavorites(): List<Favorite> = this.mapIndexed { index, relation -> relation.mapToFavorite(index) }
+
+    private fun SavedSite.titleOrFallback(): String = this.title.takeIf { it.isNotEmpty() } ?: this.url
 }
-
-data class SavedSites(
-    val favorites: List<Favorite>,
-    val bookmarks: List<Bookmark>,
-    val folders: List<BookmarkFolder>,
-)
-
-sealed class SavedSite(
-    open val id: String,
-    open val title: String,
-    open val url: String,
-) : Serializable {
-    data class Favorite(
-        override val id: String,
-        override val title: String,
-        override val url: String,
-        val position: Int,
-    ) : SavedSite(id, title, url)
-
-    data class Bookmark(
-        override val id: String,
-        override val title: String,
-        override val url: String,
-        val parentId: String = Relation.BOOMARKS_ROOT,
-    ) : SavedSite(id, title, url)
-}
-
-private fun SavedSite.titleOrFallback(): String = this.title.takeIf { it.isNotEmpty() } ?: this.url
-data class FolderBranch(
-    val bookmarks: List<Bookmark>,
-    val folders: List<BookmarkFolder>,
-)

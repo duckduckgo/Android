@@ -31,8 +31,8 @@ import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.store.SyncEntitiesDao
-import com.duckduckgo.sync.store.SyncRelationsDao
+import com.duckduckgo.savedsites.store.SyncEntitiesDao
+import com.duckduckgo.savedsites.store.SyncRelationsDao
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -45,11 +45,11 @@ class BookmarksModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun savedSitesImporter(
-        context: Context,
-        syncEntitiesDao: SyncEntitiesDao,
-        syncRelationsDao: SyncRelationsDao,
-        savedSitesRepository: SavedSitesRepository,
-        savedSitesParser: SavedSitesParser,
+            context: Context,
+            syncEntitiesDao: SyncEntitiesDao,
+            syncRelationsDao: SyncRelationsDao,
+            savedSitesRepository: SavedSitesRepository,
+            savedSitesParser: SavedSitesParser,
     ): SavedSitesImporter {
         return RealSavedSitesImporter(context.contentResolver, syncEntitiesDao, syncRelationsDao, savedSitesRepository, savedSitesParser)
     }
@@ -84,9 +84,9 @@ class BookmarksModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun providesSavedSitesRepository(
-        syncEntitiesDao: SyncEntitiesDao,
-        syncRelationsDao: SyncRelationsDao,
-        coroutineDispatcher: DispatcherProvider = DefaultDispatcherProvider(),
+            syncEntitiesDao: SyncEntitiesDao,
+            syncRelationsDao: SyncRelationsDao,
+            coroutineDispatcher: DispatcherProvider = DefaultDispatcherProvider(),
     ): SavedSitesRepository {
         return RealSavedSitesRepository(syncEntitiesDao, syncRelationsDao, coroutineDispatcher)
     }

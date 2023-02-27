@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.store
+package com.duckduckgo.savedsites.store
 
 import androidx.room.Dao
 import androidx.room.Delete

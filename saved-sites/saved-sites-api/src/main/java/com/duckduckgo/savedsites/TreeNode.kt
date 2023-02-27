@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,24 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.bookmarks.model
+package com.duckduckgo.savedsites
 
-import com.duckduckgo.sync.store.Entity
+class TreeNode<T>(val value: T) {
 
-data class BookmarkFolderBranch(
-    val bookmarks: List<Entity>,
-    val folders: List<Entity>,
-)
+    private val children: MutableList<TreeNode<T>> = mutableListOf()
+    fun add(child: TreeNode<T>) = children.add(child)
+    fun isEmpty() = children.isEmpty()
+
+    fun forEachVisit(
+            visitBefore: Visitor<T>,
+            visitAfter: Visitor<T>,
+    ) {
+        visitBefore(this)
+        children.forEach {
+            it.forEachVisit(visitBefore, visitAfter)
+        }
+        visitAfter(this)
+    }
+}
+
+typealias Visitor<T> = (TreeNode<T>) -> Unit

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.store
+package com.duckduckgo.savedsites.store
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
