@@ -138,8 +138,12 @@ class RealSavedSitesRepository(
         return if (rootFolder != null) {
             val rootFolderItem = BookmarkFolderItem(0, rootFolder, rootFolder.id == selectedFolderId)
             val folders = mutableListOf(rootFolderItem)
-            val folderDepth = traverseFolderWithDepth(1, folders, Relation.BOOMARKS_ROOT, selectedFolderId)
-            folderDepth
+            val folderDepth = traverseFolderWithDepth(1, folders, Relation.BOOMARKS_ROOT, selectedFolderId = selectedFolderId, currentFolder)
+            if (currentFolder != null) {
+                folderDepth.filterNot { it.bookmarkFolder == currentFolder }
+            } else {
+                folderDepth
+            }
         } else {
             emptyList()
         }
@@ -149,11 +153,14 @@ class RealSavedSitesRepository(
         depth: Int = 0,
         folders: MutableList<BookmarkFolderItem>,
         folderId: String,
-        selectedFolderId: String
+        selectedFolderId: String,
+        currentFolder: BookmarkFolder?,
     ): List<BookmarkFolderItem> {
         getFolders(folderId).map {
-            folders.add(BookmarkFolderItem(depth, it, it.id == selectedFolderId))
-            traverseFolderWithDepth(depth + 1, folders, it.id, selectedFolderId)
+            if (it.id != currentFolder?.id){
+                folders.add(BookmarkFolderItem(depth, it, it.id == selectedFolderId))
+                traverseFolderWithDepth(depth + 1, folders, it.id, selectedFolderId = selectedFolderId, currentFolder)
+            }
         }
         return folders
     }

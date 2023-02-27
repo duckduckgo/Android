@@ -270,7 +270,6 @@ class SavedSitesRepositoryTest {
             val favorites = awaitItem()
             assertEquals(favorites, listOf(updatedFavoriteTwo, updatedFavoriteThree, updatedFavoriteOne))
         }
-
     }
 
     @Test
@@ -695,17 +694,6 @@ class SavedSitesRepositoryTest {
     }
 
     @Test
-    fun whenFolderIsDeletedThenRemovedFromDb() {
-        val rootFolder = BookmarkFolder(id = Relation.BOOMARKS_ROOT, name = "root", parentId = "")
-        repository.insert(rootFolder)
-
-        assertEquals(repository.getFolder(rootFolder.id), rootFolder)
-
-        repository.delete(rootFolder)
-        assertNull(repository.getFolder(rootFolder.id))
-    }
-
-    @Test
     fun whenBuildFlatStructureThenReturnFolderListWithDepthWithoutCurrentFolderBranch() = runTest {
         val rootFolder = BookmarkFolder(id = Relation.BOOMARKS_ROOT, name = "root", parentId = "")
         val parentFolder = BookmarkFolder(id = "folder1", name = "name", parentId = Relation.BOOMARKS_ROOT)
@@ -720,11 +708,22 @@ class SavedSitesRepositoryTest {
         val flatStructure = repository.getFolderTree(folder.id, parentFolder)
 
         val items = listOf(
-            BookmarkFolderItem(0, rootFolder, false),
+            BookmarkFolderItem(0, rootFolder.copy(numFolders = 2), false),
             BookmarkFolderItem(1, folder, true),
         )
 
         assertEquals(items, flatStructure)
+    }
+
+    @Test
+    fun whenFolderIsDeletedThenRemovedFromDb() {
+        val rootFolder = BookmarkFolder(id = Relation.BOOMARKS_ROOT, name = "root", parentId = "")
+        repository.insert(rootFolder)
+
+        assertEquals(repository.getFolder(rootFolder.id), rootFolder)
+
+        repository.delete(rootFolder)
+        assertNull(repository.getFolder(rootFolder.id))
     }
 
     @Test
