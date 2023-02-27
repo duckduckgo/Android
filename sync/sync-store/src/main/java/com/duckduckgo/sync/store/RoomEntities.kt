@@ -79,12 +79,12 @@ data class Relation(
     }
 }
 
-data class EntityContent (
+data class EntityContent(
     var entityId: String,
     var title: String,
     var url: String?,
     var type: EntityType,
     var relationId: String,
     var numBookmarks: Int,
-    var numFolders: Int
+    var numFolders: Int,
 )

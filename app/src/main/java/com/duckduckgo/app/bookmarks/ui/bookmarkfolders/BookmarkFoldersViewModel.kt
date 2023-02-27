@@ -74,7 +74,7 @@ class BookmarkFoldersViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             val folderStructure = savedSitesRepository.getFolderTree(
                 selectedFolderId,
-                currentFolder
+                currentFolder,
             )
             onFolderStructureCreated(folderStructure)
         }

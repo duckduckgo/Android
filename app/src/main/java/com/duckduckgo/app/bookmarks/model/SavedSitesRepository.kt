@@ -41,7 +41,7 @@ interface SavedSitesRepository {
 
     suspend fun getFolderTree(
         selectedFolderId: String,
-        currentFolder: BookmarkFolder?
+        currentFolder: BookmarkFolder?,
     ): List<BookmarkFolderItem>
 
     suspend fun insertFolderBranch(branchToInsert: FolderBranch)
@@ -132,7 +132,7 @@ class RealSavedSitesRepository(
 
     override suspend fun getFolderTree(
         selectedFolderId: String,
-        currentFolder: BookmarkFolder?
+        currentFolder: BookmarkFolder?,
     ): List<BookmarkFolderItem> {
         val rootFolder = getFolder(Relation.BOOMARKS_ROOT)
         return if (rootFolder != null) {
@@ -157,7 +157,7 @@ class RealSavedSitesRepository(
         currentFolder: BookmarkFolder?,
     ): List<BookmarkFolderItem> {
         getFolders(folderId).map {
-            if (it.id != currentFolder?.id){
+            if (it.id != currentFolder?.id) {
                 folders.add(BookmarkFolderItem(depth, it, it.id == selectedFolderId))
                 traverseFolderWithDepth(depth + 1, folders, it.id, selectedFolderId = selectedFolderId, currentFolder)
             }
@@ -186,9 +186,8 @@ class RealSavedSitesRepository(
     private fun traverseBranch(
         bookmarks: MutableList<Bookmark>,
         folders: MutableList<BookmarkFolder>,
-        folderId: String
+        folderId: String,
     ): Pair<List<Bookmark>, List<BookmarkFolder>> {
-
         val folderContent = folderContent(folderId)
         bookmarks.addAll(folderContent.first)
         folders.addAll(folderContent.second)
@@ -460,7 +459,7 @@ class RealSavedSitesRepository(
 data class SavedSites(
     val favorites: List<Favorite>,
     val bookmarks: List<Bookmark>,
-    val folders: List<BookmarkFolder>
+    val folders: List<BookmarkFolder>,
 )
 
 sealed class SavedSite(

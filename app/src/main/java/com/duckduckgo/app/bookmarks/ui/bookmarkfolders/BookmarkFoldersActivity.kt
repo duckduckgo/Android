@@ -30,7 +30,6 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.store.Relation
 import timber.log.Timber
-import timber.log.Timber.Forest
 
 @InjectWith(ActivityScope::class)
 class BookmarkFoldersActivity : DuckDuckGoActivity() {
@@ -53,7 +52,8 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
         Timber.d("Saved sites: $currentFolder")
 
         viewModel.fetchBookmarkFolders(
-            intent.extras?.getString(KEY_BOOKMARK_FOLDER_ID) ?: Relation.BOOMARKS_ROOT, currentFolder as BookmarkFolder?,
+            intent.extras?.getString(KEY_BOOKMARK_FOLDER_ID) ?: Relation.BOOMARKS_ROOT,
+            currentFolder as BookmarkFolder?,
         )
     }
 

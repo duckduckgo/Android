@@ -29,7 +29,6 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.sync.store.Entity
 import com.duckduckgo.sync.store.EntityType.BOOKMARK
-import com.duckduckgo.sync.store.EntityType.FOLDER
 import com.duckduckgo.sync.store.Relation
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow

@@ -162,7 +162,7 @@ class RealSavedSitesParser : SavedSitesParser {
                         } else {
                             val bookmarkFolder = BookmarkFolder(name = folderName, parentId = parentId, id = UUID.randomUUID().toString())
                             savedSitesRepository.insert(bookmarkFolder)
-                           savedSitesRepository.getFolder(bookmarkFolder.id)?.let {
+                            savedSitesRepository.getFolder(bookmarkFolder.id)?.let {
                                 parseElement(element, it.id, savedSitesRepository, savedSites, false)
                             }
                         }

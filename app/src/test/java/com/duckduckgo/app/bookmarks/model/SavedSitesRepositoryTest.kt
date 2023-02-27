@@ -520,7 +520,7 @@ class SavedSitesRepositoryTest {
         val updatedBookmarkOne = bookmarkOne.copy(parentId = folderOne.id)
         repository.update(updatedBookmarkOne)
 
-        val updatedFolderOne = folderOne.copy(numBookmarks =  1)
+        val updatedFolderOne = folderOne.copy(numBookmarks = 1)
         assertEquals(repository.getFolder(folderOne.id), updatedFolderOne)
 
         val folderTwo = repository.insert(BookmarkFolder(id = "folder2", name = "folder2", parentId = Relation.BOOMARKS_ROOT))
@@ -528,7 +528,7 @@ class SavedSitesRepositoryTest {
         val updatedBookmarkTwo = bookmarkTwo.copy(parentId = folderTwo.id)
         repository.update(updatedBookmarkTwo)
 
-        val updatedFolderTwo = folderTwo.copy(numBookmarks =  1)
+        val updatedFolderTwo = folderTwo.copy(numBookmarks = 1)
         assertEquals(repository.getFolder(folderTwo.id), updatedFolderTwo)
 
         val bookmarkThree = repository.insertBookmark(title = "bookmark3", url = "foo3.com")
@@ -540,7 +540,7 @@ class SavedSitesRepositoryTest {
 
             repository.update(folderTwo.copy(parentId = folderOne.id))
 
-            val updatedFolderOne = folderOne.copy(numBookmarks =  1, numFolders =  1)
+            val updatedFolderOne = folderOne.copy(numBookmarks = 1, numFolders = 1)
             val updatedResult = awaitItem()
 
             assertEquals(listOf(bookmarkThree), updatedResult.first)
@@ -553,7 +553,7 @@ class SavedSitesRepositoryTest {
         val folder = repository.insert(BookmarkFolder(id = "folder", name = "folder", parentId = Relation.BOOMARKS_ROOT))
         assertEquals(repository.getFolder(folder.id), folder)
 
-        val folderUpdated =  folder.copy(name = "folder updated")
+        val folderUpdated = folder.copy(name = "folder updated")
         repository.update(folderUpdated)
         assertEquals(repository.getFolder(folderUpdated.id), folderUpdated)
     }
@@ -566,7 +566,7 @@ class SavedSitesRepositoryTest {
 
         assertEquals(repository.getFolder(folder.id), folder)
 
-        val folderUpdated =  folder.copy(parentId = folderTwo.id)
+        val folderUpdated = folder.copy(parentId = folderTwo.id)
         repository.update(folderUpdated)
 
         assertEquals(repository.getFolder(folder.id), folderUpdated)
@@ -737,7 +737,7 @@ class SavedSitesRepositoryTest {
         val parentFolder = BookmarkFolder(id = "folder1", name = "name", parentId = Relation.BOOMARKS_ROOT)
         repository.insert(parentFolder)
 
-        givenFolderWithEntities(parentFolder.id, totalBookmarks, totalFolders )
+        givenFolderWithEntities(parentFolder.id, totalBookmarks, totalFolders)
 
         repository.getFolderContent(parentFolder.id).test {
             val result = awaitItem()
@@ -802,7 +802,7 @@ class SavedSitesRepositoryTest {
         return entities
     }
 
-    private fun givenFolderWithEntities(folderId: String, bookmarks: Int, folders: Int){
+    private fun givenFolderWithEntities(folderId: String, bookmarks: Int, folders: Int) {
         val bookmarks = givenSomeBookmarks(bookmarks)
         val folders = givenSomeFolders(folders)
         val folderContent = givenFolderWithContent(folderId, bookmarks.plus(folders))

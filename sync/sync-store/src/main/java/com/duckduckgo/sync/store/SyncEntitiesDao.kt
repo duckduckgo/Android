@@ -37,7 +37,9 @@ interface SyncEntitiesDao {
     @Query("select * from entities")
     fun entities(): List<Entity>
 
-    @Query("select * from  entities inner join relations on entities.entityId = relations.entityId and entities.type = :type and relations.relationId = :folderId")
+    @Query(
+        "select * from  entities inner join relations on entities.entityId = relations.entityId and entities.type = :type and relations.relationId = :folderId",
+    )
     fun entitiesInFolder(folderId: String, type: EntityType): List<Entity>
 
     @Query("select * from entities inner join relations on entities.entityId = relations.entityId where relations.relationId = :folderId")

@@ -17,7 +17,6 @@
 package com.duckduckgo.app.bookmarks.model
 
 import com.duckduckgo.sync.store.Entity
-import com.duckduckgo.sync.store.Relation
 
 data class BookmarkFolderBranch(
     val bookmarks: List<Entity>,

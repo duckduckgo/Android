@@ -230,7 +230,7 @@ class BookmarksViewModel @Inject constructor(
         }
     }
 
-    private fun onSavedSitesItemsChanged(favorites: List<Favorite>, bookmarks: List<Bookmark>, bookmarkFolders: List<BookmarkFolder>){
+    private fun onSavedSitesItemsChanged(favorites: List<Favorite>, bookmarks: List<Bookmark>, bookmarkFolders: List<BookmarkFolder>) {
         viewState.value = viewState.value?.copy(
             favorites = favorites,
             bookmarks = bookmarks,
