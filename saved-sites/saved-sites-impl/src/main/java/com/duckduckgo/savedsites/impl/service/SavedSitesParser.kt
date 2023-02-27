@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.bookmarks.service
+package com.duckduckgo.savedsites.service
 
-import com.duckduckgo.app.bookmarks.model.*
-import com.duckduckgo.sync.store.Relation
+import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.savedsites.api.models.BookmarkFolder
+import com.duckduckgo.savedsites.api.models.SavedSite
+import com.duckduckgo.savedsites.impl.service.FolderTree
+import com.duckduckgo.savedsites.store.Relation
 import java.util.UUID
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element

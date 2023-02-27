@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.bookmarks.service
+package com.duckduckgo.savedsites.impl.service
 
 import android.net.Uri
-import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.BOOKMARK_COUNT
-
-interface SavedSitesManager {
-    suspend fun import(uri: Uri): ImportSavedSitesResult
-    suspend fun export(uri: Uri): ExportSavedSitesResult
-}
+import com.duckduckgo.savedsites.api.service.ExportSavedSitesResult
+import com.duckduckgo.savedsites.api.service.ImportSavedSitesResult
+import com.duckduckgo.savedsites.api.service.SavedSitesExporter
+import com.duckduckgo.savedsites.api.service.SavedSitesImporter
+import com.duckduckgo.savedsites.api.service.SavedSitesManager
+import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 
 class RealSavedSitesManager constructor(
     private val savedSitesImporter: SavedSitesImporter,
@@ -36,11 +36,11 @@ class RealSavedSitesManager constructor(
         val result = savedSitesExporter.export(uri)
         when (result) {
             is ExportSavedSitesResult.Error -> {
-                pixel.fire(AppPixelName.BOOKMARK_EXPORT_ERROR)
+                pixel.fire(SavedSitesPixelName.BOOKMARK_EXPORT_ERROR)
             }
             ExportSavedSitesResult.NoSavedSitesExported -> {}
             ExportSavedSitesResult.Success -> {
-                pixel.fire(AppPixelName.BOOKMARK_EXPORT_SUCCESS)
+                pixel.fire(SavedSitesPixelName.BOOKMARK_EXPORT_SUCCESS)
             }
         }
         return result
@@ -50,10 +50,10 @@ class RealSavedSitesManager constructor(
         val result = savedSitesImporter.import(uri)
         when (result) {
             is ImportSavedSitesResult.Error -> {
-                pixel.fire(AppPixelName.BOOKMARK_IMPORT_ERROR)
+                pixel.fire(SavedSitesPixelName.BOOKMARK_IMPORT_ERROR)
             }
             is ImportSavedSitesResult.Success -> {
-                pixel.fire(AppPixelName.BOOKMARK_IMPORT_SUCCESS, mapOf(BOOKMARK_COUNT to result.savedSites.size.toString()))
+                pixel.fire(SavedSitesPixelName.BOOKMARK_IMPORT_SUCCESS, mapOf(BOOKMARK_COUNT to result.savedSites.size.toString()))
             }
         }
         return result

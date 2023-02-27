@@ -19,13 +19,13 @@ package com.duckduckgo.app.bookmarks.ui
 import android.os.Bundle
 import android.text.Editable
 import android.view.View
-import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextView
-import com.duckduckgo.sync.store.Relation
+import com.duckduckgo.savedsites.api.models.SavedSite
+import com.duckduckgo.savedsites.store.Relation
 
 class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
 

@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.bookmarks.service
+package com.duckduckgo.savedsites.impl.service
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.FileUtilities
-import com.duckduckgo.app.bookmarks.model.*
-import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
-import com.duckduckgo.sync.store.Relation
+import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.savedsites.api.models.SavedSite
+import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.api.models.TreeNode
+import com.duckduckgo.savedsites.service.RealSavedSitesParser
+import com.duckduckgo.savedsites.store.Relation
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.jsoup.Jsoup

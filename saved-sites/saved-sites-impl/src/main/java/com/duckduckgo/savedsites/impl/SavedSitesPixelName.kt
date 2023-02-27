@@ -14,24 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.savedsites
+package com.duckduckgo.savedsites.impl
 
-class TreeNode<T>(val value: T) {
-
-    private val children: MutableList<TreeNode<T>> = mutableListOf()
-    fun add(child: TreeNode<T>) = children.add(child)
-    fun isEmpty() = children.isEmpty()
-
-    fun forEachVisit(
-        visitBefore: Visitor<T>,
-        visitAfter: Visitor<T>,
-    ) {
-        visitBefore(this)
-        children.forEach {
-            it.forEachVisit(visitBefore, visitAfter)
-        }
-        visitAfter(this)
-    }
+import com.duckduckgo.app.statistics.pixels.Pixel
+enum class SavedSitesPixelName(override val pixelName: String) : Pixel.PixelName {
+    BOOKMARK_IMPORT_SUCCESS("m_bi_s"),
+    BOOKMARK_IMPORT_ERROR("m_bi_e"),
+    BOOKMARK_EXPORT_SUCCESS("m_be_a"),
+    BOOKMARK_EXPORT_ERROR("m_be_e"),
 }
-
-typealias Visitor<T> = (TreeNode<T>) -> Unit

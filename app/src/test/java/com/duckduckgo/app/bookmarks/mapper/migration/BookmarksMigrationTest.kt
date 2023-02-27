@@ -34,7 +34,6 @@ import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
 import com.duckduckgo.savedsites.store.Relation
 import com.duckduckgo.savedsites.store.SyncEntitiesDao
 import com.duckduckgo.savedsites.store.SyncRelationsDao
-import dagger.Lazy
 import junit.framework.Assert.assertFalse
 import junit.framework.Assert.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -60,7 +59,6 @@ class BookmarksMigrationTest {
     private lateinit var syncRelationsDao: SyncRelationsDao
 
     private val mockFaviconManager: FaviconManager = mock()
-    private val lazyFaviconManager = Lazy { mockFaviconManager }
 
     private lateinit var favoritesDao: FavoritesDao
     private lateinit var bookmarksDao: BookmarksDao

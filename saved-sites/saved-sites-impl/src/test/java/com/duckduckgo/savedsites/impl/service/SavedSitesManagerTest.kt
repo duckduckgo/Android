@@ -14,15 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.bookmarks.service
+package com.duckduckgo.savedsites.impl.service
 
 import android.net.Uri
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.bookmarks.model.SavedSite
-import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.savedsites.api.models.SavedSite
+import com.duckduckgo.savedsites.api.service.ExportSavedSitesResult
+import com.duckduckgo.savedsites.api.service.ImportSavedSitesResult
+import com.duckduckgo.savedsites.api.service.SavedSitesExporter
+import com.duckduckgo.savedsites.api.service.SavedSitesImporter
+import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import java.util.UUID
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -64,7 +68,10 @@ class SavedSitesManagerTest {
 
         testee.import(someUri)
 
-        verify(pixel).fire(AppPixelName.BOOKMARK_IMPORT_SUCCESS, mapOf(Pixel.PixelParameter.BOOKMARK_COUNT to importedBookmarks.size.toString()))
+        verify(pixel).fire(
+            SavedSitesPixelName.BOOKMARK_IMPORT_SUCCESS,
+            mapOf(Pixel.PixelParameter.BOOKMARK_COUNT to importedBookmarks.size.toString()),
+        )
     }
 
     @Test
@@ -75,7 +82,10 @@ class SavedSitesManagerTest {
 
         testee.import(someUri)
 
-        verify(pixel).fire(AppPixelName.BOOKMARK_IMPORT_SUCCESS, mapOf(Pixel.PixelParameter.BOOKMARK_COUNT to importedFavorites.size.toString()))
+        verify(pixel).fire(
+            SavedSitesPixelName.BOOKMARK_IMPORT_SUCCESS,
+            mapOf(Pixel.PixelParameter.BOOKMARK_COUNT to importedFavorites.size.toString()),
+        )
     }
 
     @Test
@@ -85,7 +95,7 @@ class SavedSitesManagerTest {
 
         testee.import(someUri)
 
-        verify(pixel).fire(AppPixelName.BOOKMARK_IMPORT_ERROR)
+        verify(pixel).fire(SavedSitesPixelName.BOOKMARK_IMPORT_ERROR)
     }
 
     @Test
@@ -95,7 +105,7 @@ class SavedSitesManagerTest {
 
         testee.export(someUri)
 
-        verify(pixel).fire(AppPixelName.BOOKMARK_EXPORT_SUCCESS)
+        verify(pixel).fire(SavedSitesPixelName.BOOKMARK_EXPORT_SUCCESS)
     }
 
     @Test
@@ -105,7 +115,7 @@ class SavedSitesManagerTest {
 
         testee.export(someUri)
 
-        verify(pixel).fire(AppPixelName.BOOKMARK_EXPORT_ERROR)
+        verify(pixel).fire(SavedSitesPixelName.BOOKMARK_EXPORT_ERROR)
     }
 
     private fun aBookmark(): SavedSite.Bookmark {

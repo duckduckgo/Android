@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,32 +14,26 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.bookmarks.service
+package com.duckduckgo.savedsites.impl.service
 
 import android.content.ContentResolver
 import android.net.Uri
 import androidx.annotation.VisibleForTesting
-import com.duckduckgo.app.bookmarks.model.BookmarkFolder
-import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
-import com.duckduckgo.app.bookmarks.model.SavedSitesRepository
-import com.duckduckgo.app.bookmarks.model.TreeNode
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.sync.store.Relation
+import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.savedsites.api.models.BookmarkFolder
+import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
+import com.duckduckgo.savedsites.api.models.TreeNode
+import com.duckduckgo.savedsites.api.service.ExportSavedSitesResult
+import com.duckduckgo.savedsites.api.service.SavedSitesExporter
+import com.duckduckgo.savedsites.service.RealSavedSitesParser
+import com.duckduckgo.savedsites.service.SavedSitesParser
+import com.duckduckgo.savedsites.store.Relation
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
 import kotlinx.coroutines.withContext
-
-interface SavedSitesExporter {
-    suspend fun export(uri: Uri): ExportSavedSitesResult
-}
-
-sealed class ExportSavedSitesResult {
-    object Success : ExportSavedSitesResult()
-    data class Error(val exception: Exception) : ExportSavedSitesResult()
-    object NoSavedSitesExported : ExportSavedSitesResult()
-}
 
 class RealSavedSitesExporter(
     private val contentResolver: ContentResolver,

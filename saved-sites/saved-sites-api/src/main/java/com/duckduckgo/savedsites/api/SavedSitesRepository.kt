@@ -14,10 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.savedsites
+package com.duckduckgo.savedsites.api
 
-import com.duckduckgo.savedsites.SavedSite.Bookmark
-import com.duckduckgo.savedsites.SavedSite.Favorite
+import com.duckduckgo.savedsites.api.models.BookmarkFolder
+import com.duckduckgo.savedsites.api.models.BookmarkFolderItem
+import com.duckduckgo.savedsites.api.models.FolderBranch
+import com.duckduckgo.savedsites.api.models.SavedSite
+import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
+import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.api.models.SavedSites
 import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
 

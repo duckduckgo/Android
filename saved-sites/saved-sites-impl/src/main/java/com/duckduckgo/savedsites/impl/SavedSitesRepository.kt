@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.impl
+package com.duckduckgo.savedsites.impl
 
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.savedsites.BookmarkFolder
-import com.duckduckgo.savedsites.BookmarkFolderItem
-import com.duckduckgo.savedsites.FolderBranch
-import com.duckduckgo.savedsites.SavedSite
-import com.duckduckgo.savedsites.SavedSite.Bookmark
-import com.duckduckgo.savedsites.SavedSite.Favorite
-import com.duckduckgo.savedsites.SavedSites
-import com.duckduckgo.savedsites.SavedSitesRepository
+import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.savedsites.api.models.BookmarkFolder
+import com.duckduckgo.savedsites.api.models.BookmarkFolderItem
+import com.duckduckgo.savedsites.api.models.FolderBranch
+import com.duckduckgo.savedsites.api.models.SavedSite
+import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
+import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.api.models.SavedSites
 import com.duckduckgo.savedsites.store.Entity
 import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
 import com.duckduckgo.savedsites.store.EntityType.FOLDER

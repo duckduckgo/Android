@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.bookmarks.di
+package com.duckduckgo.savedsites.impl.di
 
 import android.content.Context
-import com.duckduckgo.app.bookmarks.model.RealSavedSitesRepository
-import com.duckduckgo.app.bookmarks.model.SavedSitesRepository
-import com.duckduckgo.app.bookmarks.service.RealSavedSitesExporter
-import com.duckduckgo.app.bookmarks.service.RealSavedSitesImporter
-import com.duckduckgo.app.bookmarks.service.RealSavedSitesManager
-import com.duckduckgo.app.bookmarks.service.RealSavedSitesParser
-import com.duckduckgo.app.bookmarks.service.SavedSitesExporter
-import com.duckduckgo.app.bookmarks.service.SavedSitesImporter
-import com.duckduckgo.app.bookmarks.service.SavedSitesManager
-import com.duckduckgo.app.bookmarks.service.SavedSitesParser
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.savedsites.api.service.SavedSitesExporter
+import com.duckduckgo.savedsites.api.service.SavedSitesImporter
+import com.duckduckgo.savedsites.api.service.SavedSitesManager
+import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
+import com.duckduckgo.savedsites.impl.service.RealSavedSitesExporter
+import com.duckduckgo.savedsites.impl.service.RealSavedSitesImporter
+import com.duckduckgo.savedsites.impl.service.RealSavedSitesManager
+import com.duckduckgo.savedsites.service.RealSavedSitesParser
+import com.duckduckgo.savedsites.service.SavedSitesParser
 import com.duckduckgo.savedsites.store.SyncEntitiesDao
 import com.duckduckgo.savedsites.store.SyncRelationsDao
 import com.squareup.anvil.annotations.ContributesTo
@@ -40,7 +40,7 @@ import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(AppScope::class)
-class BookmarksModule {
+class SavedSitesModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
