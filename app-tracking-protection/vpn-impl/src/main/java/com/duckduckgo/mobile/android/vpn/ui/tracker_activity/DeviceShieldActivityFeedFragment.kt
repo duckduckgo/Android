@@ -207,7 +207,7 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
     companion object {
         private val defaultConfig = ActivityFeedConfig(
             maxRows = Int.MAX_VALUE,
-            timeWindow = 5,
+            timeWindow = 7,
             timeWindowUnits = TimeUnit.DAYS,
             showTimeWindowHeadings = true,
         )
