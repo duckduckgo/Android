@@ -29,6 +29,7 @@ import com.duckduckgo.app.browser.certificates.rootstore.IsrgRootX1
 import com.duckduckgo.app.browser.certificates.rootstore.IsrgRootX2
 import java.io.InputStream
 import java.security.cert.X509Certificate
+import java.util.concurrent.TimeUnit.MILLISECONDS
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.tls.HandshakeCertificates
@@ -42,6 +43,7 @@ class GlobalGlideModule : AppGlideModule() {
         registry: Registry,
     ) {
         val okHttpClientBuilder = OkHttpClient.Builder()
+            .connectTimeout(700, MILLISECONDS) // rather than 10 seconds
             .addInterceptor { chain: Interceptor.Chain ->
                 val request = chain.request()
 

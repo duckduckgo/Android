@@ -18,6 +18,7 @@ package com.duckduckgo.autofill.store.urlmatcher
 
 import androidx.core.net.toUri
 import com.duckduckgo.app.global.extractDomain
+import com.duckduckgo.app.global.normalizeScheme
 import com.duckduckgo.autofill.api.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.autofill.api.urlmatcher.AutofillUrlMatcher.ExtractedUrlParts
 import javax.inject.Inject
@@ -78,13 +79,6 @@ class AutofillDomainNameUrlMatcher @Inject constructor() : AutofillUrlMatcher {
         savedSite: ExtractedUrlParts,
     ): Boolean {
         return visitedSite.eTldPlus1.equals(savedSite.eTldPlus1, ignoreCase = true)
-    }
-
-    private fun String.normalizeScheme(): String {
-        if (!startsWith("https://") && !startsWith("http://")) {
-            return "https://$this"
-        }
-        return this
     }
 
     private fun unextractable(): ExtractedUrlParts {

@@ -57,6 +57,8 @@ import com.duckduckgo.mobile.android.R.dimen
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
+import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -288,6 +290,8 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
 
         viewModel.viewState
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .conflate()
+            .distinctUntilChanged()
             .onEach { state ->
                 when (state.credentialMode) {
                     is Viewing -> {
@@ -359,33 +363,37 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
         invalidateMenu()
     }
 
+    private suspend fun preloadFavicon(credentials: LoginCredentials) {
+        withContext(dispatchers.io()) {
+            val size = resources.getDimensionPixelSize(dimen.toolbarIconSize)
+            val placeholder = generateDefaultFavicon(credentials, size)
+            withContext(dispatchers.main()) {
+                getActionBar()?.setLogo(BitmapDrawable(resources, placeholder))
+            }
+        }
+    }
     private fun loadDomainFavicon(credentials: LoginCredentials) {
         lifecycleScope.launch(dispatchers.io()) {
-            val favicon = generateFaviconFromDomain(credentials)
-
-            withContext(dispatchers.main()) {
-                getActionBar()?.setLogo(favicon)
+            preloadFavicon(credentials)
+            generateFaviconFromDomain(credentials)?.let {
+                withContext(dispatchers.main()) {
+                    getActionBar()?.setLogo(it)
+                }
             }
         }
     }
 
-    private suspend fun generateFaviconFromDomain(credentials: LoginCredentials): BitmapDrawable {
+    private suspend fun generateFaviconFromDomain(credentials: LoginCredentials): BitmapDrawable? {
         val size = resources.getDimensionPixelSize(dimen.toolbarIconSize)
-        val domain = credentials.domain
-        return if (domain == null) {
-            BitmapDrawable(resources, generateDefaultFavicon(credentials, size))
-        } else {
-            BitmapDrawable(
-                resources,
-                faviconManager.loadFromDiskWithParams(
-                    tabId = null,
-                    url = domain,
-                    width = size,
-                    height = size,
-                    cornerRadius = resources.getDimensionPixelSize(dimen.keyline_0),
-                ) ?: generateDefaultFavicon(credentials, size),
-            )
-        }
+        val domain = credentials.domain ?: return null
+        val favicon = faviconManager.loadFromDiskWithParams(
+            tabId = null,
+            url = domain,
+            width = size,
+            height = size,
+            cornerRadius = resources.getDimensionPixelSize(dimen.keyline_0),
+        ) ?: return null
+        return BitmapDrawable(resources, favicon)
     }
 
     private fun generateDefaultFavicon(

@@ -19,6 +19,7 @@ package com.duckduckgo.autofill.impl.ui.credential.management
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
@@ -65,6 +66,7 @@ class AutofillSettingsViewModel @Inject constructor(
     private val pixel: Pixel,
     private val dispatchers: DispatcherProvider,
     private val credentialListFilter: CredentialListFilter,
+    private val faviconManager: FaviconManager,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -286,10 +288,8 @@ class AutofillSettingsViewModel @Inject constructor(
     }
 
     fun onDeleteCurrentCredentials() {
-        val credentialsId = getCurrentCredentials()?.id ?: return
-
-        viewModelScope.launch(dispatchers.default()) {
-            autofillStore.deleteCredentials(credentialsId)
+        getCurrentCredentials()?.let {
+            onDeleteCredentials(it)
         }
     }
 
@@ -297,6 +297,9 @@ class AutofillSettingsViewModel @Inject constructor(
         val credentialsId = loginCredentials.id ?: return
 
         viewModelScope.launch(dispatchers.default()) {
+            loginCredentials.domain?.let {
+                faviconManager.deletePersistedFavicon(it)
+            }
             autofillStore.deleteCredentials(credentialsId)
         }
     }

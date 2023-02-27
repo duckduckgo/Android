@@ -19,12 +19,9 @@ package com.duckduckgo.autofill.impl.ui.credential.management
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
-import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
-import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
@@ -50,10 +47,8 @@ import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialG
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.InitialExtractor
 import com.duckduckgo.autofill.impl.ui.credential.management.suggestion.SuggestionListBuilder
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.extractTitle
-import com.duckduckgo.mobile.android.R.dimen
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class AutofillManagementRecyclerAdapter(
     private val lifecycleOwner: LifecycleOwner,
@@ -199,31 +194,11 @@ class AutofillManagementRecyclerAdapter(
     }
 
     private fun ItemRowAutofillCredentialsManagementScreenBinding.updateFavicon(credentials: LoginCredentials) {
-        lifecycleOwner.lifecycleScope.launch(dispatchers.io()) {
-            val domain = credentials.domain
-            val bitmap = if (domain.isNullOrBlank()) {
-                generateDefaultFavicon(
-                    credentials,
-                    root.resources.getDimensionPixelSize(dimen.toolbarIconSize),
-                )
-            } else {
-                faviconManager.loadFromDisk(tabId = null, url = domain) ?: generateDefaultFavicon(
-                    credentials,
-                    root.resources.getDimensionPixelSize(dimen.toolbarIconSize),
-                )
-            }
-            withContext(dispatchers.main()) {
-                favicon.setImageDrawable(BitmapDrawable(root.resources, bitmap))
-            }
+        lifecycleOwner.lifecycleScope.launch {
+            val url = credentials.domain.orEmpty()
+            val faviconPlaceholderLetter = initialExtractor.extractInitial(credentials)
+            faviconManager.loadToViewFromLocalOrFallback(url = url, view = favicon, placeholder = faviconPlaceholderLetter)
         }
-    }
-
-    private fun generateDefaultFavicon(
-        credentials: LoginCredentials,
-        size: Int,
-    ): Bitmap {
-        val faviconPlaceholderLetter = initialExtractor.extractInitial(credentials)
-        return faviconManager.generateDefaultFavicon(placeholder = faviconPlaceholderLetter, credentials.domain ?: "").toBitmap(size, size)
     }
 
     @SuppressLint("NotifyDataSetChanged")

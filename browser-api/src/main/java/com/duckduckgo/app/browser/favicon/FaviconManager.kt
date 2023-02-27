@@ -45,6 +45,7 @@ interface FaviconManager {
         tabId: String? = null,
         url: String,
         view: ImageView,
+        placeholder: String? = null,
     )
 
     suspend fun loadToViewFromLocalWithPlaceholder(
@@ -54,6 +55,11 @@ interface FaviconManager {
     )
 
     suspend fun loadFromDisk(
+        tabId: String?,
+        url: String,
+    ): Bitmap?
+
+    suspend fun loadFromDiskOrFallback(
         tabId: String?,
         url: String,
     ): Bitmap?

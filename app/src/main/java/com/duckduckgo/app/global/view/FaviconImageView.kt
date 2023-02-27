@@ -36,8 +36,9 @@ import okio.ByteString.Companion.encodeUtf8
 fun ImageView.loadFavicon(
     file: File,
     domain: String,
+    placeholder: String? = null,
 ) {
-    val defaultDrawable = generateDefaultDrawable(this.context, domain)
+    val defaultDrawable = generateDefaultDrawable(this.context, domain, placeholder)
     Glide.with(context).clear(this@loadFavicon)
     Glide.with(context)
         .load(file)
@@ -52,8 +53,9 @@ fun ImageView.loadFavicon(
 fun ImageView.loadFavicon(
     bitmap: Bitmap?,
     domain: String,
+    placeholder: String? = null,
 ) {
-    val defaultDrawable = generateDefaultDrawable(this.context, domain)
+    val defaultDrawable = generateDefaultDrawable(this.context, domain, placeholder)
     Glide.with(context).clear(this)
     Glide.with(context)
         .load(bitmap)
