@@ -234,7 +234,7 @@ class SavedSitesRepositoryTest {
     }
 
     @Test
-    fun whenFavoriteUpdatedThenDatabaseChanged() {
+    fun whenFavoriteNameUpdatedThenDataIsUpdated() {
         val favoriteone = Favorite("favorite1", "Favorite", "http://favexample.com", 0)
         val favoritetwo = Favorite("favorite1", "Favorite", "http://favexample.com", 1)
         val favoritethree = Favorite("favorite1", "Favorite", "http://favexample.com", 2)
@@ -243,11 +243,34 @@ class SavedSitesRepositoryTest {
         givenFavoriteStored(favoritetwo)
         givenFavoriteStored(favoritethree)
 
-        val updatedFavorite = favoriteone.copy(position = 2)
+        val updatedFavorite = favoriteone.copy(title = "favorite updated")
 
         repository.update(updatedFavorite)
 
-        assertFavoriteExistsInDb(updatedFavorite)
+        assertEquals(repository.getFavorite(favoriteone.url), updatedFavorite)
+    }
+
+    @Test
+    fun whenFavoritePositionUpdatedThenDataIsUpdated() = runTest {
+        val favoriteone = Favorite("favorite1", "Favorite", "http://favexample.com", 0)
+        val favoritetwo = Favorite("favorite1", "Favorite", "http://favexample.com", 1)
+        val favoritethree = Favorite("favorite1", "Favorite", "http://favexample.com", 2)
+
+        givenFavoriteStored(favoriteone)
+        givenFavoriteStored(favoritetwo)
+        givenFavoriteStored(favoritethree)
+
+        val updatedFavoriteOne = favoriteone.copy(position = 2)
+        val updatedFavoriteTwo = favoriteone.copy(position = 0)
+        val updatedFavoriteThree = favoriteone.copy(position = 1)
+
+        repository.update(updatedFavoriteOne)
+
+        repository.getFavorites().test {
+            val favorites = awaitItem()
+            assertEquals(favorites, listOf(updatedFavoriteTwo, updatedFavoriteThree, updatedFavoriteOne))
+        }
+
     }
 
     @Test

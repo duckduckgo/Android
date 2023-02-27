@@ -360,11 +360,20 @@ class RealSavedSitesRepository(
     }
 
     private fun updateFavorite(favorite: Favorite) {
-        val entity = syncEntitiesDao.entityById(favorite.id)
-
-        // update order of favorite if needed
-        if (entity != null) {
+        syncEntitiesDao.entityById(favorite.id)?.let { entity ->
             syncEntitiesDao.update(Entity(entity.entityId, favorite.title, favorite.url, BOOKMARK))
+
+            val favorites = syncEntitiesDao.entitiesInFolderSync(Relation.FAVORITES_ROOT).mapIndexed { index, entity ->
+                entity.mapToFavorite(index)
+            }.toMutableList()
+
+            val currentFavorite = favorites.find { it.id == favorite.id }
+            val currentIndex = favorites.indexOf(currentFavorite)
+            if (currentIndex < 0) return
+            favorites.removeAt(currentIndex)
+            favorites.add(favorite.position, favorite)
+
+            updateWithPosition(favorites)
         }
     }
 
@@ -381,11 +390,10 @@ class RealSavedSitesRepository(
         syncEntitiesDao.update(Entity(entityId = folder.id, title = folder.name, url = "", type = FOLDER))
 
         // has folder parent changed?
-        if (oldFolder.parentId != folder.id){
+        if (oldFolder.parentId != folder.id) {
             syncRelationsDao.deleteRelationByEntity(folder.id)
             syncRelationsDao.insert(Relation(relationId = folder.parentId, entityId = folder.id))
         }
-
     }
 
     override fun delete(folder: BookmarkFolder) {
@@ -428,7 +436,9 @@ class RealSavedSitesRepository(
     }
 
     override fun updateWithPosition(favorites: List<Favorite>) {
-        // reorder the list of the relation
+        syncRelationsDao.delete(Relation.FAVORITES_ROOT)
+        val relations = favorites.map { Relation(relationId = Relation.FAVORITES_ROOT, entityId = it.id) }
+        syncRelationsDao.insertList(relations)
     }
 
     private fun Entity.mapToBookmark(relationId: String): Bookmark = Bookmark(this.entityId, this.title, this.url.orEmpty(), relationId)

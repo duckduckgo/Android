@@ -37,6 +37,9 @@ interface SyncRelationsDao {
     @Query("select * from relations")
     fun relations(): List<Relation>
 
+    @Query("select * from relations where relationId =:relationId")
+    fun relations(relationId: String): List<Relation>
+
     @Query("select count(*) from  entities inner join relations on entities.entityId = relations.entityId and entities.type = :type and relations.relationId = :folderId")
     fun countEntitiesInFolder(folderId: String, type: EntityType): Int
 
