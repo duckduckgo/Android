@@ -33,6 +33,7 @@ import com.duckduckgo.sync.store.SyncRelationsDao
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNotNull
 import junit.framework.TestCase.assertNull
+import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -237,6 +238,7 @@ class SavedSitesRepositoryTest {
         val favoriteone = Favorite("favorite1", "Favorite", "http://favexample.com", 0)
         val favoritetwo = Favorite("favorite1", "Favorite", "http://favexample.com", 1)
         val favoritethree = Favorite("favorite1", "Favorite", "http://favexample.com", 2)
+
         givenFavoriteStored(favoriteone)
         givenFavoriteStored(favoritetwo)
         givenFavoriteStored(favoritethree)
@@ -445,6 +447,107 @@ class SavedSitesRepositoryTest {
             Assert.assertTrue(result.second.size == 1)
             Assert.assertEquals(result.second.first().id, "folder3")
         }
+    }
+
+    @Test
+    fun whenBookmarkIsMovedToAnotherFolderThenRootBookmarksReturnsEmpty() = runTest {
+        givenNoBookmarksStored()
+
+        val folderOne = repository.insert(BookmarkFolder(id = "folder1", name = "folder1", parentId = Relation.BOOMARKS_ROOT))
+        val bookmark = repository.insertBookmark(title = "bookmark1", url = "foo.com")
+        val folderTwo = repository.insert(BookmarkFolder(id = "folder2", name = "folder2", parentId = Relation.BOOMARKS_ROOT))
+
+        repository.getFolderContent(Relation.BOOMARKS_ROOT).test {
+            val result = awaitItem()
+            assertEquals(listOf(bookmark), result.first)
+
+            val updatedBookmark = bookmark.copy(parentId = folderTwo.id)
+            repository.update(updatedBookmark)
+            val updatedResult = awaitItem()
+
+            assertTrue(updatedResult.first.isEmpty())
+        }
+    }
+
+    @Test
+    fun whenBookmarkIsMovedToAnotherFolderThenFolderReturnsBookmark() = runTest {
+        givenNoBookmarksStored()
+
+        val folderOne = repository.insert(BookmarkFolder(id = "folder1", name = "folder1", parentId = Relation.BOOMARKS_ROOT))
+        val bookmark = repository.insertBookmark(title = "bookmark1", url = "foo.com")
+        val folderTwo = repository.insert(BookmarkFolder(id = "folder2", name = "folder2", parentId = Relation.BOOMARKS_ROOT))
+
+        repository.getFolderContent(folderTwo.id).test {
+            val result = awaitItem()
+            assertTrue(result.first.isEmpty())
+
+            val updatedBookmark = bookmark.copy(parentId = folderTwo.id)
+            repository.update(updatedBookmark)
+            val updatedResult = awaitItem()
+
+            assertEquals(listOf(updatedBookmark), updatedResult.first)
+        }
+    }
+
+    @Test
+    fun whenFolderIsMovedToAnotherFolderThenParentFolderIsUpdated() = runTest {
+        givenNoBookmarksStored()
+
+        val folderOne = repository.insert(BookmarkFolder(id = "folder1", name = "folder1", parentId = Relation.BOOMARKS_ROOT))
+        val bookmarkOne = repository.insertBookmark(title = "bookmark1", url = "foo1.com")
+        val updatedBookmarkOne = bookmarkOne.copy(parentId = folderOne.id)
+        repository.update(updatedBookmarkOne)
+
+        val updatedFolderOne = folderOne.copy(numBookmarks =  1)
+        assertEquals(repository.getFolder(folderOne.id), updatedFolderOne)
+
+        val folderTwo = repository.insert(BookmarkFolder(id = "folder2", name = "folder2", parentId = Relation.BOOMARKS_ROOT))
+        val bookmarkTwo = repository.insertBookmark(title = "bookmark2", url = "foo2.com")
+        val updatedBookmarkTwo = bookmarkTwo.copy(parentId = folderTwo.id)
+        repository.update(updatedBookmarkTwo)
+
+        val updatedFolderTwo = folderTwo.copy(numBookmarks =  1)
+        assertEquals(repository.getFolder(folderTwo.id), updatedFolderTwo)
+
+        val bookmarkThree = repository.insertBookmark(title = "bookmark3", url = "foo3.com")
+
+        repository.getFolderContent(Relation.BOOMARKS_ROOT).test {
+            val result = awaitItem()
+            assertEquals(listOf(bookmarkThree), result.first)
+            assertEquals(listOf(updatedFolderOne, updatedFolderTwo), result.second)
+
+            repository.update(folderTwo.copy(parentId = folderOne.id))
+
+            val updatedFolderOne = folderOne.copy(numBookmarks =  1, numFolders =  1)
+            val updatedResult = awaitItem()
+
+            assertEquals(listOf(bookmarkThree), updatedResult.first)
+            assertEquals(listOf(updatedFolderOne), updatedResult.second)
+        }
+    }
+
+    @Test
+    fun whenFolderNameUpdatedThenRepositoryReturnsUpdatedFolder() = runTest {
+        val folder = repository.insert(BookmarkFolder(id = "folder", name = "folder", parentId = Relation.BOOMARKS_ROOT))
+        assertEquals(repository.getFolder(folder.id), folder)
+
+        val folderUpdated =  folder.copy(name = "folder updated")
+        repository.update(folderUpdated)
+        assertEquals(repository.getFolder(folderUpdated.id), folderUpdated)
+    }
+
+    @Test
+    fun whenFolderParentUpdatedThenRepositoryReturnsUpdatedFolder() = runTest {
+        val folderRoot = repository.insert(BookmarkFolder(id = Relation.BOOMARKS_ROOT, name = "folder", parentId = ""))
+        val folderTwo = repository.insert(BookmarkFolder(id = "folder2", name = "folder two", parentId = folderRoot.id))
+        val folder = repository.insert(BookmarkFolder(id = "folder", name = "folder", parentId = folderRoot.id))
+
+        assertEquals(repository.getFolder(folder.id), folder)
+
+        val folderUpdated =  folder.copy(parentId = folderTwo.id)
+        repository.update(folderUpdated)
+
+        assertEquals(repository.getFolder(folder.id), folderUpdated)
     }
 
     @Test

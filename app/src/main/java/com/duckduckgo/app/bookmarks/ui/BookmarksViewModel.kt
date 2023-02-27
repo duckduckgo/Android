@@ -196,10 +196,6 @@ class BookmarksViewModel @Inject constructor(
             savedSitesRepository.getSavedSites(parentId).collect {
                 onSavedSitesItemsChanged(it.favorites, it.bookmarks, it.folders)
             }
-
-            // savedSitesRepository.getFolderContent(parentId).collect { bookmarksAndFolders ->
-            //     onBookmarkItemsChanged(bookmarks = bookmarksAndFolders.first, bookmarkFolders = bookmarksAndFolders.second)
-            // }
         }
     }
 

@@ -351,7 +351,7 @@ class RealSavedSitesRepository(
             syncRelationsDao.relationByEntityId(entity.entityId)?.let { relation ->
                 if (relation.relationId != bookmark.parentId) {
                     // bookmark moved to another folder
-                    syncRelationsDao.delete(relation.relationId)
+                    syncRelationsDao.deleteRelationByEntity(bookmark.id)
                     syncRelationsDao.insert(Relation(relationId = bookmark.parentId, entityId = relation.entityId))
                 }
                 syncEntitiesDao.update(Entity(relation.entityId, bookmark.title, bookmark.url, BOOKMARK))
@@ -376,7 +376,16 @@ class RealSavedSitesRepository(
     }
 
     override fun update(folder: BookmarkFolder) {
+        val oldFolder = getFolder(folder.id) ?: return
+
         syncEntitiesDao.update(Entity(entityId = folder.id, title = folder.name, url = "", type = FOLDER))
+
+        // has folder parent changed?
+        if (oldFolder.parentId != folder.id){
+            syncRelationsDao.deleteRelationByEntity(folder.id)
+            syncRelationsDao.insert(Relation(relationId = folder.parentId, entityId = folder.id))
+        }
+
     }
 
     override fun delete(folder: BookmarkFolder) {
@@ -396,10 +405,10 @@ class RealSavedSitesRepository(
         val entity = syncEntitiesDao.entityById(folderId)
         val relation = syncRelationsDao.relationByEntityId(folderId)
 
-        return if (entity != null && relation != null) {
-            BookmarkFolder(folderId, entity.title, relation.relationId)
-        } else if (entity != null && relation == null) {
-            BookmarkFolder(folderId, entity.title, "")
+        return if (entity != null) {
+            val numFolders = syncRelationsDao.countEntitiesInFolder(entity.entityId, FOLDER)
+            val numBookmarks = syncRelationsDao.countEntitiesInFolder(entity.entityId, BOOKMARK)
+            BookmarkFolder(folderId, entity.title, relation?.relationId ?: "", numFolders = numFolders, numBookmarks = numBookmarks)
         } else {
             null
         }
