@@ -281,8 +281,8 @@ class SavedSitesRepositoryTest {
 
         repository.updateWithPosition(listOf(favorite2, favorite))
 
-        assertFavoriteExistsInDb(favorite2.copy(position = 1))
-        assertFavoriteExistsInDb(favorite.copy(position = 0))
+        assertEquals(repository.getFavorite(favorite.url), favorite.copy(position = 1))
+        assertEquals(repository.getFavorite(favorite2.url), favorite2.copy(position = 0))
     }
 
     @Test
@@ -684,7 +684,7 @@ class SavedSitesRepositoryTest {
         val flatStructure = repository.getFolderTree(folder.id, null)
 
         val items = listOf(
-            BookmarkFolderItem(0, rootFolder, false),
+            BookmarkFolderItem(0, rootFolder.copy(numFolders = 2), false),
             BookmarkFolderItem(1, parentFolder, false),
             BookmarkFolderItem(2, childFolder, false),
             BookmarkFolderItem(1, folder, true),
@@ -820,18 +820,6 @@ class SavedSitesRepositoryTest {
             relations.add(Relation(relationId = folderId, entityId = it.entityId))
         }
         return relations
-    }
-
-    private fun assertFavoriteExistsInDb(favorite: Favorite) {
-        val favorites = syncEntitiesDao.entitiesInFolderSync(Relation.FAVORITES_ROOT).mapIndexed { index, entity ->
-            Favorite(entity.entityId, entity.title, entity.url.orEmpty(), index)
-        }
-        val storedFavorite = favorites.firstOrNull { it.url == favorite.url }
-
-        assertNotNull(storedFavorite)
-        Assert.assertEquals(storedFavorite!!.title, favorite.title)
-        Assert.assertEquals(storedFavorite.url, favorite.url)
-        Assert.assertEquals(storedFavorite.position, favorite.position)
     }
 
     private fun givenEmptyDBState() {
