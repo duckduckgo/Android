@@ -20,7 +20,6 @@ import com.duckduckgo.savedsites.SavedSite.Bookmark
 import com.duckduckgo.savedsites.SavedSite.Favorite
 import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
-import java.io.Serializable
 
 interface SavedSitesRepository {
 

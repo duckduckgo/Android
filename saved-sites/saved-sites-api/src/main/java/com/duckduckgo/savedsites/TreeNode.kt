@@ -23,8 +23,8 @@ class TreeNode<T>(val value: T) {
     fun isEmpty() = children.isEmpty()
 
     fun forEachVisit(
-            visitBefore: Visitor<T>,
-            visitAfter: Visitor<T>,
+        visitBefore: Visitor<T>,
+        visitAfter: Visitor<T>,
     ) {
         visitBefore(this)
         children.forEach {
