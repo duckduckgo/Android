@@ -23,7 +23,6 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.TreeNode
-import com.duckduckgo.savedsites.service.RealSavedSitesParser
 import com.duckduckgo.savedsites.store.Relation
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest

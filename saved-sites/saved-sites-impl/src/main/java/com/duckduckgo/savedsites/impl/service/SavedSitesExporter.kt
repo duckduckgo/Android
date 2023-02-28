@@ -27,8 +27,6 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.TreeNode
 import com.duckduckgo.savedsites.api.service.ExportSavedSitesResult
 import com.duckduckgo.savedsites.api.service.SavedSitesExporter
-import com.duckduckgo.savedsites.service.RealSavedSitesParser
-import com.duckduckgo.savedsites.service.SavedSitesParser
 import com.duckduckgo.savedsites.store.Relation
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
