@@ -16,8 +16,16 @@
 
 package com.duckduckgo.sync.impl.parser
 
+import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.sync.api.parser.SyncDataParser
 
-class RealSyncDataParser(): SyncDataParser {
+class RealSyncDataParser(repository: SavedSitesRepository): SyncDataParser {
 
+    override fun generate() {
+        
+    }
+
+    override fun parse() {
+        TODO("Not yet implemented")
+    }
 }

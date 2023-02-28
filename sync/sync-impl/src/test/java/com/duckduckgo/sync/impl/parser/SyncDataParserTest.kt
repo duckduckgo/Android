@@ -16,25 +16,25 @@
 
 package com.duckduckgo.sync.impl.parser
 
+import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.sync.api.parser.SyncDataParser
+import com.duckduckgo.sync.impl.SyncService
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.mock
 
 class SyncDataParserTest {
 
     lateinit var dataParser: SyncDataParser
+    private val repository: SavedSitesRepository = mock()
 
     @Before
     fun before() {
-        dataParser = RealSyncDataParser()
+        dataParser = RealSyncDataParser(repository)
     }
 
     @Test
-    fun whenJSONGeneratedThenFormatIsCorrect(){
-
-
+    fun whenJSONGeneratedThenFormatIsCorrect() {
 
     }
-
-
 }

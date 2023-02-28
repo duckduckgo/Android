@@ -18,5 +18,7 @@ package com.duckduckgo.sync.api.parser
 
 interface SyncDataParser {
 
+    fun generate()
+    fun parse()
 
 }
