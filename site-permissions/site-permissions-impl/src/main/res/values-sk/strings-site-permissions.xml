@@ -33,6 +33,6 @@
     <string name="systemPermissionDialogAudioDeniedContent">Lokality môžu používať váš mikrofón len vtedy, ak povolíte aplikácii DuckDuckGo žiadať o prístup.</string>
     <string name="systemPermissionDialogCameraAndAudioDeniedTitle">Povoliť aplikácii DuckDuckGo žiadať o prístup k fotoaparátu a mikrofónu v tomto zariadení</string>
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">Lokality môžu používať váš fotoaparát a mikrofón len vtedy, ak povolíte aplikácii DuckDuckGo žiadať o prístup.</string>
-    <string name="systemPermissionsDeniedDialogPositiveButton">Otvorte nastavenia</string>
+    <string name="systemPermissionsDeniedDialogPositiveButton">Otvoriť nastavenia</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Zrušiť</string>
 </resources>
