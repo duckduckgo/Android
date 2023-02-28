@@ -54,12 +54,19 @@ class RealSyncDataParser(
         updates: MutableList<SyncUpdate>
     ): List<SyncUpdate> {
         repository.getFolderContentSync(folderId).apply {
-            for (bookmark in this.first) {
-                updates.add(SyncUpdate.asBookmark(id = bookmark.id, title = bookmark.title, url = bookmark.url, deleted = null))
-            }
-            for (folder in this.second) {
-                val childrenIds = getIdsFromFolder(folderId)
+            val folder = repository.getFolder(folderId)
+            if (folder != null){
+                val childrenIds = mutableListOf<String>()
+                for (bookmark in this.first) {
+                    childrenIds.add(bookmark.id)
+                    updates.add(SyncUpdate.asBookmark(id = bookmark.id, title = bookmark.title, url = bookmark.url, deleted = null))
+                }
                 updates.add(SyncUpdate.asFolder(id = folder.id, title = folder.name, children = childrenIds, deleted = null))
+                for (folder in this.second) {
+                    val childrenIds = getIdsFromFolder(folder.id)
+                    // updates.add(SyncUpdate.asFolder(id = folder.id, title = folder.name, children = childrenIds, deleted = null))
+                    addFolderContent(folder.id, updates)
+                }
             }
         }
         return updates
@@ -85,6 +92,7 @@ class RealSyncDataParser(
 
 data class SyncBookmarkPage(val url: String)
 data class SyncFolderChildren(val children: List<String>)
+
 data class SyncUpdate(
     val id: String,
     val title: String,
