@@ -189,3 +189,10 @@ fun String.extractDomain(): String? {
         "https://$this".extractDomain()
     }
 }
+
+fun String.normalizeScheme(): String {
+    if (!startsWith("https://") && !startsWith("http://")) {
+        return "https://$this"
+    }
+    return this
+}

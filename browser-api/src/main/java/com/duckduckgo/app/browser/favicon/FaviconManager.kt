@@ -45,6 +45,7 @@ interface FaviconManager {
         tabId: String? = null,
         url: String,
         view: ImageView,
+        placeholder: String? = null,
     )
 
     suspend fun loadToViewFromLocalWithPlaceholder(
@@ -54,6 +55,11 @@ interface FaviconManager {
     )
 
     suspend fun loadFromDisk(
+        tabId: String?,
+        url: String,
+    ): Bitmap?
+
+    suspend fun loadFromDiskOrFallback(
         tabId: String?,
         url: String,
     ): Bitmap?
@@ -74,7 +80,13 @@ interface FaviconManager {
 
     suspend fun deleteAllTemp()
 
+    /**
+     * Generates a drawable which can be used as a placeholder for a favicon when a real one cannot be found
+     * @param placeholder the placeholder text to be used. if null, the placeholder letter will be extracted from the domain
+     * @param domain the domain of the site for which the favicon is being generated, used to generate background color
+     */
     fun generateDefaultFavicon(
+        placeholder: String?,
         domain: String,
     ): Drawable
 }

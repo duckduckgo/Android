@@ -28,6 +28,7 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.app.global.extractDomain
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -44,6 +45,7 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SAVE_PASSW
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SAVE_PASSWORD_PROMPT_SAVED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SAVE_PASSWORD_PROMPT_SHOWN
 import com.duckduckgo.autofill.impl.ui.credential.dialog.animateClosed
+import com.duckduckgo.autofill.impl.ui.credential.management.sorting.InitialExtractor
 import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsDialogFragment.AutofillSavingPixelEventNames.Companion.pixelNameDialogAccepted
 import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsDialogFragment.AutofillSavingPixelEventNames.Companion.pixelNameDialogDismissed
 import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsDialogFragment.AutofillSavingPixelEventNames.Companion.pixelNameDialogShown
@@ -86,6 +88,12 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
     @Inject
     lateinit var pixel: Pixel
 
+    @Inject
+    lateinit var initialExtractor: InitialExtractor
+
+    @Inject
+    lateinit var dispatcherProvider: DispatcherProvider
+
     /**
      * To capture all the ways the BottomSheet can be dismissed, we might end up with onCancel being called when we don't want it
      * This flag is set to true when taking an action which dismisses the dialog, but should not be treated as a cancellation.
@@ -119,7 +127,7 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         credentials: LoginCredentials,
     ) {
         (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_EXPANDED
-        configureSiteDetails(binding)
+        configureSiteDetails(binding, credentials)
         configureTitles(binding, credentials)
         configureCloseButtons(binding)
         configureSaveButton(binding)
@@ -130,6 +138,10 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
             Timber.v("onSave: AutofillSavingCredentialsDialogFragment. User saved credentials")
 
             pixelNameDialogEvent(Accepted)?.let { pixel.fire(it) }
+
+            lifecycleScope.launch(dispatcherProvider.io()) {
+                faviconManager.persistCachedFavicon(getTabId(), getOriginalUrl())
+            }
 
             val result = Bundle().also {
                 it.putString(CredentialSavePickerDialog.KEY_URL, getOriginalUrl())
@@ -184,14 +196,15 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         }
     }
 
-    private fun configureSiteDetails(binding: ContentAutofillSaveNewCredentialsBinding) {
+    private fun configureSiteDetails(binding: ContentAutofillSaveNewCredentialsBinding, credentials: LoginCredentials) {
         val originalUrl = getOriginalUrl()
         val url = originalUrl.extractDomain() ?: originalUrl
 
         binding.siteName.text = url
+        val placeholder = initialExtractor.extractInitial(credentials)
 
         lifecycleScope.launch {
-            faviconManager.loadToViewFromLocalOrFallback(url = url, view = binding.favicon)
+            faviconManager.loadToViewFromLocalOrFallback(tabId = getTabId(), url = originalUrl, view = binding.favicon, placeholder = placeholder)
         }
     }
 
