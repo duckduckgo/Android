@@ -17,7 +17,7 @@
 package com.duckduckgo.contentscopescripts.impl
 
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.app.userwhitelist.api.UserWhiteListRepository
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
 import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
@@ -36,7 +36,7 @@ import org.mockito.kotlin.whenever
 class RealContentScopeScriptsTest {
 
     private val mockPluginPoint: PluginPoint<ContentScopeConfigPlugin> = mock()
-    private val mockAllowList: UserWhiteListRepository = mock()
+    private val mockUserAllowListRepository: UserAllowListRepository = mock()
     private val mockContentScopeJsReader: ContentScopeJSReader = mock()
     private val mockPlugin1: ContentScopeConfigPlugin = mock()
     private val mockPlugin2: ContentScopeConfigPlugin = mock()
@@ -50,7 +50,7 @@ class RealContentScopeScriptsTest {
     fun setup() {
         testee = RealContentScopeScripts(
             mockPluginPoint,
-            mockAllowList,
+            mockUserAllowListRepository,
             mockContentScopeJsReader,
             mockAppBuildConfig,
             mockUnprotectedTemporary,
@@ -59,7 +59,7 @@ class RealContentScopeScriptsTest {
         whenever(mockPlugin1.config()).thenReturn(config1)
         whenever(mockPlugin2.config()).thenReturn(config2)
         whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(mockPlugin1, mockPlugin2))
-        whenever(mockAllowList.userWhiteList).thenReturn(listOf(exampleUrl))
+        whenever(mockUserAllowListRepository.domainsInUserAllowList()).thenReturn(listOf(exampleUrl))
         whenever(mockContentScopeJsReader.getContentScopeJS()).thenReturn(contentScopeJS)
         whenever(mockAppBuildConfig.versionCode).thenReturn(versionCode)
         whenever(mockUnprotectedTemporary.unprotectedTemporaryExceptions)
@@ -78,7 +78,7 @@ class RealContentScopeScriptsTest {
 
         assertEquals(defaultExpectedJs, js)
         verify(mockUnprotectedTemporary, times(3)).unprotectedTemporaryExceptions
-        verify(mockAllowList, times(3)).userWhiteList
+        verify(mockUserAllowListRepository, times(3)).domainsInUserAllowList()
         verifyNoMoreInteractions(mockContentScopeJsReader)
     }
 
@@ -88,7 +88,7 @@ class RealContentScopeScriptsTest {
 
         assertEquals(defaultExpectedJs, js)
 
-        whenever(mockAllowList.userWhiteList).thenReturn(listOf(exampleUrl2))
+        whenever(mockUserAllowListRepository.domainsInUserAllowList()).thenReturn(listOf(exampleUrl2))
 
         js = testee.getScript()
 
@@ -103,7 +103,7 @@ class RealContentScopeScriptsTest {
         )
 
         verify(mockUnprotectedTemporary, times(3)).unprotectedTemporaryExceptions
-        verify(mockAllowList, times(4)).userWhiteList
+        verify(mockUserAllowListRepository, times(4)).domainsInUserAllowList()
         verify(mockContentScopeJsReader, times(2)).getContentScopeJS()
     }
 
@@ -129,7 +129,7 @@ class RealContentScopeScriptsTest {
         )
 
         verify(mockUnprotectedTemporary, times(3)).unprotectedTemporaryExceptions
-        verify(mockAllowList, times(3)).userWhiteList
+        verify(mockUserAllowListRepository, times(3)).domainsInUserAllowList()
         verify(mockContentScopeJsReader, times(2)).getContentScopeJS()
     }
 
@@ -156,7 +156,7 @@ class RealContentScopeScriptsTest {
         )
 
         verify(mockUnprotectedTemporary, times(3)).unprotectedTemporaryExceptions
-        verify(mockAllowList, times(3)).userWhiteList
+        verify(mockUserAllowListRepository, times(3)).domainsInUserAllowList()
         verify(mockContentScopeJsReader, times(2)).getContentScopeJS()
     }
 
@@ -181,7 +181,7 @@ class RealContentScopeScriptsTest {
         )
 
         verify(mockUnprotectedTemporary, times(4)).unprotectedTemporaryExceptions
-        verify(mockAllowList, times(3)).userWhiteList
+        verify(mockUserAllowListRepository, times(3)).domainsInUserAllowList()
         verify(mockContentScopeJsReader, times(2)).getContentScopeJS()
     }
 

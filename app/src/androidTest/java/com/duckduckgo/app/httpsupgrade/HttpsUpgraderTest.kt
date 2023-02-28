@@ -19,7 +19,6 @@ package com.duckduckgo.app.httpsupgrade
 import android.net.Uri
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.httpsupgrade.store.HttpsFalsePositivesDao
-import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Https
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
@@ -38,7 +37,6 @@ class HttpsUpgraderTest {
 
     private var mockHttpsBloomFilterFactory: HttpsBloomFilterFactory = mock()
     private var mockBloomFalsePositiveListDao: HttpsFalsePositivesDao = mock()
-    private var mockUserAllowlistDao: UserWhitelistDao = mock()
 
     private var mockFeatureToggle: FeatureToggle = mock()
     private var mockHttps: Https = mock()
@@ -48,7 +46,7 @@ class HttpsUpgraderTest {
     fun before() {
         whenever(mockHttpsBloomFilterFactory.create()).thenReturn(bloomFilter)
         whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.HttpsFeatureName.value)).thenReturn(true)
-        testee = HttpsUpgraderImpl(mockHttpsBloomFilterFactory, mockBloomFalsePositiveListDao, mockUserAllowlistDao, mockFeatureToggle, mockHttps)
+        testee = HttpsUpgraderImpl(mockHttpsBloomFilterFactory, mockBloomFalsePositiveListDao, mockFeatureToggle, mockHttps)
         testee.reloadData()
     }
 
@@ -87,13 +85,6 @@ class HttpsUpgraderTest {
     @Test
     fun whenHttpUriHasOnlyPartDomainInLocalListThenShouldNotUpgrade() {
         bloomFilter.add("local.url")
-        assertFalse(testee.shouldUpgrade(Uri.parse("http://www.local.url")))
-    }
-
-    @Test
-    fun whenHttpDomainIsUserWhitelistedThenShouldNotUpgrade() {
-        bloomFilter.add("www.local.url")
-        whenever(mockUserAllowlistDao.contains("www.local.url")).thenReturn(true)
         assertFalse(testee.shouldUpgrade(Uri.parse("http://www.local.url")))
     }
 }

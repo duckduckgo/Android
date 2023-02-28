@@ -16,7 +16,11 @@
 
 package com.duckduckgo.app.privacy.db
 
+import android.net.Uri
+
 interface UserAllowListRepository {
-    fun isDomainInUserAllowList(domain: String): Boolean
+    fun isUrlInUserAllowList(url: String): Boolean
+    fun isUriInUserAllowList(uri: Uri): Boolean
+    fun isDomainInUserAllowList(domain: String?): Boolean
     fun domainsInUserAllowList(): List<String>
 }

@@ -17,11 +17,10 @@
 package com.duckduckgo.privacy.config.impl.features.trackingparameters
 
 import android.net.Uri
-import androidx.core.net.toUri
+import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.global.UriString
-import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.global.replaceQueryParameters
-import com.duckduckgo.app.userwhitelist.api.UserWhiteListRepository
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
@@ -43,15 +42,14 @@ class RealTrackingParameters @Inject constructor(
     private val trackingParametersRepository: TrackingParametersRepository,
     private val featureToggle: FeatureToggle,
     private val unprotectedTemporary: UnprotectedTemporary,
-    val userWhiteListRepository: UserWhiteListRepository,
+    private val userAllowListRepository: UserAllowListRepository,
 ) : TrackingParameters {
 
     override var lastCleanedUrl: String? = null
 
-    override fun isAnException(initiatingUrl: String?, url: String): Boolean {
-        return matches(initiatingUrl) || matches(url) ||
-            unprotectedTemporary.isAnException(url) ||
-            userWhiteListRepository.userWhiteList.contains(url.toUri().domain())
+    @VisibleForTesting
+    fun isAnException(initiatingUrl: String?, url: String): Boolean {
+        return matches(initiatingUrl) || matches(url) || unprotectedTemporary.isAnException(url) || userAllowListRepository.isUrlInUserAllowList(url)
     }
 
     private fun matches(url: String?): Boolean {

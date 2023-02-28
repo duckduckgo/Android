@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.userwhitelist
+package com.duckduckgo.app.privacy.db
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertFalse
+import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import org.junit.After
@@ -31,7 +32,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.MockitoAnnotations
 
-class UserWhiteListAppRepositoryTest {
+class UserAllowListRepositoryTest {
 
     @ExperimentalCoroutinesApi
     @get:Rule
@@ -44,7 +45,7 @@ class UserWhiteListAppRepositoryTest {
 
     private lateinit var db: AppDatabase
     private lateinit var dao: UserWhitelistDao
-    private lateinit var repository: UserWhiteListAppRepository
+    private lateinit var repository: UserAllowListRepository
 
     @ExperimentalCoroutinesApi
     @Before
@@ -54,7 +55,7 @@ class UserWhiteListAppRepositoryTest {
             .allowMainThreadQueries()
             .build()
         dao = db.userWhitelistDao()
-        repository = UserWhiteListAppRepository(db, TestScope(), coroutineRule.testDispatcherProvider)
+        repository = RealUserAllowListRepository(db, TestScope(), coroutineRule.testDispatcherProvider)
     }
 
     @After
@@ -64,9 +65,21 @@ class UserWhiteListAppRepositoryTest {
 
     @Test
     fun whenDbContainsUserWhiteListedDomainsThenUpdateUserWhiteList() {
-        assertEquals(0, repository.userWhiteList.size)
-        dao.insert("www.example.com")
-        assertEquals(1, repository.userWhiteList.size)
-        assertEquals("www.example.com", repository.userWhiteList.first())
+        assertEquals(0, repository.domainsInUserAllowList().size)
+        dao.insert("example.com")
+        assertEquals(1, repository.domainsInUserAllowList().size)
+        assertEquals("example.com", repository.domainsInUserAllowList().first())
+    }
+
+    @Test
+    fun whenDbContainsUserWhiteListedDomainThenIsUrlInAllowListReturnsTrue() {
+        dao.insert("example.com")
+        assertTrue(repository.isUrlInUserAllowList("https://example.com"))
+    }
+
+    @Test
+    fun whenDbDoesNotContainUserWhiteListedDomainThenIsUrlInAllowListReturnsFalse() {
+        dao.insert("example.com")
+        assertFalse(repository.isUrlInUserAllowList("https://foo.com"))
     }
 }

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser.useragent
 
+import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.device.DeviceInfo
@@ -239,7 +240,11 @@ class UserAgentProviderTest {
     }
 
     internal class FakeUserAllowListRepo : UserAllowListRepository {
-        override fun isDomainInUserAllowList(domain: String): Boolean = (domain == ALLOWED_HOST)
+        override fun isUrlInUserAllowList(url: String): Boolean = false
+
+        override fun isUriInUserAllowList(uri: Uri): Boolean = false
+
+        override fun isDomainInUserAllowList(domain: String?): Boolean = (domain == ALLOWED_HOST)
 
         override fun domainsInUserAllowList(): List<String> = emptyList()
     }
