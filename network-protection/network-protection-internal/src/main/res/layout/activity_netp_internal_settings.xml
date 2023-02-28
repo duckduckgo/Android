@@ -97,6 +97,14 @@
                 app:showSwitch="false"
             />
 
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+                android:id="@+id/dnsLeakProtectionToggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/netpDnsLeakProtection"
+                app:showSwitch="true"
+            />
+
         </LinearLayout>
 
     </ScrollView>

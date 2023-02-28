@@ -16,6 +16,7 @@
 
 package com.duckduckgo.networkprotection.store
 
+import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ClientInterface
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ReconnectStatus
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ReconnectStatus.NotReconnecting
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ReconnectStatus.Reconnecting
@@ -28,6 +29,7 @@ interface NetworkProtectionRepository {
     var privateKey: String?
     var enabledTimeInMillis: Long
     var serverDetails: ServerDetails?
+    var clientInterface: ClientInterface?
 
     enum class ReconnectStatus {
         NotReconnecting,
@@ -38,6 +40,10 @@ interface NetworkProtectionRepository {
     data class ServerDetails(
         val ipAddress: String?,
         val location: String?,
+    )
+
+    data class ClientInterface(
+        val tunnelCidrSet: Set<String>,
     )
 }
 
@@ -64,7 +70,7 @@ class RealNetworkProtectionRepository constructor(
             val ip = networkProtectionPrefs.getString(KEY_WG_SERVER_IP, null)
             val location = networkProtectionPrefs.getString(KEY_WG_SERVER_LOCATION, null)
 
-            return if (ip.isNullOrEmpty() && location.isNullOrEmpty()) {
+            return if (ip.isNullOrBlank() && location.isNullOrBlank()) {
                 null
             } else {
                 ServerDetails(
@@ -81,6 +87,16 @@ class RealNetworkProtectionRepository constructor(
                 networkProtectionPrefs.putString(KEY_WG_SERVER_IP, value.ipAddress)
                 networkProtectionPrefs.putString(KEY_WG_SERVER_LOCATION, value.location)
             }
+        }
+
+    override var clientInterface: ClientInterface?
+        get() {
+            val tunnelIp = networkProtectionPrefs.getStringSet(KEY_WG_CLIENT_IFACE_TUNNEL_IP)
+
+            return ClientInterface(tunnelIp)
+        }
+        set(value) {
+            networkProtectionPrefs.setStringSet(KEY_WG_CLIENT_IFACE_TUNNEL_IP, value?.tunnelCidrSet ?: emptySet())
         }
 
     override var reconnectStatus: ReconnectStatus
@@ -112,5 +128,6 @@ class RealNetworkProtectionRepository constructor(
         private const val KEY_WG_SERVER_ENABLE_TIME = "wg_server_enable_time"
         private const val KEY_WG_RECONNECT_STATUS = "wg_reconnect_status"
         private const val KEY_WG_RECONNECT_COUNT = "wg_reconnect_count"
+        private const val KEY_WG_CLIENT_IFACE_TUNNEL_IP = "wg_client_iface_tunnel_ip"
     }
 }

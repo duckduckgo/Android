@@ -46,6 +46,11 @@ interface NetworkProtectionPrefs {
         value: String?,
     )
 
+    fun setStringSet(
+        key: String,
+        value: Set<String>,
+    )
+
     fun getString(
         key: String,
         default: String?,
@@ -60,13 +65,18 @@ interface NetworkProtectionPrefs {
         key: String,
         default: Long,
     ): Long
+
+    fun getStringSet(
+        key: String,
+        default: Set<String> = emptySet(),
+    ): Set<String>
 }
 
 class RealNetworkProtectionPrefs constructor(
     private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
 ) : NetworkProtectionPrefs {
     private val prefs: SharedPreferences by lazy {
-        vpnSharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = true, migrate = true)
+        vpnSharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = true, migrate = false)
     }
 
     override fun putString(
@@ -74,6 +84,10 @@ class RealNetworkProtectionPrefs constructor(
         value: String?,
     ) {
         prefs.edit { putString(key, value) }
+    }
+
+    override fun setStringSet(key: String, value: Set<String>) {
+        prefs.edit { putStringSet(key, value) }
     }
 
     override fun getString(
@@ -92,6 +106,12 @@ class RealNetworkProtectionPrefs constructor(
         key: String,
         default: Long,
     ): Long = prefs.getLong(key, default)
+
+    override fun getStringSet(key: String, default: Set<String>): Set<String> {
+        val result = prefs.getStringSet(key, default) ?: default
+        // ensure we never modify the set instance returned by the getStringSet call
+        return result.toSet()
+    }
 
     override fun putBoolean(
         key: String,

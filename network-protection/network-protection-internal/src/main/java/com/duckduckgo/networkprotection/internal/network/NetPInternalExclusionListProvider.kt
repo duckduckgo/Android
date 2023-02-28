@@ -20,23 +20,19 @@ import android.content.SharedPreferences
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import androidx.core.content.edit
-import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
-import com.duckduckgo.networkprotection.impl.NetPDebugExclusionListProvider
 import com.duckduckgo.networkprotection.internal.feature.NetPInternalFeatureToggles
-import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
-@ContributesMultibinding(VpnScope::class)
 class NetPInternalExclusionListProvider @Inject constructor(
     private val packageManager: PackageManager,
     private val netPInternalFeatureToggles: NetPInternalFeatureToggles,
     private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
-) : NetPDebugExclusionListProvider {
+) {
     private val preferences: SharedPreferences
         get() = vpnSharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = true, migrate = false)
 
-    override fun getExclusionList(): Set<String> {
+    internal fun getExclusionList(): Set<String> {
         if (!netPInternalFeatureToggles.excludeSystemApps().isEnabled()) return excludeManuallySelectedApps()
 
         // returns the list of system apps for now

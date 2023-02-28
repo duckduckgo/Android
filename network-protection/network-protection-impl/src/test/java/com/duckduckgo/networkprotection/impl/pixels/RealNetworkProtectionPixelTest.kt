@@ -42,7 +42,7 @@ class RealNetworkProtectionPixelTest {
         MockitoAnnotations.openMocks(this)
         val prefs = InMemorySharedPreferences()
         whenever(
-            vpnSharedPreferencesProvider.getSharedPreferences(eq("com.duckduckgo.networkprotection.pixels.v1"), eq(true), eq(true)),
+            vpnSharedPreferencesProvider.getSharedPreferences(eq("com.duckduckgo.networkprotection.pixels.v1"), eq(true), eq(false)),
         ).thenReturn(prefs)
         testee = RealNetworkProtectionPixel(pixel, vpnSharedPreferencesProvider)
     }

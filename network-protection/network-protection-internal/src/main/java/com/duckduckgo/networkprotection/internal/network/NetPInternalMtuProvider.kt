@@ -17,24 +17,20 @@
 package com.duckduckgo.networkprotection.internal.network
 
 import android.content.SharedPreferences
-import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
-import com.duckduckgo.networkprotection.impl.NetPDebugMtuProvider
-import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
-@ContributesMultibinding(VpnScope::class)
 class NetPInternalMtuProvider @Inject constructor(
     private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
-) : NetPDebugMtuProvider {
+) {
     private val preferences: SharedPreferences
         get() = vpnSharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = true, migrate = false)
 
-    override fun getMtu(): Int {
+    internal fun getMtu(): Int {
         return preferences.getInt(MTU_SIZE, 1280)
     }
 
-    fun setMtu(mtu: Int?) {
+    internal fun setMtu(mtu: Int?) {
         if (mtu == null) {
             preferences.edit().remove(MTU_SIZE).apply()
         } else {

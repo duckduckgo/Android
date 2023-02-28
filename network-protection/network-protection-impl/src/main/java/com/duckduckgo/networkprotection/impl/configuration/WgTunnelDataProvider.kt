@@ -38,6 +38,10 @@ interface WgTunnelDataProvider {
     )
 }
 
+fun Map<InetAddress, Int>.toCidrString(): Set<String> {
+    return this.map { "${it.key.hostAddress}/${it.value}" }.toSet()
+}
+
 @ContributesBinding(VpnScope::class)
 class RealWgTunnelDataProvider @Inject constructor(
     private val deviceKeys: DeviceKeys,

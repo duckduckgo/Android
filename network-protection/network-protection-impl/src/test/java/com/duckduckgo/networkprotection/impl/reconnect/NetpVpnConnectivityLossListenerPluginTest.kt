@@ -178,5 +178,8 @@ class NetpVpnConnectivityLossListenerPluginTest {
         override var serverDetails: ServerDetails?
             get() = null
             set(_) {}
+        override var clientInterface: NetworkProtectionRepository.ClientInterface?
+            get() = null
+            set(_) {}
     }
 }

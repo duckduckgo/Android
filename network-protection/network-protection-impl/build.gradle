@@ -24,7 +24,7 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
     anvil project(':anvil-compiler')
-    implementation project(path: ':anvil-annotations')
+    implementation project(':anvil-annotations')
     implementation project(':app-build-config-api')
     implementation project(':common')
     implementation project(':common-ui')
@@ -35,6 +35,8 @@ dependencies {
     implementation project(':network-protection-store')
     implementation project(':library-loader-api')
     implementation project(':statistics')
+    implementation project(':feature-toggles-api')
+    implementation project(':privacy-config-api')
 
     implementation AndroidX.appCompat
     implementation AndroidX.constraintLayout
@@ -49,7 +51,7 @@ dependencies {
     implementation Square.retrofit2.converter.moshi
     implementation "com.jakewharton.threetenabp:threetenabp:_"
 
-    testImplementation project(path: ':common-test')
+    testImplementation project(':common-test')
     testImplementation project(':vpn-api-test')
     testImplementation CashApp.turbine
     testImplementation Testing.junit4

@@ -250,7 +250,7 @@ dependencies {
 
     implementation project(':network-protection-api')
     implementation project(':network-protection-impl')
-    implementation project(':network-protection-internal')
+    internalImplementation project(':network-protection-internal')
     implementation project(':network-protection-store')
 
     implementation project(':fingerprint-protection-api')

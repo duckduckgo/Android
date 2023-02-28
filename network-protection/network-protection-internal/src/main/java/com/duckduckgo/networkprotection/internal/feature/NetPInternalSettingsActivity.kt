@@ -35,8 +35,8 @@ import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.internal.feature.system_apps.NetPSystemAppsExclusionListActivity
-import com.duckduckgo.networkprotection.internal.network.NetPInternalIPProvider
 import com.duckduckgo.networkprotection.internal.network.NetPInternalMtuProvider
+import com.duckduckgo.networkprotection.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.store.remote_config.NetPServerRepository
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -58,7 +58,7 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var serverRepository: NetPServerRepository
 
-    @Inject lateinit var internalIPProvider: NetPInternalIPProvider
+    @Inject lateinit var netpRepository: NetworkProtectionRepository
 
     private val binding: ActivityNetpInternalSettingsBinding by viewBinding()
 
@@ -79,13 +79,14 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
             .map { it.state == VpnStateMonitor.VpnRunningState.ENABLED }
             .onEach { isEnabled ->
                 binding.excludeSystemAppsToggle.isEnabled = isEnabled
+                binding.dnsLeakProtectionToggle.isEnabled = isEnabled
                 binding.systemAppsItem.isEnabled = isEnabled && !netPInternalFeatureToggles.excludeSystemApps().isEnabled()
                 binding.overrideMtuSelector.isEnabled = isEnabled
                 binding.overrideMtuSelector.setSecondaryText("MTU size: ${netPInternalMtuProvider.getMtu()}")
                 binding.overrideServerBackendSelector.isEnabled = isEnabled
                 binding.overrideServerBackendSelector.setSecondaryText("${serverRepository.getSelectedServer()?.name ?: AUTOMATIC}")
                 if (isEnabled) {
-                    internalIPProvider.internalIP?.let {
+                    netpRepository.clientInterface?.tunnelCidrSet?.joinToString(", ")?.let {
                         binding.internalIp.show()
                         binding.internalIp.setSecondaryText(it)
                     } ?: binding.internalIp.gone()
@@ -115,6 +116,16 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
         }
         binding.systemAppsItem.setOnClickListener {
             startActivity(NetPSystemAppsExclusionListActivity.intent(this))
+        }
+
+        with(netPInternalFeatureToggles.dnsLeakProtection()) {
+            binding.dnsLeakProtectionToggle.setIsChecked(this.isEnabled())
+            binding.dnsLeakProtectionToggle.setOnCheckedChangeListener { _, isChecked ->
+                this.setEnabled(Toggle.State(enable = isChecked))
+                lifecycleScope.launch {
+                    vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
+                }
+            }
         }
     }
 
