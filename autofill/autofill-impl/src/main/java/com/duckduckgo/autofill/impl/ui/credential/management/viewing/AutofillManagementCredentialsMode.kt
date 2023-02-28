@@ -363,18 +363,19 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
         invalidateMenu()
     }
 
-    private suspend fun preloadFavicon(credentials: LoginCredentials) {
+    private suspend fun showPlaceholderFavicon(credentials: LoginCredentials) {
         withContext(dispatchers.io()) {
             val size = resources.getDimensionPixelSize(dimen.toolbarIconSize)
             val placeholder = generateDefaultFavicon(credentials, size)
+            val favicon = BitmapDrawable(resources, placeholder)
             withContext(dispatchers.main()) {
-                getActionBar()?.setLogo(BitmapDrawable(resources, placeholder))
+                getActionBar()?.setLogo(favicon)
             }
         }
     }
     private fun loadDomainFavicon(credentials: LoginCredentials) {
         lifecycleScope.launch(dispatchers.io()) {
-            preloadFavicon(credentials)
+            showPlaceholderFavicon(credentials)
             generateFaviconFromDomain(credentials)?.let {
                 withContext(dispatchers.main()) {
                     getActionBar()?.setLogo(it)
