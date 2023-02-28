@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.savedsites.service
+package com.duckduckgo.savedsites.impl.service
 
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
