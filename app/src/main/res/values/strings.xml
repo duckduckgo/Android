@@ -246,7 +246,7 @@
     <string name="surveyCtaLaunchButton">Take the Survey</string>
     <string name="surveyCtaDismissButton">No Thanks</string>
     <string name="surveyActivityTitle">User Survey</string>
-    <string name="surveyTitle">DuckDuckGo survey</string>
+    <string name="surveyTitle">DuckDuckGo Survey</string>
     <string name="surveyDismissContentDescription">Dismiss survey</string>
     <string name="surveyLoadingErrorTitle">Oh no!</string>
     <string name="surveyLoadingErrorText">Our survey is not currently loading.\nPlease try again later.</string>
@@ -367,7 +367,7 @@
     <string name="tellUsHowToImprove">Please tell us what we can improve.</string>
     <string name="thanksForTheFeedback">Thanks for the feedback!</string>
     <string name="feedbackNegativeMainReasonPageSubtitle">What is your frustration most related to?</string>
-    <string name="feedbackNegativeMainReasonPageTitle">We\'re Sorry To Hear That</string>
+    <string name="feedbackNegativeMainReasonPageTitle">We\'re Sorry to Hear That</string>
     <string name="feedbackShareDetails">Share Details</string>
     <string name="sharePositiveFeedbackWithTheTeam">Are there any details you\'d like to share with the team?</string>
     <string name="whatHaveYouBeenEnjoying">What have you been enjoying?</string>
