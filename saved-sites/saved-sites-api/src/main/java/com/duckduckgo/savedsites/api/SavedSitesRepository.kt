@@ -31,6 +31,7 @@ interface SavedSitesRepository {
     suspend fun getSavedSites(folderId: String): Flow<SavedSites>
 
     suspend fun getFolderContent(folderId: String): Flow<Pair<List<Bookmark>, List<BookmarkFolder>>>
+    suspend fun getFolderContentSync(folderId: String): Pair<List<Bookmark>, List<BookmarkFolder>>
 
     suspend fun getFolderTree(
         selectedFolderId: String,

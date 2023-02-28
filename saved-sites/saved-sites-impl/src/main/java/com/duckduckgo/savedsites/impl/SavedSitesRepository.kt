@@ -74,6 +74,22 @@ class RealSavedSitesRepository(
             .flowOn(dispatcherProvider.io())
     }
 
+    override suspend fun getFolderContentSync(folderId: String): Pair<List<Bookmark>, List<BookmarkFolder>> {
+        val entities = syncEntitiesDao.entitiesInFolderSync(folderId)
+        val bookmarks = mutableListOf<Bookmark>()
+        val folders = mutableListOf<BookmarkFolder>()
+        entities.forEach { entity ->
+            if (entity.type == FOLDER) {
+                val numFolders = syncRelationsDao.countEntitiesInFolder(entity.entityId, FOLDER)
+                val numBookmarks = syncRelationsDao.countEntitiesInFolder(entity.entityId, BOOKMARK)
+                folders.add(BookmarkFolder(entity.entityId, entity.title, folderId, numBookmarks, numFolders))
+            } else {
+                bookmarks.add(Bookmark(entity.entityId, entity.title, entity.url.orEmpty(), folderId))
+            }
+        }
+        return Pair(bookmarks.distinct(), folders.distinct())
+    }
+
     override suspend fun getFolderTree(
         selectedFolderId: String,
         currentFolder: BookmarkFolder?,

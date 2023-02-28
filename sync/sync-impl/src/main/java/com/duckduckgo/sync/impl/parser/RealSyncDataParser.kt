@@ -16,16 +16,102 @@
 
 package com.duckduckgo.sync.impl.parser
 
+import com.duckduckgo.app.global.DefaultDispatcherProvider
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.savedsites.store.Relation
 import com.duckduckgo.sync.api.parser.SyncDataParser
+import com.squareup.moshi.Moshi
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 
-class RealSyncDataParser(repository: SavedSitesRepository): SyncDataParser {
+class RealSyncDataParser(
+    private val repository: SavedSitesRepository,
+    private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider()
+) : SyncDataParser {
 
-    override fun generate() {
-        
+    override suspend fun generateInitialList(): String {
+        val json = withContext(dispatcherProvider.io()) {
+            val updates = mutableListOf<SyncUpdate>()
+            val allUpdates = addFolderContent(Relation.BOOMARKS_ROOT, updates)
+            return@withContext if (allUpdates.isEmpty()) {
+                ""
+            } else {
+                val bookmarkUpdates = SyncDataUpdates(allUpdates)
+                val dataBookmarks = SyncDataBookmarks(bookmarkUpdates)
+
+                val moshi: Moshi = Moshi.Builder().build()
+                val jsonAdapter = moshi.adapter(SyncDataBookmarks::class.java)
+                val json: String = jsonAdapter.toJson(dataBookmarks)
+                json
+            }
+        }
+        return json
+    }
+
+    private suspend fun addFolderContent(
+        folderId: String,
+        updates: MutableList<SyncUpdate>
+    ): List<SyncUpdate> {
+        repository.getFolderContentSync(folderId).apply {
+            for (bookmark in this.first) {
+                updates.add(SyncUpdate.asBookmark(id = bookmark.id, title = bookmark.title, url = bookmark.url, deleted = null))
+            }
+            for (folder in this.second) {
+                val childrenIds = getIdsFromFolder(folderId)
+                updates.add(SyncUpdate.asFolder(id = folder.id, title = folder.name, children = childrenIds, deleted = null))
+            }
+        }
+        return updates
+    }
+
+    private suspend fun getIdsFromFolder(folderId: String): List<String> {
+        val ids = mutableListOf<String>()
+        repository.getFolderContentSync(folderId).apply {
+            for (bookmark in this.first) {
+                ids.add(bookmark.id)
+            }
+            for (folder in this.second) {
+                ids.add(folder.id)
+            }
+        }
+        return ids
     }
 
     override fun parse() {
         TODO("Not yet implemented")
     }
 }
+
+data class SyncBookmarkPage(val url: String)
+data class SyncFolderChildren(val children: List<String>)
+data class SyncUpdate(
+    val id: String,
+    val title: String,
+    val page: SyncBookmarkPage?,
+    val folder: SyncFolderChildren?,
+    val deleted: String?
+) {
+    companion object {
+        fun asBookmark(
+            id: String,
+            title: String,
+            url: String,
+            deleted: String?
+        ): SyncUpdate {
+            return SyncUpdate(id, title, SyncBookmarkPage(url), null, deleted)
+        }
+
+        fun asFolder(
+            id: String,
+            title: String,
+            children: List<String>,
+            deleted: String?
+        ): SyncUpdate {
+            return SyncUpdate(id, title, null, SyncFolderChildren(children), deleted)
+        }
+    }
+}
+
+class SyncDataBookmarks(val bookmarks: SyncDataUpdates)
+class SyncDataUpdates(val updates: List<SyncUpdate>)
