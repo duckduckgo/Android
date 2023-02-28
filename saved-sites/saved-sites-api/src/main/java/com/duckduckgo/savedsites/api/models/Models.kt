@@ -57,11 +57,6 @@ data class BookmarkFolderItem(
     val isSelected: Boolean = false,
 )
 
-data class BookmarkFolderBranch(
-    val bookmarks: List<Entity>,
-    val folders: List<Entity>,
-)
-
 data class BookmarkFolder(
     val id: String,
     val name: String,
