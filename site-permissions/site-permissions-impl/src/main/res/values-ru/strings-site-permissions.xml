@@ -33,6 +33,6 @@
     <string name="systemPermissionDialogAudioDeniedContent">Если вы разрешите DuckDuckGo запрашивать доступ, сайты смогут использовать только микрофон.</string>
     <string name="systemPermissionDialogCameraAndAudioDeniedTitle">Разрешить DuckDuckGo запрашивать доступ к камере и микрофону на этом устройстве</string>
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">Если вы разрешите DuckDuckGo запрашивать доступ, сайты смогут использовать только камеру и микрофон.</string>
-    <string name="systemPermissionsDeniedDialogPositiveButton">Открыть настройки</string>
+    <string name="systemPermissionsDeniedDialogPositiveButton">Открыть Настройки</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Отменить</string>
 </resources>
