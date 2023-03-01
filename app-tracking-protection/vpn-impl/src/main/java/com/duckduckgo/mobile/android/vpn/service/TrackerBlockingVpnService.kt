@@ -235,11 +235,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             }
 
             vpnServiceStateStatsDao.insert(createVpnState(state = ENABLING))
-
-            vpnServiceCallbacksPluginPoint.getPlugins().forEach {
-                logcat { "VPN log: onVpnStarting ${it.javaClass} callback" }
-                it.onVpnStarting(this)
-            }
         }
 
         vpnNetworkStack.onPrepareVpn().getOrNull().also {
@@ -471,16 +466,11 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
 
         sendStopPixels(reason)
 
-        // If VPN has been started, then onVpnStopped must be called. Else, an error might have occurred before start so we call onVpnStartFailed
+        // If VPN has been started, then onVpnStopped must be called.
         if (hasVpnAlreadyStarted) {
             vpnServiceCallbacksPluginPoint.getPlugins().forEach {
                 logcat { "VPN log: stopping ${it.javaClass} callback" }
                 it.onVpnStopped(this, reason)
-            }
-        } else {
-            vpnServiceCallbacksPluginPoint.getPlugins().forEach {
-                logcat { "VPN log: onVpnStartFailed ${it.javaClass} callback" }
-                it.onVpnStartFailed(this)
             }
         }
 
