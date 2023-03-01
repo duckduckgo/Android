@@ -16,10 +16,7 @@
 
 package com.duckduckgo.app.settings
 
-import android.annotation.SuppressLint
 import androidx.annotation.StringRes
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -55,7 +52,6 @@ import com.duckduckgo.windows.api.WindowsWaitlist
 import com.duckduckgo.windows.api.WindowsWaitlistFeature
 import com.duckduckgo.windows.api.WindowsWaitlistState
 import javax.inject.Inject
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -67,7 +63,6 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-@SuppressLint("NoLifecycleObserver") // we don't use DI here
 @ContributesViewModel(ActivityScope::class)
 class SettingsViewModel @Inject constructor(
     private val themingDataStore: ThemingDataStore,
@@ -86,9 +81,7 @@ class SettingsViewModel @Inject constructor(
     private val autoconsent: Autoconsent,
     private val windowsWaitlist: WindowsWaitlist,
     private val windowsFeature: WindowsWaitlistFeature,
-) : ViewModel(), DefaultLifecycleObserver {
-
-    private var deviceShieldStatePollingJob: Job? = null
+) : ViewModel() {
 
     data class ViewState(
         val loading: Boolean = true,
@@ -203,10 +196,6 @@ class SettingsViewModel @Inject constructor(
                 delay(1_000)
             }
         }
-    }
-
-    override fun onStop(owner: LifecycleOwner) {
-        deviceShieldStatePollingJob?.cancel()
     }
 
     fun viewState(): StateFlow<ViewState> {
