@@ -200,6 +200,7 @@ constructor(
                 }
                 is Success -> {
                     command.send(Command.ShowMessage("${result.data}"))
+                    updateViewState()
                 }
             }
         }

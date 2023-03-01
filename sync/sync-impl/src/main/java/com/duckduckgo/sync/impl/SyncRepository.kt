@@ -50,7 +50,6 @@ interface SyncRepository {
     fun getConnectedDevices(): Result<List<ConnectedDevice>>
     fun getLinkingQR(): String
     fun connectDevice(contents: String): Result<Boolean>
-
     fun pollConnectionKeys(): Result<Boolean>
 }
 
@@ -161,6 +160,11 @@ class AppSyncRepository @Inject constructor(
 
     override fun connectDevice(contents: String): Result<Boolean> {
         val connectKeys = Adapters.connectCodeAdapter.fromJson(contents) ?: return Result.Error(reason = "Error reading json")
+        if (!isSignedIn()) {
+            val result = createAccount()
+            if (result is Error) return result
+        }
+
         val primaryKey = syncStore.primaryKey ?: return Result.Error(reason = "Error reading PK")
         val userId = syncStore.userId ?: return Result.Error(reason = "Error reading UserId")
         val token = syncStore.token ?: return Result.Error(reason = "Error token")
@@ -302,7 +306,7 @@ class AppSyncRepository @Inject constructor(
         }
     }
 
-    private fun isSignedIn() = !syncStore.primaryKey.isNullOrEmpty()
+    private fun isSignedIn() = !syncStore.primaryKey.isNullOrEmpty() && !syncStore.userId.isNullOrEmpty()
 
     private fun performLogin(
         userId: String,
