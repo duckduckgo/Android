@@ -166,7 +166,7 @@ constructor(
     }
 
     fun onReadQRClicked() {
-        viewModelScope.launch(dispatchers.io())  {
+        viewModelScope.launch(dispatchers.io()) {
             command.send(ReadQR)
         }
     }

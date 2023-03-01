@@ -30,6 +30,7 @@ import javax.inject.*
 import timber.log.Timber
 import javax.inject.*
 import kotlin.DeprecationLevel.WARNING
+import timber.log.Timber
 
 interface SyncRepository {
     fun createAccount(): Result<Boolean>
@@ -39,7 +40,8 @@ interface SyncRepository {
     fun login(recoveryCodeRawJson: String): Result<Boolean>
     fun getAccountInfo(): AccountInfo
 
-    @Deprecated(message = "Method only used for testing purposes.", level = DeprecationLevel.WARNING) fun storeRecoveryCode()
+    @Deprecated(message = "Method only used for testing purposes.", level = DeprecationLevel.WARNING)
+    fun storeRecoveryCode()
     fun removeAccount()
     fun logout(deviceId: String): Result<Boolean>
     fun deleteAccount(): Result<Boolean>
@@ -128,7 +130,8 @@ class AppSyncRepository @Inject constructor(
         )
     }
 
-    @Deprecated("Method only used for testing purposes.", level = WARNING) override fun storeRecoveryCode() {
+    @Deprecated("Method only used for testing purposes.", level = WARNING)
+    override fun storeRecoveryCode() {
         val primaryKey = syncStore.primaryKey ?: return
         val userID = syncStore.userId ?: return
         val recoveryCodeJson = Adapters.recoveryCodeAdapter.toJson(RecoveryCode(primaryKey, userID))

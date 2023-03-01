@@ -16,10 +16,8 @@
 
 package com.duckduckgo.sync.impl.ui
 
-import android.R.id
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.view.View
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
