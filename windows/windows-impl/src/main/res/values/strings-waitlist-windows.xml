@@ -44,6 +44,6 @@
 
     <string name="windows_waitlist_share_invite">Share your invite</string>
 
-    <string name="waitlistNotifyMeTitle">Know the instant you’re invited</string>
     <string name="waitlistNotifyMeSubtitle">Get a notification when your copy of DuckDuckGo for Windows is ready for download.</string>
+    <string name="waitlistNotifyMeTitle">Know the instant you’re invited</string>
 </resources>
