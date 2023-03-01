@@ -61,8 +61,7 @@ class BookmarksViewModelTest {
     private val commandObserver: Observer<BookmarksViewModel.Command> = mock()
 
     private val viewStateObserver: Observer<BookmarksViewModel.ViewState> = mock()
-    private val favoritesRepository: FavoritesRepository = mock()
-    private val bookmarksRepository: BookmarksRepository = mock()
+    private val bookmarksFacade: BookmarksFacade = mock()
     private val faviconManager: FaviconManager = mock()
     private val savedSitesManager: SavedSitesManager = mock()
     private val pixel: Pixel = mock()
@@ -74,8 +73,7 @@ class BookmarksViewModelTest {
 
     private val testee: BookmarksViewModel by lazy {
         val model = BookmarksViewModel(
-            favoritesRepository,
-            bookmarksRepository,
+            bookmarksFacade,
             faviconManager,
             savedSitesManager,
             pixel,
@@ -88,9 +86,9 @@ class BookmarksViewModelTest {
 
     @Before
     fun before() = runTest {
-        whenever(favoritesRepository.favorites()).thenReturn(flowOf())
+        whenever(bookmarksFacade.favorites()).thenReturn(flowOf())
 
-        whenever(bookmarksRepository.fetchBookmarksAndFolders(anyLong())).thenReturn(
+        whenever(bookmarksFacade.fetchBookmarksAndFolders(anyLong())).thenReturn(
             flowOf(
                 Pair(
                     listOf(bookmark),
@@ -110,14 +108,14 @@ class BookmarksViewModelTest {
     fun whenBookmarkInsertedThenDaoUpdated() = runTest {
         testee.insert(bookmark)
 
-        verify(bookmarksRepository).insert(bookmark)
+        verify(bookmarksFacade).insert(bookmark)
     }
 
     @Test
     fun whenFavoriteInsertedThenRepositoryUpdated() = runTest {
         testee.insert(favorite)
 
-        verify(favoritesRepository).insert(favorite)
+        verify(bookmarksFacade).insert(favorite)
     }
 
     @Test
@@ -125,28 +123,28 @@ class BookmarksViewModelTest {
         testee.onDeleteSavedSiteRequested(bookmark)
 
         verify(faviconManager).deletePersistedFavicon(bookmark.url)
-        verify(bookmarksRepository).delete(bookmark)
+        verify(bookmarksFacade).delete(bookmark)
     }
 
     @Test
     fun whenFavoriteDeleteRequestedThenDeleteFromRepository() = runTest {
         testee.onDeleteSavedSiteRequested(favorite)
 
-        verify(favoritesRepository).delete(favorite)
+        verify(bookmarksFacade).delete(favorite)
     }
 
     @Test
     fun whenBookmarkEditedThenDaoUpdated() = runTest {
         testee.onSavedSiteEdited(bookmark)
 
-        verify(bookmarksRepository).update(bookmark)
+        verify(bookmarksFacade).update(bookmark)
     }
 
     @Test
     fun whenFavoriteEditedThenRepositoryUpdated() = runTest {
         testee.onSavedSiteEdited(favorite)
 
-        verify(favoritesRepository).update(favorite)
+        verify(bookmarksFacade).update(favorite)
     }
 
     @Test
@@ -184,7 +182,7 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenFavoritesChangedThenObserverNotified() = runTest {
-        whenever(favoritesRepository.favorites()).thenReturn(
+        whenever(bookmarksFacade.favorites()).thenReturn(
             flow {
                 emit(emptyList())
                 emit(listOf(favorite))
@@ -210,7 +208,7 @@ class BookmarksViewModelTest {
 
         testee.fetchBookmarksAndFolders(parentId = parentId)
 
-        verify(bookmarksRepository).fetchBookmarksAndFolders(parentId)
+        verify(bookmarksFacade).fetchBookmarksAndFolders(parentId)
 
         verify(viewStateObserver, times(2)).onChanged(viewStateCaptor.capture())
 
@@ -227,7 +225,7 @@ class BookmarksViewModelTest {
     fun whenBookmarkFolderAddedThenCallInsertOnRepository() = runTest {
         testee.onBookmarkFolderAdded(bookmarkFolder)
 
-        verify(bookmarksRepository).insert(bookmarkFolder)
+        verify(bookmarksFacade).insert(bookmarkFolder)
     }
 
     @Test
@@ -242,7 +240,7 @@ class BookmarksViewModelTest {
     fun whenBookmarkFolderUpdatedThenCallUpdateOnRepository() = runTest {
         testee.onBookmarkFolderUpdated(bookmarkFolder)
 
-        verify(bookmarksRepository).update(bookmarkFolder)
+        verify(bookmarksFacade).update(bookmarkFolder)
     }
 
     @Test
@@ -251,11 +249,11 @@ class BookmarksViewModelTest {
             listOf(bookmarkEntity),
             listOf(BookmarkFolderEntity(bookmarkFolder.id, bookmarkFolder.name, bookmarkFolder.parentId)),
         )
-        whenever(bookmarksRepository.deleteFolderBranch(any())).thenReturn(bookmarkFolderBranch)
+        whenever(bookmarksFacade.deleteFolderBranch(any())).thenReturn(bookmarkFolderBranch)
 
         testee.onDeleteBookmarkFolderRequested(bookmarkFolder)
 
-        verify(bookmarksRepository).deleteFolderBranch(bookmarkFolder)
+        verify(bookmarksFacade).deleteFolderBranch(bookmarkFolder)
 
         verify(commandObserver).onChanged(commandCaptor.capture())
         assertEquals(bookmarkFolder, (commandCaptor.value as BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder).bookmarkFolder)
@@ -268,7 +266,7 @@ class BookmarksViewModelTest {
             listOf(bookmarkEntity),
             listOf(BookmarkFolderEntity(bookmarkFolder.id, bookmarkFolder.name, bookmarkFolder.parentId)),
         )
-        whenever(bookmarksRepository.deleteFolderBranch(any())).thenReturn(bookmarkFolderBranch)
+        whenever(bookmarksFacade.deleteFolderBranch(any())).thenReturn(bookmarkFolderBranch)
 
         val nonEmptyBookmarkFolder = bookmarkFolder.copy(numBookmarks = 1)
         testee.onDeleteBookmarkFolderRequested(nonEmptyBookmarkFolder)
@@ -286,6 +284,6 @@ class BookmarksViewModelTest {
 
         testee.insertDeletedFolderBranch(bookmarkFolderBranch)
 
-        verify(bookmarksRepository).insertFolderBranch(bookmarkFolderBranch)
+        verify(bookmarksFacade).insertFolderBranch(bookmarkFolderBranch)
     }
 }

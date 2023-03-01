@@ -42,8 +42,7 @@ import kotlinx.coroutines.withContext
 
 @ContributesViewModel(ActivityScope::class)
 class BookmarksViewModel @Inject constructor(
-    private val favoritesRepository: FavoritesRepository,
-    private val bookmarksRepository: BookmarksRepository,
+    private val bookmarksFacade: BookmarksFacade,
     private val faviconManager: FaviconManager,
     private val savedSitesManager: SavedSitesManager,
     private val pixel: Pixel,
@@ -83,7 +82,7 @@ class BookmarksViewModel @Inject constructor(
     init {
         viewState.value = ViewState()
         viewModelScope.launch {
-            favoritesRepository.favorites().collect {
+            bookmarksFacade.favorites().collect {
                 onFavoritesChanged(it)
             }
         }
@@ -125,12 +124,12 @@ class BookmarksViewModel @Inject constructor(
             is Bookmark -> {
                 viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
                     faviconManager.deletePersistedFavicon(savedSite.url)
-                    bookmarksRepository.delete(savedSite)
+                    bookmarksFacade.delete(savedSite)
                 }
             }
             is Favorite -> {
                 viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
-                    favoritesRepository.delete(savedSite)
+                    bookmarksFacade.delete(savedSite)
                 }
             }
         }
@@ -140,12 +139,12 @@ class BookmarksViewModel @Inject constructor(
         when (savedSite) {
             is Bookmark -> {
                 viewModelScope.launch(dispatcherProvider.io()) {
-                    bookmarksRepository.insert(savedSite)
+                    bookmarksFacade.insert(savedSite)
                 }
             }
             is Favorite -> {
                 viewModelScope.launch(dispatcherProvider.io()) {
-                    favoritesRepository.insert(savedSite)
+                    bookmarksFacade.insert(savedSite)
                 }
             }
         }
@@ -171,13 +170,13 @@ class BookmarksViewModel @Inject constructor(
 
     private suspend fun editBookmark(bookmark: Bookmark) {
         withContext(dispatcherProvider.io()) {
-            bookmarksRepository.update(bookmark)
+            bookmarksFacade.update(bookmark)
         }
     }
 
     private suspend fun editFavorite(favorite: Favorite) {
         withContext(dispatcherProvider.io()) {
-            favoritesRepository.update(favorite)
+            bookmarksFacade.update(favorite)
         }
     }
 
@@ -191,7 +190,7 @@ class BookmarksViewModel @Inject constructor(
 
     fun fetchBookmarksAndFolders(parentId: Long? = null) {
         viewModelScope.launch {
-            bookmarksRepository.fetchBookmarksAndFolders(parentId).collect { bookmarksAndFolders ->
+            bookmarksFacade.fetchBookmarksAndFolders(parentId).collect { bookmarksAndFolders ->
                 onBookmarkItemsChanged(bookmarks = bookmarksAndFolders.first, bookmarkFolders = bookmarksAndFolders.second)
             }
         }
@@ -199,7 +198,7 @@ class BookmarksViewModel @Inject constructor(
 
     override fun onBookmarkFolderAdded(bookmarkFolder: BookmarkFolder) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            bookmarksRepository.insert(bookmarkFolder)
+            bookmarksFacade.insert(bookmarkFolder)
         }
     }
 
@@ -209,13 +208,13 @@ class BookmarksViewModel @Inject constructor(
 
     override fun onBookmarkFolderUpdated(bookmarkFolder: BookmarkFolder) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            bookmarksRepository.update(bookmarkFolder)
+            bookmarksFacade.update(bookmarkFolder)
         }
     }
 
     fun onBookmarkFolderDeleted(bookmarkFolder: BookmarkFolder) {
         viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
-            val folderBranch = bookmarksRepository.deleteFolderBranch(bookmarkFolder)
+            val folderBranch = bookmarksFacade.deleteFolderBranch(bookmarkFolder)
             command.postValue(ConfirmDeleteBookmarkFolder(bookmarkFolder, folderBranch))
         }
     }
@@ -241,7 +240,7 @@ class BookmarksViewModel @Inject constructor(
 
     fun insertDeletedFolderBranch(folderBranch: BookmarkFolderBranch) {
         viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
-            bookmarksRepository.insertFolderBranch(folderBranch)
+            bookmarksFacade.insertFolderBranch(folderBranch)
         }
     }
 }

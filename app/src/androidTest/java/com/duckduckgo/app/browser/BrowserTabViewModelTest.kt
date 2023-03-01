@@ -44,6 +44,7 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.A
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
+import com.duckduckgo.app.bookmarks.model.BookmarksFacade
 import com.duckduckgo.app.bookmarks.model.BookmarksRepository
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
@@ -217,6 +218,9 @@ class BrowserTabViewModelTest {
 
     @Mock
     private lateinit var mockBookmarksRepository: BookmarksRepository
+
+    @Mock
+    private lateinit var mockBookmarksFacade: BookmarksFacade
 
     @Mock
     private lateinit var mockLongPressHandler: LongPressHandler
@@ -459,7 +463,6 @@ class BrowserTabViewModelTest {
             networkLeaderboardDao = mockNetworkLeaderboardDao,
             autoComplete = mockAutoCompleteApi,
             appSettingsPreferencesStore = mockSettingsStore,
-            bookmarksRepository = mockBookmarksRepository,
             longPressHandler = mockLongPressHandler,
             webViewSessionStorage = webViewSessionStorage,
             specialUrlDetector = mockSpecialUrlDetector,
@@ -470,6 +473,7 @@ class BrowserTabViewModelTest {
             pixel = mockPixel,
             dispatchers = coroutineRule.testDispatcherProvider,
             fireproofWebsiteRepository = fireproofWebsiteRepositoryImpl,
+            bookmarksFacade = mockBookmarksFacade,
             locationPermissionsRepository = LocationPermissionsRepositoryImpl(
                 locationPermissionsDao,
                 lazyFaviconManager,
@@ -482,7 +486,6 @@ class BrowserTabViewModelTest {
             gpc = RealGpc(mockFeatureToggle, mockGpcRepository, mockUnprotectedTemporary, mockUserAllowListRepository),
             fireproofDialogsEventHandler = fireproofDialogsEventHandler,
             emailManager = mockEmailManager,
-            favoritesRepository = mockFavoritesRepository,
             appCoroutineScope = TestScope(),
             appLinksHandler = mockAppLinksHandler,
             contentBlocking = mockContentBlocking,
