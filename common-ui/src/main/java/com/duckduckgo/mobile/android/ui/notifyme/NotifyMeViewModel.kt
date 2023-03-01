@@ -37,7 +37,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-@SuppressLint("NoLifecycleObserver") // we don't use DI here
+@SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 class NotifyMeViewModel(
     private val appBuildConfig: AppBuildConfig,
     private val notifyMeDataStore: NotifyMeDataStore,
