@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="windows_app">Aplikace DuckDuckGo pro Windows</string>
+    <string name="windows_waitlist_title">Získej předběžný přístup a vyzkoušej DuckDuckGo pro Windows!</string>
+    <string name="windows_waitlist_description">DuckDuckGo pro Windows nabízí všechno, co potřebuješ k většímu soukromí na webu – soukromé vyhledávání, blokování trackerů, vynucené šifrování, blokování vyskakovacích oken pro souhlas se soubory cookie a další ochranné funkce, které jsou nejlepší ve své třídě.</string>
+    <string name="windows_waitlist_mac_link">Hledáš verzi pro Mac?</string>
+    <string name="windows_join_waitlist">Připoj se k soukromému pořadníku</string>
+    <string name="windows_join_waitlist_error">Při připojení k pořadníku došlo k chybě, zkus to znovu později</string>
+    <string name="windows_waitlist_footer">Kvůli zařazení do pořadníku není nutné sdílet žádné osobní údaje. Tvoje místo se určuje podle časového razítka uloženého jen v tvém zařízení, abychom tě mohli upozornit, až budeš na řadě.</string>
+
+    <string name="windows_waitlist_on_the_list_title">Jsi na seznamu!</string>
+    <string name="windows_waitlist_on_the_list_notification_enabled">Dáme ti vědět, až bude tvoje kopie DuckDuckGo pro Windows připravená ke stažení.</string>
+    <string name="windows_waitlist_on_the_list_notification_disabled">Sem dostaneš pozvánku k vyzkoušení DuckDuckGo pro Windows. Zkus se sem brzy podívat znovu. Nebo ti můžeme dát vědět, až na tebe přijde řada.</string>
+
+    <string name="notification_channel_windows_waitlist">Pozvánky na čekací listinu</string>
+    <string name="windows_notification_title">Začni testovat DuckDuckGo pro Windows!</string>
+    <string name="windows_notification_text">Otevřít pozvánku</string>
+
+    <string name="windows_waitlist_code_title">Zveme tě!</string>
+    <string name="windows_waitlist_code_invite">Zvací kód</string>`
+    <string name="windows_waitlist_code_description">Už se nemůžeš dočkat, až budeš mít DuckDuckGo pro Windows?\n\n<b>1. krok</b>\nPro stažení přejdi na svém zařízení s Windows sem:\n<b><annotation type="beta_link">duckduckgo.com/windows</annotation></b>.\n\n<b>2. krok</b>\nOtevři si ve Stažených souborech instalační program DuckDuckGo, klikni na Instalovat a pak zadej kód z pozvánky.</string>
+    <string name="windows_waitlist_code_share_text"><![CDATA[Už se nemůžeš dočkat, až budeš mít DuckDuckGo na Windows?<br/><br/><b>1. krok</b><br/>Pro stažení přejdi na svém zařízení s Windows sem:<br/><a href=\"https://duckduckgo.com/windows\"><b>https://duckduckgo.com/windows.</b></a><br/><br/><b>2. krok</b><br/>Otevři si ve Stažených souborech instalační program DuckDuckGo, klikni na Instalovat a pak zadej kód z pozvánky.<br/><br/>Kód z pozvánky: %1$s]]></string>
+
+    <string name="windows_waitlist_clipboard_invite_copied">Pozvánka je zkopírovaná do schránky</string>
+    <string name="windows_waitlist_clipboard_code_copied">Kód je zkopírovaný do schránky</string>
+
+    <string name="windows_waitlist_share_invite">Pošli pozvánku dál</string>
+
+    <string name="waitlistNotifyMeSubtitle">Nech se upozornit, až bude tvoje kopie DuckDuckGo pro Windows připravená ke stažení.</string>
+    <string name="waitlistNotifyMeTitle">Zjisti to hned, co ti dorazí pozvánka</string>
+</resources>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="windows_app">Aplikacija DuckDuckGo za sistem Windows</string>
+    <string name="windows_waitlist_title">Zagotovite si zgodnji dostop in preizkusite DuckDuckGo za sistem Windows!</string>
+    <string name="windows_waitlist_description">DuckDuckGo za sistem Windows ima vse, kar potrebujete za zasebnejše brskanje – zasebno iskanje, blokiranje sledenja, prisilno šifriranje in blokiranje pojavnih oken s piškotki ter še več najboljših zaščit v svojem razredu.</string>
+    <string name="windows_waitlist_mac_link">Iščete različico za računalnike Mac?</string>
+    <string name="windows_join_waitlist">Pridruži se zasebnemu čakalnemu seznamu</string>
+    <string name="windows_join_waitlist_error">Pri dodajanju na čakalni seznam je prišlo do napake. Poskusite znova pozneje.</string>
+    <string name="windows_waitlist_footer">Za pridružitev čakalnemu seznamu vam ne bo treba posredovati nobenih osebnih podatkov. Svoje mesto si boste zagotovili v skladu s časovnim žigom, ki obstaja samo v vaši napravi, tako da vas lahko obvestimo, ko boste na vrsti.</string>
+
+    <string name="windows_waitlist_on_the_list_title">Na seznamu ste!</string>
+    <string name="windows_waitlist_on_the_list_notification_enabled">Ko bo vaša kopija DuckDuckGo za sistem Windows pripravljena za prenos, vam bomo poslali obvestilo.</string>
+    <string name="windows_waitlist_on_the_list_notification_disabled">Vaše povabilo za preizkus DuckDuckGo za sistem Windows bo prispelo sem. Preverite znova kmalu, lahko pa vam pošljemo obvestilo, ko bo preizkus na voljo.</string>
+
+    <string name="notification_channel_windows_waitlist">Povabila za čakalno listo</string>
+    <string name="windows_notification_title">Začnite testirati DuckDuckGo za sistem Windows!</string>
+    <string name="windows_notification_text">Odprite svoje povabilo</string>
+
+    <string name="windows_waitlist_code_title">Povabljeni ste!</string>
+    <string name="windows_waitlist_code_invite">Koda povabila</string>`
+    <string name="windows_waitlist_code_description">Ste pripravljeni začeti uporabljati DuckDuckGo v operacijskem sistemu Windows?\n\n<b>1. korak</b>\nZa prenos obiščite ta URL v napravi Windows:\n<b><annotation type="beta_link">duckduckgo.com/windows</annotation></b>\n\n<b>2. korak</b>\nOdprite namestitveni program DuckDuckGo Installer, ki je v mapi Prenosi, izberite Namesti in vnesite kodo povabila.</string>
+    <string name="windows_waitlist_code_share_text"><![CDATA[Ste pripravljeni začeti uporabljati DuckDuckGo v operacijskem sistemu Windows?<br/><br/><b>1. korak</b><br/>Za prenos obiščite ta URL v svoji napravi Windows:<br/><a href=\"https://duckduckgo.com/windows\"><b>https://duckduckgo.com/windows</b></a><br/><br/><b>2. korak</b><br/>Odprite namestitveni program DuckDuckGo Installer, ki je v mapi Prenosi, izberite Namesti in vnesite kodo povabila.<br/><br/>Koda povabila: %1$s]]></string>
+
+    <string name="windows_waitlist_clipboard_invite_copied">Povabilo je kopirano v odložišče</string>
+    <string name="windows_waitlist_clipboard_code_copied">Koda je kopirana v odložišče</string>
+
+    <string name="windows_waitlist_share_invite">Delite povabilo</string>
+
+    <string name="waitlistNotifyMeSubtitle">Prejmite obvestilo, ko bo vaša aplikacija DuckDuckGo za sistem Windows pripravljena za prenos.</string>
+    <string name="waitlistNotifyMeTitle">Bodite obveščeni, takoj ko ste povabljeni</string>
+</resources>

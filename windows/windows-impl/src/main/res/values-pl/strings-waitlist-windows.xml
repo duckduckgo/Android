@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="windows_app">Aplikacja DuckDuckGo dla systemu Windows</string>
+    <string name="windows_waitlist_title">Uzyskaj możliwość wcześniejszego wypróbowania DuckDuckGo dla systemu Windows!</string>
+    <string name="windows_waitlist_description">DuckDuckGo dla systemu Windows ma wszystko, czego potrzebujesz, aby przeglądać strony internetowe, zachowując większą prywatność – prywatne wyszukiwanie, blokowanie śledzących, wymuszone szyfrowanie i blokowanie wyskakujących okienek z ciasteczkami, a w planach mamy jeszcze więcej najlepszych w swojej klasie zabezpieczeń.</string>
+    <string name="windows_waitlist_mac_link">Szukasz wersji na komputer Mac?</string>
+    <string name="windows_join_waitlist">Dołącz do prywatnej listy oczekujących</string>
+    <string name="windows_join_waitlist_error">Podczas dołączania do listy oczekujących wystąpił błąd, spróbuj ponownie później</string>
+    <string name="windows_waitlist_footer">Nie musisz udostępniać żadnych danych osobowych, aby dołączyć do listy oczekujących. Miejsce w kolejce zostanie zarezerwowane zgodnie z sygnaturą czasową przechowywaną wyłącznie na Twoim urządzeniu, aby umożliwić nam powiadomienie, gdy nadejdzie Twoja kolej.</string>
+
+    <string name="windows_waitlist_on_the_list_title">Jesteś na liście!</string>
+    <string name="windows_waitlist_on_the_list_notification_enabled">Wyślemy Ci powiadomienie, gdy Twoja kopia DuckDuckGo dla komputerów z systemem Windows będzie gotowa do pobrania.</string>
+    <string name="windows_waitlist_on_the_list_notification_disabled">Tutaj pojawi się Twoje zaproszenie do wypróbowania DuckDuckGo dla komputerów z systemem Windows. Zajrzyj tu wkrótce, możemy też wysłać Ci powiadomienie, gdy nadejdzie Twoja kolej.</string>
+
+    <string name="notification_channel_windows_waitlist">Zaproszenia na listę oczekujących</string>
+    <string name="windows_notification_title">Rozpocznij testowanie DuckDuckGo dla systemu Windows!</string>
+    <string name="windows_notification_text">Otwórz zaproszenie</string>
+
+    <string name="windows_waitlist_code_title">Masz już zaproszenie!</string>
+    <string name="windows_waitlist_code_invite">Kod zaproszenia</string>`
+    <string name="windows_waitlist_code_description">Chcesz zacząć korzystać z DuckDuckGo na urządzeniu z systemem Windows?\n\n<b>Krok 1</b>\nOdwiedź ten adres na swoim urządzeniu z systemem Windows, aby pobrać aplikację:\n<b><annotation type="beta_link">duckduckgo.com/windows</annotation></b>\n\n<b>Krok 2</b>\nUruchom plik instalacyjny DuckDuckGo znajdujący się w folderze z pobranymi plikami, wybierz opcję „Instaluj”, a następnie wprowadź swój kod zaproszenia.</string>
+    <string name="windows_waitlist_code_share_text"><![CDATA[Chcesz zacząć korzystać z DuckDuckGo na urządzeniu z systemem Windows?<br/><br/><b>Krok 1</b><br/>Odwiedź ten adres na swoim urządzeniu z systemem Windows, aby pobrać aplikację:<br/><a href=\"https://duckduckgo.com/windows\"><b>https://duckduckgo.com/windows</b></a><br/><br/><b>Krok 2</b><br/>Uruchom plik instalacyjny DuckDuckGo znajdujący się w folderze z pobranymi plikami, wybierz opcję „Instaluj”, a następnie wprowadź swój kod zaproszenia.<br/><br/>Kod zaproszenia: %1$s]]></string>
+
+    <string name="windows_waitlist_clipboard_invite_copied">Zaproszenie skopiowane do schowka</string>
+    <string name="windows_waitlist_clipboard_code_copied">Kod skopiowany do schowka</string>
+
+    <string name="windows_waitlist_share_invite">Udostępnij swoje zaproszenie</string>
+
+    <string name="waitlistNotifyMeSubtitle">Otrzymasz zaproszenie, gdy Twoja kopia DuckDuckGo dla komputerów z systemem Windows będzie gotowa do pobrania.</string>
+    <string name="waitlistNotifyMeTitle">Dowiedz się, kiedy tylko otrzymasz zaproszenie</string>
+</resources>

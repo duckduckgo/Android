@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="windows_app">DuckDuckGo-app for Windows</string>
+    <string name="windows_waitlist_title">Få tidlig tilgang til å prøve DuckDuckGo for Windows!</string>
+    <string name="windows_waitlist_description">DuckDuckGo for Windows har det du trenger for å surfe med mer personvern – privat søk, sporingsblokkering, tvungen kryptering, blokkering av popup-vinduer om informasjonskapsler og enda flere førsteklasses beskyttelser som er på vei.</string>
+    <string name="windows_waitlist_mac_link">Ser du etter Mac-versjonen?</string>
+    <string name="windows_join_waitlist">Skriv deg opp på den private ventelisten</string>
+    <string name="windows_join_waitlist_error">Det oppstod en feil under registrering for ventelisten. Prøv igjen senere.</string>
+    <string name="windows_waitlist_footer">Du behøver ikke å dele noen personopplysninger for å sette deg på ventelisten. Du sikrer plassen din i køen med et tidsstempel som kun eksisterer på enheten din, så vi kan varsle deg når det er din tur.</string>
+
+    <string name="windows_waitlist_on_the_list_title">Du er satt på listen!</string>
+    <string name="windows_waitlist_on_the_list_notification_enabled">Vi sender et når du kan laste ned DuckDuckGo for Mac.</string>
+    <string name="windows_waitlist_on_the_list_notification_disabled">Invitasjonen din til å prøve DuckDuckGo for Mac kommer hit. Du kan sjekke igjen snart, eller vi kan sende deg et varsel når det er din tur.</string>
+
+    <string name="notification_channel_windows_waitlist">Ventelisteinvitasjoner</string>
+    <string name="windows_notification_title">Begynn å teste DuckDuckGo for Windows!</string>
+    <string name="windows_notification_text">Åpne invitasjonen din</string>
+
+    <string name="windows_waitlist_code_title">Du er invitert!</string>
+    <string name="windows_waitlist_code_invite">Invitasjonskode</string>`
+    <string name="windows_waitlist_code_description">Er du klar til å bruke DuckDuckGo på Windows?\n\n<b>Trinn 1</b>\nGå til denne URL-adressen på Windows-enheten din for å laste ned:\n<b><annotation type="beta_link">duckduckgo.com/windows</annotation></b>\n\n<b>Trinn 2</b>\nÅpne DuckDuckGo Installasjonsprogram i Nedlastinger, velg Installer og skriv inn invitasjonskoden din.</string>
+    <string name="windows_waitlist_code_share_text"><![CDATA[Er du klar til å bruke DuckDuckGo på Windows?<br/><br/><b>Trinn 1</b><br/>Gå til denne nettadressen på Windows-enheten din for å laste ned:<br/><a href=\"https://duckduckgo.com/windows\"><b>https://duckduckgo.com/windows</b></a><br/><br/><b>Trinn 2</b><br/>Åpne DuckDuckGo Installasjonsprogram i Nedlastinger, velg Installer og skriv inn invitasjonskoden din.<br/><br/>Invitasjonskode: %1$s]]></string>
+
+    <string name="windows_waitlist_clipboard_invite_copied">Invitasjonen er kopiert til utklippstavlen</string>
+    <string name="windows_waitlist_clipboard_code_copied">Koden er kopiert til utklippstavlen</string>
+
+    <string name="windows_waitlist_share_invite">Del invitasjonen din</string>
+
+    <string name="waitlistNotifyMeSubtitle">Få et varsel når du kan laste ned DuckDuckGo for Windows.</string>
+    <string name="waitlistNotifyMeTitle">Få beskjed umiddelbart når du blir invitert</string>
+</resources>

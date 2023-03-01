@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="windows_app">App DuckDuckGo per Windows</string>
+    <string name="windows_waitlist_title">Ottieni l\'accesso anticipato per provare DuckDuckGo per Windows!</string>
+    <string name="windows_waitlist_description">DuckDuckGo per Windows ha ciò di cui hai bisogno per navigare con maggiore privacy: ricerca privata, blocco dei sistemi di tracciamento, crittografia forzata e blocco dei popup dei cookie, oltre a ulteriori protezioni di prima classe in arrivo.</string>
+    <string name="windows_waitlist_mac_link">Cerchi la versione per Mac?</string>
+    <string name="windows_join_waitlist">Iscriviti alla lista d\'attesa privata</string>
+    <string name="windows_join_waitlist_error">Si è verificato un errore durante l\'iscrizione alla lista d\'attesa, riprova più tardi</string>
+    <string name="windows_waitlist_footer">Per iscriverti alla lista d\'attesa non dovrai comunicare informazioni personali. Ti assicurerai un posto in fila con una marca temporale presente esclusivamente sul tuo dispositivo, così potremo avvisarti quando è il tuo turno.</string>
+
+    <string name="windows_waitlist_on_the_list_title">Sei sulla lista.</string>
+    <string name="windows_waitlist_on_the_list_notification_enabled">Ti invieremo una notifica quando la tua copia di DuckDuckGo per Windows sarà pronta per il download.</string>
+    <string name="windows_waitlist_on_the_list_notification_disabled">L\'invito a provare DuckDuckGo per Windows arriverà qui. Torna a trovarci a breve, oppure possiamo inviarti una notifica non appena sarà il tuo turno.</string>
+
+    <string name="notification_channel_windows_waitlist">Inviti alla lista d\'attesa</string>
+    <string name="windows_notification_title">Inizia a testare DuckDuckGo per Windows!</string>
+    <string name="windows_notification_text">Apri il tuo invito</string>
+
+    <string name="windows_waitlist_code_title">Hai ricevuto un invito.</string>
+    <string name="windows_waitlist_code_invite">Codice invito</string>`
+    <string name="windows_waitlist_code_description">Vuoi usare DuckDuckGo su Windows?\n\n<b>Passaggio 1</b>\nVisita questo URL sul tuo dispositivo Windows per scaricarla:\n<b><annotation type="beta_link">duckduckgo.com/windows</annotation></b>\n\n<b>Passaggio 2</b>\nApri l\'installer DuckDuckGo in Download, seleziona Installa, quindi inserisci il tuo codice di invito.</string>
+    <string name="windows_waitlist_code_share_text"><![CDATA[Vuoi usare DuckDuckGo su Windows?<br/><br/><b>Passaggio 1</b><br/>Visita questo URL sul tuo dispositivo Windows per scaricare:<br/><a href=\"https://duckduckgo.com/windows\"><b>https://duckduckgo.com/windows</b></a><br/><br/><b>Passaggio 2</b><br/>Apri l\'installer DuckDuckGo in Download, seleziona Installa, quindi inserisci il tuo codice di invito.<br/><br/>Codice di invito: %1$s]]></string>
+
+    <string name="windows_waitlist_clipboard_invite_copied">Invito copiato negli appunti</string>
+    <string name="windows_waitlist_clipboard_code_copied">Codice copiato negli appunti</string>
+
+    <string name="windows_waitlist_share_invite">Condividi il tuo invito</string>
+
+    <string name="waitlistNotifyMeSubtitle">Ricevi una notifica quando la tua copia di DuckDuckGo per Windows è pronta per il download.</string>
+    <string name="waitlistNotifyMeTitle">Ricevi un avviso non appena ricevi l\'invito</string>
+</resources>

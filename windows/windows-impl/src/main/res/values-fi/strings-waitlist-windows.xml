@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="windows_app">DuckDuckGo-sovellus Windowsille</string>
+    <string name="windows_waitlist_title">Kokeile Windows-laitteen DuckDuckGo-sovellusta!</string>
+    <string name="windows_waitlist_description">DuckDuckGon Windows-sovellus tarjoaa kaiken, mitä tarvitset selaamiseen yksityisemmin. Siinä on yksityinen haku, jäljittäjien esto, pakotettu salaus ja evästeiden ponnahdusikkunoiden esto, ja tulossa on vielä lisää luokkansa parhaita suojauksia.</string>
+    <string name="windows_waitlist_mac_link">Etsitkö Mac-versiota?</string>
+    <string name="windows_join_waitlist">Liity yksityiselle odotuslistalle</string>
+    <string name="windows_join_waitlist_error">Odotuslistalle liityttäessä tapahtui virhe, yritä myöhemmin uudelleen</string>
+    <string name="windows_waitlist_footer">Sinun ei tarvitse jakaa henkilökohtaisia tietoja liittyäksesi jonotuslistalle. Varmistat paikkasi jonossa aikaleimalla, joka on olemassa vain laitteessasi. Näin voimme ilmoittaa sinulle, kun on sinun vuorosi.</string>
+
+    <string name="windows_waitlist_on_the_list_title">Olet listalla!</string>
+    <string name="windows_waitlist_on_the_list_notification_enabled">Lähetämme sinulle ilmoituksen, kun DuckDuckGon Windows-sovellus on valmis ladattavaksi.</string>
+    <string name="windows_waitlist_on_the_list_notification_disabled">Kutsusi kokeilla DuckDuckGon Windows-sovellusta saapuu tänne. Tarkista tilanne pian uudelleen. Voimme myös lähettää sinulle ilmoituksen, kun on sinun vuorosi.</string>
+
+    <string name="notification_channel_windows_waitlist">Odotuslistakutsut</string>
+    <string name="windows_notification_title">Aloita DuckDuckGon Windows-sovelluksen testaus!</string>
+    <string name="windows_notification_text">Avaa kutsusi</string>
+
+    <string name="windows_waitlist_code_title">Sinut on kutsuttu!</string>
+    <string name="windows_waitlist_code_invite">Kutsukoodi</string>`
+    <string name="windows_waitlist_code_description">Haluatko käyttää DuckDuckGo-sovellusta Windows-laitteellasi?\n\n<b>Vaihe 1</b>\nSiirry seuraavaan URL-osoitteeseen Windows-laitteellasi sovelluksen lataamiseksi:\n<b><annotation type="beta_link">duckduckgo.com/windows</annotation></b>\n\n<b>Vaihe 2</b>\nAvaa DuckDuckGo-asennusohjelma Lataukset-kohdasta, valitse Asenna ja kirjoita kutsukoodisi.</string>
+    <string name="windows_waitlist_code_share_text"><![CDATA[Haluatko käyttää DuckDuckGo-sovellusta Windows-laitteellasi?<br/><br/><b>Vaihe 1</b><br/>Siirry seuraavaan URL-osoitteeseen Windows-laitteellasi sovelluksen lataamiseksi:<a href=\"https://duckduckgo.com/windows\"><b>https://duckduckgo.com/windows</b></a><br/><br/><b>Vaihe 2</b><br/>Avaa DuckDuckGo-asennusohjelma Lataukset-kohdasta, valitse Asenna ja kirjoita sitten kutsukoodisi.<br/><br/>Kutsukoodi: %1$s]]></string>
+
+    <string name="windows_waitlist_clipboard_invite_copied">Kutsu kopioitu leikepöydälle</string>
+    <string name="windows_waitlist_clipboard_code_copied">Koodi kopioitu leikepöydälle</string>
+
+    <string name="windows_waitlist_share_invite">Jaa kutsusi</string>
+
+    <string name="waitlistNotifyMeSubtitle">Saat ilmoituksen, kun DuckDuckGon Windows-sovellus on ladattavissa.</string>
+    <string name="waitlistNotifyMeTitle">Saat ilmoituksen heti, kun sinut kutsutaan</string>
+</resources>
