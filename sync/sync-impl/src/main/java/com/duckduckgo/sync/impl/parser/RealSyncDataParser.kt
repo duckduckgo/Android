@@ -33,18 +33,31 @@ class RealSyncDataParser(
     override suspend fun generateInitialList(): String {
         val json = withContext(dispatcherProvider.io()) {
             val updates = mutableListOf<SyncUpdate>()
-            val allUpdates = addFolderContent(Relation.BOOMARKS_ROOT, updates)
-            return@withContext if (allUpdates.isEmpty()) {
-                ""
-            } else {
-                val bookmarkUpdates = SyncDataUpdates(allUpdates)
-                val dataBookmarks = SyncDataBookmarks(bookmarkUpdates)
 
-                val moshi: Moshi = Moshi.Builder().build()
-                val jsonAdapter = moshi.adapter(SyncDataBookmarks::class.java)
-                val json: String = jsonAdapter.toJson(dataBookmarks)
-                json
+            val hasFavorites = repository.hasFavorites()
+            val hasBookmarks = repository.hasBookmarks()
+
+            if (!hasFavorites && !hasBookmarks) {
+                return@withContext ""
             }
+
+            // favorites (we don't add individual items, they are added as we go through bookmark folders
+            if (hasFavorites) {
+                val favorites = repository.getFavoritesSync()
+                updates.add(SyncUpdate.asFolder(id = Relation.FAVORITES_ROOT, title = "Favorites", children = favorites.map { it.id }, deleted = null))
+            }
+
+            // bookmarks
+            val bookmarks = addFolderContent(Relation.BOOMARKS_ROOT, updates)
+
+            val bookmarkUpdates = SyncDataUpdates(bookmarks)
+            val dataBookmarks = SyncDataBookmarks(bookmarkUpdates)
+
+            val moshi: Moshi = Moshi.Builder().build()
+            val jsonAdapter = moshi.adapter(SyncDataBookmarks::class.java)
+            val json: String = jsonAdapter.toJson(dataBookmarks)
+            json
+
         }
         return json
     }
@@ -55,7 +68,7 @@ class RealSyncDataParser(
     ): List<SyncUpdate> {
         repository.getFolderContentSync(folderId).apply {
             val folder = repository.getFolder(folderId)
-            if (folder != null){
+            if (folder != null) {
                 val childrenIds = mutableListOf<String>()
                 for (bookmark in this.first) {
                     childrenIds.add(bookmark.id)
@@ -63,8 +76,6 @@ class RealSyncDataParser(
                 }
                 updates.add(SyncUpdate.asFolder(id = folder.id, title = folder.name, children = childrenIds, deleted = null))
                 for (folder in this.second) {
-                    val childrenIds = getIdsFromFolder(folder.id)
-                    // updates.add(SyncUpdate.asFolder(id = folder.id, title = folder.name, children = childrenIds, deleted = null))
                     addFolderContent(folder.id, updates)
                 }
             }
