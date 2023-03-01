@@ -56,7 +56,6 @@ class SyncInitialSetupActivity : DuckDuckGoActivity() {
         if (result.contents == null) {
             Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show()
         } else {
-            Timber.i("SYNC contents ${result.contents}")
             viewModel.onQRScanned(result.contents)
         }
     }
@@ -128,7 +127,6 @@ class SyncInitialSetupActivity : DuckDuckGoActivity() {
         options.setCameraId(0) // Use a specific camera of the device
         options.setBeepEnabled(false)
         options.setBarcodeImageEnabled(true)
-        barcodeLauncher.launch(options)
         return options
     }
 
