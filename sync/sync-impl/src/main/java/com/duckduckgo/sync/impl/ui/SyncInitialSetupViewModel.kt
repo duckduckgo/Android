@@ -115,6 +115,14 @@ constructor(
         }
     }
 
+    fun onSendBookmarksClicked(){
+
+    }
+
+    fun onReceiveBookmarksClicked(){
+
+    }
+
     private suspend fun updateViewState() {
         val accountInfo = syncRepository.getAccountInfo()
         viewState.emit(

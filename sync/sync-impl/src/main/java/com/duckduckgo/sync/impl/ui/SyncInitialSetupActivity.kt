@@ -53,6 +53,8 @@ class SyncInitialSetupActivity : DuckDuckGoActivity() {
         binding.loginAccountButton.setOnClickListener { viewModel.loginAccountClicked() }
         binding.logoutButton.setOnClickListener { viewModel.onLogoutClicked() }
         binding.deleteAccountButton.setOnClickListener { viewModel.onDeleteAccountClicked() }
+        binding.sendBookmarksButton.setOnClickListener { viewModel.onSendBookmarksClicked() }
+        binding.receiveBookmarksButton.setOnClickListener { viewModel.onReceiveBookmarksClicked() }
     }
 
     private fun observeUiEvents() {
@@ -86,5 +88,7 @@ class SyncInitialSetupActivity : DuckDuckGoActivity() {
         binding.deviceNameTextView.text = viewState.deviceName
         binding.primaryKeyTextView.text = viewState.primaryKey
         binding.secretKeyTextView.text = viewState.secretKey
+        binding.sendBookmarksButton.isVisible = viewState.isSignedIn
+        binding.receiveBookmarksButton.isVisible = viewState.isSignedIn
     }
 }
