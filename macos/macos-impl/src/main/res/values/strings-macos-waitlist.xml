@@ -15,6 +15,8 @@
   ~ limitations under the License.
   -->
 
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="macos_app">DuckDuckGo App for Mac</string>
     <string name="macos_title">Get DuckDuckGo for Mac!</string>

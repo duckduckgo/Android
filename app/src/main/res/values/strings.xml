@@ -680,4 +680,10 @@
     <string name="downloadsNotifyMeTitle">Find out when downloads are ready</string>
     <string name="downloadsNotifyMeSubtitle">Get a notification when downloads complete.</string>
 
+    <!-- Windows Settings -->
+    <string name="windows_settings_title">DuckDuckGo Windows App</string>
+    <string name="windows_settings_description">Browse privately with our app for Windows</string>
+    <string name="windows_settings_description_ready">Download available</string>
+    <string name="windows_settings_description_list">You\'re on the list!</string>
+    <string name="windows_settings_description_list_unused">You\'re on the list!</string>
 </resources>
