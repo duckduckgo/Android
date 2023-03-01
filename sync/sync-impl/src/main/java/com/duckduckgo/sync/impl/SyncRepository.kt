@@ -31,6 +31,7 @@ import timber.log.Timber
 
 interface SyncRepository {
     fun createAccount(): Result<Boolean>
+    @Deprecated(message = "Method only used for testing purposes. Relies on a local stored recovery key.", level = DeprecationLevel.WARNING)
     fun login(): Result<Boolean>
     fun login(recoveryCode: String): Result<Boolean>
     fun getAccountInfo(): AccountInfo
