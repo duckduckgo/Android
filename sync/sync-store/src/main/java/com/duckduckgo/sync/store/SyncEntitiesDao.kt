@@ -17,9 +17,12 @@
 package com.duckduckgo.sync.store
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SyncEntitiesDao {
@@ -33,9 +36,48 @@ interface SyncEntitiesDao {
     @Query("select * from entities")
     fun entities(): List<Entity>
 
+    @Delete
+    fun delete(entity: Entity)
+
+    @Query("delete from entities where url = :url")
+    fun deleteByUrl(url: String)
+
+    @Delete
+    fun deleteList(entities: List<Entity>)
+
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    fun update(entity: Entity)
+
     @Query("select * from entities where url = :url limit 1")
     fun entityByUrl(url: String): Entity?
 
     @Query("select CAST(COUNT(*) AS BIT) from entities")
     fun hasEntities(): Boolean
+
+    @Query("select CAST(COUNT(*) AS BIT) from entities where type = :type")
+    fun hasEntitiesByType(type: EntityType): Boolean
+
+    @Query("select * from entities where entityId in (:entitiesIds)")
+    fun entitiesByIds(entitiesIds: List<String>): List<Entity>
+
+    @Query(
+        "select * from entities inner join relations on entities.entityId = relations.entityId" +
+            " where relations.relationId= :folderId",
+    )
+    fun entitiesByFolderId(folderId: String): Flow<List<Entity>>
+
+    @Query(
+        "select * from entities inner join relations on entities.entityId = relations.entityId " +
+            "where relations.relationId= :folderId and entities.url = :url",
+    )
+    fun favorite(
+        folderId: String = Relation.FAVORITES_ROOT,
+        url: String,
+    ): Entity?
+
+    @Query("select * from entities where entityId = :id")
+    fun entityById(id: String): Entity
+
+    @Query("select * from entities where type = :type")
+    fun entitiesByType(type: EntityType): Flow<List<Entity>>
 }

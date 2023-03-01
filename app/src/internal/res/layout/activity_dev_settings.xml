@@ -110,6 +110,19 @@
                 android:layout_height="wrap_content"
                 app:primaryText="@string/devSettingsScreenUserAgentSelectorTitle" />
 
+            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+                android:id="@+id/syncTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/devSettingsScreenSync" />
+
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+                android:id="@+id/overrideSyncBookmarksToggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/devSettingsScreenSyncBookmarksOverride"
+                app:showSwitch="true" />
+
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

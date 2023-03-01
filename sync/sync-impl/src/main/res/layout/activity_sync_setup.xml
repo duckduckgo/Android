@@ -231,5 +231,6 @@
             android:layout_margin="10dp"
             android:layout_height="wrap_content"
             android:text="Reset" />
+
     </LinearLayout>
 </ScrollView>
