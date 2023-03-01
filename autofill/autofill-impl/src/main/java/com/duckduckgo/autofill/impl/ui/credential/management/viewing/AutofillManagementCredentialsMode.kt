@@ -57,14 +57,16 @@ import com.duckduckgo.mobile.android.R.dimen
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
-import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
+@ExperimentalCoroutinesApi
 @InjectWith(FragmentScope::class)
 class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_autofill_management_edit_mode), MenuProvider {
 
@@ -290,18 +292,20 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
 
         viewModel.viewState
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-            .conflate()
+            .transformLatest {
+                emit(it.credentialMode)
+            }
             .distinctUntilChanged()
-            .onEach { state ->
-                when (state.credentialMode) {
+            .onEach { credentialMode ->
+                when (credentialMode) {
                     is Viewing -> {
-                        populateFields(state.credentialMode.credentialsViewed)
-                        showViewMode(state.credentialMode.credentialsViewed)
+                        populateFields(credentialMode.credentialsViewed)
+                        showViewMode(credentialMode.credentialsViewed)
                         invalidateMenu()
                     }
 
                     is EditingExisting -> {
-                        initializeEditStateIfNecessary(state.credentialMode)
+                        initializeEditStateIfNecessary(credentialMode)
                         updateToolbarForEdit()
                     }
 
