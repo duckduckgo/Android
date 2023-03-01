@@ -337,8 +337,8 @@
     <!--  App Tracking Protection Disable VPN Dialog -->
     <string name="atp_DisableConfirmationDialogTitle">Uygulama İzleme Koruması devre dışı bırakılsın mı?</string>
     <string name="atp_DisableConfirmationDialogMessage">Belirli bir uygulamayla ilgili bir sorun fark ettiyseniz, bunun yerine o uygulama için korumayı yönetebilirsiniz.</string>
-    <string name="atp_DisableConfirmationDisableApp">Bir uygulama için devre dışı bırak</string>
-    <string name="atp_DisableConfirmationDisableAllApps">Tüm uygulamalar için devre dışı bırak</string>
+    <string name="atp_DisableConfirmationDisableApp">Bir Uygulama için Devre Dışı Bırak</string>
+    <string name="atp_DisableConfirmationDisableAllApps">Tüm Uygulamalar için Devre Dışı Bırak</string>
     <string name="atp_DisableConfirmationCancel">İptal</string>
 
     <!--  App Tracking Protection VPN Conflict Dialog -->
