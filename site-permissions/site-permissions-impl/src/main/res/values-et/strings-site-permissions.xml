@@ -33,6 +33,6 @@
     <string name="systemPermissionDialogAudioDeniedContent">Saidid saavad sinu mikrofoni kasutada ainult siis, kui lubad DuckDuckGo’l küsida sellele juurdepääsu.</string>
     <string name="systemPermissionDialogCameraAndAudioDeniedTitle">Luba DuckDuckGo’l küsida juurdepääsu selle seadme kaamerale ja mikrofonile</string>
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">Saidid saavad sinu kaamerat ja mikrofoni kasutada ainult siis, kui lubad DuckDuckGo’l küsida sellele juurdepääsu.</string>
-    <string name="systemPermissionsDeniedDialogPositiveButton">Ava seaded</string>
+    <string name="systemPermissionsDeniedDialogPositiveButton">Ava sätted</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Tühista</string>
 </resources>
