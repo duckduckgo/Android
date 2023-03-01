@@ -49,4 +49,6 @@ dependencies {
     testImplementation project(path: ':common-test')
     testImplementation AndroidX.archCore.testing
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+
+    androidTestImplementation "android.arch.persistence.room:testing:_"
 }
