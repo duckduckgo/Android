@@ -99,6 +99,17 @@ class SyncNativeLibTest {
         assertEquals(whatToEncrypt, decryptedResult.decryptedData)
     }
 
+    @Test
+    fun whenKeysAreDecryptedThenEncryptingThemReturnsTheSameResult(){
+        val syncNativeLib = SyncNativeLib(InstrumentationRegistry.getInstrumentation().targetContext)
+        val accountKeys = syncNativeLib.generateAccountKeys(aUserId, aPassword)
+        val prepareForLogin = syncNativeLib.prepareForLogin(accountKeys.primaryKey)
+
+        val encryptedSecretKey = syncNativeLib.encrypt(accountKeys.secretKey, prepareForLogin.stretchedPrimaryKey)
+
+        assertEquals(encryptedSecretKey.encryptedData, accountKeys.protectedSecretKey)
+    }
+
     companion object {
         private const val aUserId = "user"
         private const val aPassword = "password"
