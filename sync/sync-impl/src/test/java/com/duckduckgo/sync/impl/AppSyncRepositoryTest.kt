@@ -48,6 +48,7 @@ import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.store.SyncStore
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
@@ -259,6 +260,26 @@ class AppSyncRepositoryTest {
     }
 
     @Test
+    fun whenLoginFromQRSucceedsThenAccountPersisted() {
+        whenever(syncDeviceIds.deviceId()).thenReturn(deviceId)
+        whenever(syncDeviceIds.deviceName()).thenReturn(deviceName)
+        whenever(nativeLib.prepareForLogin(primaryKey = primaryKey)).thenReturn(validLoginKeys)
+        whenever(nativeLib.decrypt(encryptedData = protectedEncryptionKey, secretKey = stretchedPrimaryKey)).thenReturn(decryptedSecretKey)
+        whenever(syncApi.login(userId, hashedPassword, deviceId, deviceName)).thenReturn(loginSuccess)
+
+        val syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore)
+        val result = syncRepo.login(jsonRecoveryKey)
+
+        assertEquals(Result.Success(true), result)
+        verify(syncStore).userId = userId
+        verify(syncStore).deviceId = deviceId
+        verify(syncStore).deviceName = deviceName
+        verify(syncStore).token = token
+        verify(syncStore).primaryKey = primaryKey
+        verify(syncStore).secretKey = secretKey
+    }
+
+    @Test
     fun whenRecoveryCodeNotFoudnThenReturnError() {
         whenever(syncStore.recoveryCode).thenReturn(null)
 
@@ -282,6 +303,18 @@ class AppSyncRepositoryTest {
     }
 
     @Test
+    fun whenGenerateKeysFromQRFailsThenReturnError() {
+        whenever(syncDeviceIds.deviceId()).thenReturn(deviceId)
+        whenever(syncDeviceIds.deviceName()).thenReturn(deviceName)
+        whenever(nativeLib.prepareForLogin(primaryKey = primaryKey)).thenReturn(failedLoginKeys)
+
+        val syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore)
+        val result = syncRepo.login(jsonRecoveryKey)
+
+        assertTrue(result is Result.Error)
+    }
+
+    @Test
     fun whenLoginFailsThenReturnError() {
         whenever(syncStore.recoveryCode).thenReturn(jsonRecoveryKey)
         whenever(syncDeviceIds.deviceId()).thenReturn(deviceId)
@@ -292,6 +325,20 @@ class AppSyncRepositoryTest {
 
         val syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore)
         val result = syncRepo.login()
+
+        assertTrue(result is Result.Error)
+    }
+
+    @Test
+    fun whenLoginFromQRFailsThenReturnError() {
+        whenever(syncDeviceIds.deviceId()).thenReturn(deviceId)
+        whenever(syncDeviceIds.deviceName()).thenReturn(deviceName)
+        whenever(nativeLib.prepareForLogin(primaryKey = primaryKey)).thenReturn(validLoginKeys)
+        whenever(nativeLib.decrypt(encryptedData = protectedEncryptionKey, secretKey = stretchedPrimaryKey)).thenReturn(decryptedSecretKey)
+        whenever(syncApi.login(userId, hashedPassword, deviceId, deviceName)).thenReturn(loginFailed)
+
+        val syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore)
+        val result = syncRepo.login(jsonRecoveryKey)
 
         assertTrue(result is Result.Error)
     }
@@ -333,5 +380,25 @@ class AppSyncRepositoryTest {
         val result = syncRepo.getConnectedDevices()
 
         assertTrue(result is Result.Error)
+    }
+
+    @Test
+    fun whenGenerateRecoveryCodeAsStringThenReturnExpectedJson() {
+        whenever(syncStore.primaryKey).thenReturn(primaryKey)
+        whenever(syncStore.userId).thenReturn(userId)
+        val syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore)
+
+        val result = syncRepo.getRecoveryCode()
+
+        assertEquals(jsonRecoveryKey, result)
+    }
+
+    @Test
+    fun whenGenerateRecoveryCodeWithoutAccountThenReturnNull() {
+        val syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore)
+
+        val result = syncRepo.getRecoveryCode()
+
+        assertNull(result)
     }
 }

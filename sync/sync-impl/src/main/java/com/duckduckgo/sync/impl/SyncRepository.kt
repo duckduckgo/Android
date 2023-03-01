@@ -28,14 +28,18 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import javax.inject.*
 import timber.log.Timber
+import javax.inject.*
+import kotlin.DeprecationLevel.WARNING
 
 interface SyncRepository {
     fun createAccount(): Result<Boolean>
+
     @Deprecated(message = "Method only used for testing purposes. Relies on a local stored recovery key.", level = DeprecationLevel.WARNING)
     fun login(): Result<Boolean>
-    fun login(recoveryCode: String): Result<Boolean>
+    fun login(recoveryCodeRawJson: String): Result<Boolean>
     fun getAccountInfo(): AccountInfo
-    fun storeRecoveryCode()
+
+    @Deprecated(message = "Method only used for testing purposes.", level = DeprecationLevel.WARNING) fun storeRecoveryCode()
     fun removeAccount()
     fun logout(deviceId: String): Result<Boolean>
     fun deleteAccount(): Result<Boolean>
@@ -61,14 +65,13 @@ class AppSyncRepository @Inject constructor(
         val account: AccountKeys = nativeLib.generateAccountKeys(userId = userId)
         if (account.result != 0L) return Result.Error(code = account.result.toInt(), reason = "Account keys failed")
 
-        val result =
-            syncApi.createAccount(
-                account.userId,
-                account.passwordHash,
-                account.protectedSecretKey,
-                deviceId,
-                deviceName,
-            )
+        val result = syncApi.createAccount(
+            account.userId,
+            account.passwordHash,
+            account.protectedSecretKey,
+            deviceId,
+            deviceName,
+        )
 
         return when (result) {
             is Result.Error -> {
@@ -88,88 +91,28 @@ class AppSyncRepository @Inject constructor(
         }
     }
 
+    @Deprecated("Method only used for testing purposes. Relies on a local stored recovery key.", level = WARNING)
     override fun login(): Result<Boolean> {
-        val recoveryCode = getRecoveryCodeObject() ?: return Result.Error(reason = "Not valid Or existing recovery code")
+        val recoveryCodeJson = syncStore.recoveryCode ?: return Result.Error(reason = "Not existing recovery code")
+        val recoveryCode =
+            Adapters.recoveryCodeAdapter.fromJson(recoveryCodeJson) ?: return Result.Error(reason = "Failed reading json recovery code")
 
         val primaryKey = recoveryCode.primaryKey
         val userId = recoveryCode.userID
         val deviceId = syncDeviceIds.deviceId()
         val deviceName = syncDeviceIds.deviceName()
 
-        val preLogin: LoginKeys = nativeLib.prepareForLogin(primaryKey)
-        Timber.i("SYNC prelogin ${preLogin.passwordHash} and ${preLogin.stretchedPrimaryKey}")
-        if (preLogin.result != 0L) return Result.Error(code = preLogin.result.toInt(), reason = "Account keys failed")
-
-        val result =
-            syncApi.login(
-                userID = userId,
-                hashedPassword = preLogin.passwordHash,
-                deviceId = deviceId,
-                deviceName = deviceName,
-            )
-
-        return when (result) {
-            is Result.Error -> {
-                result
-            }
-
-            is Result.Success -> {
-                val decryptResult = nativeLib.decrypt(result.data.protected_encryption_key, preLogin.stretchedPrimaryKey)
-                if (decryptResult.result != 0L) return Result.Error(code = decryptResult.result.toInt(), reason = "Decrypt failed")
-                Timber.i("SYNC decrypt: decoded secret Key: ${decryptResult.decryptedData}")
-                syncStore.userId = userId
-                syncStore.deviceId = deviceId
-                syncStore.deviceName = deviceName
-                syncStore.token = result.data.token
-                syncStore.primaryKey = preLogin.primaryKey
-                syncStore.secretKey = decryptResult.decryptedData
-                Result.Success(true)
-            }
-        }
+        return performLogin(userId, deviceId, deviceName, primaryKey)
     }
 
-    override fun login(recoveryCodeJson: String): Result<Boolean> {
-        val recoveryCode = Adapters.recoveryCodeAdapter.fromJson(recoveryCodeJson) ?: return Result.Error(reason = "Failed reading json")
-        Timber.i("SYNC recoveryCode $recoveryCode")
+    override fun login(recoveryCodeRawJson: String): Result<Boolean> {
+        val recoveryCode = Adapters.recoveryCodeAdapter.fromJson(recoveryCodeRawJson) ?: return Result.Error(reason = "Failed reading json")
         val primaryKey = recoveryCode.primaryKey
-        Timber.i("SYNC primarykey $primaryKey")
         val userId = recoveryCode.userID
-        Timber.i("SYNC userId $userId")
         val deviceId = syncDeviceIds.deviceId()
         val deviceName = syncDeviceIds.deviceName()
 
-        Timber.i("SYNC prelogin")
-        val preLogin: LoginKeys = nativeLib.prepareForLogin(primaryKey)
-        Timber.i("SYNC prelogin ${preLogin.passwordHash} and ${preLogin.stretchedPrimaryKey}")
-        if (preLogin.result != 0L) return Result.Error(code = preLogin.result.toInt(), reason = "Account keys failed")
-
-        Timber.i("SYNC apilogin")
-        val result =
-            syncApi.login(
-                userID = userId,
-                hashedPassword = preLogin.passwordHash,
-                deviceId = deviceId,
-                deviceName = deviceName,
-            )
-        Timber.i("SYNC apilogin $result")
-
-        return when (result) {
-            is Result.Error -> {
-                result
-            }
-            is Result.Success -> {
-                val decryptResult = nativeLib.decrypt(result.data.protected_encryption_key, preLogin.stretchedPrimaryKey)
-                if (decryptResult.result != 0L) return Result.Error(code = decryptResult.result.toInt(), reason = "Decrypt failed")
-                Timber.i("SYNC decrypt: decoded secret Key: ${decryptResult.decryptedData}")
-                syncStore.userId = userId
-                syncStore.deviceId = deviceId
-                syncStore.deviceName = deviceName
-                syncStore.token = result.data.token
-                syncStore.primaryKey = preLogin.primaryKey
-                syncStore.secretKey = decryptResult.decryptedData
-                Result.Success(true)
-            }
-        }
+        return performLogin(userId, deviceId, deviceName, primaryKey)
     }
 
     override fun getAccountInfo(): AccountInfo {
@@ -185,7 +128,7 @@ class AppSyncRepository @Inject constructor(
         )
     }
 
-    override fun storeRecoveryCode() {
+    @Deprecated("Method only used for testing purposes.", level = WARNING) override fun storeRecoveryCode() {
         val primaryKey = syncStore.primaryKey ?: return
         val userID = syncStore.userId ?: return
         val recoveryCodeJson = Adapters.recoveryCodeAdapter.toJson(RecoveryCode(primaryKey, userID))
@@ -195,12 +138,9 @@ class AppSyncRepository @Inject constructor(
     }
 
     override fun getRecoveryCode(): String? {
-        return syncStore.recoveryCode
-    }
-
-    private fun getRecoveryCodeObject(): RecoveryCode? {
-        val recoveryCodeJson = syncStore.recoveryCode ?: return null
-        return Adapters.recoveryCodeAdapter.fromJson(recoveryCodeJson)
+        val primaryKey = syncStore.primaryKey ?: return null
+        val userID = syncStore.userId ?: return null
+        return Adapters.recoveryCodeAdapter.toJson(RecoveryCode(primaryKey, userID))
     }
 
     override fun removeAccount() {
@@ -236,9 +176,7 @@ class AppSyncRepository @Inject constructor(
     }
 
     override fun deleteAccount(): Result<Boolean> {
-        val token =
-            syncStore.token.takeUnless { it.isNullOrEmpty() }
-                ?: return Result.Error(reason = "Token Empty")
+        val token = syncStore.token.takeUnless { it.isNullOrEmpty() } ?: return Result.Error(reason = "Token Empty")
 
         return when (val result = syncApi.deleteAccount(token)) {
             is Result.Error -> {
@@ -283,11 +221,45 @@ class AppSyncRepository @Inject constructor(
 
     private fun isSignedIn() = !syncStore.primaryKey.isNullOrEmpty()
 
+    private fun performLogin(
+        userId: String,
+        deviceId: String,
+        deviceName: String,
+        primaryKey: String,
+    ): Result<Boolean> {
+        val preLogin: LoginKeys = nativeLib.prepareForLogin(primaryKey)
+        if (preLogin.result != 0L) return Result.Error(code = preLogin.result.toInt(), reason = "Login account keys failed")
+
+        val result = syncApi.login(
+            userID = userId,
+            hashedPassword = preLogin.passwordHash,
+            deviceId = deviceId,
+            deviceName = deviceName,
+        )
+
+        return when (result) {
+            is Result.Error -> {
+                result
+            }
+
+            is Result.Success -> {
+                val decryptResult = nativeLib.decrypt(result.data.protected_encryption_key, preLogin.stretchedPrimaryKey)
+                if (decryptResult.result != 0L) return Result.Error(code = decryptResult.result.toInt(), reason = "Decrypt failed")
+                syncStore.userId = userId
+                syncStore.deviceId = deviceId
+                syncStore.deviceName = deviceName
+                syncStore.token = result.data.token
+                syncStore.primaryKey = preLogin.primaryKey
+                syncStore.secretKey = decryptResult.decryptedData
+                Result.Success(true)
+            }
+        }
+    }
+
     private class Adapters {
         companion object {
             private val moshi = Moshi.Builder().build()
-            val recoveryCodeAdapter: JsonAdapter<RecoveryCode> =
-                moshi.adapter(RecoveryCode::class.java)
+            val recoveryCodeAdapter: JsonAdapter<RecoveryCode> = moshi.adapter(RecoveryCode::class.java)
         }
     }
 }
