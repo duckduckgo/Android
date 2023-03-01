@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.settings
 
+import android.annotation.SuppressLint
 import androidx.annotation.StringRes
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -66,6 +67,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
+@SuppressLint("NoLifecycleObserver") // we don't use DI here
 @ContributesViewModel(ActivityScope::class)
 class SettingsViewModel @Inject constructor(
     private val themingDataStore: ThemingDataStore,

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.apps
 
+import android.annotation.SuppressLint
 import androidx.lifecycle.*
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
@@ -40,6 +41,7 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
+@SuppressLint("NoLifecycleObserver") // we don't use DI here
 @ContributesViewModel(ActivityScope::class)
 class ManageAppsProtectionViewModel @Inject constructor(
     private val excludedApps: TrackingProtectionAppsRepository,

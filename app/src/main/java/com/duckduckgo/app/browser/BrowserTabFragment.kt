@@ -615,6 +615,7 @@ class BrowserTabFragment :
         }
 
         lifecycle.addObserver(
+            @SuppressLint("NoLifecycleObserver") // we don't use DI here
             object : DefaultLifecycleObserver {
                 override fun onStop(owner: LifecycleOwner) {
                     if (isVisible) {
