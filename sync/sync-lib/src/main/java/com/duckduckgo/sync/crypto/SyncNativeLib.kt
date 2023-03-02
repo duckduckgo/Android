@@ -19,9 +19,9 @@ package com.duckduckgo.sync.crypto
 import android.content.Context
 import android.util.Base64
 import com.duckduckgo.library.loader.LibraryLoader
-import okio.ByteString.Companion.encode
 import java.util.*
 import kotlin.system.exitProcess
+import okio.ByteString.Companion.encode
 import timber.log.Timber
 
 interface SyncLib {
@@ -38,7 +38,7 @@ interface SyncLib {
 
     fun encrypt(
         rawData: String,
-        secretKey: String
+        secretKey: String,
     ): EncryptResult
 }
 
@@ -117,7 +117,7 @@ class SyncNativeLib constructor(context: Context) : SyncLib {
 
     override fun encrypt(
         rawData: String,
-        secretKey: String
+        secretKey: String,
     ): EncryptResult {
         val rawDataByteArray = rawData.decode()
         val secretKeyByteArray = secretKey.decode()

@@ -87,7 +87,7 @@ class SyncNativeLibTest {
     }
 
     @Test
-    fun whenEncryptingThenResultIsSuccess(){
+    fun whenEncryptingThenResultIsSuccess() {
         val syncNativeLib = SyncNativeLib(InstrumentationRegistry.getInstrumentation().targetContext)
         val accountKeys = syncNativeLib.generateAccountKeys(aUserId, aPassword)
 
@@ -99,7 +99,7 @@ class SyncNativeLibTest {
     }
 
     @Test
-    fun whenDataIsEncryptedItDecryptsProperly(){
+    fun whenDataIsEncryptedItDecryptsProperly() {
         val syncNativeLib = SyncNativeLib(InstrumentationRegistry.getInstrumentation().targetContext)
         val accountKeys = syncNativeLib.generateAccountKeys(aUserId, aPassword)
 
@@ -116,5 +116,4 @@ class SyncNativeLibTest {
         private const val aUserId = "user"
         private const val aPassword = "password"
     }
-
 }
