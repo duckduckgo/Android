@@ -18,6 +18,7 @@ package com.duckduckgo.sync.crypto
 
 import android.os.Build
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import okio.ByteString.Companion.decodeBase64
 import org.junit.Assert.*
@@ -88,11 +89,8 @@ class SyncNativeLibTest {
     }
 
     @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.M)
     fun whenEncryptingThenResultIsSuccess() {
-        if (Build.VERSION.SDK_INT == 23) {
-            // these tests fail on API 23 due to WAL. This effectively skips these tests on 23.
-            return
-        }
         val syncNativeLib = SyncNativeLib(InstrumentationRegistry.getInstrumentation().targetContext)
         val accountKeys = syncNativeLib.generateAccountKeys(aUserId, aPassword)
 
@@ -104,11 +102,8 @@ class SyncNativeLibTest {
     }
 
     @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.M)
     fun whenDataIsEncryptedItDecryptsProperly() {
-        if (Build.VERSION.SDK_INT == 23) {
-            // these tests fail on API 23 due to WAL. This effectively skips these tests on 23.
-            return
-        }
         val syncNativeLib = SyncNativeLib(InstrumentationRegistry.getInstrumentation().targetContext)
         val accountKeys = syncNativeLib.generateAccountKeys(aUserId, aPassword)
 
