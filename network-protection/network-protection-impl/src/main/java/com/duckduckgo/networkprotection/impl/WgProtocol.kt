@@ -21,6 +21,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnSocketProtector
 import com.duckduckgo.networkprotection.api.NetworkProtectionStatistics
+import com.duckduckgo.networkprotection.impl.config.PcapConfig
 import com.squareup.anvil.annotations.ContributesBinding
 import com.wireguard.android.backend.GoBackend
 import com.wireguard.crypto.Key
@@ -34,6 +35,7 @@ interface WgProtocol {
     fun startWg(
         tunFd: Int,
         configString: String,
+        pcapConfig: PcapConfig? = null,
     ): Result<Unit>
 
     fun stopWg(): Result<Unit>
@@ -52,10 +54,21 @@ class RealWgProtocol @Inject constructor(
     override fun startWg(
         tunFd: Int,
         configString: String,
+        pcapConfig: PcapConfig?,
     ): Result<Unit> {
         return runCatching {
-            safelyStartWg(tunFd, configString)
+            safelyStartWg(tunFd, configString).also {
+                safelyConfigurePcap(pcapConfig)
+            }
         }.getOrDefault(Result.failure(java.lang.IllegalStateException("Wireguard failed to start")))
+    }
+
+    private fun safelyConfigurePcap(pcapConfig: PcapConfig?) {
+        runCatching {
+            pcapConfig?.let {
+                goBackend.wgPcap(it.filename, it.snapLen, it.fileSize)
+            } ?: goBackend.wgPcap(null, 0, 0)
+        }
     }
 
     private fun safelyStartWg(

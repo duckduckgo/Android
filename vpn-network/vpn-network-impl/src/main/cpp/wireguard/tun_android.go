@@ -23,6 +23,7 @@ Implementation of the TUN device interface for Android (wraps linux one)
 
 // #include <android/log.h>
 // extern int is_pkt_allowed(char *buffer, int length);
+// extern int wg_write_pcap(char *buffer, int length);
 import "C"
 
 import (
@@ -50,7 +51,17 @@ func (tunWrapper *NativeTunWrapper) Name() (string, error) {
 }
 
 func (tunWrapper *NativeTunWrapper) Write(buf []byte, offset int) (int, error) {
-    return tunWrapper.nativeTun.Write(buf, offset)
+    pktLen, err :=  tunWrapper.nativeTun.Write(buf, offset)
+
+    tag := cstring("WireGuard/GoBackend/Write")
+
+    // PCAP recording
+    pcap_res := int(C.wg_write_pcap((*C.char)(unsafe.Pointer(&buf[offset])), C.int(pktLen+offset)))
+    if pcap_res < 0 {
+        C.__android_log_write(C.ANDROID_LOG_DEBUG, tag, cstring("PCAP packet not written"))
+    }
+
+    return pktLen, err
 }
 
 func (tunWrapper *NativeTunWrapper) Flush() error {
@@ -73,6 +84,12 @@ func (tunWrapper *NativeTunWrapper) Read(buf []byte, offset int) (int, error) {
             if protocol != 0x06 {
                 // Skip checking with AppTP since for now we only check TCP connections
                 return pktLen, err
+            }
+
+            // PCAP recording
+            pcap_res := int(C.wg_write_pcap((*C.char)(unsafe.Pointer(&buf[offset])), C.int(pktLen+offset)))
+            if pcap_res < 0 {
+                C.__android_log_write(C.ANDROID_LOG_DEBUG, tag, cstring("PCAP packet not written"))
             }
 
             allow := int(C.is_pkt_allowed((*C.char)(unsafe.Pointer(&buf[offset])), C.int(pktLen+offset)))

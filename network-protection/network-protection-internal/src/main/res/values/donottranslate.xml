@@ -17,9 +17,13 @@
 <resources>
     <string name="netpDevSettingsTitle">NetP Dev Settings</string>
     <string name="netpDevSettingHeaderConfig">Config</string>
+    <string name="netpDevSettingHeaderPCAP">PCAP</string>
+    <string name="netpDevSettingHeaderPCAPDelete">Delete PCAP file</string>
+    <string name="netpDevSettingHeaderPCAPShare">Share PCAP file</string>
     <string name="netpSystemAppsExclusionList">Manage System Apps Exclusion</string>
     <string name="netpExcludeAllSystemApps">Exclude All System Apps</string>
     <string name="netpMtuSize">MTU Size</string>
     <string name="netpDevSettingInternalIP">Internal IP</string>
     <string name="netpDnsLeakProtection">DNS Leak Protection</string>
+    <string name="netpPcapRecording">Enable PCAP recording</string>
 </resources>

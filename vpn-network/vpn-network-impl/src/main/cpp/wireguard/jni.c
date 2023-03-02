@@ -146,6 +146,7 @@ JNIEXPORT void JNICALL Java_com_wireguard_android_backend_GoBackend_wgTurnOff(JN
         (*env)->DeleteGlobalRef(env, GO_BACKEND);
 
     cleanup_uid_cache();
+    wg_close_pcap();
 }
 
 JNIEXPORT jint JNICALL Java_com_wireguard_android_backend_GoBackend_wgGetSocketV4(JNIEnv *env, jclass c, jint handle)
@@ -178,4 +179,77 @@ JNIEXPORT jstring JNICALL Java_com_wireguard_android_backend_GoBackend_wgVersion
     ret = (*env)->NewStringUTF(env, version);
     free(version);
     return ret;
+}
+
+JNIEXPORT void JNICALL Java_com_wireguard_android_backend_GoBackend_wgPcap(
+    JNIEnv *env,
+    jclass c,
+    jstring name_,
+    jint record_size,
+    jint file_size
+) {
+
+    pcap_record_size = (size_t) record_size;
+    pcap_file_size = file_size;
+
+    if (name_ == NULL) {
+        if (pcap_file != NULL) {
+            int flags = fcntl(fileno(pcap_file), F_GETFL, 0);
+            if (flags < 0 || fcntl(fileno(pcap_file), F_SETFL, flags & ~O_NONBLOCK) < 0)
+                log_print(PLATFORM_LOG_PRIORITY_ERROR, "PCAP fcntl ~O_NONBLOCK error %d: %s",
+                            errno, strerror(errno));
+
+            if (fsync(fileno(pcap_file)))
+                log_print(PLATFORM_LOG_PRIORITY_ERROR, "PCAP fsync error %d: %s", errno, strerror(errno));
+
+            if (fclose(pcap_file))
+                log_print(PLATFORM_LOG_PRIORITY_ERROR, "PCAP fclose error %d: %s", errno, strerror(errno));
+
+            pcap_file = NULL;
+        }
+        log_print(PLATFORM_LOG_PRIORITY_WARN, "PCAP disabled");
+    } else {
+        const char *name = (*env)->GetStringUTFChars(env, name_, 0);
+        ng_add_alloc(name, "name");
+        log_print(PLATFORM_LOG_PRIORITY_WARN, "PCAP file %s record size %d truncate @%ld",
+                    name, pcap_record_size, pcap_file_size);
+
+        pcap_file = fopen(name, "ab+");
+        if (pcap_file == NULL)
+            log_print(PLATFORM_LOG_PRIORITY_ERROR, "PCAP fopen error %d: %s", errno, strerror(errno));
+        else {
+            int flags = fcntl(fileno(pcap_file), F_GETFL, 0);
+            if (flags < 0 || fcntl(fileno(pcap_file), F_SETFL, flags | O_NONBLOCK) < 0)
+                log_print(PLATFORM_LOG_PRIORITY_ERROR, "PCAP fcntl O_NONBLOCK error %d: %s",
+                            errno, strerror(errno));
+
+            long size = ftell(pcap_file);
+            if (size == 0) {
+                log_print(PLATFORM_LOG_PRIORITY_WARN, "PCAP initialize");
+                write_pcap_hdr();
+            } else
+                log_print(PLATFORM_LOG_PRIORITY_WARN, "PCAP current size %ld", size);
+        }
+
+        (*env)->ReleaseStringUTFChars(env, name_, name);
+        ng_delete_alloc(name, __FILE__, __LINE__);
+    }
+}
+
+int wg_write_pcap(const uint8_t *buffer, size_t length) {
+    if (pcap_file == NULL) return -1;
+
+    write_pcap_rec(buffer, length);
+
+    return 0;
+}
+
+int wg_close_pcap() {
+    if (pcap_file == NULL) return 0;
+    if (fclose(pcap_file)) {
+        log_print(PLATFORM_LOG_PRIORITY_ERROR, "PCAP fclose error %d: %s", errno, strerror(errno));
+        return -1;
+    }
+
+    return 0;
 }

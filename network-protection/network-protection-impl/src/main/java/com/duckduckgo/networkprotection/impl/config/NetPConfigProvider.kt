@@ -29,7 +29,11 @@ interface NetPConfigProvider {
     fun dns(): Set<InetAddress> = InetAddress.getAllByName(
         "one.one.one.one",
     ).toSet()
+
+    fun pcapConfig(): PcapConfig? = null
 }
+
+data class PcapConfig(val filename: String, val snapLen: Int, val fileSize: Int)
 
 @ContributesBinding(VpnScope::class)
 class RealNetPConfigProvider @Inject constructor() : NetPConfigProvider

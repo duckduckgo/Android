@@ -105,6 +105,38 @@
                 app:showSwitch="true"
             />
 
+            <!-- Section PCAP -->
+            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+                android:id="@+id/netpDevSettingHeaderPCAPTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/netpDevSettingHeaderPCAP"
+            />
+
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+                android:id="@+id/netpPcapRecordingToggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/netpPcapRecording"
+                app:showSwitch="true"
+            />
+
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+                android:id="@+id/netpDevSettingHeaderPCAPDeleteItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/netpDevSettingHeaderPCAPDelete"
+                app:showSwitch="false"
+            />
+
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+                android:id="@+id/netpSharePcapFileItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/netpDevSettingHeaderPCAPShare"
+                app:showSwitch="false"
+            />
+
         </LinearLayout>
 
     </ScrollView>

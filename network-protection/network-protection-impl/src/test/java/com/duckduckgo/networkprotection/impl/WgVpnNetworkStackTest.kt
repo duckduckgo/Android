@@ -37,12 +37,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
-import org.mockito.kotlin.verifyNoMoreInteractions
-import org.mockito.kotlin.whenever
+import org.mockito.kotlin.*
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -211,7 +206,7 @@ class WgVpnNetworkStackTest {
 
     @Test
     fun whenWgProtocolStartWgReturnsFailureThenOnStartVpnShouldReturnFailure() = runTest {
-        whenever(wgProtocol.startWg(any(), any())).thenReturn(Result.failure(java.lang.IllegalStateException()))
+        whenever(wgProtocol.startWg(any(), any(), eq(null))).thenReturn(Result.failure(java.lang.IllegalStateException()))
         whenever(wgTunnelDataProvider.get()).thenReturn(
             WgTunnelData(
                 userSpaceConfig = "testuserspaceconfig",
@@ -230,7 +225,7 @@ class WgVpnNetworkStackTest {
 
     @Test
     fun whenWgProtocolStartWgReturnsSuccessThenOnStartVpnShouldReturnSuccess() = runTest {
-        whenever(wgProtocol.startWg(any(), any())).thenReturn(Result.success(Unit))
+        whenever(wgProtocol.startWg(any(), any(), eq(null))).thenReturn(Result.success(Unit))
         whenever(wgTunnelDataProvider.get()).thenReturn(
             WgTunnelData(
                 userSpaceConfig = "testuserspaceconfig",

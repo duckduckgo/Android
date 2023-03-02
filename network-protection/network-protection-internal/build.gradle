@@ -35,16 +35,16 @@ dependencies {
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
 
-    implementation project(path: ':network-protection-impl')
-    implementation project(path: ':network-protection-api')
-    implementation project(path: ':network-protection-store')
-    implementation project(path: ':di')
-    implementation project(path: ':common')
-    implementation project(path: ':common-ui')
-    implementation project(path: ':app-build-config-api')
-    implementation project(path: ':privacy-config-api')
-    implementation project(path: ':feature-toggles-api')
-    implementation project(path: ':vpn-api')
+    implementation project(':network-protection-impl')
+    implementation project(':network-protection-api')
+    implementation project(':network-protection-store')
+    implementation project(':di')
+    implementation project(':common')
+    implementation project(':common-ui')
+    implementation project(':app-build-config-api')
+    implementation project(':privacy-config-api')
+    implementation project(':feature-toggles-api')
+    implementation project(':vpn-api')
 
     implementation Square.moshi
 
@@ -76,6 +76,7 @@ dependencies {
     implementation AndroidX.room.rxJava2
     implementation AndroidX.room.ktx
 
+    testImplementation project(':feature-toggles-test')
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4
     testImplementation AndroidX.archCore.testing

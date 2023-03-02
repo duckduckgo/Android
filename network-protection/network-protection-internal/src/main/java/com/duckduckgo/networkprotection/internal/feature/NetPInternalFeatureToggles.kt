@@ -35,4 +35,7 @@ interface NetPInternalFeatureToggles {
 
     @Toggle.DefaultValue(defaultValue = true)
     fun dnsLeakProtection(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = false)
+    fun enablePcapRecording(): Toggle
 }

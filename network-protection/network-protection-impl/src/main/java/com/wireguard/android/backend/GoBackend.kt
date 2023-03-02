@@ -71,6 +71,16 @@ class GoBackend @Inject constructor(
 
     external fun wgVersion(): String
 
+    /**
+     * Configure (enable/disable) the PCAP functionality. When enable the network layer will record a PCAP file
+     * with every outbound IP packet before being encrypted by the VPN tunnel and any inbound decrypted IP packet.
+     *
+     * @param filename is the pcap filename. If `null` is passed, PCAP will be disabled
+     * @param recordSize is the snap length
+     * @param fileSize is the max size of the PCAP file. File will always be truncated to max value
+     */
+    external fun wgPcap(filename: String?, recordSize: Int, fileSize: Int)
+
     // Called from native code
     @Suppress("unused")
     fun shouldAllow(protocol: Int, saddr: String, sport: Int, daddr: String, dport: Int, sni: String, uid: Int): Boolean {
