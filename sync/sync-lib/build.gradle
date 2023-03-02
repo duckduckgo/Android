@@ -24,6 +24,12 @@ dependencies {
     implementation Square.okio
     implementation project(':library-loader-api')
 
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation Testing.junit4
+    testImplementation AndroidX.core
+    testImplementation AndroidX.test.ext.junit
+    testImplementation Testing.robolectric
+
     // Testing dependencies
     androidTestImplementation AndroidX.test.runner
     androidTestImplementation AndroidX.test.ext.junit
