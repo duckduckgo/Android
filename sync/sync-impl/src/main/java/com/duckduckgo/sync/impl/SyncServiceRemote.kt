@@ -46,6 +46,8 @@ interface SyncApi {
     ): Result<Logout>
 
     fun deleteAccount(token: String): Result<Boolean>
+
+    fun patch(): Result<BookmarksResponse>
 }
 
 @ContributesBinding(AppScope::class)

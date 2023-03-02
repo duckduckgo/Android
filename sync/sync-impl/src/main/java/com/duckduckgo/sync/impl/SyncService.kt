@@ -88,3 +88,42 @@ data class ErrorResponse(
     val code: Int = -1,
     val error: String,
 )
+
+data class Setting(
+    val key: String,
+    val value: String,
+)
+
+data class BookmarkPage(
+    val url: String
+)
+
+data class BookmarkFolder(
+    val children: List<String>
+)
+data class Bookmark(
+    val id: String,
+    val title: String,
+    val folder: BookmarkFolder?,
+    val page: BookmarkPage?,
+    val deleted: String?
+)
+data class BookmarksResponse(
+    val last_modified: String,
+    val entries: List<Bookmark>
+)
+data class SettingsResponse(
+    val last_modified: String,
+    val entries: List<Setting>
+)
+
+data class DeviceResponse(
+    val last_modified: String,
+    val entries: List<Device>
+)
+
+data class DataResponse(
+    val bookmarks: String,
+    val settings: SettingsResponse,
+    val devices: DeviceResponse,
+)
