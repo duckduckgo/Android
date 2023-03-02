@@ -89,7 +89,7 @@ class SyncNativeLibTest {
     }
 
     @Test
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.M)
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun whenEncryptingThenResultIsSuccess() {
         val syncNativeLib = SyncNativeLib(InstrumentationRegistry.getInstrumentation().targetContext)
         val accountKeys = syncNativeLib.generateAccountKeys(aUserId, aPassword)
@@ -102,7 +102,7 @@ class SyncNativeLibTest {
     }
 
     @Test
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.M)
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun whenDataIsEncryptedItDecryptsProperly() {
         val syncNativeLib = SyncNativeLib(InstrumentationRegistry.getInstrumentation().targetContext)
         val accountKeys = syncNativeLib.generateAccountKeys(aUserId, aPassword)
