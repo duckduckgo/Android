@@ -17,9 +17,7 @@
 package com.duckduckgo.sync.impl
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Build
-import android.provider.Settings
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
@@ -36,7 +34,6 @@ interface SyncDeviceIds {
 class AppSyncDeviceIds
 @Inject
 constructor(
-    private val context: Context,
     private val syncStore: SyncStore,
 ) : SyncDeviceIds {
     override fun userId(): String {
@@ -61,7 +58,7 @@ constructor(
         var deviceName = syncStore.deviceId
         if (deviceName != null) return deviceName
 
-        deviceName  = UUID.randomUUID().toString()
+        deviceName = UUID.randomUUID().toString()
         return deviceName
     }
 }
