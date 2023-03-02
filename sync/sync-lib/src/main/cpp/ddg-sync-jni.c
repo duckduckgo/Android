@@ -71,6 +71,37 @@ Java_com_duckduckgo_sync_crypto_SyncNativeLib_prepareForLogin(
 }
 
 JNIEXPORT jint JNICALL
+Java_com_duckduckgo_sync_crypto_SyncNativeLib_encrypt(
+    JNIEnv *env,
+    jclass clazz,
+    jbyteArray encryptedBytes,
+    jbyteArray rawBytes,
+    jbyteArray secretKey
+) {
+    jsize rawBytesLength = (*env)->GetArrayLength(env, rawBytes);
+
+    // Get pointers to the arrays
+    jbyte* encryptedBytesElements = (*env)->GetByteArrayElements(env, encryptedBytes, NULL);
+    jbyte* rawBytesElements = (*env)->GetByteArrayElements(env, rawBytes, NULL);
+    jbyte* secretKeyElements = (*env)->GetByteArrayElements(env, secretKey, NULL);
+
+    // Call the C function
+    jint result = ddgSyncEncrypt(
+      (unsigned char *)encryptedBytesElements,
+      (unsigned char *)rawBytesElements,
+      (unsigned long long)rawBytesLength,
+      (unsigned char *)secretKeyElements
+    );
+
+    // Release the input arrays
+    (*env)->ReleaseByteArrayElements(env, encryptedBytes, encryptedBytesElements, JNI_COMMIT);
+    (*env)->ReleaseByteArrayElements(env, rawBytes, rawBytesElements, JNI_ABORT);
+    (*env)->ReleaseByteArrayElements(env, secretKey, secretKeyElements, JNI_ABORT);
+
+    return result;
+}
+
+JNIEXPORT jint JNICALL
 Java_com_duckduckgo_sync_crypto_SyncNativeLib_decrypt(
     JNIEnv *env,
     jclass clazz,
