@@ -29,7 +29,7 @@
     <string name="windows_waitlist_on_the_list_notification_enabled">Te enviaremos una notificación cuando tu copia de DuckDuckGo para Windows esté lista para descargar.</string>
     <string name="windows_waitlist_on_the_list_notification_disabled">Tu invitación para probar DuckDuckGo para Windows llegará aquí. Vuelve a mirar pronto, aunque también podemos enviarte una notificación cuando llegue tu turno.</string>
 
-    <string name="notification_channel_windows_waitlist">Invitaciones a la lista de espera</string>
+    <string name="notification_channel_windows_waitlist">Invitaciones de la lista de espera</string>
     <string name="windows_notification_title">¡Empieza a probar DuckDuckGo para Windows!</string>
     <string name="windows_notification_text">Abrir tu invitación</string>
 
