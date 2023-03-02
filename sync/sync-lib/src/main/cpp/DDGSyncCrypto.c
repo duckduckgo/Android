@@ -131,7 +131,7 @@ DDGSyncCryptoResult ddgSyncEncrypt(
         return DDGSYNCCRYPTO_ENCRYPTION_FAILED;
     }
 
-    memcpy(&encryptedBytes[crypto_secretbox_MACBYTES + rawBytesLength], nonceBytes, crypto_secretbox_NONCEBYTES);
+    memcpy(&encryptedBytes[rawBytesLength + crypto_secretbox_MACBYTES], nonceBytes, crypto_secretbox_NONCEBYTES);
 
     return DDGSYNCCRYPTO_OK;
 }

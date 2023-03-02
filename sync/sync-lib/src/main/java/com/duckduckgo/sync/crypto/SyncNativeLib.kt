@@ -121,13 +121,13 @@ class SyncNativeLib constructor(context: Context) : SyncLib {
     ): EncryptResult {
         val rawDataByteArray = rawData.decode()
         val secretKeyByteArray = secretKey.decode()
-        val encryptedData = ByteArray(rawDataByteArray.size + getEncryptedExtraBytes())
+        val encryptedDataByteArray = ByteArray(rawDataByteArray.size + getEncryptedExtraBytes())
 
-        val result: Long = encrypt(rawDataByteArray, encryptedData, secretKeyByteArray)
+        val result: Long = encrypt(encryptedDataByteArray, rawDataByteArray, secretKeyByteArray)
 
         return EncryptResult(
             result = result,
-            encryptedData = encryptedData.encode(),
+            encryptedData = encryptedDataByteArray.encode(),
         )
     }
 

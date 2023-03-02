@@ -94,8 +94,8 @@ Java_com_duckduckgo_sync_crypto_SyncNativeLib_encrypt(
     );
 
     // Release the input arrays
-    (*env)->ReleaseByteArrayElements(env, encryptedBytes, encryptedBytesElements, JNI_ABORT);
-    (*env)->ReleaseByteArrayElements(env, rawBytes, rawBytesElements, JNI_COMMIT);
+    (*env)->ReleaseByteArrayElements(env, encryptedBytes, encryptedBytesElements, JNI_COMMIT);
+    (*env)->ReleaseByteArrayElements(env, rawBytes, rawBytesElements, JNI_ABORT);
     (*env)->ReleaseByteArrayElements(env, secretKey, secretKeyElements, JNI_ABORT);
 
     return result;

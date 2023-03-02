@@ -87,20 +87,33 @@ class SyncNativeLibTest {
     }
 
     @Test
-    fun whenDataIsEncryptedItDecryptsProperly(){
+    fun whenEncryptingThenResultIsSuccess(){
         val syncNativeLib = SyncNativeLib(InstrumentationRegistry.getInstrumentation().targetContext)
         val accountKeys = syncNativeLib.generateAccountKeys(aUserId, aPassword)
 
         val whatToEncrypt = "bookmark"
 
         val encryptedResult = syncNativeLib.encrypt(whatToEncrypt, accountKeys.primaryKey)
+
+        assertEquals(0, encryptedResult.result)
+    }
+
+    @Test
+    fun whenDataIsEncryptedItDecryptsProperly(){
+        val syncNativeLib = SyncNativeLib(InstrumentationRegistry.getInstrumentation().targetContext)
+        val accountKeys = syncNativeLib.generateAccountKeys(aUserId, aPassword)
+
+        val whatToEncrypt = "bookmark"
+
+        val encryptedResult = syncNativeLib.encrypt(whatToEncrypt, accountKeys.protectedSecretKey)
         val decryptedResult = syncNativeLib.decrypt(encryptedResult.encryptedData, accountKeys.primaryKey)
 
+        assertEquals(0, decryptedResult.result)
         assertEquals(whatToEncrypt, decryptedResult.decryptedData)
     }
 
     @Test
-    fun whenKeysAreDecryptedThenEncryptingThemReturnsTheSameResult(){
+    fun whenKeysAreDecryptedThenEncryptingThenReturnsTheSameResult(){
         val syncNativeLib = SyncNativeLib(InstrumentationRegistry.getInstrumentation().targetContext)
         val accountKeys = syncNativeLib.generateAccountKeys(aUserId, aPassword)
         val prepareForLogin = syncNativeLib.prepareForLogin(accountKeys.primaryKey)
