@@ -194,7 +194,7 @@ constructor(
     fun onConnectQRScanned(contents: String) {
         viewModelScope.launch(dispatchers.io()) {
             val result = syncRepository.connectDevice(contents)
-            when(result) {
+            when (result) {
                 is Error -> {
                     command.send(Command.ShowMessage("$result"))
                 }
@@ -208,13 +208,13 @@ constructor(
 
     fun onConnectStart() {
         viewModelScope.launch(dispatchers.io()) {
-            val qrCode = syncRepository.getLinkingQR()
+            val qrCode = syncRepository.getConnectQR()
             updateViewState()
             command.send(ShowQR(qrCode))
             var polling = true
-            while(polling) {
+            while (polling) {
                 delay(7000)
-                when(val result = syncRepository.pollConnectionKeys()) {
+                when (val result = syncRepository.pollConnectionKeys()) {
                     is Error -> {
                         command.send(Command.ShowMessage("$result"))
                     }

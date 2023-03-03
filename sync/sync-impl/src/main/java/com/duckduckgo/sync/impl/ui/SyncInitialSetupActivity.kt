@@ -66,7 +66,6 @@ class SyncInitialSetupActivity : DuckDuckGoActivity() {
         if (result.contents == null) {
             Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show()
         } else {
-            Timber.i("SYNC contents ${result.contents}")
             viewModel.onConnectQRScanned(result.contents)
         }
     }

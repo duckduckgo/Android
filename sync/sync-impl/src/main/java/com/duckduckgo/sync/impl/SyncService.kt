@@ -63,7 +63,7 @@ interface SyncService {
     @GET("https://dev-sync-use.duckduckgo.com/sync/connect/{device_id}")
     fun connectDevice(
         @Path("device_id") deviceId: String,
-    ): Call<ConnectKeys>
+    ): Call<ConnectKey>
 }
 
 data class Login(
@@ -85,7 +85,7 @@ data class Logout(
     val device_id: String,
 )
 
-data class ConnectKeys(
+data class ConnectKey(
     val encrypted_recovery_key: String,
 )
 

@@ -130,10 +130,10 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
     override fun connect(
         token: String,
         deviceId: String,
-        publicKey: String
+        publicKey: String,
     ): Result<Boolean> {
         val response = runCatching {
-            val logoutCall = syncService.connect("Bearer $token",Connect(device_id = deviceId, encrypted_recovery_key = publicKey))
+            val logoutCall = syncService.connect("Bearer $token", Connect(device_id = deviceId, encrypted_recovery_key = publicKey))
             logoutCall.execute()
         }.getOrElse { throwable ->
             return Result.Error(reason = throwable.message.toString())

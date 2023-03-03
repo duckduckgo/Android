@@ -19,7 +19,6 @@ package com.duckduckgo.sync.impl
 import androidx.annotation.WorkerThread
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.crypto.AccountKeys
-import com.duckduckgo.sync.crypto.ConnectKeys
 import com.duckduckgo.sync.crypto.LoginKeys
 import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.impl.Result.Error
@@ -48,7 +47,7 @@ interface SyncRepository {
     fun latestToken(): String
     fun getRecoveryCode(): String?
     fun getConnectedDevices(): Result<List<ConnectedDevice>>
-    fun getLinkingQR(): String
+    fun getConnectQR(): String
     fun connectDevice(contents: String): Result<Boolean>
     fun pollConnectionKeys(): Result<Boolean>
 }
@@ -149,17 +148,17 @@ class AppSyncRepository @Inject constructor(
         return Adapters.recoveryCodeAdapter.toJson(LinkCode(RecoveryCode(primaryKey, userID)))
     }
 
-    override fun getLinkingQR(): String {
+    override fun getConnectQR(): String {
         val prepareForConnect = nativeLib.prepareForConnect()
         val deviceId = syncDeviceIds.deviceId()
         syncStore.deviceId = deviceId
         syncStore.primaryKey = prepareForConnect.publicKey
         syncStore.secretKey = prepareForConnect.secretKey
-        return Adapters.connectCodeAdapter.toJson(ConnectCode(deviceId = deviceId, publicKey = prepareForConnect.publicKey))
+        return Adapters.recoveryCodeAdapter.toJson(LinkCode(connect = ConnectCode(device_id = deviceId, secret_key = prepareForConnect.publicKey)))
     }
 
     override fun connectDevice(contents: String): Result<Boolean> {
-        val connectKeys = Adapters.connectCodeAdapter.fromJson(contents) ?: return Result.Error(reason = "Error reading json")
+        val connectKeys = Adapters.recoveryCodeAdapter.fromJson(contents)?.connect ?: return Result.Error(reason = "Error reading json")
         if (!isSignedIn()) {
             val result = createAccount()
             if (result is Error) return result
@@ -168,14 +167,14 @@ class AppSyncRepository @Inject constructor(
         val primaryKey = syncStore.primaryKey ?: return Result.Error(reason = "Error reading PK")
         val userId = syncStore.userId ?: return Result.Error(reason = "Error reading UserId")
         val token = syncStore.token ?: return Result.Error(reason = "Error token")
+        val recoverKey = Adapters.recoveryCodeAdapter.toJson(LinkCode(RecoveryCode(primaryKey = primaryKey, userId = userId)))
+        val seal = nativeLib.seal(recoverKey, connectKeys.secret_key)
 
-        val seal = nativeLib.seal("$userId;$primaryKey", connectKeys.publicKey)
-
-        return syncApi.connect(token = token, deviceId = connectKeys.deviceId, publicKey = seal)
+        return syncApi.connect(token = token, deviceId = connectKeys.device_id, publicKey = seal)
     }
 
     override fun pollConnectionKeys(): Result<Boolean> {
-        val deviceId = syncStore.deviceId!!
+        val deviceId = syncDeviceIds.deviceId()
         val result = syncApi.connectDevice(deviceId)
 
         return when (result) {
@@ -184,10 +183,10 @@ class AppSyncRepository @Inject constructor(
             }
             is Result.Success -> {
                 val sealOpen = nativeLib.sealOpen(result.data, syncStore.primaryKey!!, syncStore.secretKey!!)
-                val split = sealOpen.split(";")
-                syncStore.userId = split.first()
-                syncStore.primaryKey = split.last()
-                return login(syncStore.userId!!, syncStore.primaryKey!!)
+                val recoveryCode = Adapters.recoveryCodeAdapter.fromJson(sealOpen)?.recovery ?: return Result.Error(reason = "Error reading json")
+                syncStore.userId = recoveryCode.userId
+                syncStore.primaryKey = recoveryCode.primaryKey
+                return login(recoveryCode.userId, recoveryCode.primaryKey)
             }
         }
     }
@@ -347,9 +346,6 @@ class AppSyncRepository @Inject constructor(
         companion object {
             private val moshi = Moshi.Builder().build()
             val recoveryCodeAdapter: JsonAdapter<LinkCode> = moshi.adapter(LinkCode::class.java)
-
-            val connectCodeAdapter: JsonAdapter<ConnectCode> =
-                moshi.adapter(ConnectCode::class.java)
         }
     }
 }
@@ -364,7 +360,8 @@ data class AccountInfo(
 )
 
 data class LinkCode(
-    val recovery: RecoveryCode,
+    val recovery: RecoveryCode? = null,
+    val connect: ConnectCode? = null,
 )
 
 data class RecoveryCode(
@@ -379,8 +376,8 @@ data class ConnectedDevice(
 )
 
 data class ConnectCode(
-    val deviceId: String,
-    val publicKey: String,
+    val device_id: String,
+    val secret_key: String,
 )
 
 sealed class Result<out R> {
