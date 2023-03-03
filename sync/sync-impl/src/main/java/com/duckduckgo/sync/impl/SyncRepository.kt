@@ -97,10 +97,10 @@ class AppSyncRepository @Inject constructor(
     override fun login(): Result<Boolean> {
         val recoveryCodeJson = syncStore.recoveryCode ?: return Result.Error(reason = "Not existing recovery code")
         val recoveryCode =
-            Adapters.recoveryCodeAdapter.fromJson(recoveryCodeJson) ?: return Result.Error(reason = "Failed reading json recovery code")
+            Adapters.recoveryCodeAdapter.fromJson(recoveryCodeJson)?.recovery ?: return Result.Error(reason = "Failed reading json recovery code")
 
-        val primaryKey = recoveryCode.primaryKey
-        val userId = recoveryCode.userID
+        val primaryKey = recoveryCode.primary_key
+        val userId = recoveryCode.user_id
         val deviceId = syncDeviceIds.deviceId()
         val deviceName = syncDeviceIds.deviceName()
 
@@ -108,9 +108,9 @@ class AppSyncRepository @Inject constructor(
     }
 
     override fun login(recoveryCodeRawJson: String): Result<Boolean> {
-        val recoveryCode = Adapters.recoveryCodeAdapter.fromJson(recoveryCodeRawJson) ?: return Result.Error(reason = "Failed reading json")
-        val primaryKey = recoveryCode.primaryKey
-        val userId = recoveryCode.userID
+        val recoveryCode = Adapters.recoveryCodeAdapter.fromJson(recoveryCodeRawJson)?.recovery ?: return Result.Error(reason = "Failed reading json")
+        val primaryKey = recoveryCode.primary_key
+        val userId = recoveryCode.user_id
         val deviceId = syncDeviceIds.deviceId()
         val deviceName = syncDeviceIds.deviceName()
 
@@ -134,7 +134,7 @@ class AppSyncRepository @Inject constructor(
     override fun storeRecoveryCode() {
         val primaryKey = syncStore.primaryKey ?: return
         val userID = syncStore.userId ?: return
-        val recoveryCodeJson = Adapters.recoveryCodeAdapter.toJson(RecoveryCode(primaryKey, userID))
+        val recoveryCodeJson = Adapters.recoveryCodeAdapter.toJson(LinkCode(RecoveryCode(primaryKey, userID)))
 
         Timber.i("SYNC store recoverCode: $recoveryCodeJson")
         syncStore.recoveryCode = recoveryCodeJson
@@ -143,7 +143,7 @@ class AppSyncRepository @Inject constructor(
     override fun getRecoveryCode(): String? {
         val primaryKey = syncStore.primaryKey ?: return null
         val userID = syncStore.userId ?: return null
-        return Adapters.recoveryCodeAdapter.toJson(RecoveryCode(primaryKey, userID))
+        return Adapters.recoveryCodeAdapter.toJson(LinkCode(RecoveryCode(primaryKey, userID)))
     }
 
     override fun removeAccount() {
@@ -262,7 +262,7 @@ class AppSyncRepository @Inject constructor(
     private class Adapters {
         companion object {
             private val moshi = Moshi.Builder().build()
-            val recoveryCodeAdapter: JsonAdapter<RecoveryCode> = moshi.adapter(RecoveryCode::class.java)
+            val recoveryCodeAdapter: JsonAdapter<LinkCode> = moshi.adapter(LinkCode::class.java)
         }
     }
 }
@@ -276,9 +276,13 @@ data class AccountInfo(
     val secretKey: String = "",
 )
 
+data class LinkCode(
+    val recovery: RecoveryCode,
+)
+
 data class RecoveryCode(
-    val primaryKey: String,
-    val userID: String,
+    val primary_key: String,
+    val user_id: String,
 )
 
 data class ConnectedDevice(

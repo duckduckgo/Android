@@ -100,7 +100,7 @@ object TestSyncFixtures {
     val deleteAccountSuccess = Result.Success(true)
     val deleteAccountInvalid = Result.Error(code = wrongCredentialsCodeErr, reason = wrongCredentialsMessageErr)
 
-    val jsonRecoveryKey = "{\"primaryKey\":\"$primaryKey\",\"userID\":\"$userId\"}"
+    val jsonRecoveryKey = "{\"recovery\":{\"primary_key\":\"$primaryKey\",\"user_id\":\"$userId\"}}"
     val validLoginKeys = LoginKeys(result = 0L, passwordHash = hashedPassword, stretchedPrimaryKey = stretchedPrimaryKey, primaryKey = primaryKey)
     val failedLoginKeys = LoginKeys(result = 9L, passwordHash = "", stretchedPrimaryKey = "", primaryKey = "")
     val decryptedSecretKey = DecryptResult(result = 0L, decryptedData = secretKey)
