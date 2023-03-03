@@ -52,7 +52,10 @@ class NetPInternalConfigProvider @Inject constructor(
 
     override fun dns(): Set<InetAddress> {
         return if (netPInternalFeatureToggles.dnsLeakProtection().isEnabled()) {
-            InetAddress.getAllByName("one.one.one.one").toSet()
+            mutableSetOf(
+                *InetAddress.getAllByName("10.11.12.1"),
+                *InetAddress.getAllByName("one.one.one.one"),
+            ).toSet()
         } else {
             emptySet()
         }
