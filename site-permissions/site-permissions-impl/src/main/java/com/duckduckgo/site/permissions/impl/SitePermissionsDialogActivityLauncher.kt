@@ -35,11 +35,9 @@ import com.google.android.material.snackbar.BaseTransientBottomBar.BaseCallback
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.snackbar.Snackbar.SnackbarLayout
 import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
 import javax.inject.Inject
 
 @ContributesBinding(FragmentScope::class)
-@SingleInstanceIn(FragmentScope::class)
 class SitePermissionsDialogActivityLauncher @Inject constructor(
     private val systemPermissionsHelper: SystemPermissionsHelper,
     private val sitePermissionsRepository: SitePermissionsRepository,
