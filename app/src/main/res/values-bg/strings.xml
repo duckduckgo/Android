@@ -245,7 +245,7 @@
     <string name="surveyCtaLaunchButton">Попълнете анкетата</string>
     <string name="surveyCtaDismissButton">Не, благодаря</string>
     <string name="surveyActivityTitle">Потребителска анкета</string>
-    <string name="surveyTitle">АНКЕТА НА DUCKDUCKGO</string>
+    <string name="surveyTitle">Анкета на DuckDuckGo</string>
     <string name="surveyDismissContentDescription">Отхвърляне на анкетата</string>
     <string name="surveyLoadingErrorTitle">О, не!</string>
     <string name="surveyLoadingErrorText">В момента анкетата ни не се зарежда.\n Моля, опитайте отново по-късно.</string>
@@ -361,7 +361,7 @@
     <string name="otherMainReasonTitleShort">Други проблеми</string>
 
     <string name="openEndedInputHint">Моля, бъдете колкото може по-конкретни</string>
-    <string name="submitFeedback">ИЗПРАТИ</string>
+    <string name="submitFeedback">Изпрати</string>
 
     <string name="tellUsHowToImprove">Моля, кажете ни какво можем да подобрим.</string>
     <string name="thanksForTheFeedback">Благодарим за отзивите!</string>
@@ -372,8 +372,8 @@
     <string name="whatHaveYouBeenEnjoying">Кое Ви беше най-приятно?</string>
     <string name="awesomeToHear">Страхотно е да чуем това!</string>
     <string name="shareTheLoveWithARating">Моля, споделете вашето харесване като оцените в Play Store.</string>
-    <string name="rateTheApp">ОЦЕНКА НА ПРИЛОЖЕНИЕТО</string>
-    <string name="declineFurtherFeedback">НЕ БЛАГОДАРЯ, ПРИКЛЮЧИХ</string>
+    <string name="rateTheApp">Оценка на приложението</string>
+    <string name="declineFurtherFeedback">Не, благодаря, приключих</string>
     <string name="whichBrokenSites">Къде виждате тези проблеми?</string>
     <string name="whichBrokenSitesHint">В кой уебсайт има проблеми?</string>
     <string name="feedbackSpecificAsPossible">Моля, бъдете колкото може по-конкретни</string>
@@ -389,7 +389,6 @@
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">От това устройство</string>
-    <string name="systemSearchOmnibarInputHint"><font size="13">Търсене или въвеждане на URL адрес</font></string>
     <string name="systemSearchAppNotFound">Приложението не може да бъде намерено</string>
     <string name="systemSearchOnboardingText">Благодарим ви, че избрахте DuckDuckGo!\nС използването на нашата търсачка или приложение вашите търсения са защитени.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Приложението също:</string>
