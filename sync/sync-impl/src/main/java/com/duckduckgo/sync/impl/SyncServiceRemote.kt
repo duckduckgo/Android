@@ -23,7 +23,6 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import javax.inject.Inject
 import retrofit2.Response
-import timber.log.Timber
 
 interface SyncApi {
     fun createAccount(

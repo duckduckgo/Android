@@ -42,7 +42,6 @@ import com.journeyapps.barcodescanner.ScanIntentResult
 import com.journeyapps.barcodescanner.ScanOptions
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
 class SyncInitialSetupActivity : DuckDuckGoActivity() {
