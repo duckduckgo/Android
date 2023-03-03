@@ -18,7 +18,6 @@ package com.duckduckgo.windows.impl.ui
 
 import android.content.Context
 import android.util.Log
-import androidx.lifecycle.Lifecycle.Event
 import androidx.lifecycle.LifecycleOwner
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -90,7 +89,7 @@ class WindowsWaitlistCodeFetcherTest {
         givenUserIsInTheQueueAndCodeAlreadyExists()
         enqueueWaitlistWorker()
 
-        testee.onStateChanged(lifecycleOwner, Event.ON_START)
+        testee.onStart(lifecycleOwner)
 
         assertWaitlistWorkerIsNotEnqueued()
     }
@@ -100,7 +99,7 @@ class WindowsWaitlistCodeFetcherTest {
         givenUserIsInTheQueueAndCodeReturned()
         enqueueWaitlistWorker()
 
-        testee.onStateChanged(lifecycleOwner, Event.ON_START)
+        testee.onStart(lifecycleOwner)
 
         assertWaitlistWorkerIsNotEnqueued()
     }
@@ -110,7 +109,7 @@ class WindowsWaitlistCodeFetcherTest {
         givenUserIsInTheQueueAndCodeReturned()
         enqueueWaitlistWorker()
 
-        testee.onStateChanged(lifecycleOwner, Event.ON_START)
+        testee.onStart(lifecycleOwner)
 
         verify(mockNotificationSender).sendNotification(mockNotification)
     }
@@ -120,7 +119,7 @@ class WindowsWaitlistCodeFetcherTest {
         givenUserIsInTheQueueAndNoCodeReturned()
         enqueueWaitlistWorker()
 
-        testee.onStateChanged(lifecycleOwner, Event.ON_START)
+        testee.onStart(lifecycleOwner)
 
         verify(mockNotificationSender, never()).sendNotification(mockNotification)
         assertWaitlistWorkerIsEnqueued()
@@ -130,7 +129,7 @@ class WindowsWaitlistCodeFetcherTest {
     fun whenExecuteWaitlistCodeFetcherIfUserInNotInQueueThenDoNothing() = runTest {
         whenever(mockWindowsWaitlistManager.getState()).thenReturn(NotJoinedQueue)
 
-        testee.onStateChanged(lifecycleOwner, Event.ON_START)
+        testee.onStart(lifecycleOwner)
 
         verify(mockWindowsWaitlistManager, never()).fetchInviteCode()
     }
@@ -139,7 +138,7 @@ class WindowsWaitlistCodeFetcherTest {
     fun whenExecuteWaitlistCodeFetcherIfUserIsInBetaThenDoNothing() = runTest {
         whenever(mockWindowsWaitlistManager.getState()).thenReturn(InBeta("inviteCode"))
 
-        testee.onStateChanged(lifecycleOwner, Event.ON_START)
+        testee.onStart(lifecycleOwner)
 
         verify(mockWindowsWaitlistManager, never()).fetchInviteCode()
     }

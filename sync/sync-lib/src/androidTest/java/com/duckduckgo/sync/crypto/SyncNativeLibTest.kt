@@ -16,7 +16,9 @@
 
 package com.duckduckgo.sync.crypto
 
+import android.os.Build
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import okio.ByteString.Companion.decodeBase64
 import org.junit.Assert.*
@@ -84,6 +86,34 @@ class SyncNativeLibTest {
         val decryptedSecretKey = syncNativeLib.decrypt(accountKeys.protectedSecretKey, prepareForLogin.stretchedPrimaryKey)
 
         assertEquals(accountKeys.secretKey, decryptedSecretKey.decryptedData)
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun whenEncryptingThenResultIsSuccess() {
+        val syncNativeLib = SyncNativeLib(InstrumentationRegistry.getInstrumentation().targetContext)
+        val accountKeys = syncNativeLib.generateAccountKeys(aUserId, aPassword)
+
+        val whatToEncrypt = "bookmark"
+
+        val encryptedResult = syncNativeLib.encrypt(whatToEncrypt, accountKeys.primaryKey)
+
+        assertEquals(0, encryptedResult.result)
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun whenDataIsEncryptedItDecryptsProperly() {
+        val syncNativeLib = SyncNativeLib(InstrumentationRegistry.getInstrumentation().targetContext)
+        val accountKeys = syncNativeLib.generateAccountKeys(aUserId, aPassword)
+
+        val whatToEncrypt = "bookmark"
+
+        val encryptedResult = syncNativeLib.encrypt(whatToEncrypt, accountKeys.primaryKey)
+        val decryptedResult = syncNativeLib.decrypt(encryptedResult.encryptedData, accountKeys.primaryKey)
+
+        assertEquals(0, decryptedResult.result)
+        assertEquals(whatToEncrypt, decryptedResult.decryptedData)
     }
 
     companion object {

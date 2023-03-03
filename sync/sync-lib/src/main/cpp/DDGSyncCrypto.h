@@ -64,7 +64,7 @@ extern DDGSyncCryptoResult ddgSyncPrepareForLogin(
 
 /**
  * @param encryptedBytes OUT - the size of this should be equal to the size of data to encrypt, plus crypto_secretbox_MACBYTES (16 bytes) plus crypto_secretbox_NONCEBYTES (16).  The output will be the encrypted data, plus MAC, plus nonce.
- * @param rawBytes IN - the data to be encrypted.  Should be of size specified by rawDataLength
+ * @param rawBytes IN - the data to be encrypted.  Should be of size specified by rawBytesLength
  * @param rawBytesLength IN - the length of the data to be encrypted
  * @param secretKey IN - the secret key (assumed to be of length DDGSYNCCRYPTO_SECRET_KEY_SIZE)
  */

@@ -51,9 +51,11 @@ import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.di.scopes.ActivityScope
 import java.util.*
 import javax.inject.Inject
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -85,6 +87,8 @@ class AutofillSettingsViewModel @Inject constructor(
 
     // after unlocking, we want to know which mode to return to
     private var credentialModeBeforeLocking: CredentialMode? = null
+
+    private var combineJob: Job? = null
 
     fun onCopyUsername(username: String?) {
         username?.let { clipboardInteractor.copyToClipboard(it) }
@@ -272,10 +276,10 @@ class AutofillSettingsViewModel @Inject constructor(
     }
 
     fun observeCredentials() {
-        viewModelScope.launch(dispatchers.default()) {
+        if (combineJob != null) return
+        combineJob = viewModelScope.launch(dispatchers.io()) {
             _viewState.value = _viewState.value.copy(autofillEnabled = autofillStore.autofillEnabled)
-
-            val allCredentials = autofillStore.getAllCredentials()
+            val allCredentials = autofillStore.getAllCredentials().distinctUntilChanged()
             val combined = allCredentials.combine(searchQueryFilter) { credentials, filter ->
                 credentialListFilter.filter(credentials, filter)
             }
