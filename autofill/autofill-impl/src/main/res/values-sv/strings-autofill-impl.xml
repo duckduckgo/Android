@@ -30,7 +30,7 @@
     <string name="saveLoginDialogButtonSave">Spara inloggning</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Spara lösenord</string>
     <string name="saveLoginDialogNotNow">Inte nu</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Inloggningar lagras säkert, bara på den här enheten, och kan hanteras genom menyn Automatisk ifyllning i inställningarna.</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">DuckDuckGo lagrar denna inloggning säkert på din enhet. Du kan hantera sparade inloggningar i Inställningar.</string>
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Vill du att DuckDuckGo ska spara din inloggning?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Fler alternativ</string>
 
