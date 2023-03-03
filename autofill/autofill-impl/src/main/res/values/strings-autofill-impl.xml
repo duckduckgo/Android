@@ -30,7 +30,7 @@
     <string name="saveLoginDialogButtonSave">Save Login</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Save Password</string>
     <string name="saveLoginDialogNotNow">Not Now</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Logins are stored securely on this device only, and can be managed from the Autofill menu in Settings.</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">DuckDuckGo will securely store this Login on your device. You can manage saved Logins in Settings.</string>
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Do you want DuckDuckGo to save your Login?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">More Options</string>
 
