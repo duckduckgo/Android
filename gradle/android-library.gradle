@@ -69,10 +69,6 @@ tasks.register('jvm_tests') {
     dependsOn 'testDebugUnitTest'
 }
 
-tasks.register('code_format_checks') {
-    dependsOn 'spotlessCheck', 'lintKotlin'
-}
-
 tasks.register('lint_check') {
     dependsOn 'lint'
 }

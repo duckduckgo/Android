@@ -19,3 +19,7 @@ spotless {
 kotlinter {
     disabledRules = ['no-wildcard-imports', 'filename', 'package-name', 'annotation-spacing']
 }
+
+tasks.register('code_format_checks') {
+    dependsOn 'spotlessCheck', 'lintKotlin'
+}
