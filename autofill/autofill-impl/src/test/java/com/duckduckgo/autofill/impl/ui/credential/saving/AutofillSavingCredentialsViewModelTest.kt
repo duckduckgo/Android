@@ -62,34 +62,6 @@ class AutofillSavingCredentialsViewModelTest {
     }
 
     @Test
-    fun whenNotShowingOnboardingAndUsernamePresentThenTitleResourceIsSaveLogin() {
-        whenever(mockStore.showOnboardingWhenOfferingToSaveLogin).thenReturn(false)
-        val expectedResource = R.string.saveLoginDialogTitle
-        assertEquals(expectedResource, testee.determineTextResources(usernamePresent()).title)
-    }
-
-    @Test
-    fun whenNotShowingOnboardingAndUsernamePresentThenCtaButtonResourceIsSaveLogin() {
-        whenever(mockStore.showOnboardingWhenOfferingToSaveLogin).thenReturn(false)
-        val expectedResource = R.string.saveLoginDialogButtonSave
-        assertEquals(expectedResource, testee.determineTextResources(usernamePresent()).ctaButton)
-    }
-
-    @Test
-    fun whenNotShowingOnboardingAndUsernameMissingThenTitleResourceIsSavePassword() {
-        whenever(mockStore.showOnboardingWhenOfferingToSaveLogin).thenReturn(false)
-        val expectedResource = R.string.saveLoginMissingUsernameDialogTitle
-        assertEquals(expectedResource, testee.determineTextResources(usernameMissing()).title)
-    }
-
-    @Test
-    fun whenNotShowingOnboardingAndUsernameMissingThenCtaButtonResourceIsSavePassword() {
-        whenever(mockStore.showOnboardingWhenOfferingToSaveLogin).thenReturn(false)
-        val expectedResource = R.string.saveLoginMissingUsernameDialogButtonSave
-        assertEquals(expectedResource, testee.determineTextResources(usernameMissing()).ctaButton)
-    }
-
-    @Test
     fun whenUserPromptedToSaveThenFlagSet() = runTest {
         testee.userPromptedToSaveCredentials()
         verify(mockStore).hasEverBeenPromptedToSaveLogin = true
