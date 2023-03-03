@@ -270,7 +270,7 @@
     <string name="appEnjoymentDialogTitle">Ti piace DuckDuckGo?</string>
     <string name="appEnjoymentDialogMessage">Ci piacerebbe sapere cosa ne pensi.</string>
     <string name="appEnjoymentDialogPositiveButton">Mi piace</string>
-    <string name="appEnjoymentDialogNegativeButton">Deve essere migliorata</string>
+    <string name="appEnjoymentDialogNegativeButton">Ha bisogno di miglioramenti</string>
 
     <string name="rateAppDialogTitle">Valuta l\'app</string>
     <string name="rateAppDialogMessage">Il tuo feedback ci interessa. Condividi il tuo apprezzamento con una recensione.</string>
@@ -361,7 +361,7 @@
     <string name="otherMainReasonTitleShort">Altri problemi</string>
 
     <string name="openEndedInputHint">Sii quanto più specifico possibile</string>
-    <string name="submitFeedback">INVIA</string>
+    <string name="submitFeedback">Invia</string>
 
     <string name="tellUsHowToImprove">Dicci cosa potremmo migliorare.</string>
     <string name="thanksForTheFeedback">Grazie per il tuo feedback!</string>
@@ -372,8 +372,8 @@
     <string name="whatHaveYouBeenEnjoying">Cosa ti è piaciuto?</string>
     <string name="awesomeToHear">Fantastico!</string>
     <string name="shareTheLoveWithARating">Condividi il tuo parere positivo valutando l\'app in Play Store.</string>
-    <string name="rateTheApp">VALUTA L\'APP</string>
-    <string name="declineFurtherFeedback">NO, GRAZIE</string>
+    <string name="rateTheApp">Valuta l\'app</string>
+    <string name="declineFurtherFeedback">No grazie</string>
     <string name="whichBrokenSites">Dove hai notato questi problemi?</string>
     <string name="whichBrokenSitesHint">Quale sito web presenta problemi?</string>
     <string name="feedbackSpecificAsPossible">Sii quanto più specifico possibile</string>
@@ -389,7 +389,6 @@
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Da questo dispositivo</string>
-    <string name="systemSearchOmnibarInputHint"><font size="13">Cerca o inserisci URL</font></string>
     <string name="systemSearchAppNotFound">Impossibile trovare l\'applicazione</string>
     <string name="systemSearchOnboardingText">Grazie per aver scelto DuckDuckGo!\nOra, quando usi il nostro motore di ricerca o la nostra app, le tue ricerche sono protette.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Inoltre, l\'app DuckDuckGo:</string>

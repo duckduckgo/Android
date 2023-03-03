@@ -104,7 +104,7 @@
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Zavřít</string>
     <string name="closeAllTabsMenuItem">Zavřít všechny karty</string>
-    <string name="closeTab">Zavřít karta</string>
+    <string name="closeTab">Zavřít kartu</string>
     <string name="tabClosed">Karta zavřená</string>
     <string name="tabClosedUndo">Vrátit</string>
     <string name="downloadsMenuItemTitle">Stahování</string>
@@ -245,7 +245,7 @@
     <string name="surveyCtaLaunchButton">Zúčastnit se průzkumu</string>
     <string name="surveyCtaDismissButton">Ne, děkuji</string>
     <string name="surveyActivityTitle">Průzkum uživatelů</string>
-    <string name="surveyTitle">PRŮZKUM DUCKDUCKGO</string>
+    <string name="surveyTitle">Průzkum DuckDuckGo</string>
     <string name="surveyDismissContentDescription">Odmítnout průzkum</string>
     <string name="surveyLoadingErrorTitle">Ale ne!</string>
     <string name="surveyLoadingErrorText">Náš průzkum se momentálně nenačítá.\nZkuste to prosím později.</string>
@@ -361,7 +361,7 @@
     <string name="otherMainReasonTitleShort">Další problémy</string>
 
     <string name="openEndedInputHint">Buďte co nejkonkrétnější.</string>
-    <string name="submitFeedback">ODESLAT</string>
+    <string name="submitFeedback">Odeslat</string>
 
     <string name="tellUsHowToImprove">Řekněte nám prosím, co můžeme zlepšit.</string>
     <string name="thanksForTheFeedback">Děkujeme za zpětnou vazbu!</string>
@@ -372,8 +372,8 @@
     <string name="whatHaveYouBeenEnjoying">Co se vám líbilo?</string>
     <string name="awesomeToHear">To rádi slyšíme!</string>
     <string name="shareTheLoveWithARating">Podělte se prosím o pozitiva hodnocením na Play Store.</string>
-    <string name="rateTheApp">OHODNOŤTE APLIKACI</string>
-    <string name="declineFurtherFeedback">NE, DĚKUJI, JSEM HOTOV/A.</string>
+    <string name="rateTheApp">Ohodnoťte aplikaci</string>
+    <string name="declineFurtherFeedback">Ne, děkuji, jsme hotoví</string>
     <string name="whichBrokenSites">Kde jste narazili na tyto problémy?</string>
     <string name="whichBrokenSitesHint">Které webové stránky mají problémy?</string>
     <string name="feedbackSpecificAsPossible">Buďte co nejkonkrétnější.</string>
@@ -389,7 +389,6 @@
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Z tohoto zařízení</string>
-    <string name="systemSearchOmnibarInputHint"><font size="13">Vyhledat nebo zadat URL</font></string>
     <string name="systemSearchAppNotFound">Aplikace nebyla nalezena</string>
     <string name="systemSearchOnboardingText">Děkujeme, že jste si vybrali DuckDuckGo!\nPři použití našeho vyhledávání nebo aplikace jsou od tohoto okamžiku Vaše vyhledávání chráněna.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Aplikace DuckDuckGo také:</string>

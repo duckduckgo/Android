@@ -245,7 +245,7 @@
     <string name="surveyCtaLaunchButton">Weź udział w ankiecie</string>
     <string name="surveyCtaDismissButton">Nie, dziękuję</string>
     <string name="surveyActivityTitle">Ankieta użytkownika</string>
-    <string name="surveyTitle">ANKIETA DUCKDUCKGO</string>
+    <string name="surveyTitle">Ankieta DuckFuckGo</string>
     <string name="surveyDismissContentDescription">Zignoruj ankietę</string>
     <string name="surveyLoadingErrorTitle">O nie!</string>
     <string name="surveyLoadingErrorText">Nasza ankieta nie wczytuje się.\nSpróbuj ponownie później.</string>
@@ -361,7 +361,7 @@
     <string name="otherMainReasonTitleShort">Inne problemy</string>
 
     <string name="openEndedInputHint">Podaj jak najdokładniejsze informacje</string>
-    <string name="submitFeedback">PRZEŚLIJ</string>
+    <string name="submitFeedback">Wyślij</string>
 
     <string name="tellUsHowToImprove">Powiedz nam, co możemy poprawić.</string>
     <string name="thanksForTheFeedback">Dzięki za opinię!</string>
@@ -372,8 +372,8 @@
     <string name="whatHaveYouBeenEnjoying">Co Ci się podoba?</string>
     <string name="awesomeToHear">Świetnie!</string>
     <string name="shareTheLoveWithARating">Podziel się swoimi wrażeniami, oceniając nas w Play Store.</string>
-    <string name="rateTheApp">OCEŃ APLIKACJĘ</string>
-    <string name="declineFurtherFeedback">NIE, DZIĘKUJĘ, SKOŃCZYŁEM(-AM)</string>
+    <string name="rateTheApp">Oceń aplikację</string>
+    <string name="declineFurtherFeedback">Nie, dziękuję, skończyłem(-am)</string>
     <string name="whichBrokenSites">Gdzie dostrzegasz te problemy?</string>
     <string name="whichBrokenSitesHint">Z jaką stroną związane są problemy?</string>
     <string name="feedbackSpecificAsPossible">Podaj jak najdokładniejsze informacje</string>
@@ -389,7 +389,6 @@
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Z tego urządzenia</string>
-    <string name="systemSearchOmnibarInputHint"><font size="13">Wyszukaj lub wpisz adres URL</font></string>
     <string name="systemSearchAppNotFound">Nie można znaleźć aplikacji</string>
     <string name="systemSearchOnboardingText">Dziękujemy za wybranie DuckDuckGo!\nTeraz, gdy korzystasz z naszej wyszukiwarki lub aplikacji, Twoje wyszukiwania są chronione.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Ponadto aplikacja DuckDuckGo:</string>

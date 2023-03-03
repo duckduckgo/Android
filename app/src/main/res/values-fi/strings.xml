@@ -361,7 +361,7 @@
     <string name="otherMainReasonTitleShort">Muut ongelmat</string>
 
     <string name="openEndedInputHint">Kerro mahdollisimman tarkasti</string>
-    <string name="submitFeedback">LÄHETÄ</string>
+    <string name="submitFeedback">Lähetä</string>
 
     <string name="tellUsHowToImprove">Kerro meille, mitä voimme parantaa.</string>
     <string name="thanksForTheFeedback">Kiitos palautteesta!</string>
@@ -372,7 +372,7 @@
     <string name="whatHaveYouBeenEnjoying">Mistä olet nauttinut?</string>
     <string name="awesomeToHear">Mahtava kuulla!</string>
     <string name="shareTheLoveWithARating">Jaathan kehusi Play Store -arviolla.</string>
-    <string name="rateTheApp">ARVIOI SOVELLUS</string>
+    <string name="rateTheApp">Arvioi sovellus</string>
     <string name="declineFurtherFeedback">EI KIITOS, TÄMÄ RIITTI</string>
     <string name="whichBrokenSites">Missä näitä ongelmia esiintyy?</string>
     <string name="whichBrokenSitesHint">Millä verkkosivustolla on ongelmia?</string>
@@ -389,7 +389,6 @@
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Tästä laitteesta</string>
-    <string name="systemSearchOmnibarInputHint"><font size="13">Hae tai kirjoita URL</font></string>
     <string name="systemSearchAppNotFound">Sovellusta ei löytynyt</string>
     <string name="systemSearchOnboardingText">Kiitos, että valitsit DuckDuckGon!\nKun nyt käytät hakua tai sovellusta, hakusi ovat suojattuja.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">DuckDuckGo-sovellus myös:</string>

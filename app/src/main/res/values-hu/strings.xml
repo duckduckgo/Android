@@ -245,7 +245,7 @@
     <string name="surveyCtaLaunchButton">Kérdőív kitöltése</string>
     <string name="surveyCtaDismissButton">Nem, köszönöm</string>
     <string name="surveyActivityTitle">Felhasználói kérdőív</string>
-    <string name="surveyTitle">DUCKDUCKGO FELHASZNÁLÓI KÉRDŐÍV</string>
+    <string name="surveyTitle">DuckDuckGo kérdőív</string>
     <string name="surveyDismissContentDescription">Kérdőív elutasítása</string>
     <string name="surveyLoadingErrorTitle">Jaj, ne!</string>
     <string name="surveyLoadingErrorText">A kérdőívünk jelenleg nem töltődik be.\nKérjük, próbáld meg később.</string>
@@ -361,7 +361,7 @@
     <string name="otherMainReasonTitleShort">Egyéb problémák</string>
 
     <string name="openEndedInputHint">Kérjük, a lehető legpontosabban írj meg mindent</string>
-    <string name="submitFeedback">KÜLDÉS</string>
+    <string name="submitFeedback">Küldés</string>
 
     <string name="tellUsHowToImprove">Kérjük, mondd el, min tudunk még javítani.</string>
     <string name="thanksForTheFeedback">Köszönjük a visszajelzést!</string>
@@ -372,8 +372,8 @@
     <string name="whatHaveYouBeenEnjoying">Mi tetszett?</string>
     <string name="awesomeToHear">Örömmel halljuk!</string>
     <string name="shareTheLoveWithARating">Ha tetszik az alkalmazás, kérjük, oszd meg véleményed a Play Áruházban.</string>
-    <string name="rateTheApp">ALKALMAZÁS ÉRTÉKELÉSE</string>
-    <string name="declineFurtherFeedback">NEM, KÖSZÖNÖM, VÉGEZTEM.</string>
+    <string name="rateTheApp">Alkalmazás értékelése</string>
+    <string name="declineFurtherFeedback">Nem, köszönöm, végeztem</string>
     <string name="whichBrokenSites">Hol látod ezeket a problémákat?</string>
     <string name="whichBrokenSitesHint">Melyik weboldalon vannak problémák?</string>
     <string name="feedbackSpecificAsPossible">Kérjük, a lehető legpontosabban írj meg mindent</string>
@@ -389,7 +389,6 @@
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Ebből az eszközből</string>
-    <string name="systemSearchOmnibarInputHint"><font size="13">Keresés vagy URL beírása</font></string>
     <string name="systemSearchAppNotFound">Az alkalmazás nem található</string>
     <string name="systemSearchOnboardingText">Köszönjük, hogy a DuckDuckGo-t választottad!\nMost, amikor a mi keresésünket vagy az alkalmazásunkat használod, a kereséseid védettek.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">A DuckDuckGo alkalmazás is:</string>
@@ -408,7 +407,7 @@
     <string name="daxDialogGotIt">Megvan</string>
     <string name="hideTipsTitle">Elrejted a többi tippet?</string>
     <string name="hideTipsText">Csak néhány van, és megpróbáltuk őket informatívvá tenni.</string>
-    <string name="hideTipsButton">Ötletek elrejtése örökre</string>
+    <string name="hideTipsButton">Tippek elrejtése örökre</string>
 
     <!-- New Onboarding Experience -->
     <string name="onboardingWelcomeTitle">"Üdvözlünk a DuckDuckGo-ban!"</string>
