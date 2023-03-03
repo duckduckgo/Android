@@ -618,7 +618,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Navegue em privado com a nossa aplicação para Mac</string>
-    <string name="macos_settings_title">Aplicação para desktop DuckDuckGo</string>
+    <string name="macos_settings_title">Aplicação DuckDuckGo para Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Transferências</string>
@@ -679,4 +679,9 @@
     <string name="downloadsNotifyMeTitle">Saber quando as transferências estão prontas</string>
     <string name="downloadsNotifyMeSubtitle">Receba uma notificação quando as transferências estiverem concluídas.</string>
 
+    <!-- Windows Settings -->
+    <string name="windows_settings_title">Aplicação DuckDuckGo para Windows</string>
+    <string name="windows_settings_description">Navegue em privado com a nossa aplicação para Windows</string>
+    <string name="windows_settings_description_ready">Transferência disponível</string>
+    <string name="windows_settings_description_list">Já está na lista!</string>
 </resources>

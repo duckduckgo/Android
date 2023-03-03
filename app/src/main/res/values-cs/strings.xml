@@ -626,7 +626,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Zajisti si soukromí při prohlížení webu – v naší aplikaci pro Mac</string>
-    <string name="macos_settings_title">DuckDuckGo Desktop</string>
+    <string name="macos_settings_title">DuckDuckGo pro Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Stahování</string>
@@ -687,4 +687,9 @@
     <string name="downloadsNotifyMeTitle">Zjisti, až budou soubory ke stažení připraveny</string>
     <string name="downloadsNotifyMeSubtitle">Dostávej oznámení, jakmile skončí stahování.</string>
 
+    <!-- Windows Settings -->
+    <string name="windows_settings_title">DuckDuckGo pro Windows</string>
+    <string name="windows_settings_description">Zajisti si soukromí na webu – v naší aplikaci pro Windows</string>
+    <string name="windows_settings_description_ready">Ke stažení</string>
+    <string name="windows_settings_description_list">Jsi na seznamu!</string>
 </resources>

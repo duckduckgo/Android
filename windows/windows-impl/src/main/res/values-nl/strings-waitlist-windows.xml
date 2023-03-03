@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="windows_app">DuckDuckGo-app voor Windows</string>
+    <string name="windows_waitlist_title">Krijg vroege toegang om DuckDuckGo voor Windows uit te proberen!</string>
+    <string name="windows_waitlist_description">DuckDuckGo voor Windows heeft alles wat je nodig hebt om met meer privacy te browsen: privézoekopdrachten, blokkering van trackers, geforceerde versleuteling, blokkering van cookiepop-ups, plus nog meer uitstekende bescherming onderweg.</string>
+    <string name="windows_waitlist_mac_link">Op zoek naar de versie voor Mac?</string>
+    <string name="windows_join_waitlist">Schrijf je in voor de privéwachtlijst</string>
+    <string name="windows_join_waitlist_error">Er is een fout opgetreden bij het inschrijven op de wachtlijst. Probeer het later opnieuw</string>
+    <string name="windows_waitlist_footer">Je hoeft geen persoonsgegevens te delen om op de wachtlijst te komen. Je beveiligt je plaats met een tijdstempel die alleen op jouw apparaat bestaat. Zo kunnen we je informeren wanneer je aan de beurt bent.</string>
+
+    <string name="windows_waitlist_on_the_list_title">Je staat op de lijst!</string>
+    <string name="windows_waitlist_on_the_list_notification_enabled">We sturen je een melding wanneer je DuckDuckGo voor Windows kunt downloaden.</string>
+    <string name="windows_waitlist_on_the_list_notification_disabled">Je vindt hier je uitnodiging om DuckDuckGo voor Windows te proberen. Kom binnenkort terug, of ontvang een melding wanneer jij aan de beurt bent.</string>
+
+    <string name="notification_channel_windows_waitlist">Uitnodigingen voor wachtlijst</string>
+    <string name="windows_notification_title">Begin met het testen van DuckDuckGo voor Windows!</string>
+    <string name="windows_notification_text">Open je uitnodiging</string>
+
+    <string name="windows_waitlist_code_title">Je bent uitgenodigd!</string>
+    <string name="windows_waitlist_code_invite">Uitnodigingscode</string>`
+    <string name="windows_waitlist_code_description">Klaar om DuckDuckGo te gebruiken in Windows?\n\n<b>Stap 1</b>\nBezoek deze URL op je Windows-apparaat om te downloaden:\n<b><annotation type="beta_link">duckduckgo.com/windows</annotation></b>\n\n<b>Stap 2</b>\nOpen de DuckDuckGo Installer in Downloads, selecteer Installeren en voer vervolgens je uitnodigingscode in.</string>
+    <string name="windows_waitlist_code_share_text"><![CDATA[Klaar om DuckDuckGo te gebruiken in Windows?<br/><br/><b>Stap 1</b><br/>Bezoek deze URL op je Windows-apparaat om te downloaden:<br/><a href=\"https://duckduckgo.com/windows\"><b>https://duckduckgo.com/windows</b></a><br/><br/><b>Stap 2</b><br/>Open de DuckDuckGo Installer in Downloads, selecteer Installeren en voer vervolgens je uitnodigingscode in.<br/><br/>Uitnodigingscode: %1$s]]></string>
+
+    <string name="windows_waitlist_clipboard_invite_copied">Uitnodiging gekopieerd naar klembord</string>
+    <string name="windows_waitlist_clipboard_code_copied">Code gekopieerd naar klembord</string>
+
+    <string name="windows_waitlist_share_invite">Deel je uitnodiging</string>
+
+    <string name="waitlistNotifyMeTitle">Weet het meteen wanneer je bent uitgenodigd</string>
+    <string name="waitlistNotifyMeSubtitle">Ontvang een melding wanneer DuckDuckGo voor Windows klaar is om te downloaden.</string>
+</resources>

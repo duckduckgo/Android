@@ -618,7 +618,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Mac için uygulamamızla internette gezinirken gizliliğinizi koruyun</string>
-    <string name="macos_settings_title">DuckDuckGo Masaüstü Uygulaması</string>
+    <string name="macos_settings_title">DuckDuckGo Mac Uygulaması</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">İndirilenler</string>
@@ -679,4 +679,9 @@
     <string name="downloadsNotifyMeTitle">İndirmeler hazır olduğunda bildirim alın</string>
     <string name="downloadsNotifyMeSubtitle">İndirmeler tamamlandığında bir bildirim alın.</string>
 
+    <!-- Windows Settings -->
+    <string name="windows_settings_title">DuckDuckGo Windows Uygulaması</string>
+    <string name="windows_settings_description">Windows uygulamamızla gizliliğinizi koruyarak gezinin</string>
+    <string name="windows_settings_description_ready">İndirme mevcut</string>
+    <string name="windows_settings_description_list">Listedesiniz!</string>
 </resources>

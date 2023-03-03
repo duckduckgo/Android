@@ -618,7 +618,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Сърфирайте поверително с нашето приложение за Mac</string>
-    <string name="macos_settings_title">Приложение DuckDuckGo за настолен компютър</string>
+    <string name="macos_settings_title">Приложение DuckDuckGo за Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Изтеглени файлове</string>
@@ -679,4 +679,9 @@
     <string name="downloadsNotifyMeTitle">Разберете кога изтеглянето е завършено</string>
     <string name="downloadsNotifyMeSubtitle">Получавайте известие, когато изтеглянето завърши.</string>
 
+    <!-- Windows Settings -->
+    <string name="windows_settings_title">Приложение DuckDuckGo за Windows</string>
+    <string name="windows_settings_description">Сърфирайте поверително с нашето приложение за Windows</string>
+    <string name="windows_settings_description_ready">Налично за изтегляне</string>
+    <string name="windows_settings_description_list">Вече сте в списъка!</string>
 </resources>
