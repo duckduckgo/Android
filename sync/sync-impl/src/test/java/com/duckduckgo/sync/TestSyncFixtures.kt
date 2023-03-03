@@ -21,6 +21,7 @@ import com.duckduckgo.sync.crypto.ConnectKeys
 import com.duckduckgo.sync.crypto.DecryptResult
 import com.duckduckgo.sync.crypto.LoginKeys
 import com.duckduckgo.sync.impl.AccountCreatedResponse
+import com.duckduckgo.sync.impl.Connect
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.Device
 import com.duckduckgo.sync.impl.DeviceEntries
@@ -140,12 +141,23 @@ object TestSyncFixtures {
     val connectKey = ConnectKey(encryptedRecoveryCode)
     const val keysNotFoundErr = "connection_keys_not_found"
     const val keysNotFoundCode = 404
+    val connectSuccess = Result.Success(true)
+    val connectError = Result.Error(code = invalidCodeErr, reason = invalidMessageErr)
+    val connectResponse = Response.success<Void>(null)
+    val connectInvalid: Response<Void> = Response.error(
+        invalidCodeErr,
+        "{\"error\":\"$invalidMessageErr\"}".toResponseBody(),
+    )
+    val connectBody = Connect(device_id = deviceId, encrypted_recovery_key = encryptedRecoveryCode)
+
+    val connectDeviceBody = ConnectKey(
+        encrypted_recovery_key = encryptedRecoveryCode,
+    )
+    val connectDeviceResponse = Response.success<ConnectKey>(connectDeviceBody)
     val connectDeviceErrorResponse: Response<ConnectKey> = Response.error(
         keysNotFoundCode,
         "{\"error\":\"$keysNotFoundErr\"}".toResponseBody(),
     )
-    val connectDeviceSuccessResponse: Response<ConnectKey> = Response.success(connectKey)
-
     val connectDeviceSuccess = Result.Success(encryptedRecoveryCode)
     val connectDeviceKeysNotFoundError = Result.Error(code = keysNotFoundCode, reason = keysNotFoundErr)
 }
