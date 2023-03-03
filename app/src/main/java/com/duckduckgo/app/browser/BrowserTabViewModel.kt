@@ -1595,9 +1595,14 @@ class BrowserTabViewModel @Inject constructor(
         onSiteLocationPermissionAlwaysDenied()
     }
 
+    fun onSystemLocationPermissionDeniedTwice() {
+        pixel.fire(AppPixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_DISABLE)
+        onSystemLocationPermissionDeniedForever()
+    }
+
     fun onSystemLocationPermissionDeniedForever() {
         appSettingsPreferencesStore.appLocationPermissionDeniedForever = true
-        onSystemLocationPermissionDeniedOneTime()
+        onSiteLocationPermissionAlwaysDenied()
     }
 
     private fun registerSiteVisit() {
