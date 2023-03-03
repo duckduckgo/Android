@@ -626,7 +626,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Pretražujte privatno s našom aplikacijom za Mac</string>
-    <string name="macos_settings_title">DuckDuckGo aplikacija za osobno računalo</string>
+    <string name="macos_settings_title">Aplikacija DuckDuckGo za Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Preuzimanja</string>
@@ -687,4 +687,9 @@
     <string name="downloadsNotifyMeTitle">Saznaj kad su preuzimanja spremna</string>
     <string name="downloadsNotifyMeSubtitle">Primi obavijest kad se preuzimanja završe.</string>
 
+    <!-- Windows Settings -->
+    <string name="windows_settings_title">Aplikacija DuckDuckGo za Windows</string>
+    <string name="windows_settings_description">Privatno pregledavanje s našom aplikacijom za Windows</string>
+    <string name="windows_settings_description_ready">Preuzimanje je dostupno</string>
+    <string name="windows_settings_description_list">Na popisu si!</string>
 </resources>
