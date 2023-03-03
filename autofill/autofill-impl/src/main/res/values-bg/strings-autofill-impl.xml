@@ -30,7 +30,7 @@
     <string name="saveLoginDialogButtonSave">Запазване на данните за вход</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Запазване на паролата</string>
     <string name="saveLoginDialogNotNow">Не сега</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Данните за вход се съхраняват защитени само на това устройство и могат да се управляват от менюто за автоматично попълване в настройките.</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">DuckDuckGo ще съхранява тези данни за вход на сигурно място на Вашето устройство. Можете да управлявате запазените данни за вход в Настройки.</string>
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Искате ли DuckDuckGo да запази данните за вход?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Повече опции</string>
 
