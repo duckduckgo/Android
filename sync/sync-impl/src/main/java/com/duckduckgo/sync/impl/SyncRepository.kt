@@ -212,7 +212,7 @@ class AppSyncRepository @Inject constructor(
                 userID = userId,
                 hashedPassword = preLogin.passwordHash,
                 deviceId = deviceId,
-                deviceName = deviceName,
+                deviceName = nativeLib.encrypt(deviceName, syncStore.secretKey!!).encryptedData,
             )
 
         return when (result) {
@@ -234,7 +234,7 @@ class AppSyncRepository @Inject constructor(
     }
 
     override fun removeAccount() {
-        syncStore.clearAll(keepRecoveryCode = false)
+        syncStore.clearAll(keepRecoveryCode = true)
     }
 
     override fun logout(deviceId: String): Result<Boolean> {
