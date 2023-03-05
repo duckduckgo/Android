@@ -20,6 +20,7 @@ import com.duckduckgo.anvil.annotations.ContributesServiceApi
 import com.duckduckgo.di.scopes.AppScope
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
 
@@ -46,6 +47,11 @@ interface SyncService {
     fun login(
         @Body request: Login,
     ): Call<LoginResponse>
+
+    @GET("https://dev-sync-use.duckduckgo.com/sync/devices")
+    fun getDevices(
+        @Header("Authorization") token: String,
+    ): Call<DeviceResponse>
 }
 
 data class Login(
@@ -76,6 +82,14 @@ data class LoginResponse(
     val token: String,
     val protected_encryption_key: String,
     val devices: List<Device>,
+)
+
+data class DeviceResponse(
+    val devices: DeviceEntries,
+)
+
+data class DeviceEntries(
+    val entries: List<Device>,
 )
 
 data class Device(
