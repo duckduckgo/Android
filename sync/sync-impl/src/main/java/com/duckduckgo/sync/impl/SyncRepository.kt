@@ -25,8 +25,8 @@ import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import javax.inject.Inject
 import timber.log.Timber
+import javax.inject.*
 
 interface SyncRepository {
     fun createAccount(): Result<Boolean>
@@ -34,7 +34,7 @@ interface SyncRepository {
     fun getAccountInfo(): AccountInfo
     fun storeRecoveryCode()
     fun removeAccount()
-    fun logout(): Result<Boolean>
+    fun logout(deviceId: String = ""): Result<Boolean>
     fun deleteAccount(): Result<Boolean>
     fun latestToken(): String
     fun getConnectedDevices(): Result<List<ConnectedDevice>>
@@ -107,6 +107,7 @@ class AppSyncRepository @Inject constructor(
             is Result.Error -> {
                 result
             }
+
             is Result.Success -> {
                 val decryptResult = nativeLib.decrypt(result.data.protected_encryption_key, preLogin.stretchedPrimaryKey)
                 if (decryptResult.result != 0L) return Result.Error(code = decryptResult.result.toInt(), reason = "Decrypt failed")
@@ -153,19 +154,29 @@ class AppSyncRepository @Inject constructor(
         syncStore.clearAll(keepRecoveryCode = false)
     }
 
-    override fun logout(): Result<Boolean> {
+    override fun logout(deviceId: String): Result<Boolean> {
         val token = syncStore.token.takeUnless { it.isNullOrEmpty() }
             ?: return Result.Error(reason = "Token Empty")
-        val deviceId = syncStore.deviceId.takeUnless { it.isNullOrEmpty() }
-            ?: return Result.Error(reason = "Device Id Empty")
+
+        val logoutThisDevice = deviceId.isEmpty() || deviceId == syncStore.deviceId
+
+        val deviceId = if (logoutThisDevice) {
+            syncStore.deviceId.takeUnless { it.isNullOrEmpty() }
+                ?: return Result.Error(reason = "Device Id Empty")
+        } else {
+            deviceId
+        }
 
         return when (val result = syncApi.logout(token, deviceId)) {
             is Result.Error -> {
                 Timber.i("SYNC logout failed $result")
                 result
             }
+
             is Result.Success -> {
-                syncStore.clearAll()
+                if (logoutThisDevice) {
+                    syncStore.clearAll()
+                }
                 Result.Success(true)
             }
         }
@@ -181,6 +192,7 @@ class AppSyncRepository @Inject constructor(
                 Timber.i("SYNC deleteAccount failed $result")
                 result
             }
+
             is Result.Success -> {
                 syncStore.clearAll()
                 Result.Success(true)
