@@ -37,6 +37,7 @@ interface SyncRepository {
     fun logout(): Result<Boolean>
     fun deleteAccount(): Result<Boolean>
     fun latestToken(): String
+    fun getConnectedDevices(): Result<List<ConnectedDevice>>
 }
 
 @ContributesBinding(AppScope::class)
@@ -191,6 +192,30 @@ class AppSyncRepository @Inject constructor(
         return syncStore.token ?: ""
     }
 
+    override fun getConnectedDevices(): Result<List<ConnectedDevice>> {
+        val token = syncStore.token.takeUnless { it.isNullOrEmpty() }
+            ?: return Result.Error(reason = "Token Empty")
+
+        return when (val result = syncApi.getDevices(token)) {
+            is Result.Error -> {
+                Timber.i("SYNC getDevices failed $result")
+                result
+            }
+
+            is Result.Success -> {
+                return Result.Success(
+                    result.data.map {
+                        ConnectedDevice(
+                            thisDevice = syncStore.deviceId == it.device_id,
+                            deviceName = it.device_name,
+                            deviceId = it.device_id,
+                        )
+                    },
+                )
+            }
+        }
+    }
+
     private fun isSignedIn() = !syncStore.primaryKey.isNullOrEmpty()
 
     private class Adapters {
@@ -214,6 +239,12 @@ data class AccountInfo(
 data class RecoveryCode(
     val primaryKey: String,
     val userID: String,
+)
+
+data class ConnectedDevice(
+    val thisDevice: Boolean = false,
+    val deviceName: String,
+    val deviceId: String,
 )
 
 sealed class Result<out R> {
