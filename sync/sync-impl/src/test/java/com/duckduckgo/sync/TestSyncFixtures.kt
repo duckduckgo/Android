@@ -20,6 +20,10 @@ import com.duckduckgo.sync.crypto.AccountKeys
 import com.duckduckgo.sync.crypto.DecryptResult
 import com.duckduckgo.sync.crypto.LoginKeys
 import com.duckduckgo.sync.impl.AccountCreatedResponse
+import com.duckduckgo.sync.impl.ConnectedDevice
+import com.duckduckgo.sync.impl.Device
+import com.duckduckgo.sync.impl.DeviceEntries
+import com.duckduckgo.sync.impl.DeviceResponse
 import com.duckduckgo.sync.impl.Login
 import com.duckduckgo.sync.impl.LoginResponse
 import com.duckduckgo.sync.impl.Logout
@@ -115,4 +119,16 @@ object TestSyncFixtures {
     val loginFailed = Result.Error(code = wrongCredentialsCodeErr, reason = wrongCredentialsMessageErr)
     val loginRequestBody = Login(user_id = userId, hashed_password = hashedPassword, device_id = deviceId, device_name = deviceName)
     val loginSuccessResponse: Response<LoginResponse> = Response.success(loginResponseBody)
+
+    val listOfDevices = listOf(Device(device_id = deviceId, device_name = deviceName, jw_iat = ""))
+    val deviceResponse = DeviceResponse(DeviceEntries(listOfDevices))
+    val getDevicesBodySuccessResponse: Response<DeviceResponse> = Response.success(deviceResponse)
+    val getDevicesBodyErrorResponse: Response<DeviceResponse> = Response.error(
+        invalidCodeErr,
+        "{\"error\":\"$invalidMessageErr\"}".toResponseBody(),
+    )
+
+    val getDevicesSuccess = Result.Success(listOfDevices)
+    val getDevicesError = Result.Error(code = invalidCodeErr, reason = invalidMessageErr)
+    val listOfConnectedDevices = listOf(ConnectedDevice(thisDevice = true, deviceName = deviceName, deviceId = deviceId))
 }

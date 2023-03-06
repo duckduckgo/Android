@@ -26,9 +26,12 @@ import com.duckduckgo.sync.TestSyncFixtures.deleteAccountSuccess
 import com.duckduckgo.sync.TestSyncFixtures.deviceId
 import com.duckduckgo.sync.TestSyncFixtures.deviceName
 import com.duckduckgo.sync.TestSyncFixtures.failedLoginKeys
+import com.duckduckgo.sync.TestSyncFixtures.getDevicesError
+import com.duckduckgo.sync.TestSyncFixtures.getDevicesSuccess
 import com.duckduckgo.sync.TestSyncFixtures.hashedPassword
 import com.duckduckgo.sync.TestSyncFixtures.invalidDecryptedSecretKey
 import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKey
+import com.duckduckgo.sync.TestSyncFixtures.listOfConnectedDevices
 import com.duckduckgo.sync.TestSyncFixtures.loginFailed
 import com.duckduckgo.sync.TestSyncFixtures.loginSuccess
 import com.duckduckgo.sync.TestSyncFixtures.logoutInvalid
@@ -41,12 +44,14 @@ import com.duckduckgo.sync.TestSyncFixtures.token
 import com.duckduckgo.sync.TestSyncFixtures.userId
 import com.duckduckgo.sync.TestSyncFixtures.validLoginKeys
 import com.duckduckgo.sync.crypto.SyncLib
+import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.store.SyncStore
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -193,6 +198,20 @@ class AppSyncRepositoryTest {
     }
 
     @Test
+    fun whenLogoutRemoteDeviceSucceedsThenReturnSuccessButDoNotRemoveLocalData() {
+        whenever(syncStore.deviceId).thenReturn(deviceId)
+        whenever(syncStore.token).thenReturn(token)
+        whenever(syncApi.logout(eq(token), anyString())).thenReturn(logoutSuccess)
+
+        val syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore)
+
+        val result = syncRepo.logout("randomDeviceId")
+
+        assertTrue(result is Success)
+        verify(syncStore, times(0)).clearAll()
+    }
+
+    @Test
     fun whenDeleteAccountSucceedsThenReturnSuccessAndRemoveData() {
         whenever(syncStore.token).thenReturn(token)
         whenever(syncApi.deleteAccount(token)).thenReturn(deleteAccountSuccess)
@@ -288,6 +307,30 @@ class AppSyncRepositoryTest {
 
         val syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore)
         val result = syncRepo.login()
+
+        assertTrue(result is Result.Error)
+    }
+
+    @Test
+    fun getConnectedDevicesSucceedsThenReturnSuccess() {
+        whenever(syncStore.token).thenReturn(token)
+        whenever(syncStore.deviceId).thenReturn(deviceId)
+        whenever(syncApi.getDevices(anyString())).thenReturn(getDevicesSuccess)
+        val syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore)
+
+        val result = syncRepo.getConnectedDevices() as Success
+
+        assertEquals(listOfConnectedDevices, result.data)
+    }
+
+    @Test
+    fun getConnectedDevicesFailsThenReturnError() {
+        whenever(syncStore.token).thenReturn(token)
+        whenever(syncStore.deviceId).thenReturn(deviceId)
+        whenever(syncApi.getDevices(anyString())).thenReturn(getDevicesError)
+        val syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore)
+
+        val result = syncRepo.getConnectedDevices()
 
         assertTrue(result is Result.Error)
     }

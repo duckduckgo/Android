@@ -22,7 +22,6 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.ConnectedDevice
-import com.duckduckgo.sync.impl.Device
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncRepository
@@ -58,7 +57,7 @@ constructor(
         val secretKey: String = "",
         val protectedEncryptionKey: String = "",
         val passwordHash: String = "",
-        val connectedDevices: List<ConnectedDevice> = emptyList()
+        val connectedDevices: List<ConnectedDevice> = emptyList(),
     )
 
     sealed class Command {
@@ -122,12 +121,14 @@ constructor(
 
     private fun getConnectedDevicesClicked() {
         viewModelScope.launch(dispatchers.io()) {
-            when(val connectedDevices = syncRepository.getConnectedDevices()) {
+            when (val connectedDevices = syncRepository.getConnectedDevices()) {
                 is Error -> command.send(Command.ShowMessage(connectedDevices.reason))
                 is Success -> {
-                    viewState.emit(viewState.value.copy(
-                        connectedDevices = connectedDevices.data
-                    ))
+                    viewState.emit(
+                        viewState.value.copy(
+                            connectedDevices = connectedDevices.data,
+                        ),
+                    )
                 }
             }
             updateViewState()

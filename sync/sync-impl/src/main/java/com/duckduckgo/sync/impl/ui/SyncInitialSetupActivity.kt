@@ -31,7 +31,6 @@ import com.duckduckgo.sync.impl.databinding.ItemConnectedDeviceBinding
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.ViewState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
 class SyncInitialSetupActivity : DuckDuckGoActivity() {

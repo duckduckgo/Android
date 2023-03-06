@@ -25,8 +25,8 @@ import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import timber.log.Timber
 import javax.inject.*
+import timber.log.Timber
 
 interface SyncRepository {
     fun createAccount(): Result<Boolean>
