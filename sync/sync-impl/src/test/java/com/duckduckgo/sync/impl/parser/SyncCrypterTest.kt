@@ -26,7 +26,7 @@ import com.duckduckgo.savedsites.store.Relation
 import com.duckduckgo.sync.TestSyncFixtures
 import com.duckduckgo.sync.api.parser.SyncBookmarkPage
 import com.duckduckgo.sync.api.parser.SyncCrypter
-import com.duckduckgo.sync.api.parser.SyncEntry
+import com.duckduckgo.sync.api.parser.SyncBookmarkEntry
 import com.duckduckgo.sync.api.parser.SyncFolderChildren
 import com.duckduckgo.sync.crypto.EncryptResult
 import com.duckduckgo.sync.crypto.SyncLib
@@ -274,14 +274,14 @@ class SyncCrypterTest {
     private fun givenSomeBookmarkSyncEntries(
         totalEntries: Int,
         folderId: String
-    ): List<SyncEntry> {
-        val entries = mutableListOf<SyncEntry>()
+    ): List<SyncBookmarkEntry> {
+        val entries = mutableListOf<SyncBookmarkEntry>()
         val childrenId = mutableListOf<String>()
         for (index in 1..totalEntries) {
-            entries.add(SyncEntry("entity$index", "title$index", SyncBookmarkPage("https://testUrl$index"), null, null))
+            entries.add(SyncBookmarkEntry("entity$index", "title$index", SyncBookmarkPage("https://testUrl$index"), null, null))
             childrenId.add("entity$index")
         }
-        entries.add(SyncEntry(folderId, "Bookmarks $folderId", null, SyncFolderChildren(childrenId), null))
+        entries.add(SyncBookmarkEntry(folderId, "Bookmarks $folderId", null, SyncFolderChildren(childrenId), null))
         return entries
     }
 

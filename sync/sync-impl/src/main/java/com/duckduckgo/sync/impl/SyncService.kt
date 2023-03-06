@@ -19,7 +19,7 @@ package com.duckduckgo.sync.impl
 import com.duckduckgo.anvil.annotations.ContributesServiceApi
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.parser.SyncDataRequest
-import com.duckduckgo.sync.api.parser.SyncEntry
+import com.duckduckgo.sync.api.parser.SyncBookmarkEntry
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -116,7 +116,7 @@ data class BookmarkFolder(
 )
 data class BookmarksResponse(
     val last_modified: String,
-    val entries: List<SyncEntry>
+    val entries: List<SyncBookmarkEntry>
 )
 data class SettingsResponse(
     val last_modified: String,

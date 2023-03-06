@@ -18,13 +18,13 @@ package com.duckduckgo.sync.api.parser
 
 interface SyncCrypter {
     suspend fun generateAllData(): SyncDataRequest
-    fun store(entries: List<SyncEntry>): Boolean
+    fun store(entries: List<SyncBookmarkEntry>): Boolean
 }
 
 data class SyncBookmarkPage(val url: String)
 data class SyncFolderChildren(val children: List<String>)
 
-data class SyncEntry(
+data class SyncBookmarkEntry(
     val id: String,
     val title: String,
     val page: SyncBookmarkPage?,
@@ -37,8 +37,8 @@ data class SyncEntry(
             title: String,
             url: String,
             deleted: String?
-        ): SyncEntry {
-            return SyncEntry(id, title, SyncBookmarkPage(url), null, deleted)
+        ): SyncBookmarkEntry {
+            return SyncBookmarkEntry(id, title, SyncBookmarkPage(url), null, deleted)
         }
 
         fun asFolder(
@@ -46,14 +46,14 @@ data class SyncEntry(
             title: String,
             children: List<String>,
             deleted: String?
-        ): SyncEntry {
-            return SyncEntry(id, title, null, SyncFolderChildren(children), deleted)
+        ): SyncBookmarkEntry {
+            return SyncBookmarkEntry(id, title, null, SyncFolderChildren(children), deleted)
         }
     }
 }
 
-fun SyncEntry.isFolder(): Boolean = this.folder != null
-fun SyncEntry.isBookmark(): Boolean = this.page != null
+fun SyncBookmarkEntry.isFolder(): Boolean = this.folder != null
+fun SyncBookmarkEntry.isBookmark(): Boolean = this.page != null
 
-class SyncDataRequest(val bookmarks: SyncDataUpdates)
-class SyncDataUpdates(val updates: List<SyncEntry>)
+class SyncDataRequest(val bookmarks: SyncBookmarkUpdates)
+class SyncBookmarkUpdates(val updates: List<SyncBookmarkEntry>)

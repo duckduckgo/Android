@@ -16,9 +16,11 @@
 
 package com.duckduckgo.sync
 
+import com.duckduckgo.sync.api.parser.SyncBookmarkEntry
+import com.duckduckgo.sync.api.parser.SyncDataRequest
+import com.duckduckgo.sync.api.parser.SyncBookmarkUpdates
 import com.duckduckgo.sync.crypto.AccountKeys
 import com.duckduckgo.sync.crypto.DecryptResult
-import com.duckduckgo.sync.crypto.EncryptResult
 import com.duckduckgo.sync.crypto.LoginKeys
 import com.duckduckgo.sync.impl.AccountCreatedResponse
 import com.duckduckgo.sync.impl.Login
@@ -116,6 +118,30 @@ object TestSyncFixtures {
     val loginFailed = Result.Error(code = wrongCredentialsCodeErr, reason = wrongCredentialsMessageErr)
     val loginRequestBody = Login(user_id = userId, hashed_password = hashedPassword, device_id = deviceId, device_name = deviceName)
     val loginSuccessResponse: Response<LoginResponse> = Response.success(loginResponseBody)
-    val validEncryptedId = EncryptResult(result = 0L, encryptedData = "id")
-    val inValidEncryptedId = EncryptResult(result = 9L, encryptedData = "")
+    val patchAllSuccess = Result.Success(true)
+    val patchAllError = Result.Error(-1, "Patch All Error")
+
+    private fun aBookmarkEntry(index: Int): SyncBookmarkEntry {
+        return SyncBookmarkEntry.asBookmark("bookmark$index", "title$index", "https://bookmark$index.com", null)
+    }
+
+    private fun aBookmarkFolderEntry(
+        index: Int,
+        children: List<Int>
+    ): SyncBookmarkEntry {
+        return SyncBookmarkEntry.asFolder("folder$index", "title$index", children.map { "bookmark$index" }, null)
+    }
+
+    private fun someBookmarkEntries(): SyncBookmarkUpdates {
+        return SyncBookmarkUpdates(
+            listOf(
+                aBookmarkEntry(1),
+                aBookmarkEntry(2),
+                aBookmarkEntry(3),
+                aBookmarkFolderEntry(1, listOf(1, 2, 3)),
+            ),
+        )
+    }
+
+    val syncData = SyncDataRequest(someBookmarkEntries())
 }

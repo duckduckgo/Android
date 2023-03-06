@@ -20,13 +20,11 @@ import androidx.annotation.WorkerThread
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.parser.SyncCrypter
 import com.duckduckgo.sync.api.parser.SyncDataRequest
-import com.duckduckgo.sync.api.parser.SyncDataUpdates
 import com.duckduckgo.sync.crypto.AccountKeys
 import com.duckduckgo.sync.crypto.LoginKeys
 import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.moshi.Json
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
@@ -41,8 +39,8 @@ interface SyncRepository {
     fun logout(): Result<Boolean>
     fun deleteAccount(): Result<Boolean>
     fun latestToken(): String
-    suspend fun syncInitialData(): Result<Boolean>
-    suspend fun getAllData(): Result<Boolean>
+    suspend fun initialPatch(): Result<Boolean>
+    suspend fun getAll(): Result<Boolean>
 }
 
 @ContributesBinding(AppScope::class)
@@ -198,37 +196,35 @@ class AppSyncRepository @Inject constructor(
         return syncStore.token ?: ""
     }
 
-    override suspend fun syncInitialData(): Result<Boolean> {
+    override suspend fun initialPatch(): Result<Boolean> {
         val token =
             syncStore.token.takeUnless { it.isNullOrEmpty() }
                 ?: return Result.Error(reason = "Token Empty")
-        Timber.d("SYNC: generating all data")
+
         val allData = syncCrypter.generateAllData()
         val allDataJSON = Adapters.patchAdapter.toJson(allData)
-        Timber.d("SYNC: all data generated $allDataJSON")
-        return when (val result = syncApi.firstSync(token, allData)) {
+        Timber.d("SYNC: initial patch data generated $allDataJSON")
+        return when (val result = syncApi.patchAll(token, allData)) {
             is Result.Error -> {
-                Timber.i("SYNC initial sync failed $result")
                 result
             }
             is Result.Success -> {
-                Timber.i("SYNC initial sync success, storing data")
                 Result.Success(true)
             }
         }
     }
 
-    override suspend fun getAllData(): Result<Boolean> {
+    override suspend fun getAll(): Result<Boolean> {
         val token =
             syncStore.token.takeUnless { it.isNullOrEmpty() }
                 ?: return Result.Error(reason = "Token Empty")
+
         return when (val result = syncApi.all(token)) {
             is Result.Error -> {
-                Timber.i("SYNC get data failed $result")
                 Result.Error(reason = "SYNC get data failed $result")
             }
             is Result.Success -> {
-                Timber.i("SYNC get data success")
+                // we only care about bookmarks for now
                 syncCrypter.store(result.data.bookmarks.entries)
                 Result.Success(true)
             }

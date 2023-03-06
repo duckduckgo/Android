@@ -33,16 +33,23 @@ import com.duckduckgo.sync.TestSyncFixtures.loginFailed
 import com.duckduckgo.sync.TestSyncFixtures.loginSuccess
 import com.duckduckgo.sync.TestSyncFixtures.logoutInvalid
 import com.duckduckgo.sync.TestSyncFixtures.logoutSuccess
+import com.duckduckgo.sync.TestSyncFixtures.patchAllError
+import com.duckduckgo.sync.TestSyncFixtures.patchAllSuccess
 import com.duckduckgo.sync.TestSyncFixtures.primaryKey
 import com.duckduckgo.sync.TestSyncFixtures.protectedEncryptionKey
 import com.duckduckgo.sync.TestSyncFixtures.secretKey
 import com.duckduckgo.sync.TestSyncFixtures.stretchedPrimaryKey
+import com.duckduckgo.sync.TestSyncFixtures.syncData
 import com.duckduckgo.sync.TestSyncFixtures.token
 import com.duckduckgo.sync.TestSyncFixtures.userId
 import com.duckduckgo.sync.TestSyncFixtures.validLoginKeys
+import com.duckduckgo.sync.api.parser.SyncBookmarkEntry
+import com.duckduckgo.sync.api.parser.SyncBookmarkUpdates
 import com.duckduckgo.sync.api.parser.SyncCrypter
+import com.duckduckgo.sync.api.parser.SyncDataRequest
 import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.store.SyncStore
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -66,7 +73,7 @@ class AppSyncRepositoryTest {
     private lateinit var syncRepo: SyncRepository
 
     @Before
-    fun before(){
+    fun before() {
         syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore, syncCrypter)
     }
 
@@ -279,6 +286,28 @@ class AppSyncRepositoryTest {
         whenever(syncApi.login(userId, hashedPassword, deviceId, deviceName)).thenReturn(loginSuccess)
 
         val result = syncRepo.login()
+
+        assertTrue(result is Result.Error)
+    }
+
+    @Test
+    fun whenInitialPatchSucceedsThenReturnSuccess() = runTest {
+        whenever(syncStore.token).thenReturn(token)
+        whenever(syncCrypter.generateAllData()).thenReturn(syncData)
+        whenever(syncApi.patchAll(token, syncData)).thenReturn(patchAllSuccess)
+
+        val result = syncRepo.initialPatch()
+
+        assertTrue(result is Result.Success)
+    }
+
+    @Test
+    fun whenInitialPatchFailsThenReturnError() = runTest {
+        whenever(syncStore.token).thenReturn(token)
+        whenever(syncCrypter.generateAllData()).thenReturn(syncData)
+        whenever(syncApi.patchAll(token, syncData)).thenReturn(patchAllError)
+
+        val result = syncRepo.initialPatch()
 
         assertTrue(result is Result.Error)
     }

@@ -49,12 +49,7 @@ interface SyncApi {
 
     fun deleteAccount(token: String): Result<Boolean>
 
-    fun patch(
-        token: String,
-        bookmarks: SyncDataRequest
-    ): Result<BookmarksResponse>
-
-    fun firstSync(
+    fun patchAll(
         token: String,
         bookmarks: SyncDataRequest
     ): Result<Boolean>
@@ -162,24 +157,7 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
         }
     }
 
-    override fun patch(
-        token: String,
-        bookmarks: SyncDataRequest
-    ): Result<BookmarksResponse> {
-        val response = runCatching {
-            val patchCall = syncService.patch("Bearer $token", bookmarks)
-            patchCall.execute()
-        }.getOrElse { throwable ->
-            return Result.Error(reason = throwable.message.toString())
-        }
-
-        return onSuccess(response) {
-            val data = response.body()?.bookmarks!!
-            Result.Success(data)
-        }
-    }
-
-    override fun firstSync(
+    override fun patchAll(
         token: String,
         bookmarks: SyncDataRequest
     ): Result<Boolean> {
