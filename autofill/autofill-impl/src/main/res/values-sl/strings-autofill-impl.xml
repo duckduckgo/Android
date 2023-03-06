@@ -30,7 +30,7 @@
     <string name="saveLoginDialogButtonSave">Shrani prijavo</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Shrani geslo</string>
     <string name="saveLoginDialogNotNow">Ne zdaj</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Prijave so varno shranjene samo v tej napravi in jih lahko upravljate v meniju Samodejno izpolnjevanje v Nastavitvah.</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">DuckDuckGo bo te podatke za prijavo varno shranil v vaši napravi. Shranjene podatke za prijavo lahko upravljate v nastavitvah.</string>
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Ali želite, da DuckDuckGo shrani vašo prijavo?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Več možnosti</string>
 
