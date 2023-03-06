@@ -90,7 +90,7 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
 
     private val binding: ActivityNetpInternalSettingsBinding by viewBinding()
 
-    private val mtuSizes: List<Int?> = listOf(1000, 1100, 1280, 1400, 1500, null)
+    private val mtuSizes: List<Int?> = listOf(1000, 1100, 1200, 1280, 1400, 1500, null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
