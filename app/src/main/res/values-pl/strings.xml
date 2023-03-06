@@ -626,7 +626,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Przeglądaj prywatnie za pomocą aplikacji dla komputerów Mac</string>
-    <string name="macos_settings_title">Aplikacja komputerowa DuckDuckGo</string>
+    <string name="macos_settings_title">Aplikacja DuckDuckGo na komputery Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Pobrane</string>
@@ -687,4 +687,9 @@
     <string name="downloadsNotifyMeTitle">Dowiedz się, kiedy pliki do pobrania będą gotowe</string>
     <string name="downloadsNotifyMeSubtitle">Otrzymuj powiadomienie po zakończeniu pobierania.</string>
 
+    <!-- Windows Settings -->
+    <string name="windows_settings_title">Aplikacja DuckDuckGo dla systemu Windows</string>
+    <string name="windows_settings_description">Przeglądaj prywatnie za pomocą naszej aplikacji dla systemu Windows</string>
+    <string name="windows_settings_description_ready">Możliwość pobrania</string>
+    <string name="windows_settings_description_list">Jesteś na liście!</string>
 </resources>

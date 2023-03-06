@@ -17,6 +17,7 @@
 package com.duckduckgo.privacy.config.impl.features.amplinks
 
 import com.duckduckgo.app.global.UriString
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.AmpLinkInfo
@@ -35,6 +36,7 @@ class RealAmpLinks @Inject constructor(
     private val ampLinksRepository: AmpLinksRepository,
     private val featureToggle: FeatureToggle,
     private val unprotectedTemporary: UnprotectedTemporary,
+    private val userAllowListRepository: UserAllowListRepository,
 ) : AmpLinks {
 
     private var lastExtractedUrl: String? = null
@@ -42,7 +44,7 @@ class RealAmpLinks @Inject constructor(
     override var lastAmpLinkInfo: AmpLinkInfo? = null
 
     override fun isAnException(url: String): Boolean {
-        return matches(url) || unprotectedTemporary.isAnException(url)
+        return matches(url) || unprotectedTemporary.isAnException(url) || userAllowListRepository.isUrlInUserAllowList(url)
     }
 
     private fun matches(url: String): Boolean {

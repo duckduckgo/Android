@@ -17,6 +17,7 @@
 package com.duckduckgo.privacy.config.impl.features.https
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.privacy.config.api.HttpsException
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.https.HttpsRepository
@@ -32,11 +33,12 @@ import org.mockito.kotlin.whenever
 class RealHttpsTest {
     private val mockHttpsRepository: HttpsRepository = mock()
     private val mockUnprotectedTemporary: UnprotectedTemporary = mock()
+    private val mockUserAllowListRepository: UserAllowListRepository = mock()
     lateinit var testee: RealHttps
 
     @Before
     fun before() {
-        testee = RealHttps(mockHttpsRepository, mockUnprotectedTemporary)
+        testee = RealHttps(mockHttpsRepository, mockUnprotectedTemporary, mockUserAllowListRepository)
     }
 
     @Test
@@ -64,6 +66,15 @@ class RealHttpsTest {
     fun whenIsAnExceptionAndDomainIsListedInTheUnprotectedTemporaryListThenReturnTrue() {
         val url = "http://example.com"
         whenever(mockUnprotectedTemporary.isAnException(url)).thenReturn(true)
+        whenever(mockHttpsRepository.exceptions).thenReturn(CopyOnWriteArrayList())
+
+        assertTrue(testee.isAnException(url))
+    }
+
+    @Test
+    fun whenIsAnExceptionAndDomainIsListedInTheUserAllowListThenReturnTrue() {
+        val url = "http://example.com"
+        whenever(mockUserAllowListRepository.isUrlInUserAllowList(url)).thenReturn(true)
         whenever(mockHttpsRepository.exceptions).thenReturn(CopyOnWriteArrayList())
 
         assertTrue(testee.isAnException(url))

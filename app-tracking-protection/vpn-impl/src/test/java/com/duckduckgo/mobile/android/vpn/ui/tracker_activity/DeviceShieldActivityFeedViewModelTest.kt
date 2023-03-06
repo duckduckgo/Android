@@ -244,7 +244,10 @@ class DeviceShieldActivityFeedViewModelTest {
     }
 
     companion object {
-        private val timeWindow = TimeWindow(1, DAYS)
+        private val timeWindow = TimeWindow(
+            config.timeWindow.toLong(),
+            config.timeWindowUnits,
+        )
     }
 }
 
@@ -365,7 +368,7 @@ private val trackerFeedDataWithOneTracker = TrackerFeedItem.TrackerFeedData(
 
 private val config = DeviceShieldActivityFeedFragment.ActivityFeedConfig(
     maxRows = Int.MAX_VALUE,
-    timeWindow = 5,
+    timeWindow = 1,
     timeWindowUnits = DAYS,
     showTimeWindowHeadings = false,
 )

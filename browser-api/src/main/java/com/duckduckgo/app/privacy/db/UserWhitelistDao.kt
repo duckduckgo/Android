@@ -42,10 +42,7 @@ abstract class UserWhitelistDao {
     abstract fun all(): LiveData<List<UserWhitelistedDomain>>
 
     @Query("select domain from user_whitelist")
-    abstract fun allDomains(): List<String>
-
-    @Query("select * from user_whitelist")
-    abstract fun allFlow(): Flow<List<UserWhitelistedDomain>>
+    abstract fun allDomainsFlow(): Flow<List<String>>
 
     @Query("select count(1) > 0 from user_whitelist where domain = :domain")
     abstract fun contains(domain: String): Boolean

@@ -36,8 +36,9 @@ import okio.ByteString.Companion.encodeUtf8
 fun ImageView.loadFavicon(
     file: File,
     domain: String,
+    placeholder: String? = null,
 ) {
-    val defaultDrawable = generateDefaultDrawable(this.context, domain)
+    val defaultDrawable = generateDefaultDrawable(this.context, domain, placeholder)
     Glide.with(context).clear(this@loadFavicon)
     Glide.with(context)
         .load(file)
@@ -52,8 +53,9 @@ fun ImageView.loadFavicon(
 fun ImageView.loadFavicon(
     bitmap: Bitmap?,
     domain: String,
+    placeholder: String? = null,
 ) {
-    val defaultDrawable = generateDefaultDrawable(this.context, domain)
+    val defaultDrawable = generateDefaultDrawable(this.context, domain, placeholder)
     Glide.with(context).clear(this)
     Glide.with(context)
         .load(bitmap)
@@ -69,15 +71,27 @@ fun ImageView.loadDefaultFavicon(domain: String) {
     this.setImageDrawable(generateDefaultDrawable(this.context, domain))
 }
 
+/**
+ * Generates a default drawable which has a colored background with a character drawn centrally on top
+ * The given domain is used to generate a related background color.
+ * If an `overridePlaceholderCharacter` is specified, it will be used for the placeholder character
+ * If no `overridePlaceholderCharacter` is specified, the placeholder character will be extracted from the domain
+ */
 fun generateDefaultDrawable(
     context: Context,
     domain: String,
+    overridePlaceholderCharacter: String? = null,
 ): Drawable {
     return object : Drawable() {
         private val baseHost: String = domain.toUri().baseHost ?: ""
 
-        private val letter
-            get() = baseHost.firstOrNull()?.toString()?.uppercase(Locale.getDefault()) ?: ""
+        private val letter: String
+            get() {
+                if (overridePlaceholderCharacter != null) {
+                    return overridePlaceholderCharacter
+                }
+                return baseHost.firstOrNull()?.toString()?.uppercase(Locale.getDefault()) ?: ""
+            }
 
         private val faviconDefaultCornerRadius = context.resources.getDimension(CommonR.dimen.mediumShapeCornerRadius)
         private val faviconDefaultSize = context.resources.getDimension(CommonR.dimen.savedSiteGridItemFavicon)

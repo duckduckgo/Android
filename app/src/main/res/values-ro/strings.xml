@@ -574,7 +574,7 @@
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Dorești să îți trimitem o notificare când este rândul tău?</string>
     <string name="waitlistNotificationDialogNoThanks">Nu, mulțumesc</string>
-    <string name="waitlistNotificationDialogNotifyMe">DORESC SĂ PRIMESC NOTIFICĂRI</string>
+    <string name="waitlistNotificationDialogNotifyMe">Doresc să primesc notificări</string>
 
     <!-- Email Protection -->
     <string name="emailProtectionActivityTitle">Protecția comunicațiilor prin e-mail (beta)</string>
@@ -622,7 +622,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Răsfoiește în mod privat, cu aplicația noastră pentru Mac</string>
-    <string name="macos_settings_title">Aplicația DuckDuckGo pentru desktop</string>
+    <string name="macos_settings_title">Aplicația DuckDuckGo pentru Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Descărcări</string>
@@ -683,4 +683,9 @@
     <string name="downloadsNotifyMeTitle">Află când sunt pregătite descărcările</string>
     <string name="downloadsNotifyMeSubtitle">Primește o notificare când s-au finalizat descărcările.</string>
 
+    <!-- Windows Settings -->
+    <string name="windows_settings_title">Aplicația DuckDuckGo pentru Windows</string>
+    <string name="windows_settings_description">Navighează în mod privat cu aplicația noastră pentru Windows</string>
+    <string name="windows_settings_description_ready">Descărcare disponibilă</string>
+    <string name="windows_settings_description_list">Ești pe listă!</string>
 </resources>

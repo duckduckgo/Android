@@ -29,7 +29,7 @@ import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.FA
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.NO_SUBFOLDER
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.domain
+import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.global.touchFaviconLocation
 import com.duckduckgo.app.global.view.generateDefaultDrawable
@@ -136,7 +136,6 @@ class DuckDuckGoFaviconManager constructor(
         height: Int,
     ): Bitmap? {
         val domain = url.extractDomain() ?: return null
-
         return withContext(dispatcherProvider.io()) {
             var cachedFavicon: File? = null
             if (tabId != null) {
@@ -149,7 +148,9 @@ class DuckDuckGoFaviconManager constructor(
             return@withContext if (cachedFavicon != null) {
                 faviconDownloader.getFaviconFromDisk(cachedFavicon, cornerRadius, width, height)
             } else {
-                null
+                tryRemoteFallbackFavicon(subFolder = tabId, domain)?.let {
+                    faviconDownloader.getFaviconFromDisk(it, cornerRadius, width, height)
+                }
             }
         }
     }
@@ -158,18 +159,36 @@ class DuckDuckGoFaviconManager constructor(
         tabId: String?,
         url: String,
         view: ImageView,
+        placeholder: String?,
     ) {
         val bitmap = loadFromDisk(tabId, url)
 
         if (bitmap == null) {
-            view.loadFavicon(bitmap, url)
+            view.loadFavicon(bitmap, url, placeholder)
             val domain = url.extractDomain() ?: return
             tryRemoteFallbackFavicon(subFolder = tabId, domain)?.let {
-                view.loadFavicon(it, url)
+                view.loadFavicon(it, url, placeholder)
             }
         } else {
-            view.loadFavicon(bitmap, url)
+            view.loadFavicon(bitmap, url, placeholder)
         }
+    }
+
+    override suspend fun loadFromDiskOrFallback(
+        tabId: String?,
+        url: String,
+    ): Bitmap? {
+        val bitmap = loadFromDisk(tabId, url)
+        if (bitmap == null) {
+            val domain = url.extractDomain() ?: return null
+            tryRemoteFallbackFavicon(subFolder = tabId, domain)?.let {
+                return faviconDownloader.getFaviconFromDisk(it)
+            }
+        } else {
+            return bitmap
+        }
+
+        return null
     }
 
     override suspend fun loadToViewFromLocalWithPlaceholder(tabId: String?, url: String, view: ImageView) {
@@ -209,9 +228,10 @@ class DuckDuckGoFaviconManager constructor(
     }
 
     override fun generateDefaultFavicon(
+        placeholder: String?,
         domain: String,
     ): Drawable {
-        return generateDefaultDrawable(context, domain)
+        return generateDefaultDrawable(context, domain, placeholder)
     }
 
     private suspend fun saveFavicon(
@@ -282,7 +302,7 @@ class DuckDuckGoFaviconManager constructor(
 
     private fun String.extractDomain(): String? {
         return if (this.startsWith("http")) {
-            this.toUri().domain()
+            this.toUri().baseHost
         } else {
             "https://$this".extractDomain()
         }

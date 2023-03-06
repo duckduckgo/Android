@@ -17,6 +17,7 @@
 package com.duckduckgo.privacy.config.impl.referencetests.gpc
 
 import com.duckduckgo.app.FileUtilities
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.GpcException
@@ -48,6 +49,7 @@ class GpcHeaderReferenceTest(private val testCase: TestCase) {
     private val mockUnprotectedTemporaryRepository: UnprotectedTemporaryRepository = mock()
     private val mockGpcRepository: GpcRepository = mock()
     private val mockFeatureToggle: FeatureToggle = mock()
+    private val mockUserAllowListRepository: UserAllowListRepository = mock()
     lateinit var gpc: Gpc
 
     companion object {
@@ -71,7 +73,7 @@ class GpcHeaderReferenceTest(private val testCase: TestCase) {
     fun setup() {
         whenever(mockGpcRepository.isGpcEnabled()).thenReturn(testCase.gpcUserSettingOn)
         mockGpcPrivacyConfig()
-        gpc = RealGpc(mockFeatureToggle, mockGpcRepository, RealUnprotectedTemporary(mockUnprotectedTemporaryRepository))
+        gpc = RealGpc(mockFeatureToggle, mockGpcRepository, RealUnprotectedTemporary(mockUnprotectedTemporaryRepository), mockUserAllowListRepository)
     }
 
     @Test

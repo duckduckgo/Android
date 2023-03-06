@@ -17,7 +17,7 @@
 package com.duckduckgo.contentscopescripts.impl
 
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.app.userwhitelist.api.UserWhiteListRepository
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
 import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
@@ -37,7 +37,7 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class)
 class RealContentScopeScripts @Inject constructor(
     private val pluginPoint: PluginPoint<ContentScopeConfigPlugin>,
-    private val allowList: UserWhiteListRepository,
+    private val userAllowListRepository: UserAllowListRepository,
     private val contentScopeJSReader: ContentScopeJSReader,
     private val appBuildConfig: AppBuildConfig,
     private val unprotectedTemporary: UnprotectedTemporary,
@@ -72,8 +72,8 @@ class RealContentScopeScripts @Inject constructor(
             updateJS = true
         }
 
-        if (cachedUserUnprotectedDomains != allowList.userWhiteList) {
-            cacheUserUnprotectedDomains(allowList.userWhiteList)
+        if (cachedUserUnprotectedDomains != userAllowListRepository.domainsInUserAllowList()) {
+            cacheUserUnprotectedDomains(userAllowListRepository.domainsInUserAllowList())
             updateJS = true
         }
 

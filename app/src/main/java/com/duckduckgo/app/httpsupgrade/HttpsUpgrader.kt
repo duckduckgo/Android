@@ -23,7 +23,6 @@ import com.duckduckgo.app.global.isHttps
 import com.duckduckgo.app.global.toHttps
 import com.duckduckgo.app.httpsupgrade.store.HttpsFalsePositivesDao
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Https
@@ -61,7 +60,6 @@ interface HttpsUpgrader {
 class HttpsUpgraderImpl @Inject constructor(
     private val bloomFactory: HttpsBloomFilterFactory,
     private val bloomFalsePositiveDao: HttpsFalsePositivesDao,
-    private val userAllowListDao: UserWhitelistDao,
     private val toggle: FeatureToggle,
     private val https: Https,
 ) : HttpsUpgrader, MainProcessLifecycleObserver {
@@ -87,12 +85,7 @@ class HttpsUpgraderImpl @Inject constructor(
         }
 
         if (https.isAnException(uri.toString())) {
-            Timber.d("$host is in the remote exception list and so not upgradable")
-            return false
-        }
-
-        if (userAllowListDao.contains(host)) {
-            Timber.d("$host is in user allowlist and so not upgradable")
+            Timber.d("$host is in the exception list and so not upgradable")
             return false
         }
 

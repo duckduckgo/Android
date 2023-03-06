@@ -29,6 +29,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoFragment
 import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
@@ -42,6 +43,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementR
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ContextMenuAction.Edit
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialGrouper
+import com.duckduckgo.autofill.impl.ui.credential.management.sorting.InitialExtractor
 import com.duckduckgo.autofill.impl.ui.credential.management.suggestion.SuggestionListBuilder
 import com.duckduckgo.autofill.impl.ui.credential.management.suggestion.SuggestionMatcher
 import com.duckduckgo.di.scopes.FragmentScope
@@ -70,6 +72,12 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
 
     @Inject
     lateinit var suggestionListBuilder: SuggestionListBuilder
+
+    @Inject
+    lateinit var initialExtractor: InitialExtractor
+
+    @Inject
+    lateinit var dispatchers: DispatcherProvider
 
     val viewModel by lazy {
         ViewModelProvider(requireActivity(), viewModelFactory)[AutofillSettingsViewModel::class.java]
@@ -234,8 +242,10 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
     private fun configureRecyclerView() {
         adapter = AutofillManagementRecyclerAdapter(
             this,
+            dispatchers = dispatchers,
             faviconManager = faviconManager,
             grouper = credentialGrouper,
+            initialExtractor = initialExtractor,
             suggestionListBuilder = suggestionListBuilder,
             onCredentialSelected = this::onCredentialsSelected,
             onContextMenuItemClicked = {

@@ -30,6 +30,7 @@ interface VariantManager {
     // variant-dependant features listed here
     sealed class VariantFeature {
         object CookiePromptManagementExperiment : VariantFeature()
+        object OptimiseOnboardingExperiment : VariantFeature()
     }
 
     companion object {
@@ -50,6 +51,13 @@ interface VariantManager {
                 weight = 1.0,
                 features = listOf(VariantFeature.CookiePromptManagementExperiment),
                 filterBy = { isEuropeanCountry() },
+            ),
+            Variant(key = "za", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() && !isGBCountry() }),
+            Variant(
+                key = "zb",
+                weight = 1.0,
+                features = listOf(VariantFeature.OptimiseOnboardingExperiment),
+                filterBy = { isEnglishLocale() && !isGBCountry() },
             ),
         )
 
@@ -142,6 +150,11 @@ interface VariantManager {
         private fun isEuropeanCountry(): Boolean {
             val locale = Locale.getDefault()
             return locale != null && europeanCountries.contains(locale.country)
+        }
+
+        private fun isGBCountry(): Boolean {
+            val locale = Locale.getDefault()
+            return locale != null && locale.country == "GB"
         }
 
         private fun isSerpRegionToggleCountry(): Boolean {
@@ -242,6 +255,9 @@ class ExperimentationVariantManager(
 
 fun VariantManager.isCookiePromptManagementExperimentEnabled() =
     this.getVariant().hasFeature(VariantManager.VariantFeature.CookiePromptManagementExperiment)
+
+fun VariantManager.isOptimiseOnboardingExperimentEnabled() =
+    this.getVariant().hasFeature(VariantManager.VariantFeature.OptimiseOnboardingExperiment)
 
 /**
  * A variant which can be used for experimentation.

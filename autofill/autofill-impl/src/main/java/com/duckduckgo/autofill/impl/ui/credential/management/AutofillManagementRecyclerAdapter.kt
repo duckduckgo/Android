@@ -27,6 +27,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ItemRowAutofillCredentialsManagementScreenBinding
@@ -43,15 +44,18 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementR
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem.GroupHeading
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem.NoMatchingSearchResults
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialGrouper
+import com.duckduckgo.autofill.impl.ui.credential.management.sorting.InitialExtractor
 import com.duckduckgo.autofill.impl.ui.credential.management.suggestion.SuggestionListBuilder
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.extractTitle
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import kotlinx.coroutines.launch
 
 class AutofillManagementRecyclerAdapter(
-    val lifecycleOwner: LifecycleOwner,
-    val faviconManager: FaviconManager,
-    val grouper: CredentialGrouper,
+    private val lifecycleOwner: LifecycleOwner,
+    private val dispatchers: DispatcherProvider,
+    private val faviconManager: FaviconManager,
+    private val grouper: CredentialGrouper,
+    private val initialExtractor: InitialExtractor,
     private val suggestionListBuilder: SuggestionListBuilder,
     private val onCredentialSelected: (credentials: LoginCredentials) -> Unit,
     private val onContextMenuItemClicked: (ContextMenuAction) -> Unit,
@@ -190,13 +194,10 @@ class AutofillManagementRecyclerAdapter(
     }
 
     private fun ItemRowAutofillCredentialsManagementScreenBinding.updateFavicon(credentials: LoginCredentials) {
-        val domain = credentials.domain
-        if (domain == null) {
-            favicon.setImageBitmap(null)
-        } else {
-            lifecycleOwner.lifecycleScope.launch {
-                faviconManager.loadToViewFromLocalOrFallback(url = domain, view = favicon)
-            }
+        lifecycleOwner.lifecycleScope.launch {
+            val url = credentials.domain.orEmpty()
+            val faviconPlaceholderLetter = initialExtractor.extractInitial(credentials)
+            faviconManager.loadToViewFromLocalOrFallback(url = url, view = favicon, placeholder = faviconPlaceholderLetter)
         }
     }
 

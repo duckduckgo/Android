@@ -618,7 +618,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Naviga in privato con la nostra app per Mac</string>
-    <string name="macos_settings_title">App desktop DuckDuckGo</string>
+    <string name="macos_settings_title">App Mac DuckDuckGo</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Download</string>
@@ -679,4 +679,9 @@
     <string name="downloadsNotifyMeTitle">Scopri quando i download sono pronti</string>
     <string name="downloadsNotifyMeSubtitle">Ricevi una notifica al termine dei download.</string>
 
+    <!-- Windows Settings -->
+    <string name="windows_settings_title">App Windows DuckDuckGo</string>
+    <string name="windows_settings_description">Naviga privatamente con la nostra app per Windows</string>
+    <string name="windows_settings_description_ready">Download disponibile</string>
+    <string name="windows_settings_description_list">Sei sulla lista.</string>
 </resources>

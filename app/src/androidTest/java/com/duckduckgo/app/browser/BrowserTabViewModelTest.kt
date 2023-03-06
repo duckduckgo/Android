@@ -105,10 +105,12 @@ import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.surrogates.SurrogateResponse
@@ -330,6 +332,9 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var mockSitePermissionsManager: SitePermissionsManager
 
+    @Mock
+    private lateinit var mockUserAllowListRepository: UserAllowListRepository
+
     private lateinit var remoteMessagingModel: RemoteMessagingModel
 
     private val lazyFaviconManager = Lazy { mockFaviconManager }
@@ -382,6 +387,8 @@ class BrowserTabViewModelTest {
 
     private val mockAppTheme: AppTheme = mock()
 
+    private val mockVariantManager: VariantManager = mock()
+
     private val autofillCapabilityChecker: FakeCapabilityChecker = FakeCapabilityChecker(enabled = false)
 
     @Before
@@ -425,6 +432,7 @@ class BrowserTabViewModelTest {
             dispatchers = coroutineRule.testDispatcherProvider,
             duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),
             appTheme = mockAppTheme,
+            variantManager = mockVariantManager,
         )
 
         val siteFactory = SiteFactoryImpl(mockEntityLookup, mockUserWhitelistDao, mockContentBlocking, TestScope())
@@ -471,7 +479,7 @@ class BrowserTabViewModelTest {
             navigationAwareLoginDetector = mockNavigationAwareLoginDetector,
             userEventsStore = mockUserEventsStore,
             fileDownloader = mockFileDownloader,
-            gpc = RealGpc(mockFeatureToggle, mockGpcRepository, mockUnprotectedTemporary),
+            gpc = RealGpc(mockFeatureToggle, mockGpcRepository, mockUnprotectedTemporary, mockUserAllowListRepository),
             fireproofDialogsEventHandler = fireproofDialogsEventHandler,
             emailManager = mockEmailManager,
             favoritesRepository = mockFavoritesRepository,
@@ -4260,6 +4268,14 @@ class BrowserTabViewModelTest {
         assertCommandIssued<Command.ShowUserCredentialSavedOrUpdatedConfirmation> {
             assertFalse(this.includeShortcutToViewCredential)
         }
+    }
+
+    @Test
+    fun whenUserClickedPrivacyShieldFromOnboardingDialogThenLaunchPrivacyDashboardCommand() {
+        val cta = DaxDialogCta.DaxTrackersBlockedExperimentCta(mockOnboardingStore, mockAppInstallStore, emptyList(), "")
+        setCta(cta)
+        testee.onUserClickOnboardingPrivacyShieldModal()
+        assertCommandIssued<Command.LaunchPrivacyDashboard>()
     }
 
     private fun aCredential(): LoginCredentials {

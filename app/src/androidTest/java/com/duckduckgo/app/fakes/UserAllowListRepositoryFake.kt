@@ -16,10 +16,15 @@
 
 package com.duckduckgo.app.fakes
 
+import android.net.Uri
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 
 class UserAllowListRepositoryFake : UserAllowListRepository {
-    override fun isDomainInUserAllowList(domain: String): Boolean = false
+    override fun isUrlInUserAllowList(url: String): Boolean = false
+
+    override fun isUriInUserAllowList(uri: Uri): Boolean = false
+
+    override fun isDomainInUserAllowList(domain: String?): Boolean = false
 
     override fun domainsInUserAllowList(): List<String> = emptyList()
 }

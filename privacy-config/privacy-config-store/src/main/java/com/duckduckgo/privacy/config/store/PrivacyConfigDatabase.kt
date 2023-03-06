@@ -87,7 +87,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
 
 val MIGRATION_10_11 = object : Migration(10, 11) {
     override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("DROP TABLE autofill_exceptions")
+        database.execSQL("DROP TABLE IF EXISTS `autofill_exceptions`")
         database.execSQL("DELETE FROM privacy_config")
     }
 }

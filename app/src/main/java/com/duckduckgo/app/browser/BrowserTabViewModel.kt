@@ -446,6 +446,7 @@ class BrowserTabViewModel @Inject constructor(
             val includeShortcutToViewCredential: Boolean,
             val messageResourceId: Int,
         ) : Command()
+        object LaunchPrivacyDashboard : Command()
     }
 
     sealed class NavigationCommand : Command() {
@@ -1594,9 +1595,14 @@ class BrowserTabViewModel @Inject constructor(
         onSiteLocationPermissionAlwaysDenied()
     }
 
+    fun onSystemLocationPermissionDeniedTwice() {
+        pixel.fire(AppPixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_DISABLE)
+        onSystemLocationPermissionDeniedForever()
+    }
+
     fun onSystemLocationPermissionDeniedForever() {
         appSettingsPreferencesStore.appLocationPermissionDeniedForever = true
-        onSystemLocationPermissionDeniedOneTime()
+        onSiteLocationPermissionAlwaysDenied()
     }
 
     private fun registerSiteVisit() {
@@ -2376,6 +2382,15 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch {
             val cta = currentCtaViewState().cta ?: return@launch
             ctaViewModel.onUserDismissedCta(cta)
+        }
+    }
+
+    fun onUserClickOnboardingPrivacyShieldModal() {
+        viewModelScope.launch {
+            val cta = currentCtaViewState().cta ?: return@launch
+            ctaViewModel.onUserDismissedCta(cta)
+            ctaViewModel.onUserClickOnboardingPrivacyShield()
+            command.value = LaunchPrivacyDashboard
         }
     }
 

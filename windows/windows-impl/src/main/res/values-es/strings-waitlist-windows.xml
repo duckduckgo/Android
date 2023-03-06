@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="windows_app">Aplicación DuckDuckGo para Windows</string>
+    <string name="windows_waitlist_title">¡Consigue acceso anticipado a la prueba de DuckDuckGo para Windows!</string>
+    <string name="windows_waitlist_description">DuckDuckGo para Windows tiene todo lo que necesitas para navegar con más privacidad: búsqueda privada, bloqueo de rastreadores, encriptación forzada y bloqueo de ventanas emergentes de cookies, además de más protecciones de primera nivel que están por llegar.</string>
+    <string name="windows_waitlist_mac_link">¿Buscas la versión para Mac?</string>
+    <string name="windows_join_waitlist">Unirse a la lista de espera privada</string>
+    <string name="windows_join_waitlist_error">Se ha producido un error al unirte a la lista de espera, inténtalo de nuevo más tarde</string>
+    <string name="windows_waitlist_footer">No tendrás que compartir ninguna información personal para unirte a la lista de espera. Asegurarás tu lugar en la fila con una marca de tiempo que existe únicamente en tu dispositivo para que podamos notificarte cuando sea tu turno.</string>
+
+    <string name="windows_waitlist_on_the_list_title">¡Estás en la lista!</string>
+    <string name="windows_waitlist_on_the_list_notification_enabled">Te enviaremos una notificación cuando tu copia de DuckDuckGo para Windows esté lista para descargar.</string>
+    <string name="windows_waitlist_on_the_list_notification_disabled">Tu invitación para probar DuckDuckGo para Windows llegará aquí. Vuelve a mirar pronto, aunque también podemos enviarte una notificación cuando llegue tu turno.</string>
+
+    <string name="notification_channel_windows_waitlist">Invitaciones de la lista de espera</string>
+    <string name="windows_notification_title">¡Empieza a probar DuckDuckGo para Windows!</string>
+    <string name="windows_notification_text">Abrir tu invitación</string>
+
+    <string name="windows_waitlist_code_title">¡Estás invitado!</string>
+    <string name="windows_waitlist_code_invite">Código de invitación</string>`
+    <string name="windows_waitlist_code_description">¿Todo listo para usar DuckDuckGo en Windows?\n\n<b>Paso 1</b>\nVisita esta URL en tu dispositivo Windows para descargarlo:\n<b><annotation type="beta_link">duckduckgo.com/windows</annotation></b>\n\n<b>Paso 2</b>\nAbre el instalador de DuckDuckGo en Descargas, selecciona Instalar e introduce tu código de invitación.</string>
+    <string name="windows_waitlist_code_share_text"><![CDATA[¿Todo listo para usar DuckDuckGo en Windows?<br/><br/><b>Paso 1</b><br/>Visita esta URL en tu dispositivo Windows para descargarlo:<br/><a href=\"https://duckduckgo.com/windows\"><b>https://duckduckgo.com/windows</b></a><br/><br/><b>Paso 2</b><br/>Abre el instalador DuckDuckGo en Descargas, selecciona Instalar e introduce tu código de invitación.<br/><br/>Código de invitación: %1$s]]></string>
+
+    <string name="windows_waitlist_clipboard_invite_copied">Invitación copiada en el portapapeles</string>
+    <string name="windows_waitlist_clipboard_code_copied">Código copiado en el portapapeles</string>
+
+    <string name="windows_waitlist_share_invite">Comparte tu invitación</string>
+
+    <string name="waitlistNotifyMeTitle">Entérate en cuanto tengas la invitación</string>
+    <string name="waitlistNotifyMeSubtitle">Recibe una notificación cuando tu copia de DuckDuckGo para Windows esté lista para su descarga.</string>
+</resources>

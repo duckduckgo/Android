@@ -50,7 +50,11 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
 
     override fun isApplicable(context: AnvilContext): Boolean = true
 
-    override fun generateCode(codeGenDir: File, module: ModuleDescriptor, projectFiles: Collection<KtFile>): Collection<GeneratedFile> {
+    override fun generateCode(
+        codeGenDir: File,
+        module: ModuleDescriptor,
+        projectFiles: Collection<KtFile>,
+    ): Collection<GeneratedFile> {
         return projectFiles.classAndInnerClassReferences(module)
             .toList()
             .filter { it.isAnnotatedWith(ContributesRemoteFeature::class.fqName) }
@@ -65,7 +69,11 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             .toList()
     }
 
-    private fun generateFeatureToggleProxy(vmClass: ClassReference.Psi, codeGenDir: File, module: ModuleDescriptor): GeneratedFile {
+    private fun generateFeatureToggleProxy(
+        vmClass: ClassReference.Psi,
+        codeGenDir: File,
+        module: ModuleDescriptor,
+    ): GeneratedFile {
         val generatedPackage = vmClass.packageFqName.toString()
         val generatedClassName = "${vmClass.shortName}_ProxyModule"
         val annotation = vmClass.annotations.first { it.fqName == ContributesRemoteFeature::class.fqName }
@@ -167,7 +175,11 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
         return createGeneratedFile(codeGenDir, generatedPackage, generatedClassName, content)
     }
 
-    private fun generateRemoteFeature(vmClass: ClassReference.Psi, codeGenDir: File, module: ModuleDescriptor): GeneratedFile {
+    private fun generateRemoteFeature(
+        vmClass: ClassReference.Psi,
+        codeGenDir: File,
+        module: ModuleDescriptor,
+    ): GeneratedFile {
         val generatedPackage = vmClass.packageFqName.toString()
         val generatedClassName = "${vmClass.shortName}_RemoteFeature"
         val annotation = vmClass.annotations.first { it.fqName == ContributesRemoteFeature::class.fqName }
@@ -307,7 +319,11 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
         return createGeneratedFile(codeGenDir, generatedPackage, generatedClassName, content)
     }
 
-    private fun generateOptionalBindings(vmClass: ClassReference.Psi, codeGenDir: File, module: ModuleDescriptor): GeneratedFile {
+    private fun generateOptionalBindings(
+        vmClass: ClassReference.Psi,
+        codeGenDir: File,
+        module: ModuleDescriptor,
+    ): GeneratedFile {
         val generatedPackage = vmClass.packageFqName.toString()
         val generatedClassName = "${vmClass.shortName}_OptionalBindings_Module"
         val annotation = vmClass.annotations.first { it.fqName == ContributesRemoteFeature::class.fqName }
@@ -362,7 +378,11 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             .build()
     }
 
-    private fun createSharedPreferencesProperty(generatedPackage: String, featureName: String, module: ModuleDescriptor): PropertySpec {
+    private fun createSharedPreferencesProperty(
+        generatedPackage: String,
+        featureName: String,
+        module: ModuleDescriptor,
+    ): PropertySpec {
         val filename = "com.duckduckgo.feature.toggle.$featureName"
         return PropertySpec.builder("preferences", sharedPreferences.asClassName(module))
             .addModifiers(KModifier.PRIVATE)
@@ -529,7 +549,10 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             .build()
     }
 
-    private fun createJsonToggleDataClass(generatedPackage: String, module: ModuleDescriptor): TypeSpec {
+    private fun createJsonToggleDataClass(
+        generatedPackage: String,
+        module: ModuleDescriptor,
+    ): TypeSpec {
         return TypeSpec.classBuilder(FqName("$generatedPackage.JsonToggle").asClassName(module))
             .addModifiers(KModifier.PRIVATE)
             .addModifiers(KModifier.DATA)
@@ -576,7 +599,10 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             .build()
     }
 
-    private fun createJsonFeatureDataClass(generatedPackage: String, module: ModuleDescriptor): TypeSpec {
+    private fun createJsonFeatureDataClass(
+        generatedPackage: String,
+        module: ModuleDescriptor,
+    ): TypeSpec {
         return TypeSpec.classBuilder(FqName("$generatedPackage.JsonFeature").asClassName(module))
             .addModifiers(KModifier.PRIVATE)
             .addModifiers(KModifier.DATA)
@@ -614,10 +640,14 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             .addProperty(PropertySpec.builder("state", String::class.asClassName().copy(nullable = true)).initializer("state").build())
             .addProperty(PropertySpec.builder("hash", String::class.asClassName().copy(nullable = true)).initializer("hash").build())
             .addProperty(
-                PropertySpec.builder("minSupportedVersion", Int::class.asClassName().copy(nullable = true)).initializer("minSupportedVersion").build(),
+                PropertySpec.builder("minSupportedVersion", Int::class.asClassName().copy(nullable = true))
+                    .initializer("minSupportedVersion")
+                    .build(),
             )
             .addProperty(
-                PropertySpec.builder("settings", FqName("org.json.JSONObject").asClassName(module).copy(nullable = true)).initializer("settings").build(),
+                PropertySpec.builder("settings", FqName("org.json.JSONObject").asClassName(module).copy(nullable = true))
+                    .initializer("settings")
+                    .build(),
             )
             .addProperty(
                 PropertySpec.builder(
@@ -641,7 +671,10 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             .build()
     }
 
-    private fun createJsonExceptionDataClass(generatedPackage: String, module: ModuleDescriptor): TypeSpec {
+    private fun createJsonExceptionDataClass(
+        generatedPackage: String,
+        module: ModuleDescriptor,
+    ): TypeSpec {
         return TypeSpec.classBuilder(FqName("$generatedPackage.JsonException").asClassName(module))
             .addModifiers(KModifier.PRIVATE)
             .addModifiers(KModifier.DATA)
@@ -656,7 +689,10 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             .build()
     }
 
-    private fun createJsonObjectAdapterClass(generatedPackage: String, module: ModuleDescriptor): TypeSpec {
+    private fun createJsonObjectAdapterClass(
+        generatedPackage: String,
+        module: ModuleDescriptor,
+    ): TypeSpec {
         return TypeSpec.classBuilder("JSONObjectAdapter")
             .addModifiers(KModifier.PRIVATE)
             .addFunction(
@@ -699,7 +735,10 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             .build()
     }
 
-    private fun validateRemoteFeatureInterface(vmClass: ClassReference.Psi, module: ModuleDescriptor) {
+    private fun validateRemoteFeatureInterface(
+        vmClass: ClassReference.Psi,
+        module: ModuleDescriptor,
+    ) {
         // validate type must be an interface
         if (!vmClass.isInterface()) {
             throw AnvilCompilationException(
@@ -737,7 +776,9 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
         }
         with(annotation.settingsStoreOrNull()) {
             settingsStorePresent.set(this != null)
-            if (this != null && this.directSuperTypeReferences().none { it.asClassReferenceOrNull()?.fqName == FeatureSettings.Store::class.fqName }) {
+            if (this != null && this.directSuperTypeReferences()
+                .none { it.asClassReferenceOrNull()?.fqName == FeatureSettings.Store::class.fqName }
+            ) {
                 throw AnvilCompilationException(
                     "${vmClass.fqName} [settingsStore] must extend [FeatureSettings.Store]",
                     element = vmClass.clazz.identifyingElement,
@@ -746,7 +787,9 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
         }
         with(annotation.exceptionsStoreOrNull()) {
             exceptionStorePresent.set(this != null)
-            if (this != null && this.directSuperTypeReferences().none { it.asClassReferenceOrNull()?.fqName == FeatureExceptions.Store::class.fqName }) {
+            if (this != null && this.directSuperTypeReferences()
+                .none { it.asClassReferenceOrNull()?.fqName == FeatureExceptions.Store::class.fqName }
+            ) {
                 throw AnvilCompilationException(
                     "${vmClass.fqName} [exceptionsStore] must extend [FeatureExceptions.Store]",
                     element = vmClass.clazz.identifyingElement,
@@ -801,12 +844,15 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
     private fun AnnotationReference.featureNameOrNull(): String? {
         return argumentAt("featureName", 2)?.value()
     }
+
     private fun AnnotationReference.settingsStoreOrNull(): ClassReference? {
         return argumentAt("settingsStore", 3)?.value()
     }
+
     private fun AnnotationReference.exceptionsStoreOrNull(): ClassReference? {
         return argumentAt("exceptionsStore", 4)?.value()
     }
+
     private fun AnnotationReference.toggleStoreOrNull(): ClassReference? {
         return argumentAt("toggleStore", 5)?.value()
     }

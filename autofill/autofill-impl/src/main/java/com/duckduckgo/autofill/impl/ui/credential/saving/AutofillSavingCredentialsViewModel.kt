@@ -37,7 +37,8 @@ class AutofillSavingCredentialsViewModel @Inject constructor(
     lateinit var autofillStore: AutofillStore
 
     fun showOnboarding(): Boolean {
-        return autofillStore.showOnboardingWhenOfferingToSaveLogin
+        // hardcoding this to always show onboarding-style dialog for now; instead of querying autofillStore.showOnboardingWhenOfferingToSaveLogin
+        return true
     }
 
     fun determineTextResources(credentials: LoginCredentials): DisplayStringResourceIds {

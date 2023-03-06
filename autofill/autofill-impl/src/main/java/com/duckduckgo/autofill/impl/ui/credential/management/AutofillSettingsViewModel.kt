@@ -19,6 +19,7 @@ package com.duckduckgo.autofill.impl.ui.credential.management
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
@@ -50,9 +51,11 @@ import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.di.scopes.ActivityScope
 import java.util.*
 import javax.inject.Inject
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -65,6 +68,7 @@ class AutofillSettingsViewModel @Inject constructor(
     private val pixel: Pixel,
     private val dispatchers: DispatcherProvider,
     private val credentialListFilter: CredentialListFilter,
+    private val faviconManager: FaviconManager,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -83,6 +87,8 @@ class AutofillSettingsViewModel @Inject constructor(
 
     // after unlocking, we want to know which mode to return to
     private var credentialModeBeforeLocking: CredentialMode? = null
+
+    private var combineJob: Job? = null
 
     fun onCopyUsername(username: String?) {
         username?.let { clipboardInteractor.copyToClipboard(it) }
@@ -270,10 +276,10 @@ class AutofillSettingsViewModel @Inject constructor(
     }
 
     fun observeCredentials() {
-        viewModelScope.launch(dispatchers.default()) {
+        if (combineJob != null) return
+        combineJob = viewModelScope.launch(dispatchers.io()) {
             _viewState.value = _viewState.value.copy(autofillEnabled = autofillStore.autofillEnabled)
-
-            val allCredentials = autofillStore.getAllCredentials()
+            val allCredentials = autofillStore.getAllCredentials().distinctUntilChanged()
             val combined = allCredentials.combine(searchQueryFilter) { credentials, filter ->
                 credentialListFilter.filter(credentials, filter)
             }
@@ -286,10 +292,8 @@ class AutofillSettingsViewModel @Inject constructor(
     }
 
     fun onDeleteCurrentCredentials() {
-        val credentialsId = getCurrentCredentials()?.id ?: return
-
-        viewModelScope.launch(dispatchers.default()) {
-            autofillStore.deleteCredentials(credentialsId)
+        getCurrentCredentials()?.let {
+            onDeleteCredentials(it)
         }
     }
 
@@ -297,6 +301,9 @@ class AutofillSettingsViewModel @Inject constructor(
         val credentialsId = loginCredentials.id ?: return
 
         viewModelScope.launch(dispatchers.default()) {
+            loginCredentials.domain?.let {
+                faviconManager.deletePersistedFavicon(it)
+            }
             autofillStore.deleteCredentials(credentialsId)
         }
     }

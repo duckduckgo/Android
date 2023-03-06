@@ -17,7 +17,7 @@
 package com.duckduckgo.privacy.config.impl.features.trackingparameters
 
 import com.duckduckgo.app.FileUtilities
-import com.duckduckgo.app.userwhitelist.api.UserWhiteListRepository
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.TrackingParameterException
@@ -45,12 +45,12 @@ class TrackingParameterReferenceTest(private val testCase: TestCase) {
     private val mockRepository: TrackingParametersRepository = mock()
     private val mockUnprotectedTemporary: UnprotectedTemporary = mock()
     private val mockFeatureToggle: FeatureToggle = mock()
-    private val mockUserWhiteListRepository: UserWhiteListRepository = mock()
+    private val mockUserAllowListRepository: UserAllowListRepository = mock()
 
     @Before
     fun setup() {
         mockTrackingParameters()
-        testee = RealTrackingParameters(mockRepository, mockFeatureToggle, mockUnprotectedTemporary, mockUserWhiteListRepository)
+        testee = RealTrackingParameters(mockRepository, mockFeatureToggle, mockUnprotectedTemporary, mockUserAllowListRepository)
         whenever(mockUnprotectedTemporary.isAnException(any())).thenReturn(false)
         whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.TrackingParametersFeatureName.value, true)).thenReturn(true)
     }

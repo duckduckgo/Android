@@ -21,6 +21,7 @@ import android.util.Base64
 import com.duckduckgo.library.loader.LibraryLoader
 import java.util.*
 import kotlin.system.exitProcess
+import okio.ByteString.Companion.encode
 import timber.log.Timber
 
 interface SyncLib {
@@ -34,6 +35,11 @@ interface SyncLib {
         encryptedData: String,
         secretKey: String,
     ): DecryptResult
+
+    fun encrypt(
+        rawData: String,
+        secretKey: String,
+    ): EncryptResult
 }
 
 class SyncNativeLib constructor(context: Context) : SyncLib {
@@ -109,6 +115,22 @@ class SyncNativeLib constructor(context: Context) : SyncLib {
         )
     }
 
+    override fun encrypt(
+        rawData: String,
+        secretKey: String,
+    ): EncryptResult {
+        val rawDataByteArray = rawData.decode()
+        val secretKeyByteArray = secretKey.decode()
+        val encryptedDataByteArray = ByteArray(rawDataByteArray.size + getEncryptedExtraBytes())
+
+        val result: Long = encrypt(encryptedDataByteArray, rawDataByteArray, secretKeyByteArray)
+
+        return EncryptResult(
+            result = result,
+            encryptedData = encryptedDataByteArray.encode(),
+        )
+    }
+
     private fun ByteArray.encode(): String {
         return Base64.encodeToString(this, Base64.NO_WRAP)
     }
@@ -130,6 +152,12 @@ class SyncNativeLib constructor(context: Context) : SyncLib {
         passwordHash: ByteArray,
         stretchedPrimaryKey: ByteArray,
         primaryKey: ByteArray,
+    ): Long
+
+    private external fun encrypt(
+        encryptedBytes: ByteArray,
+        rawBytes: ByteArray,
+        secretKey: ByteArray,
     ): Long
 
     private external fun decrypt(
@@ -166,4 +194,9 @@ class LoginKeys(
 class DecryptResult(
     val result: Long,
     val decryptedData: String,
+)
+
+class EncryptResult(
+    val result: Long,
+    val encryptedData: String,
 )
