@@ -54,7 +54,7 @@ jobs:
           path: android-tests-report.zip
 
       - name: Create Asana task when workflow failed
-        if: ${{ failure() }}
+        if: ${{ failure() && github.event_name != 'workflow_dispatch' }}
         uses: honeycombio/gha-create-asana-task@main
         with:
           asana-secret: ${{ secrets.GH_ASANA_SECRET }}
