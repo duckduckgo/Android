@@ -27,6 +27,7 @@ import android.view.KeyEvent
 import android.view.View
 import android.widget.Toast
 import androidx.annotation.VisibleForTesting
+import androidx.lifecycle.lifecycleScope
 import androidx.webkit.ServiceWorkerClientCompat
 import androidx.webkit.ServiceWorkerControllerCompat
 import androidx.webkit.WebViewFeature
@@ -74,13 +75,12 @@ import javax.inject.Inject
 import kotlin.collections.ArrayList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 // open class so that we can test BrowserApplicationStateInfo
 @InjectWith(ActivityScope::class)
-open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
+open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var settingsDataStore: SettingsDataStore
@@ -302,7 +302,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         }
 
         if (intent.getBooleanExtra(FAVORITES_ONBOARDING_EXTRA, false)) {
-            launch {
+            lifecycleScope.launch {
                 val tabId = viewModel.onNewTabRequested()
                 openFavoritesOnboardingNewTab(tabId)
             }
@@ -311,7 +311,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
 
         if (launchNewSearch(intent)) {
             Timber.w("new tab requested")
-            launch { viewModel.onNewTabRequested() }
+            lifecycleScope.launch { viewModel.onNewTabRequested() }
             return
         }
 
@@ -319,14 +319,14 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         if (sharedText != null) {
             if (intent.getBooleanExtra(ShortcutBuilder.SHORTCUT_EXTRA_ARG, false)) {
                 Timber.d("Shortcut opened with url $sharedText")
-                launch { viewModel.onOpenShortcut(sharedText) }
+                lifecycleScope.launch { viewModel.onOpenShortcut(sharedText) }
             } else if (intent.getBooleanExtra(LAUNCH_FROM_FAVORITES_WIDGET, false)) {
                 Timber.d("Favorite clicked from widget $sharedText")
-                launch { viewModel.onOpenFavoriteFromWidget(query = sharedText) }
+                lifecycleScope.launch { viewModel.onOpenFavoriteFromWidget(query = sharedText) }
                 return
             } else {
                 Timber.w("opening in new tab requested for $sharedText")
-                launch { viewModel.onOpenInNewTabRequested(query = sharedText, skipHome = true) }
+                lifecycleScope.launch { viewModel.onOpenInNewTabRequested(query = sharedText, skipHome = true) }
                 return
             }
         }
@@ -344,7 +344,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         viewModel.tabs.observe(this) {
             clearStaleTabs(it)
             removeOldTabs()
-            launch { viewModel.onTabsUpdated(it) }
+            lifecycleScope.launch { viewModel.onTabsUpdated(it) }
         }
     }
 
@@ -427,14 +427,14 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
     }
 
     fun launchNewTab() {
-        launch { viewModel.onNewTabRequested() }
+        lifecycleScope.launch { viewModel.onNewTabRequested() }
     }
 
     fun openInNewTab(
         query: String,
         sourceTabId: String?,
     ) {
-        launch {
+        lifecycleScope.launch {
             viewModel.onOpenInNewTabRequested(query = query, sourceTabId = sourceTabId)
         }
     }
@@ -443,7 +443,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         message: Message,
         sourceTabId: String?,
     ) {
-        openMessageInNewTabJob = launch {
+        openMessageInNewTabJob = lifecycleScope.launch {
             val tabId = viewModel.onNewTabRequested(sourceTabId = sourceTabId)
             val fragment = openNewTab(tabId, null, false)
             fragment.messageFromPreviousTab = message
