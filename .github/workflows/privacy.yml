@@ -2,8 +2,7 @@ name: Privacy Tests
 
 on:
   pull_request:
-    paths:
-      - 'node_modules/@duckduckgo/content-scope-scripts/**'
+    types: [ labeled ]
   schedule:
     - cron: '0 3 * * *' # run at 3 AM UTC
   workflow_dispatch:
@@ -14,6 +13,7 @@ concurrency:
 
 jobs:
   privacy_tests:
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'content scope scripts') || github.event.schedule == '0 3 * * *' || github.event_name == 'workflow_dispatch' }}
     name: Privacy Tests
     runs-on: ubuntu-latest
 
