@@ -44,7 +44,7 @@ constructor(
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     private val viewState = MutableStateFlow(ViewState())
-    fun viewState(): Flow<ViewState> = viewState.onStart { getConnectedDevicesClicked() }
+    fun viewState(): Flow<ViewState> = viewState.onStart { getConnectedDevices() }
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
     data class ViewState(
@@ -70,7 +70,7 @@ constructor(
             if (result is Error) {
                 command.send(Command.ShowMessage("$result"))
             }
-            updateViewState()
+            getConnectedDevices()
         }
     }
 
@@ -94,7 +94,7 @@ constructor(
             if (result is Error) {
                 command.send(Command.ShowMessage("$result"))
             }
-            getConnectedDevicesClicked()
+            getConnectedDevices()
         }
     }
 
@@ -114,12 +114,12 @@ constructor(
             if (result is Error) {
                 command.send(Command.ShowMessage("$result"))
             }
-            getConnectedDevicesClicked()
+            getConnectedDevices()
             updateViewState()
         }
     }
 
-    private fun getConnectedDevicesClicked() {
+    private fun getConnectedDevices() {
         viewModelScope.launch(dispatchers.io()) {
             when (val connectedDevices = syncRepository.getConnectedDevices()) {
                 is Error -> command.send(Command.ShowMessage(connectedDevices.reason))
