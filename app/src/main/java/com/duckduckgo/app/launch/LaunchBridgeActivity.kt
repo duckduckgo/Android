@@ -17,6 +17,7 @@
 package com.duckduckgo.app.launch
 
 import android.os.Bundle
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
@@ -25,7 +26,6 @@ import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
@@ -42,7 +42,7 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
 
         configureObservers()
 
-        MainScope().launch { viewModel.determineViewToShow() }
+        lifecycleScope.launch { viewModel.determineViewToShow() }
     }
 
     private fun configureObservers() {

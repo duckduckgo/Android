@@ -27,8 +27,8 @@ import android.view.LayoutInflater
 import androidx.core.content.ContextCompat
 import androidx.core.view.doOnDetach
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import com.airbnb.lottie.RenderMode
-import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.IncludeDaxDialogCtaBinding
 import com.duckduckgo.app.browser.databinding.SheetFireClearDataBinding
 import com.duckduckgo.app.cta.ui.CtaViewModel
@@ -49,7 +49,6 @@ import com.duckduckgo.mobile.android.ui.view.show
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
 private const val ANIMATION_MAX_SPEED = 1.4f
@@ -64,7 +63,7 @@ class FireDialog(
     private val settingsDataStore: SettingsDataStore,
     private val userEventsStore: UserEventsStore,
     private val appCoroutineScope: CoroutineScope,
-) : BottomSheetDialog(context, com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_FireDialog), CoroutineScope by MainScope() {
+) : BottomSheetDialog(context, com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_FireDialog) {
 
     private lateinit var binding: SheetFireClearDataBinding
     private lateinit var fireCtaBinding: IncludeDaxDialogCtaBinding
@@ -96,7 +95,7 @@ class FireDialog(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        launch {
+        lifecycleScope.launch {
             ctaViewModel.getFireDialogCta()?.let {
                 configureFireDialogCta(it)
             }
