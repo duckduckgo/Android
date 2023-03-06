@@ -111,7 +111,9 @@ class RealSyncCrypter(
         folders.forEach { folder ->
             Timber.d("SYNC: inserting folder $folder")
             val bookmarkFolder = decryptFolder(folder, primaryKey, folder.id)
-            repository.insert(bookmarkFolder)
+            if (bookmarkFolder.id != Relation.BOOMARKS_ROOT && bookmarkFolder.id != Relation.FAVORITES_ROOT){
+                repository.insert(bookmarkFolder)
+            }
 
             // then subfolders
             folder.folder!!.children.forEach { childId ->
