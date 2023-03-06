@@ -128,7 +128,15 @@ constructor(
     }
 
     fun onReceiveBookmarksClicked(){
-
+        viewModelScope.launch(dispatchers.io()) {
+            val result = syncRepository.getAllData()
+            if (result is Error) {
+                command.send(Command.ShowMessage("$result"))
+            } else {
+                command.send(Command.ShowMessage("Bookmarks Sent Successfully"))
+            }
+            updateViewState()
+        }
     }
 
     private suspend fun updateViewState() {

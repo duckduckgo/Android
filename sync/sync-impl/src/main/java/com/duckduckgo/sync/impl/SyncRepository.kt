@@ -26,6 +26,7 @@ import com.duckduckgo.sync.crypto.LoginKeys
 import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.moshi.Json
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
@@ -41,6 +42,7 @@ interface SyncRepository {
     fun deleteAccount(): Result<Boolean>
     fun latestToken(): String
     suspend fun syncInitialData(): Result<Boolean>
+    suspend fun getAllData(): Result<Boolean>
 }
 
 @ContributesBinding(AppScope::class)
@@ -211,6 +213,23 @@ class AppSyncRepository @Inject constructor(
             }
             is Result.Success -> {
                 Timber.i("SYNC initial sync success, storing data")
+                Result.Success(true)
+            }
+        }
+    }
+
+    override suspend fun getAllData(): Result<Boolean> {
+        val token =
+            syncStore.token.takeUnless { it.isNullOrEmpty() }
+                ?: return Result.Error(reason = "Token Empty")
+        return when (val result = syncApi.all(token)) {
+            is Result.Error -> {
+                Timber.i("SYNC get data failed $result")
+                Result.Error(reason = "SYNC get data failed $result")
+            }
+            is Result.Success -> {
+                Timber.i("SYNC get data success")
+                syncCrypter.store(result.data.bookmarks.entries)
                 Result.Success(true)
             }
         }

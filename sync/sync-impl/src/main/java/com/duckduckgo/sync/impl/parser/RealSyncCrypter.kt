@@ -33,6 +33,7 @@ import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.store.SyncStore
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import javax.crypto.SecretKey
 
 class RealSyncCrypter(
     private val repository: SavedSitesRepository,
@@ -109,7 +110,6 @@ class RealSyncCrypter(
 
         folders.forEach { folder ->
             Timber.d("SYNC: inserting folder $folder")
-            // insert folder
             val bookmarkFolder = decryptFolder(folder, primaryKey, folder.id)
             repository.insert(bookmarkFolder)
 
@@ -153,9 +153,11 @@ class RealSyncCrypter(
         primaryKey: String
     ): String {
         Timber.d("SYNC: encrypting $id with $primaryKey")
-        val encryptId = nativeLib.seal(id, primaryKey)
-        Timber.d("SYNC: encrypted $encryptId")
-        return encryptId
+        // val encryptId = nativeLib.seal(id, primaryKey)
+        val encryptResult = nativeLib.encrypt(id, primaryKey)
+        val encrypted = if (encryptResult.result != 0L) "" else encryptResult.encryptedData
+        Timber.d("SYNC: encrypted $encrypted")
+        return encrypted
     }
 
     private fun encryptSavedSite(
@@ -175,13 +177,12 @@ class RealSyncCrypter(
         primaryKey: String,
         parentId: String
     ): Bookmark {
-        val idDecryptResult = nativeLib.decrypt(entry.id, primaryKey)
-        val id = if (idDecryptResult.result != 0L) "" else idDecryptResult.decryptedData
-
-        val urlDecryptResult = nativeLib.decrypt(entry.page!!.url, primaryKey)
-        val url = if (urlDecryptResult.result != 0L) "" else urlDecryptResult.decryptedData
-
-        return Bookmark(id = id, title = entry.title, url = url, parentId = parentId)
+        return Bookmark(
+            id = entry.id,
+            title = decrypt(entry.title, primaryKey),
+            url = decrypt(entry.page!!.url, primaryKey),
+            parentId = parentId,
+        )
     }
 
     private fun decryptFolder(
@@ -189,9 +190,20 @@ class RealSyncCrypter(
         primaryKey: String,
         parentId: String
     ): BookmarkFolder {
-        val idDecryptResult = nativeLib.decrypt(entry.id, primaryKey)
-        val id = if (idDecryptResult.result != 0L) "" else idDecryptResult.decryptedData
+        return BookmarkFolder(id = entry.id, name = decrypt(entry.title, primaryKey), parentId = parentId, 0, 0)
+    }
 
-        return BookmarkFolder(id = id, name = entry.title, parentId = parentId, 0, 0)
+    private fun decrypt(
+        text: String,
+        primaryKey: String
+    ): String {
+        Timber.d("SYNC: decrypting $text with $primaryKey")
+        // val decrypted = nativeLib.sealOpen(text, primaryKey, secretKey)
+        val decryptResult = nativeLib.decrypt(text, primaryKey)
+        Timber.d("SYNC: decrypt result ${decryptResult.result}")
+        val decrypted = if (decryptResult.result != 0L) "" else decryptResult.decryptedData
+
+        Timber.d("SYNC: decrypted $decrypted")
+        return decrypted
     }
 }

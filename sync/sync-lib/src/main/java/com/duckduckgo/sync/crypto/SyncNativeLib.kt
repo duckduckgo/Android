@@ -39,14 +39,6 @@ interface SyncLib {
         rawData: String,
         secretKey: String,
     ): EncryptResult
-
-    fun seal(message: String, publicKey: String): String
-
-    fun sealOpen(
-        cypherTextBytes: String,
-        primaryKey: String,
-        secretKey: String,
-    ): String
 }
 
 class SyncNativeLib constructor(context: Context) : SyncLib {
@@ -119,7 +111,7 @@ class SyncNativeLib constructor(context: Context) : SyncLib {
 
         return DecryptResult(
             result = result,
-            decryptedData = decryptedData.encodeKey(),
+            decryptedData = decryptedData.encodeText(),
         )
     }
 
@@ -128,7 +120,7 @@ class SyncNativeLib constructor(context: Context) : SyncLib {
         secretKey: String,
     ): EncryptResult {
         Timber.d("SYNC encrypt: $rawData with $secretKey")
-        val rawDataByteArray = rawData.decodeKey()
+        val rawDataByteArray = rawData.decodeText()
         val secretKeyByteArray = secretKey.decodeKey()
         val encryptedDataByteArray = ByteArray(rawDataByteArray.size + getEncryptedExtraBytes())
 
@@ -138,34 +130,6 @@ class SyncNativeLib constructor(context: Context) : SyncLib {
             result = result,
             encryptedData = encryptedDataByteArray.encodeKey(),
         )
-    }
-
-    override fun seal(
-        message: String,
-        publicKey: String,
-    ): String {
-        val messageBytes = message.decodeText()
-        val publicKeyBytes = publicKey.decodeKey()
-        val sealedData = ByteArray(messageBytes.size + getSealBytes())
-
-        val result: Int = seal(sealedData, publicKeyBytes, messageBytes)
-
-        return sealedData.encodeKey()
-    }
-
-    override fun sealOpen(
-        cypherText: String,
-        primaryKey: String,
-        secretKey: String,
-    ): String {
-        val primaryKeyBytes = primaryKey.decodeKey()
-        val secretKeyBytes = secretKey.decodeKey()
-        val cypherTextBytes = cypherText.decodeKey()
-        val rawBytes = ByteArray(cypherTextBytes.size - getSealBytes())
-
-        val result: Int = sealOpen(cypherTextBytes, primaryKeyBytes, secretKeyBytes, rawBytes)
-
-        return rawBytes.encodeText()
     }
 
     private fun ByteArray.encodeKey(): String {

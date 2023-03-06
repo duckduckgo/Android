@@ -22,6 +22,7 @@ import com.duckduckgo.sync.api.parser.SyncDataRequest
 import com.duckduckgo.sync.api.parser.SyncEntry
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.PATCH
 import retrofit2.http.POST
@@ -55,6 +56,9 @@ interface SyncService {
         @Header("Authorization") token: String,
         @Body request: SyncDataRequest,
     ): Call<DataResponse>
+
+    @GET("https://dev-sync-use.duckduckgo.com/sync/data")
+    fun data(@Header("Authorization") token: String): Call<DataResponse>
 }
 
 data class Login(

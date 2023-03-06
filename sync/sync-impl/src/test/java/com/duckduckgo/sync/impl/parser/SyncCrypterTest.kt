@@ -67,9 +67,6 @@ class SyncCrypterTest {
         whenever(nativeLib.encrypt(anyString(), anyString()))
             .thenAnswer { invocation -> EncryptResult(result = 0L, encryptedData = invocation.getArgument(0)) }
 
-        whenever(nativeLib.seal(anyString(), anyString()))
-            .thenAnswer { invocation -> invocation.getArgument(0) }
-
         givenSomeFavorites()
         givenSomeBookmarks()
     }
