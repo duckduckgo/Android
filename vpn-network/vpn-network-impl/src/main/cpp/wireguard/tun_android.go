@@ -86,12 +86,6 @@ func (tunWrapper *NativeTunWrapper) Read(buf []byte, offset int) (int, error) {
                 return pktLen, err
             }
 
-            // PCAP recording
-            pcap_res := int(C.wg_write_pcap((*C.char)(unsafe.Pointer(&buf[offset])), C.int(pktLen+offset)))
-            if pcap_res < 0 {
-                C.__android_log_write(C.ANDROID_LOG_DEBUG, tag, cstring("PCAP packet not written"))
-            }
-
             allow := int(C.is_pkt_allowed((*C.char)(unsafe.Pointer(&buf[offset])), C.int(pktLen+offset)))
             if allow == 0 {
                 // Returning 0 blocks the connection since we will not forward this packet
@@ -102,6 +96,12 @@ func (tunWrapper *NativeTunWrapper) Read(buf []byte, offset int) (int, error) {
         // TODO: IPv6
         default:
             C.__android_log_write(C.ANDROID_LOG_DEBUG, tag, cstring("Invalid IP"))
+    }
+
+    // PCAP recording
+    pcap_res := int(C.wg_write_pcap((*C.char)(unsafe.Pointer(&buf[offset])), C.int(pktLen+offset)))
+    if pcap_res < 0 {
+        C.__android_log_write(C.ANDROID_LOG_DEBUG, tag, cstring("PCAP packet not written"))
     }
 
     return pktLen, err
