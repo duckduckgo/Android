@@ -17,7 +17,7 @@
 package com.duckduckgo.sync.api.parser
 
 interface SyncCrypter {
-    suspend fun generateAllData(): SyncDataBookmarks
+    suspend fun generateAllData(): SyncDataRequest
     fun store(entries: List<SyncEntry>): Boolean
 }
 
@@ -55,5 +55,5 @@ data class SyncEntry(
 fun SyncEntry.isFolder(): Boolean = this.folder != null
 fun SyncEntry.isBookmark(): Boolean = this.page != null
 
-class SyncDataBookmarks(val bookmarks: SyncDataUpdates)
+class SyncDataRequest(val bookmarks: SyncDataUpdates)
 class SyncDataUpdates(val updates: List<SyncEntry>)

@@ -18,8 +18,11 @@ package com.duckduckgo.sync.impl.di
 
 import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.sync.api.parser.SyncCrypter
 import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.crypto.SyncNativeLib
+import com.duckduckgo.sync.impl.parser.RealSyncCrypter
 import com.duckduckgo.sync.store.EncryptedSharedPrefsProvider
 import com.duckduckgo.sync.store.SharedPrefsProvider
 import com.duckduckgo.sync.store.SyncSharedPrefsStore
@@ -49,5 +52,15 @@ object SyncStoreModule {
     @SingleInstanceIn(AppScope::class)
     fun providesNativeLib(context: Context): SyncLib {
         return SyncNativeLib(context)
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun provideSyncCrypter(
+        repository: SavedSitesRepository,
+        nativeLib: SyncLib,
+        syncStore: SyncStore
+    ): SyncCrypter {
+        return RealSyncCrypter(repository, nativeLib, syncStore)
     }
 }

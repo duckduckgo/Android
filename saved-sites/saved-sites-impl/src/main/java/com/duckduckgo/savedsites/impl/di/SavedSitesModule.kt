@@ -29,8 +29,8 @@ import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
 import com.duckduckgo.savedsites.impl.service.RealSavedSitesExporter
 import com.duckduckgo.savedsites.impl.service.RealSavedSitesImporter
 import com.duckduckgo.savedsites.impl.service.RealSavedSitesManager
-import com.duckduckgo.savedsites.service.RealSavedSitesParser
-import com.duckduckgo.savedsites.service.SavedSitesParser
+import com.duckduckgo.savedsites.impl.service.RealSavedSitesParser
+import com.duckduckgo.savedsites.impl.service.SavedSitesParser
 import com.duckduckgo.savedsites.store.SyncEntitiesDao
 import com.duckduckgo.savedsites.store.SyncRelationsDao
 import com.squareup.anvil.annotations.ContributesTo

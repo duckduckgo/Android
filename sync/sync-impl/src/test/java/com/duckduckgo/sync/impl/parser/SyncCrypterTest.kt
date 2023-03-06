@@ -22,14 +22,13 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
-import com.duckduckgo.savedsites.store.Entity
-import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
 import com.duckduckgo.savedsites.store.Relation
 import com.duckduckgo.sync.TestSyncFixtures
 import com.duckduckgo.sync.api.parser.SyncBookmarkPage
 import com.duckduckgo.sync.api.parser.SyncCrypter
 import com.duckduckgo.sync.api.parser.SyncEntry
 import com.duckduckgo.sync.api.parser.SyncFolderChildren
+import com.duckduckgo.sync.crypto.EncryptResult
 import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.store.SyncStore
 import junit.framework.TestCase.assertEquals
@@ -39,6 +38,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
@@ -59,14 +59,56 @@ class SyncCrypterTest {
 
     @Before fun before() {
         syncCrypter = RealSyncCrypter(repository, nativeLib, store)
+
         whenever(repository.getFolder(Relation.BOOMARKS_ROOT)).thenReturn(BookmarkFolder(Relation.BOOMARKS_ROOT, "Bookmarks", "", 0, 0))
         whenever(repository.getFolder(Relation.FAVORITES_ROOT)).thenReturn(BookmarkFolder(Relation.FAVORITES_ROOT, "Favorites", "", 0, 0))
+        whenever(store.primaryKey).thenReturn("primaryKey")
+
+        whenever(nativeLib.encrypt(anyString(), anyString()))
+            .thenAnswer { invocation -> EncryptResult(result = 0L, encryptedData = invocation.getArgument(0)) }
+
+        whenever(nativeLib.seal(anyString(), anyString()))
+            .thenAnswer { invocation -> invocation.getArgument(0) }
 
         givenSomeFavorites()
         givenSomeBookmarks()
     }
 
-    @Test fun whenNoSavedSitesAddedThenGeneratedJSONIsCorrect() = runTest {
+    @Test fun whenUserNotLoggedInThenGeneratedDataIsEmpty() = runTest {
+        whenever(repository.getFavoritesSync()).thenReturn(
+            listOf(
+                aFavorite("bookmark1", "Bookmark 1", "https://bookmark1.com", 0),
+                aFavorite("bookmark2", "Bookmark 2", "https://bookmark1.com", 1),
+                aFavorite("bookmark4", "Bookmark 4", "https://bookmark1.com", 2),
+            ),
+        )
+        whenever(repository.getFolderContentSync(Relation.BOOMARKS_ROOT)).thenReturn(
+            Pair(
+                listOf(
+                    aBookmark("bookmark1", "Bookmark 1", "https://bookmark1.com"),
+                    aBookmark("bookmark2", "Bookmark 2", "https://bookmark1.com"),
+                ),
+                listOf(aFolder("folder1", "Folder One", Relation.BOOMARKS_ROOT)),
+            ),
+        )
+        whenever(repository.getFolder("folder1")).thenReturn(BookmarkFolder("folder 1", "Folder One", Relation.BOOMARKS_ROOT, 2, 0))
+        whenever(repository.getFolderContentSync("folder1")).thenReturn(
+            Pair(
+                listOf(
+                    aBookmark("bookmark3", "Bookmark 3", "https://bookmark3.com"),
+                    aBookmark("bookmark4", "Bookmark 4", "https://bookmark4.com"),
+                ),
+                emptyList(),
+            ),
+        )
+
+        whenever(store.primaryKey).thenReturn(null)
+
+        val allData = syncCrypter.generateAllData()
+        assertTrue(allData.bookmarks.updates.isEmpty())
+    }
+
+    @Test fun whenNoSavedSitesAddedThenGeneratedDataIsCorrect() = runTest {
         givenNoFavorites()
         givenNoBookmarks()
 
@@ -172,6 +214,33 @@ class SyncCrypterTest {
         assertEquals(folder.folder!!.children.size, 2)
     }
 
+    @Test fun whenOneBookmarkAndFavouriteThenGeneratedDataIsCorrect() = runTest {
+        whenever(repository.getFavoritesSync()).thenReturn(
+            listOf(
+                aFavorite("bookmark1", "Bookmark 1", "https://bookmark1.com", 0),
+            ),
+        )
+        whenever(repository.getFolderContentSync(Relation.BOOMARKS_ROOT)).thenReturn(
+            Pair(
+                listOf(
+                    aBookmark("bookmark1", "Bookmark 1", "https://bookmark1.com"),
+                ),
+                emptyList(),
+            ),
+        )
+
+        val allData = syncCrypter.generateAllData()
+        assertTrue(allData.bookmarks.updates.size == 3)
+
+        val favoritesRoot = allData.bookmarks.updates.first()
+        assertEquals(favoritesRoot.id, Relation.FAVORITES_ROOT)
+        assertEquals(favoritesRoot.folder!!.children.size, 1)
+
+        val folder = allData.bookmarks.updates.last()
+        assertEquals(folder.id, Relation.BOOMARKS_ROOT)
+        assertEquals(folder.folder!!.children.size, 1)
+    }
+
     @Test fun whenNoDataIsFetchedThenNothingIsStored() {
         syncCrypter.store(emptyList())
         verifyNoInteractions(repository)
@@ -185,8 +254,8 @@ class SyncCrypterTest {
         val entries = givenSomeBookmarkSyncEntries(10, Relation.BOOMARKS_ROOT)
         syncCrypter.store(entries)
 
-        verify(repository.insert(any<BookmarkFolder>()), times(1))
-        verify(repository.insert(any<Bookmark>()), times(10))
+        verify(repository, times(1)).insert(any<BookmarkFolder>())
+        verify(repository, times(10)).insert(any<Bookmark>())
     }
 
     private fun givenNoFavorites() {
@@ -211,21 +280,12 @@ class SyncCrypterTest {
     ): List<SyncEntry> {
         val entries = mutableListOf<SyncEntry>()
         val childrenId = mutableListOf<String>()
-        for (index in 0..totalEntries) {
+        for (index in 1..totalEntries) {
             entries.add(SyncEntry("entity$index", "title$index", SyncBookmarkPage("https://testUrl$index"), null, null))
             childrenId.add("entity$index")
         }
         entries.add(SyncEntry(folderId, "Bookmarks $folderId", null, SyncFolderChildren(childrenId), null))
         return entries
-    }
-
-    private suspend fun givenEmptyFolder(folderId: String) {
-        whenever(repository.getFolderContentSync(folderId)).thenReturn(
-            Pair(
-                emptyList(),
-                emptyList(),
-            ),
-        )
     }
 
     private fun aFolder(

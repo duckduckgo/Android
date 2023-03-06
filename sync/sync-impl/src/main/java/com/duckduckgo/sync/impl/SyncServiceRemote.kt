@@ -17,7 +17,7 @@
 package com.duckduckgo.sync.impl
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.api.parser.SyncDataBookmarks
+import com.duckduckgo.sync.api.parser.SyncDataRequest
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -48,7 +48,15 @@ interface SyncApi {
 
     fun deleteAccount(token: String): Result<Boolean>
 
-    fun patch(bookmarks: SyncDataBookmarks): Result<BookmarksResponse>
+    fun patch(
+        token: String,
+        bookmarks: SyncDataRequest
+    ): Result<BookmarksResponse>
+
+    fun firstSync(
+        token: String,
+        bookmarks: SyncDataRequest
+    ): Result<Boolean>
 }
 
 @ContributesBinding(AppScope::class)
@@ -151,9 +159,12 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
         }
     }
 
-    override fun patch(bookmarks: SyncDataBookmarks): Result<BookmarksResponse> {
+    override fun patch(
+        token: String,
+        bookmarks: SyncDataRequest
+    ): Result<BookmarksResponse> {
         val response = runCatching {
-            val patchCall = syncService.update(bookmarks)
+            val patchCall = syncService.patch("Bearer $token", bookmarks)
             patchCall.execute()
         }.getOrElse { throwable ->
             return Result.Error(reason = throwable.message.toString())
@@ -162,6 +173,22 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
         return onSuccess(response) {
             val data = response.body()?.bookmarks!!
             Result.Success(data)
+        }
+    }
+
+    override fun firstSync(
+        token: String,
+        bookmarks: SyncDataRequest
+    ): Result<Boolean> {
+        val response = runCatching {
+            val patchCall = syncService.patch("Bearer $token", bookmarks)
+            patchCall.execute()
+        }.getOrElse { throwable ->
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            Result.Success(true)
         }
     }
 

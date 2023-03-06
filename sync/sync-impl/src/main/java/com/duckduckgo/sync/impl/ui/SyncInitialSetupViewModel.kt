@@ -115,8 +115,16 @@ constructor(
         }
     }
 
-    fun onSendBookmarksClicked(){
-
+    fun onSendBookmarksClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            val result = syncRepository.syncInitialData()
+            if (result is Error) {
+                command.send(Command.ShowMessage("$result"))
+            } else {
+                command.send(Command.ShowMessage("Bookmarks Sent Successfully"))
+            }
+            updateViewState()
+        }
     }
 
     fun onReceiveBookmarksClicked(){

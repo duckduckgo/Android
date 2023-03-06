@@ -18,6 +18,7 @@ package com.duckduckgo.sync
 
 import com.duckduckgo.sync.crypto.AccountKeys
 import com.duckduckgo.sync.crypto.DecryptResult
+import com.duckduckgo.sync.crypto.EncryptResult
 import com.duckduckgo.sync.crypto.LoginKeys
 import com.duckduckgo.sync.impl.AccountCreatedResponse
 import com.duckduckgo.sync.impl.Login
@@ -115,4 +116,6 @@ object TestSyncFixtures {
     val loginFailed = Result.Error(code = wrongCredentialsCodeErr, reason = wrongCredentialsMessageErr)
     val loginRequestBody = Login(user_id = userId, hashed_password = hashedPassword, device_id = deviceId, device_name = deviceName)
     val loginSuccessResponse: Response<LoginResponse> = Response.success(loginResponseBody)
+    val validEncryptedId = EncryptResult(result = 0L, encryptedData = "id")
+    val inValidEncryptedId = EncryptResult(result = 9L, encryptedData = "")
 }

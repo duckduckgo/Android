@@ -18,7 +18,7 @@ package com.duckduckgo.sync.impl
 
 import com.duckduckgo.anvil.annotations.ContributesServiceApi
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.api.parser.SyncDataBookmarks
+import com.duckduckgo.sync.api.parser.SyncDataRequest
 import com.duckduckgo.sync.api.parser.SyncEntry
 import retrofit2.Call
 import retrofit2.http.Body
@@ -51,8 +51,9 @@ interface SyncService {
     ): Call<LoginResponse>
 
     @PATCH("https://dev-sync-use.duckduckgo.com/sync/data")
-    fun update(
-        @Body request: SyncDataBookmarks,
+    fun patch(
+        @Header("Authorization") token: String,
+        @Body request: SyncDataRequest,
     ): Call<DataResponse>
 }
 

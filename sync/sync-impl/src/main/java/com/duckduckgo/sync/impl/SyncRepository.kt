@@ -19,6 +19,8 @@ package com.duckduckgo.sync.impl
 import androidx.annotation.WorkerThread
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.parser.SyncCrypter
+import com.duckduckgo.sync.api.parser.SyncDataRequest
+import com.duckduckgo.sync.api.parser.SyncDataUpdates
 import com.duckduckgo.sync.crypto.AccountKeys
 import com.duckduckgo.sync.crypto.LoginKeys
 import com.duckduckgo.sync.crypto.SyncLib
@@ -195,14 +197,21 @@ class AppSyncRepository @Inject constructor(
     }
 
     override suspend fun syncInitialData(): Result<Boolean> {
+        val token =
+            syncStore.token.takeUnless { it.isNullOrEmpty() }
+                ?: return Result.Error(reason = "Token Empty")
+        Timber.d("SYNC: generating all data")
         val allData = syncCrypter.generateAllData()
-        return when (val result = syncApi.patch(allData)) {
+        val allDataJSON = Adapters.patchAdapter.toJson(allData)
+        Timber.d("SYNC: all data generated $allDataJSON")
+        return when (val result = syncApi.firstSync(token, allData)) {
             is Result.Error -> {
                 Timber.i("SYNC initial sync failed $result")
                 result
             }
             is Result.Success -> {
-                Result.Success(syncCrypter.store(result.data.entries))
+                Timber.i("SYNC initial sync success, storing data")
+                Result.Success(true)
             }
         }
     }
@@ -214,6 +223,9 @@ class AppSyncRepository @Inject constructor(
             private val moshi = Moshi.Builder().build()
             val recoveryCodeAdapter: JsonAdapter<RecoveryCode> =
                 moshi.adapter(RecoveryCode::class.java)
+
+            val patchAdapter: JsonAdapter<SyncDataRequest> =
+                moshi.adapter(SyncDataRequest::class.java)
         }
     }
 }
