@@ -117,6 +117,7 @@ class SyncNativeLibTest {
     }
 
     @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun whenPrepareForConnectThenResultSuccess() {
         val syncNativeLib = SyncNativeLib(InstrumentationRegistry.getInstrumentation().targetContext)
         val prepareForConnect = syncNativeLib.prepareForConnect()
