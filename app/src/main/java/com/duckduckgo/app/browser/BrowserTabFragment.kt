@@ -1141,7 +1141,7 @@ class BrowserTabFragment :
     ) {
         if (locationPermissionsHaveNotBeenGranted()) {
             if (deniedForever) {
-                viewModel.onSystemLocationPermissionDeniedOneTime()
+                viewModel.onSystemLocationPermissionDeniedForever()
             } else {
                 showSystemLocationPermissionDialog(domain)
             }
@@ -2443,7 +2443,7 @@ class BrowserTabFragment :
                     if (ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
                         viewModel.onSystemLocationPermissionDeniedOneTime()
                     } else {
-                        viewModel.onSystemLocationPermissionDeniedForever()
+                        viewModel.onSystemLocationPermissionDeniedTwice()
                     }
                 }
             }
