@@ -17,8 +17,8 @@
 package com.duckduckgo.sync
 
 import com.duckduckgo.sync.api.parser.SyncBookmarkEntry
-import com.duckduckgo.sync.api.parser.SyncDataRequest
 import com.duckduckgo.sync.api.parser.SyncBookmarkUpdates
+import com.duckduckgo.sync.api.parser.SyncDataRequest
 import com.duckduckgo.sync.crypto.AccountKeys
 import com.duckduckgo.sync.crypto.DecryptResult
 import com.duckduckgo.sync.crypto.LoginKeys
@@ -127,7 +127,7 @@ object TestSyncFixtures {
 
     private fun aBookmarkFolderEntry(
         index: Int,
-        children: List<Int>
+        children: List<Int>,
     ): SyncBookmarkEntry {
         return SyncBookmarkEntry.asFolder("folder$index", "title$index", children.map { "bookmark$index" }, null)
     }

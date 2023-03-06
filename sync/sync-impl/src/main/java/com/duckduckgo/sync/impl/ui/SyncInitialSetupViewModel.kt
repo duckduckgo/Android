@@ -127,7 +127,7 @@ constructor(
         }
     }
 
-    fun onReceiveBookmarksClicked(){
+    fun onReceiveBookmarksClicked() {
         viewModelScope.launch(dispatchers.io()) {
             val result = syncRepository.getAll()
             if (result is Error) {

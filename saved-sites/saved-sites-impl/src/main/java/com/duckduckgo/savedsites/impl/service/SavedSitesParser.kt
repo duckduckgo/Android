@@ -19,7 +19,6 @@ package com.duckduckgo.savedsites.impl.service
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
-import com.duckduckgo.savedsites.impl.service.FolderTree
 import com.duckduckgo.savedsites.store.Relation
 import java.util.UUID
 import org.jsoup.nodes.Document

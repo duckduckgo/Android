@@ -59,7 +59,7 @@ object SyncStoreModule {
     fun provideSyncCrypter(
         repository: SavedSitesRepository,
         nativeLib: SyncLib,
-        syncStore: SyncStore
+        syncStore: SyncStore,
     ): SyncCrypter {
         return RealSyncCrypter(repository, nativeLib, syncStore)
     }

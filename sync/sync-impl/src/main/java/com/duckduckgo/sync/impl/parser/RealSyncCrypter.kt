@@ -23,10 +23,10 @@ import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.store.Relation
-import com.duckduckgo.sync.api.parser.SyncDataRequest
-import com.duckduckgo.sync.api.parser.SyncCrypter
-import com.duckduckgo.sync.api.parser.SyncBookmarkUpdates
 import com.duckduckgo.sync.api.parser.SyncBookmarkEntry
+import com.duckduckgo.sync.api.parser.SyncBookmarkUpdates
+import com.duckduckgo.sync.api.parser.SyncCrypter
+import com.duckduckgo.sync.api.parser.SyncDataRequest
 import com.duckduckgo.sync.api.parser.isBookmark
 import com.duckduckgo.sync.api.parser.isFolder
 import com.duckduckgo.sync.crypto.SyncLib
@@ -38,7 +38,7 @@ class RealSyncCrypter(
     private val repository: SavedSitesRepository,
     private val nativeLib: SyncLib,
     private val syncStore: SyncStore,
-    private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider()
+    private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
 ) : SyncCrypter {
 
     override suspend fun generateAllData(): SyncDataRequest {
@@ -81,7 +81,7 @@ class RealSyncCrypter(
     private suspend fun addFolderContent(
         folderId: String,
         updates: MutableList<SyncBookmarkEntry>,
-        primaryKey: String
+        primaryKey: String,
     ): List<SyncBookmarkEntry> {
         repository.getFolderContentSync(folderId).apply {
             val folder = repository.getFolder(folderId)
@@ -110,7 +110,7 @@ class RealSyncCrypter(
         folders.forEach { folder ->
             Timber.d("SYNC: inserting folder $folder")
             val bookmarkFolder = decryptFolder(folder, primaryKey, folder.id)
-            if (bookmarkFolder.id != Relation.BOOMARKS_ROOT && bookmarkFolder.id != Relation.FAVORITES_ROOT){
+            if (bookmarkFolder.id != Relation.BOOMARKS_ROOT && bookmarkFolder.id != Relation.FAVORITES_ROOT) {
                 repository.insert(bookmarkFolder)
             }
 
@@ -139,7 +139,7 @@ class RealSyncCrypter(
     private fun encryptFolder(
         bookmarkFolder: BookmarkFolder,
         children: List<String>,
-        primaryKey: String
+        primaryKey: String,
     ): SyncBookmarkEntry {
         return SyncBookmarkEntry.asFolder(
             id = bookmarkFolder.id,
@@ -151,7 +151,7 @@ class RealSyncCrypter(
 
     private fun encrypt(
         id: String,
-        primaryKey: String
+        primaryKey: String,
     ): String {
         Timber.d("SYNC: encrypting $id with $primaryKey")
         // val encryptId = nativeLib.seal(id, primaryKey)
@@ -176,7 +176,7 @@ class RealSyncCrypter(
     private fun decryptBookmark(
         entry: SyncBookmarkEntry,
         primaryKey: String,
-        parentId: String
+        parentId: String,
     ): Bookmark {
         return Bookmark(
             id = entry.id,
@@ -189,14 +189,14 @@ class RealSyncCrypter(
     private fun decryptFolder(
         entry: SyncBookmarkEntry,
         primaryKey: String,
-        parentId: String
+        parentId: String,
     ): BookmarkFolder {
         return BookmarkFolder(id = entry.id, name = decrypt(entry.title, primaryKey), parentId = parentId, 0, 0)
     }
 
     private fun decrypt(
         text: String,
-        primaryKey: String
+        primaryKey: String,
     ): String {
         Timber.d("SYNC: decrypting $text with $primaryKey")
         // val decrypted = nativeLib.sealOpen(text, primaryKey, secretKey)

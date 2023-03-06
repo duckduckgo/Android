@@ -51,10 +51,10 @@ interface SyncApi {
 
     fun patchAll(
         token: String,
-        bookmarks: SyncDataRequest
+        bookmarks: SyncDataRequest,
     ): Result<Boolean>
 
-    fun all(token:String): Result<DataResponse>
+    fun all(token: String): Result<DataResponse>
 }
 
 @ContributesBinding(AppScope::class)
@@ -159,7 +159,7 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
 
     override fun patchAll(
         token: String,
-        bookmarks: SyncDataRequest
+        bookmarks: SyncDataRequest,
     ): Result<Boolean> {
         val response = runCatching {
             val patchCall = syncService.patch("Bearer $token", bookmarks)
@@ -183,7 +183,7 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
 
         return onSuccess(response) {
             Timber.i("SYNC get data $response")
-            val data = response.body()?: throw IllegalStateException("SYNC get data not parsed")
+            val data = response.body() ?: throw IllegalStateException("SYNC get data not parsed")
             val allDataJSON = ResponseAdapters.dataAdapter.toJson(data.bookmarks)
             Timber.i("SYNC get data $allDataJSON")
             Result.Success(data)

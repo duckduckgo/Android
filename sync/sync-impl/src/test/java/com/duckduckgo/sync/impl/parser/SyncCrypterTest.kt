@@ -24,9 +24,9 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.store.Relation
 import com.duckduckgo.sync.TestSyncFixtures
+import com.duckduckgo.sync.api.parser.SyncBookmarkEntry
 import com.duckduckgo.sync.api.parser.SyncBookmarkPage
 import com.duckduckgo.sync.api.parser.SyncCrypter
-import com.duckduckgo.sync.api.parser.SyncBookmarkEntry
 import com.duckduckgo.sync.api.parser.SyncFolderChildren
 import com.duckduckgo.sync.crypto.EncryptResult
 import com.duckduckgo.sync.crypto.SyncLib
@@ -48,9 +48,12 @@ import org.mockito.kotlin.whenever
 
 class SyncCrypterTest {
 
-    @get:Rule @Suppress("unused") var instantTaskExecutorRule = InstantTaskExecutorRule()
+    @get:Rule
+    @Suppress("unused")
+    var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @ExperimentalCoroutinesApi @get:Rule var coroutinesTestRule = CoroutineTestRule()
+    @ExperimentalCoroutinesApi @get:Rule
+    var coroutinesTestRule = CoroutineTestRule()
 
     lateinit var syncCrypter: SyncCrypter
     private val repository: SavedSitesRepository = mock()
@@ -273,7 +276,7 @@ class SyncCrypterTest {
 
     private fun givenSomeBookmarkSyncEntries(
         totalEntries: Int,
-        folderId: String
+        folderId: String,
     ): List<SyncBookmarkEntry> {
         val entries = mutableListOf<SyncBookmarkEntry>()
         val childrenId = mutableListOf<String>()
@@ -288,7 +291,7 @@ class SyncCrypterTest {
     private fun aFolder(
         id: String,
         name: String,
-        parentId: String
+        parentId: String,
     ): BookmarkFolder {
         return BookmarkFolder(id = id, name = name, parentId = parentId)
     }
@@ -296,7 +299,7 @@ class SyncCrypterTest {
     private fun aBookmark(
         id: String,
         title: String,
-        url: String
+        url: String,
     ): Bookmark {
         return Bookmark(id, title, url)
     }
@@ -305,7 +308,7 @@ class SyncCrypterTest {
         id: String,
         title: String,
         url: String,
-        position: Int
+        position: Int,
     ): Favorite {
         return Favorite(id, title, url, position)
     }
