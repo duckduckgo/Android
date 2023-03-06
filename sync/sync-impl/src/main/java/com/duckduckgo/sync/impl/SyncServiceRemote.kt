@@ -17,6 +17,7 @@
 package com.duckduckgo.sync.impl
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.api.parser.SyncDataBookmarks
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -47,7 +48,7 @@ interface SyncApi {
 
     fun deleteAccount(token: String): Result<Boolean>
 
-    fun patch(): Result<BookmarksResponse>
+    fun patch(bookmarks: SyncDataBookmarks): Result<BookmarksResponse>
 }
 
 @ContributesBinding(AppScope::class)
@@ -147,6 +148,20 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
                     devices = emptyList(),
                 ),
             )
+        }
+    }
+
+    override fun patch(bookmarks: SyncDataBookmarks): Result<BookmarksResponse> {
+        val response = runCatching {
+            val patchCall = syncService.update(bookmarks)
+            patchCall.execute()
+        }.getOrElse { throwable ->
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            val data = response.body()?.bookmarks!!
+            Result.Success(data)
         }
     }
 

@@ -18,9 +18,12 @@ package com.duckduckgo.sync.impl
 
 import com.duckduckgo.anvil.annotations.ContributesServiceApi
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.api.parser.SyncDataBookmarks
+import com.duckduckgo.sync.api.parser.SyncEntry
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.Header
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 
 @ContributesServiceApi(AppScope::class)
@@ -46,6 +49,11 @@ interface SyncService {
     fun login(
         @Body request: Login,
     ): Call<LoginResponse>
+
+    @PATCH("https://dev-sync-use.duckduckgo.com/sync/data")
+    fun update(
+        @Body request: SyncDataBookmarks,
+    ): Call<DataResponse>
 }
 
 data class Login(
@@ -101,16 +109,9 @@ data class BookmarkPage(
 data class BookmarkFolder(
     val children: List<String>
 )
-data class Bookmark(
-    val id: String,
-    val title: String,
-    val folder: BookmarkFolder?,
-    val page: BookmarkPage?,
-    val deleted: String?
-)
 data class BookmarksResponse(
     val last_modified: String,
-    val entries: List<Bookmark>
+    val entries: List<SyncEntry>
 )
 data class SettingsResponse(
     val last_modified: String,
@@ -123,7 +124,7 @@ data class DeviceResponse(
 )
 
 data class DataResponse(
-    val bookmarks: String,
+    val bookmarks: BookmarksResponse,
     val settings: SettingsResponse,
     val devices: DeviceResponse,
 )

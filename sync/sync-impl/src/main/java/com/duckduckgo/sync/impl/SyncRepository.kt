@@ -18,6 +18,7 @@ package com.duckduckgo.sync.impl
 
 import androidx.annotation.WorkerThread
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.api.parser.SyncCrypter
 import com.duckduckgo.sync.crypto.AccountKeys
 import com.duckduckgo.sync.crypto.LoginKeys
 import com.duckduckgo.sync.crypto.SyncLib
@@ -37,6 +38,7 @@ interface SyncRepository {
     fun logout(): Result<Boolean>
     fun deleteAccount(): Result<Boolean>
     fun latestToken(): String
+    suspend fun syncInitialData(): Result<Boolean>
 }
 
 @ContributesBinding(AppScope::class)
@@ -46,6 +48,7 @@ class AppSyncRepository @Inject constructor(
     private val nativeLib: SyncLib,
     private val syncApi: SyncApi,
     private val syncStore: SyncStore,
+    private val syncCrypter: SyncCrypter,
 ) : SyncRepository {
 
     override fun createAccount(): Result<Boolean> {
@@ -189,6 +192,19 @@ class AppSyncRepository @Inject constructor(
 
     override fun latestToken(): String {
         return syncStore.token ?: ""
+    }
+
+    override suspend fun syncInitialData(): Result<Boolean> {
+        val allData = syncCrypter.generateAllData()
+        return when (val result = syncApi.patch(allData)) {
+            is Result.Error -> {
+                Timber.i("SYNC initial sync failed $result")
+                result
+            }
+            is Result.Success -> {
+                Result.Success(syncCrypter.store(result.data.entries))
+            }
+        }
     }
 
     private fun isSignedIn() = !syncStore.primaryKey.isNullOrEmpty()
