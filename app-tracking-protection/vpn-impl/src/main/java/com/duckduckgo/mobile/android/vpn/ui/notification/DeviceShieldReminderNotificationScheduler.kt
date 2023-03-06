@@ -28,6 +28,8 @@ import androidx.work.WorkManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationWorker
@@ -53,13 +55,16 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
     private val vpnFeatureRemover: VpnFeatureRemover,
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
 ) : VpnServiceCallbacks {
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        scheduleUndesiredStopReminderAlarm()
-        cancelReminderForTomorrow()
-        hideReminderNotification()
-        enableReminderReceiver()
+        if (vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)) {
+            scheduleUndesiredStopReminderAlarm()
+            cancelReminderForTomorrow()
+            hideReminderNotification()
+            enableReminderReceiver()
+        }
     }
 
     override fun onVpnStopped(
@@ -81,23 +86,34 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
             } else {
                 withContext(dispatchers.main()) {
                     logcat { "VPN Manually stopped, showing disabled notification" }
-                    showImmediateReminderNotification()
+                    tryShowAndScheduleAppTPNotifications()
                     cancelUndesiredStopReminderAlarm()
-                    scheduleReminderForTomorrow()
                 }
             }
         }
     }
 
+    private fun isStoppedDueToAppTPDisabled(): Boolean =
+        vpnFeaturesRegistry.getLastRegistryChange().first == AppTpVpnFeature.APPTP_VPN.featureName &&
+            !vpnFeaturesRegistry.getLastRegistryChange().second
+
+    private fun tryShowAndScheduleAppTPNotifications() {
+        if (isStoppedDueToAppTPDisabled()) {
+            showImmediateReminderNotification()
+            scheduleReminderForTomorrow()
+        }
+    }
+
     private fun onVPNRevoked() {
         logcat { "VPN Revoked, showing revoke notification" }
-        showImmediateRevokedNotification()
+        tryShowAndScheduleAppTPNotifications()
         cancelUndesiredStopReminderAlarm()
-        scheduleReminderForTomorrow()
     }
 
     private fun onVPNUndesiredStop() {
-        scheduleUndesiredStopReminderAlarm()
+        if (isStoppedDueToAppTPDisabled()) {
+            scheduleUndesiredStopReminderAlarm()
+        }
     }
 
     private fun scheduleUndesiredStopReminderAlarm() {

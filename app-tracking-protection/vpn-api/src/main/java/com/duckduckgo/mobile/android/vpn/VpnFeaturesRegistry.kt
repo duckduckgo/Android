@@ -62,6 +62,13 @@ interface VpnFeaturesRegistry {
      */
     fun registryChanges(): Flow<Pair<String, Boolean>>
 
+    /**
+     * Get the last known registry change at the time this function is called.
+     *
+     *  @return Pair where first is the VPNFeature name and second is the boolean representing if feature is enabled or not.
+     */
+    fun getLastRegistryChange(): Pair<String, Boolean>
+
     fun getRegisteredFeatures(): List<VpnFeature>
 }
 

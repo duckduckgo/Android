@@ -45,6 +45,10 @@ class FakeVpnFeaturesRegistry : VpnFeaturesRegistry {
         TODO("Not yet implemented")
     }
 
+    override fun getLastRegistryChange(): Pair<String, Boolean> {
+        TODO("Not yet implemented")
+    }
+
     override fun getRegisteredFeatures(): List<VpnFeature> {
         return features.map { VpnFeature { it } }
     }

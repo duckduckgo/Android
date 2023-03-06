@@ -90,6 +90,10 @@ internal class VpnFeaturesRegistryImpl(
             }
     }
 
+    override fun getLastRegistryChange(): Pair<String, Boolean> {
+        return _registry.asStateFlow().value
+    }
+
     override fun getRegisteredFeatures(): List<VpnFeature> {
         return registeredFeatures().keys.map { VpnFeature { it } }
     }
