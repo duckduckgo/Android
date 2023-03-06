@@ -30,7 +30,7 @@
     <string name="saveLoginDialogButtonSave">Bejelentkezés mentése</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Jelszó mentése</string>
     <string name="saveLoginDialogNotNow">Most nem</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">A bejelentkezési adatok csak ezen az eszközön lesznek biztonságosan tárolva, és a Beállításokban található Automatikus kitöltés menüpontban kezelhetők.</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">A DuckDuckGo biztonságosan tárolja ezen bejelentkezési adatokat az eszközödön. A mentett bejelentkezési adatokat a Beállításokban kezelheted.</string>
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">A DuckDuckGo mentse a bejelentkezést?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">További lehetőségek</string>
 

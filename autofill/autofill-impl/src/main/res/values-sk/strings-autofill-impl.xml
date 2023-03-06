@@ -30,7 +30,7 @@
     <string name="saveLoginDialogButtonSave">Uložiť prihlasovacie údaje</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Uložiť heslo</string>
     <string name="saveLoginDialogNotNow">Teraz nie</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Prihlasovacie údaje sú zabezpečene uložené len v tomto zariadení a môžete ich spravovať v ponuke Automatické vypĺňanie v Nastaveniach.</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">DuckDuckGo toto prihlásenie zabezpečene uloží vo vašom zariadení. Uložené prihlásenia môžete spravovať v Nastaveniach.</string>
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Chcete, aby DuckDuckGo uložil vaše prihlasovacie údaje?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Ďalšie možnosti</string>
 

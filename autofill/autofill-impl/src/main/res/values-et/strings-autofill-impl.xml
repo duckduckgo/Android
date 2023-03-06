@@ -30,7 +30,7 @@
     <string name="saveLoginDialogButtonSave">Salvesta sisselogimisandmed</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Salvesta parool</string>
     <string name="saveLoginDialogNotNow">Mitte praegu</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Sisselogimisandmed salvestatakse turvaliselt ainult selles seadmes ja neid saab hallata sätete menüüst Automaatne täitmine.</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">DuckDuckGo salvestab need sisselogimisandmed turvaliselt sinu seadmes. Salvestatud sisselogimisandmeid saad hallata seadetes.</string>
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Kas soovid, et DuckDuckGo salvestaks sinu sisselogimisandmed?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Veel valikuid</string>
 

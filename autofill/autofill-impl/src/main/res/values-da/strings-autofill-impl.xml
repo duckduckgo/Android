@@ -30,7 +30,7 @@
     <string name="saveLoginDialogButtonSave">Gem login</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Gem adgangskode</string>
     <string name="saveLoginDialogNotNow">Ikke nu</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Logins gemmes kun sikkert på denne enhed og kan administreres fra menuen Automatisk udfyldning i Indstillinger.</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">DuckDuckGo gemmer dette login sikkert på din enhed. Du kan administrere gemte logins i Indstillinger.</string>
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Skal DuckDuckGo gemme dit login?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Flere muligheder</string>
 
