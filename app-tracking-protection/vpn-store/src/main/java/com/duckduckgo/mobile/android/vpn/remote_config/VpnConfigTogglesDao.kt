@@ -18,12 +18,12 @@ package com.duckduckgo.mobile.android.vpn.remote_config
 
 import androidx.room.Dao
 import androidx.room.Insert
-import androidx.room.OnConflictStrategy.REPLACE
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 
 @Dao
 interface VpnConfigTogglesDao {
-    @Insert(onConflict = REPLACE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(vpnConfigToggle: VpnConfigToggle)
 
     @Query("SELECT * from vpn_config_toggles ORDER BY localtime DESC")

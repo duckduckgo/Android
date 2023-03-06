@@ -48,6 +48,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.robolectric.RuntimeEnvironment
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
@@ -62,6 +63,8 @@ class RealPrivacyConfigPersisterTest {
     private lateinit var unprotectedTemporaryRepository: UnprotectedTemporaryRepository
     private val pluginPoint = FakePrivacyFeaturePluginPoint(listOf(FakePrivacyFeaturePlugin()))
     private lateinit var sharedPreferences: SharedPreferences
+
+    private val context = RuntimeEnvironment.getApplication()
 
     @Before
     fun before() {
@@ -90,7 +93,7 @@ class RealPrivacyConfigPersisterTest {
 
     private fun prepareDb() {
         db =
-            Room.inMemoryDatabaseBuilder(mock(), PrivacyConfigDatabase::class.java)
+            Room.inMemoryDatabaseBuilder(context, PrivacyConfigDatabase::class.java)
                 .allowMainThreadQueries()
                 .build()
         privacyRepository = RealPrivacyConfigRepository(db)

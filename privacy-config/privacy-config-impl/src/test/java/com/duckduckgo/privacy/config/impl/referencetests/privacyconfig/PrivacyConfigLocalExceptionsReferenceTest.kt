@@ -41,6 +41,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.robolectric.ParameterizedRobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 
 @ExperimentalCoroutinesApi
 @RunWith(ParameterizedRobolectricTestRunner::class)
@@ -56,6 +57,8 @@ class PrivacyConfigLocalExceptionsReferenceTest(private val testCase: TestCase) 
 
     private lateinit var db: PrivacyConfigDatabase
     private lateinit var referenceTestUtilities: ReferenceTestUtilities
+
+    private val context = RuntimeEnvironment.getApplication()
 
     companion object {
         private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -106,7 +109,7 @@ class PrivacyConfigLocalExceptionsReferenceTest(private val testCase: TestCase) 
 
     private fun prepareDb() {
         db =
-            Room.inMemoryDatabaseBuilder(mock(), PrivacyConfigDatabase::class.java)
+            Room.inMemoryDatabaseBuilder(context, PrivacyConfigDatabase::class.java)
                 .allowMainThreadQueries()
                 .build()
     }
