@@ -435,6 +435,14 @@ class SavedSitesRepositoryTest {
     }
 
     @Test
+    fun whenGetBookmarkFoldersByNameThenReturnBookmarkFolder() = runTest {
+        val folder = repository.insert(BookmarkFolder(id = "folder1", name = "name", parentId = "folder2"))
+        val folderInserted = repository.getFolderByName(folder.name)
+
+        Assert.assertEquals(folder, folderInserted)
+    }
+
+    @Test
     fun whenBookmarkAddedToFolderThenGetFolderReturnsFolder() = runTest {
         givenNoBookmarksStored()
 
