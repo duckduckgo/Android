@@ -164,28 +164,28 @@ class SavedSitesRepositoryTest {
     }
 
     @Test
-    fun whenFavoriteIsAddedAndThenRemovedThenNothingIsRetrieved() {
+    fun whenFavoriteIsAddedAndThenRemovedThenBookmarkStillExists() {
         givenEmptyDBState()
 
-        repository.insertFavorite("https://favorite.com", "favorite")
+        val favorite = repository.insertFavorite("https://favorite.com", "favorite")
 
-        val favorite = repository.getFavorite("https://favorite.com")
-        assert(favorite != null)
+        assert(repository.getFavorite("https://favorite.com") != null)
 
-        repository.delete(favorite!!)
+        repository.delete(favorite)
+
         assert(repository.getFavorite("https://favorite.com") == null)
+        assert(repository.getBookmark("https://favorite.com") != null)
     }
 
     @Test
     fun whenBookmarkIsAddedAndThenRemovedThenNothingIsRetrieved() {
         givenEmptyDBState()
 
-        repository.insertBookmark("https://favorite.com", "favorite")
+        val bookmark = repository.insertBookmark("https://favorite.com", "favorite")
 
-        val bookmark = repository.getBookmark("https://favorite.com")
-        assert(bookmark != null)
+        assert(repository.getBookmark("https://favorite.com") != null)
 
-        repository.delete(bookmark!!)
+        repository.delete(bookmark)
         assert(repository.getBookmark("https://favorite.com") == null)
     }
 
@@ -578,8 +578,8 @@ class SavedSitesRepositoryTest {
 
     @Test
     fun whenInsertBranchFolderThenAllEntitiesAreInsertedCorrectly() = runTest {
-        val parentFolder = BookmarkFolder("folder1", "Parent Folder", Relation.BOOMARKS_ROOT)
-        val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1")
+        val parentFolder = BookmarkFolder("folder1", "Parent Folder", Relation.BOOMARKS_ROOT, numFolders = 1, numBookmarks = 0)
+        val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1", numFolders = 0, numBookmarks = 1)
         val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2")
         val folderBranch = FolderBranch(listOf(childBookmark), listOf(parentFolder, childFolder))
 
@@ -655,8 +655,8 @@ class SavedSitesRepositoryTest {
 
     @Test
     fun whenBranchFolderDeletedThenNothingIsRetrieved() = runTest {
-        val parentFolder = BookmarkFolder("folder1", "Parent Folder", Relation.BOOMARKS_ROOT)
-        val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1")
+        val parentFolder = BookmarkFolder("folder1", "Parent Folder", Relation.BOOMARKS_ROOT, numBookmarks = 0, numFolders = 1)
+        val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1", numBookmarks = 1, numFolders = 0)
         val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2")
         val folderBranch = FolderBranch(listOf(childBookmark), listOf(parentFolder, childFolder))
 

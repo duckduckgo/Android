@@ -34,6 +34,8 @@ import com.duckduckgo.savedsites.store.SyncEntitiesDao
 import com.duckduckgo.savedsites.store.SyncRelationsDao
 import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -190,24 +192,18 @@ class RealSavedSitesRepository(
     }
 
     override fun getFavorites(): Flow<List<Favorite>> {
-        val favorites = mutableListOf<Favorite>()
-        return syncEntitiesDao.entitiesInFolder(Relation.FAVORITES_ROOT)
-            .map { relations ->
-                relations.forEachIndexed { index, relation ->
-                    favorites.add(relation.mapToFavorite(index))
-                }
-                favorites
+        return syncRelationsDao.relations(Relation.FAVORITES_ROOT).map { relations ->
+            relations.mapIndexed { index, relation ->
+                syncEntitiesDao.entityById(relation.entityId)!!.mapToFavorite(index)
             }
-            .flowOn(dispatcherProvider.io())
+        }.flowOn(dispatcherProvider.io())
     }
 
     override fun getFavoritesObservable(): Single<List<Favorite>> {
-        val favorites = mutableListOf<Favorite>()
-        return syncEntitiesDao.entitiesInFolderObservable(Relation.FAVORITES_ROOT).map { relations ->
-            relations.forEachIndexed { index, entity ->
-                favorites.add(entity.mapToFavorite(index))
+        return syncRelationsDao.relationsObservable(Relation.FAVORITES_ROOT).map { relations ->
+            relations.mapIndexed { index, relation ->
+                syncEntitiesDao.entityById(relation.entityId)!!.mapToFavorite(index)
             }
-            favorites
         }
     }
 
@@ -299,10 +295,19 @@ class RealSavedSitesRepository(
     }
 
     override fun delete(savedSite: SavedSite) {
-        syncEntitiesDao.entityByUrl(savedSite.url)?.let {
-            syncEntitiesDao.delete(it)
-            syncRelationsDao.deleteRelationByEntity(it.entityId)
+        when (savedSite) {
+            is Bookmark -> deleteBookmark(savedSite)
+            is Favorite -> deleteFavorite(savedSite)
         }
+    }
+
+    private fun deleteFavorite(favorite: Favorite) {
+        syncRelationsDao.deleteRelationByEntity(favorite.id, Relation.FAVORITES_ROOT)
+    }
+
+    private fun deleteBookmark(bookmark: Bookmark) {
+        syncEntitiesDao.delete(bookmark.id)
+        syncRelationsDao.deleteRelationByEntity(bookmark.id)
     }
 
     override fun update(savedSite: SavedSite) {

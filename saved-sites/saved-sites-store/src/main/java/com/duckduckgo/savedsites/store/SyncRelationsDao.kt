@@ -22,6 +22,8 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import io.reactivex.Single
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SyncRelationsDao {
@@ -36,12 +38,18 @@ interface SyncRelationsDao {
     fun relations(): List<Relation>
 
     @Query("select * from relations where relationId =:relationId")
-    fun relations(relationId: String): List<Relation>
+    fun relations(relationId: String): Flow<List<Relation>>
+
+    @Query("select * from relations where relationId =:relationId")
+    fun relationsObservable(relationId: String): Single<List<Relation>>
 
     @Query(
         "select count(*) from  entities inner join relations on entities.entityId = relations.entityId and entities.type = :type and relations.relationId = :folderId",
     )
-    fun countEntitiesInFolder(folderId: String, type: EntityType): Int
+    fun countEntitiesInFolder(
+        folderId: String,
+        type: EntityType
+    ): Int
 
     @Query("select * from relations where relations.entityId = :entityId")
     fun relationByEntityId(entityId: String): Relation?
@@ -60,6 +68,9 @@ interface SyncRelationsDao {
 
     @Query("delete from relations where entityId = :entityId")
     fun deleteRelationByEntity(entityId: String)
+
+    @Query("delete from relations where entityId = :entityId AND relationId = :relationId")
+    fun deleteRelationByEntity(entityId: String, relationId: String)
 
     @Query(
         "select count(*) from entities inner join relations on entities.entityId = relations.entityId where entities.url LIKE :domain AND relationId == :relationId",
