@@ -38,14 +38,24 @@ interface SyncEntitiesDao {
     fun entities(): List<Entity>
 
     @Query(
-        "select * from  entities inner join relations on entities.entityId = relations.entityId and entities.type = :type and relations.relationId = :folderId",
+        "select * from  entities inner join relations on entities.entityId = relations.entityId " +
+            "and entities.type = :type and relations.relationId = :folderId",
     )
-    fun entitiesInFolder(folderId: String, type: EntityType): List<Entity>
+    fun entitiesInFolder(
+        folderId: String,
+        type: EntityType,
+    ): List<Entity>
 
-    @Query("select * from entities inner join relations on entities.entityId = relations.entityId where relations.relationId = :folderId")
+    @Query(
+        "select * from entities inner join relations on entities.entityId = relations.entityId " +
+            "where relations.relationId = :folderId",
+    )
     fun entitiesInFolder(folderId: String): Flow<List<Entity>>
 
-    @Query("select * from entities inner join relations on entities.entityId = relations.entityId where relations.relationId = :folderId")
+    @Query(
+        "select * from entities inner join relations on entities.entityId = relations.entityId " +
+            "where relations.relationId = :folderId",
+    )
     fun entitiesInFolderSync(folderId: String): List<Entity>
 
     @Delete

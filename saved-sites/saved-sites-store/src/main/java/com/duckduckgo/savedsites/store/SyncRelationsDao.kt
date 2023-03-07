@@ -44,7 +44,8 @@ interface SyncRelationsDao {
     fun relationsObservable(relationId: String): Single<List<Relation>>
 
     @Query(
-        "select count(*) from  entities inner join relations on entities.entityId = relations.entityId and entities.type = :type and relations.relationId = :folderId",
+        "select count(*) from  entities inner join relations on entities.entityId = relations.entityId " +
+            "and entities.type = :type and relations.relationId = :folderId",
     )
     fun countEntitiesInFolder(
         folderId: String,
@@ -70,10 +71,14 @@ interface SyncRelationsDao {
     fun deleteRelationByEntity(entityId: String)
 
     @Query("delete from relations where entityId = :entityId AND relationId = :relationId")
-    fun deleteRelationByEntity(entityId: String, relationId: String)
+    fun deleteRelationByEntity(
+        entityId: String,
+        relationId: String,
+    )
 
     @Query(
-        "select count(*) from entities inner join relations on entities.entityId = relations.entityId where entities.url LIKE :domain AND relationId == :relationId",
+        "select count(*) from entities inner join relations on entities.entityId = relations.entityId " +
+            "where entities.url LIKE :domain AND relationId == :relationId",
     )
     fun countRelationsByUrl(
         domain: String,
