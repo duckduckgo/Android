@@ -393,6 +393,18 @@ class RealSavedSitesRepository(
         }
     }
 
+    override fun getFolderByName(folderName: String): BookmarkFolder? {
+        val entity = syncEntitiesDao.entityByName(folderName)
+        return if (entity != null) {
+            val relation = syncRelationsDao.relationByEntityId(entity.entityId)
+            val numFolders = syncRelationsDao.countEntitiesInFolder(entity.entityId, FOLDER)
+            val numBookmarks = syncRelationsDao.countEntitiesInFolder(entity.entityId, BOOKMARK)
+            BookmarkFolder(entity.entityId, entity.title, relation?.relationId ?: "", numFolders = numFolders, numBookmarks = numBookmarks)
+        } else {
+            null
+        }
+    }
+
     override fun deleteAll() {
         syncRelationsDao.deleteAll()
         syncEntitiesDao.deleteAll()

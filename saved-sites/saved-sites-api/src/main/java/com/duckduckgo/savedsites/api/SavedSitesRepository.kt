@@ -83,6 +83,7 @@ interface SavedSitesRepository {
 
     fun delete(folder: BookmarkFolder)
     fun getFolder(folderId: String): BookmarkFolder?
+    fun getFolderByName(folderName: String): BookmarkFolder?
     fun deleteAll()
     fun bookmarksCount(): Long
     fun favoritesCount(): Long

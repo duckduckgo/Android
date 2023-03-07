@@ -157,7 +157,7 @@ class SavedSitesExporterTest {
         savedSitesRepository.insertFolderBranch(folderBranch)
 
         val itemList = listOf(root, parentFolder, childFolder, childBookmark)
-        val preOrderList = listOf(childFolder, childBookmark, parentFolder, root)
+        val preOrderList = listOf(childBookmark, childFolder, parentFolder, root)
 
         val treeStructure = exporter.getTreeFolderStructure()
 
@@ -170,8 +170,8 @@ class SavedSitesExporterTest {
                 count++
             },
             { node ->
-                // testNode(node, preOrderList, preOrderCount)
-                // preOrderCount++
+                testNode(node, preOrderList, preOrderCount)
+                preOrderCount++
             },
         )
     }

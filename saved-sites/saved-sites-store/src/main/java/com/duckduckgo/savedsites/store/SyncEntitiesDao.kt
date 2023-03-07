@@ -77,6 +77,9 @@ interface SyncEntitiesDao {
     @Query("select * from entities where entityId = :id")
     fun entityById(id: String): Entity?
 
+    @Query("select * from entities where title = :name")
+    fun entityByName(name: String): Entity?
+
     @Query("select * from entities where type = :type")
     fun entitiesByType(type: EntityType): Flow<List<Entity>>
 

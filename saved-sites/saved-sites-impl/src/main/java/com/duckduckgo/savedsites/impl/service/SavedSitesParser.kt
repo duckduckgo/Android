@@ -170,8 +170,14 @@ class RealSavedSitesParser : SavedSitesParser {
                                 parentId = folderParentId,
                                 id = UUID.randomUUID().toString(),
                             )
-                            savedSitesRepository.insert(bookmarkFolder)
-                            parseElement(element, bookmarkFolder.id, savedSitesRepository, savedSites, false)
+                            // if folder exists we use that one instead
+                            val existingFolder = savedSitesRepository.getFolderByName(folderName)
+                            if (existingFolder != null){
+                                parseElement(element, existingFolder.id, savedSitesRepository, savedSites, false)
+                            } else {
+                                savedSitesRepository.insert(bookmarkFolder)
+                                parseElement(element, bookmarkFolder.id, savedSitesRepository, savedSites, false)
+                            }
                         }
                     } else {
                         val linkItem = element.select("a")
