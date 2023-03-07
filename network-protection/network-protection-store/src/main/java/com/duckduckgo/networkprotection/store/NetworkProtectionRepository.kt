@@ -27,6 +27,7 @@ interface NetworkProtectionRepository {
     var reconnectStatus: ReconnectStatus
     var reconnectAttemptCount: Int
     var privateKey: String?
+    var lastPrivateKeyUpdateTimeInMillis: Long
     var enabledTimeInMillis: Long
     var serverDetails: ServerDetails?
     var clientInterface: ClientInterface?
@@ -54,9 +55,13 @@ class RealNetworkProtectionRepository constructor(
     override var privateKey: String?
         get() = networkProtectionPrefs.getString(KEY_WG_PRIVATE_KEY, null)
         set(value) {
-            value?.let {
-                networkProtectionPrefs.putString(KEY_WG_PRIVATE_KEY, value)
-            }
+            networkProtectionPrefs.putString(KEY_WG_PRIVATE_KEY, value)
+        }
+
+    override var lastPrivateKeyUpdateTimeInMillis: Long
+        get() = networkProtectionPrefs.getLong(KEY_WG_PRIVATE_KEY_LAST_UPDATE, -1L)
+        set(value) {
+            networkProtectionPrefs.putLong(KEY_WG_PRIVATE_KEY_LAST_UPDATE, value)
         }
 
     override var enabledTimeInMillis: Long
@@ -123,6 +128,7 @@ class RealNetworkProtectionRepository constructor(
 
     companion object {
         private const val KEY_WG_PRIVATE_KEY = "wg_private_key"
+        private const val KEY_WG_PRIVATE_KEY_LAST_UPDATE = "wg_private_key_last_update"
         private const val KEY_WG_SERVER_IP = "wg_server_ip"
         private const val KEY_WG_SERVER_LOCATION = "wg_server_location"
         private const val KEY_WG_SERVER_ENABLE_TIME = "wg_server_enable_time"

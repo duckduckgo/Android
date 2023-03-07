@@ -130,7 +130,7 @@ class WgVpnNetworkStack @Inject constructor(
 
             // Only update if enabledTimeInMillis has been reset
             if (networkProtectionRepository.get().enabledTimeInMillis == -1L) {
-                networkProtectionRepository.get().enabledTimeInMillis = currentTimeProvider.get()
+                networkProtectionRepository.get().enabledTimeInMillis = currentTimeProvider.getTimeInMillis()
             }
             Result.success(Unit)
         }

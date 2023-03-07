@@ -35,6 +35,8 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
+import com.duckduckgo.networkprotection.impl.rekey.NetPRekeyer
+import com.duckduckgo.networkprotection.internal.databinding.ActivityNetpInternalSettingsBinding
 import com.duckduckgo.networkprotection.internal.feature.system_apps.NetPSystemAppsExclusionListActivity
 import com.duckduckgo.networkprotection.internal.network.NetPInternalMtuProvider
 import com.duckduckgo.networkprotection.internal.network.netpDeletePcapFile
@@ -43,13 +45,15 @@ import com.duckduckgo.networkprotection.internal.network.netpPcapFileHasContent
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.store.remote_config.NetPServerRepository
 import com.google.android.material.snackbar.Snackbar
+import com.wireguard.crypto.Key
+import com.wireguard.crypto.KeyPair
 import java.io.FileInputStream
+import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import om.duckduckgo.networkprotection.internal.databinding.ActivityNetpInternalSettingsBinding
 
 @Suppress("NoHardcodedCoroutineDispatcher")
 @InjectWith(ActivityScope::class)
@@ -68,6 +72,8 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
     @Inject lateinit var netpRepository: NetworkProtectionRepository
 
     @Inject lateinit var dispatcherProvider: DispatcherProvider
+
+    @Inject lateinit var netPRekeyer: NetPRekeyer
 
     private val exportPcapFile = registerForActivityResult(ExportPcapContract()) { data ->
         data?.let { uri ->
@@ -116,11 +122,23 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
                 binding.overrideMtuSelector.setSecondaryText("MTU size: ${netPInternalMtuProvider.getMtu()}")
                 binding.overrideServerBackendSelector.isEnabled = isEnabled
                 binding.overrideServerBackendSelector.setSecondaryText("${serverRepository.getSelectedServer()?.name ?: AUTOMATIC}")
+                binding.forceRekey.isEnabled = isEnabled
                 if (isEnabled) {
                     netpRepository.clientInterface?.tunnelCidrSet?.joinToString(", ")?.let {
                         binding.internalIp.show()
                         binding.internalIp.setSecondaryText(it)
                     } ?: binding.internalIp.gone()
+                    netpRepository.privateKey?.let {
+                        "Device Public key: ${KeyPair(Key.fromBase64(it)).publicKey.toBase64()}".run {
+                            if (netpRepository.lastPrivateKeyUpdateTimeInMillis != -1L) {
+                                this + "\nLast updated ${formatter.format(netpRepository.lastPrivateKeyUpdateTimeInMillis)}"
+                            } else {
+                                this
+                            }
+                        }.also { subtitle ->
+                            binding.forceRekey.setSecondaryText(subtitle)
+                        }
+                    }
                 } else {
                     binding.internalIp.gone()
                 }
@@ -182,6 +200,12 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
                 Snackbar.make(binding.root, "Pcap file doesn't exist", Snackbar.LENGTH_LONG).show()
             }
         }
+
+        binding.forceRekey.setClickListener {
+            lifecycleScope.launch {
+                netPRekeyer.doRekey()
+            }
+        }
     }
 
     private fun showMtuSelectorMenu() {
@@ -207,6 +231,7 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
         fun MenuItem.serverName(): String? {
             return if (title == AUTOMATIC) null else title.toString()
         }
+
         val hostnames = serverRepository.getServerNames()
         PopupMenu(this, binding.overrideServerBackendSelector).apply {
             (hostnames + AUTOMATIC).forEach { hostname ->
@@ -229,6 +254,10 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
     companion object {
         fun intent(context: Context): Intent {
             return Intent(context, NetPInternalSettingsActivity::class.java)
+        }
+
+        private val formatter by lazy {
+            SimpleDateFormat("MMM dd, yyyy HH:mm aaa", Locale.getDefault())
         }
 
         private const val AUTOMATIC = "Automatic"

@@ -26,4 +26,5 @@
     <string name="netpDevSettingInternalIP">Internal IP</string>
     <string name="netpDnsLeakProtection">DNS Leak Protection</string>
     <string name="netpPcapRecording">Enable PCAP recording</string>
+    <string name="netpForceRekey">Force Rekey</string>
 </resources>

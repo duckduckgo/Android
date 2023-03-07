@@ -21,7 +21,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import om.duckduckgo.networkprotection.internal.databinding.SystemAppViewBinding
+import com.duckduckgo.networkprotection.internal.databinding.SystemAppViewBinding
 
 class SystemAppView @JvmOverloads constructor(
     context: Context,

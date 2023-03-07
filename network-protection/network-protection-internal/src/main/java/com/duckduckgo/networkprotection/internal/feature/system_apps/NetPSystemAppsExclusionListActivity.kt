@@ -32,13 +32,13 @@ import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
+import com.duckduckgo.networkprotection.internal.databinding.ActivityNetpInternalSystemAppsExclusionBinding
 import com.duckduckgo.networkprotection.internal.network.NetPInternalExclusionListProvider
 import dagger.WrongScope
 import javax.inject.Inject
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import logcat.logcat
-import om.duckduckgo.networkprotection.internal.databinding.ActivityNetpInternalSystemAppsExclusionBinding
 
 @WrongScope(
     comment = "VpnScope to access dependencies in there",

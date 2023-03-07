@@ -17,6 +17,7 @@
 package com.duckduckgo.networkprotection.impl.configuration
 
 import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.networkprotection.impl.CurrentTimeProvider
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import com.wireguard.crypto.Key
@@ -32,6 +33,7 @@ interface DeviceKeys {
 class RealDeviceKeys @Inject constructor(
     private val networkProtectionRepository: NetworkProtectionRepository,
     private val keyPairGenerator: KeyPairGenerator,
+    private val currentTimeProvider: CurrentTimeProvider,
 ) : DeviceKeys {
     override val publicKey: String
         get() = keyPairGenerator.generatePublicKey(privateKey)
@@ -39,6 +41,7 @@ class RealDeviceKeys @Inject constructor(
         get() = if (networkProtectionRepository.privateKey.isNullOrEmpty()) {
             keyPairGenerator.generatePrivateKey().also {
                 networkProtectionRepository.privateKey = it
+                networkProtectionRepository.lastPrivateKeyUpdateTimeInMillis = currentTimeProvider.getTimeInMillis()
             }
         } else {
             networkProtectionRepository.privateKey!!

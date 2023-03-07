@@ -120,7 +120,7 @@ class WgVpnNetworkStackTest {
             ),
         )
         whenever(networkProtectionRepository.enabledTimeInMillis).thenReturn(-1L)
-        whenever(currentTimeProvider.get()).thenReturn(1672229650358L)
+        whenever(currentTimeProvider.getTimeInMillis()).thenReturn(1672229650358L)
 
         testee.onPrepareVpn()
 
@@ -143,7 +143,7 @@ class WgVpnNetworkStackTest {
             ),
         )
         whenever(networkProtectionRepository.enabledTimeInMillis).thenReturn(16722296505000L)
-        whenever(currentTimeProvider.get()).thenReturn(1672229650358L)
+        whenever(currentTimeProvider.getTimeInMillis()).thenReturn(1672229650358L)
 
         testee.onPrepareVpn()
 

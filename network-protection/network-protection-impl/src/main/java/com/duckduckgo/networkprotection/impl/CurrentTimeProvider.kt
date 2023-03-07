@@ -21,10 +21,10 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 interface CurrentTimeProvider {
-    fun get(): Long
+    fun getTimeInMillis(): Long
 }
 
 @ContributesBinding(VpnScope::class)
 class RealCurrentTimeProvider @Inject constructor() : CurrentTimeProvider {
-    override fun get(): Long = System.currentTimeMillis()
+    override fun getTimeInMillis(): Long = System.currentTimeMillis()
 }

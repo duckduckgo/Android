@@ -329,7 +329,7 @@ class NetworkProtectionManagementViewModelTest {
     }
 
     @Test
-    fun whenOnStartVpnThenResetReconnectState() {
+    fun whenOnStartVpnThenResetValuesInRepository() {
         testee.onStartVpn()
 
         verify(reconnectNotifications).clearNotifications()
