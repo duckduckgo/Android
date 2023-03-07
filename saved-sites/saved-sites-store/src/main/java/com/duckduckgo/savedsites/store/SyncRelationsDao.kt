@@ -48,7 +48,7 @@ interface SyncRelationsDao {
     )
     fun countEntitiesInFolder(
         folderId: String,
-        type: EntityType
+        type: EntityType,
     ): Int
 
     @Query("select * from relations where relations.entityId = :entityId")

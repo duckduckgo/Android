@@ -22,13 +22,10 @@ import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.savedsites.api.SavedSitesRepository
-import com.duckduckgo.savedsites.api.models.BookmarkFolder
-import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.TreeNode
 import com.duckduckgo.savedsites.api.service.ExportSavedSitesResult
 import com.duckduckgo.savedsites.api.service.SavedSitesExporter
 import com.duckduckgo.savedsites.store.Relation
-import kotlinx.coroutines.flow.map
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException

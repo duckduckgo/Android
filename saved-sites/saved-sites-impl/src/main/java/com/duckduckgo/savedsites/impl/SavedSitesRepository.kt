@@ -34,8 +34,6 @@ import com.duckduckgo.savedsites.store.SyncEntitiesDao
 import com.duckduckgo.savedsites.store.SyncRelationsDao
 import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map

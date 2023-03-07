@@ -51,5 +51,4 @@ object BookmarkTestUtils {
         }
         return relations
     }
-
 }

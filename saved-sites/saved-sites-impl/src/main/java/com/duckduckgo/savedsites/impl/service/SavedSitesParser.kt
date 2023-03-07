@@ -172,7 +172,7 @@ class RealSavedSitesParser : SavedSitesParser {
                             )
                             // if folder exists we use that one instead
                             val existingFolder = savedSitesRepository.getFolderByName(folderName)
-                            if (existingFolder != null){
+                            if (existingFolder != null) {
                                 parseElement(element, existingFolder.id, savedSitesRepository, savedSites, false)
                             } else {
                                 savedSitesRepository.insert(bookmarkFolder)
