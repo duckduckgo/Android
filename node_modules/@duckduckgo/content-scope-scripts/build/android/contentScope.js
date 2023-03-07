@@ -2993,6 +2993,9 @@
   const entities = [];
   const entityData = {};
 
+  let readyResolver;
+  const ready = new Promise(resolve => { readyResolver = resolve; });
+
   /*********************************************************
    *  Widget Replacement logic
    *********************************************************/
@@ -3337,22 +3340,6 @@
       }
   }
 
-  /**
-   * Initialise the Click to Load feature, once the necessary details have been
-   * returned by the platform.
-   * @returns {Promise}
-   */
-  async function initCTL () {
-      await replaceClickToLoadElements();
-
-      window.addEventListener('ddg-ctp-replace-element', ({ target }) => {
-          replaceClickToLoadElements(target);
-      }, { capture: true });
-
-      // Inform surrogate scripts that CTP is ready
-      originalWindowDispatchEvent(createCustomEvent('ddg-ctp-ready'));
-  }
-
   function replaceTrackingElement (widget, trackingElement, placeholderElement, hideTrackingElement = false, currentPlaceholder = null) {
       widget.dispatchEvent(trackingElement, 'ddg-ctp-tracking-element');
 
@@ -3465,11 +3452,14 @@
       }
 
       // Show YouTube Preview for embedded video
+      // TODO: Fix the hideTrackingElement option and reenable, or remove it. It's
+      //       disabled for YouTube videos so far since it caused multiple
+      //       placeholders to be displayed on the page.
       if (isYoutubePreviewsEnabled === true) {
           const { youTubePreview, shadowRoot } = await createYouTubePreview(trackingElement, widget);
           const currentPlaceholder = togglePlaceholder ? document.getElementById(`yt-ctl-dialog-${widget.widgetID}`) : null;
           replaceTrackingElement(
-              widget, trackingElement, youTubePreview, /* hideTrackingElement= */ true, currentPlaceholder
+              widget, trackingElement, youTubePreview, /* hideTrackingElement= */ false, currentPlaceholder
           );
           showExtraUnblockIfShortPlaceholder(shadowRoot, youTubePreview);
 
@@ -3479,7 +3469,7 @@
           const { blockingDialog, shadowRoot } = await createYouTubeBlockingDialog(trackingElement, widget);
           const currentPlaceholder = togglePlaceholder ? document.getElementById(`yt-ctl-preview-${widget.widgetID}`) : null;
           replaceTrackingElement(
-              widget, trackingElement, blockingDialog, /* hideTrackingElement= */ true, currentPlaceholder
+              widget, trackingElement, blockingDialog, /* hideTrackingElement= */ false, currentPlaceholder
           );
           showExtraUnblockIfShortPlaceholder(shadowRoot, blockingDialog);
       }
@@ -3510,6 +3500,8 @@
    *   in the document will be replaced instead.
    */
   async function replaceClickToLoadElements (targetElement) {
+      await ready;
+
       for (const entity of Object.keys(config)) {
           for (const widgetData of Object.values(config[entity].elementData)) {
               const selector = widgetData.selectors.join();
@@ -4285,7 +4277,7 @@
   // Convention is that each function should be named the same as the sendMessage
   // method we are calling into eg. calling `sendMessage('getClickToLoadState')`
   // will result in a response routed to `updateHandlers.getClickToLoadState()`.
-  const updateHandlers = {
+  const messageResponseHandlers = {
       getClickToLoadState (response) {
           devMode = response.devMode;
           isYoutubePreviewsEnabled = response.youtubePreviewsEnabled;
@@ -4295,14 +4287,15 @@
           //       first.
 
           // Start Click to Load
-          if (document.readyState === 'complete') {
-              initCTL();
-          } else {
-              // Content script loaded before page content, so wait for load.
-              window.addEventListener('load', (event) => {
-                  initCTL();
-              });
-          }
+          window.addEventListener('ddg-ctp-replace-element', ({ target }) => {
+              replaceClickToLoadElements(target);
+          }, { capture: true });
+
+          // Inform surrogate scripts that CTP is ready
+          originalWindowDispatchEvent(createCustomEvent('ddg-ctp-ready'));
+
+          // Mark the feature as ready, to allow placeholder replacements.
+          readyResolver();
       },
       setYoutubePreviewsEnabled: function (resp) {
           if (resp?.messageType && typeof resp?.value === 'boolean') {
@@ -4318,6 +4311,8 @@
           originalWindowDispatchEvent(new OriginalCustomEvent('ddg-ctp-unblockClickToLoadContent-complete'));
       }
   };
+
+  const knownMessageResponseType = Object.prototype.hasOwnProperty.bind(messageResponseHandlers);
 
   function init$f (args) {
       const websiteOwner = args?.site?.parentEntity;
@@ -4384,19 +4379,34 @@
       });
 
       // Request the current state of Click to Load from the platform.
-      // Note: When the response is received, initCTL() is then called by the
-      //       response handler to finish starting up the feature.
+      // Note: When the response is received, the response handler finishes
+      //       starting up the feature.
       sendMessage('getClickToLoadState');
   }
 
-  function update$1 (args) {
-      const detail = args && args.detail;
-      if (!(detail && detail.func)) { return }
+  function update$1 (message) {
+      // TODO: Once all Click to Load messages include the feature property, drop
+      //       messages that don't include the feature property too.
+      if (message?.feature && message?.feature !== 'clickToLoad') return
 
-      const fn = updateHandlers[detail.func];
-      if (typeof fn !== 'function') { return }
+      const messageType = message?.messageType;
+      if (!messageType) return
 
-      fn(detail.response);
+      // Message responses.
+      if (messageType === 'response') {
+          const messageResponseType = message?.responseMessageType;
+          if (messageResponseType && knownMessageResponseType(messageResponseType)) {
+              return messageResponseHandlers[messageResponseType](message.response)
+          }
+      }
+
+      // Other known update messages.
+      if (messageType === 'displayClickToLoadPlaceholders') {
+          // TODO: Pass `message.options.ruleAction` through, that way only
+          //       content corresponding to the entity for that ruleAction need to
+          //       be replaced with a placeholder.
+          return replaceClickToLoadElements()
+      }
   }
 
   var clickToPlay = /*#__PURE__*/Object.freeze({
