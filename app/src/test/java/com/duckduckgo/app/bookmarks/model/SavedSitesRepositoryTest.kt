@@ -21,6 +21,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.bookmarks.BookmarkTestUtils.givenFolderWithContent
+import com.duckduckgo.app.bookmarks.BookmarkTestUtils.givenSomeBookmarks
+import com.duckduckgo.app.bookmarks.BookmarkTestUtils.givenSomeFolders
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
@@ -31,7 +34,6 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
 import com.duckduckgo.savedsites.store.Entity
 import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
-import com.duckduckgo.savedsites.store.EntityType.FOLDER
 import com.duckduckgo.savedsites.store.Relation
 import com.duckduckgo.savedsites.store.SyncEntitiesDao
 import com.duckduckgo.savedsites.store.SyncRelationsDao
@@ -786,26 +788,6 @@ class SavedSitesRepositoryTest {
         Assert.assertFalse(repository.hasBookmarks())
     }
 
-    private fun givenSomeBookmarks(
-        total: Int,
-    ): List<Entity> {
-        val entities = mutableListOf<Entity>()
-        for (index in 1..total) {
-            entities.add(Entity(Entity.generateBookmarkId(index.toLong()), "entity$index", "https://testUrl$index", BOOKMARK))
-        }
-        return entities
-    }
-
-    private fun givenSomeFolders(
-        total: Int,
-    ): List<Entity> {
-        val entities = mutableListOf<Entity>()
-        for (index in 1..total) {
-            entities.add(Entity(Entity.generateFolderId(index.toLong()), "entity$index", "https://testUrl$index", FOLDER))
-        }
-        return entities
-    }
-
     private fun givenFolderWithEntities(folderId: String, bookmarks: Int, folders: Int) {
         val bookmarks = givenSomeBookmarks(bookmarks)
         val folders = givenSomeFolders(folders)
@@ -813,17 +795,6 @@ class SavedSitesRepositoryTest {
         syncEntitiesDao.insertList(bookmarks)
         syncEntitiesDao.insertList(folders)
         syncRelationsDao.insertList(folderContent)
-    }
-
-    private fun givenFolderWithContent(
-        folderId: String,
-        entities: List<Entity>,
-    ): List<Relation> {
-        val relations = mutableListOf<Relation>()
-        entities.forEach {
-            relations.add(Relation(relationId = folderId, entityId = it.entityId))
-        }
-        return relations
     }
 
     private fun givenEmptyDBState() {
