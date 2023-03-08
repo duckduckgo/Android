@@ -139,8 +139,16 @@ class TrackerFeedAdapter @Inject constructor(
             }
         }
 
+        val context: Context = view.context
+        val today = context.getString(com.duckduckgo.app.global.R.string.common_Today)
+        val yesterday = context.getString(com.duckduckgo.app.global.R.string.common_Yesterday)
+
         fun bind(item: TrackerFeedItem.TrackerFeedItemHeader) {
-            view.primaryText = item.timestamp
+            if (item.timestamp == today || item.timestamp == yesterday) {
+                view.primaryText = context.getString(R.string.atp_ActivityBlockedByHeaderText, item.timestamp)
+            } else {
+                view.primaryText = context.getString(R.string.atp_ActivityBlockedByOnDateHeaderText, item.timestamp)
+            }
         }
     }
 

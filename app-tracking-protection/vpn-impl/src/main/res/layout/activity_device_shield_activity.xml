@@ -68,6 +68,24 @@
                     app:panelDrawable="@drawable/ic_info_panel_alert"
                     app:panelText="@string/atp_ActivityDisabledLabel" />
 
+                <ImageView
+                    android:id="@+id/deviceShieldTrackerPhoneAndLockImage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:src="@drawable/phone_and_lock_enabled"/>
+
+                <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                    android:id="@+id/deviceShieldTrackerBlockingTrackersDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:layout_marginStart="@dimen/keyline_5"
+                    android:layout_marginEnd="@dimen/keyline_5"
+                    android:layout_marginBottom="@dimen/keyline_4"
+                    android:layout_marginTop="@dimen/keyline_2"
+                    android:text="@string/atp_ActivityBlockingTrackersEnabledDescription"/>
+
                 <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
                     android:id="@+id/past_week_activity"
                     android:layout_width="match_parent"
