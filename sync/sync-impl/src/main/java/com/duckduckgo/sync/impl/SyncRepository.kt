@@ -28,8 +28,6 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import javax.inject.*
-import timber.log.Timber
-import javax.inject.*
 import kotlin.DeprecationLevel.WARNING
 import timber.log.Timber
 
