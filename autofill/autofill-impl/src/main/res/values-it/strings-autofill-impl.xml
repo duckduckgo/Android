@@ -30,7 +30,7 @@
     <string name="saveLoginDialogButtonSave">Salva dati di accesso</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Salva password</string>
     <string name="saveLoginDialogNotNow">Non adesso</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">I dati di accesso sono archiviati in modo sicuro solo su questo dispositivo e possono essere gestiti dal menu Compilazione automatica, all\'interno di Impostazioni.</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">DuckDuckGo salverà in modo sicuro questi dati di accesso sul tuo dispositivo. Puoi gestire i dati di accesso salvati in Impostazioni.</string>
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Vuoi che DuckDuckGo salvi i dati di accesso?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Altre opzioni</string>
 
