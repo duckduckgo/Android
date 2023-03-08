@@ -57,9 +57,7 @@ class BookmarksMigrationTest {
 
     private lateinit var syncEntitiesDao: SyncEntitiesDao
     private lateinit var syncRelationsDao: SyncRelationsDao
-
-    private val mockFaviconManager: FaviconManager = mock()
-
+    
     private lateinit var favoritesDao: FavoritesDao
     private lateinit var bookmarksDao: BookmarksDao
     private lateinit var bookmarkFoldersDao: BookmarkFoldersDao
@@ -195,7 +193,7 @@ class BookmarksMigrationTest {
         assertTrue(favorites.first().entityId == "favorite2")
     }
 
-    @Ignore @Test
+    @Test
     fun whenDataIsMigratedThenOldTablesAreDeleted() {
         givenSomeFavorites(10)
         givenSomeBookmarks(5, Relation.BOOMARKS_ROOT_ID)

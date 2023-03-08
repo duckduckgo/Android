@@ -43,7 +43,7 @@ class AppDatabaseBookmarksMigrationCallback(
     fun runMigration() {
         migrateBookmarks()
         migrateFavorites()
-        // cleanUpTables()
+        cleanUpTables()
     }
 
     private fun migrateFavorites() {
