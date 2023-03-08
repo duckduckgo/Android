@@ -93,7 +93,7 @@ class SyncInitialSetupActivity : DuckDuckGoActivity() {
                 val connectedBinding = ItemConnectedDeviceBinding.inflate(layoutInflater, binding.connectedDevicesList, true)
                 connectedBinding.deviceName.text = "${device.deviceName} ${if (device.thisDevice) "(This Device)" else ""}"
                 connectedBinding.logoutButton.setOnClickListener {
-                    viewModel.onLogoutClicked(device.deviceId)
+                    viewModel.onDeviceLogoutClicked(device.deviceId)
                 }
             }
         }
