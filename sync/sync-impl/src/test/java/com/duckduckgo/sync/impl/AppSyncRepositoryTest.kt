@@ -362,9 +362,9 @@ class AppSyncRepositoryTest {
         prepareToProvideDeviceIds()
         val syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore)
 
-        val result = syncRepo.getConnectQR()
+        val result = syncRepo.getConnectQR() as Success
 
-        assertEquals(jsonConnectKey, result)
+        assertEquals(jsonConnectKey, result.data)
     }
 
     @Test

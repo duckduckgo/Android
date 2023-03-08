@@ -47,7 +47,7 @@ interface SyncRepository {
     fun latestToken(): String
     fun getRecoveryCode(): String?
     fun getConnectedDevices(): Result<List<ConnectedDevice>>
-    fun getConnectQR(): String
+    fun getConnectQR(): Result<String>
     fun connectDevice(contents: String): Result<Boolean>
     fun pollConnectionKeys(): Result<Boolean>
 }
@@ -148,13 +148,18 @@ class AppSyncRepository @Inject constructor(
         return Adapters.recoveryCodeAdapter.toJson(LinkCode(RecoveryCode(primaryKey, userID)))
     }
 
-    override fun getConnectQR(): String {
+    override fun getConnectQR(): Result<String> {
         val prepareForConnect = nativeLib.prepareForConnect()
         val deviceId = syncDeviceIds.deviceId()
         syncStore.deviceId = deviceId
         syncStore.primaryKey = prepareForConnect.publicKey
         syncStore.secretKey = prepareForConnect.secretKey
-        return Adapters.recoveryCodeAdapter.toJson(LinkCode(connect = ConnectCode(deviceId = deviceId, secretKey = prepareForConnect.publicKey)))
+
+        val linkingQRCode = Adapters.recoveryCodeAdapter.toJson(
+            LinkCode(connect = ConnectCode(deviceId = deviceId, secretKey = prepareForConnect.publicKey)),
+        ) ?: return Error(reason = "Error generating Linking Code")
+
+        return Result.Success(linkingQRCode)
     }
 
     override fun connectDevice(contents: String): Result<Boolean> {

@@ -27,6 +27,7 @@ import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncRepository
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ReadConnectQR
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ReadQR
+import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ShowQR
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
@@ -208,7 +209,13 @@ constructor(
 
     fun onConnectStart() {
         viewModelScope.launch(dispatchers.io()) {
-            val qrCode = syncRepository.getConnectQR()
+            val qrCode = when (val qrCodeResult = syncRepository.getConnectQR()) {
+                is Error -> {
+                    command.send(ShowMessage("$qrCodeResult"))
+                    return@launch
+                }
+                is Success -> qrCodeResult.data
+            }
             updateViewState()
             command.send(ShowQR(qrCode))
             var polling = true
