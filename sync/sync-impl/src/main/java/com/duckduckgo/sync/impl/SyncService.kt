@@ -18,6 +18,7 @@ package com.duckduckgo.sync.impl
 
 import com.duckduckgo.anvil.annotations.ContributesServiceApi
 import com.duckduckgo.di.scopes.AppScope
+import com.squareup.moshi.Json
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -67,35 +68,35 @@ interface SyncService {
 }
 
 data class Login(
-    val user_id: String,
-    val hashed_password: String,
-    val device_id: String,
-    val device_name: String,
+    @field:Json(name = "user_id") val userId: String,
+    @field:Json(name = "hashed_password") val hashedPassword: String,
+    @field:Json(name = "device_id") val deviceId: String,
+    @field:Json(name = "device_name") val deviceName: String,
 )
 
 data class Signup(
-    val user_id: String,
-    val hashed_password: String,
-    val protected_encryption_key: String,
-    val device_id: String,
-    val device_name: String,
+    @field:Json(name = "user_id") val userId: String,
+    @field:Json(name = "hashed_password") val hashedPassword: String,
+    @field:Json(name = "protected_encryption_key") val protectedEncryptionKey: String,
+    @field:Json(name = "device_id") val deviceId: String,
+    @field:Json(name = "device_name") val deviceName: String,
 )
 
 data class Logout(
-    val device_id: String,
+    @field:Json(name = "device_id") val deviceId: String,
 )
 
 data class ConnectKey(
-    val encrypted_recovery_key: String,
+    @field:Json(name = "encrypted_recovery_key") val encryptedRecoveryKey: String,
 )
 
 data class Connect(
-    val device_id: String,
-    val encrypted_recovery_key: String,
+    @field:Json(name = "device_id") val deviceId: String,
+    @field:Json(name = "encrypted_recovery_key") val encryptedRecoveryKey: String,
 )
 
 data class AccountCreatedResponse(
-    val user_id: String,
+    @field:Json(name = "user_id") val userId: String,
     val token: String,
 )
 
@@ -114,9 +115,9 @@ data class DeviceEntries(
 )
 
 data class Device(
-    val device_id: String,
-    val device_name: String,
-    val jw_iat: String,
+    @field:Json(name = "device_id") val deviceId: String,
+    @field:Json(name = "device_name") val deviceName: String,
+    @field:Json(name = "jw_iat") val jwIat: String,
 )
 
 data class ErrorResponse(

@@ -154,7 +154,7 @@ class AppSyncRepository @Inject constructor(
         syncStore.deviceId = deviceId
         syncStore.primaryKey = prepareForConnect.publicKey
         syncStore.secretKey = prepareForConnect.secretKey
-        return Adapters.recoveryCodeAdapter.toJson(LinkCode(connect = ConnectCode(device_id = deviceId, secret_key = prepareForConnect.publicKey)))
+        return Adapters.recoveryCodeAdapter.toJson(LinkCode(connect = ConnectCode(deviceId = deviceId, secretKey = prepareForConnect.publicKey)))
     }
 
     override fun connectDevice(contents: String): Result<Boolean> {
@@ -168,9 +168,9 @@ class AppSyncRepository @Inject constructor(
         val userId = syncStore.userId ?: return Result.Error(reason = "Error reading UserId")
         val token = syncStore.token ?: return Result.Error(reason = "Error token")
         val recoverKey = Adapters.recoveryCodeAdapter.toJson(LinkCode(RecoveryCode(primaryKey = primaryKey, userId = userId)))
-        val seal = nativeLib.seal(recoverKey, connectKeys.secret_key)
+        val seal = nativeLib.seal(recoverKey, connectKeys.secretKey)
 
-        return syncApi.connect(token = token, deviceId = connectKeys.device_id, publicKey = seal)
+        return syncApi.connect(token = token, deviceId = connectKeys.deviceId, publicKey = seal)
     }
 
     override fun pollConnectionKeys(): Result<Boolean> {
@@ -217,7 +217,6 @@ class AppSyncRepository @Inject constructor(
             is Result.Success -> {
                 val decryptResult = nativeLib.decrypt(result.data.protected_encryption_key, preLogin.stretchedPrimaryKey)
                 if (decryptResult.result != 0L) return Result.Error(code = decryptResult.result.toInt(), reason = "Decrypt failed")
-                Timber.i("SYNC decrypt: decoded secret Key: ${decryptResult.decryptedData}")
                 syncStore.userId = userId
                 syncStore.deviceId = deviceId
                 syncStore.deviceName = deviceName
@@ -295,9 +294,9 @@ class AppSyncRepository @Inject constructor(
                 return Result.Success(
                     result.data.map {
                         ConnectedDevice(
-                            thisDevice = syncStore.deviceId == it.device_id,
-                            deviceName = it.device_name,
-                            deviceId = it.device_id,
+                            thisDevice = syncStore.deviceId == it.deviceId,
+                            deviceName = it.deviceName,
+                            deviceId = it.deviceId,
                         )
                     },
                 )
@@ -376,8 +375,8 @@ data class ConnectedDevice(
 )
 
 data class ConnectCode(
-    val device_id: String,
-    val secret_key: String,
+    @field:Json(name = "device_id") val deviceId: String,
+    @field:Json(name = "secret_key") val secretKey: String,
 )
 
 sealed class Result<out R> {

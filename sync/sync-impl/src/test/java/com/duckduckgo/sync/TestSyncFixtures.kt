@@ -123,7 +123,7 @@ object TestSyncFixtures {
         "{\"error\":\"$invalidMessageErr\"}".toResponseBody(),
     )
     val loginFailed = Result.Error(code = wrongCredentialsCodeErr, reason = wrongCredentialsMessageErr)
-    val loginRequestBody = Login(user_id = userId, hashed_password = hashedPassword, device_id = deviceId, device_name = deviceName)
+    val loginRequestBody = Login(userId = userId, hashedPassword = hashedPassword, deviceId = deviceId, deviceName = deviceName)
     val loginSuccessResponse: Response<LoginResponse> = Response.success(loginResponseBody)
 
     val listOfDevices = listOf(Device(device_id = deviceId, device_name = deviceName, jw_iat = ""))
