@@ -27,6 +27,7 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.databinding.ActivitySyncSetupBinding
+import com.duckduckgo.sync.impl.databinding.ItemConnectedDeviceBinding
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.ViewState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -86,5 +87,15 @@ class SyncInitialSetupActivity : DuckDuckGoActivity() {
         binding.deviceNameTextView.text = viewState.deviceName
         binding.primaryKeyTextView.text = viewState.primaryKey
         binding.secretKeyTextView.text = viewState.secretKey
+        binding.connectedDevicesList.removeAllViews()
+        if (viewState.isSignedIn) {
+            viewState.connectedDevices.forEach { device ->
+                val connectedBinding = ItemConnectedDeviceBinding.inflate(layoutInflater, binding.connectedDevicesList, true)
+                connectedBinding.deviceName.text = "${device.deviceName} ${if (device.thisDevice) "(This Device)" else ""}"
+                connectedBinding.logoutButton.setOnClickListener {
+                    viewModel.onDeviceLogoutClicked(device.deviceId)
+                }
+            }
+        }
     }
 }

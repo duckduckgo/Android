@@ -46,6 +46,8 @@ interface SyncApi {
     ): Result<Logout>
 
     fun deleteAccount(token: String): Result<Boolean>
+
+    fun getDevices(token: String): Result<List<Device>>
 }
 
 @ContributesBinding(AppScope::class)
@@ -98,6 +100,20 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
         return onSuccess(response) {
             val deviceIdResponse = response.body()?.device_id.takeUnless { it.isNullOrEmpty() } ?: throw IllegalStateException("Token not found")
             Result.Success(Logout(deviceIdResponse))
+        }
+    }
+
+    override fun getDevices(token: String): Result<List<Device>> {
+        val response = runCatching {
+            val logoutCall = syncService.getDevices("Bearer $token")
+            logoutCall.execute()
+        }.getOrElse { throwable ->
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            val devices = response.body()?.devices?.entries ?: throw IllegalStateException("Token not found")
+            Result.Success(devices)
         }
     }
 

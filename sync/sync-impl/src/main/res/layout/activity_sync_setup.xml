@@ -122,6 +122,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:typography="body1" />
+
+            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+                android:id="@+id/connectedDevicesSectionHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="Connected Devices" />
+
+            <LinearLayout
+                android:id="@+id/connectedDevicesList"
+                android:layout_width="wrap_content"
+                android:layout_margin="10dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"/>
         </LinearLayout>
 
         <LinearLayout
@@ -153,7 +166,6 @@
             android:layout_margin="10dp"
             android:layout_height="wrap_content"
             android:text="Store Recovery Code" />
-
 
         <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
             android:id="@+id/loginAccountButton"

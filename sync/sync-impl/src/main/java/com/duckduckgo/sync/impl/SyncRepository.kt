@@ -21,11 +21,12 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.crypto.AccountKeys
 import com.duckduckgo.sync.crypto.LoginKeys
 import com.duckduckgo.sync.crypto.SyncLib
+import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import javax.inject.Inject
+import javax.inject.*
 import timber.log.Timber
 
 interface SyncRepository {
@@ -34,9 +35,10 @@ interface SyncRepository {
     fun getAccountInfo(): AccountInfo
     fun storeRecoveryCode()
     fun removeAccount()
-    fun logout(): Result<Boolean>
+    fun logout(deviceId: String): Result<Boolean>
     fun deleteAccount(): Result<Boolean>
     fun latestToken(): String
+    fun getConnectedDevices(): Result<List<ConnectedDevice>>
 }
 
 @ContributesBinding(AppScope::class)
@@ -106,6 +108,7 @@ class AppSyncRepository @Inject constructor(
             is Result.Error -> {
                 result
             }
+
             is Result.Success -> {
                 val decryptResult = nativeLib.decrypt(result.data.protected_encryption_key, preLogin.stretchedPrimaryKey)
                 if (decryptResult.result != 0L) return Result.Error(code = decryptResult.result.toInt(), reason = "Decrypt failed")
@@ -152,19 +155,29 @@ class AppSyncRepository @Inject constructor(
         syncStore.clearAll(keepRecoveryCode = false)
     }
 
-    override fun logout(): Result<Boolean> {
+    override fun logout(deviceId: String): Result<Boolean> {
         val token = syncStore.token.takeUnless { it.isNullOrEmpty() }
             ?: return Result.Error(reason = "Token Empty")
-        val deviceId = syncStore.deviceId.takeUnless { it.isNullOrEmpty() }
-            ?: return Result.Error(reason = "Device Id Empty")
+
+        val logoutThisDevice = deviceId.isEmpty() || deviceId == syncStore.deviceId
+
+        val deviceId = if (logoutThisDevice) {
+            syncStore.deviceId.takeUnless { it.isNullOrEmpty() }
+                ?: return Result.Error(reason = "Device Id Empty")
+        } else {
+            deviceId
+        }
 
         return when (val result = syncApi.logout(token, deviceId)) {
             is Result.Error -> {
                 Timber.i("SYNC logout failed $result")
                 result
             }
+
             is Result.Success -> {
-                syncStore.clearAll()
+                if (logoutThisDevice) {
+                    syncStore.clearAll()
+                }
                 Result.Success(true)
             }
         }
@@ -180,6 +193,7 @@ class AppSyncRepository @Inject constructor(
                 Timber.i("SYNC deleteAccount failed $result")
                 result
             }
+
             is Result.Success -> {
                 syncStore.clearAll()
                 Result.Success(true)
@@ -189,6 +203,30 @@ class AppSyncRepository @Inject constructor(
 
     override fun latestToken(): String {
         return syncStore.token ?: ""
+    }
+
+    override fun getConnectedDevices(): Result<List<ConnectedDevice>> {
+        val token = syncStore.token.takeUnless { it.isNullOrEmpty() }
+            ?: return Result.Error(reason = "Token Empty")
+
+        return when (val result = syncApi.getDevices(token)) {
+            is Result.Error -> {
+                Timber.i("SYNC getDevices failed $result")
+                result
+            }
+
+            is Result.Success -> {
+                return Result.Success(
+                    result.data.map {
+                        ConnectedDevice(
+                            thisDevice = syncStore.deviceId == it.device_id,
+                            deviceName = it.device_name,
+                            deviceId = it.device_id,
+                        )
+                    },
+                )
+            }
+        }
     }
 
     private fun isSignedIn() = !syncStore.primaryKey.isNullOrEmpty()
@@ -214,6 +252,12 @@ data class AccountInfo(
 data class RecoveryCode(
     val primaryKey: String,
     val userID: String,
+)
+
+data class ConnectedDevice(
+    val thisDevice: Boolean = false,
+    val deviceName: String,
+    val deviceId: String,
 )
 
 sealed class Result<out R> {

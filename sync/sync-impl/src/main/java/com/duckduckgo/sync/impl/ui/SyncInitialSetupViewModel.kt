@@ -21,7 +21,9 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.Result.Error
+import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncRepository
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
@@ -42,7 +44,7 @@ constructor(
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     private val viewState = MutableStateFlow(ViewState())
-    fun viewState(): Flow<ViewState> = viewState.onStart { updateViewState() }
+    fun viewState(): Flow<ViewState> = viewState.onStart { getConnectedDevices() }
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
     data class ViewState(
@@ -55,6 +57,7 @@ constructor(
         val secretKey: String = "",
         val protectedEncryptionKey: String = "",
         val passwordHash: String = "",
+        val connectedDevices: List<ConnectedDevice> = emptyList(),
     )
 
     sealed class Command {
@@ -67,7 +70,7 @@ constructor(
             if (result is Error) {
                 command.send(Command.ShowMessage("$result"))
             }
-            updateViewState()
+            getConnectedDevices()
         }
     }
 
@@ -87,11 +90,22 @@ constructor(
 
     fun onLogoutClicked() {
         viewModelScope.launch(dispatchers.io()) {
-            val result = syncRepository.logout()
+            val currentDeviceId = syncRepository.getAccountInfo().deviceId
+            val result = syncRepository.logout(currentDeviceId)
             if (result is Error) {
                 command.send(Command.ShowMessage("$result"))
             }
-            updateViewState()
+            getConnectedDevices()
+        }
+    }
+
+    fun onDeviceLogoutClicked(deviceId: String) {
+        viewModelScope.launch(dispatchers.io()) {
+            val result = syncRepository.logout(deviceId)
+            if (result is Error) {
+                command.send(Command.ShowMessage("$result"))
+            }
+            getConnectedDevices()
         }
     }
 
@@ -110,6 +124,23 @@ constructor(
             val result = syncRepository.login()
             if (result is Error) {
                 command.send(Command.ShowMessage("$result"))
+            }
+            getConnectedDevices()
+            updateViewState()
+        }
+    }
+
+    private fun getConnectedDevices() {
+        viewModelScope.launch(dispatchers.io()) {
+            when (val connectedDevices = syncRepository.getConnectedDevices()) {
+                is Error -> command.send(Command.ShowMessage(connectedDevices.reason))
+                is Success -> {
+                    viewState.emit(
+                        viewState.value.copy(
+                            connectedDevices = connectedDevices.data,
+                        ),
+                    )
+                }
             }
             updateViewState()
         }
