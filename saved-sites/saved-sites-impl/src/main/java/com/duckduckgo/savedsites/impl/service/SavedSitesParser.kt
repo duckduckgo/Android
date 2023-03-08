@@ -138,7 +138,7 @@ class RealSavedSitesParser : SavedSitesParser {
         return parseElement(rootElement, "", savedSitesRepository, mutableListOf(), false)
     }
 
-    private suspend fun parseElement(
+    private fun parseElement(
         documentElement: Element,
         parentId: String,
         savedSitesRepository: SavedSitesRepository,
@@ -159,13 +159,24 @@ class RealSavedSitesParser : SavedSitesParser {
                     if (folder != null) {
                         val folderName = folder.text()
 
-                        if (folderName == FAVORITES_FOLDER || folderName == BOOKMARKS_FOLDER) {
+                        if (isFavoritesFolder(folderName) || isBookmarksFolder(folderName)) {
                             parseElement(element, Relation.BOOMARKS_ROOT, savedSitesRepository, savedSites, folderName == FAVORITES_FOLDER)
                         } else {
-                            val bookmarkFolder = BookmarkFolder(name = folderName, parentId = parentId, id = UUID.randomUUID().toString())
-                            savedSitesRepository.insert(bookmarkFolder)
-                            savedSitesRepository.getFolder(bookmarkFolder.id)?.let {
-                                parseElement(element, it.id, savedSitesRepository, savedSites, false)
+                            val folderParentId = parentId.ifEmpty {
+                                Relation.BOOMARKS_ROOT
+                            }
+                            val bookmarkFolder = BookmarkFolder(
+                                name = folderName,
+                                parentId = folderParentId,
+                                id = UUID.randomUUID().toString(),
+                            )
+                            // if folder exists we use that one instead
+                            val existingFolder = savedSitesRepository.getFolderByName(folderName)
+                            if (existingFolder != null) {
+                                parseElement(element, existingFolder.id, savedSitesRepository, savedSites, false)
+                            } else {
+                                savedSitesRepository.insert(bookmarkFolder)
+                                parseElement(element, bookmarkFolder.id, savedSitesRepository, savedSites, false)
                             }
                         }
                     } else {
@@ -185,5 +196,13 @@ class RealSavedSitesParser : SavedSitesParser {
                 }
         }
         return savedSites
+    }
+
+    private fun isFavoritesFolder(folderName: String): Boolean {
+        return folderName == FAVORITES_FOLDER || folderName == Relation.FAVORITES_NAME
+    }
+
+    private fun isBookmarksFolder(folderName: String): Boolean {
+        return folderName == BOOKMARKS_FOLDER || folderName == Relation.BOOKMARKS_NAME
     }
 }

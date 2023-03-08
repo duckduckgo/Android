@@ -76,7 +76,7 @@ data class Relation(
         const val FAVORITES_ROOT = "favorites_root"
         const val FAVORITES_NAME = "Favorites"
         const val BOOMARKS_ROOT = "bookmarks_root"
-        const val BOOMARKS_NAME = "Bookmarks"
+        const val BOOKMARKS_NAME = "Bookmarks"
         const val BOOMARKS_ROOT_ID = 0L
     }
 }

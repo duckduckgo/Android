@@ -20,6 +20,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.TreeNode
@@ -33,7 +34,9 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 class SavedSitesParserTest {
@@ -53,6 +56,9 @@ class SavedSitesParserTest {
     @Before
     fun before() {
         parser = RealSavedSitesParser()
+
+        whenever(mockSavedSitesRepository.insert(any<BookmarkFolder>()))
+            .thenAnswer { invocation -> invocation.getArgument(0) }
     }
 
     @Test
