@@ -24,6 +24,7 @@ import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.moshi.Json
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import javax.inject.*
@@ -99,8 +100,8 @@ class AppSyncRepository @Inject constructor(
         val recoveryCode =
             Adapters.recoveryCodeAdapter.fromJson(recoveryCodeJson)?.recovery ?: return Result.Error(reason = "Failed reading json recovery code")
 
-        val primaryKey = recoveryCode.primary_key
-        val userId = recoveryCode.user_id
+        val primaryKey = recoveryCode.primaryKey
+        val userId = recoveryCode.userId
         val deviceId = syncDeviceIds.deviceId()
         val deviceName = syncDeviceIds.deviceName()
 
@@ -109,8 +110,8 @@ class AppSyncRepository @Inject constructor(
 
     override fun login(recoveryCodeRawJson: String): Result<Boolean> {
         val recoveryCode = Adapters.recoveryCodeAdapter.fromJson(recoveryCodeRawJson)?.recovery ?: return Result.Error(reason = "Failed reading json")
-        val primaryKey = recoveryCode.primary_key
-        val userId = recoveryCode.user_id
+        val primaryKey = recoveryCode.primaryKey
+        val userId = recoveryCode.userId
         val deviceId = syncDeviceIds.deviceId()
         val deviceName = syncDeviceIds.deviceName()
 
@@ -281,8 +282,8 @@ data class LinkCode(
 )
 
 data class RecoveryCode(
-    val primary_key: String,
-    val user_id: String,
+    @Json(name = "primary_key") val primaryKey: String,
+    @Json(name = "user_id") val userId: String,
 )
 
 data class ConnectedDevice(
