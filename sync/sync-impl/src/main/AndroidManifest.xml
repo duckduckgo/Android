@@ -15,7 +15,8 @@
   -->
 
 <manifest package="com.duckduckgo.sync.impl"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <application>
         <activity
@@ -23,5 +24,10 @@
             android:exported="false"
             android:label="@string/sync_internal_activity_label"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"/>
+
+        <activity
+            android:name="com.journeyapps.barcodescanner.CaptureActivity"
+            android:screenOrientation="portrait"
+            tools:replace="screenOrientation" />
     </application>
 </manifest>

@@ -17,9 +17,12 @@
 package com.duckduckgo.sync
 
 import com.duckduckgo.sync.crypto.AccountKeys
+import com.duckduckgo.sync.crypto.ConnectKeys
 import com.duckduckgo.sync.crypto.DecryptResult
 import com.duckduckgo.sync.crypto.LoginKeys
 import com.duckduckgo.sync.impl.AccountCreatedResponse
+import com.duckduckgo.sync.impl.Connect
+import com.duckduckgo.sync.impl.ConnectKey
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.Device
 import com.duckduckgo.sync.impl.DeviceEntries
@@ -43,6 +46,7 @@ object TestSyncFixtures {
     const val secretKey = "secretKey"
     const val hashedPassword = "hashedPassword"
     const val protectedEncryptionKey = "protectedEncryptionKey"
+    const val encryptedRecoveryCode = "encrypted_recovery_code"
     val accountKeys = AccountKeys(
         result = 0L,
         userId = userId,
@@ -76,7 +80,7 @@ object TestSyncFixtures {
         invalidCodeErr,
         "{\"error\":\"$invalidMessageErr\"}".toResponseBody(),
     )
-    val accountCreatedSuccess = Result.Success(AccountCreatedResponse(user_id = userId, token = token))
+    val accountCreatedSuccess = Result.Success(AccountCreatedResponse(userId = userId, token = token))
     val accountCreatedFailInvalid = Result.Error(code = invalidCodeErr, reason = invalidMessageErr)
     val accountCreatedFailDupUser = Result.Error(code = duplicateUsercCodeErr, reason = duplicateUserMessageErr)
 
@@ -100,7 +104,9 @@ object TestSyncFixtures {
     val deleteAccountSuccess = Result.Success(true)
     val deleteAccountInvalid = Result.Error(code = wrongCredentialsCodeErr, reason = wrongCredentialsMessageErr)
 
-    val jsonRecoveryKey = "{\"primaryKey\": \"$primaryKey\",\"userID\": \"$userId\"}"
+    val jsonRecoveryKey = "{\"recovery\":{\"primary_key\":\"$primaryKey\",\"user_id\":\"$userId\"}}"
+    val jsonConnectKey = "{\"connect\":{\"device_id\":\"$deviceId\",\"secret_key\":\"$primaryKey\"}}"
+    val connectKeys = ConnectKeys(0L, publicKey = primaryKey, secretKey = secretKey)
     val validLoginKeys = LoginKeys(result = 0L, passwordHash = hashedPassword, stretchedPrimaryKey = stretchedPrimaryKey, primaryKey = primaryKey)
     val failedLoginKeys = LoginKeys(result = 9L, passwordHash = "", stretchedPrimaryKey = "", primaryKey = "")
     val decryptedSecretKey = DecryptResult(result = 0L, decryptedData = secretKey)
@@ -117,10 +123,10 @@ object TestSyncFixtures {
         "{\"error\":\"$invalidMessageErr\"}".toResponseBody(),
     )
     val loginFailed = Result.Error(code = wrongCredentialsCodeErr, reason = wrongCredentialsMessageErr)
-    val loginRequestBody = Login(user_id = userId, hashed_password = hashedPassword, device_id = deviceId, device_name = deviceName)
+    val loginRequestBody = Login(userId = userId, hashedPassword = hashedPassword, deviceId = deviceId, deviceName = deviceName)
     val loginSuccessResponse: Response<LoginResponse> = Response.success(loginResponseBody)
 
-    val listOfDevices = listOf(Device(device_id = deviceId, device_name = deviceName, jw_iat = ""))
+    val listOfDevices = listOf(Device(deviceId = deviceId, deviceName = deviceName, jwIat = ""))
     val deviceResponse = DeviceResponse(DeviceEntries(listOfDevices))
     val getDevicesBodySuccessResponse: Response<DeviceResponse> = Response.success(deviceResponse)
     val getDevicesBodyErrorResponse: Response<DeviceResponse> = Response.error(
@@ -131,4 +137,27 @@ object TestSyncFixtures {
     val getDevicesSuccess = Result.Success(listOfDevices)
     val getDevicesError = Result.Error(code = invalidCodeErr, reason = invalidMessageErr)
     val listOfConnectedDevices = listOf(ConnectedDevice(thisDevice = true, deviceName = deviceName, deviceId = deviceId))
+
+    val connectKey = ConnectKey(encryptedRecoveryCode)
+    const val keysNotFoundErr = "connection_keys_not_found"
+    const val keysNotFoundCode = 404
+    val connectSuccess = Result.Success(true)
+    val connectError = Result.Error(code = invalidCodeErr, reason = invalidMessageErr)
+    val connectResponse = Response.success<Void>(null)
+    val connectInvalid: Response<Void> = Response.error(
+        invalidCodeErr,
+        "{\"error\":\"$invalidMessageErr\"}".toResponseBody(),
+    )
+    val connectBody = Connect(deviceId = deviceId, encryptedRecoveryKey = encryptedRecoveryCode)
+
+    val connectDeviceBody = ConnectKey(
+        encryptedRecoveryKey = encryptedRecoveryCode,
+    )
+    val connectDeviceResponse = Response.success<ConnectKey>(connectDeviceBody)
+    val connectDeviceErrorResponse: Response<ConnectKey> = Response.error(
+        keysNotFoundCode,
+        "{\"error\":\"$keysNotFoundErr\"}".toResponseBody(),
+    )
+    val connectDeviceSuccess = Result.Success(encryptedRecoveryCode)
+    val connectDeviceKeysNotFoundError = Result.Error(code = keysNotFoundCode, reason = keysNotFoundErr)
 }

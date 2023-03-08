@@ -116,6 +116,29 @@ class SyncNativeLibTest {
         assertEquals(whatToEncrypt, decryptedResult.decryptedData)
     }
 
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun whenPrepareForConnectThenResultSuccess() {
+        val syncNativeLib = SyncNativeLib(InstrumentationRegistry.getInstrumentation().targetContext)
+        val prepareForConnect = syncNativeLib.prepareForConnect()
+        assertEquals(0L, prepareForConnect.result)
+    }
+
+    @Test
+    fun whenSealThenSuccess() {
+        val syncNativeLib = SyncNativeLib(InstrumentationRegistry.getInstrumentation().targetContext)
+        val prepareForConnect = syncNativeLib.prepareForConnect()
+        val result = syncNativeLib.seal("hola-1324-2342", prepareForConnect.publicKey)
+        val result2 = syncNativeLib.sealOpen(result, prepareForConnect.publicKey, prepareForConnect.secretKey)
+        assertEquals("hola-1324-2342", result2)
+    }
+
+    @Test
+    fun whenDecodeEncodeThenReturnSameValue() {
+        val decoded = "hola-1213-1231-123".toByteArray()
+        assertEquals("hola-1213-1231-123", String(decoded))
+    }
+
     companion object {
         private const val aUserId = "user"
         private const val aPassword = "password"
