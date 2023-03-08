@@ -80,7 +80,7 @@ object TestSyncFixtures {
         invalidCodeErr,
         "{\"error\":\"$invalidMessageErr\"}".toResponseBody(),
     )
-    val accountCreatedSuccess = Result.Success(AccountCreatedResponse(user_id = userId, token = token))
+    val accountCreatedSuccess = Result.Success(AccountCreatedResponse(userId = userId, token = token))
     val accountCreatedFailInvalid = Result.Error(code = invalidCodeErr, reason = invalidMessageErr)
     val accountCreatedFailDupUser = Result.Error(code = duplicateUsercCodeErr, reason = duplicateUserMessageErr)
 
@@ -126,7 +126,7 @@ object TestSyncFixtures {
     val loginRequestBody = Login(userId = userId, hashedPassword = hashedPassword, deviceId = deviceId, deviceName = deviceName)
     val loginSuccessResponse: Response<LoginResponse> = Response.success(loginResponseBody)
 
-    val listOfDevices = listOf(Device(device_id = deviceId, device_name = deviceName, jw_iat = ""))
+    val listOfDevices = listOf(Device(deviceId = deviceId, deviceName = deviceName, jwIat = ""))
     val deviceResponse = DeviceResponse(DeviceEntries(listOfDevices))
     val getDevicesBodySuccessResponse: Response<DeviceResponse> = Response.success(deviceResponse)
     val getDevicesBodyErrorResponse: Response<DeviceResponse> = Response.error(
@@ -148,10 +148,10 @@ object TestSyncFixtures {
         invalidCodeErr,
         "{\"error\":\"$invalidMessageErr\"}".toResponseBody(),
     )
-    val connectBody = Connect(device_id = deviceId, encrypted_recovery_key = encryptedRecoveryCode)
+    val connectBody = Connect(deviceId = deviceId, encryptedRecoveryKey = encryptedRecoveryCode)
 
     val connectDeviceBody = ConnectKey(
-        encrypted_recovery_key = encryptedRecoveryCode,
+        encryptedRecoveryKey = encryptedRecoveryCode,
     )
     val connectDeviceResponse = Response.success<ConnectKey>(connectDeviceBody)
     val connectDeviceErrorResponse: Response<ConnectKey> = Response.error(
