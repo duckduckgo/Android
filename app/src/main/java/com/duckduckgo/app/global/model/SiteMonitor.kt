@@ -150,7 +150,7 @@ class SiteMonitor(
         val isMajorNetwork = entity?.isMajor == true
         Timber.i("Shield: isMajor ${entity?.isMajor} prev ${entity?.prevalence} for $domain")
 
-        if (isMajorNetwork) return UNPROTECTED
+        // if (isMajorNetwork) return UNPROTECTED
         return PROTECTED
     }
 
