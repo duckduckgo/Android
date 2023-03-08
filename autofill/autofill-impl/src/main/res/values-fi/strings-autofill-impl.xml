@@ -70,7 +70,7 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Kirjautumistiedot tallennetaan turvallisesti vain tälle laitteelle.</string>
 
     <string name="autofillManagementAddLogin">Lisää kirjautumistiedot</string>
-    <string name="autofillManagementSearchLogins">Hae</string>
+    <string name="autofillManagementSearchLogins">Hae kirjautumistietoja</string>
     <string name="autofillManagementSearchClearDescription">Tyhjennä hakusyöte</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Ei tuloksia haulla \'%1$s\'</string>
 
