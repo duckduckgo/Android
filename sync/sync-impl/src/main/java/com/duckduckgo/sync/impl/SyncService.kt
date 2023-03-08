@@ -18,9 +18,9 @@ package com.duckduckgo.sync.impl
 
 import com.duckduckgo.anvil.annotations.ContributesServiceApi
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.moshi.Json
 import com.duckduckgo.sync.api.parser.SyncBookmarkEntry
 import com.duckduckgo.sync.api.parser.SyncDataRequest
+import com.squareup.moshi.Json
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
