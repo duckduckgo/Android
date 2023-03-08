@@ -280,8 +280,8 @@ data class LinkCode(
 )
 
 data class RecoveryCode(
-    @Json(name = "primary_key") val primaryKey: String,
-    @Json(name = "user_id") val userId: String,
+    @field:Json(name = "primary_key") val primaryKey: String,
+    @field:Json(name = "user_id") val userId: String,
 )
 
 data class ConnectedDevice(
