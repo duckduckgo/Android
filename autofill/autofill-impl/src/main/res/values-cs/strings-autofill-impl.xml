@@ -30,7 +30,7 @@
     <string name="saveLoginDialogButtonSave">Uložit přihlašovací údaje</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Uložit heslo</string>
     <string name="saveLoginDialogNotNow">Teď ne</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Přihlašovací údaje jsou bezpečně uložené pouze v tomhle zařízení a dají se spravovat v nabídce Automatické vyplňování v Nastaveních.</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">DuckDuckGo tyto přihlašovací údaje bezpečně uloží do tvého zařízení. Uložená přihlášení můžeš spravovat v Nastaveních.</string>
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Má DuckDuckGo uložit přihlašovací údaje?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Další možnosti</string>
 
@@ -70,7 +70,7 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Přihlašovací údaje jsou bezpečně uložené jen v tomhle zařízení.</string>
 
     <string name="autofillManagementAddLogin">Přidat přihlášení</string>
-    <string name="autofillManagementSearchLogins">Vyhledávání</string>
+    <string name="autofillManagementSearchLogins">Hledání přihlašovacích údajů</string>
     <string name="autofillManagementSearchClearDescription">Vymazat vyhledávací vstup</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Žádné výsledky pro dotaz „%1$s“</string>
 
