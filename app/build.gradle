@@ -264,6 +264,9 @@ dependencies {
     implementation project(':saved-sites-impl')
     implementation project(':saved-sites-store')
 
+    implementation project(':click-to-load-impl')
+    implementation project(':click-to-load-store')
+
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
     debugImplementation Square.leakCanary.android
