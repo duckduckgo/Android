@@ -175,7 +175,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
                 viewModel.viewState.collect { state ->
                     binding.enabledToggle.quietlySetIsChecked(state.autofillEnabled, globalAutofillToggleListener)
                     state.logins?.let {
-                        credentialsListUpdated(it, state.credentialSearchQuery)
+                        credentialsListUpdated(it, state.credentialSearchQuery, state.autofillEnabled)
                         parentActivity()?.invalidateOptionsMenu()
                     }
                 }
@@ -206,9 +206,10 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
     private fun credentialsListUpdated(
         credentials: List<LoginCredentials>,
         credentialSearchQuery: String,
+        autofillEnabled: Boolean,
     ) {
         if (credentials.isEmpty() && credentialSearchQuery.isEmpty()) {
-            showEmptyCredentialsPlaceholders()
+            showEmptyCredentialsPlaceholders(autofillEnabled)
         } else if (credentials.isEmpty()) {
             showNoResultsPlaceholders(credentialSearchQuery)
         } else {
@@ -222,9 +223,16 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         adapter.showNoMatchingSearchResults(query)
     }
 
-    private fun showEmptyCredentialsPlaceholders() {
-        binding.emptyStateLayout.emptyStateContainer.show()
+    private fun showEmptyCredentialsPlaceholders(autofillEnabled: Boolean) {
         binding.logins.gone()
+        with(binding.emptyStateLayout) {
+            emptyStateContainer.show()
+            emptyPlaceholderTitle.text = if (autofillEnabled) {
+                getString(R.string.credentialManagementNoLoginsSavedTitle)
+            } else {
+                getString(R.string.credentialManagementNoLoginsSavedAutofillDisabledTitle)
+            }
+        }
     }
 
     private fun renderCredentialList(credentials: List<LoginCredentials>) {
