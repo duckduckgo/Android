@@ -18,12 +18,12 @@ package com.duckduckgo.networkprotection.store.remote_config
 
 import androidx.room.Dao
 import androidx.room.Insert
-import androidx.room.OnConflictStrategy.REPLACE
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 
 @Dao
 interface NetPServersDao {
-    @Insert(onConflict = REPLACE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(server: List<NetPEgressServer>)
 
     @Query("SELECT * from netp_egress_servers")
