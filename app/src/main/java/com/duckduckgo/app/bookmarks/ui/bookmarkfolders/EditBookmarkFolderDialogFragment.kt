@@ -18,9 +18,9 @@ package com.duckduckgo.app.bookmarks.ui.bookmarkfolders
 
 import android.os.Bundle
 import android.view.View
-import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.ui.SavedSiteDialogFragment
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.savedsites.api.models.BookmarkFolder
 
 class EditBookmarkFolderDialogFragment : SavedSiteDialogFragment() {
 

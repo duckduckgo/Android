@@ -154,13 +154,26 @@
             android:layout_height="wrap_content"
             android:text="Store Recovery Code" />
 
-
         <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
             android:id="@+id/loginAccountButton"
             android:layout_width="wrap_content"
             android:layout_margin="10dp"
             android:layout_height="wrap_content"
             android:text="Login account" />
+
+        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+            android:id="@+id/sendBookmarksButton"
+            android:layout_width="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_height="wrap_content"
+            android:text="Send all bookmarks" />
+
+        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+            android:id="@+id/receiveBookmarksButton"
+            android:layout_width="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_height="wrap_content"
+            android:text="Receive bookmarks" />
 
         <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
             android:id="@+id/logoutButton"

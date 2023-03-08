@@ -21,7 +21,6 @@ import android.util.Base64
 import com.duckduckgo.library.loader.LibraryLoader
 import java.util.*
 import kotlin.system.exitProcess
-import okio.ByteString.Companion.encode
 import timber.log.Timber
 
 interface SyncLib {
@@ -75,17 +74,17 @@ class SyncNativeLib constructor(context: Context) : SyncLib {
 
         return AccountKeys(
             result = result,
-            primaryKey = primaryKey.encode(),
-            secretKey = secretKey.encode(),
-            protectedSecretKey = protectedSecretKey.encode(),
-            passwordHash = passwordHash.encode(),
+            primaryKey = primaryKey.encodeKey(),
+            secretKey = secretKey.encodeKey(),
+            protectedSecretKey = protectedSecretKey.encodeKey(),
+            passwordHash = passwordHash.encodeKey(),
             userId = userId,
             password = password,
         )
     }
 
     override fun prepareForLogin(primaryKey: String): LoginKeys {
-        val primarKeyByteArray = primaryKey.decode()
+        val primarKeyByteArray = primaryKey.decodeKey()
         val passwordHash = ByteArray(getPasswordHashSize())
         val stretchedPrimaryKey = ByteArray(getStretchedPrimaryKeySize())
 
@@ -93,8 +92,8 @@ class SyncNativeLib constructor(context: Context) : SyncLib {
 
         return LoginKeys(
             result = result,
-            passwordHash = passwordHash.encode(),
-            stretchedPrimaryKey = stretchedPrimaryKey.encode(),
+            passwordHash = passwordHash.encodeKey(),
+            stretchedPrimaryKey = stretchedPrimaryKey.encodeKey(),
             primaryKey = primaryKey,
         )
     }
@@ -103,15 +102,16 @@ class SyncNativeLib constructor(context: Context) : SyncLib {
         encryptedData: String,
         secretKey: String,
     ): DecryptResult {
-        val encryptedDataByteArray = encryptedData.decode()
-        val secretKeyByteArray = secretKey.decode()
+        Timber.d("SYNC decrypt: $encryptedData with $secretKey")
+        val encryptedDataByteArray = encryptedData.decodeKey()
+        val secretKeyByteArray = secretKey.decodeKey()
         val decryptedData = ByteArray(encryptedDataByteArray.size - getEncryptedExtraBytes())
 
         val result: Long = decrypt(decryptedData, encryptedDataByteArray, secretKeyByteArray)
 
         return DecryptResult(
             result = result,
-            decryptedData = decryptedData.encode(),
+            decryptedData = decryptedData.encodeText(),
         )
     }
 
@@ -119,24 +119,33 @@ class SyncNativeLib constructor(context: Context) : SyncLib {
         rawData: String,
         secretKey: String,
     ): EncryptResult {
-        val rawDataByteArray = rawData.decode()
-        val secretKeyByteArray = secretKey.decode()
+        Timber.d("SYNC encrypt: $rawData with $secretKey")
+        val rawDataByteArray = rawData.decodeText()
+        val secretKeyByteArray = secretKey.decodeKey()
         val encryptedDataByteArray = ByteArray(rawDataByteArray.size + getEncryptedExtraBytes())
 
         val result: Long = encrypt(encryptedDataByteArray, rawDataByteArray, secretKeyByteArray)
 
         return EncryptResult(
             result = result,
-            encryptedData = encryptedDataByteArray.encode(),
+            encryptedData = encryptedDataByteArray.encodeKey(),
         )
     }
 
-    private fun ByteArray.encode(): String {
+    private fun ByteArray.encodeKey(): String {
         return Base64.encodeToString(this, Base64.NO_WRAP)
     }
 
-    private fun String.decode(): ByteArray {
+    private fun String.decodeKey(): ByteArray {
         return Base64.decode(this, Base64.NO_WRAP)
+    }
+
+    private fun ByteArray.encodeText(): String {
+        return String(this)
+    }
+
+    private fun String.decodeText(): ByteArray {
+        return this.toByteArray()
     }
 
     private external fun generateAccountKeys(
@@ -166,12 +175,26 @@ class SyncNativeLib constructor(context: Context) : SyncLib {
         secretKey: ByteArray,
     ): Long
 
+    private external fun seal(
+        sealedBytes: ByteArray,
+        primaryKey: ByteArray,
+        messageBytes: ByteArray,
+    ): Int
+
+    private external fun sealOpen(
+        cyphertext: ByteArray,
+        primaryKey: ByteArray,
+        secretKey: ByteArray,
+        rawBytes: ByteArray,
+    ): Int
+
     private external fun getPrimaryKeySize(): Int
     private external fun getSecretKeySize(): Int
     private external fun getProtectedSecretKeySize(): Int
     private external fun getPasswordHashSize(): Int
     private external fun getStretchedPrimaryKeySize(): Int
     private external fun getEncryptedExtraBytes(): Int
+    private external fun getSealBytes(): Int
 }
 
 class AccountKeys(

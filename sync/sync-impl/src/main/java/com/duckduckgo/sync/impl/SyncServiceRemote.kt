@@ -17,12 +17,14 @@
 package com.duckduckgo.sync.impl
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.api.parser.SyncDataRequest
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import javax.inject.Inject
 import retrofit2.Response
+import timber.log.Timber
 
 interface SyncApi {
     fun createAccount(
@@ -46,6 +48,13 @@ interface SyncApi {
     ): Result<Logout>
 
     fun deleteAccount(token: String): Result<Boolean>
+
+    fun patchAll(
+        token: String,
+        bookmarks: SyncDataRequest,
+    ): Result<Boolean>
+
+    fun all(token: String): Result<DataResponse>
 }
 
 @ContributesBinding(AppScope::class)
@@ -145,6 +154,48 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
                     devices = emptyList(),
                 ),
             )
+        }
+    }
+
+    override fun patchAll(
+        token: String,
+        bookmarks: SyncDataRequest,
+    ): Result<Boolean> {
+        val response = runCatching {
+            val patchCall = syncService.patch("Bearer $token", bookmarks)
+            patchCall.execute()
+        }.getOrElse { throwable ->
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            Result.Success(true)
+        }
+    }
+
+    override fun all(token: String): Result<DataResponse> {
+        val response = runCatching {
+            val patchCall = syncService.data("Bearer $token")
+            patchCall.execute()
+        }.getOrElse { throwable ->
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            Timber.i("SYNC get data $response")
+            val data = response.body() ?: throw IllegalStateException("SYNC get data not parsed")
+            val allDataJSON = ResponseAdapters.dataAdapter.toJson(data.bookmarks)
+            Timber.i("SYNC get data $allDataJSON")
+            Result.Success(data)
+        }
+    }
+
+    private class ResponseAdapters {
+        companion object {
+            private val moshi = Moshi.Builder().build()
+
+            val dataAdapter: JsonAdapter<BookmarksResponse> =
+                moshi.adapter(BookmarksResponse::class.java)
         }
     }
 

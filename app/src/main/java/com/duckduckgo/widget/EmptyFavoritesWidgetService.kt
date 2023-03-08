@@ -20,9 +20,9 @@ import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
-import com.duckduckgo.app.bookmarks.model.SavedSitesRepository
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoApplication
+import com.duckduckgo.savedsites.api.SavedSitesRepository
 import javax.inject.Inject
 
 class EmptyFavoritesWidgetService : RemoteViewsService() {

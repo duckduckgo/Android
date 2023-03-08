@@ -22,16 +22,20 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.model.*
-import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
-import com.duckduckgo.app.bookmarks.service.SavedSitesManager
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.sync.store.Entity
-import com.duckduckgo.sync.store.EntityType.BOOKMARK
-import com.duckduckgo.sync.store.Relation
+import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.savedsites.api.models.BookmarkFolder
+import com.duckduckgo.savedsites.api.models.FolderBranch
+import com.duckduckgo.savedsites.api.models.SavedSite
+import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
+import com.duckduckgo.savedsites.api.models.SavedSites
+import com.duckduckgo.savedsites.api.service.SavedSitesManager
+import com.duckduckgo.savedsites.store.Entity
+import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
+import com.duckduckgo.savedsites.store.Relation
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -94,6 +98,16 @@ class BookmarksViewModelTest {
         whenever(savedSitesRepository.getFolderContent(anyString())).thenReturn(
             flowOf(
                 Pair(
+                    listOf(bookmark),
+                    listOf(bookmarkFolder, bookmarkFolder, bookmarkFolder),
+                ),
+            ),
+        )
+
+        whenever(savedSitesRepository.getSavedSites(anyString())).thenReturn(
+            flowOf(
+                SavedSites(
+                    listOf(favorite),
                     listOf(bookmark),
                     listOf(bookmarkFolder, bookmarkFolder, bookmarkFolder),
                 ),
@@ -184,20 +198,6 @@ class BookmarksViewModelTest {
     }
 
     @Test
-    fun whenFavoritesChangedThenObserverNotified() = runTest {
-        whenever(savedSitesRepository.getFavorites()).thenReturn(
-            flow {
-                emit(emptyList())
-                emit(listOf(favorite))
-            },
-        )
-        testee
-        verify(viewStateObserver).onChanged(viewStateCaptor.capture())
-        assertNotNull(viewStateCaptor.value)
-        assertEquals(1, viewStateCaptor.value.favorites.size)
-    }
-
-    @Test
     fun whenBookmarkFolderSelectedThenIssueOpenBookmarkFolderCommand() {
         testee.onBookmarkFolderSelected(bookmarkFolder)
 
@@ -211,7 +211,7 @@ class BookmarksViewModelTest {
 
         testee.fetchBookmarksAndFolders(parentId = parentId)
 
-        verify(savedSitesRepository).getFolderContent(parentId)
+        verify(savedSitesRepository).getSavedSites(parentId)
 
         verify(viewStateObserver, times(2)).onChanged(viewStateCaptor.capture())
 
@@ -219,6 +219,7 @@ class BookmarksViewModelTest {
         assertEquals(emptyList<BookmarkFolder>(), viewStateCaptor.allValues[0].bookmarkFolders)
         assertEquals(false, viewStateCaptor.allValues[0].enableSearch)
 
+        assertEquals(listOf(favorite), viewStateCaptor.allValues[1].favorites)
         assertEquals(listOf(bookmark), viewStateCaptor.allValues[1].bookmarks)
         assertEquals(listOf(bookmarkFolder, bookmarkFolder, bookmarkFolder), viewStateCaptor.allValues[1].bookmarkFolders)
         assertEquals(true, viewStateCaptor.allValues[1].enableSearch)

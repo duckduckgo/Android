@@ -26,7 +26,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewSavedSiteEmptyHintBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -35,6 +34,7 @@ import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.mobile.android.databinding.RowTwoLineItemBinding
 import com.duckduckgo.mobile.android.databinding.ViewSectionHeaderBinding
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
+import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 

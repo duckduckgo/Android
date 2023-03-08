@@ -21,17 +21,23 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
-import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
+import com.duckduckgo.app.bookmarks.BookmarkTestUtils.givenFolderWithContent
+import com.duckduckgo.app.bookmarks.BookmarkTestUtils.givenSomeBookmarks
+import com.duckduckgo.app.bookmarks.BookmarkTestUtils.givenSomeFolders
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.sync.store.Entity
-import com.duckduckgo.sync.store.EntityType.BOOKMARK
-import com.duckduckgo.sync.store.EntityType.FOLDER
-import com.duckduckgo.sync.store.Relation
-import com.duckduckgo.sync.store.SyncEntitiesDao
-import com.duckduckgo.sync.store.SyncRelationsDao
+import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.savedsites.api.models.BookmarkFolder
+import com.duckduckgo.savedsites.api.models.BookmarkFolderItem
+import com.duckduckgo.savedsites.api.models.FolderBranch
+import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
+import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
+import com.duckduckgo.savedsites.store.Entity
+import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
+import com.duckduckgo.savedsites.store.Relation
+import com.duckduckgo.savedsites.store.SyncEntitiesDao
+import com.duckduckgo.savedsites.store.SyncRelationsDao
 import junit.framework.TestCase.assertEquals
-import junit.framework.TestCase.assertNotNull
 import junit.framework.TestCase.assertNull
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -160,28 +166,28 @@ class SavedSitesRepositoryTest {
     }
 
     @Test
-    fun whenFavoriteIsAddedAndThenRemovedThenNothingIsRetrieved() {
+    fun whenFavoriteIsAddedAndThenRemovedThenBookmarkStillExists() {
         givenEmptyDBState()
 
-        repository.insertFavorite("https://favorite.com", "favorite")
+        val favorite = repository.insertFavorite("https://favorite.com", "favorite")
 
-        val favorite = repository.getFavorite("https://favorite.com")
-        assert(favorite != null)
+        assert(repository.getFavorite("https://favorite.com") != null)
 
-        repository.delete(favorite!!)
+        repository.delete(favorite)
+
         assert(repository.getFavorite("https://favorite.com") == null)
+        assert(repository.getBookmark("https://favorite.com") != null)
     }
 
     @Test
     fun whenBookmarkIsAddedAndThenRemovedThenNothingIsRetrieved() {
         givenEmptyDBState()
 
-        repository.insertBookmark("https://favorite.com", "favorite")
+        val bookmark = repository.insertBookmark("https://favorite.com", "favorite")
 
-        val bookmark = repository.getBookmark("https://favorite.com")
-        assert(bookmark != null)
+        assert(repository.getBookmark("https://favorite.com") != null)
 
-        repository.delete(bookmark!!)
+        repository.delete(bookmark)
         assert(repository.getBookmark("https://favorite.com") == null)
     }
 
@@ -281,8 +287,8 @@ class SavedSitesRepositoryTest {
 
         repository.updateWithPosition(listOf(favorite2, favorite))
 
-        assertFavoriteExistsInDb(favorite2.copy(position = 1))
-        assertFavoriteExistsInDb(favorite.copy(position = 0))
+        assertEquals(repository.getFavorite(favorite.url), favorite.copy(position = 1))
+        assertEquals(repository.getFavorite(favorite2.url), favorite2.copy(position = 0))
     }
 
     @Test
@@ -426,6 +432,14 @@ class SavedSitesRepositoryTest {
         val folderInserted = repository.getFolder("folder2")
 
         Assert.assertNull(folderInserted)
+    }
+
+    @Test
+    fun whenGetBookmarkFoldersByNameThenReturnBookmarkFolder() = runTest {
+        val folder = repository.insert(BookmarkFolder(id = "folder1", name = "name", parentId = "folder2"))
+        val folderInserted = repository.getFolderByName(folder.name)
+
+        Assert.assertEquals(folder, folderInserted)
     }
 
     @Test
@@ -574,8 +588,8 @@ class SavedSitesRepositoryTest {
 
     @Test
     fun whenInsertBranchFolderThenAllEntitiesAreInsertedCorrectly() = runTest {
-        val parentFolder = BookmarkFolder("folder1", "Parent Folder", Relation.BOOMARKS_ROOT)
-        val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1")
+        val parentFolder = BookmarkFolder("folder1", "Parent Folder", Relation.BOOMARKS_ROOT, numFolders = 1, numBookmarks = 0)
+        val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1", numFolders = 0, numBookmarks = 1)
         val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2")
         val folderBranch = FolderBranch(listOf(childBookmark), listOf(parentFolder, childFolder))
 
@@ -651,8 +665,8 @@ class SavedSitesRepositoryTest {
 
     @Test
     fun whenBranchFolderDeletedThenNothingIsRetrieved() = runTest {
-        val parentFolder = BookmarkFolder("folder1", "Parent Folder", Relation.BOOMARKS_ROOT)
-        val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1")
+        val parentFolder = BookmarkFolder("folder1", "Parent Folder", Relation.BOOMARKS_ROOT, numBookmarks = 0, numFolders = 1)
+        val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1", numBookmarks = 1, numFolders = 0)
         val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2")
         val folderBranch = FolderBranch(listOf(childBookmark), listOf(parentFolder, childFolder))
 
@@ -684,7 +698,7 @@ class SavedSitesRepositoryTest {
         val flatStructure = repository.getFolderTree(folder.id, null)
 
         val items = listOf(
-            BookmarkFolderItem(0, rootFolder, false),
+            BookmarkFolderItem(0, rootFolder.copy(numFolders = 2), false),
             BookmarkFolderItem(1, parentFolder, false),
             BookmarkFolderItem(2, childFolder, false),
             BookmarkFolderItem(1, folder, true),
@@ -782,26 +796,6 @@ class SavedSitesRepositoryTest {
         Assert.assertFalse(repository.hasBookmarks())
     }
 
-    private fun givenSomeBookmarks(
-        total: Int,
-    ): List<Entity> {
-        val entities = mutableListOf<Entity>()
-        for (index in 1..total) {
-            entities.add(Entity(Entity.generateBookmarkId(index.toLong()), "entity$index", "https://testUrl$index", BOOKMARK))
-        }
-        return entities
-    }
-
-    private fun givenSomeFolders(
-        total: Int,
-    ): List<Entity> {
-        val entities = mutableListOf<Entity>()
-        for (index in 1..total) {
-            entities.add(Entity(Entity.generateFolderId(index.toLong()), "entity$index", "https://testUrl$index", FOLDER))
-        }
-        return entities
-    }
-
     private fun givenFolderWithEntities(folderId: String, bookmarks: Int, folders: Int) {
         val bookmarks = givenSomeBookmarks(bookmarks)
         val folders = givenSomeFolders(folders)
@@ -809,29 +803,6 @@ class SavedSitesRepositoryTest {
         syncEntitiesDao.insertList(bookmarks)
         syncEntitiesDao.insertList(folders)
         syncRelationsDao.insertList(folderContent)
-    }
-
-    private fun givenFolderWithContent(
-        folderId: String,
-        entities: List<Entity>,
-    ): List<Relation> {
-        val relations = mutableListOf<Relation>()
-        entities.forEach {
-            relations.add(Relation(relationId = folderId, entityId = it.entityId))
-        }
-        return relations
-    }
-
-    private fun assertFavoriteExistsInDb(favorite: Favorite) {
-        val favorites = syncEntitiesDao.entitiesInFolderSync(Relation.FAVORITES_ROOT).mapIndexed { index, entity ->
-            Favorite(entity.entityId, entity.title, entity.url.orEmpty(), index)
-        }
-        val storedFavorite = favorites.firstOrNull { it.url == favorite.url }
-
-        assertNotNull(storedFavorite)
-        Assert.assertEquals(storedFavorite!!.title, favorite.title)
-        Assert.assertEquals(storedFavorite.url, favorite.url)
-        Assert.assertEquals(storedFavorite.position, favorite.position)
     }
 
     private fun givenEmptyDBState() {

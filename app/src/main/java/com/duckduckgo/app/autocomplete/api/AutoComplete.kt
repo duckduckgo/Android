@@ -20,13 +20,13 @@ import androidx.core.net.toUri
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
-import com.duckduckgo.app.bookmarks.model.SavedSite
-import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
-import com.duckduckgo.app.bookmarks.model.SavedSitesRepository
 import com.duckduckgo.app.global.UriString
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.toStringDropScheme
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.savedsites.api.models.SavedSite
+import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.squareup.anvil.annotations.ContributesBinding
 import io.reactivex.Observable
 import javax.inject.Inject

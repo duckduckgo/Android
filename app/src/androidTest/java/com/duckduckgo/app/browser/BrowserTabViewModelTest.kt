@@ -44,9 +44,6 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.A
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
-import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
-import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
-import com.duckduckgo.app.bookmarks.model.SavedSitesRepository
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.LoadExtractedUrl
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShowBackNavigationHistory
@@ -140,6 +137,9 @@ import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
+import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
+import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger

@@ -18,6 +18,8 @@ package com.duckduckgo.sync.impl
 
 import androidx.annotation.WorkerThread
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.api.parser.SyncCrypter
+import com.duckduckgo.sync.api.parser.SyncDataRequest
 import com.duckduckgo.sync.crypto.AccountKeys
 import com.duckduckgo.sync.crypto.LoginKeys
 import com.duckduckgo.sync.crypto.SyncLib
@@ -37,6 +39,8 @@ interface SyncRepository {
     fun logout(): Result<Boolean>
     fun deleteAccount(): Result<Boolean>
     fun latestToken(): String
+    suspend fun initialPatch(): Result<Boolean>
+    suspend fun getAll(): Result<Boolean>
 }
 
 @ContributesBinding(AppScope::class)
@@ -46,6 +50,7 @@ class AppSyncRepository @Inject constructor(
     private val nativeLib: SyncLib,
     private val syncApi: SyncApi,
     private val syncStore: SyncStore,
+    private val syncCrypter: SyncCrypter,
 ) : SyncRepository {
 
     override fun createAccount(): Result<Boolean> {
@@ -191,6 +196,41 @@ class AppSyncRepository @Inject constructor(
         return syncStore.token ?: ""
     }
 
+    override suspend fun initialPatch(): Result<Boolean> {
+        val token =
+            syncStore.token.takeUnless { it.isNullOrEmpty() }
+                ?: return Result.Error(reason = "Token Empty")
+
+        val allData = syncCrypter.generateAllData()
+        val allDataJSON = Adapters.patchAdapter.toJson(allData)
+        Timber.d("SYNC: initial patch data generated $allDataJSON")
+        return when (val result = syncApi.patchAll(token, allData)) {
+            is Result.Error -> {
+                result
+            }
+            is Result.Success -> {
+                Result.Success(true)
+            }
+        }
+    }
+
+    override suspend fun getAll(): Result<Boolean> {
+        val token =
+            syncStore.token.takeUnless { it.isNullOrEmpty() }
+                ?: return Result.Error(reason = "Token Empty")
+
+        return when (val result = syncApi.all(token)) {
+            is Result.Error -> {
+                Result.Error(reason = "SYNC get data failed $result")
+            }
+            is Result.Success -> {
+                // we only care about bookmarks for now
+                syncCrypter.store(result.data.bookmarks.entries)
+                Result.Success(true)
+            }
+        }
+    }
+
     private fun isSignedIn() = !syncStore.primaryKey.isNullOrEmpty()
 
     private class Adapters {
@@ -198,6 +238,9 @@ class AppSyncRepository @Inject constructor(
             private val moshi = Moshi.Builder().build()
             val recoveryCodeAdapter: JsonAdapter<RecoveryCode> =
                 moshi.adapter(RecoveryCode::class.java)
+
+            val patchAdapter: JsonAdapter<SyncDataRequest> =
+                moshi.adapter(SyncDataRequest::class.java)
         }
     }
 }

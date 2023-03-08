@@ -24,8 +24,6 @@ import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
-import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
-import com.duckduckgo.app.bookmarks.model.SavedSitesRepository
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.onboarding.store.*
@@ -35,6 +33,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchDuckDuckGo
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Suggestions.SystemSearchResultsViewState
+import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import io.reactivex.Observable
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.*

@@ -1,0 +1,62 @@
+/*
+ * Copyright (c) 2022 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+}
+
+apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+
+android {
+    lint {
+        baseline file("lint-baseline.xml")
+    }
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
+    namespace 'com.duckduckgo.saved.sites.store'
+}
+
+dependencies {
+    implementation AndroidX.core.ktx
+    implementation AndroidX.security.crypto
+    implementation Square.okio
+    implementation AndroidX.room.runtime
+    implementation AndroidX.room.rxJava2
+    implementation AndroidX.room.ktx
+    implementation KotlinX.coroutines.core
+    implementation KotlinX.coroutines.android
+
+    kapt AndroidX.room.compiler
+
+    testImplementation Testing.junit4
+    testImplementation Testing.robolectric
+    testImplementation AndroidX.test.ext.junit
+    testImplementation project(path: ':common-test')
+    testImplementation AndroidX.archCore.testing
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+
+    androidTestImplementation "android.arch.persistence.room:testing:_"
+    androidTestImplementation(KotlinX.coroutines.test) {
+        // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
+        // conflicts with mockito due to direct inclusion of byte buddy
+        exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
+    }
+}

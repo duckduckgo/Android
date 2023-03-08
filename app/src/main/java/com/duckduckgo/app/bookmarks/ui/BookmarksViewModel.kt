@@ -19,12 +19,6 @@ package com.duckduckgo.app.bookmarks.ui
 import android.net.Uri
 import androidx.lifecycle.*
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.bookmarks.model.*
-import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
-import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
-import com.duckduckgo.app.bookmarks.service.ExportSavedSitesResult
-import com.duckduckgo.app.bookmarks.service.ImportSavedSitesResult
-import com.duckduckgo.app.bookmarks.service.SavedSitesManager
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.*
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.EditSavedSiteListener
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment.AddBookmarkFolderListener
@@ -35,10 +29,18 @@ import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.sync.store.Relation
+import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.savedsites.api.models.BookmarkFolder
+import com.duckduckgo.savedsites.api.models.FolderBranch
+import com.duckduckgo.savedsites.api.models.SavedSite
+import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
+import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.api.service.ExportSavedSitesResult
+import com.duckduckgo.savedsites.api.service.ImportSavedSitesResult
+import com.duckduckgo.savedsites.api.service.SavedSitesManager
+import com.duckduckgo.savedsites.store.Relation
 import javax.inject.Inject
 import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
