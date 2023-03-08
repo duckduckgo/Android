@@ -55,10 +55,10 @@ constructor(
 
     @SuppressLint("HardwareIds")
     override fun deviceId(): String {
-        var deviceName = syncStore.deviceId
-        if (deviceName != null) return deviceName
+        var deviceId = syncStore.deviceId
+        if (deviceId != null) return deviceId
 
-        deviceName = UUID.randomUUID().toString()
-        return deviceName
+        deviceId = UUID.randomUUID().toString()
+        return deviceId
     }
 }

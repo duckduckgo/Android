@@ -45,6 +45,16 @@ interface SyncApi {
         deviceId: String,
     ): Result<Logout>
 
+    fun connect(
+        token: String,
+        deviceId: String,
+        publicKey: String,
+    ): Result<Boolean>
+
+    fun connectDevice(
+        deviceId: String,
+    ): Result<String>
+
     fun deleteAccount(token: String): Result<Boolean>
 
     fun getDevices(token: String): Result<List<Device>>
@@ -62,11 +72,11 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
         val response = runCatching {
             val call = syncService.signup(
                 Signup(
-                    user_id = userID,
-                    hashed_password = hashedPassword,
-                    protected_encryption_key = protectedEncryptionKey,
-                    device_id = deviceId,
-                    device_name = deviceName,
+                    userId = userID,
+                    hashedPassword = hashedPassword,
+                    protectedEncryptionKey = protectedEncryptionKey,
+                    deviceId = deviceId,
+                    deviceName = deviceName,
                 ),
             )
             call.execute()
@@ -76,11 +86,11 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
 
         return onSuccess(response) {
             val token = response.body()?.token.takeUnless { it.isNullOrEmpty() } ?: throw IllegalStateException("Token not found")
-            val userId = response.body()?.user_id.takeUnless { it.isNullOrEmpty() } ?: throw IllegalStateException("userId missing")
+            val userId = response.body()?.userId.takeUnless { it.isNullOrEmpty() } ?: throw IllegalStateException("userId missing")
             Result.Success(
                 AccountCreatedResponse(
                     token = token,
-                    user_id = userId,
+                    userId = userId,
                 ),
             )
         }
@@ -98,7 +108,7 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
         }
 
         return onSuccess(response) {
-            val deviceIdResponse = response.body()?.device_id.takeUnless { it.isNullOrEmpty() } ?: throw IllegalStateException("Token not found")
+            val deviceIdResponse = response.body()?.deviceId.takeUnless { it.isNullOrEmpty() } ?: throw IllegalStateException("Token not found")
             Result.Success(Logout(deviceIdResponse))
         }
     }
@@ -114,6 +124,37 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
         return onSuccess(response) {
             val devices = response.body()?.devices?.entries ?: throw IllegalStateException("Token not found")
             Result.Success(devices)
+        }
+    }
+
+    override fun connect(
+        token: String,
+        deviceId: String,
+        publicKey: String,
+    ): Result<Boolean> {
+        val response = runCatching {
+            val logoutCall = syncService.connect("Bearer $token", Connect(deviceId = deviceId, encryptedRecoveryKey = publicKey))
+            logoutCall.execute()
+        }.getOrElse { throwable ->
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            Result.Success(true)
+        }
+    }
+
+    override fun connectDevice(deviceId: String): Result<String> {
+        val response = runCatching {
+            val logoutCall = syncService.connectDevice(deviceId)
+            logoutCall.execute()
+        }.getOrElse { throwable ->
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            val sealed = response.body()?.encryptedRecoveryKey.takeUnless { it.isNullOrEmpty() } ?: throw IllegalStateException("Token not found")
+            Result.Success(sealed)
         }
     }
 
@@ -139,10 +180,10 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
         val response = runCatching {
             val call = syncService.login(
                 Login(
-                    user_id = userID,
-                    hashed_password = hashedPassword,
-                    device_id = deviceId,
-                    device_name = deviceName,
+                    userId = userID,
+                    hashedPassword = hashedPassword,
+                    deviceId = deviceId,
+                    deviceName = deviceName,
                 ),
             )
             call.execute()

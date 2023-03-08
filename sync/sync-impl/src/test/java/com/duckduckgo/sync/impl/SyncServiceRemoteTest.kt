@@ -20,6 +20,15 @@ import com.duckduckgo.sync.TestSyncFixtures.accountCreatedFailDupUser
 import com.duckduckgo.sync.TestSyncFixtures.accountCreatedFailInvalid
 import com.duckduckgo.sync.TestSyncFixtures.accountCreatedSuccess
 import com.duckduckgo.sync.TestSyncFixtures.accountKeys
+import com.duckduckgo.sync.TestSyncFixtures.connectBody
+import com.duckduckgo.sync.TestSyncFixtures.connectDeviceErrorResponse
+import com.duckduckgo.sync.TestSyncFixtures.connectDeviceKeysNotFoundError
+import com.duckduckgo.sync.TestSyncFixtures.connectDeviceResponse
+import com.duckduckgo.sync.TestSyncFixtures.connectDeviceSuccess
+import com.duckduckgo.sync.TestSyncFixtures.connectError
+import com.duckduckgo.sync.TestSyncFixtures.connectInvalid
+import com.duckduckgo.sync.TestSyncFixtures.connectResponse
+import com.duckduckgo.sync.TestSyncFixtures.connectSuccess
 import com.duckduckgo.sync.TestSyncFixtures.deleteAccountError
 import com.duckduckgo.sync.TestSyncFixtures.deleteAccountInvalid
 import com.duckduckgo.sync.TestSyncFixtures.deleteAccountResponse
@@ -28,6 +37,7 @@ import com.duckduckgo.sync.TestSyncFixtures.deviceId
 import com.duckduckgo.sync.TestSyncFixtures.deviceLogoutBody
 import com.duckduckgo.sync.TestSyncFixtures.deviceLogoutResponse
 import com.duckduckgo.sync.TestSyncFixtures.deviceName
+import com.duckduckgo.sync.TestSyncFixtures.encryptedRecoveryCode
 import com.duckduckgo.sync.TestSyncFixtures.getDevicesBodyErrorResponse
 import com.duckduckgo.sync.TestSyncFixtures.getDevicesBodySuccessResponse
 import com.duckduckgo.sync.TestSyncFixtures.getDevicesError
@@ -194,5 +204,53 @@ class SyncServiceRemoteTest {
         val result = syncRemote.getDevices(token)
 
         assertEquals(getDevicesError, result)
+    }
+
+    @Test
+    fun whenConnectSuccedsThenReturnSuccess() {
+        val syncRemote = SyncServiceRemote(syncService)
+        val call: Call<Void> = mock()
+        whenever(syncService.connect(anyString(), eq(connectBody))).thenReturn(call)
+        whenever(call.execute()).thenReturn(connectResponse)
+
+        val result = syncRemote.connect(token, deviceId, encryptedRecoveryCode)
+
+        assertEquals(connectSuccess, result)
+    }
+
+    @Test
+    fun whenConnectFailsThenReturnError() {
+        val syncRemote = SyncServiceRemote(syncService)
+        val call: Call<Void> = mock()
+        whenever(syncService.connect(anyString(), eq(connectBody))).thenReturn(call)
+        whenever(call.execute()).thenReturn(connectInvalid)
+
+        val result = syncRemote.connect(token, deviceId, encryptedRecoveryCode)
+
+        assertEquals(connectError, result)
+    }
+
+    @Test
+    fun whenConnectDeviceSuccedsThenReturnSuccess() {
+        val syncRemote = SyncServiceRemote(syncService)
+        val call: Call<ConnectKey> = mock()
+        whenever(syncService.connectDevice(deviceId)).thenReturn(call)
+        whenever(call.execute()).thenReturn(connectDeviceResponse)
+
+        val result = syncRemote.connectDevice(deviceId)
+
+        assertEquals(connectDeviceSuccess, result)
+    }
+
+    @Test
+    fun whenConnectDeviceFailsThenReturnError() {
+        val syncRemote = SyncServiceRemote(syncService)
+        val call: Call<ConnectKey> = mock()
+        whenever(syncService.connectDevice(deviceId)).thenReturn(call)
+        whenever(call.execute()).thenReturn(connectDeviceErrorResponse)
+
+        val result = syncRemote.connectDevice(deviceId)
+
+        assertEquals(connectDeviceKeysNotFoundError, result)
     }
 }
