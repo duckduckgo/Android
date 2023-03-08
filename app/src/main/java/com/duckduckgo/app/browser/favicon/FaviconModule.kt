@@ -17,13 +17,13 @@
 package com.duckduckgo.app.browser.favicon
 
 import android.content.Context
-import com.duckduckgo.app.bookmarks.db.BookmarksDao
-import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.savedsites.store.SyncEntitiesDao
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
@@ -35,10 +35,10 @@ class FaviconModule {
     @SingleInstanceIn(AppScope::class)
     fun faviconManager(
         faviconPersister: FaviconPersister,
-        bookmarksDao: BookmarksDao,
+        bookmarksDao: SyncEntitiesDao,
         fireproofWebsiteRepository: FireproofWebsiteRepository,
         locationPermissionsRepository: LocationPermissionsRepository,
-        favoritesRepository: FavoritesRepository,
+        savedSitesRepository: SavedSitesRepository,
         faviconDownloader: FaviconDownloader,
         dispatcherProvider: DispatcherProvider,
         autofillStore: AutofillStore,
@@ -49,7 +49,7 @@ class FaviconModule {
             bookmarksDao,
             fireproofWebsiteRepository,
             locationPermissionsRepository,
-            favoritesRepository,
+            savedSitesRepository,
             faviconDownloader,
             dispatcherProvider,
             autofillStore,

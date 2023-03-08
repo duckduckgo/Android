@@ -24,8 +24,6 @@ import androidx.core.net.toUri
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.bookmarks.db.BookmarksDao
-import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.FAVICON_PERSISTED_DIR
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.FAVICON_TEMP_DIR
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.NO_SUBFOLDER
@@ -35,6 +33,8 @@ import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.location.data.LocationPermissionsRepositoryImpl
 import com.duckduckgo.autofill.api.store.AutofillStore
+import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.savedsites.store.SyncEntitiesDao
 import java.io.File
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -55,8 +55,8 @@ class DuckDuckGoFaviconManagerTest {
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private val mockFaviconPersister: FaviconPersister = mock()
-    private val mockBookmarksDao: BookmarksDao = mock()
-    private val mockFavoriteRepository: FavoritesRepository = mock()
+    private val mockBookmarksDao: SyncEntitiesDao = mock()
+    private val mockSavedSitesRepository: SavedSitesRepository = mock()
     private val mockFireproofWebsiteDao: FireproofWebsiteDao = mock()
     private val mockLocationPermissionsDao: LocationPermissionsDao = mock()
     private val mockFaviconDownloader: FaviconDownloader = mock()
@@ -68,19 +68,19 @@ class DuckDuckGoFaviconManagerTest {
 
     @Before
     fun setup() {
-        whenever(mockFavoriteRepository.favoritesCountByDomain(any())).thenReturn(0)
+        whenever(mockSavedSitesRepository.getFavoritesCountByDomain(any())).thenReturn(0)
         mockAutofillStore.stub { onBlocking { getCredentials(any()) }.thenReturn(emptyList()) }
 
         testee = DuckDuckGoFaviconManager(
             faviconPersister = mockFaviconPersister,
-            bookmarksDao = mockBookmarksDao,
+            entitiesDao = mockBookmarksDao,
             fireproofWebsiteRepository = FireproofWebsiteRepositoryImpl(mockFireproofWebsiteDao, coroutineRule.testDispatcherProvider, mock()),
             locationPermissionsRepository = LocationPermissionsRepositoryImpl(
                 mockLocationPermissionsDao,
                 mock(),
                 coroutineRule.testDispatcherProvider,
             ),
-            favoritesRepository = mockFavoriteRepository,
+            savedSitesRepository = mockSavedSitesRepository,
             faviconDownloader = mockFaviconDownloader,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             autofillStore = mockAutofillStore,

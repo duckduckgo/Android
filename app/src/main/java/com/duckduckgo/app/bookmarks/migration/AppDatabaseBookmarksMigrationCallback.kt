@@ -20,10 +20,10 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.sync.store.Entity
-import com.duckduckgo.sync.store.EntityType.BOOKMARK
-import com.duckduckgo.sync.store.EntityType.FOLDER
-import com.duckduckgo.sync.store.Relation
+import com.duckduckgo.savedsites.store.Entity
+import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
+import com.duckduckgo.savedsites.store.EntityType.FOLDER
+import com.duckduckgo.savedsites.store.Relation
 import dagger.Lazy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.asExecutor
@@ -60,11 +60,11 @@ class AppDatabaseBookmarksMigrationCallback(
                     // try to purge duplicates by only adding favourites with the same url of a bookmark already added
                     val existingBookmark = syncEntitiesDao().entityByUrl(it.url)
                     if (existingBookmark != null) {
-                        favouriteMigration.add(Relation(Relation.FAVORITES_ROOT, existingBookmark))
+                        favouriteMigration.add(Relation(relationId = Relation.FAVORITES_ROOT, entityId = existingBookmark.entityId))
                     } else {
                         val entity = Entity(Entity.generateFavoriteId(it.id), it.title, it.url, BOOKMARK)
                         entitiesMigration.add(entity)
-                        favouriteMigration.add(Relation(Relation.FAVORITES_ROOT, entity))
+                        favouriteMigration.add(Relation(relationId = Relation.FAVORITES_ROOT, entityId = entity.entityId))
                     }
                 }
             }
@@ -98,13 +98,13 @@ class AppDatabaseBookmarksMigrationCallback(
             val bookmarksInFolder = bookmarksDao().getBookmarksByParentIdSync(folderId)
 
             foldersInFolder.forEach {
-                val entity = Entity(Entity.generateFolderId(it.id), it.name, "", FOLDER)
+                val entity = Entity(it.id, it.name, "", FOLDER)
                 entities.add(entity)
 
                 if (folderId == 0L) {
-                    relations.add(Relation(Relation.BOOMARKS_ROOT, entity))
+                    relations.add(Relation(relationId = Relation.BOOMARKS_ROOT, entityId = entity.entityId))
                 } else {
-                    relations.add(Relation(Entity.generateFolderId(folderId), entity))
+                    relations.add(Relation(relationId = Entity.generateFolderId(folderId), entityId = entity.entityId))
                 }
             }
             bookmarksInFolder.forEach {
@@ -112,9 +112,9 @@ class AppDatabaseBookmarksMigrationCallback(
                 entities.add(entity)
 
                 if (folderId == 0L) {
-                    relations.add(Relation(Relation.BOOMARKS_ROOT, entity))
+                    relations.add(Relation(relationId = Relation.BOOMARKS_ROOT, entityId = entity.entityId))
                 } else {
-                    relations.add(Relation(Entity.generateFolderId(folderId), entity))
+                    relations.add(Relation(relationId = Entity.generateFolderId(folderId), entityId = entity.entityId))
                 }
             }
 

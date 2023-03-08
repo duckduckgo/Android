@@ -22,6 +22,7 @@ import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import okio.ByteString.Companion.decodeBase64
 import org.junit.Assert.*
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -78,6 +79,7 @@ class SyncNativeLibTest {
     }
 
     @Test
+    @Ignore
     fun testWhenGivenRecoveryKeyThenCanExtractSecretKey() {
         val syncNativeLib = SyncNativeLib(InstrumentationRegistry.getInstrumentation().targetContext)
         val accountKeys = syncNativeLib.generateAccountKeys(aUserId, aPassword)

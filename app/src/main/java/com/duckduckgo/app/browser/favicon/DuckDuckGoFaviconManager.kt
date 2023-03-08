@@ -22,8 +22,6 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.widget.ImageView
 import androidx.core.net.toUri
-import com.duckduckgo.app.bookmarks.db.BookmarksDao
-import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.FAVICON_PERSISTED_DIR
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.FAVICON_TEMP_DIR
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.NO_SUBFOLDER
@@ -36,15 +34,17 @@ import com.duckduckgo.app.global.view.generateDefaultDrawable
 import com.duckduckgo.app.global.view.loadFavicon
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.autofill.api.store.AutofillStore
+import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.savedsites.store.SyncEntitiesDao
 import java.io.File
 import kotlinx.coroutines.withContext
 
 class DuckDuckGoFaviconManager constructor(
     private val faviconPersister: FaviconPersister,
-    private val bookmarksDao: BookmarksDao,
+    private val entitiesDao: SyncEntitiesDao,
     private val fireproofWebsiteRepository: FireproofWebsiteRepository,
     private val locationPermissionsRepository: LocationPermissionsRepository,
-    private val favoritesRepository: FavoritesRepository,
+    private val savedSitesRepository: SavedSitesRepository,
     private val faviconDownloader: FaviconDownloader,
     private val dispatcherProvider: DispatcherProvider,
     private val autofillStore: AutofillStore,
@@ -292,10 +292,10 @@ class DuckDuckGoFaviconManager constructor(
         val query = "%$domain%"
 
         return withContext(dispatcherProvider.io()) {
-            bookmarksDao.bookmarksCountByUrl(query) +
+            entitiesDao.countEntitiesByUrl(query) +
                 locationPermissionsRepository.permissionEntitiesCountByDomain(query) +
                 fireproofWebsiteRepository.fireproofWebsitesCountByDomain(domain) +
-                favoritesRepository.favoritesCountByDomain(query) +
+                savedSitesRepository.getFavoritesCountByDomain(query) +
                 autofillStore.getCredentials(domain).size
         }
     }

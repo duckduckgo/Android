@@ -19,12 +19,6 @@ package com.duckduckgo.app.bookmarks.ui
 import android.net.Uri
 import androidx.lifecycle.*
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.bookmarks.model.*
-import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
-import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
-import com.duckduckgo.app.bookmarks.service.ExportSavedSitesResult
-import com.duckduckgo.app.bookmarks.service.ImportSavedSitesResult
-import com.duckduckgo.app.bookmarks.service.SavedSitesManager
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.*
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.EditSavedSiteListener
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment.AddBookmarkFolderListener
@@ -35,6 +29,16 @@ import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.savedsites.api.models.BookmarkFolder
+import com.duckduckgo.savedsites.api.models.FolderBranch
+import com.duckduckgo.savedsites.api.models.SavedSite
+import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
+import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.api.service.ExportSavedSitesResult
+import com.duckduckgo.savedsites.api.service.ImportSavedSitesResult
+import com.duckduckgo.savedsites.api.service.SavedSitesManager
+import com.duckduckgo.savedsites.store.Relation
 import javax.inject.Inject
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
@@ -42,7 +46,7 @@ import kotlinx.coroutines.withContext
 
 @ContributesViewModel(ActivityScope::class)
 class BookmarksViewModel @Inject constructor(
-    private val bookmarksFacade: BookmarksFacade,
+    private val savedSitesRepository: SavedSitesRepository,
     private val faviconManager: FaviconManager,
     private val savedSitesManager: SavedSitesManager,
     private val pixel: Pixel,
@@ -65,7 +69,7 @@ class BookmarksViewModel @Inject constructor(
         class DeleteBookmarkFolder(val bookmarkFolder: BookmarkFolder) : Command()
         class ConfirmDeleteBookmarkFolder(
             val bookmarkFolder: BookmarkFolder,
-            val folderBranch: BookmarkFolderBranch,
+            val folderBranch: FolderBranch,
         ) : Command()
 
         data class ImportedSavedSites(val importSavedSitesResult: ImportSavedSitesResult) : Command()
@@ -81,11 +85,11 @@ class BookmarksViewModel @Inject constructor(
 
     init {
         viewState.value = ViewState()
-        viewModelScope.launch {
-            bookmarksFacade.favorites().collect {
-                onFavoritesChanged(it)
-            }
-        }
+        // viewModelScope.launch {
+        //     savedSitesRepository.getFavorites().collect {
+        //         onFavoritesChanged(it)
+        //     }
+        // }
     }
 
     override fun onSavedSiteEdited(savedSite: SavedSite) {
@@ -124,12 +128,13 @@ class BookmarksViewModel @Inject constructor(
             is Bookmark -> {
                 viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
                     faviconManager.deletePersistedFavicon(savedSite.url)
-                    bookmarksFacade.delete(savedSite)
+                    savedSitesRepository.delete(savedSite)
                 }
             }
             is Favorite -> {
                 viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
-                    bookmarksFacade.delete(savedSite)
+                    faviconManager.deletePersistedFavicon(savedSite.url)
+                    savedSitesRepository.delete(savedSite)
                 }
             }
         }
@@ -139,12 +144,12 @@ class BookmarksViewModel @Inject constructor(
         when (savedSite) {
             is Bookmark -> {
                 viewModelScope.launch(dispatcherProvider.io()) {
-                    bookmarksFacade.insert(savedSite)
+                    savedSitesRepository.insert(savedSite)
                 }
             }
             is Favorite -> {
                 viewModelScope.launch(dispatcherProvider.io()) {
-                    bookmarksFacade.insert(savedSite)
+                    savedSitesRepository.insert(savedSite)
                 }
             }
         }
@@ -170,13 +175,13 @@ class BookmarksViewModel @Inject constructor(
 
     private suspend fun editBookmark(bookmark: Bookmark) {
         withContext(dispatcherProvider.io()) {
-            bookmarksFacade.update(bookmark)
+            savedSitesRepository.update(bookmark)
         }
     }
 
     private suspend fun editFavorite(favorite: Favorite) {
         withContext(dispatcherProvider.io()) {
-            bookmarksFacade.update(favorite)
+            savedSitesRepository.update(favorite)
         }
     }
 
@@ -188,17 +193,17 @@ class BookmarksViewModel @Inject constructor(
         command.value = OpenBookmarkFolder(bookmarkFolder)
     }
 
-    fun fetchBookmarksAndFolders(parentId: Long? = null) {
+    fun fetchBookmarksAndFolders(parentId: String = Relation.BOOMARKS_ROOT) {
         viewModelScope.launch {
-            bookmarksFacade.fetchBookmarksAndFolders(parentId).collect { bookmarksAndFolders ->
-                onBookmarkItemsChanged(bookmarks = bookmarksAndFolders.first, bookmarkFolders = bookmarksAndFolders.second)
+            savedSitesRepository.getSavedSites(parentId).collect {
+                onSavedSitesItemsChanged(it.favorites, it.bookmarks, it.folders)
             }
         }
     }
 
     override fun onBookmarkFolderAdded(bookmarkFolder: BookmarkFolder) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            bookmarksFacade.insert(bookmarkFolder)
+            savedSitesRepository.insert(bookmarkFolder)
         }
     }
 
@@ -208,13 +213,13 @@ class BookmarksViewModel @Inject constructor(
 
     override fun onBookmarkFolderUpdated(bookmarkFolder: BookmarkFolder) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            bookmarksFacade.update(bookmarkFolder)
+            savedSitesRepository.update(bookmarkFolder)
         }
     }
 
     fun onBookmarkFolderDeleted(bookmarkFolder: BookmarkFolder) {
         viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
-            val folderBranch = bookmarksFacade.deleteFolderBranch(bookmarkFolder)
+            val folderBranch = savedSitesRepository.deleteFolderBranch(bookmarkFolder)
             command.postValue(ConfirmDeleteBookmarkFolder(bookmarkFolder, folderBranch))
         }
     }
@@ -225,6 +230,15 @@ class BookmarksViewModel @Inject constructor(
         } else {
             command.value = DeleteBookmarkFolder(bookmarkFolder)
         }
+    }
+
+    private fun onSavedSitesItemsChanged(favorites: List<Favorite>, bookmarks: List<Bookmark>, bookmarkFolders: List<BookmarkFolder>) {
+        viewState.value = viewState.value?.copy(
+            favorites = favorites,
+            bookmarks = bookmarks,
+            bookmarkFolders = bookmarkFolders,
+            enableSearch = bookmarks.size + bookmarkFolders.size >= MIN_ITEMS_FOR_SEARCH,
+        )
     }
 
     private fun onBookmarkItemsChanged(
@@ -238,9 +252,9 @@ class BookmarksViewModel @Inject constructor(
         )
     }
 
-    fun insertDeletedFolderBranch(folderBranch: BookmarkFolderBranch) {
+    fun insertDeletedFolderBranch(folderBranch: FolderBranch) {
         viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
-            bookmarksFacade.insertFolderBranch(folderBranch)
+            savedSitesRepository.insertFolderBranch(folderBranch)
         }
     }
 }

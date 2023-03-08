@@ -64,11 +64,11 @@ import com.duckduckgo.app.usage.app.AppDaysUsedDao
 import com.duckduckgo.app.usage.app.AppDaysUsedEntity
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
-import com.duckduckgo.sync.store.Entity
-import com.duckduckgo.sync.store.EntityTypeConverter
-import com.duckduckgo.sync.store.Relation
-import com.duckduckgo.sync.store.SyncEntitiesDao
-import com.duckduckgo.sync.store.SyncRelationsDao
+import com.duckduckgo.savedsites.store.Entity
+import com.duckduckgo.savedsites.store.EntityTypeConverter
+import com.duckduckgo.savedsites.store.Relation
+import com.duckduckgo.savedsites.store.SyncEntitiesDao
+import com.duckduckgo.savedsites.store.SyncRelationsDao
 
 @Database(
     exportSchema = true,
@@ -591,12 +591,12 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS `entities` (`entityId` TEXT NOT NULL, " +
-                    "`title` TEXT NOT NULL, `url` TEXT, `type` TEXT, PRIMARY KEY(`id`))",
+                    "`title` TEXT NOT NULL, `url` TEXT, `type` TEXT NOT NULL, PRIMARY KEY(`entityId`))",
             )
 
             database.execSQL(
-                "CREATE TABLE IF NOT EXISTS `relations` (`relationId` TEXT NOT NULL, " +
-                    "`entityId` TEXT NOT NULL, `title` TEXT NOT NULL, `url` TEXT, `type` TEXT, PRIMARY KEY(`relationId`))",
+                "CREATE TABLE IF NOT EXISTS `relations` (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
+                    "`relationId` TEXT NOT NULL, `entityId` TEXT NOT NULL)",
             )
         }
     }

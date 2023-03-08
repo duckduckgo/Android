@@ -64,10 +64,6 @@ class DevSettingsActivity : DuckDuckGoActivity() {
         viewModel.onOverrideUAToggled(isChecked)
     }
 
-    private val syncBookmarksListener = OnCheckedChangeListener { _, isChecked ->
-        viewModel.onSyncBookmarksEnabled(isChecked)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -105,7 +101,6 @@ class DevSettingsActivity : DuckDuckGoActivity() {
                     binding.overrideUserAgentToggle.quietlySetIsChecked(it.overrideUA, overrideUAListener)
                     binding.overrideUserAgentSelector.isEnabled = it.overrideUA
                     binding.overrideUserAgentSelector.setSecondaryText(it.userAgent)
-                    binding.overrideSyncBookmarksToggle.quietlySetIsChecked(it.syncBookmarksEnabled, syncBookmarksListener)
                 }
             }.launchIn(lifecycleScope)
 

@@ -28,15 +28,12 @@ import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.db.FavoriteEntity
 import com.duckduckgo.app.bookmarks.db.FavoritesDao
 import com.duckduckgo.app.bookmarks.migration.AppDatabaseBookmarksMigrationCallback
-import com.duckduckgo.app.bookmarks.model.FavoritesDataRepository
-import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.sync.store.EntityType.BOOKMARK
-import com.duckduckgo.sync.store.Relation
-import com.duckduckgo.sync.store.SyncEntitiesDao
-import com.duckduckgo.sync.store.SyncRelationsDao
-import dagger.Lazy
+import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
+import com.duckduckgo.savedsites.store.Relation
+import com.duckduckgo.savedsites.store.SyncEntitiesDao
+import com.duckduckgo.savedsites.store.SyncRelationsDao
 import junit.framework.Assert.assertFalse
 import junit.framework.Assert.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -62,10 +59,8 @@ class BookmarksMigrationTest {
     private lateinit var syncRelationsDao: SyncRelationsDao
 
     private val mockFaviconManager: FaviconManager = mock()
-    private val lazyFaviconManager = Lazy { mockFaviconManager }
-    private lateinit var favoritesDao: FavoritesDao
-    private lateinit var favoritesRepository: FavoritesRepository
 
+    private lateinit var favoritesDao: FavoritesDao
     private lateinit var bookmarksDao: BookmarksDao
     private lateinit var bookmarkFoldersDao: BookmarkFoldersDao
 
@@ -78,8 +73,6 @@ class BookmarksMigrationTest {
             .build()
 
         favoritesDao = appDatabase.favoritesDao()
-        favoritesRepository = FavoritesDataRepository(favoritesDao, lazyFaviconManager)
-
         bookmarksDao = appDatabase.bookmarksDao()
         bookmarkFoldersDao = appDatabase.bookmarkFoldersDao()
 
@@ -172,14 +165,14 @@ class BookmarksMigrationTest {
         // two relations migrated, one for bookmarks and another for favorites
         assertTrue(syncRelationsDao.relations().size == 2)
 
-        val bookmarks = syncRelationsDao.relationByIdSync(Relation.BOOMARKS_ROOT)
-        val favorites = syncRelationsDao.relationByIdSync(Relation.FAVORITES_ROOT)
+        val bookmarks = syncEntitiesDao.entitiesInFolderSync(Relation.BOOMARKS_ROOT)
+        val favorites = syncEntitiesDao.entitiesInFolderSync(Relation.FAVORITES_ROOT)
 
         assertTrue(bookmarks.size == 1)
-        assertTrue(bookmarks.first().entity.entityId == "bookmark1")
+        assertTrue(bookmarks.first().entityId == "bookmark1")
 
         assertTrue(favorites.size == 1)
-        assertTrue(favorites.first().entity.entityId == "bookmark1")
+        assertTrue(favorites.first().entityId == "bookmark1")
     }
 
     @Test
@@ -192,14 +185,14 @@ class BookmarksMigrationTest {
         assertTrue(syncEntitiesDao.entities().size == 2 + ROOT_FOLDERS)
         assertTrue(syncRelationsDao.relations().size == 2)
 
-        val bookmarks = syncRelationsDao.relationByIdSync(Relation.BOOMARKS_ROOT)
-        val favorites = syncRelationsDao.relationByIdSync(Relation.FAVORITES_ROOT)
+        val bookmarks = syncEntitiesDao.entitiesInFolderSync(Relation.BOOMARKS_ROOT)
+        val favorites = syncEntitiesDao.entitiesInFolderSync(Relation.FAVORITES_ROOT)
 
         assertTrue(bookmarks.size == 1)
-        assertTrue(bookmarks.first().entity.entityId == "bookmark1")
+        assertTrue(bookmarks.first().entityId == "bookmark1")
 
         assertTrue(favorites.size == 1)
-        assertTrue(favorites.first().entity.entityId == "favorite2")
+        assertTrue(favorites.first().entityId == "favorite2")
     }
 
     @Ignore @Test

@@ -26,7 +26,6 @@ import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
-import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -34,6 +33,7 @@ import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.global.view.generateDefaultDrawable
 import com.duckduckgo.mobile.android.R as CommonR
+import com.duckduckgo.savedsites.api.SavedSitesRepository
 import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
 
@@ -56,7 +56,7 @@ class FavoritesWidgetService : RemoteViewsService() {
         private val theme = WidgetTheme.getThemeFrom(intent.extras?.getString(THEME_EXTRAS))
 
         @Inject
-        lateinit var favoritesDataRepository: FavoritesRepository
+        lateinit var savedSitesRepository: SavedSitesRepository
 
         @Inject
         lateinit var faviconManager: FaviconManager
@@ -90,7 +90,7 @@ class FavoritesWidgetService : RemoteViewsService() {
         }
 
         override fun onDataSetChanged() {
-            val newList = favoritesDataRepository.favoritesSync().take(maxItems).map {
+            val newList = savedSitesRepository.getFavoritesSync().take(maxItems).map {
                 val bitmap = runBlocking {
                     faviconManager.loadFromDiskWithParams(
                         url = it.url,
