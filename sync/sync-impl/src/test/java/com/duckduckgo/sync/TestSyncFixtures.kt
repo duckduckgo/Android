@@ -22,11 +22,11 @@ import com.duckduckgo.sync.crypto.DecryptResult
 import com.duckduckgo.sync.crypto.LoginKeys
 import com.duckduckgo.sync.impl.AccountCreatedResponse
 import com.duckduckgo.sync.impl.Connect
+import com.duckduckgo.sync.impl.ConnectKey
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.Device
 import com.duckduckgo.sync.impl.DeviceEntries
 import com.duckduckgo.sync.impl.DeviceResponse
-import com.duckduckgo.sync.impl.ConnectKey
 import com.duckduckgo.sync.impl.Login
 import com.duckduckgo.sync.impl.LoginResponse
 import com.duckduckgo.sync.impl.Logout

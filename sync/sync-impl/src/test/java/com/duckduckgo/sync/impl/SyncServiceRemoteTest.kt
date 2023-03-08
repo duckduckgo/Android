@@ -37,11 +37,11 @@ import com.duckduckgo.sync.TestSyncFixtures.deviceId
 import com.duckduckgo.sync.TestSyncFixtures.deviceLogoutBody
 import com.duckduckgo.sync.TestSyncFixtures.deviceLogoutResponse
 import com.duckduckgo.sync.TestSyncFixtures.deviceName
+import com.duckduckgo.sync.TestSyncFixtures.encryptedRecoveryCode
 import com.duckduckgo.sync.TestSyncFixtures.getDevicesBodyErrorResponse
 import com.duckduckgo.sync.TestSyncFixtures.getDevicesBodySuccessResponse
 import com.duckduckgo.sync.TestSyncFixtures.getDevicesError
 import com.duckduckgo.sync.TestSyncFixtures.getDevicesSuccess
-import com.duckduckgo.sync.TestSyncFixtures.encryptedRecoveryCode
 import com.duckduckgo.sync.TestSyncFixtures.hashedPassword
 import com.duckduckgo.sync.TestSyncFixtures.loginError
 import com.duckduckgo.sync.TestSyncFixtures.loginFailedInvalidResponse
