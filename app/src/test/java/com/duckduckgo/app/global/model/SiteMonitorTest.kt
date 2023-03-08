@@ -536,12 +536,12 @@ class SiteMonitorTest {
     }
 
     @Test
-    fun whenSiteIsMajorNetworkThenPrivacyShieldIsUnprotected() {
+    fun whenSiteIsMajorNetworkThenPrivacyShieldIsProtected() {
         val testee = givenASiteMonitor(url = httpsDocument)
 
         testee.updatePrivacyData(givenSitePrivacyData(entity = majorNetwork))
 
-        assertEquals(UNPROTECTED, testee.privacyProtection())
+        assertEquals(PROTECTED, testee.privacyProtection())
     }
 
     @Test
