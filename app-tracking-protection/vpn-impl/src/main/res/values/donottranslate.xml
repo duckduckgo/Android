@@ -16,5 +16,8 @@
   -->
 
 <resources>
-
+    <string name="atp_ActivityBlockingTrackersEnabledDescription">DuckDuckGo is blocking hidden trackers across your apps.</string>
+    <string name="atp_ActivityBlockingTrackersDisabledDescription">Re-enable App Tracking Protection to continue blocking trackers across your apps.</string>
+    <string name="atp_ActivityBlockedByHeaderText">Blocked by DuckDuckGo %1$s</string>
+    <string name="atp_ActivityBlockedByOnDateHeaderText">Blocked by DuckDuckGo on %1$s</string>
 </resources>
