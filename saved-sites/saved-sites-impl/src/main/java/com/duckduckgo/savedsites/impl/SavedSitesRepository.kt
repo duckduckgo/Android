@@ -210,7 +210,7 @@ class RealSavedSitesRepository(
     }
 
     override fun getFavoritesCountByDomain(domain: String): Int {
-        return syncRelationsDao.countRelationsByUrl(domain)
+        return syncRelationsDao.countFavouritesByUrl(domain)
     }
 
     override fun getFavorite(url: String): Favorite? {

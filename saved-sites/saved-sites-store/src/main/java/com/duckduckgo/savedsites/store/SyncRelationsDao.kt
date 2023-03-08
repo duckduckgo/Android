@@ -80,7 +80,7 @@ interface SyncRelationsDao {
         "select count(*) from entities inner join relations on entities.entityId = relations.entityId " +
             "where entities.url LIKE :domain AND relationId == :relationId",
     )
-    fun countRelationsByUrl(
+    fun countFavouritesByUrl(
         domain: String,
         relationId: String = Relation.FAVORITES_ROOT,
     ): Int

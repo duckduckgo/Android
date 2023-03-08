@@ -74,6 +74,11 @@ class SavedSitesRepositoryTest {
         repository = RealSavedSitesRepository(syncEntitiesDao, syncRelationsDao)
     }
 
+    @After
+    fun after() {
+        db.close()
+    }
+
     @Test
     fun whenNoDataThenFolderContentisEmpty() = runTest {
         repository.getFolderContent(Relation.BOOMARKS_ROOT).test {
@@ -762,11 +767,6 @@ class SavedSitesRepositoryTest {
 
             cancelAndConsumeRemainingEvents()
         }
-    }
-
-    @After
-    fun after() {
-        db.close()
     }
 
     private fun givenNoFavoritesStored() {
