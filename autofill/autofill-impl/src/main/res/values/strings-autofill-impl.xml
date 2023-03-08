@@ -70,7 +70,7 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Logins are stored securely on this device only.</string>
 
     <string name="autofillManagementAddLogin">Add Login</string>
-    <string name="autofillManagementSearchLogins">Search</string>
+    <string name="autofillManagementSearchLogins">Search logins</string>
     <string name="autofillManagementSearchClearDescription">Clear search input</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for 'kittens'">No results for \'%1$s\'</string>
 
