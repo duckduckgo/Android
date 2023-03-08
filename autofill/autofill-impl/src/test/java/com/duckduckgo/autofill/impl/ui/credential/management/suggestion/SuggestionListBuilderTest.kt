@@ -20,6 +20,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem
+import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialListSorterByTitleAndDomain
+import com.duckduckgo.autofill.store.urlmatcher.AutofillDomainNameUrlMatcher
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -28,7 +30,10 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class SuggestionListBuilderTest {
 
-    val testee = SuggestionListBuilder(context = InstrumentationRegistry.getInstrumentation().targetContext)
+    val testee = SuggestionListBuilder(
+        context = InstrumentationRegistry.getInstrumentation().targetContext,
+        sorter = CredentialListSorterByTitleAndDomain(AutofillDomainNameUrlMatcher()),
+    )
 
     @Test
     fun whenNoSuggestionThenEmptyListReturned() {
