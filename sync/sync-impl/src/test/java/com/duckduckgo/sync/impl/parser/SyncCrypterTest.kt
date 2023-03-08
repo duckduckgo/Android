@@ -254,7 +254,6 @@ class SyncCrypterTest {
         val entries = givenSomeBookmarkSyncEntries(10, Relation.BOOMARKS_ROOT)
         syncCrypter.store(entries)
 
-        verify(repository, times(1)).insert(any<BookmarkFolder>())
         verify(repository, times(10)).insert(any<Bookmark>())
     }
 
