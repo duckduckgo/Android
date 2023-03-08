@@ -615,7 +615,8 @@ class BrowserTabViewModel @Inject constructor(
 
         observeAccessibilitySettings()
 
-        savedSitesRepository.getFavorites().onEach { favoriteSites ->
+        savedSitesRepository.getFavorites().map { favoriteSites ->
+            Timber.d("Sync: getFavorites onEach $favoriteSites")
             val favorites = favoriteSites.map { FavoritesQuickAccessAdapter.QuickAccessFavorite(it) }
             ctaViewState.value = currentCtaViewState().copy(favorites = favorites)
             autoCompleteViewState.value = currentAutoCompleteViewState().copy(favorites = favorites)
@@ -623,9 +624,10 @@ class BrowserTabViewModel @Inject constructor(
             browserViewState.value = currentBrowserViewState().copy(favorite = favorite)
         }.launchIn(viewModelScope)
 
-        // TODO: We don't neewd to pass all the bookmarks and then filter in the ViewModel.
+        // TODO: We don't need to pass all the bookmarks and then filter in the ViewModel.
         // The Repository should do it
-        savedSitesRepository.getBookmarks().onEach { bookmarks ->
+        savedSitesRepository.getBookmarks().map { bookmarks ->
+            Timber.d("Sync: getBookmarks onEach $bookmarks")
             val bookmark = bookmarks.firstOrNull { it.url == url }
             browserViewState.value = currentBrowserViewState().copy(bookmark = bookmark)
         }.launchIn(viewModelScope)

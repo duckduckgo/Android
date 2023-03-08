@@ -18,7 +18,6 @@ package com.duckduckgo.savedsites.api.models
 
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
-import com.duckduckgo.savedsites.store.Entity
 import com.duckduckgo.savedsites.store.Relation
 import java.io.Serializable
 

@@ -31,6 +31,7 @@ interface SavedSitesRepository {
     suspend fun getSavedSites(folderId: String): Flow<SavedSites>
 
     suspend fun getFolderContent(folderId: String): Flow<Pair<List<Bookmark>, List<BookmarkFolder>>>
+    suspend fun getFolderContentSync(folderId: String): Pair<List<Bookmark>, List<BookmarkFolder>>
 
     suspend fun getFolderTree(
         selectedFolderId: String,
@@ -82,6 +83,7 @@ interface SavedSitesRepository {
 
     fun delete(folder: BookmarkFolder)
     fun getFolder(folderId: String): BookmarkFolder?
+    fun getFolderByName(folderName: String): BookmarkFolder?
     fun deleteAll()
     fun bookmarksCount(): Long
     fun favoritesCount(): Long

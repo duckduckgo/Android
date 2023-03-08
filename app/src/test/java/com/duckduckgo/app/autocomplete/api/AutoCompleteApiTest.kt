@@ -325,10 +325,10 @@ class AutoCompleteApiTest {
         whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
             Single.just(
                 listOf(
-                    bookmark(url = "title example", title = "https://example.com"),
-                    bookmark(url = "title bar", title = "https://bar.com"),
-                    bookmark(url = "title foo", title = "https://foo.com"),
-                    bookmark(url = "title baz", title = "https://baz.com"),
+                    bookmark(title = "title example", url = "https://example.com"),
+                    bookmark(title = "title bar", url = "https://bar.com"),
+                    bookmark(title = "title foo", url = "https://foo.com"),
+                    bookmark(title = "title baz", url = "https://baz.com"),
                 ),
             ),
         )
@@ -351,9 +351,9 @@ class AutoCompleteApiTest {
         whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
             Single.just(
                 listOf(
-                    bookmark(url = "CNN international", title = "https://cnn.com"),
-                    bookmark(url = "CNN international", title = "https://cnn.com"),
-                    bookmark(url = "CNN international - world", title = "https://cnn.com/world"),
+                    bookmark(title = "CNN international", url = "https://cnn.com"),
+                    bookmark(title = "CNN international", url = "https://cnn.com"),
+                    bookmark(title = "CNN international - world", url = "https://cnn.com/world"),
                 ),
             ),
         )
@@ -381,8 +381,8 @@ class AutoCompleteApiTest {
         whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
             Single.just(
                 listOf(
-                    bookmark(url = "Reddit", title = "https://reddit.com"),
-                    bookmark(url = "Reddit - duckduckgo", title = "https://reddit.com/r/duckduckgo"),
+                    bookmark(title = "Reddit", url = "https://reddit.com"),
+                    bookmark(title = "Reddit - duckduckgo", url = "https://reddit.com/r/duckduckgo"),
                 ),
             ),
         )
@@ -410,8 +410,8 @@ class AutoCompleteApiTest {
         whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
             Single.just(
                 listOf(
-                    bookmark(url = "Reddit", title = "https://reddit.com"),
-                    bookmark(url = "Reddit - duckduckgo", title = "https://reddit.com/r/duckduckgo"),
+                    bookmark(title = "Reddit", url = "https://reddit.com"),
+                    bookmark(title = "Reddit - duckduckgo", url = "https://reddit.com/r/duckduckgo"),
                 ),
             ),
         )
@@ -439,8 +439,8 @@ class AutoCompleteApiTest {
         whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
             Single.just(
                 listOf(
-                    bookmark(url = "Reddit", title = "https://reddit.com"),
-                    bookmark(url = "Reddit - duckduckgo", title = "https://reddit.com/r/duckduckgo"),
+                    bookmark(title = "Reddit", url = "https://reddit.com"),
+                    bookmark(title = "Reddit - duckduckgo", url = "https://reddit.com/r/duckduckgo"),
                 ),
             ),
         )
@@ -467,8 +467,8 @@ class AutoCompleteApiTest {
         whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
             Single.just(
                 listOf(
-                    bookmark(url = "Reddit", title = "https://www.reddit.com"),
-                    bookmark(url = "duckduckgo", title = "https://www.reddit.com/r/duckduckgo"),
+                    bookmark(title = "Reddit", url = "https://www.reddit.com"),
+                    bookmark(title = "duckduckgo", url = "https://www.reddit.com/r/duckduckgo"),
                 ),
             ),
         )
@@ -497,10 +497,10 @@ class AutoCompleteApiTest {
         whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
             Single.just(
                 listOf(
-                    bookmark(url = "title example", title = "https://example.com"),
-                    bookmark(url = "title bar", title = "https://bar.com"),
-                    bookmark(url = "the title foo", title = "https://foo.com"),
-                    bookmark(url = "title baz", title = "https://baz.com"),
+                    bookmark(title = "title example", url = "https://example.com"),
+                    bookmark(title = "title bar", url = "https://bar.com"),
+                    bookmark(title = "the title foo", url = "https://foo.com"),
+                    bookmark(title = "title baz", url = "https://baz.com"),
                 ),
             ),
         )
@@ -519,10 +519,10 @@ class AutoCompleteApiTest {
         whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
             Single.just(
                 listOf(
-                    bookmark(url = "title example", title = "https://example.com"),
-                    bookmark(url = "title bar", title = "https://bar.com"),
-                    bookmark(url = "the title foo", title = "https://foo.com"),
-                    bookmark(url = "title foo baz", title = "https://baz.com"),
+                    bookmark(title = "title example", url = "https://example.com"),
+                    bookmark(title = "title bar", url = "https://bar.com"),
+                    bookmark(title = "the title foo", url = "https://foo.com"),
+                    bookmark(title = "title foo baz", url = "https://baz.com"),
                 ),
             ),
         )

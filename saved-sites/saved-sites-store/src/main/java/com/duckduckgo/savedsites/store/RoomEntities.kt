@@ -74,17 +74,9 @@ data class Relation(
 ) {
     companion object {
         const val FAVORITES_ROOT = "favorites_root"
+        const val FAVORITES_NAME = "Favorites"
         const val BOOMARKS_ROOT = "bookmarks_root"
+        const val BOOKMARKS_NAME = "Bookmarks"
         const val BOOMARKS_ROOT_ID = 0L
     }
 }
-
-data class EntityContent(
-    var entityId: String,
-    var title: String,
-    var url: String?,
-    var type: EntityType,
-    var relationId: String,
-    var numBookmarks: Int,
-    var numFolders: Int,
-)

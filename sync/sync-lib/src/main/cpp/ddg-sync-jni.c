@@ -133,6 +133,69 @@ Java_com_duckduckgo_sync_crypto_SyncNativeLib_decrypt(
 }
 
 JNIEXPORT jint JNICALL
+Java_com_duckduckgo_sync_crypto_SyncNativeLib_seal(
+    JNIEnv *env,
+    jclass clazz,
+    jbyteArray sealedBytes,
+    jbyteArray primaryKey,
+    jbyteArray messageBytes
+) {
+    jsize messageBytesLength = (*env)->GetArrayLength(env, messageBytes);
+
+    // Get pointers to the arrays
+    jbyte* sealedBytesElements = (*env)->GetByteArrayElements(env, sealedBytes, NULL);
+    jbyte* messageBytesElements = (*env)->GetByteArrayElements(env, messageBytes, NULL);
+    jbyte* primaryKeyElements = (*env)->GetByteArrayElements(env, primaryKey, NULL);
+
+    // Call the C function
+    jint result = ddgSyncSeal(
+      (unsigned char *)sealedBytesElements,
+      (unsigned char *)primaryKeyElements,
+      (unsigned char *)messageBytesElements,
+      (unsigned long long)messageBytesLength
+    );
+
+    // Release the input arrays
+    (*env)->ReleaseByteArrayElements(env, sealedBytes, sealedBytesElements, JNI_COMMIT);
+    (*env)->ReleaseByteArrayElements(env, messageBytes, messageBytesElements, JNI_ABORT);
+    (*env)->ReleaseByteArrayElements(env, primaryKey, primaryKeyElements, JNI_ABORT);
+
+    return result;
+}
+
+JNIEXPORT jint JNICALL
+Java_com_duckduckgo_sync_crypto_SyncNativeLib_sealOpen(
+    JNIEnv *env,
+    jclass clazz,
+    jbyteArray cyphertext,
+    jbyteArray primaryKey,
+    jbyteArray secretKey,
+    jbyteArray rawBytes
+) {
+    jsize cyphertextBytesLength = (*env)->GetArrayLength(env, cyphertext);
+
+    // Get pointers to the arrays
+    jbyte* cyphertextBytesElements = (*env)->GetByteArrayElements(env, cyphertext, NULL);
+    jbyte* primaryKeyElements = (*env)->GetByteArrayElements(env, primaryKey, NULL);
+    jbyte* secretKeyElements = (*env)->GetByteArrayElements(env, secretKey, NULL);
+    jbyte* rawBytesElements = (*env)->GetByteArrayElements(env, rawBytes, NULL);
+
+    // Call the C function
+    jint result = ddgSyncSealOpen(
+      (unsigned char *)cyphertextBytesElements,
+      (unsigned long long)cyphertextBytesLength,
+      (unsigned char *)primaryKeyElements,
+      (unsigned char *)secretKeyElements,
+      (unsigned char *)rawBytesElements
+    );
+
+    // Release the input arrays
+    (*env)->ReleaseByteArrayElements(env, rawBytes, rawBytesElements, JNI_COMMIT);
+
+    return result;
+}
+
+JNIEXPORT jint JNICALL
 Java_com_duckduckgo_sync_crypto_SyncNativeLib_getPrimaryKeySize(
     JNIEnv *env,
     jclass clazz
@@ -178,4 +241,28 @@ Java_com_duckduckgo_sync_crypto_SyncNativeLib_getEncryptedExtraBytes(
     jclass clazz
 ) {
     return DDGSYNCCRYPTO_ENCRYPTED_EXTRA_BYTES_SIZE;
+}
+
+JNIEXPORT jint JNICALL
+Java_com_duckduckgo_sync_crypto_SyncNativeLib_getPublicKeyBytes(
+    JNIEnv *env,
+    jclass clazz
+) {
+    return DDGSYNCCRYPTO_PUBLIC_KEY;
+}
+
+JNIEXPORT jint JNICALL
+Java_com_duckduckgo_sync_crypto_SyncNativeLib_getPrivateKeyBytes(
+    JNIEnv *env,
+    jclass clazz
+) {
+    return DDGSYNCCRYPTO_PRIVATE_KEY;
+}
+
+JNIEXPORT jint JNICALL
+Java_com_duckduckgo_sync_crypto_SyncNativeLib_getSealBytes(
+    JNIEnv *env,
+    jclass clazz
+) {
+    return crypto_box_SEALBYTES;
 }

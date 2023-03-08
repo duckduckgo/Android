@@ -22,8 +22,6 @@ import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.savedsites.api.SavedSitesRepository
-import com.duckduckgo.savedsites.api.models.BookmarkFolder
-import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.TreeNode
 import com.duckduckgo.savedsites.api.service.ExportSavedSitesResult
 import com.duckduckgo.savedsites.api.service.SavedSitesExporter
@@ -77,30 +75,25 @@ class RealSavedSitesExporter(
     }
 
     @VisibleForTesting
-    fun getTreeFolderStructure(): TreeNode<FolderTreeItem> {
+    suspend fun getTreeFolderStructure(): TreeNode<FolderTreeItem> {
         val node = TreeNode(FolderTreeItem(Relation.BOOMARKS_ROOT, RealSavedSitesParser.BOOKMARKS_FOLDER, "", null, 0))
         populateNode(node, Relation.BOOMARKS_ROOT, 1)
         return node
     }
 
-    private fun populateNode(
+    private suspend fun populateNode(
         parentNode: TreeNode<FolderTreeItem>,
         parentId: String,
         currentDepth: Int,
     ) {
-        // val bookmarkFolders = savedSitesRepository.getBookmarkFoldersByParentId(parentId)
-        val bookmarkFolders = emptyList<BookmarkFolder>()
-
-        bookmarkFolders.forEach { bookmarkFolder ->
+        val folderContent = savedSitesRepository.getFolderContentSync(parentId)
+        folderContent.second.forEach { bookmarkFolder ->
             val childNode = TreeNode(FolderTreeItem(bookmarkFolder.id, bookmarkFolder.name, bookmarkFolder.parentId, null, currentDepth))
             parentNode.add(childNode)
             populateNode(childNode, bookmarkFolder.id, currentDepth + 1)
         }
 
-        // val bookmarks = bookmarksRepository.getBookmarksByParentId(parentId)
-        val bookmarks = emptyList<Bookmark>()
-
-        bookmarks.forEach { bookmark ->
+        folderContent.first.forEach { bookmark ->
             bookmark.title?.let { title ->
                 val childNode = TreeNode(FolderTreeItem(bookmark.id, title, bookmark.parentId, bookmark.url, currentDepth))
                 parentNode.add(childNode)

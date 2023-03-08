@@ -46,9 +46,6 @@ dependencies {
 }
 
 android {
-    lint {
-        baseline file("lint-baseline.xml")
-    }
     testOptions {
         unitTests {
             includeAndroidResources = true
