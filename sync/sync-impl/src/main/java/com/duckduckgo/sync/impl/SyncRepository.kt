@@ -21,6 +21,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.crypto.AccountKeys
 import com.duckduckgo.sync.crypto.LoginKeys
 import com.duckduckgo.sync.crypto.SyncLib
+import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
@@ -34,7 +35,7 @@ interface SyncRepository {
     fun getAccountInfo(): AccountInfo
     fun storeRecoveryCode()
     fun removeAccount()
-    fun logout(deviceId: String = ""): Result<Boolean>
+    fun logout(deviceId: String): Result<Boolean>
     fun deleteAccount(): Result<Boolean>
     fun latestToken(): String
     fun getConnectedDevices(): Result<List<ConnectedDevice>>

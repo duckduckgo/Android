@@ -88,9 +88,10 @@ constructor(
         }
     }
 
-    fun onLogoutClicked(deviceId: String = "") {
+    fun onLogoutClicked(deviceId: String? = null) {
         viewModelScope.launch(dispatchers.io()) {
-            val result = syncRepository.logout(deviceId)
+            val currentDeviceId = syncRepository.getAccountInfo().deviceId
+            val result = syncRepository.logout(currentDeviceId)
             if (result is Error) {
                 command.send(Command.ShowMessage("$result"))
             }

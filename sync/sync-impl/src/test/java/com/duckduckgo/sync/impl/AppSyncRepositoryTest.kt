@@ -177,7 +177,7 @@ class AppSyncRepositoryTest {
 
         val syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore)
 
-        val result = syncRepo.logout()
+        val result = syncRepo.logout(deviceId)
 
         assertTrue(result is Result.Success)
         verify(syncStore).clearAll()
@@ -191,7 +191,7 @@ class AppSyncRepositoryTest {
 
         val syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore)
 
-        val result = syncRepo.logout()
+        val result = syncRepo.logout(deviceId)
 
         assertTrue(result is Result.Error)
         verify(syncStore, times(0)).clearAll()
@@ -231,7 +231,7 @@ class AppSyncRepositoryTest {
 
         val syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore)
 
-        val result = syncRepo.logout()
+        val result = syncRepo.deleteAccount()
 
         assertTrue(result is Result.Error)
         verify(syncStore, times(0)).clearAll()
