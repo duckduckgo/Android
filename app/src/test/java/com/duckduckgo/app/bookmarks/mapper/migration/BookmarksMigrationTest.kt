@@ -57,7 +57,7 @@ class BookmarksMigrationTest {
 
     private lateinit var syncEntitiesDao: SyncEntitiesDao
     private lateinit var syncRelationsDao: SyncRelationsDao
-    
+
     private lateinit var favoritesDao: FavoritesDao
     private lateinit var bookmarksDao: BookmarksDao
     private lateinit var bookmarkFoldersDao: BookmarkFoldersDao
