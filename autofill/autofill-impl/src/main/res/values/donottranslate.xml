@@ -15,5 +15,4 @@
   -->
 
 <resources>
-    <string name="credentialManagementNoLoginsSavedAutofillDisabledTitle">Enable Autofill to start saving Logins</string>
 </resources>
