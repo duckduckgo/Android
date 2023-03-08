@@ -18,7 +18,6 @@ package com.duckduckgo.mobile.android.vpn.ui.notification
 
 import android.content.Context
 import android.util.Log
-import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -26,11 +25,18 @@ import androidx.work.*
 import androidx.work.impl.utils.SynchronousExecutor
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.dao.VpnFeatureRemoverDao
 import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
+import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationContentPlugin
+import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationContentPlugin.NotificationContent
+import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationContentPlugin.NotificationPriority
+import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationContentPlugin.NotificationPriority.HIGH
+import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationContentPlugin.Type
+import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationContentPlugin.Type.DISABLED
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationWorker
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderReceiverManager
+import com.duckduckgo.mobile.android.vpn.service.notification.getHighestPriorityPluginForType
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REVOKED
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
 import java.util.concurrent.TimeUnit
@@ -41,6 +47,8 @@ import org.junit.*
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -55,13 +63,14 @@ class DeviceShieldReminderNotificationSchedulerTest {
     private lateinit var workManager: WorkManager
     private lateinit var notificationManager: NotificationManagerCompat
     private lateinit var testee: DeviceShieldReminderNotificationScheduler
-    private val notificationBuilder: DeviceShieldAlertNotificationBuilder = mock()
     private val vpnFeatureRemover: VpnFeatureRemover = mock()
     private val mockVpnReminderReceiverManager: VpnReminderReceiverManager = mock()
-    private val vpnFeatureRemoverDao: VpnFeatureRemoverDao = mock()
+    private val mockPluginPoint: PluginPoint<VpnReminderNotificationContentPlugin> = mock()
+    private val vpnReminderNotificationBuilder: VpnReminderNotificationBuilder = mock()
 
     @Before
     fun before() {
+        whenever(vpnReminderNotificationBuilder.buildReminderNotification(any())).thenReturn(mock())
         initializeWorkManager()
         notificationManager = NotificationManagerCompat.from(context)
         testee =
@@ -69,12 +78,12 @@ class DeviceShieldReminderNotificationSchedulerTest {
                 context,
                 workManager,
                 notificationManager,
-                notificationBuilder,
                 vpnFeatureRemover,
                 coroutinesTestRule.testDispatcherProvider,
                 TestScope(),
+                vpnReminderNotificationBuilder,
+                mockPluginPoint,
             )
-        configureMockNotifications()
     }
 
     @After
@@ -172,6 +181,45 @@ class DeviceShieldReminderNotificationSchedulerTest {
     }
 
     @Test
+    fun whenVPNManuallyStopsAndNoContentPluginForDisabledThenNoImmediateNotificationShouldBeShown() = runTest {
+        whenever(vpnFeatureRemover.isFeatureRemoved()).thenReturn(false)
+        whenever(mockPluginPoint.getHighestPriorityPluginForType(DISABLED)).thenReturn(null)
+
+        testee.onVpnStopped(TestScope(), SELF_STOP)
+
+        verifyNoInteractions(vpnReminderNotificationBuilder)
+    }
+
+    @Test
+    fun whenVPNManuallyStopsAndWithContentPluginForDisabledThenImmediateNotificationShouldBeShown() = runTest {
+        whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(fakeRevokedPlugin, fakeDisabledPlugin))
+        whenever(vpnFeatureRemover.isFeatureRemoved()).thenReturn(false)
+
+        testee.onVpnStopped(TestScope(), SELF_STOP)
+
+        verify(vpnReminderNotificationBuilder).buildReminderNotification(fakeDisabledPlugin.getContent())
+    }
+
+    @Test
+    fun whenVpnRevokedAndNoContentPluginForRevokedThenNoImmediateNotificationShouldBeShown() = runTest {
+        whenever(vpnFeatureRemover.isFeatureRemoved()).thenReturn(false)
+        whenever(mockPluginPoint.getHighestPriorityPluginForType(Type.REVOKED)).thenReturn(null)
+
+        testee.onVpnStopped(TestScope(), REVOKED)
+
+        verifyNoInteractions(vpnReminderNotificationBuilder)
+    }
+
+    @Test
+    fun whenVpnRevokedAndWithContentPluginForRevokedThenImmediateNotificationShouldBeShown() = runTest {
+        whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(fakeRevokedPlugin, fakeDisabledPlugin))
+
+        testee.onVpnStopped(TestScope(), REVOKED)
+
+        verify(vpnReminderNotificationBuilder).buildReminderNotification(fakeRevokedPlugin.getContent())
+    }
+
+    @Test
     fun whenVPNIsKilledThenUndesiredReminderIsEnqueued() {
         testee.onVpnStopped(TestScope(), REVOKED)
 
@@ -186,19 +234,6 @@ class DeviceShieldReminderNotificationSchedulerTest {
         testee.onVpnStopped(TestScope(), REVOKED)
 
         assertWorkersAreNotEnqueued(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_UNDESIRED_TAG)
-    }
-
-    private fun configureMockNotifications() {
-        whenever(notificationBuilder.buildReminderNotification(any(), any())).thenReturn(
-            NotificationCompat.Builder(context, "")
-                .setSmallIcon(R.drawable.ic_device_shield_notification_logo)
-                .build(),
-        )
-        whenever(notificationBuilder.buildRevokedNotification(any())).thenReturn(
-            NotificationCompat.Builder(context, "")
-                .setSmallIcon(R.drawable.ic_device_shield_notification_logo)
-                .build(),
-        )
     }
 
     private fun enqueueDailyReminderNotificationWorker() {
@@ -258,5 +293,31 @@ class DeviceShieldReminderNotificationSchedulerTest {
         return workManager
             .getWorkInfosByTag(tag)
             .get()
+    }
+
+    private val fakeRevokedPlugin = object : VpnReminderNotificationContentPlugin {
+        override fun getContent(): NotificationContent = NotificationContent(
+            isSilent = false,
+            shouldAutoCancel = false,
+            customViewLayout = R.layout.notification_device_shield_revoked,
+            onNotificationPressIntent = null,
+            notificationAction = emptyList(),
+        )
+
+        override fun getPriority(): NotificationPriority = HIGH
+        override fun getType(): Type = Type.REVOKED
+    }
+
+    private val fakeDisabledPlugin = object : VpnReminderNotificationContentPlugin {
+        override fun getContent(): NotificationContent = NotificationContent(
+            isSilent = false,
+            shouldAutoCancel = false,
+            customViewLayout = R.layout.notification_device_shield_disabled,
+            onNotificationPressIntent = null,
+            notificationAction = emptyList(),
+        )
+
+        override fun getPriority(): NotificationPriority = HIGH
+        override fun getType(): Type = DISABLED
     }
 }
