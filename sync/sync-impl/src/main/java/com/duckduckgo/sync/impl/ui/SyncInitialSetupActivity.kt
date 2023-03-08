@@ -48,7 +48,6 @@ class SyncInitialSetupActivity : DuckDuckGoActivity() {
     private val binding: ActivitySyncSetupBinding by viewBinding()
     private val viewModel: SyncInitialSetupViewModel by bindViewModel()
 
-    // Register the launcher and result handler
     private val barcodeLauncher = registerForActivityResult(
         ScanContract(),
     ) { result: ScanIntentResult ->
