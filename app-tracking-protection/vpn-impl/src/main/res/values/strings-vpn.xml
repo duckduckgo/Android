@@ -228,6 +228,10 @@
     <string name="atp_ActivityAbout">About</string>
     <string name="atp_ActivityManage">Manage</string>
     <string name="atp_ActivityRemoveFeature">Disable and Delete Data</string>
+    <string name="atp_ActivityBlockingTrackersEnabledDescription">DuckDuckGo is blocking hidden trackers across your apps.</string>
+    <string name="atp_ActivityBlockingTrackersDisabledDescription">Re-enable App Tracking Protection to continue blocking trackers across your apps.</string>
+    <string name="atp_ActivityBlockedByHeaderText" instruction="Placeholder %1$s is a text containing either Today or Yesterday. Example: Blocked by DuckDuckGo Today">Blocked by DuckDuckGo %1$s</string>
+    <string name="atp_ActivityBlockedByOnDateHeaderText" instruction="Placeholder %1$s is a text containing a formatted date like Feb 05. Example: Blocked by DuckDuckGo on Feb 05">Blocked by DuckDuckGo on %1$s</string>
 
     <!--  App Tracking Protection FAQ -->
     <string name="atp_FAQActivityTitle">FAQ</string>
@@ -272,8 +276,8 @@
         <item quantity="other" instruction="Placeholder is a number">%1$d attempts. Known to collect:"</item>
     </plurals>
     <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
-        <item quantity="one" instruction="Placeholder is a number">"Blocked %1$d tracking attempt"</item>
-        <item quantity="other" instruction="Placeholder is a number">"Blocked %1$d tracking attempts"</item>
+        <item quantity="one" instruction="Placeholder is a number">"DuckDuckGo Blocked %1$d Tracking Attempt"</item>
+        <item quantity="other" instruction="Placeholder is a number">"DuckDuckGo Blocked %1$d Tracking Attempts"</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Report an Issue With This App</string>
     <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">Show %1$d more</string>
