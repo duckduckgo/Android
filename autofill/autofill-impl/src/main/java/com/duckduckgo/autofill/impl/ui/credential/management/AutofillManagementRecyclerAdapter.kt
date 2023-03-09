@@ -139,8 +139,8 @@ class AutofillManagementRecyclerAdapter(
         viewHolder: CredentialsViewHolder,
     ) {
         with(viewHolder.binding) {
-            title.text = loginCredentials.extractTitle()
-            subtitle.text = loginCredentials.username
+            title.setPrimaryText(loginCredentials.extractTitle() ?: "")
+            title.setSecondaryText(loginCredentials.username ?: "")
             root.setOnClickListener { onCredentialSelected(loginCredentials) }
 
             val popupMenu = initializePopupMenu(root.context, loginCredentials)
