@@ -45,6 +45,13 @@
             app:layout_constraintTop_toBottomOf="@id/enabledToggle"
             android:layout_height="wrap_content" />
 
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/credentialToggleGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="visible"
+            app:constraint_referenced_ids="topDivider, enabledToggle" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/logins"
             android:layout_width="0dp"

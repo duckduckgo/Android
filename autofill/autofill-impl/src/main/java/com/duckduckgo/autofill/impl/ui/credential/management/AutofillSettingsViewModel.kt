@@ -364,11 +364,13 @@ class AutofillSettingsViewModel @Inject constructor(
     fun onSearchQueryChanged(searchText: String) {
         Timber.v("Search query changed: %s", searchText)
         searchQueryFilter.value = searchText
-        _viewState.value = _viewState.value.copy(credentialSearchQuery = searchText)
+        val showAutofillEnabledToggle = searchText.isEmpty()
+        _viewState.value = _viewState.value.copy(credentialSearchQuery = searchText, showAutofillEnabledToggle = showAutofillEnabledToggle)
     }
 
     data class ViewState(
         val autofillEnabled: Boolean = true,
+        val showAutofillEnabledToggle: Boolean = true,
         val logins: List<LoginCredentials>? = null,
         val credentialMode: CredentialMode? = null,
         val credentialSearchQuery: String = "",
