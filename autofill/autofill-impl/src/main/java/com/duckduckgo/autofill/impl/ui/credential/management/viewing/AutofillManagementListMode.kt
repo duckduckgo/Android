@@ -22,11 +22,15 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.widget.CompoundButton
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.MenuProvider
+import androidx.core.view.updateLayoutParams
+import androidx.core.view.updateMargins
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DispatcherProvider
@@ -47,6 +51,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.sorting.InitialExtr
 import com.duckduckgo.autofill.impl.ui.credential.management.suggestion.SuggestionListBuilder
 import com.duckduckgo.autofill.impl.ui.credential.management.suggestion.SuggestionMatcher
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.mobile.android.ui.view.SearchBar
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
@@ -178,6 +183,15 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
                         credentialsListUpdated(it, state.credentialSearchQuery)
                         parentActivity()?.invalidateOptionsMenu()
                     }
+
+                    val resources = binding.logins.context.resources
+                    if (state.showAutofillEnabledToggle) {
+                        binding.credentialToggleGroup.show()
+                        binding.logins.updateTopMargin(resources.getDimensionPixelSize(CommonR.dimen.keyline_empty))
+                    } else {
+                        binding.credentialToggleGroup.gone()
+                        binding.logins.updateTopMargin(resources.getDimensionPixelSize(CommonR.dimen.keyline_4))
+                    }
                 }
             }
         }
@@ -281,4 +295,8 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
 
         private const val ARG_CURRENT_URL = "ARG_CURRENT_URL"
     }
+}
+
+private fun RecyclerView.updateTopMargin(marginPx: Int) {
+    updateLayoutParams<ConstraintLayout.LayoutParams> { this.updateMargins(top = marginPx) }
 }
