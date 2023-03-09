@@ -49,6 +49,16 @@ interface SyncLib {
         primaryKey: String,
         secretKey: String,
     ): String
+
+    fun decryptData(
+        rawData: String,
+        primaryKey: String,
+    ): DecryptResult
+
+    fun encryptData(
+        rawData: String,
+        primaryKey: String,
+    ): EncryptResult
 }
 
 class SyncNativeLib constructor(context: Context) : SyncLib {
@@ -116,7 +126,7 @@ class SyncNativeLib constructor(context: Context) : SyncLib {
         val secretKeyByteArray = secretKey.decodeKey()
         val decryptedData = ByteArray(encryptedDataByteArray.size - getEncryptedExtraBytes())
 
-            val result: Long = decrypt(decryptedData, encryptedDataByteArray, secretKeyByteArray)
+        val result: Long = decrypt(decryptedData, encryptedDataByteArray, secretKeyByteArray)
 
         return DecryptResult(
             result = result,
@@ -154,6 +164,38 @@ class SyncNativeLib constructor(context: Context) : SyncLib {
         return EncryptResult(
             result = result,
             encryptedData = encryptedDataByteArray.encodeKey(),
+        )
+    }
+
+    override fun encryptData(
+        rawData: String,
+        primaryKey: String,
+    ): EncryptResult {
+        val rawDataByteArray = rawData.decodeText()
+        val secretKeyByteArray = primaryKey.decodeKey()
+        val encryptedDataByteArray = ByteArray(rawDataByteArray.size + getEncryptedExtraBytes())
+
+        val result: Long = encrypt(encryptedDataByteArray, rawDataByteArray, secretKeyByteArray)
+
+        return EncryptResult(
+            result = result,
+            encryptedData = encryptedDataByteArray.encodeKey(),
+        )
+    }
+
+    override fun decryptData(
+        encryptedData: String,
+        primaryKey: String,
+    ): DecryptResult {
+        val encryptedDataByteArray = encryptedData.decodeKey()
+        val secretKeyByteArray = primaryKey.decodeKey()
+        val decryptedData = ByteArray(encryptedDataByteArray.size - getEncryptedExtraBytes())
+
+        val result: Long = decrypt(decryptedData, encryptedDataByteArray, secretKeyByteArray)
+
+        return DecryptResult(
+            result = result,
+            decryptedData = decryptedData.encodeText(),
         )
     }
 

@@ -63,18 +63,20 @@ class AppSyncRepository @Inject constructor(
 
     override fun createAccount(): Result<Boolean> {
         val userId = syncDeviceIds.userId()
-        val deviceId = syncDeviceIds.deviceId()
-        val deviceName = syncDeviceIds.deviceName()
 
         val account: AccountKeys = nativeLib.generateAccountKeys(userId = userId)
         if (account.result != 0L) return Result.Error(code = account.result.toInt(), reason = "Account keys failed")
+
+        val deviceId = syncDeviceIds.deviceId()
+        val deviceName = syncDeviceIds.deviceName()
+        val encryptedDeviceName = nativeLib.encryptData(deviceName, account.primaryKey).encryptedData
 
         val result = syncApi.createAccount(
             account.userId,
             account.passwordHash,
             account.protectedSecretKey,
             deviceId,
-            deviceName,
+            encryptedDeviceName,
         )
 
         return when (result) {
@@ -212,7 +214,7 @@ class AppSyncRepository @Inject constructor(
                 userID = userId,
                 hashedPassword = preLogin.passwordHash,
                 deviceId = deviceId,
-                deviceName = nativeLib.encrypt(deviceName, syncStore.secretKey!!).encryptedData,
+                deviceName = nativeLib.encryptData(deviceName, preLogin.primaryKey).encryptedData,
             )
 
         return when (result) {
@@ -300,7 +302,7 @@ class AppSyncRepository @Inject constructor(
                     result.data.map {
                         ConnectedDevice(
                             thisDevice = syncStore.deviceId == it.deviceId,
-                            deviceName = it.deviceName,
+                            deviceName = nativeLib.decryptData(it.deviceName, syncStore.primaryKey!!).decryptedData,
                             deviceId = it.deviceId,
                         )
                     },
@@ -324,7 +326,7 @@ class AppSyncRepository @Inject constructor(
             userID = userId,
             hashedPassword = preLogin.passwordHash,
             deviceId = deviceId,
-            deviceName = deviceName,
+            deviceName = nativeLib.encryptData(deviceName, preLogin.primaryKey).encryptedData,
         )
 
         return when (result) {
