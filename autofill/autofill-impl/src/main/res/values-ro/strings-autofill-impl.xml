@@ -70,7 +70,7 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Datele de conectare sunt stocate în siguranță numai pe acest dispozitiv.</string>
 
     <string name="autofillManagementAddLogin">Adaugă date de autentificare</string>
-    <string name="autofillManagementSearchLogins">Căutare</string>
+    <string name="autofillManagementSearchLogins">Date de autentificare pentru căutare</string>
     <string name="autofillManagementSearchClearDescription">Șterge datele introduse pentru căutare</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Nu există rezultate pentru „%1$s”</string>
 
