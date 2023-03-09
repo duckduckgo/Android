@@ -51,10 +51,10 @@ import com.duckduckgo.autofill.impl.ui.credential.management.sorting.InitialExtr
 import com.duckduckgo.autofill.impl.ui.credential.management.suggestion.SuggestionListBuilder
 import com.duckduckgo.autofill.impl.ui.credential.management.suggestion.SuggestionMatcher
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.mobile.android.ui.view.SearchBar
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
-import com.duckduckgo.mobile.android.ui.view.toPx
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
 import kotlinx.coroutines.launch
@@ -184,12 +184,13 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
                         parentActivity()?.invalidateOptionsMenu()
                     }
 
+                    val resources = binding.logins.context.resources
                     if (state.showAutofillEnabledToggle) {
                         binding.credentialToggleGroup.show()
-                        binding.logins.updateTopMargin(0)
+                        binding.logins.updateTopMargin(resources.getDimensionPixelSize(CommonR.dimen.keyline_empty))
                     } else {
                         binding.credentialToggleGroup.gone()
-                        binding.logins.updateTopMargin(16)
+                        binding.logins.updateTopMargin(resources.getDimensionPixelSize(CommonR.dimen.keyline_4))
                     }
                 }
             }
@@ -296,6 +297,6 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
     }
 }
 
-private fun RecyclerView.updateTopMargin(marginDp: Int) {
-    updateLayoutParams<ConstraintLayout.LayoutParams> { this.updateMargins(top = marginDp.toPx()) }
+private fun RecyclerView.updateTopMargin(marginPx: Int) {
+    updateLayoutParams<ConstraintLayout.LayoutParams> { this.updateMargins(top = marginPx) }
 }
