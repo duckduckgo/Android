@@ -231,6 +231,10 @@
     <string name="atp_ActivityAbout">Par</string>
     <string name="atp_ActivityManage">Pārvaldīt</string>
     <string name="atp_ActivityRemoveFeature">Atspējot un dzēst datus</string>
+    <string name="atp_ActivityBlockingTrackersEnabledDescription">DuckDuckGo bloķē slēptos izsekotājus tavās lietotnēs.</string>
+    <string name="atp_ActivityBlockingTrackersDisabledDescription">Atkal iespējo lietotņu izsekošanas aizsardzību, lai turpinātu bloķēt izsekotājus visās lietotnēs.</string>
+    <string name="atp_ActivityBlockedByHeaderText" instruction="Placeholder %1$s is a text containing either Today or Yesterday. Example: Blocked by DuckDuckGo Today">DuckDuckGo bloķēja %1$s</string>
+    <string name="atp_ActivityBlockedByOnDateHeaderText" instruction="Placeholder %1$s is a text containing a formatted date like Feb 05. Example: Blocked by DuckDuckGo on Feb 05">DuckDuckGo bloķēja %1$s</string>
 
     <!--  App Tracking Protection FAQ -->
     <string name="atp_FAQActivityTitle">BUJ</string>
@@ -276,9 +280,9 @@
         <item quantity="other">%1$d mēģinājumi. Zināms, ka vāc šādus datus:</item>
     </plurals>
     <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
-        <item quantity="zero">Bloķēti %1$d izsekošanas mēģinājumi</item>
-        <item quantity="one">Bloķēts %1$d izsekošanas mēģinājums</item>
-        <item quantity="other">Bloķēti %1$d izsekošanas mēģinājumi</item>
+        <item quantity="zero">DuckDuckGo bloķēja %1$d izsekošanas mēģinājumus</item>
+        <item quantity="one">DuckDuckGo bloķēja %1$d izsekošanas mēģinājumu</item>
+        <item quantity="other">DuckDuckGo bloķēja %1$d izsekošanas mēģinājumus</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Ziņot par problēmu ar šo lietotni</string>
     <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">Rādīt vēl %1$d</string>
