@@ -33,6 +33,10 @@ data class Entity(
             return "folder$index"
         }
 
+        fun generateFolderId(index: String): String {
+            return "folder$index"
+        }
+
         fun generateFavoriteId(index: Long): String {
             return "favorite$index"
         }

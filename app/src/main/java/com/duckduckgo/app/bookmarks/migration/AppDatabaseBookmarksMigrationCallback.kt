@@ -86,7 +86,7 @@ class AppDatabaseBookmarksMigrationCallback(
                     findFolderRelation(it.id)
                 }
             }
-            syncEntitiesDao().insert(Entity(Relation.BOOMARKS_ROOT, "Bookmarks", "", FOLDER))
+            syncEntitiesDao().insert(Entity(Relation.BOOMARKS_ROOT, Relation.BOOKMARKS_NAME, "", FOLDER))
         }
     }
 
@@ -98,7 +98,7 @@ class AppDatabaseBookmarksMigrationCallback(
             val bookmarksInFolder = bookmarksDao().getBookmarksByParentIdSync(folderId)
 
             foldersInFolder.forEach {
-                val entity = Entity(it.id, it.name, "", FOLDER)
+                val entity = Entity(Entity.generateFolderId(it.id), it.name, "", FOLDER)
                 entities.add(entity)
 
                 if (folderId == 0L) {
