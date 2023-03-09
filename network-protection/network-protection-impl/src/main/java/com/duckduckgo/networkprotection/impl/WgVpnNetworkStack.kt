@@ -84,7 +84,7 @@ class WgVpnNetworkStack @Inject constructor(
                     mtu = netPConfigProvider.mtu(),
                     addresses = wgTunnelData?.tunnelAddress ?: emptyMap(),
                     dns = netPConfigProvider.dns(),
-                    routes = emptyMap(),
+                    routes = netPConfigProvider.routes(),
                     appExclusionList = netPConfigProvider.exclusionList(),
                 ),
             ).also { logcat { "Returning VPN configuration: ${it.getOrNull()}" } }

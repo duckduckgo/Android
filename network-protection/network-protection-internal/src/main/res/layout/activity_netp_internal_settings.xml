@@ -101,7 +101,7 @@
                 android:id="@+id/dnsLeakProtectionToggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryText="@string/netpDnsLeakProtection"
+                app:primaryText="@string/netpDnsCloudflareFallback"
                 app:showSwitch="true"
             />
             <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem

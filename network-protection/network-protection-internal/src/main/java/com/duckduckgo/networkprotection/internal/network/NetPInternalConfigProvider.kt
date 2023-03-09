@@ -20,6 +20,7 @@ import android.content.Context
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.networkprotection.impl.config.NetPConfigProvider
 import com.duckduckgo.networkprotection.impl.config.PcapConfig
+import com.duckduckgo.networkprotection.impl.config.RealNetPConfigProvider
 import com.duckduckgo.networkprotection.internal.feature.NetPInternalFeatureToggles
 import com.squareup.anvil.annotations.ContributesBinding
 import java.io.File
@@ -32,6 +33,7 @@ import javax.inject.Inject
     priority = ContributesBinding.Priority.HIGHEST,
 )
 class NetPInternalConfigProvider @Inject constructor(
+    private val realNetPConfigProvider: RealNetPConfigProvider,
     private val mtuInternalProvider: NetPInternalMtuProvider,
     private val exclusionListProvider: NetPInternalExclusionListProvider,
     private val netPInternalFeatureToggles: NetPInternalFeatureToggles,
@@ -51,14 +53,11 @@ class NetPInternalConfigProvider @Inject constructor(
     }
 
     override fun dns(): Set<InetAddress> {
-        return if (netPInternalFeatureToggles.dnsLeakProtection().isEnabled()) {
-            mutableSetOf(
-                *InetAddress.getAllByName("10.11.12.1"),
-                *InetAddress.getAllByName("one.one.one.one"),
-            ).toSet()
-        } else {
-            emptySet()
-        }
+        return realNetPConfigProvider.dns().toMutableSet().apply {
+            if (netPInternalFeatureToggles.cloudflareDnsFallback().isEnabled()) {
+                addAll(InetAddress.getAllByName("one.one.one.one"))
+            }
+        }.toSet()
     }
 
     override fun pcapConfig(): PcapConfig? {

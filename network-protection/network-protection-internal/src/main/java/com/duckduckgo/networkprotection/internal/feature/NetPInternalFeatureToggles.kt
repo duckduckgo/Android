@@ -33,8 +33,8 @@ interface NetPInternalFeatureToggles {
     @Toggle.DefaultValue(defaultValue = false)
     fun excludeSystemApps(): Toggle
 
-    @Toggle.DefaultValue(defaultValue = true)
-    fun dnsLeakProtection(): Toggle
+    @Toggle.DefaultValue(defaultValue = false)
+    fun cloudflareDnsFallback(): Toggle
 
     @Toggle.DefaultValue(defaultValue = false)
     fun enablePcapRecording(): Toggle

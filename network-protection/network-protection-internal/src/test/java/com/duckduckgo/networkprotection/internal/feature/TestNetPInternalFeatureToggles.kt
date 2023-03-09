@@ -40,7 +40,7 @@ class TestNetPInternalFeatureToggles {
     @Test
     fun testDefaultValues() {
         assertTrue(toggles.self().isEnabled())
-        assertTrue(toggles.dnsLeakProtection().isEnabled())
+        assertFalse(toggles.cloudflareDnsFallback().isEnabled())
         assertFalse(toggles.excludeSystemApps().isEnabled())
         assertFalse(toggles.enablePcapRecording().isEnabled())
     }

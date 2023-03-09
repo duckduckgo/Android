@@ -167,7 +167,7 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
             startActivity(NetPSystemAppsExclusionListActivity.intent(this))
         }
 
-        with(netPInternalFeatureToggles.dnsLeakProtection()) {
+        with(netPInternalFeatureToggles.cloudflareDnsFallback()) {
             binding.dnsLeakProtectionToggle.setIsChecked(this.isEnabled())
             binding.dnsLeakProtectionToggle.setOnCheckedChangeListener { _, isChecked ->
                 this.setEnabled(Toggle.State(enable = isChecked))

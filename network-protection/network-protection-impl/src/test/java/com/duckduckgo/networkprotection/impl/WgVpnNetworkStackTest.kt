@@ -84,6 +84,10 @@ class WgVpnNetworkStackTest {
                 override fun dns(): Set<InetAddress> {
                     return setOf(InetAddress.getLocalHost())
                 }
+
+                override fun routes(): Map<String, Int> {
+                    return mapOf("10.11.12.1" to 32)
+                }
             },
         )
     }
@@ -98,7 +102,7 @@ class WgVpnNetworkStackTest {
                     mtu = 1280,
                     addresses = emptyMap(),
                     dns = setOf(InetAddress.getLocalHost()),
-                    routes = emptyMap(),
+                    routes = mapOf("10.11.12.1" to 32),
                     appExclusionList = setOf("com.google.android.gms"),
                 ),
             ),
