@@ -80,4 +80,12 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_chevron_forward_small_24" />
 
+    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:defaultPadding="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/activity_message" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
