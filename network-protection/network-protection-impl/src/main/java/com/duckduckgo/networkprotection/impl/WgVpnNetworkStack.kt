@@ -70,6 +70,7 @@ class WgVpnNetworkStack @Inject constructor(
 
             networkProtectionRepository.get().run {
                 serverDetails = ServerDetails(
+                    serverName = wgTunnelData!!.serverName,
                     ipAddress = wgTunnelData!!.serverIP,
                     location = wgTunnelData!!.serverLocation,
                 )

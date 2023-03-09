@@ -68,6 +68,7 @@ class RealWgServerDataProviderTest() {
 
         assertEquals(
             WgServerData(
+                serverName = "egress.euw",
                 publicKey = "CLQMP4SFzpyvAzMj3rXwShm+3n6Yt68hGHBF67At+x0=",
                 publicEndpoint = "euw.egress.np.duck.com:443",
                 address = "",
@@ -84,6 +85,7 @@ class RealWgServerDataProviderTest() {
 
         assertEquals(
             WgServerData(
+                serverName = "egress.use.2",
                 publicKey = "q3YJJUwMNP31J8qSvMdVsxASKNcjrm8ep8cLcI0qViY=",
                 publicEndpoint = "109.200.208.198:443",
                 address = "",
@@ -100,6 +102,7 @@ class RealWgServerDataProviderTest() {
 
         assertEquals(
             WgServerData(
+                serverName = "egress.usw.1",
                 publicKey = "R/BMR6Rr5rzvp7vSIWdAtgAmOLK9m7CqTcDynblM3Us=",
                 publicEndpoint = "162.245.204.100:443",
                 address = "",
@@ -116,6 +119,7 @@ class RealWgServerDataProviderTest() {
 
         assertEquals(
             WgServerData(
+                serverName = "egress.usw.1",
                 publicKey = "R/BMR6Rr5rzvp7vSIWdAtgAmOLK9m7CqTcDynblM3Us=",
                 publicEndpoint = "162.245.204.100:443",
                 address = "",
@@ -156,6 +160,7 @@ class RealWgServerDataProviderTest() {
 
         assertEquals(
             WgServerData(
+                serverName = "egress.euw",
                 publicKey = "CLQMP4SFzpyvAzMj3rXwShm+3n6Yt68hGHBF67At+x0=",
                 publicEndpoint = "euw.egress.np.duck.com:443",
                 address = "",
@@ -174,6 +179,7 @@ class RealWgServerDataProviderTest() {
 
         assertEquals(
             WgServerData(
+                serverName = "egress.usw.1",
                 publicKey = "R/BMR6Rr5rzvp7vSIWdAtgAmOLK9m7CqTcDynblM3Us=",
                 publicEndpoint = "162.245.204.100:443",
                 address = "",

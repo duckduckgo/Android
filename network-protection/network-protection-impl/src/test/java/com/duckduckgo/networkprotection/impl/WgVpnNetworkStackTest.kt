@@ -58,11 +58,21 @@ class WgVpnNetworkStackTest {
     @Mock
     private lateinit var netpPixels: NetworkProtectionPixels
 
+    private lateinit var wgTunnelData: WgTunnelData
+
     private lateinit var testee: WgVpnNetworkStack
 
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
+
+        wgTunnelData = WgTunnelData(
+            serverName = "euw.1",
+            userSpaceConfig = "testuserspaceconfig",
+            serverIP = "10.10.10.10",
+            serverLocation = "Stockholm, Sweden",
+            tunnelAddress = emptyMap(),
+        )
 
         testee = WgVpnNetworkStack(
             { wgProtocol },
@@ -80,14 +90,7 @@ class WgVpnNetworkStackTest {
 
     @Test
     fun whenOnPrepareVpnThenReturnVpnTunnelConfigAndStoreServerDetails() = runTest {
-        whenever(wgTunnelDataProvider.get()).thenReturn(
-            WgTunnelData(
-                userSpaceConfig = "testuserspaceconfig",
-                serverIP = "10.10.10.10",
-                serverLocation = "Stockholm, Sweden",
-                tunnelAddress = emptyMap(),
-            ),
-        )
+        whenever(wgTunnelDataProvider.get()).thenReturn(wgTunnelData)
 
         assertEquals(
             Result.success(
@@ -103,6 +106,7 @@ class WgVpnNetworkStackTest {
         )
 
         verify(networkProtectionRepository).serverDetails = ServerDetails(
+            serverName = "euw.1",
             ipAddress = "10.10.10.10",
             location = "Stockholm, Sweden",
         )
@@ -111,14 +115,7 @@ class WgVpnNetworkStackTest {
 
     @Test
     fun whenOnStartVpnAndEnabledTimeHasBeenResetThenSetEnabledTimeInMillis() = runTest {
-        whenever(wgTunnelDataProvider.get()).thenReturn(
-            WgTunnelData(
-                userSpaceConfig = "testuserspaceconfig",
-                serverIP = "10.10.10.10",
-                serverLocation = "Stockholm, Sweden",
-                tunnelAddress = emptyMap(),
-            ),
-        )
+        whenever(wgTunnelDataProvider.get()).thenReturn(wgTunnelData)
         whenever(networkProtectionRepository.enabledTimeInMillis).thenReturn(-1L)
         whenever(currentTimeProvider.getTimeInMillis()).thenReturn(1672229650358L)
 
@@ -134,14 +131,7 @@ class WgVpnNetworkStackTest {
 
     @Test
     fun whenOnStartVpnAndEnabledTimeHasBeenSetThenDoNotUpdateEnabledTime() = runTest {
-        whenever(wgTunnelDataProvider.get()).thenReturn(
-            WgTunnelData(
-                userSpaceConfig = "testuserspaceconfig",
-                serverIP = "10.10.10.10",
-                serverLocation = "Stockholm, Sweden",
-                tunnelAddress = emptyMap(),
-            ),
-        )
+        whenever(wgTunnelDataProvider.get()).thenReturn(wgTunnelData)
         whenever(networkProtectionRepository.enabledTimeInMillis).thenReturn(16722296505000L)
         whenever(currentTimeProvider.getTimeInMillis()).thenReturn(1672229650358L)
 
@@ -153,6 +143,7 @@ class WgVpnNetworkStackTest {
         )
 
         verify(networkProtectionRepository).serverDetails = ServerDetails(
+            serverName = "euw.1",
             ipAddress = "10.10.10.10",
             location = "Stockholm, Sweden",
         )
@@ -207,14 +198,7 @@ class WgVpnNetworkStackTest {
     @Test
     fun whenWgProtocolStartWgReturnsFailureThenOnStartVpnShouldReturnFailure() = runTest {
         whenever(wgProtocol.startWg(any(), any(), eq(null))).thenReturn(Result.failure(java.lang.IllegalStateException()))
-        whenever(wgTunnelDataProvider.get()).thenReturn(
-            WgTunnelData(
-                userSpaceConfig = "testuserspaceconfig",
-                serverIP = "10.10.10.10",
-                serverLocation = "Stockholm, Sweden",
-                tunnelAddress = emptyMap(),
-            ),
-        )
+        whenever(wgTunnelDataProvider.get()).thenReturn(wgTunnelData)
 
         testee.onPrepareVpn()
 
@@ -226,14 +210,7 @@ class WgVpnNetworkStackTest {
     @Test
     fun whenWgProtocolStartWgReturnsSuccessThenOnStartVpnShouldReturnSuccess() = runTest {
         whenever(wgProtocol.startWg(any(), any(), eq(null))).thenReturn(Result.success(Unit))
-        whenever(wgTunnelDataProvider.get()).thenReturn(
-            WgTunnelData(
-                userSpaceConfig = "testuserspaceconfig",
-                serverIP = "10.10.10.10",
-                serverLocation = "Stockholm, Sweden",
-                tunnelAddress = emptyMap(),
-            ),
-        )
+        whenever(wgTunnelDataProvider.get()).thenReturn(wgTunnelData)
 
         testee.onPrepareVpn()
 

@@ -39,6 +39,7 @@ interface NetworkProtectionRepository {
     }
 
     data class ServerDetails(
+        val serverName: String?,
         val ipAddress: String?,
         val location: String?,
     )
@@ -72,6 +73,7 @@ class RealNetworkProtectionRepository constructor(
 
     override var serverDetails: ServerDetails?
         get() {
+            val name = networkProtectionPrefs.getString(KEY_WG_SERVER_NAME, null)
             val ip = networkProtectionPrefs.getString(KEY_WG_SERVER_IP, null)
             val location = networkProtectionPrefs.getString(KEY_WG_SERVER_LOCATION, null)
 
@@ -79,6 +81,7 @@ class RealNetworkProtectionRepository constructor(
                 null
             } else {
                 ServerDetails(
+                    serverName = name,
                     ipAddress = ip,
                     location = location,
                 )
@@ -86,9 +89,11 @@ class RealNetworkProtectionRepository constructor(
         }
         set(value) {
             if (value == null) {
+                networkProtectionPrefs.putString(KEY_WG_SERVER_NAME, null)
                 networkProtectionPrefs.putString(KEY_WG_SERVER_IP, null)
                 networkProtectionPrefs.putString(KEY_WG_SERVER_LOCATION, null)
             } else {
+                networkProtectionPrefs.putString(KEY_WG_SERVER_NAME, value.serverName)
                 networkProtectionPrefs.putString(KEY_WG_SERVER_IP, value.ipAddress)
                 networkProtectionPrefs.putString(KEY_WG_SERVER_LOCATION, value.location)
             }
@@ -129,6 +134,7 @@ class RealNetworkProtectionRepository constructor(
     companion object {
         private const val KEY_WG_PRIVATE_KEY = "wg_private_key"
         private const val KEY_WG_PRIVATE_KEY_LAST_UPDATE = "wg_private_key_last_update"
+        private const val KEY_WG_SERVER_NAME = "wg_server_name"
         private const val KEY_WG_SERVER_IP = "wg_server_ip"
         private const val KEY_WG_SERVER_LOCATION = "wg_server_location"
         private const val KEY_WG_SERVER_ENABLE_TIME = "wg_server_enable_time"

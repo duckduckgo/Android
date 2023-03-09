@@ -31,6 +31,7 @@ import logcat.logcat
 interface WgTunnelDataProvider {
     suspend fun get(): WgTunnelData?
     data class WgTunnelData(
+        val serverName: String,
         val userSpaceConfig: String,
         val serverLocation: String?,
         val serverIP: String?,
@@ -68,6 +69,7 @@ class RealWgTunnelDataProvider @Inject constructor(
                 )
                 .build().run {
                     WgTunnelData(
+                        serverName = serverData.serverName,
                         userSpaceConfig = this.toWgUserspaceString(),
                         serverLocation = serverData.location,
                         serverIP = kotlin.runCatching { InetAddress.getByName(peers[0].endpoint?.host).hostAddress }.getOrNull(),

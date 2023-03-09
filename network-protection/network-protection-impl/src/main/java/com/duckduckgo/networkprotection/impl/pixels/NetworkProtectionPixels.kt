@@ -25,6 +25,7 @@ import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_BACKEND_API_ERROR_DEVICE_REGISTRATION_FAILED_DAILY
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_DISABLE_DAILY
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_ENABLE_DAILY
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_LATENCY_REPORT
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_VPN_CONNECTIVITY_LOST
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_VPN_CONNECTIVITY_LOST_DAILY
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_VPN_RECONNECT_FAILED
@@ -90,6 +91,11 @@ interface NetworkProtectionPixels {
      * count -> fire a pixel on every call
      */
     fun reportWireguardLibraryLoadFailed()
+
+    /**
+     * This fun will fire one pixel
+     */
+    fun reportLatency(metadata: Map<String, String>)
 }
 
 @ContributesBinding(AppScope::class)
@@ -138,6 +144,10 @@ class RealNetworkProtectionPixel @Inject constructor(
     override fun reportWireguardLibraryLoadFailed() {
         tryToFireDailyPixel(NETP_WG_ERROR_FAILED_TO_LOAD_WG_LIBRARY_DAILY)
         firePixel(NETP_WG_ERROR_FAILED_TO_LOAD_WG_LIBRARY)
+    }
+
+    override fun reportLatency(metadata: Map<String, String>) {
+        firePixel(NETP_LATENCY_REPORT, metadata)
     }
 
     private fun firePixel(

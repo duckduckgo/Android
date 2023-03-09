@@ -154,6 +154,7 @@ class NetworkProtectionManagementViewModelTest {
         )
         whenever(networkProtectionRepository.serverDetails).thenReturn(
             ServerDetails(
+                serverName = "euw.1",
                 ipAddress = "10.10.10.10",
                 location = "Stockholm, Sweden",
             ),
@@ -175,6 +176,7 @@ class NetworkProtectionManagementViewModelTest {
         whenever(networkProtectionRepository.enabledTimeInMillis).thenReturn(-1)
         whenever(networkProtectionRepository.serverDetails).thenReturn(
             ServerDetails(
+                serverName = "euw.1",
                 ipAddress = "10.10.10.10",
                 location = "Stockholm, Sweden",
             ),

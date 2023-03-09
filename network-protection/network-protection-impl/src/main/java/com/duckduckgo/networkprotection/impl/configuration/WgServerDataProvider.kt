@@ -32,6 +32,7 @@ import logcat.logcat
 
 interface WgServerDataProvider {
     data class WgServerData(
+        val serverName: String,
         val publicKey: String,
         val publicEndpoint: String,
         val address: String,
@@ -84,6 +85,7 @@ class RealWgServerDataProvider @Inject constructor(
     }
 
     private fun EligibleServerInfo.toWgServerData(): WgServerData = WgServerData(
+        serverName = server.name,
         publicKey = server.publicKey,
         publicEndpoint = server.extractPublicEndpoint(),
         address = allowedIPs.joinToString(","),

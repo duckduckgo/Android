@@ -36,6 +36,7 @@ class RealNetworkProtectionRepositoryTest {
         MockitoAnnotations.openMocks(this)
         testee = RealNetworkProtectionRepository(networkProtectionPrefs)
 
+        whenever(networkProtectionPrefs.getString("wg_server_name", null)).thenReturn("expected_server_name")
         whenever(networkProtectionPrefs.getString("wg_server_ip", null)).thenReturn("expected_ip")
         whenever(networkProtectionPrefs.getString("wg_server_location", null)).thenReturn("expected_location")
         whenever(networkProtectionPrefs.getString("wg_private_key", null)).thenReturn("expected_private_key")
@@ -70,6 +71,7 @@ class RealNetworkProtectionRepositoryTest {
     fun whenGettingServerDetailsThenGetServerDetailsFromPrefs() {
         assertEquals(
             ServerDetails(
+                serverName = "expected_server_name",
                 ipAddress = "expected_ip",
                 location = "expected_location",
             ),
@@ -80,6 +82,7 @@ class RealNetworkProtectionRepositoryTest {
     @Test
     fun whenSettingServerDetailsThenPutLongInPrefs() {
         testee.serverDetails = ServerDetails(
+            serverName = "expected_server_name",
             ipAddress = "expected_ip",
             location = "expected_location",
         )
@@ -110,6 +113,7 @@ class RealNetworkProtectionRepositoryTest {
 
         assertEquals(
             ServerDetails(
+                serverName = "expected_server_name",
                 ipAddress = null,
                 location = "expected_location",
             ),
@@ -123,8 +127,23 @@ class RealNetworkProtectionRepositoryTest {
 
         assertEquals(
             ServerDetails(
+                serverName = "expected_server_name",
                 ipAddress = "expected_ip",
                 location = null,
+            ),
+            testee.serverDetails,
+        )
+    }
+
+    @Test
+    fun whenServerNameIsNullThenServerDetailsNameIsNull() {
+        whenever(networkProtectionPrefs.getString("wg_server_name", null)).thenReturn(null)
+
+        assertEquals(
+            ServerDetails(
+                serverName = null,
+                ipAddress = "expected_ip",
+                location = "expected_location",
             ),
             testee.serverDetails,
         )

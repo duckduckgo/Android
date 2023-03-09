@@ -21,13 +21,12 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.alerts.reconnect.NetPReconnectNotifications
+import com.duckduckgo.networkprotection.impl.fakes.FakeNetworkProtectionRepository
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository
-import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ReconnectStatus
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ReconnectStatus.NotReconnecting
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ReconnectStatus.Reconnecting
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ReconnectStatus.ReconnectingFailed
-import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ServerDetails
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -153,38 +152,5 @@ class NetpVpnConnectivityLossListenerPluginTest {
         assertEquals(0, repository.reconnectAttemptCount)
         verifyNoInteractions(reconnectNotifications)
         verifyNoInteractions(netpPixels)
-    }
-
-    private class FakeNetworkProtectionRepository : NetworkProtectionRepository {
-        private var _reconnectStatus: ReconnectStatus? = null
-        private var _reconnectAttemptCount: Int = 0
-
-        override var reconnectStatus: ReconnectStatus
-            get() = _reconnectStatus ?: NotReconnecting
-            set(value) {
-                _reconnectStatus = value
-            }
-        override var reconnectAttemptCount: Int
-            get() = _reconnectAttemptCount
-            set(value) {
-                _reconnectAttemptCount = value
-            }
-        override var privateKey: String?
-            get() = null
-            set(_) {}
-
-        override var lastPrivateKeyUpdateTimeInMillis: Long
-            get() = -1L
-            set(_) {}
-
-        override var enabledTimeInMillis: Long
-            get() = -1L
-            set(_) {}
-        override var serverDetails: ServerDetails?
-            get() = null
-            set(_) {}
-        override var clientInterface: NetworkProtectionRepository.ClientInterface?
-            get() = null
-            set(_) {}
     }
 }
