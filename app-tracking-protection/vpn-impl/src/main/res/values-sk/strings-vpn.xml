@@ -237,6 +237,10 @@
     <string name="atp_ActivityAbout">O</string>
     <string name="atp_ActivityManage">Spravujte stránku</string>
     <string name="atp_ActivityRemoveFeature">Zakázanie a odstránenie údajov</string>
+    <string name="atp_ActivityBlockingTrackersEnabledDescription">DuckDuckGo blokuje skryté sledovacie zariadenia v aplikáciách.</string>
+    <string name="atp_ActivityBlockingTrackersDisabledDescription">Opätovne zapnite ochranu pred sledovaním aplikácií, aby ste mohli pokračovať v blokovaní sledovacích zariadení vo všetkých aplikáciách.</string>
+    <string name="atp_ActivityBlockedByHeaderText" instruction="Placeholder %1$s is a text containing either Today or Yesterday. Example: Blocked by DuckDuckGo Today">Zablokované službou DuckDuckGo %1$s</string>
+    <string name="atp_ActivityBlockedByOnDateHeaderText" instruction="Placeholder %1$s is a text containing a formatted date like Feb 05. Example: Blocked by DuckDuckGo on Feb 05">Zablokované službou DuckDuckGo dňa %1$s</string>
 
     <!--  App Tracking Protection FAQ -->
     <string name="atp_FAQActivityTitle">Často kladené otázky (FAQ)</string>
@@ -283,10 +287,10 @@
         <item quantity="other">%1$d pokusov. Je známe, že zbiera:</item>
     </plurals>
     <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
-        <item quantity="one">Blokovaný %1$d pokus o sledovanie</item>
-        <item quantity="few">Blokované %1$d pokusy o sledovanie</item>
-        <item quantity="many">Blokované %1$d pokusu o sledovanie</item>
-        <item quantity="other">Blokovaných %1$d pokusov o sledovanie</item>
+        <item quantity="one">DuckDuckGo zablokoval %1$d pokus o sledovanie</item>
+        <item quantity="few">DuckDuckGo zablokoval %1$d pokusy o sledovanie</item>
+        <item quantity="many">DuckDuckGo zablokoval %1$d pokusu o sledovanie</item>
+        <item quantity="other">DuckDuckGo zablokoval %1$d pokusov o sledovanie</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Nahláste problém s touto aplikáciou</string>
     <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">Zobraziť ešte %1$d</string>
