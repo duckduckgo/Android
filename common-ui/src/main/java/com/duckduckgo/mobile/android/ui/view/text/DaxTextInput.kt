@@ -100,7 +100,7 @@ class DaxTextInput @JvmOverloads constructor(
             binding.internalEditText.onFocusChangeListener = OnFocusChangeListener { _, hasFocus ->
                 if (hasFocus) {
                     if (isPassword) {
-                        showPassword()
+                        showPassword(isEditing = true)
                     }
                     binding.internalEditText.showKeyboard()
                 } else {
@@ -201,15 +201,21 @@ class DaxTextInput @JvmOverloads constructor(
             if (isPasswordShown) {
                 hidePassword()
             } else {
-                showPassword()
+                showPassword(isEditing = binding.internalEditText.hasFocus())
             }
         }
     }
 
-    private fun showPassword() {
+    private fun showPassword(isEditing: Boolean) {
         isPasswordShown = true
         binding.internalPasswordIcon.setImageResource(R.drawable.ic_password_hide)
-        binding.internalEditText.inputType = EditorInfo.TYPE_CLASS_TEXT or EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE
+
+        val inputType = if (isEditing) {
+            EditorInfo.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+        } else {
+            EditorInfo.TYPE_CLASS_TEXT or EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE
+        }
+        binding.internalEditText.inputType = inputType
         binding.internalEditText.transformationMethod = null
         binding.internalEditText.setSelection(binding.internalEditText.length())
     }
