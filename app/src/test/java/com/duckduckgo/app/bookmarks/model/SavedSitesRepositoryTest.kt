@@ -527,6 +527,8 @@ class SavedSitesRepositoryTest {
             val updatedResult = awaitItem()
 
             assertEquals(listOf(updatedBookmark), updatedResult.first)
+
+            cancelAndConsumeRemainingEvents()
         }
     }
 
@@ -564,6 +566,8 @@ class SavedSitesRepositoryTest {
 
             assertEquals(listOf(bookmarkThree), updatedResult.first)
             assertEquals(listOf(updatedFolderOne), updatedResult.second)
+
+            cancelAndConsumeRemainingEvents()
         }
     }
 
