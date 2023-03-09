@@ -195,3 +195,7 @@ data class Route(
     val lowAddress: String,
     val highAddress: String,
 )
+
+internal fun List<Route>.asAddressMaskPair(): List<Pair<String, Int>> {
+    return this.map { it.address to it.maskWidth }
+}

@@ -304,21 +304,27 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
                 // The address is also isolated to minimize network interference during performance tests
                 VpnRoutes.includedTestRoutes.forEach { addRoute(it.address, it.maskWidth) }
             } else {
-                val vpnRoutes = VpnRoutes.includedRoutes.toMutableSet()
+                // If tunnel config has routes use them, else use the defaults.
+                // we're mapping her to a list of pairs because we want to make sure that when we combine them with other defaults, eg. add the DNS
+                // addresses, we don't override any entry in the map
+                val vpnRoutes = tunnelConfig.routes
+                    .map { it.key to it.value }
+                    .ifEmpty { VpnRoutes.includedRoutes.asAddressMaskPair() }.toMutableList()
                 if (isInterceptDnsTrafficEnabled) {
                     // we need to make sure that all DNS traffic goes through the VPN. Specifically when the DNS server is on the local network
                     dnsList.filterIsInstance<Inet4Address>().forEach { addr ->
                         addr.asRoute()?.let {
                             logcat { "Adding DNS address $it to VPN routes" }
-                            vpnRoutes.add(it)
+                            vpnRoutes.add(it.address to it.maskWidth)
                         }
                     }
                 }
                 vpnRoutes.forEach { route ->
                     // convert to InetAddress to later check if it's loopback
-                    kotlin.runCatching { InetAddress.getByName(route.address) }.getOrNull()?.let {
+                    kotlin.runCatching { InetAddress.getByName(route.first) }.getOrNull()?.let {
                         if (!it.isLoopbackAddress) {
-                            addRoute(route.address, route.maskWidth)
+                            logcat { "Adding route $route" }
+                            addRoute(route.first, route.second)
                         } else {
                             logcat(LogPriority.WARN) { "Tried to add loopback address $it to VPN routes" }
                         }
@@ -329,10 +335,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             // Add the route for all Global Unicast Addresses. This is the IPv6 equivalent to
             // IPv4 public IP addresses. They are addresses that routable in the internet
             addRoute("2000::", 3)
-
-            tunnelConfig.routes.forEach {
-                addRoute(it.key, it.value)
-            }
 
             setBlocking(true)
             // Cap the max MTU value to avoid backpressure issues in the socket
