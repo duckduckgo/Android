@@ -69,11 +69,11 @@
                     app:panelText="@string/atp_ActivityDisabledLabel" />
 
                 <ImageView
-                    android:id="@+id/deviceShieldTrackerPhoneAndLockImage"
+                    android:id="@+id/deviceShieldTrackerShieldImage"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:src="@drawable/phone_and_lock_enabled"/>
+                    android:src="@drawable/apptp_shield_enabled"/>
 
                 <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                     android:id="@+id/deviceShieldTrackerBlockingTrackersDescription"

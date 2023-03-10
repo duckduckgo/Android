@@ -516,7 +516,7 @@ class DeviceShieldTrackerActivity :
         if (runningState.state == VpnRunningState.ENABLED) {
             binding.deviceShieldTrackerBlockingTrackersDescription.text =
                 resources.getString(R.string.atp_ActivityBlockingTrackersEnabledDescription)
-            binding.deviceShieldTrackerPhoneAndLockImage.setImageResource(R.drawable.phone_and_lock_enabled)
+            binding.deviceShieldTrackerShieldImage.setImageResource(R.drawable.apptp_shield_enabled)
             if (runningState.alwaysOnState.isAlwaysOnLockedDown()) {
                 binding.deviceShieldTrackerLabelEnabled.gone()
 
@@ -548,7 +548,7 @@ class DeviceShieldTrackerActivity :
         } else {
             binding.deviceShieldTrackerBlockingTrackersDescription.text =
                 resources.getString(R.string.atp_ActivityBlockingTrackersDisabledDescription)
-            binding.deviceShieldTrackerPhoneAndLockImage.setImageResource(R.drawable.phone_and_lock_disabled)
+            binding.deviceShieldTrackerShieldImage.setImageResource(R.drawable.apptp_shield_disabled)
             binding.deviceShieldTrackerLabelEnabled.gone()
 
             val (disabledLabel, annotation) = if (runningState.stopReason == REVOKED) {
