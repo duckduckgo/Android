@@ -30,7 +30,7 @@
     <string name="saveLoginDialogButtonSave">Salva dati di accesso</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Salva password</string>
     <string name="saveLoginDialogNotNow">Non adesso</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">I dati di accesso sono archiviati in modo sicuro solo su questo dispositivo e possono essere gestiti dal menu Compilazione automatica, all\'interno di Impostazioni.</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">DuckDuckGo salverà in modo sicuro questi dati di accesso sul tuo dispositivo. Puoi gestire i dati di accesso salvati in Impostazioni.</string>
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Vuoi che DuckDuckGo salvi i dati di accesso?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Altre opzioni</string>
 
@@ -70,7 +70,7 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">I dati di accesso vengono salvati in modo sicuro solo su questo dispositivo.</string>
 
     <string name="autofillManagementAddLogin">Aggiungi dati di accesso</string>
-    <string name="autofillManagementSearchLogins">Ricerca</string>
+    <string name="autofillManagementSearchLogins">Cerca dati di accesso</string>
     <string name="autofillManagementSearchClearDescription">Elimina input di ricerca</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Nessun risultato per \"%1$s\"</string>
 

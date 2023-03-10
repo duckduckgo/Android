@@ -30,7 +30,7 @@
     <string name="saveLoginDialogButtonSave">Guardar início de sessão</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Guardar palavra-passe</string>
     <string name="saveLoginDialogNotNow">Agora não</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Os inícios de sessão são armazenados com segurança apenas neste dispositivo e podes efetuar a gestão dos mesmo a partir do menu de Preenchimento automático nas Definições.</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">O DuckDuckGo vai armazenar este início de sessão em segurança no teu dispositivo. Podes gerir os inícios de sessão guardados nas Definições.</string>
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Queres que o DuckDuckGo guarde o teu início de sessão?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Mais opções</string>
 
@@ -70,7 +70,7 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Os inícios de sessão são armazenados em segurança apenas neste dispositivo.</string>
 
     <string name="autofillManagementAddLogin">Adicionar início de sessão</string>
-    <string name="autofillManagementSearchLogins">Pesquisar</string>
+    <string name="autofillManagementSearchLogins">Pesquisar inícios de sessão</string>
     <string name="autofillManagementSearchClearDescription">Limpar introdução da pesquisa</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Nenhum resultado para \"%1$s\"</string>
 
