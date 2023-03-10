@@ -26,6 +26,8 @@ import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_DISABLE_DAILY
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_ENABLE_DAILY
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_LATENCY_REPORT
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_REKEY_COMPLETED
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_REKEY_COMPLETED_DAILY
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_VPN_CONNECTIVITY_LOST
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_VPN_CONNECTIVITY_LOST_DAILY
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_VPN_RECONNECT_FAILED
@@ -96,6 +98,13 @@ interface NetworkProtectionPixels {
      * This fun will fire one pixel
      */
     fun reportLatency(metadata: Map<String, String>)
+
+    /**
+     * This fun will fire two pixels
+     * daily -> fire only once a day no matter how many times we call this fun
+     * count -> fire a pixel on every call
+     */
+    fun reportRekeyCompleted()
 }
 
 @ContributesBinding(AppScope::class)
@@ -148,6 +157,11 @@ class RealNetworkProtectionPixel @Inject constructor(
 
     override fun reportLatency(metadata: Map<String, String>) {
         firePixel(NETP_LATENCY_REPORT, metadata)
+    }
+
+    override fun reportRekeyCompleted() {
+        tryToFireDailyPixel(NETP_REKEY_COMPLETED_DAILY)
+        firePixel(NETP_REKEY_COMPLETED)
     }
 
     private fun firePixel(

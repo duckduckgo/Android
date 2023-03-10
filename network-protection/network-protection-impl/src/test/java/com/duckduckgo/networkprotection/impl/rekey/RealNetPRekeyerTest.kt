@@ -18,6 +18,7 @@ package com.duckduckgo.networkprotection.impl.rekey
 
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature.NETP_VPN
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -28,6 +29,7 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -38,12 +40,15 @@ class RealNetPRekeyerTest {
     @Mock
     private lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
+    @Mock
+    private lateinit var networkProtectionPixels: NetworkProtectionPixels
+
     private lateinit var testee: RealNetPRekeyer
 
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        testee = RealNetPRekeyer(networkProtectionRepository, vpnFeaturesRegistry)
+        testee = RealNetPRekeyer(networkProtectionRepository, vpnFeaturesRegistry, networkProtectionPixels)
     }
 
     @Test
@@ -55,6 +60,7 @@ class RealNetPRekeyerTest {
         verify(networkProtectionRepository).privateKey = null
         verify(networkProtectionRepository).lastPrivateKeyUpdateTimeInMillis = -1
         verify(vpnFeaturesRegistry, never()).refreshFeature(any())
+        verifyNoInteractions(networkProtectionPixels)
     }
 
     @Test
@@ -66,5 +72,6 @@ class RealNetPRekeyerTest {
         verify(networkProtectionRepository).privateKey = null
         verify(networkProtectionRepository).lastPrivateKeyUpdateTimeInMillis = -1
         verify(vpnFeaturesRegistry).refreshFeature(NETP_VPN)
+        verify(networkProtectionPixels).reportRekeyCompleted()
     }
 }

@@ -19,6 +19,7 @@ package com.duckduckgo.networkprotection.impl.rekey
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -32,6 +33,7 @@ interface NetPRekeyer {
 class RealNetPRekeyer @Inject constructor(
     private val networkProtectionRepository: NetworkProtectionRepository,
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
+    private val networkProtectionPixels: NetworkProtectionPixels,
 ) : NetPRekeyer {
 
     override suspend fun doRekey() {
@@ -41,6 +43,7 @@ class RealNetPRekeyer @Inject constructor(
         if (vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)) {
             logcat { "Restarting VPN after clearing client keys" }
             vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
+            networkProtectionPixels.reportRekeyCompleted()
         }
     }
 }
