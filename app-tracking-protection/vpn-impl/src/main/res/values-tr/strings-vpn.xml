@@ -225,6 +225,10 @@
     <string name="atp_ActivityAbout">Hakkında</string>
     <string name="atp_ActivityManage">Yönet</string>
     <string name="atp_ActivityRemoveFeature">Verileri Devre Dışı Bırak ve Sil</string>
+    <string name="atp_ActivityBlockingTrackersEnabledDescription">DuckDuckGo, uygulamalarınızdaki gizli izleyicileri engelliyor.</string>
+    <string name="atp_ActivityBlockingTrackersDisabledDescription">Uygulamalarınızda izleyicileri engellemeye devam etmek için App Tracking Protection\'ı yeniden etkinleştirin.</string>
+    <string name="atp_ActivityBlockedByHeaderText" instruction="Placeholder %1$s is a text containing either Today or Yesterday. Example: Blocked by DuckDuckGo Today">DuckDuckGo tarafından %1$s engellendi</string>
+    <string name="atp_ActivityBlockedByOnDateHeaderText" instruction="Placeholder %1$s is a text containing a formatted date like Feb 05. Example: Blocked by DuckDuckGo on Feb 05">DuckDuckGo tarafından %1$s günü engellendi</string>
 
     <!--  App Tracking Protection FAQ -->
     <string name="atp_FAQActivityTitle">SSS</string>
@@ -269,8 +273,8 @@
         <item quantity="other">%1$d girişimi. Şunları topladığı biliniyor:</item>
     </plurals>
     <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
-        <item quantity="one">%1$d izleme girişimini engelledi</item>
-        <item quantity="other">%1$d izleme girişimini engelledi</item>
+        <item quantity="one">DuckDuckGo, %1$d İzleme Girişimini Engelledi</item>
+        <item quantity="other">DuckDuckGo, %1$d İzleme Girişimini Engelledi</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Bu Uygulamayla İlgili Bir Sorun Bildirin</string>
     <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">%1$d tane daha göster</string>
