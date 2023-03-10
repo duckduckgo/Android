@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
+import android.annotation.SuppressLint
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -30,6 +31,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.mobile.android.ui.view.setAllParentsClip
 
+@SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 class PulseAnimation(private val lifecycleOwner: LifecycleOwner) : DefaultLifecycleObserver {
     private var pulseAnimation: AnimatorSet = AnimatorSet()
     private var highlightImageView: View? = null
