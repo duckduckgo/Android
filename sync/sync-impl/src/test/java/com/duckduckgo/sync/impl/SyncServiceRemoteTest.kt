@@ -16,6 +16,7 @@
 
 package com.duckduckgo.sync.impl
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.sync.TestSyncFixtures.accountCreatedFailDupUser
 import com.duckduckgo.sync.TestSyncFixtures.accountCreatedFailInvalid
 import com.duckduckgo.sync.TestSyncFixtures.accountCreatedSuccess
@@ -59,12 +60,14 @@ import com.duckduckgo.sync.TestSyncFixtures.token
 import com.duckduckgo.sync.TestSyncFixtures.userId
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import retrofit2.Call
 
+@RunWith(AndroidJUnit4::class)
 class SyncServiceRemoteTest {
 
     private val syncService: SyncService = mock()

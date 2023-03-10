@@ -33,6 +33,7 @@ import com.duckduckgo.sync.impl.LoginResponse
 import com.duckduckgo.sync.impl.Logout
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Signup
+import com.duckduckgo.sync.impl.encodeB64
 import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.Response
 
@@ -109,6 +110,8 @@ object TestSyncFixtures {
 
     val jsonRecoveryKey = "{\"recovery\":{\"primary_key\":\"$primaryKey\",\"user_id\":\"$userId\"}}"
     val jsonConnectKey = "{\"connect\":{\"device_id\":\"$deviceId\",\"secret_key\":\"$primaryKey\"}}"
+    val jsonRecoveryKeyEncoded = jsonRecoveryKey.encodeB64()
+    val jsonConnectKeyEncoded = jsonConnectKey.encodeB64()
     val connectKeys = ConnectKeys(0L, publicKey = primaryKey, secretKey = secretKey)
     val validLoginKeys = LoginKeys(result = 0L, passwordHash = hashedPassword, stretchedPrimaryKey = stretchedPrimaryKey, primaryKey = primaryKey)
     val failedLoginKeys = LoginKeys(result = 9L, passwordHash = "", stretchedPrimaryKey = "", primaryKey = "")

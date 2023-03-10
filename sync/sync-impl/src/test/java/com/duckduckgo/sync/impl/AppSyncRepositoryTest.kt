@@ -16,6 +16,7 @@
 
 package com.duckduckgo.sync.impl
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.sync.TestSyncFixtures.accountCreatedFailDupUser
 import com.duckduckgo.sync.TestSyncFixtures.accountCreatedSuccess
 import com.duckduckgo.sync.TestSyncFixtures.accountKeys
@@ -36,8 +37,9 @@ import com.duckduckgo.sync.TestSyncFixtures.getDevicesError
 import com.duckduckgo.sync.TestSyncFixtures.getDevicesSuccess
 import com.duckduckgo.sync.TestSyncFixtures.hashedPassword
 import com.duckduckgo.sync.TestSyncFixtures.invalidDecryptedSecretKey
-import com.duckduckgo.sync.TestSyncFixtures.jsonConnectKey
+import com.duckduckgo.sync.TestSyncFixtures.jsonConnectKeyEncoded
 import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKey
+import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKeyEncoded
 import com.duckduckgo.sync.TestSyncFixtures.listOfConnectedDevices
 import com.duckduckgo.sync.TestSyncFixtures.loginFailed
 import com.duckduckgo.sync.TestSyncFixtures.loginSuccess
@@ -60,6 +62,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -68,6 +71,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
+@RunWith(AndroidJUnit4::class)
 class AppSyncRepositoryTest {
 
     private var nativeLib: SyncLib = mock()
@@ -232,7 +236,7 @@ class AppSyncRepositoryTest {
         prepareForLoginSuccess()
         val syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore)
 
-        val result = syncRepo.login(jsonRecoveryKey)
+        val result = syncRepo.login(jsonRecoveryKeyEncoded)
 
         assertEquals(Result.Success(true), result)
         verify(syncStore).userId = userId
@@ -271,7 +275,7 @@ class AppSyncRepositoryTest {
         whenever(nativeLib.prepareForLogin(primaryKey = primaryKey)).thenReturn(failedLoginKeys)
 
         val syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore)
-        val result = syncRepo.login(jsonRecoveryKey)
+        val result = syncRepo.login(jsonRecoveryKeyEncoded)
 
         assertTrue(result is Result.Error)
     }
@@ -299,7 +303,7 @@ class AppSyncRepositoryTest {
         whenever(syncApi.login(userId, hashedPassword, deviceId, deviceName, devicePlatformType)).thenReturn(loginFailed)
 
         val syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore)
-        val result = syncRepo.login(jsonRecoveryKey)
+        val result = syncRepo.login(jsonRecoveryKeyEncoded)
 
         assertTrue(result is Result.Error)
     }
@@ -353,7 +357,7 @@ class AppSyncRepositoryTest {
 
         val result = syncRepo.getRecoveryCode()
 
-        assertEquals(jsonRecoveryKey, result)
+        assertEquals(jsonRecoveryKeyEncoded, result)
     }
 
     @Test
@@ -373,7 +377,7 @@ class AppSyncRepositoryTest {
 
         val result = syncRepo.getConnectQR() as Success
 
-        assertEquals(jsonConnectKey, result.data)
+        assertEquals(jsonConnectKeyEncoded, result.data)
     }
 
     @Test
@@ -383,7 +387,7 @@ class AppSyncRepositoryTest {
         whenever(syncApi.connect(token, deviceId, encryptedRecoveryCode)).thenReturn(Result.Success(true))
         val syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore)
 
-        val result = syncRepo.connectDevice(jsonConnectKey)
+        val result = syncRepo.connectDevice(jsonConnectKeyEncoded)
 
         verify(syncApi).connect(token, deviceId, encryptedRecoveryCode)
         assertTrue(result is Success)
@@ -401,7 +405,7 @@ class AppSyncRepositoryTest {
         whenever(syncApi.connect(token, deviceId, encryptedRecoveryCode)).thenReturn(Result.Success(true))
         val syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore)
 
-        val result = syncRepo.connectDevice(jsonConnectKey)
+        val result = syncRepo.connectDevice(jsonConnectKeyEncoded)
 
         verify(syncApi).connect(token, deviceId, encryptedRecoveryCode)
         assertTrue(result is Success)

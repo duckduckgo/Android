@@ -115,7 +115,9 @@ class AppSyncRepository @Inject constructor(
     }
 
     override fun login(recoveryCodeRawJson: String): Result<Boolean> {
-        val recoveryCode = Adapters.recoveryCodeAdapter.fromJson(recoveryCodeRawJson)?.recovery ?: return Result.Error(reason = "Failed reading json")
+        val recoveryCode = Adapters.recoveryCodeAdapter.fromJson(recoveryCodeRawJson.decodeB64())?.recovery ?: return Result.Error(
+            reason = "Failed reading json",
+        )
         val primaryKey = recoveryCode.primaryKey
         val userId = recoveryCode.userId
         val deviceId = syncDeviceIds.deviceId()
@@ -150,7 +152,7 @@ class AppSyncRepository @Inject constructor(
     override fun getRecoveryCode(): String? {
         val primaryKey = syncStore.primaryKey ?: return null
         val userID = syncStore.userId ?: return null
-        return Adapters.recoveryCodeAdapter.toJson(LinkCode(RecoveryCode(primaryKey, userID)))
+        return Adapters.recoveryCodeAdapter.toJson(LinkCode(RecoveryCode(primaryKey, userID))).encodeB64()
     }
 
     override fun getConnectQR(): Result<String> {
@@ -164,11 +166,11 @@ class AppSyncRepository @Inject constructor(
             LinkCode(connect = ConnectCode(deviceId = deviceId, secretKey = prepareForConnect.publicKey)),
         ) ?: return Error(reason = "Error generating Linking Code")
 
-        return Result.Success(linkingQRCode)
+        return Result.Success(linkingQRCode.encodeB64())
     }
 
     override fun connectDevice(contents: String): Result<Boolean> {
-        val connectKeys = Adapters.recoveryCodeAdapter.fromJson(contents)?.connect ?: return Result.Error(reason = "Error reading json")
+        val connectKeys = Adapters.recoveryCodeAdapter.fromJson(contents.decodeB64())?.connect ?: return Result.Error(reason = "Error reading json")
         if (!isSignedIn()) {
             val result = createAccount()
             if (result is Error) return result
