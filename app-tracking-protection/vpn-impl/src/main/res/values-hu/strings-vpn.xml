@@ -225,6 +225,10 @@
     <string name="atp_ActivityAbout">További információ</string>
     <string name="atp_ActivityManage">Kezelés</string>
     <string name="atp_ActivityRemoveFeature">Kikapcsolás és adatok törlése</string>
+    <string name="atp_ActivityBlockingTrackersEnabledDescription">A DuckDuckGo blokkolja a rejtett nyomkövetőket az alkalmazásokban.</string>
+    <string name="atp_ActivityBlockingTrackersDisabledDescription">Engedélyezd újra az App Tracking Protection funkciót, hogy továbbra is blokkold a nyomkövetőket az alkalmazásokban.</string>
+    <string name="atp_ActivityBlockedByHeaderText" instruction="Placeholder %1$s is a text containing either Today or Yesterday. Example: Blocked by DuckDuckGo Today">A DuckDuckGo %1$s blokkolta</string>
+    <string name="atp_ActivityBlockedByOnDateHeaderText" instruction="Placeholder %1$s is a text containing a formatted date like Feb 05. Example: Blocked by DuckDuckGo on Feb 05">A DuckDuckGo %1$s-i dátummal blokkolta</string>
 
     <!--  App Tracking Protection FAQ -->
     <string name="atp_FAQActivityTitle">GYIK</string>
@@ -269,8 +273,8 @@
         <item quantity="other">%1$d kísérlet. A következőket gyűjti:</item>
     </plurals>
     <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
-        <item quantity="one">%1$d követési kísérletet blokkolva</item>
-        <item quantity="other">%1$d követési kísérletet blokkolva</item>
+        <item quantity="one">A DuckDuckGo %1$d nyomkövetési kísérletet blokkolt</item>
+        <item quantity="other">A DuckDuckGo %1$d nyomkövetési kísérletet blokkolt</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Az alkalmazással kapcsolatos probléma bejelentése</string>
     <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">További %1$d megjelenítése</string>
