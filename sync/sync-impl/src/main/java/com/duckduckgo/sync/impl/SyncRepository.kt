@@ -71,7 +71,7 @@ class AppSyncRepository @Inject constructor(
         val deviceName = syncDeviceIds.deviceName()
         val deviceType = syncDeviceIds.deviceType()
         val encryptedDeviceName = nativeLib.encryptData(deviceName, account.primaryKey).encryptedData
-        val encryptedDeviceType = nativeLib.encryptData(deviceType.platform, account.primaryKey).encryptedData
+        val encryptedDeviceType = nativeLib.encryptData(deviceType.deviceFactor, account.primaryKey).encryptedData
 
         val result = syncApi.createAccount(
             account.userId,
@@ -294,7 +294,7 @@ class AppSyncRepository @Inject constructor(
         if (preLogin.result != 0L) return Result.Error(code = preLogin.result.toInt(), reason = "Login account keys failed")
 
         val deviceType = syncDeviceIds.deviceType()
-        val encryptedDeviceType = nativeLib.encryptData(deviceType.platform, preLogin.primaryKey).encryptedData
+        val encryptedDeviceType = nativeLib.encryptData(deviceType.deviceFactor, preLogin.primaryKey).encryptedData
 
         val result = syncApi.login(
             userID = userId,

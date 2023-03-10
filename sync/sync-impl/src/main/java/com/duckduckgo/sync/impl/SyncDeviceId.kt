@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.os.Build
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.impl.Type.DESKTOP
 import com.duckduckgo.sync.impl.Type.MOBILE
 import com.duckduckgo.sync.impl.Type.UNKNOWN
 import com.duckduckgo.sync.store.SyncStore
@@ -68,16 +69,18 @@ constructor(
     }
 
     override fun deviceType(): DeviceType {
-        return DeviceType("android_${deviceInfo.formFactor().description}")
+        return DeviceType(deviceInfo.formFactor().description)
     }
 }
 
-data class DeviceType(val platform: String = "") {
+data class DeviceType(val deviceFactor: String = "") {
     fun type(): Type {
         val mobileRegex = Regex("(phone|tablet)", RegexOption.IGNORE_CASE)
+        val desktopRegex = Regex("(desktop)", RegexOption.IGNORE_CASE)
         return when {
-            platform.contains(mobileRegex) -> MOBILE
-            platform.isEmpty() -> UNKNOWN
+            deviceFactor.contains(mobileRegex) -> MOBILE
+            deviceFactor.contains(desktopRegex) -> DESKTOP
+            deviceFactor.isEmpty() -> UNKNOWN
             else -> UNKNOWN
         }
     }

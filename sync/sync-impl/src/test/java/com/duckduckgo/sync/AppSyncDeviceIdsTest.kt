@@ -96,7 +96,7 @@ class AppSyncDeviceIdsTest {
         val deviceType = appSyncDeviceIds.deviceType()
 
         assertEquals(deviceType.type(), Type.MOBILE)
-        assertEquals(deviceType.platform, "android_phone")
+        assertEquals(deviceType.deviceFactor, "phone")
     }
 
     private fun getFakeSyncStore(): SyncStore {

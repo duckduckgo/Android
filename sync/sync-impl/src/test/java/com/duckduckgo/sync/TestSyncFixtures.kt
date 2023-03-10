@@ -42,8 +42,8 @@ object TestSyncFixtures {
     const val password = "password"
     const val deviceId = "deviceId"
     const val deviceName = "deviceName"
-    const val devicePlatformType = "android_phone"
-    val deviceType = DeviceType(devicePlatformType)
+    const val deviceFactor = "phone"
+    val deviceType = DeviceType(deviceFactor)
     const val token = "token"
     const val primaryKey = "primaryKey"
     const val stretchedPrimaryKey = "primaryKey"
@@ -70,7 +70,7 @@ object TestSyncFixtures {
         passwordHash = "",
     )
     val accountCreated = AccountCreatedResponse(userId, token)
-    val signUpRequest = Signup(userId, hashedPassword, protectedEncryptionKey, deviceId, deviceName, devicePlatformType)
+    val signUpRequest = Signup(userId, hashedPassword, protectedEncryptionKey, deviceId, deviceName, deviceFactor)
     val signupSuccess: Response<AccountCreatedResponse> = Response.success(accountCreated)
     const val duplicateUsercCodeErr = 409
     const val duplicateUserMessageErr = "Invalid hashed_password. Must be 32 bytes encoded in Base64URL."
@@ -134,11 +134,11 @@ object TestSyncFixtures {
         hashedPassword = hashedPassword,
         deviceId = deviceId,
         deviceName = deviceName,
-        deviceType = devicePlatformType,
+        deviceType = deviceFactor,
     )
     val loginSuccessResponse: Response<LoginResponse> = Response.success(loginResponseBody)
 
-    val listOfDevices = listOf(Device(deviceId = deviceId, deviceName = deviceName, jwIat = "", deviceType = devicePlatformType))
+    val listOfDevices = listOf(Device(deviceId = deviceId, deviceName = deviceName, jwIat = "", deviceType = deviceFactor))
     val deviceResponse = DeviceResponse(DeviceEntries(listOfDevices))
     val getDevicesBodySuccessResponse: Response<DeviceResponse> = Response.success(deviceResponse)
     val getDevicesBodyErrorResponse: Response<DeviceResponse> = Response.error(
