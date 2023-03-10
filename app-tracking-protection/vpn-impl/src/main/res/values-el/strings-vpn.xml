@@ -225,6 +225,10 @@
     <string name="atp_ActivityAbout">Σχετικά</string>
     <string name="atp_ActivityManage">Διαχείριση</string>
     <string name="atp_ActivityRemoveFeature">Απενεργοποίηση και διαγραφή δεδομένων</string>
+    <string name="atp_ActivityBlockingTrackersEnabledDescription">Το DuckDuckGo αποκλείει κρυφές εφαρμογές παρακολούθησης στις εφαρμογές σας.</string>
+    <string name="atp_ActivityBlockingTrackersDisabledDescription">Ενεργοποιήστε εκ νέου την Προστασία παρακολούθησης από εφαρμογές για να συνεχίσετε να αποκλείετε εφαρμογές παρακολούθησης των εφαρμογών σας.</string>
+    <string name="atp_ActivityBlockedByHeaderText" instruction="Placeholder %1$s is a text containing either Today or Yesterday. Example: Blocked by DuckDuckGo Today">Αποκλείστηκε από το DuckDuckGo %1$s</string>
+    <string name="atp_ActivityBlockedByOnDateHeaderText" instruction="Placeholder %1$s is a text containing a formatted date like Feb 05. Example: Blocked by DuckDuckGo on Feb 05">Αποκλείστηκε από το DuckDuckGo στις %1$s</string>
 
     <!--  App Tracking Protection FAQ -->
     <string name="atp_FAQActivityTitle">Συχνές ερωτήσεις</string>
@@ -269,8 +273,8 @@
         <item quantity="other">%1$d προσπάθειες. Είναι γνωστό ότι συλλέγει:</item>
     </plurals>
     <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
-        <item quantity="one">Αποκλείστηκε %1$d προσπάθεια παρακολούθησης</item>
-        <item quantity="other">Αποκλείστηκαν %1$d προσπάθειες παρακολούθησης</item>
+        <item quantity="one">Το DuckDuckGo απέκλεισε %1$d προσπάθεια παρακολούθησης</item>
+        <item quantity="other">Το DuckDuckGo απέκλεισε %1$d προσπάθειες παρακολούθησης</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Αναφέρετε ένα πρόβλημα με αυτήν την εφαρμογή</string>
     <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">Εμφάνιση %1$d ακόμα</string>
