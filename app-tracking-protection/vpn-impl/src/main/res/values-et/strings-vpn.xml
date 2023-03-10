@@ -225,6 +225,10 @@
     <string name="atp_ActivityAbout">Teave</string>
     <string name="atp_ActivityManage">Halda</string>
     <string name="atp_ActivityRemoveFeature">Keela ja kustuta andmed</string>
+    <string name="atp_ActivityBlockingTrackersEnabledDescription">DuckDuckGo blokeerib varjatud jälgijaid sinu rakendustes.</string>
+    <string name="atp_ActivityBlockingTrackersDisabledDescription">Luba uuesti App Tracking Protection, et jätkata jälgijate blokeerimist oma rakendustes.</string>
+    <string name="atp_ActivityBlockedByHeaderText" instruction="Placeholder %1$s is a text containing either Today or Yesterday. Example: Blocked by DuckDuckGo Today">%1$s DuckDuckGo poolt blokeeritud</string>
+    <string name="atp_ActivityBlockedByOnDateHeaderText" instruction="Placeholder %1$s is a text containing a formatted date like Feb 05. Example: Blocked by DuckDuckGo on Feb 05">%1$s DuckDuckGo poolt blokeeritud</string>
 
     <!--  App Tracking Protection FAQ -->
     <string name="atp_FAQActivityTitle">KKK</string>
@@ -269,8 +273,8 @@
         <item quantity="other">%1$d katset. Teada olevalt kogutakse järgmist:</item>
     </plurals>
     <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
-        <item quantity="one">Blokeeriti %1$d jälgimiskatse</item>
-        <item quantity="other">Blokeeriti %1$d jälgimiskatset</item>
+        <item quantity="one">DuckDuckGo blokeeris %1$d jälgimiskatse</item>
+        <item quantity="other">DuckDuckGo blokeeris %1$d jälgimiskatset</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Teata selle rakendusega seotud probleemist</string>
     <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">Kuva %1$d rohkem</string>
