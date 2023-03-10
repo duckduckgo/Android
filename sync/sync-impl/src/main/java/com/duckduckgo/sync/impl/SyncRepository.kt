@@ -63,18 +63,23 @@ class AppSyncRepository @Inject constructor(
 
     override fun createAccount(): Result<Boolean> {
         val userId = syncDeviceIds.userId()
-        val deviceId = syncDeviceIds.deviceId()
-        val deviceName = syncDeviceIds.deviceName()
 
         val account: AccountKeys = nativeLib.generateAccountKeys(userId = userId)
         if (account.result != 0L) return Result.Error(code = account.result.toInt(), reason = "Account keys failed")
+
+        val deviceId = syncDeviceIds.deviceId()
+        val deviceName = syncDeviceIds.deviceName()
+        val deviceType = syncDeviceIds.deviceType()
+        val encryptedDeviceName = nativeLib.encryptData(deviceName, account.primaryKey).encryptedData
+        val encryptedDeviceType = nativeLib.encryptData(deviceType.deviceFactor, account.primaryKey).encryptedData
 
         val result = syncApi.createAccount(
             account.userId,
             account.passwordHash,
             account.protectedSecretKey,
             deviceId,
-            deviceName,
+            encryptedDeviceName,
+            encryptedDeviceType,
         )
 
         return when (result) {
@@ -110,7 +115,9 @@ class AppSyncRepository @Inject constructor(
     }
 
     override fun login(recoveryCodeRawJson: String): Result<Boolean> {
-        val recoveryCode = Adapters.recoveryCodeAdapter.fromJson(recoveryCodeRawJson)?.recovery ?: return Result.Error(reason = "Failed reading json")
+        val recoveryCode = Adapters.recoveryCodeAdapter.fromJson(recoveryCodeRawJson.decodeB64())?.recovery ?: return Result.Error(
+            reason = "Failed reading json",
+        )
         val primaryKey = recoveryCode.primaryKey
         val userId = recoveryCode.userId
         val deviceId = syncDeviceIds.deviceId()
@@ -145,7 +152,7 @@ class AppSyncRepository @Inject constructor(
     override fun getRecoveryCode(): String? {
         val primaryKey = syncStore.primaryKey ?: return null
         val userID = syncStore.userId ?: return null
-        return Adapters.recoveryCodeAdapter.toJson(LinkCode(RecoveryCode(primaryKey, userID)))
+        return Adapters.recoveryCodeAdapter.toJson(LinkCode(RecoveryCode(primaryKey, userID))).encodeB64()
     }
 
     override fun getConnectQR(): Result<String> {
@@ -159,11 +166,11 @@ class AppSyncRepository @Inject constructor(
             LinkCode(connect = ConnectCode(deviceId = deviceId, secretKey = prepareForConnect.publicKey)),
         ) ?: return Error(reason = "Error generating Linking Code")
 
-        return Result.Success(linkingQRCode)
+        return Result.Success(linkingQRCode.encodeB64())
     }
 
     override fun connectDevice(contents: String): Result<Boolean> {
-        val connectKeys = Adapters.recoveryCodeAdapter.fromJson(contents)?.connect ?: return Result.Error(reason = "Error reading json")
+        val connectKeys = Adapters.recoveryCodeAdapter.fromJson(contents.decodeB64())?.connect ?: return Result.Error(reason = "Error reading json")
         if (!isSignedIn()) {
             val result = createAccount()
             if (result is Error) return result
@@ -191,44 +198,7 @@ class AppSyncRepository @Inject constructor(
                 val recoveryCode = Adapters.recoveryCodeAdapter.fromJson(sealOpen)?.recovery ?: return Result.Error(reason = "Error reading json")
                 syncStore.userId = recoveryCode.userId
                 syncStore.primaryKey = recoveryCode.primaryKey
-                return login(recoveryCode.userId, recoveryCode.primaryKey)
-            }
-        }
-    }
-
-    private fun login(
-        userId: String,
-        primaryKey: String,
-    ): Result<Boolean> {
-        val deviceId = syncDeviceIds.deviceId()
-        val deviceName = syncDeviceIds.deviceName()
-
-        val preLogin: LoginKeys = nativeLib.prepareForLogin(primaryKey)
-        Timber.i("SYNC prelogin ${preLogin.passwordHash} and ${preLogin.stretchedPrimaryKey}")
-        if (preLogin.result != 0L) return Result.Error(code = preLogin.result.toInt(), reason = "Account keys failed")
-
-        val result =
-            syncApi.login(
-                userID = userId,
-                hashedPassword = preLogin.passwordHash,
-                deviceId = deviceId,
-                deviceName = deviceName,
-            )
-
-        return when (result) {
-            is Result.Error -> {
-                result
-            }
-            is Result.Success -> {
-                val decryptResult = nativeLib.decrypt(result.data.protected_encryption_key, preLogin.stretchedPrimaryKey)
-                if (decryptResult.result != 0L) return Result.Error(code = decryptResult.result.toInt(), reason = "Decrypt failed")
-                syncStore.userId = userId
-                syncStore.deviceId = deviceId
-                syncStore.deviceName = deviceName
-                syncStore.token = result.data.token
-                syncStore.primaryKey = preLogin.primaryKey
-                syncStore.secretKey = decryptResult.decryptedData
-                Result.Success(true)
+                return performLogin(recoveryCode.userId, deviceId, syncDeviceIds.deviceName(), recoveryCode.primaryKey)
             }
         }
     }
@@ -288,6 +258,8 @@ class AppSyncRepository @Inject constructor(
     override fun getConnectedDevices(): Result<List<ConnectedDevice>> {
         val token = syncStore.token.takeUnless { it.isNullOrEmpty() }
             ?: return Result.Error(reason = "Token Empty")
+        val primaryKey = syncStore.primaryKey.takeUnless { it.isNullOrEmpty() }
+            ?: return Result.Error(reason = "PrimaryKey not found")
 
         return when (val result = syncApi.getDevices(token)) {
             is Result.Error -> {
@@ -300,8 +272,11 @@ class AppSyncRepository @Inject constructor(
                     result.data.map {
                         ConnectedDevice(
                             thisDevice = syncStore.deviceId == it.deviceId,
-                            deviceName = it.deviceName,
+                            deviceName = nativeLib.decryptData(it.deviceName, primaryKey).decryptedData,
                             deviceId = it.deviceId,
+                            deviceType = it.deviceType.takeUnless { it.isNullOrEmpty() }?.let { encryptedDeviceType ->
+                                DeviceType(nativeLib.decryptData(encryptedDeviceType, primaryKey).decryptedData)
+                            } ?: DeviceType(),
                         )
                     },
                 )
@@ -320,11 +295,15 @@ class AppSyncRepository @Inject constructor(
         val preLogin: LoginKeys = nativeLib.prepareForLogin(primaryKey)
         if (preLogin.result != 0L) return Result.Error(code = preLogin.result.toInt(), reason = "Login account keys failed")
 
+        val deviceType = syncDeviceIds.deviceType()
+        val encryptedDeviceType = nativeLib.encryptData(deviceType.deviceFactor, preLogin.primaryKey).encryptedData
+
         val result = syncApi.login(
             userID = userId,
             hashedPassword = preLogin.passwordHash,
             deviceId = deviceId,
-            deviceName = deviceName,
+            deviceName = nativeLib.encryptData(deviceName, preLogin.primaryKey).encryptedData,
+            deviceType = encryptedDeviceType,
         )
 
         return when (result) {
@@ -377,6 +356,7 @@ data class ConnectedDevice(
     val thisDevice: Boolean = false,
     val deviceName: String,
     val deviceId: String,
+    val deviceType: DeviceType,
 )
 
 data class ConnectCode(

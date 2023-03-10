@@ -16,6 +16,7 @@
 
 package com.duckduckgo.sync.impl
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.sync.TestSyncFixtures.accountCreatedFailDupUser
 import com.duckduckgo.sync.TestSyncFixtures.accountCreatedFailInvalid
 import com.duckduckgo.sync.TestSyncFixtures.accountCreatedSuccess
@@ -33,6 +34,7 @@ import com.duckduckgo.sync.TestSyncFixtures.deleteAccountError
 import com.duckduckgo.sync.TestSyncFixtures.deleteAccountInvalid
 import com.duckduckgo.sync.TestSyncFixtures.deleteAccountResponse
 import com.duckduckgo.sync.TestSyncFixtures.deleteAccountSuccess
+import com.duckduckgo.sync.TestSyncFixtures.deviceFactor
 import com.duckduckgo.sync.TestSyncFixtures.deviceId
 import com.duckduckgo.sync.TestSyncFixtures.deviceLogoutBody
 import com.duckduckgo.sync.TestSyncFixtures.deviceLogoutResponse
@@ -58,12 +60,14 @@ import com.duckduckgo.sync.TestSyncFixtures.token
 import com.duckduckgo.sync.TestSyncFixtures.userId
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import retrofit2.Call
 
+@RunWith(AndroidJUnit4::class)
 class SyncServiceRemoteTest {
 
     private val syncService: SyncService = mock()
@@ -76,7 +80,7 @@ class SyncServiceRemoteTest {
         whenever(call.execute()).thenReturn(signupSuccess)
 
         val result = with(accountKeys) {
-            syncRemote.createAccount(userId, passwordHash, protectedSecretKey, deviceId, deviceName)
+            syncRemote.createAccount(userId, passwordHash, protectedSecretKey, deviceId, deviceName, deviceFactor)
         }
 
         assertEquals(accountCreatedSuccess, result)
@@ -90,7 +94,7 @@ class SyncServiceRemoteTest {
         whenever(call.execute()).thenReturn(signupFailInvalid)
 
         val result = with(accountKeys) {
-            syncRemote.createAccount(userId, passwordHash, protectedSecretKey, deviceId, deviceName)
+            syncRemote.createAccount(userId, passwordHash, protectedSecretKey, deviceId, deviceName, deviceFactor)
         }
 
         assertEquals(accountCreatedFailInvalid, result)
@@ -104,7 +108,7 @@ class SyncServiceRemoteTest {
         whenever(call.execute()).thenReturn(signupFailDuplicatedUser)
 
         val result = with(accountKeys) {
-            syncRemote.createAccount(userId, passwordHash, protectedSecretKey, deviceId, deviceName)
+            syncRemote.createAccount(userId, passwordHash, protectedSecretKey, deviceId, deviceName, deviceFactor)
         }
 
         assertEquals(accountCreatedFailDupUser, result)
@@ -165,7 +169,7 @@ class SyncServiceRemoteTest {
         whenever(syncService.login(loginRequestBody)).thenReturn(call)
         whenever(call.execute()).thenReturn(loginSuccessResponse)
 
-        val result = syncRemote.login(userId, hashedPassword, deviceId, deviceName)
+        val result = syncRemote.login(userId, hashedPassword, deviceId, deviceName, deviceFactor)
 
         assertEquals(loginSuccess, result)
     }
@@ -177,7 +181,7 @@ class SyncServiceRemoteTest {
         whenever(syncService.login(loginRequestBody)).thenReturn(call)
         whenever(call.execute()).thenReturn(loginFailedInvalidResponse)
 
-        val result = syncRemote.login(userId, hashedPassword, deviceId, deviceName)
+        val result = syncRemote.login(userId, hashedPassword, deviceId, deviceName, deviceFactor)
 
         assertEquals(loginError, result)
     }

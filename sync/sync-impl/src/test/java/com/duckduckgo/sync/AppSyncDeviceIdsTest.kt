@@ -17,35 +17,41 @@
 package com.duckduckgo.sync
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.sync.impl.AppSyncDeviceIds
+import com.duckduckgo.sync.impl.Type
 import com.duckduckgo.sync.store.SyncStore
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class AppSyncDeviceIdsTest {
 
+    private var deviceInfo: DeviceInfo = mock()
+
     @Test
     fun whenUserIdExistsInStoreThenReturnsStoredValue() {
         val syncStore = getFakeSyncStore()
-        val appSyncDeviceIds = AppSyncDeviceIds(syncStore)
+        val appSyncDeviceIds = AppSyncDeviceIds(syncStore, deviceInfo)
         assertEquals(syncStore.userId, appSyncDeviceIds.userId())
     }
 
     @Test
     fun whenDeviceIdExistsInStoreThenReturnsStoredValue() {
         val syncStore = getFakeSyncStore()
-        val appSyncDeviceIds = AppSyncDeviceIds(syncStore)
+        val appSyncDeviceIds = AppSyncDeviceIds(syncStore, deviceInfo)
         assertEquals(syncStore.deviceId, appSyncDeviceIds.deviceId())
     }
 
     @Test
     fun whenDeviceNameExistsInStoreThenReturnsStoredValue() {
         val syncStore = getFakeSyncStore()
-        val appSyncDeviceIds = AppSyncDeviceIds(syncStore)
+        val appSyncDeviceIds = AppSyncDeviceIds(syncStore, deviceInfo)
         assertEquals(syncStore.deviceName, appSyncDeviceIds.deviceName())
     }
 
@@ -54,7 +60,7 @@ class AppSyncDeviceIdsTest {
         val emptySyncStore = getFakeEmptySyncStore()
         assertNull(emptySyncStore.userId)
 
-        val appSyncDeviceIds = AppSyncDeviceIds(emptySyncStore)
+        val appSyncDeviceIds = AppSyncDeviceIds(emptySyncStore, deviceInfo)
 
         val userId = appSyncDeviceIds.userId()
         assertTrue(userId.isNotEmpty())
@@ -65,7 +71,7 @@ class AppSyncDeviceIdsTest {
         val emptySyncStore = getFakeEmptySyncStore()
         assertNull(emptySyncStore.deviceId)
 
-        val appSyncDeviceIds = AppSyncDeviceIds(emptySyncStore)
+        val appSyncDeviceIds = AppSyncDeviceIds(emptySyncStore, deviceInfo)
 
         val deviceId = appSyncDeviceIds.deviceId()
         assertTrue(deviceId.isNotEmpty())
@@ -75,10 +81,22 @@ class AppSyncDeviceIdsTest {
     fun whenDeviceNameDoesNotExistInStoreThenNewIdIsReturned() {
         val emptySyncStore = getFakeEmptySyncStore()
         assertNull(emptySyncStore.deviceName)
-        val appSyncDeviceIds = AppSyncDeviceIds(emptySyncStore)
+        val appSyncDeviceIds = AppSyncDeviceIds(emptySyncStore, deviceInfo)
 
         val deviceName = appSyncDeviceIds.deviceName()
         assertTrue(deviceName.isNotEmpty())
+    }
+
+    @Test
+    fun whenPlatformTypeIsAndroidPhoneThenDeviceTypeMobile() {
+        val emptySyncStore = getFakeEmptySyncStore()
+        whenever(deviceInfo.formFactor()).thenReturn(DeviceInfo.FormFactor.PHONE)
+        val appSyncDeviceIds = AppSyncDeviceIds(emptySyncStore, deviceInfo)
+
+        val deviceType = appSyncDeviceIds.deviceType()
+
+        assertEquals(deviceType.type(), Type.MOBILE)
+        assertEquals(deviceType.deviceFactor, "phone")
     }
 
     private fun getFakeSyncStore(): SyncStore {

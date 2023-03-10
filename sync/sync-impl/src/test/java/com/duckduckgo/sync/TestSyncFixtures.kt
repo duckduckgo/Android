@@ -27,11 +27,13 @@ import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.Device
 import com.duckduckgo.sync.impl.DeviceEntries
 import com.duckduckgo.sync.impl.DeviceResponse
+import com.duckduckgo.sync.impl.DeviceType
 import com.duckduckgo.sync.impl.Login
 import com.duckduckgo.sync.impl.LoginResponse
 import com.duckduckgo.sync.impl.Logout
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Signup
+import com.duckduckgo.sync.impl.encodeB64
 import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.Response
 
@@ -40,6 +42,8 @@ object TestSyncFixtures {
     const val password = "password"
     const val deviceId = "deviceId"
     const val deviceName = "deviceName"
+    const val deviceFactor = "phone"
+    val deviceType = DeviceType(deviceFactor)
     const val token = "token"
     const val primaryKey = "primaryKey"
     const val stretchedPrimaryKey = "primaryKey"
@@ -66,7 +70,7 @@ object TestSyncFixtures {
         passwordHash = "",
     )
     val accountCreated = AccountCreatedResponse(userId, token)
-    val signUpRequest = Signup(userId, hashedPassword, protectedEncryptionKey, deviceId, deviceName)
+    val signUpRequest = Signup(userId, hashedPassword, protectedEncryptionKey, deviceId, deviceName, deviceFactor)
     val signupSuccess: Response<AccountCreatedResponse> = Response.success(accountCreated)
     const val duplicateUsercCodeErr = 409
     const val duplicateUserMessageErr = "Invalid hashed_password. Must be 32 bytes encoded in Base64URL."
@@ -106,6 +110,8 @@ object TestSyncFixtures {
 
     val jsonRecoveryKey = "{\"recovery\":{\"primary_key\":\"$primaryKey\",\"user_id\":\"$userId\"}}"
     val jsonConnectKey = "{\"connect\":{\"device_id\":\"$deviceId\",\"secret_key\":\"$primaryKey\"}}"
+    val jsonRecoveryKeyEncoded = jsonRecoveryKey.encodeB64()
+    val jsonConnectKeyEncoded = jsonConnectKey.encodeB64()
     val connectKeys = ConnectKeys(0L, publicKey = primaryKey, secretKey = secretKey)
     val validLoginKeys = LoginKeys(result = 0L, passwordHash = hashedPassword, stretchedPrimaryKey = stretchedPrimaryKey, primaryKey = primaryKey)
     val failedLoginKeys = LoginKeys(result = 9L, passwordHash = "", stretchedPrimaryKey = "", primaryKey = "")
@@ -123,10 +129,16 @@ object TestSyncFixtures {
         "{\"error\":\"$invalidMessageErr\"}".toResponseBody(),
     )
     val loginFailed = Result.Error(code = wrongCredentialsCodeErr, reason = wrongCredentialsMessageErr)
-    val loginRequestBody = Login(userId = userId, hashedPassword = hashedPassword, deviceId = deviceId, deviceName = deviceName)
+    val loginRequestBody = Login(
+        userId = userId,
+        hashedPassword = hashedPassword,
+        deviceId = deviceId,
+        deviceName = deviceName,
+        deviceType = deviceFactor,
+    )
     val loginSuccessResponse: Response<LoginResponse> = Response.success(loginResponseBody)
 
-    val listOfDevices = listOf(Device(deviceId = deviceId, deviceName = deviceName, jwIat = ""))
+    val listOfDevices = listOf(Device(deviceId = deviceId, deviceName = deviceName, jwIat = "", deviceType = deviceFactor))
     val deviceResponse = DeviceResponse(DeviceEntries(listOfDevices))
     val getDevicesBodySuccessResponse: Response<DeviceResponse> = Response.success(deviceResponse)
     val getDevicesBodyErrorResponse: Response<DeviceResponse> = Response.error(
@@ -136,7 +148,7 @@ object TestSyncFixtures {
 
     val getDevicesSuccess = Result.Success(listOfDevices)
     val getDevicesError = Result.Error(code = invalidCodeErr, reason = invalidMessageErr)
-    val listOfConnectedDevices = listOf(ConnectedDevice(thisDevice = true, deviceName = deviceName, deviceId = deviceId))
+    val listOfConnectedDevices = listOf(ConnectedDevice(thisDevice = true, deviceName = deviceName, deviceId = deviceId, deviceType = deviceType))
 
     val connectKey = ConnectKey(encryptedRecoveryCode)
     const val keysNotFoundErr = "connection_keys_not_found"
