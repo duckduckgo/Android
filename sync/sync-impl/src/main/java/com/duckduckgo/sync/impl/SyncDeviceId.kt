@@ -73,10 +73,11 @@ constructor(
     }
 }
 
+private val mobileRegex = Regex("(phone|tablet)", RegexOption.IGNORE_CASE)
+private val desktopRegex = Regex("(desktop)", RegexOption.IGNORE_CASE)
+
 data class DeviceType(val deviceFactor: String = "") {
     fun type(): Type {
-        val mobileRegex = Regex("(phone|tablet)", RegexOption.IGNORE_CASE)
-        val desktopRegex = Regex("(desktop)", RegexOption.IGNORE_CASE)
         return when {
             deviceFactor.contains(mobileRegex) -> MOBILE
             deviceFactor.contains(desktopRegex) -> DESKTOP
