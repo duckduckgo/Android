@@ -258,6 +258,8 @@ class AppSyncRepository @Inject constructor(
     override fun getConnectedDevices(): Result<List<ConnectedDevice>> {
         val token = syncStore.token.takeUnless { it.isNullOrEmpty() }
             ?: return Result.Error(reason = "Token Empty")
+        val primaryKey = syncStore.primaryKey.takeUnless { it.isNullOrEmpty() }
+            ?: return Result.Error(reason = "PrimaryKey not found")
 
         return when (val result = syncApi.getDevices(token)) {
             is Result.Error -> {
@@ -270,10 +272,10 @@ class AppSyncRepository @Inject constructor(
                     result.data.map {
                         ConnectedDevice(
                             thisDevice = syncStore.deviceId == it.deviceId,
-                            deviceName = nativeLib.decryptData(it.deviceName, syncStore.primaryKey!!).decryptedData,
+                            deviceName = nativeLib.decryptData(it.deviceName, primaryKey).decryptedData,
                             deviceId = it.deviceId,
                             deviceType = it.deviceType.takeUnless { it.isNullOrEmpty() }?.let { encryptedDeviceType ->
-                                DeviceType(nativeLib.decryptData(encryptedDeviceType, syncStore.primaryKey!!).decryptedData)
+                                DeviceType(nativeLib.decryptData(encryptedDeviceType, primaryKey).decryptedData)
                             } ?: DeviceType(),
                         )
                     },
