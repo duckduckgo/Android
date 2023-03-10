@@ -31,6 +31,7 @@ interface SyncApi {
         protectedEncryptionKey: String,
         deviceId: String,
         deviceName: String,
+        deviceType: String,
     ): Result<AccountCreatedResponse>
 
     fun login(
@@ -38,6 +39,7 @@ interface SyncApi {
         hashedPassword: String,
         deviceId: String,
         deviceName: String,
+        deviceType: String,
     ): Result<LoginResponse>
 
     fun logout(
@@ -68,6 +70,7 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
         protectedEncryptionKey: String,
         deviceId: String,
         deviceName: String,
+        deviceType: String,
     ): Result<AccountCreatedResponse> {
         val response = runCatching {
             val call = syncService.signup(
@@ -77,6 +80,7 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
                     protectedEncryptionKey = protectedEncryptionKey,
                     deviceId = deviceId,
                     deviceName = deviceName,
+                    deviceType = deviceType,
                 ),
             )
             call.execute()
@@ -176,6 +180,7 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
         hashedPassword: String,
         deviceId: String,
         deviceName: String,
+        deviceType: String,
     ): Result<LoginResponse> {
         val response = runCatching {
             val call = syncService.login(
@@ -184,6 +189,7 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
                     hashedPassword = hashedPassword,
                     deviceId = deviceId,
                     deviceName = deviceName,
+                    deviceType = deviceType,
                 ),
             )
             call.execute()

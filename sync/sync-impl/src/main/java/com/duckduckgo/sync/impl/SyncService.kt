@@ -72,6 +72,7 @@ data class Login(
     @field:Json(name = "hashed_password") val hashedPassword: String,
     @field:Json(name = "device_id") val deviceId: String,
     @field:Json(name = "device_name") val deviceName: String,
+    @field:Json(name = "device_type") val deviceType: String,
 )
 
 data class Signup(
@@ -80,6 +81,7 @@ data class Signup(
     @field:Json(name = "protected_encryption_key") val protectedEncryptionKey: String,
     @field:Json(name = "device_id") val deviceId: String,
     @field:Json(name = "device_name") val deviceName: String,
+    @field:Json(name = "device_type") val deviceType: String,
 )
 
 data class Logout(
@@ -117,6 +119,7 @@ data class DeviceEntries(
 data class Device(
     @field:Json(name = "device_id") val deviceId: String,
     @field:Json(name = "device_name") val deviceName: String,
+    @field:Json(name = "device_type") val deviceType: String?,
     @field:Json(name = "jw_iat") val jwIat: String,
 )
 

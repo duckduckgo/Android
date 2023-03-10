@@ -28,6 +28,8 @@ import com.duckduckgo.sync.TestSyncFixtures.deleteAccountInvalid
 import com.duckduckgo.sync.TestSyncFixtures.deleteAccountSuccess
 import com.duckduckgo.sync.TestSyncFixtures.deviceId
 import com.duckduckgo.sync.TestSyncFixtures.deviceName
+import com.duckduckgo.sync.TestSyncFixtures.devicePlatformType
+import com.duckduckgo.sync.TestSyncFixtures.deviceType
 import com.duckduckgo.sync.TestSyncFixtures.encryptedRecoveryCode
 import com.duckduckgo.sync.TestSyncFixtures.failedLoginKeys
 import com.duckduckgo.sync.TestSyncFixtures.getDevicesError
@@ -93,9 +95,9 @@ class AppSyncRepositoryTest {
     @Test
     fun whenCreateAccountFailsThenReturnError() {
         prepareToProvideDeviceIds()
-        whenever(nativeLib.encryptData(anyString(), primaryKey = eq(primaryKey))).thenReturn(EncryptResult(0L, deviceName))
+        prepareForEncryption()
         whenever(nativeLib.generateAccountKeys(userId = anyString(), password = anyString())).thenReturn(accountKeys)
-        whenever(syncApi.createAccount(anyString(), anyString(), anyString(), anyString(), anyString()))
+        whenever(syncApi.createAccount(anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
             .thenReturn(accountCreatedFailDupUser)
         val syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore)
 
@@ -109,7 +111,7 @@ class AppSyncRepositoryTest {
     fun whenCreateAccountGenerateKeysFailsThenReturnError() {
         prepareToProvideDeviceIds()
         whenever(nativeLib.generateAccountKeys(userId = anyString(), password = anyString())).thenReturn(accountKeysFailed)
-        whenever(syncApi.createAccount(anyString(), anyString(), anyString(), anyString(), anyString()))
+        whenever(syncApi.createAccount(anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
             .thenReturn(accountCreatedSuccess)
         val syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore)
 
@@ -278,10 +280,9 @@ class AppSyncRepositoryTest {
     fun whenLoginFailsThenReturnError() {
         whenever(syncStore.recoveryCode).thenReturn(jsonRecoveryKey)
         prepareToProvideDeviceIds()
-        whenever(nativeLib.encryptData(anyString(), primaryKey = eq(primaryKey))).thenReturn(EncryptResult(0L, deviceName))
+        prepareForEncryption()
         whenever(nativeLib.prepareForLogin(primaryKey = primaryKey)).thenReturn(validLoginKeys)
-        whenever(nativeLib.decrypt(encryptedData = protectedEncryptionKey, secretKey = stretchedPrimaryKey)).thenReturn(decryptedSecretKey)
-        whenever(syncApi.login(userId, hashedPassword, deviceId, deviceName)).thenReturn(loginFailed)
+        whenever(syncApi.login(userId, hashedPassword, deviceId, deviceName, devicePlatformType)).thenReturn(loginFailed)
 
         val syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore)
         val result = syncRepo.login()
@@ -292,10 +293,10 @@ class AppSyncRepositoryTest {
     @Test
     fun whenLoginFromQRFailsThenReturnError() {
         prepareToProvideDeviceIds()
-        whenever(nativeLib.encryptData(anyString(), primaryKey = eq(primaryKey))).thenReturn(EncryptResult(0L, deviceName))
+        prepareForEncryption()
         whenever(nativeLib.prepareForLogin(primaryKey = primaryKey)).thenReturn(validLoginKeys)
         whenever(nativeLib.decrypt(encryptedData = protectedEncryptionKey, secretKey = stretchedPrimaryKey)).thenReturn(decryptedSecretKey)
-        whenever(syncApi.login(userId, hashedPassword, deviceId, deviceName)).thenReturn(loginFailed)
+        whenever(syncApi.login(userId, hashedPassword, deviceId, deviceName, devicePlatformType)).thenReturn(loginFailed)
 
         val syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore)
         val result = syncRepo.login(jsonRecoveryKey)
@@ -307,10 +308,10 @@ class AppSyncRepositoryTest {
     fun whenDecryptSecretKeyFailsThenReturnError() {
         whenever(syncStore.recoveryCode).thenReturn(jsonRecoveryKey)
         prepareToProvideDeviceIds()
-        whenever(nativeLib.encryptData(anyString(), primaryKey = eq(primaryKey))).thenReturn(EncryptResult(0L, deviceName))
+        prepareForEncryption()
         whenever(nativeLib.prepareForLogin(primaryKey = primaryKey)).thenReturn(validLoginKeys)
         whenever(nativeLib.decrypt(encryptedData = protectedEncryptionKey, secretKey = stretchedPrimaryKey)).thenReturn(invalidDecryptedSecretKey)
-        whenever(syncApi.login(userId, hashedPassword, deviceId, deviceName)).thenReturn(loginSuccess)
+        whenever(syncApi.login(userId, hashedPassword, deviceId, deviceName, devicePlatformType)).thenReturn(loginSuccess)
 
         val syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore)
         val result = syncRepo.login()
@@ -323,7 +324,7 @@ class AppSyncRepositoryTest {
         whenever(syncStore.token).thenReturn(token)
         whenever(syncStore.primaryKey).thenReturn(primaryKey)
         whenever(syncStore.deviceId).thenReturn(deviceId)
-        whenever(nativeLib.decryptData(anyString(), primaryKey = eq(primaryKey))).thenReturn(DecryptResult(0L, deviceName))
+        prepareForEncryption()
         whenever(syncApi.getDevices(anyString())).thenReturn(getDevicesSuccess)
         val syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore)
 
@@ -413,7 +414,6 @@ class AppSyncRepositoryTest {
         whenever(syncStore.primaryKey).thenReturn(primaryKey)
         whenever(syncStore.secretKey).thenReturn(secretKey)
         whenever(syncApi.connectDevice(deviceId)).thenReturn(connectDeviceSuccess)
-        whenever(nativeLib.encryptData(anyString(), primaryKey = eq(primaryKey))).thenReturn(EncryptResult(0L, deviceName))
         whenever(nativeLib.sealOpen(encryptedRecoveryCode, primaryKey, secretKey)).thenReturn(jsonRecoveryKey)
         val syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore)
 
@@ -434,13 +434,12 @@ class AppSyncRepositoryTest {
     }
 
     private fun prepareForLoginSuccess() {
+        prepareForEncryption()
         whenever(syncDeviceIds.deviceId()).thenReturn(deviceId)
         whenever(syncDeviceIds.deviceName()).thenReturn(deviceName)
+        whenever(syncDeviceIds.deviceType()).thenReturn(deviceType)
         whenever(nativeLib.prepareForLogin(primaryKey = primaryKey)).thenReturn(validLoginKeys)
-        whenever(nativeLib.decrypt(encryptedData = protectedEncryptionKey, secretKey = stretchedPrimaryKey)).thenReturn(decryptedSecretKey)
-        whenever(nativeLib.decryptData(anyString(), primaryKey = eq(primaryKey))).thenReturn(DecryptResult(0L, deviceName))
-        whenever(nativeLib.encryptData(anyString(), primaryKey = eq(primaryKey))).thenReturn(EncryptResult(0L, deviceName))
-        whenever(syncApi.login(userId, hashedPassword, deviceId, deviceName)).thenReturn(loginSuccess)
+        whenever(syncApi.login(userId, hashedPassword, deviceId, deviceName, devicePlatformType)).thenReturn(loginSuccess)
     }
 
     private fun givenAuthenticatedDevice() {
@@ -456,12 +455,23 @@ class AppSyncRepositoryTest {
         whenever(syncDeviceIds.userId()).thenReturn(userId)
         whenever(syncDeviceIds.deviceId()).thenReturn(deviceId)
         whenever(syncDeviceIds.deviceName()).thenReturn(deviceName)
+        whenever(syncDeviceIds.deviceType()).thenReturn(deviceType)
     }
 
     private fun prepareForCreateAccountSuccess() {
-        whenever(nativeLib.encryptData(anyString(), primaryKey = eq(primaryKey))).thenReturn(EncryptResult(0L, deviceName))
+        prepareForEncryption()
         whenever(nativeLib.generateAccountKeys(userId = anyString(), password = anyString())).thenReturn(accountKeys)
-        whenever(syncApi.createAccount(anyString(), anyString(), anyString(), anyString(), anyString()))
+        whenever(syncApi.createAccount(anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
             .thenReturn(Result.Success(AccountCreatedResponse(userId, token)))
+    }
+
+    private fun prepareForEncryption() {
+        whenever(nativeLib.decrypt(encryptedData = protectedEncryptionKey, secretKey = stretchedPrimaryKey)).thenReturn(decryptedSecretKey)
+        whenever(nativeLib.decryptData(anyString(), primaryKey = eq(primaryKey))).thenAnswer {
+            DecryptResult(0L, it.arguments.first() as String)
+        }
+        whenever(nativeLib.encryptData(anyString(), primaryKey = eq(primaryKey))).thenAnswer {
+            EncryptResult(0L, it.arguments.first() as String)
+        }
     }
 }

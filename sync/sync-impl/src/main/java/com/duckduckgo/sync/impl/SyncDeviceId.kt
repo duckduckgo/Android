@@ -18,7 +18,10 @@ package com.duckduckgo.sync.impl
 
 import android.annotation.SuppressLint
 import android.os.Build
+import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.impl.Type.MOBILE
+import com.duckduckgo.sync.impl.Type.UNKNOWN
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
 import java.util.*
@@ -28,6 +31,7 @@ interface SyncDeviceIds {
     fun userId(): String
     fun deviceName(): String
     fun deviceId(): String
+    fun deviceType(): DeviceType
 }
 
 @ContributesBinding(AppScope::class)
@@ -35,6 +39,7 @@ class AppSyncDeviceIds
 @Inject
 constructor(
     private val syncStore: SyncStore,
+    private val deviceInfo: DeviceInfo,
 ) : SyncDeviceIds {
     override fun userId(): String {
         var userId = syncStore.userId
@@ -61,4 +66,26 @@ constructor(
         deviceId = UUID.randomUUID().toString()
         return deviceId
     }
+
+    override fun deviceType(): DeviceType {
+        return DeviceType("android_${deviceInfo.formFactor().description}")
+    }
+}
+
+data class DeviceType(val platform: String = "") {
+    fun type(): Type {
+        val mobileRegex = Regex("(phone|tablet)", RegexOption.IGNORE_CASE)
+        return when {
+            platform.contains(mobileRegex) -> MOBILE
+            platform.isEmpty() -> UNKNOWN
+            else -> UNKNOWN
+        }
+    }
+}
+
+enum class Type {
+    MOBILE,
+    UNKNOWN,
+    DESKTOP,
+    ;
 }
