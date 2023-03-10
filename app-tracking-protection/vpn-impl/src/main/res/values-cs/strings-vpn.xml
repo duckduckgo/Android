@@ -237,6 +237,10 @@
     <string name="atp_ActivityAbout">Informace</string>
     <string name="atp_ActivityManage">Spravovat</string>
     <string name="atp_ActivityRemoveFeature">Zakázat a odstranit data</string>
+    <string name="atp_ActivityBlockingTrackersEnabledDescription">DuckDuckGo blokuje skryté trackery v aplikacích.</string>
+    <string name="atp_ActivityBlockingTrackersDisabledDescription">Když znovu zapneš ochranu App Tracking Protection, můžeš dál blokovat trackery ve všech aplikacích.</string>
+    <string name="atp_ActivityBlockedByHeaderText" instruction="Placeholder %1$s is a text containing either Today or Yesterday. Example: Blocked by DuckDuckGo Today">%1$s zablokovalo DuckDuckGo </string>
+    <string name="atp_ActivityBlockedByOnDateHeaderText" instruction="Placeholder %1$s is a text containing a formatted date like Feb 05. Example: Blocked by DuckDuckGo on Feb 05">%1$s zablokovalo DuckDuckGo</string>
 
     <!--  App Tracking Protection FAQ -->
     <string name="atp_FAQActivityTitle">FAQ</string>
@@ -283,10 +287,10 @@
         <item quantity="other">%1$d pokusů. Víme, že shromažďuje:</item>
     </plurals>
     <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
-        <item quantity="one">Zablokovaný %1$d pokus o sledování</item>
-        <item quantity="few">Zablokovány %1$d pokusy o sledování</item>
-        <item quantity="many">Zablokováno %1$d pokusu o sledování</item>
-        <item quantity="other">Zablokováno %1$d pokusů o sledování</item>
+        <item quantity="one">DuckDuckGo zablokovalo %1$d pokus o sledování</item>
+        <item quantity="few">DuckDuckGo zablokovalo %1$d pokusy o sledování</item>
+        <item quantity="many">DuckDuckGo zablokovalo %1$d pokusu o sledování</item>
+        <item quantity="other">DuckDuckGo zablokovalo %1$d pokusů o sledování</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Nahlásit problém s touhle aplikací</string>
     <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">Zobrazit další %1$d</string>
