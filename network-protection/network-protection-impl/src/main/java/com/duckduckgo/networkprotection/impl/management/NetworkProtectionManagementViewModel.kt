@@ -16,6 +16,7 @@
 
 package com.duckduckgo.networkprotection.impl.management
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -57,6 +58,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
+@SuppressLint("NoLifecycleObserver") // does not subscribe to app lifecycle
 @ContributesViewModel(ActivityScope::class)
 class NetworkProtectionManagementViewModel @Inject constructor(
     private val vpnStateMonitor: VpnStateMonitor,
