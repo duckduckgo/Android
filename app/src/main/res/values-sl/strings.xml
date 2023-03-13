@@ -657,7 +657,7 @@
     <!-- smartling.character_limit = 160 -->
     <string name="autoconsentDialogDescription">Želite, da jih uredim namesto vas? Poskušam zmanjšati piškotke, povečati zasebnost in skriti pojavna okna, kot so ta.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Upravljanje pojavnih oken za piškotke</string>
+    <string name="autoconsentPrimaryCta">Upravljaj pojavna okna za piškotke</string>
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Ne, hvala</string>
 
