@@ -670,7 +670,7 @@
     <!-- smartling.character_limit = 160 -->
     <string name="autoconsentDialogDescription">Vrei să mă ocup de asta pentru tine? Pot să încerc să minimizez numărul de module cookie, să maximizez confidențialitatea și să ascund ferestrele pop-up precum aceasta.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Gestionare pop-up-uri pentru module cookie</string>
+    <string name="autoconsentPrimaryCta">Gestionează pop-up-uri module cookie</string>
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Nu, mulțumesc</string>
 
