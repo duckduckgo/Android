@@ -16,7 +16,6 @@
 
 package com.duckduckgo.networkprotection.impl.configuration
 
-import com.duckduckgo.networkprotection.impl.CurrentTimeProvider
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -33,39 +32,32 @@ class RealDeviceKeysTest {
     @Mock
     private lateinit var keyPairGenerator: KeyPairGenerator
 
-    @Mock
-    private lateinit var currentTimeProvider: CurrentTimeProvider
-
     private lateinit var testee: RealDeviceKeys
 
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        testee = RealDeviceKeys(networkProtectionRepository, keyPairGenerator, currentTimeProvider)
+        testee = RealDeviceKeys(networkProtectionRepository, keyPairGenerator)
     }
 
     @Test
     fun whenNoPrivateKeyInRepositoryThenGeneratePrivateKeyAndStoreIt() {
         val expectedPrivateKey = "testprivatekey123"
         whenever(networkProtectionRepository.privateKey).thenReturn(null)
-        whenever(currentTimeProvider.getTimeInMillis()).thenReturn(1677846410368L)
         whenever(keyPairGenerator.generatePrivateKey()).thenReturn(expectedPrivateKey)
 
         assertEquals(expectedPrivateKey, testee.privateKey)
         verify(networkProtectionRepository).privateKey = expectedPrivateKey
-        verify(networkProtectionRepository).lastPrivateKeyUpdateTimeInMillis = 1677846410368L
     }
 
     @Test
     fun whenEmptyPrivateKeyInRepositoryThenGeneratePrivateKeyAndStoreIt() {
         val expectedPrivateKey = "testprivatekey123"
         whenever(networkProtectionRepository.privateKey).thenReturn("")
-        whenever(currentTimeProvider.getTimeInMillis()).thenReturn(1677846410368L)
         whenever(keyPairGenerator.generatePrivateKey()).thenReturn(expectedPrivateKey)
 
         assertEquals(expectedPrivateKey, testee.privateKey)
         verify(networkProtectionRepository).privateKey = expectedPrivateKey
-        verify(networkProtectionRepository).lastPrivateKeyUpdateTimeInMillis = 1677846410368L
     }
 
     @Test

@@ -21,8 +21,10 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
+import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -49,10 +51,19 @@ class RealNetworkProtectionRepositoryTest {
     }
 
     @Test
-    fun whenSettingPrivateKeyThenPutStringInPrefs() {
+    fun whenSettingPrivateKeyWithValueThenPutStringInPrefsAndSetLastUpdate() {
         testee.privateKey = "privateKey"
 
         verify(networkProtectionPrefs).putString("wg_private_key", "privateKey")
+        verify(networkProtectionPrefs).putLong(eq("wg_private_key_last_update"), anyLong())
+    }
+
+    @Test
+    fun whenSettingPrivateKeyNullThenClearPrivateKeyAndLastUpdate() {
+        testee.privateKey = null
+
+        verify(networkProtectionPrefs).putString("wg_private_key", null)
+        verify(networkProtectionPrefs).putLong("wg_private_key_last_update", -1L)
     }
 
     @Test

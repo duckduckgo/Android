@@ -63,6 +63,6 @@ class NetPRekeyScheduler @Inject constructor(
     }
 
     companion object {
-        private const val DAILY_NETP_REKEY_TAG = "DAILY_NETP_REKEY_TAG"
+        internal const val DAILY_NETP_REKEY_TAG = "DAILY_NETP_REKEY_TAG"
     }
 }

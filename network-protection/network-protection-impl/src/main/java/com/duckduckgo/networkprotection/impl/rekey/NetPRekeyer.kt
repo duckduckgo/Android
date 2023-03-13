@@ -16,10 +16,12 @@
 
 package com.duckduckgo.networkprotection.impl.rekey
 
+import androidx.work.WorkManager
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
+import com.duckduckgo.networkprotection.impl.rekey.NetPRekeyScheduler.Companion.DAILY_NETP_REKEY_TAG
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -31,6 +33,7 @@ interface NetPRekeyer {
 
 @ContributesBinding(AppScope::class)
 class RealNetPRekeyer @Inject constructor(
+    private val workManager: WorkManager,
     private val networkProtectionRepository: NetworkProtectionRepository,
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
     private val networkProtectionPixels: NetworkProtectionPixels,
@@ -39,11 +42,13 @@ class RealNetPRekeyer @Inject constructor(
     override suspend fun doRekey() {
         logcat { "Rekeying client" }
         networkProtectionRepository.privateKey = null
-        networkProtectionRepository.lastPrivateKeyUpdateTimeInMillis = -1L
         if (vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)) {
             logcat { "Restarting VPN after clearing client keys" }
             vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
-            networkProtectionPixels.reportRekeyCompleted()
+        } else {
+            logcat { "Cancelling scheduled rekey" }
+            workManager.cancelUniqueWork(DAILY_NETP_REKEY_TAG)
         }
+        networkProtectionPixels.reportRekeyCompleted()
     }
 }

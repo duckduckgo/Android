@@ -16,6 +16,7 @@
 
 package com.duckduckgo.networkprotection.impl.rekey
 
+import androidx.work.WorkManager
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature.NETP_VPN
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
@@ -43,12 +44,15 @@ class RealNetPRekeyerTest {
     @Mock
     private lateinit var networkProtectionPixels: NetworkProtectionPixels
 
+    @Mock
+    private lateinit var workManager: WorkManager
+
     private lateinit var testee: RealNetPRekeyer
 
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        testee = RealNetPRekeyer(networkProtectionRepository, vpnFeaturesRegistry, networkProtectionPixels)
+        testee = RealNetPRekeyer(workManager, networkProtectionRepository, vpnFeaturesRegistry, networkProtectionPixels)
     }
 
     @Test
@@ -58,9 +62,9 @@ class RealNetPRekeyerTest {
         testee.doRekey()
 
         verify(networkProtectionRepository).privateKey = null
-        verify(networkProtectionRepository).lastPrivateKeyUpdateTimeInMillis = -1
         verify(vpnFeaturesRegistry, never()).refreshFeature(any())
-        verifyNoInteractions(networkProtectionPixels)
+        verify(workManager).cancelUniqueWork("DAILY_NETP_REKEY_TAG")
+        verify(networkProtectionPixels).reportRekeyCompleted()
     }
 
     @Test
@@ -70,8 +74,8 @@ class RealNetPRekeyerTest {
         testee.doRekey()
 
         verify(networkProtectionRepository).privateKey = null
-        verify(networkProtectionRepository).lastPrivateKeyUpdateTimeInMillis = -1
         verify(vpnFeaturesRegistry).refreshFeature(NETP_VPN)
         verify(networkProtectionPixels).reportRekeyCompleted()
+        verifyNoInteractions(workManager)
     }
 }

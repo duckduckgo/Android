@@ -40,9 +40,8 @@ class FakeNetworkProtectionRepository : NetworkProtectionRepository {
         get() = null
         set(_) {}
 
-    override var lastPrivateKeyUpdateTimeInMillis: Long
+    override val lastPrivateKeyUpdateTimeInMillis: Long
         get() = -1L
-        set(_) {}
 
     override var enabledTimeInMillis: Long
         get() = -1L
