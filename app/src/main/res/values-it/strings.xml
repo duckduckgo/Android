@@ -649,7 +649,7 @@
     <!-- smartling.character_limit = 160 -->
     <string name="autoconsentDialogDescription">Vuoi che me ne occupi io? Posso cercare di ridurre al minimo i cookie, massimizzare la privacy e nascondere i popup come questo.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Gestione dei popup dei cookie</string>
+    <string name="autoconsentPrimaryCta">Gestisci i popup dei cookie</string>
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">No, grazie</string>
 
