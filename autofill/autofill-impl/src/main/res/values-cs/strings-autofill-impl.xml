@@ -70,7 +70,7 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Přihlašovací údaje jsou bezpečně uložené jen v tomhle zařízení.</string>
 
     <string name="autofillManagementAddLogin">Přidat přihlášení</string>
-    <string name="autofillManagementSearchLogins">Vyhledávání</string>
+    <string name="autofillManagementSearchLogins">Hledání přihlašovacích údajů</string>
     <string name="autofillManagementSearchClearDescription">Vymazat vyhledávací vstup</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Žádné výsledky pro dotaz „%1$s“</string>
 
