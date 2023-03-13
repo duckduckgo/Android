@@ -19,7 +19,7 @@ package com.duckduckgo.sync.impl.di
 import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
-import com.duckduckgo.sync.api.parser.SyncCrypter
+import com.duckduckgo.sync.impl.parser.SyncCrypter
 import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.crypto.SyncNativeLib
 import com.duckduckgo.sync.impl.parser.RealSyncCrypter

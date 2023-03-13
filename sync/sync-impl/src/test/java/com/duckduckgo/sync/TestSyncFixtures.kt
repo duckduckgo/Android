@@ -16,9 +16,9 @@
 
 package com.duckduckgo.sync
 
-import com.duckduckgo.sync.api.parser.SyncBookmarkEntry
-import com.duckduckgo.sync.api.parser.SyncBookmarkUpdates
-import com.duckduckgo.sync.api.parser.SyncDataRequest
+import com.duckduckgo.sync.impl.parser.SyncBookmarkEntry
+import com.duckduckgo.sync.impl.parser.SyncBookmarkUpdates
+import com.duckduckgo.sync.impl.parser.SyncDataRequest
 import com.duckduckgo.sync.crypto.AccountKeys
 import com.duckduckgo.sync.crypto.ConnectKeys
 import com.duckduckgo.sync.crypto.DecryptResult

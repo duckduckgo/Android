@@ -23,12 +23,6 @@ import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.store.Relation
-import com.duckduckgo.sync.api.parser.SyncBookmarkEntry
-import com.duckduckgo.sync.api.parser.SyncBookmarkUpdates
-import com.duckduckgo.sync.api.parser.SyncCrypter
-import com.duckduckgo.sync.api.parser.SyncDataRequest
-import com.duckduckgo.sync.api.parser.isBookmark
-import com.duckduckgo.sync.api.parser.isFolder
 import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.store.SyncStore
 import kotlinx.coroutines.withContext

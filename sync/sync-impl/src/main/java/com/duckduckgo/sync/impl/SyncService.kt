@@ -18,8 +18,8 @@ package com.duckduckgo.sync.impl
 
 import com.duckduckgo.anvil.annotations.ContributesServiceApi
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.api.parser.SyncBookmarkEntry
-import com.duckduckgo.sync.api.parser.SyncDataRequest
+import com.duckduckgo.sync.impl.parser.SyncBookmarkEntry
+import com.duckduckgo.sync.impl.parser.SyncDataRequest
 import com.squareup.moshi.Json
 import retrofit2.Call
 import retrofit2.http.Body
@@ -71,8 +71,8 @@ interface SyncService {
 
     @PATCH("https://dev-sync-use.duckduckgo.com/sync/data")
     fun patch(
-        @Header("Authorization") token: String,
-        @Body request: SyncDataRequest,
+            @Header("Authorization") token: String,
+            @Body request: SyncDataRequest,
     ): Call<DataResponse>
 
     @GET("https://dev-sync-use.duckduckgo.com/sync/data")
@@ -153,8 +153,8 @@ data class BookmarkFolder(
     val children: List<String>,
 )
 data class BookmarksResponse(
-    val last_modified: String,
-    val entries: List<SyncBookmarkEntry>,
+        val last_modified: String,
+        val entries: List<SyncBookmarkEntry>,
 )
 data class SettingsResponse(
     val last_modified: String,

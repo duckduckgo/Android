@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.api.parser
+package com.duckduckgo.sync.impl.parser
 
 interface SyncCrypter {
     suspend fun generateAllData(): SyncDataRequest

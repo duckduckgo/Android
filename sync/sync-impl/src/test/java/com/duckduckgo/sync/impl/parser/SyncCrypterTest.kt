@@ -24,10 +24,6 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.store.Relation
 import com.duckduckgo.sync.TestSyncFixtures
-import com.duckduckgo.sync.api.parser.SyncBookmarkEntry
-import com.duckduckgo.sync.api.parser.SyncBookmarkPage
-import com.duckduckgo.sync.api.parser.SyncCrypter
-import com.duckduckgo.sync.api.parser.SyncFolderChildren
 import com.duckduckgo.sync.crypto.EncryptResult
 import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.store.SyncStore
