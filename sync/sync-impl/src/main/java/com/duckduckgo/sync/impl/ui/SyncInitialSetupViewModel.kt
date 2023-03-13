@@ -156,7 +156,7 @@ constructor(
 
     fun onSendBookmarksClicked() {
         viewModelScope.launch(dispatchers.io()) {
-            val result = syncRepository.initialPatch()
+            val result = syncRepository.sendAllData()
             if (result is Error) {
                 command.send(Command.ShowMessage("$result"))
             } else {
@@ -168,7 +168,7 @@ constructor(
 
     fun onReceiveBookmarksClicked() {
         viewModelScope.launch(dispatchers.io()) {
-            val result = syncRepository.getAll()
+            val result = syncRepository.fetchAllData()
             if (result is Error) {
                 command.send(Command.ShowMessage("$result"))
             } else {

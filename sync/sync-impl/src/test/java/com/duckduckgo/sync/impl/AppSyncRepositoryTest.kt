@@ -348,7 +348,7 @@ class AppSyncRepositoryTest {
         whenever(syncCrypter.generateAllData()).thenReturn(syncData)
         whenever(syncApi.patchAll(token, syncData)).thenReturn(patchAllSuccess)
 
-        val result = syncRepo.initialPatch()
+        val result = syncRepo.sendAllData()
 
         assertTrue(result is Result.Success)
     }
@@ -359,7 +359,7 @@ class AppSyncRepositoryTest {
         whenever(syncCrypter.generateAllData()).thenReturn(syncData)
         whenever(syncApi.patchAll(token, syncData)).thenReturn(patchAllError)
 
-        val result = syncRepo.initialPatch()
+        val result = syncRepo.sendAllData()
 
         assertTrue(result is Result.Error)
     }

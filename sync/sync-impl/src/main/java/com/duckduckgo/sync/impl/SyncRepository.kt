@@ -52,8 +52,8 @@ interface SyncRepository {
     fun getConnectQR(): Result<String>
     fun connectDevice(contents: String): Result<Boolean>
     fun pollConnectionKeys(): Result<Boolean>
-    suspend fun initialPatch(): Result<Boolean>
-    suspend fun getAll(): Result<Boolean>
+    suspend fun sendAllData(): Result<Boolean>
+    suspend fun fetchAllData(): Result<Boolean>
 }
 
 @ContributesBinding(AppScope::class)
@@ -330,7 +330,7 @@ class AppSyncRepository @Inject constructor(
         }
     }
 
-    override suspend fun initialPatch(): Result<Boolean> {
+    override suspend fun sendAllData(): Result<Boolean> {
         val token =
             syncStore.token.takeUnless { it.isNullOrEmpty() }
                 ?: return Result.Error(reason = "Token Empty")
@@ -348,7 +348,7 @@ class AppSyncRepository @Inject constructor(
         }
     }
 
-    override suspend fun getAll(): Result<Boolean> {
+    override suspend fun fetchAllData(): Result<Boolean> {
         val token =
             syncStore.token.takeUnless { it.isNullOrEmpty() }
                 ?: return Result.Error(reason = "Token Empty")
