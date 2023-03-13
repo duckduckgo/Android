@@ -19,7 +19,7 @@ package com.duckduckgo.networkprotection.impl.configuration
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
-import com.duckduckgo.networkprotection.impl.configuration.WgServerDataProvider.WgServerData
+import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.WgServerData
 import java.util.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -31,7 +31,7 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class RealWgServerDataProviderTest() {
+class RealWgServerApiTest() {
     private val wgVpnControllerService = FakeWgVpnControllerService()
 
     @Mock
@@ -41,7 +41,7 @@ class RealWgServerDataProviderTest() {
     private lateinit var appBuildConfig: AppBuildConfig
 
     private lateinit var fakeWgServerDebugProvider: FakeWgServerDebugProvider
-    private lateinit var testee: RealWgServerDataProvider
+    private lateinit var testee: RealWgServerApi
 
     @Before
     fun setUp() {
@@ -50,7 +50,7 @@ class RealWgServerDataProviderTest() {
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
         fakeWgServerDebugProvider = FakeWgServerDebugProvider()
 
-        testee = RealWgServerDataProvider(
+        testee = RealWgServerApi(
             wgVpnControllerService,
             deviceTimezoneProvider,
             appBuildConfig,
@@ -73,9 +73,10 @@ class RealWgServerDataProviderTest() {
                 publicEndpoint = "euw.egress.np.duck.com:443",
                 address = "",
                 location = null,
+                gateway = "1.2.3.4",
                 allowedIPs = "0.0.0.0/0,::0/0",
             ),
-            testee.get("testpublickey"),
+            testee.registerPublicKey("testpublickey"),
         )
     }
 
@@ -90,9 +91,10 @@ class RealWgServerDataProviderTest() {
                 publicEndpoint = "109.200.208.198:443",
                 address = "",
                 location = "Newark, United states",
+                gateway = "1.2.3.4",
                 allowedIPs = "0.0.0.0/0,::0/0",
             ),
-            testee.get("testpublickey"),
+            testee.registerPublicKey("testpublickey"),
         )
     }
 
@@ -107,9 +109,10 @@ class RealWgServerDataProviderTest() {
                 publicEndpoint = "162.245.204.100:443",
                 address = "",
                 location = null,
+                gateway = "1.2.3.4",
                 allowedIPs = "0.0.0.0/0,::0/0",
             ),
-            testee.get("testpublickey"),
+            testee.registerPublicKey("testpublickey"),
         )
     }
 
@@ -124,9 +127,10 @@ class RealWgServerDataProviderTest() {
                 publicEndpoint = "162.245.204.100:443",
                 address = "",
                 location = null,
+                gateway = "1.2.3.4",
                 allowedIPs = "0.0.0.0/0,::0/0",
             ),
-            testee.get("testpublickey"),
+            testee.registerPublicKey("testpublickey"),
         )
     }
 
@@ -135,7 +139,7 @@ class RealWgServerDataProviderTest() {
         whenever(deviceTimezoneProvider.getTimeZone()).thenReturn(TimeZone.getTimeZone("GMT-1:00"))
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
 
-        testee.get("testpublickey")
+        testee.registerPublicKey("testpublickey")
 
         assertEquals(
             wgVpnControllerService.getServers().map { it.server },
@@ -147,7 +151,7 @@ class RealWgServerDataProviderTest() {
     fun whenNotInternalFlavorGetWgServerDataThenStoreReturnedServers() = runTest {
         whenever(deviceTimezoneProvider.getTimeZone()).thenReturn(TimeZone.getTimeZone("GMT-1:00"))
 
-        testee.get("testpublickey")
+        testee.registerPublicKey("testpublickey")
 
         assertTrue(fakeWgServerDebugProvider.cachedServers.isEmpty())
     }
@@ -165,9 +169,10 @@ class RealWgServerDataProviderTest() {
                 publicEndpoint = "euw.egress.np.duck.com:443",
                 address = "",
                 location = null,
+                gateway = "1.2.3.4",
                 allowedIPs = "0.0.0.0/0,::0/0",
             ),
-            testee.get("testpublickey"),
+            testee.registerPublicKey("testpublickey"),
         )
     }
 
@@ -184,9 +189,10 @@ class RealWgServerDataProviderTest() {
                 publicEndpoint = "162.245.204.100:443",
                 address = "",
                 location = null,
+                gateway = "1.2.3.4",
                 allowedIPs = "0.0.0.0/0,::0/0",
             ),
-            testee.get("testpublickey"),
+            testee.registerPublicKey("testpublickey"),
         )
     }
 }

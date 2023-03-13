@@ -60,6 +60,7 @@ private val SERVERS_JSON = """
                   },
                   "publicKey": "R/BMR6Rr5rzvp7vSIWdAtgAmOLK9m7CqTcDynblM3Us=",
                   "hostnames": [],
+                  "internalIp": "1.2.3.4",
                   "ips": [
                     "162.245.204.100"
                   ],
@@ -82,6 +83,7 @@ private val SERVERS_JSON = """
                   "hostnames": [
                     "euw.egress.np.duck.com"
                   ],
+                  "internalIp": "1.2.3.4",
                   "ips": [],
                   "port": 443
                 }
@@ -101,6 +103,7 @@ private val SERVERS_JSON = """
                   },
                   "publicKey": "4PnM/V0CodegK44rd9fKTxxS9QDVTw13j8fxKsVud3s=",
                   "hostnames": [],
+                  "internalIp": "1.2.3.4",
                   "ips": [
                     "31.204.129.39"
                   ],
@@ -122,6 +125,7 @@ private val SERVERS_JSON = """
                   },
                   "publicKey": "ocUfgaqaN/s/D3gTwJstipGh03T2v6wLL+aVtg3Viz4=",
                   "hostnames": [],
+                  "internalIp": "1.2.3.4",
                   "ips": [
                     "31.204.129.36"
                   ],
@@ -143,6 +147,7 @@ private val SERVERS_JSON = """
                   },
                   "publicKey": "q3YJJUwMNP31J8qSvMdVsxASKNcjrm8ep8cLcI0qViY=",
                   "hostnames": [],
+                  "internalIp": "1.2.3.4",
                   "ips": [
                     "109.200.208.198"
                   ],
@@ -164,6 +169,7 @@ private val SERVERS_JSON = """
                   },
                   "publicKey": "L4gDTg3KqbhjjiN99n/Zmwxwmbv+P+n8ZZVL0v34cAs=",
                   "hostnames": [],
+                  "internalIp": "1.2.3.4",
                   "ips": [
                     "109.200.208.196"
                   ],
@@ -187,6 +193,7 @@ private val SERVERS_JSON = """
                   "hostnames": [
                     "usc.egress.np.duck.com"
                   ],
+                  "internalIp": "1.2.3.4",
                   "ips": [
                     "109.200.208.196"
                   ],
@@ -208,6 +215,7 @@ private val SERVERS_JSON = """
                   },
                   "publicKey": "8JjNmnFYZA+CnWAkbiucDrUJ70wl+Tl3O3ETkRgw028=",
                   "hostnames": [],
+                  "internalIp": "1.2.3.4",
                   "ips": [
                     "162.245.204.102"
                   ],

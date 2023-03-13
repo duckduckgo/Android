@@ -22,18 +22,18 @@ import java.net.Inet4Address
 import java.net.InetAddress
 import javax.inject.Inject
 
-interface NetPConfigProvider {
+interface NetPDefaultConfigProvider {
     fun mtu(): Int = 1280
 
     fun exclusionList(): Set<String> = setOf("com.google.android.gms")
 
-    fun dns(): Set<InetAddress> = InetAddress.getAllByName("10.11.12.1").toSet()
+    fun fallbackDns(): Set<InetAddress> = emptySet()
 
     fun routes(): Map<String, Int> {
         // ensure the set DNS are in the routes
         // We're only setting routes for IPv4 atm
         return WgVpnRoutes.wgVpnRoutes.toMutableMap().apply {
-            dns().filterIsInstance<Inet4Address>().mapNotNull { it.hostAddress }.forEach { ip ->
+            fallbackDns().filterIsInstance<Inet4Address>().mapNotNull { it.hostAddress }.forEach { ip ->
                 this[ip] = 32
             }
         }
@@ -45,4 +45,4 @@ interface NetPConfigProvider {
 data class PcapConfig(val filename: String, val snapLen: Int, val fileSize: Int)
 
 @ContributesBinding(VpnScope::class)
-class RealNetPConfigProvider @Inject constructor() : NetPConfigProvider
+class RealNetPDefaultConfigProvider @Inject constructor() : NetPDefaultConfigProvider

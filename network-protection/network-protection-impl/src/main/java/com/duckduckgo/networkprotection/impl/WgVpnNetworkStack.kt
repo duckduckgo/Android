@@ -22,9 +22,9 @@ import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack.VpnTunnelConfig
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
-import com.duckduckgo.networkprotection.impl.config.NetPConfigProvider
-import com.duckduckgo.networkprotection.impl.configuration.WgTunnelDataProvider
-import com.duckduckgo.networkprotection.impl.configuration.WgTunnelDataProvider.WgTunnelData
+import com.duckduckgo.networkprotection.impl.config.NetPDefaultConfigProvider
+import com.duckduckgo.networkprotection.impl.configuration.WgTunnel
+import com.duckduckgo.networkprotection.impl.configuration.WgTunnel.WgTunnelData
 import com.duckduckgo.networkprotection.impl.configuration.toCidrString
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository
@@ -33,6 +33,7 @@ import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.Server
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
+import java.net.InetAddress
 import javax.inject.Inject
 import logcat.LogPriority
 import logcat.asLog
@@ -45,11 +46,11 @@ import logcat.logcat
 @SingleInstanceIn(VpnScope::class)
 class WgVpnNetworkStack @Inject constructor(
     private val wgProtocol: Lazy<WgProtocol>,
-    private val configProvider: Lazy<WgTunnelDataProvider>,
+    private val wgTunnelLazy: Lazy<WgTunnel>,
     private val networkProtectionRepository: Lazy<NetworkProtectionRepository>,
     private val currentTimeProvider: CurrentTimeProvider,
     private val netpPixels: Lazy<NetworkProtectionPixels>,
-    private val netPConfigProvider: NetPConfigProvider,
+    private val netPDefaultConfigProvider: NetPDefaultConfigProvider,
 ) : VpnNetworkStack {
     private var wgTunnelData: WgTunnelData? = null
 
@@ -58,8 +59,17 @@ class WgVpnNetworkStack @Inject constructor(
     override fun onCreateVpn(): Result<Unit> = Result.success(Unit)
 
     override suspend fun onPrepareVpn(): Result<VpnTunnelConfig> {
+        fun WgTunnelData.allDns(): Set<InetAddress> {
+            return mutableSetOf<InetAddress>().apply {
+                runCatching { InetAddress.getByName(gateway) }.getOrNull()?.let {
+                    add(it)
+                }
+                addAll(netPDefaultConfigProvider.fallbackDns())
+            }.toSet().also { logcat { "DNS to be configured $it" } }
+        }
+
         return try {
-            wgTunnelData = configProvider.get().get()
+            wgTunnelData = wgTunnelLazy.get().establish()
             logcat { "Received config from BE: $wgTunnelData" }
 
             if (wgTunnelData == null) {
@@ -81,11 +91,11 @@ class WgVpnNetworkStack @Inject constructor(
 
             Result.success(
                 VpnTunnelConfig(
-                    mtu = netPConfigProvider.mtu(),
+                    mtu = netPDefaultConfigProvider.mtu(),
                     addresses = wgTunnelData?.tunnelAddress ?: emptyMap(),
-                    dns = netPConfigProvider.dns(),
-                    routes = netPConfigProvider.routes(),
-                    appExclusionList = netPConfigProvider.exclusionList(),
+                    dns = wgTunnelData!!.allDns(),
+                    routes = netPDefaultConfigProvider.routes(),
+                    appExclusionList = netPDefaultConfigProvider.exclusionList(),
                 ),
             ).also { logcat { "Returning VPN configuration: ${it.getOrNull()}" } }
         } catch (e: Throwable) {
@@ -120,7 +130,7 @@ class WgVpnNetworkStack @Inject constructor(
             wgTunnelData!!.userSpaceConfig.also {
                 logcat { "WgUserspace config: $it" }
             },
-            pcapConfig = netPConfigProvider.pcapConfig(),
+            pcapConfig = netPDefaultConfigProvider.pcapConfig(),
         )
         return if (result.isFailure) {
             logcat(LogPriority.ERROR) { "Failed to turnOnNative due to ${result.exceptionOrNull()}" }

@@ -17,12 +17,11 @@
 package com.duckduckgo.networkprotection.impl
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack.VpnTunnelConfig
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.RESTART
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
-import com.duckduckgo.networkprotection.impl.config.NetPConfigProvider
-import com.duckduckgo.networkprotection.impl.configuration.WgTunnelDataProvider
-import com.duckduckgo.networkprotection.impl.configuration.WgTunnelDataProvider.WgTunnelData
+import com.duckduckgo.networkprotection.impl.config.NetPDefaultConfigProvider
+import com.duckduckgo.networkprotection.impl.configuration.WgTunnel
+import com.duckduckgo.networkprotection.impl.configuration.WgTunnel.WgTunnelData
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ClientInterface
@@ -30,8 +29,7 @@ import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.Server
 import java.net.InetAddress
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -47,7 +45,7 @@ class WgVpnNetworkStackTest {
     private lateinit var wgProtocol: WgProtocol
 
     @Mock
-    private lateinit var wgTunnelDataProvider: WgTunnelDataProvider
+    private lateinit var wgTunnel: WgTunnel
 
     @Mock
     private lateinit var networkProtectionRepository: NetworkProtectionRepository
@@ -59,6 +57,16 @@ class WgVpnNetworkStackTest {
     private lateinit var netpPixels: NetworkProtectionPixels
 
     private lateinit var wgTunnelData: WgTunnelData
+
+    private val netPDefaultConfigProvider = object : NetPDefaultConfigProvider {
+        override fun fallbackDns(): Set<InetAddress> {
+            return setOf(InetAddress.getByName("127.0.0.1"))
+        }
+
+        override fun routes(): Map<String, Int> {
+            return mapOf("10.11.12.1" to 32)
+        }
+    }
 
     private lateinit var testee: WgVpnNetworkStack
 
@@ -72,42 +80,34 @@ class WgVpnNetworkStackTest {
             serverIP = "10.10.10.10",
             serverLocation = "Stockholm, Sweden",
             tunnelAddress = emptyMap(),
+            gateway = "1.2.3.4",
         )
 
         testee = WgVpnNetworkStack(
             { wgProtocol },
-            { wgTunnelDataProvider },
+            { wgTunnel },
             { networkProtectionRepository },
             currentTimeProvider,
             { netpPixels },
-            object : NetPConfigProvider {
-                override fun dns(): Set<InetAddress> {
-                    return setOf(InetAddress.getLocalHost())
-                }
-
-                override fun routes(): Map<String, Int> {
-                    return mapOf("10.11.12.1" to 32)
-                }
-            },
+            netPDefaultConfigProvider,
         )
     }
 
     @Test
     fun whenOnPrepareVpnThenReturnVpnTunnelConfigAndStoreServerDetails() = runTest {
-        whenever(wgTunnelDataProvider.get()).thenReturn(wgTunnelData)
+        whenever(wgTunnel.establish()).thenReturn(wgTunnelData)
 
-        assertEquals(
-            Result.success(
-                VpnTunnelConfig(
-                    mtu = 1280,
-                    addresses = emptyMap(),
-                    dns = setOf(InetAddress.getLocalHost()),
-                    routes = mapOf("10.11.12.1" to 32),
-                    appExclusionList = setOf("com.google.android.gms"),
-                ),
-            ),
-            testee.onPrepareVpn(),
-        )
+        val actual = testee.onPrepareVpn().getOrNull()
+        val expectedDns = (netPDefaultConfigProvider.fallbackDns() + InetAddress.getByName(wgTunnelData.gateway))
+
+        assertNotNull(actual)
+        assertEquals(1280, actual!!.mtu)
+        assertEquals(emptyMap<InetAddress, Int>(), actual.addresses)
+        assertEquals(setOf("com.google.android.gms"), actual.appExclusionList)
+        assertEquals(mapOf("10.11.12.1" to 32), actual.routes)
+        assertEquals(expectedDns.size, actual.dns.size)
+        assertTrue(actual.dns.any { it.hostAddress == "1.2.3.4" })
+        assertTrue(actual.dns.any { it.hostAddress == "127.0.0.1" })
 
         verify(networkProtectionRepository).serverDetails = ServerDetails(
             serverName = "euw.1",
@@ -119,7 +119,7 @@ class WgVpnNetworkStackTest {
 
     @Test
     fun whenOnStartVpnAndEnabledTimeHasBeenResetThenSetEnabledTimeInMillis() = runTest {
-        whenever(wgTunnelDataProvider.get()).thenReturn(wgTunnelData)
+        whenever(wgTunnel.establish()).thenReturn(wgTunnelData)
         whenever(networkProtectionRepository.enabledTimeInMillis).thenReturn(-1L)
         whenever(currentTimeProvider.getTimeInMillis()).thenReturn(1672229650358L)
 
@@ -135,7 +135,7 @@ class WgVpnNetworkStackTest {
 
     @Test
     fun whenOnStartVpnAndEnabledTimeHasBeenSetThenDoNotUpdateEnabledTime() = runTest {
-        whenever(wgTunnelDataProvider.get()).thenReturn(wgTunnelData)
+        whenever(wgTunnel.establish()).thenReturn(wgTunnelData)
         whenever(networkProtectionRepository.enabledTimeInMillis).thenReturn(16722296505000L)
         whenever(currentTimeProvider.getTimeInMillis()).thenReturn(1672229650358L)
 
@@ -192,7 +192,7 @@ class WgVpnNetworkStackTest {
 
     @Test
     fun whenWgTunnelDataProviderThrowsExceptionThenOnPrepareShouldReturnFailure() = runTest {
-        whenever(wgTunnelDataProvider.get()).thenReturn(null)
+        whenever(wgTunnel.establish()).thenReturn(null)
 
         assertTrue(testee.onPrepareVpn().isFailure)
         verify(netpPixels).reportErrorInRegistration()
@@ -202,7 +202,7 @@ class WgVpnNetworkStackTest {
     @Test
     fun whenWgProtocolStartWgReturnsFailureThenOnStartVpnShouldReturnFailure() = runTest {
         whenever(wgProtocol.startWg(any(), any(), eq(null))).thenReturn(Result.failure(java.lang.IllegalStateException()))
-        whenever(wgTunnelDataProvider.get()).thenReturn(wgTunnelData)
+        whenever(wgTunnel.establish()).thenReturn(wgTunnelData)
 
         testee.onPrepareVpn()
 
@@ -214,7 +214,7 @@ class WgVpnNetworkStackTest {
     @Test
     fun whenWgProtocolStartWgReturnsSuccessThenOnStartVpnShouldReturnSuccess() = runTest {
         whenever(wgProtocol.startWg(any(), any(), eq(null))).thenReturn(Result.success(Unit))
-        whenever(wgTunnelDataProvider.get()).thenReturn(wgTunnelData)
+        whenever(wgTunnel.establish()).thenReturn(wgTunnelData)
 
         testee.onPrepareVpn()
 

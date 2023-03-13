@@ -17,7 +17,7 @@
 package com.duckduckgo.networkprotection.impl.configuration
 
 import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.networkprotection.impl.configuration.WgTunnelDataProvider.WgTunnelData
+import com.duckduckgo.networkprotection.impl.configuration.WgTunnel.WgTunnelData
 import com.squareup.anvil.annotations.ContributesBinding
 import com.wireguard.config.Config
 import com.wireguard.config.Interface
@@ -28,13 +28,14 @@ import logcat.LogPriority
 import logcat.asLog
 import logcat.logcat
 
-interface WgTunnelDataProvider {
-    suspend fun get(): WgTunnelData?
+interface WgTunnel {
+    suspend fun establish(): WgTunnelData?
     data class WgTunnelData(
         val serverName: String,
         val userSpaceConfig: String,
         val serverLocation: String?,
         val serverIP: String?,
+        val gateway: String,
         val tunnelAddress: Map<InetAddress, Int>,
     )
 }
@@ -44,15 +45,15 @@ fun Map<InetAddress, Int>.toCidrString(): Set<String> {
 }
 
 @ContributesBinding(VpnScope::class)
-class RealWgTunnelDataProvider @Inject constructor(
+class RealWgTunnel @Inject constructor(
     private val deviceKeys: DeviceKeys,
-    private val wgServerDataProvider: WgServerDataProvider,
-) : WgTunnelDataProvider {
+    private val wgServerApi: WgServerApi,
+) : WgTunnel {
 
-    override suspend fun get(): WgTunnelData? {
+    override suspend fun establish(): WgTunnelData? {
         return try {
             // ensure we always return null on error
-            val serverData = wgServerDataProvider.get(deviceKeys.publicKey) ?: return null
+            val serverData = wgServerApi.registerPublicKey(deviceKeys.publicKey) ?: return null
             Config.Builder()
                 .setInterface(
                     Interface.Builder()
@@ -73,6 +74,7 @@ class RealWgTunnelDataProvider @Inject constructor(
                         userSpaceConfig = this.toWgUserspaceString(),
                         serverLocation = serverData.location,
                         serverIP = kotlin.runCatching { InetAddress.getByName(peers[0].endpoint?.host).hostAddress }.getOrNull(),
+                        gateway = serverData.gateway,
                         tunnelAddress = getInterface().addresses.associate { Pair(it.address, it.mask) },
                     )
                 }

@@ -22,7 +22,7 @@ import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.networkprotection.impl.configuration.WgServerDataProvider.WgServerData
+import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.WgServerData
 import com.squareup.anvil.annotations.ContributesBinding
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -30,28 +30,29 @@ import javax.inject.Inject
 import kotlin.math.abs
 import logcat.logcat
 
-interface WgServerDataProvider {
+interface WgServerApi {
     data class WgServerData(
         val serverName: String,
         val publicKey: String,
         val publicEndpoint: String,
         val address: String,
         val location: String?,
+        val gateway: String,
         val allowedIPs: String = "0.0.0.0/0,::0/0",
     )
 
-    suspend fun get(publicKey: String): WgServerData?
+    suspend fun registerPublicKey(publicKey: String): WgServerData?
 }
 
 @ContributesBinding(VpnScope::class)
-class RealWgServerDataProvider @Inject constructor(
+class RealWgServerApi @Inject constructor(
     private val wgVpnControllerService: WgVpnControllerService,
     private val timezoneProvider: DeviceTimezoneProvider,
     private val appBuildConfig: AppBuildConfig,
     private val serverDebugProvider: PluginPoint<WgServerDebugProvider>,
-) : WgServerDataProvider {
+) : WgServerApi {
 
-    override suspend fun get(publicKey: String): WgServerData? {
+    override suspend fun registerPublicKey(publicKey: String): WgServerData? {
         return wgVpnControllerService.getServers()
             .also {
                 if (appBuildConfig.isInternalBuild()) {
@@ -80,7 +81,9 @@ class RealWgServerDataProvider @Inject constructor(
                         publicKey = publicKey,
                         server = selectedServer.server.name,
                     ),
-                ).firstOrNull()?.toWgServerData()
+                ).firstOrNull()?.toWgServerData().also {
+                    logcat { "Registered public key to server: $it" }
+                }
             }
     }
 
@@ -89,6 +92,7 @@ class RealWgServerDataProvider @Inject constructor(
         publicKey = server.publicKey,
         publicEndpoint = server.extractPublicEndpoint(),
         address = allowedIPs.joinToString(","),
+        gateway = server.internalIp,
         location = server.attributes.extractLocation(),
     )
 

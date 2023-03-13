@@ -18,28 +18,30 @@ package com.duckduckgo.networkprotection.internal.network
 
 import android.content.Context
 import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.networkprotection.impl.config.NetPConfigProvider
+import com.duckduckgo.networkprotection.impl.config.NetPDefaultConfigProvider
 import com.duckduckgo.networkprotection.impl.config.PcapConfig
-import com.duckduckgo.networkprotection.impl.config.RealNetPConfigProvider
+import com.duckduckgo.networkprotection.impl.config.RealNetPDefaultConfigProvider
 import com.duckduckgo.networkprotection.internal.feature.NetPInternalFeatureToggles
 import com.squareup.anvil.annotations.ContributesBinding
 import java.io.File
 import java.io.FileOutputStream
 import java.net.InetAddress
 import javax.inject.Inject
+import logcat.LogPriority
+import logcat.logcat
 
 @ContributesBinding(
     scope = VpnScope::class,
     priority = ContributesBinding.Priority.HIGHEST,
 )
-class NetPInternalConfigProvider @Inject constructor(
-    private val realNetPConfigProvider: RealNetPConfigProvider,
+class NetPInternalDefaultConfigProvider @Inject constructor(
+    private val realNetPConfigProvider: RealNetPDefaultConfigProvider,
     private val mtuInternalProvider: NetPInternalMtuProvider,
     private val exclusionListProvider: NetPInternalExclusionListProvider,
     private val netPInternalFeatureToggles: NetPInternalFeatureToggles,
     private val context: Context,
-) : NetPConfigProvider {
-    private val defaultConfig = object : NetPConfigProvider {}
+) : NetPDefaultConfigProvider {
+    private val defaultConfig = object : NetPDefaultConfigProvider {}
 
     override fun mtu(): Int {
         return mtuInternalProvider.getMtu()
@@ -52,10 +54,12 @@ class NetPInternalConfigProvider @Inject constructor(
         }.toSet()
     }
 
-    override fun dns(): Set<InetAddress> {
-        return realNetPConfigProvider.dns().toMutableSet().apply {
+    override fun fallbackDns(): Set<InetAddress> {
+        return realNetPConfigProvider.fallbackDns().toMutableSet().apply {
             if (netPInternalFeatureToggles.cloudflareDnsFallback().isEnabled()) {
-                addAll(InetAddress.getAllByName("one.one.one.one"))
+                runCatching { InetAddress.getAllByName("one.one.one.one") }.getOrNull()?.let {
+                    addAll(it)
+                } ?: logcat(LogPriority.ERROR) { "Error resolving fallback DNS" }
             }
         }.toSet()
     }
