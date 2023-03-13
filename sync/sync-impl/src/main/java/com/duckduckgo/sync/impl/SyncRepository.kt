@@ -338,7 +338,7 @@ class AppSyncRepository @Inject constructor(
         val allData = syncCrypter.generateAllData()
         val allDataJSON = Adapters.patchAdapter.toJson(allData)
         Timber.d("SYNC: initial patch data generated $allDataJSON")
-        return when (val result = syncApi.patchAll(token, allData)) {
+        return when (val result = syncApi.sendAllBookmarks(token, allData)) {
             is Result.Error -> {
                 result
             }
@@ -353,7 +353,7 @@ class AppSyncRepository @Inject constructor(
             syncStore.token.takeUnless { it.isNullOrEmpty() }
                 ?: return Result.Error(reason = "Token Empty")
 
-        return when (val result = syncApi.all(token)) {
+        return when (val result = syncApi.getAllData(token)) {
             is Result.Error -> {
                 Result.Error(reason = "SYNC get data failed $result")
             }

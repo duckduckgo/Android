@@ -27,25 +27,7 @@ data class Entity(
     var title: String,
     var url: String?,
     var type: EntityType,
-) {
-    companion object {
-        fun generateFolderId(index: Long): String {
-            return "folder$index"
-        }
-
-        fun generateFolderId(index: String): String {
-            return "folder$index"
-        }
-
-        fun generateFavoriteId(index: Long): String {
-            return "favorite$index"
-        }
-
-        fun generateBookmarkId(index: Long): String {
-            return "bookmark$index"
-        }
-    }
-}
+)
 
 enum class EntityType {
     BOOKMARK,

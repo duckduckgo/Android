@@ -74,7 +74,7 @@ class AppDatabaseBookmarksMigrationCallback(
                 if (existingBookmark != null) {
                     favouriteMigration.add(Relation(relationId = Relation.FAVORITES_ROOT, entityId = existingBookmark.entityId))
                 } else {
-                    val entity = Entity(Entity.generateFavoriteId(it.id), it.title, it.url, BOOKMARK)
+                    val entity = Entity(generateFavoriteId(it.id), it.title, it.url, BOOKMARK)
                     entitiesMigration.add(entity)
                     favouriteMigration.add(Relation(relationId = Relation.FAVORITES_ROOT, entityId = entity.entityId))
                 }
@@ -108,23 +108,23 @@ class AppDatabaseBookmarksMigrationCallback(
             val bookmarksInFolder = bookmarksDao().getBookmarksByParentIdSync(folderId)
 
             foldersInFolder.forEach {
-                val entity = Entity(Entity.generateFolderId(it.id), it.name, "", FOLDER)
+                val entity = Entity(generateFolderId(it.id), it.name, "", FOLDER)
                 entities.add(entity)
 
                 if (folderId == 0L) {
                     relations.add(Relation(relationId = Relation.BOOMARKS_ROOT, entityId = entity.entityId))
                 } else {
-                    relations.add(Relation(relationId = Entity.generateFolderId(folderId), entityId = entity.entityId))
+                    relations.add(Relation(relationId = generateFolderId(folderId), entityId = entity.entityId))
                 }
             }
             bookmarksInFolder.forEach {
-                val entity = Entity(Entity.generateBookmarkId(it.id), it.title.orEmpty(), it.url, BOOKMARK)
+                val entity = Entity(generateBookmarkId(it.id), it.title.orEmpty(), it.url, BOOKMARK)
                 entities.add(entity)
 
                 if (folderId == 0L) {
                     relations.add(Relation(relationId = Relation.BOOMARKS_ROOT, entityId = entity.entityId))
                 } else {
-                    relations.add(Relation(relationId = Entity.generateFolderId(folderId), entityId = entity.entityId))
+                    relations.add(Relation(relationId = generateFolderId(folderId), entityId = entity.entityId))
                 }
             }
 
@@ -151,8 +151,21 @@ class AppDatabaseBookmarksMigrationCallback(
         // At most 1 thread will be doing IO
         dispatcherProvider.io().limitedParallelism(1).asExecutor().execute(f)
     }
-
     companion object {
-        const val BOOKMARKS_MIGRATION_DB_VERSION = 45
+        fun generateFolderId(index: Long): String {
+            return "folder$index"
+        }
+
+        fun generateFolderId(index: String): String {
+            return "folder$index"
+        }
+
+        fun generateFavoriteId(index: Long): String {
+            return "favorite$index"
+        }
+
+        fun generateBookmarkId(index: Long): String {
+            return "bookmark$index"
+        }
     }
 }

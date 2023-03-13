@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.bookmarks
 
+import com.duckduckgo.app.bookmarks.migration.AppDatabaseBookmarksMigrationCallback
 import com.duckduckgo.savedsites.store.Entity
 import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
 import com.duckduckgo.savedsites.store.EntityType.FOLDER
@@ -28,16 +29,17 @@ object BookmarkTestUtils {
     ): List<Entity> {
         val entities = mutableListOf<Entity>()
         for (index in 1..total) {
-            entities.add(Entity(Entity.generateBookmarkId(index.toLong()), "entity$index", "https://testUrl$index", BOOKMARK))
+            entities.add(Entity(AppDatabaseBookmarksMigrationCallback.generateBookmarkId(index.toLong()), "entity$index", "https://testUrl$index", BOOKMARK))
         }
         return entities
     }
+
     fun givenSomeFolders(
         total: Int,
     ): List<Entity> {
         val entities = mutableListOf<Entity>()
         for (index in 1..total) {
-            entities.add(Entity(Entity.generateFolderId(index.toLong()), "entity$index", "https://testUrl$index", FOLDER))
+            entities.add(Entity(AppDatabaseBookmarksMigrationCallback.generateFolderId(index.toLong()), "entity$index", "https://testUrl$index", FOLDER))
         }
         return entities
     }

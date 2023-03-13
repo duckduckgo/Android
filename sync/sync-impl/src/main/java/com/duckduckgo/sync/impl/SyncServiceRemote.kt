@@ -63,12 +63,12 @@ interface SyncApi {
 
     fun getDevices(token: String): Result<List<Device>>
 
-    fun patchAll(
+    fun sendAllBookmarks(
         token: String,
         bookmarks: SyncDataRequest,
     ): Result<Boolean>
 
-    fun all(token: String): Result<DataResponse>
+    fun getAllData(token: String): Result<DataResponse>
 }
 
 @ContributesBinding(AppScope::class)
@@ -220,7 +220,7 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
         }
     }
 
-    override fun patchAll(
+    override fun sendAllBookmarks(
         token: String,
         bookmarks: SyncDataRequest,
     ): Result<Boolean> {
@@ -236,7 +236,7 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
         }
     }
 
-    override fun all(token: String): Result<DataResponse> {
+    override fun getAllData(token: String): Result<DataResponse> {
         val response = runCatching {
             val patchCall = syncService.data("Bearer $token")
             patchCall.execute()

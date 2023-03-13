@@ -79,7 +79,6 @@ class SyncNativeLibTest {
     }
 
     @Test
-    @Ignore
     fun testWhenGivenRecoveryKeyThenCanExtractSecretKey() {
         val syncNativeLib = SyncNativeLib(InstrumentationRegistry.getInstrumentation().targetContext)
         val accountKeys = syncNativeLib.generateAccountKeys(aUserId, aPassword)

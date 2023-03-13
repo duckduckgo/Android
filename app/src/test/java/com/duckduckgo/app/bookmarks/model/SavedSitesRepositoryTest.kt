@@ -773,6 +773,60 @@ class SavedSitesRepositoryTest {
         }
     }
 
+    @Test
+    fun whenUserHasBookmarksAndFavoritesThenGetSavedSitesReturnsEverything() = runTest {
+        val favorite = Favorite("favorite1", "Favorite", "http://favexample.com", 0)
+        val favorite2 = Favorite("favorite2", "Favorite2", "http://favexample2.com", 1)
+        givenFavoriteStored(favorite, favorite2)
+
+        val bookmarks = givenSomeBookmarks(10)
+        savedSitesEntitiesDao.insertList(bookmarks)
+
+        val relation = givenFolderWithContent(Relation.BOOMARKS_ROOT, bookmarks)
+        savedSitesRelationsDao.insertList(relation)
+
+        repository.getSavedSites(Relation.BOOMARKS_ROOT).test {
+            val savedSites = awaitItem()
+            assertTrue(savedSites.bookmarks.size == 10)
+            assertTrue(savedSites.favorites.size == 2)
+        }
+    }
+
+    @Test
+    fun whenUserHasBookmarksAndFavoritesThenGetSavedSitesFromASubFolderReturnsSubFolder() = runTest {
+        val favorite = Favorite("favorite1", "Favorite", "http://favexample.com", 0)
+        val favorite2 = Favorite("favorite2", "Favorite2", "http://favexample2.com", 1)
+        givenFavoriteStored(favorite, favorite2)
+
+        val folder = givenSomeFolders(1)
+        val subFolderId = folder.first().entityId
+        savedSitesEntitiesDao.insertList(folder)
+
+        val relation = givenFolderWithContent(Relation.BOOMARKS_ROOT, folder)
+        savedSitesRelationsDao.insertList(relation)
+
+        val bookmarks = givenSomeBookmarks(10)
+        savedSitesEntitiesDao.insertList(bookmarks)
+
+        val subFolder = givenFolderWithContent(subFolderId, bookmarks)
+        savedSitesRelationsDao.insertList(subFolder)
+
+        repository.getSavedSites(Relation.BOOMARKS_ROOT).test {
+            val savedSites = awaitItem()
+            assertTrue(savedSites.bookmarks.isEmpty())
+            assertTrue(savedSites.favorites.size == 2)
+            assertTrue(savedSites.folders.size == 1)
+            cancelAndConsumeRemainingEvents()
+        }
+
+        repository.getSavedSites(subFolderId).test {
+            val savedSites = awaitItem()
+            assertTrue(savedSites.bookmarks.size == 10)
+            assertTrue(savedSites.favorites.isEmpty())
+            assertTrue(savedSites.folders.isEmpty())
+        }
+    }
+
     private fun givenNoFavoritesStored() {
         Assert.assertFalse(repository.hasFavorites())
     }
@@ -800,7 +854,11 @@ class SavedSitesRepositoryTest {
         Assert.assertFalse(repository.hasBookmarks())
     }
 
-    private fun givenFolderWithEntities(folderId: String, bookmarks: Int, folders: Int) {
+    private fun givenFolderWithEntities(
+        folderId: String,
+        bookmarks: Int,
+        folders: Int
+    ) {
         val bookmarks = givenSomeBookmarks(bookmarks)
         val folders = givenSomeFolders(folders)
         val folderContent = givenFolderWithContent(folderId, bookmarks.plus(folders))

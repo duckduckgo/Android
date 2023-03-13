@@ -43,7 +43,6 @@ class RealSyncCrypter(
             val hasBookmarks = repository.hasBookmarks()
 
             if (!hasFavorites && !hasBookmarks) {
-                Timber.d("SYNC: favourites and bookmarks empty, nothing to generate")
                 return@withContext SyncDataRequest(SyncBookmarkUpdates(emptyList()))
             }
 
@@ -51,7 +50,6 @@ class RealSyncCrypter(
 
             // favorites (we don't add individual items, they are added as we go through bookmark folders)
             if (hasFavorites) {
-                Timber.d("SYNC: generating favorites")
                 val favorites = repository.getFavoritesSync()
                 updates.add(
                     SyncBookmarkEntry.asFolder(
@@ -63,7 +61,6 @@ class RealSyncCrypter(
                 )
             }
 
-            Timber.d("SYNC: generating bookmarks")
             val bookmarks = addFolderContent(Relation.BOOMARKS_ROOT, updates, primaryKey)
 
             val bookmarkUpdates = SyncBookmarkUpdates(bookmarks)
@@ -80,7 +77,6 @@ class RealSyncCrypter(
         repository.getFolderContentSync(folderId).apply {
             val folder = repository.getFolder(folderId)
             if (folder != null) {
-                Timber.d("SYNC: generating folder $folder")
                 val childrenIds = mutableListOf<String>()
                 for (bookmark in this.first) {
                     childrenIds.add(bookmark.id)
@@ -96,13 +92,11 @@ class RealSyncCrypter(
     }
 
     override fun store(entries: List<SyncBookmarkEntry>): Boolean {
-        Timber.d("SYNC: storing entries")
         val primaryKey = syncStore.primaryKey ?: return false
 
         val folders = entries.filter { it.folder != null }
 
         folders.forEach { folder ->
-            Timber.d("SYNC: inserting folder $folder")
             val bookmarkFolder = decryptFolder(folder, primaryKey, folder.id)
             if (bookmarkFolder.id != Relation.BOOMARKS_ROOT && bookmarkFolder.id != Relation.FAVORITES_ROOT) {
                 repository.insert(bookmarkFolder)
@@ -113,20 +107,14 @@ class RealSyncCrypter(
                 val entry = entries.find { it.id == childId }
                 if (entry != null) {
                     if (entry.isFolder()) {
-                        val bookmarkFolder = decryptFolder(entry, primaryKey, folder.id)
-                        Timber.d("SYNC: inserting subfolder folder $bookmarkFolder")
-                        repository.insert(bookmarkFolder)
+                        repository.insert(decryptFolder(entry, primaryKey, folder.id))
                     }
                     if (entry.isBookmark()) {
-                        val bookmark = decryptBookmark(entry, primaryKey, folder.id)
-                        Timber.d("SYNC: inserting bookmark folder $bookmark")
-                        repository.insert(bookmark)
+                        repository.insert(decryptBookmark(entry, primaryKey, folder.id))
                     }
                 }
             }
         }
-
-        Timber.d("SYNC: storing success")
         return true
     }
 
@@ -147,12 +135,8 @@ class RealSyncCrypter(
         id: String,
         primaryKey: String,
     ): String {
-        Timber.d("SYNC: encrypting $id with $primaryKey")
-        // val encryptId = nativeLib.seal(id, primaryKey)
         val encryptResult = nativeLib.encrypt(id, primaryKey)
-        val encrypted = if (encryptResult.result != 0L) "" else encryptResult.encryptedData
-        Timber.d("SYNC: encrypted $encrypted")
-        return encrypted
+        return if (encryptResult.result != 0L) "" else encryptResult.encryptedData
     }
 
     private fun encryptSavedSite(
@@ -192,13 +176,7 @@ class RealSyncCrypter(
         text: String,
         primaryKey: String,
     ): String {
-        Timber.d("SYNC: decrypting $text with $primaryKey")
-        // val decrypted = nativeLib.sealOpen(text, primaryKey, secretKey)
         val decryptResult = nativeLib.decrypt(text, primaryKey)
-        Timber.d("SYNC: decrypt result ${decryptResult.result}")
-        val decrypted = if (decryptResult.result != 0L) "" else decryptResult.decryptedData
-
-        Timber.d("SYNC: decrypted $decrypted")
-        return decrypted
+        return if (decryptResult.result != 0L) "" else decryptResult.decryptedData
     }
 }
