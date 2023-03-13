@@ -70,7 +70,7 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Les identifiants sont stockés de manière sécurisée sur cet appareil uniquement.</string>
 
     <string name="autofillManagementAddLogin">Ajouter un identifiant</string>
-    <string name="autofillManagementSearchLogins">Rechercher</string>
+    <string name="autofillManagementSearchLogins">Recherche d\'identifiants</string>
     <string name="autofillManagementSearchClearDescription">Effacer la recherche</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Aucun résultat pour « %1$s »</string>
 

@@ -70,7 +70,7 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Логины надежно хранятся только на этом устройстве.</string>
 
     <string name="autofillManagementAddLogin">Добавить логин</string>
-    <string name="autofillManagementSearchLogins">Поиск</string>
+    <string name="autofillManagementSearchLogins">Поиск логинов</string>
     <string name="autofillManagementSearchClearDescription">Сбросить поисковый запрос</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Поиск «%1$s» не дал результатов</string>
 
