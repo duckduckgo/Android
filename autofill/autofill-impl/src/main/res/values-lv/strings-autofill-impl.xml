@@ -70,7 +70,7 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Pieteikšanās dati tiek droši glabāti tikai šajā ierīcē.</string>
 
     <string name="autofillManagementAddLogin">Pievienot pieteikšanās datus</string>
-    <string name="autofillManagementSearchLogins">Meklēt</string>
+    <string name="autofillManagementSearchLogins">Meklēt pieteikšanās datus</string>
     <string name="autofillManagementSearchClearDescription">Notīrīt meklēšanas ievadi</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Vaicājumam “%1$s” nav rezultātu</string>
 

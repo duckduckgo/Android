@@ -70,7 +70,7 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">I dati di accesso vengono salvati in modo sicuro solo su questo dispositivo.</string>
 
     <string name="autofillManagementAddLogin">Aggiungi dati di accesso</string>
-    <string name="autofillManagementSearchLogins">Ricerca</string>
+    <string name="autofillManagementSearchLogins">Cerca dati di accesso</string>
     <string name="autofillManagementSearchClearDescription">Elimina input di ricerca</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Nessun risultato per \"%1$s\"</string>
 

@@ -70,7 +70,7 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Girişler yalnızca bu cihazda güvenli bir şekilde saklanır.</string>
 
     <string name="autofillManagementAddLogin">Giriş Ekle</string>
-    <string name="autofillManagementSearchLogins">Arama yap</string>
+    <string name="autofillManagementSearchLogins">Giriş ara</string>
     <string name="autofillManagementSearchClearDescription">Arama girişini temizle</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">\'%1$s\' için sonuç yok</string>
 
