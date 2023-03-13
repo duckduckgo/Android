@@ -79,7 +79,12 @@ class RealSavedSitesRepository(
         return Pair(bookmarks.distinct(), folders.distinct())
     }
 
-    private fun mapEntity(entity: Entity, folderId: String, bookmarks: MutableList<Bookmark>, folders: MutableList<BookmarkFolder>) {
+    private fun mapEntity(
+        entity: Entity,
+        folderId: String,
+        bookmarks: MutableList<Bookmark>,
+        folders: MutableList<BookmarkFolder>,
+    ) {
         if (entity.type == FOLDER) {
             val numFolders = savedSitesRelationsDao.countEntitiesInFolder(entity.entityId, FOLDER)
             val numBookmarks = savedSitesRelationsDao.countEntitiesInFolder(entity.entityId, BOOKMARK)
@@ -426,7 +431,9 @@ class RealSavedSitesRepository(
         BookmarkFolder(this.entityId, this.title, relationId)
 
     private fun Entity.mapToFavorite(index: Int = 0): Favorite = Favorite(this.entityId, this.title, this.url.orEmpty(), index)
-    private fun List<Entity>.mapToBookmarks(folderId: String = SavedSitesNames.BOOMARKS_ROOT): List<Bookmark> = this.map { it.mapToBookmark(folderId) }
+    private fun List<Entity>.mapToBookmarks(folderId: String = SavedSitesNames.BOOMARKS_ROOT): List<Bookmark> =
+        this.map { it.mapToBookmark(folderId) }
+
     private fun List<Entity>.mapToFavorites(): List<Favorite> = this.mapIndexed { index, relation -> relation.mapToFavorite(index) }
 
     private fun SavedSite.titleOrFallback(): String = this.title.takeIf { it.isNotEmpty() } ?: this.url
