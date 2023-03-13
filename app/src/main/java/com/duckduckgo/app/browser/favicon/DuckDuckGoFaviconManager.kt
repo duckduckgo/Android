@@ -35,13 +35,13 @@ import com.duckduckgo.app.global.view.loadFavicon
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.savedsites.api.SavedSitesRepository
-import com.duckduckgo.savedsites.store.SyncEntitiesDao
+import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import java.io.File
 import kotlinx.coroutines.withContext
 
 class DuckDuckGoFaviconManager constructor(
     private val faviconPersister: FaviconPersister,
-    private val entitiesDao: SyncEntitiesDao,
+    private val entitiesDao: SavedSitesEntitiesDao,
     private val fireproofWebsiteRepository: FireproofWebsiteRepository,
     private val locationPermissionsRepository: LocationPermissionsRepository,
     private val savedSitesRepository: SavedSitesRepository,

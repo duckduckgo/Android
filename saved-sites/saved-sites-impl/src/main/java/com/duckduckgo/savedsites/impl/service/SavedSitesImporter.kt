@@ -25,8 +25,8 @@ import com.duckduckgo.savedsites.api.service.SavedSitesImporter
 import com.duckduckgo.savedsites.store.Entity
 import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
 import com.duckduckgo.savedsites.store.Relation
-import com.duckduckgo.savedsites.store.SyncEntitiesDao
-import com.duckduckgo.savedsites.store.SyncRelationsDao
+import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
+import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import org.jsoup.Jsoup
 
 /*
@@ -46,11 +46,11 @@ import org.jsoup.Jsoup
  */
 
 class RealSavedSitesImporter(
-    private val contentResolver: ContentResolver,
-    private val syncEntitiesDao: SyncEntitiesDao,
-    private val syncRelationsDao: SyncRelationsDao,
-    private val savedSitesRepository: SavedSitesRepository,
-    private val savedSitesParser: SavedSitesParser,
+        private val contentResolver: ContentResolver,
+        private val savedSitesEntitiesDao: SavedSitesEntitiesDao,
+        private val savedSitesRelationsDao: SavedSitesRelationsDao,
+        private val savedSitesRepository: SavedSitesRepository,
+        private val savedSitesParser: SavedSitesParser,
 ) : SavedSitesImporter {
 
     companion object {
@@ -72,8 +72,8 @@ class RealSavedSitesImporter(
                 )
             }.also { pairs ->
                 pairs.asSequence().chunked(IMPORT_BATCH_SIZE).forEach { chunk ->
-                    syncRelationsDao.insertList(chunk.map { it.first })
-                    syncEntitiesDao.insertList(chunk.map { it.second })
+                    savedSitesRelationsDao.insertList(chunk.map { it.first })
+                    savedSitesEntitiesDao.insertList(chunk.map { it.second })
                 }
             }
 
@@ -84,8 +84,8 @@ class RealSavedSitesImporter(
                 )
             }.also { pairs ->
                 pairs.asSequence().chunked(IMPORT_BATCH_SIZE).forEach { chunk ->
-                    syncRelationsDao.insertList(chunk.map { it.first })
-                    syncEntitiesDao.insertList(chunk.map { it.second })
+                    savedSitesRelationsDao.insertList(chunk.map { it.first })
+                    savedSitesEntitiesDao.insertList(chunk.map { it.second })
                 }
             }
 

@@ -26,7 +26,7 @@ import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface SyncEntitiesDao {
+interface SavedSitesEntitiesDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(entity: Entity)

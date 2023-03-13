@@ -41,9 +41,25 @@ class AppDatabaseBookmarksMigrationCallback(
     }
 
     fun runMigration() {
-        migrateBookmarks()
-        migrateFavorites()
-        cleanUpTables()
+        addRootFolders()
+        if (needsMigration()) {
+            migrateBookmarks()
+            migrateFavorites()
+            cleanUpTables()
+        }
+    }
+
+    private fun addRootFolders(){
+        with(appDatabase.get()) {
+            syncEntitiesDao().insert(Entity(Relation.FAVORITES_ROOT, Relation.FAVORITES_NAME, "", FOLDER))
+            syncEntitiesDao().insert(Entity(Relation.BOOMARKS_ROOT, Relation.BOOKMARKS_NAME, "", FOLDER))
+        }
+    }
+
+    private fun needsMigration(): Boolean {
+        with(appDatabase.get()) {
+            return (favoritesDao().userHasFavorites() || bookmarksDao().bookmarksCount() > 0)
+        }
     }
 
     private fun migrateFavorites() {
@@ -51,21 +67,16 @@ class AppDatabaseBookmarksMigrationCallback(
             val favouriteMigration = mutableListOf<Relation>()
             val entitiesMigration = mutableListOf<Entity>()
 
-            // add favorites root folder
-            entitiesMigration.add(Entity(Relation.FAVORITES_ROOT, "Favorites", "", FOLDER))
-
-            if (favoritesDao().userHasFavorites()) {
-                val favourites = favoritesDao().favoritesSync()
-                favourites.forEach {
-                    // try to purge duplicates by only adding favourites with the same url of a bookmark already added
-                    val existingBookmark = syncEntitiesDao().entityByUrl(it.url)
-                    if (existingBookmark != null) {
-                        favouriteMigration.add(Relation(relationId = Relation.FAVORITES_ROOT, entityId = existingBookmark.entityId))
-                    } else {
-                        val entity = Entity(Entity.generateFavoriteId(it.id), it.title, it.url, BOOKMARK)
-                        entitiesMigration.add(entity)
-                        favouriteMigration.add(Relation(relationId = Relation.FAVORITES_ROOT, entityId = entity.entityId))
-                    }
+            val favourites = favoritesDao().favoritesSync()
+            favourites.forEach {
+                // try to purge duplicates by only adding favourites with the same url of a bookmark already added
+                val existingBookmark = syncEntitiesDao().entityByUrl(it.url)
+                if (existingBookmark != null) {
+                    favouriteMigration.add(Relation(relationId = Relation.FAVORITES_ROOT, entityId = existingBookmark.entityId))
+                } else {
+                    val entity = Entity(Entity.generateFavoriteId(it.id), it.title, it.url, BOOKMARK)
+                    entitiesMigration.add(entity)
+                    favouriteMigration.add(Relation(relationId = Relation.FAVORITES_ROOT, entityId = entity.entityId))
                 }
             }
 
@@ -86,7 +97,6 @@ class AppDatabaseBookmarksMigrationCallback(
                     findFolderRelation(it.id)
                 }
             }
-            syncEntitiesDao().insert(Entity(Relation.BOOMARKS_ROOT, Relation.BOOKMARKS_NAME, "", FOLDER))
         }
     }
 
@@ -140,5 +150,9 @@ class AppDatabaseBookmarksMigrationCallback(
     private fun ioThread(f: () -> Unit) {
         // At most 1 thread will be doing IO
         dispatcherProvider.io().limitedParallelism(1).asExecutor().execute(f)
+    }
+
+    companion object {
+        const val BOOKMARKS_MIGRATION_DB_VERSION = 45
     }
 }

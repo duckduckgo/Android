@@ -65,10 +65,11 @@ import com.duckduckgo.app.usage.app.AppDaysUsedEntity
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 import com.duckduckgo.savedsites.store.Entity
+import com.duckduckgo.savedsites.store.EntityType
 import com.duckduckgo.savedsites.store.EntityTypeConverter
 import com.duckduckgo.savedsites.store.Relation
-import com.duckduckgo.savedsites.store.SyncEntitiesDao
-import com.duckduckgo.savedsites.store.SyncRelationsDao
+import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
+import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 
 @Database(
     exportSchema = true,
@@ -155,9 +156,9 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun authCookiesAllowedDomainsDao(): AuthCookiesAllowedDomainsDao
     abstract fun webTrackersBlockedDao(): WebTrackersBlockedDao
 
-    abstract fun syncEntitiesDao(): SyncEntitiesDao
+    abstract fun syncEntitiesDao(): SavedSitesEntitiesDao
 
-    abstract fun syncRelationsDao(): SyncRelationsDao
+    abstract fun syncRelationsDao(): SavedSitesRelationsDao
 }
 
 @Suppress("PropertyName")

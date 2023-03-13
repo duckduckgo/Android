@@ -30,8 +30,8 @@ import com.duckduckgo.savedsites.store.Entity
 import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
 import com.duckduckgo.savedsites.store.EntityType.FOLDER
 import com.duckduckgo.savedsites.store.Relation
-import com.duckduckgo.savedsites.store.SyncEntitiesDao
-import com.duckduckgo.savedsites.store.SyncRelationsDao
+import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
+import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -39,8 +39,8 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 
 class RealSavedSitesRepository(
-    private val syncEntitiesDao: SyncEntitiesDao,
-    private val syncRelationsDao: SyncRelationsDao,
+    private val savedSitesEntitiesDao: SavedSitesEntitiesDao,
+    private val savedSitesRelationsDao: SavedSitesRelationsDao,
     private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
 ) : SavedSitesRepository {
 
@@ -57,13 +57,13 @@ class RealSavedSitesRepository(
     }
 
     override suspend fun getFolderContent(folderId: String): Flow<Pair<List<Bookmark>, List<BookmarkFolder>>> {
-        return syncEntitiesDao.entitiesInFolder(folderId).map { entities ->
+        return savedSitesEntitiesDao.entitiesInFolder(folderId).map { entities ->
             val bookmarks = mutableListOf<Bookmark>()
             val folders = mutableListOf<BookmarkFolder>()
             entities.map { entity ->
                 if (entity.type == FOLDER) {
-                    val numFolders = syncRelationsDao.countEntitiesInFolder(entity.entityId, FOLDER)
-                    val numBookmarks = syncRelationsDao.countEntitiesInFolder(entity.entityId, BOOKMARK)
+                    val numFolders = savedSitesRelationsDao.countEntitiesInFolder(entity.entityId, FOLDER)
+                    val numBookmarks = savedSitesRelationsDao.countEntitiesInFolder(entity.entityId, BOOKMARK)
                     folders.add(BookmarkFolder(entity.entityId, entity.title, folderId, numBookmarks, numFolders))
                 } else {
                     bookmarks.add(Bookmark(entity.entityId, entity.title, entity.url.orEmpty(), folderId))
@@ -75,13 +75,13 @@ class RealSavedSitesRepository(
     }
 
     override suspend fun getFolderContentSync(folderId: String): Pair<List<Bookmark>, List<BookmarkFolder>> {
-        val entities = syncEntitiesDao.entitiesInFolderSync(folderId)
+        val entities = savedSitesEntitiesDao.entitiesInFolderSync(folderId)
         val bookmarks = mutableListOf<Bookmark>()
         val folders = mutableListOf<BookmarkFolder>()
         entities.forEach { entity ->
             if (entity.type == FOLDER) {
-                val numFolders = syncRelationsDao.countEntitiesInFolder(entity.entityId, FOLDER)
-                val numBookmarks = syncRelationsDao.countEntitiesInFolder(entity.entityId, BOOKMARK)
+                val numFolders = savedSitesRelationsDao.countEntitiesInFolder(entity.entityId, FOLDER)
+                val numBookmarks = savedSitesRelationsDao.countEntitiesInFolder(entity.entityId, BOOKMARK)
                 folders.add(BookmarkFolder(entity.entityId, entity.title, folderId, numBookmarks, numFolders))
             } else {
                 bookmarks.add(Bookmark(entity.entityId, entity.title, entity.url.orEmpty(), folderId))
@@ -158,7 +158,7 @@ class RealSavedSitesRepository(
     }
 
     private fun getFolders(folderId: String): List<BookmarkFolder> {
-        return syncEntitiesDao.entitiesInFolder(folderId, FOLDER).map { entity ->
+        return savedSitesEntitiesDao.entitiesInFolder(folderId, FOLDER).map { entity ->
             entity.mapToBookmarkFolder(folderId)
         }
     }
@@ -166,7 +166,7 @@ class RealSavedSitesRepository(
     private fun folderContent(folderId: String): Pair<List<Bookmark>, List<BookmarkFolder>> {
         val bookmarks = mutableListOf<Bookmark>()
         val folders = mutableListOf<BookmarkFolder>()
-        syncEntitiesDao.entitiesInFolderSync(folderId).forEach { entity ->
+        savedSitesEntitiesDao.entitiesInFolderSync(folderId).forEach { entity ->
             if (entity.type == FOLDER) {
                 folders.add(entity.mapToBookmarkFolder(folderId))
             } else {
@@ -190,48 +190,48 @@ class RealSavedSitesRepository(
     }
 
     override fun getFavorites(): Flow<List<Favorite>> {
-        return syncRelationsDao.relations(Relation.FAVORITES_ROOT).map { relations ->
+        return savedSitesRelationsDao.relations(Relation.FAVORITES_ROOT).map { relations ->
             relations.mapIndexed { index, relation ->
-                syncEntitiesDao.entityById(relation.entityId)!!.mapToFavorite(index)
+                savedSitesEntitiesDao.entityById(relation.entityId)!!.mapToFavorite(index)
             }
         }.flowOn(dispatcherProvider.io())
     }
 
     override fun getFavoritesObservable(): Single<List<Favorite>> {
-        return syncRelationsDao.relationsObservable(Relation.FAVORITES_ROOT).map { relations ->
+        return savedSitesRelationsDao.relationsObservable(Relation.FAVORITES_ROOT).map { relations ->
             relations.mapIndexed { index, relation ->
-                syncEntitiesDao.entityById(relation.entityId)!!.mapToFavorite(index)
+                savedSitesEntitiesDao.entityById(relation.entityId)!!.mapToFavorite(index)
             }
         }
     }
 
     override fun getFavoritesSync(): List<Favorite> {
-        return syncEntitiesDao.entitiesInFolderSync(Relation.FAVORITES_ROOT).mapToFavorites()
+        return savedSitesEntitiesDao.entitiesInFolderSync(Relation.FAVORITES_ROOT).mapToFavorites()
     }
 
     override fun getFavoritesCountByDomain(domain: String): Int {
-        return syncRelationsDao.countFavouritesByUrl(domain)
+        return savedSitesRelationsDao.countFavouritesByUrl(domain)
     }
 
     override fun getFavorite(url: String): Favorite? {
-        val favorites = syncEntitiesDao.entitiesInFolderSync(Relation.FAVORITES_ROOT).mapIndexed { index, entity ->
+        val favorites = savedSitesEntitiesDao.entitiesInFolderSync(Relation.FAVORITES_ROOT).mapIndexed { index, entity ->
             entity.mapToFavorite(index)
         }
         return favorites.firstOrNull { it.url == url }
     }
 
     override fun getBookmarks(): Flow<List<Bookmark>> {
-        return syncEntitiesDao.entitiesByType(BOOKMARK).map { entities -> entities.mapToBookmarks() }
+        return savedSitesEntitiesDao.entitiesByType(BOOKMARK).map { entities -> entities.mapToBookmarks() }
     }
 
     override fun getBookmarksObservable(): Single<List<Bookmark>> {
-        return syncEntitiesDao.entitiesByTypeObservable(BOOKMARK).map { entities -> entities.mapToBookmarks() }
+        return savedSitesEntitiesDao.entitiesByTypeObservable(BOOKMARK).map { entities -> entities.mapToBookmarks() }
     }
 
     override fun getBookmark(url: String): Bookmark? {
-        val bookmark = syncEntitiesDao.entityByUrl(url)
+        val bookmark = savedSitesEntitiesDao.entityByUrl(url)
         return if (bookmark != null) {
-            syncRelationsDao.relationByEntityId(bookmark.entityId)?.let {
+            savedSitesRelationsDao.relationByEntityId(bookmark.entityId)?.let {
                 bookmark.mapToBookmark(it.relationId)
             }
         } else {
@@ -253,8 +253,8 @@ class RealSavedSitesRepository(
     ): Bookmark {
         val titleOrFallback = title.takeIf { it.isNotEmpty() } ?: url
         val entity = Entity(title = titleOrFallback, url = url, type = BOOKMARK)
-        syncEntitiesDao.insert(entity)
-        syncRelationsDao.insert(Relation(relationId = Relation.BOOMARKS_ROOT, entityId = entity.entityId))
+        savedSitesEntitiesDao.insert(entity)
+        savedSitesRelationsDao.insert(Relation(relationId = Relation.BOOMARKS_ROOT, entityId = entity.entityId))
         return entity.mapToBookmark(Relation.BOOMARKS_ROOT)
     }
 
@@ -263,14 +263,14 @@ class RealSavedSitesRepository(
         title: String,
     ): Favorite {
         val titleOrFallback = title.takeIf { it.isNotEmpty() } ?: url
-        val existentBookmark = syncEntitiesDao.entityByUrl(url)
+        val existentBookmark = savedSitesEntitiesDao.entityByUrl(url)
         if (existentBookmark == null) {
             val entity = Entity(title = titleOrFallback, url = url, type = BOOKMARK)
-            syncEntitiesDao.insert(entity)
-            syncRelationsDao.insert(Relation(relationId = Relation.BOOMARKS_ROOT, entityId = entity.entityId))
-            syncRelationsDao.insert(Relation(relationId = Relation.FAVORITES_ROOT, entityId = entity.entityId))
+            savedSitesEntitiesDao.insert(entity)
+            savedSitesRelationsDao.insert(Relation(relationId = Relation.BOOMARKS_ROOT, entityId = entity.entityId))
+            savedSitesRelationsDao.insert(Relation(relationId = Relation.FAVORITES_ROOT, entityId = entity.entityId))
         } else {
-            syncRelationsDao.insert(Relation(relationId = Relation.FAVORITES_ROOT, entityId = existentBookmark.entityId))
+            savedSitesRelationsDao.insert(Relation(relationId = Relation.FAVORITES_ROOT, entityId = existentBookmark.entityId))
         }
         return getFavorite(url)!!
     }
@@ -285,8 +285,8 @@ class RealSavedSitesRepository(
             is Bookmark -> {
                 // a bookmark will have a parent folder that we must respect
                 val entity = Entity(entityId = savedSite.id, title = titleOrFallback, url = savedSite.url, type = BOOKMARK)
-                syncEntitiesDao.insert(entity)
-                syncRelationsDao.insert(Relation(relationId = savedSite.parentId, entityId = entity.entityId))
+                savedSitesEntitiesDao.insert(entity)
+                savedSitesRelationsDao.insert(Relation(relationId = savedSite.parentId, entityId = entity.entityId))
                 entity.mapToBookmark(savedSite.parentId)
             }
         }
@@ -300,12 +300,12 @@ class RealSavedSitesRepository(
     }
 
     private fun deleteFavorite(favorite: Favorite) {
-        syncRelationsDao.deleteRelationByEntity(favorite.id, Relation.FAVORITES_ROOT)
+        savedSitesRelationsDao.deleteRelationByEntity(favorite.id, Relation.FAVORITES_ROOT)
     }
 
     private fun deleteBookmark(bookmark: Bookmark) {
-        syncEntitiesDao.delete(bookmark.id)
-        syncRelationsDao.deleteRelationByEntity(bookmark.id)
+        savedSitesEntitiesDao.delete(bookmark.id)
+        savedSitesRelationsDao.deleteRelationByEntity(bookmark.id)
     }
 
     override fun update(savedSite: SavedSite) {
@@ -316,23 +316,23 @@ class RealSavedSitesRepository(
     }
 
     private fun updateBookmark(bookmark: Bookmark) {
-        syncEntitiesDao.entityById(bookmark.id)?.let { entity ->
-            syncRelationsDao.relationByEntityId(entity.entityId)?.let { relation ->
+        savedSitesEntitiesDao.entityById(bookmark.id)?.let { entity ->
+            savedSitesRelationsDao.relationByEntityId(entity.entityId)?.let { relation ->
                 if (relation.relationId != bookmark.parentId) {
                     // bookmark moved to another folder
-                    syncRelationsDao.deleteRelationByEntity(bookmark.id)
-                    syncRelationsDao.insert(Relation(relationId = bookmark.parentId, entityId = relation.entityId))
+                    savedSitesRelationsDao.deleteRelationByEntity(bookmark.id)
+                    savedSitesRelationsDao.insert(Relation(relationId = bookmark.parentId, entityId = relation.entityId))
                 }
-                syncEntitiesDao.update(Entity(relation.entityId, bookmark.title, bookmark.url, BOOKMARK))
+                savedSitesEntitiesDao.update(Entity(relation.entityId, bookmark.title, bookmark.url, BOOKMARK))
             }
         }
     }
 
     private fun updateFavorite(favorite: Favorite) {
-        syncEntitiesDao.entityById(favorite.id)?.let { entity ->
-            syncEntitiesDao.update(Entity(entity.entityId, favorite.title, favorite.url, BOOKMARK))
+        savedSitesEntitiesDao.entityById(favorite.id)?.let { entity ->
+            savedSitesEntitiesDao.update(Entity(entity.entityId, favorite.title, favorite.url, BOOKMARK))
 
-            val favorites = syncEntitiesDao.entitiesInFolderSync(Relation.FAVORITES_ROOT).mapIndexed { index, entity ->
+            val favorites = savedSitesEntitiesDao.entitiesInFolderSync(Relation.FAVORITES_ROOT).mapIndexed { index, entity ->
                 entity.mapToFavorite(index)
             }.toMutableList()
 
@@ -348,43 +348,43 @@ class RealSavedSitesRepository(
 
     override fun insert(folder: BookmarkFolder): BookmarkFolder {
         val entity = Entity(entityId = folder.id, title = folder.name, url = "", type = FOLDER)
-        syncEntitiesDao.insert(entity)
-        syncRelationsDao.insert(Relation(relationId = folder.parentId, entityId = folder.id))
+        savedSitesEntitiesDao.insert(entity)
+        savedSitesRelationsDao.insert(Relation(relationId = folder.parentId, entityId = folder.id))
         return folder
     }
 
     override fun update(folder: BookmarkFolder) {
         val oldFolder = getFolder(folder.id) ?: return
 
-        syncEntitiesDao.update(Entity(entityId = folder.id, title = folder.name, url = "", type = FOLDER))
+        savedSitesEntitiesDao.update(Entity(entityId = folder.id, title = folder.name, url = "", type = FOLDER))
 
         // has folder parent changed?
         if (oldFolder.parentId != folder.id) {
-            syncRelationsDao.deleteRelationByEntity(folder.id)
-            syncRelationsDao.insert(Relation(relationId = folder.parentId, entityId = folder.id))
+            savedSitesRelationsDao.deleteRelationByEntity(folder.id)
+            savedSitesRelationsDao.insert(Relation(relationId = folder.parentId, entityId = folder.id))
         }
     }
 
     override fun delete(folder: BookmarkFolder) {
-        val relations = syncEntitiesDao.entitiesInFolderSync(folder.id)
+        val relations = savedSitesEntitiesDao.entitiesInFolderSync(folder.id)
         val entities = mutableListOf<Entity>()
         relations.forEach {
             entities.add(it)
         }
 
-        syncRelationsDao.deleteRelationByEntity(folder.id)
-        syncRelationsDao.delete(folder.id)
-        syncEntitiesDao.deleteList(entities.toList())
-        syncEntitiesDao.delete(folder.id)
+        savedSitesRelationsDao.deleteRelationByEntity(folder.id)
+        savedSitesRelationsDao.delete(folder.id)
+        savedSitesEntitiesDao.deleteList(entities.toList())
+        savedSitesEntitiesDao.delete(folder.id)
     }
 
     override fun getFolder(folderId: String): BookmarkFolder? {
-        val entity = syncEntitiesDao.entityById(folderId)
-        val relation = syncRelationsDao.relationByEntityId(folderId)
+        val entity = savedSitesEntitiesDao.entityById(folderId)
+        val relation = savedSitesRelationsDao.relationByEntityId(folderId)
 
         return if (entity != null) {
-            val numFolders = syncRelationsDao.countEntitiesInFolder(entity.entityId, FOLDER)
-            val numBookmarks = syncRelationsDao.countEntitiesInFolder(entity.entityId, BOOKMARK)
+            val numFolders = savedSitesRelationsDao.countEntitiesInFolder(entity.entityId, FOLDER)
+            val numBookmarks = savedSitesRelationsDao.countEntitiesInFolder(entity.entityId, BOOKMARK)
             BookmarkFolder(folderId, entity.title, relation?.relationId ?: "", numFolders = numFolders, numBookmarks = numBookmarks)
         } else {
             null
@@ -392,11 +392,11 @@ class RealSavedSitesRepository(
     }
 
     override fun getFolderByName(folderName: String): BookmarkFolder? {
-        val entity = syncEntitiesDao.entityByName(folderName)
+        val entity = savedSitesEntitiesDao.entityByName(folderName)
         return if (entity != null) {
-            val relation = syncRelationsDao.relationByEntityId(entity.entityId)
-            val numFolders = syncRelationsDao.countEntitiesInFolder(entity.entityId, FOLDER)
-            val numBookmarks = syncRelationsDao.countEntitiesInFolder(entity.entityId, BOOKMARK)
+            val relation = savedSitesRelationsDao.relationByEntityId(entity.entityId)
+            val numFolders = savedSitesRelationsDao.countEntitiesInFolder(entity.entityId, FOLDER)
+            val numBookmarks = savedSitesRelationsDao.countEntitiesInFolder(entity.entityId, BOOKMARK)
             BookmarkFolder(entity.entityId, entity.title, relation?.relationId ?: "", numFolders = numFolders, numBookmarks = numBookmarks)
         } else {
             null
@@ -404,22 +404,22 @@ class RealSavedSitesRepository(
     }
 
     override fun deleteAll() {
-        syncRelationsDao.deleteAll()
-        syncEntitiesDao.deleteAll()
+        savedSitesRelationsDao.deleteAll()
+        savedSitesEntitiesDao.deleteAll()
     }
 
     override fun bookmarksCount(): Long {
-        return syncEntitiesDao.entitiesByTypeSync(BOOKMARK).size.toLong()
+        return savedSitesEntitiesDao.entitiesByTypeSync(BOOKMARK).size.toLong()
     }
 
     override fun favoritesCount(): Long {
-        return syncEntitiesDao.entitiesInFolderSync(Relation.FAVORITES_ROOT).size.toLong()
+        return savedSitesEntitiesDao.entitiesInFolderSync(Relation.FAVORITES_ROOT).size.toLong()
     }
 
     override fun updateWithPosition(favorites: List<Favorite>) {
-        syncRelationsDao.delete(Relation.FAVORITES_ROOT)
+        savedSitesRelationsDao.delete(Relation.FAVORITES_ROOT)
         val relations = favorites.map { Relation(relationId = Relation.FAVORITES_ROOT, entityId = it.id) }
-        syncRelationsDao.insertList(relations)
+        savedSitesRelationsDao.insertList(relations)
     }
 
     private fun Entity.mapToBookmark(relationId: String): Bookmark = Bookmark(this.entityId, this.title, this.url.orEmpty(), relationId)

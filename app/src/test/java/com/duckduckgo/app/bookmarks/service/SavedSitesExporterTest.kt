@@ -35,8 +35,8 @@ import com.duckduckgo.savedsites.impl.service.FolderTreeItem
 import com.duckduckgo.savedsites.impl.service.RealSavedSitesExporter
 import com.duckduckgo.savedsites.impl.service.RealSavedSitesParser
 import com.duckduckgo.savedsites.store.Relation
-import com.duckduckgo.savedsites.store.SyncEntitiesDao
-import com.duckduckgo.savedsites.store.SyncRelationsDao
+import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
+import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import java.io.File
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -59,8 +59,8 @@ class SavedSitesExporterTest {
     private lateinit var db: AppDatabase
     private lateinit var savedSitesRepository: SavedSitesRepository
     private lateinit var exporter: RealSavedSitesExporter
-    private lateinit var syncEntitiesDao: SyncEntitiesDao
-    private lateinit var syncRelationsDao: SyncRelationsDao
+    private lateinit var savedSitesEntitiesDao: SavedSitesEntitiesDao
+    private lateinit var savedSitesRelationsDao: SavedSitesRelationsDao
     private lateinit var filesDir: File
 
     @Before
@@ -69,9 +69,9 @@ class SavedSitesExporterTest {
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
-        syncEntitiesDao = db.syncEntitiesDao()
-        syncRelationsDao = db.syncRelationsDao()
-        savedSitesRepository = RealSavedSitesRepository(syncEntitiesDao, syncRelationsDao)
+        savedSitesEntitiesDao = db.syncEntitiesDao()
+        savedSitesRelationsDao = db.syncRelationsDao()
+        savedSitesRepository = RealSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao)
 
         filesDir = context.filesDir
         exporter = RealSavedSitesExporter(context.contentResolver, savedSitesRepository, RealSavedSitesParser())

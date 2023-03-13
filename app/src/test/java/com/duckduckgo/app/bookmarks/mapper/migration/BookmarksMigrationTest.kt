@@ -31,8 +31,8 @@ import com.duckduckgo.app.bookmarks.migration.AppDatabaseBookmarksMigrationCallb
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
 import com.duckduckgo.savedsites.store.Relation
-import com.duckduckgo.savedsites.store.SyncEntitiesDao
-import com.duckduckgo.savedsites.store.SyncRelationsDao
+import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
+import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import junit.framework.Assert.assertFalse
 import junit.framework.Assert.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -52,8 +52,8 @@ class BookmarksMigrationTest {
 
     private lateinit var appDatabase: AppDatabase
 
-    private lateinit var syncEntitiesDao: SyncEntitiesDao
-    private lateinit var syncRelationsDao: SyncRelationsDao
+    private lateinit var savedSitesEntitiesDao: SavedSitesEntitiesDao
+    private lateinit var savedSitesRelationsDao: SavedSitesRelationsDao
 
     private lateinit var favoritesDao: FavoritesDao
     private lateinit var bookmarksDao: BookmarksDao
@@ -71,8 +71,8 @@ class BookmarksMigrationTest {
         bookmarksDao = appDatabase.bookmarksDao()
         bookmarkFoldersDao = appDatabase.bookmarkFoldersDao()
 
-        syncEntitiesDao = appDatabase.syncEntitiesDao()
-        syncRelationsDao = appDatabase.syncRelationsDao()
+        savedSitesEntitiesDao = appDatabase.syncEntitiesDao()
+        savedSitesRelationsDao = appDatabase.syncRelationsDao()
     }
 
     @Test
@@ -81,10 +81,10 @@ class BookmarksMigrationTest {
         givenSomeFavorites(totalFavorites)
         whenMigrationApplied()
 
-        val relations = syncRelationsDao.relations()
+        val relations = savedSitesRelationsDao.relations()
         assertTrue(relations.size == totalFavorites)
 
-        val entities = syncEntitiesDao.entities()
+        val entities = savedSitesEntitiesDao.entities()
         assertTrue(entities.size == totalFavorites + 2)
     }
 
@@ -96,15 +96,15 @@ class BookmarksMigrationTest {
 
         whenMigrationApplied()
 
-        assertTrue(syncEntitiesDao.hasEntities())
-        assertTrue(syncRelationsDao.hasRelations())
+        assertTrue(savedSitesEntitiesDao.hasEntities())
+        assertTrue(savedSitesRelationsDao.hasRelations())
 
-        syncEntitiesDao.entitiesByType(BOOKMARK).test {
+        savedSitesEntitiesDao.entitiesByType(BOOKMARK).test {
             val entities = awaitItem()
             assertTrue(entities.size == totalBookmarks)
         }
 
-        val relations = (syncRelationsDao.relations())
+        val relations = (savedSitesRelationsDao.relations())
         assertTrue(relations.size == totalBookmarks)
     }
 
@@ -119,13 +119,13 @@ class BookmarksMigrationTest {
 
         whenMigrationApplied()
 
-        assertTrue(syncEntitiesDao.hasEntities())
-        assertTrue(syncRelationsDao.hasRelations())
+        assertTrue(savedSitesEntitiesDao.hasEntities())
+        assertTrue(savedSitesRelationsDao.hasRelations())
 
-        val entities = syncEntitiesDao.entities()
+        val entities = savedSitesEntitiesDao.entities()
         assertTrue(entities.size == totalFolder + bookmarksPerFolder + totalFavorites + ROOT_FOLDERS)
 
-        val relations = (syncRelationsDao.relations())
+        val relations = (savedSitesRelationsDao.relations())
         assertTrue(relations.size == totalFolder + bookmarksPerFolder + totalFavorites)
     }
 
@@ -137,13 +137,13 @@ class BookmarksMigrationTest {
 
         whenMigrationApplied()
 
-        assertTrue(syncEntitiesDao.hasEntities())
-        assertTrue(syncRelationsDao.hasRelations())
+        assertTrue(savedSitesEntitiesDao.hasEntities())
+        assertTrue(savedSitesRelationsDao.hasRelations())
 
-        val entities = syncEntitiesDao.entities()
+        val entities = savedSitesEntitiesDao.entities()
         assertTrue(entities.size == totalFolder + bookmarksPerFolder + ROOT_FOLDERS)
 
-        val relations = (syncRelationsDao.relations())
+        val relations = (savedSitesRelationsDao.relations())
         assertTrue(relations.size == totalFolder + bookmarksPerFolder) // total folder + root folder
     }
 
@@ -155,13 +155,13 @@ class BookmarksMigrationTest {
         whenMigrationApplied()
 
         // only one entity migrated
-        assertTrue(syncEntitiesDao.entities().size == 1 + ROOT_FOLDERS)
+        assertTrue(savedSitesEntitiesDao.entities().size == 1 + ROOT_FOLDERS)
 
         // two relations migrated, one for bookmarks and another for favorites
-        assertTrue(syncRelationsDao.relations().size == 2)
+        assertTrue(savedSitesRelationsDao.relations().size == 2)
 
-        val bookmarks = syncEntitiesDao.entitiesInFolderSync(Relation.BOOMARKS_ROOT)
-        val favorites = syncEntitiesDao.entitiesInFolderSync(Relation.FAVORITES_ROOT)
+        val bookmarks = savedSitesEntitiesDao.entitiesInFolderSync(Relation.BOOMARKS_ROOT)
+        val favorites = savedSitesEntitiesDao.entitiesInFolderSync(Relation.FAVORITES_ROOT)
 
         assertTrue(bookmarks.size == 1)
         assertTrue(bookmarks.first().entityId == "bookmark1")
@@ -177,11 +177,11 @@ class BookmarksMigrationTest {
 
         whenMigrationApplied()
 
-        assertTrue(syncEntitiesDao.entities().size == 2 + ROOT_FOLDERS)
-        assertTrue(syncRelationsDao.relations().size == 2)
+        assertTrue(savedSitesEntitiesDao.entities().size == 2 + ROOT_FOLDERS)
+        assertTrue(savedSitesRelationsDao.relations().size == 2)
 
-        val bookmarks = syncEntitiesDao.entitiesInFolderSync(Relation.BOOMARKS_ROOT)
-        val favorites = syncEntitiesDao.entitiesInFolderSync(Relation.FAVORITES_ROOT)
+        val bookmarks = savedSitesEntitiesDao.entitiesInFolderSync(Relation.BOOMARKS_ROOT)
+        val favorites = savedSitesEntitiesDao.entitiesInFolderSync(Relation.FAVORITES_ROOT)
 
         assertTrue(bookmarks.size == 1)
         assertTrue(bookmarks.first().entityId == "bookmark1")

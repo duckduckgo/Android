@@ -31,8 +31,8 @@ import com.duckduckgo.savedsites.impl.service.RealSavedSitesImporter
 import com.duckduckgo.savedsites.impl.service.RealSavedSitesManager
 import com.duckduckgo.savedsites.impl.service.RealSavedSitesParser
 import com.duckduckgo.savedsites.impl.service.SavedSitesParser
-import com.duckduckgo.savedsites.store.SyncEntitiesDao
-import com.duckduckgo.savedsites.store.SyncRelationsDao
+import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
+import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -45,13 +45,13 @@ class SavedSitesModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun savedSitesImporter(
-        context: Context,
-        syncEntitiesDao: SyncEntitiesDao,
-        syncRelationsDao: SyncRelationsDao,
-        savedSitesRepository: SavedSitesRepository,
-        savedSitesParser: SavedSitesParser,
+            context: Context,
+            savedSitesEntitiesDao: SavedSitesEntitiesDao,
+            savedSitesRelationsDao: SavedSitesRelationsDao,
+            savedSitesRepository: SavedSitesRepository,
+            savedSitesParser: SavedSitesParser,
     ): SavedSitesImporter {
-        return RealSavedSitesImporter(context.contentResolver, syncEntitiesDao, syncRelationsDao, savedSitesRepository, savedSitesParser)
+        return RealSavedSitesImporter(context.contentResolver, savedSitesEntitiesDao, savedSitesRelationsDao, savedSitesRepository, savedSitesParser)
     }
 
     @Provides
@@ -84,10 +84,10 @@ class SavedSitesModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun providesSavedSitesRepository(
-        syncEntitiesDao: SyncEntitiesDao,
-        syncRelationsDao: SyncRelationsDao,
-        coroutineDispatcher: DispatcherProvider = DefaultDispatcherProvider(),
+            savedSitesEntitiesDao: SavedSitesEntitiesDao,
+            savedSitesRelationsDao: SavedSitesRelationsDao,
+            coroutineDispatcher: DispatcherProvider = DefaultDispatcherProvider(),
     ): SavedSitesRepository {
-        return RealSavedSitesRepository(syncEntitiesDao, syncRelationsDao, coroutineDispatcher)
+        return RealSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao, coroutineDispatcher)
     }
 }

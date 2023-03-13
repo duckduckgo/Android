@@ -23,7 +23,7 @@ import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
-import com.duckduckgo.savedsites.store.SyncEntitiesDao
+import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
@@ -35,7 +35,7 @@ class FaviconModule {
     @SingleInstanceIn(AppScope::class)
     fun faviconManager(
         faviconPersister: FaviconPersister,
-        bookmarksDao: SyncEntitiesDao,
+        bookmarksDao: SavedSitesEntitiesDao,
         fireproofWebsiteRepository: FireproofWebsiteRepository,
         locationPermissionsRepository: LocationPermissionsRepository,
         savedSitesRepository: SavedSitesRepository,

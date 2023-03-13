@@ -34,7 +34,7 @@ import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.location.data.LocationPermissionsRepositoryImpl
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.savedsites.api.SavedSitesRepository
-import com.duckduckgo.savedsites.store.SyncEntitiesDao
+import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import java.io.File
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -55,7 +55,7 @@ class DuckDuckGoFaviconManagerTest {
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private val mockFaviconPersister: FaviconPersister = mock()
-    private val mockBookmarksDao: SyncEntitiesDao = mock()
+    private val mockBookmarksDao: SavedSitesEntitiesDao = mock()
     private val mockSavedSitesRepository: SavedSitesRepository = mock()
     private val mockFireproofWebsiteDao: FireproofWebsiteDao = mock()
     private val mockLocationPermissionsDao: LocationPermissionsDao = mock()

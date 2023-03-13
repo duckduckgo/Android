@@ -35,8 +35,8 @@ import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
 import com.duckduckgo.savedsites.store.Entity
 import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
 import com.duckduckgo.savedsites.store.Relation
-import com.duckduckgo.savedsites.store.SyncEntitiesDao
-import com.duckduckgo.savedsites.store.SyncRelationsDao
+import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
+import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
 import junit.framework.TestCase.assertTrue
@@ -57,8 +57,8 @@ class SavedSitesRepositoryTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
-    private lateinit var syncEntitiesDao: SyncEntitiesDao
-    private lateinit var syncRelationsDao: SyncRelationsDao
+    private lateinit var savedSitesEntitiesDao: SavedSitesEntitiesDao
+    private lateinit var savedSitesRelationsDao: SavedSitesRelationsDao
 
     private lateinit var db: AppDatabase
     private lateinit var repository: SavedSitesRepository
@@ -68,10 +68,10 @@ class SavedSitesRepositoryTest {
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
-        syncEntitiesDao = db.syncEntitiesDao()
-        syncRelationsDao = db.syncRelationsDao()
+        savedSitesEntitiesDao = db.syncEntitiesDao()
+        savedSitesRelationsDao = db.syncRelationsDao()
 
-        repository = RealSavedSitesRepository(syncEntitiesDao, syncRelationsDao)
+        repository = RealSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao)
     }
 
     @After
@@ -93,10 +93,10 @@ class SavedSitesRepositoryTest {
     fun whenRootFolderHasOnlyBookmarksThenDataIsRetrieved() = runTest {
         val totalBookmarks = 10
         val entities = givenSomeBookmarks(totalBookmarks)
-        syncEntitiesDao.insertList(entities)
+        savedSitesEntitiesDao.insertList(entities)
 
         val relation = givenFolderWithContent(Relation.BOOMARKS_ROOT, entities)
-        syncRelationsDao.insertList(relation)
+        savedSitesRelationsDao.insertList(relation)
 
         repository.getFolderContent(Relation.BOOMARKS_ROOT).test {
             val result = awaitItem()
@@ -112,13 +112,13 @@ class SavedSitesRepositoryTest {
         val totalFolders = 3
 
         val entities = givenSomeBookmarks(totalBookmarks)
-        syncEntitiesDao.insertList(entities)
+        savedSitesEntitiesDao.insertList(entities)
 
         val folders = givenSomeFolders(totalFolders)
-        syncEntitiesDao.insertList(folders)
+        savedSitesEntitiesDao.insertList(folders)
 
         val relation = givenFolderWithContent(Relation.BOOMARKS_ROOT, entities.plus(folders))
-        syncRelationsDao.insertList(relation)
+        savedSitesRelationsDao.insertList(relation)
 
         repository.getFolderContent(Relation.BOOMARKS_ROOT).test {
             val result = awaitItem()
@@ -134,13 +134,13 @@ class SavedSitesRepositoryTest {
         val totalFolders = 3
 
         val entities = givenSomeBookmarks(totalBookmarks)
-        syncEntitiesDao.insertList(entities)
+        savedSitesEntitiesDao.insertList(entities)
 
         val folders = givenSomeFolders(totalFolders)
-        syncEntitiesDao.insertList(folders)
+        savedSitesEntitiesDao.insertList(folders)
 
         val relation = givenFolderWithContent(Relation.BOOMARKS_ROOT, entities.plus(folders))
-        syncRelationsDao.insertList(relation)
+        savedSitesRelationsDao.insertList(relation)
 
         repository.getFolderContent("12").test {
             val result = awaitItem()
@@ -780,8 +780,8 @@ class SavedSitesRepositoryTest {
     private fun givenFavoriteStored(vararg favorite: Favorite) {
         favorite.forEach {
             val entity = Entity(it.id, it.title, it.url, type = BOOKMARK)
-            syncEntitiesDao.insert(entity)
-            syncRelationsDao.insert(Relation(relationId = Relation.FAVORITES_ROOT, entityId = entity.entityId))
+            savedSitesEntitiesDao.insert(entity)
+            savedSitesRelationsDao.insert(Relation(relationId = Relation.FAVORITES_ROOT, entityId = entity.entityId))
         }
     }
 
@@ -789,11 +789,11 @@ class SavedSitesRepositoryTest {
         val entity1 = Entity(title = "title", url = "http://example.com", type = BOOKMARK)
         val entity2 = Entity(title = "title2", url = "http://examples.com", type = BOOKMARK)
 
-        syncEntitiesDao.insert(entity1)
-        syncRelationsDao.insert(Relation(relationId = Relation.FAVORITES_ROOT, entityId = entity1.entityId))
+        savedSitesEntitiesDao.insert(entity1)
+        savedSitesRelationsDao.insert(Relation(relationId = Relation.FAVORITES_ROOT, entityId = entity1.entityId))
 
-        syncEntitiesDao.insert(entity2)
-        syncRelationsDao.insert(Relation(relationId = Relation.FAVORITES_ROOT, entityId = entity2.entityId))
+        savedSitesEntitiesDao.insert(entity2)
+        savedSitesRelationsDao.insert(Relation(relationId = Relation.FAVORITES_ROOT, entityId = entity2.entityId))
     }
 
     private fun givenNoBookmarksStored() {
@@ -804,13 +804,13 @@ class SavedSitesRepositoryTest {
         val bookmarks = givenSomeBookmarks(bookmarks)
         val folders = givenSomeFolders(folders)
         val folderContent = givenFolderWithContent(folderId, bookmarks.plus(folders))
-        syncEntitiesDao.insertList(bookmarks)
-        syncEntitiesDao.insertList(folders)
-        syncRelationsDao.insertList(folderContent)
+        savedSitesEntitiesDao.insertList(bookmarks)
+        savedSitesEntitiesDao.insertList(folders)
+        savedSitesRelationsDao.insertList(folderContent)
     }
 
     private fun givenEmptyDBState() {
-        syncRelationsDao.insertList(givenFolderWithContent(Relation.BOOMARKS_ROOT, emptyList()))
-        syncRelationsDao.insertList(givenFolderWithContent(Relation.FAVORITES_ROOT, emptyList()))
+        savedSitesRelationsDao.insertList(givenFolderWithContent(Relation.BOOMARKS_ROOT, emptyList()))
+        savedSitesRelationsDao.insertList(givenFolderWithContent(Relation.FAVORITES_ROOT, emptyList()))
     }
 }
