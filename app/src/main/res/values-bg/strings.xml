@@ -649,7 +649,7 @@
     <!-- smartling.character_limit = 160 -->
     <string name="autoconsentDialogDescription">Искате ли да се справя с това вместо Вас? Мога да се опитам да намаля бисквитките до минимум, да увелича поверителността и да скрия подобни изскачащи прозорци.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Управление на прозорци за бисквитки</string>
+    <string name="autoconsentPrimaryCta">Управлявай прозорците за бисквитки</string>
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Не, благодаря</string>
 
