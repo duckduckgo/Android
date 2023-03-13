@@ -658,7 +658,7 @@
     <!-- smartling.character_limit = 160 -->
     <string name="autoconsentDialogDescription">Mám ho vyřešit za tebe? Můžu zkusit vybrat jen nezbytné soubory cookie, maximalizovat ochranu soukromí a podobná vyskakovací okna odteď skrývat.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Správa vyskakovacích oken ohledně cookies</string>
+    <string name="autoconsentPrimaryCta">Spravovat vyskakovací okna ohledně cookies</string>
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Ne, děkuji</string>
 
