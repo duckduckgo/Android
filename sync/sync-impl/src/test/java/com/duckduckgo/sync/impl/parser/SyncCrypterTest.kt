@@ -22,7 +22,7 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
-import com.duckduckgo.savedsites.store.Relation
+import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.sync.TestSyncFixtures
 import com.duckduckgo.sync.crypto.EncryptResult
 import com.duckduckgo.sync.crypto.SyncLib
@@ -59,8 +59,10 @@ class SyncCrypterTest {
     @Before fun before() {
         syncCrypter = RealSyncCrypter(repository, nativeLib, store)
 
-        whenever(repository.getFolder(Relation.BOOMARKS_ROOT)).thenReturn(BookmarkFolder(Relation.BOOMARKS_ROOT, "Bookmarks", "", 0, 0))
-        whenever(repository.getFolder(Relation.FAVORITES_ROOT)).thenReturn(BookmarkFolder(Relation.FAVORITES_ROOT, "Favorites", "", 0, 0))
+        whenever(repository.getFolder(SavedSitesNames.BOOMARKS_ROOT)).thenReturn(BookmarkFolder(SavedSitesNames.BOOMARKS_ROOT, "Bookmarks", "", 0, 0))
+        whenever(repository.getFolder(SavedSitesNames.FAVORITES_ROOT)).thenReturn(
+            BookmarkFolder(SavedSitesNames.FAVORITES_ROOT, "Favorites", "", 0, 0),
+        )
         whenever(store.primaryKey).thenReturn("primaryKey")
 
         whenever(nativeLib.encrypt(anyString(), anyString()))
@@ -78,16 +80,16 @@ class SyncCrypterTest {
                 aFavorite("bookmark4", "Bookmark 4", "https://bookmark1.com", 2),
             ),
         )
-        whenever(repository.getFolderContentSync(Relation.BOOMARKS_ROOT)).thenReturn(
+        whenever(repository.getFolderContentSync(SavedSitesNames.BOOMARKS_ROOT)).thenReturn(
             Pair(
                 listOf(
                     aBookmark("bookmark1", "Bookmark 1", "https://bookmark1.com"),
                     aBookmark("bookmark2", "Bookmark 2", "https://bookmark1.com"),
                 ),
-                listOf(aFolder("folder1", "Folder One", Relation.BOOMARKS_ROOT)),
+                listOf(aFolder("folder1", "Folder One", SavedSitesNames.BOOMARKS_ROOT)),
             ),
         )
-        whenever(repository.getFolder("folder1")).thenReturn(BookmarkFolder("folder 1", "Folder One", Relation.BOOMARKS_ROOT, 2, 0))
+        whenever(repository.getFolder("folder1")).thenReturn(BookmarkFolder("folder 1", "Folder One", SavedSitesNames.BOOMARKS_ROOT, 2, 0))
         whenever(repository.getFolderContentSync("folder1")).thenReturn(
             Pair(
                 listOf(
@@ -114,7 +116,7 @@ class SyncCrypterTest {
 
     @Test fun whenOnlyBookmarksThenGeneratedDataIsCorrect() = runTest {
         givenNoFavorites()
-        whenever(repository.getFolderContentSync(Relation.BOOMARKS_ROOT)).thenReturn(
+        whenever(repository.getFolderContentSync(SavedSitesNames.BOOMARKS_ROOT)).thenReturn(
             Pair(
                 listOf(
                     aBookmark("bookmark1", "Bookmark 1", "https://bookmark1.com"),
@@ -128,7 +130,7 @@ class SyncCrypterTest {
 
         assertTrue(allData.bookmarks.updates.size == 3)
         val bookmarksRoot = allData.bookmarks.updates[2]
-        assertEquals(bookmarksRoot.id, Relation.BOOMARKS_ROOT)
+        assertEquals(bookmarksRoot.id, SavedSitesNames.BOOMARKS_ROOT)
         assertEquals(bookmarksRoot.folder!!.children.size, 2)
 
         val folder = allData.bookmarks.updates.first()
@@ -138,16 +140,16 @@ class SyncCrypterTest {
 
     @Test fun whenFolderWithBookmarksThenGeneratedDataIsCorrect() = runTest {
         givenNoFavorites()
-        whenever(repository.getFolderContentSync(Relation.BOOMARKS_ROOT)).thenReturn(
+        whenever(repository.getFolderContentSync(SavedSitesNames.BOOMARKS_ROOT)).thenReturn(
             Pair(
                 listOf(
                     aBookmark("bookmark1", "Bookmark 1", "https://bookmark1.com"),
                     aBookmark("bookmark2", "Bookmark 2", "https://bookmark1.com"),
                 ),
-                listOf(aFolder("folder1", "Folder One", Relation.BOOMARKS_ROOT)),
+                listOf(aFolder("folder1", "Folder One", SavedSitesNames.BOOMARKS_ROOT)),
             ),
         )
-        whenever(repository.getFolder("folder1")).thenReturn(BookmarkFolder("folder 1", "Folder One", Relation.BOOMARKS_ROOT, 2, 0))
+        whenever(repository.getFolder("folder1")).thenReturn(BookmarkFolder("folder 1", "Folder One", SavedSitesNames.BOOMARKS_ROOT, 2, 0))
         whenever(repository.getFolderContentSync("folder1")).thenReturn(
             Pair(
                 listOf(
@@ -162,7 +164,7 @@ class SyncCrypterTest {
 
         assertTrue(allData.bookmarks.updates.size == 6)
         val bookmarksRoot = allData.bookmarks.updates[2]
-        assertEquals(bookmarksRoot.id, Relation.BOOMARKS_ROOT)
+        assertEquals(bookmarksRoot.id, SavedSitesNames.BOOMARKS_ROOT)
         assertEquals(bookmarksRoot.folder!!.children.size, 2)
 
         val folder = allData.bookmarks.updates.last()
@@ -178,16 +180,16 @@ class SyncCrypterTest {
                 aFavorite("bookmark4", "Bookmark 4", "https://bookmark1.com", 2),
             ),
         )
-        whenever(repository.getFolderContentSync(Relation.BOOMARKS_ROOT)).thenReturn(
+        whenever(repository.getFolderContentSync(SavedSitesNames.BOOMARKS_ROOT)).thenReturn(
             Pair(
                 listOf(
                     aBookmark("bookmark1", "Bookmark 1", "https://bookmark1.com"),
                     aBookmark("bookmark2", "Bookmark 2", "https://bookmark1.com"),
                 ),
-                listOf(aFolder("folder1", "Folder One", Relation.BOOMARKS_ROOT)),
+                listOf(aFolder("folder1", "Folder One", SavedSitesNames.BOOMARKS_ROOT)),
             ),
         )
-        whenever(repository.getFolder("folder1")).thenReturn(BookmarkFolder("folder 1", "Folder One", Relation.BOOMARKS_ROOT, 2, 0))
+        whenever(repository.getFolder("folder1")).thenReturn(BookmarkFolder("folder 1", "Folder One", SavedSitesNames.BOOMARKS_ROOT, 2, 0))
         whenever(repository.getFolderContentSync("folder1")).thenReturn(
             Pair(
                 listOf(
@@ -202,7 +204,7 @@ class SyncCrypterTest {
         assertTrue(allData.bookmarks.updates.size == 7)
 
         val favoritesRoot = allData.bookmarks.updates.first()
-        assertEquals(favoritesRoot.id, Relation.FAVORITES_ROOT)
+        assertEquals(favoritesRoot.id, SavedSitesNames.FAVORITES_ROOT)
         assertEquals(favoritesRoot.folder!!.children.size, 3)
 
         val folder = allData.bookmarks.updates.last()
@@ -216,7 +218,7 @@ class SyncCrypterTest {
                 aFavorite("bookmark1", "Bookmark 1", "https://bookmark1.com", 0),
             ),
         )
-        whenever(repository.getFolderContentSync(Relation.BOOMARKS_ROOT)).thenReturn(
+        whenever(repository.getFolderContentSync(SavedSitesNames.BOOMARKS_ROOT)).thenReturn(
             Pair(
                 listOf(
                     aBookmark("bookmark1", "Bookmark 1", "https://bookmark1.com"),
@@ -229,11 +231,11 @@ class SyncCrypterTest {
         assertTrue(allData.bookmarks.updates.size == 3)
 
         val favoritesRoot = allData.bookmarks.updates.first()
-        assertEquals(favoritesRoot.id, Relation.FAVORITES_ROOT)
+        assertEquals(favoritesRoot.id, SavedSitesNames.FAVORITES_ROOT)
         assertEquals(favoritesRoot.folder!!.children.size, 1)
 
         val folder = allData.bookmarks.updates.last()
-        assertEquals(folder.id, Relation.BOOMARKS_ROOT)
+        assertEquals(folder.id, SavedSitesNames.BOOMARKS_ROOT)
         assertEquals(folder.folder!!.children.size, 1)
     }
 
@@ -247,7 +249,7 @@ class SyncCrypterTest {
         whenever(store.primaryKey).thenReturn(TestSyncFixtures.primaryKey)
         whenever(nativeLib.decrypt(any(), any())).thenReturn(TestSyncFixtures.decryptedSecretKey)
 
-        val entries = givenSomeBookmarkSyncEntries(10, Relation.BOOMARKS_ROOT)
+        val entries = givenSomeBookmarkSyncEntries(10, SavedSitesNames.BOOMARKS_ROOT)
         syncCrypter.store(entries)
 
         verify(repository, times(10)).insert(any<Bookmark>())

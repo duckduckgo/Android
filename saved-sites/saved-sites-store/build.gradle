@@ -46,6 +46,8 @@ dependencies {
 
     kapt AndroidX.room.compiler
 
+    implementation project(path: ':saved-sites-api')
+
     testImplementation Testing.junit4
     testImplementation Testing.robolectric
     testImplementation AndroidX.test.ext.junit

@@ -24,6 +24,7 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.A
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.store.Relation
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -551,14 +552,14 @@ class AutoCompleteApiTest {
         id: String = UUID.randomUUID().toString(),
         title: String = "title",
         url: String = "https://example.com",
-    ) = Bookmark(id, title, url, Relation.BOOMARKS_ROOT)
+    ) = Bookmark(id, title, url, SavedSitesNames.BOOMARKS_ROOT)
 
     private fun bookmarks() = listOf(
         Bookmark(
             UUID.randomUUID().toString(),
             "title",
             "https://example.com",
-            Relation.BOOMARKS_ROOT,
+            SavedSitesNames.BOOMARKS_ROOT,
         ),
     )
 }

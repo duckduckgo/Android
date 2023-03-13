@@ -16,9 +16,6 @@
 
 package com.duckduckgo.sync
 
-import com.duckduckgo.sync.impl.parser.SyncBookmarkEntry
-import com.duckduckgo.sync.impl.parser.SyncBookmarkUpdates
-import com.duckduckgo.sync.impl.parser.SyncDataRequest
 import com.duckduckgo.sync.crypto.AccountKeys
 import com.duckduckgo.sync.crypto.ConnectKeys
 import com.duckduckgo.sync.crypto.DecryptResult
@@ -37,6 +34,9 @@ import com.duckduckgo.sync.impl.Logout
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Signup
 import com.duckduckgo.sync.impl.encodeB64
+import com.duckduckgo.sync.impl.parser.SyncBookmarkEntry
+import com.duckduckgo.sync.impl.parser.SyncBookmarkUpdates
+import com.duckduckgo.sync.impl.parser.SyncDataRequest
 import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.Response
 

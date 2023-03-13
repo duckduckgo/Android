@@ -65,7 +65,6 @@ import com.duckduckgo.app.usage.app.AppDaysUsedEntity
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 import com.duckduckgo.savedsites.store.Entity
-import com.duckduckgo.savedsites.store.EntityType
 import com.duckduckgo.savedsites.store.EntityTypeConverter
 import com.duckduckgo.savedsites.store.Relation
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao

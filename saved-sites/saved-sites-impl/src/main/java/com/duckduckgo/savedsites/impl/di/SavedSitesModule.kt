@@ -45,11 +45,11 @@ class SavedSitesModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun savedSitesImporter(
-            context: Context,
-            savedSitesEntitiesDao: SavedSitesEntitiesDao,
-            savedSitesRelationsDao: SavedSitesRelationsDao,
-            savedSitesRepository: SavedSitesRepository,
-            savedSitesParser: SavedSitesParser,
+        context: Context,
+        savedSitesEntitiesDao: SavedSitesEntitiesDao,
+        savedSitesRelationsDao: SavedSitesRelationsDao,
+        savedSitesRepository: SavedSitesRepository,
+        savedSitesParser: SavedSitesParser,
     ): SavedSitesImporter {
         return RealSavedSitesImporter(context.contentResolver, savedSitesEntitiesDao, savedSitesRelationsDao, savedSitesRepository, savedSitesParser)
     }
@@ -84,9 +84,9 @@ class SavedSitesModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun providesSavedSitesRepository(
-            savedSitesEntitiesDao: SavedSitesEntitiesDao,
-            savedSitesRelationsDao: SavedSitesRelationsDao,
-            coroutineDispatcher: DispatcherProvider = DefaultDispatcherProvider(),
+        savedSitesEntitiesDao: SavedSitesEntitiesDao,
+        savedSitesRelationsDao: SavedSitesRelationsDao,
+        coroutineDispatcher: DispatcherProvider = DefaultDispatcherProvider(),
     ): SavedSitesRepository {
         return RealSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao, coroutineDispatcher)
     }

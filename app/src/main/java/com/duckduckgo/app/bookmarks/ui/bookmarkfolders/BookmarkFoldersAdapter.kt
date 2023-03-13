@@ -29,6 +29,7 @@ import com.duckduckgo.mobile.android.databinding.RowTwoLineItemBinding
 import com.duckduckgo.mobile.android.databinding.ViewSectionHeaderBinding
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
+import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.store.Relation
 import timber.log.Timber
 
@@ -55,7 +56,7 @@ class BookmarkFoldersAdapter(
 
     private fun generateNewList(value: List<BookmarkFoldersItemTypes>): List<BookmarkFoldersItemTypes> {
         Timber.d("Bookmarks: generateNewList")
-        return if (parentId == Relation.BOOMARKS_ROOT) {
+        return if (parentId == SavedSitesNames.BOOMARKS_ROOT) {
             listOf(Header) + value
         } else {
             value

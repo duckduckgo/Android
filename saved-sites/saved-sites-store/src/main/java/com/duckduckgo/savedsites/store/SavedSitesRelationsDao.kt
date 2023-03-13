@@ -22,6 +22,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
 
@@ -37,15 +38,15 @@ interface SavedSitesRelationsDao {
     @Query("select * from relations")
     fun relations(): List<Relation>
 
-    @Query("select * from relations where relationId =:relationId")
-    fun relations(relationId: String): Flow<List<Relation>>
+    @Query("select * from relations where folderId =:folderId")
+    fun relations(folderId: String): Flow<List<Relation>>
 
-    @Query("select * from relations where relationId =:relationId")
-    fun relationsObservable(relationId: String): Single<List<Relation>>
+    @Query("select * from relations where folderId =:folderId")
+    fun relationsObservable(folderId: String): Single<List<Relation>>
 
     @Query(
-        "select count(*) from  entities inner join relations on entities.entityId = relations.entityId " +
-            "and entities.type = :type and relations.relationId = :folderId",
+        "select count(*) from entities inner join relations on entities.entityId = relations.entityId " +
+            "and entities.type = :type and relations.folderId = :folderId",
     )
     fun countEntitiesInFolder(
         folderId: String,
@@ -64,25 +65,25 @@ interface SavedSitesRelationsDao {
     @Delete
     fun delete(relation: Relation)
 
-    @Query("delete from relations where relationId = :relationId")
-    fun delete(relationId: String)
+    @Query("delete from relations where folderId = :folderId")
+    fun delete(folderId: String)
 
     @Query("delete from relations where entityId = :entityId")
     fun deleteRelationByEntity(entityId: String)
 
-    @Query("delete from relations where entityId = :entityId AND relationId = :relationId")
+    @Query("delete from relations where entityId = :entityId AND folderId = :folderId")
     fun deleteRelationByEntity(
         entityId: String,
-        relationId: String,
+        folderId: String,
     )
 
     @Query(
         "select count(*) from entities inner join relations on entities.entityId = relations.entityId " +
-            "where entities.url LIKE :domain AND relationId == :relationId",
+            "where entities.url LIKE :domain AND folderId == :folderId",
     )
     fun countFavouritesByUrl(
         domain: String,
-        relationId: String = Relation.FAVORITES_ROOT,
+        folderId: String = SavedSitesNames.FAVORITES_ROOT,
     ): Int
 
     @Query("delete from relations")

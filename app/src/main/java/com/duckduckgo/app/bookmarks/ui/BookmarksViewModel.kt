@@ -38,7 +38,6 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.service.ExportSavedSitesResult
 import com.duckduckgo.savedsites.api.service.ImportSavedSitesResult
 import com.duckduckgo.savedsites.api.service.SavedSitesManager
-import com.duckduckgo.savedsites.store.Relation
 import javax.inject.Inject
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
@@ -85,11 +84,6 @@ class BookmarksViewModel @Inject constructor(
 
     init {
         viewState.value = ViewState()
-        // viewModelScope.launch {
-        //     savedSitesRepository.getFavorites().collect {
-        //         onFavoritesChanged(it)
-        //     }
-        // }
     }
 
     override fun onSavedSiteEdited(savedSite: SavedSite) {
@@ -193,7 +187,7 @@ class BookmarksViewModel @Inject constructor(
         command.value = OpenBookmarkFolder(bookmarkFolder)
     }
 
-    fun fetchBookmarksAndFolders(parentId: String = Relation.BOOMARKS_ROOT) {
+    fun fetchBookmarksAndFolders(parentId: String) {
         viewModelScope.launch {
             savedSitesRepository.getSavedSites(parentId).collect {
                 onSavedSitesItemsChanged(it.favorites, it.bookmarks, it.folders)

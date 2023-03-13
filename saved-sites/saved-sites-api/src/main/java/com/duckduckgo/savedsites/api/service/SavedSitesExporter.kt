@@ -17,7 +17,6 @@
 package com.duckduckgo.savedsites.api.service
 
 import android.net.Uri
-import com.duckduckgo.savedsites.api.models.BookmarkFolder
 
 /**
  * Class that takes care of exporting [SavedSites]

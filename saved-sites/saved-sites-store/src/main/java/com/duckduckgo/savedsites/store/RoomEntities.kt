@@ -55,14 +55,6 @@ class EntityTypeConverter {
 @Entity(tableName = "relations")
 data class Relation(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    var relationId: String = UUID.randomUUID().toString(),
+    var folderId: String = UUID.randomUUID().toString(),
     var entityId: String,
-) {
-    companion object {
-        const val FAVORITES_ROOT = "favorites_root"
-        const val FAVORITES_NAME = "Favorites"
-        const val BOOMARKS_ROOT = "bookmarks_root"
-        const val BOOKMARKS_NAME = "Bookmarks"
-        const val BOOMARKS_ROOT_ID = 0L
-    }
-}
+)

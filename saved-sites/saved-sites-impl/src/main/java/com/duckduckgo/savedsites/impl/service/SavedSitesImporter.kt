@@ -20,6 +20,7 @@ import android.content.ContentResolver
 import android.net.Uri
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite
+import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.api.service.ImportSavedSitesResult
 import com.duckduckgo.savedsites.api.service.SavedSitesImporter
 import com.duckduckgo.savedsites.store.Entity
@@ -46,11 +47,11 @@ import org.jsoup.Jsoup
  */
 
 class RealSavedSitesImporter(
-        private val contentResolver: ContentResolver,
-        private val savedSitesEntitiesDao: SavedSitesEntitiesDao,
-        private val savedSitesRelationsDao: SavedSitesRelationsDao,
-        private val savedSitesRepository: SavedSitesRepository,
-        private val savedSitesParser: SavedSitesParser,
+    private val contentResolver: ContentResolver,
+    private val savedSitesEntitiesDao: SavedSitesEntitiesDao,
+    private val savedSitesRelationsDao: SavedSitesRelationsDao,
+    private val savedSitesRepository: SavedSitesRepository,
+    private val savedSitesParser: SavedSitesParser,
 ) : SavedSitesImporter {
 
     companion object {
@@ -67,7 +68,7 @@ class RealSavedSitesImporter(
 
             savedSites.filterIsInstance<SavedSite.Bookmark>().map { bookmark ->
                 Pair(
-                    Relation(relationId = bookmark.parentId, entityId = bookmark.id),
+                    Relation(folderId = bookmark.parentId, entityId = bookmark.id),
                     Entity(bookmark.id, title = bookmark.title, url = bookmark.url, type = BOOKMARK),
                 )
             }.also { pairs ->
@@ -79,7 +80,7 @@ class RealSavedSitesImporter(
 
             savedSites.filterIsInstance<SavedSite.Favorite>().filter { it.url.isNotEmpty() }.map { favorite ->
                 Pair(
-                    Relation(relationId = Relation.FAVORITES_ROOT, entityId = favorite.id),
+                    Relation(folderId = SavedSitesNames.FAVORITES_ROOT, entityId = favorite.id),
                     Entity(favorite.id, title = favorite.title, url = favorite.url, type = BOOKMARK),
                 )
             }.also { pairs ->

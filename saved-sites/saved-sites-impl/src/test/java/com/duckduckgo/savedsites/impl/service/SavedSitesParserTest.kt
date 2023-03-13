@@ -23,6 +23,7 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.api.models.TreeNode
 import com.duckduckgo.savedsites.store.Relation
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -63,10 +64,10 @@ class SavedSitesParserTest {
 
     @Test
     fun whenSomeBookmarksExistThenHtmlIsGenerated() = runTest {
-        val bookmark = SavedSite.Bookmark(id = "bookmark1", title = "example", url = "www.example.com", Relation.BOOMARKS_ROOT)
+        val bookmark = SavedSite.Bookmark(id = "bookmark1", title = "example", url = "www.example.com", SavedSitesNames.BOOMARKS_ROOT)
         val favorite = SavedSite.Favorite(id = "fav1", title = "example", url = "www.example.com", 0)
 
-        val node = TreeNode(FolderTreeItem(Relation.BOOMARKS_ROOT, RealSavedSitesParser.BOOKMARKS_FOLDER, "", null, 0))
+        val node = TreeNode(FolderTreeItem(SavedSitesNames.BOOMARKS_ROOT, RealSavedSitesParser.BOOKMARKS_FOLDER, "", null, 0))
         node.add(TreeNode(FolderTreeItem(bookmark.id, bookmark.title, bookmark.parentId, bookmark.url, 1)))
 
         val result = parser.generateHtml(node, listOf(favorite))
@@ -93,7 +94,7 @@ class SavedSitesParserTest {
 
     @Test
     fun whenNoSavedSitesExistThenNothingIsGenerated() = runTest {
-        val node = TreeNode(FolderTreeItem(Relation.BOOMARKS_ROOT, RealSavedSitesParser.BOOKMARKS_FOLDER, "", null, 0))
+        val node = TreeNode(FolderTreeItem(SavedSitesNames.BOOMARKS_ROOT, RealSavedSitesParser.BOOKMARKS_FOLDER, "", null, 0))
 
         val result = parser.generateHtml(node, emptyList())
         val expectedHtml = ""
@@ -291,7 +292,7 @@ class SavedSitesParserTest {
                         savedSites.add(SavedSite.Favorite("favorite1", title = title, url = link, favorites))
                         favorites++
                     } else {
-                        savedSites.add(SavedSite.Bookmark("bookmark1", title = title, url = link, parentId = Relation.BOOMARKS_ROOT))
+                        savedSites.add(SavedSite.Bookmark("bookmark1", title = title, url = link, parentId = SavedSitesNames.BOOMARKS_ROOT))
                     }
                 }
             }

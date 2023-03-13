@@ -19,6 +19,7 @@ package com.duckduckgo.savedsites.impl.service
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
+import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.store.Relation
 import java.util.UUID
 import org.jsoup.nodes.Document
@@ -160,10 +161,10 @@ class RealSavedSitesParser : SavedSitesParser {
                         val folderName = folder.text()
 
                         if (isFavoritesFolder(folderName) || isBookmarksFolder(folderName)) {
-                            parseElement(element, Relation.BOOMARKS_ROOT, savedSitesRepository, savedSites, folderName == FAVORITES_FOLDER)
+                            parseElement(element, SavedSitesNames.BOOMARKS_ROOT, savedSitesRepository, savedSites, folderName == FAVORITES_FOLDER)
                         } else {
                             val folderParentId = parentId.ifEmpty {
-                                Relation.BOOMARKS_ROOT
+                                SavedSitesNames.BOOMARKS_ROOT
                             }
                             val bookmarkFolder = BookmarkFolder(
                                 name = folderName,
@@ -199,10 +200,10 @@ class RealSavedSitesParser : SavedSitesParser {
     }
 
     private fun isFavoritesFolder(folderName: String): Boolean {
-        return folderName == FAVORITES_FOLDER || folderName == Relation.FAVORITES_NAME
+        return folderName == FAVORITES_FOLDER || folderName == SavedSitesNames.FAVORITES_NAME
     }
 
     private fun isBookmarksFolder(folderName: String): Boolean {
-        return folderName == BOOKMARKS_FOLDER || folderName == Relation.BOOKMARKS_NAME
+        return folderName == BOOKMARKS_FOLDER || folderName == SavedSitesNames.BOOKMARKS_NAME
     }
 }

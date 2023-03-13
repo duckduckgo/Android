@@ -30,7 +30,6 @@ java {
 dependencies {
     implementation project(':common')
     implementation project(':di')
-    implementation project(path: ':saved-sites-store')
 
     implementation Kotlin.stdlib.jdk7
     implementation KotlinX.coroutines.core
@@ -46,11 +45,6 @@ dependencies {
 }
 
 android {
-    testOptions {
-        unitTests {
-            includeAndroidResources = true
-        }
-    }
     namespace 'com.duckduckgo.saved.sites.api'
 }
 

@@ -29,7 +29,9 @@ object BookmarkTestUtils {
     ): List<Entity> {
         val entities = mutableListOf<Entity>()
         for (index in 1..total) {
-            entities.add(Entity(AppDatabaseBookmarksMigrationCallback.generateBookmarkId(index.toLong()), "entity$index", "https://testUrl$index", BOOKMARK))
+            entities.add(
+                Entity(AppDatabaseBookmarksMigrationCallback.generateBookmarkId(index.toLong()), "entity$index", "https://testUrl$index", BOOKMARK),
+            )
         }
         return entities
     }
@@ -39,7 +41,9 @@ object BookmarkTestUtils {
     ): List<Entity> {
         val entities = mutableListOf<Entity>()
         for (index in 1..total) {
-            entities.add(Entity(AppDatabaseBookmarksMigrationCallback.generateFolderId(index.toLong()), "entity$index", "https://testUrl$index", FOLDER))
+            entities.add(
+                Entity(AppDatabaseBookmarksMigrationCallback.generateFolderId(index.toLong()), "entity$index", "https://testUrl$index", FOLDER),
+            )
         }
         return entities
     }
@@ -49,7 +53,7 @@ object BookmarkTestUtils {
     ): List<Relation> {
         val relations = mutableListOf<Relation>()
         entities.forEach {
-            relations.add(Relation(relationId = folderId, entityId = it.entityId))
+            relations.add(Relation(folderId = folderId, entityId = it.entityId))
         }
         return relations
     }

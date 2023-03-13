@@ -22,6 +22,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
 
@@ -39,7 +40,7 @@ interface SavedSitesEntitiesDao {
 
     @Query(
         "select * from  entities inner join relations on entities.entityId = relations.entityId " +
-            "and entities.type = :type and relations.relationId = :folderId",
+            "and entities.type = :type and relations.folderId = :folderId",
     )
     fun entitiesInFolder(
         folderId: String,
@@ -48,13 +49,13 @@ interface SavedSitesEntitiesDao {
 
     @Query(
         "select * from entities inner join relations on entities.entityId = relations.entityId " +
-            "where relations.relationId = :folderId",
+            "where relations.folderId = :folderId",
     )
     fun entitiesInFolder(folderId: String): Flow<List<Entity>>
 
     @Query(
         "select * from entities inner join relations on entities.entityId = relations.entityId " +
-            "where relations.relationId = :folderId",
+            "where relations.folderId = :folderId",
     )
     fun entitiesInFolderSync(folderId: String): List<Entity>
 
@@ -103,7 +104,7 @@ interface SavedSitesEntitiesDao {
 
     @Query("delete from entities where entityId != :bookmarksRoot AND entityId != :favoritesRoot")
     fun deleteAll(
-        bookmarksRoot: String = Relation.BOOMARKS_ROOT,
-        favoritesRoot: String = Relation.FAVORITES_ROOT,
+        bookmarksRoot: String = SavedSitesNames.BOOMARKS_ROOT,
+        favoritesRoot: String = SavedSitesNames.FAVORITES_ROOT,
     )
 }

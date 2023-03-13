@@ -53,6 +53,7 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.FolderBranch
 import com.duckduckgo.savedsites.api.models.SavedSite
+import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.api.service.ExportSavedSitesResult
 import com.duckduckgo.savedsites.api.service.ImportSavedSitesResult
 import com.duckduckgo.savedsites.store.Relation
@@ -112,7 +113,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
             ?: getString(R.string.bookmarksActivityTitle)
 
     private fun getParentFolderId() = intent.extras?.getString(KEY_BOOKMARK_FOLDER_ID)
-        ?: Relation.BOOMARKS_ROOT
+        ?: SavedSitesNames.BOOMARKS_ROOT
 
     override fun onActivityResult(
         requestCode: Int,
@@ -143,7 +144,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     private fun setupBookmarksRecycler(parentId: String) {
-        if (parentId == Relation.BOOMARKS_ROOT) {
+        if (parentId == SavedSitesNames.BOOMARKS_ROOT) {
             bookmarksAdapter = BookmarksAdapter(layoutInflater, viewModel, this, faviconManager, dispatchers)
             favoritesAdapter = FavoritesAdapter(layoutInflater, viewModel, this, faviconManager, dispatchers)
             bookmarkFoldersAdapter = BookmarkFoldersAdapter(layoutInflater, viewModel, parentId)
@@ -161,7 +162,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
             this,
         ) { viewState ->
             viewState?.let { state ->
-                if (parentId == Relation.BOOMARKS_ROOT) {
+                if (parentId == SavedSitesNames.BOOMARKS_ROOT) {
                     favoritesAdapter.setItems(state.favorites.map { FavoritesAdapter.FavoriteItem(it) })
                 }
                 bookmarksAdapter.setItems(state.bookmarks.map { BookmarksAdapter.BookmarkItem(it) }, state.bookmarkFolders.isEmpty())
@@ -303,7 +304,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
 
     private fun showSearchBar() {
         toolbar.gone()
-        viewModel.fetchBookmarksAndFolders()
+        viewModel.fetchBookmarksAndFolders(SavedSitesNames.BOOMARKS_ROOT)
         searchBar.handle(SearchBar.Event.ShowSearchBar)
     }
 
@@ -314,7 +315,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     private fun setSearchMenuItemVisibility() {
-        searchMenuItem?.isVisible = viewModel.viewState.value?.enableSearch == true || getParentFolderId() != Relation.BOOMARKS_ROOT
+        searchMenuItem?.isVisible = viewModel.viewState.value?.enableSearch == true || getParentFolderId() != SavedSitesNames.BOOMARKS_ROOT
     }
 
     private fun showEditSavedSiteDialog(savedSite: SavedSite) {

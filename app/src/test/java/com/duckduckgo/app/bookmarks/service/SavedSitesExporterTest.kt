@@ -28,6 +28,7 @@ import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.FolderBranch
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
+import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.api.models.TreeNode
 import com.duckduckgo.savedsites.api.service.ExportSavedSitesResult
 import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
@@ -77,8 +78,8 @@ class SavedSitesExporterTest {
         exporter = RealSavedSitesExporter(context.contentResolver, savedSitesRepository, RealSavedSitesParser())
 
         // initial db state
-        savedSitesRepository.insert(BookmarkFolder(id = Relation.BOOMARKS_ROOT, name = "Bookmarks", parentId = ""))
-        savedSitesRepository.insert(BookmarkFolder(id = Relation.FAVORITES_ROOT, name = "Favorites", parentId = ""))
+        savedSitesRepository.insert(BookmarkFolder(id = SavedSitesNames.BOOMARKS_ROOT, name = "Bookmarks", parentId = ""))
+        savedSitesRepository.insert(BookmarkFolder(id = SavedSitesNames.FAVORITES_ROOT, name = "Favorites", parentId = ""))
     }
 
     @After
@@ -88,8 +89,8 @@ class SavedSitesExporterTest {
 
     @Test
     fun whenSomeBookmarksExistThenExportingSucceeds() = runTest {
-        val root = BookmarkFolder(Relation.BOOMARKS_ROOT, "DuckDuckGo Bookmarks", "")
-        val parentFolder = BookmarkFolder("folder1", "Folder One", Relation.BOOMARKS_ROOT)
+        val root = BookmarkFolder(SavedSitesNames.BOOMARKS_ROOT, "DuckDuckGo Bookmarks", "")
+        val parentFolder = BookmarkFolder("folder1", "Folder One", SavedSitesNames.BOOMARKS_ROOT)
         val childFolder = BookmarkFolder("folder2", "Folder Two", "folder1")
         val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2")
         val folderBranch = FolderBranch(listOf(childBookmark), listOf(root, parentFolder, childFolder))
@@ -141,8 +142,8 @@ class SavedSitesExporterTest {
 
     @Test
     fun whenGetTreeStructureThenReturnTraversableTree() = runTest {
-        val root = BookmarkFolder(Relation.BOOMARKS_ROOT, "DuckDuckGo Bookmarks", "")
-        val parentFolder = BookmarkFolder("folder1", "Folder One", Relation.BOOMARKS_ROOT)
+        val root = BookmarkFolder(SavedSitesNames.BOOMARKS_ROOT, "DuckDuckGo Bookmarks", "")
+        val parentFolder = BookmarkFolder("folder1", "Folder One", SavedSitesNames.BOOMARKS_ROOT)
         val childFolder = BookmarkFolder("folder2", "Folder Two", "folder1")
         val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2")
         val folderBranch = FolderBranch(listOf(childBookmark), listOf(root, parentFolder, childFolder))
@@ -193,7 +194,7 @@ class SavedSitesExporterTest {
                 "" -> {
                     Assert.assertEquals(0, node.value.depth)
                 }
-                Relation.BOOMARKS_ROOT -> {
+                SavedSitesNames.BOOMARKS_ROOT -> {
                     Assert.assertEquals(1, node.value.depth)
                 }
                 else -> {

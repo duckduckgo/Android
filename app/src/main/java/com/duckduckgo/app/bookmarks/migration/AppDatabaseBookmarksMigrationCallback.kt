@@ -20,6 +20,7 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.store.Entity
 import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
 import com.duckduckgo.savedsites.store.EntityType.FOLDER
@@ -49,10 +50,10 @@ class AppDatabaseBookmarksMigrationCallback(
         }
     }
 
-    private fun addRootFolders(){
+    private fun addRootFolders() {
         with(appDatabase.get()) {
-            syncEntitiesDao().insert(Entity(Relation.FAVORITES_ROOT, Relation.FAVORITES_NAME, "", FOLDER))
-            syncEntitiesDao().insert(Entity(Relation.BOOMARKS_ROOT, Relation.BOOKMARKS_NAME, "", FOLDER))
+            syncEntitiesDao().insert(Entity(SavedSitesNames.FAVORITES_ROOT, SavedSitesNames.FAVORITES_NAME, "", FOLDER))
+            syncEntitiesDao().insert(Entity(SavedSitesNames.BOOMARKS_ROOT, SavedSitesNames.BOOKMARKS_NAME, "", FOLDER))
         }
     }
 
@@ -72,11 +73,11 @@ class AppDatabaseBookmarksMigrationCallback(
                 // try to purge duplicates by only adding favourites with the same url of a bookmark already added
                 val existingBookmark = syncEntitiesDao().entityByUrl(it.url)
                 if (existingBookmark != null) {
-                    favouriteMigration.add(Relation(relationId = Relation.FAVORITES_ROOT, entityId = existingBookmark.entityId))
+                    favouriteMigration.add(Relation(folderId = SavedSitesNames.FAVORITES_ROOT, entityId = existingBookmark.entityId))
                 } else {
                     val entity = Entity(generateFavoriteId(it.id), it.title, it.url, BOOKMARK)
                     entitiesMigration.add(entity)
-                    favouriteMigration.add(Relation(relationId = Relation.FAVORITES_ROOT, entityId = entity.entityId))
+                    favouriteMigration.add(Relation(folderId = SavedSitesNames.FAVORITES_ROOT, entityId = entity.entityId))
                 }
             }
 
@@ -89,7 +90,7 @@ class AppDatabaseBookmarksMigrationCallback(
         with(appDatabase.get()) {
             if (bookmarksDao().bookmarksCount() > 0) {
                 // start from root folder
-                findFolderRelation(Relation.BOOMARKS_ROOT_ID)
+                findFolderRelation(SavedSitesNames.BOOMARKS_ROOT_ID)
 
                 // continue folder by folder
                 val bookmarkFolders = bookmarkFoldersDao().getBookmarkFoldersSync()
@@ -112,9 +113,9 @@ class AppDatabaseBookmarksMigrationCallback(
                 entities.add(entity)
 
                 if (folderId == 0L) {
-                    relations.add(Relation(relationId = Relation.BOOMARKS_ROOT, entityId = entity.entityId))
+                    relations.add(Relation(folderId = SavedSitesNames.BOOMARKS_ROOT, entityId = entity.entityId))
                 } else {
-                    relations.add(Relation(relationId = generateFolderId(folderId), entityId = entity.entityId))
+                    relations.add(Relation(folderId = generateFolderId(folderId), entityId = entity.entityId))
                 }
             }
             bookmarksInFolder.forEach {
@@ -122,9 +123,9 @@ class AppDatabaseBookmarksMigrationCallback(
                 entities.add(entity)
 
                 if (folderId == 0L) {
-                    relations.add(Relation(relationId = Relation.BOOMARKS_ROOT, entityId = entity.entityId))
+                    relations.add(Relation(folderId = SavedSitesNames.BOOMARKS_ROOT, entityId = entity.entityId))
                 } else {
-                    relations.add(Relation(relationId = generateFolderId(folderId), entityId = entity.entityId))
+                    relations.add(Relation(folderId = generateFolderId(folderId), entityId = entity.entityId))
                 }
             }
 
@@ -151,6 +152,7 @@ class AppDatabaseBookmarksMigrationCallback(
         // At most 1 thread will be doing IO
         dispatcherProvider.io().limitedParallelism(1).asExecutor().execute(f)
     }
+
     companion object {
         fun generateFolderId(index: Long): String {
             return "folder$index"

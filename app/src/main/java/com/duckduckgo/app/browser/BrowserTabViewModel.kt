@@ -624,8 +624,6 @@ class BrowserTabViewModel @Inject constructor(
             browserViewState.value = currentBrowserViewState().copy(favorite = favorite)
         }.launchIn(viewModelScope)
 
-        // TODO: We don't need to pass all the bookmarks and then filter in the ViewModel.
-        // The Repository should do it
         savedSitesRepository.getBookmarks().map { bookmarks ->
             Timber.d("Sync: getBookmarks onEach $bookmarks")
             val bookmark = bookmarks.firstOrNull { it.url == url }

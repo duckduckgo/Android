@@ -22,6 +22,7 @@ import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.api.models.TreeNode
 import com.duckduckgo.savedsites.api.service.ExportSavedSitesResult
 import com.duckduckgo.savedsites.api.service.SavedSitesExporter
@@ -76,8 +77,8 @@ class RealSavedSitesExporter(
 
     @VisibleForTesting
     suspend fun getTreeFolderStructure(): TreeNode<FolderTreeItem> {
-        val node = TreeNode(FolderTreeItem(Relation.BOOMARKS_ROOT, RealSavedSitesParser.BOOKMARKS_FOLDER, "", null, 0))
-        populateNode(node, Relation.BOOMARKS_ROOT, 1)
+        val node = TreeNode(FolderTreeItem(SavedSitesNames.BOOMARKS_ROOT, RealSavedSitesParser.BOOKMARKS_FOLDER, "", null, 0))
+        populateNode(node, SavedSitesNames.BOOMARKS_ROOT, 1)
         return node
     }
 

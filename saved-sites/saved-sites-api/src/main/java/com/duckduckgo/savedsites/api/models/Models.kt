@@ -18,8 +18,8 @@ package com.duckduckgo.savedsites.api.models
 
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
-import com.duckduckgo.savedsites.store.Relation
 import java.io.Serializable
+import java.util.*
 
 data class SavedSites(
     val favorites: List<Favorite>,
@@ -43,7 +43,7 @@ sealed class SavedSite(
         override val id: String,
         override val title: String,
         override val url: String,
-        val parentId: String = Relation.BOOMARKS_ROOT,
+        val parentId: String = SavedSitesNames.BOOMARKS_ROOT,
     ) : SavedSite(id, title, url)
 }
 
@@ -68,9 +68,17 @@ data class BookmarkFolderItem(
  * UI model used in the Bookmarks Management screen to represent a [BookmarkFolder]
  */
 data class BookmarkFolder(
-    val id: String,
+    val id: String = UUID.randomUUID().toString(),
     val name: String,
     val parentId: String,
     val numBookmarks: Int = 0,
     val numFolders: Int = 0,
 ) : Serializable
+
+object SavedSitesNames {
+    val FAVORITES_ROOT = "favorites_root"
+    val FAVORITES_NAME = "Favorites"
+    val BOOMARKS_ROOT = "bookmarks_root"
+    val BOOKMARKS_NAME = "Bookmarks"
+    val BOOMARKS_ROOT_ID = 0L
+}

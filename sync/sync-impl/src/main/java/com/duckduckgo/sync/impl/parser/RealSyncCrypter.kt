@@ -22,11 +22,10 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
-import com.duckduckgo.savedsites.store.Relation
+import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.store.SyncStore
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 
 class RealSyncCrypter(
     private val repository: SavedSitesRepository,
@@ -53,15 +52,15 @@ class RealSyncCrypter(
                 val favorites = repository.getFavoritesSync()
                 updates.add(
                     SyncBookmarkEntry.asFolder(
-                        id = Relation.FAVORITES_ROOT,
-                        title = encrypt(Relation.FAVORITES_NAME, primaryKey),
+                        id = SavedSitesNames.FAVORITES_ROOT,
+                        title = encrypt(SavedSitesNames.FAVORITES_NAME, primaryKey),
                         children = favorites.map { it.id },
                         deleted = null,
                     ),
                 )
             }
 
-            val bookmarks = addFolderContent(Relation.BOOMARKS_ROOT, updates, primaryKey)
+            val bookmarks = addFolderContent(SavedSitesNames.BOOMARKS_ROOT, updates, primaryKey)
 
             val bookmarkUpdates = SyncBookmarkUpdates(bookmarks)
             SyncDataRequest(bookmarkUpdates)
@@ -98,7 +97,7 @@ class RealSyncCrypter(
 
         folders.forEach { folder ->
             val bookmarkFolder = decryptFolder(folder, primaryKey, folder.id)
-            if (bookmarkFolder.id != Relation.BOOMARKS_ROOT && bookmarkFolder.id != Relation.FAVORITES_ROOT) {
+            if (bookmarkFolder.id != SavedSitesNames.BOOMARKS_ROOT && bookmarkFolder.id != SavedSitesNames.FAVORITES_ROOT) {
                 repository.insert(bookmarkFolder)
             }
 
