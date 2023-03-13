@@ -71,8 +71,8 @@ interface SyncService {
 
     @PATCH("https://dev-sync-use.duckduckgo.com/sync/data")
     fun patch(
-            @Header("Authorization") token: String,
-            @Body request: SyncDataRequest,
+        @Header("Authorization") token: String,
+        @Body request: SyncDataRequest,
     ): Call<DataResponse>
 
     @GET("https://dev-sync-use.duckduckgo.com/sync/data")
@@ -145,24 +145,22 @@ data class Setting(
     val value: String,
 )
 
-data class BookmarkPage(
-    val url: String,
-)
-
 data class BookmarkFolder(
     val children: List<String>,
 )
+
 data class BookmarksResponse(
-        val last_modified: String,
-        val entries: List<SyncBookmarkEntry>,
+    @field:Json(name = "last_modified") val lastModified: String,
+    val entries: List<SyncBookmarkEntry>,
 )
+
 data class SettingsResponse(
-    val last_modified: String,
+    @field:Json(name = "last_modified") val lastModified: String,
     val entries: List<Setting>,
 )
 
 data class DeviceDataResponse(
-    val last_modified: String,
+    @field:Json(name = "last_modified") val lastModified: String,
     val entries: List<Device>,
 )
 
