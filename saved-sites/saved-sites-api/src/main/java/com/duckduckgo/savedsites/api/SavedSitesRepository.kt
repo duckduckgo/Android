@@ -37,21 +37,21 @@ interface SavedSitesRepository {
      * @param folderId the id of the folder.
      * @return [Flow] of all [SavedSites]
      */
-    suspend fun getSavedSites(folderId: String): Flow<SavedSites>
+    fun getSavedSites(folderId: String): Flow<SavedSites>
 
     /**
      * Returns all [Bookmark] and [BookmarkFolder] inside a folder
      * @param folderId the id of the folder.
      * @return [Flow] [Pair] of [Bookmark] and [BookmarkFolder] inside a folder
      */
-    suspend fun getFolderContent(folderId: String): Flow<Pair<List<Bookmark>, List<BookmarkFolder>>>
+    fun getFolderContent(folderId: String): Flow<Pair<List<Bookmark>, List<BookmarkFolder>>>
 
     /**
      * Returns all [Bookmark] and [BookmarkFolder] inside a folder
      * @param folderId the id of the folder.
      * @return [Pair] of [Bookmark] and [BookmarkFolder] inside a folder
      */
-    suspend fun getFolderContentSync(folderId: String): Pair<List<Bookmark>, List<BookmarkFolder>>
+    fun getFolderContentSync(folderId: String): Pair<List<Bookmark>, List<BookmarkFolder>>
 
     /**
      * Returns complete list of [BookmarkFolderItem] inside a folder. This method traverses all folders.
@@ -59,7 +59,7 @@ interface SavedSitesRepository {
      * @param currentFolder folder currently selected, used to determine the current depth in the tree.
      * @return [List] of [BookmarkFolderItem] inside a folder
      */
-    suspend fun getFolderTree(
+    fun getFolderTree(
         selectedFolderId: String,
         currentFolder: BookmarkFolder?,
     ): List<BookmarkFolderItem>
@@ -70,7 +70,7 @@ interface SavedSitesRepository {
      * @param branchToInsert the [FolderBranch] previously deleted
      * @return [FolderBranch] inserted
      */
-    suspend fun insertFolderBranch(branchToInsert: FolderBranch)
+    fun insertFolderBranch(branchToInsert: FolderBranch)
 
     /**
      * Deletes all [Bookmark] and [BookmarkFolder] inside a folder.

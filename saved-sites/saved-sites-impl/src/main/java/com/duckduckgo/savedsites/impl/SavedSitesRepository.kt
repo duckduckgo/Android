@@ -45,7 +45,7 @@ class RealSavedSitesRepository(
     private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
 ) : SavedSitesRepository {
 
-    override suspend fun getSavedSites(folderId: String): Flow<SavedSites> {
+    override fun getSavedSites(folderId: String): Flow<SavedSites> {
         return if (folderId == SavedSitesNames.BOOMARKS_ROOT) {
             getFavorites().combine(getFolderContent(folderId)) { favorites, folderContent ->
                 SavedSites(favorites = favorites.distinct(), bookmarks = folderContent.first, folders = folderContent.second)
@@ -57,7 +57,7 @@ class RealSavedSitesRepository(
         }
     }
 
-    override suspend fun getFolderContent(folderId: String): Flow<Pair<List<Bookmark>, List<BookmarkFolder>>> {
+    override fun getFolderContent(folderId: String): Flow<Pair<List<Bookmark>, List<BookmarkFolder>>> {
         return savedSitesEntitiesDao.entitiesInFolder(folderId).map { entities ->
             val bookmarks = mutableListOf<Bookmark>()
             val folders = mutableListOf<BookmarkFolder>()
@@ -69,7 +69,7 @@ class RealSavedSitesRepository(
             .flowOn(dispatcherProvider.io())
     }
 
-    override suspend fun getFolderContentSync(folderId: String): Pair<List<Bookmark>, List<BookmarkFolder>> {
+    override fun getFolderContentSync(folderId: String): Pair<List<Bookmark>, List<BookmarkFolder>> {
         val entities = savedSitesEntitiesDao.entitiesInFolderSync(folderId)
         val bookmarks = mutableListOf<Bookmark>()
         val folders = mutableListOf<BookmarkFolder>()
@@ -89,7 +89,7 @@ class RealSavedSitesRepository(
         }
     }
 
-    override suspend fun getFolderTree(
+    override fun getFolderTree(
         selectedFolderId: String,
         currentFolder: BookmarkFolder?,
     ): List<BookmarkFolderItem> {
@@ -124,7 +124,7 @@ class RealSavedSitesRepository(
         return folders
     }
 
-    override suspend fun insertFolderBranch(branchToInsert: FolderBranch) {
+    override fun insertFolderBranch(branchToInsert: FolderBranch) {
         with(branchToInsert) {
             folders.forEach {
                 insert(it)
