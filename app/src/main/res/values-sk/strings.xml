@@ -658,7 +658,7 @@
     <!-- smartling.character_limit = 160 -->
     <string name="autoconsentDialogDescription">Chceš, aby som to riešil za teba? Môžem sa pokúsiť minimalizovať súbory cookie, maximalizovať ochranu súkromia a skryť kontextové okná, ako sú tieto.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Správa kontextových okien súborov cookie</string>
+    <string name="autoconsentPrimaryCta">Spravovať kontextové okná súborov cookie</string>
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Nie, ďakujem</string>
 
