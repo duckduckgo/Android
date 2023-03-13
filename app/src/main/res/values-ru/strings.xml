@@ -657,7 +657,7 @@
     <!-- smartling.character_limit = 160 -->
     <string name="autoconsentDialogDescription">Хотите, чтобы такие окна закрывались автоматически? Мы можем попытаться минимизировать выбор куки-файлов для большей безопасности ваших данных и автоматически закрывать такие окна.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Управление окнами выбора куки-файлов</string>
+    <string name="autoconsentPrimaryCta">Управлять окнами выбора куки-файлов</string>
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Нет, спасибо</string>
 
