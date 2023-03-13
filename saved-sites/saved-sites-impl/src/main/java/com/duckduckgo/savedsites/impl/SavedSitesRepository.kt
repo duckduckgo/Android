@@ -47,11 +47,11 @@ class RealSavedSitesRepository(
     override suspend fun getSavedSites(folderId: String): Flow<SavedSites> {
         return if (folderId == Relation.BOOMARKS_ROOT) {
             getFavorites().combine(getFolderContent(folderId)) { favorites, folderContent ->
-                SavedSites(favorites.distinct(), folderContent.first, folderContent.second)
+                SavedSites(favorites = favorites.distinct(), bookmarks = folderContent.first, folders = folderContent.second)
             }
         } else {
             getFolderContent(folderId).map {
-                SavedSites(emptyList(), it.first, it.second)
+                SavedSites(favorites = emptyList(), bookmarks = it.first, folders = it.second)
             }
         }
     }
