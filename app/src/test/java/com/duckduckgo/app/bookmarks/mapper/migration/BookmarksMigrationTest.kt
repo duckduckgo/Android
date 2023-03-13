@@ -31,7 +31,6 @@ import com.duckduckgo.app.bookmarks.migration.AppDatabaseBookmarksMigrationCallb
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
-import com.duckduckgo.savedsites.store.Relation
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import junit.framework.Assert.assertFalse

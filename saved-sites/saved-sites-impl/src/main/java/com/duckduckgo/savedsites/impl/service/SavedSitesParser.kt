@@ -20,7 +20,6 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
-import com.duckduckgo.savedsites.store.Relation
 import java.util.UUID
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element

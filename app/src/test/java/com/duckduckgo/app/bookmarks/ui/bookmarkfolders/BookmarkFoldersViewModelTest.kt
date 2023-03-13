@@ -23,7 +23,7 @@ import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.BookmarkFolderItem
-import com.duckduckgo.savedsites.store.Relation
+import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import junit.framework.TestCase.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
