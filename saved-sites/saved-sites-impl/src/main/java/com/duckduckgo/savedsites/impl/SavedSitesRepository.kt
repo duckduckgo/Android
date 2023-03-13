@@ -61,13 +61,7 @@ class RealSavedSitesRepository(
             val bookmarks = mutableListOf<Bookmark>()
             val folders = mutableListOf<BookmarkFolder>()
             entities.map { entity ->
-                if (entity.type == FOLDER) {
-                    val numFolders = savedSitesRelationsDao.countEntitiesInFolder(entity.entityId, FOLDER)
-                    val numBookmarks = savedSitesRelationsDao.countEntitiesInFolder(entity.entityId, BOOKMARK)
-                    folders.add(BookmarkFolder(entity.entityId, entity.title, folderId, numBookmarks, numFolders))
-                } else {
-                    bookmarks.add(Bookmark(entity.entityId, entity.title, entity.url.orEmpty(), folderId))
-                }
+                mapEntity(entity, folderId, bookmarks, folders)
             }
             Pair(bookmarks.distinct(), folders.distinct())
         }
@@ -79,15 +73,19 @@ class RealSavedSitesRepository(
         val bookmarks = mutableListOf<Bookmark>()
         val folders = mutableListOf<BookmarkFolder>()
         entities.forEach { entity ->
-            if (entity.type == FOLDER) {
-                val numFolders = savedSitesRelationsDao.countEntitiesInFolder(entity.entityId, FOLDER)
-                val numBookmarks = savedSitesRelationsDao.countEntitiesInFolder(entity.entityId, BOOKMARK)
-                folders.add(BookmarkFolder(entity.entityId, entity.title, folderId, numBookmarks, numFolders))
-            } else {
-                bookmarks.add(Bookmark(entity.entityId, entity.title, entity.url.orEmpty(), folderId))
-            }
+            mapEntity(entity, folderId, bookmarks, folders)
         }
         return Pair(bookmarks.distinct(), folders.distinct())
+    }
+
+    private fun mapEntity(entity: Entity, folderId: String, bookmarks: MutableList<Bookmark>, folders: MutableList<BookmarkFolder>){
+        if (entity.type == FOLDER) {
+            val numFolders = savedSitesRelationsDao.countEntitiesInFolder(entity.entityId, FOLDER)
+            val numBookmarks = savedSitesRelationsDao.countEntitiesInFolder(entity.entityId, BOOKMARK)
+            folders.add(BookmarkFolder(entity.entityId, entity.title, folderId, numBookmarks, numFolders))
+        } else {
+            bookmarks.add(Bookmark(entity.entityId, entity.title, entity.url.orEmpty(), folderId))
+        }
     }
 
     override suspend fun getFolderTree(

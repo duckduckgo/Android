@@ -46,16 +46,27 @@ sealed class SavedSite(
         val parentId: String = Relation.BOOMARKS_ROOT,
     ) : SavedSite(id, title, url)
 }
+
+/**
+ * Used to represent the content of a [BookmarkFolder]
+ */
 data class FolderBranch(
     val bookmarks: List<Bookmark>,
     val folders: List<BookmarkFolder>,
 )
+
+/**
+ * UI model used in the Bookmarks Management screen to edit a [BookmarkFolder]
+ */
 data class BookmarkFolderItem(
     val depth: Int,
     val bookmarkFolder: BookmarkFolder,
     val isSelected: Boolean = false,
 )
 
+/**
+ * UI model used in the Bookmarks Management screen to represent a [BookmarkFolder]
+ */
 data class BookmarkFolder(
     val id: String,
     val name: String,

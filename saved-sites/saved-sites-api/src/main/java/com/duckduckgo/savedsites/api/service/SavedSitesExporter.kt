@@ -17,8 +17,19 @@
 package com.duckduckgo.savedsites.api.service
 
 import android.net.Uri
+import com.duckduckgo.savedsites.api.models.BookmarkFolder
 
+/**
+ * Class that takes care of exporting [SavedSites]
+ * This is used to export [SavedSites] to another Browser
+ */
 interface SavedSitesExporter {
+    /**
+     * Generates a HTML based file with all [SavedSites] that the user has
+     * in Netscape format.
+     * @param uri of the [File] where we'll store the data
+     * @return [ExportSavedSitesResult] result of the operation
+     */
     suspend fun export(uri: Uri): ExportSavedSitesResult
 }
 
