@@ -70,7 +70,7 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Os inícios de sessão são armazenados em segurança apenas neste dispositivo.</string>
 
     <string name="autofillManagementAddLogin">Adicionar início de sessão</string>
-    <string name="autofillManagementSearchLogins">Pesquisar</string>
+    <string name="autofillManagementSearchLogins">Pesquisar inícios de sessão</string>
     <string name="autofillManagementSearchClearDescription">Limpar introdução da pesquisa</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Nenhum resultado para \"%1$s\"</string>
 

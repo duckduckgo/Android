@@ -70,7 +70,7 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Csak ezen az eszközön és biztonságosan tároljuk a bejelentkezési adatokat.</string>
 
     <string name="autofillManagementAddLogin">Bejelentkezési adatok hozzáadása</string>
-    <string name="autofillManagementSearchLogins">Keresés</string>
+    <string name="autofillManagementSearchLogins">Bejelentkezési adatok keresése</string>
     <string name="autofillManagementSearchClearDescription">Megadott keresés törlése</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Nincs találat erre: „%1$s”</string>
 
