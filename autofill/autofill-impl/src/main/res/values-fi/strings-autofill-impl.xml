@@ -67,6 +67,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Ehdotettu</string>
     <string name="credentialManagementNoLoginsSavedTitle">Kirjautumistietoja ei ole vielä tallennettu</string>
+    <string name="credentialManagementNoLoginsSavedAutofillDisabledTitle">Ota automaattinen täyttö käyttöön tallentaaksesi kirjautumistietoja</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Kirjautumistiedot tallennetaan turvallisesti vain tälle laitteelle.</string>
 
     <string name="autofillManagementAddLogin">Lisää kirjautumistiedot</string>
