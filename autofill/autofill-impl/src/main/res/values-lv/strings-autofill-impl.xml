@@ -65,6 +65,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Ieteikts</string>
     <string name="credentialManagementNoLoginsSavedTitle">Nav saglabātu pieteikšanās datu</string>
+    <string name="credentialManagementNoLoginsSavedAutofillDisabledTitle">Iespējo automātisko aizpildīšanu, lai sāktu saglabāt pieteikšanās datus</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Pieteikšanās dati tiek droši glabāti tikai šajā ierīcē.</string>
 
     <string name="autofillManagementAddLogin">Pievienot pieteikšanās datus</string>

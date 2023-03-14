@@ -65,6 +65,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Önerilen</string>
     <string name="credentialManagementNoLoginsSavedTitle">Henüz kaydedilmiş Giriş yok</string>
+    <string name="credentialManagementNoLoginsSavedAutofillDisabledTitle">Girişleri kaydetmeye başlamak için Otomatik Doldurmayı etkinleştirin</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Girişler yalnızca bu cihazda güvenli bir şekilde saklanır.</string>
 
     <string name="autofillManagementAddLogin">Giriş Ekle</string>
