@@ -17,7 +17,7 @@
 package com.duckduckgo.sync.impl.parser
 
 interface SyncCrypter {
-    suspend fun generateAllData(): SyncDataRequest
+    fun generateAllData(): SyncDataRequest
     fun store(entries: List<SyncBookmarkEntry>): Boolean
 }
 

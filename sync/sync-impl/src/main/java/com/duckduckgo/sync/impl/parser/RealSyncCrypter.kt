@@ -16,8 +16,7 @@
 
 package com.duckduckgo.sync.impl.parser
 
-import com.duckduckgo.app.global.DefaultDispatcherProvider
-import com.duckduckgo.app.global.DispatcherProvider
+import androidx.annotation.WorkerThread
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
@@ -25,50 +24,46 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.store.SyncStore
-import kotlinx.coroutines.withContext
 
 class RealSyncCrypter(
     private val repository: SavedSitesRepository,
     private val nativeLib: SyncLib,
     private val syncStore: SyncStore,
-    private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
 ) : SyncCrypter {
 
-    override suspend fun generateAllData(): SyncDataRequest {
-        val allData = withContext(dispatcherProvider.io()) {
-            val updates = mutableListOf<SyncBookmarkEntry>()
+    @WorkerThread
+    override fun generateAllData(): SyncDataRequest {
+        val updates = mutableListOf<SyncBookmarkEntry>()
 
-            val hasFavorites = repository.hasFavorites()
-            val hasBookmarks = repository.hasBookmarks()
+        val hasFavorites = repository.hasFavorites()
+        val hasBookmarks = repository.hasBookmarks()
 
-            if (!hasFavorites && !hasBookmarks) {
-                return@withContext SyncDataRequest(SyncBookmarkUpdates(emptyList()))
-            }
-
-            val primaryKey = syncStore.primaryKey ?: return@withContext SyncDataRequest(SyncBookmarkUpdates(emptyList()))
-
-            // favorites (we don't add individual items, they are added as we go through bookmark folders)
-            if (hasFavorites) {
-                val favorites = repository.getFavoritesSync()
-                updates.add(
-                    SyncBookmarkEntry.asFolder(
-                        id = SavedSitesNames.FAVORITES_ROOT,
-                        title = encrypt(SavedSitesNames.FAVORITES_NAME, primaryKey),
-                        children = favorites.map { it.id },
-                        deleted = null,
-                    ),
-                )
-            }
-
-            val bookmarks = addFolderContent(SavedSitesNames.BOOMARKS_ROOT, updates, primaryKey)
-
-            val bookmarkUpdates = SyncBookmarkUpdates(bookmarks)
-            SyncDataRequest(bookmarkUpdates)
+        if (!hasFavorites && !hasBookmarks) {
+            return SyncDataRequest(SyncBookmarkUpdates(emptyList()))
         }
-        return allData
+
+        val primaryKey = syncStore.primaryKey ?: return SyncDataRequest(SyncBookmarkUpdates(emptyList()))
+
+        // favorites (we don't add individual items, they are added as we go through bookmark folders)
+        if (hasFavorites) {
+            val favorites = repository.getFavoritesSync()
+            updates.add(
+                SyncBookmarkEntry.asFolder(
+                    id = SavedSitesNames.FAVORITES_ROOT,
+                    title = encrypt(SavedSitesNames.FAVORITES_NAME, primaryKey),
+                    children = favorites.map { it.id },
+                    deleted = null,
+                ),
+            )
+        }
+
+        val bookmarks = addFolderContent(SavedSitesNames.BOOMARKS_ROOT, updates, primaryKey)
+
+        val bookmarkUpdates = SyncBookmarkUpdates(bookmarks)
+        return SyncDataRequest(bookmarkUpdates)
     }
 
-    private suspend fun addFolderContent(
+    private fun addFolderContent(
         folderId: String,
         updates: MutableList<SyncBookmarkEntry>,
         primaryKey: String,
@@ -90,6 +85,7 @@ class RealSyncCrypter(
         return updates
     }
 
+    @WorkerThread
     override fun store(entries: List<SyncBookmarkEntry>): Boolean {
         val primaryKey = syncStore.primaryKey ?: return false
 

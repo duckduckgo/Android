@@ -52,8 +52,8 @@ interface SyncRepository {
     fun getConnectQR(): Result<String>
     fun connectDevice(contents: String): Result<Boolean>
     fun pollConnectionKeys(): Result<Boolean>
-    suspend fun sendAllData(): Result<Boolean>
-    suspend fun fetchAllData(): Result<Boolean>
+    fun sendAllData(): Result<Boolean>
+    fun fetchAllData(): Result<Boolean>
 }
 
 @ContributesBinding(AppScope::class)
@@ -198,6 +198,7 @@ class AppSyncRepository @Inject constructor(
             is Result.Error -> {
                 result
             }
+
             is Result.Success -> {
                 val sealOpen = nativeLib.sealOpen(result.data, syncStore.primaryKey!!, syncStore.secretKey!!)
                 val recoveryCode = Adapters.recoveryCodeAdapter.fromJson(sealOpen)?.recovery ?: return Result.Error(reason = "Error reading json")
@@ -330,7 +331,8 @@ class AppSyncRepository @Inject constructor(
         }
     }
 
-    override suspend fun sendAllData(): Result<Boolean> {
+    @WorkerThread
+    override fun sendAllData(): Result<Boolean> {
         val token =
             syncStore.token.takeUnless { it.isNullOrEmpty() }
                 ?: return Result.Error(reason = "Token Empty")
@@ -342,13 +344,15 @@ class AppSyncRepository @Inject constructor(
             is Result.Error -> {
                 result
             }
+
             is Result.Success -> {
                 Result.Success(true)
             }
         }
     }
 
-    override suspend fun fetchAllData(): Result<Boolean> {
+    @WorkerThread
+    override fun fetchAllData(): Result<Boolean> {
         val token =
             syncStore.token.takeUnless { it.isNullOrEmpty() }
                 ?: return Result.Error(reason = "Token Empty")
@@ -357,6 +361,7 @@ class AppSyncRepository @Inject constructor(
             is Result.Error -> {
                 Result.Error(reason = "SYNC get data failed $result")
             }
+
             is Result.Success -> {
                 // we only care about bookmarks for now
                 syncCrypter.store(result.data.bookmarks.entries)

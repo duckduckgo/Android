@@ -21,6 +21,7 @@ import android.view.View
 import com.duckduckgo.app.bookmarks.ui.SavedSiteDialogFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
+import java.util.*
 
 class AddBookmarkFolderDialogFragment : SavedSiteDialogFragment() {
 
@@ -44,7 +45,7 @@ class AddBookmarkFolderDialogFragment : SavedSiteDialogFragment() {
         arguments?.getString(KEY_PARENT_FOLDER_ID)?.let {
             val name = binding.titleInput.text
             if (name.isNotBlank()) {
-                listener?.onBookmarkFolderAdded(BookmarkFolder(name = name, parentId = it))
+                listener?.onBookmarkFolderAdded(BookmarkFolder(id = UUID.randomUUID().toString(), name = name, parentId = it))
             }
         }
     }

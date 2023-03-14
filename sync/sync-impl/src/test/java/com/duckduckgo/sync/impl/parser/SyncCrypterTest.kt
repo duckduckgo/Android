@@ -138,7 +138,7 @@ class SyncCrypterTest {
         assertEquals(folder.page!!.url, "https://bookmark1.com")
     }
 
-    @Test fun whenFolderWithBookmarksThenGeneratedDataIsCorrect() = runTest {
+    @Test fun whenFolderWithBookmarksThenGeneratedDataIsCorrect() {
         givenNoFavorites()
         whenever(repository.getFolderContentSync(SavedSitesNames.BOOMARKS_ROOT)).thenReturn(
             Pair(
