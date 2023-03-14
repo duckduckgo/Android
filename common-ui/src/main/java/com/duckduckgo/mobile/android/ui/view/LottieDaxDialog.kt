@@ -24,6 +24,7 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.text.HtmlCompat
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewDaxDialogAnimatedBinding
@@ -166,7 +167,7 @@ class LottieDaxDialog : DialogFragment(R.layout.view_dax_dialog_animated), DaxDi
 
         context?.let {
             with(binding) {
-                titleText.text = title
+                titleText.text = HtmlCompat.fromHtml(title, HtmlCompat.FROM_HTML_MODE_LEGACY)
                 descriptionText.text = description
                 hideText.text = hideButtonText
                 primaryCta.text = primaryButtonText
