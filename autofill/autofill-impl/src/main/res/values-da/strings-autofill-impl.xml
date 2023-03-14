@@ -65,6 +65,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Foreslået</string>
     <string name="credentialManagementNoLoginsSavedTitle">Ingen logins gemt endnu</string>
+    <string name="credentialManagementNoLoginsSavedAutofillDisabledTitle">Aktivér automatisk udfyldning for at begynde at gemme logins</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Login gemmes kun sikkert på denne enhed.</string>
 
     <string name="autofillManagementAddLogin">Tilføj login</string>

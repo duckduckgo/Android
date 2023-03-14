@@ -65,6 +65,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Aanbevolen</string>
     <string name="credentialManagementNoLoginsSavedTitle">Nog geen aanmeldgegevens opgeslagen</string>
+    <string name="credentialManagementNoLoginsSavedAutofillDisabledTitle">Schakel Automatisch invullen in om aanmeldgegevens op te slaan</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Aanmeldgegevens worden alleen op dit apparaat veilig opgeslagen.</string>
 
     <string name="autofillManagementAddLogin">Aanmeldgegevens toevoegen</string>
