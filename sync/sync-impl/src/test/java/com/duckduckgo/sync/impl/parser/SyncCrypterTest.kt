@@ -24,6 +24,7 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.sync.TestSyncFixtures
+import com.duckduckgo.sync.crypto.DecryptResult
 import com.duckduckgo.sync.crypto.EncryptResult
 import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.store.SyncStore
@@ -247,7 +248,7 @@ class SyncCrypterTest {
     @Test
     fun whenBookmarksToStoreThenRepositoryStoresThem() {
         whenever(store.primaryKey).thenReturn(TestSyncFixtures.primaryKey)
-        whenever(nativeLib.decrypt(any(), any())).thenReturn(TestSyncFixtures.decryptedSecretKey)
+        whenever(nativeLib.decrypt(any(), any())).thenReturn(DecryptResult(result = 0L, decryptedData = "something"))
 
         val entries = givenSomeBookmarkSyncEntries(10, SavedSitesNames.BOOMARKS_ROOT)
         syncCrypter.store(entries)
