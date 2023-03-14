@@ -32,6 +32,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
+import java.lang.IllegalStateException
 import java.net.InetAddress
 import javax.inject.Inject
 import logcat.LogPriority
@@ -106,9 +107,13 @@ class NgVpnNetworkStack @Inject constructor(
     override fun onDestroyVpn(): Result<Unit> {
         val vpnNetwork = vpnNetwork.safeGet().getOrElse { return Result.failure(it) }
 
-        synchronized(jniLock) {
-            vpnNetwork.destroy(jniContext)
-            jniContext = 0
+        if (jniContext != 0L) {
+            synchronized(jniLock) {
+                vpnNetwork.destroy(jniContext)
+                jniContext = 0
+            }
+        } else {
+            logcat { "VPN network already destroyed...noop" }
         }
         vpnNetwork.addCallback(null)
 
@@ -168,6 +173,11 @@ class NgVpnNetworkStack @Inject constructor(
     }
 
     private fun startNative(tunfd: Int): Result<Unit> {
+        if (jniContext == 0L) {
+            logcat(LogPriority.ERROR) { "Trying to start VPN Network without previously creating it" }
+            return Result.failure(IllegalStateException("Trying to start VPN Network without previously creating it"))
+        }
+
         val vpnNetwork = vpnNetwork.safeGet().getOrElse { return Result.failure(it) }
         if (tunnelThread == null) {
             logcat { "Start native runtime" }
