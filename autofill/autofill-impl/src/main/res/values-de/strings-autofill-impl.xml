@@ -67,6 +67,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Vorgeschlagen</string>
     <string name="credentialManagementNoLoginsSavedTitle">Noch keine Anmeldedaten gespeichert</string>
+    <string name="credentialManagementNoLoginsSavedAutofillDisabledTitle">Autovervollständigen aktivieren, um Anmeldedaten zu speichern</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Anmeldedaten werden nur auf diesem Gerät sicher gespeichert.</string>
 
     <string name="autofillManagementAddLogin">Anmeldedaten hinzufügen</string>
