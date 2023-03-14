@@ -596,7 +596,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
 
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS `relations` (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
-                    "`relationId` TEXT NOT NULL, `entityId` TEXT NOT NULL)",
+                    "`folderId` TEXT NOT NULL, `entityId` TEXT NOT NULL)",
             )
         }
     }
