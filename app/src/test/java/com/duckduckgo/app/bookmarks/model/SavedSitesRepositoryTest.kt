@@ -281,6 +281,7 @@ class SavedSitesRepositoryTest {
         repository.getFavorites().test {
             val favorites = awaitItem()
             assertEquals(favorites, listOf(updatedFavoriteTwo, updatedFavoriteThree, updatedFavoriteOne))
+            cancelAndConsumeRemainingEvents()
         }
     }
 
@@ -421,6 +422,7 @@ class SavedSitesRepositoryTest {
             Assert.assertTrue(result.first.size == 1)
             Assert.assertTrue(result.first.first().id == bookmark.id)
             Assert.assertTrue(result.second.isEmpty())
+            cancelAndConsumeRemainingEvents()
         }
     }
 
@@ -465,6 +467,7 @@ class SavedSitesRepositoryTest {
             val result = awaitItem()
             Assert.assertTrue(result.first.size == 2)
             Assert.assertTrue(result.second.isEmpty())
+            cancelAndConsumeRemainingEvents()
         }
     }
 
@@ -488,6 +491,7 @@ class SavedSitesRepositoryTest {
             Assert.assertTrue(result.first.size == 2)
             Assert.assertTrue(result.second.size == 1)
             Assert.assertEquals(result.second.first().id, "folder3")
+            cancelAndConsumeRemainingEvents()
         }
     }
 
@@ -495,7 +499,6 @@ class SavedSitesRepositoryTest {
     fun whenBookmarkIsMovedToAnotherFolderThenRootBookmarksReturnsEmpty() = runTest {
         givenNoBookmarksStored()
 
-        val folderOne = repository.insert(BookmarkFolder(id = "folder1", name = "folder1", parentId = SavedSitesNames.BOOMARKS_ROOT))
         val bookmark = repository.insertBookmark(title = "bookmark1", url = "foo.com")
         val folderTwo = repository.insert(BookmarkFolder(id = "folder2", name = "folder2", parentId = SavedSitesNames.BOOMARKS_ROOT))
 
@@ -505,9 +508,10 @@ class SavedSitesRepositoryTest {
 
             val updatedBookmark = bookmark.copy(parentId = folderTwo.id)
             repository.update(updatedBookmark)
-            val updatedResult = awaitItem()
 
+            val updatedResult = awaitItem()
             assertTrue(updatedResult.first.isEmpty())
+            cancelAndConsumeRemainingEvents()
         }
     }
 
@@ -515,7 +519,6 @@ class SavedSitesRepositoryTest {
     fun whenBookmarkIsMovedToAnotherFolderThenFolderReturnsBookmark() = runTest {
         givenNoBookmarksStored()
 
-        val folderOne = repository.insert(BookmarkFolder(id = "folder1", name = "folder1", parentId = SavedSitesNames.BOOMARKS_ROOT))
         val bookmark = repository.insertBookmark(title = "bookmark1", url = "foo.com")
         val folderTwo = repository.insert(BookmarkFolder(id = "folder2", name = "folder2", parentId = SavedSitesNames.BOOMARKS_ROOT))
 
@@ -790,6 +793,7 @@ class SavedSitesRepositoryTest {
             val savedSites = awaitItem()
             assertTrue(savedSites.bookmarks.size == 10)
             assertTrue(savedSites.favorites.size == 2)
+            cancelAndConsumeRemainingEvents()
         }
     }
 
@@ -825,6 +829,7 @@ class SavedSitesRepositoryTest {
             assertTrue(savedSites.bookmarks.size == 10)
             assertTrue(savedSites.favorites.isEmpty())
             assertTrue(savedSites.folders.isEmpty())
+            cancelAndConsumeRemainingEvents()
         }
     }
 
