@@ -67,6 +67,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Suggéré</string>
     <string name="credentialManagementNoLoginsSavedTitle">Aucun identifiant enregistré pour l\'instant</string>
+    <string name="credentialManagementNoLoginsSavedAutofillDisabledTitle">Activer la saisie automatique pour commencer à enregistrer les identifiants</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Les identifiants sont stockés de manière sécurisée sur cet appareil uniquement.</string>
 
     <string name="autofillManagementAddLogin">Ajouter un identifiant</string>
