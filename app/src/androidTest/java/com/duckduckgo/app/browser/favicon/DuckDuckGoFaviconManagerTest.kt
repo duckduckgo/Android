@@ -55,7 +55,7 @@ class DuckDuckGoFaviconManagerTest {
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private val mockFaviconPersister: FaviconPersister = mock()
-    private val mockBookmarksDao: SavedSitesEntitiesDao = mock()
+    private val mockSavedSitesDao: SavedSitesEntitiesDao = mock()
     private val mockSavedSitesRepository: SavedSitesRepository = mock()
     private val mockFireproofWebsiteDao: FireproofWebsiteDao = mock()
     private val mockLocationPermissionsDao: LocationPermissionsDao = mock()
@@ -73,7 +73,7 @@ class DuckDuckGoFaviconManagerTest {
 
         testee = DuckDuckGoFaviconManager(
             faviconPersister = mockFaviconPersister,
-            entitiesDao = mockBookmarksDao,
+            savedSitesDao = mockSavedSitesDao,
             fireproofWebsiteRepository = FireproofWebsiteRepositoryImpl(mockFireproofWebsiteDao, coroutineRule.testDispatcherProvider, mock()),
             locationPermissionsRepository = LocationPermissionsRepositoryImpl(
                 mockLocationPermissionsDao,

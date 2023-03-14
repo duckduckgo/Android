@@ -245,7 +245,6 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
         }
 
         return onSuccess(response) {
-            Timber.i("SYNC get data $response")
             val data = response.body() ?: throw IllegalStateException("SYNC get data not parsed")
             val allDataJSON = ResponseAdapters.dataAdapter.toJson(data.bookmarks)
             Timber.i("SYNC get data $allDataJSON")

@@ -41,7 +41,7 @@ import kotlinx.coroutines.withContext
 
 class DuckDuckGoFaviconManager constructor(
     private val faviconPersister: FaviconPersister,
-    private val entitiesDao: SavedSitesEntitiesDao,
+    private val savedSitesDao: SavedSitesEntitiesDao,
     private val fireproofWebsiteRepository: FireproofWebsiteRepository,
     private val locationPermissionsRepository: LocationPermissionsRepository,
     private val savedSitesRepository: SavedSitesRepository,
@@ -292,7 +292,7 @@ class DuckDuckGoFaviconManager constructor(
         val query = "%$domain%"
 
         return withContext(dispatcherProvider.io()) {
-            entitiesDao.countEntitiesByUrl(query) +
+            savedSitesDao.countEntitiesByUrl(query) +
                 locationPermissionsRepository.permissionEntitiesCountByDomain(query) +
                 fireproofWebsiteRepository.fireproofWebsitesCountByDomain(domain) +
                 savedSitesRepository.getFavoritesCountByDomain(query) +

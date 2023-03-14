@@ -29,7 +29,6 @@ java {
 
 dependencies {
     implementation project(':common')
-    implementation project(':di')
 
     implementation Kotlin.stdlib.jdk7
     implementation KotlinX.coroutines.core

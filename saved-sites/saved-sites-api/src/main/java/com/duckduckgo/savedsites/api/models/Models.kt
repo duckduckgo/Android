@@ -68,7 +68,7 @@ data class BookmarkFolderItem(
  * UI model used in the Bookmarks Management screen to represent a [BookmarkFolder]
  */
 data class BookmarkFolder(
-    val id: String,
+    val id: String = UUID.randomUUID().toString(),
     val name: String,
     val parentId: String,
     val numBookmarks: Int = 0,
