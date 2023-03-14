@@ -67,6 +67,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Predloženo</string>
     <string name="credentialManagementNoLoginsSavedTitle">Još nema spremljenih prijava</string>
+    <string name="credentialManagementNoLoginsSavedAutofillDisabledTitle">Omogući automatsko popunjavanje za početak spremanja prijava</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Prijave su sigurno spremljene samo na ovom uređaju.</string>
 
     <string name="autofillManagementAddLogin">Dodaj prijavu</string>
