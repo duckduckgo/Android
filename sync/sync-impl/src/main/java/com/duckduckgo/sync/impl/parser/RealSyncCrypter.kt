@@ -130,7 +130,7 @@ class RealSyncCrypter(
         id: String,
         primaryKey: String,
     ): String {
-        val encryptResult = nativeLib.encrypt(id, primaryKey)
+        val encryptResult = nativeLib.encryptData(id, primaryKey)
         return if (encryptResult.result != 0L) "" else encryptResult.encryptedData
     }
 
@@ -171,7 +171,7 @@ class RealSyncCrypter(
         text: String,
         primaryKey: String,
     ): String {
-        val decryptResult = nativeLib.decrypt(text, primaryKey)
+        val decryptResult = nativeLib.decryptData(text, primaryKey)
         return if (decryptResult.result != 0L) "" else decryptResult.decryptedData
     }
 }
