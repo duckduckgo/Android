@@ -64,6 +64,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Рекомендации</string>
     <string name="credentialManagementNoLoginsSavedTitle">Сохраненных логинов пока нет</string>
+    <string name="credentialManagementNoLoginsSavedAutofillDisabledTitle">Для сохранения логинов включите автозаполнение</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Логины надежно хранятся только на этом устройстве.</string>
 
     <string name="autofillManagementAddLogin">Добавить логин</string>
