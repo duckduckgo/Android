@@ -64,6 +64,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Sugerido</string>
     <string name="credentialManagementNoLoginsSavedTitle">Nenhum início de sessão guardado</string>
+    <string name="credentialManagementNoLoginsSavedAutofillDisabledTitle">Ativa o preenchimento automático para começares a guardar inícios de sessão</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Os inícios de sessão são armazenados em segurança apenas neste dispositivo.</string>
 
     <string name="autofillManagementAddLogin">Adicionar início de sessão</string>
