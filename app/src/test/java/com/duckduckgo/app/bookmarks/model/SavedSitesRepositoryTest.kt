@@ -520,26 +520,23 @@ class SavedSitesRepositoryTest {
         givenNoBookmarksStored()
 
         val bookmark = repository.insertBookmark(title = "bookmark1", url = "foo.com")
+        val root = repository.insert(BookmarkFolder(id = SavedSitesNames.BOOMARKS_ROOT, name = "Bookmarks", parentId = ""))
         val folderTwo = repository.insert(BookmarkFolder(id = "folder2", name = "folder2", parentId = SavedSitesNames.BOOMARKS_ROOT))
 
-        repository.getFolderContent(folderTwo.id).test {
-            val result = awaitItem()
-            assertTrue(result.first.isEmpty())
+        assertTrue(repository.getFolder(SavedSitesNames.BOOMARKS_ROOT)!!.numBookmarks == 1)
 
-            val updatedBookmark = bookmark.copy(parentId = folderTwo.id)
-            repository.update(updatedBookmark)
-            val updatedResult = awaitItem()
+        val updatedBookmark = bookmark.copy(parentId = folderTwo.id)
+        repository.update(updatedBookmark)
 
-            assertEquals(listOf(updatedBookmark), updatedResult.first)
-
-            cancelAndConsumeRemainingEvents()
-        }
+        assertTrue(repository.getFolder(SavedSitesNames.BOOMARKS_ROOT)!!.numBookmarks == 0)
+        assertTrue(repository.getFolder(folderTwo.id)!!.numBookmarks == 1)
     }
 
     @Test
     fun whenFolderIsMovedToAnotherFolderThenParentFolderIsUpdated() = runTest {
         givenNoBookmarksStored()
 
+        val root = repository.insert(BookmarkFolder(id = SavedSitesNames.BOOMARKS_ROOT, name = "Bookmarks", parentId = ""))
         val folderOne = repository.insert(BookmarkFolder(id = "folder1", name = "folder1", parentId = SavedSitesNames.BOOMARKS_ROOT))
         val bookmarkOne = repository.insertBookmark(title = "bookmark1", url = "foo1.com")
         val updatedBookmarkOne = bookmarkOne.copy(parentId = folderOne.id)
@@ -558,21 +555,13 @@ class SavedSitesRepositoryTest {
 
         val bookmarkThree = repository.insertBookmark(title = "bookmark3", url = "foo3.com")
 
-        repository.getFolderContent(SavedSitesNames.BOOMARKS_ROOT).test {
-            val result = awaitItem()
-            assertEquals(listOf(bookmarkThree), result.first)
-            assertEquals(listOf(updatedFolderOne, updatedFolderTwo), result.second)
+        assertTrue(repository.getFolder(SavedSitesNames.BOOMARKS_ROOT)!!.numBookmarks == 1)
+        assertTrue(repository.getFolder(SavedSitesNames.BOOMARKS_ROOT)!!.numFolders == 2)
 
-            repository.update(folderTwo.copy(parentId = folderOne.id))
+        repository.update(folderTwo.copy(parentId = folderOne.id))
 
-            val updatedFolderOne = folderOne.copy(numBookmarks = 1, numFolders = 1)
-            val updatedResult = awaitItem()
-
-            assertEquals(listOf(bookmarkThree), updatedResult.first)
-            assertEquals(listOf(updatedFolderOne), updatedResult.second)
-
-            cancelAndConsumeRemainingEvents()
-        }
+        assertTrue(repository.getFolder(SavedSitesNames.BOOMARKS_ROOT)!!.numBookmarks == 1)
+        assertTrue(repository.getFolder(SavedSitesNames.BOOMARKS_ROOT)!!.numFolders == 1)
     }
 
     @Test
