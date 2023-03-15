@@ -204,7 +204,11 @@ class NgVpnNetworkStack @Inject constructor(
         tunnelThread?.let {
             logcat { "Stopping tunnel thread" }
 
-            vpnNetwork.stop(jniContext)
+            // In this case we don't check for jniContext == 0 and rather runCatching because we want to make sure we stop the tunnelThread
+            // if the jniContext is invalid the stop() call should fail, we log and continue
+            runCatching { vpnNetwork.stop(jniContext) }.onFailure {
+                logcat(LogPriority.ERROR) { "Error stopping the VPN network ${it.asLog()}" }
+            }
 
             var thread = tunnelThread
             while (thread != null && thread.isAlive) {
