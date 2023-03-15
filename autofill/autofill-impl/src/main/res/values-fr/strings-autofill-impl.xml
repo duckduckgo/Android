@@ -19,8 +19,6 @@
 <resources>
     <string name="autofillManagementScreenTitle">Saisie automatique des identifiants</string>
 
-    <string name="managementLockedModeText">Déverrouiller la saisie automatique</string>
-
     <string name="managementDisabledModeCta"><b>Configurer dans les paramètres</b></string>
     <string name="managementDisabledModeSubtitle">Un schéma de verrouillage de l\'appareil, un code PIN ou des données biométriques sont nécessaires pour protéger les informations relatives à la saisie automatique de vos identifiants.</string>
     <string name="managementDisabledModeTitle">Sécurisez votre appareil pour utiliser la saisie automatique</string>
@@ -67,7 +65,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Suggéré</string>
     <string name="credentialManagementNoLoginsSavedTitle">Aucun identifiant enregistré pour l\'instant</string>
-    <string name="credentialManagementNoLoginsSavedAutofillDisabledTitle">Activer la saisie automatique pour commencer à enregistrer les identifiants</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Les identifiants sont stockés de manière sécurisée sur cet appareil uniquement.</string>
 
     <string name="autofillManagementAddLogin">Ajouter un identifiant</string>

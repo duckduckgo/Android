@@ -19,8 +19,6 @@
 <resources>
     <string name="autofillManagementScreenTitle">Automatické vyplňovanie prihlasovacích údajov</string>
 
-    <string name="managementLockedModeText">Odomknutie automatického vypĺňania</string>
-
     <string name="managementDisabledModeCta"><b>Nastaviť v Nastaveniach</b></string>
     <string name="managementDisabledModeSubtitle">Na ochranu vašich prihlasovacích údajov pri automatickom vypĺňaní sa vyžaduje vzor uzamknutia zariadenia, kód PIN alebo biometrické údaje.</string>
     <string name="managementDisabledModeTitle">Zabezpečte svoje zariadenie, aby ste mohli používať automatické vypĺňanie</string>
@@ -67,7 +65,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Navrhované</string>
     <string name="credentialManagementNoLoginsSavedTitle">Zatiaľ nie sú uložené žiadne prihlásenia</string>
-    <string name="credentialManagementNoLoginsSavedAutofillDisabledTitle">Ak chcete začať ukladať prihlásenia, povoľte automatické vypĺňanie</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Prihlásenia sú zabezpečene uložené iba v tomto zariadení.</string>
 
     <string name="autofillManagementAddLogin">Pridať prihlásenie</string>

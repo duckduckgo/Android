@@ -19,8 +19,6 @@
 <resources>
     <string name="autofillManagementScreenTitle">Automatiškai užpildyti prisijungimus</string>
 
-    <string name="managementLockedModeText">Atrakinti automatinį pildymą</string>
-
     <string name="managementDisabledModeCta"><b>Nustatyti nustatymuose</b></string>
     <string name="managementDisabledModeSubtitle">Norint apsaugoti automatinio pildymo prisijungimo duomenis, reikia naudoti įrenginio užrakinimo šabloną, PIN kodą arba biometrinius duomenis.</string>
     <string name="managementDisabledModeTitle">Apsaugokite įrenginį, kad galėtumėte naudoti automatinį pildymą</string>
@@ -67,7 +65,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Siūloma</string>
     <string name="credentialManagementNoLoginsSavedTitle">Dar nėra išsaugotų prisijungimų</string>
-    <string name="credentialManagementNoLoginsSavedAutofillDisabledTitle">Įgalinkite automatinį pildymą, kad pradėtumėte išsaugoti prisijungimus</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Prisijungimai saugiai saugomi tik šiame įrenginyje.</string>
 
     <string name="autofillManagementAddLogin">Pridėti prisijungimą</string>

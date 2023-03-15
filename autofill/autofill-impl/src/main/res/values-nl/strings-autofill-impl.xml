@@ -19,8 +19,6 @@
 <resources>
     <string name="autofillManagementScreenTitle">Login met automatisch invullen</string>
 
-    <string name="managementLockedModeText">Automatisch invullen ontgrendelen</string>
-
     <string name="managementDisabledModeCta"><b>Instellen in Instellingen</b></string>
     <string name="managementDisabledModeSubtitle">Een vergrendelingspatroon, pincode of biometrische gegevens zijn noodzakelijk om uw inloggegevens voor automatisch invullen te beschermen.</string>
     <string name="managementDisabledModeTitle">Beveilig je apparaat om automatisch invullen te gebruiken</string>
@@ -67,7 +65,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Aanbevolen</string>
     <string name="credentialManagementNoLoginsSavedTitle">Nog geen aanmeldgegevens opgeslagen</string>
-    <string name="credentialManagementNoLoginsSavedAutofillDisabledTitle">Schakel Automatisch invullen in om aanmeldgegevens op te slaan</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Aanmeldgegevens worden alleen op dit apparaat veilig opgeslagen.</string>
 
     <string name="autofillManagementAddLogin">Aanmeldgegevens toevoegen</string>

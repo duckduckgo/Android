@@ -19,8 +19,6 @@
 <resources>
     <string name="autofillManagementScreenTitle">Anmeldedaten automatisch ausfüllen</string>
 
-    <string name="managementLockedModeText">Autovervollständigen freischalten</string>
-
     <string name="managementDisabledModeCta"><b>In den Einstellungen einrichten</b></string>
     <string name="managementDisabledModeSubtitle">Ein Entsperrmuster, eine PIN oder biometrische Daten sind erforderlich, um deine Anmeldedaten für das automatische Ausfüllen zu schützen.</string>
     <string name="managementDisabledModeTitle">Sichere dein Gerät, um das automatische Ausfüllen zu verwenden</string>
@@ -67,7 +65,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Vorgeschlagen</string>
     <string name="credentialManagementNoLoginsSavedTitle">Noch keine Anmeldedaten gespeichert</string>
-    <string name="credentialManagementNoLoginsSavedAutofillDisabledTitle">Autovervollständigen aktivieren, um Anmeldedaten zu speichern</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Anmeldedaten werden nur auf diesem Gerät sicher gespeichert.</string>
 
     <string name="autofillManagementAddLogin">Anmeldedaten hinzufügen</string>

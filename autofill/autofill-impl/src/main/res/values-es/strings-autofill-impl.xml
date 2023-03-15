@@ -19,8 +19,6 @@
 <resources>
     <string name="autofillManagementScreenTitle">Autocompletar inicios de sesión</string>
 
-    <string name="managementLockedModeText">Desbloquear Autocompletar</string>
-
     <string name="managementDisabledModeCta"><b>Configurar en Ajustes</b></string>
     <string name="managementDisabledModeSubtitle">Se requiere un patrón de bloqueo del dispositivo, un PIN o datos biométricos para proteger tus datos de Autocompletar de inicio de sesión.</string>
     <string name="managementDisabledModeTitle">Asegura tu dispositivo para usar Autocompletar</string>
@@ -67,7 +65,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Sugerencias</string>
     <string name="credentialManagementNoLoginsSavedTitle">Aún no hay inicios de sesión guardados</string>
-    <string name="credentialManagementNoLoginsSavedAutofillDisabledTitle">Habilitar Autocompletar para comenzar a guardar inicios de sesión</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Los inicios de sesión se almacenan de forma segura únicamente en este dispositivo.</string>
 
     <string name="autofillManagementAddLogin">Añadir inicio de sesión</string>
