@@ -26,9 +26,9 @@ import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
 import com.duckduckgo.savedsites.store.EntityType.FOLDER
 import com.duckduckgo.savedsites.store.Relation
 import dagger.Lazy
+import java.util.UUID
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.asExecutor
-import java.util.UUID
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AppDatabaseBookmarksMigrationCallback(
@@ -92,7 +92,6 @@ class AppDatabaseBookmarksMigrationCallback(
     private fun migrateBookmarks() {
         with(appDatabase.get()) {
             if (bookmarksDao().bookmarksCount() > 0) {
-
                 // generate Ids for all folders
                 val bookmarkFolders = bookmarkFoldersDao().getBookmarkFoldersSync()
                 bookmarkFolders.forEach {
@@ -112,7 +111,7 @@ class AppDatabaseBookmarksMigrationCallback(
 
     private fun findFolderRelation(
         parentId: Long,
-        folderMap: MutableMap<Long, String>
+        folderMap: MutableMap<Long, String>,
     ) {
         with(appDatabase.get()) {
             val entities = mutableListOf<Entity>()
@@ -165,5 +164,4 @@ class AppDatabaseBookmarksMigrationCallback(
         // At most 1 thread will be doing IO
         dispatcherProvider.io().limitedParallelism(1).asExecutor().execute(f)
     }
-
 }
