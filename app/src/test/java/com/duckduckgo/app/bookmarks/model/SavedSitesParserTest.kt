@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,51 +14,82 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.savedsites.impl.service
+package com.duckduckgo.app.bookmarks.model
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.room.Room
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.FileUtilities
+import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.savedsites.api.SavedSitesRepository
-import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.api.models.TreeNode
+import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
+import com.duckduckgo.savedsites.impl.service.FolderTreeItem
+import com.duckduckgo.savedsites.impl.service.RealSavedSitesParser
+import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
+import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
+import com.duckduckgo.sync.crypto.EncryptResult
+import com.duckduckgo.sync.crypto.SyncLib
+import com.duckduckgo.sync.impl.parser.RealSyncCrypter
+import com.duckduckgo.sync.impl.parser.SyncCrypter
+import com.duckduckgo.sync.store.SyncStore
+import junit.framework.TestCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.jsoup.Jsoup
 import org.junit.Assert
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.any
+import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
+@RunWith(AndroidJUnit4::class)
 class SavedSitesParserTest {
 
     @get:Rule
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @ExperimentalCoroutinesApi
     @get:Rule
     var coroutinesTestRule = CoroutineTestRule()
 
     private lateinit var parser: RealSavedSitesParser
 
-    private var mockSavedSitesRepository: SavedSitesRepository = mock()
+    private lateinit var savedSitesEntitiesDao: SavedSitesEntitiesDao
+    private lateinit var savedSitesRelationsDao: SavedSitesRelationsDao
+
+    private lateinit var db: AppDatabase
+    private lateinit var repository: SavedSitesRepository
+
+    lateinit var syncCrypter: SyncCrypter
+    private val nativeLib: SyncLib = mock()
+    private val store: SyncStore = mock()
 
     @Before
-    fun before() {
-        parser = RealSavedSitesParser()
+    fun setup() {
+        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
+            .allowMainThreadQueries()
+            .build()
+        savedSitesEntitiesDao = db.syncEntitiesDao()
+        savedSitesRelationsDao = db.syncRelationsDao()
 
-        whenever(mockSavedSitesRepository.insert(any<BookmarkFolder>()))
-            .thenAnswer { invocation -> invocation.getArgument(0) }
+        repository = RealSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao)
+        parser = RealSavedSitesParser()
+        syncCrypter = RealSyncCrypter(repository, nativeLib, store)
+
+        whenever(store.primaryKey).thenReturn("primaryKey")
+
+        whenever(nativeLib.encryptData(ArgumentMatchers.anyString(), ArgumentMatchers.anyString()))
+            .thenAnswer { invocation -> EncryptResult(result = 0L, encryptedData = invocation.getArgument(0)) }
     }
 
     @Test
@@ -88,7 +119,7 @@ class SavedSitesParserTest {
             "    </DL><p>\n" +
             "</DL><p>\n"
 
-        assertEquals(expectedHtml, result)
+        Assert.assertEquals(expectedHtml, result)
     }
 
     @Test
@@ -98,7 +129,7 @@ class SavedSitesParserTest {
         val result = parser.generateHtml(node, emptyList())
         val expectedHtml = ""
 
-        assertEquals(expectedHtml, result)
+        Assert.assertEquals(expectedHtml, result)
     }
 
     @Test
@@ -106,7 +137,7 @@ class SavedSitesParserTest {
         val inputStream = FileUtilities.loadResource(javaClass.classLoader!!, "bookmarks/bookmarks_invalid.html")
         val document = Jsoup.parse(inputStream, Charsets.UTF_8.name(), "duckduckgo.com")
 
-        val bookmarks = parser.parseHtml(document, mockSavedSitesRepository)
+        val bookmarks = parser.parseHtml(document, repository)
 
         Assert.assertTrue(bookmarks.isEmpty())
     }
@@ -116,17 +147,17 @@ class SavedSitesParserTest {
         val inputStream = FileUtilities.loadResource(javaClass.classLoader!!, "bookmarks/bookmarks_firefox.html")
         val document = Jsoup.parse(inputStream, Charsets.UTF_8.name(), "duckduckgo.com")
 
-        val bookmarks = parser.parseHtml(document, mockSavedSitesRepository)
+        val bookmarks = parser.parseHtml(document, repository)
 
-        assertEquals(17, bookmarks.size)
+        Assert.assertEquals(17, bookmarks.size)
 
         val firstBookmark = bookmarks.first()
-        assertEquals("https://support.mozilla.org/en-US/products/firefox", firstBookmark.url)
-        assertEquals("Get Help", firstBookmark.title)
+        Assert.assertEquals("https://support.mozilla.org/en-US/products/firefox", firstBookmark.url)
+        Assert.assertEquals("Get Help", firstBookmark.title)
 
         val lastBookmark = bookmarks.last()
-        assertEquals("https://www.mozilla.org/en-US/firefox/central/", lastBookmark.url)
-        assertEquals("Getting Started", lastBookmark.title)
+        Assert.assertEquals("https://www.mozilla.org/en-US/firefox/central/", lastBookmark.url)
+        Assert.assertEquals("Getting Started", lastBookmark.title)
     }
 
     @Test
@@ -134,20 +165,20 @@ class SavedSitesParserTest {
         val inputStream = FileUtilities.loadResource(javaClass.classLoader!!, "bookmarks/bookmarks_brave.html")
         val document = Jsoup.parse(inputStream, Charsets.UTF_8.name(), "duckduckgo.com")
 
-        val bookmarks = parser.parseHtml(document, mockSavedSitesRepository)
+        val bookmarks = parser.parseHtml(document, repository)
 
-        assertEquals(12, bookmarks.size)
+        Assert.assertEquals(12, bookmarks.size)
 
         val firstBookmark = bookmarks.first()
-        assertEquals(
+        Assert.assertEquals(
             "https://www.theguardian.com/international",
             firstBookmark.url,
         )
-        assertEquals("News, sport and opinion from the Guardian's global edition | The Guardian", firstBookmark.title)
+        Assert.assertEquals("News, sport and opinion from the Guardian's global edition | The Guardian", firstBookmark.title)
 
         val lastBookmark = bookmarks.last()
-        assertEquals("https://www.macrumors.com/", lastBookmark.url)
-        assertEquals("MacRumors: Apple News and Rumors", lastBookmark.title)
+        Assert.assertEquals("https://www.macrumors.com/", lastBookmark.url)
+        Assert.assertEquals("MacRumors: Apple News and Rumors", lastBookmark.title)
     }
 
     @Test
@@ -155,20 +186,20 @@ class SavedSitesParserTest {
         val inputStream = FileUtilities.loadResource(javaClass.classLoader!!, "bookmarks/bookmarks_chrome.html")
         val document = Jsoup.parse(inputStream, Charsets.UTF_8.name(), "duckduckgo.com")
 
-        val bookmarks = parser.parseHtml(document, mockSavedSitesRepository)
+        val bookmarks = parser.parseHtml(document, repository)
 
-        assertEquals(12, bookmarks.size)
+        Assert.assertEquals(12, bookmarks.size)
 
         val firstBookmark = bookmarks.first()
-        assertEquals(
+        Assert.assertEquals(
             "https://www.theguardian.com/international",
             firstBookmark.url,
         )
-        assertEquals("News, sport and opinion from the Guardian's global edition | The Guardian", firstBookmark.title)
+        Assert.assertEquals("News, sport and opinion from the Guardian's global edition | The Guardian", firstBookmark.title)
 
         val lastBookmark = bookmarks.last()
-        assertEquals("https://www.macrumors.com/", lastBookmark.url)
-        assertEquals("MacRumors: Apple News and Rumors", lastBookmark.title)
+        Assert.assertEquals("https://www.macrumors.com/", lastBookmark.url)
+        Assert.assertEquals("MacRumors: Apple News and Rumors", lastBookmark.title)
     }
 
     @Test
@@ -176,21 +207,21 @@ class SavedSitesParserTest {
         val inputStream = FileUtilities.loadResource(javaClass.classLoader!!, "bookmarks/bookmarks_ddg_android.html")
         val document = Jsoup.parse(inputStream, Charsets.UTF_8.name(), "duckduckgo.com")
 
-        val bookmarks = parser.parseHtml(document, mockSavedSitesRepository)
+        val bookmarks = parser.parseHtml(document, repository)
 
-        assertEquals(13, bookmarks.size)
+        Assert.assertEquals(13, bookmarks.size)
 
         val firstBookmark = bookmarks.first()
-        assertEquals(
+        Assert.assertEquals(
             "https://www.theguardian.com/international",
             firstBookmark.url,
         )
-        assertEquals("News, sport and opinion from the Guardian's global edition | The Guardian", firstBookmark.title)
+        Assert.assertEquals("News, sport and opinion from the Guardian's global edition | The Guardian", firstBookmark.title)
 
         val lastBookmark = bookmarks.last()
-        assertEquals("https://www.apple.com/uk/", lastBookmark.url)
-        assertEquals("Apple (United Kingdom)", lastBookmark.title)
-        assertTrue(lastBookmark is Favorite)
+        Assert.assertEquals("https://www.apple.com/uk/", lastBookmark.url)
+        Assert.assertEquals("Apple (United Kingdom)", lastBookmark.title)
+        Assert.assertTrue(lastBookmark is Favorite)
     }
 
     @Test
@@ -198,20 +229,20 @@ class SavedSitesParserTest {
         val inputStream = FileUtilities.loadResource(javaClass.classLoader!!, "bookmarks/bookmarks_ddg_macos.html")
         val document = Jsoup.parse(inputStream, Charsets.UTF_8.name(), "duckduckgo.com")
 
-        val bookmarks = parser.parseHtml(document, mockSavedSitesRepository)
+        val bookmarks = parser.parseHtml(document, repository)
 
-        assertEquals(13, bookmarks.size)
+        Assert.assertEquals(13, bookmarks.size)
 
         val firstBookmark = bookmarks.first()
-        assertEquals(
+        Assert.assertEquals(
             "https://www.theguardian.com/international",
             firstBookmark.url,
         )
-        assertEquals("News, sport and opinion from the Guardian's global edition | The Guardian", firstBookmark.title)
+        Assert.assertEquals("News, sport and opinion from the Guardian's global edition | The Guardian", firstBookmark.title)
 
         val lastBookmark = bookmarks.last()
-        assertEquals("https://www.apple.com/uk/", lastBookmark.url)
-        assertEquals("Apple (United Kingdom)", lastBookmark.title)
+        Assert.assertEquals("https://www.apple.com/uk/", lastBookmark.url)
+        Assert.assertEquals("Apple (United Kingdom)", lastBookmark.title)
     }
 
     @Test
@@ -219,20 +250,20 @@ class SavedSitesParserTest {
         val inputStream = FileUtilities.loadResource(javaClass.classLoader!!, "bookmarks/bookmarks_safari.html")
         val document = Jsoup.parse(inputStream, Charsets.UTF_8.name(), "duckduckgo.com")
 
-        val bookmarks = parser.parseHtml(document, mockSavedSitesRepository)
+        val bookmarks = parser.parseHtml(document, repository)
 
-        assertEquals(14, bookmarks.size)
+        Assert.assertEquals(14, bookmarks.size)
 
         val firstBookmark = bookmarks.first()
-        assertEquals(
+        Assert.assertEquals(
             "https://www.apple.com/uk",
             firstBookmark.url,
         )
-        assertEquals("Apple", firstBookmark.title)
+        Assert.assertEquals("Apple", firstBookmark.title)
 
         val lastBookmark = bookmarks.last()
-        assertEquals("https://www.macrumors.com/", lastBookmark.url)
-        assertEquals("MacRumors: Apple News and Rumors", lastBookmark.title)
+        Assert.assertEquals("https://www.macrumors.com/", lastBookmark.url)
+        Assert.assertEquals("MacRumors: Apple News and Rumors", lastBookmark.title)
     }
 
     @Test
@@ -240,14 +271,14 @@ class SavedSitesParserTest {
         val inputStream = FileUtilities.loadResource(javaClass.classLoader!!, "bookmarks/bookmarks_favorites_ddg.html")
         val document = Jsoup.parse(inputStream, Charsets.UTF_8.name(), "duckduckgo.com")
 
-        val savedSites = parser.parseHtml(document, mockSavedSitesRepository)
+        val savedSites = parser.parseHtml(document, repository)
 
         val favorites = savedSites.filterIsInstance<SavedSite.Favorite>()
         val bookmarks = savedSites.filterIsInstance<SavedSite.Bookmark>()
 
-        assertEquals(12, savedSites.size)
-        assertEquals(3, favorites.size)
-        assertEquals(9, bookmarks.size)
+        Assert.assertEquals(12, savedSites.size)
+        Assert.assertEquals(3, favorites.size)
+        Assert.assertEquals(9, bookmarks.size)
     }
 
     @Test
@@ -300,8 +331,23 @@ class SavedSitesParserTest {
         val favoritesLists = savedSites.filterIsInstance<SavedSite.Favorite>()
         val bookmarks = savedSites.filterIsInstance<SavedSite.Bookmark>()
 
-        assertEquals(12, savedSites.size)
-        assertEquals(3, favoritesLists.size)
-        assertEquals(9, bookmarks.size)
+        Assert.assertEquals(12, savedSites.size)
+        Assert.assertEquals(3, favoritesLists.size)
+        Assert.assertEquals(9, bookmarks.size)
     }
+
+    @Test
+    fun whenImportedFromFirefoxThenCanUploadToSync() = runTest {
+        val inputStream = FileUtilities.loadResource(javaClass.classLoader!!, "bookmarks/bookmarks_firefox.html")
+        val document = Jsoup.parse(inputStream, Charsets.UTF_8.name(), "duckduckgo.com")
+
+        val bookmarks = parser.parseHtml(document, repository)
+
+        Assert.assertEquals(17, bookmarks.size)
+
+        val allData = syncCrypter.generateAllData()
+        TestCase.assertTrue(allData.bookmarks.updates.isEmpty())
+
+    }
+
 }

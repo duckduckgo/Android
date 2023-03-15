@@ -167,8 +167,7 @@ class RealSavedSitesParser : SavedSitesParser {
                             }
                             val bookmarkFolder = BookmarkFolder(
                                 name = folderName,
-                                parentId = folderParentId,
-                                id = UUID.randomUUID().toString(),
+                                parentId = folderParentId
                             )
                             // if folder exists we use that one instead
                             val existingFolder = savedSitesRepository.getFolderByName(folderName)
