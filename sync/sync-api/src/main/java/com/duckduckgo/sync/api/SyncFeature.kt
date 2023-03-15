@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,11 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'java-library'
-    id 'kotlin'
+package com.duckduckgo.sync.api
+
+import com.duckduckgo.feature.toggles.api.Toggle
+
+interface SyncFeature {
+    @Toggle.DefaultValue(false)
+    fun self(): Toggle
 }
-
-apply from: "$rootProject.projectDir/code-formatting.gradle"
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-}
-
-dependencies {
-    implementation Kotlin.stdlib.jdk7
-    api project(path: ':feature-toggles-api')
-}
-

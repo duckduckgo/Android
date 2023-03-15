@@ -48,6 +48,7 @@ import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
+import com.duckduckgo.sync.api.DeviceSyncRepository
 import com.duckduckgo.windows.api.WindowsWaitlist
 import com.duckduckgo.windows.api.WindowsWaitlistFeature
 import com.duckduckgo.windows.api.WindowsWaitlistState
@@ -81,6 +82,7 @@ class SettingsViewModel @Inject constructor(
     private val autoconsent: Autoconsent,
     private val windowsWaitlist: WindowsWaitlist,
     private val windowsFeature: WindowsWaitlistFeature,
+    private val deviceSyncRepository: DeviceSyncRepository,
 ) : ViewModel() {
 
     data class ViewState(
@@ -99,6 +101,8 @@ class SettingsViewModel @Inject constructor(
         val appTrackingProtectionEnabled: Boolean = false,
         val emailAddress: String? = null,
         val showAutofill: Boolean = false,
+        val showSyncSetting: Boolean = false,
+        val syncEnabled: Boolean = false,
         val autoconsentEnabled: Boolean = false,
         @StringRes val notificationsSettingSubtitleId: Int = R.string.settingsSubtitleNotificationsDisabled,
         val windowsWaitlistState: WindowsWaitlistState? = null,
@@ -174,6 +178,8 @@ class SettingsViewModel @Inject constructor(
                     autoconsentEnabled = autoconsent.isSettingEnabled(),
                     notificationsSettingSubtitleId = getNotificationsSettingSubtitleId(notificationsEnabled),
                     windowsWaitlistState = windowsSettingState(),
+                    showSyncSetting = deviceSyncRepository.isFeatureEnabled(),
+                    syncEnabled = deviceSyncRepository.isDeviceSyncEnabled(),
                 ),
             )
         }
