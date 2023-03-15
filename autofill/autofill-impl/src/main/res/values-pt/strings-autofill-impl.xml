@@ -19,8 +19,6 @@
 <resources>
     <string name="autofillManagementScreenTitle">Preenchimento automático de inícios de sessão</string>
 
-    <string name="managementLockedModeText">Desbloquear o preenchimento automático</string>
-
     <string name="managementDisabledModeCta"><b>Configura nas Definições</b></string>
     <string name="managementDisabledModeSubtitle">É necessário um padrão de bloqueio do dispositivo, um PIN ou dados biométricos para proteger os teus dados de início de sessão com preenchimento automático.</string>
     <string name="managementDisabledModeTitle">Protege o teu dispositivo para usares o preenchimento automático</string>
@@ -67,7 +65,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Sugerido</string>
     <string name="credentialManagementNoLoginsSavedTitle">Nenhum início de sessão guardado</string>
-    <string name="credentialManagementNoLoginsSavedAutofillDisabledTitle">Ativa o preenchimento automático para começares a guardar inícios de sessão</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Os inícios de sessão são armazenados em segurança apenas neste dispositivo.</string>
 
     <string name="autofillManagementAddLogin">Adicionar início de sessão</string>

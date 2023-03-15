@@ -19,8 +19,6 @@
 <resources>
     <string name="autofillManagementScreenTitle">Samodejno izpolnjevanje obrazcev za prijavo</string>
 
-    <string name="managementLockedModeText">Odkleni samodejno izpolnjevanje</string>
-
     <string name="managementDisabledModeCta"><b>Nastavitev v nastavitvah</b></string>
     <string name="managementDisabledModeSubtitle">Za zaščito podatkov samodejnega izpolnjevanja prijave je potreben vzorec za zaklepanje naprave, koda PIN ali biometrični podatki.</string>
     <string name="managementDisabledModeTitle">Zaščitite svojo napravo za uporabo samodejnega izpolnjevanja</string>
@@ -67,7 +65,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Predlagano</string>
     <string name="credentialManagementNoLoginsSavedTitle">Podatki za prijavo še niso shranjeni</string>
-    <string name="credentialManagementNoLoginsSavedAutofillDisabledTitle">Omogočite samodejno izpolnjevanje, da začnete shranjevati podatke za prijavo</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Podatki za prijavo so varno shranjeni samo v tej napravi.</string>
 
     <string name="autofillManagementAddLogin">Dodajanje podatkov za prijavo</string>
