@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,11 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
+package com.duckduckgo.sync.api
+
+import android.content.Context
+import android.content.Intent
+
+interface SyncNav {
+    fun openSyncActivity(context: Context): Intent
 }
-
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
-
-dependencies {
-    implementation Kotlin.stdlib.jdk7
-    api project(path: ':feature-toggles-api')
-}
-
-android {
-    namespace 'com.duckduckgo.sync.api'
-}
-

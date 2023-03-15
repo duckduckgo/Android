@@ -139,6 +139,7 @@ class SettingsViewModel @Inject constructor(
         object LaunchMacOs : Command()
         object LaunchNotificationsSettings : Command()
         object LaunchWindows : Command()
+        object LaunchSyncSettings : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
@@ -489,6 +490,10 @@ class SettingsViewModel @Inject constructor(
         } else {
             R.string.settingsSubtitleNotificationsDisabled
         }
+    }
+
+    fun onSyncSettingClicked() {
+        viewModelScope.launch { command.send(Command.LaunchSyncSettings) }
     }
 
     companion object {

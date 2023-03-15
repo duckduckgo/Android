@@ -20,4 +20,8 @@
     <string name="userIdSectionHeader">User ID</string>
     <string name="deviceIdSectionHeader">Device Id</string>
     <string name="deviceNameSectionHeader">Device Name</string>
+
+    <!-- Sync -->
+    <string name="sync_screen_title">Sync</string>
+    <string name="sync_toggle_text">Sync</string>
 </resources>

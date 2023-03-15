@@ -83,6 +83,7 @@ import com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnOnboardingActivity
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
+import com.duckduckgo.sync.api.SyncNav
 import com.duckduckgo.windows.api.WindowsWaitlistState
 import com.duckduckgo.windows.api.WindowsWaitlistState.InBeta
 import com.duckduckgo.windows.api.WindowsWaitlistState.JoinedWaitlist
@@ -110,6 +111,9 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
+
+    @Inject
+    lateinit var syncNav: SyncNav
 
     @Inject
     lateinit var autofillSettingsActivityLauncher: AutofillSettingsActivityLauncher
@@ -173,7 +177,7 @@ class SettingsActivity : DuckDuckGoActivity() {
 
         with(viewsFeatures) {
             autofill.setClickListener { viewModel.onAutofillSettingsClick() }
-            syncSetting.setClickListener { }
+            syncSetting.setClickListener { viewModel.onSyncSettingClicked() }
         }
 
         with(viewsAppearance) {
@@ -452,6 +456,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             is Command.LaunchAutoconsent -> launchAutoconsent()
             is Command.LaunchNotificationsSettings -> launchNotificationsSettings()
             is Command.LaunchWindows -> launchWindowsScreen()
+            is Command.LaunchSyncSettings -> launchSyncSettings()
             null -> TODO()
         }
     }
@@ -641,6 +646,10 @@ class SettingsActivity : DuckDuckGoActivity() {
     private fun launchWindowsScreen() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         startActivity(WindowsWaitlistActivity.intent(this), options)
+    }
+
+    private fun launchSyncSettings() {
+        startActivity(syncNav.openSyncActivity(this))
     }
 
     private fun launchAutoconsent() {
