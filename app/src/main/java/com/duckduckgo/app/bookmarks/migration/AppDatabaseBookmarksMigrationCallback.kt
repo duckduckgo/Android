@@ -36,6 +36,8 @@ class AppDatabaseBookmarksMigrationCallback(
     private val dispatcherProvider: DispatcherProvider,
 ) : RoomDatabase.Callback() {
 
+    private val folderMap: MutableMap<Long, String> = mutableMapOf()
+
     override fun onOpen(db: SupportSQLiteDatabase) {
         ioThread {
             runMigration()
@@ -90,35 +92,42 @@ class AppDatabaseBookmarksMigrationCallback(
     private fun migrateBookmarks() {
         with(appDatabase.get()) {
             if (bookmarksDao().bookmarksCount() > 0) {
-                // start from root folder
-                findFolderRelation(SavedSitesNames.BOOMARKS_ROOT_ID)
 
-                // continue folder by folder
+                // generate Ids for all folders
                 val bookmarkFolders = bookmarkFoldersDao().getBookmarkFoldersSync()
                 bookmarkFolders.forEach {
-                    findFolderRelation(it.id)
+                    folderMap[it.id] = UUID.randomUUID().toString()
+                }
+
+                // start from root folder
+                findFolderRelation(SavedSitesNames.BOOMARKS_ROOT_ID, folderMap)
+
+                // continue folder by folder
+                bookmarkFolders.forEach {
+                    findFolderRelation(it.id, folderMap)
                 }
             }
         }
     }
 
-    private fun findFolderRelation(folderId: Long) {
+    private fun findFolderRelation(
+        parentId: Long,
+        folderMap: MutableMap<Long, String>
+    ) {
         with(appDatabase.get()) {
             val entities = mutableListOf<Entity>()
             val relations = mutableListOf<Relation>()
-            val foldersInFolder = bookmarkFoldersDao().getBookmarkFoldersByParentIdSync(folderId)
-            val bookmarksInFolder = bookmarksDao().getBookmarksByParentIdSync(folderId)
-
-            val generatedFolderId = UUID.randomUUID().toString()
+            val foldersInFolder = bookmarkFoldersDao().getBookmarkFoldersByParentIdSync(parentId)
+            val bookmarksInFolder = bookmarksDao().getBookmarksByParentIdSync(parentId)
 
             foldersInFolder.forEach {
-                val entity = Entity(UUID.randomUUID().toString(), it.name, "", FOLDER)
+                val entity = Entity(entityId = folderMap[it.id.toLong()]!!, title = it.name, url = "", type = FOLDER)
                 entities.add(entity)
 
-                if (folderId == SavedSitesNames.BOOMARKS_ROOT_ID) {
+                if (parentId == SavedSitesNames.BOOMARKS_ROOT_ID) {
                     relations.add(Relation(folderId = SavedSitesNames.BOOMARKS_ROOT, entityId = entity.entityId))
                 } else {
-                    relations.add(Relation(folderId = generatedFolderId, entityId = entity.entityId))
+                    relations.add(Relation(folderId = folderMap[parentId]!!, entityId = entity.entityId))
                 }
             }
 
@@ -126,10 +135,10 @@ class AppDatabaseBookmarksMigrationCallback(
                 val entity = Entity(UUID.randomUUID().toString(), it.title.orEmpty(), it.url, BOOKMARK)
                 entities.add(entity)
 
-                if (folderId == 0L) {
+                if (parentId == SavedSitesNames.BOOMARKS_ROOT_ID) {
                     relations.add(Relation(folderId = SavedSitesNames.BOOMARKS_ROOT, entityId = entity.entityId))
                 } else {
-                    relations.add(Relation(folderId = generatedFolderId, entityId = entity.entityId))
+                    relations.add(Relation(folderId = folderMap[parentId]!!, entityId = entity.entityId))
                 }
             }
 

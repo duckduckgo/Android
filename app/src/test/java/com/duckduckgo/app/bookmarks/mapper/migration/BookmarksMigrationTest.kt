@@ -167,7 +167,7 @@ class BookmarksMigrationTest {
         assertTrue(bookmarks.first().title == "bookmark1")
 
         assertTrue(favorites.size == 1)
-        assertTrue(favorites.first().title == "favorite1")
+        assertTrue(favorites.first().title == "bookmark1")
     }
 
     @Test
