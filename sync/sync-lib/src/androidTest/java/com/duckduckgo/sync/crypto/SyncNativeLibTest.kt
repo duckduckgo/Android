@@ -96,7 +96,7 @@ class SyncNativeLibTest {
 
         val whatToEncrypt = "bookmark"
 
-        val encryptedResult = syncNativeLib.encrypt(whatToEncrypt, accountKeys.primaryKey)
+        val encryptedResult = syncNativeLib.encryptData(whatToEncrypt, accountKeys.primaryKey)
 
         assertEquals(0, encryptedResult.result)
     }

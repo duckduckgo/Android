@@ -66,7 +66,7 @@ class SyncCrypterTest {
         )
         whenever(store.primaryKey).thenReturn("primaryKey")
 
-        whenever(nativeLib.encrypt(anyString(), anyString()))
+        whenever(nativeLib.encryptData(anyString(), anyString()))
             .thenAnswer { invocation -> EncryptResult(result = 0L, encryptedData = invocation.getArgument(0)) }
 
         givenSomeFavorites()
@@ -248,7 +248,7 @@ class SyncCrypterTest {
     @Test
     fun whenBookmarksToStoreThenRepositoryStoresThem() {
         whenever(store.primaryKey).thenReturn(TestSyncFixtures.primaryKey)
-        whenever(nativeLib.decrypt(any(), any())).thenReturn(DecryptResult(result = 0L, decryptedData = "something"))
+        whenever(nativeLib.decryptData(any(), any())).thenReturn(DecryptResult(result = 0L, decryptedData = "something"))
 
         val entries = givenSomeBookmarkSyncEntries(10, SavedSitesNames.BOOMARKS_ROOT)
         syncCrypter.store(entries)
