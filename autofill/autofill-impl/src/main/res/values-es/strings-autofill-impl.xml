@@ -64,7 +64,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Sugerencias</string>
     <string name="credentialManagementNoLoginsSavedTitle">Aún no hay inicios de sesión guardados</string>
-    <string name="credentialManagementNoLoginsSavedAutofillDisabledTitle">Habilitar Autocompletar para comenzar a guardar inicios de sesión</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Los inicios de sesión se almacenan de forma segura únicamente en este dispositivo.</string>
 
     <string name="autofillManagementAddLogin">Añadir inicio de sesión</string>
