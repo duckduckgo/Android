@@ -19,8 +19,6 @@
 <resources>
     <string name="autofillManagementScreenTitle">Compilazione automatica dei dati di accesso</string>
 
-    <string name="managementLockedModeText">Sblocca la compilazione automatica</string>
-
     <string name="managementDisabledModeCta"><b>Configura in Impostazioni</b></string>
     <string name="managementDisabledModeSubtitle">Una sequenza di blocco del dispositivo, un PIN o dati biometrici sono necessari per proteggere i dettagli di accesso della compilazione automatica.</string>
     <string name="managementDisabledModeTitle">Proteggi il tuo dispositivo per utilizzare la compilazione automatica</string>
@@ -67,7 +65,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Suggerimenti</string>
     <string name="credentialManagementNoLoginsSavedTitle">Non ci sono ancora dati di accesso salvati</string>
-    <string name="credentialManagementNoLoginsSavedAutofillDisabledTitle">Attiva la compilazione automatica per iniziare a salvare i dati di accesso</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">I dati di accesso vengono salvati in modo sicuro solo su questo dispositivo.</string>
 
     <string name="autofillManagementAddLogin">Aggiungi dati di accesso</string>

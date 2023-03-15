@@ -19,8 +19,6 @@
 <resources>
     <string name="autofillManagementScreenTitle">Fyll inn pålogginger automatisk</string>
 
-    <string name="managementLockedModeText">Lås opp Autofyll</string>
-
     <string name="managementDisabledModeCta"><b>Konfigurer i Innstillinger</b></string>
     <string name="managementDisabledModeSubtitle">Du trenger låsemønster, PIN-kode eller biometri på enheten for å beskytte påloggingsinformasjonen din når du bruker Autofyll.</string>
     <string name="managementDisabledModeTitle">Sikre enheten din for å bruke Autofyll</string>
@@ -67,7 +65,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Forslag</string>
     <string name="credentialManagementNoLoginsSavedTitle">Ingen pålogginger er lagret ennå</string>
-    <string name="credentialManagementNoLoginsSavedAutofillDisabledTitle">Aktiver Autofyll for å begynne å lagre pålogginger</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Pålogginger lagres sikkert og bare på denne enheten.</string>
 
     <string name="autofillManagementAddLogin">Legg til pålogging</string>

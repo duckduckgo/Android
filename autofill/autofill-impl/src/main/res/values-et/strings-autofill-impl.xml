@@ -19,8 +19,6 @@
 <resources>
     <string name="autofillManagementScreenTitle">Sisesta sisselogimisandmed automaatselt</string>
 
-    <string name="managementLockedModeText">Ava automaatne täitmine</string>
-
     <string name="managementDisabledModeCta"><b>Seadista sätetes</b></string>
     <string name="managementDisabledModeSubtitle">Automaatse sisselogimise andmete kaitsmiseks on vaja seadme lukustusmustrit, PIN-koodi või biomeetriat.</string>
     <string name="managementDisabledModeTitle">Automaatse täitmise kasutamiseks taga seadme kaitse</string>
@@ -67,7 +65,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Soovitatud</string>
     <string name="credentialManagementNoLoginsSavedTitle">Sisselogimisandmeid pole veel salvestatud</string>
-    <string name="credentialManagementNoLoginsSavedAutofillDisabledTitle">Sisselogimisandmete salvestamise alustamiseks luba automaatne täitmine</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Sisselogimisandmed salvestatakse turvaliselt ainult selles seadmes.</string>
 
     <string name="autofillManagementAddLogin">Lisa sisselogimisandmed</string>

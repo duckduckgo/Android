@@ -19,8 +19,6 @@
 <resources>
     <string name="autofillManagementScreenTitle">Автоматично попълване на данни за вход</string>
 
-    <string name="managementLockedModeText">Отключете автоматичното попълване</string>
-
     <string name="managementDisabledModeCta"><b>Настройване в Настройки</b></string>
     <string name="managementDisabledModeSubtitle">Изисква се шаблон за заключване на устройството, ПИН код или биометрични данни, за да защитите информацията си за вход с автоматично попълване.</string>
     <string name="managementDisabledModeTitle">Защитете устройството си, за да използвате автоматично попълване</string>
@@ -67,7 +65,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Предложения</string>
     <string name="credentialManagementNoLoginsSavedTitle">Все още няма запазени данни за вход</string>
-    <string name="credentialManagementNoLoginsSavedAutofillDisabledTitle">Активирайте автоматичното попълване, за да започнете да запазвате данни за вход</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Данните за вход се съхраняват на сигурно място само на това устройство.</string>
 
     <string name="autofillManagementAddLogin">Добавяне на данни за вход</string>
