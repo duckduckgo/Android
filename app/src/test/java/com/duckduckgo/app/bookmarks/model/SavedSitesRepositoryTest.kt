@@ -264,7 +264,7 @@ class SavedSitesRepositoryTest {
     }
 
     @Test
-    fun whenBookmarkFavoriteMovedToAnotherFolderThenBookmarkIsStillFavorite(){
+    fun whenBookmarkFavoriteMovedToAnotherFolderThenBookmarkIsStillFavorite() {
         val favoriteone = Favorite("favorite1", "Favorite", "http://favexample.com", 0)
         givenFavoriteStored(favoriteone)
 

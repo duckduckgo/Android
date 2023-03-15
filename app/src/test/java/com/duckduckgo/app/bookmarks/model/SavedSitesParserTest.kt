@@ -347,7 +347,5 @@ class SavedSitesParserTest {
 
         val allData = syncCrypter.generateAllData()
         TestCase.assertTrue(allData.bookmarks.updates.isEmpty())
-
     }
-
 }
