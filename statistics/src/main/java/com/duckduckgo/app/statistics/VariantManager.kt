@@ -31,6 +31,7 @@ interface VariantManager {
     sealed class VariantFeature {
         object CookiePromptManagementExperiment : VariantFeature()
         object OptimiseOnboardingExperiment : VariantFeature()
+        object OnboardingCustomizationExperiment: VariantFeature()
     }
 
     companion object {
@@ -59,6 +60,8 @@ interface VariantManager {
                 features = listOf(VariantFeature.OptimiseOnboardingExperiment),
                 filterBy = { isEnglishLocale() && !isGBCountry() },
             ),
+            Variant(key = "mi", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
+            Variant(key = "mj", weight = 1.0, features = listOf(VariantFeature.OnboardingCustomizationExperiment), filterBy = { noFilter() }),
         )
 
         val REFERRER_VARIANTS = listOf(
@@ -258,6 +261,9 @@ fun VariantManager.isCookiePromptManagementExperimentEnabled() =
 
 fun VariantManager.isOptimiseOnboardingExperimentEnabled() =
     this.getVariant().hasFeature(VariantManager.VariantFeature.OptimiseOnboardingExperiment)
+
+fun VariantManager.isOnboardingCustomizationExperimentEnabled() =
+    this.getVariant().hasFeature(VariantManager.VariantFeature.OnboardingCustomizationExperiment)
 
 /**
  * A variant which can be used for experimentation.
