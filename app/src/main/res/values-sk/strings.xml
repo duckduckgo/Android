@@ -654,13 +654,13 @@
 
     <!-- Autoconsent -->
     <!-- smartling.character_limit = 82 -->
-    <string name="autoconsentDialogTitle">Zdá sa, že táto stránka má vyskakovacie okno pre súhlas so súbormi cookie 👇</string>
+    <string name="autoconsentDialogTitle"><![CDATA[<b>Chcete, aby som spravoval automatické okná súborov cookie?</b>]]></string>
     <!-- smartling.character_limit = 160 -->
-    <string name="autoconsentDialogDescription">Chceš, aby som to riešil za teba? Môžem sa pokúsiť minimalizovať súbory cookie, maximalizovať ochranu súkromia a skryť kontextové okná, ako sú tieto.</string>
+    <string name="autoconsentDialogDescription">Môžem sa pokúsiť vybrať najosobnejšie dostupné nastavenia a skryť automatické okná ako sú tieto.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Správa kontextových okien súborov cookie</string>
+    <string name="autoconsentPrimaryCta">Spravovať automatické okná za mňa</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentSecondaryCta">Nie, ďakujem</string>
+    <string name="autoconsentSecondaryCta">Nie, budem ich spravovať sám</string>
 
     <string name="autoconsentSetting">Správa kontextových okien súborov cookie</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Kontextové okno je skryté</string>
