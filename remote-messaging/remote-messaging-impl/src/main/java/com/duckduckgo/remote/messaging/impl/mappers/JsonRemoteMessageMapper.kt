@@ -23,13 +23,10 @@ import com.duckduckgo.remote.messaging.api.Content.BigTwoActions
 import com.duckduckgo.remote.messaging.api.Content.Medium
 import com.duckduckgo.remote.messaging.api.Content.Placeholder
 import com.duckduckgo.remote.messaging.api.Content.Small
+import com.duckduckgo.remote.messaging.api.JsonMessageAction
+import com.duckduckgo.remote.messaging.api.MessageActionMapperPlugin
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.impl.models.*
-import com.duckduckgo.remote.messaging.impl.models.JsonActionType.APP_TP_ONBOARDING
-import com.duckduckgo.remote.messaging.impl.models.JsonActionType.DEFAULT_BROWSER
-import com.duckduckgo.remote.messaging.impl.models.JsonActionType.DISMISS
-import com.duckduckgo.remote.messaging.impl.models.JsonActionType.PLAYSTORE
-import com.duckduckgo.remote.messaging.impl.models.JsonActionType.URL
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.BIG_SINGLE_ACTION
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.BIG_TWO_ACTION
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.MEDIUM
@@ -38,14 +35,14 @@ import com.duckduckgo.remote.messaging.impl.models.asJsonFormat
 import java.util.Locale
 import timber.log.Timber
 
-private val smallMapper: (JsonContent, List<ActionMapper>) -> Content = { jsonContent, actionMappers ->
+private val smallMapper: (JsonContent, Set<MessageActionMapperPlugin>) -> Content = { jsonContent, _ ->
     Small(
         titleText = jsonContent.titleText.failIfEmpty(),
         descriptionText = jsonContent.descriptionText.failIfEmpty(),
     )
 }
 
-private val mediumMapper: (JsonContent, List<ActionMapper>) -> Content = { jsonContent, actionMappers ->
+private val mediumMapper: (JsonContent, Set<MessageActionMapperPlugin>) -> Content = { jsonContent, _ ->
     Medium(
         titleText = jsonContent.titleText.failIfEmpty(),
         descriptionText = jsonContent.descriptionText.failIfEmpty(),
@@ -53,7 +50,7 @@ private val mediumMapper: (JsonContent, List<ActionMapper>) -> Content = { jsonC
     )
 }
 
-private val bigMessageSingleActionMapper: (JsonContent, List<ActionMapper>) -> Content = { jsonContent, actionMappers ->
+private val bigMessageSingleActionMapper: (JsonContent, Set<MessageActionMapperPlugin>) -> Content = { jsonContent, actionMappers ->
     BigSingleAction(
         titleText = jsonContent.titleText.failIfEmpty(),
         descriptionText = jsonContent.descriptionText.failIfEmpty(),
@@ -63,7 +60,7 @@ private val bigMessageSingleActionMapper: (JsonContent, List<ActionMapper>) -> C
     )
 }
 
-private val bigMessageTwoActionMapper: (JsonContent, List<ActionMapper>) -> Content = { jsonContent, actionMappers ->
+private val bigMessageTwoActionMapper: (JsonContent, Set<MessageActionMapperPlugin>) -> Content = { jsonContent, actionMappers ->
     BigTwoActions(
         titleText = jsonContent.titleText.failIfEmpty(),
         descriptionText = jsonContent.descriptionText.failIfEmpty(),
@@ -85,12 +82,12 @@ private val messageMappers = mapOf(
 
 fun List<JsonRemoteMessage>.mapToRemoteMessage(
     locale: Locale,
-    actionMappers: List<ActionMapper>
+    actionMappers: Set<MessageActionMapperPlugin>,
 ): List<RemoteMessage> = this.mapNotNull { it.map(locale, actionMappers) }
 
 private fun JsonRemoteMessage.map(
     locale: Locale,
-    actionMappers: List<ActionMapper>
+    actionMappers: Set<MessageActionMapperPlugin>,
 ): RemoteMessage? {
     return runCatching {
         val remoteMessage = RemoteMessage(
@@ -119,14 +116,14 @@ private fun RemoteMessage.localizeMessage(translations: Map<String, JsonContentT
 
 private fun JsonContent.mapToContent(
     messageType: String,
-    actionMappers: List<ActionMapper>
+    actionMappers: Set<MessageActionMapperPlugin>,
 ): Content {
     return messageMappers[messageType]?.invoke(this, actionMappers) ?: throw IllegalArgumentException("Message type not found")
 }
 
-private fun JsonMessageAction.toAction(actionMappers: List<ActionMapper>): Action {
+private fun JsonMessageAction.toAction(actionMappers: Set<MessageActionMapperPlugin>): Action {
     actionMappers.forEach {
-        val result = it.mapper.invoke(this)
+        val result = it.evaluate(this)
         if (result != null) return result
     }
 
