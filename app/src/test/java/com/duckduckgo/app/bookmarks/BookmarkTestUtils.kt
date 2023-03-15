@@ -20,7 +20,6 @@ import com.duckduckgo.savedsites.store.Entity
 import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
 import com.duckduckgo.savedsites.store.EntityType.FOLDER
 import com.duckduckgo.savedsites.store.Relation
-import java.util.UUID
 
 object BookmarkTestUtils {
 
