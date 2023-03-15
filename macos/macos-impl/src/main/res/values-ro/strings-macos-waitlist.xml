@@ -21,7 +21,8 @@
     <string name="macos_title">Obține DuckDuckGo pentru Mac!</string>
 
     <string name="macos_share_title">Trimite linkul</string>
-    <string name="macos_description_text">DuckDuckGo pentru Mac are viteza de care ai nevoie, funcțiile de răsfoire pe care ți le dorești și este prevăzută cu cele mai bune caracteristici de bază în privința confidențialității din domeniu.\n\nPe dispozitivul Mac, accesează:\n<b><font color="#3969EF">duckduckgo.com/mac</font></b></string>
+    <string name="macos_description_text">DuckDuckGo pentru Mac are viteza de care ai nevoie, funcțiile de răsfoire pe care ți le dorești și este prevăzută cu cele mai bune caracteristici de bază în privința confidențialității din domeniu.\n\nPe dispozitivul tău Mac, accesează:</string>
+    <string name="macos_description_link">duckduckgo.com/mac</string>
     <string name="macos_share_text">Ești gata să răsfoiești în mod privat pe Mac?\n\nVizitează această adresă URL pe dispozitivul tău Mac pentru a descărca:\nhttps://duckduckgo.com/mac</string>
 
     <string name="macos_waitlist_windows_link">Cauți versiunea pentru Windows?</string>
