@@ -19,8 +19,6 @@
 <resources>
     <string name="autofillManagementScreenTitle">Automatisk udfyldning ved login</string>
 
-    <string name="managementLockedModeText">Lås op for automatisk udfyldning</string>
-
     <string name="managementDisabledModeCta"><b>Konfigurer i Indstillinger</b></string>
     <string name="managementDisabledModeSubtitle">Der kræves et låsemønster, en pinkode eller biometri for at beskytte dine oplysninger om automatisk udfyldning.</string>
     <string name="managementDisabledModeTitle">Beskyt din enhed for at bruge automatisk udfyldning</string>
@@ -67,7 +65,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Foreslået</string>
     <string name="credentialManagementNoLoginsSavedTitle">Ingen logins gemt endnu</string>
-    <string name="credentialManagementNoLoginsSavedAutofillDisabledTitle">Aktivér automatisk udfyldning for at begynde at gemme logins</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Login gemmes kun sikkert på denne enhed.</string>
 
     <string name="autofillManagementAddLogin">Tilføj login</string>

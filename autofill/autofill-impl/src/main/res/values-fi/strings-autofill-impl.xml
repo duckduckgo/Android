@@ -19,8 +19,6 @@
 <resources>
     <string name="autofillManagementScreenTitle">Täytä kirjautumistiedot automaattisesti</string>
 
-    <string name="managementLockedModeText">Poista automaattisen täytön lukitus</string>
-
     <string name="managementDisabledModeCta"><b>Määritä Asetuksissa</b></string>
     <string name="managementDisabledModeSubtitle">Automaattisen täytön kirjautumistietojen suojaamiseen tarvitaan laitteen lukituskuvio, PIN-koodi tai biometriset tiedot.</string>
     <string name="managementDisabledModeTitle">Suojaa laitteesi automaattisen täytön käyttöä varten</string>
@@ -67,7 +65,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Ehdotettu</string>
     <string name="credentialManagementNoLoginsSavedTitle">Kirjautumistietoja ei ole vielä tallennettu</string>
-    <string name="credentialManagementNoLoginsSavedAutofillDisabledTitle">Ota automaattinen täyttö käyttöön tallentaaksesi kirjautumistietoja</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Kirjautumistiedot tallennetaan turvallisesti vain tälle laitteelle.</string>
 
     <string name="autofillManagementAddLogin">Lisää kirjautumistiedot</string>

@@ -19,8 +19,6 @@
 <resources>
     <string name="autofillManagementScreenTitle">Автозаполнение логинов</string>
 
-    <string name="managementLockedModeText">Разблокировать автозаполнение</string>
-
     <string name="managementDisabledModeCta"><b>Откройте «Настройки»</b></string>
     <string name="managementDisabledModeSubtitle">Для защиты автоматически заполняемой учетной информации нужны биометрические данные, графический ключ или ПИН-код.</string>
     <string name="managementDisabledModeTitle">Защитите свое устройство, чтобы использовать автозаполнение</string>
@@ -67,7 +65,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Рекомендации</string>
     <string name="credentialManagementNoLoginsSavedTitle">Сохраненных логинов пока нет</string>
-    <string name="credentialManagementNoLoginsSavedAutofillDisabledTitle">Для сохранения логинов включите автозаполнение</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Логины надежно хранятся только на этом устройстве.</string>
 
     <string name="autofillManagementAddLogin">Добавить логин</string>

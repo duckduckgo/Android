@@ -19,8 +19,6 @@
 <resources>
     <string name="autofillManagementScreenTitle">Completare automată la autentificare</string>
 
-    <string name="managementLockedModeText">Deblochează completarea automată</string>
-
     <string name="managementDisabledModeCta"><b>Configurează în Setări</b></string>
     <string name="managementDisabledModeSubtitle">Este necesar un model de blocare a dispozitivului, un cod PIN sau date biometrice pentru a-ți proteja detaliile de autentificare prin completarea automată.</string>
     <string name="managementDisabledModeTitle">Asigură-ți dispozitivul pentru a utiliza completarea automată</string>
@@ -67,7 +65,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Sugerat</string>
     <string name="credentialManagementNoLoginsSavedTitle">Nu au fost salvate încă date de autentificare</string>
-    <string name="credentialManagementNoLoginsSavedAutofillDisabledTitle">Activează Completarea automată pentru a începe salvarea autentificărilor</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Datele de conectare sunt stocate în siguranță numai pe acest dispozitiv.</string>
 
     <string name="autofillManagementAddLogin">Adaugă date de autentificare</string>
