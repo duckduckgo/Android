@@ -21,6 +21,7 @@ import com.duckduckgo.savedsites.store.Entity
 import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
 import com.duckduckgo.savedsites.store.EntityType.FOLDER
 import com.duckduckgo.savedsites.store.Relation
+import java.util.UUID
 
 object BookmarkTestUtils {
 
@@ -30,7 +31,7 @@ object BookmarkTestUtils {
         val entities = mutableListOf<Entity>()
         for (index in 1..total) {
             entities.add(
-                Entity(AppDatabaseBookmarksMigrationCallback.generateBookmarkId(index.toLong()), "entity$index", "https://testUrl$index", BOOKMARK),
+                Entity(UUID.randomUUID().toString(), "entity$index", "https://testUrl$index", BOOKMARK),
             )
         }
         return entities
@@ -42,7 +43,7 @@ object BookmarkTestUtils {
         val entities = mutableListOf<Entity>()
         for (index in 1..total) {
             entities.add(
-                Entity(AppDatabaseBookmarksMigrationCallback.generateFolderId(index.toLong()), "entity$index", "https://testUrl$index", FOLDER),
+                Entity(UUID.randomUUID().toString(), "entity$index", "https://testUrl$index", FOLDER),
             )
         }
         return entities

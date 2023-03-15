@@ -28,6 +28,7 @@ import com.duckduckgo.savedsites.store.Relation
 import dagger.Lazy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.asExecutor
+import java.util.UUID
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AppDatabaseBookmarksMigrationCallback(
@@ -75,7 +76,7 @@ class AppDatabaseBookmarksMigrationCallback(
                 if (existingBookmark != null) {
                     favouriteMigration.add(Relation(folderId = SavedSitesNames.FAVORITES_ROOT, entityId = existingBookmark.entityId))
                 } else {
-                    val entity = Entity(generateFavoriteId(it.id), it.title, it.url, BOOKMARK)
+                    val entity = Entity(UUID.randomUUID().toString(), it.title, it.url, BOOKMARK)
                     entitiesMigration.add(entity)
                     favouriteMigration.add(Relation(folderId = SavedSitesNames.FAVORITES_ROOT, entityId = entity.entityId))
                 }
@@ -108,24 +109,27 @@ class AppDatabaseBookmarksMigrationCallback(
             val foldersInFolder = bookmarkFoldersDao().getBookmarkFoldersByParentIdSync(folderId)
             val bookmarksInFolder = bookmarksDao().getBookmarksByParentIdSync(folderId)
 
+            val generatedFolderId = UUID.randomUUID().toString()
+
             foldersInFolder.forEach {
-                val entity = Entity(generateFolderId(it.id), it.name, "", FOLDER)
+                val entity = Entity(UUID.randomUUID().toString(), it.name, "", FOLDER)
                 entities.add(entity)
 
                 if (folderId == 0L) {
                     relations.add(Relation(folderId = SavedSitesNames.BOOMARKS_ROOT, entityId = entity.entityId))
                 } else {
-                    relations.add(Relation(folderId = generateFolderId(folderId), entityId = entity.entityId))
+                    relations.add(Relation(folderId = generatedFolderId, entityId = entity.entityId))
                 }
             }
+
             bookmarksInFolder.forEach {
-                val entity = Entity(generateBookmarkId(it.id), it.title.orEmpty(), it.url, BOOKMARK)
+                val entity = Entity(UUID.randomUUID().toString(), it.title.orEmpty(), it.url, BOOKMARK)
                 entities.add(entity)
 
                 if (folderId == 0L) {
                     relations.add(Relation(folderId = SavedSitesNames.BOOMARKS_ROOT, entityId = entity.entityId))
                 } else {
-                    relations.add(Relation(folderId = generateFolderId(folderId), entityId = entity.entityId))
+                    relations.add(Relation(folderId = generatedFolderId, entityId = entity.entityId))
                 }
             }
 
@@ -153,21 +157,4 @@ class AppDatabaseBookmarksMigrationCallback(
         dispatcherProvider.io().limitedParallelism(1).asExecutor().execute(f)
     }
 
-    companion object {
-        fun generateFolderId(index: Long): String {
-            return "folder$index"
-        }
-
-        fun generateFolderId(index: String): String {
-            return "folder$index"
-        }
-
-        fun generateFavoriteId(index: Long): String {
-            return "favorite$index"
-        }
-
-        fun generateBookmarkId(index: Long): String {
-            return "bookmark$index"
-        }
-    }
 }
