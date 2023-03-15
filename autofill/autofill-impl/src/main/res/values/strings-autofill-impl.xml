@@ -17,13 +17,11 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Autofill Logins</string>
-
-    <string name="managementLockedModeText">Unlock Autofill</string>
+    <string name="autofillManagementScreenTitle">Logins</string>
 
     <string name="managementDisabledModeCta"><b>Set up in Settings</b></string>
-    <string name="managementDisabledModeSubtitle">A device lock pattern, PIN, or biometrics is required to protect your Autofill Login details.</string>
-    <string name="managementDisabledModeTitle">Secure your device to use Autofill</string>
+    <string name="managementDisabledModeSubtitle">A device lock pattern, PIN, or biometrics is required to protect your Logins.</string>
+    <string name="managementDisabledModeTitle">Secure your device to save Logins</string>
 
     <string name="saveLoginDialogTitle">Save Login?</string>
     <string name="saveLoginMissingUsernameDialogTitle">Save Password?</string>
@@ -67,7 +65,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Suggested</string>
     <string name="credentialManagementNoLoginsSavedTitle">No Logins saved yet</string>
-    <string name="credentialManagementNoLoginsSavedAutofillDisabledTitle">Enable Autofill to start saving Logins</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Logins are stored securely on this device only.</string>
 
     <string name="autofillManagementAddLogin">Add Login</string>

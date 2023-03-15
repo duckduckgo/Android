@@ -19,8 +19,6 @@
 <resources>
     <string name="autofillManagementScreenTitle">Autouzupełnianie logowania</string>
 
-    <string name="managementLockedModeText">Odblokuj autouzupełnianie</string>
-
     <string name="managementDisabledModeCta"><b>Dostosuj ustawienia</b></string>
     <string name="managementDisabledModeSubtitle">Aby chronić automatycznie uzupełniane dane logowania, korzystaj z blokady urządzenia za pomocą wzoru, kodu PIN lub danych biometrycznych.</string>
     <string name="managementDisabledModeTitle">Zabezpiecz swoje urządzenie, aby korzystać z funkcji autouzupełniania</string>
@@ -67,7 +65,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Sugerowane</string>
     <string name="credentialManagementNoLoginsSavedTitle">Nie zapisano jeszcze żadnych loginów</string>
-    <string name="credentialManagementNoLoginsSavedAutofillDisabledTitle">Włącz funkcję autouzupełniania, aby rozpocząć zapisywanie loginów.</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Loginy są bezpiecznie przechowywane tylko na tym urządzeniu.</string>
 
     <string name="autofillManagementAddLogin">Dodaj login</string>
