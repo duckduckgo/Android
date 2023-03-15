@@ -16,6 +16,8 @@
 
 package com.duckduckgo.remote.messaging.impl.models
 
+import com.duckduckgo.remote.messaging.api.JsonMessageAction
+
 data class JsonRemoteMessagingConfig(
     val version: Long,
     val messages: List<JsonRemoteMessage>,
@@ -61,19 +63,6 @@ data class JsonMatchingAttribute(
     val since: Any? = null,
     val fallback: Boolean? = null,
 )
-
-data class JsonMessageAction(
-    val type: String,
-    val value: String,
-)
-
-sealed class JsonActionType(val jsonValue: String) {
-    object URL : JsonActionType("url")
-    object PLAYSTORE : JsonActionType("playstore")
-    object DEFAULT_BROWSER : JsonActionType("defaultBrowser")
-    object DISMISS : JsonActionType("dismiss")
-    object APP_TP_ONBOARDING : JsonActionType("atpOnboarding")
-}
 
 sealed class JsonMessageType(val jsonValue: String) {
     object SMALL : JsonMessageType("small")
