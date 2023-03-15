@@ -39,6 +39,7 @@ import com.duckduckgo.savedsites.store.Relation
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertNotNull
 import junit.framework.TestCase.assertNull
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -260,6 +261,22 @@ class SavedSitesRepositoryTest {
         repository.update(updatedFavorite)
 
         assertEquals(repository.getFavorite(favoriteone.url), updatedFavorite)
+    }
+
+    @Test
+    fun whenBookmarkFavoriteMovedToAnotherFolderThenBookmarkIsStillFavorite(){
+        val favoriteone = Favorite("favorite1", "Favorite", "http://favexample.com", 0)
+        givenFavoriteStored(favoriteone)
+
+        val folder = repository.insert(BookmarkFolder(id = "folder1", name = "name", parentId = SavedSitesNames.BOOMARKS_ROOT))
+
+        val bookmark = repository.getBookmark(favoriteone.url)
+        assertNotNull(bookmark)
+
+        val updatedBookmark = bookmark!!.copy(parentId = folder.id)
+        repository.update(updatedBookmark)
+
+        assertNotNull(repository.getFavorite(favoriteone.url))
     }
 
     @Test
@@ -790,7 +807,7 @@ class SavedSitesRepositoryTest {
 
         repository.getSavedSites(SavedSitesNames.BOOMARKS_ROOT).test {
             val savedSites = awaitItem()
-            assertTrue(savedSites.bookmarks.size == 10)
+            assertTrue(savedSites.bookmarks.size == 12)
             assertTrue(savedSites.favorites.size == 2)
             cancelAndConsumeRemainingEvents()
         }
@@ -817,7 +834,7 @@ class SavedSitesRepositoryTest {
 
         repository.getSavedSites(SavedSitesNames.BOOMARKS_ROOT).test {
             val savedSites = awaitItem()
-            assertTrue(savedSites.bookmarks.isEmpty())
+            assertTrue(savedSites.bookmarks.size == 2)
             assertTrue(savedSites.favorites.size == 2)
             assertTrue(savedSites.folders.size == 1)
             cancelAndConsumeRemainingEvents()
@@ -859,6 +876,7 @@ class SavedSitesRepositoryTest {
             val entity = Entity(it.id, it.title, it.url, type = BOOKMARK)
             savedSitesEntitiesDao.insert(entity)
             savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.FAVORITES_ROOT, entityId = entity.entityId))
+            savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.BOOMARKS_ROOT, entityId = entity.entityId))
         }
     }
 

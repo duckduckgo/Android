@@ -336,8 +336,13 @@ class RealSavedSitesRepository(
             savedSitesRelationsDao.relationByEntityId(entity.entityId)?.let { relation ->
                 if (relation.folderId != bookmark.parentId) {
                     // bookmark moved to another folder
+                    val isFavorite = getFavorite(bookmark.url) != null
                     savedSitesRelationsDao.deleteRelationByEntity(bookmark.id)
                     savedSitesRelationsDao.insert(Relation(folderId = bookmark.parentId, entityId = relation.entityId))
+                    if (isFavorite) {
+                        // favorite relations must be restored too
+                        savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.FAVORITES_ROOT, entityId = relation.entityId))
+                    }
                 }
                 savedSitesEntitiesDao.update(Entity(relation.entityId, bookmark.title, bookmark.url, BOOKMARK))
             }
