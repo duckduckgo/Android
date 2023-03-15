@@ -260,6 +260,9 @@ dependencies {
     implementation project(':windows-impl')
     implementation project(':windows-store')
 
+    implementation project(':runtime-checks-impl')
+    implementation project(':runtime-checks-store')
+
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
     debugImplementation Square.leakCanary.android
