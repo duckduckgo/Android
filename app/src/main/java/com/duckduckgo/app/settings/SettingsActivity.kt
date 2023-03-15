@@ -125,6 +125,9 @@ class SettingsActivity : DuckDuckGoActivity() {
     private val viewsAutofill
         get() = binding.includeSettings.contentSettingsAutofill
 
+    private val viewsSync
+        get() = binding.includeSettings.contentSettingsSync
+
     private val viewsAppearance
         get() = binding.includeSettings.contentSettingsAppearance
 
@@ -171,6 +174,8 @@ class SettingsActivity : DuckDuckGoActivity() {
         with(viewsAutofill) {
             autofill.setClickListener { viewModel.onAutofillSettingsClick() }
         }
+
+        viewsSync.syncSetting.setClickListener { }
 
         with(viewsAppearance) {
             selectedThemeSetting.setClickListener { viewModel.userRequestedToChangeTheme() }
@@ -255,6 +260,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                         it.appTrackingProtectionEnabled,
                         it.appTrackingProtectionOnboardingShown,
                     )
+                    updateSyncSetting(visible = viewState.showSyncSetting, deviceSyncEnabled = viewState.syncEnabled)
                     updateEmailSubtitle(it.emailAddress)
                     updateAutofill(it.showAutofill)
                     updateWindowsSettings(it.windowsWaitlistState)
@@ -292,6 +298,12 @@ class SettingsActivity : DuckDuckGoActivity() {
     private fun updateEmailSubtitle(emailAddress: String?) {
         val subtitle = emailAddress ?: getString(R.string.settingsEmailProtectionSubtitle)
         viewsMore.emailSetting.setSecondaryText(subtitle)
+    }
+
+    private fun updateSyncSetting(visible: Boolean, deviceSyncEnabled: Boolean) {
+        viewsSync.settingsSectionSync.isVisible = visible
+        val deviceSyncStatus = if (deviceSyncEnabled) R.string.syncSettingsEnabled else R.string.syncSettingsDisabled
+        viewsSync.syncSetting.setSecondaryText(getString(deviceSyncStatus))
     }
 
     private fun setGlobalPrivacyControlSetting(enabled: Boolean) {

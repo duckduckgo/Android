@@ -36,6 +36,12 @@
             android:layout_marginTop="@dimen/keyline_4" />
 
         <include
+            android:id="@+id/contentSettingsSync"
+            layout="@layout/content_settings_sync"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <include
             android:id="@+id/contentSettingsAutofill"
             layout="@layout/content_settings_autofill"
             android:layout_width="match_parent"
