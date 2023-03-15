@@ -432,6 +432,7 @@
     <!-- Onboarding DDG Feature Options -->
     <string name="onboardingFeatureOptionsTitle">Какво Ви води при DuckDuckGo?</string>
     <string name="onboardingFeatureOptionsContinue">Продължи</string>
+    <string name="onboardingFeatureOptionsSkip">Пропускане на тази стъпка</string>
     <!-- smartling.character_limit = 28 -->
     <string name="onboardingFeatureOptionPrivateSearch">Поверително търсене</string>
     <!-- smartling.character_limit = 28 -->
