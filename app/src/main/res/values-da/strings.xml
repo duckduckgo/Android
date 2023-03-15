@@ -646,13 +646,13 @@
 
     <!-- Autoconsent -->
     <!-- smartling.character_limit = 82 -->
-    <string name="autoconsentDialogTitle">Det ser ud til, at dette websted har et pop op-vindue med cookies-samtykke👇</string>
+    <string name="autoconsentDialogTitle"><![CDATA[<b>Skal jeg håndtere cookie pop op-vinduer?</b>]]></string>
     <!-- smartling.character_limit = 160 -->
-    <string name="autoconsentDialogDescription">Skal jeg tage mig af dem for dig? Jeg kan forsøge at minimere cookies, maksimere privatlivets fred og skjule pop op-vinduer som disse.</string>
+    <string name="autoconsentDialogDescription">Jeg kan forsøge at vælge de mest private indstillinger og skjule pop op-vinduer som disse.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Administrer cookie pop op-vinduer</string>
+    <string name="autoconsentPrimaryCta">Håndter pop op-vinduer for mig</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentSecondaryCta">Nej tak.</string>
+    <string name="autoconsentSecondaryCta">Nej, jeg klarer dem selv</string>
 
     <string name="autoconsentSetting">Administrer cookie pop op-vinduer</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Pop op-vindue skjult</string>
