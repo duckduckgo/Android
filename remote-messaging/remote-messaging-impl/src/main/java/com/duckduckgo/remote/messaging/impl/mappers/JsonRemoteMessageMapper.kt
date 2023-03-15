@@ -38,14 +38,14 @@ import com.duckduckgo.remote.messaging.impl.models.asJsonFormat
 import java.util.Locale
 import timber.log.Timber
 
-private val smallMapper: (JsonContent) -> Content = { jsonContent ->
+private val smallMapper: (JsonContent, List<ActionMapper>) -> Content = { jsonContent, actionMappers ->
     Small(
         titleText = jsonContent.titleText.failIfEmpty(),
         descriptionText = jsonContent.descriptionText.failIfEmpty(),
     )
 }
 
-private val mediumMapper: (JsonContent) -> Content = { jsonContent ->
+private val mediumMapper: (JsonContent, List<ActionMapper>) -> Content = { jsonContent, actionMappers ->
     Medium(
         titleText = jsonContent.titleText.failIfEmpty(),
         descriptionText = jsonContent.descriptionText.failIfEmpty(),
@@ -53,25 +53,25 @@ private val mediumMapper: (JsonContent) -> Content = { jsonContent ->
     )
 }
 
-private val bigMessageSingleActionMapper: (JsonContent) -> Content = { jsonContent ->
+private val bigMessageSingleActionMapper: (JsonContent, List<ActionMapper>) -> Content = { jsonContent, actionMappers ->
     BigSingleAction(
         titleText = jsonContent.titleText.failIfEmpty(),
         descriptionText = jsonContent.descriptionText.failIfEmpty(),
         placeholder = jsonContent.placeholder.asPlaceholder(),
         primaryActionText = jsonContent.primaryActionText.failIfEmpty(),
-        primaryAction = jsonContent.primaryAction!!.toAction(),
+        primaryAction = jsonContent.primaryAction!!.toAction(actionMappers),
     )
 }
 
-private val bigMessageTwoActionMapper: (JsonContent) -> Content = { jsonContent ->
+private val bigMessageTwoActionMapper: (JsonContent, List<ActionMapper>) -> Content = { jsonContent, actionMappers ->
     BigTwoActions(
         titleText = jsonContent.titleText.failIfEmpty(),
         descriptionText = jsonContent.descriptionText.failIfEmpty(),
         placeholder = jsonContent.placeholder.asPlaceholder(),
         primaryActionText = jsonContent.primaryActionText.failIfEmpty(),
-        primaryAction = jsonContent.primaryAction!!.toAction(),
+        primaryAction = jsonContent.primaryAction!!.toAction(actionMappers),
         secondaryActionText = jsonContent.secondaryActionText.failIfEmpty(),
-        secondaryAction = jsonContent.secondaryAction!!.toAction(),
+        secondaryAction = jsonContent.secondaryAction!!.toAction(actionMappers),
     )
 }
 
@@ -83,42 +83,19 @@ private val messageMappers = mapOf(
     Pair(BIG_TWO_ACTION.jsonValue, bigMessageTwoActionMapper),
 )
 
-private val urlActionMapper: (JsonMessageAction) -> Action = {
-    Action.Url(it.value)
-}
+fun List<JsonRemoteMessage>.mapToRemoteMessage(
+    locale: Locale,
+    actionMappers: List<ActionMapper>
+): List<RemoteMessage> = this.mapNotNull { it.map(locale, actionMappers) }
 
-private val dismissActionMapper: (JsonMessageAction) -> Action = {
-    Action.Dismiss()
-}
-
-private val playStoreActionMapper: (JsonMessageAction) -> Action = {
-    Action.PlayStore(it.value)
-}
-
-private val defaultBrowserActionMapper: (JsonMessageAction) -> Action = {
-    Action.DefaultBrowser()
-}
-
-private val appTpOnboardingActionMapper: (JsonMessageAction) -> Action = {
-    Action.AppTpOnboarding()
-}
-
-// plugin point?
-private val actionMappers = mapOf(
-    Pair(URL.jsonValue, urlActionMapper),
-    Pair(DISMISS.jsonValue, dismissActionMapper),
-    Pair(PLAYSTORE.jsonValue, playStoreActionMapper),
-    Pair(DEFAULT_BROWSER.jsonValue, defaultBrowserActionMapper),
-    Pair(APP_TP_ONBOARDING.jsonValue, appTpOnboardingActionMapper),
-)
-
-fun List<JsonRemoteMessage>.mapToRemoteMessage(locale: Locale): List<RemoteMessage> = this.mapNotNull { it.map(locale) }
-
-private fun JsonRemoteMessage.map(locale: Locale): RemoteMessage? {
+private fun JsonRemoteMessage.map(
+    locale: Locale,
+    actionMappers: List<ActionMapper>
+): RemoteMessage? {
     return runCatching {
         val remoteMessage = RemoteMessage(
             id = this.id.failIfEmpty(),
-            content = this.content!!.mapToContent(this.content.messageType),
+            content = this.content!!.mapToContent(this.content.messageType, actionMappers),
             matchingRules = this.matchingRules.orEmpty(),
             exclusionRules = this.exclusionRules.orEmpty(),
         )
@@ -140,12 +117,20 @@ private fun RemoteMessage.localizeMessage(translations: Map<String, JsonContentT
     }
 }
 
-private fun JsonContent.mapToContent(messageType: String): Content {
-    return messageMappers[messageType]?.invoke(this) ?: throw IllegalArgumentException("Message type not found")
+private fun JsonContent.mapToContent(
+    messageType: String,
+    actionMappers: List<ActionMapper>
+): Content {
+    return messageMappers[messageType]?.invoke(this, actionMappers) ?: throw IllegalArgumentException("Message type not found")
 }
 
-private fun JsonMessageAction.toAction(): Action {
-    return actionMappers[this.type]?.invoke(this) ?: throw IllegalArgumentException("Unknown Action Type")
+private fun JsonMessageAction.toAction(actionMappers: List<ActionMapper>): Action {
+    actionMappers.forEach {
+        val result = it.mapper.invoke(this)
+        if (result != null) return result
+    }
+
+    throw IllegalArgumentException("Unknown Action Type")
 }
 
 private fun String.failIfEmpty() = this.ifEmpty { throw IllegalStateException("Empty argument") }

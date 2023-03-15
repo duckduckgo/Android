@@ -45,7 +45,7 @@ class JsonRemoteMessageMapperTest(private val testCase: TestCase) {
 
     @Test
     fun whenJsonMessageThenReturnMessage() {
-        val remoteMessages = testCase.jsonRemoteMessages.mapToRemoteMessage(Locale.FRANCE)
+        val remoteMessages = testCase.jsonRemoteMessages.mapToRemoteMessage(Locale.FRANCE, actionMappers)
 
         assertEquals(testCase.expectedMessages, remoteMessages)
     }
