@@ -111,41 +111,35 @@ class BookmarksViewModel @Inject constructor(
     fun onEditSavedSiteRequested(savedSite: SavedSite) {
         command.value = ShowEditSavedSite(savedSite)
     }
-
     fun onDeleteSavedSiteRequested(savedSite: SavedSite) {
+        if (savedSite is Favorite){
+            command.value = ConfirmDeleteSavedSite(savedSite)
+        } else {
+            viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
+                val favourite = savedSitesRepository.getFavorite(savedSite.url)
+                withContext(dispatcherProvider.main()) {
+                    if (favourite != null){
+                        // bookmark was also a favourite, so we return that one instead
+                        command.value = ConfirmDeleteSavedSite(favourite)
+                    } else {
+                        command.value = ConfirmDeleteSavedSite(savedSite)
+                    }
+                }
+            }
+        }
         delete(savedSite)
-        command.value = ConfirmDeleteSavedSite(savedSite)
     }
 
     private fun delete(savedSite: SavedSite) {
-        when (savedSite) {
-            is Bookmark -> {
-                viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
-                    faviconManager.deletePersistedFavicon(savedSite.url)
-                    savedSitesRepository.delete(savedSite)
-                }
-            }
-            is Favorite -> {
-                viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
-                    faviconManager.deletePersistedFavicon(savedSite.url)
-                    savedSitesRepository.delete(savedSite)
-                }
-            }
+        viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
+            faviconManager.deletePersistedFavicon(savedSite.url)
+            savedSitesRepository.delete(savedSite)
         }
     }
 
     fun insert(savedSite: SavedSite) {
-        when (savedSite) {
-            is Bookmark -> {
-                viewModelScope.launch(dispatcherProvider.io()) {
-                    savedSitesRepository.insert(savedSite)
-                }
-            }
-            is Favorite -> {
-                viewModelScope.launch(dispatcherProvider.io()) {
-                    savedSitesRepository.insert(savedSite)
-                }
-            }
+        viewModelScope.launch(dispatcherProvider.io()) {
+            savedSitesRepository.insert(savedSite)
         }
     }
 
@@ -177,10 +171,6 @@ class BookmarksViewModel @Inject constructor(
         withContext(dispatcherProvider.io()) {
             savedSitesRepository.update(favorite)
         }
-    }
-
-    private fun onFavoritesChanged(favorites: List<Favorite>) {
-        viewState.value = viewState.value?.copy(favorites = favorites)
     }
 
     fun onBookmarkFolderSelected(bookmarkFolder: BookmarkFolder) {
