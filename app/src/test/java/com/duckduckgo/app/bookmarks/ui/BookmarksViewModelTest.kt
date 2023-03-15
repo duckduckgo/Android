@@ -27,14 +27,13 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
+import com.duckduckgo.savedsites.api.models.BookmarkFolderItem
 import com.duckduckgo.savedsites.api.models.FolderBranch
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSites
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.api.service.SavedSitesManager
-import com.duckduckgo.savedsites.store.Entity
-import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -76,7 +75,7 @@ class BookmarksViewModelTest {
     private val bookmark = SavedSite.Bookmark(id = "bookmark1", title = "title", url = "www.example.com", parentId = SavedSitesNames.BOOMARKS_ROOT)
     private val favorite = SavedSite.Favorite(id = "favorite1", title = "title", url = "www.example.com", position = 0)
     private val bookmarkFolder = BookmarkFolder(id = "folder1", name = "folder", parentId = SavedSitesNames.BOOMARKS_ROOT)
-    private val bookmarkEntity = Entity(entityId = bookmark.id, title = bookmark.title, url = bookmark.url, type = BOOKMARK)
+    private val bookmarkFolderItem = BookmarkFolderItem(0, bookmarkFolder, true)
 
     private val testee: BookmarksViewModel by lazy {
         val model = BookmarksViewModel(
@@ -222,6 +221,30 @@ class BookmarksViewModelTest {
         assertEquals(listOf(favorite), viewStateCaptor.allValues[1].favorites)
         assertEquals(listOf(bookmark), viewStateCaptor.allValues[1].bookmarks)
         assertEquals(listOf(bookmarkFolder, bookmarkFolder, bookmarkFolder), viewStateCaptor.allValues[1].bookmarkFolders)
+        assertEquals(true, viewStateCaptor.allValues[1].enableSearch)
+    }
+
+    @Test
+    fun whenFetchEverythingThenUpdateStateWithData() = runTest {
+        whenever(savedSitesRepository.getFavoritesSync()).thenReturn(listOf(favorite))
+        whenever(savedSitesRepository.getBookmarksTree()).thenReturn(listOf(bookmark, bookmark, bookmark))
+        whenever(savedSitesRepository.getFolderTree(SavedSitesNames.BOOMARKS_ROOT, null)).thenReturn(listOf(bookmarkFolderItem, bookmarkFolderItem))
+
+        testee.fetchAllBookmarksAndFolders()
+
+        verify(savedSitesRepository).getFavoritesSync()
+        verify(savedSitesRepository).getBookmarksTree()
+        verify(savedSitesRepository).getFolderTree(SavedSitesNames.BOOMARKS_ROOT, null)
+
+        verify(viewStateObserver, times(2)).onChanged(viewStateCaptor.capture())
+
+        assertEquals(emptyList<BookmarkEntity>(), viewStateCaptor.allValues[0].bookmarks)
+        assertEquals(emptyList<BookmarkFolder>(), viewStateCaptor.allValues[0].bookmarkFolders)
+        assertEquals(false, viewStateCaptor.allValues[0].enableSearch)
+
+        assertEquals(listOf(favorite), viewStateCaptor.allValues[1].favorites)
+        assertEquals(listOf(bookmark, bookmark, bookmark), viewStateCaptor.allValues[1].bookmarks)
+        assertEquals(listOf(bookmarkFolder, bookmarkFolder), viewStateCaptor.allValues[1].bookmarkFolders)
         assertEquals(true, viewStateCaptor.allValues[1].enableSearch)
     }
 

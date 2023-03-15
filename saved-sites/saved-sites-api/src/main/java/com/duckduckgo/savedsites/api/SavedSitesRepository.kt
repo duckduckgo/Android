@@ -65,6 +65,12 @@ interface SavedSitesRepository {
     ): List<BookmarkFolderItem>
 
     /**
+     * Returns complete list of all [Bookmark] This method traverses all folders.
+     * @return [List] of all [Bookmark]
+     */
+    fun getBookmarksTree(): List<Bookmark>
+
+    /**
      * Inserts all [Bookmark] and [BookmarkFolder] in a folder.
      * Used when Undoing [deleteFolderBranch]
      * @param branchToInsert the [FolderBranch] previously deleted

@@ -822,6 +822,24 @@ class SavedSitesRepositoryTest {
         }
     }
 
+    @Test
+    fun whenUserHasBookmarksThenBookmarksTreeReturnsSavedSites() = runTest {
+        val rootFolder = BookmarkFolder(id = SavedSitesNames.BOOMARKS_ROOT, name = "root", parentId = "")
+        repository.insert(rootFolder)
+
+        val parentFolder = BookmarkFolder(id = "folder1", name = "name", parentId = SavedSitesNames.BOOMARKS_ROOT)
+        repository.insert(parentFolder)
+
+        val totalBookmarks = 10
+        val totalFolders = 3
+        givenFolderWithEntities(parentFolder.id, totalBookmarks, totalFolders)
+
+        val bookmarks = repository.getBookmarksTree()
+
+        assertTrue(bookmarks.size == 10)
+        assertTrue(bookmarks[0].parentId == parentFolder.id)
+    }
+
     private fun givenNoFavoritesStored() {
         Assert.assertFalse(repository.hasFavorites())
     }

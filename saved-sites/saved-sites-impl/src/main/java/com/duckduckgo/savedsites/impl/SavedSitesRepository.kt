@@ -113,6 +113,18 @@ class RealSavedSitesRepository(
         }
     }
 
+    override fun getBookmarksTree(): List<Bookmark> {
+        val bookmarks = mutableListOf<Bookmark>()
+        val bookmarkEntities = savedSitesEntitiesDao.entitiesByTypeSync(BOOKMARK)
+        bookmarkEntities.forEach {
+            val relation = savedSitesRelationsDao.relationByEntityId(it.entityId)
+            if (relation != null) {
+                bookmarks.add(it.mapToBookmark(relation.folderId))
+            }
+        }
+        return bookmarks
+    }
+
     private fun traverseFolderWithDepth(
         depth: Int = 0,
         folders: MutableList<BookmarkFolderItem>,

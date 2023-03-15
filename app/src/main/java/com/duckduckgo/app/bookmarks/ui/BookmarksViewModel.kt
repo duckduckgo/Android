@@ -35,6 +35,7 @@ import com.duckduckgo.savedsites.api.models.FolderBranch
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.api.service.ExportSavedSitesResult
 import com.duckduckgo.savedsites.api.service.ImportSavedSitesResult
 import com.duckduckgo.savedsites.api.service.SavedSitesManager
@@ -112,13 +113,13 @@ class BookmarksViewModel @Inject constructor(
         command.value = ShowEditSavedSite(savedSite)
     }
     fun onDeleteSavedSiteRequested(savedSite: SavedSite) {
-        if (savedSite is Favorite){
+        if (savedSite is Favorite) {
             command.value = ConfirmDeleteSavedSite(savedSite)
         } else {
             viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
                 val favourite = savedSitesRepository.getFavorite(savedSite.url)
                 withContext(dispatcherProvider.main()) {
-                    if (favourite != null){
+                    if (favourite != null) {
                         // bookmark was also a favourite, so we return that one instead
                         command.value = ConfirmDeleteSavedSite(favourite)
                     } else {
@@ -181,6 +182,17 @@ class BookmarksViewModel @Inject constructor(
         viewModelScope.launch {
             savedSitesRepository.getSavedSites(parentId).collect {
                 onSavedSitesItemsChanged(it.favorites, it.bookmarks, it.folders)
+            }
+        }
+    }
+
+    fun fetchAllBookmarksAndFolders() {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            val favorites = savedSitesRepository.getFavoritesSync()
+            val folders = savedSitesRepository.getFolderTree(SavedSitesNames.BOOMARKS_ROOT, null).map { it.bookmarkFolder }
+            val bookmarks = savedSitesRepository.getBookmarksTree()
+            withContext(dispatcherProvider.main()) {
+                onSavedSitesItemsChanged(favorites, bookmarks, folders)
             }
         }
     }

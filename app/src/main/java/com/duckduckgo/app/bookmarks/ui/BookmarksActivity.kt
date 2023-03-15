@@ -303,7 +303,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
 
     private fun showSearchBar() {
         toolbar.gone()
-        viewModel.fetchBookmarksAndFolders(SavedSitesNames.BOOMARKS_ROOT)
+        viewModel.fetchAllBookmarksAndFolders()
         searchBar.handle(SearchBar.Event.ShowSearchBar)
     }
 
