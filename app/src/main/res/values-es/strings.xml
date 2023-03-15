@@ -646,13 +646,13 @@
 
     <!-- Autoconsent -->
     <!-- smartling.character_limit = 82 -->
-    <string name="autoconsentDialogTitle">Parece que este sitio tiene una ventana emergente de consentimiento para cookies</string>
+    <string name="autoconsentDialogTitle"><![CDATA[<b>¿Quieres que me encargue de las cookies emergentes?</b>]]></string>
     <!-- smartling.character_limit = 160 -->
-    <string name="autoconsentDialogDescription">¿Quieres que me encargue de ella por ti? Puedo intentar minimizar las cookies, maximizar la privacidad y ocultar ventanas emergentes como estas.</string>
+    <string name="autoconsentDialogDescription">Puedo intentar seleccionar la configuración más privada disponible y ocultar ventanas emergentes como estas.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Administrar ventanas emergentes de cookies</string>
+    <string name="autoconsentPrimaryCta">Gestionar ventanas emergentes por mí</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentSecondaryCta">No, gracias</string>
+    <string name="autoconsentSecondaryCta">No, las gestionaré yo</string>
 
     <string name="autoconsentSetting">Administrar ventanas emergentes de cookies</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Ventana emergente oculta</string>
