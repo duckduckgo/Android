@@ -60,6 +60,7 @@ import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
+import com.duckduckgo.app.browser.autofill.AutofillFireproofDialogSuppressor
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
@@ -391,6 +392,8 @@ class BrowserTabViewModelTest {
 
     private val autofillCapabilityChecker: FakeCapabilityChecker = FakeCapabilityChecker(enabled = false)
 
+    private val autofillFireproofDialogSuppressor: AutofillFireproofDialogSuppressor = mock()
+
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
@@ -498,6 +501,7 @@ class BrowserTabViewModelTest {
             adClickManager = mockAdClickManager,
             sitePermissionsManager = mockSitePermissionsManager,
             autofillCapabilityChecker = autofillCapabilityChecker,
+            autofillFireproofDialogSuppressor = autofillFireproofDialogSuppressor,
         )
 
         testee.loadData("abc", null, false, false)

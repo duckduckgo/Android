@@ -56,6 +56,7 @@ class AutofillCredentialsSelectionResultHandlerTest {
     private val autofillStore: AutofillStore = mock()
     private val pixel: Pixel = mock()
     private val dummyFragment = Fragment()
+    private val autofillDialogSuppressor: AutofillFireproofDialogSuppressor = mock()
     private lateinit var deviceAuthenticator: FakeAuthenticator
     private lateinit var testee: AutofillCredentialsSelectionResultHandler
 
@@ -217,6 +218,20 @@ class AutofillCredentialsSelectionResultHandlerTest {
         verifyAuthenticatorNeverCalled()
     }
 
+    @Test
+    fun whenSaveOrUpdateDialogDismissedThenAutofillDialogSuppressorCalled() = runTest {
+        setupAuthenticatorAlwaysAuth()
+        testee.processSaveOrUpdatePromptDismissed()
+        verify(autofillDialogSuppressor).autofillSaveOrUpdateDialogVisibilityChanged(visible = false)
+    }
+
+    @Test
+    fun whenSaveOrUpdateDialogShownThenAutofillDialogSuppressorCalled() = runTest {
+        setupAuthenticatorAlwaysAuth()
+        testee.processSaveOrUpdatePromptShown()
+        verify(autofillDialogSuppressor).autofillSaveOrUpdateDialogVisibilityChanged(visible = true)
+    }
+
     private suspend fun verifySaveNeverCalled() {
         verify(credentialsSaver, never()).saveCredentials(any(), any())
     }
@@ -307,6 +322,7 @@ class AutofillCredentialsSelectionResultHandlerTest {
             autofillStore = autofillStore,
             appCoroutineScope = this,
             pixel = pixel,
+            autofillDialogSuppressor = autofillDialogSuppressor,
         )
     }
 

@@ -29,7 +29,7 @@ interface CredentialAutofillPickerDialog {
 
     companion object {
 
-        fun resultKey(tabId: String) = "$tabId/CredentialAutofillPickerDialogResult"
+        fun resultKey(tabId: String) = "${prefix(tabId, TAG)}/Result"
 
         const val TAG = "CredentialAutofillPickerDialog"
         const val KEY_CANCELLED = "cancelled"
@@ -46,8 +46,9 @@ interface CredentialAutofillPickerDialog {
 interface CredentialSavePickerDialog {
 
     companion object {
-        fun resultKeyUserChoseToSaveCredentials(tabId: String) = "$tabId/CredentialSavePickerDialogResultSave"
-        fun resultKeyShouldPromptToDisableAutofill(tabId: String) = "$tabId/CredentialSavePickerDialogResultShouldPromptToDisableAutofill"
+        fun resultKeyUserChoseToSaveCredentials(tabId: String) = "${prefix(tabId, TAG)}/UserChoseToSave"
+        fun resultKeyShouldPromptToDisableAutofill(tabId: String) = "${prefix(tabId, TAG)}/ShouldPromptToDisableAutofill"
+        fun resultKeyPromptDismissed(tabId: String) = "${prefix(tabId, TAG)}/UserDismissedPrompt"
 
         const val TAG = "CredentialSavePickerDialog"
         const val KEY_URL = "url"
@@ -72,7 +73,8 @@ interface CredentialUpdateExistingCredentialsDialog {
     }
 
     companion object {
-        fun resultKey(tabId: String) = "$tabId/CredentialUpdateExistingCredentialsResult"
+        fun resultKeyCredentialUpdated(tabId: String) = "${prefix(tabId, TAG)}/UserChoseToUpdate"
+        fun resultKeyPromptDismissed(tabId: String) = "${prefix(tabId, TAG)}/UserDismissedPrompt"
 
         const val TAG = "CredentialUpdateExistingCredentialsDialog"
         const val KEY_URL = "url"
@@ -111,4 +113,11 @@ interface CredentialAutofillDialogFactory {
         credentials: LoginCredentials,
         tabId: String,
     ): DialogFragment
+}
+
+private fun prefix(
+    tabId: String,
+    tag: String,
+): String {
+    return "$tabId/$tag"
 }

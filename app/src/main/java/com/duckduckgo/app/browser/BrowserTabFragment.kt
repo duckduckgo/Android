@@ -1867,7 +1867,15 @@ class BrowserTabFragment :
             }
         }
 
-        setFragmentResultListener(CredentialUpdateExistingCredentialsDialog.resultKey(tabId)) { _, result ->
+        setFragmentResultListener(CredentialSavePickerDialog.resultKeyPromptDismissed(tabId)) { _, _ ->
+            autofillCredentialsSelectionResultHandler.processSaveOrUpdatePromptDismissed()
+        }
+
+        setFragmentResultListener(CredentialUpdateExistingCredentialsDialog.resultKeyPromptDismissed(tabId)) { _, _ ->
+            autofillCredentialsSelectionResultHandler.processSaveOrUpdatePromptDismissed()
+        }
+
+        setFragmentResultListener(CredentialUpdateExistingCredentialsDialog.resultKeyCredentialUpdated(tabId)) { _, result ->
             launch {
                 autofillCredentialsSelectionResultHandler.processUpdateCredentialsResult(result, viewModel)?.let {
                     viewModel.onShowUserCredentialsUpdated(it)
@@ -1919,6 +1927,8 @@ class BrowserTabFragment :
         val url = webView?.url ?: return
         if (url != currentUrl) return
 
+        autofillCredentialsSelectionResultHandler.processSaveOrUpdatePromptShown()
+
         val dialog = credentialAutofillDialogFactory.autofillSavingCredentialsDialog(url, credentials, tabId)
         showDialogHidingPrevious(dialog, CredentialSavePickerDialog.TAG)
     }
@@ -1930,6 +1940,8 @@ class BrowserTabFragment :
         val url = webView?.url ?: return
         if (url != currentUrl) return
 
+        autofillCredentialsSelectionResultHandler.processSaveOrUpdatePromptShown()
+
         val dialog = credentialAutofillDialogFactory.autofillSavingUpdatePasswordDialog(url, credentials, tabId)
         showDialogHidingPrevious(dialog, CredentialUpdateExistingCredentialsDialog.TAG)
     }
@@ -1940,6 +1952,8 @@ class BrowserTabFragment :
     ) {
         val url = webView?.url ?: return
         if (url != currentUrl) return
+
+        autofillCredentialsSelectionResultHandler.processSaveOrUpdatePromptShown()
 
         val dialog = credentialAutofillDialogFactory.autofillSavingUpdateUsernameDialog(url, credentials, tabId)
         showDialogHidingPrevious(dialog, CredentialUpdateExistingCredentialsDialog.TAG)
