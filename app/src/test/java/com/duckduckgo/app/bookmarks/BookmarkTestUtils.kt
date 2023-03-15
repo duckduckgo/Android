@@ -30,7 +30,7 @@ object BookmarkTestUtils {
         val entities = mutableListOf<Entity>()
         for (index in 1..total) {
             entities.add(
-                Entity(UUID.randomUUID().toString(), "entity$index", "https://testUrl$index", BOOKMARK),
+                Entity(title = "entity$index", url = "https://testUrl$index", type = BOOKMARK),
             )
         }
         return entities
@@ -42,11 +42,12 @@ object BookmarkTestUtils {
         val entities = mutableListOf<Entity>()
         for (index in 1..total) {
             entities.add(
-                Entity(UUID.randomUUID().toString(), "entity$index", "https://testUrl$index", FOLDER),
+                Entity(title = "folder$index", url = "https://testUrl$index", type = FOLDER),
             )
         }
         return entities
     }
+
     fun givenFolderWithContent(
         folderId: String,
         entities: List<Entity>,

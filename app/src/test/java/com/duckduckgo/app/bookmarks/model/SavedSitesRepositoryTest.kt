@@ -750,7 +750,7 @@ class SavedSitesRepositoryTest {
         val rootFolder = BookmarkFolder(id = SavedSitesNames.BOOMARKS_ROOT, name = "root", parentId = "")
         repository.insert(rootFolder)
 
-        val parentFolder = BookmarkFolder(id = "folder1", name = "name", parentId = SavedSitesNames.BOOMARKS_ROOT)
+        val parentFolder = BookmarkFolder(name = "name", parentId = SavedSitesNames.BOOMARKS_ROOT)
         repository.insert(parentFolder)
 
         givenFolderWithEntities(parentFolder.id, totalBookmarks, totalFolders)
@@ -758,9 +758,19 @@ class SavedSitesRepositoryTest {
         repository.getFolderContent(parentFolder.id).test {
             val result = awaitItem()
 
-            val parentFolder = result.second.first()
-            assert(parentFolder.numBookmarks == 10)
-            assert(parentFolder.numFolders == 3)
+            assert(result.first.size == 10)
+            assert(result.second.size == 3)
+
+            cancelAndConsumeRemainingEvents()
+        }
+
+        repository.getFolderContent(SavedSitesNames.BOOMARKS_ROOT).test {
+            val result = awaitItem()
+
+            val folder = result.second.first()
+
+            assert(folder.numBookmarks == 10)
+            assert(folder.numFolders == 3)
 
             cancelAndConsumeRemainingEvents()
         }
