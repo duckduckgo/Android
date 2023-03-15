@@ -16,7 +16,15 @@
 
 package com.duckduckgo.sync.api
 
+/** Public interface for Device Sync State */
 interface DeviceSyncState {
+    /**
+     * Checks if feature should be visible to users.
+     */
     fun isFeatureEnabled(): Boolean
+
+    /**
+     * Checks if user is signed in on this device.
+     */
     fun isDeviceSyncEnabled(): Boolean
 }
