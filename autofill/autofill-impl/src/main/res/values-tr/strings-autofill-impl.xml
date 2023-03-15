@@ -19,8 +19,6 @@
 <resources>
     <string name="autofillManagementScreenTitle">Girişleri Otomatik Doldur</string>
 
-    <string name="managementLockedModeText">Otomatik Doldurmayı Aç</string>
-
     <string name="managementDisabledModeCta"><b>Ayarlarda Ayarlama</b></string>
     <string name="managementDisabledModeSubtitle">Otomatik Doldurulan Giriş bilgilerinizin güvenliğini sağlamak için bir cihaz kilidi deseni, PIN veya biyometrik veri gereklidir.</string>
     <string name="managementDisabledModeTitle">Cihazınızı Otomatik Doldurma özelliğini kullanmak için güvenli hâle getirin</string>
@@ -67,7 +65,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Önerilen</string>
     <string name="credentialManagementNoLoginsSavedTitle">Henüz kaydedilmiş Giriş yok</string>
-    <string name="credentialManagementNoLoginsSavedAutofillDisabledTitle">Girişleri kaydetmeye başlamak için Otomatik Doldurmayı etkinleştirin</string>
     <string name="credentialManagementNoLoginsSavedSubtitle">Girişler yalnızca bu cihazda güvenli bir şekilde saklanır.</string>
 
     <string name="autofillManagementAddLogin">Giriş Ekle</string>
