@@ -48,7 +48,7 @@ import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import com.duckduckgo.sync.api.DeviceSyncRepository
+import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.windows.api.WindowsWaitlist
 import com.duckduckgo.windows.api.WindowsWaitlistFeature
 import com.duckduckgo.windows.api.WindowsWaitlistState
@@ -125,7 +125,7 @@ class SettingsViewModelTest {
     private lateinit var windowsFeatureToggle: Toggle
 
     @Mock
-    private lateinit var deviceSyncRepository: DeviceSyncRepository
+    private lateinit var deviceSyncState: DeviceSyncState
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
@@ -165,7 +165,7 @@ class SettingsViewModelTest {
             autoconsent,
             windowsWaitlist,
             windowsFeature,
-            deviceSyncRepository,
+            deviceSyncState,
         )
 
         runTest {
@@ -785,7 +785,7 @@ class SettingsViewModelTest {
 
     @Test
     fun whenSyncFeatureDisabledThenViewStateIsCorrect() = runTest {
-        whenever(deviceSyncRepository.isFeatureEnabled()).thenReturn(false)
+        whenever(deviceSyncState.isFeatureEnabled()).thenReturn(false)
         testee.start()
 
         testee.viewState().test {
@@ -796,8 +796,8 @@ class SettingsViewModelTest {
 
     @Test
     fun whenSyncFeatureEnabledAndDeviceSyncEnabledThenSettingVisibleAndStateEnabled() = runTest {
-        whenever(deviceSyncRepository.isFeatureEnabled()).thenReturn(true)
-        whenever(deviceSyncRepository.isDeviceSyncEnabled()).thenReturn(true)
+        whenever(deviceSyncState.isFeatureEnabled()).thenReturn(true)
+        whenever(deviceSyncState.isDeviceSyncEnabled()).thenReturn(true)
         testee.start()
 
         testee.viewState().test {

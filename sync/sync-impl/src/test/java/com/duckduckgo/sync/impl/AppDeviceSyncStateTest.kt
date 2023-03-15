@@ -25,7 +25,7 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-internal class AppDeviceSyncRepositoryTest {
+internal class AppDeviceSyncStateTest {
 
     private val appBuildConfig: AppBuildConfig = mock()
     private val syncFeature: SyncFeature = mock()
@@ -34,24 +34,24 @@ internal class AppDeviceSyncRepositoryTest {
     @Test
     fun whenUserSignedInThenDeviceSyncEnabled() {
         whenever(syncRepository.isSignedIn()).thenReturn(true)
-        val appDeviceSyncRepository = AppDeviceSyncRepository(appBuildConfig, syncFeature, syncRepository)
-        assertTrue(appDeviceSyncRepository.isDeviceSyncEnabled())
+        val appDeviceSyncState = AppDeviceSyncState(appBuildConfig, syncFeature, syncRepository)
+        assertTrue(appDeviceSyncState.isDeviceSyncEnabled())
     }
 
     @Test
     fun whenInternalBuildThenFeatureEnabled() {
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
         givenFeatureFlag(enabled = false)
-        val appDeviceSyncRepository = AppDeviceSyncRepository(appBuildConfig, syncFeature, syncRepository)
-        assertTrue(appDeviceSyncRepository.isFeatureEnabled())
+        val appDeviceSyncState = AppDeviceSyncState(appBuildConfig, syncFeature, syncRepository)
+        assertTrue(appDeviceSyncState.isFeatureEnabled())
     }
 
     @Test
     fun whenFeatureFlagEnabledThenFeatureEnabled() {
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
         givenFeatureFlag(enabled = true)
-        val appDeviceSyncRepository = AppDeviceSyncRepository(appBuildConfig, syncFeature, syncRepository)
-        assertTrue(appDeviceSyncRepository.isFeatureEnabled())
+        val appDeviceSyncState = AppDeviceSyncState(appBuildConfig, syncFeature, syncRepository)
+        assertTrue(appDeviceSyncState.isFeatureEnabled())
     }
 
     private fun givenFeatureFlag(enabled: Boolean) {

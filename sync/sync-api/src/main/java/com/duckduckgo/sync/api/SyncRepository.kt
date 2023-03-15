@@ -16,7 +16,7 @@
 
 package com.duckduckgo.sync.api
 
-interface DeviceSyncRepository {
+interface DeviceSyncState {
     fun isFeatureEnabled(): Boolean
     fun isDeviceSyncEnabled(): Boolean
 }

@@ -14,21 +14,30 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.sync
+package com.duckduckgo.sync.impl
 
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.api.DeviceSyncRepository
+import com.duckduckgo.sync.api.DeviceSyncState
+import com.duckduckgo.sync.api.SyncFeature
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.*
 
-/**
- * We need to provide this fake implementation for non internal builds until we can add sync modules dependencies for all flavors.
- */
 @ContributesBinding(
     scope = AppScope::class,
-    priority = ContributesBinding.Priority.NORMAL,
+    boundType = DeviceSyncState::class,
+    priority = ContributesBinding.Priority.HIGHEST,
 )
-class FakeDeviceSyncRepository @Inject constructor() : DeviceSyncRepository {
-    override fun isFeatureEnabled(): Boolean = false
-    override fun isDeviceSyncEnabled(): Boolean = false
+class AppDeviceSyncState @Inject constructor(
+    private val appBuildConfig: AppBuildConfig,
+    private val syncFeature: SyncFeature,
+    private val syncRepository: SyncRepository,
+) : DeviceSyncState {
+
+    override fun isDeviceSyncEnabled(): Boolean = syncRepository.isSignedIn()
+
+    override fun isFeatureEnabled(): Boolean {
+        return syncFeature.self().isEnabled() || appBuildConfig.isInternalBuild()
+    }
 }
