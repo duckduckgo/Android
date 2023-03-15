@@ -48,6 +48,7 @@ import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
+import com.duckduckgo.sync.api.DeviceSyncRepository
 import com.duckduckgo.windows.api.WindowsWaitlist
 import com.duckduckgo.windows.api.WindowsWaitlistFeature
 import com.duckduckgo.windows.api.WindowsWaitlistState
@@ -123,6 +124,9 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var windowsFeatureToggle: Toggle
 
+    @Mock
+    private lateinit var deviceSyncRepository: DeviceSyncRepository
+
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
@@ -161,6 +165,7 @@ class SettingsViewModelTest {
             autoconsent,
             windowsWaitlist,
             windowsFeature,
+            deviceSyncRepository,
         )
 
         runTest {
@@ -774,6 +779,31 @@ class SettingsViewModelTest {
             assertEquals(Command.LaunchNotificationsSettings, awaitItem())
             verify(mockPixel).fire(AppPixelName.SETTINGS_NOTIFICATIONS_PRESSED)
 
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSyncFeatureDisabledThenViewStateIsCorrect() = runTest {
+        whenever(deviceSyncRepository.isFeatureEnabled()).thenReturn(false)
+        testee.start()
+
+        testee.viewState().test {
+            assertFalse(awaitItem().showSyncSetting)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSyncFeatureEnabledAndDeviceSyncEnabledThenSettingVisibleAndStateEnabled() = runTest {
+        whenever(deviceSyncRepository.isFeatureEnabled()).thenReturn(true)
+        whenever(deviceSyncRepository.isDeviceSyncEnabled()).thenReturn(true)
+        testee.start()
+
+        testee.viewState().test {
+            val viewState = awaitItem()
+            assertTrue(viewState.showSyncSetting)
+            assertTrue(viewState.syncEnabled)
             cancelAndConsumeRemainingEvents()
         }
     }
