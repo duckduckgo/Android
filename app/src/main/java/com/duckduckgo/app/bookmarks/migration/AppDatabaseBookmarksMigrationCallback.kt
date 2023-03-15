@@ -112,7 +112,7 @@ class AppDatabaseBookmarksMigrationCallback(
             val generatedFolderId = UUID.randomUUID().toString()
 
             foldersInFolder.forEach {
-                val entity = Entity(UUID.randomUUID().toString(), it.name, "", FOLDER)
+                val entity = Entity(generatedFolderId, it.name, "", FOLDER)
                 entities.add(entity)
 
                 if (folderId == 0L) {

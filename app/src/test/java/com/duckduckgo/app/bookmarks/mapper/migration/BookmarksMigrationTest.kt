@@ -164,10 +164,10 @@ class BookmarksMigrationTest {
         val favorites = savedSitesEntitiesDao.entitiesInFolderSync(SavedSitesNames.FAVORITES_ROOT)
 
         assertTrue(bookmarks.size == 1)
-        assertTrue(bookmarks.first().entityId == "bookmark1")
+        assertTrue(bookmarks.first().title == "bookmark1")
 
         assertTrue(favorites.size == 1)
-        assertTrue(favorites.first().entityId == "bookmark1")
+        assertTrue(favorites.first().title == "favorite1")
     }
 
     @Test
@@ -184,10 +184,10 @@ class BookmarksMigrationTest {
         val favorites = savedSitesEntitiesDao.entitiesInFolderSync(SavedSitesNames.FAVORITES_ROOT)
 
         assertTrue(bookmarks.size == 1)
-        assertTrue(bookmarks.first().entityId == "bookmark1")
+        assertTrue(bookmarks.first().title == "Bookmark1")
 
         assertTrue(favorites.size == 1)
-        assertTrue(favorites.first().entityId == "favorite2")
+        assertTrue(favorites.first().title == "Favorite1")
     }
 
     @Test
