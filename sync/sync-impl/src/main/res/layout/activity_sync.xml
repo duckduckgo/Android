@@ -72,7 +72,7 @@
                     android:layout_height="wrap_content"
                     app:primaryText="Android"
                     app:secondaryText="This device"
-                    app:leadingIcon="@drawable/ic_union"
+                    app:leadingIcon="@drawable/ic_device_mobile_24"
                     app:leadingIconBackground="circular"
                     app:trailingIcon="@drawable/ic_menu_vertical_24"/>
 
