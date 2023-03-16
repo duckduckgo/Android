@@ -19,15 +19,17 @@ package com.duckduckgo.sync.impl.ui
 import android.content.Context
 import android.content.Intent
 import android.os.*
+import androidx.fragment.app.commitNow
 import com.duckduckgo.anvil.annotations.*
 import com.duckduckgo.app.global.*
 import com.duckduckgo.di.scopes.*
 import com.duckduckgo.mobile.android.ui.viewbinding.*
+import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.*
 
 @InjectWith(ActivityScope::class)
 class SetupAccountActivity : DuckDuckGoActivity() {
-    private val binding: ActivitySyncSetupFlowBinding by viewBinding()
+    private val binding: ActivitySyncSetupAccountBinding by viewBinding()
     private val viewModel: SetupAccountViewModel by bindViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,15 +40,16 @@ class SetupAccountActivity : DuckDuckGoActivity() {
     }
 
     private fun configureListeners() {
-        binding.closeIcon.setOnClickListener {
-            finish()
-        }
     }
 
     private fun observeUiEvents() {
+        supportFragmentManager.commitNow {
+            replace(R.id.fragment_container_view, EnableSyncFragment.instance(), TAG_ENABLE_SYNC)
+        }
     }
 
     companion object {
+        private const val TAG_ENABLE_SYNC = "tag_enable_sync"
         fun intent(context: Context): Intent {
             return Intent(context, SetupAccountActivity::class.java)
         }
