@@ -17,12 +17,14 @@
 package com.duckduckgo.sync.impl
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.impl.parser.SyncDataRequest
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import javax.inject.Inject
 import retrofit2.Response
+import timber.log.Timber
 
 interface SyncApi {
     fun createAccount(
@@ -31,6 +33,7 @@ interface SyncApi {
         protectedEncryptionKey: String,
         deviceId: String,
         deviceName: String,
+        deviceType: String,
     ): Result<AccountCreatedResponse>
 
     fun login(
@@ -38,6 +41,7 @@ interface SyncApi {
         hashedPassword: String,
         deviceId: String,
         deviceName: String,
+        deviceType: String,
     ): Result<LoginResponse>
 
     fun logout(
@@ -45,7 +49,26 @@ interface SyncApi {
         deviceId: String,
     ): Result<Logout>
 
+    fun connect(
+        token: String,
+        deviceId: String,
+        publicKey: String,
+    ): Result<Boolean>
+
+    fun connectDevice(
+        deviceId: String,
+    ): Result<String>
+
     fun deleteAccount(token: String): Result<Boolean>
+
+    fun getDevices(token: String): Result<List<Device>>
+
+    fun sendAllBookmarks(
+        token: String,
+        bookmarks: SyncDataRequest,
+    ): Result<Boolean>
+
+    fun getAllData(token: String): Result<DataResponse>
 }
 
 @ContributesBinding(AppScope::class)
@@ -56,15 +79,17 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
         protectedEncryptionKey: String,
         deviceId: String,
         deviceName: String,
+        deviceType: String,
     ): Result<AccountCreatedResponse> {
         val response = runCatching {
             val call = syncService.signup(
                 Signup(
-                    user_id = userID,
-                    hashed_password = hashedPassword,
-                    protected_encryption_key = protectedEncryptionKey,
-                    device_id = deviceId,
-                    device_name = deviceName,
+                    userId = userID,
+                    hashedPassword = hashedPassword,
+                    protectedEncryptionKey = protectedEncryptionKey,
+                    deviceId = deviceId,
+                    deviceName = deviceName,
+                    deviceType = deviceType,
                 ),
             )
             call.execute()
@@ -74,11 +99,11 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
 
         return onSuccess(response) {
             val token = response.body()?.token.takeUnless { it.isNullOrEmpty() } ?: throw IllegalStateException("Token not found")
-            val userId = response.body()?.user_id.takeUnless { it.isNullOrEmpty() } ?: throw IllegalStateException("userId missing")
+            val userId = response.body()?.userId.takeUnless { it.isNullOrEmpty() } ?: throw IllegalStateException("userId missing")
             Result.Success(
                 AccountCreatedResponse(
                     token = token,
-                    user_id = userId,
+                    userId = userId,
                 ),
             )
         }
@@ -96,8 +121,53 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
         }
 
         return onSuccess(response) {
-            val deviceIdResponse = response.body()?.device_id.takeUnless { it.isNullOrEmpty() } ?: throw IllegalStateException("Token not found")
+            val deviceIdResponse = response.body()?.deviceId.takeUnless { it.isNullOrEmpty() } ?: throw IllegalStateException("Token not found")
             Result.Success(Logout(deviceIdResponse))
+        }
+    }
+
+    override fun getDevices(token: String): Result<List<Device>> {
+        val response = runCatching {
+            val logoutCall = syncService.getDevices("Bearer $token")
+            logoutCall.execute()
+        }.getOrElse { throwable ->
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            val devices = response.body()?.devices?.entries ?: throw IllegalStateException("Token not found")
+            Result.Success(devices)
+        }
+    }
+
+    override fun connect(
+        token: String,
+        deviceId: String,
+        publicKey: String,
+    ): Result<Boolean> {
+        val response = runCatching {
+            val logoutCall = syncService.connect("Bearer $token", Connect(deviceId = deviceId, encryptedRecoveryKey = publicKey))
+            logoutCall.execute()
+        }.getOrElse { throwable ->
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            Result.Success(true)
+        }
+    }
+
+    override fun connectDevice(deviceId: String): Result<String> {
+        val response = runCatching {
+            val logoutCall = syncService.connectDevice(deviceId)
+            logoutCall.execute()
+        }.getOrElse { throwable ->
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            val sealed = response.body()?.encryptedRecoveryKey.takeUnless { it.isNullOrEmpty() } ?: throw IllegalStateException("Token not found")
+            Result.Success(sealed)
         }
     }
 
@@ -119,14 +189,16 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
         hashedPassword: String,
         deviceId: String,
         deviceName: String,
+        deviceType: String,
     ): Result<LoginResponse> {
         val response = runCatching {
             val call = syncService.login(
                 Login(
-                    user_id = userID,
-                    hashed_password = hashedPassword,
-                    device_id = deviceId,
-                    device_name = deviceName,
+                    userId = userID,
+                    hashedPassword = hashedPassword,
+                    deviceId = deviceId,
+                    deviceName = deviceName,
+                    deviceType = deviceType,
                 ),
             )
             call.execute()
@@ -145,6 +217,47 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
                     devices = emptyList(),
                 ),
             )
+        }
+    }
+
+    override fun sendAllBookmarks(
+        token: String,
+        bookmarks: SyncDataRequest,
+    ): Result<Boolean> {
+        val response = runCatching {
+            val patchCall = syncService.patch("Bearer $token", bookmarks)
+            patchCall.execute()
+        }.getOrElse { throwable ->
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            Result.Success(true)
+        }
+    }
+
+    override fun getAllData(token: String): Result<DataResponse> {
+        val response = runCatching {
+            val patchCall = syncService.data("Bearer $token")
+            patchCall.execute()
+        }.getOrElse { throwable ->
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            val data = response.body() ?: throw IllegalStateException("SYNC get data not parsed")
+            val allDataJSON = ResponseAdapters.dataAdapter.toJson(data.bookmarks)
+            Timber.i("SYNC get data $allDataJSON")
+            Result.Success(data)
+        }
+    }
+
+    private class ResponseAdapters {
+        companion object {
+            private val moshi = Moshi.Builder().build()
+
+            val dataAdapter: JsonAdapter<BookmarksResponse> =
+                moshi.adapter(BookmarksResponse::class.java)
         }
     }
 

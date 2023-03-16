@@ -28,6 +28,7 @@ class VpnRoutes {
          *
          * We exclude:
          *   - private local IP ranges
+         *   - CGNAT address range 100.64.0.0 -> 100.127.255.255
          *   - special IP addresses 127.0.0.0 to 127.255.255.255
          *   - not allocated to host (Class E) IP address - 240.0.0.0 to 255.255.255.255
          *   - link-local address range
@@ -114,7 +115,11 @@ class VpnRoutes {
             Route(address = "97.64.0.0", maskWidth = 10, lowAddress = "97.64.0.0", highAddress = "97.127.255.255"),
             // Excluded range: 97.128.0.0 -> 97.255.255.255
             Route(address = "98.0.0.0", maskWidth = 7, lowAddress = "98.0.0.0", highAddress = "99.255.255.255"),
-            Route(address = "100.0.0.0", maskWidth = 6, lowAddress = "100.0.0.0", highAddress = "103.255.255.255"),
+            Route(address = "100.0.0.0", maskWidth = 10, lowAddress = "100.0.0.0", highAddress = "100.63.255.255"),
+            // Excluded range: 100.64.0.0 -> 100.127.255.255
+            Route(address = "100.128.0.0", maskWidth = 9, lowAddress = "100.128.0.0", highAddress = "100.255.255.255"),
+            Route(address = "101.0.0.0", maskWidth = 8, lowAddress = "101.0.0.0", highAddress = "101.255.255.255"),
+            Route(address = "102.0.0.0", maskWidth = 7, lowAddress = "102.0.0.0", highAddress = "103.255.255.255"),
             Route(address = "104.0.0.0", maskWidth = 5, lowAddress = "104.0.0.0", highAddress = "111.255.255.255"),
             Route(address = "112.0.0.0", maskWidth = 5, lowAddress = "112.0.0.0", highAddress = "119.255.255.255"),
             Route(address = "120.0.0.0", maskWidth = 6, lowAddress = "120.0.0.0", highAddress = "123.255.255.255"),
@@ -190,3 +195,7 @@ data class Route(
     val lowAddress: String,
     val highAddress: String,
 )
+
+internal fun List<Route>.asAddressMaskPair(): List<Pair<String, Int>> {
+    return this.map { it.address to it.maskWidth }
+}

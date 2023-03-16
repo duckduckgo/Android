@@ -21,11 +21,18 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.Result.Error
+import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncRepository
+import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ReadConnectQR
+import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ReadQR
+import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ShowMessage
+import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ShowQR
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
@@ -42,7 +49,7 @@ constructor(
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     private val viewState = MutableStateFlow(ViewState())
-    fun viewState(): Flow<ViewState> = viewState.onStart { updateViewState() }
+    fun viewState(): Flow<ViewState> = viewState.onStart { getConnectedDevices() }
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
     data class ViewState(
@@ -55,10 +62,14 @@ constructor(
         val secretKey: String = "",
         val protectedEncryptionKey: String = "",
         val passwordHash: String = "",
+        val connectedDevices: List<ConnectedDevice> = emptyList(),
     )
 
     sealed class Command {
         data class ShowMessage(val message: String) : Command()
+        object ReadQR : Command()
+        object ReadConnectQR : Command()
+        data class ShowQR(val string: String) : Command()
     }
 
     fun onCreateAccountClicked() {
@@ -67,7 +78,7 @@ constructor(
             if (result is Error) {
                 command.send(Command.ShowMessage("$result"))
             }
-            updateViewState()
+            getConnectedDevices()
         }
     }
 
@@ -87,11 +98,22 @@ constructor(
 
     fun onLogoutClicked() {
         viewModelScope.launch(dispatchers.io()) {
-            val result = syncRepository.logout()
+            val currentDeviceId = syncRepository.getAccountInfo().deviceId
+            val result = syncRepository.logout(currentDeviceId)
             if (result is Error) {
                 command.send(Command.ShowMessage("$result"))
             }
-            updateViewState()
+            getConnectedDevices()
+        }
+    }
+
+    fun onDeviceLogoutClicked(deviceId: String) {
+        viewModelScope.launch(dispatchers.io()) {
+            val result = syncRepository.logout(deviceId)
+            if (result is Error) {
+                command.send(Command.ShowMessage("$result"))
+            }
+            getConnectedDevices()
         }
     }
 
@@ -111,6 +133,47 @@ constructor(
             if (result is Error) {
                 command.send(Command.ShowMessage("$result"))
             }
+            getConnectedDevices()
+            updateViewState()
+        }
+    }
+
+    private fun getConnectedDevices() {
+        viewModelScope.launch(dispatchers.io()) {
+            when (val connectedDevices = syncRepository.getConnectedDevices()) {
+                is Error -> command.send(Command.ShowMessage(connectedDevices.reason))
+                is Success -> {
+                    viewState.emit(
+                        viewState.value.copy(
+                            connectedDevices = connectedDevices.data,
+                        ),
+                    )
+                }
+            }
+            updateViewState()
+        }
+    }
+
+    fun onSendBookmarksClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            val result = syncRepository.sendAllData()
+            if (result is Error) {
+                command.send(Command.ShowMessage("$result"))
+            } else {
+                command.send(Command.ShowMessage("Bookmarks Sent Successfully"))
+            }
+            updateViewState()
+        }
+    }
+
+    fun onReceiveBookmarksClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            val result = syncRepository.fetchAllData()
+            if (result is Error) {
+                command.send(Command.ShowMessage("$result"))
+            } else {
+                command.send(Command.ShowMessage("Bookmarks Sent Successfully"))
+            }
             updateViewState()
         }
     }
@@ -128,5 +191,79 @@ constructor(
                 secretKey = accountInfo.secretKey,
             ),
         )
+    }
+
+    fun onReadQRClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            command.send(ReadQR)
+        }
+    }
+
+    fun onShowQRClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            val recoveryCode = syncRepository.getRecoveryCode() ?: return@launch
+            command.send(ShowQR(recoveryCode))
+        }
+    }
+
+    fun onQRScanned(contents: String) {
+        viewModelScope.launch(dispatchers.io()) {
+            val result = syncRepository.login(contents)
+            if (result is Error) {
+                command.send(Command.ShowMessage("$result"))
+            }
+            updateViewState()
+        }
+    }
+
+    fun onConnectQRScanned(contents: String) {
+        viewModelScope.launch(dispatchers.io()) {
+            val result = syncRepository.connectDevice(contents)
+            when (result) {
+                is Error -> {
+                    command.send(Command.ShowMessage("$result"))
+                }
+                is Success -> {
+                    command.send(Command.ShowMessage("${result.data}"))
+                    updateViewState()
+                }
+            }
+        }
+    }
+
+    fun onConnectStart() {
+        viewModelScope.launch(dispatchers.io()) {
+            val qrCode = when (val qrCodeResult = syncRepository.getConnectQR()) {
+                is Error -> {
+                    command.send(ShowMessage("$qrCodeResult"))
+                    return@launch
+                }
+                is Success -> qrCodeResult.data
+            }
+            updateViewState()
+            command.send(ShowQR(qrCode))
+            var polling = true
+            while (polling) {
+                delay(7000)
+                when (val result = syncRepository.pollConnectionKeys()) {
+                    is Error -> {
+                        command.send(Command.ShowMessage("$result"))
+                    }
+                    is Success -> {
+                        command.send(Command.ShowMessage(result.data.toString()))
+                        polling = false
+                        updateViewState()
+                    }
+                }
+            }
+        }
+    }
+
+    fun onReadConnectQRClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            viewModelScope.launch(dispatchers.io()) {
+                command.send(ReadConnectQR)
+            }
+        }
     }
 }

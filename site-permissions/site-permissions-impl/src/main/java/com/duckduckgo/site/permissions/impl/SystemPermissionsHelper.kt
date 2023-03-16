@@ -50,6 +50,7 @@ class SystemPermissionsHelperImpl @Inject constructor(
 
     private lateinit var permissionLauncher: ActivityResultLauncher<String>
     private lateinit var multiplePermissionsLauncher: ActivityResultLauncher<Array<String>>
+    private var currentPermissionRequested: String? = null
 
     override fun hasMicPermissionsGranted(): Boolean =
         ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED &&
@@ -74,6 +75,7 @@ class SystemPermissionsHelperImpl @Inject constructor(
 
     override fun requestPermission(permission: String) {
         if (this::permissionLauncher.isInitialized) {
+            currentPermissionRequested = permission
             permissionLauncher.launch(permission)
         } else {
             throw IllegalAccessException("registerPermissionLaunchers() needs to be called before requestPermission()")
@@ -82,6 +84,7 @@ class SystemPermissionsHelperImpl @Inject constructor(
 
     override fun requestMultiplePermissions(permissions: Array<String>) {
         if (this::multiplePermissionsLauncher.isInitialized) {
+            currentPermissionRequested = permissions.first()
             multiplePermissionsLauncher.launch(permissions)
         } else {
             throw IllegalAccessException("registerPermissionLaunchers() needs to be called before requestMultiplePermissions()")
@@ -89,5 +92,5 @@ class SystemPermissionsHelperImpl @Inject constructor(
     }
 
     override fun isPermissionsRejectedForever(activity: Activity): Boolean =
-        !ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.RECORD_AUDIO)
+        currentPermissionRequested?.let { !ActivityCompat.shouldShowRequestPermissionRationale(activity, it) } ?: true
 }

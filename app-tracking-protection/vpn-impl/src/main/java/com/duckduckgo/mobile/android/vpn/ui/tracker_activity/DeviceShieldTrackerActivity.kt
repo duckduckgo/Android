@@ -152,7 +152,7 @@ class DeviceShieldTrackerActivity :
             viewModel.onViewEvent(ViewEvent.AskToRemoveFeature)
         }
 
-        binding.ctaShowAll.setClickListener {
+        binding.ctaShowAll.setOnClickListener {
             viewModel.onViewEvent(ViewEvent.LaunchMostRecentActivity)
         }
 

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.sync.impl.ui
 
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.widget.Toast
 import androidx.core.view.isVisible
@@ -25,9 +26,21 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.ui.view.hide
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.databinding.ActivitySyncSetupBinding
+import com.duckduckgo.sync.impl.databinding.ItemConnectedDeviceBinding
+import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ReadConnectQR
+import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ReadQR
+import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ShowMessage
+import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ShowQR
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.ViewState
+import com.google.zxing.BarcodeFormat.QR_CODE
+import com.journeyapps.barcodescanner.BarcodeEncoder
+import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanIntentResult
+import com.journeyapps.barcodescanner.ScanOptions
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -35,6 +48,27 @@ import kotlinx.coroutines.flow.onEach
 class SyncInitialSetupActivity : DuckDuckGoActivity() {
     private val binding: ActivitySyncSetupBinding by viewBinding()
     private val viewModel: SyncInitialSetupViewModel by bindViewModel()
+
+    private val barcodeLauncher = registerForActivityResult(
+        ScanContract(),
+    ) { result: ScanIntentResult ->
+        if (result.contents == null) {
+            Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show()
+        } else {
+            viewModel.onQRScanned(result.contents)
+        }
+    }
+
+    // Register the launcher and result handler
+    private val barcodeConnectLauncher = registerForActivityResult(
+        ScanContract(),
+    ) { result: ScanIntentResult ->
+        if (result.contents == null) {
+            Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show()
+        } else {
+            viewModel.onConnectQRScanned(result.contents)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,7 +79,11 @@ class SyncInitialSetupActivity : DuckDuckGoActivity() {
     }
 
     private fun configureListeners() {
+        binding.showQRCode.setOnClickListener {
+            viewModel.onShowQRClicked()
+        }
         binding.createAccountButton.setOnClickListener { viewModel.onCreateAccountClicked() }
+        binding.readQRButton.setOnClickListener { viewModel.onReadQRClicked() }
         binding.storeRecoveryCodeButton.setOnClickListener {
             viewModel.onStoreRecoveryCodeClicked()
         }
@@ -53,6 +91,10 @@ class SyncInitialSetupActivity : DuckDuckGoActivity() {
         binding.loginAccountButton.setOnClickListener { viewModel.loginAccountClicked() }
         binding.logoutButton.setOnClickListener { viewModel.onLogoutClicked() }
         binding.deleteAccountButton.setOnClickListener { viewModel.onDeleteAccountClicked() }
+        binding.connectQRCode.setOnClickListener { viewModel.onConnectStart() }
+        binding.readConnectQRCode.setOnClickListener { viewModel.onReadConnectQRClicked() }
+        binding.sendBookmarksButton.setOnClickListener { viewModel.onSendBookmarksClicked() }
+        binding.receiveBookmarksButton.setOnClickListener { viewModel.onReceiveBookmarksClicked() }
     }
 
     private fun observeUiEvents() {
@@ -71,10 +113,39 @@ class SyncInitialSetupActivity : DuckDuckGoActivity() {
 
     private fun processCommand(command: SyncInitialSetupViewModel.Command) {
         when (command) {
-            is SyncInitialSetupViewModel.Command.ShowMessage -> {
+            is ShowMessage -> {
                 Toast.makeText(this, command.message, Toast.LENGTH_LONG).show()
             }
+
+            ReadQR -> {
+                barcodeLauncher.launch(getScanOptions())
+            }
+
+            is ShowQR -> {
+                try {
+                    val barcodeEncoder = BarcodeEncoder()
+                    val bitmap: Bitmap = barcodeEncoder.encodeBitmap(command.string, QR_CODE, 400, 400)
+                    binding.qrCodeImageView.show()
+                    binding.qrCodeImageView.setImageBitmap(bitmap)
+                    binding.showQRCode.hide()
+                } catch (e: Exception) {
+                }
+            }
+
+            ReadConnectQR -> {
+                barcodeConnectLauncher.launch(getScanOptions())
+            }
         }
+    }
+
+    private fun getScanOptions(): ScanOptions {
+        val options = ScanOptions()
+        options.setDesiredBarcodeFormats(ScanOptions.QR_CODE)
+        options.setPrompt("Scan a barcode")
+        options.setCameraId(0) // Use a specific camera of the device
+        options.setBeepEnabled(false)
+        options.setBarcodeImageEnabled(true)
+        return options
     }
 
     private fun renderViewState(viewState: ViewState) {
@@ -86,5 +157,17 @@ class SyncInitialSetupActivity : DuckDuckGoActivity() {
         binding.deviceNameTextView.text = viewState.deviceName
         binding.primaryKeyTextView.text = viewState.primaryKey
         binding.secretKeyTextView.text = viewState.secretKey
+        binding.sendBookmarksButton.isVisible = viewState.isSignedIn
+        binding.receiveBookmarksButton.isVisible = viewState.isSignedIn
+        binding.connectedDevicesList.removeAllViews()
+        if (viewState.isSignedIn) {
+            viewState.connectedDevices.forEach { device ->
+                val connectedBinding = ItemConnectedDeviceBinding.inflate(layoutInflater, binding.connectedDevicesList, true)
+                connectedBinding.deviceName.text = "${device.deviceName} ${if (device.thisDevice) "(This Device)" else ""}"
+                connectedBinding.logoutButton.setOnClickListener {
+                    viewModel.onDeviceLogoutClicked(device.deviceId)
+                }
+            }
+        }
     }
 }

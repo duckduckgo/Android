@@ -17,8 +17,6 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
-import com.duckduckgo.app.bookmarks.model.BookmarksRepository
-import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.store.AndroidAppProperties
@@ -32,7 +30,9 @@ import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.browser.api.AppProperties
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
+import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -62,23 +62,23 @@ object DevicePropertiesModule {
     @SingleInstanceIn(AppScope::class)
     fun providesUserBrowserProperties(
         themingDataStore: ThemingDataStore,
-        bookmarksRepository: BookmarksRepository,
-        favoritesRepository: FavoritesRepository,
+        savedSitesRepository: SavedSitesRepository,
         appInstallStore: AppInstallStore,
         widgetCapabilities: WidgetCapabilities,
         emailManager: EmailManager,
         searchCountDao: SearchCountDao,
         appDaysUsedRepository: AppDaysUsedRepository,
+        appTrackingProtection: AppTrackingProtection,
     ): UserBrowserProperties {
         return AndroidUserBrowserProperties(
             themingDataStore,
-            bookmarksRepository,
-            favoritesRepository,
+            savedSitesRepository,
             appInstallStore,
             widgetCapabilities,
             emailManager,
             searchCountDao,
             appDaysUsedRepository,
+            appTrackingProtection,
         )
     }
 }

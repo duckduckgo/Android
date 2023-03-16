@@ -27,15 +27,19 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
+import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationContentPlugin
+import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationContentPlugin.Type.DISABLED
+import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationContentPlugin.Type.REVOKED
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationWorker
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderReceiver
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
+import com.duckduckgo.mobile.android.vpn.service.notification.getHighestPriorityPluginForType
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -43,16 +47,16 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
 
-@SingleInstanceIn(VpnScope::class)
 @ContributesMultibinding(VpnScope::class)
 class DeviceShieldReminderNotificationScheduler @Inject constructor(
     private val context: Context,
     private val workManager: WorkManager,
     private val notificationManager: NotificationManagerCompat,
-    private val deviceShieldAlertNotificationBuilder: DeviceShieldAlertNotificationBuilder,
     private val vpnFeatureRemover: VpnFeatureRemover,
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val vpnReminderNotificationBuilder: VpnReminderNotificationBuilder,
+    private val vpnReminderNotificationContentPluginPoint: PluginPoint<VpnReminderNotificationContentPlugin>,
 ) : VpnServiceCallbacks {
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
@@ -127,13 +131,27 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
     }
 
     private fun showImmediateReminderNotification() {
-        val notification = deviceShieldAlertNotificationBuilder.buildReminderNotification(context, true)
-        notificationManager.notify(TrackerBlockingVpnService.VPN_REMINDER_NOTIFICATION_ID, notification)
+        vpnReminderNotificationContentPluginPoint.getHighestPriorityPluginForType(DISABLED)?.let {
+            it.getContent()?.let { content ->
+                logcat { "Showing disabled notification from $it" }
+                notificationManager.notify(
+                    TrackerBlockingVpnService.VPN_REMINDER_NOTIFICATION_ID,
+                    vpnReminderNotificationBuilder.buildReminderNotification(content),
+                )
+            }
+        }
     }
 
     private fun showImmediateRevokedNotification() {
-        val notification = deviceShieldAlertNotificationBuilder.buildRevokedNotification(context)
-        notificationManager.notify(TrackerBlockingVpnService.VPN_REMINDER_NOTIFICATION_ID, notification)
+        vpnReminderNotificationContentPluginPoint.getHighestPriorityPluginForType(REVOKED)?.let {
+            it.getContent()?.let { content ->
+                logcat { "Showing revoked notification from $it" }
+                notificationManager.notify(
+                    TrackerBlockingVpnService.VPN_REMINDER_NOTIFICATION_ID,
+                    vpnReminderNotificationBuilder.buildReminderNotification(content),
+                )
+            }
+        }
     }
 
     private fun scheduleReminderForTomorrow() {

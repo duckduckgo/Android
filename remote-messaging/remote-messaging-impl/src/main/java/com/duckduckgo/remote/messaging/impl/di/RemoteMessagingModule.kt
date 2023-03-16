@@ -24,13 +24,13 @@ import com.duckduckgo.browser.api.AppProperties
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.remote.messaging.api.AttributeMatcherPlugin
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.impl.*
 import com.duckduckgo.remote.messaging.impl.RealRemoteMessagingConfigDownloader
 import com.duckduckgo.remote.messaging.impl.RemoteMessagingConfigDownloader
 import com.duckduckgo.remote.messaging.impl.mappers.RemoteMessagingConfigJsonMapper
 import com.duckduckgo.remote.messaging.impl.matchers.AndroidAppAttributeMatcher
-import com.duckduckgo.remote.messaging.impl.matchers.AttributeMatcher
 import com.duckduckgo.remote.messaging.impl.matchers.DeviceAttributeMatcher
 import com.duckduckgo.remote.messaging.impl.matchers.UserAttributeMatcher
 import com.duckduckgo.remote.messaging.impl.network.RemoteMessagingService
@@ -106,7 +106,7 @@ object DataSourceModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun providesRemoteMessagingConfigMatcher(
-        matchers: DaggerSet<AttributeMatcher>,
+        matchers: DaggerSet<AttributeMatcherPlugin>,
         remoteMessagingRepository: RemoteMessagingRepository,
     ): RemoteMessagingConfigMatcher {
         return RemoteMessagingConfigMatcher(matchers, remoteMessagingRepository)
@@ -117,7 +117,7 @@ object DataSourceModule {
     fun providesAndroidAppAttributeMatcher(
         appProperties: AppProperties,
         appBuildConfig: AppBuildConfig,
-    ): AttributeMatcher {
+    ): AttributeMatcherPlugin {
         return AndroidAppAttributeMatcher(appProperties, appBuildConfig)
     }
 
@@ -126,7 +126,7 @@ object DataSourceModule {
     fun providesDeviceAttributeMatcher(
         appBuildConfig: AppBuildConfig,
         appProperties: AppProperties,
-    ): AttributeMatcher {
+    ): AttributeMatcherPlugin {
         return DeviceAttributeMatcher(appBuildConfig, appProperties)
     }
 
@@ -134,7 +134,7 @@ object DataSourceModule {
     @IntoSet
     fun providesUserAttributeMatcher(
         userBrowserProperties: UserBrowserProperties,
-    ): AttributeMatcher {
+    ): AttributeMatcherPlugin {
         return UserAttributeMatcher(userBrowserProperties)
     }
 

@@ -22,7 +22,6 @@ import android.content.Intent
 import android.os.Build
 import android.widget.Toast
 import androidx.annotation.VisibleForTesting
-import androidx.lifecycle.DefaultLifecycleObserver
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder.Companion.SHORTCUT_TITLE_ARG
@@ -37,7 +36,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @InjectWith(ReceiverScope::class)
-class ShortcutReceiver : BroadcastReceiver(), DefaultLifecycleObserver {
+class ShortcutReceiver : BroadcastReceiver() {
 
     @Inject
     lateinit var pixel: Pixel

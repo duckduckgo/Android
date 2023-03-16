@@ -31,14 +31,13 @@ import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.toPx
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
+import com.google.android.material.snackbar.BaseTransientBottomBar.BaseCallback
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.snackbar.Snackbar.SnackbarLayout
 import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
 import javax.inject.Inject
 
 @ContributesBinding(FragmentScope::class)
-@SingleInstanceIn(FragmentScope::class)
 class SitePermissionsDialogActivityLauncher @Inject constructor(
     private val systemPermissionsHelper: SystemPermissionsHelper,
     private val sitePermissionsRepository: SitePermissionsRepository,
@@ -230,14 +229,23 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
             layout.setPadding(0, 0, 0, 40.toPx())
         }
         snackbar.apply {
-            setAction(R.string.sitePermissionsDeniedSnackBarAction) {
-                onPermissionAllowed()
-            }
+            setAction(R.string.sitePermissionsDeniedSnackBarAction) { onPermissionAllowed() }
+            addCallback(
+                object : Snackbar.Callback() {
+                    override fun onDismissed(
+                        transientBottomBar: Snackbar?,
+                        event: Int,
+                    ) {
+                        if (event == BaseCallback.DISMISS_EVENT_TIMEOUT) { sitePermissionRequest.deny() }
+                    }
+                },
+            )
             show()
         }
     }
 
     private fun showSystemPermissionsDeniedDialog() {
+        sitePermissionRequest.deny()
         val titleRes = when (permissionRequested) {
             SitePermissionsRequestedType.CAMERA -> R.string.systemPermissionDialogCameraDeniedTitle
             SitePermissionsRequestedType.AUDIO -> R.string.systemPermissionDialogAudioDeniedTitle

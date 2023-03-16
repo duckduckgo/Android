@@ -30,7 +30,7 @@
     <string name="saveLoginDialogButtonSave">Zapisz logowanie</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Zapisz hasło</string>
     <string name="saveLoginDialogNotNow">Nie teraz</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Dane logowania są bezpiecznie przechowywane wyłącznie na tym urządzeniu i można nimi zarządzać w sekcji Autouzupełnianie menu Ustawienia.</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">DuckDuckGo będzie bezpiecznie przechowywać ten login na Twoim urządzeniu. Zapisanymi loginami możesz zarządzać w ustawieniach.</string>
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Czy chcesz zapisać dane logowania w DuckDuckGo?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Więcej opcji</string>
 

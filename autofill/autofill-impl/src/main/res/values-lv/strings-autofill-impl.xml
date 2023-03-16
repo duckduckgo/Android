@@ -30,7 +30,7 @@
     <string name="saveLoginDialogButtonSave">Saglabāt pieteikšanās datus</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Saglabāt paroli</string>
     <string name="saveLoginDialogNotNow">Ne tagad</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Pieteikšanās dati tiek droši saglabāti tikai šajā ierīcē, un tos var pārvaldīt no Iestatījumu izvēlnes Automātiskā aizpildīšana.</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">DuckDuckGo droši saglabās šos pieteikšanās datus tavā ierīcē. Saglabātos pieteikšanās datus vari pārvaldīt sadaļā Iestatījumi.</string>
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Vai vēlies, lai DuckDuckGo saglabātu tavus pieteikšanās datus?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Citas iespējas</string>
 

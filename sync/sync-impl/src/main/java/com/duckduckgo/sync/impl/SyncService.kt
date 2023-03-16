@@ -18,10 +18,16 @@ package com.duckduckgo.sync.impl
 
 import com.duckduckgo.anvil.annotations.ContributesServiceApi
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.impl.parser.SyncBookmarkEntry
+import com.duckduckgo.sync.impl.parser.SyncDataRequest
+import com.squareup.moshi.Json
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.Path
 
 @ContributesServiceApi(AppScope::class)
 interface SyncService {
@@ -46,29 +52,65 @@ interface SyncService {
     fun login(
         @Body request: Login,
     ): Call<LoginResponse>
+
+    @GET("https://dev-sync-use.duckduckgo.com/sync/devices")
+    fun getDevices(
+        @Header("Authorization") token: String,
+    ): Call<DeviceResponse>
+
+    @POST("https://dev-sync-use.duckduckgo.com/sync/connect")
+    fun connect(
+        @Header("Authorization") token: String,
+        @Body request: Connect,
+    ): Call<Void>
+
+    @GET("https://dev-sync-use.duckduckgo.com/sync/connect/{device_id}")
+    fun connectDevice(
+        @Path("device_id") deviceId: String,
+    ): Call<ConnectKey>
+
+    @PATCH("https://dev-sync-use.duckduckgo.com/sync/data")
+    fun patch(
+        @Header("Authorization") token: String,
+        @Body request: SyncDataRequest,
+    ): Call<DataResponse>
+
+    @GET("https://dev-sync-use.duckduckgo.com/sync/data")
+    fun data(@Header("Authorization") token: String): Call<DataResponse>
 }
 
 data class Login(
-    val user_id: String,
-    val hashed_password: String,
-    val device_id: String,
-    val device_name: String,
+    @field:Json(name = "user_id") val userId: String,
+    @field:Json(name = "hashed_password") val hashedPassword: String,
+    @field:Json(name = "device_id") val deviceId: String,
+    @field:Json(name = "device_name") val deviceName: String,
+    @field:Json(name = "device_type") val deviceType: String,
 )
 
 data class Signup(
-    val user_id: String,
-    val hashed_password: String,
-    val protected_encryption_key: String,
-    val device_id: String,
-    val device_name: String,
+    @field:Json(name = "user_id") val userId: String,
+    @field:Json(name = "hashed_password") val hashedPassword: String,
+    @field:Json(name = "protected_encryption_key") val protectedEncryptionKey: String,
+    @field:Json(name = "device_id") val deviceId: String,
+    @field:Json(name = "device_name") val deviceName: String,
+    @field:Json(name = "device_type") val deviceType: String,
 )
 
 data class Logout(
-    val device_id: String,
+    @field:Json(name = "device_id") val deviceId: String,
+)
+
+data class ConnectKey(
+    @field:Json(name = "encrypted_recovery_key") val encryptedRecoveryKey: String,
+)
+
+data class Connect(
+    @field:Json(name = "device_id") val deviceId: String,
+    @field:Json(name = "encrypted_recovery_key") val encryptedRecoveryKey: String,
 )
 
 data class AccountCreatedResponse(
-    val user_id: String,
+    @field:Json(name = "user_id") val userId: String,
     val token: String,
 )
 
@@ -78,13 +120,52 @@ data class LoginResponse(
     val devices: List<Device>,
 )
 
+data class DeviceResponse(
+    val devices: DeviceEntries,
+)
+
+data class DeviceEntries(
+    val entries: List<Device>,
+)
+
 data class Device(
-    val device_id: String,
-    val device_name: String,
-    val jw_iat: String,
+    @field:Json(name = "device_id") val deviceId: String,
+    @field:Json(name = "device_name") val deviceName: String,
+    @field:Json(name = "device_type") val deviceType: String?,
+    @field:Json(name = "jw_iat") val jwIat: String,
 )
 
 data class ErrorResponse(
     val code: Int = -1,
     val error: String,
+)
+
+data class Setting(
+    val key: String,
+    val value: String,
+)
+
+data class BookmarkFolder(
+    val children: List<String>,
+)
+
+data class BookmarksResponse(
+    @field:Json(name = "last_modified") val lastModified: String,
+    val entries: List<SyncBookmarkEntry>,
+)
+
+data class SettingsResponse(
+    @field:Json(name = "last_modified") val lastModified: String,
+    val entries: List<Setting>,
+)
+
+data class DeviceDataResponse(
+    @field:Json(name = "last_modified") val lastModified: String,
+    val entries: List<Device>,
+)
+
+data class DataResponse(
+    val bookmarks: BookmarksResponse,
+    val settings: SettingsResponse,
+    val devices: DeviceDataResponse,
 )

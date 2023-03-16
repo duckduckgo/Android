@@ -16,6 +16,7 @@
 
 package com.duckduckgo.mobile.android.ui.viewbinding
 
+import android.annotation.SuppressLint
 import android.os.Handler
 import android.os.Looper
 import android.view.View
@@ -45,6 +46,7 @@ class FragmentViewBindingDelegate<T : ViewBinding>(
     init {
         fragment.viewLifecycleOwnerLiveData.observe(fragment) { lifecycleOwner ->
             lifecycleOwner.lifecycle.addObserver(
+                @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
                 object : DefaultLifecycleObserver {
                     override fun onDestroy(owner: LifecycleOwner) {
                         nullifyBindingHandler.post { binding = null }

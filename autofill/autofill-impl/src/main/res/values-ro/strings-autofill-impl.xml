@@ -30,7 +30,7 @@
     <string name="saveLoginDialogButtonSave">Salvează autentificarea</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Salvează parola</string>
     <string name="saveLoginDialogNotNow">Nu acum</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Autentificările sunt stocate în siguranță doar pe acest dispozitiv și pot fi gestionate din meniul de completare automată din Setări.</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">DuckDuckGo va stoca în siguranță aceste date de conectare pe dispozitivul tău. Din Setări poți gestiona datele de conectare salvate.</string>
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Dorești ca DuckDuckGo să îți salveze datele de autentificare?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Mai multe opțiuni</string>
 

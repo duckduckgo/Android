@@ -18,7 +18,11 @@ package com.duckduckgo.sync.impl
 
 import android.annotation.SuppressLint
 import android.os.Build
+import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.impl.Type.DESKTOP
+import com.duckduckgo.sync.impl.Type.MOBILE
+import com.duckduckgo.sync.impl.Type.UNKNOWN
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
 import java.util.*
@@ -28,6 +32,7 @@ interface SyncDeviceIds {
     fun userId(): String
     fun deviceName(): String
     fun deviceId(): String
+    fun deviceType(): DeviceType
 }
 
 @ContributesBinding(AppScope::class)
@@ -35,6 +40,7 @@ class AppSyncDeviceIds
 @Inject
 constructor(
     private val syncStore: SyncStore,
+    private val deviceInfo: DeviceInfo,
 ) : SyncDeviceIds {
     override fun userId(): String {
         var userId = syncStore.userId
@@ -55,10 +61,35 @@ constructor(
 
     @SuppressLint("HardwareIds")
     override fun deviceId(): String {
-        var deviceName = syncStore.deviceId
-        if (deviceName != null) return deviceName
+        var deviceId = syncStore.deviceId
+        if (deviceId != null) return deviceId
 
-        deviceName = UUID.randomUUID().toString()
-        return deviceName
+        deviceId = UUID.randomUUID().toString()
+        return deviceId
     }
+
+    override fun deviceType(): DeviceType {
+        return DeviceType(deviceInfo.formFactor().description)
+    }
+}
+
+private val mobileRegex = Regex("(phone|tablet)", RegexOption.IGNORE_CASE)
+private val desktopRegex = Regex("(desktop)", RegexOption.IGNORE_CASE)
+
+data class DeviceType(val deviceFactor: String = "") {
+    fun type(): Type {
+        return when {
+            deviceFactor.contains(mobileRegex) -> MOBILE
+            deviceFactor.contains(desktopRegex) -> DESKTOP
+            deviceFactor.isEmpty() -> UNKNOWN
+            else -> UNKNOWN
+        }
+    }
+}
+
+enum class Type {
+    MOBILE,
+    UNKNOWN,
+    DESKTOP,
+    ;
 }

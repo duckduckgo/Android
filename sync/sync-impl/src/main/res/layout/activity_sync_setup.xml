@@ -16,6 +16,7 @@
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:scrollbarAlwaysDrawVerticalTrack="true"
@@ -122,6 +123,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:typography="body1" />
+
+            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+                android:id="@+id/connectedDevicesSectionHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="Connected Devices" />
+
+            <LinearLayout
+                android:id="@+id/connectedDevicesList"
+                android:layout_width="wrap_content"
+                android:layout_margin="10dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"/>
         </LinearLayout>
 
         <LinearLayout
@@ -148,12 +162,47 @@
         </LinearLayout>
 
         <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+            android:id="@+id/readQRButton"
+            android:layout_width="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_height="wrap_content"
+            android:text="Read QR code" />
+
+        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+            android:id="@+id/showQRCode"
+            android:layout_width="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_height="wrap_content"
+            android:text="Show QR code" />
+
+        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+            android:id="@+id/readConnectQRCode"
+            android:layout_width="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_height="wrap_content"
+            android:text="Connect (read QR)" />
+
+        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+            android:id="@+id/connectQRCode"
+            android:layout_width="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_height="wrap_content"
+            android:text="Connect (show QR)" />
+
+        <ImageView
+            android:id="@+id/qrCodeImageView"
+            android:layout_width="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            tools:ignore="ContentDescription" />
+
+        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
             android:id="@+id/storeRecoveryCodeButton"
             android:layout_width="wrap_content"
             android:layout_margin="10dp"
             android:layout_height="wrap_content"
             android:text="Store Recovery Code" />
-
 
         <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
             android:id="@+id/loginAccountButton"
@@ -161,6 +210,20 @@
             android:layout_margin="10dp"
             android:layout_height="wrap_content"
             android:text="Login account" />
+
+        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+            android:id="@+id/sendBookmarksButton"
+            android:layout_width="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_height="wrap_content"
+            android:text="Send all bookmarks" />
+
+        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+            android:id="@+id/receiveBookmarksButton"
+            android:layout_width="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_height="wrap_content"
+            android:text="Receive bookmarks" />
 
         <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
             android:id="@+id/logoutButton"
@@ -182,5 +245,6 @@
             android:layout_margin="10dp"
             android:layout_height="wrap_content"
             android:text="Reset" />
+
     </LinearLayout>
 </ScrollView>

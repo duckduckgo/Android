@@ -96,7 +96,7 @@ class SyncNativeLibTest {
 
         val whatToEncrypt = "bookmark"
 
-        val encryptedResult = syncNativeLib.encrypt(whatToEncrypt, accountKeys.primaryKey)
+        val encryptedResult = syncNativeLib.encryptData(whatToEncrypt, accountKeys.primaryKey)
 
         assertEquals(0, encryptedResult.result)
     }
@@ -109,11 +109,34 @@ class SyncNativeLibTest {
 
         val whatToEncrypt = "bookmark"
 
-        val encryptedResult = syncNativeLib.encrypt(whatToEncrypt, accountKeys.primaryKey)
-        val decryptedResult = syncNativeLib.decrypt(encryptedResult.encryptedData, accountKeys.primaryKey)
+        val encryptedResult = syncNativeLib.encryptData(whatToEncrypt, accountKeys.primaryKey)
+        val decryptedResult = syncNativeLib.decryptData(encryptedResult.encryptedData, accountKeys.primaryKey)
 
         assertEquals(0, decryptedResult.result)
         assertEquals(whatToEncrypt, decryptedResult.decryptedData)
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun whenPrepareForConnectThenResultSuccess() {
+        val syncNativeLib = SyncNativeLib(InstrumentationRegistry.getInstrumentation().targetContext)
+        val prepareForConnect = syncNativeLib.prepareForConnect()
+        assertEquals(0L, prepareForConnect.result)
+    }
+
+    @Test
+    fun whenSealThenSuccess() {
+        val syncNativeLib = SyncNativeLib(InstrumentationRegistry.getInstrumentation().targetContext)
+        val prepareForConnect = syncNativeLib.prepareForConnect()
+        val result = syncNativeLib.seal("hola-1324-2342", prepareForConnect.publicKey)
+        val result2 = syncNativeLib.sealOpen(result, prepareForConnect.publicKey, prepareForConnect.secretKey)
+        assertEquals("hola-1324-2342", result2)
+    }
+
+    @Test
+    fun whenDecodeEncodeThenReturnSameValue() {
+        val decoded = "hola-1213-1231-123".toByteArray()
+        assertEquals("hola-1213-1231-123", String(decoded))
     }
 
     companion object {

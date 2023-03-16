@@ -24,7 +24,7 @@ import android.os.Process
 
 abstract class MultiProcessApplication : Application() {
     private val shortProcessName: String by lazy {
-        currentProcessName?.substring(packageName.length) ?: "UNKNOWN"
+        currentProcessName?.substringAfter(delimiter = packageName, missingDelimiterValue = "UNKNOWN") ?: "UNKNOWN"
     }
     private val isMainProcessCached: Boolean by lazy { isMainProcess }
 

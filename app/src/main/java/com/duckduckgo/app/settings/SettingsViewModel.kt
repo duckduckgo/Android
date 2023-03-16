@@ -17,8 +17,6 @@
 package com.duckduckgo.app.settings
 
 import androidx.annotation.StringRes
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -43,18 +41,17 @@ import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.windows.api.WindowsWaitlist
 import com.duckduckgo.windows.api.WindowsWaitlistFeature
 import com.duckduckgo.windows.api.WindowsWaitlistState
 import javax.inject.Inject
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -73,7 +70,7 @@ class SettingsViewModel @Inject constructor(
     private val defaultWebBrowserCapability: DefaultBrowserDetector,
     private val variantManager: VariantManager,
     private val fireAnimationLoader: FireAnimationLoader,
-    private val vpnStore: VpnStore,
+    private val appTrackingProtection: AppTrackingProtection,
     private val gpc: Gpc,
     private val featureToggle: FeatureToggle,
     private val pixel: Pixel,
@@ -84,9 +81,7 @@ class SettingsViewModel @Inject constructor(
     private val autoconsent: Autoconsent,
     private val windowsWaitlist: WindowsWaitlist,
     private val windowsFeature: WindowsWaitlistFeature,
-) : ViewModel(), DefaultLifecycleObserver {
-
-    private var deviceShieldStatePollingJob: Job? = null
+) : ViewModel() {
 
     data class ViewState(
         val loading: Boolean = true,
@@ -172,7 +167,7 @@ class SettingsViewModel @Inject constructor(
                     selectedFireAnimation = settingsDataStore.selectedFireAnimation,
                     globalPrivacyControlEnabled = gpc.isEnabled() && featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName.value),
                     appLinksSettingType = getAppLinksSettingsState(settingsDataStore.appLinksEnabled, settingsDataStore.showAppLinksPrompt),
-                    appTrackingProtectionOnboardingShown = vpnStore.didShowOnboarding(),
+                    appTrackingProtectionOnboardingShown = appTrackingProtection.isOnboarded(),
                     appTrackingProtectionEnabled = vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN),
                     emailAddress = emailManager.getEmailAddress(),
                     showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen(),
@@ -194,17 +189,13 @@ class SettingsViewModel @Inject constructor(
                 val isDeviceShieldEnabled = vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)
                 if (currentViewState().appTrackingProtectionEnabled != isDeviceShieldEnabled) {
                     viewState.value = currentViewState().copy(
-                        appTrackingProtectionOnboardingShown = vpnStore.didShowOnboarding(),
+                        appTrackingProtectionOnboardingShown = appTrackingProtection.isOnboarded(),
                         appTrackingProtectionEnabled = isDeviceShieldEnabled,
                     )
                 }
                 delay(1_000)
             }
         }
-    }
-
-    override fun onStop(owner: LifecycleOwner) {
-        deviceShieldStatePollingJob?.cancel()
     }
 
     fun viewState(): StateFlow<ViewState> {
@@ -310,7 +301,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onAppTPSettingClicked() {
-        if (vpnStore.didShowOnboarding()) {
+        if (appTrackingProtection.isOnboarded()) {
             viewModelScope.launch { command.send(Command.LaunchAppTPTrackersScreen) }
         } else {
             viewModelScope.launch { command.send(Command.LaunchAppTPOnboarding) }

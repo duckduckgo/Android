@@ -30,7 +30,7 @@
     <string name="saveLoginDialogButtonSave">Lagre påloggingen</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Lagre passordet</string>
     <string name="saveLoginDialogNotNow">Ikke nå</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Pålogginger lagres bare på denne enheten, og kan administreres fra Autofyll-menyen i Innstillinger.</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">DuckDuckGo lagrer denne påloggingen på en sikker måte på enheten din. Du kan administrere lagrede pålogginger i innstillingene.</string>
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Vil du at DuckDuckGo skal lagre påloggingen din?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Flere alternativer</string>
 

@@ -30,7 +30,7 @@
     <string name="saveLoginDialogButtonSave">Сохранить логин</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Сохранить пароль</string>
     <string name="saveLoginDialogNotNow">Не сейчас</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Учетные данные сохраняются только на этом устройстве. Управлять ими можно в меню «Автозаполнение» в «Настройках».</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">DuckDuckGo безопасно сохранит этот логин на вашем устройстве. Сохраненными учетными данными можно управлять в «Настройках».</string>
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Хотите, чтобы DuckDuckGo сохранил логин?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Другие параметры</string>
 

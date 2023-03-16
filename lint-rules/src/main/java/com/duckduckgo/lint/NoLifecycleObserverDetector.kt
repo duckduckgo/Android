@@ -37,7 +37,7 @@ class NoLifecycleObserverDetector : Detector(), SourceCodeScanner {
 
     internal class InternalDetectorHandler(private val context: JavaContext) : UElementHandler() {
         override fun visitClass(node: UClass) {
-            if (node.extendsListTypes.any { bannedObserverClassNames.contains(it.className) }) {
+            if (node.implementsListTypes.any { bannedObserverClassNames.contains(it.className) }) {
                 context.report(NO_LIFECYCLE_OBSERVER_ISSUE, node, context.getNameLocation(node), "LifecycleObserver should not be directly extended")
             }
         }

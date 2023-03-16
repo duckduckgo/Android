@@ -57,6 +57,7 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.ui.notification.VpnEnabledNotificationBuilder
 import dagger.android.AndroidInjection
 import java.net.Inet4Address
+import java.net.Inet6Address
 import java.net.InetAddress
 import java.util.concurrent.Executors
 import javax.inject.Inject
@@ -291,10 +292,14 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
     private suspend fun createTunnelInterface(tunnelConfig: VpnTunnelConfig) {
         tunInterface = Builder().run {
             tunnelConfig.addresses.forEach { addAddress(it.key, it.value) }
+            val tunHasIpv6Address = tunnelConfig.addresses.any { it.key is Inet6Address }
 
             // Allow IPv6 to go through the VPN
             // See https://developer.android.com/reference/android/net/VpnService.Builder#allowFamily(int) for more info as to why
-            allowFamily(AF_INET6)
+            if (tunHasIpv6Address) {
+                logcat { "Allowing IPv6 traffic through the tun interface" }
+                allowFamily(AF_INET6)
+            }
 
             val dnsList = getDns(tunnelConfig.dns)
 
@@ -304,34 +309,42 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
                 // The address is also isolated to minimize network interference during performance tests
                 VpnRoutes.includedTestRoutes.forEach { addRoute(it.address, it.maskWidth) }
             } else {
-                val vpnRoutes = VpnRoutes.includedRoutes.toMutableSet()
+                // If tunnel config has routes use them, else use the defaults.
+                // we're mapping her to a list of pairs because we want to make sure that when we combine them with other defaults, eg. add the DNS
+                // addresses, we don't override any entry in the map
+                val vpnRoutes = tunnelConfig.routes
+                    .map { it.key to it.value }
+                    .ifEmpty { VpnRoutes.includedRoutes.asAddressMaskPair() }.toMutableList()
                 if (isInterceptDnsTrafficEnabled) {
                     // we need to make sure that all DNS traffic goes through the VPN. Specifically when the DNS server is on the local network
                     dnsList.filterIsInstance<Inet4Address>().forEach { addr ->
                         addr.asRoute()?.let {
                             logcat { "Adding DNS address $it to VPN routes" }
-                            vpnRoutes.add(it)
+                            vpnRoutes.add(it.address to it.maskWidth)
                         }
                     }
                 }
-                vpnRoutes.forEach { route ->
-                    // convert to InetAddress to later check if it's loopback
-                    kotlin.runCatching { InetAddress.getByName(route.address) }.getOrNull()?.let {
-                        if (!it.isLoopbackAddress) {
-                            addRoute(route.address, route.maskWidth)
+                vpnRoutes.mapNotNull { runCatching { InetAddress.getByName(it.first) to it.second }.getOrNull() }
+                    .filter { (it.first is Inet4Address) || (tunHasIpv6Address && it.first is Inet6Address) }
+                    .forEach { route ->
+                        if (!route.first.isLoopbackAddress) {
+                            logcat { "Adding route $route" }
+                            runCatching {
+                                addRoute(route.first, route.second)
+                            }.onFailure {
+                                logcat(LogPriority.WARN) { "Error setting route $route: ${it.asLog()}" }
+                            }
                         } else {
-                            logcat(LogPriority.WARN) { "Tried to add loopback address $it to VPN routes" }
+                            logcat(LogPriority.WARN) { "Tried to add loopback address $route to VPN routes" }
                         }
                     }
-                }
             }
 
             // Add the route for all Global Unicast Addresses. This is the IPv6 equivalent to
             // IPv4 public IP addresses. They are addresses that routable in the internet
-            addRoute("2000::", 3)
-
-            tunnelConfig.routes.forEach {
-                addRoute(it.key, it.value)
+            if (tunHasIpv6Address) {
+                logcat { "Setting IPv6 address in the tun interface" }
+                addRoute("2000::", 3)
             }
 
             setBlocking(true)
@@ -341,23 +354,25 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             configureMeteredConnection()
 
             // Set DNS
-            dnsList.forEach { addr ->
-                if (isIpv6SupportEnabled || addr is Inet4Address) {
-                    logcat { "Adding DNS $addr" }
-                    runCatching {
-                        addDnsServer(addr)
-                    }.onFailure { t ->
-                        logcat(LogPriority.ERROR) { "Error setting DNS $addr: ${t.asLog()}" }
-                        if (addr.isLoopbackAddress) {
-                            deviceShieldPixels.reportLoopbackDnsError()
-                        } else if (addr.isAnyLocalAddress) {
-                            deviceShieldPixels.reportAnylocalDnsError()
-                        } else {
-                            deviceShieldPixels.reportGeneralDnsError()
+            dnsList
+                .filter { (it is Inet4Address) || (tunHasIpv6Address && it is Inet6Address) }
+                .forEach { addr ->
+                    if (isIpv6SupportEnabled || addr is Inet4Address) {
+                        logcat { "Adding DNS $addr" }
+                        runCatching {
+                            addDnsServer(addr)
+                        }.onFailure { t ->
+                            logcat(LogPriority.ERROR) { "Error setting DNS $addr: ${t.asLog()}" }
+                            if (addr.isLoopbackAddress) {
+                                deviceShieldPixels.reportLoopbackDnsError()
+                            } else if (addr.isAnyLocalAddress) {
+                                deviceShieldPixels.reportAnylocalDnsError()
+                            } else {
+                                deviceShieldPixels.reportGeneralDnsError()
+                            }
                         }
                     }
                 }
-            }
 
             safelyAddDisallowedApps(tunnelConfig.appExclusionList.toList())
 

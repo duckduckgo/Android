@@ -30,7 +30,7 @@
     <string name="saveLoginDialogButtonSave">Išsaugoti prisijungimą</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Išsaugoti slaptažodį</string>
     <string name="saveLoginDialogNotNow">Ne dabar</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Prisijungimai saugiai saugomi tik šiame prietaise, o juos galima tvarkyti nustatymų automatinio pildymo meniu.</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">„DuckDuckGo“ saugiai išsaugos šį prisijungimą jūsų įrenginyje. Išsaugotus prisijungimus galite tvarkyti nustatymuose.</string>
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Ar norite, kad „DuckDuckGo“ išsaugotų jūsų prisijungimą?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Daugiau parinkčių</string>
 

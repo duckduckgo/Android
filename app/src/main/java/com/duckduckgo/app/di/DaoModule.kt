@@ -100,4 +100,10 @@ object DaoModule {
 
     @Provides
     fun allowedDomainsDao(database: AppDatabase) = database.authCookiesAllowedDomainsDao()
+
+    @Provides
+    fun syncEntitiesDao(database: AppDatabase) = database.syncEntitiesDao()
+
+    @Provides
+    fun syncRelationsDao(database: AppDatabase) = database.syncRelationsDao()
 }

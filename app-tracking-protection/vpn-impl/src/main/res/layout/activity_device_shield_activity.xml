@@ -121,15 +121,20 @@
                     android:layout_height="0dp"
                     android:layout_weight="1" />
 
-                <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+                <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                     android:id="@+id/cta_show_all"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingStart="56dp"
+                    android:layout_marginBottom="@dimen/keyline_4"
+                    android:background="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:minHeight="@dimen/keyline_7"
+                    android:paddingStart="72dp"
                     android:paddingTop="@dimen/keyline_2"
+                    android:paddingEnd="@dimen/keyline_4"
                     android:paddingBottom="@dimen/keyline_2"
-                    android:visibility="gone"
-                    app:primaryText="@string/atp_ActivityCtaShowAll" />
+                    android:text="@string/atp_ActivityCtaShowAll"
+                    android:visibility="gone" />
 
                 <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
                     android:layout_width="match_parent"

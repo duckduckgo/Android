@@ -20,21 +20,22 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.bookmarks.model.BookmarkFolder
-import com.duckduckgo.app.bookmarks.model.BookmarkFolderItem
-import com.duckduckgo.app.bookmarks.model.BookmarksRepository
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment.AddBookmarkFolderListener
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersViewModel.Command.NewFolderCreatedUpdateTheStructure
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersViewModel.Command.SelectFolder
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.savedsites.api.models.BookmarkFolder
+import com.duckduckgo.savedsites.api.models.BookmarkFolderItem
 import javax.inject.Inject
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
 class BookmarkFoldersViewModel @Inject constructor(
-    val bookmarksRepository: BookmarksRepository,
+    val savedSitesRepository: SavedSitesRepository,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel(), AddBookmarkFolderListener {
 
@@ -55,26 +56,25 @@ class BookmarkFoldersViewModel @Inject constructor(
     }
 
     fun fetchBookmarkFolders(
-        selectedFolderId: Long,
-        rootFolderName: String,
+        selectedFolderId: String,
         currentFolder: BookmarkFolder?,
     ) {
+        Timber.d("Saved sites: selectedFolderId $selectedFolderId")
+        Timber.d("Saved sites: currentFolder $currentFolder")
         viewModelScope.launch(dispatcherProvider.io()) {
-            val folderStructure = bookmarksRepository.getFlatFolderStructure(selectedFolderId, currentFolder, rootFolderName)
+            val folderStructure = savedSitesRepository.getFolderTree(selectedFolderId, currentFolder)
             onFolderStructureCreated(folderStructure)
         }
     }
 
     fun newFolderAdded(
-        rootFolderName: String,
-        selectedFolderId: Long,
+        selectedFolderId: String,
         currentFolder: BookmarkFolder?,
     ) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            val folderStructure = bookmarksRepository.getFlatFolderStructure(
+            val folderStructure = savedSitesRepository.getFolderTree(
                 selectedFolderId,
                 currentFolder,
-                rootFolderName,
             )
             onFolderStructureCreated(folderStructure)
         }
@@ -90,7 +90,7 @@ class BookmarkFoldersViewModel @Inject constructor(
 
     override fun onBookmarkFolderAdded(bookmarkFolder: BookmarkFolder) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            bookmarksRepository.insert(bookmarkFolder)
+            savedSitesRepository.insert(bookmarkFolder)
         }
         command.value = NewFolderCreatedUpdateTheStructure
     }
