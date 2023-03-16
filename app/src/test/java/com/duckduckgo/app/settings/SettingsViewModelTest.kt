@@ -40,12 +40,12 @@ import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.windows.api.WindowsWaitlist
@@ -97,7 +97,7 @@ class SettingsViewModelTest {
     private lateinit var mockFeatureToggle: FeatureToggle
 
     @Mock
-    private lateinit var mockDeviceShieldOnboarding: VpnStore
+    private lateinit var appTrackingProtection: AppTrackingProtection
 
     @Mock
     private lateinit var mockAppBuildConfig: AppBuildConfig
@@ -150,7 +150,7 @@ class SettingsViewModelTest {
             mockDefaultBrowserDetector,
             mockVariantManager,
             mockFireAnimationLoader,
-            mockDeviceShieldOnboarding,
+            appTrackingProtection,
             mockGpc,
             mockFeatureToggle,
             mockPixel,
@@ -737,7 +737,7 @@ class SettingsViewModelTest {
 
     @Test
     fun whenAppTPOnboardingNotShownThenViewStateIsCorrect() = runTest {
-        whenever(mockDeviceShieldOnboarding.didShowOnboarding()).thenReturn(false)
+        whenever(appTrackingProtection.isOnboarded()).thenReturn(false)
         testee.start()
 
         testee.viewState().test {
@@ -747,7 +747,7 @@ class SettingsViewModelTest {
 
     @Test
     fun whenAppTPOnboardingShownThenViewStateIsCorrect() = runTest {
-        whenever(mockDeviceShieldOnboarding.didShowOnboarding()).thenReturn(true)
+        whenever(appTrackingProtection.isOnboarded()).thenReturn(true)
         testee.start()
 
         testee.viewState().test {

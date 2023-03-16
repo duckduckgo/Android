@@ -16,18 +16,18 @@
 
 package com.duckduckgo.remote.messaging.impl
 
+import com.duckduckgo.remote.messaging.api.AttributeMatcherPlugin
+import com.duckduckgo.remote.messaging.api.MatchingAttribute
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
-import com.duckduckgo.remote.messaging.impl.matchers.AttributeMatcher
 import com.duckduckgo.remote.messaging.impl.matchers.EvaluationResult
 import com.duckduckgo.remote.messaging.impl.matchers.toResult
-import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
-import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute.Unknown
 import com.duckduckgo.remote.messaging.impl.models.RemoteConfig
+import com.duckduckgo.remote.messaging.impl.models.Unknown
 import timber.log.Timber
 
 class RemoteMessagingConfigMatcher(
-    private val matchers: Set<AttributeMatcher>,
+    private val matchers: Set<AttributeMatcherPlugin>,
     private val remoteMessagingRepository: RemoteMessagingRepository,
 ) {
 
@@ -47,7 +47,7 @@ class RemoteMessagingConfigMatcher(
         return null
     }
 
-    private suspend fun Iterable<Int>.evaluateMatchingRules(rules: Map<Int, List<MatchingAttribute>>): EvaluationResult {
+    private suspend fun Iterable<Int>.evaluateMatchingRules(rules: Map<Int, List<MatchingAttribute<*>>>): EvaluationResult {
         var result: EvaluationResult = EvaluationResult.Match
 
         for (rule in this) {
@@ -68,7 +68,7 @@ class RemoteMessagingConfigMatcher(
         return result
     }
 
-    private suspend fun Iterable<Int>.evaluateExclusionRules(rules: Map<Int, List<MatchingAttribute>>): EvaluationResult {
+    private suspend fun Iterable<Int>.evaluateExclusionRules(rules: Map<Int, List<MatchingAttribute<*>>>): EvaluationResult {
         var result: EvaluationResult = EvaluationResult.Fail
 
         for (rule in this) {
@@ -89,13 +89,13 @@ class RemoteMessagingConfigMatcher(
         return result
     }
 
-    private suspend fun evaluateAttribute(matchingAttribute: MatchingAttribute): EvaluationResult {
+    private suspend fun evaluateAttribute(matchingAttribute: MatchingAttribute<*>): EvaluationResult {
         if (matchingAttribute is Unknown) {
             return matchingAttribute.fallback.toResult()
         } else {
             matchers.forEach {
                 val result = it.evaluate(matchingAttribute)
-                if (result != null) return result
+                if (result != null) return EvaluationResult.fromBoolean(result)
             }
         }
 

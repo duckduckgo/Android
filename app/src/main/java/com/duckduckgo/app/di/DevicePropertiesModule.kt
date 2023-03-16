@@ -32,6 +32,7 @@ import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.browser.api.AppProperties
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -69,6 +70,7 @@ object DevicePropertiesModule {
         emailManager: EmailManager,
         searchCountDao: SearchCountDao,
         appDaysUsedRepository: AppDaysUsedRepository,
+        appTrackingProtection: AppTrackingProtection,
     ): UserBrowserProperties {
         return AndroidUserBrowserProperties(
             themingDataStore,
@@ -79,6 +81,7 @@ object DevicePropertiesModule {
             emailManager,
             searchCountDao,
             appDaysUsedRepository,
+            appTrackingProtection,
         )
     }
 }

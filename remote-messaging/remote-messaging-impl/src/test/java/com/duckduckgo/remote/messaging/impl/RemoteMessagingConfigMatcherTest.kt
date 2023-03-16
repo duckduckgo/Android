@@ -16,17 +16,12 @@
 
 package com.duckduckgo.remote.messaging.impl
 
+import com.duckduckgo.remote.messaging.api.AttributeMatcherPlugin
+import com.duckduckgo.remote.messaging.api.MatchingAttribute
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aMediumMessage
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aSmallMessage
-import com.duckduckgo.remote.messaging.impl.matchers.AttributeMatcher
-import com.duckduckgo.remote.messaging.impl.matchers.EvaluationResult
-import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
-import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute.Api
-import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute.Bookmarks
-import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute.EmailEnabled
-import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute.Locale
-import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute.Unknown
+import com.duckduckgo.remote.messaging.impl.models.*
 import com.duckduckgo.remote.messaging.impl.models.RemoteConfig
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -38,9 +33,9 @@ import org.mockito.kotlin.whenever
 
 class RemoteMessagingConfigMatcherTest {
 
-    private val deviceAttributeMatcher: AttributeMatcher = mock()
-    private val androidAppAttributeMatcher: AttributeMatcher = mock()
-    private val userAttributeMatcher: AttributeMatcher = mock()
+    private val deviceAttributeMatcher: AttributeMatcherPlugin = mock()
+    private val androidAppAttributeMatcher: AttributeMatcherPlugin = mock()
+    private val userAttributeMatcher: AttributeMatcherPlugin = mock()
     private val remoteMessagingRepository: RemoteMessagingRepository = mock()
 
     private val testee = RemoteMessagingConfigMatcher(
@@ -358,16 +353,16 @@ class RemoteMessagingConfigMatcherTest {
     }
 
     private suspend fun givenDeviceMatches(
-        vararg matchingAttributes: MatchingAttribute,
+        vararg matchingAttributes: MatchingAttribute<*>,
     ) {
-        whenever(deviceAttributeMatcher.evaluate(any())).thenReturn(EvaluationResult.Fail)
-        whenever(androidAppAttributeMatcher.evaluate(any())).thenReturn(EvaluationResult.Fail)
-        whenever(userAttributeMatcher.evaluate(any())).thenReturn(EvaluationResult.Fail)
+        whenever(deviceAttributeMatcher.evaluate(any())).thenReturn(false)
+        whenever(androidAppAttributeMatcher.evaluate(any())).thenReturn(false)
+        whenever(userAttributeMatcher.evaluate(any())).thenReturn(false)
 
         matchingAttributes.forEach {
-            whenever(deviceAttributeMatcher.evaluate(it)).thenReturn(EvaluationResult.Match)
-            whenever(androidAppAttributeMatcher.evaluate(it)).thenReturn(EvaluationResult.Match)
-            whenever(userAttributeMatcher.evaluate(it)).thenReturn(EvaluationResult.Match)
+            whenever(deviceAttributeMatcher.evaluate(it)).thenReturn(true)
+            whenever(androidAppAttributeMatcher.evaluate(it)).thenReturn(true)
+            whenever(userAttributeMatcher.evaluate(it)).thenReturn(true)
         }
     }
 
@@ -377,7 +372,7 @@ class RemoteMessagingConfigMatcherTest {
 
     private fun rule(
         id: Int,
-        vararg matchingAttributes: MatchingAttribute,
+        vararg matchingAttributes: MatchingAttribute<*>,
     ) = Pair(id, matchingAttributes.asList())
 
     private fun rules(vararg ids: Int) = ids.asList()
