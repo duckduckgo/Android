@@ -432,6 +432,7 @@
     <!-- Onboarding DDG Feature Options -->
     <string name="onboardingFeatureOptionsTitle">Mis toob sind DuckDuckGo’sse?</string>
     <string name="onboardingFeatureOptionsContinue">Jätka</string>
+    <string name="onboardingFeatureOptionsSkip">Jäta see samm vahele</string>
     <!-- smartling.character_limit = 28 -->
     <string name="onboardingFeatureOptionPrivateSearch">Privaatne otsing</string>
     <!-- smartling.character_limit = 28 -->
