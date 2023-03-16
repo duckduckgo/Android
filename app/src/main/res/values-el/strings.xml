@@ -646,13 +646,13 @@
 
     <!-- Autoconsent -->
     <!-- smartling.character_limit = 82 -->
-    <string name="autoconsentDialogTitle">Φαίνεται ότι αυτός ο ιστότοπος έχει αναδυόμενο παράθυρο συναίνεσης για cookies👇</string>
+    <string name="autoconsentDialogTitle"><![CDATA[<b>Θέλετε να διαχειρίζομαι αναδυόμενα παράθυρα για cookie;</b>]]></string>
     <!-- smartling.character_limit = 160 -->
-    <string name="autoconsentDialogDescription">Θέλετε να τα διαχειριστώ αυτά για εσάς; Μπορώ να προσπαθήσω να ελαχιστοποιήσω τα cookies, να μεγιστοποιήσω το απόρρητο και να αποκρύψω αναδυόμενα παράθυρα όπως αυτά.</string>
+    <string name="autoconsentDialogDescription">Μπορώ να προσπαθήσω να επιλέγω τις πιο ιδιωτικές ρυθμίσεις που υπάρχουν διαθέσιμες και να αποκρύπτω αναδυόμενα παράθυρα όπως αυτά.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Διαχείριση αναδυόμενων παραθύρων cookies</string>
+    <string name="autoconsentPrimaryCta">Χειριστείτε αναδυόμενα παράθυρα αντί εμού</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentSecondaryCta">Όχι, ευχαριστώ</string>
+    <string name="autoconsentSecondaryCta">Όχι, θα τα διαχειρίζομαι εγώ προσωπικά</string>
 
     <string name="autoconsentSetting">Διαχείριση αναδυόμενων παραθύρων για cookies</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Κρυφό αναδυόμενο παράθυρο</string>
