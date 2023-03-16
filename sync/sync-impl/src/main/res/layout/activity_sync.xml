@@ -18,7 +18,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:app="http://schemas.android.com/apk/res-auto"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="match_parent" xmlns:tools="http://schemas.android.com/tools"
             android:scrollbarAlwaysDrawVerticalTrack="true"
             android:fadeScrollbars="false"
             android:scrollbars="vertical">
@@ -30,7 +30,7 @@
 
         <include
             android:id="@+id/includeToolbar"
-            layout="@layout/include_default_toolbar" />
+            layout="@layout/include_default_toolbar"/>
 
         <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
             android:id="@+id/deviceSyncStatusToggle"
@@ -39,6 +39,92 @@
             android:layout_marginTop="@dimen/keyline_4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
+
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/keyline_4"
+            app:textType="secondary"
+            app:typography="body2"
+            android:text="Sync your bookmarks across your devices and save an encrypted backup on DuckDuckGo’s servers."/>
+
+        <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="Synced Devices"/>
+
+        <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="Android"
+            app:secondaryText="This device"
+            app:leadingIcon="@drawable/ic_union"
+            app:leadingIconBackground="circular"
+            app:trailingIcon="@drawable/ic_menu_vertical_24"/>
+
+        <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryTextTruncated="true"
+            app:primaryText="Sync New Device"/>
+
+        <ImageView
+            android:id="@+id/qrCodeImageView"
+            android:layout_width="@dimen/qrSize"
+            android:layout_height="@dimen/qrSize"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            tools:ignore="ContentDescription" />
+
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/keyline_4"
+            app:textType="secondary"
+            app:typography="body2"
+            android:text="Go to Settings > Sync in the DuckDuckGo App on a different device and scan to connect instantly"/>
+
+        <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryTextTruncated="true"
+            app:primaryText="Show Text Code"/>
+
+        <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryTextTruncated="true"
+            app:primaryText="Scan QR Code"/>
+
+        <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/keyline_4"
+            app:textType="secondary"
+            app:typography="body2"
+            android:text="If you lose your device, you will need this recovery code to restore your synced data."/>
+
+        <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryTextTruncated="true"
+            app:primaryText="Turn Off and Delete Server Data…"/>
 
     </LinearLayout>
 </ScrollView>
