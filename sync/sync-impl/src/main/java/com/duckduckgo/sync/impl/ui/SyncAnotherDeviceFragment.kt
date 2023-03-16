@@ -18,27 +18,17 @@ package com.duckduckgo.sync.impl.ui
 
 import android.os.Bundle
 import android.view.View
-import androidx.activity.OnBackPressedCallback
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoFragment
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.FragmentEnableSyncBinding
-import timber.log.Timber
 
 @InjectWith(FragmentScope::class)
-class EnableSyncFragment : DuckDuckGoFragment(R.layout.fragment_enable_sync) {
-
-    interface EnableSyncListener {
-        fun turnOnSync()
-        fun recoverYourSyncedData()
-    }
+class SyncAnotherDeviceFragment : DuckDuckGoFragment(R.layout.fragment_enable_sync) {
 
     private val binding: FragmentEnableSyncBinding by viewBinding()
-
-    private val listener: EnableSyncListener?
-        get() = activity as? EnableSyncListener
 
     override fun onViewCreated(
         view: View,
@@ -53,18 +43,18 @@ class EnableSyncFragment : DuckDuckGoFragment(R.layout.fragment_enable_sync) {
         binding.closeIcon.setOnClickListener {
             requireActivity().finish()
         }
-        binding.footerPrimaryButton.setOnClickListener {
-            listener?.turnOnSync()
-        }
-        binding.footerSecondaryButton.setOnClickListener {
-            listener?.recoverYourSyncedData()
-        }
     }
 
     private fun observeUiEvents() {
+        binding.contentIllustration.setImageResource(R.drawable.ic_connect_device_128)
+        binding.contentTitle.text = "Sync Another Device?"
+        binding.contentBody.text = "Your bookmarks will be backed up! Would you like to sync another device now?\n\nIf you’ve already set up Sync on another device, this will allow you to combine bookmarks from both devices into a single backup."
+        binding.footerPrimaryButton.text = "Sync Another Device"
+        binding.footerSecondaryButton.text = "Not Now"
     }
 
     companion object {
-        fun instance() = EnableSyncFragment()
+        fun instance() = SyncAnotherDeviceFragment()
     }
 }
+
