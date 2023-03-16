@@ -21,7 +21,8 @@
     <string name="macos_title">DuckDuckGo для Mac!</string>
 
     <string name="macos_share_title">Поделиться ссылкой</string>
-    <string name="macos_description_text">Приложение DuckDuckGo для Mac — это высокая скорость, функциональность и беспрецедентная конфиденциальность.\n\nСсылка для загрузки на Mac:\n<b><font color="#3969EF">duckduckgo.com/mac</font></b></string>
+    <string name="macos_description_text">Приложение DuckDuckGo для Mac — это высокая скорость, функциональность и беспрецедентная конфиденциальность.\n\nПерейдите на компьютере Mac по ссылке:</string>
+    <string name="macos_description_link">duckduckgo.com/mac</string>
     <string name="macos_share_text">Конфиденциальность в Интернете на Mac? Не проблема!\n\nЗагрузите наше приложение по ссылке:\nhttps://duckduckgo.com/mac</string>
 
     <string name="macos_waitlist_windows_link">Ищете версию для Windows?</string>
