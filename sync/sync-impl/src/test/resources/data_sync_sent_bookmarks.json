@@ -1,0 +1,24 @@
+{
+  "bookmarks": {
+    "updates": [
+      {
+        "id": "bookmarks_root",
+        "folder": {
+          "children": [
+            "rcv9suHAD8-BDCOpVw2Er"
+          ]
+        }
+      }
+    ],
+    "modified_since": "string"
+  },
+  "settings": {
+    "updates": [
+      {
+        "key": "string",
+        "value": "string"
+      }
+    ],
+    "modified_since": "string"
+  }
+}

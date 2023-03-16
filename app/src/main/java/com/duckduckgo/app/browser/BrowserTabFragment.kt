@@ -69,9 +69,6 @@ import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
-import com.duckduckgo.app.bookmarks.model.SavedSite
-import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
-import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
 import com.duckduckgo.app.browser.BrowserTabViewModel.AccessibilityViewState
@@ -202,6 +199,10 @@ import com.duckduckgo.mobile.android.ui.view.dialog.StackedAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnOnboardingActivity
 import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.savedsites.api.models.SavedSite
+import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
+import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
 import com.duckduckgo.voice.api.VoiceSearchLauncher
@@ -2116,7 +2117,7 @@ class BrowserTabFragment :
     private fun editSavedSite(savedSiteChangedViewState: SavedSiteChangedViewState) {
         val addBookmarkDialog = EditSavedSiteDialogFragment.instance(
             savedSiteChangedViewState.savedSite,
-            savedSiteChangedViewState.bookmarkFolder?.id ?: 0,
+            savedSiteChangedViewState.bookmarkFolder?.id ?: SavedSitesNames.BOOMARKS_ROOT,
             savedSiteChangedViewState.bookmarkFolder?.name,
         )
         addBookmarkDialog.show(childFragmentManager, ADD_SAVED_SITE_FRAGMENT_TAG)

@@ -260,6 +260,10 @@ dependencies {
     implementation project(':windows-impl')
     implementation project(':windows-store')
 
+    implementation project(':saved-sites-api')
+    implementation project(':saved-sites-impl')
+    implementation project(':saved-sites-store')
+
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
     debugImplementation Square.leakCanary.android

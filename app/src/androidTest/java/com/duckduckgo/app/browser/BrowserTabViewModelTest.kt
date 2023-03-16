@@ -44,10 +44,6 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.A
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
-import com.duckduckgo.app.bookmarks.model.BookmarksRepository
-import com.duckduckgo.app.bookmarks.model.FavoritesRepository
-import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
-import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.LoadExtractedUrl
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShowBackNavigationHistory
@@ -141,6 +137,9 @@ import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
+import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
+import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
@@ -148,6 +147,7 @@ import dagger.Lazy
 import io.reactivex.Observable
 import java.io.File
 import java.util.Locale
+import java.util.UUID
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -216,7 +216,7 @@ class BrowserTabViewModelTest {
     private lateinit var mockBookmarksDao: BookmarksDao
 
     @Mock
-    private lateinit var mockBookmarksRepository: BookmarksRepository
+    private lateinit var mockSavedSitesRepository: SavedSitesRepository
 
     @Mock
     private lateinit var mockLongPressHandler: LongPressHandler
@@ -286,9 +286,6 @@ class BrowserTabViewModelTest {
 
     @Mock
     private lateinit var mockEmailManager: EmailManager
-
-    @Mock
-    private lateinit var mockFavoritesRepository: FavoritesRepository
 
     @Mock
     private lateinit var mockSpecialUrlDetector: SpecialUrlDetector
@@ -400,7 +397,7 @@ class BrowserTabViewModelTest {
         fireproofWebsiteDao = db.fireproofWebsiteDao()
         locationPermissionsDao = db.locationPermissionsDao()
 
-        mockAutoCompleteApi = AutoCompleteApi(mockAutoCompleteService, mockBookmarksDao, mockFavoritesRepository)
+        mockAutoCompleteApi = AutoCompleteApi(mockAutoCompleteService, mockSavedSitesRepository)
         val fireproofWebsiteRepositoryImpl = FireproofWebsiteRepositoryImpl(
             fireproofWebsiteDao,
             coroutineRule.testDispatcherProvider,
@@ -411,8 +408,8 @@ class BrowserTabViewModelTest {
         whenever(mockTabRepository.flowTabs).thenReturn(flowOf(emptyList()))
         whenever(mockTabRepository.liveTabs).thenReturn(tabsLiveData)
         whenever(mockEmailManager.signedInFlow()).thenReturn(emailStateFlow.asStateFlow())
-        whenever(mockFavoritesRepository.favorites()).thenReturn(favoriteListFlow.consumeAsFlow())
-        whenever(mockBookmarksRepository.bookmarks()).thenReturn(bookmarksListFlow.consumeAsFlow())
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(favoriteListFlow.consumeAsFlow())
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(bookmarksListFlow.consumeAsFlow())
         whenever(mockRemoteMessagingRepository.messageFlow()).thenReturn(remoteMessageFlow.consumeAsFlow())
         whenever(mockSettingsDataStore.automaticFireproofSetting).thenReturn(AutomaticFireproofSetting.ASK_EVERY_TIME)
 
@@ -459,7 +456,6 @@ class BrowserTabViewModelTest {
             networkLeaderboardDao = mockNetworkLeaderboardDao,
             autoComplete = mockAutoCompleteApi,
             appSettingsPreferencesStore = mockSettingsStore,
-            bookmarksRepository = mockBookmarksRepository,
             longPressHandler = mockLongPressHandler,
             webViewSessionStorage = webViewSessionStorage,
             specialUrlDetector = mockSpecialUrlDetector,
@@ -470,6 +466,7 @@ class BrowserTabViewModelTest {
             pixel = mockPixel,
             dispatchers = coroutineRule.testDispatcherProvider,
             fireproofWebsiteRepository = fireproofWebsiteRepositoryImpl,
+            savedSitesRepository = mockSavedSitesRepository,
             locationPermissionsRepository = LocationPermissionsRepositoryImpl(
                 locationPermissionsDao,
                 lazyFaviconManager,
@@ -482,7 +479,6 @@ class BrowserTabViewModelTest {
             gpc = RealGpc(mockFeatureToggle, mockGpcRepository, mockUnprotectedTemporary, mockUserAllowListRepository),
             fireproofDialogsEventHandler = fireproofDialogsEventHandler,
             emailManager = mockEmailManager,
-            favoritesRepository = mockFavoritesRepository,
             appCoroutineScope = TestScope(),
             appLinksHandler = mockAppLinksHandler,
             contentBlocking = mockContentBlocking,
@@ -647,41 +643,43 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenBookmarkEditedThenRepositoryIsUpdated() = runTest {
-        val bookmark = Bookmark(id = 0, title = "A title", url = "www.example.com", parentId = 0)
-        testee.onSavedSiteEdited(bookmark)
-        verify(mockBookmarksRepository).update(bookmark)
+        val folderId = "folder1"
+        val bookmark =
+            Bookmark(id = UUID.randomUUID().toString(), title = "A title", url = "www.example.com", parentId = folderId)
+        testee.onBookmarkEdited(bookmark, folderId)
+        verify(mockSavedSitesRepository).updateBookmark(bookmark, folderId)
     }
 
     @Test
     fun whenFavoriteEditedThenRepositoryUpdated() = runTest {
-        val favorite = Favorite(0, "A title", "www.example.com", 1)
-        testee.onSavedSiteEdited(favorite)
-        verify(mockFavoritesRepository).update(favorite)
+        val favorite = Favorite(UUID.randomUUID().toString(), "A title", "www.example.com", 1)
+        testee.onFavouriteEdited(favorite)
+        verify(mockSavedSitesRepository).updateFavourite(favorite)
     }
 
     @Test
     fun whenBookmarkAddedThenRepositoryIsUpdatedAndUserNotified() = runTest {
         val url = "http://www.example.com"
         val title = "A title"
-        val bookmark = Bookmark(id = 0, title = title, url = url, parentId = 0)
-        whenever(mockBookmarksRepository.insert(title = anyString(), url = anyString(), parentId = anyLong())).thenReturn(bookmark)
+        val bookmark = Bookmark(id = UUID.randomUUID().toString(), title = title, url = url, parentId = UUID.randomUUID().toString())
+        whenever(mockSavedSitesRepository.insertBookmark(title = anyString(), url = anyString())).thenReturn(bookmark)
         loadUrl(url = url, title = title)
 
         testee.onBookmarkMenuClicked()
-        verify(mockBookmarksRepository).insert(title = title, url = url)
+        verify(mockSavedSitesRepository).insertBookmark(title = title, url = url)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.lastValue is Command.ShowSavedSiteAddedConfirmation)
     }
 
     @Test
     fun whenFavoriteAddedThenRepositoryUpdatedAndUserNotified() = runTest {
-        val savedSite = Favorite(1, "title", "http://example.com", 0)
+        val savedSite = Favorite(UUID.randomUUID().toString(), "title", "http://example.com", 0)
         loadUrl("www.example.com", "A title")
-        whenever(mockFavoritesRepository.insert(any(), any())).thenReturn(savedSite)
+        whenever(mockSavedSitesRepository.insertFavorite(any(), any())).thenReturn(savedSite)
 
         testee.onFavoriteMenuClicked()
 
-        verify(mockFavoritesRepository).insert(title = "A title", url = "www.example.com")
+        verify(mockSavedSitesRepository).insertFavorite(title = "A title", url = "www.example.com")
         assertCommandIssued<Command.ShowSavedSiteAddedConfirmation>()
     }
 
@@ -689,35 +687,35 @@ class BrowserTabViewModelTest {
     fun whenNoSiteAndUserSelectsToAddFavoriteThenSiteIsNotAdded() = runTest {
         testee.onFavoriteMenuClicked()
 
-        verify(mockFavoritesRepository, times(0)).insert(any(), any())
+        verify(mockSavedSitesRepository, times(0)).insertFavorite(any(), any())
     }
 
     @Test
     fun whenQuickAccessDeletedThenRepositoryUpdated() = runTest {
-        val savedSite = Favorite(1, "title", "http://example.com", 0)
+        val savedSite = Favorite(UUID.randomUUID().toString(), "title", "http://example.com", 0)
 
         testee.deleteQuickAccessItem(savedSite)
 
-        verify(mockFavoritesRepository).delete(savedSite)
+        verify(mockSavedSitesRepository).delete(savedSite)
     }
 
     @Test
     fun whenQuickAccessInsertedThenRepositoryUpdated() {
-        val savedSite = Favorite(1, "title", "http://example.com", 0)
+        val savedSite = Favorite(UUID.randomUUID().toString(), "title", "http://example.com", 0)
 
         testee.insertQuickAccessItem(savedSite)
 
-        verify(mockFavoritesRepository).insert(savedSite)
+        verify(mockSavedSitesRepository).insert(savedSite)
     }
 
     @Test
     fun whenQuickAccessListChangedThenRepositoryUpdated() {
-        val savedSite = Favorite(1, "title", "http://example.com", 0)
+        val savedSite = Favorite(UUID.randomUUID().toString(), "title", "http://example.com", 0)
         val savedSites = listOf(QuickAccessFavorite(savedSite))
 
         testee.onQuickAccessListChanged(savedSites)
 
-        verify(mockFavoritesRepository).updateWithPosition(listOf(savedSite))
+        verify(mockSavedSitesRepository).updateWithPosition(listOf(savedSite))
     }
 
     @Test
@@ -1161,7 +1159,18 @@ class BrowserTabViewModelTest {
     @Test
     fun whenOmnibarFocusedWithUrlAndUserHasFavoritesThenAutoCompleteShowsFavorites() {
         testee.autoCompleteViewState.value =
-            autoCompleteViewState().copy(favorites = listOf(QuickAccessFavorite(Favorite(1, "title", "http://example.com", 1))))
+            autoCompleteViewState().copy(
+                favorites = listOf(
+                    QuickAccessFavorite(
+                        Favorite(
+                            UUID.randomUUID().toString(),
+                            "title",
+                            "http://example.com",
+                            1,
+                        ),
+                    ),
+                ),
+            )
         doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
         testee.onOmnibarInputStateChanged("https://example.com", true, hasQueryChanged = false)
         assertFalse(autoCompleteViewState().showSuggestions)
@@ -1569,8 +1578,8 @@ class BrowserTabViewModelTest {
     fun whenSiteLoadedAndUserSelectsToAddBookmarkThenAddBookmarkCommandSentWithUrlAndTitle() = runTest {
         val url = "http://foo.com"
         val title = "Foo Title"
-        val bookmark = Bookmark(id = 0, title = title, url = url, parentId = 0)
-        whenever(mockBookmarksRepository.insert(title = anyString(), url = anyString(), parentId = anyLong())).thenReturn(bookmark)
+        val bookmark = Bookmark(id = UUID.randomUUID().toString(), title = title, url = url, parentId = UUID.randomUUID().toString())
+        whenever(mockSavedSitesRepository.insertBookmark(title = anyString(), url = anyString())).thenReturn(bookmark)
         loadUrl(url = url)
         testee.titleReceived(newTitle = title)
         testee.onBookmarkMenuClicked()
@@ -1581,12 +1590,17 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenNoSiteAndUserSelectsToAddBookmarkThenBookmarkIsNotAdded() = runTest {
-        val bookmark = Bookmark(id = 0, title = "A title", url = "www.example.com", parentId = 0)
-        whenever(mockBookmarksRepository.insert(anyString(), anyString(), anyLong())).thenReturn(bookmark)
+        val bookmark = Bookmark(
+            id = UUID.randomUUID().toString(),
+            title = "A title",
+            url = "www.example.com",
+            parentId = UUID.randomUUID().toString(),
+        )
+        whenever(mockSavedSitesRepository.insertBookmark(anyString(), anyString())).thenReturn(bookmark)
 
         testee.onBookmarkMenuClicked()
 
-        verify(mockBookmarksRepository, times(0)).insert(bookmark)
+        verify(mockSavedSitesRepository, times(0)).insert(bookmark)
     }
 
     @Test
@@ -1900,7 +1914,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenBookmarkSuggestionSubmittedThenAutoCompleteBookmarkSelectionPixelSent() = runTest {
-        whenever(mockBookmarksRepository.hasBookmarks()).thenReturn(true)
+        whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(true)
         val suggestion = AutoCompleteBookmarkSuggestion("example", "Example", "https://example.com")
         testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", listOf(suggestion)))
         testee.fireAutocompletePixel(suggestion)
@@ -1909,7 +1923,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSearchSuggestionSubmittedWithBookmarksThenAutoCompleteSearchSelectionPixelSent() = runTest {
-        whenever(mockBookmarksRepository.hasBookmarks()).thenReturn(true)
+        whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(true)
         val suggestions = listOf(AutoCompleteSearchSuggestion("", false), AutoCompleteBookmarkSuggestion("", "", ""))
         testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", suggestions))
         testee.fireAutocompletePixel(AutoCompleteSearchSuggestion("example", false))
@@ -1919,7 +1933,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSearchSuggestionSubmittedWithoutBookmarksThenAutoCompleteSearchSelectionPixelSent() = runTest {
-        whenever(mockBookmarksRepository.hasBookmarks()).thenReturn(false)
+        whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(false)
         testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", emptyList()))
         testee.fireAutocompletePixel(AutoCompleteSearchSuggestion("example", false))
 
@@ -3121,8 +3135,8 @@ class BrowserTabViewModelTest {
     fun whenBookmarkAddedThenPersistFavicon() = runTest {
         val url = "http://example.com"
         val title = "A title"
-        val bookmark = Bookmark(id = 0, title = title, url = url, parentId = 0)
-        whenever(mockBookmarksRepository.insert(title = anyString(), url = anyString(), parentId = anyLong())).thenReturn(bookmark)
+        val bookmark = Bookmark(id = UUID.randomUUID().toString(), title = title, url = url, parentId = UUID.randomUUID().toString())
+        whenever(mockSavedSitesRepository.insertBookmark(title = anyString(), url = anyString())).thenReturn(bookmark)
         loadUrl(url = url, title = title)
 
         testee.onBookmarkMenuClicked()
@@ -3644,18 +3658,18 @@ class BrowserTabViewModelTest {
     @Test
     fun whenEditBookmarkRequestedThenRepositoryIsNotUpdated() = runTest {
         val url = "http://www.example.com"
-        val bookmark = Bookmark(id = 1L, title = "", url = url, parentId = 0L)
-        whenever(mockBookmarksRepository.getBookmark(url = url)).thenReturn(bookmark)
+        val bookmark = Bookmark(id = UUID.randomUUID().toString(), title = "", url = url, parentId = UUID.randomUUID().toString())
+        whenever(mockSavedSitesRepository.getBookmark(url = url)).thenReturn(bookmark)
         bookmarksListFlow.send(listOf(bookmark))
         loadUrl(url = url, isBrowserShowing = true)
         testee.onBookmarkMenuClicked()
-        verify(mockBookmarksRepository, never()).insert(title = anyString(), url = anyString(), parentId = anyLong())
+        verify(mockSavedSitesRepository, never()).insertBookmark(title = anyString(), url = anyString())
     }
 
     @Test
     fun whenEditBookmarkRequestedThenEditBookmarkPressedPixelIsFired() = runTest {
-        val bookmark = Bookmark(id = 1L, title = "title", url = "www.example.com", parentId = 0L)
-        whenever(mockBookmarksRepository.getBookmark("www.example.com")).thenReturn(bookmark)
+        val bookmark = Bookmark(id = UUID.randomUUID().toString(), title = "title", url = "www.example.com", parentId = UUID.randomUUID().toString())
+        whenever(mockSavedSitesRepository.getBookmark("www.example.com")).thenReturn(bookmark)
         bookmarksListFlow.send(listOf(bookmark))
         loadUrl("www.example.com", isBrowserShowing = true)
         testee.onBookmarkMenuClicked()
@@ -3664,8 +3678,8 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenEditBookmarkRequestedThenEditDialogIsShownWithCorrectUrlAndTitle() = runTest {
-        val bookmark = Bookmark(id = 1L, title = "title", url = "www.example.com", parentId = 0L)
-        whenever(mockBookmarksRepository.getBookmark("www.example.com")).thenReturn(bookmark)
+        val bookmark = Bookmark(id = UUID.randomUUID().toString(), title = "title", url = "www.example.com", parentId = UUID.randomUUID().toString())
+        whenever(mockSavedSitesRepository.getBookmark("www.example.com")).thenReturn(bookmark)
         bookmarksListFlow.send(listOf(bookmark))
         loadUrl("www.example.com", isBrowserShowing = true)
         testee.onBookmarkMenuClicked()
@@ -3678,17 +3692,17 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenRemoveFavoriteRequestedThenDaoInsertIsNotCalled() = runTest {
-        val favoriteSite = Favorite(id = 1L, title = "", url = "www.example.com", position = 0)
+        val favoriteSite = Favorite(id = UUID.randomUUID().toString(), title = "", url = "www.example.com", position = 0)
         favoriteListFlow.send(listOf(favoriteSite))
         loadUrl("www.example.com", isBrowserShowing = true)
         testee.onFavoriteMenuClicked()
-        verify(mockFavoritesRepository, never()).insert(any())
+        verify(mockSavedSitesRepository, never()).insert(any<Favorite>())
     }
 
     @Test
     fun whenRemoveFavoriteRequestedThenRemoveFavoritePressedPixelIsFired() = runTest {
-        val favoriteSite = Favorite(id = 1L, title = "", url = "www.example.com", position = 0)
-        whenever(mockFavoritesRepository.favorite("www.example.com")).thenReturn(favoriteSite)
+        val favoriteSite = Favorite(id = UUID.randomUUID().toString(), title = "", url = "www.example.com", position = 0)
+        whenever(mockSavedSitesRepository.getFavorite("www.example.com")).thenReturn(favoriteSite)
         favoriteListFlow.send(listOf(favoriteSite))
         loadUrl("www.example.com", isBrowserShowing = true)
         testee.onFavoriteMenuClicked()
@@ -3699,18 +3713,18 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenRemoveFavoriteRequestedThenRepositoryDeleteIsCalledForThatSite() = runTest {
-        val favoriteSite = Favorite(id = 1L, title = "", url = "www.example.com", position = 0)
-        whenever(mockFavoritesRepository.favorite("www.example.com")).thenReturn(favoriteSite)
+        val favoriteSite = Favorite(id = UUID.randomUUID().toString(), title = "", url = "www.example.com", position = 0)
+        whenever(mockSavedSitesRepository.getFavorite("www.example.com")).thenReturn(favoriteSite)
         favoriteListFlow.send(listOf(favoriteSite))
         loadUrl("www.example.com", isBrowserShowing = true)
         testee.onFavoriteMenuClicked()
-        verify(mockFavoritesRepository, atLeastOnce()).delete(favoriteSite)
+        verify(mockSavedSitesRepository, atLeastOnce()).delete(favoriteSite)
     }
 
     @Test
     fun whenRemoveFavoriteRequestedThenDeleteConfirmationDialogIsShownWithCorrectUrlAndTitle() = runTest {
-        val favoriteSite = Favorite(id = 1L, title = "title", url = "www.example.com", position = 0)
-        whenever(mockFavoritesRepository.favorite("www.example.com")).thenReturn(favoriteSite)
+        val favoriteSite = Favorite(id = UUID.randomUUID().toString(), title = "title", url = "www.example.com", position = 0)
+        whenever(mockSavedSitesRepository.getFavorite("www.example.com")).thenReturn(favoriteSite)
         favoriteListFlow.send(listOf(favoriteSite))
         loadUrl("www.example.com", isBrowserShowing = true)
         testee.onFavoriteMenuClicked()

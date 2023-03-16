@@ -21,14 +21,21 @@ import androidx.lifecycle.Observer
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
-import com.duckduckgo.app.bookmarks.db.BookmarkFolderEntity
 import com.duckduckgo.app.bookmarks.model.*
-import com.duckduckgo.app.bookmarks.service.SavedSitesManager
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.savedsites.api.models.BookmarkFolder
+import com.duckduckgo.savedsites.api.models.BookmarkFolderItem
+import com.duckduckgo.savedsites.api.models.FolderBranch
+import com.duckduckgo.savedsites.api.models.SavedSite
+import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
+import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.api.models.SavedSites
+import com.duckduckgo.savedsites.api.models.SavedSitesNames
+import com.duckduckgo.savedsites.api.service.SavedSitesManager
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -37,7 +44,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers.anyLong
+import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.*
 
 @ExperimentalCoroutinesApi
@@ -61,21 +68,19 @@ class BookmarksViewModelTest {
     private val commandObserver: Observer<BookmarksViewModel.Command> = mock()
 
     private val viewStateObserver: Observer<BookmarksViewModel.ViewState> = mock()
-    private val favoritesRepository: FavoritesRepository = mock()
-    private val bookmarksRepository: BookmarksRepository = mock()
+    private val savedSitesRepository: SavedSitesRepository = mock()
     private val faviconManager: FaviconManager = mock()
     private val savedSitesManager: SavedSitesManager = mock()
     private val pixel: Pixel = mock()
 
-    private val bookmark = SavedSite.Bookmark(id = 0, title = "title", url = "www.example.com", parentId = 0)
-    private val favorite = SavedSite.Favorite(id = 0, title = "title", url = "www.example.com", position = 0)
-    private val bookmarkFolder = BookmarkFolder(id = 1, name = "folder", parentId = 0)
-    private val bookmarkEntity = BookmarkEntity(id = bookmark.id, title = bookmark.title, url = bookmark.url, parentId = 0)
+    private val bookmark = SavedSite.Bookmark(id = "bookmark1", title = "title", url = "www.example.com", parentId = SavedSitesNames.BOOMARKS_ROOT)
+    private val favorite = SavedSite.Favorite(id = "favorite1", title = "title", url = "www.example.com", position = 0)
+    private val bookmarkFolder = BookmarkFolder(id = "folder1", name = "folder", parentId = SavedSitesNames.BOOMARKS_ROOT)
+    private val bookmarkFolderItem = BookmarkFolderItem(0, bookmarkFolder, true)
 
     private val testee: BookmarksViewModel by lazy {
         val model = BookmarksViewModel(
-            favoritesRepository,
-            bookmarksRepository,
+            savedSitesRepository,
             faviconManager,
             savedSitesManager,
             pixel,
@@ -88,11 +93,21 @@ class BookmarksViewModelTest {
 
     @Before
     fun before() = runTest {
-        whenever(favoritesRepository.favorites()).thenReturn(flowOf())
+        whenever(savedSitesRepository.getFavorites()).thenReturn(flowOf())
 
-        whenever(bookmarksRepository.fetchBookmarksAndFolders(anyLong())).thenReturn(
+        whenever(savedSitesRepository.getFolderContent(anyString())).thenReturn(
             flowOf(
                 Pair(
+                    listOf(bookmark),
+                    listOf(bookmarkFolder, bookmarkFolder, bookmarkFolder),
+                ),
+            ),
+        )
+
+        whenever(savedSitesRepository.getSavedSites(anyString())).thenReturn(
+            flowOf(
+                SavedSites(
+                    listOf(favorite),
                     listOf(bookmark),
                     listOf(bookmarkFolder, bookmarkFolder, bookmarkFolder),
                 ),
@@ -110,14 +125,14 @@ class BookmarksViewModelTest {
     fun whenBookmarkInsertedThenDaoUpdated() = runTest {
         testee.insert(bookmark)
 
-        verify(bookmarksRepository).insert(bookmark)
+        verify(savedSitesRepository).insert(bookmark)
     }
 
     @Test
     fun whenFavoriteInsertedThenRepositoryUpdated() = runTest {
         testee.insert(favorite)
 
-        verify(favoritesRepository).insert(favorite)
+        verify(savedSitesRepository).insert(favorite)
     }
 
     @Test
@@ -125,28 +140,28 @@ class BookmarksViewModelTest {
         testee.onDeleteSavedSiteRequested(bookmark)
 
         verify(faviconManager).deletePersistedFavicon(bookmark.url)
-        verify(bookmarksRepository).delete(bookmark)
+        verify(savedSitesRepository).delete(bookmark)
     }
 
     @Test
     fun whenFavoriteDeleteRequestedThenDeleteFromRepository() = runTest {
         testee.onDeleteSavedSiteRequested(favorite)
 
-        verify(favoritesRepository).delete(favorite)
+        verify(savedSitesRepository).delete(favorite)
     }
 
     @Test
     fun whenBookmarkEditedThenDaoUpdated() = runTest {
-        testee.onSavedSiteEdited(bookmark)
+        testee.onBookmarkEdited(bookmark, "folder1")
 
-        verify(bookmarksRepository).update(bookmark)
+        verify(savedSitesRepository).updateBookmark(bookmark, "folder1")
     }
 
     @Test
     fun whenFavoriteEditedThenRepositoryUpdated() = runTest {
-        testee.onSavedSiteEdited(favorite)
+        testee.onFavouriteEdited(favorite)
 
-        verify(favoritesRepository).update(favorite)
+        verify(savedSitesRepository).updateFavourite(favorite)
     }
 
     @Test
@@ -183,20 +198,6 @@ class BookmarksViewModelTest {
     }
 
     @Test
-    fun whenFavoritesChangedThenObserverNotified() = runTest {
-        whenever(favoritesRepository.favorites()).thenReturn(
-            flow {
-                emit(emptyList())
-                emit(listOf(favorite))
-            },
-        )
-        testee
-        verify(viewStateObserver).onChanged(viewStateCaptor.capture())
-        assertNotNull(viewStateCaptor.value)
-        assertEquals(1, viewStateCaptor.value.favorites.size)
-    }
-
-    @Test
     fun whenBookmarkFolderSelectedThenIssueOpenBookmarkFolderCommand() {
         testee.onBookmarkFolderSelected(bookmarkFolder)
 
@@ -206,11 +207,11 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenFetchBookmarksAndFoldersThenUpdateStateWithCollectedBookmarksAndFolders() = runTest {
-        val parentId = 1L
+        val parentId = "folder1"
 
         testee.fetchBookmarksAndFolders(parentId = parentId)
 
-        verify(bookmarksRepository).fetchBookmarksAndFolders(parentId)
+        verify(savedSitesRepository).getSavedSites(parentId)
 
         verify(viewStateObserver, times(2)).onChanged(viewStateCaptor.capture())
 
@@ -218,8 +219,33 @@ class BookmarksViewModelTest {
         assertEquals(emptyList<BookmarkFolder>(), viewStateCaptor.allValues[0].bookmarkFolders)
         assertEquals(false, viewStateCaptor.allValues[0].enableSearch)
 
+        assertEquals(listOf(favorite), viewStateCaptor.allValues[1].favorites)
         assertEquals(listOf(bookmark), viewStateCaptor.allValues[1].bookmarks)
         assertEquals(listOf(bookmarkFolder, bookmarkFolder, bookmarkFolder), viewStateCaptor.allValues[1].bookmarkFolders)
+        assertEquals(true, viewStateCaptor.allValues[1].enableSearch)
+    }
+
+    @Test
+    fun whenFetchEverythingThenUpdateStateWithData() = runTest {
+        whenever(savedSitesRepository.getFavoritesSync()).thenReturn(listOf(favorite))
+        whenever(savedSitesRepository.getBookmarksTree()).thenReturn(listOf(bookmark, bookmark, bookmark))
+        whenever(savedSitesRepository.getFolderTree(SavedSitesNames.BOOMARKS_ROOT, null)).thenReturn(listOf(bookmarkFolderItem, bookmarkFolderItem))
+
+        testee.fetchAllBookmarksAndFolders()
+
+        verify(savedSitesRepository).getFavoritesSync()
+        verify(savedSitesRepository).getBookmarksTree()
+        verify(savedSitesRepository).getFolderTree(SavedSitesNames.BOOMARKS_ROOT, null)
+
+        verify(viewStateObserver, times(2)).onChanged(viewStateCaptor.capture())
+
+        assertEquals(emptyList<BookmarkEntity>(), viewStateCaptor.allValues[0].bookmarks)
+        assertEquals(emptyList<BookmarkFolder>(), viewStateCaptor.allValues[0].bookmarkFolders)
+        assertEquals(false, viewStateCaptor.allValues[0].enableSearch)
+
+        assertEquals(emptyList<Favorite>(), viewStateCaptor.allValues[1].favorites)
+        assertEquals(listOf(bookmark, bookmark, bookmark), viewStateCaptor.allValues[1].bookmarks)
+        assertEquals(listOf(bookmarkFolder, bookmarkFolder), viewStateCaptor.allValues[1].bookmarkFolders)
         assertEquals(true, viewStateCaptor.allValues[1].enableSearch)
     }
 
@@ -227,7 +253,7 @@ class BookmarksViewModelTest {
     fun whenBookmarkFolderAddedThenCallInsertOnRepository() = runTest {
         testee.onBookmarkFolderAdded(bookmarkFolder)
 
-        verify(bookmarksRepository).insert(bookmarkFolder)
+        verify(savedSitesRepository).insert(bookmarkFolder)
     }
 
     @Test
@@ -242,33 +268,35 @@ class BookmarksViewModelTest {
     fun whenBookmarkFolderUpdatedThenCallUpdateOnRepository() = runTest {
         testee.onBookmarkFolderUpdated(bookmarkFolder)
 
-        verify(bookmarksRepository).update(bookmarkFolder)
+        verify(savedSitesRepository).update(bookmarkFolder)
     }
 
     @Test
     fun whenDeleteEmptyBookmarkFolderRequestedThenDeleteFolderAndIssueConfirmDeleteBookmarkFolderCommand() = runTest {
-        val bookmarkFolderBranch = BookmarkFolderBranch(
-            listOf(bookmarkEntity),
-            listOf(BookmarkFolderEntity(bookmarkFolder.id, bookmarkFolder.name, bookmarkFolder.parentId)),
-        )
-        whenever(bookmarksRepository.deleteFolderBranch(any())).thenReturn(bookmarkFolderBranch)
+        val parentFolder = BookmarkFolder("folder1", "Parent Folder", SavedSitesNames.BOOMARKS_ROOT)
+        val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1")
+        val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2")
+        val folderBranch = FolderBranch(listOf(childBookmark), listOf(parentFolder, childFolder))
+
+        whenever(savedSitesRepository.deleteFolderBranch(any())).thenReturn(folderBranch)
 
         testee.onDeleteBookmarkFolderRequested(bookmarkFolder)
 
-        verify(bookmarksRepository).deleteFolderBranch(bookmarkFolder)
+        verify(savedSitesRepository).deleteFolderBranch(bookmarkFolder)
 
         verify(commandObserver).onChanged(commandCaptor.capture())
         assertEquals(bookmarkFolder, (commandCaptor.value as BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder).bookmarkFolder)
-        assertEquals(bookmarkFolderBranch, (commandCaptor.value as BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder).folderBranch)
+        assertEquals(folderBranch, (commandCaptor.value as BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder).folderBranch)
     }
 
     @Test
     fun whenDeleteNonEmptyBookmarkFolderRequestedThenIssueDeleteBookmarkFolderCommand() = runTest {
-        val bookmarkFolderBranch = BookmarkFolderBranch(
-            listOf(bookmarkEntity),
-            listOf(BookmarkFolderEntity(bookmarkFolder.id, bookmarkFolder.name, bookmarkFolder.parentId)),
-        )
-        whenever(bookmarksRepository.deleteFolderBranch(any())).thenReturn(bookmarkFolderBranch)
+        val parentFolder = BookmarkFolder("folder1", "Parent Folder", SavedSitesNames.BOOMARKS_ROOT)
+        val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1")
+        val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2")
+        val folderBranch = FolderBranch(listOf(childBookmark), listOf(parentFolder, childFolder))
+
+        whenever(savedSitesRepository.deleteFolderBranch(any())).thenReturn(folderBranch)
 
         val nonEmptyBookmarkFolder = bookmarkFolder.copy(numBookmarks = 1)
         testee.onDeleteBookmarkFolderRequested(nonEmptyBookmarkFolder)
@@ -279,13 +307,13 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenInsertRecentlyDeletedBookmarksAndFoldersThenInsertCachedFolderBranch() = runTest {
-        val bookmarkFolderBranch = BookmarkFolderBranch(
-            listOf(bookmarkEntity),
-            listOf(BookmarkFolderEntity(bookmarkFolder.id, bookmarkFolder.name, bookmarkFolder.parentId)),
-        )
+        val parentFolder = BookmarkFolder("folder1", "Parent Folder", SavedSitesNames.BOOMARKS_ROOT)
+        val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1")
+        val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2")
+        val folderBranch = FolderBranch(listOf(childBookmark), listOf(parentFolder, childFolder))
 
-        testee.insertDeletedFolderBranch(bookmarkFolderBranch)
+        testee.insertDeletedFolderBranch(folderBranch)
 
-        verify(bookmarksRepository).insertFolderBranch(bookmarkFolderBranch)
+        verify(savedSitesRepository).insertFolderBranch(folderBranch)
     }
 }

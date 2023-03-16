@@ -147,6 +147,23 @@ DDGSyncCryptoResult ddgSyncEncrypt(
     return DDGSYNCCRYPTO_OK;
 }
 
+extern DDGSyncCryptoResult ddgSyncDecrypt(
+    unsigned char *rawBytes,
+    unsigned char *encryptedBytes,
+    unsigned long long encryptedBytesLength,
+    unsigned char *secretKey) {
+
+    unsigned char nonceBytes[crypto_secretbox_NONCEBYTES];
+
+    memcpy(nonceBytes, &encryptedBytes[encryptedBytesLength - crypto_secretbox_NONCEBYTES], crypto_secretbox_NONCEBYTES);
+
+    if (0 != crypto_secretbox_open_easy(rawBytes, encryptedBytes, encryptedBytesLength - crypto_secretbox_NONCEBYTES, nonceBytes, secretKey)) {
+        return DDGSYNCCRYPTO_DECRYPTION_FAILED;
+    }
+
+    return DDGSYNCCRYPTO_OK;
+}
+
 DDGSyncCryptoResult ddgSyncSeal(
     unsigned char *sealed,
     unsigned char primaryKey[DDGSYNCCRYPTO_PRIMARY_KEY_SIZE],
@@ -178,23 +195,6 @@ DDGSyncCryptoResult ddgSyncSealOpen(
     }
 
     memcpy(rawBytes, decrypted, cypherTextLength - crypto_box_SEALBYTES);
-
-    return DDGSYNCCRYPTO_OK;
-}
-
-extern DDGSyncCryptoResult ddgSyncDecrypt(
-    unsigned char *rawBytes,
-    unsigned char *encryptedBytes,
-    unsigned long long encryptedBytesLength,
-    unsigned char *secretKey) {
-
-    unsigned char nonceBytes[crypto_secretbox_NONCEBYTES];
-
-    memcpy(nonceBytes, &encryptedBytes[encryptedBytesLength - crypto_secretbox_NONCEBYTES], crypto_secretbox_NONCEBYTES);
-
-    if (0 != crypto_secretbox_open_easy(rawBytes, encryptedBytes, encryptedBytesLength - crypto_secretbox_NONCEBYTES, nonceBytes, secretKey)) {
-        return DDGSYNCCRYPTO_DECRYPTION_FAILED;
-    }
 
     return DDGSYNCCRYPTO_OK;
 }

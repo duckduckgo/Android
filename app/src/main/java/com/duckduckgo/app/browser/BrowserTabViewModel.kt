@@ -44,10 +44,6 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
-import com.duckduckgo.app.bookmarks.model.BookmarkFolder
-import com.duckduckgo.app.bookmarks.model.BookmarksRepository
-import com.duckduckgo.app.bookmarks.model.FavoritesRepository
-import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.EditSavedSiteListener
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.*
 import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState.Browser
@@ -124,6 +120,11 @@ import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.privacy.config.api.*
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.savedsites.api.models.BookmarkFolder
+import com.duckduckgo.savedsites.api.models.SavedSite
+import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
+import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
@@ -149,8 +150,7 @@ class BrowserTabViewModel @Inject constructor(
     private val userWhitelistDao: UserWhitelistDao,
     private val contentBlocking: ContentBlocking,
     private val networkLeaderboardDao: NetworkLeaderboardDao,
-    private val bookmarksRepository: BookmarksRepository,
-    private val favoritesRepository: FavoritesRepository,
+    private val savedSitesRepository: SavedSitesRepository,
     private val fireproofWebsiteRepository: FireproofWebsiteRepository,
     private val locationPermissionsRepository: LocationPermissionsRepository,
     private val geoLocationPermissions: GeoLocationPermissions,
@@ -618,7 +618,8 @@ class BrowserTabViewModel @Inject constructor(
 
         observeAccessibilitySettings()
 
-        favoritesRepository.favorites().onEach { favoriteSites ->
+        savedSitesRepository.getFavorites().map { favoriteSites ->
+            Timber.d("Sync: getFavorites onEach $favoriteSites")
             val favorites = favoriteSites.map { FavoritesQuickAccessAdapter.QuickAccessFavorite(it) }
             ctaViewState.value = currentCtaViewState().copy(favorites = favorites)
             autoCompleteViewState.value = currentAutoCompleteViewState().copy(favorites = favorites)
@@ -626,7 +627,8 @@ class BrowserTabViewModel @Inject constructor(
             browserViewState.value = currentBrowserViewState().copy(favorite = favorite)
         }.launchIn(viewModelScope)
 
-        bookmarksRepository.bookmarks().onEach { bookmarks ->
+        savedSitesRepository.getBookmarks().map { bookmarks ->
+            Timber.d("Sync: getBookmarks onEach $bookmarks")
             val bookmark = bookmarks.firstOrNull { it.url == url }
             browserViewState.value = currentBrowserViewState().copy(bookmark = bookmark)
         }.launchIn(viewModelScope)
@@ -802,8 +804,9 @@ class BrowserTabViewModel @Inject constructor(
 
     suspend fun fireAutocompletePixel(suggestion: AutoCompleteSuggestion) {
         val currentViewState = currentAutoCompleteViewState()
+
         val hasBookmarks = withContext(dispatchers.io()) {
-            bookmarksRepository.hasBookmarks()
+            savedSitesRepository.hasBookmarks()
         }
         val hasBookmarkResults = currentViewState.searchResults.suggestions.any { it is AutoCompleteBookmarkSuggestion }
         val params = mapOf(
@@ -1295,20 +1298,20 @@ class BrowserTabViewModel @Inject constructor(
 
     private suspend fun getBookmark(url: String): SavedSite.Bookmark? {
         return withContext(dispatchers.io()) {
-            bookmarksRepository.getBookmark(url)
+            savedSitesRepository.getBookmark(url)
         }
     }
 
     private suspend fun getBookmarkFolder(bookmark: SavedSite.Bookmark?): BookmarkFolder? {
         if (bookmark == null) return null
         return withContext(dispatchers.io()) {
-            bookmarksRepository.getBookmarkFolderByParentId(bookmark.parentId)
+            savedSitesRepository.getFolder(bookmark.parentId)
         }
     }
 
     private suspend fun getFavorite(url: String): SavedSite.Favorite? {
         return withContext(dispatchers.io()) {
-            favoritesRepository.favorite(url)
+            savedSitesRepository.getFavorite(url)
         }
     }
 
@@ -1807,7 +1810,7 @@ class BrowserTabViewModel @Inject constructor(
             if (url.isNotBlank()) {
                 faviconManager.persistCachedFavicon(tabId, url)
             }
-            bookmarksRepository.insert(title, url)
+            savedSitesRepository.insertBookmark(url, title)
         }
         val bookmarkFolder = getBookmarkFolder(savedBookmark)
         withContext(dispatchers.main()) {
@@ -1834,7 +1837,7 @@ class BrowserTabViewModel @Inject constructor(
     private fun removeFavoriteSite(favorite: SavedSite.Favorite) {
         viewModelScope.launch {
             withContext(dispatchers.io()) {
-                favoritesRepository.delete(favorite)
+                savedSitesRepository.delete(favorite)
             }
             withContext(dispatchers.main()) {
                 command.value = DeleteSavedSiteConfirmation(favorite)
@@ -1850,7 +1853,7 @@ class BrowserTabViewModel @Inject constructor(
             val favorite = withContext(dispatchers.io()) {
                 if (url.isNotBlank()) {
                     faviconManager.persistCachedFavicon(tabId, url)
-                    favoritesRepository.insert(title = title, url = url)
+                    savedSitesRepository.insertFavorite(title = title, url = url)
                 } else {
                     null
                 }
@@ -1949,18 +1952,18 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    override fun onSavedSiteEdited(savedSite: SavedSite) {
-        when (savedSite) {
-            is SavedSite.Bookmark -> {
-                viewModelScope.launch(dispatchers.io()) {
-                    editBookmark(savedSite)
-                }
-            }
-            is SavedSite.Favorite -> {
-                viewModelScope.launch(dispatchers.io()) {
-                    editFavorite(savedSite)
-                }
-            }
+    override fun onFavouriteEdited(favorite: Favorite) {
+        viewModelScope.launch(dispatchers.io()) {
+            savedSitesRepository.updateFavourite(favorite)
+        }
+    }
+
+    override fun onBookmarkEdited(
+        bookmark: Bookmark,
+        oldFolderId: String,
+    ) {
+        viewModelScope.launch(dispatchers.io()) {
+            savedSitesRepository.updateBookmark(bookmark, oldFolderId)
         }
     }
 
@@ -1986,18 +1989,6 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onDeleteQuickAccessItemRequested(savedSite: SavedSite) {
         command.value = DeleteSavedSiteConfirmation(savedSite)
-    }
-
-    private suspend fun editBookmark(bookmark: SavedSite.Bookmark) {
-        withContext(dispatchers.io()) {
-            bookmarksRepository.update(bookmark)
-        }
-    }
-
-    private suspend fun editFavorite(favorite: SavedSite.Favorite) {
-        withContext(dispatchers.io()) {
-            favoritesRepository.update(favorite)
-        }
     }
 
     fun onBrokenSiteSelected() {
@@ -2690,20 +2681,20 @@ class BrowserTabViewModel @Inject constructor(
     fun deleteQuickAccessItem(savedSite: SavedSite) {
         val favorite = savedSite as? SavedSite.Favorite ?: return
         viewModelScope.launch(dispatchers.io() + NonCancellable) {
-            favoritesRepository.delete(favorite)
+            savedSitesRepository.delete(favorite)
         }
     }
 
     fun insertQuickAccessItem(savedSite: SavedSite) {
         val favorite = savedSite as? SavedSite.Favorite ?: return
         viewModelScope.launch(dispatchers.io()) {
-            favoritesRepository.insert(favorite)
+            savedSitesRepository.insert(favorite)
         }
     }
 
     fun onQuickAccessListChanged(newList: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
         viewModelScope.launch(dispatchers.io()) {
-            favoritesRepository.updateWithPosition(newList.map { it.favorite })
+            savedSitesRepository.updateWithPosition(newList.map { it.favorite })
         }
     }
 

@@ -22,9 +22,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.duckduckgo.app.bookmarks.model.BookmarkFolderItem
 import com.duckduckgo.app.browser.databinding.ItemBookmarkFolderBinding
 import com.duckduckgo.mobile.android.ui.view.toPx
+import com.duckduckgo.savedsites.api.models.BookmarkFolderItem
 
 class BookmarkFolderStructureAdapter(
     private val viewModel: BookmarkFoldersViewModel,

@@ -27,7 +27,6 @@ import android.view.WindowManager
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.DialogFragment
-import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_ID
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_NAME
@@ -39,6 +38,7 @@ import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.mobile.android.ui.view.showKeyboard
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
+import com.duckduckgo.savedsites.api.models.BookmarkFolder
 
 abstract class SavedSiteDialogFragment : DialogFragment() {
 
@@ -51,7 +51,7 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
     private var initialTitle: String? = null
     private var titleState = ValidationState.UNCHANGED
 
-    private var initialParentFolderId: Long? = null
+    private var initialParentFolderId: String? = null
     private var folderChanged = false
 
     var showAddFolderMenu: Boolean = false
@@ -70,10 +70,10 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
     }
 
     private fun storeFolderIdFromIntent(data: Intent) {
-        val parentId = data.getLongExtra(KEY_BOOKMARK_FOLDER_ID, 0)
+        val parentId = data.getStringExtra(KEY_BOOKMARK_FOLDER_ID)
         folderChanged = parentId != initialParentFolderId
         setConfirmationVisibility()
-        arguments?.putLong(KEY_BOOKMARK_FOLDER_ID, parentId)
+        arguments?.putString(KEY_BOOKMARK_FOLDER_ID, parentId)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -94,7 +94,7 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
         configureToolbar(binding.savedSiteAppBar.toolbar)
         configureUI()
         initialTitle = binding.titleInput.text.toString()
-        initialParentFolderId = arguments?.getLong(EditBookmarkFolderDialogFragment.KEY_PARENT_FOLDER_ID)
+        initialParentFolderId = arguments?.getString(EditBookmarkFolderDialogFragment.KEY_PARENT_FOLDER_ID)
         addTextWatchers()
         showKeyboard(binding.titleInput)
         return binding.root
@@ -147,7 +147,7 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
     private fun configureClickListeners() {
         binding.savedSiteLocation.setOnClickListener {
             context?.let { context ->
-                arguments?.getLong(KEY_BOOKMARK_FOLDER_ID)?.let {
+                arguments?.getString(KEY_BOOKMARK_FOLDER_ID)?.let {
                     if (arguments?.getSerializable(KEY_CURRENT_FOLDER) != null) {
                         launcher.launch(
                             BookmarkFoldersActivity.intent(
