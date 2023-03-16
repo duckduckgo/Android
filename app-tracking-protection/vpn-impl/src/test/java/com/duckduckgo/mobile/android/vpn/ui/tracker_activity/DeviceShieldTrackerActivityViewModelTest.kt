@@ -23,7 +23,7 @@ import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
-import com.duckduckgo.mobile.android.vpn.network.VpnDetector
+import com.duckduckgo.mobile.android.vpn.network.ExternalVpnDetector
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
@@ -63,7 +63,7 @@ class DeviceShieldTrackerActivityViewModelTest {
 
     private val appTrackerBlockingStatsRepository = mock<AppTrackerBlockingStatsRepository>()
     private val deviceShieldPixels = mock<DeviceShieldPixels>()
-    private val vpnDetector = mock<VpnDetector>()
+    private val vpnDetector = mock<ExternalVpnDetector>()
     private val vpnStateMonitor = mock<VpnStateMonitor>()
     private val vpnFeatureRemover = mock<VpnFeatureRemover>()
     private val vpnStore = mock<VpnStore>()
@@ -139,7 +139,7 @@ class DeviceShieldTrackerActivityViewModelTest {
 
     @Test
     fun whenToggleIsSwitchedOnAndOtherVPNIsDisabledThenTrackingProtectionIsEnabled() = runBlocking {
-        whenever(vpnDetector.isVpnDetected()).thenReturn(false)
+        whenever(vpnDetector.isExternalVpnDetected()).thenReturn(false)
         viewModel.commands().test {
             viewModel.onAppTPToggleSwitched(true)
             assertEquals(DeviceShieldTrackerActivityViewModel.Command.CheckVPNPermission, awaitItem())
@@ -149,7 +149,7 @@ class DeviceShieldTrackerActivityViewModelTest {
 
     @Test
     fun whenToggleIsSwitchedOffAndOtherVPNIsDisabledThenConfirmationDialogIsShown() = runBlocking {
-        whenever(vpnDetector.isVpnDetected()).thenReturn(false)
+        whenever(vpnDetector.isExternalVpnDetected()).thenReturn(false)
         viewModel.commands().test {
             viewModel.onAppTPToggleSwitched(false)
             assertEquals(DeviceShieldTrackerActivityViewModel.Command.ShowDisableVpnConfirmationDialog, awaitItem())
@@ -243,7 +243,7 @@ class DeviceShieldTrackerActivityViewModelTest {
 
     @Test
     fun whenToggleIsSwitchedOnAndOtherVPNIsEnabledThenVpnConflictDialogIsShown() = runBlocking {
-        whenever(vpnDetector.isVpnDetected()).thenReturn(true)
+        whenever(vpnDetector.isExternalVpnDetected()).thenReturn(true)
         viewModel.commands().test {
             viewModel.onAppTPToggleSwitched(true)
             assertEquals(DeviceShieldTrackerActivityViewModel.Command.ShowVpnConflictDialog, awaitItem())
