@@ -18,7 +18,7 @@ package com.duckduckgo.remote.messaging.impl.mappers
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.remote.messaging.api.Action
-import com.duckduckgo.remote.messaging.api.JsonActionType.APP_TP_ONBOARDING
+import com.duckduckgo.remote.messaging.api.JsonActionType.APP_NAVIGATION
 import com.duckduckgo.remote.messaging.api.JsonActionType.DEFAULT_BROWSER
 import com.duckduckgo.remote.messaging.api.JsonActionType.DISMISS
 import com.duckduckgo.remote.messaging.api.JsonActionType.PLAYSTORE
@@ -74,19 +74,6 @@ class DefaultBrowserActionMapper @Inject constructor() : MessageActionMapperPlug
     override fun evaluate(jsonMessageAction: JsonMessageAction): Action? {
         return if (jsonMessageAction.type == DEFAULT_BROWSER.jsonValue) {
             Action.DefaultBrowser()
-        } else {
-            null
-        }
-    }
-}
-
-@ContributesMultibinding(
-    AppScope::class,
-)
-class AppTPActionMapper @Inject constructor() : MessageActionMapperPlugin {
-    override fun evaluate(jsonMessageAction: JsonMessageAction): Action? {
-        return if (jsonMessageAction.type == APP_TP_ONBOARDING.jsonValue) {
-            Action.AppTpOnboarding()
         } else {
             null
         }

@@ -19,7 +19,7 @@ package com.duckduckgo.remote.messaging.impl
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Action.ActionType
-import com.duckduckgo.remote.messaging.api.Action.AppTpOnboarding
+import com.duckduckgo.remote.messaging.api.Action.AppNavigation
 import com.duckduckgo.remote.messaging.api.Action.DefaultBrowser
 import com.duckduckgo.remote.messaging.api.Action.Dismiss
 import com.duckduckgo.remote.messaging.api.Action.PlayStore
@@ -122,7 +122,7 @@ class AppRemoteMessagingRepository(
                         .withSubtype(Url::class.java, ActionType.URL.name)
                         .withSubtype(Dismiss::class.java, ActionType.DISMISS.name)
                         .withSubtype(DefaultBrowser::class.java, ActionType.DEFAULT_BROWSER.name)
-                        .withSubtype(AppTpOnboarding::class.java, ActionType.APP_TP_ONBOARDING.name),
+                        .withSubtype(AppNavigation::class.java, ActionType.APP_NAVIGATION.name),
                 )
                 .add(KotlinJsonAdapterFactory())
                 .build()

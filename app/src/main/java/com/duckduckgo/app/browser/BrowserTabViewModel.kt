@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.net.http.SslCertificate
@@ -385,7 +386,7 @@ class BrowserTabViewModel @Inject constructor(
         class LaunchPlayStore(val appPackage: String) : Command()
         class LaunchSurvey(val survey: Survey) : Command()
         object LaunchDefaultBrowser : Command()
-        object LaunchAppTPOnboarding : Command()
+        class NavigateToScreen(val intent: Intent) : Command()
         object LaunchAddWidget : Command()
         class RequiresAuthentication(val request: BasicAuthenticationRequest) : Command()
         class SaveCredentials(

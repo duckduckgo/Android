@@ -18,7 +18,8 @@
 
 package com.duckduckgo.remote.messaging.api
 
-import com.duckduckgo.remote.messaging.api.Action.ActionType.APP_TP_ONBOARDING
+import android.content.Intent
+import com.duckduckgo.remote.messaging.api.Action.ActionType.APP_NAVIGATION
 import com.duckduckgo.remote.messaging.api.Action.ActionType.DEFAULT_BROWSER
 import com.duckduckgo.remote.messaging.api.Action.ActionType.DISMISS
 import com.duckduckgo.remote.messaging.api.Action.ActionType.PLAYSTORE
@@ -85,13 +86,13 @@ sealed class Action(val actionType: ActionType) {
     // Using data class instead of Object. Object can't be serialized
     data class DefaultBrowser(val value: String = "") : Action(DEFAULT_BROWSER)
     data class Dismiss(val value: String = "") : Action(DISMISS)
-    data class AppTpOnboarding(val value: String = "") : Action(APP_TP_ONBOARDING)
+    data class AppNavigation(val intent: Intent) : Action(APP_NAVIGATION)
 
     enum class ActionType {
         URL,
         PLAYSTORE,
         DEFAULT_BROWSER,
         DISMISS,
-        APP_TP_ONBOARDING,
+        APP_NAVIGATION,
     }
 }
