@@ -78,7 +78,9 @@ class SyncActivity : DuckDuckGoActivity() {
 
     private fun processCommand(it: Command) {
         when (it) {
-            LaunchDeviceSetupFlow -> Toast.makeText(this, "will launch setup flow", Toast.LENGTH_LONG).show()
+            LaunchDeviceSetupFlow -> {
+                startActivity(SetupAccountActivity.intent(this))
+            }
         }
     }
 
