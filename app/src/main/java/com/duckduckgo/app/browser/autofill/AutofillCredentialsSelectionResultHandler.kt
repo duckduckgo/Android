@@ -56,6 +56,7 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val autofillStore: AutofillStore,
     private val pixel: Pixel,
+    private val autofillDialogSuppressor: AutofillFireproofDialogSuppressor,
 ) {
 
     fun processAutofillCredentialSelectionResult(
@@ -101,6 +102,8 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(
         context: Context,
         viewModel: BrowserTabViewModel,
     ) {
+        autofillDialogSuppressor.autofillSaveOrUpdateDialogVisibilityChanged(visible = false)
+
         pixel.fire(AutofillPixelNames.AUTOFILL_DECLINE_PROMPT_TO_DISABLE_AUTOFILL_SHOWN)
         withContext(dispatchers.main()) {
             AlertDialog.Builder(context)
@@ -139,6 +142,8 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(
         result: Bundle,
         credentialSaver: AutofillCredentialSaver,
     ): LoginCredentials? {
+        autofillDialogSuppressor.autofillSaveOrUpdateDialogVisibilityChanged(visible = false)
+
         val selectedCredentials = result.getParcelable<LoginCredentials>(CredentialSavePickerDialog.KEY_CREDENTIALS) ?: return null
         val originalUrl = result.getString(CredentialSavePickerDialog.KEY_URL) ?: return null
         val savedCredentials = credentialSaver.saveCredentials(originalUrl, selectedCredentials)
@@ -152,6 +157,8 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(
         result: Bundle,
         credentialSaver: AutofillCredentialSaver,
     ): LoginCredentials? {
+        autofillDialogSuppressor.autofillSaveOrUpdateDialogVisibilityChanged(visible = false)
+
         val selectedCredentials = result.getParcelable<LoginCredentials>(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIALS) ?: return null
         val originalUrl = result.getString(CredentialUpdateExistingCredentialsDialog.KEY_URL) ?: return null
         val updateType =
@@ -163,6 +170,14 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(
         withContext(dispatchers.main()) {
             viewModel.onRefreshRequested()
         }
+    }
+
+    fun processSaveOrUpdatePromptDismissed() {
+        autofillDialogSuppressor.autofillSaveOrUpdateDialogVisibilityChanged(visible = false)
+    }
+
+    fun processSaveOrUpdatePromptShown() {
+        autofillDialogSuppressor.autofillSaveOrUpdateDialogVisibilityChanged(visible = true)
     }
 
     interface CredentialInjector {

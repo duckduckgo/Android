@@ -136,7 +136,7 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
                 it.putParcelable(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIALS, credentials)
                 it.putParcelable(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIAL_UPDATE_TYPE, getUpdateType())
             }
-            parentFragment?.setFragmentResult(CredentialUpdateExistingCredentialsDialog.resultKey(getTabId()), result)
+            parentFragment?.setFragmentResult(CredentialUpdateExistingCredentialsDialog.resultKeyCredentialUpdated(getTabId()), result)
 
             ignoreCancellationEvents = true
             animateClosed()
@@ -170,7 +170,7 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
         }
 
         Timber.v("onCancel: AutofillUpdatingExistingCredentialsDialogFragment. User declined to update credentials")
-
+        parentFragment?.setFragmentResult(CredentialUpdateExistingCredentialsDialog.resultKeyPromptDismissed(getTabId()), Bundle())
         pixelNameDialogEvent(Dismissed)?.let { pixel.fire(it) }
     }
 
