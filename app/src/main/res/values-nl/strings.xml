@@ -646,13 +646,13 @@
 
     <!-- Autoconsent -->
     <!-- smartling.character_limit = 82 -->
-    <string name="autoconsentDialogTitle">Het lijkt erop dat deze site een pop-up heeft om toestemming voor cookies te vragen👇</string>
+    <string name="autoconsentDialogTitle"><![CDATA[<b>Wil je dat ik cookiepop-ups aanpak?</b>]]></string>
     <!-- smartling.character_limit = 160 -->
-    <string name="autoconsentDialogDescription">Wil je dat ik deze voor je afhandel? Ik kan proberen cookies te minimaliseren, privacy te maximaliseren en pop-ups zoals deze te verbergen.</string>
+    <string name="autoconsentDialogDescription">Ik kan proberen de striktst mogelijke privacyinstellingen te selecteren en pop-ups zoals deze te verbergen.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Cookiepop-ups beheren</string>
+    <string name="autoconsentPrimaryCta">Pop-ups voor mij verbergen</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentSecondaryCta">Nee, bedankt</string>
+    <string name="autoconsentSecondaryCta">Nee, ik beheer ze zelf</string>
 
     <string name="autoconsentSetting">Cookiepop-ups beheren</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Pop-up verborgen</string>
