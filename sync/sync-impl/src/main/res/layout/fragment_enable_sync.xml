@@ -39,6 +39,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:backgroundTint="?attr/daxColorPrimaryIcon"
+            android:background="?selectableItemBackground"
             app:srcCompat="@drawable/ic_close_24" />
 
         <ImageView
@@ -67,6 +68,7 @@
             android:text="Turn on Sync?"/>
 
         <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            android:id="@+id/content_body"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/keyline_5"
