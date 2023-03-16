@@ -16,12 +16,12 @@
 
 package com.duckduckgo.mobile.android.vpn.network
 
-interface VpnDetector {
+interface ExternalVpnDetector {
 
     /**
-     * Detects if the current network connection is using a VPN
+     * Detects if the current network connection is using an external VPN
      *
      * @return returns a boolean that identifies the connection being routed through a VPN
      */
-    fun isVpnDetected(): Boolean
+    fun isExternalVpnDetected(): Boolean
 }
