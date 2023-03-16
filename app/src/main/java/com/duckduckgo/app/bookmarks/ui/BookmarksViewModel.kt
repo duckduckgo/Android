@@ -87,18 +87,18 @@ class BookmarksViewModel @Inject constructor(
         viewState.value = ViewState()
     }
 
-    override fun onSavedSiteEdited(savedSite: SavedSite) {
-        when (savedSite) {
-            is Bookmark -> {
-                viewModelScope.launch(dispatcherProvider.io()) {
-                    editBookmark(savedSite)
-                }
-            }
-            is Favorite -> {
-                viewModelScope.launch(dispatcherProvider.io()) {
-                    editFavorite(savedSite)
-                }
-            }
+    override fun onFavouriteEdited(favorite: Favorite) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            savedSitesRepository.updateFavourite(favorite)
+        }
+    }
+
+    override fun onBookmarkEdited(
+        bookmark: Bookmark,
+        oldFolderId: String,
+    ) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            savedSitesRepository.updateBookmark(bookmark, oldFolderId)
         }
     }
 
@@ -159,18 +159,6 @@ class BookmarksViewModel @Inject constructor(
             withContext(dispatcherProvider.main()) {
                 command.value = ExportedSavedSites(result)
             }
-        }
-    }
-
-    private suspend fun editBookmark(bookmark: Bookmark) {
-        withContext(dispatcherProvider.io()) {
-            savedSitesRepository.update(bookmark)
-        }
-    }
-
-    private suspend fun editFavorite(favorite: Favorite) {
-        withContext(dispatcherProvider.io()) {
-            savedSitesRepository.update(favorite)
         }
     }
 

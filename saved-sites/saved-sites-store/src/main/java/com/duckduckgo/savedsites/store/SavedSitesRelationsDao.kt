@@ -56,6 +56,9 @@ interface SavedSitesRelationsDao {
     @Query("select * from relations where relations.entityId = :entityId")
     fun relationByEntityId(entityId: String): Relation?
 
+    @Query("select * from relations where relations.entityId = :entityId")
+    fun relationsByEntityId(entityId: String): List<Relation>
+
     @Query("select CAST(COUNT(*) AS BIT) from relations")
     fun hasRelations(): Boolean
 
@@ -70,6 +73,9 @@ interface SavedSitesRelationsDao {
 
     @Query("delete from relations where entityId = :entityId")
     fun deleteRelationByEntity(entityId: String)
+
+    @Query("delete from relations where relations.entityId = :entityId and relations.folderId = :folderId")
+    fun deleteRelationByEntityAndFolder(entityId: String, folderId: String)
 
     @Query("delete from relations where entityId = :entityId AND folderId = :folderId")
     fun deleteRelationByEntity(

@@ -258,7 +258,7 @@ class SavedSitesRepositoryTest {
 
         val updatedFavorite = favoriteone.copy(title = "favorite updated")
 
-        repository.update(updatedFavorite)
+        repository.updateFavourite(updatedFavorite)
 
         assertEquals(repository.getFavorite(favoriteone.url), updatedFavorite)
     }
@@ -274,7 +274,7 @@ class SavedSitesRepositoryTest {
         assertNotNull(bookmark)
 
         val updatedBookmark = bookmark!!.copy(parentId = folder.id)
-        repository.update(updatedBookmark)
+        repository.updateBookmark(updatedBookmark, bookmark.parentId)
 
         assertNotNull(repository.getFavorite(favoriteone.url))
     }
@@ -293,7 +293,7 @@ class SavedSitesRepositoryTest {
         val updatedFavoriteTwo = favoriteone.copy(position = 0)
         val updatedFavoriteThree = favoriteone.copy(position = 1)
 
-        repository.update(updatedFavoriteOne)
+        repository.updateFavourite(updatedFavoriteOne)
 
         repository.getFavorites().test {
             val favorites = awaitItem()
@@ -402,7 +402,7 @@ class SavedSitesRepositoryTest {
         val bookmark = repository.insert(Bookmark(id = "bookmark1", title = "title", url = "foo.com", parentId = SavedSitesNames.BOOMARKS_ROOT))
         val updatedBookmark = Bookmark(id = bookmark.id, title = "new title", url = "example.com", parentId = SavedSitesNames.BOOMARKS_ROOT)
 
-        repository.update(updatedBookmark)
+        repository.updateBookmark(updatedBookmark, "folder1")
         val bookmarkUpdated = repository.getBookmark(updatedBookmark.url)!!
 
         Assert.assertEquals(updatedBookmark.id, bookmarkUpdated.id)
@@ -415,7 +415,7 @@ class SavedSitesRepositoryTest {
         val bookmark = repository.insert(Bookmark(id = "bookmark1", title = "title", url = "foo.com", parentId = SavedSitesNames.BOOMARKS_ROOT))
         val updatedBookmark = Bookmark(id = bookmark.id, title = "title", url = "foo.com", parentId = "folder2")
 
-        repository.update(updatedBookmark)
+        repository.updateBookmark(updatedBookmark, "folder1")
         val bookmarkUpdated = repository.getBookmark(bookmark.url)!!
 
         Assert.assertEquals(updatedBookmark.id, bookmarkUpdated.id)
@@ -475,10 +475,10 @@ class SavedSitesRepositoryTest {
         val folder = repository.insert(BookmarkFolder(id = "folder2", name = "folder2", parentId = SavedSitesNames.BOOMARKS_ROOT))
 
         val bookmarkOne = repository.insertBookmark(title = "one", url = "fooone.com")
-        repository.update(bookmarkOne.copy(parentId = folder.id))
+        repository.updateBookmark(bookmarkOne.copy(parentId = folder.id), bookmarkOne.parentId)
 
         val bookmarkTwo = repository.insertBookmark(title = "two", url = "footwo.com")
-        repository.update(bookmarkTwo.copy(parentId = folder.id))
+        repository.updateBookmark(bookmarkTwo.copy(parentId = folder.id), bookmarkTwo.parentId)
 
         repository.getFolderContent(folder.id).test {
             val result = awaitItem()
@@ -496,10 +496,10 @@ class SavedSitesRepositoryTest {
         val folder = repository.insert(BookmarkFolder(id = "folder2", name = "folder2", parentId = SavedSitesNames.BOOMARKS_ROOT))
 
         val bookmarkOne = repository.insertBookmark(title = "one", url = "fooone.com")
-        repository.update(bookmarkOne.copy(parentId = folder.id))
+        repository.updateBookmark(bookmarkOne.copy(parentId = folder.id), bookmarkOne.parentId)
 
         val bookmarkTwo = repository.insertBookmark(title = "two", url = "footwo.com")
-        repository.update(bookmarkTwo.copy(parentId = folder.id))
+        repository.updateBookmark(bookmarkTwo.copy(parentId = folder.id), bookmarkTwo.parentId)
 
         repository.insert(BookmarkFolder(id = "folder3", name = "folder2", parentId = "folder2"))
 
@@ -524,7 +524,7 @@ class SavedSitesRepositoryTest {
             assertEquals(listOf(bookmark), result.first)
 
             val updatedBookmark = bookmark.copy(parentId = folderTwo.id)
-            repository.update(updatedBookmark)
+            repository.updateBookmark(updatedBookmark, bookmark.parentId)
 
             val updatedResult = awaitItem()
             assertTrue(updatedResult.first.isEmpty())
@@ -543,7 +543,7 @@ class SavedSitesRepositoryTest {
         assertTrue(repository.getFolder(SavedSitesNames.BOOMARKS_ROOT)!!.numBookmarks == 1)
 
         val updatedBookmark = bookmark.copy(parentId = folderTwo.id)
-        repository.update(updatedBookmark)
+        repository.updateBookmark(updatedBookmark, bookmark.parentId)
 
         assertTrue(repository.getFolder(SavedSitesNames.BOOMARKS_ROOT)!!.numBookmarks == 0)
         assertTrue(repository.getFolder(folderTwo.id)!!.numBookmarks == 1)
@@ -557,7 +557,7 @@ class SavedSitesRepositoryTest {
         val folderOne = repository.insert(BookmarkFolder(id = "folder1", name = "folder1", parentId = SavedSitesNames.BOOMARKS_ROOT))
         val bookmarkOne = repository.insertBookmark(title = "bookmark1", url = "foo1.com")
         val updatedBookmarkOne = bookmarkOne.copy(parentId = folderOne.id)
-        repository.update(updatedBookmarkOne)
+        repository.updateBookmark(updatedBookmarkOne, SavedSitesNames.BOOMARKS_ROOT)
 
         val updatedFolderOne = folderOne.copy(numBookmarks = 1)
         assertEquals(repository.getFolder(folderOne.id), updatedFolderOne)
@@ -565,7 +565,7 @@ class SavedSitesRepositoryTest {
         val folderTwo = repository.insert(BookmarkFolder(id = "folder2", name = "folder2", parentId = SavedSitesNames.BOOMARKS_ROOT))
         val bookmarkTwo = repository.insertBookmark(title = "bookmark2", url = "foo2.com")
         val updatedBookmarkTwo = bookmarkTwo.copy(parentId = folderTwo.id)
-        repository.update(updatedBookmarkTwo)
+        repository.updateBookmark(updatedBookmarkTwo, bookmarkTwo.parentId)
 
         val updatedFolderTwo = folderTwo.copy(numBookmarks = 1)
         assertEquals(repository.getFolder(folderTwo.id), updatedFolderTwo)

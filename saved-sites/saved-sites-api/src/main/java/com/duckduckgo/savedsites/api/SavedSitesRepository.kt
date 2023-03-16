@@ -194,10 +194,17 @@ interface SavedSitesRepository {
     fun delete(savedSite: SavedSite)
 
     /**
-     * Updates the content of a [SavedSite]
+     * Updates the content of a [Favorite]
      * @param savedSite to be updated
      */
-    fun update(savedSite: SavedSite)
+    fun updateFavourite(favorite: Favorite)
+
+    /**
+     * Updates the content of a [Bookmark]
+     * @param savedSite to be updated
+     * @param fromFolderId id of the previous bookmark folder
+     */
+    fun updateBookmark(bookmark: Bookmark, fromFolderId: String)
 
     /**
      * Updates the position of [Favorite]

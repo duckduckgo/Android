@@ -123,6 +123,8 @@ import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
+import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
+import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
@@ -1949,18 +1951,18 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    override fun onSavedSiteEdited(savedSite: SavedSite) {
-        when (savedSite) {
-            is SavedSite.Bookmark -> {
-                viewModelScope.launch(dispatchers.io()) {
-                    editBookmark(savedSite)
-                }
-            }
-            is SavedSite.Favorite -> {
-                viewModelScope.launch(dispatchers.io()) {
-                    editFavorite(savedSite)
-                }
-            }
+    override fun onFavouriteEdited(favorite: Favorite) {
+        viewModelScope.launch(dispatchers.io()) {
+            savedSitesRepository.updateFavourite(favorite)
+        }
+    }
+
+    override fun onBookmarkEdited(
+        bookmark: Bookmark,
+        oldFolderId: String,
+    ) {
+        viewModelScope.launch(dispatchers.io()) {
+            savedSitesRepository.updateBookmark(bookmark, oldFolderId)
         }
     }
 
@@ -1986,18 +1988,6 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onDeleteQuickAccessItemRequested(savedSite: SavedSite) {
         command.value = DeleteSavedSiteConfirmation(savedSite)
-    }
-
-    private suspend fun editBookmark(bookmark: SavedSite.Bookmark) {
-        withContext(dispatchers.io()) {
-            savedSitesRepository.update(bookmark)
-        }
-    }
-
-    private suspend fun editFavorite(favorite: SavedSite.Favorite) {
-        withContext(dispatchers.io()) {
-            savedSitesRepository.update(favorite)
-        }
     }
 
     fun onBrokenSiteSelected() {

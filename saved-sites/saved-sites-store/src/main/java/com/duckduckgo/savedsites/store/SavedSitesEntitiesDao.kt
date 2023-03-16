@@ -71,7 +71,7 @@ interface SavedSitesEntitiesDao {
     @Delete
     fun deleteList(entities: List<Entity>)
 
-    @Update(onConflict = OnConflictStrategy.REPLACE)
+    @Update(onConflict = OnConflictStrategy.IGNORE)
     fun update(entity: Entity)
 
     @Query("select * from entities where url = :url limit 1")

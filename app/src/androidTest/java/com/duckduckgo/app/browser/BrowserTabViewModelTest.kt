@@ -643,17 +643,18 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenBookmarkEditedThenRepositoryIsUpdated() = runTest {
+        val folderId = "folder1"
         val bookmark =
-            Bookmark(id = UUID.randomUUID().toString(), title = "A title", url = "www.example.com", parentId = UUID.randomUUID().toString())
-        testee.onSavedSiteEdited(bookmark)
-        verify(mockSavedSitesRepository).update(bookmark)
+            Bookmark(id = UUID.randomUUID().toString(), title = "A title", url = "www.example.com", parentId = folderId)
+        testee.onBookmarkEdited(bookmark, folderId)
+        verify(mockSavedSitesRepository).updateBookmark(bookmark, folderId)
     }
 
     @Test
     fun whenFavoriteEditedThenRepositoryUpdated() = runTest {
         val favorite = Favorite(UUID.randomUUID().toString(), "A title", "www.example.com", 1)
-        testee.onSavedSiteEdited(favorite)
-        verify(mockSavedSitesRepository).update(favorite)
+        testee.onFavouriteEdited(favorite)
+        verify(mockSavedSitesRepository).updateFavourite(favorite)
     }
 
     @Test

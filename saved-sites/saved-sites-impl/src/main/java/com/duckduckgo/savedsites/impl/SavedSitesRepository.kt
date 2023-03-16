@@ -324,32 +324,7 @@ class RealSavedSitesRepository(
         savedSitesRelationsDao.deleteRelationByEntity(bookmark.id)
     }
 
-    override fun update(savedSite: SavedSite) {
-        when (savedSite) {
-            is Bookmark -> updateBookmark(savedSite)
-            is Favorite -> updateFavorite(savedSite)
-        }
-    }
-
-    private fun updateBookmark(bookmark: Bookmark) {
-        savedSitesEntitiesDao.entityById(bookmark.id)?.let { entity ->
-            savedSitesRelationsDao.relationByEntityId(entity.entityId)?.let { relation ->
-                if (relation.folderId != bookmark.parentId) {
-                    // bookmark moved to another folder
-                    val isFavorite = getFavorite(bookmark.url) != null
-                    savedSitesRelationsDao.deleteRelationByEntity(bookmark.id)
-                    savedSitesRelationsDao.insert(Relation(folderId = bookmark.parentId, entityId = relation.entityId))
-                    if (isFavorite) {
-                        // favorite relations must be restored too
-                        savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.FAVORITES_ROOT, entityId = relation.entityId))
-                    }
-                }
-                savedSitesEntitiesDao.update(Entity(relation.entityId, bookmark.title, bookmark.url, BOOKMARK))
-            }
-        }
-    }
-
-    private fun updateFavorite(favorite: Favorite) {
+    override fun updateFavourite(favorite: Favorite) {
         savedSitesEntitiesDao.entityById(favorite.id)?.let { entity ->
             savedSitesEntitiesDao.update(Entity(entity.entityId, favorite.title, favorite.url, BOOKMARK))
 
@@ -365,6 +340,16 @@ class RealSavedSitesRepository(
 
             updateWithPosition(favorites)
         }
+    }
+
+    override fun updateBookmark(bookmark: Bookmark, oldFolderId: String) {
+        if (bookmark.parentId != oldFolderId) {
+            // bookmark has moved to another folder
+            savedSitesRelationsDao.deleteRelationByEntityAndFolder(bookmark.id, oldFolderId)
+            savedSitesRelationsDao.insert(Relation(folderId = bookmark.parentId, entityId = bookmark.id))
+        }
+
+        savedSitesEntitiesDao.update(Entity(bookmark.id, bookmark.title, bookmark.url, BOOKMARK))
     }
 
     override fun insert(folder: BookmarkFolder): BookmarkFolder {
