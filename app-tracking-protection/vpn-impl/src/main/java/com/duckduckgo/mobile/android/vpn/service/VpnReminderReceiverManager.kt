@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,14 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.edit
+import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.prefs.PREFS_FILENAME
 import com.duckduckgo.mobile.android.vpn.prefs.PREFS_KEY_REMINDER_NOTIFICATION_SHOWN
-import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldAlertNotificationBuilder
+import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationContentPlugin.Type.DISABLED
+import com.duckduckgo.mobile.android.vpn.service.notification.getHighestPriorityPluginForType
+import com.duckduckgo.mobile.android.vpn.ui.notification.VpnReminderNotificationBuilder
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import logcat.logcat
@@ -39,24 +40,28 @@ interface VpnReminderReceiverManager {
 class AndroidVpnReminderReceiverManager @Inject constructor(
     private val deviceShieldPixels: DeviceShieldPixels,
     private val notificationManager: NotificationManagerCompat,
-    private val deviceShieldAlertNotificationBuilder: DeviceShieldAlertNotificationBuilder,
-    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
+    private val vpnReminderNotificationBuilder: VpnReminderNotificationBuilder,
+    private val vpnReminderNotificationContentPluginPoint: PluginPoint<VpnReminderNotificationContentPlugin>,
 ) : VpnReminderReceiverManager {
 
     override fun showReminderNotificationIfVpnDisabled(context: Context) {
-        if (vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)) {
+        if (TrackerBlockingVpnService.isServiceRunning(context)) {
             logcat { "Vpn is already running, nothing to show" }
         } else {
             logcat { "Vpn is not running, showing reminder notification" }
-            val notification = if (wasReminderNotificationShown(context)) {
-                deviceShieldAlertNotificationBuilder.buildReminderNotification(context, true)
-            } else {
-                notificationWasShown(context)
-                deviceShieldAlertNotificationBuilder.buildReminderNotification(context, false)
+            val notification = vpnReminderNotificationContentPluginPoint.getHighestPriorityPluginForType(DISABLED)?.getContent()?.let { content ->
+                val actualContent = if (wasReminderNotificationShown(context)) {
+                    content.copy(true)
+                } else {
+                    notificationWasShown(context)
+                    content.copy(false)
+                }
+                vpnReminderNotificationBuilder.buildReminderNotification(actualContent)
             }
-
-            deviceShieldPixels.didShowReminderNotification()
-            notificationManager.notify(TrackerBlockingVpnService.VPN_REMINDER_NOTIFICATION_ID, notification)
+            if (notification != null) {
+                deviceShieldPixels.didShowReminderNotification()
+                notificationManager.notify(TrackerBlockingVpnService.VPN_REMINDER_NOTIFICATION_ID, notification)
+            }
         }
     }
 

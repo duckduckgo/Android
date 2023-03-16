@@ -21,7 +21,6 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.os.Build
 import android.os.ResultReceiver
 import android.widget.RemoteViews
@@ -30,8 +29,6 @@ import androidx.core.app.TaskStackBuilder
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
-import com.duckduckgo.mobile.android.vpn.service.VpnReminderReceiver
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -50,15 +47,6 @@ object DeviceShieldAlertNotificationBuilderModule {
 }
 
 interface DeviceShieldAlertNotificationBuilder {
-
-    fun buildReminderNotification(
-        context: Context,
-        silent: Boolean,
-    ): Notification
-
-    fun buildRevokedNotification(
-        context: Context,
-    ): Notification
 
     fun buildStatusNotification(
         context: Context,
@@ -88,88 +76,6 @@ class AndroidDeviceShieldAlertNotificationBuilder constructor(
                 notificationManager.isNotificationPolicyAccessGranted
             }
         }
-    }
-
-    override fun buildReminderNotification(
-        context: Context,
-        silent: Boolean,
-    ): Notification {
-        registerAlertChannel(context)
-
-        val notificationLayout = RemoteViews(context.packageName, R.layout.notification_device_shield_disabled)
-
-        val onNotificationTapPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
-            addNextIntentWithParentStack(
-                Intent(
-                    context,
-                    Class.forName("com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"),
-                ),
-            )
-            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-        }
-
-        val restartVpnIntent = Intent(context, VpnReminderReceiver::class.java).let { intent ->
-            intent.action = TrackerBlockingVpnService.ACTION_VPN_REMINDER_RESTART
-            PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-        }
-
-        return NotificationCompat.Builder(context, VPN_ALERTS_CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_device_shield_notification_logo)
-            .setStyle(NotificationCompat.DecoratedCustomViewStyle())
-            .setContentIntent(onNotificationTapPendingIntent)
-            .setCustomContentView(notificationLayout)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setCategory(NotificationCompat.CATEGORY_STATUS)
-            .setSilent(silent)
-            .addAction(
-                NotificationCompat.Action(
-                    R.drawable.ic_vpn_notification_24,
-                    context.getString(R.string.atp_EnableCTA),
-                    restartVpnIntent,
-                ),
-            )
-            .addAction(NotificationActionReportIssue.reportIssueNotificationAction(context))
-            .setChannelId(VPN_ALERTS_CHANNEL_ID)
-            .build()
-    }
-
-    override fun buildRevokedNotification(context: Context): Notification {
-        registerAlertChannel(context)
-
-        val notificationLayout = RemoteViews(context.packageName, R.layout.notification_device_shield_revoked)
-
-        val onNotificationTapPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
-            addNextIntentWithParentStack(
-                Intent(
-                    context,
-                    Class.forName("com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"),
-                ),
-            )
-            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-        }
-
-        val restartVpnIntent = Intent(context, VpnReminderReceiver::class.java).let { intent ->
-            intent.action = TrackerBlockingVpnService.ACTION_VPN_REMINDER_RESTART
-            PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-        }
-
-        return NotificationCompat.Builder(context, VPN_ALERTS_CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_device_shield_notification_logo)
-            .setStyle(NotificationCompat.DecoratedCustomViewStyle())
-            .setContentIntent(onNotificationTapPendingIntent)
-            .setCustomContentView(notificationLayout)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setCategory(NotificationCompat.CATEGORY_STATUS)
-            .setSilent(true)
-            .addAction(
-                NotificationCompat.Action(
-                    R.drawable.ic_vpn_notification_24,
-                    context.getString(R.string.atp_EnableCTA),
-                    restartVpnIntent,
-                ),
-            )
-            .addAction(NotificationActionReportIssue.reportIssueNotificationAction(context))
-            .build()
     }
 
     override fun buildStatusNotification(
