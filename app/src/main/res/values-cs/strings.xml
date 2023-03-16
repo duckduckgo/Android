@@ -436,6 +436,7 @@
     <!-- Onboarding DDG Feature Options -->
     <string name="onboardingFeatureOptionsTitle">Co tě přivádí na DuckDuckGo?</string>
     <string name="onboardingFeatureOptionsContinue">Pokračovat</string>
+    <string name="onboardingFeatureOptionsSkip">Přeskočit tento krok</string>
     <!-- smartling.character_limit = 28 -->
     <string name="onboardingFeatureOptionPrivateSearch">Soukromé vyhledávání</string>
     <!-- smartling.character_limit = 28 -->
