@@ -654,13 +654,13 @@
 
     <!-- Autoconsent -->
     <!-- smartling.character_limit = 82 -->
-    <string name="autoconsentDialogTitle">Videti je, da ima to spletno mesto pojavno okno s soglasjem za piškotke 👇</string>
+    <string name="autoconsentDialogTitle"><![CDATA[<b>Ali želite, da upravljam pojavna okna piškotkov?</b>]]></string>
     <!-- smartling.character_limit = 160 -->
-    <string name="autoconsentDialogDescription">Želite, da jih uredim namesto vas? Poskušam zmanjšati piškotke, povečati zasebnost in skriti pojavna okna, kot so ta.</string>
+    <string name="autoconsentDialogDescription">Lahko poskusim izbrati najbolj zasebne nastavitve, ki so na voljo, in skriti takšna pojavna okna.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Upravljanje pojavnih oken za piškotke</string>
+    <string name="autoconsentPrimaryCta">Upravljaj pojavna okna zame</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentSecondaryCta">Ne, hvala</string>
+    <string name="autoconsentSecondaryCta">Ne, upravljanje prepusti meni</string>
 
     <string name="autoconsentSetting">Upravljanje pojavnih oken za piškotke</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Pojavno okno je skrito</string>
