@@ -155,6 +155,9 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
     }
 
     override fun onCancel(dialog: DialogInterface) {
+        // need a reference to this early as it will could null after launching the coroutine
+        val parentFragmentForResult = parentFragment
+
         if (ignoreCancellationEvents) {
             Timber.v("onCancel: Ignoring cancellation event")
             return
@@ -166,7 +169,9 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
             autofillDeclineCounter.userDeclinedToSaveCredentials(getOriginalUrl().extractDomain())
 
             if (autofillDeclineCounter.shouldPromptToDisableAutofill()) {
-                parentFragment?.setFragmentResult(CredentialSavePickerDialog.resultKeyShouldPromptToDisableAutofill(getTabId()), Bundle())
+                parentFragmentForResult?.setFragmentResult(CredentialSavePickerDialog.resultKeyShouldPromptToDisableAutofill(getTabId()), Bundle())
+            } else {
+                parentFragmentForResult?.setFragmentResult(CredentialSavePickerDialog.resultKeyPromptDismissed(getTabId()), Bundle())
             }
         }
 

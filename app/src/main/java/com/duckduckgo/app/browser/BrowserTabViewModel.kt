@@ -54,6 +54,7 @@ import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.NonHttpAppLink
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
 import com.duckduckgo.app.browser.autofill.AutofillCredentialsSelectionResultHandler
+import com.duckduckgo.app.browser.autofill.AutofillFireproofDialogSuppressor
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource.ImageFavicon
 import com.duckduckgo.app.browser.favicon.FaviconSource.UrlFavicon
@@ -185,6 +186,7 @@ class BrowserTabViewModel @Inject constructor(
     private val autofillCapabilityChecker: AutofillCapabilityChecker,
     private val adClickManager: AdClickManager,
     private val sitePermissionsManager: SitePermissionsManager,
+    private val autofillFireproofDialogSuppressor: AutofillFireproofDialogSuppressor,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     UrlExtractionListener,
@@ -578,17 +580,25 @@ class BrowserTabViewModel @Inject constructor(
     private val loginDetectionObserver = Observer<LoginDetected> { loginEvent ->
         Timber.i("LoginDetection for $loginEvent")
         viewModelScope.launch(dispatchers.io()) {
+            val canPromptAboutFireproofing = !autofillFireproofDialogSuppressor.isAutofillPreventingFireproofPrompts()
+
             if (!isFireproofWebsite(loginEvent.forwardedToDomain)) {
                 withContext(dispatchers.main()) {
                     val showAutomaticFireproofDialog =
                         settingsDataStore.automaticFireproofSetting == ASK_EVERY_TIME && settingsDataStore.showAutomaticFireproofDialog
                     when {
-                        showAutomaticFireproofDialog ->
-                            command.value = AskToAutomateFireproofWebsite(FireproofWebsiteEntity(loginEvent.forwardedToDomain))
+                        showAutomaticFireproofDialog -> {
+                            if (canPromptAboutFireproofing) {
+                                command.value = AskToAutomateFireproofWebsite(FireproofWebsiteEntity(loginEvent.forwardedToDomain))
+                            }
+                        }
                         settingsDataStore.automaticFireproofSetting == ALWAYS ->
                             fireproofDialogsEventHandler.onUserConfirmedFireproofDialog(loginEvent.forwardedToDomain)
-                        else ->
-                            command.value = AskToFireproofWebsite(FireproofWebsiteEntity(loginEvent.forwardedToDomain))
+                        else -> {
+                            if (canPromptAboutFireproofing) {
+                                command.value = AskToFireproofWebsite(FireproofWebsiteEntity(loginEvent.forwardedToDomain))
+                            }
+                        }
                     }
                 }
             }
