@@ -151,16 +151,16 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenBookmarkEditedThenDaoUpdated() = runTest {
-        testee.onSavedSiteEdited(bookmark)
+        testee.onBookmarkEdited(bookmark, "folder1")
 
-        verify(savedSitesRepository).update(bookmark)
+        verify(savedSitesRepository).updateBookmark(bookmark, "folder1")
     }
 
     @Test
     fun whenFavoriteEditedThenRepositoryUpdated() = runTest {
-        testee.onSavedSiteEdited(favorite)
+        testee.onFavouriteEdited(favorite)
 
-        verify(savedSitesRepository).update(favorite)
+        verify(savedSitesRepository).updateFavourite(favorite)
     }
 
     @Test

@@ -274,7 +274,7 @@ class SavedSitesRepositoryTest {
         assertNotNull(bookmark)
 
         val updatedBookmark = bookmark!!.copy(parentId = folder.id)
-        repository.updateBookmark(updatedBookmark, bookmark.parentId)
+        repository.updateBookmark(updatedBookmark, SavedSitesNames.BOOMARKS_ROOT)
 
         assertNotNull(repository.getFavorite(favoriteone.url))
     }

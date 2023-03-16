@@ -53,8 +53,8 @@ interface SavedSitesRelationsDao {
         type: EntityType,
     ): Int
 
-    @Query("select * from relations where relations.entityId = :entityId")
-    fun relationByEntityId(entityId: String): Relation?
+    @Query("select * from relations where relations.entityId = :entityId and relations.folderId <> :favoritesRoot")
+    fun relationByEntityId(entityId: String, favoritesRoot: String = SavedSitesNames.FAVORITES_ROOT): Relation?
 
     @Query("select * from relations where relations.entityId = :entityId")
     fun relationsByEntityId(entityId: String): List<Relation>

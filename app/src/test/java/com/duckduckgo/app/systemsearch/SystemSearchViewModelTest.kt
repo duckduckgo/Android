@@ -332,9 +332,9 @@ class SystemSearchViewModelTest {
     fun whenQuickAccessEditedThenRepositoryUpdated() {
         val savedSite = Favorite("favorite1", "title", "http://example.com", 0)
 
-        testee.onSavedSiteEdited(savedSite)
+        testee.onFavouriteEdited(savedSite)
 
-        verify(mocksavedSitesRepository).update(savedSite)
+        verify(mocksavedSitesRepository).updateFavourite(savedSite)
     }
 
     @Test

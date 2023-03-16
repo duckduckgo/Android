@@ -43,6 +43,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
 class BookmarksViewModel @Inject constructor(
@@ -98,6 +99,7 @@ class BookmarksViewModel @Inject constructor(
         oldFolderId: String,
     ) {
         viewModelScope.launch(dispatcherProvider.io()) {
+            Timber.d("Bookmark: $bookmark from $oldFolderId")
             savedSitesRepository.updateBookmark(bookmark, oldFolderId)
         }
     }
@@ -180,7 +182,7 @@ class BookmarksViewModel @Inject constructor(
             val folders = savedSitesRepository.getFolderTree(SavedSitesNames.BOOMARKS_ROOT, null).map { it.bookmarkFolder }
             val bookmarks = savedSitesRepository.getBookmarksTree()
             withContext(dispatcherProvider.main()) {
-                onSavedSitesItemsChanged(favorites, bookmarks, folders)
+                onSavedSitesItemsChanged(emptyList(), bookmarks, folders)
             }
         }
     }
