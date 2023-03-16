@@ -21,7 +21,8 @@
     <string name="macos_title">Hangi DuckDuckGo for Mac!</string>
 
     <string name="macos_share_title">Jaga linki</string>
-    <string name="macos_description_text">DuckDuckGo for Mac on täpselt nii kiire kui vaja, ootuspäraste sirvimisfunktsioonidega ja täis meie tippklassi privaatsuselemente.\n\nAva oma Macis aadress:\n<b><font color="#3969EF">duckduckgo.com/mac</font></b></string>
+    <string name="macos_description_text">DuckDuckGo for Mac on täpselt nii kiire kui vaja, ootuspäraste brauserifunktsioonidega ja meie tippklassi privaatsuselementidest tulvil.\n\nAva oma Macis:</string>
+    <string name="macos_description_link">duckduckgo.com/mac</string>
     <string name="macos_share_text">Kas oled valmis Macis privaatselt sirvima?\n\nAllalaadimiseks ava oma Macis see URL:\nhttps://duckduckgo.com/mac</string>
 
     <string name="macos_waitlist_windows_link">Kas otsid Windowsi versiooni?</string>
