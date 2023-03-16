@@ -209,7 +209,13 @@ class DaxTextInput @JvmOverloads constructor(
     private fun showPassword() {
         isPasswordShown = true
         binding.internalPasswordIcon.setImageResource(R.drawable.ic_password_hide)
-        binding.internalEditText.inputType = EditorInfo.TYPE_CLASS_TEXT or EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE
+
+        val inputType = if (binding.internalEditText.hasFocus()) {
+            EditorInfo.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+        } else {
+            EditorInfo.TYPE_CLASS_TEXT or EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE
+        }
+        binding.internalEditText.inputType = inputType
         binding.internalEditText.transformationMethod = null
         binding.internalEditText.setSelection(binding.internalEditText.length())
     }
