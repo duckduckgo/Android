@@ -108,6 +108,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
+        <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryTextTruncated="true"
+            app:primaryText="Save Recovery PDF"/>
+
         <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -124,6 +130,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:primaryTextTruncated="true"
+            android:layout_marginBottom="@dimen/keyline_4"
             app:primaryText="Turn Off and Delete Server Data…"/>
 
     </LinearLayout>
