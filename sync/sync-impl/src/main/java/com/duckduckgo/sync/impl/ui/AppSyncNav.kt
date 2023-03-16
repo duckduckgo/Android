@@ -27,7 +27,7 @@ import javax.inject.*
     scope = AppScope::class,
     priority = ContributesBinding.Priority.HIGHEST,
 )
-class AppSyncNav @Inject constructor(): SyncNav {
+class AppSyncNav @Inject constructor() : SyncNav {
     override fun openSyncActivity(context: Context): Intent {
         return SyncActivity.intent(context)
     }

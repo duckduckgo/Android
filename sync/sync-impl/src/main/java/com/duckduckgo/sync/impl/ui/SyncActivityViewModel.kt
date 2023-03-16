@@ -23,6 +23,7 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.SyncRepository
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
+import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -30,7 +31,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class SyncActivityViewModel @Inject constructor(
@@ -45,11 +45,11 @@ class SyncActivityViewModel @Inject constructor(
 
     data class ViewState(
         val isDeviceSyncEnabled: Boolean = false,
-        val loginQRCode: String? = null
+        val loginQRCode: String? = null,
     )
 
     sealed class Command {
-        object LaunchDeviceSetupFlow: Command()
+        object LaunchDeviceSetupFlow : Command()
     }
 
     fun onToggleClicked(isChecked: Boolean) {
@@ -64,7 +64,7 @@ class SyncActivityViewModel @Inject constructor(
         viewState.emit(
             viewState.value.copy(
                 isDeviceSyncEnabled = syncRepository.isSignedIn(),
-                loginQRCode = syncRepository.getRecoveryCode()
+                loginQRCode = syncRepository.getRecoveryCode(),
             ),
         )
     }

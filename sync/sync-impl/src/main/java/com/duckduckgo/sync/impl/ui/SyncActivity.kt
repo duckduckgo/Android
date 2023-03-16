@@ -40,7 +40,6 @@ import com.google.zxing.BarcodeFormat.QR_CODE
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
 class SyncActivity : DuckDuckGoActivity() {
@@ -50,7 +49,7 @@ class SyncActivity : DuckDuckGoActivity() {
     private val deviceSyncStatusToggleListener: OnCheckedChangeListener = object : OnCheckedChangeListener {
         override fun onCheckedChanged(
             buttonView: CompoundButton?,
-            isChecked: Boolean
+            isChecked: Boolean,
         ) {
             viewModel.onToggleClicked(isChecked)
         }
@@ -83,14 +82,14 @@ class SyncActivity : DuckDuckGoActivity() {
     }
 
     private fun processCommand(it: Command) {
-        when(it) {
+        when (it) {
             LaunchDeviceSetupFlow -> Toast.makeText(this, "will launch setup flow", Toast.LENGTH_LONG).show()
         }
     }
 
     private fun renderViewState(viewState: ViewState) {
         binding.deviceSyncStatusToggle.quietlySetIsChecked(viewState.isDeviceSyncEnabled, deviceSyncStatusToggleListener)
-        if(viewState.isDeviceSyncEnabled) {
+        if (viewState.isDeviceSyncEnabled) {
             binding.viewSwitcher.displayedChild = 1
         }
 
