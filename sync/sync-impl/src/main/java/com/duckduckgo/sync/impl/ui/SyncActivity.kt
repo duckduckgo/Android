@@ -22,6 +22,7 @@ import android.graphics.Bitmap
 import android.os.Bundle
 import android.widget.CompoundButton
 import android.widget.CompoundButton.OnCheckedChangeListener
+import android.widget.Toast
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -33,6 +34,7 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivitySyncBinding
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import com.google.zxing.BarcodeFormat.QR_CODE
 import com.journeyapps.barcodescanner.BarcodeEncoder
@@ -81,7 +83,9 @@ class SyncActivity : DuckDuckGoActivity() {
     }
 
     private fun processCommand(it: Command) {
-
+        when(it) {
+            LaunchDeviceSetupFlow -> Toast.makeText(this, "will launch setup flow", Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun renderViewState(viewState: ViewState) {
