@@ -86,6 +86,9 @@ class SyncActivity : DuckDuckGoActivity() {
 
     private fun renderViewState(viewState: ViewState) {
         binding.deviceSyncStatusToggle.quietlySetIsChecked(viewState.isDeviceSyncEnabled, deviceSyncStatusToggleListener)
+        if(viewState.isDeviceSyncEnabled) {
+            binding.viewSwitcher.displayedChild = 1
+        }
 
         if (!viewState.loginQRCode.isNullOrEmpty()) {
             val barcodeEncoder = BarcodeEncoder()
