@@ -646,13 +646,13 @@
 
     <!-- Autoconsent -->
     <!-- smartling.character_limit = 82 -->
-    <string name="autoconsentDialogTitle">Úgy tűnik, hogy az oldalon sütik elfogadására szolgáló felugró ablak van👇</string>
+    <string name="autoconsentDialogTitle"><![CDATA[<b>Kezeljem a felugró sütiablakokat?</b>]]></string>
     <!-- smartling.character_limit = 160 -->
-    <string name="autoconsentDialogDescription">Elintézzem helyetted? Megpróbálhatom minimalizálni a sütiket, maximalizálni az adatvédelmet, illetve elrejteni az ilyen felugró ablakokat.</string>
+    <string name="autoconsentDialogDescription">Megpróbálhatom kiválasztani a rendelkezésre álló leginkább privát beállításokat, és elrejteni az ilyen felugró ablakokat.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Felugró sütiablakok kezelése</string>
+    <string name="autoconsentPrimaryCta">Kezeld a felugró ablakokat</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentSecondaryCta">Nem, köszönöm</string>
+    <string name="autoconsentSecondaryCta">Ne, majd kezelem én magam</string>
 
     <string name="autoconsentSetting">Felugró sütiablakok kezelése</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Felugró ablak elrejtve</string>
