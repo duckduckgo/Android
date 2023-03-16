@@ -24,4 +24,13 @@
     <!-- Sync -->
     <string name="sync_screen_title">Sync</string>
     <string name="sync_toggle_text">Sync</string>
+    <string name="sync_off_hint">Sync your bookmarks across your devices and save an encrypted backup on DuckDuckGo\'s servers.</string>
+    <string name="synced_devices_section_title">Synced Devices</string>
+    <string name="sync_new_device_section_title">Sync New Device</string>
+    <string name="sync_new_device_hint">Go to Settings > Sync in the DuckDuckGo App on a different device and scan to connect instantly.</string>
+    <string name="sync_show_text_code_item">Show Text Code</string>
+    <string name="sync_show_qr_code_item">Scan QR Code</string>
+    <string name="sync_save_recovery_code_item">Save Recovery PDF</string>
+    <string name="sync_save_recovery_code_item_hint">If you lose your device, you will need this recovery code to restore your synced data.</string>
+    <string name="sync_delete_account_item">Turn Off and Delete Server Data…</string>
 </resources>

@@ -51,12 +51,13 @@
                 android:layout_margin="@dimen/keyline_4"
                 app:textType="secondary"
                 app:typography="body2"
-                android:text="Sync your bookmarks across your devices and save an encrypted backup on DuckDuckGo’s servers."/>
+                android:text="@string/sync_off_hint"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
+
                 <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
@@ -64,7 +65,7 @@
                 <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:primaryText="Synced Devices"/>
+                    app:primaryText="@string/synced_devices_section_title"/>
 
                 <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
                     android:layout_width="match_parent"
@@ -83,7 +84,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryTextTruncated="true"
-                    app:primaryText="Sync New Device"/>
+                    app:primaryText="@string/sync_new_device_section_title"/>
 
                 <ImageView
                     android:id="@+id/qrCodeImageView"
@@ -99,19 +100,19 @@
                     android:layout_margin="@dimen/keyline_4"
                     app:textType="secondary"
                     app:typography="body2"
-                    android:text="Go to Settings > Sync in the DuckDuckGo App on a different device and scan to connect instantly"/>
+                    android:text="@string/sync_new_device_hint"/>
 
                 <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryTextTruncated="true"
-                    app:primaryText="Show Text Code"/>
+                    app:primaryText="@string/sync_show_text_code_item"/>
 
                 <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryTextTruncated="true"
-                    app:primaryText="Scan QR Code"/>
+                    app:primaryText="@string/sync_show_qr_code_item"/>
 
                 <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
                     android:layout_width="match_parent"
@@ -121,7 +122,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryTextTruncated="true"
-                    app:primaryText="Save Recovery PDF"/>
+                    app:primaryText="@string/sync_save_recovery_code_item"/>
 
                 <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                     android:layout_width="match_parent"
@@ -129,7 +130,7 @@
                     android:layout_margin="@dimen/keyline_4"
                     app:textType="secondary"
                     app:typography="body2"
-                    android:text="If you lose your device, you will need this recovery code to restore your synced data."/>
+                    android:text="@string/sync_save_recovery_code_item_hint"/>
 
                 <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
                     android:layout_width="match_parent"
@@ -140,7 +141,7 @@
                     android:layout_height="wrap_content"
                     app:primaryTextTruncated="true"
                     android:layout_marginBottom="@dimen/keyline_4"
-                    app:primaryText="Turn Off and Delete Server Data…"/>
+                    app:primaryText="@string/sync_delete_account_item"/>
             </LinearLayout>
         </ViewSwitcher>
     </LinearLayout>
