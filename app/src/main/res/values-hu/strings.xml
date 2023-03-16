@@ -432,6 +432,7 @@
     <!-- Onboarding DDG Feature Options -->
     <string name="onboardingFeatureOptionsTitle">Miért a DuckDuckGót választottad?</string>
     <string name="onboardingFeatureOptionsContinue">Folytatás</string>
+    <string name="onboardingFeatureOptionsSkip">Lépés kihagyása</string>
     <!-- smartling.character_limit = 28 -->
     <string name="onboardingFeatureOptionPrivateSearch">Privát keresés</string>
     <!-- smartling.character_limit = 28 -->
