@@ -646,13 +646,13 @@
 
     <!-- Autoconsent -->
     <!-- smartling.character_limit = 82 -->
-    <string name="autoconsentDialogTitle">Il semble que ce site ait une fenêtre contextuelle de consentement aux cookies 👇</string>
+    <string name="autoconsentDialogTitle"><![CDATA[<b>Vous voulez que je gère les fenêtres contextuelles des cookies ?</b>]]></string>
     <!-- smartling.character_limit = 160 -->
-    <string name="autoconsentDialogDescription">Voulez-vous que je m\'en charge ? Je peux essayer de minimiser les cookies, de maximiser la confidentialité et de masquer les fenêtres contextuelles comme celles-ci.</string>
+    <string name="autoconsentDialogDescription">Je peux essayer de sélectionner les paramètres de confidentialité les plus élevés et masquer les fenêtres contextuelles comme celles-ci.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Gérer les fenêtres contextuelles (cookies)</string>
+    <string name="autoconsentPrimaryCta">Gérer les fenêtres contextuelles pour moi</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentSecondaryCta">Non merci</string>
+    <string name="autoconsentSecondaryCta">Non, je les gérerai moi-même</string>
 
     <string name="autoconsentSetting">Gérer les fenêtres contextuelles de cookies</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Fenêtre contextuelle masquée</string>
