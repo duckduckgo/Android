@@ -37,11 +37,6 @@ interface SyncLib {
 
     fun prepareForConnect(): ConnectKeys
 
-    fun encrypt(
-        rawData: String,
-        secretKey: String,
-    ): EncryptResult
-
     fun seal(message: String, publicKey: String): String
 
     fun sealOpen(
@@ -148,22 +143,6 @@ class SyncNativeLib constructor(context: Context) : SyncLib {
             result = result,
             publicKey = publicKey.encodeKey(),
             secretKey = privateKey.encodeKey(),
-        )
-    }
-
-    override fun encrypt(
-        rawData: String,
-        secretKey: String,
-    ): EncryptResult {
-        val rawDataByteArray = rawData.decodeKey()
-        val secretKeyByteArray = secretKey.decodeKey()
-        val encryptedDataByteArray = ByteArray(rawDataByteArray.size + getEncryptedExtraBytes())
-
-        val result: Long = encrypt(encryptedDataByteArray, rawDataByteArray, secretKeyByteArray)
-
-        return EncryptResult(
-            result = result,
-            encryptedData = encryptedDataByteArray.encodeKey(),
         )
     }
 

@@ -42,6 +42,7 @@
     <string name="devSettingsScreenUserAgentFirefox">Firefox</string>
     <string name="devSettingsScreenUserAgentDuckDuckGo">DDG Default</string>
     <string name="devSettingsScreenUserAgentWebView">UA WebView</string>
+
     <!-- Privacy Audit settings -->
     <string name="auditSettingsTitle">Audit Settings</string>
     <string name="auditSettingsSubtitle">Features useful for doing our privacy audit</string>

@@ -19,17 +19,21 @@ package com.duckduckgo.app.bookmarks.ui
 import android.os.Bundle
 import android.text.Editable
 import android.view.View
-import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+import com.duckduckgo.savedsites.api.models.SavedSite
+import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
+import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.api.models.SavedSitesNames
 
 class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
 
     interface EditSavedSiteListener {
-        fun onSavedSiteEdited(savedSite: SavedSite)
+        fun onFavouriteEdited(favorite: Favorite)
+        fun onBookmarkEdited(bookmark: Bookmark, oldFolderId: String)
     }
 
     var listener: EditSavedSiteListener? = null
@@ -75,14 +79,13 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
         val updatedUrl = validateInput(binding.urlInput.text, savedSite.url)
 
         when (savedSite) {
-            is SavedSite.Bookmark -> {
-                val parentId = arguments?.getLong(AddBookmarkFolderDialogFragment.KEY_PARENT_FOLDER_ID) ?: 0
-                listener?.onSavedSiteEdited(
-                    savedSite.copy(title = updatedTitle, url = updatedUrl, parentId = parentId),
-                )
+            is Bookmark -> {
+                val parentId = arguments?.getString(AddBookmarkFolderDialogFragment.KEY_PARENT_FOLDER_ID) ?: SavedSitesNames.BOOMARKS_ROOT
+                val updatedBookmark = savedSite.copy(title = updatedTitle, url = updatedUrl, parentId = parentId)
+                listener?.onBookmarkEdited(updatedBookmark, savedSite.parentId)
             }
-            is SavedSite.Favorite -> {
-                listener?.onSavedSiteEdited(
+            is Favorite -> {
+                listener?.onFavouriteEdited(
                     savedSite.copy(title = updatedTitle, url = updatedUrl),
                 )
             }
@@ -124,13 +127,13 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
 
         fun instance(
             savedSite: SavedSite,
-            parentFolderId: Long = 0,
+            parentFolderId: String = SavedSitesNames.BOOMARKS_ROOT,
             parentFolderName: String? = null,
         ): EditSavedSiteDialogFragment {
             val dialog = EditSavedSiteDialogFragment()
             val bundle = Bundle()
             bundle.putSerializable(KEY_SAVED_SITE, savedSite)
-            bundle.putLong(AddBookmarkFolderDialogFragment.KEY_PARENT_FOLDER_ID, parentFolderId)
+            bundle.putString(AddBookmarkFolderDialogFragment.KEY_PARENT_FOLDER_ID, parentFolderId)
             bundle.putString(AddBookmarkFolderDialogFragment.KEY_PARENT_FOLDER_NAME, parentFolderName)
             dialog.arguments = bundle
             return dialog

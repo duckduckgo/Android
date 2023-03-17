@@ -19,8 +19,7 @@ package com.duckduckgo.remote.messaging.impl.matchers
 import android.os.Build
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.AppProperties
-import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
-import java.util.*
+import com.duckduckgo.remote.messaging.impl.models.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -38,266 +37,266 @@ class DeviceAttributeMatcherTest {
 
     @Test
     fun whenDeviceMatchesLocaleThenReturnMatch() = runTest {
-        givenDeviceProperties(locale = Locale.US)
+        givenDeviceProperties(locale = java.util.Locale.US)
 
         val result = testee.evaluate(
-            MatchingAttribute.Locale(value = listOf("en-US")),
+            Locale(value = listOf("en-US")),
         )
 
-        assertEquals(EvaluationResult.Match, result)
+        assertEquals(true, result)
     }
 
     @Test
     fun whenDeviceMatchesAnyLocaleThenReturnMatch() = runTest {
-        givenDeviceProperties(locale = Locale.US)
+        givenDeviceProperties(locale = java.util.Locale.US)
 
         val result = testee.evaluate(
-            MatchingAttribute.Locale(value = listOf("fr-FR", "fr-CA", "en-US")),
+            Locale(value = listOf("fr-FR", "fr-CA", "en-US")),
         )
 
-        assertEquals(EvaluationResult.Match, result)
+        assertEquals(true, result)
     }
 
     @Test
     fun whenDeviceDoesNotMatchLocaleThenReturnFail() = runTest {
-        givenDeviceProperties(locale = Locale.FRANCE)
+        givenDeviceProperties(locale = java.util.Locale.FRANCE)
 
         val result = testee.evaluate(
-            MatchingAttribute.Locale(value = listOf("en_US")),
+            Locale(value = listOf("en_US")),
         )
 
-        assertEquals(EvaluationResult.Fail, result)
+        assertEquals(false, result)
     }
 
     @Test
     fun whenLocaleMatchingAttributeIsEmptyThenReturnFail() = runTest {
-        givenDeviceProperties(locale = Locale.US)
+        givenDeviceProperties(locale = java.util.Locale.US)
 
         val result = testee.evaluate(
-            MatchingAttribute.Locale(value = listOf("")),
+            Locale(value = listOf("")),
         )
 
-        assertEquals(EvaluationResult.Fail, result)
+        assertEquals(false, result)
     }
 
     @Test
     fun whenDeviceSameAsOsApiLevelThenReturnMatch() = runTest {
         givenDeviceProperties(apiLevel = 21)
 
-        val result = testee.evaluate(MatchingAttribute.Api(value = 21))
+        val result = testee.evaluate(Api(value = 21))
 
-        assertEquals(EvaluationResult.Match, result)
+        assertEquals(true, result)
     }
 
     @Test
     fun whenDeviceDifferentAsOsApiLevelThenReturnFail() = runTest {
         givenDeviceProperties(apiLevel = 21)
 
-        val result = testee.evaluate(MatchingAttribute.Api(value = 19))
+        val result = testee.evaluate(Api(value = 19))
 
-        assertEquals(EvaluationResult.Fail, result)
+        assertEquals(false, result)
     }
 
     @Test
     fun whenDeviceMatchesOsApiLevelThenReturnMatch() = runTest {
         givenDeviceProperties(apiLevel = 21)
 
-        val result = testee.evaluate(MatchingAttribute.Api(min = 19))
+        val result = testee.evaluate(Api(min = 19))
 
-        assertEquals(EvaluationResult.Match, result)
+        assertEquals(true, result)
     }
 
     @Test
     fun whenDeviceMatchesOsApiLevelRangeThenReturnMatch() = runTest {
         givenDeviceProperties(apiLevel = 21)
 
-        val result = testee.evaluate(MatchingAttribute.Api(min = 19, max = 23))
+        val result = testee.evaluate(Api(min = 19, max = 23))
 
-        assertEquals(EvaluationResult.Match, result)
+        assertEquals(true, result)
     }
 
     @Test
     fun whenDeviceDoesNotMatchesOsApiLevelRangeThenReturnMatch() = runTest {
         givenDeviceProperties(apiLevel = 23)
 
-        val result = testee.evaluate(MatchingAttribute.Api(min = 19, max = 21))
+        val result = testee.evaluate(Api(min = 19, max = 21))
 
-        assertEquals(EvaluationResult.Fail, result)
+        assertEquals(false, result)
     }
 
     @Test
     fun whenDeviceDoesNotMatchOsApiLevelThenReturnFail() = runTest {
         givenDeviceProperties(apiLevel = 21)
 
-        val result = testee.evaluate(MatchingAttribute.Api(max = 19))
+        val result = testee.evaluate(Api(max = 19))
 
-        assertEquals(EvaluationResult.Fail, result)
+        assertEquals(false, result)
     }
 
     @Test
     fun whenOsApiMatchingAttributeEmptyThenReturnFail() = runTest {
         givenDeviceProperties(apiLevel = 21)
 
-        val result = testee.evaluate(MatchingAttribute.Api())
+        val result = testee.evaluate(Api())
 
-        assertEquals(EvaluationResult.Fail, result)
+        assertEquals(false, result)
     }
 
     @Test
     fun whenDeviceWVSameAsWVVersionThenReturnMatch() = runTest {
         givenDeviceProperties(webView = "96.0.4664.104")
 
-        val result = testee.evaluate(MatchingAttribute.WebView(value = "96.0.4664.104"))
+        val result = testee.evaluate(WebView(value = "96.0.4664.104"))
 
-        assertEquals(EvaluationResult.Match, result)
+        assertEquals(true, result)
     }
 
     @Test
     fun whenDeviceWVDifferentAsWVVersionThenReturnMatch() = runTest {
         givenDeviceProperties(webView = "96.0.4664.104")
 
-        val result = testee.evaluate(MatchingAttribute.WebView(value = "96.0.4664.105"))
+        val result = testee.evaluate(WebView(value = "96.0.4664.105"))
 
-        assertEquals(EvaluationResult.Fail, result)
+        assertEquals(false, result)
     }
 
     @Test
     fun whenDeviceWVLowerThanMaxWVVersionThenReturnMatch() = runTest {
         givenDeviceProperties(webView = "96.0.4664.104")
 
-        val result = testee.evaluate(MatchingAttribute.WebView(max = "96.0.4665.101"))
+        val result = testee.evaluate(WebView(max = "96.0.4665.101"))
 
-        assertEquals(EvaluationResult.Match, result)
+        assertEquals(true, result)
     }
 
     @Test
     fun whenDeviceWVGreaterThanMaxWVVersionThenReturnFail() = runTest {
         givenDeviceProperties(webView = "96.0.4665.0")
 
-        val result = testee.evaluate(MatchingAttribute.WebView(max = "96.0.4664.101"))
+        val result = testee.evaluate(WebView(max = "96.0.4664.101"))
 
-        assertEquals(EvaluationResult.Fail, result)
+        assertEquals(false, result)
     }
 
     @Test
     fun whenDeviceWVGreaterThanMinWVVersionThenReturnMatch() = runTest {
         givenDeviceProperties(webView = "96.0.4665.104")
 
-        val result = testee.evaluate(MatchingAttribute.WebView(min = "96.0.4664.101"))
+        val result = testee.evaluate(WebView(min = "96.0.4664.101"))
 
-        assertEquals(EvaluationResult.Match, result)
+        assertEquals(true, result)
     }
 
     @Test
     fun whenDeviceWVLowerThanMinWVVersionThenReturnFail() = runTest {
         givenDeviceProperties(webView = "96.0.4664.104")
 
-        val result = testee.evaluate(MatchingAttribute.WebView(min = "96.1.4664.104"))
+        val result = testee.evaluate(WebView(min = "96.1.4664.104"))
 
-        assertEquals(EvaluationResult.Fail, result)
+        assertEquals(false, result)
     }
 
     @Test
     fun whenDeviceMatchesWebViewMaxVersionThenReturnMatch() = runTest {
         givenDeviceProperties(webView = "96.0.4664.104")
 
-        val result = testee.evaluate(MatchingAttribute.WebView(max = "96.0.4664.104"))
+        val result = testee.evaluate(WebView(max = "96.0.4664.104"))
 
-        assertEquals(EvaluationResult.Match, result)
+        assertEquals(true, result)
     }
 
     @Test
     fun whenDeviceMatchesWebViewMinVersionThenReturnMatch() = runTest {
         givenDeviceProperties(webView = "96.0.4664.104")
 
-        val result = testee.evaluate(MatchingAttribute.WebView(min = "96.0.4664.104"))
+        val result = testee.evaluate(WebView(min = "96.0.4664.104"))
 
-        assertEquals(EvaluationResult.Match, result)
+        assertEquals(true, result)
     }
 
     @Test
     fun whenDeviceWVMatchesMaxSimplifiedWVVersionThenReturnMatch() = runTest {
         givenDeviceProperties(webView = "96.0.4664.104")
 
-        val result = testee.evaluate(MatchingAttribute.WebView(max = "96"))
+        val result = testee.evaluate(WebView(max = "96"))
 
-        assertEquals(EvaluationResult.Match, result)
+        assertEquals(true, result)
     }
 
     @Test
     fun whenDeviceWVMatchesMinSimplifiedWVVersionThenReturnMatch() = runTest {
         givenDeviceProperties(webView = "96.0.4664.104")
 
-        val result = testee.evaluate(MatchingAttribute.WebView(min = "96"))
+        val result = testee.evaluate(WebView(min = "96"))
 
-        assertEquals(EvaluationResult.Match, result)
+        assertEquals(true, result)
     }
 
     @Test
     fun whenDeviceWVGreaterThanMaxSimplifiedWVVersionThenReturnFail() = runTest {
         givenDeviceProperties(webView = "96.0.4664.104")
 
-        val result = testee.evaluate(MatchingAttribute.WebView(max = "95"))
+        val result = testee.evaluate(WebView(max = "95"))
 
-        assertEquals(EvaluationResult.Fail, result)
+        assertEquals(false, result)
     }
 
     @Test
     fun whenDeviceWVLowerThanMinSimplifiedWVVersionThenReturnFail() = runTest {
         givenDeviceProperties(webView = "96.0.4664.104")
 
-        val result = testee.evaluate(MatchingAttribute.WebView(min = "97"))
+        val result = testee.evaluate(WebView(min = "97"))
 
-        assertEquals(EvaluationResult.Fail, result)
+        assertEquals(false, result)
     }
 
     @Test
     fun whenDeviceDoesNotProvideWVVersionsThenReturnFail() = runTest {
         givenDeviceProperties(webView = "")
 
-        val result = testee.evaluate(MatchingAttribute.WebView(min = "97"))
+        val result = testee.evaluate(WebView(min = "97"))
 
-        assertEquals(EvaluationResult.Fail, result)
+        assertEquals(false, result)
     }
 
     @Test
     fun whenDeviceWVVersionHasUnknownFormatThenReturnFail() = runTest {
         givenDeviceProperties(webView = "test93.91.0")
 
-        val result = testee.evaluate(MatchingAttribute.WebView(min = "91"))
+        val result = testee.evaluate(WebView(min = "91"))
 
-        assertEquals(EvaluationResult.Fail, result)
+        assertEquals(false, result)
     }
 
     @Test
     fun whenDeviceWVVersionHasUnknownFormatInBetweenThenReturnFail() = runTest {
         givenDeviceProperties(webView = "93.91.test.0")
 
-        val result = testee.evaluate(MatchingAttribute.WebView(min = "91"))
+        val result = testee.evaluate(WebView(min = "91"))
 
-        assertEquals(EvaluationResult.Fail, result)
+        assertEquals(false, result)
     }
 
     @Test
     fun whenDeviceWVVersionHasUnknownFormatAtEndThenReturnFail() = runTest {
         givenDeviceProperties(webView = "93.91.0.test")
 
-        val result = testee.evaluate(MatchingAttribute.WebView(min = "91"))
+        val result = testee.evaluate(WebView(min = "91"))
 
-        assertEquals(EvaluationResult.Fail, result)
+        assertEquals(false, result)
     }
 
     @Test
     fun whenEmptyWebViewMatchingAttributeThenReturnFail() = runTest {
         givenDeviceProperties(webView = "96.0.4664.104")
 
-        val result = testee.evaluate(MatchingAttribute.WebView())
+        val result = testee.evaluate(WebView())
 
-        assertEquals(EvaluationResult.Fail, result)
+        assertEquals(false, result)
     }
 
     private fun givenDeviceProperties(
-        locale: Locale = Locale.getDefault(),
+        locale: java.util.Locale = java.util.Locale.getDefault(),
         apiLevel: Int = Build.VERSION.SDK_INT,
         webView: String = "",
     ) {

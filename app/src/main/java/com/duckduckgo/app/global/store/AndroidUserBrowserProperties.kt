@@ -16,8 +16,6 @@
 
 package com.duckduckgo.app.global.store
 
-import com.duckduckgo.app.bookmarks.model.BookmarksRepository
-import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
@@ -25,30 +23,32 @@ import com.duckduckgo.app.usage.app.AppDaysUsedRepository
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
+import com.duckduckgo.savedsites.api.SavedSitesRepository
 import java.util.*
 
 class AndroidUserBrowserProperties(
     private val themingDataStore: ThemingDataStore,
-    private val bookmarksRepository: BookmarksRepository,
-    private val favoritesRepository: FavoritesRepository,
+    private val savedSitesRepository: SavedSitesRepository,
     private val appInstallStore: AppInstallStore,
     private val widgetCapabilities: WidgetCapabilities,
     private val emailManager: EmailManager,
     private val searchCountDao: SearchCountDao,
     private val appDaysUsedRepository: AppDaysUsedRepository,
+    private val appTrackingProtection: AppTrackingProtection,
 ) : UserBrowserProperties {
     override fun appTheme(): DuckDuckGoTheme {
         return themingDataStore.theme
     }
 
     override suspend fun bookmarks(): Long {
-        return bookmarksRepository.bookmarksCount()
+        return savedSitesRepository.bookmarksCount()
     }
 
     override suspend fun favorites(): Long {
-        return favoritesRepository.favoritesCount()
+        return savedSitesRepository.favoritesCount()
     }
 
     override fun daysSinceInstalled(): Long {
@@ -73,5 +73,9 @@ class AndroidUserBrowserProperties(
 
     override fun widgetAdded(): Boolean {
         return widgetCapabilities.hasInstalledWidgets
+    }
+
+    override fun appTpOnboarded(): Boolean {
+        return appTrackingProtection.isOnboarded()
     }
 }
