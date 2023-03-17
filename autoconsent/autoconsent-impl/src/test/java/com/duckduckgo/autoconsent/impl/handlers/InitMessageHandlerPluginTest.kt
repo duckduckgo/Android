@@ -140,7 +140,7 @@ class InitMessageHandlerPluginTest {
 
     @Test
     fun whenProcessIfCookiePromptManagementExperimentEnabledAndAutoconsentIsDisabledAndNotAlreadyHandledThenCallEvaluate() {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "mc" })
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "mt" })
 
         settingsRepository.userSetting = false
         settingsRepository.firstPopupHandled = false
