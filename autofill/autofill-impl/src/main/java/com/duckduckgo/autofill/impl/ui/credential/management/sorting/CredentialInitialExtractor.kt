@@ -65,7 +65,7 @@ class CredentialInitialExtractor @Inject constructor(
     }
 
     override fun extractInitialFromDomain(loginCredentials: LoginCredentials): String? {
-        return autofillUrlMatcher.extractUrlPartsForAutofill(loginCredentials.domain).eTldPlus1?.firstOrNull()?.uppercaseChar()?.toString()
+        return autofillUrlMatcher.extractUrlPartsForAutofill(loginCredentials.domain).userFacingETldPlus1?.firstOrNull()?.uppercaseChar()?.toString()
     }
 
     companion object {

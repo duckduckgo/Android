@@ -18,6 +18,7 @@ package com.duckduckgo.autofill.impl.ui.credential.management.suggestion
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.autofill.api.TestUrlUnicodeNormalizer
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialListSorterByTitleAndDomain
@@ -32,7 +33,7 @@ class SuggestionListBuilderTest {
 
     val testee = SuggestionListBuilder(
         context = InstrumentationRegistry.getInstrumentation().targetContext,
-        sorter = CredentialListSorterByTitleAndDomain(AutofillDomainNameUrlMatcher()),
+        sorter = CredentialListSorterByTitleAndDomain(AutofillDomainNameUrlMatcher(TestUrlUnicodeNormalizer())),
     )
 
     @Test
