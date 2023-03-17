@@ -104,7 +104,7 @@
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Închidere</string>
     <string name="closeAllTabsMenuItem">Închide toate filele</string>
-    <string name="closeTab">Închide</string>
+    <string name="closeTab">Închidere filă</string>
     <string name="tabClosed">Filă închisă</string>
     <string name="tabClosedUndo">Anulează</string>
     <string name="downloadsMenuItemTitle">Descărcări</string>
@@ -245,7 +245,7 @@
     <string name="surveyCtaLaunchButton">Participă la sondaj</string>
     <string name="surveyCtaDismissButton">Nu, mulțumesc</string>
     <string name="surveyActivityTitle">Sondajul utilizatorului</string>
-    <string name="surveyTitle">SONDAJ DUCKDUCKGO</string>
+    <string name="surveyTitle">Sondaj DuckDuckGo</string>
     <string name="surveyDismissContentDescription">Renunță la sondaj</string>
     <string name="surveyLoadingErrorTitle">Oh, nu!</string>
     <string name="surveyLoadingErrorText">Sondajul nostru nu se încarcă.\nTe rugăm să încercerci din nou, mai târziu.</string>
@@ -366,14 +366,14 @@
     <string name="tellUsHowToImprove">Te rugăm să ne spui ce putem îmbunătăți.</string>
     <string name="thanksForTheFeedback">Îți mulțumim pentru feedback!</string>
     <string name="feedbackNegativeMainReasonPageSubtitle">Ce aspect te deranjează cel mai tare?</string>
-    <string name="feedbackNegativeMainReasonPageTitle">Ne pare rău să auzim aceasta</string>
+    <string name="feedbackNegativeMainReasonPageTitle">Ne pare rău de experiența ta</string>
     <string name="feedbackShareDetails">Trimite detalii</string>
     <string name="sharePositiveFeedbackWithTheTeam">Există detalii pe care dorești să le împărtășești echipei?</string>
     <string name="whatHaveYouBeenEnjoying">Ce ți-a plăcut?</string>
     <string name="awesomeToHear">Ne bucurăm să auzim aceasta!</string>
     <string name="shareTheLoveWithARating">Te rugăm să împărtășești experiența ta, evaluând aplicația în Play Store.</string>
     <string name="rateTheApp">Evaluează aplicația</string>
-    <string name="declineFurtherFeedback">NU, MULȚUMESC, AM TERMINAT</string>
+    <string name="declineFurtherFeedback">Nu mulțumesc, am terminat</string>
     <string name="whichBrokenSites">Unde vezi aceste probleme?</string>
     <string name="whichBrokenSitesHint">Ce site web are probleme?</string>
     <string name="feedbackSpecificAsPossible">Te rugăm să furnizezi detalii cât mai concrete</string>
@@ -389,7 +389,6 @@
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">De pe acest dispozitiv</string>
-    <string name="systemSearchOmnibarInputHint"><font size="13">Căutare sau tastare URL</font></string>
     <string name="systemSearchAppNotFound">Aplicația nu a fost găsită</string>
     <string name="systemSearchOnboardingText">Mulțumim pentru că ai ales DuckDuckGo!\nAcum, când utilizezi căutarea sau aplicația noastră, căutările tale sunt protejate.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">De asemenea, aplicația DuckDuckGo:</string>

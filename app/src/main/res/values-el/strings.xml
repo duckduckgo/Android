@@ -245,7 +245,7 @@
     <string name="surveyCtaLaunchButton">Πάρτε μέρος στην έρευνα</string>
     <string name="surveyCtaDismissButton">Όχι, ευχαριστώ</string>
     <string name="surveyActivityTitle">Έρευνα χρηστών</string>
-    <string name="surveyTitle">ΕΡΕΥΝΑ DUCKDUCKGO</string>
+    <string name="surveyTitle">Έρευνα DuckDuckGo</string>
     <string name="surveyDismissContentDescription">Απόρριψη έρευνας</string>
     <string name="surveyLoadingErrorTitle">Ωχ, όχι!</string>
     <string name="surveyLoadingErrorText">Η έρευνά μας δεν φορτώνει αυτήν τη στιγμή.\nΠροσπαθήστε ξανά αργότερα.</string>
@@ -361,7 +361,7 @@
     <string name="otherMainReasonTitleShort">Άλλα προβλήματα</string>
 
     <string name="openEndedInputHint">Να είστε όσο το δυνατόν πιο συγκεκριμένοι</string>
-    <string name="submitFeedback">ΥΠΟΒΟΛΗ</string>
+    <string name="submitFeedback">Υποβολή</string>
 
     <string name="tellUsHowToImprove">Πείτε μας πού μπορούμε να βελτιωθούμε.</string>
     <string name="thanksForTheFeedback">Ευχαριστούμε για τα σχόλιά σας!</string>
@@ -372,8 +372,8 @@
     <string name="whatHaveYouBeenEnjoying">Ποια στοιχεία απολαμβάνετε;</string>
     <string name="awesomeToHear">Αυτό μας κάνει πολύ χαρούμενους!</string>
     <string name="shareTheLoveWithARating">Δείξτε την αγάπη σας αξιολογώντας μας στο Play Store.</string>
-    <string name="rateTheApp">ΑΞΙΟΛΟΓΗΣΗ ΕΦΑΡΜΟΓΗΣ</string>
-    <string name="declineFurtherFeedback">ΟΧΙ ΕΥΧΑΡΙΣΤΩ, ΤΕΛΕΙΩΣΑ</string>
+    <string name="rateTheApp">Αξιολόγηση εφαρμογής</string>
+    <string name="declineFurtherFeedback">Όχι, ευχαριστώ, τελείωσα</string>
     <string name="whichBrokenSites">Πού βλέπετε τα προβλήματα αυτά;</string>
     <string name="whichBrokenSitesHint">Ποιος ιστότοπος παρουσιάζει προβλήματα;</string>
     <string name="feedbackSpecificAsPossible">Να είστε όσο το δυνατόν πιο συγκεκριμένοι</string>
@@ -389,7 +389,6 @@
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Από αυτή τη συσκευή</string>
-    <string name="systemSearchOmnibarInputHint"><font size="13">Αναζήτηση ή πληκτρολόγηση διεύθυνσης URL</font></string>
     <string name="systemSearchAppNotFound">Η εφαρμογή δεν βρέθηκε</string>
     <string name="systemSearchOnboardingText">Ευχαριστώ που επιλέξατε το DuckDuckGo!\nΤώρα, όταν χρησιμοποιείτε την αναζήτηση ή την εφαρμογή μας, οι αναζητήσεις σας προστατεύονται.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Η εφαρμογή DuckDuckGo επίσης:</string>

@@ -33,6 +33,6 @@
     <string name="systemPermissionDialogAudioDeniedContent">Weby můžou používat mikrofon, jen když službě DuckDuckGo povolíš žádat o přístup.</string>
     <string name="systemPermissionDialogCameraAndAudioDeniedTitle">Povolit DuckDuckGo žádat na tomto zařízení o přístup k fotoaparátu a mikrofonu</string>
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">Weby můžou používat tvůj fotoaparát a mikrofon, jen když službě DuckDuckGo povolíš žádat o přístup.</string>
-    <string name="systemPermissionsDeniedDialogPositiveButton">Otevřené nastavení</string>
+    <string name="systemPermissionsDeniedDialogPositiveButton">Otevřít nastavení</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Zrušit</string>
 </resources>

@@ -21,7 +21,8 @@
     <string name="macos_title">Pobierz DuckDuckGo dla komputerów Mac!</string>
 
     <string name="macos_share_title">Udostępnij link</string>
-    <string name="macos_description_text">Aplikacja DuckDuckGo dla komputerów Mac zapewnia szybkość, której potrzebujesz, i niezbędne funkcje przeglądania. Ponadto jest wyposażona w najlepsze w swojej klasie narzędzia do ochrony prywatności.Na komputerze Mac odwiedź stronę:\n<b><font color="#3969EF">duckduckgo.com/mac</font></b></string>
+    <string name="macos_description_text">Aplikacja DuckDuckGo dla komputerów Mac zapewnia szybkość, której potrzebujesz, i niezbędne funkcje przeglądania. Ponadto jest wyposażona w najlepsze w swojej klasie narzędzia do ochrony prywatności.\n\nNa komputerze Mac przejdź do:</string>
+    <string name="macos_description_link">duckduckgo.com/mac</string>
     <string name="macos_share_text">Chcesz rozpocząć prywatne przeglądanie na komputerze Mac?\n\nPrzejdź pod ten adres URL na komputerze Mac, aby pobrać:\nduckduckgo.com/mac</string>
 
     <string name="macos_waitlist_windows_link">Szukasz wersji dla systemu Windows?</string>

@@ -21,7 +21,8 @@
     <string name="macos_title">Iegūsti DuckDuckGo Mac datoram!</string>
 
     <string name="macos_share_title">Kopīgot saiti</string>
-    <string name="macos_description_text">DuckDuckGo Mac datoram sniedz nepieciešamo ātrumu, ierastās pārlūkošanas funkcijas un savā klasē labākās privātuma pamatfunkcijas.\n\nSavā Mac datorā dodies uz: \n<b><font color="#3969EF">duckduckgo.com/mac</font></b></string>
+    <string name="macos_description_text">DuckDuckGo Mac datoram sniedz nepieciešamo ātrumu, ierastās pārlūkošanas funkcijas un savā klasē labākās privātuma pamatfunkcijas.\n\nSavā Mac datorā dodies uz:</string>
+    <string name="macos_description_link">duckduckgo.com/mac</string>
     <string name="macos_share_text">Vai esi gatavs sākt privātu pārlūkošanu savā Mac?\n\n Apmeklē šo URL savā Mac datorā, lai lejupielādētu:\nhttps://duckduckgo.com/mac</string>
 
     <string name="macos_waitlist_windows_link">Vai meklē Windows versiju?</string>

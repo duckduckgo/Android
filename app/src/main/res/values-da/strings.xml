@@ -104,7 +104,7 @@
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Luk</string>
     <string name="closeAllTabsMenuItem">Luk alle faner</string>
-    <string name="closeTab">Luk fane</string>
+    <string name="closeTab">Luk fanen</string>
     <string name="tabClosed">Fanen er lukket</string>
     <string name="tabClosedUndo">Fortryd</string>
     <string name="downloadsMenuItemTitle">Downloads</string>
@@ -243,9 +243,9 @@
     <string name="surveyCtaTitle">Hjælp os med at forbedre appen!</string>
     <string name="surveyCtaDescription">Deltag i vores korte undersøgelse, og del din feedback.</string>
     <string name="surveyCtaLaunchButton">Deltag i undersøgelsen</string>
-    <string name="surveyCtaDismissButton">Nej tak.</string>
+    <string name="surveyCtaDismissButton">Nej tak</string>
     <string name="surveyActivityTitle">Brugerundersøgelse</string>
-    <string name="surveyTitle">DUCKDUCKGO-UNDERSØGELSE</string>
+    <string name="surveyTitle">DuckDuckGo-undersøgelse</string>
     <string name="surveyDismissContentDescription">Afvis undersøgelse</string>
     <string name="surveyLoadingErrorTitle">Åh, nej!</string>
     <string name="surveyLoadingErrorText">Vores undersøgelse kan ikke indlæses i øjeblikket.\nForsøg igen senere.</string>
@@ -269,7 +269,7 @@
     <!-- App Enjoyment / Rating / Feedback -->
     <string name="appEnjoymentDialogTitle">Nyder du DuckDuckGo?</string>
     <string name="appEnjoymentDialogMessage">Vi vil rigtig gerne vide, hvad du synes.</string>
-    <string name="appEnjoymentDialogPositiveButton">Jeg kan godt lide den.</string>
+    <string name="appEnjoymentDialogPositiveButton">Jeg kan godt lide den</string>
     <string name="appEnjoymentDialogNegativeButton">Den skal forbedres</string>
 
     <string name="rateAppDialogTitle">Bedøm appen</string>
@@ -373,7 +373,7 @@
     <string name="awesomeToHear">Fantastisk at høre!</string>
     <string name="shareTheLoveWithARating">Del kærligheden ved at bedømme os i Play Store.</string>
     <string name="rateTheApp">Bedøm appen</string>
-    <string name="declineFurtherFeedback">NEJ TAK, JEG ER FÆRDIG.</string>
+    <string name="declineFurtherFeedback">Nej tak, jeg er færdig</string>
     <string name="whichBrokenSites">Hvor oplever du disse problemer?</string>
     <string name="whichBrokenSitesHint">Hvilket websted har problemer?</string>
     <string name="feedbackSpecificAsPossible">Vær så specifik som muligt</string>
@@ -389,7 +389,6 @@
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Fra denne enhed</string>
-    <string name="systemSearchOmnibarInputHint"><font size="13">Søg eller indtast URL</font></string>
     <string name="systemSearchAppNotFound">Appen kunne ikke findes</string>
     <string name="systemSearchOnboardingText">Tak, fordi du valgte DuckDuckGo!\nNår du bruger vores søgning eller app, er dine søgninger beskyttet.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">DuckDuckGo-appen kan også:</string>

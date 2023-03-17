@@ -73,6 +73,20 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/statusTitle"/>
 
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                android:id="@+id/waitlistDescriptionLink"
+                app:typography="body1_bold"
+                android:textColor="?daxColorAccentBlue"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginEnd="24dp"
+                android:text="@string/macos_description_link"
+                android:textAlignment="center"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/waitlistDescription"/>
+
             <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
                     android:id="@+id/shareButton"
                     android:layout_width="match_parent"
@@ -84,7 +98,7 @@
                     app:buttonSize="large"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/waitlistDescription"/>
+                    app:layout_constraintTop_toBottomOf="@+id/waitlistDescriptionLink"/>
 
             <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
                 android:id="@+id/lookingForWindowsVersionButton"

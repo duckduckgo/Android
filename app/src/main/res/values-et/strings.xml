@@ -243,9 +243,9 @@
     <string name="surveyCtaTitle">Aidake meil rakendust täiustada!</string>
     <string name="surveyCtaDescription">Vasta meie lühikesele küsitlusele ja jaga oma tagasisidet.</string>
     <string name="surveyCtaLaunchButton">Vastake küsitlusele</string>
-    <string name="surveyCtaDismissButton">Ei aitäh</string>
+    <string name="surveyCtaDismissButton">Ei, aitäh</string>
     <string name="surveyActivityTitle">Kasutajaküsitlus</string>
-    <string name="surveyTitle">DUCKDUCKGO KÜSITLUS</string>
+    <string name="surveyTitle">DuckDuckGo küsitlus</string>
     <string name="surveyDismissContentDescription">Loobu küsitlusest</string>
     <string name="surveyLoadingErrorTitle">Oh ei!</string>
     <string name="surveyLoadingErrorText">Meie küsitlust praegu laadida ei õnnestunud.\nPalun proovige hiljem uuesti.</string>
@@ -361,7 +361,7 @@
     <string name="otherMainReasonTitleShort">Teised probleemid</string>
 
     <string name="openEndedInputHint">Palun ole võimalikult konkreetne</string>
-    <string name="submitFeedback">ESITA</string>
+    <string name="submitFeedback">Esita</string>
 
     <string name="tellUsHowToImprove">Palun öelge meile, mida saaksime täiustada.</string>
     <string name="thanksForTheFeedback">Aitäh tagasiside eest!</string>
@@ -372,8 +372,8 @@
     <string name="whatHaveYouBeenEnjoying">Mida olete nautinud?</string>
     <string name="awesomeToHear">Vinge kuulda!</string>
     <string name="shareTheLoveWithARating">Jagage armastust Play Store\'i hinnanguga.</string>
-    <string name="rateTheApp">HINDA RAKENDUST</string>
-    <string name="declineFurtherFeedback">EI, AITÄH, OLEN VALMIS</string>
+    <string name="rateTheApp">Hinda rakendust</string>
+    <string name="declineFurtherFeedback">Ei, aitäh. Olen valmis</string>
     <string name="whichBrokenSites">Kus te neid probleeme näete?</string>
     <string name="whichBrokenSitesHint">Millisel veebisaidil on probleeme?</string>
     <string name="feedbackSpecificAsPossible">Palun olge võimalikult konkreetne</string>
@@ -389,7 +389,6 @@
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Sellest seadmest</string>
-    <string name="systemSearchOmnibarInputHint"><font size="13">Otsige või tippige URL</font></string>
     <string name="systemSearchAppNotFound">Rakendust ei leitud</string>
     <string name="systemSearchOnboardingText">Täname, et valisite DuckDuckGo!\nNüüd, kui kasutate meie otsingut või rakendust, on teie otsingud kaitstud.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Peale selle DuckDuckGo rakendus:</string>

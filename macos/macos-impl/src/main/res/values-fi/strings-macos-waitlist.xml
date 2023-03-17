@@ -21,7 +21,8 @@
     <string name="macos_title">Kokeile Macin DuckDuckGota!</string>
 
     <string name="macos_share_title">Jaa linkki</string>
-    <string name="macos_description_text">Macin DuckDuckGo-sovellus tarjoaa kaipaamaasi nopeutta, odottamasi selaustoiminnot ja luokkansa parhaat tietosuojaominaisuudet.\n\nSiirry Mac-laitteellasi osoitteeseen:\n<b><font color="#3969EF">duckduckgo.com/mac</font></b></string>
+    <string name="macos_description_text">Macin DuckDuckGo-sovellus tarjoaa kaipaamaasi nopeutta, odottamasi selaustoiminnot ja luokkansa parhaat tietosuojaominaisuudet.\n\nSiirry Mac-tietokoneellasi osoitteeseen:</string>
+    <string name="macos_description_link">duckduckgo.com/mac</string>
     <string name="macos_share_text">Oletko valmis aloittamaan yksityisen selaamisen Macilla?\n\nLataa sovellus Mac-laitteellesi osoitteesta:\nhttps://duckduckgo.com/mac</string>
 
     <string name="macos_waitlist_windows_link">Etsitkö Windows-versiota?</string>
