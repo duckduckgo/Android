@@ -65,7 +65,7 @@ appId: com.duckduckgo.mobile.android
 - assertNotVisible:
     text: "Privacy Test Pages - Home"
     index: 0
-- assertNotVisible:
+- assertVisible:
     text: "No favorites added yet"
 # Undo remove favorite from bookmarks screen
 - assertVisible: "Undo"
