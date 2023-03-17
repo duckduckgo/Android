@@ -436,6 +436,7 @@
     <!-- Onboarding DDG Feature Options -->
     <string name="onboardingFeatureOptionsTitle">Что заинтересовало вас в DuckDuckGo?</string>
     <string name="onboardingFeatureOptionsContinue">Продолжить</string>
+    <string name="onboardingFeatureOptionsSkip">Пропустить этот шаг</string>
     <!-- smartling.character_limit = 28 -->
     <string name="onboardingFeatureOptionPrivateSearch">Конфиденциальный поиск</string>
     <!-- smartling.character_limit = 28 -->
