@@ -46,7 +46,7 @@ class VariantManagerTest {
 
     @Test
     fun cookiePromptManagementControlVariantHasExpectedWeightAndNoFeatures() {
-        val variant = variants.first { it.key == "mq" }
+        val variant = variants.first { it.key == "mb" }
         assertEqualsDouble(1.0, variant.weight)
         assertEquals(0, variant.features.size)
         assertEquals(0, variant.features.size)
@@ -54,7 +54,7 @@ class VariantManagerTest {
 
     @Test
     fun cookiePromptManagementExperimentalVariantHasExpectedWeightAndFeatures() {
-        val variant = variants.first { it.key == "mr" }
+        val variant = variants.first { it.key == "mc" }
         assertEqualsDouble(1.0, variant.weight)
         assertEquals(1, variant.features.size)
         assertTrue(variant.hasFeature(CookiePromptManagementExperiment))
