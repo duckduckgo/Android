@@ -434,6 +434,7 @@
     <!-- Onboarding DDG Feature Options -->
     <string name="onboardingFeatureOptionsTitle">Kas tevi piesaista DuckDuckGo?</string>
     <string name="onboardingFeatureOptionsContinue">Turpināt</string>
+    <string name="onboardingFeatureOptionsSkip">Izlaist šo soli</string>
     <!-- smartling.character_limit = 28 -->
     <string name="onboardingFeatureOptionPrivateSearch">Privāta meklēšana</string>
     <!-- smartling.character_limit = 28 -->
