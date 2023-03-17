@@ -662,13 +662,13 @@
 
     <!-- Autoconsent -->
     <!-- smartling.character_limit = 82 -->
-    <string name="autoconsentDialogTitle">Näyttää siltä, että tällä sivustolla on evästeiden hallinnan ponnahdusikkuna👇</string>
+    <string name="autoconsentDialogTitle"><![CDATA[<b>Haluatko, että hoidan evästeiden ponnahdusikkunat?</b>]]></string>
     <!-- smartling.character_limit = 160 -->
-    <string name="autoconsentDialogDescription">Haluatko, että hoidan nämä puolestasi? Voin yrittää minimoida evästeet, maksimoida yksityisyyden ja piilottaa tällaiset ponnahdusikkunat.</string>
+    <string name="autoconsentDialogDescription">Voin pyrkiä valitsemaan valittavissa olevista asetuksista yksityisimmät ja piilottaa tämänkaltaiset ponnahdusikkunat.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Evästeiden hallinnan ponnahdusikkunat</string>
+    <string name="autoconsentPrimaryCta">Hoida ponnahdusikkunat puolestani</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentSecondaryCta">Ei kiitos</string>
+    <string name="autoconsentSecondaryCta">Ei, hoidan ne itse</string>
 
     <string name="autoconsentSetting">Evästeiden hallinnan ponnahdusikkunat</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Ponnahdusikkuna piilotettu</string>

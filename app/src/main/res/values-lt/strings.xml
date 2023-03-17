@@ -670,13 +670,13 @@
 
     <!-- Autoconsent -->
     <!-- smartling.character_limit = 82 -->
-    <string name="autoconsentDialogTitle">Atrodo, kad šioje svetainėje yra sutikimo su slapukais iškylantysis langas 👇</string>
+    <string name="autoconsentDialogTitle"><![CDATA[<b>Norite, kad sutvarkyčiau iškylančiuosius slapukų langus?</b>]]></string>
     <!-- smartling.character_limit = 160 -->
-    <string name="autoconsentDialogDescription">Norite, kad viską sutvarkyčiau? Galiu pabandyti sumažinti slapukų skaičių, sustiprinti privatumą ir paslėpti tokius iššokančiuosius langus.</string>
+    <string name="autoconsentDialogDescription">Galiu pabandyti pasirinkti privačiausius galimus nustatymus ir paslėpti tokius iškylančiuosius langus.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Valdyti slapukų iššokančiuosius langus</string>
+    <string name="autoconsentPrimaryCta">Sutvarkykite iškylančiuosius langus už mane</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentSecondaryCta">Ne, dėkoju</string>
+    <string name="autoconsentSecondaryCta">Ne, aš juos susitvarkysiu pats</string>
 
     <string name="autoconsentSetting">Valdyti slapukų iššokančiuosius langus</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Iškylantysis langas paslėptas</string>

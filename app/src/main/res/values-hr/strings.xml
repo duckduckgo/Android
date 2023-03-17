@@ -670,13 +670,13 @@
 
     <!-- Autoconsent -->
     <!-- smartling.character_limit = 82 -->
-    <string name="autoconsentDialogTitle">Čini se da ova stranica ima skočni prozor za pristanak na kolačiće👇</string>
+    <string name="autoconsentDialogTitle"><![CDATA[<b>Želiš li da upravljam skočnim prozorima kolačića?</b>]]></string>
     <!-- smartling.character_limit = 160 -->
-    <string name="autoconsentDialogDescription">Da se ja pobrinem za to umjesto tebe? Mogu pokušati minimizirati kolačiće, maksimalno povećati privatnost i sakriti skočne prozore poput ovih.</string>
+    <string name="autoconsentDialogDescription">Mogu pokušati odabrati najprivatnije dostupne postavke i sakriti skočne prozore poput ovih.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Upravljanje skočnim prozorima kolačića</string>
+    <string name="autoconsentPrimaryCta">Upravljaj skočnim prozorima umjesto mene</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentSecondaryCta">Ne, hvala</string>
+    <string name="autoconsentSecondaryCta">Ne, sam ću njima upravljati</string>
 
     <string name="autoconsentSetting">Upravljanje skočnim prozorima kolačića</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Skočni prozor je sakriven</string>

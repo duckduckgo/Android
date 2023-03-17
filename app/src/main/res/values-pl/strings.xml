@@ -670,13 +670,13 @@
 
     <!-- Autoconsent -->
     <!-- smartling.character_limit = 82 -->
-    <string name="autoconsentDialogTitle">Na tej stronie pojawia się okienko z prośbą o zgodę na używanie plików cookie 👇</string>
+    <string name="autoconsentDialogTitle"><![CDATA[<b>Czy mam zająć się wyskakującymi okienkami z prośbą o używanie plików cookie?</b>]]></string>
     <!-- smartling.character_limit = 160 -->
-    <string name="autoconsentDialogDescription">Mamy się tym za Ciebie zająć? Możemy spróbować zminimalizować liczbę plików cookie, zmaksymalizować prywatność i ukryć takie wyskakujące okienka.</string>
+    <string name="autoconsentDialogDescription">Mogę spróbować wybrać najbardziej prywatne dostępne ustawienia i ukryć takie wyskakujące okienka.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Zarządzaj okienkami z prośbą o zgodę</string>
+    <string name="autoconsentPrimaryCta">Obsługuj za mnie wyskakujące okienka</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentSecondaryCta">Nie, dziękuję</string>
+    <string name="autoconsentSecondaryCta">Nie, zajmę się nimi samodzielnie</string>
 
     <string name="autoconsentSetting">Zarządzaj wyskakującymi okienkami z prośbą o używanie plików cookie</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Ukryte wyskakujące okienka</string>

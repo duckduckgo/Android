@@ -666,13 +666,13 @@
 
     <!-- Autoconsent -->
     <!-- smartling.character_limit = 82 -->
-    <string name="autoconsentDialogTitle">Acest site are o fereastră pop-up pentru consimțământul privind modulele cookie👇</string>
+    <string name="autoconsentDialogTitle"><![CDATA[<b>Vrei să mă ocup de ferestrele pop-up cu module cookie?</b>]]></string>
     <!-- smartling.character_limit = 160 -->
-    <string name="autoconsentDialogDescription">Vrei să mă ocup de asta pentru tine? Pot să încerc să minimizez numărul de module cookie, să maximizez confidențialitatea și să ascund ferestrele pop-up precum aceasta.</string>
+    <string name="autoconsentDialogDescription">Pot încerca să selectez cele mai private setări disponibile și să ascund ferestrele pop-up de acest tip.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Gestionează pop-up-uri module cookie</string>
+    <string name="autoconsentPrimaryCta">Gestionează ferestrele pop-up în locul meu</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentSecondaryCta">Nu, mulțumesc</string>
+    <string name="autoconsentSecondaryCta">Nu, le voi gestiona personal</string>
 
     <string name="autoconsentSetting">Gestionează ferestrele pop-up cu privire la modulele cookie</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Pop-up ascuns</string>
