@@ -46,24 +46,31 @@ appId: com.duckduckgo.mobile.android
     text: "bookmarks"
 - tapOn:
     text: "bookmarks"
-- assertVisible:
+- assertNotVisible:
     text: "No bookmarks added yet"
 - assertVisible:
     text: "Privacy Test Pages - Home"
 # Remove favorite from bookmarks screen
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/trailingIcon"
+    index: 0
 - assertVisible:
     text: "Delete"
 - tapOn:
     text: "delete"
-- assertVisible: "Deleted Privacy Test Pages - Home"
+# When a favorite is removed, it still stays as Bookmark
+- assertVisible:
+    text: "Privacy Test Pages - Home"
+    index: 1
 - assertNotVisible:
     text: "Privacy Test Pages - Home"
-- assertVisible:
+    index: 0
+- assertNotVisible:
     text: "No favorites added yet"
 # Undo remove favorite from bookmarks screen
 - assertVisible: "Undo"
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/snackbar_action"
-- assertVisible: "Privacy Test Pages - Home"
+- assertVisible:
+    text: "Privacy Test Pages - Home"
+    index: 0
