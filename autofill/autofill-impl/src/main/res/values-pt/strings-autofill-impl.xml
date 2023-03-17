@@ -30,7 +30,7 @@
     <string name="saveLoginDialogButtonSave">Guardar início de sessão</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Guardar palavra-passe</string>
     <string name="saveLoginDialogNotNow">Agora não</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">O DuckDuckGo vai armazenar este início de sessão em segurança no teu dispositivo. Podes gerir os inícios de sessão guardados nas Definições.</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">Os inícios de sessão são armazenados com segurança apenas neste dispositivo e podes efetuar a gestão dos mesmo a partir do menu de Preenchimento automático nas Definições.</string>
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Queres que o DuckDuckGo guarde o teu início de sessão?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Mais opções</string>
 

@@ -30,7 +30,7 @@
     <string name="saveLoginDialogButtonSave">Anmeldedaten speichern</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Passwort speichern</string>
     <string name="saveLoginDialogNotNow">Jetzt nicht</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">DuckDuckGo speichert diese Anmeldedaten sicher auf deinem Gerät. Du kannst die gespeicherten Anmeldedaten in den Einstellungen verwalten.</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">Anmeldedaten werden nur auf diesem Gerät sicher gespeichert und können über das Menü Autovervollständigen in den Einstellungen verwaltet werden.</string>
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Möchtest du, dass DuckDuckGo deine Anmeldedaten speichert?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Weitere Optionen</string>
 

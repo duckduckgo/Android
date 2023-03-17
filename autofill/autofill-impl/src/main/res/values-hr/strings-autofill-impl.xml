@@ -30,7 +30,7 @@
     <string name="saveLoginDialogButtonSave">Spremi prijavu</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Spremi lozinku</string>
     <string name="saveLoginDialogNotNow">Ne sada</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">DuckDuckGo će sigurno spremiti ovu prijavu na tvoj uređaj. Spremljenim prijavama možeš upravljati u Postavkama.</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">Prijave se sigurno pohranjuju samo na ovom uređaju i njima se može upravljati iz izbornika Automatsko popunjavanje u Postavkama.</string>
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Želiš li da DuckDuckGo spremi tvoju prijavu?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Dodatne mogućnosti</string>
 

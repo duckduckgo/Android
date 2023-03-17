@@ -30,7 +30,7 @@
     <string name="saveLoginDialogButtonSave">Girişi Kaydet</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Şifre Kaydet</string>
     <string name="saveLoginDialogNotNow">Şimdi Değil</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">DuckDuckGo bu Girişi cihazınızda güvenli bir şekilde saklayacaktır. Kayıtlı Girişleri Ayarlar\'dan yönetebilirsiniz.</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">Girişler yalnızca bu cihazda güvenli bir şekilde saklanır ve Ayarlar\'daki Otomatik Doldurma menüsünden yönetilebilir.</string>
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">DuckDuckGo\'nun Girişinizi kaydetmesini istiyor musunuz?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Diğer Seçenekler</string>
 
