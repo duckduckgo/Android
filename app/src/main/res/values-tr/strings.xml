@@ -662,13 +662,13 @@
 
     <!-- Autoconsent -->
     <!-- smartling.character_limit = 82 -->
-    <string name="autoconsentDialogTitle">Görünüşe göre bu sitede çerez izni için açılır pencere var 👇</string>
+    <string name="autoconsentDialogTitle"><![CDATA[<b>Çerez açılır pencerelerini yönetmemi ister misiniz?</b>]]></string>
     <!-- smartling.character_limit = 160 -->
-    <string name="autoconsentDialogDescription">Bunları sizin yerinize halletmemizi ister misiniz? Çerezleri en aza indirmeyi, gizliliği en üst düzeye çıkarmayı ve bunun gibi açılır pencereleri gizlemeyi deneyebiliriz.</string>
+    <string name="autoconsentDialogDescription">Mevcut en gizli ayarları seçmeyi ve bu gibi açılır pencereleri gizlemeyi deneyebilirim.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Çerez Açılır Pencerelerini Yönetin</string>
+    <string name="autoconsentPrimaryCta">Açılır Pencereleri Benim Yerime Yönet</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentSecondaryCta">Hayır Teşekkürler</string>
+    <string name="autoconsentSecondaryCta">Hayır, Kendim Yöneteceğim</string>
 
     <string name="autoconsentSetting">Çerez Açılır Pencerelerini Yönetin</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Açılır Pencere Gizli</string>

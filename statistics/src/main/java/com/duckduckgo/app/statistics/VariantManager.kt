@@ -45,9 +45,9 @@ interface VariantManager {
             // the future if we can filter by app version
             Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
             Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
-            Variant(key = "mq", weight = 1.0, features = emptyList(), filterBy = { isEuropeanCountry() }),
+            Variant(key = "mb", weight = 1.0, features = emptyList(), filterBy = { isEuropeanCountry() }),
             Variant(
-                key = "mr",
+                key = "mc",
                 weight = 1.0,
                 features = listOf(VariantFeature.CookiePromptManagementExperiment),
                 filterBy = { isEuropeanCountry() },

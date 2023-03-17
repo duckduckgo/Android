@@ -666,13 +666,13 @@
 
     <!-- Autoconsent -->
     <!-- smartling.character_limit = 82 -->
-    <string name="autoconsentDialogTitle">Izskatās, ka šajā vietnē ir sīkfailu piekrišanas uznirstošais logs👇</string>
+    <string name="autoconsentDialogTitle"><![CDATA[<b>Vai vēlies, lai es apstrādāju sīkfailu uznirstošos logus?</b>]]></string>
     <!-- smartling.character_limit = 160 -->
-    <string name="autoconsentDialogDescription">Vai vēlies, lai es tos apstrādāju tavā vietā? Es varu mēģināt samazināt sīkfailus, maksimāli pastiprināt privātumu un paslēpt šādus uznirstošos logus.</string>
+    <string name="autoconsentDialogDescription">Es varu mēģināt izvēlēties visprivātākos pieejamos iestatījumus un paslēpt šādus uznirstošos logus.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Pārvaldīt sīkfailu uznirstošos logus</string>
+    <string name="autoconsentPrimaryCta">Apstrādājiet uznirstošos logus manā vietā</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentSecondaryCta">Nē, paldies</string>
+    <string name="autoconsentSecondaryCta">Nē, es tos pārvaldīšu pats</string>
 
     <string name="autoconsentSetting">Pārvaldīt sīkfailu uznirstošos logus</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Uznirstošais logs paslēpts</string>

@@ -662,13 +662,13 @@
 
     <!-- Autoconsent -->
     <!-- smartling.character_limit = 82 -->
-    <string name="autoconsentDialogTitle">Paistab, et sellel saidil on küpsiste nõusoleku hüpik👇</string>
+    <string name="autoconsentDialogTitle"><![CDATA[<b>Kas soovid, et tegeleksin küpsisehüpikutega?</b>]]></string>
     <!-- smartling.character_limit = 160 -->
-    <string name="autoconsentDialogDescription">Kas soovid, et ma need sinu eest lahendaksin? Ma võin proovida minimeerida küpsiseid, maksimeerida privaatsust ja sellised hüpikaknad peita.</string>
+    <string name="autoconsentDialogDescription">Võin proovida valida kõige privaatsemad kasutadaolevad seaded ja peita sellised hüpikud.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Halda küpsiste hüpikaknaid</string>
+    <string name="autoconsentPrimaryCta">Halda hüpikuid minu eest</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentSecondaryCta">Ei aitäh</string>
+    <string name="autoconsentSecondaryCta">Ei, ma haldan neid ise</string>
 
     <string name="autoconsentSetting">Halda küpsiste hüpikaknaid</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Hüpikaken on peidetud</string>
