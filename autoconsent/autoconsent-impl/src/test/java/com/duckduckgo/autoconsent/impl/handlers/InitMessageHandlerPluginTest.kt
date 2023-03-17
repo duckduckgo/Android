@@ -62,7 +62,7 @@ class InitMessageHandlerPluginTest {
 
     @Before
     fun setup() {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "mb" })
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "ms" })
     }
 
     @Test
@@ -116,7 +116,7 @@ class InitMessageHandlerPluginTest {
 
     @Test
     fun whenProcessIfCookiePromptManagementExperimentEnabledAndAutoconsentIsDisabledAndAlreadyHandledThenDoNothing() {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "mc" })
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "mt" })
 
         settingsRepository.userSetting = false
         settingsRepository.firstPopupHandled = true
@@ -128,7 +128,7 @@ class InitMessageHandlerPluginTest {
 
     @Test
     fun whenProcessIfCookiePromptManagementExperimentEnabledAndAutoconsentIsEnabledAndNotAlreadyHandledThenCallEvaluate() {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "mc" })
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "mt" })
 
         settingsRepository.userSetting = true
         settingsRepository.firstPopupHandled = false
@@ -152,7 +152,7 @@ class InitMessageHandlerPluginTest {
 
     @Test
     fun whenProcessIfCookiePromptManagementExperimentEnabledAndAutoconsentIsEnabledAndAlreadyHandledThenCallEvaluate() {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "mc" })
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "mt" })
 
         settingsRepository.userSetting = true
         settingsRepository.firstPopupHandled = true
