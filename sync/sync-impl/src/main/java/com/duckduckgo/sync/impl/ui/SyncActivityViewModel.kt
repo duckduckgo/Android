@@ -45,6 +45,7 @@ class SyncActivityViewModel @Inject constructor(
 
     data class ViewState(
         val isDeviceSyncEnabled: Boolean = false,
+        val showAccount: Boolean = false,
         val loginQRCode: String? = null,
     )
 
@@ -52,9 +53,20 @@ class SyncActivityViewModel @Inject constructor(
         object LaunchDeviceSetupFlow : Command()
     }
 
+    fun refreshData() {
+        viewModelScope.launch {
+            updateViewState()
+        }
+    }
+
     fun onToggleClicked(isChecked: Boolean) {
-        if (isChecked) {
-            viewModelScope.launch {
+        viewModelScope.launch {
+            if (isChecked) {
+                viewState.emit(
+                    viewState.value.copy(
+                        isDeviceSyncEnabled = isChecked
+                    ),
+                )
                 command.send(LaunchDeviceSetupFlow)
             }
         }
@@ -64,6 +76,7 @@ class SyncActivityViewModel @Inject constructor(
         viewState.emit(
             viewState.value.copy(
                 isDeviceSyncEnabled = syncRepository.isSignedIn(),
+                showAccount = syncRepository.isSignedIn(),
                 loginQRCode = syncRepository.getRecoveryCode(),
             ),
         )

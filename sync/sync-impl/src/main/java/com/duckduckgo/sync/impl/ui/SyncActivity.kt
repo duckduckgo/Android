@@ -40,6 +40,7 @@ import com.google.zxing.BarcodeFormat.QR_CODE
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
 class SyncActivity : DuckDuckGoActivity() {
@@ -60,6 +61,11 @@ class SyncActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
         observeUiEvents()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        viewModel.refreshData()
     }
 
     private fun observeUiEvents() {
@@ -85,10 +91,9 @@ class SyncActivity : DuckDuckGoActivity() {
     }
 
     private fun renderViewState(viewState: ViewState) {
+        Timber.i("CRIS: $viewState")
         binding.deviceSyncStatusToggle.quietlySetIsChecked(viewState.isDeviceSyncEnabled, deviceSyncStatusToggleListener)
-        if (viewState.isDeviceSyncEnabled) {
-            binding.viewSwitcher.displayedChild = 1
-        }
+        binding.viewSwitcher.displayedChild = if (viewState.showAccount) 1 else 0
 
         if (!viewState.loginQRCode.isNullOrEmpty()) {
             val barcodeEncoder = BarcodeEncoder()
