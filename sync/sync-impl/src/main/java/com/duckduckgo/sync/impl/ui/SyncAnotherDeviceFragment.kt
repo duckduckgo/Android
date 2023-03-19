@@ -24,11 +24,20 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.FragmentEnableSyncBinding
+import com.duckduckgo.sync.impl.ui.EnableSyncFragment.EnableSyncListener
 
 @InjectWith(FragmentScope::class)
 class SyncAnotherDeviceFragment : DuckDuckGoFragment(R.layout.fragment_enable_sync) {
 
+    interface SyncAnotherDeviceListener {
+        fun syncAnotherDevice()
+        fun createAccount()
+    }
+
     private val binding: FragmentEnableSyncBinding by viewBinding()
+
+    private val listener: SyncAnotherDeviceListener?
+        get() = activity as? SyncAnotherDeviceListener
 
     override fun onViewCreated(
         view: View,
@@ -40,6 +49,9 @@ class SyncAnotherDeviceFragment : DuckDuckGoFragment(R.layout.fragment_enable_sy
     }
 
     private fun configureListeners() {
+        binding.footerSecondaryButton.setOnClickListener {
+            listener?.createAccount()
+        }
         binding.closeIcon.setOnClickListener {
             requireActivity().finish()
         }

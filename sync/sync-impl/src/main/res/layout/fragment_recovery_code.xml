@@ -81,11 +81,39 @@
             app:typography="body1"
             android:text="If you lose access to your devices, you will need this code to recover your synced data."/>
 
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/recoveryCodeSkeleton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_margin="20dp"
+            app:layout_constraintTop_toBottomOf="@id/content_body"
+            android:padding="@dimen/keyline_5">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.duckduckgo.mobile.android.ui.view.SkeletonView
+                    android:layout_width="96dp"
+                    android:layout_height="96dp"/>
+                <com.duckduckgo.mobile.android.ui.view.SkeletonView
+                    android:layout_width="match_parent"
+                    android:layout_marginStart="@dimen/keyline_4"
+                    android:layout_height="96dp"/>
+
+            </LinearLayout>
+
+        </com.facebook.shimmer.ShimmerFrameLayout>
+
         <LinearLayout
             android:id="@+id/recover_code_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
+            android:visibility="invisible"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_margin="20dp"
             app:layout_constraintTop_toBottomOf="@id/content_body"
@@ -101,11 +129,13 @@
                 tools:ignore="ContentDescription"/>
 
             <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                android:id="@+id/recoveryCodeText"
                 android:layout_width="match_parent"
                 android:layout_marginStart="@dimen/keyline_4"
                 android:layout_height="96dp"
                 android:ellipsize="end"
                 android:text="eyJyZWNvdmVyeSI6eyJ1c2VyX2lkIjoiNjgwRDQ1QjUtNUU2RS00MzQ3LTlDNDQtQjZGQkU4MEZDNEE3IiwicHJpbWFyeV9rZXkiOiJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFPSJ9fQ=="/>
+
         </LinearLayout>
 
         <com.duckduckgo.mobile.android.ui.view.text.DaxTextView

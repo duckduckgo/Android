@@ -88,8 +88,8 @@
 
                 <ImageView
                     android:id="@+id/qrCodeImageView"
-                    android:layout_width="@dimen/qrSize"
-                    android:layout_height="@dimen/qrSize"
+                    android:layout_width="@dimen/qrSizeLarge"
+                    android:layout_height="@dimen/qrSizeLarge"
                     android:layout_gravity="center"
                     android:visibility="gone"
                     tools:ignore="ContentDescription"/>

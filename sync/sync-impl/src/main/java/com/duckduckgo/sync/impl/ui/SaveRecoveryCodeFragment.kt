@@ -16,19 +16,43 @@
 
 package com.duckduckgo.sync.impl.ui
 
-import android.os.*
-import android.view.*
-import com.duckduckgo.anvil.annotations.*
-import com.duckduckgo.app.global.*
-import com.duckduckgo.di.scopes.*
-import com.duckduckgo.mobile.android.ui.viewbinding.*
+import android.graphics.Bitmap
+import android.os.Bundle
+import android.view.View
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.global.DuckDuckGoFragment
+import com.duckduckgo.app.global.FragmentViewModelFactory
+import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.mobile.android.ui.view.hide
+import com.duckduckgo.mobile.android.ui.view.show
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.R
-import com.duckduckgo.sync.impl.databinding.*
+import com.duckduckgo.sync.impl.databinding.FragmentRecoveryCodeBinding
+import com.duckduckgo.sync.impl.ui.SaveRecoveryCodeViewModel.Command
+import com.duckduckgo.sync.impl.ui.SaveRecoveryCodeViewModel.ViewMode.AccountCreated
+import com.duckduckgo.sync.impl.ui.SaveRecoveryCodeViewModel.ViewMode.CreatingAccount
+import com.duckduckgo.sync.impl.ui.SaveRecoveryCodeViewModel.ViewMode.Error
+import com.duckduckgo.sync.impl.ui.SaveRecoveryCodeViewModel.ViewState
+import com.google.zxing.BarcodeFormat.QR_CODE
+import com.journeyapps.barcodescanner.BarcodeEncoder
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import javax.inject.*
 
 @InjectWith(FragmentScope::class)
 class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_code) {
+    @Inject
+    lateinit var viewModelFactory: FragmentViewModelFactory
 
     private val binding: FragmentRecoveryCodeBinding by viewBinding()
+
+    private val viewModel: SaveRecoveryCodeViewModel by lazy {
+        ViewModelProvider(this, viewModelFactory)[SaveRecoveryCodeViewModel::class.java]
+    }
 
     override fun onViewCreated(
         view: View,
@@ -50,6 +74,51 @@ class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_c
     }
 
     private fun observeUiEvents() {
+        viewModel
+            .viewState()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
+            .onEach { viewState -> renderViewState(viewState) }
+            .launchIn(lifecycleScope)
+
+        viewModel
+            .commands()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { processCommand(it) }
+            .launchIn(lifecycleScope)
+        binding.recoveryCodeSkeleton.startShimmer()
+    }
+
+    private fun processCommand(it: Command) {
+        TODO("Not yet implemented")
+    }
+
+    private fun renderViewState(viewState: ViewState) {
+        when (val viewMode = viewState.viewMode) {
+            is AccountCreated -> {
+                binding.recoveryCodeSkeleton.stopShimmer()
+                binding.recoveryCodeSkeleton.hide()
+                binding.recoverCodeContainer.show()
+
+                val barcodeEncoder = BarcodeEncoder()
+                val bitmap: Bitmap = barcodeEncoder.encodeBitmap(
+                    viewMode.loginQRCode,
+                    QR_CODE,
+                    resources.getDimensionPixelSize(R.dimen.qrSizeSmall),
+                    resources.getDimensionPixelSize(R.dimen.qrSizeSmall),
+                )
+                binding.qrCodeImageView.show()
+                binding.qrCodeImageView.setImageBitmap(bitmap)
+
+                binding.recoveryCodeText.text = viewMode.b64RecoveryCode
+            }
+
+            CreatingAccount -> {
+                binding.recoverCodeContainer.hide()
+                binding.recoveryCodeSkeleton.startShimmer()
+            }
+
+            Error -> TODO()
+        }
     }
 
     companion object {

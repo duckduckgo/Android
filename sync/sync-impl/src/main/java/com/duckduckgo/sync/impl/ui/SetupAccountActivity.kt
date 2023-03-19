@@ -30,19 +30,22 @@ import com.duckduckgo.app.global.*
 import com.duckduckgo.di.scopes.*
 import com.duckduckgo.mobile.android.ui.viewbinding.*
 import com.duckduckgo.sync.impl.R
+import com.duckduckgo.sync.impl.R.id
 import com.duckduckgo.sync.impl.databinding.*
 import com.duckduckgo.sync.impl.ui.EnableSyncFragment.EnableSyncListener
 import com.duckduckgo.sync.impl.ui.SetupAccountViewModel.Command
 import com.duckduckgo.sync.impl.ui.SetupAccountViewModel.Command.Finish
+import com.duckduckgo.sync.impl.ui.SetupAccountViewModel.ViewMode.CreateAccount
 import com.duckduckgo.sync.impl.ui.SetupAccountViewModel.ViewMode.SyncAnotherDevice
 import com.duckduckgo.sync.impl.ui.SetupAccountViewModel.ViewMode.TurnOnSync
 import com.duckduckgo.sync.impl.ui.SetupAccountViewModel.ViewState
+import com.duckduckgo.sync.impl.ui.SyncAnotherDeviceFragment.SyncAnotherDeviceListener
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
-class SetupAccountActivity : DuckDuckGoActivity(), EnableSyncListener {
+class SetupAccountActivity : DuckDuckGoActivity(), EnableSyncListener, SyncAnotherDeviceListener {
     private val binding: ActivitySyncSetupAccountBinding by viewBinding()
     private val viewModel: SetupAccountViewModel by bindViewModel()
 
@@ -85,12 +88,18 @@ class SetupAccountActivity : DuckDuckGoActivity(), EnableSyncListener {
         when(viewState.viewMode) {
             SyncAnotherDevice -> {
                 supportFragmentManager.commitNow {
-                    replace(R.id.fragment_container_view, SyncAnotherDeviceFragment.instance(), TAG_RECOVER_ACCOUNT)
+                    replace(id.fragment_container_view, SyncAnotherDeviceFragment.instance(), TAG_RECOVER_ACCOUNT)
                 }
             }
             TurnOnSync -> {
                 supportFragmentManager.commitNow {
-                    replace(R.id.fragment_container_view, EnableSyncFragment.instance(), TAG_ENABLE_SYNC)
+                    replace(id.fragment_container_view, EnableSyncFragment.instance(), TAG_ENABLE_SYNC)
+                }
+            }
+
+            CreateAccount -> {
+                supportFragmentManager.commitNow {
+                    replace(id.fragment_container_view, SaveRecoveryCodeFragment.instance(), TAG_ENABLE_SYNC)
                 }
             }
         }
@@ -102,6 +111,15 @@ class SetupAccountActivity : DuckDuckGoActivity(), EnableSyncListener {
 
     override fun recoverYourSyncedData() {
         TODO("Not yet implemented")
+    }
+
+    override fun syncAnotherDevice() {
+        TODO("Not yet implemented")
+    }
+
+    override fun createAccount() {
+        Timber.i("CRIS: create account!")
+        viewModel.createAccount()
     }
 
     companion object {
