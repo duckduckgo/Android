@@ -21,12 +21,12 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.impl.Result.Error
+import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncRepository
-import com.duckduckgo.sync.impl.ui.SetupAccountViewModel.Command.Finish
-import com.duckduckgo.sync.impl.ui.SetupAccountViewModel.ViewMode.CreateAccount
+import com.duckduckgo.sync.impl.ui.SaveRecoveryCodeViewModel.ViewMode.AccountCreated
+import com.duckduckgo.sync.impl.ui.SaveRecoveryCodeViewModel.ViewMode.CreatingAccount
 import com.duckduckgo.sync.impl.ui.SetupAccountViewModel.ViewMode.SyncAnotherDevice
-import com.duckduckgo.sync.impl.ui.SetupAccountViewModel.ViewMode.TurnOnSync
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -34,74 +34,64 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import java.lang.IllegalStateException
 import javax.inject.*
 
 @ContributesViewModel(ActivityScope::class)
-class SetupAccountViewModel @Inject constructor(
+class SaveRecoveryCodeViewModel @Inject constructor(
     private val syncRepository: SyncRepository,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
     private val viewState = MutableStateFlow(ViewState())
-    fun viewState(): Flow<ViewState> = viewState
-    fun commands(): Flow<Command> = command.receiveAsFlow()
+    fun viewState(): Flow<ViewState> = viewState.onStart { createAccount() }
 
-    data class ViewState(
-        val viewMode: ViewMode = TurnOnSync
-    )
-
-    sealed class ViewMode {
-        object TurnOnSync: ViewMode()
-        object SyncAnotherDevice: ViewMode()
-        object CreateAccount: ViewMode()
-    }
-
-    sealed class Command {
-        object Finish: Command()
-    }
-    fun onBackPressed() {
-        viewModelScope.launch {
-            when (viewState.value.viewMode) {
-                SyncAnotherDevice -> {
-                    viewState.emit(
-                        viewState.value.copy(
-                            viewMode = TurnOnSync
-                        ),
-                    )
-                }
-                TurnOnSync -> {
-                    viewModelScope.launch {
-                        command.send(Finish)
-                    }
-                }
-
-                CreateAccount -> {
-                    viewModelScope.launch {
-                        command.send(Finish)
-                    }
+    private fun createAccount() = viewModelScope.launch(dispatchers.io()) {
+        if (syncRepository.isSignedIn()) {
+            syncRepository.getRecoveryCode()?.let {
+                val newState = AccountCreated(
+                    loginQRCode = it,
+                    b64RecoveryCode = it,
+                )
+                viewState.emit(ViewState(newState))
+            } ?: viewState.emit(ViewState(ViewMode.Error))
+        } else {
+            viewState.emit(ViewState(CreatingAccount))
+            val result = syncRepository.createAccount()
+            when(result) {
+                is Error -> TODO()
+                is Success -> {
+                    syncRepository.getRecoveryCode()?.let {
+                        viewState.emit(ViewState(AccountCreated(
+                            it,
+                            it,
+                        )))
+                    }?: viewState.emit(ViewState(ViewMode.Error))
                 }
             }
         }
     }
 
-    fun onTurnOnSync() {
-        viewModelScope.launch {
-            viewState.emit(
-                viewState.value.copy(
-                    viewMode = SyncAnotherDevice
-                ),
-            )
-        }
+    fun commands(): Flow<Command> = command.receiveAsFlow()
+
+    data class ViewState(
+        val viewMode: ViewMode = CreatingAccount
+    )
+
+    sealed class ViewMode {
+        object CreatingAccount : ViewMode()
+        object Error : ViewMode()
+        data class AccountCreated(
+            val loginQRCode: String,
+            val b64RecoveryCode: String,
+        ) : ViewMode()
     }
 
-    fun createAccount() {
-        viewModelScope.launch {
-            viewState.emit(
-                viewState.value.copy(
-                    viewMode = CreateAccount
-                ),
-            )
-        }
+    sealed class Command {
+        object Finish : Command()
+    }
+
+    fun onBackPressed() {
     }
 }

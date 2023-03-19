@@ -95,8 +95,8 @@ class SyncActivity : DuckDuckGoActivity() {
             val bitmap: Bitmap = barcodeEncoder.encodeBitmap(
                 viewState.loginQRCode,
                 QR_CODE,
-                resources.getDimensionPixelSize(R.dimen.qrSize),
-                resources.getDimensionPixelSize(R.dimen.qrSize),
+                resources.getDimensionPixelSize(R.dimen.qrSizeLarge),
+                resources.getDimensionPixelSize(R.dimen.qrSizeLarge),
             )
             binding.qrCodeImageView.show()
             binding.qrCodeImageView.setImageBitmap(bitmap)
