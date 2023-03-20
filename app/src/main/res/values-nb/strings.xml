@@ -661,13 +661,13 @@
 
     <!-- Autoconsent -->
     <!-- smartling.character_limit = 82 -->
-    <string name="autoconsentDialogTitle">Nettstedet ser ut til å ha et popup-vindu om samtykke til informasjonskapsler👇</string>
+    <string name="autoconsentDialogTitle"><![CDATA[<b>Vil du at jeg skal håndtere popup-vinduer om informasjonskapsler?</b>]]></string>
     <!-- smartling.character_limit = 160 -->
-    <string name="autoconsentDialogDescription">Skal jeg håndtere dette for deg? Jeg kan prøve å minimere informasjonskapslene, maksimere personvernet og skjule popup-vinduer som dette.</string>
+    <string name="autoconsentDialogDescription">Jeg kan prøve å velge de mest private innstillingene og skjule popup-vinduer som disse.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Administrer vinduer om informasjonskapsler</string>
+    <string name="autoconsentPrimaryCta">Håndter popup-vinduer for meg</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentSecondaryCta">Nei takk</string>
+    <string name="autoconsentSecondaryCta">Nei, jeg tar meg av dem selv</string>
 
     <string name="autoconsentSetting">Administrer popup-vinduer om informasjonskapsler</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Popup-vindu skjult</string>

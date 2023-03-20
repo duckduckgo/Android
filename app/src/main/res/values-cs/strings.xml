@@ -669,13 +669,13 @@
 
     <!-- Autoconsent -->
     <!-- smartling.character_limit = 82 -->
-    <string name="autoconsentDialogTitle">Vypadá to, že tenhle web má vyskakovací okno pro souhlas se soubory cookie 👇</string>
+    <string name="autoconsentDialogTitle"><![CDATA[<b>Mám se postarat o vyskakovací okna ohledně souhlasu s cookies?</b>]]></string>
     <!-- smartling.character_limit = 160 -->
-    <string name="autoconsentDialogDescription">Mám ho vyřešit za tebe? Můžu zkusit vybrat jen nezbytné soubory cookie, maximalizovat ochranu soukromí a podobná vyskakovací okna odteď skrývat.</string>
+    <string name="autoconsentDialogDescription">Můžu zkusit vybrat nejsoukromější možné nastavení a podobná vyskakovací okna příště skrývat.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Spravovat vyskakovací okna ohledně cookies</string>
+    <string name="autoconsentPrimaryCta">Řešit vyskakovací okna za mě</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentSecondaryCta">Ne, děkuji</string>
+    <string name="autoconsentSecondaryCta">Ne, já se o ně postarám</string>
 
     <string name="autoconsentSetting">Správa vyskakovacích oken ohledně cookies</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Skryté vyskakovací okno</string>

@@ -661,13 +661,13 @@
 
     <!-- Autoconsent -->
     <!-- smartling.character_limit = 82 -->
-    <string name="autoconsentDialogTitle">Изглежда, че този сайт има изскачащ прозорец за съгласие за бисквитки👇</string>
+    <string name="autoconsentDialogTitle"><![CDATA[<b>Искате ли да управлявам изскачащите прозорци за бисквитки?</b>]]></string>
     <!-- smartling.character_limit = 160 -->
-    <string name="autoconsentDialogDescription">Искате ли да се справя с това вместо Вас? Мога да се опитам да намаля бисквитките до минимум, да увелича поверителността и да скрия подобни изскачащи прозорци.</string>
+    <string name="autoconsentDialogDescription">Мога да се опитам да избирам най-поверителните възможни настройки в тези изскачащи прозорци и след това да ги скривам.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Управлявай прозорците за бисквитки</string>
+    <string name="autoconsentPrimaryCta">Управлявай изскачащите прозорци вместо мен</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentSecondaryCta">Не, благодаря</string>
+    <string name="autoconsentSecondaryCta">Не, аз ще ги управлявам</string>
 
     <string name="autoconsentSetting">Управление на изскачащите прозорци за бисквитки</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Изскачащият прозорец е скрит</string>
