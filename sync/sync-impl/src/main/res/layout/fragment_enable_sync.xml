@@ -65,7 +65,7 @@
             app:layout_constraintTop_toBottomOf="@+id/content_illustration"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:text="Turn on Sync?"/>
+            android:text="@string/sync_enable_sync_title"/>
 
         <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/content_body"
@@ -78,7 +78,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:textType="primary"
             app:typography="body1"
-            android:text="This will save an encrypted backup of your bookmarks on DuckDuckGo’s servers, which can be synced with your other devices.\n\nThe decryption key is stored on your device and cannot be read by DuckDuckGo."/>
+            android:text="@string/sync_enable_sync_content"/>
 
         <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
             android:id="@+id/footer_primary_button"
@@ -90,7 +90,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toTopOf="@id/footer_secondary_button"
-            android:text="Turn On Sync"/>
+            android:text="@string/sync_enable_sync_primary_button"/>
 
         <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
             android:id="@+id/footer_secondary_button"
@@ -102,7 +102,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:text="Recover Your Synced Data"/>
+            android:text="@string/sync_enable_sync_secondary_button"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

@@ -33,4 +33,18 @@
     <string name="sync_save_recovery_code_item">Save Recovery PDF</string>
     <string name="sync_save_recovery_code_item_hint">If you lose your device, you will need this recovery code to restore your synced data.</string>
     <string name="sync_delete_account_item">Turn Off and Delete Server Data…</string>
+    <string name="sync_enable_sync_title">Turn on Sync?</string>
+    <string name="sync_enable_sync_content">This will save an encrypted backup of your bookmarks on DuckDuckGo\'s servers, which can be synced with your other devices.\n\nThe decryption key is stored on your device and cannot be read by DuckDuckGo.</string>
+    <string name="sync_enable_sync_primary_button">Turn On Sync</string>
+    <string name="sync_enable_sync_secondary_button">Recover Your Synced Data</string>
+    <string name="sync_another_device_title">Sync Another Device?</string>
+    <string name="sync_another_device_content">Your bookmarks will be backed up! Would you like to sync another device now?\n\nIf you\'ve already set up Sync on another device, this will allow you to combine bookmarks from both devices into a single backup.</string>
+    <string name="sync_another_device_primary_button">Sync Another Device</string>
+    <string name="sync_another_device_secondary_button">Not Now</string>
+    <string name="sync_recovery_code_title">Save Recovery PDF?</string>
+    <string name="sync_recovery_code_content">If you lose access to your devices, you will need this code to recover your synced data.</string>
+    <string name="sync_recovery_code_hint">Anyone with access to this code can access your synced data, so please keep it in a safe place.</string>
+    <string name="sync_recovery_code_primary_button">Save Recovery PDF</string>
+    <string name="sync_recovery_code_secondary_button">Copy Code</string>
+    <string name="sync_recovery_code_skip_button">Not Now</string>
 </resources>
