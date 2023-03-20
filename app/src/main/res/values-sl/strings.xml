@@ -435,6 +435,7 @@
     <!-- Onboarding DDG Feature Options -->
     <string name="onboardingFeatureOptionsTitle">Zakaj ste izbrali DuckDuckGo?</string>
     <string name="onboardingFeatureOptionsContinue">Nadaljuj</string>
+    <string name="onboardingFeatureOptionsSkip">Preskoči ta korak</string>
     <!-- smartling.character_limit = 28 -->
     <string name="onboardingFeatureOptionPrivateSearch">Zasebno iskanje</string>
     <!-- smartling.character_limit = 28 -->

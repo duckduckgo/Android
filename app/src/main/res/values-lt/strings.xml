@@ -435,6 +435,7 @@
     <!-- Onboarding DDG Feature Options -->
     <string name="onboardingFeatureOptionsTitle">Kas jus atvedė į „DuckDuckGo“?</string>
     <string name="onboardingFeatureOptionsContinue">Tęsti</string>
+    <string name="onboardingFeatureOptionsSkip">Praleisti šį žingsnį</string>
     <!-- smartling.character_limit = 28 -->
     <string name="onboardingFeatureOptionPrivateSearch">Privati paieška</string>
     <!-- smartling.character_limit = 28 -->

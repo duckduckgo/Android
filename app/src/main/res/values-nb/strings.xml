@@ -431,6 +431,7 @@
     <!-- Onboarding DDG Feature Options -->
     <string name="onboardingFeatureOptionsTitle">Hva ledet deg til DuckDuckGo?</string>
     <string name="onboardingFeatureOptionsContinue">Fortsett</string>
+    <string name="onboardingFeatureOptionsSkip">Hopp over dette trinnet</string>
     <!-- smartling.character_limit = 28 -->
     <string name="onboardingFeatureOptionPrivateSearch">Private search</string>
     <!-- smartling.character_limit = 28 -->

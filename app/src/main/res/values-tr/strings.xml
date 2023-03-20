@@ -431,6 +431,7 @@
     <!-- Onboarding DDG Feature Options -->
     <string name="onboardingFeatureOptionsTitle">Sizi DuckDuckGo\'ya getiren nedir?</string>
     <string name="onboardingFeatureOptionsContinue">Devam et</string>
+    <string name="onboardingFeatureOptionsSkip">Bu Adımı Atlayın</string>
     <!-- smartling.character_limit = 28 -->
     <string name="onboardingFeatureOptionPrivateSearch">Gizli Arama</string>
     <!-- smartling.character_limit = 28 -->

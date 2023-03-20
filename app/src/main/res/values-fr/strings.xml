@@ -431,6 +431,7 @@
     <!-- Onboarding DDG Feature Options -->
     <string name="onboardingFeatureOptionsTitle">Qu\'est-ce qui vous amène chez DuckDuckGo ?</string>
     <string name="onboardingFeatureOptionsContinue">Continuer</string>
+    <string name="onboardingFeatureOptionsSkip">Ignorer cette étape</string>
     <!-- smartling.character_limit = 28 -->
     <string name="onboardingFeatureOptionPrivateSearch">Recherche privée</string>
     <!-- smartling.character_limit = 28 -->

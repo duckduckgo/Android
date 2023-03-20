@@ -431,6 +431,7 @@
     <!-- Onboarding DDG Feature Options -->
     <string name="onboardingFeatureOptionsTitle">Mikä tuo sinut DuckDuckGo:hon?</string>
     <string name="onboardingFeatureOptionsContinue">Jatka</string>
+    <string name="onboardingFeatureOptionsSkip">Ohita tämä vaihe</string>
     <!-- smartling.character_limit = 28 -->
     <string name="onboardingFeatureOptionPrivateSearch">Yksityinen haku</string>
     <!-- smartling.character_limit = 28 -->

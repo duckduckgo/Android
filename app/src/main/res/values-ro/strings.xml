@@ -433,6 +433,7 @@
     <!-- Onboarding DDG Feature Options -->
     <string name="onboardingFeatureOptionsTitle">Ce te aduce la DuckDuckGo?</string>
     <string name="onboardingFeatureOptionsContinue">Continuă</string>
+    <string name="onboardingFeatureOptionsSkip">Omite acest pas</string>
     <!-- smartling.character_limit = 28 -->
     <string name="onboardingFeatureOptionPrivateSearch">Căutare Confidențială</string>
     <!-- smartling.character_limit = 28 -->
