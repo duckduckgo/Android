@@ -48,40 +48,61 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_4"
-        android:layout_marginEnd="@dimen/keyline_4"
+        android:layout_marginEnd="@dimen/keyline_1"
         android:textColor="@color/primary_text_color_selector"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/trailingContainer"
+        app:layout_constraintEnd_toStartOf="@+id/trailingBarrier"
         app:layout_constraintStart_toEndOf="@id/leadingIconBackground"
         app:layout_constraintTop_toTopOf="parent"
         app:typography="body1"
+        tools:ignore="InvalidColorAttribute"
         tools:text="Title" />
 
-    <FrameLayout
-        android:id="@+id/trailingContainer"
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/trailingBarrier"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:barrierDirection="start"
+        app:constraint_referenced_ids="trailingSwitch,trailingIconContainer,endTrailingPadding" />
+
+    <com.duckduckgo.mobile.android.ui.view.SwitchView
+        android:id="@+id/trailingSwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_1"
+        android:layout_marginEnd="@dimen/keyline_2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/trailingBarrier"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+    <FrameLayout
+        android:id="@+id/trailingIconContainer"
+        android:layout_width="@dimen/listItemTrailingIconWidth"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <com.duckduckgo.mobile.android.ui.view.button.IconButton
+        <ImageView
             android:id="@+id/trailingIcon"
             android:layout_width="@dimen/listItemImageSize"
             android:layout_height="@dimen/listItemImageSize"
-            android:layout_marginEnd="@dimen/listItemEndPadding"
-            android:background="?selectableItemBackgroundBorderless"
+            android:layout_gravity="center"
+            android:background="?attr/selectableItemBackgroundBorderless"
             app:srcCompat="@drawable/ic_menu_vertical_24"
             tools:ignore="ContentDescription" />
-
-        <com.duckduckgo.mobile.android.ui.view.SwitchView
-            android:id="@+id/trailingSwitch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/keyline_4"
-            android:padding="0dp"
-            tools:ignore="SpeakableTextPresentCheck" />
-
     </FrameLayout>
+
+    <View
+        android:id="@+id/endTrailingPadding"
+        android:layout_width="@dimen/keyline_0"
+        android:layout_height="0dp"
+        android:layout_marginEnd="@dimen/keyline_3"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

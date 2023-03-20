@@ -85,13 +85,16 @@ class TwoLineListItem @JvmOverloads constructor(
 
             val showTrailingIcon = hasValue(R.styleable.TwoLineListItem_trailingIcon)
             val showSwitch = getBoolean(R.styleable.TwoLineListItem_showSwitch, false)
-            if (showSwitch) {
-                showSwitch()
-            } else if (showTrailingIcon) {
-                binding.trailingIcon.setImageDrawable(getDrawable(R.styleable.TwoLineListItem_trailingIcon))
-                showTrailingIcon()
-            } else {
-                binding.trailingContainer.gone()
+            when {
+                showSwitch -> showSwitch()
+                showTrailingIcon -> {
+                    binding.trailingIcon.setImageDrawable(getDrawable(R.styleable.TwoLineListItem_trailingIcon))
+                    showTrailingIcon()
+                }
+                else -> {
+                    binding.trailingIconContainer.gone()
+                    binding.trailingSwitch.gone()
+                }
             }
 
             recycle()
@@ -159,7 +162,7 @@ class TwoLineListItem @JvmOverloads constructor(
 
     /** Sets the item overflow menu click listener */
     fun setTrailingIconClickListener(onClick: (View) -> Unit) {
-        binding.trailingIcon.setOnClickListener { onClick(binding.trailingIcon) }
+        binding.trailingIconContainer.setOnClickListener { onClick(binding.trailingIcon) }
     }
 
     /** Sets the trailing image content description */
@@ -178,15 +181,13 @@ class TwoLineListItem @JvmOverloads constructor(
 
     /** Sets the Switch Visible */
     fun showSwitch() {
-        binding.trailingContainer.show()
+        binding.trailingIconContainer.gone()
         binding.trailingSwitch.show()
-        binding.trailingIcon.gone()
     }
 
     /** Sets the Trailing Icon Visible */
     fun showTrailingIcon() {
-        binding.trailingContainer.show()
-        binding.trailingIcon.show()
+        binding.trailingIconContainer.show()
         binding.trailingSwitch.gone()
     }
 
