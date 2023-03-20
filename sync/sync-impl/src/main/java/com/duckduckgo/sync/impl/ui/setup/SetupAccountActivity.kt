@@ -33,7 +33,7 @@ import com.duckduckgo.sync.impl.databinding.*
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.Close
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSyncAnotherDevice
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.CreateAccount
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSaveRecoveryCode
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.TurnOnSync
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowFragment.SetupFlowListener
@@ -97,7 +97,7 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
                     replace(id.fragment_container_view, SyncSetupFlowFragment.instance(InitialSetupScreen), TAG_ENABLE_SYNC)
                 }
             }
-            CreateAccount -> {
+            AskSaveRecoveryCode -> {
                 supportFragmentManager.commitNow {
                     replace(id.fragment_container_view, SaveRecoveryCodeFragment.instance(), TAG_ENABLE_SYNC)
                 }
@@ -118,7 +118,7 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
     }
 
     override fun launchFinishSetupFlow() {
-        viewModel.createAccount()
+        viewModel.finishSetupFlow()
     }
 
     companion object {
