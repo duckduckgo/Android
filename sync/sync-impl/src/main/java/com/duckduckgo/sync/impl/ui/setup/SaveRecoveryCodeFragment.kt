@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.impl.ui
+package com.duckduckgo.sync.impl.ui.setup
 
 import android.graphics.Bitmap
 import android.os.Bundle
@@ -32,11 +32,11 @@ import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.FragmentRecoveryCodeBinding
-import com.duckduckgo.sync.impl.ui.SaveRecoveryCodeViewModel.Command
-import com.duckduckgo.sync.impl.ui.SaveRecoveryCodeViewModel.ViewMode.AccountCreated
-import com.duckduckgo.sync.impl.ui.SaveRecoveryCodeViewModel.ViewMode.CreatingAccount
-import com.duckduckgo.sync.impl.ui.SaveRecoveryCodeViewModel.ViewMode.Error
-import com.duckduckgo.sync.impl.ui.SaveRecoveryCodeViewModel.ViewState
+import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command
+import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.AccountCreated
+import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.CreatingAccount
+import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.Error
+import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewState
 import com.google.zxing.BarcodeFormat.QR_CODE
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import javax.inject.*
