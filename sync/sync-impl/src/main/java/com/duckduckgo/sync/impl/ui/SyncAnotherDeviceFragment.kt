@@ -18,22 +18,41 @@ package com.duckduckgo.sync.impl.ui
 
 import android.os.Bundle
 import android.view.View
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoFragment
+import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.FragmentSyncSetupBinding
+import com.duckduckgo.sync.impl.ui.SyncAnotherDeviceViewModel.Command
+import com.duckduckgo.sync.impl.ui.SyncAnotherDeviceViewModel.Command.Finish
+import com.duckduckgo.sync.impl.ui.SyncAnotherDeviceViewModel.Command.LaunchSaveRecoveryCodeScreen
+import com.duckduckgo.sync.impl.ui.SyncAnotherDeviceViewModel.ViewState
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import javax.inject.*
 
 @InjectWith(FragmentScope::class)
 class SyncAnotherDeviceFragment : DuckDuckGoFragment(R.layout.fragment_sync_setup) {
 
     interface SyncAnotherDeviceListener {
         fun syncAnotherDevice()
-        fun createAccount()
+        fun launchSaveRecoveryCodeScreen()
     }
 
+    @Inject
+    lateinit var viewModelFactory: FragmentViewModelFactory
+
     private val binding: FragmentSyncSetupBinding by viewBinding()
+
+    private val viewModel: SyncAnotherDeviceViewModel by lazy {
+        ViewModelProvider(this, viewModelFactory)[SyncAnotherDeviceViewModel::class.java]
+    }
 
     private val listener: SyncAnotherDeviceListener?
         get() = activity as? SyncAnotherDeviceListener
@@ -49,19 +68,42 @@ class SyncAnotherDeviceFragment : DuckDuckGoFragment(R.layout.fragment_sync_setu
 
     private fun configureListeners() {
         binding.footerSecondaryButton.setOnClickListener {
-            listener?.createAccount()
+            viewModel.onNotNowClicked()
         }
         binding.closeIcon.setOnClickListener {
-            requireActivity().finish()
+            viewModel.onCloseClicked()
         }
     }
 
     private fun observeUiEvents() {
+        viewModel
+            .viewState()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
+            .onEach { viewState -> renderViewState(viewState) }
+            .launchIn(lifecycleScope)
+
+        viewModel
+            .commands()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { processCommand(it) }
+            .launchIn(lifecycleScope)
+    }
+
+    private fun renderViewState(viewState: ViewState) {
         binding.contentIllustration.setImageResource(R.drawable.ic_connect_device_128)
         binding.contentTitle.text = getString(R.string.sync_another_device_title)
         binding.contentBody.text = getString(R.string.sync_another_device_content)
         binding.footerPrimaryButton.text = getString(R.string.sync_another_device_primary_button)
         binding.footerSecondaryButton.text = getString(R.string.sync_another_device_secondary_button)
+    }
+
+    private fun processCommand(it: Command) {
+        when(it) {
+            Finish -> requireActivity().finish()
+            LaunchSaveRecoveryCodeScreen -> {
+                listener?.launchSaveRecoveryCodeScreen()
+            }
+        }
     }
 
     companion object {

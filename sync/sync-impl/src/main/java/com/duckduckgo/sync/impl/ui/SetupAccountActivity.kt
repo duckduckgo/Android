@@ -118,7 +118,7 @@ class SetupAccountActivity : DuckDuckGoActivity(), EnableSyncListener, SyncAnoth
         TODO("Not yet implemented")
     }
 
-    override fun createAccount() {
+    override fun launchSaveRecoveryCodeScreen() {
         Timber.i("CRIS: create account!")
         viewModel.createAccount()
     }
