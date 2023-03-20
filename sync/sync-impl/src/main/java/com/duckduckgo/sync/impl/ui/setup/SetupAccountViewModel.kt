@@ -24,7 +24,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.SyncRepository
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.Close
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSyncAnotherDevice
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.CreateAccount
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSaveRecoveryCode
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.TurnOnSync
 import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -52,7 +52,7 @@ class SetupAccountViewModel @Inject constructor(
     sealed class ViewMode {
         object TurnOnSync : ViewMode()
         object AskSyncAnotherDevice : ViewMode()
-        object CreateAccount : ViewMode()
+        object AskSaveRecoveryCode : ViewMode()
     }
 
     sealed class Command {
@@ -72,7 +72,7 @@ class SetupAccountViewModel @Inject constructor(
                     }
                 }
 
-                CreateAccount -> {
+                AskSaveRecoveryCode -> {
                     viewModelScope.launch {
                         command.send(Close)
                     }
@@ -87,9 +87,9 @@ class SetupAccountViewModel @Inject constructor(
         }
     }
 
-    fun createAccount() {
+    fun finishSetupFlow() {
         viewModelScope.launch {
-            viewState.emit(viewState.value.copy(viewMode = CreateAccount))
+            viewState.emit(viewState.value.copy(viewMode = AskSaveRecoveryCode))
         }
     }
 }
