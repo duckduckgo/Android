@@ -26,15 +26,13 @@ import com.duckduckgo.sync.impl.ui.SetupAccountViewModel.Command.Finish
 import com.duckduckgo.sync.impl.ui.SetupAccountViewModel.ViewMode.CreateAccount
 import com.duckduckgo.sync.impl.ui.SetupAccountViewModel.ViewMode.SyncAnotherDevice
 import com.duckduckgo.sync.impl.ui.SetupAccountViewModel.ViewMode.TurnOnSync
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
+import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import javax.inject.*
 
 @ContributesViewModel(ActivityScope::class)
 class SetupAccountViewModel @Inject constructor(
@@ -48,17 +46,17 @@ class SetupAccountViewModel @Inject constructor(
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
     data class ViewState(
-        val viewMode: ViewMode = TurnOnSync
+        val viewMode: ViewMode = TurnOnSync,
     )
 
     sealed class ViewMode {
-        object TurnOnSync: ViewMode()
-        object SyncAnotherDevice: ViewMode()
-        object CreateAccount: ViewMode()
+        object TurnOnSync : ViewMode()
+        object SyncAnotherDevice : ViewMode()
+        object CreateAccount : ViewMode()
     }
 
     sealed class Command {
-        object Finish: Command()
+        object Finish : Command()
     }
     fun onBackPressed() {
         viewModelScope.launch {
@@ -66,7 +64,7 @@ class SetupAccountViewModel @Inject constructor(
                 SyncAnotherDevice -> {
                     viewState.emit(
                         viewState.value.copy(
-                            viewMode = TurnOnSync
+                            viewMode = TurnOnSync,
                         ),
                     )
                 }
@@ -89,7 +87,7 @@ class SetupAccountViewModel @Inject constructor(
         viewModelScope.launch {
             viewState.emit(
                 viewState.value.copy(
-                    viewMode = SyncAnotherDevice
+                    viewMode = SyncAnotherDevice,
                 ),
             )
         }
@@ -99,7 +97,7 @@ class SetupAccountViewModel @Inject constructor(
         viewModelScope.launch {
             viewState.emit(
                 viewState.value.copy(
-                    viewMode = CreateAccount
+                    viewMode = CreateAccount,
                 ),
             )
         }

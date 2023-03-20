@@ -68,4 +68,3 @@ class SyncAnotherDeviceFragment : DuckDuckGoFragment(R.layout.fragment_sync_setu
         fun instance() = SyncAnotherDeviceFragment()
     }
 }
-

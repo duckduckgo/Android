@@ -64,7 +64,7 @@ class SyncActivityViewModel @Inject constructor(
             if (isChecked) {
                 viewState.emit(
                     viewState.value.copy(
-                        isDeviceSyncEnabled = isChecked
+                        isDeviceSyncEnabled = isChecked,
                     ),
                 )
                 command.send(LaunchDeviceSetupFlow)

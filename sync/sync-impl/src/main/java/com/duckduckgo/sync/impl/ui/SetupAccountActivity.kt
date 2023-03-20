@@ -19,7 +19,6 @@ package com.duckduckgo.sync.impl.ui
 import android.content.Context
 import android.content.Intent
 import android.os.*
-import android.window.OnBackInvokedDispatcher
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.commitNow
 import androidx.lifecycle.Lifecycle
@@ -29,7 +28,6 @@ import com.duckduckgo.anvil.annotations.*
 import com.duckduckgo.app.global.*
 import com.duckduckgo.di.scopes.*
 import com.duckduckgo.mobile.android.ui.viewbinding.*
-import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.R.id
 import com.duckduckgo.sync.impl.databinding.*
 import com.duckduckgo.sync.impl.ui.EnableSyncFragment.EnableSyncListener
@@ -57,11 +55,14 @@ class SetupAccountActivity : DuckDuckGoActivity(), EnableSyncListener, SyncAnoth
     }
 
     private fun configureListeners() {
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                viewModel.onBackPressed()
-            }
-        })
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    viewModel.onBackPressed()
+                }
+            },
+        )
     }
 
     private fun observeUiEvents() {
@@ -79,13 +80,13 @@ class SetupAccountActivity : DuckDuckGoActivity(), EnableSyncListener, SyncAnoth
     }
 
     private fun processCommand(it: Command) {
-        when(it) {
+        when (it) {
             Finish -> finish()
         }
     }
 
     private fun renderViewState(viewState: ViewState) {
-        when(viewState.viewMode) {
+        when (viewState.viewMode) {
             SyncAnotherDevice -> {
                 supportFragmentManager.commitNow {
                     replace(id.fragment_container_view, SyncAnotherDeviceFragment.instance(), TAG_RECOVER_ACCOUNT)

@@ -29,13 +29,6 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.ConflatedBroadcastChannel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.launch
 import javax.inject.*
 import kotlin.DeprecationLevel.WARNING
 import timber.log.Timber
@@ -43,10 +36,12 @@ import timber.log.Timber
 interface SyncRepository {
     fun createAccount(): Result<Boolean>
     fun isSignedIn(): Boolean
+
     @Deprecated(message = "Method only used for testing purposes. Relies on a local stored recovery key.", level = DeprecationLevel.WARNING)
     fun login(): Result<Boolean>
     fun login(recoveryCodeRawJson: String): Result<Boolean>
     fun getAccountInfo(): AccountInfo
+
     @Deprecated(message = "Method only used for testing purposes.", level = DeprecationLevel.WARNING)
     fun storeRecoveryCode()
     fun removeAccount()

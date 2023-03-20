@@ -39,9 +39,9 @@ import com.duckduckgo.sync.impl.ui.SaveRecoveryCodeViewModel.ViewMode.Error
 import com.duckduckgo.sync.impl.ui.SaveRecoveryCodeViewModel.ViewState
 import com.google.zxing.BarcodeFormat.QR_CODE
 import com.journeyapps.barcodescanner.BarcodeEncoder
+import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import javax.inject.*
 
 @InjectWith(FragmentScope::class)
 class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_code) {
