@@ -26,7 +26,7 @@ import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncRepository
 import com.duckduckgo.sync.impl.ui.SaveRecoveryCodeViewModel.ViewMode.AccountCreated
 import com.duckduckgo.sync.impl.ui.SaveRecoveryCodeViewModel.ViewMode.CreatingAccount
-import com.duckduckgo.sync.impl.ui.SetupAccountViewModel.ViewMode.SyncAnotherDevice
+import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -34,8 +34,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import java.lang.IllegalStateException
-import javax.inject.*
 
 @ContributesViewModel(ActivityScope::class)
 class SaveRecoveryCodeViewModel @Inject constructor(
@@ -59,15 +57,19 @@ class SaveRecoveryCodeViewModel @Inject constructor(
         } else {
             viewState.emit(ViewState(CreatingAccount))
             val result = syncRepository.createAccount()
-            when(result) {
+            when (result) {
                 is Error -> TODO()
                 is Success -> {
                     syncRepository.getRecoveryCode()?.let {
-                        viewState.emit(ViewState(AccountCreated(
-                            it,
-                            it,
-                        )))
-                    }?: viewState.emit(ViewState(ViewMode.Error))
+                        viewState.emit(
+                            ViewState(
+                                AccountCreated(
+                                    it,
+                                    it,
+                                ),
+                            ),
+                        )
+                    } ?: viewState.emit(ViewState(ViewMode.Error))
                 }
             }
         }
@@ -76,7 +78,7 @@ class SaveRecoveryCodeViewModel @Inject constructor(
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
     data class ViewState(
-        val viewMode: ViewMode = CreatingAccount
+        val viewMode: ViewMode = CreatingAccount,
     )
 
     sealed class ViewMode {
