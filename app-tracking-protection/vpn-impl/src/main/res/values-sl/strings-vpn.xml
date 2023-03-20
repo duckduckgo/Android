@@ -237,6 +237,10 @@
     <string name="atp_ActivityAbout">O nas</string>
     <string name="atp_ActivityManage">Upravljanje</string>
     <string name="atp_ActivityRemoveFeature">Onemogočanje in brisanje podatkov</string>
+    <string name="atp_ActivityBlockingTrackersEnabledDescription">DuckDuckGo blokira skrite sledilnike v aplikacijah.</string>
+    <string name="atp_ActivityBlockingTrackersDisabledDescription">Znova omogočite funkcijo App Tracking Protection in še naprej blokirajte sledilnike v aplikacijah.</string>
+    <string name="atp_ActivityBlockedByHeaderText" instruction="Placeholder %1$s is a text containing either Today or Yesterday. Example: Blocked by DuckDuckGo Today">Blokira DuckDuckGo %1$s</string>
+    <string name="atp_ActivityBlockedByOnDateHeaderText" instruction="Placeholder %1$s is a text containing a formatted date like Feb 05. Example: Blocked by DuckDuckGo on Feb 05">Blokiral DuckDuckGo dne %1$s</string>
 
     <!--  App Tracking Protection FAQ -->
     <string name="atp_FAQActivityTitle">POGOSTA VPRAŠANJA</string>
@@ -283,10 +287,10 @@
         <item quantity="other">%1$d poskusov. Poznano pri zbiranju:</item>
     </plurals>
     <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
-        <item quantity="one">Blokada %1$d poskusa sledenja</item>
-        <item quantity="two">Blokada %1$d poskusov sledenja</item>
-        <item quantity="few">Blokada %1$d poskusov sledenja</item>
-        <item quantity="other">Blokada %1$d poskusov sledenja</item>
+        <item quantity="one">DuckDuckGo je blokiral %1$d poskus sledenja</item>
+        <item quantity="two">DuckDuckGo je blokiral %1$d poskusa sledenja</item>
+        <item quantity="few">DuckDuckGo je blokiral %1$d poskuse sledenja</item>
+        <item quantity="other">DuckDuckGo je blokiral %1$d poskusov sledenja</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Prijava težave s to aplikacijo</string>
     <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">Pokaži več %1$d</string>

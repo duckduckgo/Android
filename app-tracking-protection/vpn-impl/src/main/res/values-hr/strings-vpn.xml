@@ -237,6 +237,10 @@
     <string name="atp_ActivityAbout">O</string>
     <string name="atp_ActivityManage">Upravljanje</string>
     <string name="atp_ActivityRemoveFeature">Onemogućavanje i brisanje podataka</string>
+    <string name="atp_ActivityBlockingTrackersEnabledDescription">DuckDuckGo blokira skrivene alate za praćenje u tvojim aplikacijama.</string>
+    <string name="atp_ActivityBlockingTrackersDisabledDescription">Ponovo omogući zaštitu od praćenja aplikacija App Tracking Protection kako bi se nastavili blokirati alati za praćenje u tvojim aplikacijama.</string>
+    <string name="atp_ActivityBlockedByHeaderText" instruction="Placeholder %1$s is a text containing either Today or Yesterday. Example: Blocked by DuckDuckGo Today">Blokirao DuckDuckGo %1$s</string>
+    <string name="atp_ActivityBlockedByOnDateHeaderText" instruction="Placeholder %1$s is a text containing a formatted date like Feb 05. Example: Blocked by DuckDuckGo on Feb 05">Blokirao DuckDuckGo %1$s</string>
 
     <!--  App Tracking Protection FAQ -->
     <string name="atp_FAQActivityTitle">Često postavljana pitanja</string>
@@ -283,10 +287,10 @@
         <item quantity="other">%1$d pokušaja. Poznato je da prikuplja:</item>
     </plurals>
     <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
-        <item quantity="one">Blokiran %1$d pokušaj praćenja</item>
-        <item quantity="few">Blokirano %1$d pokušaja praćenja</item>
-        <item quantity="many">Blokirano %1$d pokušaja praćenja</item>
-        <item quantity="other">Blokirano %1$d pokušaja praćenja</item>
+        <item quantity="one">DuckDuckGo je blokirao %1$d pokušaj praćenja</item>
+        <item quantity="few">DuckDuckGo je blokirao %1$d pokušaja praćenja</item>
+        <item quantity="many">DuckDuckGo je blokirao %1$d pokušaja praćenja</item>
+        <item quantity="other">DuckDuckGo je blokirao %1$d pokušaja praćenja</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Prijavi problem s ovom aplikacijom</string>
     <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">Prikaži još %1$d</string>

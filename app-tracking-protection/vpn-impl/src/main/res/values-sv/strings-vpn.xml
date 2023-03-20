@@ -225,6 +225,10 @@
     <string name="atp_ActivityAbout">Om</string>
     <string name="atp_ActivityManage">Hantera</string>
     <string name="atp_ActivityRemoveFeature">Inaktivera och radera data</string>
+    <string name="atp_ActivityBlockingTrackersEnabledDescription">DuckDuckGo blockerar dolda spårare i dina appar.</string>
+    <string name="atp_ActivityBlockingTrackersDisabledDescription">Aktivera App Tracking Protection igen för att fortsätta blockera spårare i alla dina appar.</string>
+    <string name="atp_ActivityBlockedByHeaderText" instruction="Placeholder %1$s is a text containing either Today or Yesterday. Example: Blocked by DuckDuckGo Today">Blockerad av DuckDuckGo %1$s</string>
+    <string name="atp_ActivityBlockedByOnDateHeaderText" instruction="Placeholder %1$s is a text containing a formatted date like Feb 05. Example: Blocked by DuckDuckGo on Feb 05">Blockerad av DuckDuckGo %1$s</string>
 
     <!--  App Tracking Protection FAQ -->
     <string name="atp_FAQActivityTitle">Vanliga frågor</string>
@@ -269,8 +273,8 @@
         <item quantity="other">%1$d försök. Känd för att samla in:</item>
     </plurals>
     <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
-        <item quantity="one">%1$d spårningsförsök har blockerats</item>
-        <item quantity="other">%1$d spårningsförsök har blockerats</item>
+        <item quantity="one">DuckDuckGo blockerade %1$d spårningsförsök</item>
+        <item quantity="other">DuckDuckGo blockerade %1$d spårningsförsök</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Rapportera ett problem med den här appen</string>
     <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">Visa %1$d till</string>

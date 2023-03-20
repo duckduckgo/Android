@@ -225,6 +225,10 @@
     <string name="atp_ActivityAbout">Informazioni</string>
     <string name="atp_ActivityManage">Gestisci</string>
     <string name="atp_ActivityRemoveFeature">Disattiva ed elimina dati</string>
+    <string name="atp_ActivityBlockingTrackersEnabledDescription">DuckDuckGo sta bloccando i sistemi di tracciamento nascosti nelle tue app.</string>
+    <string name="atp_ActivityBlockingTrackersDisabledDescription">Riattiva App Tracking Protection per continuare a bloccare i sistemi di tracciamento nelle tue app.</string>
+    <string name="atp_ActivityBlockedByHeaderText" instruction="Placeholder %1$s is a text containing either Today or Yesterday. Example: Blocked by DuckDuckGo Today">Bloccato da DuckDuckGo %1$s</string>
+    <string name="atp_ActivityBlockedByOnDateHeaderText" instruction="Placeholder %1$s is a text containing a formatted date like Feb 05. Example: Blocked by DuckDuckGo on Feb 05">Bloccato da DuckDuckGo il %1$s</string>
 
     <!--  App Tracking Protection FAQ -->
     <string name="atp_FAQActivityTitle">Domande frequenti</string>
@@ -269,8 +273,8 @@
         <item quantity="other">%1$d tentativi. Di solito raccoglie:</item>
     </plurals>
     <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
-        <item quantity="one">Bloccato %1$d tentativo di tracciamento</item>
-        <item quantity="other">Bloccati %1$d tentativi di tracciamento</item>
+        <item quantity="one">DuckDuckGo ha bloccato %1$d tentativo di tracciamento</item>
+        <item quantity="other">DuckDuckGo ha bloccato %1$d tentativi di tracciamento</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Segnala un problema con questa app</string>
     <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">Mostra altri %1$d</string>

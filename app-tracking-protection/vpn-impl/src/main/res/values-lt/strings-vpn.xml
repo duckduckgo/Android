@@ -237,6 +237,10 @@
     <string name="atp_ActivityAbout">Apie</string>
     <string name="atp_ActivityManage">Tvarkyti</string>
     <string name="atp_ActivityRemoveFeature">Duomenų išjungimas ir ištrynimas</string>
+    <string name="atp_ActivityBlockingTrackersEnabledDescription">„DuckDuckGo“ blokuoja paslėptas sekimo priemones visose programėlėse.</string>
+    <string name="atp_ActivityBlockingTrackersDisabledDescription">Vėl įjunkite programėlių sekimo apsaugą, kad ir toliau blokuotumėte sekimo priemones visose programėlėse.</string>
+    <string name="atp_ActivityBlockedByHeaderText" instruction="Placeholder %1$s is a text containing either Today or Yesterday. Example: Blocked by DuckDuckGo Today">Užblokavo „DuckDuckGo“ %1$s</string>
+    <string name="atp_ActivityBlockedByOnDateHeaderText" instruction="Placeholder %1$s is a text containing a formatted date like Feb 05. Example: Blocked by DuckDuckGo on Feb 05">Užblokavo „DuckDuckGo“ %1$s</string>
 
     <!--  App Tracking Protection FAQ -->
     <string name="atp_FAQActivityTitle">DUK</string>
@@ -283,10 +287,10 @@
         <item quantity="other">%1$d bandymų. Žinoma, kad renka:</item>
     </plurals>
     <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
-        <item quantity="one">Užblokuotas %1$d stebėjimo bandymas</item>
-        <item quantity="few">Užblokuoti %1$d stebėjimo bandymai</item>
-        <item quantity="many">Užblokuoti %1$d stebėjimo bandymai</item>
-        <item quantity="other">Užblokuota %1$d stebėjimo bandymų</item>
+        <item quantity="one">„DuckDuckGo“ užblokavo %1$d sekimo bandymą</item>
+        <item quantity="few">„DuckDuckGo“ užblokavo %1$d sekimo bandymus</item>
+        <item quantity="many">„DuckDuckGo“ užblokavo %1$d sekimo bandymo</item>
+        <item quantity="other">„DuckDuckGo“ užblokavo %1$d sekimo bandymų</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Praneškite apie problemą, susijusią su šia programa</string>
     <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">Rodyti dar %1$d</string>
