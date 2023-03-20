@@ -23,18 +23,17 @@ import com.duckduckgo.app.global.DuckDuckGoFragment
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.R
-import com.duckduckgo.sync.impl.databinding.FragmentEnableSyncBinding
-import com.duckduckgo.sync.impl.ui.EnableSyncFragment.EnableSyncListener
+import com.duckduckgo.sync.impl.databinding.FragmentSyncSetupBinding
 
 @InjectWith(FragmentScope::class)
-class SyncAnotherDeviceFragment : DuckDuckGoFragment(R.layout.fragment_enable_sync) {
+class SyncAnotherDeviceFragment : DuckDuckGoFragment(R.layout.fragment_sync_setup) {
 
     interface SyncAnotherDeviceListener {
         fun syncAnotherDevice()
         fun createAccount()
     }
 
-    private val binding: FragmentEnableSyncBinding by viewBinding()
+    private val binding: FragmentSyncSetupBinding by viewBinding()
 
     private val listener: SyncAnotherDeviceListener?
         get() = activity as? SyncAnotherDeviceListener

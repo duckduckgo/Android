@@ -18,24 +18,22 @@ package com.duckduckgo.sync.impl.ui
 
 import android.os.Bundle
 import android.view.View
-import androidx.activity.OnBackPressedCallback
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoFragment
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.R
-import com.duckduckgo.sync.impl.databinding.FragmentEnableSyncBinding
-import timber.log.Timber
+import com.duckduckgo.sync.impl.databinding.FragmentSyncSetupBinding
 
 @InjectWith(FragmentScope::class)
-class EnableSyncFragment : DuckDuckGoFragment(R.layout.fragment_enable_sync) {
+class EnableSyncFragment : DuckDuckGoFragment(R.layout.fragment_sync_setup) {
 
     interface EnableSyncListener {
         fun turnOnSync()
         fun recoverYourSyncedData()
     }
 
-    private val binding: FragmentEnableSyncBinding by viewBinding()
+    private val binding: FragmentSyncSetupBinding by viewBinding()
 
     private val listener: EnableSyncListener?
         get() = activity as? EnableSyncListener
