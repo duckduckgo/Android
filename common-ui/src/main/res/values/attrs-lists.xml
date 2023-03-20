@@ -19,6 +19,7 @@
     <!--Default lists attributes-->
     <attr name="oneLineListItemStyle" format="reference"/>
     <attr name="twoLineListItemStyle" format="reference"/>
+    <attr name="multiselectListItemStyle" format="reference"/>
 
     <attr name="primaryText" format="string"/>
     <attr name="primaryTextColorOverlay" format="color"/>
@@ -39,6 +40,8 @@
     </attr>
     <attr name="textColorOverride" format="color"/>
     <attr name="showOverflowMenu" format="boolean"/>
+    <attr name="trailingEmoji" format="string"/>
+    <attr name="selected" format="boolean"/>
 
     <!--Section Header Item view-->
     <declare-styleable name="SectionHeaderListItem">
@@ -69,6 +72,13 @@
         <attr name="trailingIcon"/>
         <attr name="showBetaPill"/>
         <attr name="showSwitch"/>
+    </declare-styleable>
+
+    <!--Multiselect Item view-->
+    <declare-styleable name="MultiselectListItem">
+        <attr name="primaryText"/>
+        <attr name="trailingEmoji"/>
+        <attr name="selected"/>
     </declare-styleable>
 
 </resources>
