@@ -59,10 +59,10 @@ class SyncAnotherDeviceFragment : DuckDuckGoFragment(R.layout.fragment_enable_sy
 
     private fun observeUiEvents() {
         binding.contentIllustration.setImageResource(R.drawable.ic_connect_device_128)
-        binding.contentTitle.text = "Sync Another Device?"
-        binding.contentBody.text = "Your bookmarks will be backed up! Would you like to sync another device now?\n\nIf you’ve already set up Sync on another device, this will allow you to combine bookmarks from both devices into a single backup."
-        binding.footerPrimaryButton.text = "Sync Another Device"
-        binding.footerSecondaryButton.text = "Not Now"
+        binding.contentTitle.text = getString(R.string.sync_another_device_title)
+        binding.contentBody.text = getString(R.string.sync_another_device_content)
+        binding.footerPrimaryButton.text = getString(R.string.sync_another_device_primary_button)
+        binding.footerSecondaryButton.text = getString(R.string.sync_another_device_secondary_button)
     }
 
     companion object {
