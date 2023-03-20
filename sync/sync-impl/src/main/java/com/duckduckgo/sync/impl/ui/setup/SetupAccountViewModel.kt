@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.impl.ui
+package com.duckduckgo.sync.impl.ui.setup
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -22,10 +22,10 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.SyncRepository
-import com.duckduckgo.sync.impl.ui.SetupAccountViewModel.Command.Finish
-import com.duckduckgo.sync.impl.ui.SetupAccountViewModel.ViewMode.CreateAccount
-import com.duckduckgo.sync.impl.ui.SetupAccountViewModel.ViewMode.SyncAnotherDevice
-import com.duckduckgo.sync.impl.ui.SetupAccountViewModel.ViewMode.TurnOnSync
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.Close
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSyncAnotherDevice
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.CreateAccount
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.TurnOnSync
 import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -51,55 +51,45 @@ class SetupAccountViewModel @Inject constructor(
 
     sealed class ViewMode {
         object TurnOnSync : ViewMode()
-        object SyncAnotherDevice : ViewMode()
+        object AskSyncAnotherDevice : ViewMode()
         object CreateAccount : ViewMode()
     }
 
     sealed class Command {
-        object Finish : Command()
+        object Close : Command()
     }
+
     fun onBackPressed() {
         viewModelScope.launch {
             when (viewState.value.viewMode) {
-                SyncAnotherDevice -> {
-                    viewState.emit(
-                        viewState.value.copy(
-                            viewMode = TurnOnSync,
-                        ),
-                    )
+                AskSyncAnotherDevice -> {
+                    viewState.emit(viewState.value.copy(viewMode = TurnOnSync))
                 }
+
                 TurnOnSync -> {
                     viewModelScope.launch {
-                        command.send(Finish)
+                        command.send(Close)
                     }
                 }
 
                 CreateAccount -> {
                     viewModelScope.launch {
-                        command.send(Finish)
+                        command.send(Close)
                     }
                 }
             }
         }
     }
 
-    fun onTurnOnSync() {
+    fun onAskSyncAnotherDevice() {
         viewModelScope.launch {
-            viewState.emit(
-                viewState.value.copy(
-                    viewMode = SyncAnotherDevice,
-                ),
-            )
+            viewState.emit(viewState.value.copy(viewMode = AskSyncAnotherDevice))
         }
     }
 
     fun createAccount() {
         viewModelScope.launch {
-            viewState.emit(
-                viewState.value.copy(
-                    viewMode = CreateAccount,
-                ),
-            )
+            viewState.emit(viewState.value.copy(viewMode = CreateAccount))
         }
     }
 }

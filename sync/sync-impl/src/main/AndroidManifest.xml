@@ -32,7 +32,7 @@
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"/>
 
         <activity
-            android:name=".ui.SetupAccountActivity"
+            android:name=".ui.setup.SetupAccountActivity"
             android:exported="false"
             android:label="@string/sync_screen_title"
             android:parentActivityName=".ui.SyncActivity"/>

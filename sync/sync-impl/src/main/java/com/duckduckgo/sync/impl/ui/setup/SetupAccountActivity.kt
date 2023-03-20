@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.impl.ui
+package com.duckduckgo.sync.impl.ui.setup
 
 import android.content.Context
 import android.content.Intent
@@ -30,20 +30,20 @@ import com.duckduckgo.di.scopes.*
 import com.duckduckgo.mobile.android.ui.viewbinding.*
 import com.duckduckgo.sync.impl.R.id
 import com.duckduckgo.sync.impl.databinding.*
-import com.duckduckgo.sync.impl.ui.EnableSyncFragment.EnableSyncListener
-import com.duckduckgo.sync.impl.ui.SetupAccountViewModel.Command
-import com.duckduckgo.sync.impl.ui.SetupAccountViewModel.Command.Finish
-import com.duckduckgo.sync.impl.ui.SetupAccountViewModel.ViewMode.CreateAccount
-import com.duckduckgo.sync.impl.ui.SetupAccountViewModel.ViewMode.SyncAnotherDevice
-import com.duckduckgo.sync.impl.ui.SetupAccountViewModel.ViewMode.TurnOnSync
-import com.duckduckgo.sync.impl.ui.SetupAccountViewModel.ViewState
-import com.duckduckgo.sync.impl.ui.SyncAnotherDeviceFragment.SyncAnotherDeviceListener
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.Close
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSyncAnotherDevice
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.CreateAccount
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.TurnOnSync
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewState
+import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowFragment.SetupFlowListener
+import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.ViewMode.InitialSetupScreen
+import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.ViewMode.SyncAnotherDeviceScreen
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
-class SetupAccountActivity : DuckDuckGoActivity(), EnableSyncListener, SyncAnotherDeviceListener {
+class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
     private val binding: ActivitySyncSetupAccountBinding by viewBinding()
     private val viewModel: SetupAccountViewModel by bindViewModel()
 
@@ -81,23 +81,22 @@ class SetupAccountActivity : DuckDuckGoActivity(), EnableSyncListener, SyncAnoth
 
     private fun processCommand(it: Command) {
         when (it) {
-            Finish -> finish()
+            Close -> finish()
         }
     }
 
     private fun renderViewState(viewState: ViewState) {
         when (viewState.viewMode) {
-            SyncAnotherDevice -> {
+            AskSyncAnotherDevice -> {
                 supportFragmentManager.commitNow {
-                    replace(id.fragment_container_view, SyncAnotherDeviceFragment.instance(), TAG_RECOVER_ACCOUNT)
+                    replace(id.fragment_container_view, SyncSetupFlowFragment.instance(SyncAnotherDeviceScreen), TAG_RECOVER_ACCOUNT)
                 }
             }
             TurnOnSync -> {
                 supportFragmentManager.commitNow {
-                    replace(id.fragment_container_view, EnableSyncFragment.instance(), TAG_ENABLE_SYNC)
+                    replace(id.fragment_container_view, SyncSetupFlowFragment.instance(InitialSetupScreen), TAG_ENABLE_SYNC)
                 }
             }
-
             CreateAccount -> {
                 supportFragmentManager.commitNow {
                     replace(id.fragment_container_view, SaveRecoveryCodeFragment.instance(), TAG_ENABLE_SYNC)
@@ -106,8 +105,8 @@ class SetupAccountActivity : DuckDuckGoActivity(), EnableSyncListener, SyncAnoth
         }
     }
 
-    override fun turnOnSync() {
-        viewModel.onTurnOnSync()
+    override fun askSyncAnotherDevice() {
+        viewModel.onAskSyncAnotherDevice()
     }
 
     override fun recoverYourSyncedData() {
@@ -118,8 +117,7 @@ class SetupAccountActivity : DuckDuckGoActivity(), EnableSyncListener, SyncAnoth
         TODO("Not yet implemented")
     }
 
-    override fun launchSaveRecoveryCodeScreen() {
-        Timber.i("CRIS: create account!")
+    override fun launchFinishSetupFlow() {
         viewModel.createAccount()
     }
 
