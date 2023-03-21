@@ -21,6 +21,8 @@ import android.view.LayoutInflater
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.DialogTextAlertBinding
 import com.duckduckgo.mobile.android.ui.view.gone
@@ -153,16 +155,41 @@ class TextAlertDialogBuilder(val context: Context) : DaxAlertDialog {
             binding.textAlertDialogMessage.text = messageText
         }
 
-        binding.textAlertDialogPositiveButton.text = positiveButtonText
-        binding.textAlertDialogPositiveButton.setOnClickListener {
-            listener.onPositiveButtonClicked()
-            dialog.dismiss()
-        }
+        setButtons(binding, dialog)
+    }
 
-        binding.textAlertDialogCancelButton.text = negativeButtonText
-        binding.textAlertDialogCancelButton.setOnClickListener {
-            listener.onNegativeButtonClicked()
-            dialog.dismiss()
+    private fun setButtons(
+        binding: DialogTextAlertBinding,
+        dialog: AlertDialog,
+    ) {
+        binding.textAlertDialogPositiveButton.isVisible = !isDestructiveVersion
+        binding.textAlertDialogPositiveDestructiveButton.isVisible = isDestructiveVersion
+        binding.textAlertDialogCancelButton.isVisible = !isDestructiveVersion
+        binding.textAlertDialogCancelDestructiveButton.isVisible = isDestructiveVersion
+
+        if (isDestructiveVersion) {
+            binding.textAlertDialogPositiveDestructiveButton.text = positiveButtonText
+            binding.textAlertDialogPositiveDestructiveButton.setOnClickListener {
+                listener.onPositiveButtonClicked()
+                dialog.dismiss()
+            }
+            binding.textAlertDialogCancelDestructiveButton.text = negativeButtonText
+            binding.textAlertDialogCancelDestructiveButton.setTextColor(ContextCompat.getColorStateList(context, R.color.secondary_text_color_selector))
+            binding.textAlertDialogCancelDestructiveButton.setOnClickListener {
+                listener.onNegativeButtonClicked()
+                dialog.dismiss()
+            }
+        } else {
+            binding.textAlertDialogPositiveButton.text = positiveButtonText
+            binding.textAlertDialogPositiveButton.setOnClickListener {
+                listener.onPositiveButtonClicked()
+                dialog.dismiss()
+            }
+            binding.textAlertDialogCancelButton.text = negativeButtonText
+            binding.textAlertDialogCancelButton.setOnClickListener {
+                listener.onNegativeButtonClicked()
+                dialog.dismiss()
+            }
         }
     }
 

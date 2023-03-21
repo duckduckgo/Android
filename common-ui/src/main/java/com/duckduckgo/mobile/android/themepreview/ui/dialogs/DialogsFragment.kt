@@ -116,6 +116,29 @@ class DialogsFragment : Fragment() {
             }
         }
 
+        view.findViewById<Button>(R.id.textAlertDestructiveDialogButton)?.let {
+            it.setOnClickListener {
+                TextAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.text_dialog_title)
+                    .setMessage(R.string.text_dialog_message)
+                    .setDestructiveButtons(true)
+                    .setPositiveButton(R.string.text_dialog_positive)
+                    .setNegativeButton(R.string.text_dialog_negative)
+                    .addEventListener(
+                        object : TextAlertDialogBuilder.EventListener() {
+                            override fun onPositiveButtonClicked() {
+                                Snackbar.make(it, "Positive Button Clicked", Snackbar.LENGTH_SHORT).show()
+                            }
+
+                            override fun onNegativeButtonClicked() {
+                                Snackbar.make(it, "Negative Button Clicked", Snackbar.LENGTH_SHORT).show()
+                            }
+                        },
+                    )
+                    .show()
+            }
+        }
+
         view.findViewById<Button>(R.id.textAlertDialogCancellable)?.let {
             it.setOnClickListener {
                 TextAlertDialogBuilder(requireContext())
