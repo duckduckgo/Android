@@ -133,8 +133,8 @@
                 android:layout_width="match_parent"
                 android:layout_marginStart="@dimen/keyline_4"
                 android:layout_height="96dp"
-                android:ellipsize="end"
-                android:text="eyJyZWNvdmVyeSI6eyJ1c2VyX2lkIjoiNjgwRDQ1QjUtNUU2RS00MzQ3LTlDNDQtQjZGQkU4MEZDNEE3IiwicHJpbWFyeV9rZXkiOiJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFPSJ9fQ=="/>
+                android:maxLines="4"
+                android:ellipsize="end"/>
 
         </LinearLayout>
 

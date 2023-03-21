@@ -32,8 +32,8 @@ import com.duckduckgo.sync.impl.R.id
 import com.duckduckgo.sync.impl.databinding.*
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.Close
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSyncAnotherDevice
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSaveRecoveryCode
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSyncAnotherDevice
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.TurnOnSync
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowFragment.SetupFlowListener
