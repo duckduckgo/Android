@@ -42,7 +42,6 @@ import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.ViewState
 import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
 
 @InjectWith(FragmentScope::class)
 class SyncSetupFlowFragment : DuckDuckGoFragment(R.layout.fragment_sync_setup) {
@@ -97,9 +96,7 @@ class SyncSetupFlowFragment : DuckDuckGoFragment(R.layout.fragment_sync_setup) {
             .launchIn(lifecycleScope)
     }
 
-    private fun renderViewState(viewState: ViewState?) {
-        if (viewState == null) return
-        Timber.i("CRIS: $viewState")
+    private fun renderViewState(viewState: ViewState) {
         when (viewState.viewMode) {
             InitialSetupScreen -> {
                 binding.contentIllustration.setImageResource(R.drawable.ic_sync_128)
