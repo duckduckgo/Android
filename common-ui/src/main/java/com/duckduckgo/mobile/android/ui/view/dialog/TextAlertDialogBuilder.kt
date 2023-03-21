@@ -40,21 +40,14 @@ class TextAlertDialogBuilder(val context: Context) : DaxAlertDialog {
 
     private var dialog: AlertDialog? = null
 
-    var listener: EventListener = DefaultEventListener()
-        private set
-    var titleText: CharSequence = ""
-        private set
-    var messageText: CharSequence = ""
-        private set
-    var headerImageDrawableId = 0
-        private set
-    var positiveButtonText: CharSequence = ""
-        private set
-    var negativeButtonText: CharSequence = ""
-        private set
-
-    var isCancellable: Boolean = false
-        private set
+    private var listener: EventListener = DefaultEventListener()
+    private var titleText: CharSequence = ""
+    private var messageText: CharSequence = ""
+    private var headerImageDrawableId = 0
+    private var positiveButtonText: CharSequence = ""
+    private var negativeButtonText: CharSequence = ""
+    private var isCancellable: Boolean = false
+    private var isDestructiveVersion: Boolean = false
 
     fun setHeaderImageResource(@DrawableRes drawableId: Int): TextAlertDialogBuilder {
         headerImageDrawableId = drawableId
@@ -93,6 +86,11 @@ class TextAlertDialogBuilder(val context: Context) : DaxAlertDialog {
 
     fun setCancellable(cancellable: Boolean): TextAlertDialogBuilder {
         isCancellable = cancellable
+        return this
+    }
+
+    fun setDestructiveButtons(isDestructive: Boolean): TextAlertDialogBuilder {
+        isDestructiveVersion = isDestructive
         return this
     }
 
