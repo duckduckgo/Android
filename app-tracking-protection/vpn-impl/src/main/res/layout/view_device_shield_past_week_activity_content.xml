@@ -24,14 +24,13 @@
 
     <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/content_title"
-        app:typography="caption_allCaps"
-        app:textType="secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:paddingBottom="4dp"
+        android:paddingBottom="@dimen/keyline_1"
         android:text="@string/atp_ActivityPastWeekBlocked"
-        tools:text="Blocked"/>
+        app:textType="secondary"
+        app:typography="body2" />
 
     <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         app:typography="h2"
@@ -42,12 +41,13 @@
         tools:text="31,306"/>
 
     <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
-        app:typography="body2"
         android:id="@+id/content_footer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="@string/atp_ActivityPastWeekAcross"
-        tools:text="Trackers"/>
+        android:paddingTop="@dimen/keyline_1"
+        app:textType="secondary"
+        app:typography="body2"
+        tools:text="Trackers" />
 
 </LinearLayout>
