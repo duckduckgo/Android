@@ -83,7 +83,7 @@
             android:text="@string/atp_PromoteAlwaysOnDialogSettings"
         />
 
-        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonSecondary
+        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
             android:id="@+id/notNowButton"
             app:buttonSize="large"
             android:layout_width="match_parent"
