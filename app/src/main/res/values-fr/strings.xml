@@ -245,7 +245,7 @@
     <string name="surveyCtaLaunchButton">Participer à l\'enquête</string>
     <string name="surveyCtaDismissButton">Non merci</string>
     <string name="surveyActivityTitle">Enquête auprès des utilisateurs</string>
-    <string name="surveyTitle">ENQUÊTE DUCKDUCKGO</string>
+    <string name="surveyTitle">Enquête DuckDuckGo</string>
     <string name="surveyDismissContentDescription">Ignorer l\'enquête</string>
     <string name="surveyLoadingErrorTitle">Oh non !</string>
     <string name="surveyLoadingErrorText">Notre enquête ne charge pas pour le moment.\nVeuillez réessayer plus tard.</string>
@@ -361,7 +361,7 @@
     <string name="otherMainReasonTitleShort">Autres problèmes</string>
 
     <string name="openEndedInputHint">Veuillez être aussi précis que possible</string>
-    <string name="submitFeedback">ENVOYER</string>
+    <string name="submitFeedback">Envoyer</string>
 
     <string name="tellUsHowToImprove">Dites-nous ce que nous pouvons améliorer.</string>
     <string name="thanksForTheFeedback">Merci pour vos commentaires !</string>
@@ -372,8 +372,8 @@
     <string name="whatHaveYouBeenEnjoying">Qu\'avez-vous apprécié ?</string>
     <string name="awesomeToHear">Nous sommes heureux de l\'apprendre !</string>
     <string name="shareTheLoveWithARating">Veuillez partager votre appréciation en donnant une note sur le Play Store.</string>
-    <string name="rateTheApp">NOTER L\'APPLICATION</string>
-    <string name="declineFurtherFeedback">NON MERCI, J\'AI TERMINÉ</string>
+    <string name="rateTheApp">Noter l\'application</string>
+    <string name="declineFurtherFeedback">Non merci, j\'ai terminé</string>
     <string name="whichBrokenSites">Où voyez-vous ces problèmes ?</string>
     <string name="whichBrokenSitesHint">Quel site rencontre des problèmes ?</string>
     <string name="feedbackSpecificAsPossible">Veuillez être aussi précis que possible</string>
@@ -389,7 +389,6 @@
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Depuis cet appareil</string>
-    <string name="systemSearchOmnibarInputHint"><font size="13">Faire des recherches ou saisir l\'URL</font></string>
     <string name="systemSearchAppNotFound">Impossible de trouver l\'application</string>
     <string name="systemSearchOnboardingText">Merci d\'avoir choisi DuckDuckGo!\nDésormais, lorsque vous utilisez notre outil de recherche ou notre application, vos recherches sont protégées.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">L\'application DuckDuckGo offre également les fonctionnalités suivantes :</string>
@@ -408,7 +407,7 @@
     <string name="daxDialogGotIt">J\'ai compris</string>
     <string name="hideTipsTitle">Masquer les conseils restants ?</string>
     <string name="hideTipsText">Il n\'y en a que quelques-uns et nous avons essayé de les rendre aussi utiles que possible.</string>
-    <string name="hideTipsButton">Masquer les conseils pour toujours</string>
+    <string name="hideTipsButton">Masquer les conseils définitivement</string>
 
     <!-- New Onboarding Experience -->
     <string name="onboardingWelcomeTitle">"Bienvenue sur DuckDuckGo !"</string>
@@ -428,6 +427,23 @@
     <string name="daxNonSerpCtaText"><![CDATA[Lors de votre navigation, je bloque les traqueurs indésirables.<br/><br/>Continuez à naviguer en toute tranquillité !]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Attention ! Je ne peux pas empêcher %1$s de voir votre activité sur %2$s.&lt;br/&gt;&lt;br/&gt;Si vous naviguez avec moi, je peux réduire les données récoltées par %3$s en bloquant ses traqueurs sur de nombreux autres sites.</string>
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Attention ! Comme %1$s est propriétaire de %2$s, je ne peux pas l\'empêcher d\'y suivre votre activité.&lt;br/&gt;&lt;br/&gt;Si vous naviguez avec moi, je peux réduire les données récoltées par %3$s en bloquant ses traqueurs sur de nombreux autres sites.</string>
+
+    <!-- Onboarding DDG Feature Options -->
+    <string name="onboardingFeatureOptionsTitle">Qu\'est-ce qui vous amène chez DuckDuckGo ?</string>
+    <string name="onboardingFeatureOptionsContinue">Continuer</string>
+    <string name="onboardingFeatureOptionsSkip">Ignorer cette étape</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionPrivateSearch">Recherche privée</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionTrackerBlocking">blocage des traqueurs</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionSmallerDigitalFootprint">Empreinte numérique réduite</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionFasterPageLoads">Chargement rapide des pages</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionFewerAds">Moins de publicités</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionOneClickDataClearing">Données supprimées en 1 clic</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationContinue">Enregistrer dans les téléchargements</string>
@@ -646,13 +662,13 @@
 
     <!-- Autoconsent -->
     <!-- smartling.character_limit = 82 -->
-    <string name="autoconsentDialogTitle">Il semble que ce site ait une fenêtre contextuelle de consentement aux cookies 👇</string>
+    <string name="autoconsentDialogTitle"><![CDATA[<b>Vous voulez que je gère les fenêtres contextuelles des cookies ?</b>]]></string>
     <!-- smartling.character_limit = 160 -->
-    <string name="autoconsentDialogDescription">Voulez-vous que je m\'en charge ? Je peux essayer de minimiser les cookies, de maximiser la confidentialité et de masquer les fenêtres contextuelles comme celles-ci.</string>
+    <string name="autoconsentDialogDescription">Je peux essayer de sélectionner les paramètres de confidentialité les plus élevés et masquer les fenêtres contextuelles comme celles-ci.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Gérer les fenêtres contextuelles (cookies)</string>
+    <string name="autoconsentPrimaryCta">Gérer les fenêtres contextuelles pour moi</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentSecondaryCta">Non merci</string>
+    <string name="autoconsentSecondaryCta">Non, je les gérerai moi-même</string>
 
     <string name="autoconsentSetting">Gérer les fenêtres contextuelles de cookies</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Fenêtre contextuelle masquée</string>

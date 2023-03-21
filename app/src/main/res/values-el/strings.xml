@@ -245,7 +245,7 @@
     <string name="surveyCtaLaunchButton">Πάρτε μέρος στην έρευνα</string>
     <string name="surveyCtaDismissButton">Όχι, ευχαριστώ</string>
     <string name="surveyActivityTitle">Έρευνα χρηστών</string>
-    <string name="surveyTitle">ΕΡΕΥΝΑ DUCKDUCKGO</string>
+    <string name="surveyTitle">Έρευνα DuckDuckGo</string>
     <string name="surveyDismissContentDescription">Απόρριψη έρευνας</string>
     <string name="surveyLoadingErrorTitle">Ωχ, όχι!</string>
     <string name="surveyLoadingErrorText">Η έρευνά μας δεν φορτώνει αυτήν τη στιγμή.\nΠροσπαθήστε ξανά αργότερα.</string>
@@ -361,7 +361,7 @@
     <string name="otherMainReasonTitleShort">Άλλα προβλήματα</string>
 
     <string name="openEndedInputHint">Να είστε όσο το δυνατόν πιο συγκεκριμένοι</string>
-    <string name="submitFeedback">ΥΠΟΒΟΛΗ</string>
+    <string name="submitFeedback">Υποβολή</string>
 
     <string name="tellUsHowToImprove">Πείτε μας πού μπορούμε να βελτιωθούμε.</string>
     <string name="thanksForTheFeedback">Ευχαριστούμε για τα σχόλιά σας!</string>
@@ -372,8 +372,8 @@
     <string name="whatHaveYouBeenEnjoying">Ποια στοιχεία απολαμβάνετε;</string>
     <string name="awesomeToHear">Αυτό μας κάνει πολύ χαρούμενους!</string>
     <string name="shareTheLoveWithARating">Δείξτε την αγάπη σας αξιολογώντας μας στο Play Store.</string>
-    <string name="rateTheApp">ΑΞΙΟΛΟΓΗΣΗ ΕΦΑΡΜΟΓΗΣ</string>
-    <string name="declineFurtherFeedback">ΟΧΙ ΕΥΧΑΡΙΣΤΩ, ΤΕΛΕΙΩΣΑ</string>
+    <string name="rateTheApp">Αξιολόγηση εφαρμογής</string>
+    <string name="declineFurtherFeedback">Όχι, ευχαριστώ, τελείωσα</string>
     <string name="whichBrokenSites">Πού βλέπετε τα προβλήματα αυτά;</string>
     <string name="whichBrokenSitesHint">Ποιος ιστότοπος παρουσιάζει προβλήματα;</string>
     <string name="feedbackSpecificAsPossible">Να είστε όσο το δυνατόν πιο συγκεκριμένοι</string>
@@ -389,7 +389,6 @@
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Από αυτή τη συσκευή</string>
-    <string name="systemSearchOmnibarInputHint"><font size="13">Αναζήτηση ή πληκτρολόγηση διεύθυνσης URL</font></string>
     <string name="systemSearchAppNotFound">Η εφαρμογή δεν βρέθηκε</string>
     <string name="systemSearchOnboardingText">Ευχαριστώ που επιλέξατε το DuckDuckGo!\nΤώρα, όταν χρησιμοποιείτε την αναζήτηση ή την εφαρμογή μας, οι αναζητήσεις σας προστατεύονται.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Η εφαρμογή DuckDuckGo επίσης:</string>
@@ -428,6 +427,23 @@
     <string name="daxNonSerpCtaText"><![CDATA[Καθώς πιέζετε και μετακινείτε τον δρομέα, θα μπλοκάρω ενοχλητικούς ιχνηλάτες. <br/><br/> Εμπρός - συνεχίστε την περιήγηση!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Προσοχή! Δεν μπορώ να εμποδίσω το δίκτυο %1$s από το να δει τη δραστηριότητά σας στο %2$s.\n\nΑλλά περιηγηθείτε μαζί μου και θα μπορώ να περιορίσω το τι θα γνωρίζει το δίκτυο %3$s για σας συνολικά, αποκλείοντας τις εφαρμογές παρακολούθησης σε πλήθος άλλων ιστότοπων.</string>
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Προσοχή! Επειδή το %1$s κατέχει %2$s, δεν μπορώ να τους εμποδίσω από το να δουν τη δραστηριότητά σας εδώ.&lt;br/&gt;&lt;br/&gt;Αλλά περιηγηθείτε μαζί μου και μπορώ να περιορίσω τι θα γνωρίζει το %3$s για εσάς συνολικά, αποκλείοντας τις εφαρμογές παρακολούθησής τους σε πλήθος άλλων ιστότοπων.</string>
+
+    <!-- Onboarding DDG Feature Options -->
+    <string name="onboardingFeatureOptionsTitle">Τι σας φέρνει στο DuckDuckGo;</string>
+    <string name="onboardingFeatureOptionsContinue">Συνέχεια</string>
+    <string name="onboardingFeatureOptionsSkip">Παράλειψη του βήματος αυτού</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionPrivateSearch">Ιδιωτική αναζήτηση</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionTrackerBlocking">Αποκλεισμός παρακολούθησης</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionSmallerDigitalFootprint">Μικρότερο ψηφιακό αποτύπωμα</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionFasterPageLoads">Ταχύτερη φόρτωση σελίδων</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionFewerAds">Λιγότερες διαφημίσεις</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionOneClickDataClearing">Εκκαθάριση δεδομένων με 1 κλικ</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationContinue">Αποθήκευση στις λήψεις</string>
@@ -646,13 +662,13 @@
 
     <!-- Autoconsent -->
     <!-- smartling.character_limit = 82 -->
-    <string name="autoconsentDialogTitle">Φαίνεται ότι αυτός ο ιστότοπος έχει αναδυόμενο παράθυρο συναίνεσης για cookies👇</string>
+    <string name="autoconsentDialogTitle"><![CDATA[<b>Θέλετε να διαχειρίζομαι αναδυόμενα παράθυρα για cookie;</b>]]></string>
     <!-- smartling.character_limit = 160 -->
-    <string name="autoconsentDialogDescription">Θέλετε να τα διαχειριστώ αυτά για εσάς; Μπορώ να προσπαθήσω να ελαχιστοποιήσω τα cookies, να μεγιστοποιήσω το απόρρητο και να αποκρύψω αναδυόμενα παράθυρα όπως αυτά.</string>
+    <string name="autoconsentDialogDescription">Μπορώ να προσπαθήσω να επιλέγω τις πιο ιδιωτικές ρυθμίσεις που υπάρχουν διαθέσιμες και να αποκρύπτω αναδυόμενα παράθυρα όπως αυτά.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Διαχείριση αναδυόμενων παραθύρων cookies</string>
+    <string name="autoconsentPrimaryCta">Χειριστείτε αναδυόμενα παράθυρα αντί εμού</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentSecondaryCta">Όχι, ευχαριστώ</string>
+    <string name="autoconsentSecondaryCta">Όχι, θα τα διαχειρίζομαι εγώ προσωπικά</string>
 
     <string name="autoconsentSetting">Διαχείριση αναδυόμενων παραθύρων για cookies</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Κρυφό αναδυόμενο παράθυρο</string>

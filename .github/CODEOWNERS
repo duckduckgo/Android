@@ -1,0 +1,3 @@
+# This is the module where the Android Design System resides
+# Any changes to the source files of this module require approval from @malmstein or @nalcalag.
+/common-ui/ @malmstein @nalcalag

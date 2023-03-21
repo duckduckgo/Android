@@ -361,7 +361,7 @@
     <string name="otherMainReasonTitleShort">Muut ongelmat</string>
 
     <string name="openEndedInputHint">Kerro mahdollisimman tarkasti</string>
-    <string name="submitFeedback">LÄHETÄ</string>
+    <string name="submitFeedback">Lähetä</string>
 
     <string name="tellUsHowToImprove">Kerro meille, mitä voimme parantaa.</string>
     <string name="thanksForTheFeedback">Kiitos palautteesta!</string>
@@ -372,7 +372,7 @@
     <string name="whatHaveYouBeenEnjoying">Mistä olet nauttinut?</string>
     <string name="awesomeToHear">Mahtava kuulla!</string>
     <string name="shareTheLoveWithARating">Jaathan kehusi Play Store -arviolla.</string>
-    <string name="rateTheApp">ARVIOI SOVELLUS</string>
+    <string name="rateTheApp">Arvioi sovellus</string>
     <string name="declineFurtherFeedback">EI KIITOS, TÄMÄ RIITTI</string>
     <string name="whichBrokenSites">Missä näitä ongelmia esiintyy?</string>
     <string name="whichBrokenSitesHint">Millä verkkosivustolla on ongelmia?</string>
@@ -389,7 +389,6 @@
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Tästä laitteesta</string>
-    <string name="systemSearchOmnibarInputHint"><font size="13">Hae tai kirjoita URL</font></string>
     <string name="systemSearchAppNotFound">Sovellusta ei löytynyt</string>
     <string name="systemSearchOnboardingText">Kiitos, että valitsit DuckDuckGon!\nKun nyt käytät hakua tai sovellusta, hakusi ovat suojattuja.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">DuckDuckGo-sovellus myös:</string>
@@ -428,6 +427,23 @@
     <string name="daxNonSerpCtaText"><![CDATA[Kun napautat ja selaat, estän ikävät seurantaohjelmat. <br/><br/>Siirry eteenpäin – jatka selaamista!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Huomio! %1$s näkee mitä teet sivustolla %2$s enkä voi estää sitä. &lt;br/&gt;&lt;br/&gt;Mutta jos käytät minua selaamiseen, voin vähentää, mitä %3$s saa tietää sinusta, estämällä heidän seurantansa monilla muilla sivustoilla.</string>
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Hälytys! Koska %1$s omistaa palvelun %2$s, en voi estää heitä näkemästä, mitä teet täällä.&lt;br/&gt;&lt;br/&gt;Mutta jos käytät minua selaamiseen, voin vähentää, mitä %3$s saa tietää sinusta estämällä heidän seurantansa monilla muilla sivustoilla.</string>
+
+    <!-- Onboarding DDG Feature Options -->
+    <string name="onboardingFeatureOptionsTitle">Mikä tuo sinut DuckDuckGo:hon?</string>
+    <string name="onboardingFeatureOptionsContinue">Jatka</string>
+    <string name="onboardingFeatureOptionsSkip">Ohita tämä vaihe</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionPrivateSearch">Yksityinen haku</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionTrackerBlocking">Seurannan esto</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionSmallerDigitalFootprint">Pienempi digijalanjälki</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionFasterPageLoads">Nopeampi sivulataus</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionFewerAds">Vähemmän mainoksia</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionOneClickDataClearing">Yhden latauksen tyhjennys</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationContinue">Tallenna latauksiin</string>
@@ -646,13 +662,13 @@
 
     <!-- Autoconsent -->
     <!-- smartling.character_limit = 82 -->
-    <string name="autoconsentDialogTitle">Näyttää siltä, että tällä sivustolla on evästeiden hallinnan ponnahdusikkuna👇</string>
+    <string name="autoconsentDialogTitle"><![CDATA[<b>Haluatko, että hoidan evästeiden ponnahdusikkunat?</b>]]></string>
     <!-- smartling.character_limit = 160 -->
-    <string name="autoconsentDialogDescription">Haluatko, että hoidan nämä puolestasi? Voin yrittää minimoida evästeet, maksimoida yksityisyyden ja piilottaa tällaiset ponnahdusikkunat.</string>
+    <string name="autoconsentDialogDescription">Voin pyrkiä valitsemaan valittavissa olevista asetuksista yksityisimmät ja piilottaa tämänkaltaiset ponnahdusikkunat.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Evästeiden hallinnan ponnahdusikkunat</string>
+    <string name="autoconsentPrimaryCta">Hoida ponnahdusikkunat puolestani</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentSecondaryCta">Ei kiitos</string>
+    <string name="autoconsentSecondaryCta">Ei, hoidan ne itse</string>
 
     <string name="autoconsentSetting">Evästeiden hallinnan ponnahdusikkunat</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Ponnahdusikkuna piilotettu</string>

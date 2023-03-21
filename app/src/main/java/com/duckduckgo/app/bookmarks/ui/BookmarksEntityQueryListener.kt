@@ -17,13 +17,14 @@
 package com.duckduckgo.app.bookmarks.ui
 
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.app.bookmarks.model.BookmarkFolder
-import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersAdapter
 import com.duckduckgo.app.utils.ConflatedJob
+import com.duckduckgo.savedsites.api.models.BookmarkFolder
+import com.duckduckgo.savedsites.api.models.SavedSite
 import java.util.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class BookmarksEntityQueryListener(
     private val viewModel: BookmarksViewModel,
@@ -39,7 +40,9 @@ class BookmarksEntityQueryListener(
             viewModel.viewState.value?.bookmarks?.let { bookmarks ->
                 viewModel.viewState.value?.bookmarkFolders?.let { bookmarkFolders ->
                     val filteredFolders = filterBookmarkFolders(newText, bookmarkFolders)
-                    bookmarksAdapter.setItems(filterBookmarks(newText, bookmarks), filteredFolders.isEmpty(), true)
+                    val filteredBookmarks = filterBookmarks(newText, bookmarks)
+                    Timber.d("Bookmark: filter $filteredBookmarks")
+                    bookmarksAdapter.setItems(filteredBookmarks, filteredFolders.isEmpty(), true)
                     bookmarkFoldersAdapter.bookmarkFolderItems = filteredFolders
                 }
             }

@@ -18,40 +18,24 @@ package com.duckduckgo.remote.messaging.impl.matchers
 
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.AppProperties
-import com.duckduckgo.remote.messaging.impl.models.IntMatchingAttribute
-import com.duckduckgo.remote.messaging.impl.models.MATCHING_ATTR_INT_DEFAULT_VALUE
-import com.duckduckgo.remote.messaging.impl.models.MATCHING_ATTR_STRING_DEFAULT_VALUE
-import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
-import com.duckduckgo.remote.messaging.impl.models.RangeIntMatchingAttribute
-import com.duckduckgo.remote.messaging.impl.models.RangeStringMatchingAttribute
-import com.duckduckgo.remote.messaging.impl.models.StringMatchingAttribute
-import com.duckduckgo.remote.messaging.impl.models.asJsonFormat
-import com.duckduckgo.remote.messaging.impl.models.matches
+import com.duckduckgo.remote.messaging.api.AttributeMatcherPlugin
+import com.duckduckgo.remote.messaging.api.MatchingAttribute
+import com.duckduckgo.remote.messaging.impl.models.*
 
 class DeviceAttributeMatcher(
     private val appBuildConfig: AppBuildConfig,
     private val appProperties: AppProperties,
-) : AttributeMatcher {
-    override suspend fun evaluate(matchingAttribute: MatchingAttribute): EvaluationResult? {
-        when (matchingAttribute) {
-            is MatchingAttribute.Api -> {
-                if (matchingAttribute == MatchingAttribute.Api()) return EvaluationResult.Fail
-
-                if (matchingAttribute.value != MATCHING_ATTR_INT_DEFAULT_VALUE) {
-                    return (matchingAttribute as IntMatchingAttribute).matches(appBuildConfig.sdkInt)
-                }
-                return (matchingAttribute as RangeIntMatchingAttribute).matches(appBuildConfig.sdkInt)
+) : AttributeMatcherPlugin {
+    override suspend fun evaluate(matchingAttribute: MatchingAttribute<*>): Boolean? {
+        return when (matchingAttribute) {
+            is Api -> {
+                matchingAttribute.matches(appBuildConfig.sdkInt)
             }
-            is MatchingAttribute.Locale -> {
-                if (matchingAttribute == MatchingAttribute.Locale()) return EvaluationResult.Fail
-                return matchingAttribute.matches(appBuildConfig.deviceLocale.asJsonFormat())
+            is Locale -> {
+                matchingAttribute.matches(appBuildConfig.deviceLocale.asJsonFormat())
             }
-            is MatchingAttribute.WebView -> {
-                if (matchingAttribute == MatchingAttribute.WebView()) return EvaluationResult.Fail
-                if (matchingAttribute.value != MATCHING_ATTR_STRING_DEFAULT_VALUE) {
-                    return (matchingAttribute as StringMatchingAttribute).matches(appProperties.webView())
-                }
-                return (matchingAttribute as RangeStringMatchingAttribute).matches(appProperties.webView())
+            is WebView -> {
+                matchingAttribute.matches(appProperties.webView())
             }
             else -> return null
         }

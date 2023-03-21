@@ -21,7 +21,8 @@
     <string name="macos_title">Skaffa DuckDuckGo för Mac!</string>
 
     <string name="macos_share_title">Dela länk</string>
-    <string name="macos_description_text">DuckDuckGo för Mac har hastigheten du behöver, webbläsarfunktionerna du förväntar dig och våra många förstklassiga integritetsfunktioner.\n\nPå din Mac går du till:\n<b><font color="#3969EF">duckduckgo.com/mac</font></b></string>
+    <string name="macos_description_text">DuckDuckGo för Mac har hastigheten du behöver, webbläsarfunktionerna du förväntar dig och våra många förstklassiga integritetsfunktioner.\n\nPå din Mac går du till:</string>
+    <string name="macos_description_link">duckduckgo.com/mac</string>
     <string name="macos_share_text">Är du redo att börja surfa privat på din Mac?\n\nLadda ner genom att gå till den här webbadressen på din Mac:\nduckduckgo.com/mac</string>
 
     <string name="macos_waitlist_windows_link">Letar du efter Windows-versionen?</string>

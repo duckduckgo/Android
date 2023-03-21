@@ -21,7 +21,8 @@
     <string name="macos_title">Gaukite „Mac“ skirtą „DuckDuckGo“!</string>
 
     <string name="macos_share_title">Bendrinti nuorodą</string>
-    <string name="macos_description_text">„Mac“ skirta „DuckDuckGo“ pasižymi jums reikiama sparta, naršyklės funkcijomis ir aukščiausios klasės privatumo įrankiais.\n\n„Mac“ kompiuteryje eikite į:\n<b><font color="#3969EF">duckduckgo.com/mac</font></b></string>
+    <string name="macos_description_text">„Mac“ skirta „DuckDuckGo“ pasižymi jums reikiama sparta, naršyklės funkcijomis ir aukščiausios klasės privatumo įrankiais.\n\n„Mac“ kompiuteryje eikite į:</string>
+    <string name="macos_description_link">duckduckgo.com/mac</string>
     <string name="macos_share_text">Pasiruošę naršyti privačiai „Mac“?\n\nSpustelėkite šį URL „Mac“ kompiuteryje, kad atsisiųstumėte:\nduckduckgo.com/mac</string>
 
     <string name="macos_waitlist_windows_link">Ieškote „Windows“ versijos?</string>

@@ -245,7 +245,7 @@
     <string name="surveyCtaLaunchButton">Dalyvauti apklausoje</string>
     <string name="surveyCtaDismissButton">Ne, dėkoju</string>
     <string name="surveyActivityTitle">Naudotojų apklausa</string>
-    <string name="surveyTitle">„DUCKDUCKGO“ APKLAUSA</string>
+    <string name="surveyTitle">„DuckDuckGo“ apklausa</string>
     <string name="surveyDismissContentDescription">Išjungti apklausą</string>
     <string name="surveyLoadingErrorTitle">Ak, ne!</string>
     <string name="surveyLoadingErrorText">Mūsų apklausa šiuo metu neįkeliama.\nBandykite dar kartą vėliau.</string>
@@ -361,7 +361,7 @@
     <string name="otherMainReasonTitleShort">Kitos problemos</string>
 
     <string name="openEndedInputHint">Nurodykite kuo konkrečiau</string>
-    <string name="submitFeedback">PATEIKTI</string>
+    <string name="submitFeedback">Pateikti</string>
 
     <string name="tellUsHowToImprove">Papasakokite, ką galime patobulinti.</string>
     <string name="thanksForTheFeedback">Dėkojame už atsiliepimą!</string>
@@ -372,8 +372,8 @@
     <string name="whatHaveYouBeenEnjoying">Kas jums patiko?</string>
     <string name="awesomeToHear">Nuostabu tai girdėti!</string>
     <string name="shareTheLoveWithARating">Įvertinkite mus „Play Store“ parduotuvėje.</string>
-    <string name="rateTheApp">ĮVERTINKITE PROGRAMĄ</string>
-    <string name="declineFurtherFeedback">AČIŪ, NE, AŠ BAIGIAU.</string>
+    <string name="rateTheApp">Įvertinkite programą</string>
+    <string name="declineFurtherFeedback">Ačiū, ne, aš baigiau</string>
     <string name="whichBrokenSites">Kur susiduriate su šiomis problemomis?</string>
     <string name="whichBrokenSitesHint">Kokioje svetainėje susidūrėte su problema?</string>
     <string name="feedbackSpecificAsPossible">Nurodykite kuo konkrečiau</string>
@@ -389,7 +389,6 @@
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Iš šio įrenginio</string>
-    <string name="systemSearchOmnibarInputHint"><font size="13">Ieškoti arba įvesti URL</font></string>
     <string name="systemSearchAppNotFound">Nepavyko rasti programos</string>
     <string name="systemSearchOnboardingText">Dėkojame, kad pasirinkote „DuckDuckGo“!\nDabar, kai naudojate mūsų paieškos funkciją ar programėlę, jūsų paieškos yra apsaugotos.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">„DuckDuckGo“ programėlė taip pat:</string>
@@ -432,6 +431,23 @@
     <string name="daxNonSerpCtaText"><![CDATA[Bakstelėjus ir slenkant, bus blokuojami įkyrūs sekimo įrenginiai. <br/><br/>Pirmyn – naršykite toliau!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Būk atidus! Negaliu neleisti %1$s matyti tavo veiklos %2$s &lt;br/&gt;&lt;br/&gt;Tačiau naršyk kartu su manimi ir aš sumažinsiu informacijos, kurią %3$s žino apie tave, kiekį užblokuodamas stebėjimo priemones kitose svetainėse.</string>
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Įspėjimas! Kadangi %1$s priklauso %2$s, negaliu neleisti jiems matyti tavo veiklos.&lt;br/&gt;&lt;br/&gt;Tačiau naršyk kartu su manimi ir aš sumažinsiu informacijos, kurią %3$s žino apie tave, kiekį užblokuodamas stebėjimo priemones kitose svetainėse.</string>
+
+    <!-- Onboarding DDG Feature Options -->
+    <string name="onboardingFeatureOptionsTitle">Kas jus atvedė į „DuckDuckGo“?</string>
+    <string name="onboardingFeatureOptionsContinue">Tęsti</string>
+    <string name="onboardingFeatureOptionsSkip">Praleisti šį žingsnį</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionPrivateSearch">Privati paieška</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionTrackerBlocking">Sekimo blokavimas</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionSmallerDigitalFootprint">Maž. skaitmeninis pėdsakas</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionFasterPageLoads">Greitesnis puslapio įkėlimas</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionFewerAds">Mažiau reklamų</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionOneClickDataClearing">Duomenų išvalymas vienu spustelėjimu</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationContinue">Išsaugoti Atsisiuntimuose</string>
@@ -654,13 +670,13 @@
 
     <!-- Autoconsent -->
     <!-- smartling.character_limit = 82 -->
-    <string name="autoconsentDialogTitle">Atrodo, kad šioje svetainėje yra sutikimo su slapukais iškylantysis langas 👇</string>
+    <string name="autoconsentDialogTitle"><![CDATA[<b>Norite, kad sutvarkyčiau iškylančiuosius slapukų langus?</b>]]></string>
     <!-- smartling.character_limit = 160 -->
-    <string name="autoconsentDialogDescription">Norite, kad viską sutvarkyčiau? Galiu pabandyti sumažinti slapukų skaičių, sustiprinti privatumą ir paslėpti tokius iššokančiuosius langus.</string>
+    <string name="autoconsentDialogDescription">Galiu pabandyti pasirinkti privačiausius galimus nustatymus ir paslėpti tokius iškylančiuosius langus.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Valdyti slapukų iššokančiuosius langus</string>
+    <string name="autoconsentPrimaryCta">Sutvarkykite iškylančiuosius langus už mane</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentSecondaryCta">Ne, dėkoju</string>
+    <string name="autoconsentSecondaryCta">Ne, aš juos susitvarkysiu pats</string>
 
     <string name="autoconsentSetting">Valdyti slapukų iššokančiuosius langus</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Iškylantysis langas paslėptas</string>

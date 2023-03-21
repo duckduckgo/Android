@@ -22,7 +22,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.duckduckgo.app.bookmarks.model.BookmarkFolder
+import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import kotlinx.coroutines.flow.Flow
 
 @Dao

@@ -104,7 +104,7 @@
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Zavřít</string>
     <string name="closeAllTabsMenuItem">Zavřít všechny karty</string>
-    <string name="closeTab">Zavřít karta</string>
+    <string name="closeTab">Zavřít kartu</string>
     <string name="tabClosed">Karta zavřená</string>
     <string name="tabClosedUndo">Vrátit</string>
     <string name="downloadsMenuItemTitle">Stahování</string>
@@ -245,7 +245,7 @@
     <string name="surveyCtaLaunchButton">Zúčastnit se průzkumu</string>
     <string name="surveyCtaDismissButton">Ne, děkuji</string>
     <string name="surveyActivityTitle">Průzkum uživatelů</string>
-    <string name="surveyTitle">PRŮZKUM DUCKDUCKGO</string>
+    <string name="surveyTitle">Průzkum DuckDuckGo</string>
     <string name="surveyDismissContentDescription">Odmítnout průzkum</string>
     <string name="surveyLoadingErrorTitle">Ale ne!</string>
     <string name="surveyLoadingErrorText">Náš průzkum se momentálně nenačítá.\nZkuste to prosím později.</string>
@@ -361,7 +361,7 @@
     <string name="otherMainReasonTitleShort">Další problémy</string>
 
     <string name="openEndedInputHint">Buďte co nejkonkrétnější.</string>
-    <string name="submitFeedback">ODESLAT</string>
+    <string name="submitFeedback">Odeslat</string>
 
     <string name="tellUsHowToImprove">Řekněte nám prosím, co můžeme zlepšit.</string>
     <string name="thanksForTheFeedback">Děkujeme za zpětnou vazbu!</string>
@@ -372,8 +372,8 @@
     <string name="whatHaveYouBeenEnjoying">Co se vám líbilo?</string>
     <string name="awesomeToHear">To rádi slyšíme!</string>
     <string name="shareTheLoveWithARating">Podělte se prosím o pozitiva hodnocením na Play Store.</string>
-    <string name="rateTheApp">OHODNOŤTE APLIKACI</string>
-    <string name="declineFurtherFeedback">NE, DĚKUJI, JSEM HOTOV/A.</string>
+    <string name="rateTheApp">Ohodnoťte aplikaci</string>
+    <string name="declineFurtherFeedback">Ne, děkuji, jsme hotoví</string>
     <string name="whichBrokenSites">Kde jste narazili na tyto problémy?</string>
     <string name="whichBrokenSitesHint">Které webové stránky mají problémy?</string>
     <string name="feedbackSpecificAsPossible">Buďte co nejkonkrétnější.</string>
@@ -389,7 +389,6 @@
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Z tohoto zařízení</string>
-    <string name="systemSearchOmnibarInputHint"><font size="13">Vyhledat nebo zadat URL</font></string>
     <string name="systemSearchAppNotFound">Aplikace nebyla nalezena</string>
     <string name="systemSearchOnboardingText">Děkujeme, že jste si vybrali DuckDuckGo!\nPři použití našeho vyhledávání nebo aplikace jsou od tohoto okamžiku Vaše vyhledávání chráněna.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Aplikace DuckDuckGo také:</string>
@@ -432,6 +431,23 @@
     <string name="daxNonSerpCtaText"><![CDATA[Zatímco Vy budete klepat a přejíždět, já budu blokovat zlovolné sledovače. <br/><br/>Nenechejte se rušit — pokračujte v prohlížení!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Upozornění! Nemůžeme zabránit, aby %1$s viděli vaši aktivitu na stránkách %2$s &lt;br/&gt;&lt;br/&gt;Ale procházejte s námi a budete moci omezit, co o vás %3$s celkově ví zablokováním jejich trackerů na mnoha jiných stránkách.</string>
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Upozornění! Vzhledem k tomu, že %2$s vlastní %1$s, nemůžeme jim zabránit, aby viděli vaši aktivitu tady.&lt;br/&gt;&lt;br/&gt;Ale procházejte s námi a budeme moci redukovat, co o vás celkově %3$s ví zablokováním jejich trackerů na mnoha jiných stránkách.</string>
+
+    <!-- Onboarding DDG Feature Options -->
+    <string name="onboardingFeatureOptionsTitle">Co tě přivádí na DuckDuckGo?</string>
+    <string name="onboardingFeatureOptionsContinue">Pokračovat</string>
+    <string name="onboardingFeatureOptionsSkip">Přeskočit tento krok</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionPrivateSearch">Soukromé vyhledávání</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionTrackerBlocking">Blokování trackerů</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionSmallerDigitalFootprint">Menší digitální stopa</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionFasterPageLoads">Rychlejší načítání stránek</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionFewerAds">Méně reklam</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionOneClickDataClearing">Smazání dat jedním kliknutím</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationContinue">Uložit do Stahování</string>
@@ -654,13 +670,13 @@
 
     <!-- Autoconsent -->
     <!-- smartling.character_limit = 82 -->
-    <string name="autoconsentDialogTitle">Vypadá to, že tenhle web má vyskakovací okno pro souhlas se soubory cookie 👇</string>
+    <string name="autoconsentDialogTitle"><![CDATA[<b>Mám se postarat o vyskakovací okna ohledně souhlasu s cookies?</b>]]></string>
     <!-- smartling.character_limit = 160 -->
-    <string name="autoconsentDialogDescription">Mám ho vyřešit za tebe? Můžu zkusit vybrat jen nezbytné soubory cookie, maximalizovat ochranu soukromí a podobná vyskakovací okna odteď skrývat.</string>
+    <string name="autoconsentDialogDescription">Můžu zkusit vybrat nejsoukromější možné nastavení a podobná vyskakovací okna příště skrývat.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Správa vyskakovacích oken ohledně cookies</string>
+    <string name="autoconsentPrimaryCta">Řešit vyskakovací okna za mě</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentSecondaryCta">Ne, děkuji</string>
+    <string name="autoconsentSecondaryCta">Ne, já se o ně postarám</string>
 
     <string name="autoconsentSetting">Správa vyskakovacích oken ohledně cookies</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Skryté vyskakovací okno</string>

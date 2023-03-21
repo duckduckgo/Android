@@ -18,46 +18,39 @@ package com.duckduckgo.remote.messaging.impl.matchers
 
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.AppProperties
-import com.duckduckgo.remote.messaging.impl.models.MATCHING_ATTR_STRING_DEFAULT_VALUE
-import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
-import com.duckduckgo.remote.messaging.impl.models.RangeStringMatchingAttribute
-import com.duckduckgo.remote.messaging.impl.models.StringMatchingAttribute
-import com.duckduckgo.remote.messaging.impl.models.matches
+import com.duckduckgo.remote.messaging.api.AttributeMatcherPlugin
+import com.duckduckgo.remote.messaging.api.MatchingAttribute
+import com.duckduckgo.remote.messaging.impl.models.*
 
 class AndroidAppAttributeMatcher(
     private val appProperties: AppProperties,
     private val appBuildConfig: AppBuildConfig,
-) : AttributeMatcher {
-    override suspend fun evaluate(matchingAttribute: MatchingAttribute): EvaluationResult? {
-        when (matchingAttribute) {
-            is MatchingAttribute.Flavor -> {
-                if (matchingAttribute == MatchingAttribute.Flavor()) return EvaluationResult.Fail
-                return matchingAttribute.matches(appBuildConfig.flavor.toString())
+) : AttributeMatcherPlugin {
+    override suspend fun evaluate(matchingAttribute: MatchingAttribute<*>): Boolean? {
+        return when (matchingAttribute) {
+            is Flavor -> {
+                matchingAttribute.matches(appBuildConfig.flavor.toString())
             }
-            is MatchingAttribute.AppId -> {
-                return matchingAttribute.matches(appBuildConfig.applicationId)
+            is AppId -> {
+                matchingAttribute.matches(appBuildConfig.applicationId)
             }
-            is MatchingAttribute.AppVersion -> {
-                if (matchingAttribute == MatchingAttribute.AppVersion()) return EvaluationResult.Fail
-                if (matchingAttribute.value != MATCHING_ATTR_STRING_DEFAULT_VALUE) {
-                    return (matchingAttribute as StringMatchingAttribute).matches(appBuildConfig.versionName)
-                }
-                return (matchingAttribute as RangeStringMatchingAttribute).matches(appBuildConfig.versionName)
+            is AppVersion -> {
+                matchingAttribute.matches(appBuildConfig.versionName)
             }
-            is MatchingAttribute.Atb -> {
-                return matchingAttribute.matches(appProperties.atb())
+            is Atb -> {
+                matchingAttribute.matches(appProperties.atb())
             }
-            is MatchingAttribute.AppAtb -> {
-                return matchingAttribute.matches(appProperties.appAtb())
+            is AppAtb -> {
+                matchingAttribute.matches(appProperties.appAtb())
             }
-            is MatchingAttribute.SearchAtb -> {
-                return matchingAttribute.matches(appProperties.searchAtb())
+            is SearchAtb -> {
+                matchingAttribute.matches(appProperties.searchAtb())
             }
-            is MatchingAttribute.ExpVariant -> {
-                return matchingAttribute.matches(appProperties.expVariant())
+            is ExpVariant -> {
+                matchingAttribute.matches(appProperties.expVariant())
             }
-            is MatchingAttribute.InstalledGPlay -> {
-                return matchingAttribute.matches(appProperties.installedGPlay())
+            is InstalledGPlay -> {
+                matchingAttribute.matches(appProperties.installedGPlay())
             }
             else -> return null
         }

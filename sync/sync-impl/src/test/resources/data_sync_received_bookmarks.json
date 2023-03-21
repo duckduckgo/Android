@@ -1,0 +1,48 @@
+{
+  "bookmarks": {
+    "last_modified": "2022-08-30T00:00:00Z",
+    "entries": [
+      {
+        "id": "bookmarks_root",
+        "folder": {
+          "children": [
+            "rcv9suHAD8-BDCOpVw2Er"
+          ]
+        }
+      },
+      {
+        "id": "rcv9suHAD8-BDCOpVw2Er",
+        "title": "QmV0dGVyIENhbGwgU2F1bAo=",
+        "page": {
+          "url": "aHR0cHM6Ly9lYXRsb3Nwb2xsb3NoZXJtYW5vcy5jb20="
+        },
+        "deleted": null
+      },
+      {
+        "id": "favorites_root",
+        "folder": {
+          "children": []
+        }
+      }
+    ]
+  },
+  "settings": {
+    "last_modified": "2022-08-30T00:00:00Z",
+    "entries": [
+      {
+        "key": "autofill.ask_to_save.user_and_passwords",
+        "value": "false"
+      }
+    ]
+  },
+  "devices": {
+    "last_modified": "",
+    "entries": [
+      {
+        "device_id": "n79D6uF3hmoYbGGJ8Xesm",
+        "device_name": "My Tablet",
+        "jwt_iat": "2022-10-25T13:14:56.981Z"
+      }
+    ]
+  }
+}

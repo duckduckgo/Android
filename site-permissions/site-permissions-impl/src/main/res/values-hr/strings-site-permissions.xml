@@ -33,6 +33,6 @@
     <string name="systemPermissionDialogAudioDeniedContent">Stranice mogu koristiti tvoj mikrofon samo ako dopustiš DuckDuckGou da zatraži pristup.</string>
     <string name="systemPermissionDialogCameraAndAudioDeniedTitle">Dopusti DuckDuckGou da zatraži pristup kameri i mikrofonu na ovom uređaju</string>
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">Stranice mogu koristiti tvoju kameru i mikrofon samo ako dopustiš DuckDuckGou da zatraži pristup.</string>
-    <string name="systemPermissionsDeniedDialogPositiveButton">Otvorite postavke</string>
+    <string name="systemPermissionsDeniedDialogPositiveButton">Otvori postavke</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Otkaži</string>
 </resources>

@@ -24,20 +24,18 @@ import com.duckduckgo.remote.messaging.api.Content.Medium
 import com.duckduckgo.remote.messaging.api.Content.Placeholder
 import com.duckduckgo.remote.messaging.api.Content.Small
 import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.remote.messaging.impl.models.*
+import com.duckduckgo.remote.messaging.impl.models.JsonActionType.APP_TP_ONBOARDING
 import com.duckduckgo.remote.messaging.impl.models.JsonActionType.DEFAULT_BROWSER
 import com.duckduckgo.remote.messaging.impl.models.JsonActionType.DISMISS
 import com.duckduckgo.remote.messaging.impl.models.JsonActionType.PLAYSTORE
 import com.duckduckgo.remote.messaging.impl.models.JsonActionType.URL
-import com.duckduckgo.remote.messaging.impl.models.JsonContent
-import com.duckduckgo.remote.messaging.impl.models.JsonContentTranslations
-import com.duckduckgo.remote.messaging.impl.models.JsonMessageAction
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.BIG_SINGLE_ACTION
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.BIG_TWO_ACTION
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.MEDIUM
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.SMALL
-import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessage
 import com.duckduckgo.remote.messaging.impl.models.asJsonFormat
-import java.util.*
+import java.util.Locale
 import timber.log.Timber
 
 private val smallMapper: (JsonContent) -> Content = { jsonContent ->
@@ -77,6 +75,7 @@ private val bigMessageTwoActionMapper: (JsonContent) -> Content = { jsonContent 
     )
 }
 
+// plugin point?
 private val messageMappers = mapOf(
     Pair(SMALL.jsonValue, smallMapper),
     Pair(MEDIUM.jsonValue, mediumMapper),
@@ -100,11 +99,17 @@ private val defaultBrowserActionMapper: (JsonMessageAction) -> Action = {
     Action.DefaultBrowser()
 }
 
+private val appTpOnboardingActionMapper: (JsonMessageAction) -> Action = {
+    Action.AppTpOnboarding()
+}
+
+// plugin point?
 private val actionMappers = mapOf(
     Pair(URL.jsonValue, urlActionMapper),
     Pair(DISMISS.jsonValue, dismissActionMapper),
     Pair(PLAYSTORE.jsonValue, playStoreActionMapper),
     Pair(DEFAULT_BROWSER.jsonValue, defaultBrowserActionMapper),
+    Pair(APP_TP_ONBOARDING.jsonValue, appTpOnboardingActionMapper),
 )
 
 fun List<JsonRemoteMessage>.mapToRemoteMessage(locale: Locale): List<RemoteMessage> = this.mapNotNull { it.map(locale) }

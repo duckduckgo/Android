@@ -33,6 +33,6 @@
     <string name="systemPermissionDialogAudioDeniedContent">Οι ιστότοποι μπορούν να χρησιμοποιούν το μικρόφωνό σας μόνο εάν επιτρέψετε στο DuckDuckGo να αιτηθεί πρόσβαση.</string>
     <string name="systemPermissionDialogCameraAndAudioDeniedTitle">Επιτρέψτε στο DuckDuckGo να αιτηθεί πρόσβαση στην κάμερα και στο μικρόφωνο της συσκευής αυτής</string>
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">Οι ιστότοποι μπορούν να χρησιμοποιούν την κάμερα και το μικρόφωνό σας μόνο εάν επιτρέψετε στο DuckDuckGo να αιτηθεί πρόσβαση.</string>
-    <string name="systemPermissionsDeniedDialogPositiveButton">Άνοιγμα Ρυθμίσεων</string>
+    <string name="systemPermissionsDeniedDialogPositiveButton">Άνοιγμα ρυθμίσεων</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Ακύρωση</string>
 </resources>

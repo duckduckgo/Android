@@ -18,9 +18,9 @@ package com.duckduckgo.app.bookmarks.ui.bookmarkfolders
 
 import android.os.Bundle
 import android.view.View
-import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.ui.SavedSiteDialogFragment
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.savedsites.api.models.BookmarkFolder
 
 class EditBookmarkFolderDialogFragment : SavedSiteDialogFragment() {
 
@@ -45,7 +45,7 @@ class EditBookmarkFolderDialogFragment : SavedSiteDialogFragment() {
     }
 
     override fun onConfirmation() {
-        arguments?.getLong(KEY_PARENT_FOLDER_ID)?.let {
+        arguments?.getString(KEY_PARENT_FOLDER_ID)?.let {
             val name = binding.titleInput.text
             if (name.isNotBlank()) {
                 val bookmarkFolder = arguments?.getSerializable(BookmarkFoldersActivity.KEY_CURRENT_FOLDER) as BookmarkFolder
@@ -59,13 +59,13 @@ class EditBookmarkFolderDialogFragment : SavedSiteDialogFragment() {
         const val KEY_PARENT_FOLDER_NAME = "KEY_PARENT_FOLDER_NAME"
 
         fun instance(
-            parentFolderId: Long,
+            parentFolderId: String,
             parentFolderName: String,
             bookmarkFolder: BookmarkFolder,
         ): EditBookmarkFolderDialogFragment {
             val dialogFragment = EditBookmarkFolderDialogFragment()
             val bundle = Bundle()
-            bundle.putLong(KEY_PARENT_FOLDER_ID, parentFolderId)
+            bundle.putString(KEY_PARENT_FOLDER_ID, parentFolderId)
             bundle.putString(KEY_PARENT_FOLDER_NAME, parentFolderName)
             bundle.putSerializable(BookmarkFoldersActivity.KEY_CURRENT_FOLDER, bookmarkFolder)
             dialogFragment.arguments = bundle

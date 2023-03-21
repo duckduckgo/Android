@@ -26,7 +26,7 @@ import com.duckduckgo.app.global.formatters.time.model.dateOfLastWeek
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
-import com.duckduckgo.mobile.android.vpn.network.VpnDetector
+import com.duckduckgo.mobile.android.vpn.network.ExternalVpnDetector
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
@@ -47,7 +47,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     private val deviceShieldPixels: DeviceShieldPixels,
     private val appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository,
     private val vpnStateMonitor: VpnStateMonitor,
-    private val vpnDetector: VpnDetector,
+    private val vpnDetector: ExternalVpnDetector,
     private val vpnFeatureRemover: VpnFeatureRemover,
     private val vpnStore: VpnStore,
     private val dispatcherProvider: DispatcherProvider,
@@ -79,7 +79,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
 
     internal fun onAppTPToggleSwitched(enabled: Boolean) {
         when {
-            enabled && vpnDetector.isVpnDetected() -> sendCommand(Command.ShowVpnConflictDialog)
+            enabled && vpnDetector.isExternalVpnDetected() -> sendCommand(Command.ShowVpnConflictDialog)
             enabled == true -> sendCommand(Command.CheckVPNPermission)
             enabled == false -> sendCommand(Command.ShowDisableVpnConfirmationDialog)
         }

@@ -260,6 +260,10 @@ dependencies {
     implementation project(':windows-impl')
     implementation project(':windows-store')
 
+    implementation project(':saved-sites-api')
+    implementation project(':saved-sites-impl')
+    implementation project(':saved-sites-store')
+
     implementation project(':runtime-checks-impl')
     implementation project(':runtime-checks-store')
 

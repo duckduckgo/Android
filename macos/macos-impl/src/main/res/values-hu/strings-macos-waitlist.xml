@@ -21,7 +21,8 @@
     <string name="macos_title">Szered meg a DuckDuckGo Mac verzióját!</string>
 
     <string name="macos_share_title">Link megosztása</string>
-    <string name="macos_description_text">A DuckDuckGo Mac verziója gyors, böngészési funkciókban gazdag, és kategóriája legjobb adatvédelmi megoldásait kínálja.Mac számítógépén lépj a következő címre:\n<b><font color="#3969EF">duckduckgo.com/mac</font></b></string>
+    <string name="macos_description_text">A DuckDuckGo Mac verziója gyors, böngészési funkciókban gazdag, és kategóriája legjobb adatvédelmi megoldásait kínálja.\n\nMacen lépj erre az oldalra:</string>
+    <string name="macos_description_link">duckduckgo.com/mac</string>
     <string name="macos_share_text">Készen állsz a privát böngészésre a Macen?\n\nA letöltéshez látogass el erre az URL-címre a Macen:\nduckduckgo.com/mac</string>
 
     <string name="macos_waitlist_windows_link">A Windowsra készült verziót keresed?</string>

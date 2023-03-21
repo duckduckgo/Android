@@ -20,9 +20,9 @@ import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
-import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoApplication
+import com.duckduckgo.savedsites.api.SavedSitesRepository
 import javax.inject.Inject
 
 class EmptyFavoritesWidgetService : RemoteViewsService() {
@@ -45,7 +45,7 @@ class EmptyFavoritesWidgetService : RemoteViewsService() {
     ) : RemoteViewsFactory {
 
         @Inject
-        lateinit var favoritesDataRepository: FavoritesRepository
+        lateinit var savedSitesRepository: SavedSitesRepository
 
         private var count = 0
 
@@ -54,7 +54,7 @@ class EmptyFavoritesWidgetService : RemoteViewsService() {
         }
 
         override fun onDataSetChanged() {
-            count = if (favoritesDataRepository.userHasFavorites()) 1 else 0
+            count = if (savedSitesRepository.hasFavorites()) 1 else 0
         }
 
         override fun onDestroy() {

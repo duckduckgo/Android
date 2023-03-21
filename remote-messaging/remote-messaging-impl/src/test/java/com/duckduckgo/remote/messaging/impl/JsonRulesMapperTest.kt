@@ -16,10 +16,11 @@
 
 package com.duckduckgo.remote.messaging.impl
 
+import com.duckduckgo.remote.messaging.api.MatchingAttribute
 import com.duckduckgo.remote.messaging.impl.mappers.mapToMatchingRules
+import com.duckduckgo.remote.messaging.impl.models.*
 import com.duckduckgo.remote.messaging.impl.models.JsonMatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.JsonMatchingRule
-import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
 import java.text.SimpleDateFormat
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -46,8 +47,8 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("flavor", JsonMatchingAttribute(value = emptyList<String>())),
                 ),
                 matchingRule(
-                    MatchingAttribute.Locale(value = listOf("ES"), fallback = null),
-                    MatchingAttribute.Flavor(value = emptyList(), fallback = null),
+                    Locale(value = listOf("ES"), fallback = null),
+                    Flavor(value = emptyList(), fallback = null),
                 ),
             ),
             TestCase(
@@ -56,8 +57,8 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("flavor", JsonMatchingAttribute(value = emptyList<String>(), fallback = false)),
                 ),
                 matchingRule(
-                    MatchingAttribute.Locale(value = listOf("ES"), fallback = true),
-                    MatchingAttribute.Flavor(value = emptyList(), fallback = false),
+                    Locale(value = listOf("ES"), fallback = true),
+                    Flavor(value = emptyList(), fallback = false),
                 ),
             ),
             TestCase(
@@ -66,8 +67,8 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("flavor", JsonMatchingAttribute(fallback = false)),
                 ),
                 matchingRule(
-                    MatchingAttribute.Locale(value = emptyList(), fallback = true),
-                    MatchingAttribute.Flavor(value = emptyList(), fallback = false),
+                    Locale(value = emptyList(), fallback = true),
+                    Flavor(value = emptyList(), fallback = false),
                 ),
             ),
             TestCase(
@@ -76,8 +77,8 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("flavor", JsonMatchingAttribute()),
                 ),
                 matchingRule(
-                    MatchingAttribute.Locale(value = emptyList(), fallback = null),
-                    MatchingAttribute.Flavor(value = emptyList(), fallback = null),
+                    Locale(value = emptyList(), fallback = null),
+                    Flavor(value = emptyList(), fallback = null),
                 ),
             ),
             TestCase(
@@ -86,8 +87,8 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("flavor", JsonMatchingAttribute(value = false)),
                 ),
                 matchingRule(
-                    MatchingAttribute.Unknown(fallback = null),
-                    MatchingAttribute.Unknown(fallback = null),
+                    Unknown(fallback = null),
+                    Unknown(fallback = null),
                 ),
             ),
             TestCase(
@@ -96,8 +97,8 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("flavor", JsonMatchingAttribute(value = false, fallback = true)),
                 ),
                 matchingRule(
-                    MatchingAttribute.Unknown(fallback = true),
-                    MatchingAttribute.Unknown(fallback = true),
+                    Unknown(fallback = true),
+                    Unknown(fallback = true),
                 ),
             ),
             TestCase(
@@ -109,11 +110,11 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("daysSinceInstalled", JsonMatchingAttribute(value = 28)),
                 ),
                 matchingRule(
-                    MatchingAttribute.Api(value = 28, fallback = null),
-                    MatchingAttribute.SearchCount(value = 28, fallback = null),
-                    MatchingAttribute.Bookmarks(value = 28, fallback = null),
-                    MatchingAttribute.Favorites(value = 28, fallback = null),
-                    MatchingAttribute.DaysSinceInstalled(value = 28, fallback = null),
+                    Api(value = 28, fallback = null),
+                    SearchCount(value = 28, fallback = null),
+                    Bookmarks(value = 28, fallback = null),
+                    Favorites(value = 28, fallback = null),
+                    DaysSinceInstalled(value = 28, fallback = null),
                 ),
             ),
             TestCase(
@@ -125,11 +126,11 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("daysSinceInstalled", JsonMatchingAttribute(value = 15, min = 20, max = 28)),
                 ),
                 matchingRule(
-                    MatchingAttribute.Api(value = 15, min = 20, max = 28, fallback = null),
-                    MatchingAttribute.SearchCount(value = 15, min = 20, max = 28, fallback = null),
-                    MatchingAttribute.Bookmarks(value = 15, min = 20, max = 28, fallback = null),
-                    MatchingAttribute.Favorites(value = 15, min = 20, max = 28, fallback = null),
-                    MatchingAttribute.DaysSinceInstalled(value = 15, min = 20, max = 28, fallback = null),
+                    Api(value = 15, min = 20, max = 28, fallback = null),
+                    SearchCount(value = 15, min = 20, max = 28, fallback = null),
+                    Bookmarks(value = 15, min = 20, max = 28, fallback = null),
+                    Favorites(value = 15, min = 20, max = 28, fallback = null),
+                    DaysSinceInstalled(value = 15, min = 20, max = 28, fallback = null),
                 ),
             ),
             TestCase(
@@ -141,11 +142,11 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("daysSinceInstalled", JsonMatchingAttribute(min = 20, max = 28)),
                 ),
                 matchingRule(
-                    MatchingAttribute.Api(min = 20, max = 28, fallback = null),
-                    MatchingAttribute.SearchCount(min = 20, max = 28, fallback = null),
-                    MatchingAttribute.Bookmarks(min = 20, max = 28, fallback = null),
-                    MatchingAttribute.Favorites(min = 20, max = 28, fallback = null),
-                    MatchingAttribute.DaysSinceInstalled(min = 20, max = 28, fallback = null),
+                    Api(min = 20, max = 28, fallback = null),
+                    SearchCount(min = 20, max = 28, fallback = null),
+                    Bookmarks(min = 20, max = 28, fallback = null),
+                    Favorites(min = 20, max = 28, fallback = null),
+                    DaysSinceInstalled(min = 20, max = 28, fallback = null),
                 ),
             ),
             TestCase(
@@ -157,11 +158,11 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("daysSinceInstalled", JsonMatchingAttribute(max = 28)),
                 ),
                 matchingRule(
-                    MatchingAttribute.Api(min = -1, max = 28, fallback = null),
-                    MatchingAttribute.SearchCount(min = -1, max = 28, fallback = null),
-                    MatchingAttribute.Bookmarks(min = -1, max = 28, fallback = null),
-                    MatchingAttribute.Favorites(min = -1, max = 28, fallback = null),
-                    MatchingAttribute.DaysSinceInstalled(min = -1, max = 28, fallback = null),
+                    Api(min = -1, max = 28, fallback = null),
+                    SearchCount(min = -1, max = 28, fallback = null),
+                    Bookmarks(min = -1, max = 28, fallback = null),
+                    Favorites(min = -1, max = 28, fallback = null),
+                    DaysSinceInstalled(min = -1, max = 28, fallback = null),
                 ),
             ),
             TestCase(
@@ -173,11 +174,11 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("daysSinceInstalled", JsonMatchingAttribute(min = 20)),
                 ),
                 matchingRule(
-                    MatchingAttribute.Api(min = 20, max = -1, fallback = null),
-                    MatchingAttribute.SearchCount(min = 20, max = -1, fallback = null),
-                    MatchingAttribute.Bookmarks(min = 20, max = -1, fallback = null),
-                    MatchingAttribute.Favorites(min = 20, max = -1, fallback = null),
-                    MatchingAttribute.DaysSinceInstalled(min = 20, max = -1, fallback = null),
+                    Api(min = 20, max = -1, fallback = null),
+                    SearchCount(min = 20, max = -1, fallback = null),
+                    Bookmarks(min = 20, max = -1, fallback = null),
+                    Favorites(min = 20, max = -1, fallback = null),
+                    DaysSinceInstalled(min = 20, max = -1, fallback = null),
                 ),
             ),
             TestCase(
@@ -189,11 +190,11 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("daysSinceInstalled", JsonMatchingAttribute(min = 20, max = 28, fallback = true)),
                 ),
                 matchingRule(
-                    MatchingAttribute.Api(min = 20, max = 28, fallback = true),
-                    MatchingAttribute.SearchCount(min = 20, max = 28, fallback = true),
-                    MatchingAttribute.Bookmarks(min = 20, max = 28, fallback = true),
-                    MatchingAttribute.Favorites(min = 20, max = 28, fallback = true),
-                    MatchingAttribute.DaysSinceInstalled(min = 20, max = 28, fallback = true),
+                    Api(min = 20, max = 28, fallback = true),
+                    SearchCount(min = 20, max = 28, fallback = true),
+                    Bookmarks(min = 20, max = 28, fallback = true),
+                    Favorites(min = 20, max = 28, fallback = true),
+                    DaysSinceInstalled(min = 20, max = 28, fallback = true),
                 ),
             ),
             TestCase(
@@ -205,11 +206,11 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("daysSinceInstalled", JsonMatchingAttribute(value = "wrong", fallback = true)),
                 ),
                 matchingRule(
-                    MatchingAttribute.Unknown(fallback = true),
-                    MatchingAttribute.Unknown(fallback = true),
-                    MatchingAttribute.Unknown(fallback = true),
-                    MatchingAttribute.Unknown(fallback = true),
-                    MatchingAttribute.Unknown(fallback = true),
+                    Unknown(fallback = true),
+                    Unknown(fallback = true),
+                    Unknown(fallback = true),
+                    Unknown(fallback = true),
+                    Unknown(fallback = true),
                 ),
             ),
             TestCase(
@@ -221,11 +222,11 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("daysSinceInstalled", JsonMatchingAttribute(min = "wrong", fallback = true)),
                 ),
                 matchingRule(
-                    MatchingAttribute.Unknown(fallback = true),
-                    MatchingAttribute.Unknown(fallback = true),
-                    MatchingAttribute.Unknown(fallback = true),
-                    MatchingAttribute.Unknown(fallback = true),
-                    MatchingAttribute.Unknown(fallback = true),
+                    Unknown(fallback = true),
+                    Unknown(fallback = true),
+                    Unknown(fallback = true),
+                    Unknown(fallback = true),
+                    Unknown(fallback = true),
                 ),
             ),
             TestCase(
@@ -237,11 +238,11 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("daysSinceInstalled", JsonMatchingAttribute(value = "wrong")),
                 ),
                 matchingRule(
-                    MatchingAttribute.Unknown(fallback = null),
-                    MatchingAttribute.Unknown(fallback = null),
-                    MatchingAttribute.Unknown(fallback = null),
-                    MatchingAttribute.Unknown(fallback = null),
-                    MatchingAttribute.Unknown(fallback = null),
+                    Unknown(fallback = null),
+                    Unknown(fallback = null),
+                    Unknown(fallback = null),
+                    Unknown(fallback = null),
+                    Unknown(fallback = null),
                 ),
             ),
             TestCase(
@@ -253,11 +254,11 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("daysSinceInstalled", JsonMatchingAttribute()),
                 ),
                 matchingRule(
-                    MatchingAttribute.Api(),
-                    MatchingAttribute.SearchCount(),
-                    MatchingAttribute.Bookmarks(),
-                    MatchingAttribute.Favorites(),
-                    MatchingAttribute.DaysSinceInstalled(),
+                    Api(),
+                    SearchCount(),
+                    Bookmarks(),
+                    Favorites(),
+                    DaysSinceInstalled(),
                 ),
             ),
             TestCase(
@@ -269,11 +270,11 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("daysSinceInstalled", JsonMatchingAttribute(fallback = true)),
                 ),
                 matchingRule(
-                    MatchingAttribute.Api(fallback = true),
-                    MatchingAttribute.SearchCount(fallback = true),
-                    MatchingAttribute.Bookmarks(fallback = true),
-                    MatchingAttribute.Favorites(fallback = true),
-                    MatchingAttribute.DaysSinceInstalled(fallback = true),
+                    Api(fallback = true),
+                    SearchCount(fallback = true),
+                    Bookmarks(fallback = true),
+                    Favorites(fallback = true),
+                    DaysSinceInstalled(fallback = true),
                 ),
             ),
             TestCase(
@@ -282,8 +283,8 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("appVersion", JsonMatchingAttribute(value = "28")),
                 ),
                 matchingRule(
-                    MatchingAttribute.WebView(value = "28", fallback = null),
-                    MatchingAttribute.AppVersion(value = "28", fallback = null),
+                    WebView(value = "28", fallback = null),
+                    AppVersion(value = "28", fallback = null),
                 ),
             ),
             TestCase(
@@ -292,8 +293,8 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("appVersion", JsonMatchingAttribute(value = "15", min = "20", max = "28")),
                 ),
                 matchingRule(
-                    MatchingAttribute.WebView(value = "15", min = "20", max = "28", fallback = null),
-                    MatchingAttribute.AppVersion(value = "15", min = "20", max = "28", fallback = null),
+                    WebView(value = "15", min = "20", max = "28", fallback = null),
+                    AppVersion(value = "15", min = "20", max = "28", fallback = null),
                 ),
             ),
             TestCase(
@@ -302,8 +303,8 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("appVersion", JsonMatchingAttribute(min = "20", max = "28")),
                 ),
                 matchingRule(
-                    MatchingAttribute.WebView(min = "20", max = "28", fallback = null),
-                    MatchingAttribute.AppVersion(min = "20", max = "28", fallback = null),
+                    WebView(min = "20", max = "28", fallback = null),
+                    AppVersion(min = "20", max = "28", fallback = null),
                 ),
             ),
             TestCase(
@@ -312,8 +313,8 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("appVersion", JsonMatchingAttribute(min = "20")),
                 ),
                 matchingRule(
-                    MatchingAttribute.WebView(min = "20", max = "", fallback = null),
-                    MatchingAttribute.AppVersion(min = "20", max = "", fallback = null),
+                    WebView(min = "20", max = "", fallback = null),
+                    AppVersion(min = "20", max = "", fallback = null),
                 ),
             ),
             TestCase(
@@ -322,8 +323,8 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("appVersion", JsonMatchingAttribute(max = "28")),
                 ),
                 matchingRule(
-                    MatchingAttribute.WebView(min = "", max = "28", fallback = null),
-                    MatchingAttribute.AppVersion(min = "", max = "28", fallback = null),
+                    WebView(min = "", max = "28", fallback = null),
+                    AppVersion(min = "", max = "28", fallback = null),
                 ),
             ),
             TestCase(
@@ -332,8 +333,8 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("appVersion", JsonMatchingAttribute(min = "20", max = "28", fallback = true)),
                 ),
                 matchingRule(
-                    MatchingAttribute.WebView(min = "20", max = "28", fallback = true),
-                    MatchingAttribute.AppVersion(min = "20", max = "28", fallback = true),
+                    WebView(min = "20", max = "28", fallback = true),
+                    AppVersion(min = "20", max = "28", fallback = true),
                 ),
             ),
             TestCase(
@@ -342,8 +343,8 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("appVersion", JsonMatchingAttribute()),
                 ),
                 matchingRule(
-                    MatchingAttribute.WebView(min = "", max = "", fallback = null),
-                    MatchingAttribute.AppVersion(min = "", max = "", fallback = null),
+                    WebView(min = "", max = "", fallback = null),
+                    AppVersion(min = "", max = "", fallback = null),
                 ),
             ),
             TestCase(
@@ -352,8 +353,8 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("appVersion", JsonMatchingAttribute(fallback = true)),
                 ),
                 matchingRule(
-                    MatchingAttribute.WebView(min = "", max = "", fallback = true),
-                    MatchingAttribute.AppVersion(min = "", max = "", fallback = true),
+                    WebView(min = "", max = "", fallback = true),
+                    AppVersion(min = "", max = "", fallback = true),
                 ),
             ),
             TestCase(
@@ -364,10 +365,10 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("widgetAdded", JsonMatchingAttribute(value = true)),
                 ),
                 matchingRule(
-                    MatchingAttribute.InstalledGPlay(value = true),
-                    MatchingAttribute.DefaultBrowser(value = true),
-                    MatchingAttribute.EmailEnabled(value = true),
-                    MatchingAttribute.WidgetAdded(value = true),
+                    InstalledGPlay(value = true),
+                    DefaultBrowser(value = true),
+                    EmailEnabled(value = true),
+                    WidgetAdded(value = true),
                 ),
             ),
             TestCase(
@@ -378,10 +379,10 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("widgetAdded", JsonMatchingAttribute(value = true, fallback = true)),
                 ),
                 matchingRule(
-                    MatchingAttribute.InstalledGPlay(value = true, fallback = true),
-                    MatchingAttribute.DefaultBrowser(value = true, fallback = true),
-                    MatchingAttribute.EmailEnabled(value = true, fallback = true),
-                    MatchingAttribute.WidgetAdded(value = true, fallback = true),
+                    InstalledGPlay(value = true, fallback = true),
+                    DefaultBrowser(value = true, fallback = true),
+                    EmailEnabled(value = true, fallback = true),
+                    WidgetAdded(value = true, fallback = true),
                 ),
             ),
             TestCase(
@@ -392,10 +393,10 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("widgetAdded", JsonMatchingAttribute(value = "wrong")),
                 ),
                 matchingRule(
-                    MatchingAttribute.Unknown(fallback = null),
-                    MatchingAttribute.Unknown(fallback = null),
-                    MatchingAttribute.Unknown(fallback = null),
-                    MatchingAttribute.Unknown(fallback = null),
+                    Unknown(fallback = null),
+                    Unknown(fallback = null),
+                    Unknown(fallback = null),
+                    Unknown(fallback = null),
                 ),
             ),
             TestCase(
@@ -406,10 +407,10 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("widgetAdded", JsonMatchingAttribute(value = "wrong", fallback = true)),
                 ),
                 matchingRule(
-                    MatchingAttribute.Unknown(fallback = true),
-                    MatchingAttribute.Unknown(fallback = true),
-                    MatchingAttribute.Unknown(fallback = true),
-                    MatchingAttribute.Unknown(fallback = true),
+                    Unknown(fallback = true),
+                    Unknown(fallback = true),
+                    Unknown(fallback = true),
+                    Unknown(fallback = true),
                 ),
             ),
             TestCase(
@@ -420,10 +421,10 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("widgetAdded", JsonMatchingAttribute()),
                 ),
                 matchingRule(
-                    MatchingAttribute.Unknown(fallback = null),
-                    MatchingAttribute.Unknown(fallback = null),
-                    MatchingAttribute.Unknown(fallback = null),
-                    MatchingAttribute.Unknown(fallback = null),
+                    Unknown(fallback = null),
+                    Unknown(fallback = null),
+                    Unknown(fallback = null),
+                    Unknown(fallback = null),
                 ),
             ),
             TestCase(
@@ -434,10 +435,10 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("widgetAdded", JsonMatchingAttribute(fallback = true)),
                 ),
                 matchingRule(
-                    MatchingAttribute.Unknown(fallback = true),
-                    MatchingAttribute.Unknown(fallback = true),
-                    MatchingAttribute.Unknown(fallback = true),
-                    MatchingAttribute.Unknown(fallback = true),
+                    Unknown(fallback = true),
+                    Unknown(fallback = true),
+                    Unknown(fallback = true),
+                    Unknown(fallback = true),
                 ),
             ),
             TestCase(
@@ -450,12 +451,12 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("appTheme", JsonMatchingAttribute(value = "light")),
                 ),
                 matchingRule(
-                    MatchingAttribute.AppId(value = "com.duckduckgo.mobile.android.debug"),
-                    MatchingAttribute.Atb(value = "v298-8"),
-                    MatchingAttribute.AppAtb(value = "v298-8"),
-                    MatchingAttribute.SearchAtb(value = "v298-8"),
-                    MatchingAttribute.ExpVariant(value = "zo"),
-                    MatchingAttribute.AppTheme(value = "light"),
+                    AppId(value = "com.duckduckgo.mobile.android.debug"),
+                    Atb(value = "v298-8"),
+                    AppAtb(value = "v298-8"),
+                    SearchAtb(value = "v298-8"),
+                    ExpVariant(value = "zo"),
+                    AppTheme(value = "light"),
                 ),
             ),
             TestCase(
@@ -468,12 +469,12 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("appTheme", JsonMatchingAttribute(value = "light", fallback = true)),
                 ),
                 matchingRule(
-                    MatchingAttribute.AppId(value = "com.duckduckgo.mobile.android.debug", fallback = true),
-                    MatchingAttribute.Atb(value = "v298-8", fallback = true),
-                    MatchingAttribute.AppAtb(value = "v298-8", fallback = true),
-                    MatchingAttribute.SearchAtb(value = "v298-8", fallback = true),
-                    MatchingAttribute.ExpVariant(value = "zo", fallback = true),
-                    MatchingAttribute.AppTheme(value = "light", fallback = true),
+                    AppId(value = "com.duckduckgo.mobile.android.debug", fallback = true),
+                    Atb(value = "v298-8", fallback = true),
+                    AppAtb(value = "v298-8", fallback = true),
+                    SearchAtb(value = "v298-8", fallback = true),
+                    ExpVariant(value = "zo", fallback = true),
+                    AppTheme(value = "light", fallback = true),
                 ),
             ),
             TestCase(
@@ -486,12 +487,12 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("appTheme", JsonMatchingAttribute(value = 15)),
                 ),
                 matchingRule(
-                    MatchingAttribute.Unknown(fallback = null),
-                    MatchingAttribute.Unknown(fallback = null),
-                    MatchingAttribute.Unknown(fallback = null),
-                    MatchingAttribute.Unknown(fallback = null),
-                    MatchingAttribute.Unknown(fallback = null),
-                    MatchingAttribute.Unknown(fallback = null),
+                    Unknown(fallback = null),
+                    Unknown(fallback = null),
+                    Unknown(fallback = null),
+                    Unknown(fallback = null),
+                    Unknown(fallback = null),
+                    Unknown(fallback = null),
                 ),
             ),
             TestCase(
@@ -504,12 +505,12 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("appTheme", JsonMatchingAttribute(value = 15, fallback = true)),
                 ),
                 matchingRule(
-                    MatchingAttribute.Unknown(fallback = true),
-                    MatchingAttribute.Unknown(fallback = true),
-                    MatchingAttribute.Unknown(fallback = true),
-                    MatchingAttribute.Unknown(fallback = true),
-                    MatchingAttribute.Unknown(fallback = true),
-                    MatchingAttribute.Unknown(fallback = true),
+                    Unknown(fallback = true),
+                    Unknown(fallback = true),
+                    Unknown(fallback = true),
+                    Unknown(fallback = true),
+                    Unknown(fallback = true),
+                    Unknown(fallback = true),
                 ),
             ),
             TestCase(
@@ -522,12 +523,12 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("appTheme", JsonMatchingAttribute()),
                 ),
                 matchingRule(
-                    MatchingAttribute.AppId(value = "", fallback = null),
-                    MatchingAttribute.Atb(value = "", fallback = null),
-                    MatchingAttribute.AppAtb(value = "", fallback = null),
-                    MatchingAttribute.SearchAtb(value = "", fallback = null),
-                    MatchingAttribute.ExpVariant(value = "", fallback = null),
-                    MatchingAttribute.AppTheme(value = "", fallback = null),
+                    AppId(value = "", fallback = null),
+                    Atb(value = "", fallback = null),
+                    AppAtb(value = "", fallback = null),
+                    SearchAtb(value = "", fallback = null),
+                    ExpVariant(value = "", fallback = null),
+                    AppTheme(value = "", fallback = null),
                 ),
             ),
             TestCase(
@@ -540,12 +541,12 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("appTheme", JsonMatchingAttribute(fallback = true)),
                 ),
                 matchingRule(
-                    MatchingAttribute.AppId(value = "", fallback = true),
-                    MatchingAttribute.Atb(value = "", fallback = true),
-                    MatchingAttribute.AppAtb(value = "", fallback = true),
-                    MatchingAttribute.SearchAtb(value = "", fallback = true),
-                    MatchingAttribute.ExpVariant(value = "", fallback = true),
-                    MatchingAttribute.AppTheme(value = "", fallback = true),
+                    AppId(value = "", fallback = true),
+                    Atb(value = "", fallback = true),
+                    AppAtb(value = "", fallback = true),
+                    SearchAtb(value = "", fallback = true),
+                    ExpVariant(value = "", fallback = true),
+                    AppTheme(value = "", fallback = true),
                 ),
             ),
             TestCase(
@@ -553,7 +554,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("daysUsedSince", JsonMatchingAttribute(since = "2020-08-09", value = 2)),
                 ),
                 matchingRule(
-                    MatchingAttribute.DaysUsedSince(since = SimpleDateFormat("yyyy-mm-dd").parse("2020-08-09")!!, value = 2),
+                    DaysUsedSince(since = SimpleDateFormat("yyyy-mm-dd").parse("2020-08-09")!!, value = 2),
                 ),
             ),
             TestCase(
@@ -561,7 +562,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("daysUsedSince", JsonMatchingAttribute(since = "2020-08-09", value = 2, fallback = true)),
                 ),
                 matchingRule(
-                    MatchingAttribute.DaysUsedSince(since = SimpleDateFormat("yyyy-mm-dd").parse("2020-08-09")!!, value = 2, fallback = true),
+                    DaysUsedSince(since = SimpleDateFormat("yyyy-mm-dd").parse("2020-08-09")!!, value = 2, fallback = true),
                 ),
             ),
             TestCase(
@@ -569,7 +570,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("daysUsedSince", JsonMatchingAttribute(since = "20200809", value = 2, fallback = true)),
                 ),
                 matchingRule(
-                    MatchingAttribute.Unknown(fallback = true),
+                    Unknown(fallback = true),
                 ),
             ),
             TestCase(
@@ -577,7 +578,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("daysUsedSince", JsonMatchingAttribute(since = "wrong", value = "wrong")),
                 ),
                 matchingRule(
-                    MatchingAttribute.Unknown(fallback = null),
+                    Unknown(fallback = null),
                 ),
             ),
             TestCase(
@@ -585,7 +586,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("daysUsedSince", JsonMatchingAttribute(since = "wrong", value = "wrong", fallback = true)),
                 ),
                 matchingRule(
-                    MatchingAttribute.Unknown(fallback = true),
+                    Unknown(fallback = true),
                 ),
             ),
             TestCase(
@@ -593,7 +594,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("daysUsedSince", JsonMatchingAttribute()),
                 ),
                 matchingRule(
-                    MatchingAttribute.Unknown(fallback = null),
+                    Unknown(fallback = null),
                 ),
             ),
             TestCase(
@@ -601,7 +602,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("daysUsedSince", JsonMatchingAttribute(fallback = true)),
                 ),
                 matchingRule(
-                    MatchingAttribute.Unknown(fallback = true),
+                    Unknown(fallback = true),
                 ),
             ),
             TestCase(
@@ -610,8 +611,8 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("unknown2", JsonMatchingAttribute(value = "test", fallback = true)),
                 ),
                 matchingRule(
-                    MatchingAttribute.Unknown(fallback = null),
-                    MatchingAttribute.Unknown(fallback = true),
+                    Unknown(fallback = null),
+                    Unknown(fallback = true),
                 ),
             ),
         )
@@ -623,10 +624,10 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
             )
         }
 
-        private fun matchingRule(vararg matchingAttribute: MatchingAttribute): Map<Int, List<MatchingAttribute>> {
+        private fun matchingRule(vararg matchingAttribute: MatchingAttribute<*>): Map<Int, List<MatchingAttribute<*>>> {
             return mapOf(Pair(5, matchingAttribute.toList()))
         }
     }
 
-    data class TestCase(val jsonMatchingRule: JsonMatchingRule, val matchingRules: Map<Int, List<MatchingAttribute>>)
+    data class TestCase(val jsonMatchingRule: JsonMatchingRule, val matchingRules: Map<Int, List<MatchingAttribute<*>>>)
 }

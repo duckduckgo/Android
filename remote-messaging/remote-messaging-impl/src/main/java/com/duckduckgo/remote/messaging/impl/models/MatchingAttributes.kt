@@ -16,128 +16,250 @@
 
 package com.duckduckgo.remote.messaging.impl.models
 
-import com.duckduckgo.remote.messaging.impl.matchers.EvaluationResult
-import com.duckduckgo.remote.messaging.impl.matchers.toResult
+import com.duckduckgo.remote.messaging.api.MatchingAttribute
 import java.util.*
 import timber.log.Timber
 
-sealed class MatchingAttribute {
-    data class Locale(
-        override val value: List<String> = emptyList(),
-        val fallback: Boolean? = null,
-    ) : MatchingAttribute(), StringArrayMatchingAttribute
+data class Locale(
+    override val value: List<String> = emptyList(),
+    val fallback: Boolean? = null,
+) : MatchingAttribute<String>, StringArrayMatchingAttribute {
+    override fun matches(matchingValue: String): Boolean? {
+        if (this == Locale()) return false
+        return (this as StringArrayMatchingAttribute).matches(matchingValue)
+    }
+}
 
-    data class Api(
-        override val min: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
-        override val max: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
-        override val value: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
-        val fallback: Boolean? = null,
-    ) : MatchingAttribute(), RangeIntMatchingAttribute, IntMatchingAttribute
+data class Api(
+    override val min: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
+    override val max: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
+    override val value: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
+    val fallback: Boolean? = null,
+) : MatchingAttribute<Int>, RangeIntMatchingAttribute, IntMatchingAttribute {
+    override fun matches(matchingValue: Int): Boolean? {
+        if (this == Api()) return false
 
-    data class WebView(
-        override val min: String = MATCHING_ATTR_STRING_DEFAULT_VALUE,
-        override val max: String = MATCHING_ATTR_STRING_DEFAULT_VALUE,
-        override val value: String = MATCHING_ATTR_STRING_DEFAULT_VALUE,
-        val fallback: Boolean? = null,
-    ) : MatchingAttribute(), RangeStringMatchingAttribute, StringMatchingAttribute
+        if (this.value != MATCHING_ATTR_INT_DEFAULT_VALUE) {
+            return (this as IntMatchingAttribute).matches(matchingValue)
+        }
+        return (this as RangeIntMatchingAttribute).matches(matchingValue)
+    }
+}
 
-    data class Flavor(
-        override val value: List<String> = emptyList(),
-        val fallback: Boolean? = null,
-    ) : MatchingAttribute(), StringArrayMatchingAttribute
+data class WebView(
+    override val min: String = MATCHING_ATTR_STRING_DEFAULT_VALUE,
+    override val max: String = MATCHING_ATTR_STRING_DEFAULT_VALUE,
+    override val value: String = MATCHING_ATTR_STRING_DEFAULT_VALUE,
+    val fallback: Boolean? = null,
+) : MatchingAttribute<String>, RangeStringMatchingAttribute, StringMatchingAttribute {
+    override fun matches(matchingValue: String): Boolean? {
+        if (this == WebView()) return false
+        if (value != MATCHING_ATTR_STRING_DEFAULT_VALUE) {
+            return (this as StringMatchingAttribute).matches(matchingValue)
+        }
+        return (this as RangeStringMatchingAttribute).matches(matchingValue)
+    }
+}
 
-    data class AppId(
-        override val value: String = MATCHING_ATTR_STRING_DEFAULT_VALUE,
-        val fallback: Boolean? = null,
-    ) : MatchingAttribute(), StringMatchingAttribute
+data class Flavor(
+    override val value: List<String> = emptyList(),
+    val fallback: Boolean? = null,
+) : MatchingAttribute<String>, StringArrayMatchingAttribute {
+    override fun matches(matchingValue: String): Boolean? {
+        if (this == Flavor()) return false
+        return (this as StringArrayMatchingAttribute).matches(matchingValue)
+    }
+}
 
-    data class AppVersion(
-        override val min: String = MATCHING_ATTR_STRING_DEFAULT_VALUE,
-        override val max: String = MATCHING_ATTR_STRING_DEFAULT_VALUE,
-        override val value: String = MATCHING_ATTR_STRING_DEFAULT_VALUE,
-        val fallback: Boolean? = null,
-    ) : MatchingAttribute(), RangeStringMatchingAttribute, StringMatchingAttribute
+data class AppId(
+    override val value: String = MATCHING_ATTR_STRING_DEFAULT_VALUE,
+    val fallback: Boolean? = null,
+) : MatchingAttribute<String>, StringMatchingAttribute {
+    override fun matches(matchingValue: String): Boolean? {
+        return (this as StringMatchingAttribute).matches(matchingValue)
+    }
+}
 
-    data class Atb(
-        override val value: String = MATCHING_ATTR_STRING_DEFAULT_VALUE,
-        val fallback: Boolean? = null,
-    ) : MatchingAttribute(), StringMatchingAttribute
+data class AppVersion(
+    override val min: String = MATCHING_ATTR_STRING_DEFAULT_VALUE,
+    override val max: String = MATCHING_ATTR_STRING_DEFAULT_VALUE,
+    override val value: String = MATCHING_ATTR_STRING_DEFAULT_VALUE,
+    val fallback: Boolean? = null,
+) : MatchingAttribute<String>, RangeStringMatchingAttribute, StringMatchingAttribute {
+    override fun matches(matchingValue: String): Boolean? {
+        if (this == AppVersion()) return false
+        if (value != MATCHING_ATTR_STRING_DEFAULT_VALUE) {
+            return (this as StringMatchingAttribute).matches(matchingValue)
+        }
+        return (this as RangeStringMatchingAttribute).matches(matchingValue)
+    }
+}
 
-    data class AppAtb(
-        override val value: String = MATCHING_ATTR_STRING_DEFAULT_VALUE,
-        val fallback: Boolean? = null,
-    ) : MatchingAttribute(), StringMatchingAttribute
+data class Atb(
+    override val value: String = MATCHING_ATTR_STRING_DEFAULT_VALUE,
+    val fallback: Boolean? = null,
+) : MatchingAttribute<String>, StringMatchingAttribute {
+    override fun matches(matchingValue: String): Boolean? {
+        return (this as StringMatchingAttribute).matches(matchingValue)
+    }
+}
 
-    data class SearchAtb(
-        override val value: String = MATCHING_ATTR_STRING_DEFAULT_VALUE,
-        val fallback: Boolean? = null,
-    ) : MatchingAttribute(), StringMatchingAttribute
+data class AppAtb(
+    override val value: String = MATCHING_ATTR_STRING_DEFAULT_VALUE,
+    val fallback: Boolean? = null,
+) : MatchingAttribute<String>, StringMatchingAttribute {
+    override fun matches(matchingValue: String): Boolean? {
+        return (this as StringMatchingAttribute).matches(matchingValue)
+    }
+}
 
-    data class ExpVariant(
-        override val value: String = MATCHING_ATTR_STRING_DEFAULT_VALUE,
-        val fallback: Boolean? = null,
-    ) : MatchingAttribute(), StringMatchingAttribute
+data class SearchAtb(
+    override val value: String = MATCHING_ATTR_STRING_DEFAULT_VALUE,
+    val fallback: Boolean? = null,
+) : MatchingAttribute<String>, StringMatchingAttribute {
+    override fun matches(matchingValue: String): Boolean? {
+        return (this as StringMatchingAttribute).matches(matchingValue)
+    }
+}
 
-    data class InstalledGPlay(
-        override val value: Boolean,
-        val fallback: Boolean? = null,
-    ) : MatchingAttribute(), BooleanMatchingAttribute
+data class ExpVariant(
+    override val value: String = MATCHING_ATTR_STRING_DEFAULT_VALUE,
+    val fallback: Boolean? = null,
+) : MatchingAttribute<String>, StringMatchingAttribute {
+    override fun matches(matchingValue: String): Boolean? {
+        return (this as StringMatchingAttribute).matches(matchingValue)
+    }
+}
 
-    data class DefaultBrowser(
-        override val value: Boolean,
-        val fallback: Boolean? = null,
-    ) : MatchingAttribute(), BooleanMatchingAttribute
+data class InstalledGPlay(
+    override val value: Boolean,
+    val fallback: Boolean? = null,
+) : MatchingAttribute<Boolean>, BooleanMatchingAttribute {
+    override fun matches(matchingValue: Boolean): Boolean? {
+        return (this as BooleanMatchingAttribute).matches(matchingValue)
+    }
+}
 
-    data class EmailEnabled(
-        override val value: Boolean,
-        val fallback: Boolean? = null,
-    ) : MatchingAttribute(), BooleanMatchingAttribute
+data class DefaultBrowser(
+    override val value: Boolean,
+    val fallback: Boolean? = null,
+) : MatchingAttribute<Boolean>, BooleanMatchingAttribute {
+    override fun matches(matchingValue: Boolean): Boolean? {
+        return (this as BooleanMatchingAttribute).matches(matchingValue)
+    }
+}
 
-    data class WidgetAdded(
-        override val value: Boolean,
-        val fallback: Boolean? = null,
-    ) : MatchingAttribute(), BooleanMatchingAttribute
+data class EmailEnabled(
+    override val value: Boolean,
+    val fallback: Boolean? = null,
+) : MatchingAttribute<Boolean>, BooleanMatchingAttribute {
+    override fun matches(matchingValue: Boolean): Boolean? {
+        return (this as BooleanMatchingAttribute).matches(matchingValue)
+    }
+}
 
-    data class SearchCount(
-        override val min: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
-        override val max: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
-        override val value: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
-        val fallback: Boolean? = null,
-    ) : MatchingAttribute(), RangeIntMatchingAttribute, IntMatchingAttribute
+data class AppTpOnboarded(
+    override val value: Boolean,
+    val fallback: Boolean? = null,
+) : MatchingAttribute<Boolean>, BooleanMatchingAttribute {
+    override fun matches(matchingValue: Boolean): Boolean? {
+        return (this as BooleanMatchingAttribute).matches(matchingValue)
+    }
+}
 
-    data class Bookmarks(
-        override val min: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
-        override val max: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
-        override val value: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
-        val fallback: Boolean? = null,
-    ) : MatchingAttribute(), RangeIntMatchingAttribute, IntMatchingAttribute
+data class WidgetAdded(
+    override val value: Boolean,
+    val fallback: Boolean? = null,
+) : MatchingAttribute<Boolean>, BooleanMatchingAttribute {
+    override fun matches(matchingValue: Boolean): Boolean? {
+        return (this as BooleanMatchingAttribute).matches(matchingValue)
+    }
+}
 
-    data class Favorites(
-        override val min: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
-        override val max: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
-        override val value: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
-        val fallback: Boolean? = null,
-    ) : MatchingAttribute(), RangeIntMatchingAttribute, IntMatchingAttribute
+data class SearchCount(
+    override val min: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
+    override val max: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
+    override val value: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
+    val fallback: Boolean? = null,
+) : MatchingAttribute<Int>, RangeIntMatchingAttribute, IntMatchingAttribute {
+    override fun matches(matchingValue: Int): Boolean? {
+        if (this == SearchCount()) return false
+        if (value != MATCHING_ATTR_INT_DEFAULT_VALUE) {
+            return (this as IntMatchingAttribute).matches(matchingValue)
+        }
+        return (this as RangeIntMatchingAttribute).matches(matchingValue)
+    }
+}
 
-    data class AppTheme(
-        override val value: String = MATCHING_ATTR_STRING_DEFAULT_VALUE,
-        val fallback: Boolean? = null,
-    ) : MatchingAttribute(), StringMatchingAttribute
+data class Bookmarks(
+    override val min: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
+    override val max: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
+    override val value: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
+    val fallback: Boolean? = null,
+) : MatchingAttribute<Int>, RangeIntMatchingAttribute, IntMatchingAttribute {
+    override fun matches(matchingValue: Int): Boolean? {
+        if (this == Bookmarks()) return false
+        if (value != MATCHING_ATTR_INT_DEFAULT_VALUE) {
+            return (this as IntMatchingAttribute).matches(matchingValue)
+        }
+        return (this as RangeIntMatchingAttribute).matches(matchingValue)
+    }
+}
 
-    data class DaysSinceInstalled(
-        override val min: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
-        override val max: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
-        override val value: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
-        val fallback: Boolean? = null,
-    ) : MatchingAttribute(), RangeIntMatchingAttribute, IntMatchingAttribute
+data class Favorites(
+    override val min: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
+    override val max: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
+    override val value: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
+    val fallback: Boolean? = null,
+) : MatchingAttribute<Int>, RangeIntMatchingAttribute, IntMatchingAttribute {
+    override fun matches(matchingValue: Int): Boolean? {
+        if (this == Favorites()) return false
+        if (value != MATCHING_ATTR_INT_DEFAULT_VALUE) {
+            return (this as IntMatchingAttribute).matches(matchingValue)
+        }
+        return (this as RangeIntMatchingAttribute).matches(matchingValue)
+    }
+}
 
-    data class DaysUsedSince(
-        override val since: Date,
-        override val value: Int,
-        val fallback: Boolean? = null,
-    ) : MatchingAttribute(), DateMatchingAttribute
+data class AppTheme(
+    override val value: String = MATCHING_ATTR_STRING_DEFAULT_VALUE,
+    val fallback: Boolean? = null,
+) : MatchingAttribute<String>, StringMatchingAttribute {
+    override fun matches(matchingValue: String): Boolean? {
+        return (this as StringMatchingAttribute).matches(matchingValue)
+    }
+}
 
-    data class Unknown(val fallback: Boolean?) : MatchingAttribute()
+data class DaysSinceInstalled(
+    override val min: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
+    override val max: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
+    override val value: Int = MATCHING_ATTR_INT_DEFAULT_VALUE,
+    val fallback: Boolean? = null,
+) : MatchingAttribute<Int>, RangeIntMatchingAttribute, IntMatchingAttribute {
+    override fun matches(matchingValue: Int): Boolean? {
+        if (this == DaysSinceInstalled()) return false
+
+        if (value != MATCHING_ATTR_INT_DEFAULT_VALUE) {
+            return (this as IntMatchingAttribute).matches(matchingValue)
+        }
+        return (this as RangeIntMatchingAttribute).matches(matchingValue)
+    }
+}
+
+data class DaysUsedSince(
+    override val since: Date,
+    override val value: Int,
+    val fallback: Boolean? = null,
+) : MatchingAttribute<Int>, DateMatchingAttribute {
+    override fun matches(matchingValue: Int): Boolean? {
+        return (this as DateMatchingAttribute).matches(matchingValue)
+    }
+}
+
+data class Unknown(val fallback: Boolean?) : MatchingAttribute<Unit> {
+    override fun matches(matchingValue: Unit): Boolean? {
+        return fallback
+    }
 }
 
 interface RangeIntMatchingAttribute {
@@ -171,53 +293,53 @@ interface DateMatchingAttribute {
     val value: Int
 }
 
-fun StringArrayMatchingAttribute.matches(value: String): EvaluationResult {
-    this.value.find { it.equals(value, true) } ?: return false.toResult()
-    return true.toResult()
+fun StringArrayMatchingAttribute.matches(value: String): Boolean? {
+    this.value.find { it.equals(value, true) } ?: return false
+    return true
 }
 
-fun BooleanMatchingAttribute.matches(value: Boolean): EvaluationResult {
-    return (this.value == value).toResult()
+fun BooleanMatchingAttribute.matches(value: Boolean): Boolean? {
+    return (this.value == value)
 }
 
-fun IntMatchingAttribute.matches(value: Int): EvaluationResult {
-    return (this.value == value).toResult()
+fun IntMatchingAttribute.matches(value: Int): Boolean {
+    return (this.value == value)
 }
 
-fun RangeIntMatchingAttribute.matches(value: Int): EvaluationResult {
+fun RangeIntMatchingAttribute.matches(value: Int): Boolean {
     if ((this.min.isDefaultValue() || value >= this.min) &&
         (this.max.isDefaultValue() || value <= this.max)
     ) {
-        return true.toResult()
+        return true
     }
 
-    return false.toResult()
+    return false
 }
 
-fun DateMatchingAttribute.matches(value: Int): EvaluationResult {
+fun DateMatchingAttribute.matches(value: Int): Boolean {
     if ((this.value.isDefaultValue() || value == this.value)) {
-        return true.toResult()
+        return true
     }
-    return false.toResult()
+    return false
 }
 
-fun StringMatchingAttribute.matches(value: String): EvaluationResult {
-    return this.value.equals(value, ignoreCase = true).toResult()
+fun StringMatchingAttribute.matches(value: String): Boolean? {
+    return this.value.equals(value, ignoreCase = true)
 }
 
-fun RangeStringMatchingAttribute.matches(value: String): EvaluationResult {
+fun RangeStringMatchingAttribute.matches(value: String): Boolean? {
     Timber.i("RMF: device value: $value")
-    if (!value.matches(Regex("[0-9]+(\\.[0-9]+)*"))) return false.toResult()
+    if (!value.matches(Regex("[0-9]+(\\.[0-9]+)*"))) return false
 
     val versionAsIntList = value.split(".").filter { it.isNotEmpty() }.map { it.toInt() }
     val minVersionAsIntList = this.min.split(".").filter { it.isNotEmpty() }.map { it.toInt() }
     val maxVersionAsIntList = this.max.split(".").filter { it.isNotEmpty() }.map { it.toInt() }
 
-    if (versionAsIntList.isEmpty()) return false.toResult()
-    if (versionAsIntList.compareTo(minVersionAsIntList) <= -1) return false.toResult()
-    if (versionAsIntList.compareTo(maxVersionAsIntList) >= 1) return false.toResult()
+    if (versionAsIntList.isEmpty()) return false
+    if (versionAsIntList.compareTo(minVersionAsIntList) <= -1) return false
+    if (versionAsIntList.compareTo(maxVersionAsIntList) >= 1) return false
 
-    return true.toResult()
+    return true
 }
 
 private fun List<Int>.compareTo(other: List<Int>): Int {
@@ -248,7 +370,7 @@ internal fun Any?.toIntOrDefault(default: Int): Int = when {
 
 internal fun Any?.toStringOrDefault(default: String): String = this?.let { it as String } ?: default
 
-internal fun Locale.asJsonFormat() = "$language-$country"
+internal fun java.util.Locale.asJsonFormat() = "$language-$country"
 
 const val MATCHING_ATTR_INT_DEFAULT_VALUE = -1
 const val MATCHING_ATTR_STRING_DEFAULT_VALUE = ""

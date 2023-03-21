@@ -104,7 +104,7 @@
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Închidere</string>
     <string name="closeAllTabsMenuItem">Închide toate filele</string>
-    <string name="closeTab">Închide</string>
+    <string name="closeTab">Închidere filă</string>
     <string name="tabClosed">Filă închisă</string>
     <string name="tabClosedUndo">Anulează</string>
     <string name="downloadsMenuItemTitle">Descărcări</string>
@@ -245,7 +245,7 @@
     <string name="surveyCtaLaunchButton">Participă la sondaj</string>
     <string name="surveyCtaDismissButton">Nu, mulțumesc</string>
     <string name="surveyActivityTitle">Sondajul utilizatorului</string>
-    <string name="surveyTitle">SONDAJ DUCKDUCKGO</string>
+    <string name="surveyTitle">Sondaj DuckDuckGo</string>
     <string name="surveyDismissContentDescription">Renunță la sondaj</string>
     <string name="surveyLoadingErrorTitle">Oh, nu!</string>
     <string name="surveyLoadingErrorText">Sondajul nostru nu se încarcă.\nTe rugăm să încercerci din nou, mai târziu.</string>
@@ -366,14 +366,14 @@
     <string name="tellUsHowToImprove">Te rugăm să ne spui ce putem îmbunătăți.</string>
     <string name="thanksForTheFeedback">Îți mulțumim pentru feedback!</string>
     <string name="feedbackNegativeMainReasonPageSubtitle">Ce aspect te deranjează cel mai tare?</string>
-    <string name="feedbackNegativeMainReasonPageTitle">Ne pare rău să auzim aceasta</string>
+    <string name="feedbackNegativeMainReasonPageTitle">Ne pare rău de experiența ta</string>
     <string name="feedbackShareDetails">Trimite detalii</string>
     <string name="sharePositiveFeedbackWithTheTeam">Există detalii pe care dorești să le împărtășești echipei?</string>
     <string name="whatHaveYouBeenEnjoying">Ce ți-a plăcut?</string>
     <string name="awesomeToHear">Ne bucurăm să auzim aceasta!</string>
     <string name="shareTheLoveWithARating">Te rugăm să împărtășești experiența ta, evaluând aplicația în Play Store.</string>
     <string name="rateTheApp">Evaluează aplicația</string>
-    <string name="declineFurtherFeedback">NU, MULȚUMESC, AM TERMINAT</string>
+    <string name="declineFurtherFeedback">Nu mulțumesc, am terminat</string>
     <string name="whichBrokenSites">Unde vezi aceste probleme?</string>
     <string name="whichBrokenSitesHint">Ce site web are probleme?</string>
     <string name="feedbackSpecificAsPossible">Te rugăm să furnizezi detalii cât mai concrete</string>
@@ -389,7 +389,6 @@
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">De pe acest dispozitiv</string>
-    <string name="systemSearchOmnibarInputHint"><font size="13">Căutare sau tastare URL</font></string>
     <string name="systemSearchAppNotFound">Aplicația nu a fost găsită</string>
     <string name="systemSearchOnboardingText">Mulțumim pentru că ai ales DuckDuckGo!\nAcum, când utilizezi căutarea sau aplicația noastră, căutările tale sunt protejate.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">De asemenea, aplicația DuckDuckGo:</string>
@@ -430,6 +429,23 @@
     <string name="daxNonSerpCtaText"><![CDATA[În timp ce atingi și derulezi, voi bloca urmăritorii pisălogi. <br/><br/>Dă-i bătaie - continuă să navighezi!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Atenție! Nu pot împiedica utilizatorul %1$s să îți vadă activitatea pe %2$s.&lt;br/&gt;&lt;br/&gt;Dar navighează cu mine și pot limita ceea ce știe %3$s despre tine în general, blocându-i instrumentul de urmărire pe o mulțime de alte site-uri.</string>
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Atenție! Deoarece %1$s deține %2$s, nu îi pot împiedica să îți vadă activitatea aici.&lt;br/&gt;&lt;br/&gt;Dar navighează cu mine și pot reduce ceea ce %3$s cunoaște despre tine în general, blocând instrumentele lor de urmărire pe o mulțime de alte site-uri.</string>
+
+    <!-- Onboarding DDG Feature Options -->
+    <string name="onboardingFeatureOptionsTitle">Ce te aduce la DuckDuckGo?</string>
+    <string name="onboardingFeatureOptionsContinue">Continuă</string>
+    <string name="onboardingFeatureOptionsSkip">Omite acest pas</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionPrivateSearch">Căutare Confidențială</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionTrackerBlocking">Blocarea urmăririi</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionSmallerDigitalFootprint">Urme digitale mai mici</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionFasterPageLoads">Încărcări mai rapide ale paginilor</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionFewerAds">Mai puține reclame</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionOneClickDataClearing">Ștergerea datelor cu un clic</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationContinue">Salvează în Descărcări</string>
@@ -650,13 +666,13 @@
 
     <!-- Autoconsent -->
     <!-- smartling.character_limit = 82 -->
-    <string name="autoconsentDialogTitle">Acest site are o fereastră pop-up pentru consimțământul privind modulele cookie👇</string>
+    <string name="autoconsentDialogTitle"><![CDATA[<b>Vrei să mă ocup de ferestrele pop-up cu module cookie?</b>]]></string>
     <!-- smartling.character_limit = 160 -->
-    <string name="autoconsentDialogDescription">Vrei să mă ocup de asta pentru tine? Pot să încerc să minimizez numărul de module cookie, să maximizez confidențialitatea și să ascund ferestrele pop-up precum aceasta.</string>
+    <string name="autoconsentDialogDescription">Pot încerca să selectez cele mai private setări disponibile și să ascund ferestrele pop-up de acest tip.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Gestionare pop-up-uri pentru module cookie</string>
+    <string name="autoconsentPrimaryCta">Gestionează ferestrele pop-up în locul meu</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentSecondaryCta">Nu, mulțumesc</string>
+    <string name="autoconsentSecondaryCta">Nu, le voi gestiona personal</string>
 
     <string name="autoconsentSetting">Gestionează ferestrele pop-up cu privire la modulele cookie</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Pop-up ascuns</string>
