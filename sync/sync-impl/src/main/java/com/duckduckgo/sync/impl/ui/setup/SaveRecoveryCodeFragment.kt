@@ -108,7 +108,6 @@ class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_c
                 )
                 binding.qrCodeImageView.show()
                 binding.qrCodeImageView.setImageBitmap(bitmap)
-
                 binding.recoveryCodeText.text = viewMode.b64RecoveryCode
             }
 
