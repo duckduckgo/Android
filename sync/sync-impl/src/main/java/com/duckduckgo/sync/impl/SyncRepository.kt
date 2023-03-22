@@ -29,9 +29,9 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import timber.log.Timber
 import javax.inject.*
 import kotlin.DeprecationLevel.WARNING
-import timber.log.Timber
 
 interface SyncRepository {
     fun createAccount(): Result<Boolean>
@@ -49,6 +49,7 @@ interface SyncRepository {
     fun deleteAccount(): Result<Boolean>
     fun latestToken(): String
     fun getRecoveryCode(): String?
+    fun getThisConnectedDevice(): Result<ConnectedDevice>
     fun getConnectedDevices(): Result<List<ConnectedDevice>>
     fun getConnectQR(): Result<String>
     fun connectDevice(contents: String): Result<Boolean>
@@ -260,6 +261,17 @@ class AppSyncRepository @Inject constructor(
 
     override fun latestToken(): String {
         return syncStore.token ?: ""
+    }
+
+    override fun getThisConnectedDevice(): Result<ConnectedDevice> {
+        return Result.Success(
+            ConnectedDevice(
+                thisDevice = true,
+                deviceName = syncStore.deviceName.orEmpty(),
+                deviceType = syncDeviceIds.deviceType(),
+                deviceId = syncStore.deviceId.orEmpty()
+            ),
+        )
     }
 
     override fun getConnectedDevices(): Result<List<ConnectedDevice>> {

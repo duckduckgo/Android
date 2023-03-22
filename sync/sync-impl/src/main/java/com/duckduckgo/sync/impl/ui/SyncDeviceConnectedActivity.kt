@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -27,15 +28,15 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.databinding.ActivityDeviceConnectedBinding
-import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command
-import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.ViewState
+import com.duckduckgo.sync.impl.ui.SyncDeviceConnectedViewModel.Command
+import com.duckduckgo.sync.impl.ui.SyncDeviceConnectedViewModel.ViewState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
 class SyncDeviceConnectedActivity : DuckDuckGoActivity() {
     private val binding: ActivityDeviceConnectedBinding by viewBinding()
-    private val viewModel: SyncLoginViewModel by bindViewModel()
+    private val viewModel: SyncDeviceConnectedViewModel by bindViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,6 +62,8 @@ class SyncDeviceConnectedActivity : DuckDuckGoActivity() {
     }
 
     private fun renderViewState(viewState: ViewState) {
+        binding.connectedDeviceItem.setPrimaryText(viewState.deviceName)
+        binding.connectedDeviceItem.setLeadingIconDrawable(ContextCompat.getDrawable(this, viewState.deviceType)!!)
     }
 
     companion object {
