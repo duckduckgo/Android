@@ -38,7 +38,7 @@ class RuntimeChecksContentScopeConfigPluginTest {
 
     @Test
     fun whenGetConfigThenReturnCorrectlyFormattedJson() {
-        whenever(mockRuntimeChecksRepository.runtimeChecksEntity).thenReturn(RuntimeChecksEntity(json = config))
+        whenever(mockRuntimeChecksRepository.getRuntimeChecksEntity()).thenReturn(RuntimeChecksEntity(json = config))
         assertEquals("\"runtimeChecks\":$config", testee.config())
     }
 
