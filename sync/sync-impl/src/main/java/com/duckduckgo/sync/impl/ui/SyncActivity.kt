@@ -60,11 +60,6 @@ class SyncActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
         observeUiEvents()
-        configureListeners()
-    }
-
-    private fun configureListeners() {
-        binding.deviceSyncStatusToggle.setOnCheckedChangeListener(deviceSyncStatusToggleListener)
     }
 
     private fun observeUiEvents() {
@@ -76,7 +71,7 @@ class SyncActivity : DuckDuckGoActivity() {
 
         viewModel
             .commands()
-            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
     }
