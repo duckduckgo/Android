@@ -21,9 +21,11 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.SyncRepository
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
+import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.LoginSucess
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.ReadQRCode
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.ReadTextCode
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -51,6 +53,8 @@ class SyncLoginViewModel @Inject constructor(
     sealed class Command {
         object ReadQRCode : Command()
         object ReadTextCode : Command()
+        object LoginSucess : Command()
+        object Error: Command()
     }
 
     fun onReadQRCodeClicked() {
@@ -65,7 +69,14 @@ class SyncLoginViewModel @Inject constructor(
         }
     }
 
-    fun onConnectQRScanned(contents: String) {
-        TODO("Not yet implemented")
+    fun onConnectQRScanned(qrCode: String) {
+        viewModelScope.launch(dispatchers.io()) {
+            val result = syncRepository.login(qrCode)
+            if (result is Error) {
+                command.send(Command.Error)
+            } else {
+                command.send(LoginSucess)
+            }
+        }
     }
 }

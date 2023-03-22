@@ -29,6 +29,8 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.databinding.ActivityLoginSyncBinding
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command
+import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.Error
+import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.LoginSucess
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.ReadQRCode
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.ReadTextCode
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.ViewState
@@ -80,6 +82,8 @@ class SyncLoginActivity : DuckDuckGoActivity() {
         when (it) {
             ReadQRCode -> barcodeConnectLauncher.launch(getScanOptions())
             ReadTextCode -> TODO()
+            Error -> finish()
+            LoginSucess -> Toast.makeText(this, "Success", Toast.LENGTH_LONG).show()
         }
     }
 
