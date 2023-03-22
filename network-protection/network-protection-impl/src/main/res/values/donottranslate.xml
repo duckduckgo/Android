@@ -40,4 +40,15 @@
     <string name="netpBannerReconnecting">Connection interrupted. Attempting to reconnect now…</string>
     <string name="netpBannerReconnectionFailed">Failed to connect. Please try again later.</string>
 
+    <!-- VPN conflict -->
+    <string name="netpVpnConflictTitle">Your VPN app may be disconnected</string>
+    <string name="netpVpnConflictMessage">Android only allows one active VPN connection at a time. Enabling Network Protection may disconnect any active VPN on your device.</string>
+    <string name="netpActionGotIt">Got it</string>
+
+    <!-- Always on -->
+    <string name="netpAlwaysOnVpnConflictTitle">Your VPN app is blocking Network Protection</string>
+    <string name="netpAlwaysOnVpnConflictMessage">Android only allows one active VPN connection at a time. Open Network settings > VPN. Find the VPN app that’s “always-on” and disable it to continue.</string>
+    <string name="netpActionOpenSettings">Open Settings</string>
+    <string name="netpActionCancel">Cancel</string>
+
 </resources>

@@ -20,6 +20,7 @@ import android.content.Intent
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.mobile.android.vpn.network.ExternalVpnDetector
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.DISABLED
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.ENABLED
@@ -32,6 +33,9 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowReconnectingFailed
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.CheckVPNPermission
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.RequestVPNPermission
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ResetToggle
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowVpnAlwaysOnConflictDialog
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowVpnConflictDialog
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionDetails
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Connected
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Connecting
@@ -72,6 +76,9 @@ class NetworkProtectionManagementViewModelTest {
 
     @Mock
     private lateinit var reconnectNotifications: NetPReconnectNotifications
+
+    @Mock
+    private lateinit var externalVpnDetector: ExternalVpnDetector
     private lateinit var testee: NetworkProtectionManagementViewModel
 
     @Before
@@ -84,6 +91,7 @@ class NetworkProtectionManagementViewModelTest {
             networkProtectionRepository,
             coroutineRule.testDispatcherProvider,
             reconnectNotifications,
+            externalVpnDetector,
         )
     }
 
@@ -111,10 +119,54 @@ class NetworkProtectionManagementViewModelTest {
     }
 
     @Test
+    fun whenExternalVPNDetectedAndOnNetpToggleClickedTrueThenEmitShowVpnConflictDialog() = runTest {
+        whenever(externalVpnDetector.isExternalVpnDetected()).thenReturn(true)
+
+        testee.commands().test {
+            testee.onNetpToggleClicked(true)
+            assertEquals(ShowVpnConflictDialog, this.awaitItem())
+        }
+    }
+
+    @Test
+    fun whenNoExternalVPNDetectedAndOnNetpToggleClickedTrueThenEmitCheckVPNPermission() = runTest {
+        whenever(externalVpnDetector.isExternalVpnDetected()).thenReturn(false)
+
+        testee.commands().test {
+            testee.onNetpToggleClicked(true)
+            assertEquals(CheckVPNPermission, this.awaitItem())
+        }
+    }
+
+    @Test
+    fun wheOnVPNPermissionRejectedWithTimeToLastVPNRequestDiffLessThan500ThenEmitShowVpnAlwaysOnConflictDialog() = runTest {
+        testee.commands().test {
+            val intent = Intent()
+            testee.onRequiredPermissionNotGranted(intent, 600)
+            testee.onVPNPermissionRejected(1000)
+            assertEquals(RequestVPNPermission(intent), this.awaitItem())
+            assertEquals(ResetToggle, this.awaitItem())
+            assertEquals(ShowVpnAlwaysOnConflictDialog, this.awaitItem())
+        }
+    }
+
+    @Test
+    fun whenOnVPNPermissionRejectedWithTimeToLastVPNRequestDiffGreaterThan500ThenDoNotShowAlwaysOnConflictDialog() = runTest {
+        testee.commands().test {
+            val intent = Intent()
+            testee.onRequiredPermissionNotGranted(intent, 600)
+            testee.onVPNPermissionRejected(1200)
+            assertEquals(RequestVPNPermission(intent), this.awaitItem())
+            assertEquals(ResetToggle, this.awaitItem())
+            this.ensureAllEventsConsumed()
+        }
+    }
+
+    @Test
     fun whenOnRequiredPermissionNotGrantedThenEmitRequestVPNPermission() = runTest {
         testee.commands().test {
             val intent = Intent()
-            testee.onRequiredPermissionNotGranted(intent)
+            testee.onRequiredPermissionNotGranted(intent, 1000)
             assertEquals(RequestVPNPermission(intent), this.awaitItem())
         }
     }
@@ -241,6 +293,7 @@ class NetworkProtectionManagementViewModelTest {
             networkProtectionRepository,
             coroutineRule.testDispatcherProvider,
             reconnectNotifications,
+            externalVpnDetector,
         )
 
         whenever(vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(
@@ -274,6 +327,7 @@ class NetworkProtectionManagementViewModelTest {
             networkProtectionRepository,
             coroutineRule.testDispatcherProvider,
             reconnectNotifications,
+            externalVpnDetector,
         )
 
         whenever(vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(
@@ -307,6 +361,7 @@ class NetworkProtectionManagementViewModelTest {
             networkProtectionRepository,
             coroutineRule.testDispatcherProvider,
             reconnectNotifications,
+            externalVpnDetector,
         )
 
         whenever(vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(

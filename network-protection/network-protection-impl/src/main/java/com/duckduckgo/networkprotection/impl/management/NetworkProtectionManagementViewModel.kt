@@ -28,6 +28,7 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.mobile.android.vpn.network.ExternalVpnDetector
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.DISABLED
@@ -66,6 +67,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     private val networkProtectionRepository: NetworkProtectionRepository,
     private val dispatcherProvider: DispatcherProvider,
     private val reconnectNotifications: NetPReconnectNotifications,
+    private val externalVpnDetector: ExternalVpnDetector,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private var reconnectStateFlow = MutableStateFlow(networkProtectionRepository.reconnectStatus)
@@ -75,6 +77,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
 
     private var isTimerTickRunning: Boolean = false
     private var timerTickJob = ConflatedJob()
+    private var lastVpnRequestTime = -1L
 
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
 
@@ -192,16 +195,29 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         }
     }
 
-    fun onRequiredPermissionNotGranted(vpnIntent: Intent) {
+    fun onRequiredPermissionNotGranted(vpnIntent: Intent, lastVpnRequestTimeInMillis: Long) {
+        lastVpnRequestTime = lastVpnRequestTimeInMillis
         sendCommand(RequestVPNPermission(vpnIntent))
     }
 
     fun onNetpToggleClicked(enabled: Boolean) {
         if (enabled) {
-            sendCommand(CheckVPNPermission)
+            if (externalVpnDetector.isExternalVpnDetected()) {
+                sendCommand(Command.ShowVpnConflictDialog)
+            } else {
+                sendCommand(CheckVPNPermission)
+            }
         } else {
             onStopVpn()
         }
+    }
+
+    fun onVPNPermissionRejected(rejectTimeInMillis: Long) {
+        sendCommand(Command.ResetToggle)
+        if (rejectTimeInMillis - lastVpnRequestTime < 500) {
+            sendCommand(Command.ShowVpnAlwaysOnConflictDialog)
+        }
+        lastVpnRequestTime = -1L
     }
 
     fun onStartVpn() {
@@ -237,6 +253,9 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     sealed class Command {
         object CheckVPNPermission : Command()
         data class RequestVPNPermission(val vpnIntent: Intent) : Command()
+        object ShowVpnAlwaysOnConflictDialog : Command()
+        object ShowVpnConflictDialog : Command()
+        object ResetToggle : Command()
     }
 
     data class ViewState(

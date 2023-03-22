@@ -16,10 +16,14 @@
 
 package com.duckduckgo.networkprotection.impl.management
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.VpnService
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
+import android.util.Log
 import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.net.toUri
@@ -28,8 +32,10 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.addClickableLink
+import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.mobile.android.ui.view.show
@@ -43,18 +49,25 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionDetails
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ViewState
+import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
 class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
 
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
+
     private val binding: ActivityNetpManagementBinding by viewBinding()
     private val viewModel: NetworkProtectionManagementViewModel by bindViewModel()
     private val vpnPermissionRequestActivityResult =
         registerForActivityResult(StartActivityForResult()) {
+            Log.d("KL", "result code: ${it.resultCode}")
             if (it.resultCode == RESULT_OK) {
                 viewModel.onStartVpn()
+            } else {
+                viewModel.onVPNPermissionRejected(System.currentTimeMillis())
             }
         }
     private val toggleChangeListener = OnCheckedChangeListener { _, isChecked ->
@@ -102,7 +115,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
             ConnectionState.Connecting -> binding.renderConnectingState()
             ConnectionState.Connected -> viewState.connectionDetails?.let { binding.renderConnectedState(it) }
             ConnectionState.Disconnected -> binding.renderDisconnectedState()
-            else -> { }
+            else -> {}
         }
 
         when (viewState.alertState) {
@@ -111,6 +124,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
             None -> binding.netPAlert.gone()
         }
     }
+
     private fun ActivityNetpManagementBinding.renderAlertReconnecting() {
         netPAlert.setText(resources.getString(R.string.netpBannerReconnecting))
         netPAlert.show()
@@ -163,6 +177,9 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         when (command) {
             is Command.CheckVPNPermission -> checkVPNPermission()
             is Command.RequestVPNPermission -> requestVPNPermission(command.vpnIntent)
+            is Command.ShowVpnAlwaysOnConflictDialog -> showAlwaysOnConflictDialog()
+            is Command.ShowVpnConflictDialog -> showVpnConflictDialog()
+            is Command.ResetToggle -> resetToggle()
         }
     }
 
@@ -173,7 +190,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
             }
             is VpnPermissionStatus.Denied -> {
                 binding.netpToggle.quietlySetChecked(false)
-                viewModel.onRequiredPermissionNotGranted(permissionStatus.intent)
+                viewModel.onRequiredPermissionNotGranted(permissionStatus.intent, System.currentTimeMillis())
             }
         }
     }
@@ -189,6 +206,68 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
 
     private fun requestVPNPermission(intent: Intent) {
         vpnPermissionRequestActivityResult.launch(intent)
+    }
+
+    private fun showAlwaysOnConflictDialog() {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.netpAlwaysOnVpnConflictTitle)
+            .setMessage(R.string.netpAlwaysOnVpnConflictMessage)
+            .setPositiveButton(R.string.netpActionOpenSettings)
+            .setNegativeButton(R.string.netpActionCancel)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        onVpnConflictDialogGoToSettings()
+                    }
+
+                    override fun onNegativeButtonClicked() {}
+                },
+            )
+            .show()
+    }
+
+    private fun showVpnConflictDialog() {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.netpVpnConflictTitle)
+            .setMessage(R.string.netpVpnConflictMessage)
+            .setPositiveButton(R.string.netpActionGotIt)
+            .setNegativeButton(R.string.netpActionCancel)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        onVpnConflictDialogContinue()
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        resetToggle()
+                    }
+                },
+            )
+            .show()
+    }
+
+    private fun onVpnConflictDialogContinue() {
+        checkVPNPermission()
+    }
+
+    fun onVpnConflictDialogGoToSettings() {
+        openVPNSettings()
+    }
+
+    @SuppressLint("InlinedApi")
+    private fun openVPNSettings() {
+        val intent = if (appBuildConfig.sdkInt >= Build.VERSION_CODES.N) {
+            Intent(Settings.ACTION_VPN_SETTINGS)
+        } else {
+            Intent("android.net.vpn.SETTINGS")
+        }
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
+    }
+
+    private fun resetToggle() {
+        binding.netpToggle.isEnabled = true
+        binding.netpToggle.quietlySetChecked(false)
     }
 
     private fun TwoLineListItem.quietlySetChecked(isChecked: Boolean) {
