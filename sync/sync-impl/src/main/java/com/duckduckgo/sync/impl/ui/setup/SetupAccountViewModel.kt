@@ -23,12 +23,14 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.SyncRepository
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.DEVICE_CONNECTED
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_CODE
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SETUP
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.Close
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.RecoverSyncData
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSaveRecoveryCode
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSyncAnotherDevice
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.DeviceConnected
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.TurnOnSync
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -52,6 +54,7 @@ class SetupAccountViewModel @Inject constructor(
         val viewMode = when (screen) {
             SETUP -> TurnOnSync
             RECOVERY_CODE -> AskSaveRecoveryCode
+            DEVICE_CONNECTED -> DeviceConnected
         }
         emit(ViewState(viewMode))
     }
@@ -66,6 +69,7 @@ class SetupAccountViewModel @Inject constructor(
         object TurnOnSync : ViewMode()
         object AskSyncAnotherDevice : ViewMode()
         object AskSaveRecoveryCode : ViewMode()
+        object DeviceConnected : ViewMode()
     }
 
     sealed class Command {
@@ -92,6 +96,12 @@ class SetupAccountViewModel @Inject constructor(
                             command.send(Close)
                         }
                     }
+
+                    DeviceConnected -> {
+                        viewModelScope.launch {
+                            command.send(Close)
+                        }
+                    }
                 }
             }
         }
@@ -112,6 +122,12 @@ class SetupAccountViewModel @Inject constructor(
     fun onRecoverYourSyncedData() {
         viewModelScope.launch {
             command.send(RecoverSyncData)
+        }
+    }
+
+    fun onLoginSucess() {
+        viewModelScope.launch {
+            viewState.emit(ViewState(viewMode = DeviceConnected))
         }
     }
 }

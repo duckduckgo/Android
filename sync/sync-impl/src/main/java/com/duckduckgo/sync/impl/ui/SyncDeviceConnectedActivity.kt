@@ -19,33 +19,54 @@ package com.duckduckgo.sync.impl.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.global.DuckDuckGoFragment
+import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivityDeviceConnectedBinding
 import com.duckduckgo.sync.impl.ui.SyncDeviceConnectedViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncDeviceConnectedViewModel.Command.FinishSetupFlow
 import com.duckduckgo.sync.impl.ui.SyncDeviceConnectedViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeFragment
+import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_CODE
+import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowFragment.SetupFlowListener
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.*
 
-@InjectWith(ActivityScope::class)
-class SyncDeviceConnectedActivity : DuckDuckGoActivity() {
+@InjectWith(FragmentScope::class)
+class SyncDeviceConnectedFragment : DuckDuckGoFragment(R.layout.activity_device_connected) {
+
+    @Inject
+    lateinit var viewModelFactory: FragmentViewModelFactory
+
     private val binding: ActivityDeviceConnectedBinding by viewBinding()
-    private val viewModel: SyncDeviceConnectedViewModel by bindViewModel()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(binding.root)
+    private val viewModel: SyncDeviceConnectedViewModel by lazy {
+        ViewModelProvider(this, viewModelFactory)[SyncDeviceConnectedViewModel::class.java]
+    }
+
+    private val listener: SetupFlowListener?
+        get() = activity as? SetupFlowListener
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
+        super.onViewCreated(view, savedInstanceState)
         observeUiEvents()
     }
 
@@ -65,22 +86,21 @@ class SyncDeviceConnectedActivity : DuckDuckGoActivity() {
 
     private fun processCommand(it: Command) {
         when(it) {
-            FinishSetupFlow -> startActivity(SetupAccountActivity.intent(this, RECOVERY_CODE))
+            FinishSetupFlow -> listener?.launchFinishSetupFlow()
         }
     }
 
     private fun renderViewState(viewState: ViewState) {
         binding.connectedDeviceItem.setPrimaryText(viewState.deviceName)
-        binding.connectedDeviceItem.setLeadingIconDrawable(ContextCompat.getDrawable(this, viewState.deviceType)!!)
+        binding.connectedDeviceItem.setLeadingIconDrawable(ContextCompat.getDrawable(requireContext(), viewState.deviceType)!!)
         binding.footerPrimaryButton.setOnClickListener {
             viewModel.onNextClicked()
         }
     }
 
     companion object {
-        fun intent(context: Context): Intent {
-            return Intent(context, SyncDeviceConnectedActivity::class.java)
-        }
+        fun instance() = SyncDeviceConnectedFragment()
     }
+
 }
 

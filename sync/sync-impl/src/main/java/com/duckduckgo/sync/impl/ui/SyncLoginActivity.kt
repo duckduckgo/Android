@@ -82,8 +82,15 @@ class SyncLoginActivity : DuckDuckGoActivity() {
         when (it) {
             ReadQRCode -> barcodeConnectLauncher.launch(getScanOptions())
             ReadTextCode -> TODO()
-            Error -> finish()
-            LoginSucess -> Toast.makeText(this, "Success", Toast.LENGTH_LONG).show()
+            Error -> {
+                setResult(RESULT_CANCELED)
+                finish()
+            }
+            LoginSucess -> {
+                Toast.makeText(this, "Success", Toast.LENGTH_LONG).show()
+                setResult(RESULT_OK)
+                finish()
+            }
         }
     }
 
