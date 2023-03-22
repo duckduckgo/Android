@@ -26,5 +26,5 @@ interface DeviceSyncState {
     /**
      * Checks if user is signed in on this device.
      */
-    fun isDeviceSyncEnabled(): Boolean
+    fun isUserSignedInOnDevice(): Boolean
 }
