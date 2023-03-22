@@ -49,8 +49,10 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
     private val binding: ActivitySyncSetupAccountBinding by viewBinding()
     private val viewModel: SetupAccountViewModel by bindViewModel()
 
+    private lateinit var screen: Screen
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        screen = intent.getSerializableExtra(SETUP_ACCOUNT_SCREEN_EXTRA) as? Screen ?: Screen.SETUP
         setContentView(binding.root)
         observeUiEvents()
         configureListeners()
@@ -69,7 +71,7 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
 
     private fun observeUiEvents() {
         viewModel
-            .viewState()
+            .viewState(screen)
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { viewState -> renderViewState(viewState) }
             .launchIn(lifecycleScope)
@@ -127,8 +129,22 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
     companion object {
         private const val TAG_ENABLE_SYNC = "tag_enable_sync"
         private const val TAG_RECOVER_ACCOUNT = "tag_recover_account"
+
+        enum class Screen {
+            SETUP,
+            RECOVERY_CODE,
+        }
+
+        const val SETUP_ACCOUNT_SCREEN_EXTRA = "SETUP_ACCOUNT_SCREEN_EXTRA"
+
         fun intent(context: Context): Intent {
             return Intent(context, SetupAccountActivity::class.java)
+        }
+
+        fun intent(context: Context, screen: Screen): Intent {
+            return Intent(context, SetupAccountActivity::class.java).apply {
+                putExtra(SETUP_ACCOUNT_SCREEN_EXTRA, screen)
+            }
         }
     }
 }

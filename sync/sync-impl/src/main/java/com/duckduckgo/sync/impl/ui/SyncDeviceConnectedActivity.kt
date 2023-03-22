@@ -29,7 +29,12 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.databinding.ActivityDeviceConnectedBinding
 import com.duckduckgo.sync.impl.ui.SyncDeviceConnectedViewModel.Command
+import com.duckduckgo.sync.impl.ui.SyncDeviceConnectedViewModel.Command.FinishSetupFlow
 import com.duckduckgo.sync.impl.ui.SyncDeviceConnectedViewModel.ViewState
+import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeFragment
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_CODE
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -59,11 +64,17 @@ class SyncDeviceConnectedActivity : DuckDuckGoActivity() {
     }
 
     private fun processCommand(it: Command) {
+        when(it) {
+            FinishSetupFlow -> startActivity(SetupAccountActivity.intent(this, RECOVERY_CODE))
+        }
     }
 
     private fun renderViewState(viewState: ViewState) {
         binding.connectedDeviceItem.setPrimaryText(viewState.deviceName)
         binding.connectedDeviceItem.setLeadingIconDrawable(ContextCompat.getDrawable(this, viewState.deviceType)!!)
+        binding.footerPrimaryButton.setOnClickListener {
+            viewModel.onNextClicked()
+        }
     }
 
     companion object {

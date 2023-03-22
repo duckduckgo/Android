@@ -22,18 +22,23 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.SyncRepository
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_CODE
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SETUP
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.Close
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.RecoverSyncData
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSaveRecoveryCode
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSyncAnotherDevice
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.TurnOnSync
-import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import javax.inject.*
 
 @ContributesViewModel(ActivityScope::class)
 class SetupAccountViewModel @Inject constructor(
@@ -42,8 +47,15 @@ class SetupAccountViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
-    private val viewState = MutableStateFlow(ViewState())
-    fun viewState(): Flow<ViewState> = viewState
+    private val viewState = MutableStateFlow<ViewState?>(null)
+    fun viewState(screen: Screen): Flow<ViewState> = viewState.filterNotNull().onStart {
+        val viewMode = when (screen) {
+            SETUP -> TurnOnSync
+            RECOVERY_CODE -> AskSaveRecoveryCode
+        }
+        emit(ViewState(viewMode))
+    }
+
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
     data class ViewState(
@@ -63,20 +75,22 @@ class SetupAccountViewModel @Inject constructor(
 
     fun onBackPressed() {
         viewModelScope.launch {
-            when (viewState.value.viewMode) {
-                AskSyncAnotherDevice -> {
-                    viewState.emit(viewState.value.copy(viewMode = TurnOnSync))
-                }
-
-                TurnOnSync -> {
-                    viewModelScope.launch {
-                        command.send(Close)
+            viewState.value?.let {
+                when (it.viewMode) {
+                    AskSyncAnotherDevice -> {
+                        viewState.emit(it.copy(viewMode = TurnOnSync))
                     }
-                }
 
-                AskSaveRecoveryCode -> {
-                    viewModelScope.launch {
-                        command.send(Close)
+                    TurnOnSync -> {
+                        viewModelScope.launch {
+                            command.send(Close)
+                        }
+                    }
+
+                    AskSaveRecoveryCode -> {
+                        viewModelScope.launch {
+                            command.send(Close)
+                        }
                     }
                 }
             }
@@ -85,13 +99,13 @@ class SetupAccountViewModel @Inject constructor(
 
     fun onAskSyncAnotherDevice() {
         viewModelScope.launch {
-            viewState.emit(viewState.value.copy(viewMode = AskSyncAnotherDevice))
+            viewState.emit(ViewState(viewMode = AskSyncAnotherDevice))
         }
     }
 
     fun finishSetupFlow() {
         viewModelScope.launch {
-            viewState.emit(viewState.value.copy(viewMode = AskSaveRecoveryCode))
+            viewState.emit(ViewState(viewMode = AskSaveRecoveryCode))
         }
     }
 
