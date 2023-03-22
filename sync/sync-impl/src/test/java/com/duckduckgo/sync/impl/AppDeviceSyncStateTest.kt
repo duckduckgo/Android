@@ -35,7 +35,7 @@ internal class AppDeviceSyncStateTest {
     fun whenUserSignedInThenDeviceSyncEnabled() {
         whenever(syncRepository.isSignedIn()).thenReturn(true)
         val appDeviceSyncState = AppDeviceSyncState(appBuildConfig, syncFeature, syncRepository)
-        assertTrue(appDeviceSyncState.isDeviceSyncEnabled())
+        assertTrue(appDeviceSyncState.isUserSignedInOnDevice())
     }
 
     @Test

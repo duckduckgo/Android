@@ -35,7 +35,7 @@ class AppDeviceSyncState @Inject constructor(
     private val syncRepository: SyncRepository,
 ) : DeviceSyncState {
 
-    override fun isDeviceSyncEnabled(): Boolean = syncRepository.isSignedIn()
+    override fun isUserSignedInOnDevice(): Boolean = syncRepository.isSignedIn()
 
     override fun isFeatureEnabled(): Boolean {
         return syncFeature.self().isEnabled() || appBuildConfig.isInternalBuild()

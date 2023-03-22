@@ -795,9 +795,9 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenSyncFeatureEnabledAndDeviceSyncEnabledThenSettingVisibleAndStateEnabled() = runTest {
+    fun whenSyncFeatureEnabledAndUserSignedInOnDeviceThenSettingVisibleAndStateEnabled() = runTest {
         whenever(deviceSyncState.isFeatureEnabled()).thenReturn(true)
-        whenever(deviceSyncState.isDeviceSyncEnabled()).thenReturn(true)
+        whenever(deviceSyncState.isUserSignedInOnDevice()).thenReturn(true)
         testee.start()
 
         testee.viewState().test {

@@ -30,5 +30,5 @@ import javax.inject.*
 )
 class FakeDeviceSyncState @Inject constructor() : DeviceSyncState {
     override fun isFeatureEnabled(): Boolean = false
-    override fun isDeviceSyncEnabled(): Boolean = false
+    override fun isUserSignedInOnDevice(): Boolean = false
 }

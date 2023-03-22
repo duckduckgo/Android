@@ -179,7 +179,7 @@ class SettingsViewModel @Inject constructor(
                     notificationsSettingSubtitleId = getNotificationsSettingSubtitleId(notificationsEnabled),
                     windowsWaitlistState = windowsSettingState(),
                     showSyncSetting = deviceSyncState.isFeatureEnabled(),
-                    syncEnabled = deviceSyncState.isDeviceSyncEnabled(),
+                    syncEnabled = deviceSyncState.isUserSignedInOnDevice(),
                 ),
             )
         }
