@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/daxMultiselectCtaContainer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:alpha="0"
+    android:clipChildren="false"
+    android:orientation="vertical"
+    android:visibility="gone">
+
+    <ImageView
+        android:id="@+id/daxBubbleLogo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_dax_icon" />
+
+    <com.duckduckgo.mobile.android.ui.view.shape.DaxBubbleCardView
+        android:id="@+id/bubbleCarView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/keyline_4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/logo"
+        app:layout_constraintWidth_max="600dp">
+
+        <LinearLayout
+            style="@style/Widget.DuckDuckGo.DaxDialog.Content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                android:id="@+id/daxMultiselectText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/keyline_4"
+                android:text="What brings you to DuckDuckGo?"
+                app:typography="body1" />
+
+            <com.duckduckgo.app.onboarding.ui.customisationexperiment.MultiselectListItem
+                android:id="@+id/optionPrivateSearch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_2"
+                app:primaryText="@string/onboardingFeatureOptionPrivateSearch"
+                app:trailingEmoji="🕵🏽" />
+
+            <com.duckduckgo.app.onboarding.ui.customisationexperiment.MultiselectListItem
+                android:id="@+id/optionTrackerBlocking"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_2"
+                app:primaryText="@string/onboardingFeatureOptionTrackerBlocking"
+                app:trailingEmoji="🚫" />
+
+            <com.duckduckgo.app.onboarding.ui.customisationexperiment.MultiselectListItem
+                android:id="@+id/optionSmallerFootprint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_2"
+                app:primaryText="@string/onboardingFeatureOptionSmallerDigitalFootprint"
+                app:trailingEmoji="👟" />
+
+            <com.duckduckgo.app.onboarding.ui.customisationexperiment.MultiselectListItem
+                android:id="@+id/optionFasterPageLoads"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_2"
+                app:primaryText="@string/onboardingFeatureOptionFasterPageLoads"
+                app:trailingEmoji="🚀" />
+
+            <com.duckduckgo.app.onboarding.ui.customisationexperiment.MultiselectListItem
+                android:id="@+id/optionFewerAds"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_2"
+                app:primaryText="@string/onboardingFeatureOptionFewerAds"
+                app:trailingEmoji="🎉" />
+
+            <com.duckduckgo.app.onboarding.ui.customisationexperiment.MultiselectListItem
+                android:id="@+id/optionOneClickDataClearing"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_2"
+                app:primaryText="@string/onboardingFeatureOptionOneClickDataClearing"
+                app:trailingEmoji="🔥" />
+
+            <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+                android:id="@+id/primaryCta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_5"
+                android:text="@string/onboardingFeatureOptionsContinue"
+                android:visibility="gone"
+                app:buttonSize="large" />
+
+            <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
+                android:id="@+id/secondaryCta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_5"
+                android:text="Skip This Step"
+                app:buttonSize="large" />
+
+        </LinearLayout>
+
+    </com.duckduckgo.mobile.android.ui.view.shape.DaxBubbleCardView>
+
+</LinearLayout>

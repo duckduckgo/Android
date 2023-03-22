@@ -29,5 +29,6 @@ object WelcomePageView {
         object Idle : State()
         data class ShowDefaultBrowserDialog(val intent: Intent) : State()
         object Finish : State()
+        object ShowFeatureOptionsCta : State()
     }
 }

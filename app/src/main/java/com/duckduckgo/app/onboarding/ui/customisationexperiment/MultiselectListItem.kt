@@ -32,9 +32,9 @@ class MultiselectListItem @JvmOverloads constructor(
 
     private val binding: ViewMultiselectListItemBinding by viewBinding()
 
-    var primaryText:String = ""
+    var primaryText: String = ""
         private set
-    var trailingEmoji:String = ""
+    var trailingEmoji: String = ""
         private set
     var isItemSelected: Boolean = false
         set(value) {
@@ -44,7 +44,6 @@ class MultiselectListItem @JvmOverloads constructor(
             }
             field = value
         }
-
 
     init {
         context.obtainStyledAttributes(
@@ -85,5 +84,12 @@ class MultiselectListItem @JvmOverloads constructor(
     fun setTrailingEmoji(@StringRes emojiTextRes: Int) {
         trailingEmoji = context.getString(emojiTextRes)
         binding.emojiText.text = trailingEmoji
+    }
+
+    fun setOnClickListener(onClick: () -> Unit) {
+        binding.itemContainer.setOnClickListener {
+            isItemSelected = !isItemSelected
+            onClick.invoke()
+        }
     }
 }

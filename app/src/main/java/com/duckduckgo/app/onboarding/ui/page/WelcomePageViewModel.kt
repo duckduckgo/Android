@@ -22,7 +22,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.onboarding.ui.customisationexperiment.DDGFeatureRepository
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.isOnboardingCustomizationExperimentEnabled
+import com.duckduckgo.app.statistics.isOptimiseOnboardingExperimentEnabled
 import com.duckduckgo.app.statistics.pixels.Pixel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -33,6 +37,7 @@ class WelcomePageViewModel(
     private val context: Context,
     private val pixel: Pixel,
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
+    private val variantManager: VariantManager,
 ) : ViewModel() {
 
     fun reduce(event: WelcomePageView.Event): Flow<WelcomePageView.State> {
@@ -43,7 +48,14 @@ class WelcomePageViewModel(
         }
     }
 
-    private fun onPrimaryCtaClicked(): Flow<WelcomePageView.State> = flow {
+    private fun onPrimaryCtaClicked() : Flow<WelcomePageView.State> = flow {
+        when (variantManager.isOnboardingCustomizationExperimentEnabled()) {
+            true -> emit(WelcomePageView.State.ShowFeatureOptionsCta)
+            false -> onCtaOnboardingFlowFinished()
+        }
+    }
+
+    private fun onCtaOnboardingFlowFinished() : Flow<WelcomePageView.State> = flow {
         if (defaultRoleBrowserDialog.shouldShowDialog()) {
             val intent = defaultRoleBrowserDialog.createIntent(context)
             if (intent != null) {
@@ -94,6 +106,7 @@ class WelcomePageViewModelFactory(
     private val context: Context,
     private val pixel: Pixel,
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
+    private val variantManager: VariantManager,
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -104,6 +117,7 @@ class WelcomePageViewModelFactory(
                     context,
                     pixel,
                     defaultRoleBrowserDialog,
+                    variantManager,
                 )
                 else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
             }

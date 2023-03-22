@@ -35,12 +35,15 @@ import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomeBinding
 import com.duckduckgo.app.global.extensions.html
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import javax.inject.Inject
+import kotlinx.android.synthetic.main.include_dax_multiselect_dialog_cta.view.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
 @InjectWith(FragmentScope::class)
@@ -111,6 +114,29 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
             WelcomePageView.State.Finish -> {
                 onContinuePressed()
             }
+            WelcomePageView.State.ShowFeatureOptionsCta -> showFeatureOptionsDialog()
+        }
+    }
+
+    private fun showFeatureOptionsDialog() {
+        binding.daxDialogCta.root.gone()
+        binding.daxDialogMultiselectCta?.apply {
+            root.show()
+            root.animate().alpha(1.0f).duration = 1000
+            secondaryCta.setOnClickListener { event(WelcomePageView.Event.OnPrimaryCtaClicked) }
+            optionPrivateSearch.setOnClickListener { showContinueButton() }
+            optionTrackerBlocking.setOnClickListener { showContinueButton() }
+            optionSmallerFootprint.setOnClickListener { showContinueButton() }
+            optionFasterPageLoads.setOnClickListener { showContinueButton() }
+            optionFewerAds.setOnClickListener { showContinueButton() }
+            optionOneClickDataClearing.setOnClickListener { showContinueButton() }
+        }
+    }
+
+    private fun showContinueButton() {
+        binding.daxDialogMultiselectCta?.apply {
+            primaryCta.show()
+            secondaryCta.gone()
         }
     }
 
