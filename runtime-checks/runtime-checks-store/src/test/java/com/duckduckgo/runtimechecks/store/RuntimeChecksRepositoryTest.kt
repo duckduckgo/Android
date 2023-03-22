@@ -54,7 +54,7 @@ class RuntimeChecksRepositoryTest {
                 )
 
             verify(mockRuntimeChecksDao).get()
-            assertEquals("{}", testee.runtimeChecksEntity.json)
+            assertEquals("{}", testee.getRuntimeChecksEntity().json)
         }
 
     @Test
@@ -69,7 +69,7 @@ class RuntimeChecksRepositoryTest {
                 )
 
             verify(mockRuntimeChecksDao).get()
-            assertEquals(runtimeChecksEntity.json, testee.runtimeChecksEntity.json)
+            assertEquals(runtimeChecksEntity.json, testee.getRuntimeChecksEntity().json)
         }
 
     @Test

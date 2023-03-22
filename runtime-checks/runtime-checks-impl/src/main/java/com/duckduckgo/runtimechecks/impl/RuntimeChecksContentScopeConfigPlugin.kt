@@ -29,7 +29,7 @@ class RuntimeChecksContentScopeConfigPlugin @Inject constructor(
 
     override fun config(): String {
         val featureName = RuntimeChecksFeatureName.RuntimeChecks.value
-        val config = runtimeChecksRepository.runtimeChecksEntity.json
+        val config = runtimeChecksRepository.getRuntimeChecksEntity().json
         return "\"$featureName\":$config"
     }
 

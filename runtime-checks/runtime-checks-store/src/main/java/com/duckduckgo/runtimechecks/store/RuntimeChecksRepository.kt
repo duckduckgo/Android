@@ -24,7 +24,7 @@ interface RuntimeChecksRepository {
     fun updateAll(
         runtimeChecksEntity: RuntimeChecksEntity,
     )
-    var runtimeChecksEntity: RuntimeChecksEntity
+    fun getRuntimeChecksEntity(): RuntimeChecksEntity
 }
 
 class RealRuntimeChecksRepository constructor(
@@ -34,7 +34,7 @@ class RealRuntimeChecksRepository constructor(
 ) : RuntimeChecksRepository {
 
     private val runtimeChecksDao: RuntimeChecksDao = database.runtimeChecksDao()
-    override var runtimeChecksEntity = RuntimeChecksEntity(json = EMPTY_JSON)
+    private var runtimeChecksEntity = RuntimeChecksEntity(json = EMPTY_JSON)
 
     init {
         coroutineScope.launch(dispatcherProvider.io()) {
@@ -45,6 +45,10 @@ class RealRuntimeChecksRepository constructor(
     override fun updateAll(runtimeChecksEntity: RuntimeChecksEntity) {
         runtimeChecksDao.updateAll(runtimeChecksEntity)
         loadToMemory()
+    }
+
+    override fun getRuntimeChecksEntity(): RuntimeChecksEntity {
+        return runtimeChecksEntity
     }
 
     private fun loadToMemory() {

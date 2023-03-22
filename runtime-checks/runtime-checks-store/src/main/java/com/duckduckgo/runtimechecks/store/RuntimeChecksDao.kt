@@ -23,13 +23,13 @@ import androidx.room.Query
 import androidx.room.Transaction
 
 @Dao
-abstract class RuntimeChecksDao {
+interface RuntimeChecksDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insert(runtimeChecksEntity: RuntimeChecksEntity)
+    fun insert(runtimeChecksEntity: RuntimeChecksEntity)
 
     @Transaction
-    open fun updateAll(
+    fun updateAll(
         runtimeChecksEntity: RuntimeChecksEntity,
     ) {
         delete()
@@ -37,8 +37,8 @@ abstract class RuntimeChecksDao {
     }
 
     @Query("select * from runtime_checks")
-    abstract fun get(): RuntimeChecksEntity?
+    fun get(): RuntimeChecksEntity?
 
     @Query("delete from runtime_checks")
-    abstract fun delete()
+    fun delete()
 }
