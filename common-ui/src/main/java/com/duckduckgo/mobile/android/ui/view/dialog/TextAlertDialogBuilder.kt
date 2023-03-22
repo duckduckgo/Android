@@ -25,6 +25,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.DialogTextAlertBinding
+import com.duckduckgo.mobile.android.ui.view.button.DaxButton
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
@@ -168,28 +169,32 @@ class TextAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         binding.textAlertDialogCancelDestructiveButton.isVisible = isDestructiveVersion
 
         if (isDestructiveVersion) {
-            binding.textAlertDialogPositiveDestructiveButton.text = positiveButtonText
-            binding.textAlertDialogPositiveDestructiveButton.setOnClickListener {
-                listener.onPositiveButtonClicked()
-                dialog.dismiss()
-            }
-            binding.textAlertDialogCancelDestructiveButton.text = negativeButtonText
-            binding.textAlertDialogCancelDestructiveButton.setTextColor(ContextCompat.getColorStateList(context, R.color.secondary_text_color_selector))
-            binding.textAlertDialogCancelDestructiveButton.setOnClickListener {
-                listener.onNegativeButtonClicked()
-                dialog.dismiss()
-            }
+            setButtonListener(binding.textAlertDialogPositiveDestructiveButton, positiveButtonText, dialog) { listener.onPositiveButtonClicked() }
+            setButtonListener(binding.textAlertDialogCancelDestructiveButton, negativeButtonText, dialog) { listener.onNegativeButtonClicked() }
+            // no need to get fancy, just change the button textColor
+            binding.textAlertDialogCancelDestructiveButton.setTextColor(
+                ContextCompat.getColorStateList(
+                    context,
+                    R.color.secondary_text_color_selector,
+                ),
+            )
         } else {
-            binding.textAlertDialogPositiveButton.text = positiveButtonText
-            binding.textAlertDialogPositiveButton.setOnClickListener {
-                listener.onPositiveButtonClicked()
-                dialog.dismiss()
-            }
-            binding.textAlertDialogCancelButton.text = negativeButtonText
-            binding.textAlertDialogCancelButton.setOnClickListener {
-                listener.onNegativeButtonClicked()
-                dialog.dismiss()
-            }
+            setButtonListener(binding.textAlertDialogPositiveButton, positiveButtonText, dialog) { listener.onPositiveButtonClicked() }
+            setButtonListener(binding.textAlertDialogCancelButton, negativeButtonText, dialog) { listener.onNegativeButtoqnClicked() }
+        }
+    }
+
+    private fun setButtonListener(
+        button: DaxButton,
+        text: CharSequence,
+        dialog: AlertDialog,
+        onClick: () -> Unit,
+
+    ) {
+        button.text = text
+        button.setOnClickListener {
+            onClick.invoke()
+            dialog.dismiss()
         }
     }
 

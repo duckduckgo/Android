@@ -18,11 +18,8 @@ package com.duckduckgo.mobile.android.ui.view.button
 
 import android.content.Context
 import android.util.AttributeSet
-import androidx.annotation.ColorInt
-import androidx.core.content.ContextCompat
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.view.button.Size.Small
-import com.duckduckgo.mobile.android.ui.view.text.DaxTextView.Typography
 import com.google.android.material.button.MaterialButton
 
 open class DaxButton @JvmOverloads constructor(
@@ -67,7 +64,6 @@ open class DaxButton @JvmOverloads constructor(
         minHeight = resources.getDimensionPixelSize(Size.dimension(buttonSize))
         setPadding(sidePadding, topPadding, sidePadding, topPadding)
     }
-
 }
 
 enum class Size {
