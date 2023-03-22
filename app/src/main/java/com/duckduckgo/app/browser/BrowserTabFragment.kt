@@ -44,6 +44,7 @@ import android.webkit.WebView.HitTestResult
 import android.webkit.WebView.HitTestResult.*
 import android.widget.Button
 import android.widget.EditText
+import android.widget.FrameLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.AnyThread
@@ -438,6 +439,8 @@ class BrowserTabFragment :
 
     private lateinit var quickAccessItems: IncludeQuickAccessItemsBinding
 
+    private lateinit var webViewContainer: FrameLayout
+
     private val findInPage
         get() = omnibar.findInPage
 
@@ -606,6 +609,7 @@ class BrowserTabFragment :
         super.onActivityCreated(savedInstanceState)
         omnibar = IncludeOmnibarToolbarBinding.bind(binding.rootView)
         quickAccessItems = IncludeQuickAccessItemsBinding.bind(binding.rootView)
+        webViewContainer = binding.webViewContainer
         configureObservers()
         configurePrivacyShield()
         configureWebView()
@@ -2352,7 +2356,7 @@ class BrowserTabFragment :
     }
 
     private fun destroyWebView() {
-        binding.webViewContainer?.removeAllViews()
+        webViewContainer.removeAllViews()
         webView?.destroy()
         webView = null
     }
