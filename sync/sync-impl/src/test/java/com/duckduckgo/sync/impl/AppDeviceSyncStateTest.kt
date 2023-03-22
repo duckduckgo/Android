@@ -30,11 +30,12 @@ internal class AppDeviceSyncStateTest {
     private val appBuildConfig: AppBuildConfig = mock()
     private val syncFeature: SyncFeature = mock()
     private val syncRepository: SyncRepository = mock()
+    private val appDeviceSyncState = AppDeviceSyncState(appBuildConfig, syncFeature, syncRepository)
 
     @Test
     fun whenUserSignedInThenDeviceSyncEnabled() {
         whenever(syncRepository.isSignedIn()).thenReturn(true)
-        val appDeviceSyncState = AppDeviceSyncState(appBuildConfig, syncFeature, syncRepository)
+
         assertTrue(appDeviceSyncState.isUserSignedInOnDevice())
     }
 
@@ -42,7 +43,7 @@ internal class AppDeviceSyncStateTest {
     fun whenInternalBuildThenFeatureEnabled() {
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
         givenFeatureFlag(enabled = false)
-        val appDeviceSyncState = AppDeviceSyncState(appBuildConfig, syncFeature, syncRepository)
+
         assertTrue(appDeviceSyncState.isFeatureEnabled())
     }
 
@@ -50,7 +51,7 @@ internal class AppDeviceSyncStateTest {
     fun whenFeatureFlagEnabledThenFeatureEnabled() {
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
         givenFeatureFlag(enabled = true)
-        val appDeviceSyncState = AppDeviceSyncState(appBuildConfig, syncFeature, syncRepository)
+
         assertTrue(appDeviceSyncState.isFeatureEnabled())
     }
 
