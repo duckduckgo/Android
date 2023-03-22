@@ -20,6 +20,9 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.VpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.mobile.android.vpn.dao.VpnHeartBeatDao
+import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
+import com.duckduckgo.mobile.android.vpn.heartbeat.VpnServiceHeartbeatMonitor
 import com.duckduckgo.mobile.android.vpn.model.AlwaysOnState
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceState.DISABLED
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceState.ENABLED
@@ -31,10 +34,8 @@ import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason.REVOKED
 import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason.SELF_STOP
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState
-import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.INVALID
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
-import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.flow.*
@@ -42,13 +43,14 @@ import logcat.logcat
 
 @ContributesBinding(AppScope::class)
 class RealVpnStateMonitor @Inject constructor(
-    private val database: VpnDatabase,
+    private val vpnHeartBeatDao: VpnHeartBeatDao,
+    private val vpnServiceStateStatsDao: VpnServiceStateStatsDao,
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
     private val dispatcherProvider: DispatcherProvider,
 ) : VpnStateMonitor {
 
     override fun getStateFlow(vpnFeature: VpnFeature): Flow<VpnState> {
-        return database.vpnServiceStateDao().getStateStats().map { mapState(it) }
+        return vpnServiceStateStatsDao.getStateStats().map { mapState(it) }
             .filter {
                 // we only care about the following states
                 (it.state == VpnRunningState.ENABLED) || (it.state == VpnRunningState.ENABLING) || (it.state == VpnRunningState.DISABLED)
@@ -64,7 +66,7 @@ class RealVpnStateMonitor @Inject constructor(
                 }
             }
             .onStart {
-                val vpnState = mapState(database.vpnServiceStateDao().getLastStateStats())
+                val vpnState = mapState(vpnServiceStateStatsDao.getLastStateStats())
                 VpnState(
                     state = if (vpnFeaturesRegistry.isFeatureRegistered(vpnFeature)) VpnRunningState.ENABLED else VpnRunningState.DISABLED,
                     alwaysOnState = vpnState.alwaysOnState,
@@ -72,6 +74,30 @@ class RealVpnStateMonitor @Inject constructor(
                 ).also { emit(it) }
             }.flowOn(dispatcherProvider.io())
             .distinctUntilChanged()
+    }
+
+    override suspend fun isAlwaysOnEnabled(): Boolean {
+        return vpnServiceStateStatsDao.getLastStateStats()?.alwaysOnState?.alwaysOnEnabled ?: false
+    }
+
+    override suspend fun vpnLastDisabledByAndroid(): Boolean {
+        fun vpnUnexpectedlyDisabled(): Boolean {
+            return vpnServiceStateStatsDao.getLastStateStats()?.let {
+                (
+                    it.state == DISABLED &&
+                        it.stopReason != SELF_STOP &&
+                        it.stopReason != REVOKED
+                    )
+            } ?: false
+        }
+
+        fun vpnKilledBySystem(): Boolean {
+            val lastHeartBeat = vpnHeartBeatDao.hearBeats().maxByOrNull { it.timestamp }
+            return lastHeartBeat?.type == VpnServiceHeartbeatMonitor.DATA_HEART_BEAT_TYPE_ALIVE &&
+                !vpnFeaturesRegistry.isAnyFeatureRegistered()
+        }
+
+        return vpnUnexpectedlyDisabled() || vpnKilledBySystem()
     }
 
     private fun mapState(lastState: VpnServiceStateStats?): VpnState {
