@@ -28,9 +28,9 @@ interface RuntimeChecksRepository {
 }
 
 class RealRuntimeChecksRepository constructor(
-    val database: RuntimeChecksDatabase,
-    private val coroutineScope: CoroutineScope,
-    val dispatcherProvider: DispatcherProvider,
+    private val database: RuntimeChecksDatabase,
+    coroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
 ) : RuntimeChecksRepository {
 
     private val runtimeChecksDao: RuntimeChecksDao = database.runtimeChecksDao()
