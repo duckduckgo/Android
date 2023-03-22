@@ -30,8 +30,10 @@ import com.duckduckgo.di.scopes.*
 import com.duckduckgo.mobile.android.ui.viewbinding.*
 import com.duckduckgo.sync.impl.R.id
 import com.duckduckgo.sync.impl.databinding.*
+import com.duckduckgo.sync.impl.ui.SyncLoginActivity
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.Close
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.RecoverSyncData
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSaveRecoveryCode
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSyncAnotherDevice
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.TurnOnSync
@@ -82,6 +84,7 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
     private fun processCommand(it: Command) {
         when (it) {
             Close -> finish()
+            RecoverSyncData -> startActivity(SyncLoginActivity.intent(this))
         }
     }
 
@@ -110,7 +113,7 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
     }
 
     override fun recoverYourSyncedData() {
-        // noop
+        viewModel.onRecoverYourSyncedData()
     }
 
     override fun syncAnotherDevice() {

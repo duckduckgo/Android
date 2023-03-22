@@ -23,6 +23,7 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.SyncRepository
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.Close
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.RecoverSyncData
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSaveRecoveryCode
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSyncAnotherDevice
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.TurnOnSync
@@ -57,6 +58,7 @@ class SetupAccountViewModel @Inject constructor(
 
     sealed class Command {
         object Close : Command()
+        object RecoverSyncData : Command()
     }
 
     fun onBackPressed() {
@@ -90,6 +92,12 @@ class SetupAccountViewModel @Inject constructor(
     fun finishSetupFlow() {
         viewModelScope.launch {
             viewState.emit(viewState.value.copy(viewMode = AskSaveRecoveryCode))
+        }
+    }
+
+    fun onRecoverYourSyncedData() {
+        viewModelScope.launch {
+            command.send(RecoverSyncData)
         }
     }
 }

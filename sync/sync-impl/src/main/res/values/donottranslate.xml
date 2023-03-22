@@ -23,6 +23,7 @@
 
     <!-- Sync -->
     <string name="sync_screen_title">Sync</string>
+    <string name="login_screen_title">Scan QR Code</string>
     <string name="sync_toggle_text">Sync</string>
     <string name="sync_off_hint">Sync your bookmarks across your devices and save an encrypted backup on DuckDuckGo\'s servers.</string>
     <string name="synced_devices_section_title">Synced Devices</string>
