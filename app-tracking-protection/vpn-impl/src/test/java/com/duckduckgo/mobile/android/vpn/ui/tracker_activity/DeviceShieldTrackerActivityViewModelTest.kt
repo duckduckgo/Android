@@ -178,8 +178,8 @@ class DeviceShieldTrackerActivityViewModelTest {
 
     @Test
     fun whenVpnLaunchedAlwaysOnDisabledAndSystemKilledAppTpThenShowAlwaysOnPromotion() = runBlocking {
-        whenever(vpnStore.isAlwaysOnEnabled()).thenReturn(false)
-        whenever(vpnStore.vpnLastDisabledByAndroid()).thenReturn(true)
+        whenever(vpnStateMonitor.isAlwaysOnEnabled()).thenReturn(false)
+        whenever(vpnStateMonitor.vpnLastDisabledByAndroid()).thenReturn(true)
 
         viewModel.commands().test {
             viewModel.onVPNPermissionResult(AppCompatActivity.RESULT_OK)
@@ -192,8 +192,8 @@ class DeviceShieldTrackerActivityViewModelTest {
 
     @Test
     fun whenVpnLaunchedAlwaysOnDisabledAndSystemDidNotKilledAppTpThenDoNotShowAlwaysOnPromotion() = runBlocking {
-        whenever(vpnStore.isAlwaysOnEnabled()).thenReturn(false)
-        whenever(vpnStore.vpnLastDisabledByAndroid()).thenReturn(false)
+        whenever(vpnStateMonitor.isAlwaysOnEnabled()).thenReturn(false)
+        whenever(vpnStateMonitor.vpnLastDisabledByAndroid()).thenReturn(false)
 
         viewModel.commands().test {
             viewModel.onVPNPermissionResult(AppCompatActivity.RESULT_OK)
@@ -204,8 +204,8 @@ class DeviceShieldTrackerActivityViewModelTest {
 
     @Test
     fun whenVPNInAlwaysOnModeThenShowPromoteAlwaysOnDialogCommandIsNotSent() = runBlocking {
-        whenever(vpnStore.isAlwaysOnEnabled()).thenReturn(true)
-        whenever(vpnStore.vpnLastDisabledByAndroid()).thenReturn(true)
+        whenever(vpnStateMonitor.isAlwaysOnEnabled()).thenReturn(true)
+        whenever(vpnStateMonitor.vpnLastDisabledByAndroid()).thenReturn(true)
 
         viewModel.commands().test {
             viewModel.onVPNPermissionResult(AppCompatActivity.RESULT_OK)

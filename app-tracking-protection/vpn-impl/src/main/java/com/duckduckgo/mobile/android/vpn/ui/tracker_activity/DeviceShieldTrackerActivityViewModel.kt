@@ -92,7 +92,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     }
 
     private suspend fun shouldPromoteAlwaysOnOnAppTPEnable(): Boolean {
-        return !vpnStore.isAlwaysOnEnabled() && vpnStore.vpnLastDisabledByAndroid()
+        return !vpnStateMonitor.isAlwaysOnEnabled() && vpnStateMonitor.vpnLastDisabledByAndroid()
     }
 
     private fun sendCommand(newCommand: Command) {

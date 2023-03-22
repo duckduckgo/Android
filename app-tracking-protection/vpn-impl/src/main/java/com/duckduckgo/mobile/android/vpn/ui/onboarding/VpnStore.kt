@@ -19,13 +19,6 @@ package com.duckduckgo.mobile.android.vpn.ui.onboarding
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
-import com.duckduckgo.mobile.android.vpn.dao.VpnHeartBeatDao
-import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
-import com.duckduckgo.mobile.android.vpn.heartbeat.VpnServiceHeartbeatMonitor
-import com.duckduckgo.mobile.android.vpn.model.VpnServiceState
-import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -37,9 +30,6 @@ interface VpnStore {
     fun onboardingDidShow()
     fun onboardingDidNotShow()
     fun didShowOnboarding(): Boolean
-
-    suspend fun isAlwaysOnEnabled(): Boolean
-    suspend fun vpnLastDisabledByAndroid(): Boolean
 
     fun didShowAppTpEnabledCta(): Boolean
     fun appTpEnabledCtaDidShow()
@@ -53,9 +43,6 @@ interface VpnStore {
 @SingleInstanceIn(AppScope::class)
 class SharedPreferencesVpnStore @Inject constructor(
     private val sharedPreferencesProvider: VpnSharedPreferencesProvider,
-    private val vpnHeartBeatDao: VpnHeartBeatDao,
-    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
-    private val vpnServiceStateDao: VpnServiceStateStatsDao,
 ) : VpnStore {
 
     private val preferences: SharedPreferences
@@ -71,30 +58,6 @@ class SharedPreferencesVpnStore @Inject constructor(
 
     override fun didShowOnboarding(): Boolean {
         return preferences.getBoolean(KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED, false)
-    }
-
-    override suspend fun isAlwaysOnEnabled(): Boolean {
-        return vpnServiceStateDao.getLastStateStats()?.alwaysOnState?.alwaysOnEnabled ?: false
-    }
-
-    override suspend fun vpnLastDisabledByAndroid(): Boolean {
-        fun vpnUnexpectedlyDisabled(): Boolean {
-            return vpnServiceStateDao.getLastStateStats()?.let {
-                (
-                    it.state == VpnServiceState.DISABLED &&
-                        it.stopReason != VpnStoppingReason.SELF_STOP &&
-                        it.stopReason != VpnStoppingReason.REVOKED
-                    )
-            } ?: false
-        }
-
-        fun vpnKilledBySystem(): Boolean {
-            val lastHeartBeat = vpnHeartBeatDao.hearBeats().maxByOrNull { it.timestamp }
-            return lastHeartBeat?.type == VpnServiceHeartbeatMonitor.DATA_HEART_BEAT_TYPE_ALIVE &&
-                !vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)
-        }
-
-        return vpnUnexpectedlyDisabled() || vpnKilledBySystem()
     }
 
     override fun didShowAppTpEnabledCta(): Boolean {
