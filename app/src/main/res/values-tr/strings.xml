@@ -508,8 +508,8 @@
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Hiçbir zaman</string>
     <string name="disableLoginDetectionDialogTitle">Sitelerde oturum açılırken Koruma hatırlatıcısı devre dışı bırakılsın mı?</string>
     <string name="disableLoginDetectionDialogDescription">Bu tercihi istediğiniz zaman Ayarlar\'dan değiştirebilirsiniz.</string>
-    <string name="disableLoginDetectionDialogPositive">DEVRE DIŞI BIRAK</string>
-    <string name="disableLoginDetectionDialogNegative">İPTAL</string>
+    <string name="disableLoginDetectionDialogPositive">Devre dışı bırak</string>
+    <string name="disableLoginDetectionDialogNegative">Vazgeç</string>
     <string name="automaticFireproofWebsiteLoginDialogTitle">Oturum açıldığında web siteleri otomatik olarak korumalı yapılsın mı?</string>
     <string name="automaticFireproofWebsiteLoginDialogDescription">Siteleri korumalı yaptığınızda, Yangın düğmesini kullandıktan sonra da oturumunuz açık kalır. Bunu daha sonra Ayarlar\'dan istediğiniz zaman değiştirebilirsiniz. </string>
     <string name="automaticFireproofWebsiteLoginDialogFirstOption">Her Zaman Korumalı Yap</string>

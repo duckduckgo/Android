@@ -508,8 +508,8 @@
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Nunca</string>
     <string name="disableLoginDetectionDialogTitle">Desativar lembrete de barreira de segurança ao iniciar sessão em sites?</string>
     <string name="disableLoginDetectionDialogDescription">Pode alterar esta preferência nas definições em qualquer altura.</string>
-    <string name="disableLoginDetectionDialogPositive">DESATIVAR</string>
-    <string name="disableLoginDetectionDialogNegative">CANCELAR</string>
+    <string name="disableLoginDetectionDialogPositive">Desativar</string>
+    <string name="disableLoginDetectionDialogNegative">Cancelar</string>
     <string name="automaticFireproofWebsiteLoginDialogTitle">Sites com barreira de segurança automaticamente ao entrar?</string>
     <string name="automaticFireproofWebsiteLoginDialogDescription">Os sites com barreira de segurança irão manter a sessão iniciada após a utilização do Botão de Proteção. Pode sempre alterar isto mais tarde nas Definições. </string>
     <string name="automaticFireproofWebsiteLoginDialogFirstOption">Sempre com barreira de segurança</string>
