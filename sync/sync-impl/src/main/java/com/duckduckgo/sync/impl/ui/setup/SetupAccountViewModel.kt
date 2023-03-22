@@ -36,10 +36,10 @@ import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.*
 
 @ContributesViewModel(ActivityScope::class)
@@ -49,14 +49,15 @@ class SetupAccountViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
-    private val viewState = MutableStateFlow<ViewState?>(null)
-    fun viewState(screen: Screen): Flow<ViewState> = viewState.filterNotNull().onStart {
+    private val viewState = MutableStateFlow(ViewState())
+
+    fun viewState(screen: Screen): Flow<ViewState> = viewState.onSubscription {
         val viewMode = when (screen) {
             SETUP -> TurnOnSync
             RECOVERY_CODE -> AskSaveRecoveryCode
             DEVICE_CONNECTED -> DeviceConnected
         }
-        emit(ViewState(viewMode))
+        viewState.value = ViewState(viewMode)
     }
 
     fun commands(): Flow<Command> = command.receiveAsFlow()
@@ -79,28 +80,27 @@ class SetupAccountViewModel @Inject constructor(
 
     fun onBackPressed() {
         viewModelScope.launch {
-            viewState.value?.let {
-                when (it.viewMode) {
-                    AskSyncAnotherDevice -> {
-                        viewState.emit(it.copy(viewMode = TurnOnSync))
-                    }
+            Timber.i("CRIS: back pressed and value is ${viewState.value}")
+            when (viewState.value.viewMode) {
+                AskSyncAnotherDevice -> {
+                    viewState.emit(ViewState(viewMode = TurnOnSync))
+                }
 
-                    TurnOnSync -> {
-                        viewModelScope.launch {
-                            command.send(Close)
-                        }
+                TurnOnSync -> {
+                    viewModelScope.launch {
+                        command.send(Close)
                     }
+                }
 
-                    AskSaveRecoveryCode -> {
-                        viewModelScope.launch {
-                            command.send(Close)
-                        }
+                AskSaveRecoveryCode -> {
+                    viewModelScope.launch {
+                        command.send(Close)
                     }
+                }
 
-                    DeviceConnected -> {
-                        viewModelScope.launch {
-                            command.send(Close)
-                        }
+                DeviceConnected -> {
+                    viewModelScope.launch {
+                        command.send(Close)
                     }
                 }
             }
