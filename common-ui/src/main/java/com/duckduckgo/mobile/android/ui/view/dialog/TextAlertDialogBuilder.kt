@@ -180,7 +180,7 @@ class TextAlertDialogBuilder(val context: Context) : DaxAlertDialog {
             )
         } else {
             setButtonListener(binding.textAlertDialogPositiveButton, positiveButtonText, dialog) { listener.onPositiveButtonClicked() }
-            setButtonListener(binding.textAlertDialogCancelButton, negativeButtonText, dialog) { listener.onNegativeButtoqnClicked() }
+            setButtonListener(binding.textAlertDialogCancelButton, negativeButtonText, dialog) { listener.onNegativeButtonClicked() }
         }
     }
 
