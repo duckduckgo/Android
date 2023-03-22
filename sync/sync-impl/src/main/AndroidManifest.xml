@@ -45,6 +45,12 @@
             android:parentActivityName=".ui.setup.SetupAccountActivity"/>
 
         <activity
+            android:name=".ui.SyncDeviceConnectedActivity"
+            android:exported="false"
+            android:label="@string/connected_device_title"
+            android:parentActivityName=".ui.SyncActivity"/>
+
+        <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="portrait"
             tools:replace="screenOrientation" />
