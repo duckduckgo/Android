@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-}
+package com.duckduckgo.sync.impl.di
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.api.SyncFeature
 
-dependencies {
-    implementation Kotlin.stdlib.jdk7
-    api project(path: ':feature-toggles-api')
-}
-
-android {
-    namespace 'com.duckduckgo.sync.api'
-}
-
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    boundType = SyncFeature::class,
+    featureName = "deviceSync",
+)
+@Suppress("unused")
+private interface UnusedSyncFeatureCodegenTrigger

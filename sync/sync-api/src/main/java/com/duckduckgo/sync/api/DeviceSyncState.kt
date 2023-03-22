@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
+package com.duckduckgo.sync.api
+
+/** Public interface for Device Sync State */
+interface DeviceSyncState {
+    /**
+     * Checks if feature should be visible to users.
+     */
+    fun isFeatureEnabled(): Boolean
+
+    /**
+     * Checks if user is signed in on this device.
+     */
+    fun isUserSignedInOnDevice(): Boolean
 }
-
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
-
-dependencies {
-    implementation Kotlin.stdlib.jdk7
-    api project(path: ':feature-toggles-api')
-}
-
-android {
-    namespace 'com.duckduckgo.sync.api'
-}
-
