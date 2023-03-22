@@ -16,11 +16,12 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:id="@+id/settingsSectionSync"
+              android:id="@+id/settingsSectionFeatures"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:orientation="vertical">
 
+    <!-- we have custom logic inside SettingsActivity that relies on the assumption that this layout has divider + settings -->
     <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
@@ -30,4 +31,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/syncSettingsEntry"/>
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+        android:id="@+id/autofill"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/autofillManagementScreenTitle"/>
+
 </LinearLayout>

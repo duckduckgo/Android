@@ -29,6 +29,8 @@ import android.widget.CompoundButton.OnCheckedChangeListener
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.view.children
+import androidx.core.view.forEach
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -52,6 +54,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.ui.WhitelistActivity
 import com.duckduckgo.app.settings.SettingsViewModel.AutomaticallyClearData
 import com.duckduckgo.app.settings.SettingsViewModel.Command
+import com.duckduckgo.app.settings.SettingsViewModel.ViewState
 import com.duckduckgo.app.settings.clear.AppLinkSettingType
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
@@ -122,11 +125,8 @@ class SettingsActivity : DuckDuckGoActivity() {
     private val viewsGeneral
         get() = binding.includeSettings.contentSettingsGeneral
 
-    private val viewsAutofill
-        get() = binding.includeSettings.contentSettingsAutofill
-
-    private val viewsSync
-        get() = binding.includeSettings.contentSettingsSync
+    private val viewsFeatures
+        get() = binding.includeSettings.contentSettingsFeatures
 
     private val viewsAppearance
         get() = binding.includeSettings.contentSettingsAppearance
@@ -171,11 +171,10 @@ class SettingsActivity : DuckDuckGoActivity() {
             homeScreenWidgetSetting.setClickListener { viewModel.userRequestedToAddHomeScreenWidget() }
         }
 
-        with(viewsAutofill) {
+        with(viewsFeatures) {
             autofill.setClickListener { viewModel.onAutofillSettingsClick() }
+            syncSetting.setClickListener { }
         }
-
-        viewsSync.syncSetting.setClickListener { }
 
         with(viewsAppearance) {
             selectedThemeSetting.setClickListener { viewModel.userRequestedToChangeTheme() }
@@ -260,10 +259,9 @@ class SettingsActivity : DuckDuckGoActivity() {
                         it.appTrackingProtectionEnabled,
                         it.appTrackingProtectionOnboardingShown,
                     )
-                    updateSyncSetting(visible = viewState.showSyncSetting, deviceSyncEnabled = viewState.syncEnabled)
                     updateEmailSubtitle(it.emailAddress)
-                    updateAutofill(it.showAutofill)
                     updateWindowsSettings(it.windowsWaitlistState)
+                    updateFeaturesSection(it)
                     viewsCustomize.notificationsSetting.setSecondaryText(getString(it.notificationsSettingSubtitleId))
                 }
             }.launchIn(lifecycleScope)
@@ -274,7 +272,15 @@ class SettingsActivity : DuckDuckGoActivity() {
             .launchIn(lifecycleScope)
     }
 
-    private fun updateAutofill(autofillEnabled: Boolean) = with(viewsAutofill.settingsSectionAutofill) {
+    private fun updateFeaturesSection(viewState: ViewState) {
+        updateAutofill(viewState.showAutofill)
+        updateSyncSetting(visible = viewState.showSyncSetting, deviceSyncEnabled = viewState.syncEnabled)
+        // section will be visible if more than 1 view (a part from horizontal divider) is visible.
+        val showFeaturesSection = viewsFeatures.settingsSectionFeatures.children.count { it.visibility == View.VISIBLE } > 1
+        viewsFeatures.settingsSectionFeatures.isVisible = showFeaturesSection
+    }
+
+    private fun updateAutofill(autofillEnabled: Boolean) = with(viewsFeatures.autofill) {
         visibility = if (autofillEnabled) {
             View.VISIBLE
         } else {
@@ -301,9 +307,11 @@ class SettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun updateSyncSetting(visible: Boolean, deviceSyncEnabled: Boolean) {
-        viewsSync.settingsSectionSync.isVisible = visible
-        val deviceSyncStatus = if (deviceSyncEnabled) R.string.syncSettingsEnabled else R.string.syncSettingsDisabled
-        viewsSync.syncSetting.setSecondaryText(getString(deviceSyncStatus))
+        with(viewsFeatures.syncSetting) {
+            isVisible = visible
+            val deviceSyncStatus = if (deviceSyncEnabled) R.string.syncSettingsEnabled else R.string.syncSettingsDisabled
+            setSecondaryText(getString(deviceSyncStatus))
+        }
     }
 
     private fun setGlobalPrivacyControlSetting(enabled: Boolean) {
