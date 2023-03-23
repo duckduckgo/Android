@@ -508,8 +508,8 @@
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Mai</string>
     <string name="disableLoginDetectionDialogTitle">Disabilitare il promemoria per la protezione quando si accede ai siti?</string>
     <string name="disableLoginDetectionDialogDescription">Puoi modificare questa preferenza in qualsiasi momento nella sezione Impostazioni.</string>
-    <string name="disableLoginDetectionDialogPositive">DISABILITA</string>
-    <string name="disableLoginDetectionDialogNegative">ANNULLA</string>
+    <string name="disableLoginDetectionDialogPositive">Disabilita</string>
+    <string name="disableLoginDetectionDialogNegative">Annulla</string>
     <string name="automaticFireproofWebsiteLoginDialogTitle">Proteggere automaticamente i siti web al momento dell\'accesso?</string>
     <string name="automaticFireproofWebsiteLoginDialogDescription">L\'attivazione della protezione ti consentirà di effettuare l\'accesso dopo aver utilizzato il pulsante Proteggi (icona del fuoco). Puoi sempre modificare questa scelta in un secondo momento in Impostazioni. </string>
     <string name="automaticFireproofWebsiteLoginDialogFirstOption">Proteggi sempre</string>
