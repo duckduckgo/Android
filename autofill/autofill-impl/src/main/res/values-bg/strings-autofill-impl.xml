@@ -17,11 +17,11 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Автоматично попълване на данни за вход</string>
+    <string name="autofillManagementScreenTitle">Данни за вход</string>
 
     <string name="managementDisabledModeCta"><b>Настройване в Настройки</b></string>
-    <string name="managementDisabledModeSubtitle">Изисква се шаблон за заключване на устройството, ПИН код или биометрични данни, за да защитите информацията си за вход с автоматично попълване.</string>
-    <string name="managementDisabledModeTitle">Защитете устройството си, за да използвате автоматично попълване</string>
+    <string name="managementDisabledModeSubtitle">За защита на данните за вход е необходимо да зададете модел за заключване, ПИН код или биометрични данни.</string>
+    <string name="managementDisabledModeTitle">Защитете устройството, за да можете да запазвате данни за вход</string>
 
     <string name="saveLoginDialogTitle">Запазване на данните за вход?</string>
     <string name="saveLoginMissingUsernameDialogTitle">Запазване на паролата?</string>
