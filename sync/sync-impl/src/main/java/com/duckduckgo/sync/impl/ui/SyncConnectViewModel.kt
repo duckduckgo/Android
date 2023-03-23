@@ -23,25 +23,30 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.SyncRepository
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
-import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.LoginSucess
-import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.ReadQRCode
-import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.ReadTextCode
-import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.ShowQRCode
+import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSucess
+import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ReadQRCode
+import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ReadTextCode
+import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowQRCode
 import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
-class SyncLoginViewModel @Inject constructor(
+class SyncConnectViewModel @Inject constructor(
     private val syncRepository: SyncRepository,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
     private val command = Channel<Command>(1, DROP_OLDEST)
+    private val viewState = MutableStateFlow(ViewState)
+
+    fun viewState(): Flow<ViewState> = viewState
     fun commands(): Flow<Command> = command.receiveAsFlow()
+
+    object ViewState
 
     sealed class Command {
         object ReadQRCode : Command()
@@ -65,7 +70,7 @@ class SyncLoginViewModel @Inject constructor(
 
     fun onConnectQRScanned(qrCode: String) {
         viewModelScope.launch(dispatchers.io()) {
-            val result = syncRepository.login(qrCode)
+            val result = syncRepository.connectDevice(qrCode)
             if (result is Error) {
                 command.send(Command.Error)
             } else {

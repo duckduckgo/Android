@@ -17,31 +17,32 @@
 package com.duckduckgo.sync.impl.ui
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.SyncRepository
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
-import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.LoginSucess
-import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.ReadQRCode
-import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.ReadTextCode
-import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.ShowQRCode
-import javax.inject.*
+import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.launch
+import javax.inject.*
 
 @ContributesViewModel(ActivityScope::class)
-class SyncLoginViewModel @Inject constructor(
+class ShowQRCodeViewModel @Inject constructor(
     private val syncRepository: SyncRepository,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
-    private val command = Channel<Command>(1, DROP_OLDEST)
-    fun commands(): Flow<Command> = command.receiveAsFlow()
+    private val command = Channel<SyncLoginViewModel.Command>(1, DROP_OLDEST)
+    private val viewState = MutableStateFlow(ViewState())
+
+    fun viewState(): Flow<ViewState> = viewState
+    fun commands(): Flow<SyncLoginViewModel.Command> = command.receiveAsFlow()
+
+    data class ViewState(
+        val qrCode: String = "",
+    )
 
     sealed class Command {
         object ReadQRCode : Command()
@@ -49,34 +50,5 @@ class SyncLoginViewModel @Inject constructor(
         object ReadTextCode : Command()
         object LoginSucess : Command()
         object Error : Command()
-    }
-
-    fun onReadQRCodeClicked() {
-        viewModelScope.launch {
-            command.send(ReadQRCode)
-        }
-    }
-
-    fun onReadTextCodeClicked() {
-        viewModelScope.launch {
-            command.send(ReadTextCode)
-        }
-    }
-
-    fun onConnectQRScanned(qrCode: String) {
-        viewModelScope.launch(dispatchers.io()) {
-            val result = syncRepository.login(qrCode)
-            if (result is Error) {
-                command.send(Command.Error)
-            } else {
-                command.send(LoginSucess)
-            }
-        }
-    }
-
-    fun onShowQRCodeClicked() {
-        viewModelScope.launch {
-            command.send(ShowQRCode)
-        }
     }
 }
