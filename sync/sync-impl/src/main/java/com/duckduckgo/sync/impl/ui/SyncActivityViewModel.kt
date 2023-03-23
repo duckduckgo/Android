@@ -61,12 +61,8 @@ class SyncActivityViewModel @Inject constructor(
 
     fun onToggleClicked(isChecked: Boolean) {
         viewModelScope.launch {
+            viewState.emit(viewState.value.copy(isDeviceSyncEnabled = isChecked))
             if (isChecked) {
-                viewState.emit(
-                    viewState.value.copy(
-                        isDeviceSyncEnabled = isChecked,
-                    ),
-                )
                 command.send(LaunchDeviceSetupFlow)
             }
         }
