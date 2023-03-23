@@ -84,4 +84,10 @@ class SyncConnectViewModel @Inject constructor(
             command.send(ShowQRCode)
         }
     }
+
+    fun onLoginSucess() {
+        viewModelScope.launch {
+            command.send(LoginSucess)
+        }
+    }
 }

@@ -30,8 +30,9 @@ import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivityShowQrCodeBinding
+import com.duckduckgo.sync.impl.ui.ShowQRCodeViewModel.Command.Error
+import com.duckduckgo.sync.impl.ui.ShowQRCodeViewModel.Command.LoginSucess
 import com.duckduckgo.sync.impl.ui.ShowQRCodeViewModel.ViewState
-import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command
 import com.google.zxing.BarcodeFormat.QR_CODE
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import kotlinx.coroutines.flow.launchIn
@@ -77,8 +78,17 @@ class ShowQRCodeActivity: DuckDuckGoActivity() {
         }
     }
 
-    private fun processCommand(command: Command) {
-
+    private fun processCommand(command: ShowQRCodeViewModel.Command) {
+        when (command) {
+            Error -> {
+                setResult(RESULT_CANCELED)
+                finish()
+            }
+            LoginSucess -> {
+                setResult(RESULT_OK)
+                finish()
+            }
+        }
     }
 
     companion object {

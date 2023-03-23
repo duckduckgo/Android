@@ -16,10 +16,12 @@
 
 package com.duckduckgo.sync.impl.ui
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContract
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -40,6 +42,22 @@ import com.journeyapps.barcodescanner.ScanOptions
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
+class ConnectViaQRCodeContract : ActivityResultContract<Void?, Boolean>() {
+    override fun createIntent(
+        context: Context,
+        input: Void?,
+    ): Intent {
+        return ShowQRCodeActivity.intent(context)
+    }
+
+    override fun parseResult(
+        resultCode: Int,
+        intent: Intent?,
+    ): Boolean {
+        return resultCode == Activity.RESULT_OK
+    }
+}
+
 @InjectWith(ActivityScope::class)
 class SyncConnectActivity : DuckDuckGoActivity() {
     private val binding: ActivityConnectSyncBinding by viewBinding()
@@ -54,6 +72,13 @@ class SyncConnectActivity : DuckDuckGoActivity() {
         } else {
             Toast.makeText(this, "Read ${result.contents}", Toast.LENGTH_LONG).show()
             viewModel.onConnectQRScanned(result.contents)
+        }
+    }
+
+    private val showQRConnectLauncher = registerForActivityResult(ConnectViaQRCodeContract()) { resultOk ->
+        if (resultOk) {
+            Toast.makeText(this, "login went well", Toast.LENGTH_LONG).show()
+            viewModel.onLoginSucess()
         }
     }
 
@@ -87,7 +112,7 @@ class SyncConnectActivity : DuckDuckGoActivity() {
                 setResult(RESULT_OK)
                 finish()
             }
-            ShowQRCode -> ShowQRCodeActivity.intent(this).also { startActivity(it) }
+            ShowQRCode -> showQRConnectLauncher.launch(null)
             Command.Error -> {
                 setResult(RESULT_CANCELED)
                 finish()
