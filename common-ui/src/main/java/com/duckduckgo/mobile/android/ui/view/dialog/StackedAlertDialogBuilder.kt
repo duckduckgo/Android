@@ -22,6 +22,8 @@ import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
+import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.DialogStackedAlertBinding
 import com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
 import com.duckduckgo.mobile.android.ui.view.gone
@@ -39,16 +41,12 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
 
     private var dialog: AlertDialog? = null
 
-    var listener: EventListener = DefaultEventListener()
-        private set
-    var titleText: CharSequence = ""
-        private set
-    var messageText: CharSequence = ""
-        private set
-    var headerImageDrawableId = 0
-        private set
-    var stackedButtonList: MutableList<CharSequence> = mutableListOf()
-        private set
+    private var listener: EventListener = DefaultEventListener()
+    private var titleText: CharSequence = ""
+    private var messageText: CharSequence = ""
+    private var headerImageDrawableId = 0
+    private var stackedButtonList: MutableList<CharSequence> = mutableListOf()
+    private var isDestructiveVersion: Boolean = false
 
     fun setHeaderImageResource(@DrawableRes drawableId: Int): StackedAlertDialogBuilder {
         headerImageDrawableId = drawableId
@@ -79,6 +77,11 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         stackedButtonTextId.forEach {
             stackedButtonList.add(context.getText(it))
         }
+        return this
+    }
+
+    fun setDestructiveButtons(isDestructive: Boolean): StackedAlertDialogBuilder {
+        isDestructiveVersion = isDestructive
         return this
     }
 
@@ -135,13 +138,47 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
             binding.stackedlertDialogMessage.text = messageText
         }
 
+        addButtons(binding.stackedAlertDialogButtonLayout, stackedButtonList, dialog)
+    }
+
+    private fun addButtons(
+        root: LinearLayout,
+        stackedButtonList: MutableList<CharSequence>,
+        dialog: AlertDialog,
+    ) {
         val buttonParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.WRAP_CONTENT,
             LinearLayout.LayoutParams.WRAP_CONTENT,
         )
-
         stackedButtonList.forEachIndexed { index, text ->
-            val button = DaxButtonGhost(context, null)
+            val button = when {
+                isDestructiveVersion && index == stackedButtonList.lastIndex -> {
+                    val ghostButton = DaxButtonGhost(context, null)
+                    ghostButton.setTextColor(
+                        ContextCompat.getColorStateList(
+                            context,
+                            R.color.red_text_color_selector,
+                        ),
+                    )
+                    ghostButton
+                }
+
+                isDestructiveVersion -> {
+                    val ghostButton = DaxButtonGhost(context, null)
+                    ghostButton.setTextColor(
+                        ContextCompat.getColorStateList(
+                            context,
+                            R.color.secondary_text_color_selector,
+                        ),
+                    )
+                    ghostButton
+                }
+
+                else -> {
+                    DaxButtonGhost(context, null)
+                }
+            }
+
             button.text = text
             button.layoutParams = buttonParams
 
@@ -150,7 +187,7 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
                 dialog.dismiss()
             }
 
-            binding.stackedAlertDialogButtonLayout.addView(button)
+            root.addView(button)
         }
     }
 

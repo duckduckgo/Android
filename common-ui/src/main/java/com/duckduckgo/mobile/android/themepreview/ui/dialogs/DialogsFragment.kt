@@ -94,11 +94,54 @@ class DialogsFragment : Fragment() {
             }
         }
 
+        view.findViewById<Button>(R.id.radioButtonDestructiveAlertDialog)?.let {
+            it.setOnClickListener {
+                RadioListAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.text_dialog_title)
+                    .setMessage(R.string.text_dialog_message)
+                    .setPositiveButton(R.string.text_dialog_positive)
+                    .setNegativeButton(R.string.text_dialog_negative)
+                    .setDestructiveButtons(true)
+                    .setOptions(listOf(R.string.text_dialog_option, R.string.text_dialog_option, R.string.text_dialog_option))
+                    .addEventListener(
+                        object : RadioListAlertDialogBuilder.EventListener() {
+                            override fun onRadioItemSelected(selectedItem: Int) {
+                                Snackbar.make(it, "Radio Button $selectedItem selected", Snackbar.LENGTH_SHORT).show()
+                            }
+                        },
+                    )
+                    .show()
+            }
+        }
+
         view.findViewById<Button>(R.id.textAlertDialogButton)?.let {
             it.setOnClickListener {
                 TextAlertDialogBuilder(requireContext())
                     .setTitle(R.string.text_dialog_title)
                     .setMessage(R.string.text_dialog_message)
+                    .setPositiveButton(R.string.text_dialog_positive)
+                    .setNegativeButton(R.string.text_dialog_negative)
+                    .addEventListener(
+                        object : TextAlertDialogBuilder.EventListener() {
+                            override fun onPositiveButtonClicked() {
+                                Snackbar.make(it, "Positive Button Clicked", Snackbar.LENGTH_SHORT).show()
+                            }
+
+                            override fun onNegativeButtonClicked() {
+                                Snackbar.make(it, "Negative Button Clicked", Snackbar.LENGTH_SHORT).show()
+                            }
+                        },
+                    )
+                    .show()
+            }
+        }
+
+        view.findViewById<Button>(R.id.textAlertDestructiveDialogButton)?.let {
+            it.setOnClickListener {
+                TextAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.text_dialog_title)
+                    .setMessage(R.string.text_dialog_message)
+                    .setDestructiveButtons(true)
                     .setPositiveButton(R.string.text_dialog_positive)
                     .setNegativeButton(R.string.text_dialog_negative)
                     .addEventListener(
@@ -189,204 +232,229 @@ class DialogsFragment : Fragment() {
                         .show()
                 }
 
-                view.findViewById<Button>(R.id.actionBottomSheetButton)?.let { button ->
-                    button.setOnClickListener {
-                        ActionBottomSheetDialog.Builder(requireContext())
-                            .setPrimaryItem("Primary Item")
-                            .setSecondaryItem("Secondary Item")
+                view.findViewById<Button>(R.id.stackedAlertDestructiveDialogWithButtons)?.let {
+                    it.setOnClickListener {
+                        StackedAlertDialogBuilder(requireContext())
+                            .setTitle(R.string.text_dialog_title)
+                            .setMessage(R.string.text_dialog_message)
+                            .setStackedButtons(
+                                listOf(
+                                    R.string.text_dialog_positive,
+                                    R.string.text_dialog_positive,
+                                    R.string.text_dialog_positive,
+                                    R.string.text_dialog_positive,
+                                ),
+                            )
+                            .setDestructiveButtons(true)
                             .addEventListener(
-                                object : ActionBottomSheetDialog.EventListener() {
-                                    override fun onPrimaryItemClicked() {
-                                        Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
-                                    }
-
-                                    override fun onSecondaryItemClicked() {
-                                        Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
+                                object : StackedAlertDialogBuilder.EventListener() {
+                                    override fun onButtonClicked(position: Int) {
+                                        Snackbar.make(it, "Button $position Clicked", Snackbar.LENGTH_SHORT).show()
                                     }
                                 },
                             )
                             .show()
                     }
-                }
 
-                view.findViewById<Button>(R.id.actionBottomSheetButtonWithTitle)?.let { button ->
-                    button.setOnClickListener {
-                        ActionBottomSheetDialog.Builder(requireContext())
-                            .setTitle("Title")
-                            .setPrimaryItem("Primary Item", R.drawable.ic_add_16)
-                            .setSecondaryItem("Secondary Item", R.drawable.ic_add_16)
-                            .addEventListener(
-                                object : ActionBottomSheetDialog.EventListener() {
-                                    override fun onPrimaryItemClicked() {
-                                        Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
-                                    }
+                    view.findViewById<Button>(R.id.actionBottomSheetButton)?.let { button ->
+                        button.setOnClickListener {
+                            ActionBottomSheetDialog.Builder(requireContext())
+                                .setPrimaryItem("Primary Item")
+                                .setSecondaryItem("Secondary Item")
+                                .addEventListener(
+                                    object : ActionBottomSheetDialog.EventListener() {
+                                        override fun onPrimaryItemClicked() {
+                                            Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
+                                        }
 
-                                    override fun onSecondaryItemClicked() {
-                                        Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
-                                    }
-                                },
-                            )
-                            .show()
-                    }
-                }
-
-                view.findViewById<Button>(R.id.promoBottomSheetButton)?.let { button ->
-                    button.setOnClickListener {
-                        PromoBottomSheetDialog.Builder(requireContext())
-                            .setContent("Add our search widget to your home screen for quick, easy access.")
-                            .setPrimaryButton("Button")
-                            .setSecondaryButton("Button")
-                            .addEventListener(
-                                object : PromoBottomSheetDialog.EventListener() {
-                                    override fun onPrimaryButtonClicked() {
-                                        super.onPrimaryButtonClicked()
-                                        Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
-                                    }
-
-                                    override fun onSecondaryButtonClicked() {
-                                        super.onSecondaryButtonClicked()
-                                        Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
-                                    }
-                                },
-                            )
-                            .show()
-                    }
-                }
-
-                view.findViewById<Button>(R.id.promoBottomSheetButtonWithTitle)?.let { button ->
-                    button.setOnClickListener {
-                        PromoBottomSheetDialog.Builder(requireContext())
-                            .setTitle("Title")
-                            .setContent("Add our search widget to your home screen for quick, easy access.")
-                            .setPrimaryButton("Button")
-                            .setSecondaryButton("Button")
-                            .addEventListener(
-                                object : PromoBottomSheetDialog.EventListener() {
-                                    override fun onPrimaryButtonClicked() {
-                                        super.onPrimaryButtonClicked()
-                                        Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
-                                    }
-
-                                    override fun onSecondaryButtonClicked() {
-                                        super.onSecondaryButtonClicked()
-                                        Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
-                                    }
-                                },
-                            )
-                            .show()
-                    }
-                }
-
-                view.findViewById<Button>(R.id.promoBottomSheetButtonWithImage)?.let { button ->
-                    button.setOnClickListener {
-                        PromoBottomSheetDialog.Builder(requireContext())
-                            .setIcon(R.drawable.ic_bottom_sheet_promo_icon)
-                            .setTitle("Title")
-                            .setContent("Add our search widget to your home screen for quick, easy access.")
-                            .setPrimaryButton("Button")
-                            .setSecondaryButton("Button")
-                            .addEventListener(
-                                object : PromoBottomSheetDialog.EventListener() {
-                                    override fun onPrimaryButtonClicked() {
-                                        super.onPrimaryButtonClicked()
-                                        Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
-                                    }
-
-                                    override fun onSecondaryButtonClicked() {
-                                        super.onSecondaryButtonClicked()
-                                        Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
-                                    }
-                                },
-                            )
-                            .show()
-                    }
-                }
-
-                view.findViewById<Button>(R.id.animated_button)?.let {
-                    it.setOnClickListener {
-                        activity?.supportFragmentManager?.let { fragmentManager ->
-                            TypewriterDaxDialog.newInstance(
-                                daxText = "This is an example of a Dax dialog with an animated text",
-                                primaryButtonText = "Primary CTA",
-                                secondaryButtonText = "Secondary CTA",
-                                hideButtonText = "Hide",
-                                toolbarDimmed = true,
-                            ).show(fragmentManager, "dialog")
+                                        override fun onSecondaryItemClicked() {
+                                            Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
+                                        }
+                                    },
+                                )
+                                .show()
                         }
                     }
-                }
 
-                view.findViewById<Button>(R.id.not_dimmed_button)?.let {
-                    it.setOnClickListener {
-                        activity?.supportFragmentManager?.let { fragmentManager ->
-                            TypewriterDaxDialog.newInstance(
-                                daxText = "This is an example of a Dax dialog with toolbar location not dimmed",
-                                primaryButtonText = "Primary CTA",
-                                secondaryButtonText = "Secondary CTA",
-                                hideButtonText = "Hide",
-                                toolbarDimmed = false,
-                            ).show(fragmentManager, "dialog")
+                    view.findViewById<Button>(R.id.actionBottomSheetButtonWithTitle)?.let { button ->
+                        button.setOnClickListener {
+                            ActionBottomSheetDialog.Builder(requireContext())
+                                .setTitle("Title")
+                                .setPrimaryItem("Primary Item", R.drawable.ic_add_16)
+                                .setSecondaryItem("Secondary Item", R.drawable.ic_add_16)
+                                .addEventListener(
+                                    object : ActionBottomSheetDialog.EventListener() {
+                                        override fun onPrimaryItemClicked() {
+                                            Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
+                                        }
+
+                                        override fun onSecondaryItemClicked() {
+                                            Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
+                                        }
+                                    },
+                                )
+                                .show()
                         }
                     }
-                }
 
-                view.findViewById<Button>(R.id.dismissible_button)?.let {
-                    it.setOnClickListener {
-                        activity?.supportFragmentManager?.let { fragmentManager ->
-                            TypewriterDaxDialog.newInstance(
-                                daxText = "This is an example of a Dax dialog that can be dimissed by clicking anywhere in the screen.",
-                                primaryButtonText = "Primary CTA",
-                                secondaryButtonText = "Secondary CTA",
-                                hideButtonText = "Hide",
-                                toolbarDimmed = true,
-                                dismissible = true,
-                            ).show(fragmentManager, "dialog")
+                    view.findViewById<Button>(R.id.promoBottomSheetButton)?.let { button ->
+                        button.setOnClickListener {
+                            PromoBottomSheetDialog.Builder(requireContext())
+                                .setContent("Add our search widget to your home screen for quick, easy access.")
+                                .setPrimaryButton("Button")
+                                .setSecondaryButton("Button")
+                                .addEventListener(
+                                    object : PromoBottomSheetDialog.EventListener() {
+                                        override fun onPrimaryButtonClicked() {
+                                            super.onPrimaryButtonClicked()
+                                            Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
+                                        }
+
+                                        override fun onSecondaryButtonClicked() {
+                                            super.onSecondaryButtonClicked()
+                                            Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
+                                        }
+                                    },
+                                )
+                                .show()
                         }
                     }
-                }
 
-                view.findViewById<Button>(R.id.no_hide_button)?.let {
-                    it.setOnClickListener {
-                        activity?.supportFragmentManager?.let { fragmentManager ->
-                            TypewriterDaxDialog.newInstance(
-                                daxText = "This is an example of a Dax dialog without hide button.",
-                                primaryButtonText = "Primary CTA",
-                                secondaryButtonText = "Secondary CTA",
-                                hideButtonText = "Hide",
-                                toolbarDimmed = true,
-                                showHideButton = false,
-                            ).show(fragmentManager, "dialog")
+                    view.findViewById<Button>(R.id.promoBottomSheetButtonWithTitle)?.let { button ->
+                        button.setOnClickListener {
+                            PromoBottomSheetDialog.Builder(requireContext())
+                                .setTitle("Title")
+                                .setContent("Add our search widget to your home screen for quick, easy access.")
+                                .setPrimaryButton("Button")
+                                .setSecondaryButton("Button")
+                                .addEventListener(
+                                    object : PromoBottomSheetDialog.EventListener() {
+                                        override fun onPrimaryButtonClicked() {
+                                            super.onPrimaryButtonClicked()
+                                            Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
+                                        }
+
+                                        override fun onSecondaryButtonClicked() {
+                                            super.onSecondaryButtonClicked()
+                                            Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
+                                        }
+                                    },
+                                )
+                                .show()
                         }
                     }
-                }
 
-                view.findViewById<Button>(R.id.custom_typing_button)?.let {
-                    it.setOnClickListener {
-                        activity?.supportFragmentManager?.let { fragmentManager ->
-                            TypewriterDaxDialog.newInstance(
-                                daxText = "This is an example of a Dax dialog with a custom typing delay of 200ms.",
-                                primaryButtonText = "Primary CTA",
-                                secondaryButtonText = "Secondary CTA",
-                                hideButtonText = "Hide",
-                                toolbarDimmed = true,
-                                typingDelayInMs = 200L,
-                            ).show(fragmentManager, "dialog")
+                    view.findViewById<Button>(R.id.promoBottomSheetButtonWithImage)?.let { button ->
+                        button.setOnClickListener {
+                            PromoBottomSheetDialog.Builder(requireContext())
+                                .setIcon(R.drawable.ic_bottom_sheet_promo_icon)
+                                .setTitle("Title")
+                                .setContent("Add our search widget to your home screen for quick, easy access.")
+                                .setPrimaryButton("Button")
+                                .setSecondaryButton("Button")
+                                .addEventListener(
+                                    object : PromoBottomSheetDialog.EventListener() {
+                                        override fun onPrimaryButtonClicked() {
+                                            super.onPrimaryButtonClicked()
+                                            Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
+                                        }
+
+                                        override fun onSecondaryButtonClicked() {
+                                            super.onSecondaryButtonClicked()
+                                            Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
+                                        }
+                                    },
+                                )
+                                .show()
                         }
                     }
-                }
 
-                view.findViewById<Button>(R.id.cookie_content)?.let {
-                    it.setOnClickListener {
-                        activity?.supportFragmentManager?.let { fragmentManager ->
-                            LottieDaxDialog.newInstance(
-                                titleText = "Cookie Prompt",
-                                descriptionText = "This is an example of a Dax dialog with a custom animation",
-                                lottieRes = R.raw.cookie_banner_dark,
-                                primaryButtonText = "Primary CTA",
-                                secondaryButtonText = "Secondary CTA",
-                                hideButtonText = "Hide",
-                                showHideButton = false,
-                            ).show(fragmentManager, "dialog")
+                    view.findViewById<Button>(R.id.animated_button)?.let {
+                        it.setOnClickListener {
+                            activity?.supportFragmentManager?.let { fragmentManager ->
+                                TypewriterDaxDialog.newInstance(
+                                    daxText = "This is an example of a Dax dialog with an animated text",
+                                    primaryButtonText = "Primary CTA",
+                                    secondaryButtonText = "Secondary CTA",
+                                    hideButtonText = "Hide",
+                                    toolbarDimmed = true,
+                                ).show(fragmentManager, "dialog")
+                            }
+                        }
+                    }
+
+                    view.findViewById<Button>(R.id.not_dimmed_button)?.let {
+                        it.setOnClickListener {
+                            activity?.supportFragmentManager?.let { fragmentManager ->
+                                TypewriterDaxDialog.newInstance(
+                                    daxText = "This is an example of a Dax dialog with toolbar location not dimmed",
+                                    primaryButtonText = "Primary CTA",
+                                    secondaryButtonText = "Secondary CTA",
+                                    hideButtonText = "Hide",
+                                    toolbarDimmed = false,
+                                ).show(fragmentManager, "dialog")
+                            }
+                        }
+                    }
+
+                    view.findViewById<Button>(R.id.dismissible_button)?.let {
+                        it.setOnClickListener {
+                            activity?.supportFragmentManager?.let { fragmentManager ->
+                                TypewriterDaxDialog.newInstance(
+                                    daxText = "This is an example of a Dax dialog that can be dimissed by clicking anywhere in the screen.",
+                                    primaryButtonText = "Primary CTA",
+                                    secondaryButtonText = "Secondary CTA",
+                                    hideButtonText = "Hide",
+                                    toolbarDimmed = true,
+                                    dismissible = true,
+                                ).show(fragmentManager, "dialog")
+                            }
+                        }
+                    }
+
+                    view.findViewById<Button>(R.id.no_hide_button)?.let {
+                        it.setOnClickListener {
+                            activity?.supportFragmentManager?.let { fragmentManager ->
+                                TypewriterDaxDialog.newInstance(
+                                    daxText = "This is an example of a Dax dialog without hide button.",
+                                    primaryButtonText = "Primary CTA",
+                                    secondaryButtonText = "Secondary CTA",
+                                    hideButtonText = "Hide",
+                                    toolbarDimmed = true,
+                                    showHideButton = false,
+                                ).show(fragmentManager, "dialog")
+                            }
+                        }
+                    }
+
+                    view.findViewById<Button>(R.id.custom_typing_button)?.let {
+                        it.setOnClickListener {
+                            activity?.supportFragmentManager?.let { fragmentManager ->
+                                TypewriterDaxDialog.newInstance(
+                                    daxText = "This is an example of a Dax dialog with a custom typing delay of 200ms.",
+                                    primaryButtonText = "Primary CTA",
+                                    secondaryButtonText = "Secondary CTA",
+                                    hideButtonText = "Hide",
+                                    toolbarDimmed = true,
+                                    typingDelayInMs = 200L,
+                                ).show(fragmentManager, "dialog")
+                            }
+                        }
+                    }
+
+                    view.findViewById<Button>(R.id.cookie_content)?.let {
+                        it.setOnClickListener {
+                            activity?.supportFragmentManager?.let { fragmentManager ->
+                                LottieDaxDialog.newInstance(
+                                    titleText = "Cookie Prompt",
+                                    descriptionText = "This is an example of a Dax dialog with a custom animation",
+                                    lottieRes = R.raw.cookie_banner_dark,
+                                    primaryButtonText = "Primary CTA",
+                                    secondaryButtonText = "Secondary CTA",
+                                    hideButtonText = "Hide",
+                                    showHideButton = false,
+                                ).show(fragmentManager, "dialog")
+                            }
                         }
                     }
                 }

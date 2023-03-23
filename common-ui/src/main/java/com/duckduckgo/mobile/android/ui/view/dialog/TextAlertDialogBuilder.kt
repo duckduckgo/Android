@@ -21,8 +21,11 @@ import android.view.LayoutInflater
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.DialogTextAlertBinding
+import com.duckduckgo.mobile.android.ui.view.button.DaxButton
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
@@ -40,21 +43,14 @@ class TextAlertDialogBuilder(val context: Context) : DaxAlertDialog {
 
     private var dialog: AlertDialog? = null
 
-    var listener: EventListener = DefaultEventListener()
-        private set
-    var titleText: CharSequence = ""
-        private set
-    var messageText: CharSequence = ""
-        private set
-    var headerImageDrawableId = 0
-        private set
-    var positiveButtonText: CharSequence = ""
-        private set
-    var negativeButtonText: CharSequence = ""
-        private set
-
-    var isCancellable: Boolean = false
-        private set
+    private var listener: EventListener = DefaultEventListener()
+    private var titleText: CharSequence = ""
+    private var messageText: CharSequence = ""
+    private var headerImageDrawableId = 0
+    private var positiveButtonText: CharSequence = ""
+    private var negativeButtonText: CharSequence = ""
+    private var isCancellable: Boolean = false
+    private var isDestructiveVersion: Boolean = false
 
     fun setHeaderImageResource(@DrawableRes drawableId: Int): TextAlertDialogBuilder {
         headerImageDrawableId = drawableId
@@ -93,6 +89,11 @@ class TextAlertDialogBuilder(val context: Context) : DaxAlertDialog {
 
     fun setCancellable(cancellable: Boolean): TextAlertDialogBuilder {
         isCancellable = cancellable
+        return this
+    }
+
+    fun setDestructiveButtons(isDestructive: Boolean): TextAlertDialogBuilder {
+        isDestructiveVersion = isDestructive
         return this
     }
 
@@ -155,15 +156,44 @@ class TextAlertDialogBuilder(val context: Context) : DaxAlertDialog {
             binding.textAlertDialogMessage.text = messageText
         }
 
-        binding.textAlertDialogPositiveButton.text = positiveButtonText
-        binding.textAlertDialogPositiveButton.setOnClickListener {
-            listener.onPositiveButtonClicked()
-            dialog.dismiss()
-        }
+        setButtons(binding, dialog)
+    }
 
-        binding.textAlertDialogCancelButton.text = negativeButtonText
-        binding.textAlertDialogCancelButton.setOnClickListener {
-            listener.onNegativeButtonClicked()
+    private fun setButtons(
+        binding: DialogTextAlertBinding,
+        dialog: AlertDialog,
+    ) {
+        binding.textAlertDialogPositiveButton.isVisible = !isDestructiveVersion
+        binding.textAlertDialogPositiveDestructiveButton.isVisible = isDestructiveVersion
+        binding.textAlertDialogCancelButton.isVisible = !isDestructiveVersion
+        binding.textAlertDialogCancelDestructiveButton.isVisible = isDestructiveVersion
+
+        if (isDestructiveVersion) {
+            setButtonListener(binding.textAlertDialogPositiveDestructiveButton, positiveButtonText, dialog) { listener.onPositiveButtonClicked() }
+            setButtonListener(binding.textAlertDialogCancelDestructiveButton, negativeButtonText, dialog) { listener.onNegativeButtonClicked() }
+            // no need to get fancy, just change the button textColor
+            binding.textAlertDialogCancelDestructiveButton.setTextColor(
+                ContextCompat.getColorStateList(
+                    context,
+                    R.color.secondary_text_color_selector,
+                ),
+            )
+        } else {
+            setButtonListener(binding.textAlertDialogPositiveButton, positiveButtonText, dialog) { listener.onPositiveButtonClicked() }
+            setButtonListener(binding.textAlertDialogCancelButton, negativeButtonText, dialog) { listener.onNegativeButtonClicked() }
+        }
+    }
+
+    private fun setButtonListener(
+        button: DaxButton,
+        text: CharSequence,
+        dialog: AlertDialog,
+        onClick: () -> Unit,
+
+    ) {
+        button.text = text
+        button.setOnClickListener {
+            onClick.invoke()
             dialog.dismiss()
         }
     }

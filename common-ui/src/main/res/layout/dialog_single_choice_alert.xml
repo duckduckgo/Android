@@ -51,7 +51,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_2"
         android:fadeScrollbars="false"
-        app:layout_constraintBottom_toTopOf="@id/radioListDialogPositiveButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_max="@dimen/dialogRadioGroupHeightMax"
         app:layout_constraintStart_toStartOf="parent"
@@ -74,6 +73,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/radioListDialogContent"/>
 
+    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonDestructive
+        android:id="@+id/radioListDialogDestructivePositiveButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_4"
+        android:text="Positive"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/radioListDialogContent"/>
+
     <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
         android:id="@+id/radioListDialogNegativeButton"
         android:layout_width="wrap_content"
@@ -83,6 +92,17 @@
         android:text="Cancel"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/radioListDialogPositiveButton"
+        app:layout_constraintTop_toBottomOf="@+id/radioListDialogContent"/>
+
+    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
+        android:id="@+id/radioListDestructiveDialogNegativeButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_4"
+        android:layout_marginEnd="@dimen/keyline_2"
+        android:text="Cancel"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/radioListDialogDestructivePositiveButton"
         app:layout_constraintTop_toBottomOf="@+id/radioListDialogContent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
