@@ -14,8 +14,6 @@
     BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
     'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
     -webkit-font-smoothing: antialiased;
-    /* move it offscreen to avoid flashing */
-    transform: translate(-1000px);
     z-index: 2147483647;
 }
 :not(.top-autofill).wrapper--data {
@@ -69,8 +67,12 @@
     color: #333333;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
 }
-.tooltip--email::before,
-.tooltip--email::after {
+.tooltip--email__caret {
+    position: absolute;
+    z-index: 2147483647;
+}
+.tooltip--email__caret::before,
+.tooltip--email__caret::after {
     content: "";
     width: 0;
     height: 0;
@@ -79,15 +81,15 @@
     display: block;
     border-bottom: 8px solid #D0D0D0;
     position: absolute;
-    right: 20px;
+    right: -26px;
 }
-.tooltip--email::before {
+.tooltip--email__caret::before {
     border-bottom-color: #D0D0D0;
-    top: -9px;
+    top: -1px;
 }
-.tooltip--email::after {
+.tooltip--email__caret::after {
     border-bottom-color: #FFFFFF;
-    top: -8px;
+    top: 0px;
 }
 
 /* Buttons */
@@ -264,8 +266,9 @@ hr:first-child {
 
 /* Email Protection signup notice */
 :not(.top-autofill) .tooltip--email-signup {
+    text-align: left;
     color: #222222;
-    padding: 20px;
+    padding: 16px 20px;
     width: 380px;
 }
 
@@ -291,6 +294,7 @@ hr:first-child {
     border: 0;
     cursor: pointer;
     display: inline-block;
+    font-family: inherit;
     font-style: normal;
     font-weight: bold;
     padding: 8px 12px;
@@ -329,4 +333,17 @@ hr:first-child {
 .tooltip--email-signup button.ghost:active {
     background-color: rgba(0, 0, 0, 0.12);
     color: #1e42a4;
+}
+
+.tooltip--email-signup button.close-tooltip {
+    background-color: transparent;
+    background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iMTMiIHZpZXdCb3g9IjAgMCAxMiAxMyIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0wLjI5Mjg5NCAwLjY1NjkwN0MwLjY4MzQxOCAwLjI2NjM4MyAxLjMxNjU4IDAuMjY2MzgzIDEuNzA3MTEgMC42NTY5MDdMNiA0Ljk0OThMMTAuMjkyOSAwLjY1NjkwN0MxMC42ODM0IDAuMjY2MzgzIDExLjMxNjYgMC4yNjYzODMgMTEuNzA3MSAwLjY1NjkwN0MxMi4wOTc2IDEuMDQ3NDMgMTIuMDk3NiAxLjY4MDYgMTEuNzA3MSAyLjA3MTEyTDcuNDE0MjEgNi4zNjQwMUwxMS43MDcxIDEwLjY1NjlDMTIuMDk3NiAxMS4wNDc0IDEyLjA5NzYgMTEuNjgwNiAxMS43MDcxIDEyLjA3MTFDMTEuMzE2NiAxMi40NjE2IDEwLjY4MzQgMTIuNDYxNiAxMC4yOTI5IDEyLjA3MTFMNiA3Ljc3ODIzTDEuNzA3MTEgMTIuMDcxMUMxLjMxNjU4IDEyLjQ2MTYgMC42ODM0MTcgMTIuNDYxNiAwLjI5Mjg5MyAxMi4wNzExQy0wLjA5NzYzMTEgMTEuNjgwNiAtMC4wOTc2MzExIDExLjA0NzQgMC4yOTI4OTMgMTAuNjU2OUw0LjU4NTc5IDYuMzY0MDFMMC4yOTI4OTQgMi4wNzExMkMtMC4wOTc2MzA2IDEuNjgwNiAtMC4wOTc2MzA2IDEuMDQ3NDMgMC4yOTI4OTQgMC42NTY5MDdaIiBmaWxsPSJibGFjayIgZmlsbC1vcGFjaXR5PSIwLjg0Ii8+Cjwvc3ZnPgo=);
+    background-position: center center;
+    background-repeat: no-repeat;
+    border: 0;
+    cursor: pointer;
+    padding: 16px;
+    position: absolute;
+    right: 12px;
+    top: 12px;
 }
