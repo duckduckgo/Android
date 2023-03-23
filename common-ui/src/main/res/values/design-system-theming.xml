@@ -73,6 +73,7 @@
         <item name="materialDividerStyle">@style/Widget.DuckDuckGo.ListDivider</item>
 
         <!-- Design System Components -->
+        <item name="themedButton">@style/Widget.MaterialComponents.Button</item>
         <item name="daxButtonPrimary">@style/Widget.DuckDuckGo.DaxButton.TextButton.Primary</item>
         <item name="daxButtonSecondary">@style/Widget.DuckDuckGo.DaxButton.Secondary</item>
         <item name="daxButtonDestructive">@style/Widget.DuckDuckGo.DaxButton.TextButton.Destructive</item>

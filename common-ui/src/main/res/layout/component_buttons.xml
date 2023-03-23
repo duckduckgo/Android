@@ -32,6 +32,21 @@
         android:layout_width="match_parent"
         app:primaryText="Dax Buttons"/>
 
+    <com.duckduckgo.mobile.android.ui.view.button.ThemeButton
+        android:id="@+id/dax_themed_button_primary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:buttonType="primary"
+        app:buttonSize="small"
+        android:text="Primary Small"/>
+
+    <com.duckduckgo.mobile.android.ui.view.button.ThemeButton
+        android:id="@+id/dax_themed_button_secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:buttonType="secondary"
+        android:text="Secondary Small"/>
+
     <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
         android:id="@+id/dax_button_primary"
         android:layout_width="wrap_content"

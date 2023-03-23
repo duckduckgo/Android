@@ -31,4 +31,13 @@
 
     <attr name="radioButtonStyle" format="reference"/>
 
+    <declare-styleable name="ThemeButton">
+        <attr name="buttonType" format="enum">
+            <enum name="primary" value="0"/>
+            <enum name="secondary" value="1"/>
+            <enum name="destructive" value="2"/>
+        </attr>
+    </declare-styleable>
+    <attr name="themedButton" format="reference"/>
+
 </resources>
