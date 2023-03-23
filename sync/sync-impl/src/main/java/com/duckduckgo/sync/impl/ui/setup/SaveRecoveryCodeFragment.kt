@@ -38,6 +38,7 @@ import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.Crea
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.Error
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewState
 import com.google.zxing.BarcodeFormat.QR_CODE
+import com.google.zxing.EncodeHintType
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
@@ -105,6 +106,7 @@ class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_c
                     QR_CODE,
                     resources.getDimensionPixelSize(R.dimen.qrSizeSmall),
                     resources.getDimensionPixelSize(R.dimen.qrSizeSmall),
+                    mapOf(EncodeHintType.MARGIN to 0)
                 )
                 binding.qrCodeImageView.show()
                 binding.qrCodeImageView.setImageBitmap(bitmap)

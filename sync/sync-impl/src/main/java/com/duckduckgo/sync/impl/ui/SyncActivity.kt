@@ -37,6 +37,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSet
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity
 import com.google.zxing.BarcodeFormat.QR_CODE
+import com.google.zxing.EncodeHintType
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -100,6 +101,7 @@ class SyncActivity : DuckDuckGoActivity() {
                 QR_CODE,
                 resources.getDimensionPixelSize(R.dimen.qrSizeLarge),
                 resources.getDimensionPixelSize(R.dimen.qrSizeLarge),
+                mapOf(EncodeHintType.MARGIN to 0)
             )
             binding.qrCodeImageView.show()
             binding.qrCodeImageView.setImageBitmap(bitmap)
