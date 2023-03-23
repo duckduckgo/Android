@@ -16,10 +16,12 @@
 
 package com.duckduckgo.sync.impl.ui.setup
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContract
 import androidx.fragment.app.commitNow
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -30,12 +32,16 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.R.id
 import com.duckduckgo.sync.impl.databinding.ActivitySyncSetupAccountBinding
+import com.duckduckgo.sync.impl.ui.SyncConnectActivity
+import com.duckduckgo.sync.impl.ui.SyncDeviceConnectedFragment
+import com.duckduckgo.sync.impl.ui.SyncLoginActivity
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.DEVICE_CONNECTED
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_CODE
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SETUP
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.Close
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.RecoverSyncData
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.SyncAnotherDevice
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSaveRecoveryCode
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSyncAnotherDevice
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.DeviceConnected
@@ -45,6 +51,23 @@ import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.ViewMode.Initial
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.ViewMode.SyncAnotherDeviceScreen
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import timber.log.Timber
+
+class ConnectContract : ActivityResultContract<Void?, Boolean>() {
+    override fun createIntent(
+        context: Context,
+        input: Void?,
+    ): Intent {
+        return SyncConnectActivity.intent(context)
+    }
+
+    override fun parseResult(
+        resultCode: Int,
+        intent: Intent?,
+    ): Boolean {
+        return resultCode == Activity.RESULT_OK
+    }
+}
 
 @InjectWith(ActivityScope::class)
 class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
@@ -55,6 +78,13 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
 
     private val loginFlow = registerForActivityResult(LoginContract()) { resultOk ->
         if (resultOk) {
+            viewModel.onLoginSucess()
+        }
+    }
+
+    private val connectFlow = registerForActivityResult(ConnectContract()) { resultOk ->
+        if (resultOk) {
+            Toast.makeText(this, "login went well", Toast.LENGTH_LONG).show()
             viewModel.onLoginSucess()
         }
     }
@@ -105,6 +135,7 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
         when (it) {
             Close -> finish()
             RecoverSyncData -> loginFlow.launch(null)
+            SyncAnotherDevice -> connectFlow.launch(null)
         }
     }
 
@@ -149,7 +180,7 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
     }
 
     override fun syncAnotherDevice() {
-        // noop
+        viewModel.onSyncAnotherDevice()
     }
 
     override fun launchFinishSetupFlow() {

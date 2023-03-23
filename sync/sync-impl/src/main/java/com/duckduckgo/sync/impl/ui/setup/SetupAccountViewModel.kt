@@ -28,6 +28,7 @@ import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.R
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SETUP
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.Close
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.RecoverSyncData
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.SyncAnotherDevice
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSaveRecoveryCode
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSyncAnotherDevice
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.DeviceConnected
@@ -79,6 +80,7 @@ class SetupAccountViewModel @Inject constructor(
     sealed class Command {
         object Close : Command()
         object RecoverSyncData : Command()
+        object SyncAnotherDevice : Command()
     }
 
     fun onBackPressed() {
@@ -118,6 +120,12 @@ class SetupAccountViewModel @Inject constructor(
     fun onLoginSucess() {
         viewModelScope.launch {
             viewState.emit(ViewState(viewMode = DeviceConnected))
+        }
+    }
+
+    fun onSyncAnotherDevice() {
+        viewModelScope.launch {
+            command.send(SyncAnotherDevice)
         }
     }
 }

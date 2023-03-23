@@ -41,7 +41,7 @@ class ShowQRCodeViewModel @Inject constructor(
     fun commands(): Flow<SyncLoginViewModel.Command> = command.receiveAsFlow()
 
     data class ViewState(
-        val qrCode: String = "",
+        val qrCode: String? = null,
     )
 
     sealed class Command {

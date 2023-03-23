@@ -27,13 +27,12 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.LoginSucess
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.ReadQRCode
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.ReadTextCode
-import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.ShowQRCode
-import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import javax.inject.*
 
 @ContributesViewModel(ActivityScope::class)
 class SyncLoginViewModel @Inject constructor(
@@ -45,7 +44,6 @@ class SyncLoginViewModel @Inject constructor(
 
     sealed class Command {
         object ReadQRCode : Command()
-        object ShowQRCode : Command()
         object ReadTextCode : Command()
         object LoginSucess : Command()
         object Error : Command()
@@ -71,12 +69,6 @@ class SyncLoginViewModel @Inject constructor(
             } else {
                 command.send(LoginSucess)
             }
-        }
-    }
-
-    fun onShowQRCodeClicked() {
-        viewModelScope.launch {
-            command.send(ShowQRCode)
         }
     }
 }

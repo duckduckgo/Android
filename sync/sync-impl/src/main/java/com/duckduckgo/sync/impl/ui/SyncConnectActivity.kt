@@ -87,7 +87,7 @@ class SyncConnectActivity : DuckDuckGoActivity() {
                 setResult(RESULT_OK)
                 finish()
             }
-            ShowQRCode -> TODO()
+            ShowQRCode -> ShowQRCodeActivity.intent(this).also { startActivity(it) }
             Command.Error -> {
                 setResult(RESULT_CANCELED)
                 finish()

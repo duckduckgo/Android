@@ -16,6 +16,9 @@
 
 package com.duckduckgo.sync.impl.ui
 
+import android.content.Context
+import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -23,10 +26,14 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import com.duckduckgo.sync.impl.databinding.ActivityLoginSyncBinding
+import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivityShowQrCodeBinding
 import com.duckduckgo.sync.impl.ui.ShowQRCodeViewModel.ViewState
+import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command
+import com.google.zxing.BarcodeFormat.QR_CODE
+import com.journeyapps.barcodescanner.BarcodeEncoder
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -57,10 +64,26 @@ class ShowQRCodeActivity: DuckDuckGoActivity() {
     }
 
     private fun renderViewState(viewState: ViewState) {
-        binding.qrCodeImageView.setImageBitmap(viewState.qrCode)
+        if (!viewState.qrCode.isNullOrEmpty()) {
+            val barcodeEncoder = BarcodeEncoder()
+            val bitmap: Bitmap = barcodeEncoder.encodeBitmap(
+                viewState.qrCode,
+                QR_CODE,
+                resources.getDimensionPixelSize(R.dimen.qrSizeXLarge),
+                resources.getDimensionPixelSize(R.dimen.qrSizeXLarge),
+            )
+            binding.qrCodeImageView.show()
+            binding.qrCodeImageView.setImageBitmap(bitmap)
+        }
     }
 
-    private fun processCommand() {
+    private fun processCommand(command: Command) {
 
+    }
+
+    companion object {
+        fun intent(context: Context): Intent {
+            return Intent(context, ShowQRCodeActivity::class.java)
+        }
     }
 }
