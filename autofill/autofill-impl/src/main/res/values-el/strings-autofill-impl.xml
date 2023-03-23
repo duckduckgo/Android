@@ -38,7 +38,6 @@
     <string name="useSavedLoginDialogGroupThisWebsite">Από αυτόν τον ιστότοπο</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Από %1$s</string>
 
-    <string name="updateLoginDialogTitle">Ενημέρωση κωδικού πρόσβασης;</string>
     <string name="updateLoginDialogButtonUpdatePassword">Ενημέρωση κωδικού πρόσβασης</string>
     <string name="updateLoginDialogButtonNotNow">Όχι τώρα</string>
 

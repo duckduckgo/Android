@@ -38,7 +38,6 @@
     <string name="useSavedLoginDialogGroupThisWebsite">От този уебсайт</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">От %1$s</string>
 
-    <string name="updateLoginDialogTitle">Актуализиране на паролата?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Актуализиране на паролата</string>
     <string name="updateLoginDialogButtonNotNow">Не сега</string>
 

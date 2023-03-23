@@ -38,7 +38,6 @@
     <string name="useSavedLoginDialogGroupThisWebsite">Bu Web Sitesinden</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">%1$s adresinden</string>
 
-    <string name="updateLoginDialogTitle">Şifre Güncellensin mi?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Şifreyi Güncelle</string>
     <string name="updateLoginDialogButtonNotNow">Şimdi Değil</string>
 

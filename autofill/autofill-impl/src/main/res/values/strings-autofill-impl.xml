@@ -23,8 +23,8 @@
     <string name="managementDisabledModeSubtitle">A device lock pattern, PIN, or biometrics is required to protect your Logins.</string>
     <string name="managementDisabledModeTitle">Secure your device to save Logins</string>
 
-    <string name="saveLoginDialogTitle">Save Login?</string>
-    <string name="saveLoginMissingUsernameDialogTitle">Save Password?</string>
+    <string name="saveLoginDialogTitle">Save login?</string>
+    <string name="saveLoginMissingUsernameDialogTitle">Save password?</string>
     <string name="saveLoginDialogButtonSave">Save Login</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Save Password</string>
     <string name="saveLoginDialogNotNow">Not Now</string>
@@ -38,11 +38,10 @@
     <string name="useSavedLoginDialogGroupThisWebsite">From This Website</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">From %1$s</string>
 
-    <string name="updateLoginDialogTitle">Update Password?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Update Password</string>
     <string name="updateLoginDialogButtonNotNow">Not Now</string>
 
-    <string name="updateLoginDialogTitleUpdateUsername">Update Username?</string>
+    <string name="updateLoginDialogTitleUpdateUsername">Update username?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Update Username</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Close Autofill Dialog</string>

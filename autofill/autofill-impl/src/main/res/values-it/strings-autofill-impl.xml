@@ -38,7 +38,6 @@
     <string name="useSavedLoginDialogGroupThisWebsite">Da questo sito web</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Da %1$s</string>
 
-    <string name="updateLoginDialogTitle">Aggiornare password?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Aggiorna password</string>
     <string name="updateLoginDialogButtonNotNow">Non adesso</string>
 

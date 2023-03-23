@@ -38,7 +38,6 @@
     <string name="useSavedLoginDialogGroupThisWebsite">Iš šios svetainės</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Iš %1$s</string>
 
-    <string name="updateLoginDialogTitle">Atnaujinti slaptažodį?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Atnaujinti slaptažodį</string>
     <string name="updateLoginDialogButtonNotNow">Ne dabar</string>
 

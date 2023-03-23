@@ -38,7 +38,6 @@
     <string name="useSavedLoginDialogGroupThisWebsite">S ove web lokacije</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">S %1$s</string>
 
-    <string name="updateLoginDialogTitle">Želiš li ažurirati lozinku?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Ažuriraj lozinku</string>
     <string name="updateLoginDialogButtonNotNow">Ne sada</string>
 

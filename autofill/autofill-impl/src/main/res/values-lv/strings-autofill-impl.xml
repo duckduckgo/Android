@@ -38,7 +38,6 @@
     <string name="useSavedLoginDialogGroupThisWebsite">No šīs vietnes</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">No %1$s</string>
 
-    <string name="updateLoginDialogTitle">Atjaunināt paroli?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Atjaunināt paroli</string>
     <string name="updateLoginDialogButtonNotNow">Ne tagad</string>
 
