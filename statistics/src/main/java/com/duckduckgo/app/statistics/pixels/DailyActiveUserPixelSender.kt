@@ -20,7 +20,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.app.statistics.api.FeatureEnabledPlugin
+import com.duckduckgo.app.statistics.api.BrowserFeatureStateReporterPlugin
 import com.duckduckgo.app.statistics.api.RefreshRetentionAtbPlugin
 import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName
 import com.duckduckgo.di.scopes.AppScope
@@ -29,24 +29,23 @@ import javax.inject.Inject
 import org.threeten.bp.Instant
 import org.threeten.bp.ZoneOffset
 import org.threeten.bp.format.DateTimeFormatter
-import timber.log.Timber
 
 @ContributesMultibinding(AppScope::class)
 class DailyActiveUserPixelSender @Inject constructor(
     private val context: Context,
     private val pixel: Pixel,
-    private val plugins: PluginPoint<FeatureEnabledPlugin>,
+    private val plugins: PluginPoint<BrowserFeatureStateReporterPlugin>,
 ) : RefreshRetentionAtbPlugin {
 
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(PIXELS_PREF_FILE, Context.MODE_PRIVATE)
 
     override fun onSearchRetentionAtbRefreshed() {
-        tryToFireDailyPixel(StatisticsPixelName.DAILY_ACTIVE.pixelName)
+        tryToFireDailyPixel(StatisticsPixelName.BROWSER_DAILY_ACTIVE_FEATURE_STATE.pixelName)
     }
 
     override fun onAppRetentionAtbRefreshed() {
-        tryToFireDailyPixel(StatisticsPixelName.DAILY_ACTIVE.pixelName)
+        tryToFireDailyPixel(StatisticsPixelName.BROWSER_DAILY_ACTIVE_FEATURE_STATE.pixelName)
     }
 
     private fun tryToFireDailyPixel(
@@ -54,22 +53,17 @@ class DailyActiveUserPixelSender @Inject constructor(
     ) {
         val now = getUtcIsoLocalDate()
         val timestamp = preferences.getString(pixelName.appendTimestampSuffix(), null)
-        val parameters = addFeatureParameters()
+
+        val parameters = mutableMapOf<String, String>()
+        plugins.getPlugins().forEach { plugin ->
+            parameters[plugin.featureName()] = plugin.isFeatureEnabled().toBinaryString()
+        }
+
         // check if pixel was already sent in the current day
         if (timestamp == null || now > timestamp) {
-            Timber.d("Firing daily active pixel with parameters: $parameters")
             pixel.fire(pixelName, parameters, emptyMap())
                 .also { preferences.edit { putString(pixelName.appendTimestampSuffix(), now) } }
         }
-    }
-
-    private fun addFeatureParameters(): Map<String, String> {
-        val parameters = mutableMapOf<String, String>()
-        plugins.getPlugins().forEach { plugin ->
-            Timber.d("Daily active pixel with feature $plugin")
-            parameters[plugin.featureName()] = plugin.isFeatureEnabled().toBinaryString()
-        }
-        return parameters
     }
 
     private fun getUtcIsoLocalDate(): String {

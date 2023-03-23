@@ -17,19 +17,21 @@
 package com.duckduckgo.app.statistics.api
 
 import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName
 import com.duckduckgo.di.scopes.AppScope
 
 @ContributesPluginPoint(AppScope::class)
-interface FeatureEnabledPlugin {
+interface BrowserFeatureStateReporterPlugin {
 
     /**
-     * Used with the DAU pixel, to notify is a feature is enabled or not
+     * Used by the [StatisticsPixelName.BROWSER_DAILY_ACTIVE_FEATURE_STATE] pixel,
+     * to notify is a feature is enabled or not
      * @return true if the feature is enabled, false if not
      */
     fun isFeatureEnabled(): Boolean
 
     /**
-     * Identifies the feature name
+     * Identifies the feature name that will be sent as parameter in [StatisticsPixelName.BROWSER_DAILY_ACTIVE_FEATURE_STATE]
      * @return the name of the feature
      */
     fun featureName(): String
