@@ -17,6 +17,7 @@
 package com.duckduckgo.autofill.impl.ui.credential.management
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.autofill.api.TestUrlUnicodeNormalizer
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialListSorterByTitleAndDomain
 import com.duckduckgo.autofill.store.urlmatcher.AutofillDomainNameUrlMatcher
@@ -28,7 +29,8 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class CredentialListSorterTest {
 
-    private val autofillUrlMatcher = AutofillDomainNameUrlMatcher()
+    private val unicodeNormalizer = TestUrlUnicodeNormalizer()
+    private val autofillUrlMatcher = AutofillDomainNameUrlMatcher(unicodeNormalizer)
 
     private val testee = CredentialListSorterByTitleAndDomain(autofillUrlMatcher = autofillUrlMatcher)
     private val list = mutableListOf<LoginCredentials>()
@@ -306,6 +308,20 @@ class CredentialListSorterTest {
             },
         )
         sorted.assertIdOrder(0, 4, 3, 2, 1, 5)
+    }
+
+    @Test
+    fun whenDomainsStartWithDecomposableLetterThenIsDecomposedInOrdering() {
+        unicodeNormalizer.overrides["ç.com"] = "c.com"
+        val sorted = testee.sort(
+            list.also {
+                it.add(creds(id = 0, domain = "a.com"))
+                it.add(creds(id = 1, domain = "b.com"))
+                it.add(creds(id = 2, domain = "ç.com"))
+                it.add(creds(id = 3, domain = "d.com"))
+            },
+        )
+        sorted.assertIdOrder(0, 1, 2, 3)
     }
 
     private fun List<LoginCredentials>.assertTitleOrder(vararg titles: String?) {

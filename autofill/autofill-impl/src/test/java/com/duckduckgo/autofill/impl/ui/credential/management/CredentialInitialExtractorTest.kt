@@ -17,6 +17,7 @@
 package com.duckduckgo.autofill.impl.ui.credential.management
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.autofill.api.TestUrlUnicodeNormalizer
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialInitialExtractor
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialInitialExtractor.Companion.INITIAL_CHAR_FOR_NON_LETTERS
@@ -28,7 +29,8 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class CredentialInitialExtractorTest {
 
-    private val testee = CredentialInitialExtractor(autofillUrlMatcher = AutofillDomainNameUrlMatcher())
+    private val unicodeNormalizer = TestUrlUnicodeNormalizer()
+    private val testee = CredentialInitialExtractor(autofillUrlMatcher = AutofillDomainNameUrlMatcher(unicodeNormalizer))
 
     @Test
     fun whenMissingTitleAndDomainThenPlaceholderChar() {
@@ -68,15 +70,28 @@ class CredentialInitialExtractorTest {
         testee.extractInitial(loginCredentials).assertIsPlaceholder()
     }
 
-    @Test()
+    @Test
     fun whenTitleStartsWithANonLatinLetterThatCannotBeDecomposedThenOriginalLetterIsUsed() {
         val loginCredentials = creds(title = "ß website")
         assertEquals("ß", testee.extractInitial(loginCredentials))
     }
 
     @Test
+    fun whenDomainStartsWithANonLatinLetterThatCannotBeDecomposedThenOriginalLetterIsUsed() {
+        val loginCredentials = creds(title = "ß.com")
+        assertEquals("ß", testee.extractInitial(loginCredentials))
+    }
+
+    @Test
     fun whenTitleStartsWithAnAccentedLetterThenThatBaseLetterIsUsed() {
         val loginCredentials = creds(title = "Ça va website")
+        assertEquals("C", testee.extractInitial(loginCredentials))
+    }
+
+    @Test
+    fun whenDomainStartsWithAnAccentedLetterThenThatBaseLetterIsUsed() {
+        unicodeNormalizer.overrides["ça.com"] = "ca.com"
+        val loginCredentials = creds(domain = "ça.com")
         assertEquals("C", testee.extractInitial(loginCredentials))
     }
 

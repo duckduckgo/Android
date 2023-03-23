@@ -105,7 +105,7 @@ class CredentialListSorterByTitleAndDomain @Inject constructor(
     }
 
     /**
-     * Get the best candidate to sort on between the title and the e-tld+1.
+     * Get the best candidate to sort on between the title and the user-facing e-tld+1.
      * If a title is present and different from the other title being compared, then title is the best thing to compare.
      * If both titles being compared are identical, or title is missing, then we want to use the e-tld+1.
      *
@@ -121,7 +121,7 @@ class CredentialListSorterByTitleAndDomain @Inject constructor(
             return title
         }
 
-        domainParts.eTldPlus1?.let { return it }
+        domainParts.userFacingETldPlus1?.let { return it }
 
         return rawDomain
     }

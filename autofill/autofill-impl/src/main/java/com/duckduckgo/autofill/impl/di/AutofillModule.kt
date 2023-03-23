@@ -21,6 +21,7 @@ import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autofill.api.InternalTestUserChecker
+import com.duckduckgo.autofill.api.encoding.UrlUnicodeNormalizer
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.api.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.autofill.store.ALL_MIGRATIONS
@@ -65,7 +66,7 @@ class AutofillModule {
     }
 
     @Provides
-    fun provideAutofillUrlMatcher(): AutofillUrlMatcher = AutofillDomainNameUrlMatcher()
+    fun provideAutofillUrlMatcher(unicodeNormalizer: UrlUnicodeNormalizer): AutofillUrlMatcher = AutofillDomainNameUrlMatcher(unicodeNormalizer)
 
     @SingleInstanceIn(AppScope::class)
     @Provides
