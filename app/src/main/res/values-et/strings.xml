@@ -508,8 +508,8 @@
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Mitte kunagi</string>
     <string name="disableLoginDetectionDialogTitle">Kas keelata tulekindel meeldetuletus saitidele sisselogimisel?</string>
     <string name="disableLoginDetectionDialogDescription">Seda eelistust saate seadetes igal ajal muuta.</string>
-    <string name="disableLoginDetectionDialogPositive">KEELA</string>
-    <string name="disableLoginDetectionDialogNegative">TÜHISTA</string>
+    <string name="disableLoginDetectionDialogPositive">Keela</string>
+    <string name="disableLoginDetectionDialogNegative">Loobu</string>
     <string name="automaticFireproofWebsiteLoginDialogTitle">Automaatselt tulekindlad veebisaidid sisselogimisel?</string>
     <string name="automaticFireproofWebsiteLoginDialogDescription">Saitide muutmine tulekindaks hoiab sind sisse logitud pärast tulenupu kasutamist. Seda saab sätete alt alati muuta. </string>
     <string name="automaticFireproofWebsiteLoginDialogFirstOption">Alati tulekindel</string>
