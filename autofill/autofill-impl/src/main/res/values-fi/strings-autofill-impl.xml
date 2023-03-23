@@ -17,11 +17,11 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Täytä kirjautumistiedot automaattisesti</string>
+    <string name="autofillManagementScreenTitle">Kirjautumistiedot</string>
 
     <string name="managementDisabledModeCta"><b>Määritä Asetuksissa</b></string>
-    <string name="managementDisabledModeSubtitle">Automaattisen täytön kirjautumistietojen suojaamiseen tarvitaan laitteen lukituskuvio, PIN-koodi tai biometriset tiedot.</string>
-    <string name="managementDisabledModeTitle">Suojaa laitteesi automaattisen täytön käyttöä varten</string>
+    <string name="managementDisabledModeSubtitle">Kirjautumistietojen suojaamiseen tarvitaan laitteen lukituskuvio, PIN-koodi tai biometriset tiedot.</string>
+    <string name="managementDisabledModeTitle">Suojaa laitteesi kirjautumistietojen tallentamiseksi</string>
 
     <string name="saveLoginDialogTitle">Tallennetaanko kirjautumistiedot?</string>
     <string name="saveLoginMissingUsernameDialogTitle">Tallennetaanko salasana?</string>
