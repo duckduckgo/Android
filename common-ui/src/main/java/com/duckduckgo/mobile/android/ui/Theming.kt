@@ -69,6 +69,8 @@ object Theming {
         val FIXED_THEME_ACTIVITIES = listOf(
             "com.duckduckgo.app.onboarding.ui.OnboardingActivity",
             "com.duckduckgo.sync.impl.ui.SyncLoginActivity",
+            "com.duckduckgo.sync.impl.ui.SyncConnectActivity",
+            "com.duckduckgo.sync.impl.ui.ShowQRCodeActivity",
         )
     }
 }
