@@ -123,7 +123,8 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
         binding.daxDialogMultiselectCta?.apply {
             root.show()
             root.animate().alpha(1.0f).duration = 1000
-            secondaryCta.setOnClickListener { event(WelcomePageView.Event.OnPrimaryCtaClicked) }
+            primaryCta.setOnClickListener { event(WelcomePageView.Event.OnSkipOptions) }
+            secondaryCta.setOnClickListener { event(WelcomePageView.Event.OnSkipOptions) }
             optionPrivateSearch.setOnClickListener { showContinueButton() }
             optionTrackerBlocking.setOnClickListener { showContinueButton() }
             optionSmallerFootprint.setOnClickListener { showContinueButton() }

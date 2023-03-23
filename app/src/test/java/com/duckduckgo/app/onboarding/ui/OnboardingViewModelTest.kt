@@ -20,6 +20,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.app.statistics.VariantManager
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
@@ -37,11 +38,11 @@ class OnboardingViewModelTest {
     var coroutineRule = CoroutineTestRule()
 
     private var userStageStore: UserStageStore = mock()
-
     private val pageLayout: OnboardingPageManager = mock()
+    private val mockVariantManager: VariantManager = mock()
 
     private val testee: OnboardingViewModel by lazy {
-        OnboardingViewModel(userStageStore, pageLayout, coroutineRule.testDispatcherProvider)
+        OnboardingViewModel(userStageStore, pageLayout, coroutineRule.testDispatcherProvider, mockVariantManager)
     }
 
     @Test

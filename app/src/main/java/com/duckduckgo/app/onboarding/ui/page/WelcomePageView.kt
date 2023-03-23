@@ -17,12 +17,15 @@
 package com.duckduckgo.app.onboarding.ui.page
 
 import android.content.Intent
+import com.duckduckgo.app.onboarding.ui.customisationexperiment.DDGFeatureOnboardingOption
 
 object WelcomePageView {
     sealed class Event {
         object OnPrimaryCtaClicked : Event()
         object OnDefaultBrowserSet : Event()
         object OnDefaultBrowserNotSet : Event()
+        object OnSkipOptions : Event()
+        data class OnContinueOptions(val options: List<DDGFeatureOnboardingOption>) : Event()
     }
 
     sealed class State {

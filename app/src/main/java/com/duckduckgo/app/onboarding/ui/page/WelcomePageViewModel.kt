@@ -22,11 +22,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.onboarding.ui.customisationexperiment.DDGFeatureRepository
+import com.duckduckgo.app.onboarding.ui.customisationexperiment.DDGFeatureOnboardingOption
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.isOnboardingCustomizationExperimentEnabled
-import com.duckduckgo.app.statistics.isOptimiseOnboardingExperimentEnabled
 import com.duckduckgo.app.statistics.pixels.Pixel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -45,7 +44,23 @@ class WelcomePageViewModel(
             WelcomePageView.Event.OnPrimaryCtaClicked -> onPrimaryCtaClicked()
             WelcomePageView.Event.OnDefaultBrowserSet -> onDefaultBrowserSet()
             WelcomePageView.Event.OnDefaultBrowserNotSet -> onDefaultBrowserNotSet()
+            WelcomePageView.Event.OnSkipOptions -> onCtaOnboardingFlowFinished()
+            is WelcomePageView.Event.OnContinueOptions -> onContinueWithOptionsClicked(event.options)
         }
+    }
+
+    private fun onContinueWithOptionsClicked(options: List<DDGFeatureOnboardingOption>): Flow<WelcomePageView.State> = flow {
+        options.forEach { option ->
+            when (option) {
+                DDGFeatureOnboardingOption.PRIVATE_SEARCH -> {}
+                DDGFeatureOnboardingOption.TRACKER_BLOCKING -> {}
+                DDGFeatureOnboardingOption.SMALLER_DIGITAL_FOOTPRINT -> {}
+                DDGFeatureOnboardingOption.FASTER_PAGE_LOADS -> {}
+                DDGFeatureOnboardingOption.FEWER_ADS -> {}
+                DDGFeatureOnboardingOption.ONE_CLICK_DATA_CLEARING -> {}
+            }
+        }
+        onCtaOnboardingFlowFinished()
     }
 
     private fun onPrimaryCtaClicked() : Flow<WelcomePageView.State> = flow {
