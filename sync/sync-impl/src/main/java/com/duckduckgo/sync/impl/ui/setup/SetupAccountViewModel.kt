@@ -32,6 +32,7 @@ import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSaveR
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSyncAnotherDevice
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.DeviceConnected
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.TurnOnSync
+import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -40,7 +41,6 @@ import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.*
 
 @ContributesViewModel(ActivityScope::class)
 class SetupAccountViewModel @Inject constructor(
@@ -50,14 +50,18 @@ class SetupAccountViewModel @Inject constructor(
 
     private val command = Channel<Command>(1, DROP_OLDEST)
     private val viewState = MutableStateFlow(ViewState())
+    private var initialStateProcessed = false
 
     fun viewState(screen: Screen): Flow<ViewState> = viewState.onSubscription {
-        val viewMode = when (screen) {
-            SETUP -> TurnOnSync
-            RECOVERY_CODE -> AskSaveRecoveryCode
-            DEVICE_CONNECTED -> DeviceConnected
+        if (!initialStateProcessed) {
+            val viewMode = when (screen) {
+                SETUP -> TurnOnSync
+                RECOVERY_CODE -> AskSaveRecoveryCode
+                DEVICE_CONNECTED -> DeviceConnected
+            }
+            viewState.value = ViewState(viewMode)
+            initialStateProcessed = true
         }
-        viewState.value = ViewState(viewMode)
     }
 
     fun commands(): Flow<Command> = command.receiveAsFlow()

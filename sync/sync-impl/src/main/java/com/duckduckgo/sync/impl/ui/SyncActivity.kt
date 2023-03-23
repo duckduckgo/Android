@@ -85,7 +85,7 @@ class SyncActivity : DuckDuckGoActivity() {
     private fun processCommand(it: Command) {
         when (it) {
             LaunchDeviceSetupFlow -> {
-                startActivity(SetupAccountActivity.intent(this))
+                startActivity(SetupAccountActivity.intentStartSetupFlow(this))
             }
         }
     }

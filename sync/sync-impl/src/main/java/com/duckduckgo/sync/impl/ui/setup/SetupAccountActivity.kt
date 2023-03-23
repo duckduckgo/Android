@@ -35,6 +35,9 @@ import com.duckduckgo.sync.impl.R.id
 import com.duckduckgo.sync.impl.databinding.ActivitySyncSetupAccountBinding
 import com.duckduckgo.sync.impl.ui.SyncDeviceConnectedFragment
 import com.duckduckgo.sync.impl.ui.SyncLoginActivity
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.DEVICE_CONNECTED
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_CODE
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SETUP
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.Close
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.RecoverSyncData
@@ -48,18 +51,19 @@ import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.ViewMode.Initial
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.ViewMode.SyncAnotherDeviceScreen
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import timber.log.Timber
 
 class LoginContract : ActivityResultContract<Void?, Boolean>() {
     override fun createIntent(
         context: Context,
-        input: Void?
+        input: Void?,
     ): Intent {
         return SyncLoginActivity.intent(context)
     }
 
     override fun parseResult(
         resultCode: Int,
-        intent: Intent?
+        intent: Intent?,
     ): Boolean {
         return resultCode == Activity.RESULT_OK
     }
@@ -81,10 +85,20 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        screen = intent.getSerializableExtra(SETUP_ACCOUNT_SCREEN_EXTRA) as? Screen ?: Screen.SETUP
+        if (savedInstanceState != null) {
+            screen = savedInstanceState.getSerializable(SETUP_ACCOUNT_SCREEN_EXTRA) as Screen
+        } else {
+            screen = intent.getSerializableExtra(SETUP_ACCOUNT_SCREEN_EXTRA) as? Screen ?: SETUP
+        }
+        Timber.i("CRIS: onCreate $screen")
         setContentView(binding.root)
         observeUiEvents()
         configureListeners()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putSerializable(SETUP_ACCOUNT_SCREEN_EXTRA, screen)
     }
 
     private fun configureListeners() {
@@ -122,24 +136,28 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
     private fun renderViewState(viewState: ViewState) {
         when (viewState.viewMode) {
             AskSyncAnotherDevice -> {
+                screen = SETUP
                 supportFragmentManager.commitNow {
                     replace(id.fragment_container_view, SyncSetupFlowFragment.instance(SyncAnotherDeviceScreen), TAG_ENABLE_SYNC)
                 }
             }
 
             TurnOnSync -> {
+                screen = SETUP
                 supportFragmentManager.commitNow {
                     replace(id.fragment_container_view, SyncSetupFlowFragment.instance(InitialSetupScreen), TAG_ENABLE_SYNC)
                 }
             }
 
             AskSaveRecoveryCode -> {
+                screen = RECOVERY_CODE
                 supportFragmentManager.commitNow {
                     replace(id.fragment_container_view, SaveRecoveryCodeFragment.instance(), TAG_RECOVER_ACCOUNT)
                 }
             }
 
             DeviceConnected -> {
+                screen = DEVICE_CONNECTED
                 supportFragmentManager.commitNow {
                     replace(id.fragment_container_view, SyncDeviceConnectedFragment.instance(), TAG_DEVICE_CONNECTED)
                 }
@@ -176,13 +194,15 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
 
         const val SETUP_ACCOUNT_SCREEN_EXTRA = "SETUP_ACCOUNT_SCREEN_EXTRA"
 
-        fun intent(context: Context): Intent {
-            return Intent(context, SetupAccountActivity::class.java)
+        fun intentStartSetupFlow(context: Context): Intent {
+            return Intent(context, SetupAccountActivity::class.java).apply {
+                putExtra(SETUP_ACCOUNT_SCREEN_EXTRA, SETUP)
+            }
         }
 
         fun intent(
             context: Context,
-            screen: Screen
+            screen: Screen,
         ): Intent {
             return Intent(context, SetupAccountActivity::class.java).apply {
                 putExtra(SETUP_ACCOUNT_SCREEN_EXTRA, screen)
