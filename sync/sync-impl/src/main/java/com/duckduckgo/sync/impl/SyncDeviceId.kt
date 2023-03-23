@@ -88,7 +88,7 @@ data class DeviceType(val deviceFactor: String = "") {
 }
 
 fun Type.asDrawableRes(): Int {
-    return when(this) {
+    return when (this) {
         MOBILE -> R.drawable.ic_device_mobile_24
         UNKNOWN -> R.drawable.ic_device_mobile_24
         DESKTOP -> R.drawable.ic_device_desktop_24

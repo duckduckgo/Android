@@ -26,6 +26,7 @@ import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncRepository
 import com.duckduckgo.sync.impl.asDrawableRes
 import com.duckduckgo.sync.impl.ui.SyncDeviceConnectedViewModel.Command.FinishSetupFlow
+import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -34,7 +35,6 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import javax.inject.*
 
 @ContributesViewModel(ActivityScope::class)
 class SyncDeviceConnectedViewModel @Inject constructor(
@@ -56,7 +56,7 @@ class SyncDeviceConnectedViewModel @Inject constructor(
 
     data class ViewState(
         @DrawableRes val deviceType: Int,
-        val deviceName: String
+        val deviceName: String,
     )
 
     sealed class Command {

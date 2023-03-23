@@ -16,8 +16,6 @@
 
 package com.duckduckgo.sync.impl.ui
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.core.content.ContextCompat
@@ -26,10 +24,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.DuckDuckGoFragment
 import com.duckduckgo.app.global.FragmentViewModelFactory
-import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.R
@@ -37,15 +33,10 @@ import com.duckduckgo.sync.impl.databinding.ActivityDeviceConnectedBinding
 import com.duckduckgo.sync.impl.ui.SyncDeviceConnectedViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncDeviceConnectedViewModel.Command.FinishSetupFlow
 import com.duckduckgo.sync.impl.ui.SyncDeviceConnectedViewModel.ViewState
-import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeFragment
-import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_CODE
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowFragment.SetupFlowListener
+import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import javax.inject.*
 
 @InjectWith(FragmentScope::class)
 class SyncDeviceConnectedFragment : DuckDuckGoFragment(R.layout.activity_device_connected) {
@@ -85,7 +76,7 @@ class SyncDeviceConnectedFragment : DuckDuckGoFragment(R.layout.activity_device_
     }
 
     private fun processCommand(it: Command) {
-        when(it) {
+        when (it) {
             FinishSetupFlow -> listener?.launchFinishSetupFlow()
         }
     }
@@ -101,6 +92,4 @@ class SyncDeviceConnectedFragment : DuckDuckGoFragment(R.layout.activity_device_
     companion object {
         fun instance() = SyncDeviceConnectedFragment()
     }
-
 }
-

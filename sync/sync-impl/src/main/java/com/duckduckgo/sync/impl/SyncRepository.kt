@@ -29,9 +29,9 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import timber.log.Timber
 import javax.inject.*
 import kotlin.DeprecationLevel.WARNING
+import timber.log.Timber
 
 interface SyncRepository {
     fun createAccount(): Result<Boolean>
@@ -269,7 +269,7 @@ class AppSyncRepository @Inject constructor(
                 thisDevice = true,
                 deviceName = syncStore.deviceName.orEmpty(),
                 deviceType = syncDeviceIds.deviceType(),
-                deviceId = syncStore.deviceId.orEmpty()
+                deviceId = syncStore.deviceId.orEmpty(),
             ),
         )
     }
