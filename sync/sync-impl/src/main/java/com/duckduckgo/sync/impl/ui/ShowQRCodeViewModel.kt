@@ -20,12 +20,14 @@ import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.impl.Result.Error
+import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncRepository
-import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.*
 
@@ -37,7 +39,7 @@ class ShowQRCodeViewModel @Inject constructor(
     private val command = Channel<SyncLoginViewModel.Command>(1, DROP_OLDEST)
     private val viewState = MutableStateFlow(ViewState())
 
-    fun viewState(): Flow<ViewState> = viewState
+    fun viewState(): Flow<ViewState> = viewState.onStart { updateViewState() }
     fun commands(): Flow<SyncLoginViewModel.Command> = command.receiveAsFlow()
 
     data class ViewState(
@@ -51,4 +53,19 @@ class ShowQRCodeViewModel @Inject constructor(
         object LoginSucess : Command()
         object Error : Command()
     }
+
+    private suspend fun updateViewState() {
+        val result = syncRepository.getConnectQR()
+        when (result) {
+            is Error -> TODO()
+            is Success -> {
+                viewState.emit(
+                    viewState.value.copy(
+                        qrCode = result.data
+                    ),
+                )
+            }
+        }
+    }
+
 }

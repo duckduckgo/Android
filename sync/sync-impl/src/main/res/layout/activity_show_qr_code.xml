@@ -31,6 +31,7 @@
         android:layout_width="@dimen/qrSizeXLarge"
         android:layout_height="@dimen/qrSizeXLarge"
         android:layout_gravity="center"
+        android:layout_margin="@dimen/keyline_5"
         android:visibility="gone"
         tools:ignore="ContentDescription"/>
 
@@ -39,7 +40,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:layout_marginTop="@dimen/keyline_5"
+        app:buttonSize="large"
         android:layout_marginBottom="@dimen/keyline_5"
         android:layout_marginStart="@dimen/keyline_5"
         android:layout_marginEnd="@dimen/keyline_5"
@@ -50,7 +51,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:typography="body1"
-        app:primaryText="Go to Settings > Sync in the DuckDuckGo App on a different device and scan this QR code to sync."/>
+        android:layout_margin="@dimen/keyline_4"
+        android:gravity="center"
+        android:text="Go to Settings > Sync in the DuckDuckGo App on a different device and scan this QR code to sync."/>
 
 
 </LinearLayout>
