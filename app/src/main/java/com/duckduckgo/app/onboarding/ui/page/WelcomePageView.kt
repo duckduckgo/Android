@@ -25,7 +25,7 @@ object WelcomePageView {
         object OnDefaultBrowserSet : Event()
         object OnDefaultBrowserNotSet : Event()
         object OnSkipOptions : Event()
-        data class OnContinueOptions(val options: List<DDGFeatureOnboardingOption>) : Event()
+        data class OnContinueOptions(val options: Map<DDGFeatureOnboardingOption, Boolean>) : Event()
     }
 
     sealed class State {
