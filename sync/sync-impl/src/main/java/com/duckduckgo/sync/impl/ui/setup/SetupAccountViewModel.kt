@@ -37,6 +37,7 @@ import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -52,14 +53,14 @@ class SetupAccountViewModel @Inject constructor(
     private val viewState = MutableStateFlow(ViewState())
     private var initialStateProcessed = false
 
-    fun viewState(screen: Screen): Flow<ViewState> = viewState.onSubscription {
+    fun viewState(screen: Screen): Flow<ViewState> = viewState.onStart {
         if (!initialStateProcessed) {
             val viewMode = when (screen) {
                 SETUP -> TurnOnSync
                 RECOVERY_CODE -> AskSaveRecoveryCode
                 DEVICE_CONNECTED -> DeviceConnected
             }
-            viewState.value = ViewState(viewMode)
+            viewState.emit(ViewState(viewMode))
             initialStateProcessed = true
         }
     }
