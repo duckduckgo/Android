@@ -61,7 +61,7 @@
         android:id="@+id/showQRCode"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="Manually Enter Code"
+        app:primaryText="Show QR Code"
         app:leadingIcon="@drawable/ic_qr_24"
         app:leadingIconBackground="circular"/>
 
