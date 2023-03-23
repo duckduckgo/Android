@@ -23,6 +23,8 @@ import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Build
+import com.duckduckgo.app.statistics.api.FeatureEnabledPlugin
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import timber.log.Timber
 
@@ -35,7 +37,7 @@ interface DefaultBrowserDetector {
 class AndroidDefaultBrowserDetector(
     private val context: Context,
     private val appBuildConfig: AppBuildConfig,
-) : DefaultBrowserDetector {
+) : DefaultBrowserDetector, FeatureEnabledPlugin {
 
     override fun deviceSupportsDefaultBrowserConfiguration(): Boolean {
         return appBuildConfig.sdkInt >= Build.VERSION_CODES.N
@@ -54,6 +56,14 @@ class AndroidDefaultBrowserDetector(
         val intent = Intent(ACTION_VIEW, Uri.parse("https://"))
         val resolutionInfo: ResolveInfo? = context.packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
         return resolutionInfo?.activityInfo?.packageName ?: ANDROID_PACKAGE
+    }
+
+    override fun isFeatureEnabled(): Boolean {
+        return isDefaultBrowser()
+    }
+
+    override fun featureName(): String {
+        return PixelParameter.DEFAULT_BROWSER
     }
 
     companion object {

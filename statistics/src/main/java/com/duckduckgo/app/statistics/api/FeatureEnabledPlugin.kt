@@ -23,9 +23,14 @@ import com.duckduckgo.di.scopes.AppScope
 interface FeatureEnabledPlugin {
 
     /**
-     * Returns if the feature is enabled
      * Used with the DAU pixel, to notify is a feature is enabled or not
+     * @return true if the feature is enabled, false if not
      */
     fun isFeatureEnabled(): Boolean
 
+    /**
+     * Identifies the feature name
+     * @return the name of the feature
+     */
+    fun featureName(): String
 }
