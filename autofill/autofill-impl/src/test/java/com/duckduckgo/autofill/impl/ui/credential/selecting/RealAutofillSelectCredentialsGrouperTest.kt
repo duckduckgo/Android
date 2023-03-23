@@ -17,6 +17,7 @@
 package com.duckduckgo.autofill.impl.ui.credential.selecting
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.autofill.api.TestUrlUnicodeNormalizer
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialListSorterByTitleAndDomain
 import com.duckduckgo.autofill.impl.ui.credential.selecting.AutofillSelectCredentialsGrouper.Groups
@@ -28,7 +29,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class RealAutofillSelectCredentialsGrouperTest {
 
-    private val urlMatcher = AutofillDomainNameUrlMatcher()
+    private val urlMatcher = AutofillDomainNameUrlMatcher(TestUrlUnicodeNormalizer())
     private val sorter = CredentialListSorterByTitleAndDomain(urlMatcher)
 
     private val testee = RealAutofillSelectCredentialsGrouper(

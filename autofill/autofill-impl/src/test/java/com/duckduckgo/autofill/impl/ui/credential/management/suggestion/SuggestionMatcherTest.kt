@@ -17,16 +17,18 @@
 package com.duckduckgo.autofill.impl.ui.credential.management.suggestion
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.autofill.api.TestUrlUnicodeNormalizer
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.store.urlmatcher.AutofillDomainNameUrlMatcher
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class SuggestionMatcherTest {
 
-    private val testee = SuggestionMatcher(AutofillDomainNameUrlMatcher())
+    private val testee = SuggestionMatcher(AutofillDomainNameUrlMatcher(TestUrlUnicodeNormalizer()))
 
     @Test
     fun whenUrlIsNullThenNoSuggestions() {
