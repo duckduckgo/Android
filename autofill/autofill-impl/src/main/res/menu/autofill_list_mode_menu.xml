@@ -19,14 +19,14 @@
 
     <item
         android:id="@+id/searchLogins"
-        android:icon="@drawable/ic_baseline_search_24"
+        android:icon="@drawable/ic_find_search_24"
         android:title="@string/autofillManagementSearchLogins"
         android:visible="false"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/addLoginManually"
-        android:icon="@drawable/ic_baseline_add_24"
+        android:icon="@drawable/ic_add_24"
         android:title="@string/autofillManagementAddLogin"
         app:showAsAction="always" />
 

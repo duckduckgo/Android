@@ -12,6 +12,7 @@ dependencies {
     implementation project(path: ':secure-storage-api')
     implementation project(path: ':privacy-config-api')
     implementation project(path: ':feature-toggles-api')
+    implementation project(path: ':app-build-config-api')
 
     implementation AndroidX.core.ktx
     implementation AndroidX.appCompat
@@ -25,6 +26,7 @@ dependencies {
     // Room
     implementation AndroidX.room.runtime
     implementation AndroidX.room.ktx
+    testImplementation project(path: ':autofill-test')
     kapt AndroidX.room.compiler
 
     // Testing dependencies
