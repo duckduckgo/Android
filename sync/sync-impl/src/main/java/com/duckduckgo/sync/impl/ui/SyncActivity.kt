@@ -101,7 +101,7 @@ class SyncActivity : DuckDuckGoActivity() {
                 QR_CODE,
                 resources.getDimensionPixelSize(R.dimen.qrSizeLarge),
                 resources.getDimensionPixelSize(R.dimen.qrSizeLarge),
-                mapOf(EncodeHintType.MARGIN to 0)
+                mapOf(EncodeHintType.MARGIN to 0),
             )
             binding.qrCodeImageView.show()
             binding.qrCodeImageView.setImageBitmap(bitmap)
