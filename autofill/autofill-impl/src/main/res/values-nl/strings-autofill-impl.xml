@@ -17,11 +17,11 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Login met automatisch invullen</string>
+    <string name="autofillManagementScreenTitle">Aanmeldgegevens</string>
 
     <string name="managementDisabledModeCta"><b>Instellen in Instellingen</b></string>
-    <string name="managementDisabledModeSubtitle">Een vergrendelingspatroon, pincode of biometrische gegevens zijn noodzakelijk om uw inloggegevens voor automatisch invullen te beschermen.</string>
-    <string name="managementDisabledModeTitle">Beveilig je apparaat om automatisch invullen te gebruiken</string>
+    <string name="managementDisabledModeSubtitle">Een vergrendelingspatroon, pincode of biometrische gegevens zijn noodzakelijk om je aanmeldgegevens te beschermen.</string>
+    <string name="managementDisabledModeTitle">Beveilig je apparaat om aanmeldgegevens op te slaan</string>
 
     <string name="saveLoginDialogTitle">Login opslaan?</string>
     <string name="saveLoginMissingUsernameDialogTitle">Wachtwoord opslaan?</string>
