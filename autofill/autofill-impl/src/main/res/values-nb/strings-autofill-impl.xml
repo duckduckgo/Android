@@ -38,7 +38,6 @@
     <string name="useSavedLoginDialogGroupThisWebsite">Fra dette nettstedet</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Fra %1$s</string>
 
-    <string name="updateLoginDialogTitle">Vil du oppdatere passordet?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Oppdater passordet</string>
     <string name="updateLoginDialogButtonNotNow">Ikke nå</string>
 

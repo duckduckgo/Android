@@ -38,7 +38,6 @@
     <string name="useSavedLoginDialogGroupThisWebsite">S tega spletnega mesta</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">S spletnega mesta %1$s</string>
 
-    <string name="updateLoginDialogTitle">Želite posodobiti geslo?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Posodobitev gesla</string>
     <string name="updateLoginDialogButtonNotNow">Ne zdaj</string>
 

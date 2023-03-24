@@ -15,5 +15,6 @@
   -->
 
 <resources>
-
+    <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user's username for this site">Update password for \n%1$s?</string>
+    <string name="updateLoginUpdatePasswordExplanation" >DuckDuckGo will update this stored Login on your device.</string>
 </resources>
