@@ -38,7 +38,6 @@
     <string name="useSavedLoginDialogGroupThisWebsite">Sellelt veebisaidilt</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Saidilt %1$s</string>
 
-    <string name="updateLoginDialogTitle">Kas värskendada parooli?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Värskenda parooli</string>
     <string name="updateLoginDialogButtonNotNow">Mitte praegu</string>
 

@@ -38,7 +38,6 @@
     <string name="useSavedLoginDialogGroupThisWebsite">Tältä sivustolta</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Sivustolta %1$s</string>
 
-    <string name="updateLoginDialogTitle">Päivitetäänkö salasana?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Päivitä salasana</string>
     <string name="updateLoginDialogButtonNotNow">Ei nyt</string>
 

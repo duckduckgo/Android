@@ -38,7 +38,6 @@
     <string name="useSavedLoginDialogGroupThisWebsite">Z tejto webovej lokality</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Z adresy %1$s</string>
 
-    <string name="updateLoginDialogTitle">Aktualizovať heslo?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Aktualizovať heslo</string>
     <string name="updateLoginDialogButtonNotNow">Teraz nie</string>
 

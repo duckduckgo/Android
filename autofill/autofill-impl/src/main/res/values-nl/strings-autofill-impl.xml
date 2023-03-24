@@ -38,7 +38,6 @@
     <string name="useSavedLoginDialogGroupThisWebsite">Van deze website</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Van %1$s</string>
 
-    <string name="updateLoginDialogTitle">Wachtwoord bijwerken?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Wachtwoord bijwerken</string>
     <string name="updateLoginDialogButtonNotNow">Niet nu</string>
 

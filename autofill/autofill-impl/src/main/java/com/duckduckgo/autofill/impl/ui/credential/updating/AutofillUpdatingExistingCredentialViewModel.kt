@@ -18,14 +18,21 @@ package com.duckduckgo.autofill.impl.ui.credential.updating
 
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.di.scopes.FragmentScope
 import javax.inject.Inject
 
 @ContributesViewModel(FragmentScope::class)
 class AutofillUpdatingExistingCredentialViewModel @Inject constructor() : ViewModel() {
 
-    fun convertPasswordToMaskedView(credentials: LoginCredentials): String {
-        return credentials.password?.toCharArray()?.joinToString(separator = "") { "•" } ?: ""
+    fun ellipsizeIfNecessary(username: String): String {
+        return if (username.length > USERNAME_MAX_LENGTH) {
+            username.take(USERNAME_MAX_LENGTH - 1) + Typography.ellipsis
+        } else {
+            username
+        }
+    }
+
+    companion object {
+        private const val USERNAME_MAX_LENGTH = 50
     }
 }

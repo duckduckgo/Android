@@ -184,6 +184,14 @@ class SecureStoreBackedAutofillStoreTest {
     }
 
     @Test
+    fun whenStoredCredentialMissingUsernameAndStoringACredentialWithNoUsernameThenUrlOnlyMatch() = runTest {
+        setupTesteeWithAutofillAvailable()
+        storeCredentials(1, "https://example.com", username = null, password = "password")
+        val result = testee.containsCredentials("example.com", username = null, password = "differentPassword")
+        assertUrlOnlyMatch(result)
+    }
+
+    @Test
     fun whenPasswordIsUpdatedForUrlThenUpdatedOnlyMatchingCredential() = runTest {
         setupTesteeWithAutofillAvailable()
         val url = "https://example.com"
@@ -467,23 +475,23 @@ class SecureStoreBackedAutofillStoreTest {
     }
 
     private fun assertNotMatch(result: ContainsCredentialsResult) {
-        assertTrue(String.format("Expected NoMatch but was %s", result), result is NoMatch)
+        assertTrue(String.format("Expected NoMatch but was %s", result.javaClass.simpleName), result is NoMatch)
     }
 
     private fun assertUrlOnlyMatch(result: ContainsCredentialsResult) {
-        assertTrue(String.format("Expected UrlOnlyMatch but was %s", result), result is UrlOnlyMatch)
+        assertTrue(String.format("Expected UrlOnlyMatch but was %s", result.javaClass.simpleName), result is UrlOnlyMatch)
     }
 
     private fun assertUsernameMissing(result: ContainsCredentialsResult) {
-        assertTrue(String.format("Expected UsernameMissing but was %s", result), result is UsernameMissing)
+        assertTrue(String.format("Expected UsernameMissing but was %s", result.javaClass.simpleName), result is UsernameMissing)
     }
 
     private fun assertUsernameMatch(result: ContainsCredentialsResult) {
-        assertTrue(String.format("Expected UsernameMatch but was %s", result), result is UsernameMatch)
+        assertTrue(String.format("Expected UsernameMatch but was %s", result.javaClass.simpleName), result is UsernameMatch)
     }
 
     private fun assertExactMatch(result: ContainsCredentialsResult) {
-        assertTrue(String.format("Expected ExactMatch but was %s", result), result is ExactMatch)
+        assertTrue(String.format("Expected ExactMatch but was %s", result.javaClass.simpleName), result is ExactMatch)
     }
 
     private suspend fun storeCredentials(

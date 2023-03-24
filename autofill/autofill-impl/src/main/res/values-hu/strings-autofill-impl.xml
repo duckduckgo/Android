@@ -38,7 +38,6 @@
     <string name="useSavedLoginDialogGroupThisWebsite">Erről a webhelyről</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Innen: %1$s</string>
 
-    <string name="updateLoginDialogTitle">Frissíted a jelszót?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Jelszó frissítése</string>
     <string name="updateLoginDialogButtonNotNow">Most nem</string>
 

@@ -38,7 +38,6 @@
     <string name="useSavedLoginDialogGroupThisWebsite">С этого сайта</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">С %1$s</string>
 
-    <string name="updateLoginDialogTitle">Обновить пароль?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Обновить пароль</string>
     <string name="updateLoginDialogButtonNotNow">Не сейчас</string>
 

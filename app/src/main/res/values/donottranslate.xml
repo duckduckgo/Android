@@ -22,7 +22,7 @@
     <string name="autofillLoginUpdatedSnackbarMessage">Login updated</string>
     <string name="autofillDisableAutofillPromptTitle">Do you want to keep saving Logins?</string>
     <string name="autofillDisableAutofillPromptMessage">You can disable this at any time in Settings.</string>
-    <string name="autofillDisableAutofillPromptPositiveButton">Keep using</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Keep Saving</string>
     <string name="autofillDisableAutofillPromptNegativeButton">Disable</string>
 
     <!-- We won't have a translation for this, to be used later. -->
