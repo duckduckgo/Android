@@ -110,11 +110,11 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
     }
 
     override fun recoverYourSyncedData() {
-        TODO("Not yet implemented")
+        // noop
     }
 
     override fun syncAnotherDevice() {
-        TODO("Not yet implemented")
+        // noop
     }
 
     override fun launchFinishSetupFlow() {

@@ -24,6 +24,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncRepository
+import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Finish
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.AccountCreated
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.CreatingAccount
 import javax.inject.*
@@ -53,12 +54,14 @@ class SaveRecoveryCodeViewModel @Inject constructor(
                     b64RecoveryCode = it,
                 )
                 viewState.emit(ViewState(newState))
-            } ?: viewState.emit(ViewState(ViewMode.Error))
+            } ?: command.send(Command.Error)
         } else {
             viewState.emit(ViewState(CreatingAccount))
             val result = syncRepository.createAccount()
             when (result) {
-                is Error -> TODO()
+                is Error -> {
+                    command.send(Command.Error)
+                }
                 is Success -> {
                     syncRepository.getRecoveryCode()?.let {
                         viewState.emit(
@@ -69,7 +72,7 @@ class SaveRecoveryCodeViewModel @Inject constructor(
                                 ),
                             ),
                         )
-                    } ?: viewState.emit(ViewState(ViewMode.Error))
+                    } ?: command.send(Command.Error)
                 }
             }
         }
@@ -83,7 +86,6 @@ class SaveRecoveryCodeViewModel @Inject constructor(
 
     sealed class ViewMode {
         object CreatingAccount : ViewMode()
-        object Error : ViewMode()
         data class AccountCreated(
             val loginQRCode: String,
             val b64RecoveryCode: String,
@@ -92,8 +94,12 @@ class SaveRecoveryCodeViewModel @Inject constructor(
 
     sealed class Command {
         object Finish : Command()
+        object Error : Command()
     }
 
-    fun onBackPressed() {
+    fun onNextClicked() {
+        viewModelScope.launch {
+            command.send(Finish)
+        }
     }
 }
