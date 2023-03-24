@@ -63,7 +63,6 @@ interface Pixel {
         const val SHOWED_BOOKMARKS = "sb"
         const val DEFAULT_BROWSER_BEHAVIOUR_TRIGGERED = "bt"
         const val DEFAULT_BROWSER_SET_FROM_ONBOARDING = "fo"
-        const val DEFAULT_BROWSER_SET_ON_ANDROID_13_OR_ABOVE = "os_version_13_or_above"
         const val DEFAULT_BROWSER_SET_ORIGIN = "dbo"
         const val CTA_SHOWN = "cta"
         const val SERP_QUERY_CHANGED = "1"

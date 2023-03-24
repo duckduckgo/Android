@@ -29,8 +29,4 @@ interface DownloadsItemListener {
     fun onCancelItemClicked(item: DownloadItem)
 
     fun onItemVisibilityChanged(visible: Boolean)
-
-    fun onNotifyMeButtonClicked()
-
-    fun onNotifyMeDismissButtonClicked()
 }
