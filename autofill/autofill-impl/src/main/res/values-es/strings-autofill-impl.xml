@@ -17,11 +17,11 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Autocompletar inicios de sesión</string>
+    <string name="autofillManagementScreenTitle">Inicios de sesión</string>
 
     <string name="managementDisabledModeCta"><b>Configurar en Ajustes</b></string>
-    <string name="managementDisabledModeSubtitle">Se requiere un patrón de bloqueo del dispositivo, un PIN o datos biométricos para proteger tus datos de Autocompletar de inicio de sesión.</string>
-    <string name="managementDisabledModeTitle">Asegura tu dispositivo para usar Autocompletar</string>
+    <string name="managementDisabledModeSubtitle">Se requiere un patrón de bloqueo del dispositivo, un PIN o datos biométricos para proteger tus inicios de sesión.</string>
+    <string name="managementDisabledModeTitle">Protege tu dispositivo para guardar los inicios de sesión</string>
 
     <string name="saveLoginDialogTitle">¿Guardar inicio de sesión?</string>
     <string name="saveLoginMissingUsernameDialogTitle">¿Guardar contraseña?</string>
