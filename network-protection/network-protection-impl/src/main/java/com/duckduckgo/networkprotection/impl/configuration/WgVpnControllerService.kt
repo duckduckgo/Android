@@ -25,11 +25,11 @@ import retrofit2.http.POST
 
 @ContributesServiceApi(VpnScope::class)
 interface WgVpnControllerService {
-    @GET("https://on-dev.goduckgo.com/servers")
+    @GET("https://staging.netp.duckduckgo.com/servers")
     suspend fun getServers(): List<RegisteredServerInfo>
 
     @Headers("Content-Type: application/json")
-    @POST("https://on-dev.goduckgo.com/register")
+    @POST("https://staging.netp.duckduckgo.com/register")
     suspend fun registerKey(
         @Body registerKeyBody: RegisterKeyBody,
     ): List<EligibleServerInfo>
