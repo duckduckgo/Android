@@ -18,5 +18,5 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="autofill_auth_text">Ontgrendel apparaat om je opgeslagen aanmeldgegevens te gebruiken.</string>
-    <string name="biometric_prompt_title">Automatisch invullen vergrendeld</string>
+    <string name="biometric_prompt_title">Aanmeldgegevens vergrendeld</string>
 </resources>
