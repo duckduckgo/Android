@@ -108,4 +108,51 @@ class SetupAccountViewModelTest {
             assertTrue(viewState2.viewMode is ViewMode.AskSaveRecoveryCode)
         }
     }
+
+    @Test
+    fun whenFlowStartedFromDeviceConnectedThenViewModeDeviceConnected() = runTest {
+        testee.viewState(Screen.DEVICE_CONNECTED).test {
+            val viewState = awaitItem()
+            assertTrue(viewState.viewMode is ViewMode.DeviceConnected)
+        }
+    }
+
+    @Test
+    fun whenOnBackPressedAndViewModeDeviceConnectedThenClose() = runTest {
+        testee.viewState(Screen.DEVICE_CONNECTED).test {
+            val viewState = awaitItem()
+            assertTrue(viewState.viewMode is ViewMode.DeviceConnected)
+            testee.onBackPressed()
+        }
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is Command.Close)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnRecoverYourSyncDataClickedThenCommandRecoverSyncData() = runTest {
+        testee.viewState(Screen.SETUP).test {
+            val viewState = awaitItem()
+            assertTrue(viewState.viewMode is ViewMode.TurnOnSync)
+            testee.onRecoverYourSyncedData()
+        }
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is Command.RecoverSyncData)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnLoginSucessClickecThenViewModeDeviceConnected() = runTest {
+        testee.viewState(Screen.SETUP).test {
+            val viewState = awaitItem()
+            assertTrue(viewState.viewMode is ViewMode.TurnOnSync)
+            testee.onLoginSucess()
+            val viewState2 = awaitItem()
+            assertTrue(viewState2.viewMode is ViewMode.DeviceConnected)
+        }
+    }
 }
