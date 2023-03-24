@@ -250,7 +250,4 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
 
     NOTIFY_ME_BUTTON_PRESSED("m_notify_me_component_notify_me_button_pressed"),
     NOTIFY_ME_DISMISS_BUTTON_PRESSED("m_notify_me_component_close_button_pressed"),
-
-    DEFAULT_BROWSER_ENABLED_DAU("m_default_browser_enabled_daily_active_user_d"),
-    DEFAULT_BROWSER_DISABLED_DAU("m_default_browser_disabled_daily_active_user_d"),
 }
