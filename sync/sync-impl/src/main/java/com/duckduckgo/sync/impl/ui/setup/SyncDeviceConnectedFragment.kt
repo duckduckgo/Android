@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.impl.ui
+package com.duckduckgo.sync.impl.ui.setup
 
 import android.os.Bundle
 import android.view.View
@@ -30,10 +30,9 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.FragmentDeviceConnectedBinding
-import com.duckduckgo.sync.impl.ui.SyncDeviceConnectedViewModel.Command
-import com.duckduckgo.sync.impl.ui.SyncDeviceConnectedViewModel.Command.FinishSetupFlow
-import com.duckduckgo.sync.impl.ui.SyncDeviceConnectedViewModel.ViewState
-import com.duckduckgo.sync.impl.ui.setup.SetupFlowListener
+import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.Command
+import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.Command.FinishSetupFlow
+import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.ViewState
 import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach

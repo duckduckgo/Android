@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.impl.ui
+package com.duckduckgo.sync.impl.ui.setup
 
 import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModel
@@ -25,7 +25,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncRepository
 import com.duckduckgo.sync.impl.asDrawableRes
-import com.duckduckgo.sync.impl.ui.SyncDeviceConnectedViewModel.Command.FinishSetupFlow
+import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.Command.FinishSetupFlow
 import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel

@@ -30,7 +30,6 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.R.id
 import com.duckduckgo.sync.impl.databinding.ActivitySyncSetupAccountBinding
-import com.duckduckgo.sync.impl.ui.SyncDeviceConnectedFragment
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.DEVICE_CONNECTED
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_CODE
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SETUP
