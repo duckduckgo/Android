@@ -59,7 +59,7 @@ import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.Error
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.Success
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.UserCancelled
-import com.duckduckgo.deviceauth.api.DeviceAuthenticator.Features.AUTOFILL
+import com.duckduckgo.deviceauth.api.DeviceAuthenticator.Features.AUTOFILL_TO_ACCESS_CREDENTIALS
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.ui.view.SearchBar
@@ -123,7 +123,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
     private fun launchDeviceAuth() {
         viewModel.lock()
 
-        deviceAuthenticator.authenticate(AUTOFILL, this) {
+        deviceAuthenticator.authenticate(AUTOFILL_TO_ACCESS_CREDENTIALS, this) {
             when (it) {
                 Success -> onAuthenticationSuccessful()
                 UserCancelled -> onAuthenticationCancelled()
