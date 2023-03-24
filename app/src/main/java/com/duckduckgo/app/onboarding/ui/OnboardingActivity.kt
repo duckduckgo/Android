@@ -71,7 +71,7 @@ class OnboardingActivity : DuckDuckGoActivity() {
 
     @SuppressLint("SourceLockedOrientationActivity")
     private fun setScreenOrientation() {
-        if(resources.getBoolean(R.bool.portrait_only)){
+        if (resources.getBoolean(R.bool.portrait_only)) {
             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         }
     }

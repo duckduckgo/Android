@@ -55,12 +55,12 @@ class WelcomePageViewModel(
         }
     }
 
-    private fun onSkipOptionsClicked(): Flow<WelcomePageView.State> = flow {
+    private fun onSkipOptionsClicked(): Flow<WelcomePageView.State> {
         pixel.fire(AppPixelName.ONBOARDING_OPTION_SKIP)
-        onCtaOnboardingFlowFinished()
+        return onCtaOnboardingFlowFinished()
     }
 
-    private fun onContinueWithOptionsClicked(options: Map<DDGFeatureOnboardingOption, Boolean>): Flow<WelcomePageView.State> = flow {
+    private fun onContinueWithOptionsClicked(options: Map<DDGFeatureOnboardingOption, Boolean>): Flow<WelcomePageView.State> {
         val optionsSelected = options.filter { it.value }.map { it.key }.toList()
         if (optionsSelected.isEmpty()) {
             pixel.fire(AppPixelName.ONBOARDING_OPTION_SKIP)
@@ -77,7 +77,7 @@ class WelcomePageViewModel(
             }
             pixel.fire(AppPixelName.ONBOARDING_OPTIONS_SELECTED)
         }
-        onCtaOnboardingFlowFinished()
+        return onCtaOnboardingFlowFinished()
     }
 
     private fun onPrimaryCtaClicked(): Flow<WelcomePageView.State> = flow {

@@ -26,11 +26,11 @@ import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.isOnboardingCustomizationExperimentEnabled
 import com.duckduckgo.di.scopes.ActivityScope
+import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
-import javax.inject.Inject
 import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
