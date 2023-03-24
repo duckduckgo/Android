@@ -512,8 +512,8 @@
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Nigdy</string>
     <string name="disableLoginDetectionDialogTitle">Wyłączyć przypomnienie o zabezpieczeniach podczas logowania się do witryn internetowych?</string>
     <string name="disableLoginDetectionDialogDescription">W każdej chwili można zmienić ten wybór w Ustawieniach.</string>
-    <string name="disableLoginDetectionDialogPositive">WYŁĄCZ</string>
-    <string name="disableLoginDetectionDialogNegative">ANULUJ</string>
+    <string name="disableLoginDetectionDialogPositive">Wyłącz</string>
+    <string name="disableLoginDetectionDialogNegative">Anuluj</string>
     <string name="automaticFireproofWebsiteLoginDialogTitle">Zabezpieczać automatycznie witryny internetowe po zalogowaniu?</string>
     <string name="automaticFireproofWebsiteLoginDialogDescription">Zabezpieczenie witryn za pomocą przycisku Zabezpiecz nie spowoduje wylogowania. Zawsze można później zmienić ten wybór w Ustawieniach. </string>
     <string name="automaticFireproofWebsiteLoginDialogFirstOption">Zawsze zabezpieczaj</string>
