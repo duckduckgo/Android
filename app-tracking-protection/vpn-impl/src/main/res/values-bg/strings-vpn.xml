@@ -225,6 +225,10 @@
     <string name="atp_ActivityAbout">За нас</string>
     <string name="atp_ActivityManage">Управление</string>
     <string name="atp_ActivityRemoveFeature">Деактивиране и изтриване на данни</string>
+    <string name="atp_ActivityBlockingTrackersEnabledDescription">DuckDuckGo блокира скритите тракери в приложенията, които използвате.</string>
+    <string name="atp_ActivityBlockingTrackersDisabledDescription">Активирайте отново функцията App Tracking Protection, за да продължите да блокирате тракерите в приложенията, които използвате.</string>
+    <string name="atp_ActivityBlockedByHeaderText" instruction="Placeholder %1$s is a text containing either Today or Yesterday. Example: Blocked by DuckDuckGo Today">Блокирани от DuckDuckGo %1$s</string>
+    <string name="atp_ActivityBlockedByOnDateHeaderText" instruction="Placeholder %1$s is a text containing a formatted date like Feb 05. Example: Blocked by DuckDuckGo on Feb 05">Блокирани от DuckDuckGo на %1$s</string>
 
     <!--  App Tracking Protection FAQ -->
     <string name="atp_FAQActivityTitle">Често задавани въпроси</string>
@@ -269,8 +273,8 @@
         <item quantity="other">%1$d опита. Известно е, че събира:</item>
     </plurals>
     <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
-        <item quantity="one">Блокирани %1$d опит за проследяване</item>
-        <item quantity="other">Блокирани %1$d опита за проследяване</item>
+        <item quantity="one">DuckDuckGo блокира %1$d опит за проследяване</item>
+        <item quantity="other">DuckDuckGo блокира %1$d опита за проследяване</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Докладване на проблем с това приложение</string>
     <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">Показване на още %1$d</string>

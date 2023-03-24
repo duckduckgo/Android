@@ -34,6 +34,7 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.extensions.safeGetApplicationIcon
 import com.duckduckgo.mobile.android.ui.TextDrawable
 import com.duckduckgo.mobile.android.ui.recyclerviewext.StickyHeaders
+import com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.mobile.android.ui.view.show
@@ -139,8 +140,16 @@ class TrackerFeedAdapter @Inject constructor(
             }
         }
 
+        val context: Context = view.context
+        val today = context.getString(com.duckduckgo.app.global.R.string.common_Today)
+        val yesterday = context.getString(com.duckduckgo.app.global.R.string.common_Yesterday)
+
         fun bind(item: TrackerFeedItem.TrackerFeedItemHeader) {
-            view.primaryText = item.timestamp
+            if (item.timestamp == today || item.timestamp == yesterday) {
+                view.primaryText = context.getString(R.string.atp_ActivityBlockedByHeaderText, item.timestamp)
+            } else {
+                view.primaryText = context.getString(R.string.atp_ActivityBlockedByOnDateHeaderText, item.timestamp)
+            }
         }
     }
 
@@ -261,7 +270,9 @@ class TrackerFeedAdapter @Inject constructor(
         }
 
         var protectedAppsState: AppsProtectionStateView = view.findViewById(R.id.protectedAppsState)
+        var protectedAppsDivider: HorizontalDivider = view.findViewById(R.id.protectedAppsBottomDivider)
         var unProtectedAppsState: AppsProtectionStateView = view.findViewById(R.id.unProtectedAppsState)
+        var unProtectedAppsDivider: HorizontalDivider = view.findViewById(R.id.unProtectedAppsBottomDivider)
 
         fun bind(
             tracker: TrackerFeedItem.TrackerTrackerAppsProtection,
@@ -272,16 +283,20 @@ class TrackerFeedAdapter @Inject constructor(
                     onAppClick(tracker.copy(selectedFilter = appsFilter))
                 }
                 protectedAppsState.show()
+                protectedAppsDivider.show()
             } else {
                 protectedAppsState.gone()
+                protectedAppsDivider.gone()
             }
             if (tracker.appsData.unprotectedAppsData.appsCount > 0) {
                 unProtectedAppsState.bind(tracker.appsData.unprotectedAppsData) { appsFilter ->
                     onAppClick(tracker.copy(selectedFilter = appsFilter))
                 }
                 unProtectedAppsState.show()
+                unProtectedAppsDivider.show()
             } else {
                 unProtectedAppsState.gone()
+                unProtectedAppsDivider.gone()
             }
         }
     }

@@ -514,6 +514,9 @@ class DeviceShieldTrackerActivity :
         bannerState: BannerState,
     ) {
         if (runningState.state == VpnRunningState.ENABLED) {
+            binding.deviceShieldTrackerBlockingTrackersDescription.text =
+                resources.getString(R.string.atp_ActivityBlockingTrackersEnabledDescription)
+            binding.deviceShieldTrackerShieldImage.setImageResource(R.drawable.apptp_shield_enabled)
             if (runningState.alwaysOnState.isAlwaysOnLockedDown()) {
                 binding.deviceShieldTrackerLabelEnabled.gone()
 
@@ -543,6 +546,9 @@ class DeviceShieldTrackerActivity :
                 }
             }
         } else {
+            binding.deviceShieldTrackerBlockingTrackersDescription.text =
+                resources.getString(R.string.atp_ActivityBlockingTrackersDisabledDescription)
+            binding.deviceShieldTrackerShieldImage.setImageResource(R.drawable.apptp_shield_disabled)
             binding.deviceShieldTrackerLabelEnabled.gone()
 
             val (disabledLabel, annotation) = if (runningState.stopReason == REVOKED) {
