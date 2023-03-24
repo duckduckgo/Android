@@ -18,5 +18,5 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="autofill_auth_text">Atrakinkite įrenginį, kad galėtumėte naudoti išsaugotus prisijungimus.</string>
-    <string name="biometric_prompt_title">Automatinis užpildymas užrakintas</string>
+    <string name="biometric_prompt_title">Prisijungimai užrakinti</string>
 </resources>
