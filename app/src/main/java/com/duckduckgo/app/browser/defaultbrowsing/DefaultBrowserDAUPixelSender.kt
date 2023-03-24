@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.statistics.pixels
+package com.duckduckgo.app.browser.defaultbrowsing
 
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.app.statistics.api.BrowserFeatureStateReporterPlugin
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.api.RefreshRetentionAtbPlugin
-import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -31,21 +30,21 @@ import org.threeten.bp.ZoneOffset
 import org.threeten.bp.format.DateTimeFormatter
 
 @ContributesMultibinding(AppScope::class)
-class DailyActiveUserPixelSender @Inject constructor(
+class DefaultBrowserDAUPixelSender @Inject constructor(
     private val context: Context,
     private val pixel: Pixel,
-    private val plugins: PluginPoint<BrowserFeatureStateReporterPlugin>,
+    private val defaultBrowserDetector: DefaultBrowserDetector,
 ) : RefreshRetentionAtbPlugin {
 
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(PIXELS_PREF_FILE, Context.MODE_PRIVATE)
 
     override fun onSearchRetentionAtbRefreshed() {
-        tryToFireDailyPixel(StatisticsPixelName.BROWSER_DAILY_ACTIVE_FEATURE_STATE.pixelName)
+        // no-op
     }
 
     override fun onAppRetentionAtbRefreshed() {
-        tryToFireDailyPixel(StatisticsPixelName.BROWSER_DAILY_ACTIVE_FEATURE_STATE.pixelName)
+        tryToFireDailyPixel(AppPixelName.DEFAULT_BROWSER_ENABLED_DAU.pixelName)
     }
 
     private fun tryToFireDailyPixel(
@@ -54,14 +53,14 @@ class DailyActiveUserPixelSender @Inject constructor(
         val now = getUtcIsoLocalDate()
         val timestamp = preferences.getString(pixelName.appendTimestampSuffix(), null)
 
-        val parameters = mutableMapOf<String, String>()
-        plugins.getPlugins().forEach { plugin ->
-            parameters[plugin.featureName()] = plugin.isFeatureEnabled().toBinaryString()
-        }
-
         // check if pixel was already sent in the current day
         if (timestamp == null || now > timestamp) {
-            pixel.fire(pixelName, parameters, emptyMap())
+            val pixelName = if (defaultBrowserDetector.isDefaultBrowser()) {
+                AppPixelName.DEFAULT_BROWSER_ENABLED_DAU.pixelName
+            } else {
+                AppPixelName.DEFAULT_BROWSER_DISABLED_DAU.pixelName
+            }
+            pixel.fire(pixelName, emptyMap(), emptyMap())
                 .also { preferences.edit { putString(pixelName.appendTimestampSuffix(), now) } }
         }
     }
@@ -79,5 +78,3 @@ class DailyActiveUserPixelSender @Inject constructor(
 private fun String.appendTimestampSuffix(): String {
     return "${this}_timestamp"
 }
-
-fun Boolean.toBinaryString(): String = if (this) "1" else "0"

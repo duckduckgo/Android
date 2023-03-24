@@ -29,6 +29,7 @@ import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.AppThirdPartyCookieManager
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsRepository
+import com.duckduckgo.app.browser.defaultbrowsing.AndroidDefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
 import com.duckduckgo.app.browser.downloader.*
@@ -191,6 +192,14 @@ class BrowserModule {
         pixel: Pixel,
     ): LongPressHandler {
         return WebViewLongPressHandler(context, pixel)
+    }
+
+    @Provides
+    fun defaultWebBrowserCapability(
+        context: Context,
+        appBuildConfig: AppBuildConfig,
+    ): DefaultBrowserDetector {
+        return AndroidDefaultBrowserDetector(context, appBuildConfig)
     }
 
     @Provides
