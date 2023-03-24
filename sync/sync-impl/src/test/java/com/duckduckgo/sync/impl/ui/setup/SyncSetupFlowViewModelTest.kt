@@ -19,7 +19,6 @@ package com.duckduckgo.sync.impl.ui.setup
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.sync.impl.SyncRepository
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.Command.*
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.ViewMode
 import kotlinx.coroutines.ExperimentalCoroutinesApi
