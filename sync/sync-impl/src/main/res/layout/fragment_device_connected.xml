@@ -15,97 +15,108 @@
   ~ limitations under the License.
   -->
 
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="?attr/colorPrimaryDark"
-            android:scrollbarAlwaysDrawVerticalTrack="true"
-            android:fadeScrollbars="false"
-            android:scrollbars="vertical"
-            android:fillViewport="true">
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorPrimaryDark">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:orientation="vertical"
+
+    <LinearLayout
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="?attr/actionBarSize"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <com.duckduckgo.mobile.android.ui.view.button.IconButton
             android:id="@+id/close_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/keyline_4"
-            android:visibility="invisible"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
+            android:padding="@dimen/keyline_4"
             app:backgroundTint="?attr/daxColorPrimaryIcon"
             android:background="?selectableItemBackground"
-            app:srcCompat="@drawable/ic_close_24" />
+            app:srcCompat="@drawable/ic_close_24"/>
 
-        <ImageView
-            android:id="@+id/content_illustration"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="76dp"
-            android:src="@drawable/ic_sync_success_128"
-            android:layout_gravity="center_horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="ContentDescription"/>
+    </LinearLayout>
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
-            android:id="@+id/content_title"
+    <ScrollView
+        android:id="@+id/content_scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        app:layout_constraintBottom_toTopOf="@+id/footer_primary_button"
+        android:scrollbarAlwaysDrawVerticalTrack="true"
+        android:fadeScrollbars="false"
+        android:scrollbars="vertical">
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/keyline_5"
-            android:gravity="center"
-            app:textType="primary"
-            app:typography="h1"
-            app:layout_constraintTop_toBottomOf="@+id/content_illustration"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:text="@string/sync_connected_device_title"/>
+            android:orientation="vertical">
 
-        <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-            android:id="@+id/connected_device_item"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:primaryText="Android"
-            android:layout_marginTop="@dimen/keyline_5"
-            android:layout_marginStart="@dimen/keyline_5"
-            android:layout_marginEnd="@dimen/keyline_5"
-            app:leadingIcon="@drawable/ic_device_mobile_24"
-            app:layout_constraintTop_toBottomOf="@id/content_title"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:leadingIconBackground="circular"/>
+            <ImageView
+                android:id="@+id/content_illustration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:src="@drawable/ic_sync_success_128"
+                android:layout_gravity="center_horizontal"
+                tools:ignore="ContentDescription"/>
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
-            android:id="@+id/content_body"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/keyline_5"
-            android:gravity="center"
-            app:layout_constraintTop_toBottomOf="@+id/connected_device_item"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:textType="primary"
-            app:typography="body1"
-            android:text="@string/sync_connected_device_hint"/>
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                android:id="@+id/content_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_5"
+                android:layout_marginStart="@dimen/keyline_5"
+                android:layout_marginEnd="@dimen/keyline_5"
+                android:gravity="center"
+                app:textType="primary"
+                app:typography="h1"
+                android:text="@string/sync_enable_sync_title"/>
 
-        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
-            android:id="@+id/footer_primary_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/keyline_5"
-            android:layout_marginEnd="@dimen/keyline_5"
-            app:buttonSize="large"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:text="@string/sync_connected_device_primary_button"/>
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+                android:id="@+id/connected_device_item"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="Android"
+                android:layout_marginTop="@dimen/keyline_5"
+                android:layout_marginStart="@dimen/keyline_5"
+                android:layout_marginEnd="@dimen/keyline_5"
+                app:leadingIcon="@drawable/ic_device_mobile_24"
+                app:leadingIconBackground="circular"/>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</ScrollView>
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                android:id="@+id/content_body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/keyline_5"
+                android:gravity="center"
+                app:textType="primary"
+                app:typography="body1"
+                android:text="@string/sync_connected_device_hint"/>
+        </LinearLayout>
+    </ScrollView>
+
+    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+        android:id="@+id/footer_primary_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_5"
+        android:layout_marginEnd="@dimen/keyline_5"
+        android:layout_marginBottom="@dimen/keyline_4"
+        app:buttonSize="large"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="@string/sync_connected_device_primary_button"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
