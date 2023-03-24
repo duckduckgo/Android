@@ -32,6 +32,7 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomeBinding
+import com.duckduckgo.app.browser.databinding.IncludeDaxMultiselectDialogCtaBinding
 import com.duckduckgo.app.global.extensions.html
 import com.duckduckgo.app.onboarding.ui.customisationexperiment.DDGFeatureOnboardingOption
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -115,24 +116,41 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
             WelcomePageView.State.Finish -> {
                 onContinuePressed()
             }
-            WelcomePageView.State.ShowFeatureOptionsCta -> showFeatureOptionsDialog()
+            WelcomePageView.State.ShowFeatureOptionsCta -> startMultiselectDialogAnimation()
         }
     }
 
-    private fun showFeatureOptionsDialog() {
-        binding.daxDialogCta.root.gone()
+    private fun startMultiselectDialogAnimation() {
+        val ctaText = context?.getString(R.string.onboardingFeatureOptionsTitle).orEmpty()
         binding.daxDialogMultiselectCta?.apply {
+            binding.daxDialogCta.root.gone()
             root.show()
-            root.animate().alpha(1.0f).duration = 1000
-            primaryCta.setOnClickListener { getSelectedOptionsAndContinue() }
-            secondaryCta.setOnClickListener { event(WelcomePageView.Event.OnSkipOptions) }
-            optionPrivateSearch.setOnClickListener { showContinueButton() }
-            optionTrackerBlocking.setOnClickListener { showContinueButton() }
-            optionSmallerFootprint.setOnClickListener { showContinueButton() }
-            optionFasterPageLoads.setOnClickListener { showContinueButton() }
-            optionFewerAds.setOnClickListener { showContinueButton() }
-            optionOneClickDataClearing.setOnClickListener { showContinueButton() }
+            root.dialogTextCta.startTypingAnimation(ctaText)
+            ViewCompat.animate(root)
+                .alpha(MAX_ALPHA)
+                .setDuration(ANIMATION_DURATION)
+                .withEndAction {
+                    ViewCompat.animate(root.featureOptionsContainer)
+                        .alpha(MAX_ALPHA)
+                        .setDuration(ANIMATION_DURATION)
+                        .setStartDelay(ANIMATION_DURATION)
+                        .withEndAction {
+                            setMultiselectListeners(this)
+                        }
+                    setPrimaryCtaListenerAfterWelcomeAlphaAnimation()
+                }
         }
+    }
+
+    private fun setMultiselectListeners(binding: IncludeDaxMultiselectDialogCtaBinding) {
+        binding.primaryCta.setOnClickListener { getSelectedOptionsAndContinue() }
+        binding.secondaryCta.setOnClickListener { event(WelcomePageView.Event.OnSkipOptions) }
+        binding.optionPrivateSearch.setOnClickListener { showContinueButton() }
+        binding.optionTrackerBlocking.setOnClickListener { showContinueButton() }
+        binding.optionSmallerFootprint.setOnClickListener { showContinueButton() }
+        binding.optionFasterPageLoads.setOnClickListener { showContinueButton() }
+        binding.optionFewerAds.setOnClickListener { showContinueButton() }
+        binding.optionOneClickDataClearing.setOnClickListener { showContinueButton() }
     }
 
     private fun getSelectedOptionsAndContinue() {
