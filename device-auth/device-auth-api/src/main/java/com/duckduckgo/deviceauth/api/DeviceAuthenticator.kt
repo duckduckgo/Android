@@ -52,6 +52,7 @@ interface DeviceAuthenticator {
     }
 
     enum class Features {
-        AUTOFILL,
+        AUTOFILL_TO_USE_CREDENTIALS,
+        AUTOFILL_TO_ACCESS_CREDENTIALS,
     }
 }

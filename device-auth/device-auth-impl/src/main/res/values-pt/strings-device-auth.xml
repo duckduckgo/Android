@@ -17,6 +17,5 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofill_auth_text">Desbloqueia o dispositivo para utilizares os teus inícios de sessão guardados.</string>
     <string name="biometric_prompt_title">Preenchimento automático bloqueado</string>
 </resources>

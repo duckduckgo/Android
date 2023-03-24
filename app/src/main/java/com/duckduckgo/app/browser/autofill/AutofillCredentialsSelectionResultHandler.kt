@@ -42,7 +42,7 @@ import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.Error
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.Success
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.UserCancelled
-import com.duckduckgo.deviceauth.api.DeviceAuthenticator.Features.AUTOFILL
+import com.duckduckgo.deviceauth.api.DeviceAuthenticator.Features.AUTOFILL_TO_USE_CREDENTIALS
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -75,7 +75,7 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(
         val selectedCredentials = result.getParcelable<LoginCredentials>(CredentialAutofillPickerDialog.KEY_CREDENTIALS) ?: return
 
         pixel.fire(AUTOFILL_AUTHENTICATION_TO_AUTOFILL_SHOWN)
-        deviceAuthenticator.authenticate(AUTOFILL, browserTabFragment) {
+        deviceAuthenticator.authenticate(AUTOFILL_TO_USE_CREDENTIALS, browserTabFragment) {
             when (it) {
                 Success -> {
                     Timber.v("Autofill: user selected credential to use, and successfully authenticated")
