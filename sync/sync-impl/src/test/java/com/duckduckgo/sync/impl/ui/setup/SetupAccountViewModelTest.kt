@@ -97,7 +97,7 @@ class SetupAccountViewModelTest {
             assertTrue(viewState2.viewMode is ViewMode.AskSyncAnotherDevice)
         }
     }
-    
+
     @Test
     fun whenFinishSetupFlowThenViewModeAskRecoveryCode() = runTest {
         testee.viewState().test {
