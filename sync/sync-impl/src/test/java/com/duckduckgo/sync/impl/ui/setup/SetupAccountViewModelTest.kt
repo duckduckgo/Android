@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl.ui.setup
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.sync.impl.SyncRepository
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -42,7 +43,7 @@ class SetupAccountViewModelTest {
 
     @Test
     fun whenOnBackPressedAndViewModeSyncAnotherDeviceThenViewModeEnableSync() = runTest {
-        testee.viewState().test {
+        testee.viewState(Screen.SETUP).test {
             var viewState = awaitItem()
             testee.onAskSyncAnotherDevice()
             viewState = awaitItem()
@@ -55,7 +56,7 @@ class SetupAccountViewModelTest {
 
     @Test
     fun whenOnBackPressedAndViewModeEnableSyncThenClose() = runTest {
-        testee.viewState().test {
+        testee.viewState(Screen.SETUP).test {
             val viewState = awaitItem()
             assertTrue(viewState.viewMode is ViewMode.TurnOnSync)
             testee.onBackPressed()
@@ -69,7 +70,7 @@ class SetupAccountViewModelTest {
 
     @Test
     fun whenOnBackPressedAndViewModeSaveRecoveryCodeThenClose() = runTest {
-        testee.viewState().test {
+        testee.viewState(Screen.SETUP).test {
             var viewState = awaitItem()
             testee.onAskSyncAnotherDevice()
             viewState = awaitItem()
@@ -88,7 +89,7 @@ class SetupAccountViewModelTest {
 
     @Test
     fun whenOnAskSyncAnotherDeviceThenViewModeSyncAnotherDevice() = runTest {
-        testee.viewState().test {
+        testee.viewState(Screen.SETUP).test {
             val viewState = awaitItem()
             assertTrue(viewState.viewMode is ViewMode.TurnOnSync)
             testee.onAskSyncAnotherDevice()
@@ -99,7 +100,7 @@ class SetupAccountViewModelTest {
 
     @Test
     fun whenFinishSetupFlowThenViewModeAskRecoveryCode() = runTest {
-        testee.viewState().test {
+        testee.viewState(Screen.SETUP).test {
             val viewState = awaitItem()
             assertTrue(viewState.viewMode is ViewMode.TurnOnSync)
             testee.finishSetupFlow()
