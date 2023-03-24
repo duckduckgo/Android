@@ -31,7 +31,7 @@ interface VariantManager {
     sealed class VariantFeature {
         object CookiePromptManagementExperiment : VariantFeature()
         object OptimiseOnboardingExperiment : VariantFeature()
-        object OnboardingCustomizationExperiment: VariantFeature()
+        object OnboardingCustomizationExperiment : VariantFeature()
     }
 
     companion object {

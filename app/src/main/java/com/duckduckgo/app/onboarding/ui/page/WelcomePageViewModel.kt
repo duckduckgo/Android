@@ -48,12 +48,18 @@ class WelcomePageViewModel(
     fun reduce(event: WelcomePageView.Event): Flow<WelcomePageView.State> {
         return when (event) {
             WelcomePageView.Event.OnPrimaryCtaClicked -> onPrimaryCtaClicked()
-            WelcomePageView.Event.OnDefaultBrowserSet -> onDefaultBrowserSet()
-            WelcomePageView.Event.OnDefaultBrowserNotSet -> onDefaultBrowserNotSet()
             WelcomePageView.Event.OnSkipOptions -> onSkipOptionsClicked()
             is WelcomePageView.Event.OnContinueOptions -> onContinueWithOptionsClicked(event.options)
+            WelcomePageView.Event.OnDefaultBrowserSet -> onDefaultBrowserSet()
+            WelcomePageView.Event.OnDefaultBrowserNotSet -> onDefaultBrowserNotSet()
         }
     }
+
+    private fun onPrimaryCtaClicked(): Flow<WelcomePageView.State> =
+        when (variantManager.isOnboardingCustomizationExperimentEnabled()) {
+            true -> flow { emit(WelcomePageView.State.ShowFeatureOptionsCta) }
+            false -> onCtaOnboardingFlowFinished()
+        }
 
     private fun onSkipOptionsClicked(): Flow<WelcomePageView.State> {
         pixel.fire(AppPixelName.ONBOARDING_OPTION_SKIP)
@@ -78,13 +84,6 @@ class WelcomePageViewModel(
             pixel.fire(AppPixelName.ONBOARDING_OPTIONS_SELECTED)
         }
         return onCtaOnboardingFlowFinished()
-    }
-
-    private fun onPrimaryCtaClicked(): Flow<WelcomePageView.State> = flow {
-        when (variantManager.isOnboardingCustomizationExperimentEnabled()) {
-            true -> emit(WelcomePageView.State.ShowFeatureOptionsCta)
-            false -> onCtaOnboardingFlowFinished()
-        }
     }
 
     private fun onCtaOnboardingFlowFinished(): Flow<WelcomePageView.State> = flow {

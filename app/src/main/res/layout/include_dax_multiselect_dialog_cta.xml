@@ -34,7 +34,7 @@
         app:srcCompat="@drawable/ic_dax_icon" />
 
     <com.duckduckgo.mobile.android.ui.view.shape.DaxBubbleCardView
-        android:id="@+id/bubbleCarView"
+        android:id="@+id/cardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/keyline_4"
@@ -119,7 +119,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/keyline_5"
-                android:text="Skip This Step"
+                android:text="@string/onboardingFeatureOptionsSkip"
                 app:buttonSize="large" />
 
         </LinearLayout>
