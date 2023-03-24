@@ -238,21 +238,21 @@ class SecureStoreBackedAutofillStore(
     }
 
     private fun usernameMatch(
-        it: WebsiteLoginDetailsWithCredentials,
+        credentials: WebsiteLoginDetailsWithCredentials,
         username: String?,
     ): Boolean {
-        return it.details.username != null && it.details.username == username
+        return credentials.details.username != null && credentials.details.username == username
     }
 
     private fun usernameMissing(
-        it: WebsiteLoginDetailsWithCredentials,
+        credentials: WebsiteLoginDetailsWithCredentials,
         username: String?,
         password: String?,
     ): Boolean {
-        return it.details.username == null &&
+        return credentials.details.username == null &&
             !username.isNullOrEmpty() &&
-            it.password != null &&
-            it.password == password
+            credentials.password != null &&
+            credentials.password == password
     }
 
     private fun WebsiteLoginDetailsWithCredentials.toLoginCredentials(): LoginCredentials {

@@ -184,7 +184,7 @@ class SecureStoreBackedAutofillStoreTest {
     }
 
     @Test
-    fun whenXXX() = runTest {
+    fun whenStoredCredentialMissingUsernameAndStoringACredentialWithNoUsernameThenUrlOnlyMatch() = runTest {
         setupTesteeWithAutofillAvailable()
         storeCredentials(1, "https://example.com", username = null, password = "password")
         val result = testee.containsCredentials("example.com", username = null, password = "differentPassword")
