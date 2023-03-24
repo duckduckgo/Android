@@ -110,7 +110,7 @@ class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_c
                     QR_CODE,
                     resources.getDimensionPixelSize(R.dimen.qrSizeSmall),
                     resources.getDimensionPixelSize(R.dimen.qrSizeSmall),
-                    mapOf(EncodeHintType.MARGIN to 0)
+                    mapOf(EncodeHintType.MARGIN to 0),
                 )
                 binding.qrCodeImageView.show()
                 binding.qrCodeImageView.setImageBitmap(bitmap)
