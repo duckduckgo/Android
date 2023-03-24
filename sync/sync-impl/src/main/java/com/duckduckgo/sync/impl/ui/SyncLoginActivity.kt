@@ -19,7 +19,6 @@ package com.duckduckgo.sync.impl.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -33,7 +32,6 @@ import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.Error
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.LoginSucess
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.ReadQRCode
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.ReadTextCode
-import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.ViewState
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanIntentResult
 import com.journeyapps.barcodescanner.ScanOptions
@@ -45,14 +43,10 @@ class SyncLoginActivity : DuckDuckGoActivity() {
     private val binding: ActivityLoginSyncBinding by viewBinding()
     private val viewModel: SyncLoginViewModel by bindViewModel()
 
-    // Register the launcher and result handler
     private val barcodeConnectLauncher = registerForActivityResult(
         ScanContract(),
     ) { result: ScanIntentResult ->
-        if (result.contents == null) {
-            Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show()
-        } else {
-            Toast.makeText(this, "Read ${result.contents}", Toast.LENGTH_LONG).show()
+        if (result.contents != null) {
             viewModel.onConnectQRScanned(result.contents)
         }
     }
@@ -62,15 +56,10 @@ class SyncLoginActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
         observeUiEvents()
+        configureListeners()
     }
 
     private fun observeUiEvents() {
-        viewModel
-            .viewState()
-            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
-            .onEach { viewState -> renderViewState(viewState) }
-            .launchIn(lifecycleScope)
-
         viewModel
             .commands()
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
@@ -81,20 +70,21 @@ class SyncLoginActivity : DuckDuckGoActivity() {
     private fun processCommand(it: Command) {
         when (it) {
             ReadQRCode -> barcodeConnectLauncher.launch(getScanOptions())
-            ReadTextCode -> TODO()
+            ReadTextCode -> {
+                // noop
+            }
             Error -> {
                 setResult(RESULT_CANCELED)
                 finish()
             }
             LoginSucess -> {
-                Toast.makeText(this, "Success", Toast.LENGTH_LONG).show()
                 setResult(RESULT_OK)
                 finish()
             }
         }
     }
 
-    private fun renderViewState(viewState: ViewState) {
+    private fun configureListeners() {
         binding.readQRCode.setOnClickListener {
             viewModel.onReadQRCodeClicked()
         }
@@ -106,7 +96,7 @@ class SyncLoginActivity : DuckDuckGoActivity() {
     private fun getScanOptions(): ScanOptions {
         val options = ScanOptions()
         options.setDesiredBarcodeFormats(ScanOptions.QR_CODE)
-        options.setCameraId(0) // Use a specific camera of the device
+        options.setCameraId(0)
         options.setBeepEnabled(false)
         options.setBarcodeImageEnabled(true)
         return options
@@ -118,4 +108,3 @@ class SyncLoginActivity : DuckDuckGoActivity() {
         }
     }
 }
-

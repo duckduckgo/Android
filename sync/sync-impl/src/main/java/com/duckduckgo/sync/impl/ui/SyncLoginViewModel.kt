@@ -24,7 +24,6 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.SyncRepository
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.LoginSucess
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.ReadQRCode
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.ReadTextCode
@@ -32,7 +31,6 @@ import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
@@ -42,12 +40,7 @@ class SyncLoginViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
     private val command = Channel<Command>(1, DROP_OLDEST)
-    private val viewState = MutableStateFlow(ViewState)
-
-    fun viewState(): Flow<ViewState> = viewState
     fun commands(): Flow<Command> = command.receiveAsFlow()
-
-    object ViewState
 
     sealed class Command {
         object ReadQRCode : Command()

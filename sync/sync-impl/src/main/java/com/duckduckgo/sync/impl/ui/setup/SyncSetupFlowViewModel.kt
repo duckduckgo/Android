@@ -28,6 +28,7 @@ import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.Command.FinishSe
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.Command.RecoverSyncData
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.Command.SyncAnotherDevice
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.ViewMode.SyncAnotherDeviceScreen
+import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -35,7 +36,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import javax.inject.*
 
 @ContributesViewModel(ActivityScope::class)
 class SyncSetupFlowViewModel @Inject constructor(

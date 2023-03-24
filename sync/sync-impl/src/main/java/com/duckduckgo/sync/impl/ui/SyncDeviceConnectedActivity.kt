@@ -29,22 +29,22 @@ import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.R
-import com.duckduckgo.sync.impl.databinding.ActivityDeviceConnectedBinding
+import com.duckduckgo.sync.impl.databinding.FragmentDeviceConnectedBinding
 import com.duckduckgo.sync.impl.ui.SyncDeviceConnectedViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncDeviceConnectedViewModel.Command.FinishSetupFlow
 import com.duckduckgo.sync.impl.ui.SyncDeviceConnectedViewModel.ViewState
-import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowFragment.SetupFlowListener
+import com.duckduckgo.sync.impl.ui.setup.SetupFlowListener
 import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(FragmentScope::class)
-class SyncDeviceConnectedFragment : DuckDuckGoFragment(R.layout.activity_device_connected) {
+class SyncDeviceConnectedFragment : DuckDuckGoFragment(R.layout.fragment_device_connected) {
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
 
-    private val binding: ActivityDeviceConnectedBinding by viewBinding()
+    private val binding: FragmentDeviceConnectedBinding by viewBinding()
 
     private val viewModel: SyncDeviceConnectedViewModel by lazy {
         ViewModelProvider(this, viewModelFactory)[SyncDeviceConnectedViewModel::class.java]
