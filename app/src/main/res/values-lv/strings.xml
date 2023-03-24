@@ -510,8 +510,8 @@
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Nekad</string>
     <string name="disableLoginDetectionDialogTitle">Vai atspējot atgādinājumu par ugunsdrošību, kad pierakstāties vietnēs?</string>
     <string name="disableLoginDetectionDialogDescription">Šo preferenci varēsi jebkurā laikā mainīt iestatījumu sadaļā.</string>
-    <string name="disableLoginDetectionDialogPositive">ATSPĒJOT</string>
-    <string name="disableLoginDetectionDialogNegative">ATCELT</string>
+    <string name="disableLoginDetectionDialogPositive">Atslēgt</string>
+    <string name="disableLoginDetectionDialogNegative">Atcelt</string>
     <string name="automaticFireproofWebsiteLoginDialogTitle">Automātiski padarīt vietnes ugunsdrošas pierakstoties?</string>
     <string name="automaticFireproofWebsiteLoginDialogDescription">Padarot vietnes ugunsdrošas, paliksi pierakstījies(-usies) arī pēc Uguns pogas nospiešanas. Vēlāk to vienmēr vari mainīt sadaļā Iestatījumi. </string>
     <string name="automaticFireproofWebsiteLoginDialogFirstOption">Vienmēr padarīt ugunsdrošu</string>
