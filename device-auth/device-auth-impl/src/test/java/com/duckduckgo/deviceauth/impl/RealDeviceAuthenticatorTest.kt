@@ -20,7 +20,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.deviceauth.api.AutofillAuthorizationGracePeriod
-import com.duckduckgo.deviceauth.api.DeviceAuthenticator.Features.AUTOFILL
+import com.duckduckgo.deviceauth.api.DeviceAuthenticator.Features.AUTOFILL_TO_ACCESS_CREDENTIALS
+import com.duckduckgo.deviceauth.api.DeviceAuthenticator.Features.AUTOFILL_TO_USE_CREDENTIALS
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
@@ -93,23 +94,41 @@ class RealDeviceAuthenticatorTest {
     }
 
     @Test
-    fun whenAuthenticateIsCalledWithFragmentThenLaunchAuthLauncher() {
-        testee.authenticate(AUTOFILL, fragment) {}
+    fun whenAuthenticateToAccessCredentialsIsCalledWithFragmentThenLaunchAuthLauncher() {
+        testee.authenticate(AUTOFILL_TO_ACCESS_CREDENTIALS, fragment) {}
 
-        verify(authLauncher).launch(eq(R.string.autofill_auth_text), eq(fragment), any())
+        verify(authLauncher).launch(eq(R.string.autofill_auth_text_for_access), eq(fragment), any())
     }
 
     @Test
-    fun whenAuthenticateIsCalledWithActivityThenLaunchAuthLauncher() {
-        testee.authenticate(AUTOFILL, fragment) {}
-
-        verify(authLauncher).launch(eq(R.string.autofill_auth_text), eq(fragment), any())
+    fun whenAuthenticateToUseCredentialsIsCalledWithFragmentThenLaunchAuthLauncher() {
+        testee.authenticate(AUTOFILL_TO_USE_CREDENTIALS, fragment) {}
+        verify(authLauncher).launch(eq(R.string.autofill_auth_text_for_using), eq(fragment), any())
     }
 
     @Test
-    fun whenAuthGracePeriodActiveThenNoDeviceAuthLaunched() {
+    fun whenAuthenticateToAccessCredentialsIsCalledWithActivityThenLaunchAuthLauncher() {
+        testee.authenticate(AUTOFILL_TO_ACCESS_CREDENTIALS, fragment) {}
+        verify(authLauncher).launch(eq(R.string.autofill_auth_text_for_access), eq(fragment), any())
+    }
+
+    @Test
+    fun whenAuthenticateToUseCredentialsIsCalledWithActivityThenLaunchAuthLauncher() {
+        testee.authenticate(AUTOFILL_TO_USE_CREDENTIALS, fragment) {}
+        verify(authLauncher).launch(eq(R.string.autofill_auth_text_for_using), eq(fragment), any())
+    }
+
+    @Test
+    fun whenAuthGracePeriodActiveThenNoDeviceAuthLaunchedWhenUsingCredentials() {
         whenever(autofillAuthorizationGracePeriod.isAuthRequired()).thenReturn(false)
-        testee.authenticate(AUTOFILL, fragmentActivity) {}
+        testee.authenticate(AUTOFILL_TO_USE_CREDENTIALS, fragmentActivity) {}
+        verifyAuthNotLaunched()
+    }
+
+    @Test
+    fun whenAuthGracePeriodActiveThenNoDeviceAuthLaunchedWhenAccessingCredentials() {
+        whenever(autofillAuthorizationGracePeriod.isAuthRequired()).thenReturn(false)
+        testee.authenticate(AUTOFILL_TO_ACCESS_CREDENTIALS, fragmentActivity) {}
         verifyAuthNotLaunched()
     }
 

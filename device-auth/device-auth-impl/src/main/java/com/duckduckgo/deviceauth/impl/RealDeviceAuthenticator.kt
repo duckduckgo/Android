@@ -73,6 +73,7 @@ class RealDeviceAuthenticator @Inject constructor(
     private fun getAuthText(
         feature: Features,
     ): Int = when (feature) {
-        Features.AUTOFILL -> R.string.autofill_auth_text
+        Features.AUTOFILL_TO_USE_CREDENTIALS -> R.string.autofill_auth_text_for_using
+        Features.AUTOFILL_TO_ACCESS_CREDENTIALS -> R.string.autofill_auth_text_for_access
     }
 }
