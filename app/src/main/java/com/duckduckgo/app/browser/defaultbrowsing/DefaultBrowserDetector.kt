@@ -23,7 +23,13 @@ import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Build
+import com.duckduckgo.app.statistics.api.BrowserFeatureStateReporterPlugin
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 import timber.log.Timber
 
 interface DefaultBrowserDetector {
@@ -31,10 +37,13 @@ interface DefaultBrowserDetector {
     fun isDefaultBrowser(): Boolean
     fun hasDefaultBrowser(): Boolean
 }
-class AndroidDefaultBrowserDetector(
+
+@ContributesMultibinding(scope = AppScope::class, boundType = BrowserFeatureStateReporterPlugin::class)
+@ContributesBinding(scope = AppScope::class, boundType = DefaultBrowserDetector::class)
+class AndroidDefaultBrowserDetector @Inject constructor(
     private val context: Context,
     private val appBuildConfig: AppBuildConfig,
-) : DefaultBrowserDetector {
+) : DefaultBrowserDetector, BrowserFeatureStateReporterPlugin {
 
     override fun deviceSupportsDefaultBrowserConfiguration(): Boolean {
         return appBuildConfig.sdkInt >= Build.VERSION_CODES.N
@@ -53,6 +62,14 @@ class AndroidDefaultBrowserDetector(
         val intent = Intent(ACTION_VIEW, Uri.parse("https://"))
         val resolutionInfo: ResolveInfo? = context.packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
         return resolutionInfo?.activityInfo?.packageName ?: ANDROID_PACKAGE
+    }
+
+    override fun isFeatureEnabled(): Boolean {
+        return isDefaultBrowser()
+    }
+
+    override fun featureName(): String {
+        return PixelParameter.DEFAULT_BROWSER
     }
 
     companion object {
