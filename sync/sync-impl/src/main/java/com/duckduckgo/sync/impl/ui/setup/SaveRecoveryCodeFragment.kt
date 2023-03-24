@@ -33,9 +33,10 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.FragmentRecoveryCodeBinding
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command
+import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Error
+import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Finish
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.AccountCreated
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.CreatingAccount
-import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.Error
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewState
 import com.google.zxing.BarcodeFormat.QR_CODE
 import com.google.zxing.EncodeHintType
@@ -70,7 +71,7 @@ class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_c
         binding.footerSecondaryButton.setOnClickListener {
         }
         binding.footerNextButton.setOnClickListener {
-            requireActivity().finish()
+            viewModel.onNextClicked()
         }
     }
 
@@ -90,7 +91,10 @@ class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_c
     }
 
     private fun processCommand(it: Command) {
-        TODO("Not yet implemented")
+        when (it) {
+            Error -> requireActivity().finish()
+            Finish -> requireActivity().finish()
+        }
     }
 
     private fun renderViewState(viewState: ViewState) {
@@ -117,8 +121,6 @@ class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_c
                 binding.recoverCodeContainer.hide()
                 binding.recoveryCodeSkeleton.startShimmer()
             }
-
-            Error -> TODO()
         }
     }
 
