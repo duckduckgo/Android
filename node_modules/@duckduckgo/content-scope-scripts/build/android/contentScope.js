@@ -346,8 +346,17 @@
      * @returns The value of the config setting or the default value
      */
     function getFeatureAttr (featureName, args, prop, defaultValue) {
-        let configSetting = getFeatureSetting(featureName, args, prop);
+        const configSetting = getFeatureSetting(featureName, args, prop);
+        return processAttr(configSetting, defaultValue)
+    }
 
+    /**
+     * Handles the processing of a config setting.
+     * @param {*} configSetting
+     * @param {*} defaultValue
+     * @returns
+     */
+    function processAttr (configSetting, defaultValue) {
         if (configSetting === undefined) {
             return defaultValue
         }
@@ -440,10 +449,22 @@
                 }
                 return proxyObject.apply(...args)
             };
+            const getMethod = (target, prop, receiver) => {
+                if (prop === 'toString') {
+                    const method = Reflect.get(target, prop, receiver).bind(target);
+                    Object.defineProperty(method, 'toString', {
+                        value: String.toString.bind(String.toString),
+                        enumerable: false
+                    });
+                    return method
+                }
+                return DDGReflect.get(target, prop, receiver)
+            };
             {
                 this._native = objectScope[property];
                 const handler = {};
                 handler.apply = outputHandler;
+                handler.get = getMethod;
                 this.internal = new globalObj.Proxy(objectScope[property], handler);
             }
         }
