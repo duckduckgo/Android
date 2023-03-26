@@ -41,6 +41,7 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowReconnecting
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowReconnectingFailed
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.CheckVPNPermission
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.OpenVPNSettings
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.RequestVPNPermission
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Connected
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Connecting
@@ -99,6 +100,17 @@ class NetworkProtectionManagementViewModel @Inject constructor(
                 connectionDetails = connectionDetailsToEmit,
                 alertState = getAlertState(vpnState.state, reconnectState),
             )
+        }
+    }
+
+    override fun onCreate(owner: LifecycleOwner) {
+        super.onCreate(owner)
+        viewModelScope.launch(dispatcherProvider.io()) {
+            // This is a one-shot check run 500ms after the screen is shown
+            delay(500)
+            getRunningState().firstOrNull()?.alwaysOnState?.let {
+                handleAlwaysOnInitialState(it)
+            }
         }
     }
 
@@ -227,12 +239,37 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         networkProtectionRepository.enabledTimeInMillis = -1L
         reconnectNotifications.clearNotifications()
         forceUpdateRunningState()
+        tryShowAlwaysOnPromotion()
+    }
+
+    private fun tryShowAlwaysOnPromotion() {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            if (shouldShowAlwaysOnPromotion()) {
+                // TODO send pixels
+                sendCommand(Command.ShowAlwaysOnPromotionDialog)
+            }
+        }
+    }
+
+    private fun handleAlwaysOnInitialState(alwaysOnState: VpnStateMonitor.AlwaysOnState) {
+        if (alwaysOnState.enabled && alwaysOnState.lockedDown) {
+            sendCommand(Command.ShowAlwaysOnLockdownDialog)
+        }
+    }
+
+    fun onAlwaysOnOpenSettingsClicked() {
+        // TODO (send pixels)
+        sendCommand(OpenVPNSettings)
     }
 
     private fun onStopVpn() {
         featuresRegistry.unregisterFeature(NetPVpnFeature.NETP_VPN)
         reconnectNotifications.clearNotifications()
         forceUpdateRunningState()
+    }
+
+    private suspend fun shouldShowAlwaysOnPromotion(): Boolean {
+        return !vpnStateMonitor.isAlwaysOnEnabled() && vpnStateMonitor.vpnLastDisabledByAndroid()
     }
 
     private fun forceUpdateRunningState() {
@@ -256,6 +293,9 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         object ShowVpnAlwaysOnConflictDialog : Command()
         object ShowVpnConflictDialog : Command()
         object ResetToggle : Command()
+        object ShowAlwaysOnPromotionDialog : Command()
+        object ShowAlwaysOnLockdownDialog : Command()
+        object OpenVPNSettings : Command()
     }
 
     data class ViewState(

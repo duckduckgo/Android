@@ -50,5 +50,10 @@
     <string name="netpAlwaysOnVpnConflictMessage">Android only allows one active VPN connection at a time. Open Network settings > VPN. Find the VPN app that’s “always-on” and disable it to continue.</string>
     <string name="netpActionOpenSettings">Open Settings</string>
     <string name="netpActionCancel">Cancel</string>
+    <string name="netpActionNotNow">Not Now</string>
+    <string name="netpAlwaysOnPromotionHeading">Set to Always-on</string>
+    <string name="netpAlwaysOnPromotionBody"><![CDATA[Go to your device’s VPN Settings for DuckDuckGo and enable <b>Always-on</b> VPN to prevent Android disabling protection.\n\nMake sure to leave the other setting OFF.]]></string>
+    <string name="netpAlwaysOnLockdownBody"><![CDATA[To avoid app issues, go to your device\'s <b>VPN Settings for DuckDuckGo</b> and disable <b>Block connections without VPN</b>]]></string>
+    <string name="netpAlwaysOnLockdownHeading">Change your VPN settings</string>
 
 </resources>

@@ -23,10 +23,10 @@ import android.net.VpnService
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.net.toUri
+import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -49,6 +49,7 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionDetails
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ViewState
+import com.duckduckgo.networkprotection.impl.management.alwayson.NetworkProtectionAlwaysOnDialogFragment
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -63,7 +64,6 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
     private val viewModel: NetworkProtectionManagementViewModel by bindViewModel()
     private val vpnPermissionRequestActivityResult =
         registerForActivityResult(StartActivityForResult()) {
-            Log.d("KL", "result code: ${it.resultCode}")
             if (it.resultCode == RESULT_OK) {
                 viewModel.onStartVpn()
             } else {
@@ -180,6 +180,9 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
             is Command.ShowVpnAlwaysOnConflictDialog -> showAlwaysOnConflictDialog()
             is Command.ShowVpnConflictDialog -> showVpnConflictDialog()
             is Command.ResetToggle -> resetToggle()
+            is Command.ShowAlwaysOnPromotionDialog -> showAlwaysOnPromotionDialog()
+            is Command.ShowAlwaysOnLockdownDialog -> showAlwaysOnLockdownDialog()
+            is Command.OpenVPNSettings -> openVPNSettings()
         }
     }
 
@@ -270,6 +273,38 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         binding.netpToggle.quietlySetChecked(false)
     }
 
+    private fun showAlwaysOnPromotionDialog() {
+        dismissAlwaysOnDialog()
+
+        NetworkProtectionAlwaysOnDialogFragment.newPromotionDialog(
+            object : NetworkProtectionAlwaysOnDialogFragment.Listener {
+                override fun onGoToSettingsClicked() {
+                    viewModel.onAlwaysOnOpenSettingsClicked()
+                }
+
+                override fun onCanceled() {}
+            },
+        ).show(supportFragmentManager, TAG_ALWAYS_ON_DIALOG)
+    }
+
+    private fun showAlwaysOnLockdownDialog() {
+        dismissAlwaysOnDialog()
+
+        NetworkProtectionAlwaysOnDialogFragment.newLockdownDialog(
+            object : NetworkProtectionAlwaysOnDialogFragment.Listener {
+                override fun onGoToSettingsClicked() {
+                    viewModel.onAlwaysOnOpenSettingsClicked()
+                }
+
+                override fun onCanceled() {}
+            },
+        ).show(supportFragmentManager, TAG_ALWAYS_ON_DIALOG)
+    }
+
+    private fun dismissAlwaysOnDialog() {
+        (supportFragmentManager.findFragmentByTag(TAG_ALWAYS_ON_DIALOG) as? DialogFragment)?.dismiss()
+    }
+
     private fun TwoLineListItem.quietlySetChecked(isChecked: Boolean) {
         setOnCheckedChangeListener { _, _ -> }
         setIsChecked(isChecked)
@@ -283,6 +318,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
 
     companion object {
         private const val REPORT_ISSUES_ANNOTATION = "report_issues_link"
+        private const val TAG_ALWAYS_ON_DIALOG = "NETP_ALWAYS_ON_DIALOG"
         val FEEDBACK_URL = "https://form.asana.com/?k=_wNLt6YcT5ILpQjDuW0Mxw&d=137249556945".toUri()
         fun intent(context: Context): Intent {
             return Intent(context, NetworkProtectionManagementActivity::class.java)

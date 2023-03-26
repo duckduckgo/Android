@@ -22,6 +22,7 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.network.ExternalVpnDetector
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.AlwaysOnState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.DISABLED
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.ENABLED
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.ENABLING
@@ -32,8 +33,11 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowReconnecting
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowReconnectingFailed
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.CheckVPNPermission
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.OpenVPNSettings
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.RequestVPNPermission
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ResetToggle
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowAlwaysOnLockdownDialog
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowAlwaysOnPromotionDialog
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowVpnAlwaysOnConflictDialog
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowVpnConflictDialog
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionDetails
@@ -424,5 +428,80 @@ class NetworkProtectionManagementViewModelTest {
     @Test
     fun whenNotReconnectingThenAlertStateIsNone() {
         assertEquals(None, testee.getAlertState(DISABLED, NotReconnecting))
+    }
+
+    @Test
+    fun whenOnAlwaysOnOpenSettingsClickedThenEmitOpenVPNSettingsCommand() = runTest {
+        testee.commands().test {
+            testee.onAlwaysOnOpenSettingsClicked()
+            assertEquals(OpenVPNSettings, this.awaitItem())
+        }
+    }
+
+    @Test
+    fun whenOnStartVpnWithAlwaysOnOFFAndVPNLastDisabledByAndroidThenEmitShowAlwaysOnPromotionDialogCommand() = runTest {
+        whenever(vpnStateMonitor.isAlwaysOnEnabled()).thenReturn(false)
+        whenever(vpnStateMonitor.vpnLastDisabledByAndroid()).thenReturn(true)
+
+        testee.commands().test {
+            testee.onStartVpn()
+            assertEquals(ShowAlwaysOnPromotionDialog, this.expectMostRecentItem())
+        }
+    }
+
+    @Test
+    fun whenOnStartVpnWithAlwaysOnEnabledThenDoNotEmitShowAlwaysOnPromotionDialogCommand() = runTest {
+        whenever(vpnStateMonitor.isAlwaysOnEnabled()).thenReturn(true)
+        whenever(vpnStateMonitor.vpnLastDisabledByAndroid()).thenReturn(true)
+
+        testee.commands().test {
+            testee.onStartVpn()
+            this.ensureAllEventsConsumed()
+        }
+    }
+
+    @Test
+    fun whenOnStartVpnWithAlwaysOnOffButVPNNotKilledByAndroidThenDoNotEmitShowAlwaysOnPromotionDialogCommand() = runTest {
+        whenever(vpnStateMonitor.isAlwaysOnEnabled()).thenReturn(false)
+        whenever(vpnStateMonitor.vpnLastDisabledByAndroid()).thenReturn(false)
+
+        testee.commands().test {
+            testee.onStartVpn()
+            this.ensureAllEventsConsumed()
+        }
+    }
+
+    @Test
+    fun whenOnCreateWithAlwaysOnLockdownThenDoNotEmitShowAlwaysOnLockdownDialogCommand() = runTest {
+        whenever(vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(
+            flowOf(
+                VpnState(
+                    state = ENABLED,
+                    alwaysOnState = AlwaysOnState.ALWAYS_ON_LOCKED_DOWN,
+                ),
+            ),
+        )
+
+        testee.commands().test {
+            testee.onCreate(mock())
+            assertEquals(ShowAlwaysOnLockdownDialog, this.awaitItem())
+        }
+    }
+
+    @Test
+    fun whenOnCreateWithoutAlwaysOnLockdowmThenDoNotEmitShowAlwaysOnLockdownDialogCommand() = runTest {
+        whenever(vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(
+            flowOf(
+                VpnState(
+                    state = ENABLED,
+                    alwaysOnState = AlwaysOnState.ALWAYS_ON_ENABLED,
+                ),
+            ),
+        )
+
+        testee.commands().test {
+            testee.onCreate(mock())
+            this.ensureAllEventsConsumed()
+        }
     }
 }
