@@ -17,11 +17,11 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Sisesta sisselogimisandmed automaatselt</string>
+    <string name="autofillManagementScreenTitle">Sisselogimine</string>
 
     <string name="managementDisabledModeCta"><b>Seadista sätetes</b></string>
-    <string name="managementDisabledModeSubtitle">Automaatse sisselogimise andmete kaitsmiseks on vaja seadme lukustusmustrit, PIN-koodi või biomeetriat.</string>
-    <string name="managementDisabledModeTitle">Automaatse täitmise kasutamiseks taga seadme kaitse</string>
+    <string name="managementDisabledModeSubtitle">Sisselogimise kaitsmiseks on vaja seadme lukustusmustrit, PIN-koodi või biomeetriat.</string>
+    <string name="managementDisabledModeTitle">Sisselogimise salvestamiseks kaitske oma seadet</string>
 
     <string name="saveLoginDialogTitle">Kas salvestada sisselogimisandmed?</string>
     <string name="saveLoginMissingUsernameDialogTitle">Kas salvestada parool?</string>
