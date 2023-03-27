@@ -17,11 +17,11 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Preenchimento automático de inícios de sessão</string>
+    <string name="autofillManagementScreenTitle">Inícios de sessão</string>
 
     <string name="managementDisabledModeCta"><b>Configura nas Definições</b></string>
-    <string name="managementDisabledModeSubtitle">É necessário um padrão de bloqueio do dispositivo, um PIN ou dados biométricos para proteger os teus dados de início de sessão com preenchimento automático.</string>
-    <string name="managementDisabledModeTitle">Protege o teu dispositivo para usares o preenchimento automático</string>
+    <string name="managementDisabledModeSubtitle">É necessário um padrão de bloqueio de dispositivo, PIN ou biometria para proteger os teus inícios de sessão.</string>
+    <string name="managementDisabledModeTitle">Proteger o dispositivo para guardar inícios de sessão</string>
 
     <string name="saveLoginDialogTitle">Guardar início de sessão?</string>
     <string name="saveLoginMissingUsernameDialogTitle">Guardar palavra-passe?</string>
