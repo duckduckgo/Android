@@ -20,6 +20,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.fragment.app.commitNow
@@ -33,8 +34,6 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.R.id
 import com.duckduckgo.sync.impl.databinding.ActivitySyncSetupAccountBinding
 import com.duckduckgo.sync.impl.ui.SyncConnectActivity
-import com.duckduckgo.sync.impl.ui.SyncDeviceConnectedFragment
-import com.duckduckgo.sync.impl.ui.SyncLoginActivity
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.DEVICE_CONNECTED
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_CODE
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SETUP
@@ -51,7 +50,6 @@ import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.ViewMode.Initial
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.ViewMode.SyncAnotherDeviceScreen
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
 
 class ConnectContract : ActivityResultContract<Void?, Boolean>() {
     override fun createIntent(
