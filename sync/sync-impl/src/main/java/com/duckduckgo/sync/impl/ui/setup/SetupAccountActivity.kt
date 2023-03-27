@@ -16,13 +16,10 @@
 
 package com.duckduckgo.sync.impl.ui.setup
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.fragment.app.commitNow
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -33,7 +30,6 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.R.id
 import com.duckduckgo.sync.impl.databinding.ActivitySyncSetupAccountBinding
-import com.duckduckgo.sync.impl.ui.SyncConnectActivity
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.DEVICE_CONNECTED
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_CODE
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SETUP
@@ -51,22 +47,6 @@ import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.ViewMode.SyncAno
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-class ConnectContract : ActivityResultContract<Void?, Boolean>() {
-    override fun createIntent(
-        context: Context,
-        input: Void?,
-    ): Intent {
-        return SyncConnectActivity.intent(context)
-    }
-
-    override fun parseResult(
-        resultCode: Int,
-        intent: Intent?,
-    ): Boolean {
-        return resultCode == Activity.RESULT_OK
-    }
-}
-
 @InjectWith(ActivityScope::class)
 class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
     private val binding: ActivitySyncSetupAccountBinding by viewBinding()
@@ -80,9 +60,8 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
         }
     }
 
-    private val connectFlow = registerForActivityResult(ConnectContract()) { resultOk ->
+    private val connectFlow = registerForActivityResult(ConnectFlowContract()) { resultOk ->
         if (resultOk) {
-            Toast.makeText(this, "login went well", Toast.LENGTH_LONG).show()
             viewModel.onLoginSucess()
         }
     }
