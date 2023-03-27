@@ -8,13 +8,13 @@ Each platform calls into the API exposed by content-scope-features.js where the 
 
 The exposed API is a global called contentScopeFeatures and has three methods:
 - load
-    - Calls the load method on all of the features
+    - Calls the load method on all the features
 - init
-    - Calls the init method on all of the features
+    - Calls the init method on all the features
     - This should be passed the arguments object which has the following keys:
         - 'platform' which is an object with:
             - 'name' which is a string of 'android', 'ios', 'macos' or 'extension'
-        - 'debug' true if debuging should be enabled
+        - 'debug' true if debugging should be enabled
         - 'globalPrivacyControlValue' false if the user has disabled GPC.
         - 'sessionKey' a unique session based key.
         - 'cookie' TODO
@@ -24,7 +24,7 @@ The exposed API is a global called contentScopeFeatures and has three methods:
             - 'domain' the hostname of the site in the URL bar
             - 'enabledFeatures' this is an array of features/ to enable
 - update
-    - Calls the update method on all of the features
+    - Calls the update method on all the features
 
 ## Features
 
@@ -51,7 +51,7 @@ The [inject/](https://github.com/duckduckgo/content-scope-scripts/tree/main/inje
 - In Firefox the code is loaded as a standard extension content script.
 - For Apple, Windows and Android the code is a UserScript that has some string replacements for properties and loads in as the page scope.
     - Note: currently we don't implement the update calls as it's only required by cookie protections which we don't implement.
-- All other browsers the code is stringified, base64 encoded and injected in as a self deleting <script> tag.
+- All other browsers the code is stringified, base64 encoded and injected in as a self deleting `<script>` tag.
 
 In the built output you will see these dramatic differences in the bundled code which is created into: /build
 
@@ -60,10 +60,10 @@ In the built output you will see these dramatic differences in the bundled code 
 - `$CONTENT_SCOPE$` - raw remote config object
 - `$USER_UNPROTECTED_DOMAINS$` - an array of user allowlisted domains
 - `$USER_PREFERENCES$` - an object containing:
-    - platform: { name: '<ios | macos | extension | android>' }
+    - platform: `{ name: '<ios | macos | extension | android>' }`
     - debug: boolean
     - globalPrivacyControlValue: boolean
-    - sessionKey: <CSRNG UUID 4 string> (used for fingerprinting) - this should regnerate on browser close or every 24 hours.
+    - sessionKey: `<CSRNG UUID 4 string>` (used for fingerprinting) - this should regenerate on browser close or every 24 hours.
 
 ### Features scope injection utilities
 
