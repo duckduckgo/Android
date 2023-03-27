@@ -61,7 +61,9 @@ class ShowQRCodeViewModel @Inject constructor(
                         command.send(LoginSucess)
                         polling = false
                     }
-                    else -> {}
+                    else -> {
+                        //noop - keep polling
+                    }
                 }
             }
         }
