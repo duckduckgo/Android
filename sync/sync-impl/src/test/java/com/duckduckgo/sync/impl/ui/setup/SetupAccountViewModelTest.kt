@@ -155,4 +155,21 @@ class SetupAccountViewModelTest {
             assertTrue(viewState2.viewMode is ViewMode.DeviceConnected)
         }
     }
+
+    @Test
+    fun whenUserClicksOnSyncAnotherDeviceThenCommandSyncAnotherDevice() = runTest {
+        testee.viewState(Screen.SETUP).test {
+            val viewState = awaitItem()
+            assertTrue(viewState.viewMode is ViewMode.TurnOnSync)
+            testee.onAskSyncAnotherDevice()
+            val viewState2 = awaitItem()
+            assertTrue(viewState2.viewMode is ViewMode.AskSyncAnotherDevice)
+            testee.onSyncAnotherDevice()
+        }
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is Command.SyncAnotherDevice)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 }
