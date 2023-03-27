@@ -18,5 +18,5 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="autofill_auth_text">Lås enheden op for at bruge dine gemte logins.</string>
-    <string name="biometric_prompt_title">Automatisk udfyldning låst</string>
+    <string name="biometric_prompt_title">Logins låst</string>
 </resources>
