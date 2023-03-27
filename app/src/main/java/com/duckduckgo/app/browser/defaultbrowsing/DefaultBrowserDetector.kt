@@ -64,12 +64,8 @@ class AndroidDefaultBrowserDetector @Inject constructor(
         return resolutionInfo?.activityInfo?.packageName ?: ANDROID_PACKAGE
     }
 
-    override fun isFeatureEnabled(): Boolean {
-        return isDefaultBrowser()
-    }
-
-    override fun featureName(): String {
-        return PixelParameter.DEFAULT_BROWSER
+    override fun featureState(): Pair<Boolean, String> {
+        return Pair(isDefaultBrowser(), PixelParameter.DEFAULT_BROWSER)
     }
 
     companion object {

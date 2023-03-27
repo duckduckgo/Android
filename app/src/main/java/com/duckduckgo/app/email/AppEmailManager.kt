@@ -160,11 +160,7 @@ class AppEmailManager @Inject constructor(
         nextAlias = null
     }
 
-    override fun isFeatureEnabled(): Boolean {
-        return isSignedIn()
-    }
-
-    override fun featureName(): String {
-        return PixelParameter.EMAIL
+    override fun featureState(): Pair<Boolean, String> {
+        return Pair(isSignedIn(), PixelParameter.EMAIL)
     }
 }

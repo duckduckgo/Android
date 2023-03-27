@@ -31,7 +31,7 @@ import org.threeten.bp.ZoneOffset
 import org.threeten.bp.format.DateTimeFormatter
 
 @ContributesMultibinding(AppScope::class)
-class DailyActiveUserPixelSender @Inject constructor(
+class FeatureRetentionPixelSender @Inject constructor(
     private val context: Context,
     private val pixel: Pixel,
     private val plugins: PluginPoint<BrowserFeatureStateReporterPlugin>,
@@ -56,7 +56,8 @@ class DailyActiveUserPixelSender @Inject constructor(
 
         val parameters = mutableMapOf<String, String>()
         plugins.getPlugins().forEach { plugin ->
-            parameters[plugin.featureName()] = plugin.isFeatureEnabled().toBinaryString()
+            val featureState = plugin.featureState()
+            parameters[featureState.second] = featureState.first.toBinaryString()
         }
 
         // check if pixel was already sent in the current day

@@ -25,14 +25,8 @@ interface BrowserFeatureStateReporterPlugin {
 
     /**
      * Used by the [StatisticsPixelName.BROWSER_DAILY_ACTIVE_FEATURE_STATE] pixel,
-     * to notify is a feature is enabled or not
-     * @return true if the feature is enabled, false if not
+     * to notify the state of a feature
+     * @return true if the feature is enabled, false if not, alongside the feature name
      */
-    fun isFeatureEnabled(): Boolean
-
-    /**
-     * Identifies the feature name that will be sent as parameter in [StatisticsPixelName.BROWSER_DAILY_ACTIVE_FEATURE_STATE]
-     * @return the name of the feature
-     */
-    fun featureName(): String
+    fun featureState(): Pair<Boolean, String>
 }
