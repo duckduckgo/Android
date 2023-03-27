@@ -55,7 +55,7 @@ class ShowQRCodeViewModel @Inject constructor(
             showQRCode()
             var polling = true
             while (polling) {
-                delay(5000)
+                delay(POLLING_INTERVAL)
                 when (syncRepository.pollConnectionKeys()) {
                     is Success -> {
                         command.send(LoginSucess)
@@ -96,4 +96,7 @@ class ShowQRCodeViewModel @Inject constructor(
         }
     }
 
+    companion object {
+        const val POLLING_INTERVAL = 5000L
+    }
 }
