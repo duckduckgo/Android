@@ -17,11 +17,11 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Autouzupełnianie logowania</string>
+    <string name="autofillManagementScreenTitle">Dane logowania</string>
 
     <string name="managementDisabledModeCta"><b>Dostosuj ustawienia</b></string>
-    <string name="managementDisabledModeSubtitle">Aby chronić automatycznie uzupełniane dane logowania, korzystaj z blokady urządzenia za pomocą wzoru, kodu PIN lub danych biometrycznych.</string>
-    <string name="managementDisabledModeTitle">Zabezpiecz swoje urządzenie, aby korzystać z funkcji autouzupełniania</string>
+    <string name="managementDisabledModeSubtitle">Aby chronić dane logowania, korzystaj z blokady urządzenia za pomocą wzoru, kodu PIN lub danych biometrycznych.</string>
+    <string name="managementDisabledModeTitle">Zabezpiecz urządzenie, aby chronić dane logowania</string>
 
     <string name="saveLoginDialogTitle">Zapisać logowanie?</string>
     <string name="saveLoginMissingUsernameDialogTitle">Zapisać hasło?</string>
