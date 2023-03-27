@@ -71,7 +71,7 @@ class SyncConnectViewModel @Inject constructor(
 
     fun onConnectQRScanned(qrCode: String) {
         viewModelScope.launch(dispatchers.io()) {
-            when(syncRepository.connectDevice(qrCode)) {
+            when (syncRepository.connectDevice(qrCode)) {
                 is Error -> command.send(Command.Error)
                 is Success -> command.send(LoginSucess)
             }

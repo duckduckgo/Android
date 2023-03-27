@@ -19,7 +19,6 @@ package com.duckduckgo.sync.impl.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -126,4 +125,3 @@ class SyncConnectActivity : DuckDuckGoActivity() {
         }
     }
 }
-

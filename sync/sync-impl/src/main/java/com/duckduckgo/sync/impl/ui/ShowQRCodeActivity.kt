@@ -39,7 +39,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
-class ShowQRCodeActivity: DuckDuckGoActivity() {
+class ShowQRCodeActivity : DuckDuckGoActivity() {
     private val binding: ActivityShowQrCodeBinding by viewBinding()
     private val viewModel: ShowQRCodeViewModel by bindViewModel()
 

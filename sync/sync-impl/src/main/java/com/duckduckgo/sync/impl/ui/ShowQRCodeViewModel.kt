@@ -26,8 +26,7 @@ import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncRepository
 import com.duckduckgo.sync.impl.ui.ShowQRCodeViewModel.Command.LoginSucess
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command
-import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ShowMessage
-import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ShowQR
+import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -36,7 +35,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import javax.inject.*
 
 @ContributesViewModel(ActivityScope::class)
 class ShowQRCodeViewModel @Inject constructor(
@@ -62,7 +60,7 @@ class ShowQRCodeViewModel @Inject constructor(
                         polling = false
                     }
                     else -> {
-                        //noop - keep polling
+                        // noop - keep polling
                     }
                 }
             }
@@ -89,7 +87,7 @@ class ShowQRCodeViewModel @Inject constructor(
             is Success -> {
                 viewState.emit(
                     viewState.value.copy(
-                        qrCode = result.data
+                        qrCode = result.data,
                     ),
                 )
             }

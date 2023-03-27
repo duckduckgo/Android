@@ -19,7 +19,6 @@ package com.duckduckgo.sync.impl.ui
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.sync.TestSyncFixtures
 import com.duckduckgo.sync.TestSyncFixtures.jsonConnectKeyEncoded
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncRepository
@@ -47,7 +46,7 @@ class SyncConnectViewModelTest {
     )
 
     @Test
-    fun whenUserClicksOnReadQRCodeThenCommandIsReadQRCode() = runTest{
+    fun whenUserClicksOnReadQRCodeThenCommandIsReadQRCode() = runTest {
         testee.commands().test {
             testee.onReadQRCodeClicked()
             val command = awaitItem()
@@ -57,7 +56,7 @@ class SyncConnectViewModelTest {
     }
 
     @Test
-    fun whenUserClicksOnReadTextCodeThenCommandIsReadTextCode() = runTest{
+    fun whenUserClicksOnReadTextCodeThenCommandIsReadTextCode() = runTest {
         testee.commands().test {
             testee.onReadTextCodeClicked()
             val command = awaitItem()
@@ -67,7 +66,7 @@ class SyncConnectViewModelTest {
     }
 
     @Test
-    fun whenUserScansConnectQRCodeAndConnectDeviceSucceedsThenCommandIsLoginSuccess() = runTest{
+    fun whenUserScansConnectQRCodeAndConnectDeviceSucceedsThenCommandIsLoginSuccess() = runTest {
         whenever(syncRepostitory.connectDevice(jsonConnectKeyEncoded)).thenReturn(Result.Success(true))
         testee.commands().test {
             testee.onConnectQRScanned(jsonConnectKeyEncoded)
@@ -78,7 +77,7 @@ class SyncConnectViewModelTest {
     }
 
     @Test
-    fun whenUserScansConnectQRCodeAndConnectDeviceFailsThenCommandIsError() = runTest{
+    fun whenUserScansConnectQRCodeAndConnectDeviceFailsThenCommandIsError() = runTest {
         whenever(syncRepostitory.connectDevice(jsonConnectKeyEncoded)).thenReturn(Result.Error(reason = "error"))
         testee.commands().test {
             testee.onConnectQRScanned(jsonConnectKeyEncoded)
@@ -89,7 +88,7 @@ class SyncConnectViewModelTest {
     }
 
     @Test
-    fun whenUseClicksOnShowQRCodeThenCommandIsShowQRCode() = runTest{
+    fun whenUseClicksOnShowQRCodeThenCommandIsShowQRCode() = runTest {
         testee.commands().test {
             testee.onShowQRCodeClicked()
             val command = awaitItem()
@@ -99,7 +98,7 @@ class SyncConnectViewModelTest {
     }
 
     @Test
-    fun whenLoginSucceedsThenCommandIsLoginSuccess() = runTest{
+    fun whenLoginSucceedsThenCommandIsLoginSuccess() = runTest {
         testee.commands().test {
             testee.onLoginSucess()
             val command = awaitItem()

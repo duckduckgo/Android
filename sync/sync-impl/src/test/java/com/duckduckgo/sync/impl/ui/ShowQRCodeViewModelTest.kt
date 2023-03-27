@@ -61,7 +61,7 @@ class ShowQRCodeViewModelTest {
     fun whenGenerateConnectQRFailsThenSendError() = runTest {
         whenever(syncRepostitory.getConnectQR()).thenReturn(Result.Error(reason = "error"))
         whenever(syncRepostitory.pollConnectionKeys()).thenReturn(Result.Success(true))
-        testee.viewState().test{
+        testee.viewState().test {
             awaitItem()
             cancelAndIgnoreRemainingEvents()
         }
@@ -77,7 +77,7 @@ class ShowQRCodeViewModelTest {
     fun whenConnectionKeysSuccessThenLoginSuccess() = runTest {
         whenever(syncRepostitory.getConnectQR()).thenReturn(Result.Success(jsonConnectKeyEncoded))
         whenever(syncRepostitory.pollConnectionKeys()).thenReturn(Result.Success(true))
-        testee.viewState().test{
+        testee.viewState().test {
             awaitItem()
             cancelAndIgnoreRemainingEvents()
         }
