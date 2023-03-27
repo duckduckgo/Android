@@ -60,6 +60,9 @@ dependencies {
     // Apache commons
     implementation "org.apache.commons:commons-math3:_"
 
+    implementation "com.jakewharton.threetenabp:threetenabp:_"
+    testImplementation "org.threeten:threetenbp:_"
+
     testImplementation Testing.junit4
     androidTestImplementation AndroidX.test.runner
     androidTestImplementation AndroidX.test.rules
