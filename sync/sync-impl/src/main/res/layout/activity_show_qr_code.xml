@@ -45,7 +45,7 @@
         android:layout_marginStart="@dimen/keyline_5"
         android:layout_marginEnd="@dimen/keyline_5"
         android:layout_gravity="center"
-        android:text="Copy Code"/>
+        android:text="@string/sync_connect_copy_code"/>
 
     <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:layout_width="match_parent"
@@ -53,7 +53,7 @@
         app:typography="body1"
         android:layout_margin="@dimen/keyline_4"
         android:gravity="center"
-        android:text="Go to Settings > Sync in the DuckDuckGo App on a different device and scan this QR code to sync."/>
+        android:text="@string/sync_connect_scan_qr_hint"/>
 
 
 </LinearLayout>

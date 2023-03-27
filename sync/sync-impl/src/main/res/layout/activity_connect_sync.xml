@@ -39,7 +39,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/keyline_4"
-        android:text="Scan the QR code on your Recovery PDF, or another synced device, to recover your synced data."/>
+        android:text="@string/sync_connect_scan_qr_hint"/>
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/readQRCode"
