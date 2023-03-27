@@ -17,11 +17,11 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Saisie automatique des identifiants</string>
+    <string name="autofillManagementScreenTitle">Identifiants</string>
 
     <string name="managementDisabledModeCta"><b>Configurer dans les paramètres</b></string>
-    <string name="managementDisabledModeSubtitle">Un schéma de verrouillage de l\'appareil, un code PIN ou des données biométriques sont nécessaires pour protéger les informations relatives à la saisie automatique de vos identifiants.</string>
-    <string name="managementDisabledModeTitle">Sécurisez votre appareil pour utiliser la saisie automatique</string>
+    <string name="managementDisabledModeSubtitle">Un schéma de verrouillage de l\'appareil, un code PIN ou des données biométriques sont nécessaires pour protéger vos identifiants.</string>
+    <string name="managementDisabledModeTitle">Sécurisez votre appareil pour enregistrer des identifiants</string>
 
     <string name="saveLoginDialogTitle">Enregistrer l\'identifiant ?</string>
     <string name="saveLoginMissingUsernameDialogTitle">Enregistrer le mot de passe ?</string>
