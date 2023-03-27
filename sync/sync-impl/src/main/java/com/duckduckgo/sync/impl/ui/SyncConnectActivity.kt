@@ -16,12 +16,10 @@
 
 package com.duckduckgo.sync.impl.ui
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -36,48 +34,28 @@ import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ReadQRCode
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ReadTextCode
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowQRCode
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.ViewState
+import com.duckduckgo.sync.impl.ui.setup.ConnectViaQRCodeContract
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanIntentResult
 import com.journeyapps.barcodescanner.ScanOptions
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-class ConnectViaQRCodeContract : ActivityResultContract<Void?, Boolean>() {
-    override fun createIntent(
-        context: Context,
-        input: Void?,
-    ): Intent {
-        return ShowQRCodeActivity.intent(context)
-    }
-
-    override fun parseResult(
-        resultCode: Int,
-        intent: Intent?,
-    ): Boolean {
-        return resultCode == Activity.RESULT_OK
-    }
-}
-
 @InjectWith(ActivityScope::class)
 class SyncConnectActivity : DuckDuckGoActivity() {
     private val binding: ActivityConnectSyncBinding by viewBinding()
     private val viewModel: SyncConnectViewModel by bindViewModel()
 
-    // Register the launcher and result handler
     private val barcodeConnectLauncher = registerForActivityResult(
         ScanContract(),
     ) { result: ScanIntentResult ->
-        if (result.contents == null) {
-            Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show()
-        } else {
-            Toast.makeText(this, "Read ${result.contents}", Toast.LENGTH_LONG).show()
+        if (result.contents != null) {
             viewModel.onConnectQRScanned(result.contents)
         }
     }
 
     private val showQRConnectLauncher = registerForActivityResult(ConnectViaQRCodeContract()) { resultOk ->
         if (resultOk) {
-            Toast.makeText(this, "login went well", Toast.LENGTH_LONG).show()
             viewModel.onLoginSucess()
         }
     }
@@ -106,9 +84,10 @@ class SyncConnectActivity : DuckDuckGoActivity() {
     private fun processCommand(it: Command) {
         when (it) {
             ReadQRCode -> barcodeConnectLauncher.launch(getScanOptions())
-            ReadTextCode -> TODO()
+            ReadTextCode -> {
+                // not implemented yet
+            }
             LoginSucess -> {
-                Toast.makeText(this, "Success", Toast.LENGTH_LONG).show()
                 setResult(RESULT_OK)
                 finish()
             }
@@ -135,7 +114,7 @@ class SyncConnectActivity : DuckDuckGoActivity() {
     private fun getScanOptions(): ScanOptions {
         val options = ScanOptions()
         options.setDesiredBarcodeFormats(ScanOptions.QR_CODE)
-        options.setCameraId(0) // Use a specific camera of the device
+        options.setCameraId(0)
         options.setBeepEnabled(false)
         options.setBarcodeImageEnabled(true)
         return options

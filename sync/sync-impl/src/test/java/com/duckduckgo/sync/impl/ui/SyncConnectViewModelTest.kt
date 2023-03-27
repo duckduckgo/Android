@@ -19,11 +19,11 @@ package com.duckduckgo.sync.impl.ui
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.sync.TestSyncFixtures
 import com.duckduckgo.sync.TestSyncFixtures.jsonConnectKeyEncoded
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncRepository
-import com.duckduckgo.sync.impl.ui.ShowQRCodeViewModel.Command
-import com.duckduckgo.sync.impl.ui.ShowQRCodeViewModel.Command.LoginSucess
+import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
@@ -35,38 +35,53 @@ import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
-class ShowQRCodeViewModelTest {
+class SyncConnectViewModelTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val syncRepostitory: SyncRepository = mock()
 
-    private val testee = ShowQRCodeViewModel(
+    private val testee = SyncConnectViewModel(
         syncRepostitory,
         coroutineTestRule.testDispatcherProvider,
     )
 
     @Test
-    fun whenScreenStartedThenShowQRCode() = runTest {
-        whenever(syncRepostitory.getConnectQR()).thenReturn(Result.Success(jsonConnectKeyEncoded))
-        whenever(syncRepostitory.pollConnectionKeys()).thenReturn(Result.Success(true))
-        testee.viewState().test {
-            val viewState = awaitItem()
-            assertTrue(viewState.qrCode == jsonConnectKeyEncoded)
+    fun whenUserClicksOnReadQRCodeThenCommandIsReadQRCode() = runTest{
+        testee.commands().test {
+            testee.onReadQRCodeClicked()
+            val command = awaitItem()
+            assertTrue(command is Command.ReadQRCode)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenGenerateConnectQRFailsThenSendError() = runTest {
-        whenever(syncRepostitory.getConnectQR()).thenReturn(Result.Error(reason = "error"))
-        whenever(syncRepostitory.pollConnectionKeys()).thenReturn(Result.Success(true))
-        testee.viewState().test{
-            awaitItem()
+    fun whenUserClicksOnReadTextCodeThenCommandIsReadTextCode() = runTest{
+        testee.commands().test {
+            testee.onReadTextCodeClicked()
+            val command = awaitItem()
+            assertTrue(command is Command.ReadTextCode)
             cancelAndIgnoreRemainingEvents()
         }
+    }
 
+    @Test
+    fun whenUserScansConnectQRCodeAndConnectDeviceSucceedsThenCommandIsLoginSuccess() = runTest{
+        whenever(syncRepostitory.connectDevice(jsonConnectKeyEncoded)).thenReturn(Result.Success(true))
         testee.commands().test {
+            testee.onConnectQRScanned(jsonConnectKeyEncoded)
+            val command = awaitItem()
+            assertTrue(command is Command.LoginSucess)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserScansConnectQRCodeAndConnectDeviceFailsThenCommandIsError() = runTest{
+        whenever(syncRepostitory.connectDevice(jsonConnectKeyEncoded)).thenReturn(Result.Error(reason = "error"))
+        testee.commands().test {
+            testee.onConnectQRScanned(jsonConnectKeyEncoded)
             val command = awaitItem()
             assertTrue(command is Command.Error)
             cancelAndIgnoreRemainingEvents()
@@ -74,17 +89,21 @@ class ShowQRCodeViewModelTest {
     }
 
     @Test
-    fun whenConnectionKeysSuccessThenLoginSuccess() = runTest {
-        whenever(syncRepostitory.getConnectQR()).thenReturn(Result.Success(jsonConnectKeyEncoded))
-        whenever(syncRepostitory.pollConnectionKeys()).thenReturn(Result.Success(true))
-        testee.viewState().test{
-            awaitItem()
+    fun whenUseClicksOnShowQRCodeThenCommandIsShowQRCode() = runTest{
+        testee.commands().test {
+            testee.onShowQRCodeClicked()
+            val command = awaitItem()
+            assertTrue(command is Command.ShowQRCode)
             cancelAndIgnoreRemainingEvents()
         }
+    }
 
+    @Test
+    fun whenLoginSucceedsThenCommandIsLoginSuccess() = runTest{
         testee.commands().test {
+            testee.onLoginSucess()
             val command = awaitItem()
-            assertTrue(command is LoginSucess)
+            assertTrue(command is Command.LoginSucess)
             cancelAndIgnoreRemainingEvents()
         }
     }

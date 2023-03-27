@@ -22,6 +22,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.Result.Error
+import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncRepository
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSucess
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ReadQRCode
@@ -70,11 +71,9 @@ class SyncConnectViewModel @Inject constructor(
 
     fun onConnectQRScanned(qrCode: String) {
         viewModelScope.launch(dispatchers.io()) {
-            val result = syncRepository.connectDevice(qrCode)
-            if (result is Error) {
-                command.send(Command.Error)
-            } else {
-                command.send(LoginSucess)
+            when(syncRepository.connectDevice(qrCode)) {
+                is Error -> command.send(Command.Error)
+                is Success -> command.send(LoginSucess)
             }
         }
     }
