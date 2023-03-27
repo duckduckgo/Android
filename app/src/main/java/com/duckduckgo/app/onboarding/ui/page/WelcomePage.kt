@@ -122,7 +122,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
 
     private fun startMultiselectDialogAnimation() {
         val ctaText = context?.getString(R.string.onboardingFeatureOptionsTitle).orEmpty()
-        binding.daxDialogMultiselectCta?.apply {
+        binding.daxDialogMultiselectCta.apply {
             binding.daxDialogCta.root.gone()
             root.show()
             root.dialogTextCta.startTypingAnimation(ctaText)
@@ -155,7 +155,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
 
     private fun getSelectedOptionsAndContinue() {
         var options: Map<DDGFeatureOnboardingOption, Boolean> = mapOf()
-        binding.daxDialogMultiselectCta?.apply {
+        binding.daxDialogMultiselectCta.apply {
             options = mapOf(
                 DDGFeatureOnboardingOption.PRIVATE_SEARCH to optionPrivateSearch.isItemSelected,
                 DDGFeatureOnboardingOption.TRACKER_BLOCKING to optionTrackerBlocking.isItemSelected,
@@ -169,7 +169,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
     }
 
     private fun showContinueButton() {
-        binding.daxDialogMultiselectCta?.apply {
+        binding.daxDialogMultiselectCta.apply {
             primaryCta.show()
             secondaryCta.gone()
         }

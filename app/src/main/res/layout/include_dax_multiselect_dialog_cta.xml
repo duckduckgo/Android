@@ -54,66 +54,73 @@
                 style="@style/Typography.DuckDuckGo.Body1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/keyline_4"
                 android:clickable="true"
                 android:focusable="true"
-                android:layout_marginBottom="@dimen/keyline_4"
                 android:textColor="?attr/daxColorPrimaryText" />
 
-            <LinearLayout
-                android:id="@+id/featureOptionsContainer"
+            <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:alpha="0"
-                android:orientation="vertical">
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:fadeScrollbars="false">
 
-                <com.duckduckgo.app.onboarding.ui.customisationexperiment.MultiselectListItem
-                    android:id="@+id/optionPrivateSearch"
+                <LinearLayout
+                    android:id="@+id/featureOptionsContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/keyline_2"
-                    app:primaryText="@string/onboardingFeatureOptionPrivateSearch"
-                    app:trailingEmoji="🕵🏽" />
+                    android:alpha="0"
+                    android:orientation="vertical">
 
-                <com.duckduckgo.app.onboarding.ui.customisationexperiment.MultiselectListItem
-                    android:id="@+id/optionTrackerBlocking"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/keyline_2"
-                    app:primaryText="@string/onboardingFeatureOptionTrackerBlocking"
-                    app:trailingEmoji="🚫" />
+                    <com.duckduckgo.app.onboarding.ui.customisationexperiment.MultiselectListItem
+                        android:id="@+id/optionPrivateSearch"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/keyline_2"
+                        app:primaryText="@string/onboardingFeatureOptionPrivateSearch"
+                        app:trailingEmoji="🕵🏽" />
 
-                <com.duckduckgo.app.onboarding.ui.customisationexperiment.MultiselectListItem
-                    android:id="@+id/optionSmallerFootprint"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/keyline_2"
-                    app:primaryText="@string/onboardingFeatureOptionSmallerDigitalFootprint"
-                    app:trailingEmoji="👟" />
+                    <com.duckduckgo.app.onboarding.ui.customisationexperiment.MultiselectListItem
+                        android:id="@+id/optionTrackerBlocking"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/keyline_2"
+                        app:primaryText="@string/onboardingFeatureOptionTrackerBlocking"
+                        app:trailingEmoji="🚫" />
 
-                <com.duckduckgo.app.onboarding.ui.customisationexperiment.MultiselectListItem
-                    android:id="@+id/optionFasterPageLoads"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/keyline_2"
-                    app:primaryText="@string/onboardingFeatureOptionFasterPageLoads"
-                    app:trailingEmoji="🚀" />
+                    <com.duckduckgo.app.onboarding.ui.customisationexperiment.MultiselectListItem
+                        android:id="@+id/optionSmallerFootprint"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/keyline_2"
+                        app:primaryText="@string/onboardingFeatureOptionSmallerDigitalFootprint"
+                        app:trailingEmoji="👟" />
 
-                <com.duckduckgo.app.onboarding.ui.customisationexperiment.MultiselectListItem
-                    android:id="@+id/optionFewerAds"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/keyline_2"
-                    app:primaryText="@string/onboardingFeatureOptionFewerAds"
-                    app:trailingEmoji="🎉" />
+                    <com.duckduckgo.app.onboarding.ui.customisationexperiment.MultiselectListItem
+                        android:id="@+id/optionFasterPageLoads"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/keyline_2"
+                        app:primaryText="@string/onboardingFeatureOptionFasterPageLoads"
+                        app:trailingEmoji="🚀" />
 
-                <com.duckduckgo.app.onboarding.ui.customisationexperiment.MultiselectListItem
-                    android:id="@+id/optionOneClickDataClearing"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/keyline_2"
-                    app:primaryText="@string/onboardingFeatureOptionOneClickDataClearing"
-                    app:trailingEmoji="🔥" />
-            </LinearLayout>
+                    <com.duckduckgo.app.onboarding.ui.customisationexperiment.MultiselectListItem
+                        android:id="@+id/optionFewerAds"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/keyline_2"
+                        app:primaryText="@string/onboardingFeatureOptionFewerAds"
+                        app:trailingEmoji="🎉" />
+
+                    <com.duckduckgo.app.onboarding.ui.customisationexperiment.MultiselectListItem
+                        android:id="@+id/optionOneClickDataClearing"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/keyline_2"
+                        app:primaryText="@string/onboardingFeatureOptionOneClickDataClearing"
+                        app:trailingEmoji="🔥" />
+                </LinearLayout>
+            </ScrollView>
 
             <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
                 android:id="@+id/primaryCta"
