@@ -89,7 +89,7 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
         when (viewState.viewMode) {
             AskSyncAnotherDevice -> {
                 supportFragmentManager.commitNow {
-                    replace(id.fragment_container_view, SyncSetupFlowFragment.instance(SyncAnotherDeviceScreen), TAG_RECOVER_ACCOUNT)
+                    replace(id.fragment_container_view, SyncSetupFlowFragment.instance(SyncAnotherDeviceScreen), TAG_ENABLE_SYNC)
                 }
             }
             TurnOnSync -> {
@@ -99,7 +99,7 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
             }
             AskSaveRecoveryCode -> {
                 supportFragmentManager.commitNow {
-                    replace(id.fragment_container_view, SaveRecoveryCodeFragment.instance(), TAG_ENABLE_SYNC)
+                    replace(id.fragment_container_view, SaveRecoveryCodeFragment.instance(), TAG_RECOVER_ACCOUNT)
                 }
             }
         }
