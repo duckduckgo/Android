@@ -451,11 +451,11 @@ class AppSyncRepositoryTest {
         whenever(syncStore.deviceName).thenReturn(deviceName)
         whenever(syncDeviceIds.deviceType()).thenReturn(deviceType)
 
-        val result = syncRepo.getThisConnectedDevice() as Success
+        val result = syncRepo.getThisConnectedDevice()
 
-        assertEquals(deviceId, result.data.deviceId)
-        assertEquals(deviceName, result.data.deviceName)
-        assertEquals(deviceType, result.data.deviceType)
+        assertEquals(deviceId, result.deviceId)
+        assertEquals(deviceName, result.deviceName)
+        assertEquals(deviceType, result.deviceType)
     }
 
     private fun prepareForLoginSuccess() {

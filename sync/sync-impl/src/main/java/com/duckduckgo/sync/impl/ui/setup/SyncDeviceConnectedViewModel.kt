@@ -46,10 +46,7 @@ class SyncDeviceConnectedViewModel @Inject constructor(
 
     fun viewState(): Flow<ViewState> = viewState.filterNotNull().onStart {
         val result = syncRepository.getThisConnectedDevice()
-
-        if (result is Success) {
-            emit(ViewState(result.data.deviceType.type().asDrawableRes(), result.data.deviceName))
-        }
+        emit(ViewState(result.deviceType.type().asDrawableRes(), result.deviceName))
     }
 
     fun commands(): Flow<Command> = command.receiveAsFlow()
