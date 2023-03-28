@@ -18,7 +18,6 @@ package com.duckduckgo.sync.impl.ui
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.widget.CompoundButton
 import android.widget.CompoundButton.OnCheckedChangeListener
@@ -30,15 +29,11 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivitySyncBinding
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity
-import com.google.zxing.BarcodeFormat.QR_CODE
-import com.google.zxing.EncodeHintType
-import com.journeyapps.barcodescanner.BarcodeEncoder
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -94,17 +89,9 @@ class SyncActivity : DuckDuckGoActivity() {
         binding.deviceSyncStatusToggle.quietlySetIsChecked(viewState.isDeviceSyncEnabled, deviceSyncStatusToggleListener)
         binding.viewSwitcher.displayedChild = if (viewState.showAccount) 1 else 0
 
-        if (!viewState.loginQRCode.isNullOrEmpty()) {
-            val barcodeEncoder = BarcodeEncoder()
-            val bitmap: Bitmap = barcodeEncoder.encodeBitmap(
-                viewState.loginQRCode,
-                QR_CODE,
-                resources.getDimensionPixelSize(R.dimen.qrSizeLarge),
-                resources.getDimensionPixelSize(R.dimen.qrSizeLarge),
-                mapOf(EncodeHintType.MARGIN to 0),
-            )
+        if (viewState.loginQRCode != null) {
             binding.qrCodeImageView.show()
-            binding.qrCodeImageView.setImageBitmap(bitmap)
+            binding.qrCodeImageView.setImageBitmap(viewState.loginQRCode)
         }
     }
 

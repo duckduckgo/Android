@@ -16,16 +16,18 @@
 
 package com.duckduckgo.sync.impl.ui
 
+import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.impl.QREncoder
+import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncRepository
 import com.duckduckgo.sync.impl.ui.ShowQRCodeViewModel.Command.LoginSucess
-import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command
 import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -35,9 +37,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @ContributesViewModel(ActivityScope::class)
 class ShowQRCodeViewModel @Inject constructor(
+    private val qrEncoder: QREncoder,
     private val syncRepository: SyncRepository,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
@@ -70,7 +74,7 @@ class ShowQRCodeViewModel @Inject constructor(
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
     data class ViewState(
-        val qrCode: String? = null,
+        val qrCodeBitmap: Bitmap? = null,
     )
 
     sealed class Command {
@@ -79,15 +83,17 @@ class ShowQRCodeViewModel @Inject constructor(
     }
 
     private suspend fun showQRCode() {
-        val result = syncRepository.getConnectQR()
-        when (result) {
+        when (val result = syncRepository.getConnectQR()) {
             is Error -> {
                 command.send(Command.Error)
             }
             is Success -> {
+                val qrBitmap = withContext(dispatchers.io()) {
+                    qrEncoder.encodeAsBitmap(result.data, R.dimen.qrSizeXLarge, R.dimen.qrSizeXLarge)
+                }
                 viewState.emit(
                     viewState.value.copy(
-                        qrCode = result.data,
+                        qrCodeBitmap = qrBitmap,
                     ),
                 )
             }

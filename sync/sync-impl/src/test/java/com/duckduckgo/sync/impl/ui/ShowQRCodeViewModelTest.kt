@@ -20,16 +20,21 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.sync.TestSyncFixtures.jsonConnectKeyEncoded
+import com.duckduckgo.sync.TestSyncFixtures.qrBitmap
+import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncRepository
 import com.duckduckgo.sync.impl.ui.ShowQRCodeViewModel.Command
 import com.duckduckgo.sync.impl.ui.ShowQRCodeViewModel.Command.LoginSucess
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -39,20 +44,24 @@ class ShowQRCodeViewModelTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
+    private val qrEncoder: QREncoder = mock()
     private val syncRepostitory: SyncRepository = mock()
 
     private val testee = ShowQRCodeViewModel(
+        qrEncoder,
         syncRepostitory,
         coroutineTestRule.testDispatcherProvider,
     )
 
     @Test
     fun whenScreenStartedThenShowQRCode() = runTest {
+        val bitmap = qrBitmap()
         whenever(syncRepostitory.getConnectQR()).thenReturn(Result.Success(jsonConnectKeyEncoded))
+        whenever(qrEncoder.encodeAsBitmap(eq(jsonConnectKeyEncoded), any(), any())).thenReturn(bitmap)
         whenever(syncRepostitory.pollConnectionKeys()).thenReturn(Result.Success(true))
         testee.viewState().test {
             val viewState = awaitItem()
-            assertTrue(viewState.qrCode == jsonConnectKeyEncoded)
+            assertEquals(bitmap, viewState.qrCodeBitmap)
             cancelAndIgnoreRemainingEvents()
         }
     }

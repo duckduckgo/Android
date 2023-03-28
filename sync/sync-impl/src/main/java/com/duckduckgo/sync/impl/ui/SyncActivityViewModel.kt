@@ -16,11 +16,14 @@
 
 package com.duckduckgo.sync.impl.ui
 
+import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.impl.QREncoder
+import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.SyncRepository
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
 import javax.inject.Inject
@@ -31,9 +34,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @ContributesViewModel(ActivityScope::class)
 class SyncActivityViewModel @Inject constructor(
+    private val qrEncoder: QREncoder,
     private val syncRepository: SyncRepository,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
@@ -46,7 +51,7 @@ class SyncActivityViewModel @Inject constructor(
     data class ViewState(
         val isDeviceSyncEnabled: Boolean = false,
         val showAccount: Boolean = false,
-        val loginQRCode: String? = null,
+        val loginQRCode: Bitmap? = null,
     )
 
     sealed class Command {
@@ -69,11 +74,15 @@ class SyncActivityViewModel @Inject constructor(
     }
 
     private suspend fun updateViewState() {
+        val qrBitmap = withContext(dispatchers.io()) {
+            val recoveryCode = syncRepository.getRecoveryCode() ?: return@withContext null
+            qrEncoder.encodeAsBitmap(recoveryCode, R.dimen.qrSizeLarge, R.dimen.qrSizeLarge)
+        }
         viewState.emit(
             viewState.value.copy(
                 isDeviceSyncEnabled = syncRepository.isSignedIn(),
                 showAccount = syncRepository.isSignedIn(),
-                loginQRCode = syncRepository.getRecoveryCode(),
+                loginQRCode = qrBitmap,
             ),
         )
     }

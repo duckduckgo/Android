@@ -16,11 +16,14 @@
 
 package com.duckduckgo.sync.impl.ui.setup
 
+import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.impl.QREncoder
+import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncRepository
@@ -38,6 +41,7 @@ import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
 class SaveRecoveryCodeViewModel @Inject constructor(
+    private val qrEncoder: QREncoder,
     private val syncRepository: SyncRepository,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
@@ -49,29 +53,23 @@ class SaveRecoveryCodeViewModel @Inject constructor(
     private fun createAccount() = viewModelScope.launch(dispatchers.io()) {
         if (syncRepository.isSignedIn()) {
             syncRepository.getRecoveryCode()?.let {
+                val bitmap = qrEncoder.encodeAsBitmap(it, R.dimen.qrSizeSmall, R.dimen.qrSizeSmall)
                 val newState = AccountCreated(
-                    loginQRCode = it,
+                    loginQRCode = bitmap,
                     b64RecoveryCode = it,
                 )
                 viewState.emit(ViewState(newState))
             } ?: command.send(Command.Error)
         } else {
             viewState.emit(ViewState(CreatingAccount))
-            val result = syncRepository.createAccount()
-            when (result) {
+            when (syncRepository.createAccount()) {
                 is Error -> {
                     command.send(Command.Error)
                 }
                 is Success -> {
                     syncRepository.getRecoveryCode()?.let {
-                        viewState.emit(
-                            ViewState(
-                                AccountCreated(
-                                    it,
-                                    it,
-                                ),
-                            ),
-                        )
+                        val bitmap = qrEncoder.encodeAsBitmap(it, R.dimen.qrSizeSmall, R.dimen.qrSizeSmall)
+                        viewState.emit(ViewState(AccountCreated(bitmap, it)))
                     } ?: command.send(Command.Error)
                 }
             }
@@ -87,7 +85,7 @@ class SaveRecoveryCodeViewModel @Inject constructor(
     sealed class ViewMode {
         object CreatingAccount : ViewMode()
         data class AccountCreated(
-            val loginQRCode: String,
+            val loginQRCode: Bitmap,
             val b64RecoveryCode: String,
         ) : ViewMode()
     }

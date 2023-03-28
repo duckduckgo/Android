@@ -16,6 +16,7 @@
 
 package com.duckduckgo.sync
 
+import android.graphics.Bitmap
 import com.duckduckgo.sync.crypto.AccountKeys
 import com.duckduckgo.sync.crypto.ConnectKeys
 import com.duckduckgo.sync.crypto.DecryptResult
@@ -201,4 +202,8 @@ object TestSyncFixtures {
     }
 
     val syncData = SyncDataRequest(someBookmarkEntries())
+
+    fun qrBitmap(): Bitmap {
+        return Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)
+    }
 }
