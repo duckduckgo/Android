@@ -16,7 +16,6 @@
 
 package com.duckduckgo.sync.impl.ui.setup
 
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.Lifecycle
@@ -38,9 +37,6 @@ import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Finis
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.AccountCreated
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.CreatingAccount
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewState
-import com.google.zxing.BarcodeFormat.QR_CODE
-import com.google.zxing.EncodeHintType
-import com.journeyapps.barcodescanner.BarcodeEncoder
 import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -103,17 +99,8 @@ class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_c
                 binding.recoveryCodeSkeleton.stopShimmer()
                 binding.recoveryCodeSkeleton.hide()
                 binding.recoverCodeContainer.show()
-
-                val barcodeEncoder = BarcodeEncoder()
-                val bitmap: Bitmap = barcodeEncoder.encodeBitmap(
-                    viewMode.loginQRCode,
-                    QR_CODE,
-                    resources.getDimensionPixelSize(R.dimen.qrSizeSmall),
-                    resources.getDimensionPixelSize(R.dimen.qrSizeSmall),
-                    mapOf(EncodeHintType.MARGIN to 0),
-                )
                 binding.qrCodeImageView.show()
-                binding.qrCodeImageView.setImageBitmap(bitmap)
+                binding.qrCodeImageView.setImageBitmap(viewMode.loginQRCode)
                 binding.recoveryCodeText.text = viewMode.b64RecoveryCode
             }
 

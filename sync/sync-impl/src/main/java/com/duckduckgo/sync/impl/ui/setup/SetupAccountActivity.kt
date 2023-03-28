@@ -36,6 +36,7 @@ import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.S
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.Close
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.RecoverSyncData
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.SyncAnotherDevice
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSaveRecoveryCode
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSyncAnotherDevice
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.DeviceConnected
@@ -54,6 +55,12 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
     private lateinit var screen: Screen
 
     private val loginFlow = registerForActivityResult(LoginContract()) { resultOk ->
+        if (resultOk) {
+            viewModel.onLoginSucess()
+        }
+    }
+
+    private val connectFlow = registerForActivityResult(ConnectFlowContract()) { resultOk ->
         if (resultOk) {
             viewModel.onLoginSucess()
         }
@@ -105,6 +112,7 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
         when (it) {
             Close -> finish()
             RecoverSyncData -> loginFlow.launch(null)
+            SyncAnotherDevice -> connectFlow.launch(null)
         }
     }
 
@@ -149,7 +157,7 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
     }
 
     override fun syncAnotherDevice() {
-        // noop
+        viewModel.onSyncAnotherDevice()
     }
 
     override fun launchFinishSetupFlow() {

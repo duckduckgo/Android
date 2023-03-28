@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/includeToolbar"
+        layout="@layout/include_default_toolbar"/>
+
+    <ImageView
+        android:id="@+id/qrCodeImageView"
+        android:layout_width="@dimen/qrSizeLarge"
+        android:layout_height="@dimen/qrSizeLarge"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        tools:ignore="ContentDescription"/>
+
+
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/keyline_4"
+        android:text="@string/sync_connect_scan_qr_hint"/>
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+        android:id="@+id/readQRCode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="Read QR code"
+        app:leadingIcon="@drawable/ic_qr_24"
+        app:leadingIconBackground="circular"/>
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+        android:id="@+id/readTextCode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="Manually Enter Code"
+        app:leadingIcon="@drawable/ic_keyboard_24"
+        app:leadingIconBackground="circular"/>
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+        android:id="@+id/showQRCode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="Show QR Code"
+        app:leadingIcon="@drawable/ic_qr_24"
+        app:leadingIconBackground="circular"/>
+
+</LinearLayout>
