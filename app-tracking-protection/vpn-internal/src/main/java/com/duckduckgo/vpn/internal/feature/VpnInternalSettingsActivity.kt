@@ -145,7 +145,6 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
                 binding.vpnAlwaysSetDNSToggle.isEnabled = isEnabled
                 binding.debugLoggingToggle.isEnabled = isEnabled
                 binding.settingsInfo.isVisible = !isEnabled
-                binding.openBetaToggle.isVisible = !appTpConfig.isEnabled(AppTpSetting.OpenBeta)
             }
             .launchIn(lifecycleScope)
     }
@@ -234,21 +233,6 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
                     sendBroadcast(VpnRemoteFeatureReceiver.enableIntent(this))
                 } else {
                     sendBroadcast(VpnRemoteFeatureReceiver.disableIntent(this))
-                }
-            }
-        }
-
-        with(AppTpSetting.OpenBeta) {
-            binding.openBetaToggle.setIsChecked(appTpConfig.isEnabled(this))
-            binding.openBetaToggle.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked) {
-                    lifecycleScope.launch(dispatchers.io()) {
-                        appTpConfig.edit().setEnabled(this@with, true)
-                    }
-                } else {
-                    lifecycleScope.launch(dispatchers.io()) {
-                        appTpConfig.edit().setEnabled(this@with, false)
-                    }
                 }
             }
         }

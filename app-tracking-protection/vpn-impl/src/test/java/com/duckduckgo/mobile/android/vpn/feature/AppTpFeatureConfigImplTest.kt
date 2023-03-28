@@ -65,7 +65,6 @@ class AppTpFeatureConfigImplTest {
                 AppTpSetting.CPUMonitoring -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.ProtectGames -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.ExceptionLists -> assertTrue(config.isEnabled(setting))
-                AppTpSetting.OpenBeta -> assertFalse(config.isEnabled(setting))
             }
         }
     }
