@@ -19,38 +19,20 @@ package com.duckduckgo.app.email.di
 import android.content.Context
 import com.duckduckgo.app.autofill.JavascriptInjector
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
-import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.email.AppEmailManager
 import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.email.EmailInjectorJs
 import com.duckduckgo.app.email.EmailManager
-import com.duckduckgo.app.email.api.EmailService
 import com.duckduckgo.app.email.db.EmailDataStore
 import com.duckduckgo.app.email.db.EmailEncryptedSharedPreferences
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.Autofill
 import com.duckduckgo.autofill.api.AutofillFeature
-import com.duckduckgo.di.scopes.AppScope
 import dagger.Module
 import dagger.Provides
-import dagger.SingleInstanceIn
-import kotlinx.coroutines.CoroutineScope
 
 @Module
 class EmailModule {
-
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun providesEmailManager(
-        emailService: EmailService,
-        emailDataStore: EmailDataStore,
-        dispatcherProvider: DispatcherProvider,
-        @AppCoroutineScope appCoroutineScope: CoroutineScope,
-        pixel: Pixel,
-    ): EmailManager {
-        return AppEmailManager(emailService, emailDataStore, dispatcherProvider, appCoroutineScope, pixel)
-    }
 
     @Provides
     fun providesEmailInjector(

@@ -26,14 +26,23 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <com.google.android.material.divider.MaterialDivider
+    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+        android:id="@+id/protectedAppsBottomDivider"
         android:layout_width="match_parent"
         android:layout_height="@dimen/horizontalDividerHeight"
-        app:dividerInsetStart="@dimen/apps_protection_state_insetPadding"/>
+        android:layout_marginStart="@dimen/apps_protection_state_insetPadding"
+        app:defaultPadding="false" />
 
     <com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.AppsProtectionStateView
         android:id="@+id/unProtectedAppsState"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
+
+    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+        android:id="@+id/unProtectedAppsBottomDivider"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/horizontalDividerHeight"
+        android:layout_marginStart="@dimen/apps_protection_state_insetPadding"
+        app:defaultPadding="false" />
 
 </LinearLayout>

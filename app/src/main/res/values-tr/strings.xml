@@ -104,7 +104,7 @@
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Kapat</string>
     <string name="closeAllTabsMenuItem">Tüm Sekmeleri Kapat</string>
-    <string name="closeTab">Sekmeyi kapat</string>
+    <string name="closeTab">Sekmeyi Kapat</string>
     <string name="tabClosed">Sekme kapatıldı</string>
     <string name="tabClosedUndo">Geri al</string>
     <string name="downloadsMenuItemTitle">İndirilenler</string>
@@ -243,9 +243,9 @@
     <string name="surveyCtaTitle">Uygulamayı geliştirmemize yardımcı olun!</string>
     <string name="surveyCtaDescription">Kısa anketimize katılın ve geri bildiriminizi paylaşın.</string>
     <string name="surveyCtaLaunchButton">Ankete katıl</string>
-    <string name="surveyCtaDismissButton">Hayır teşekkürler</string>
+    <string name="surveyCtaDismissButton">Hayır Teşekkürler</string>
     <string name="surveyActivityTitle">Kullanıcı Anketi</string>
-    <string name="surveyTitle">DUCKDUCKGO ANKETİ</string>
+    <string name="surveyTitle">DuckDuckGo Anketi</string>
     <string name="surveyDismissContentDescription">Anketi kapat</string>
     <string name="surveyLoadingErrorTitle">Olamaz!</string>
     <string name="surveyLoadingErrorText">Anketimiz şu anda yüklenemiyor.\nLütfen daha sonra tekrar deneyin.</string>
@@ -270,7 +270,7 @@
     <string name="appEnjoymentDialogTitle">DuckDuckGo\'yu sevdiniz mi?</string>
     <string name="appEnjoymentDialogMessage">Düşüncelerinizi öğrenmek isteriz.</string>
     <string name="appEnjoymentDialogPositiveButton">Sevdim</string>
-    <string name="appEnjoymentDialogNegativeButton">Üzerinde çalışılmalı</string>
+    <string name="appEnjoymentDialogNegativeButton">Üzerinde Çalışılmalı</string>
 
     <string name="rateAppDialogTitle">Uygulamayı değerlendir</string>
     <string name="rateAppDialogMessage">Görüşleriniz önemli. Lütfen bir inceleme yazın.</string>
@@ -361,7 +361,7 @@
     <string name="otherMainReasonTitleShort">Diğer Sorunlar</string>
 
     <string name="openEndedInputHint">Lütfen mümkün olduğunca spesifik olun</string>
-    <string name="submitFeedback">GÖNDER</string>
+    <string name="submitFeedback">Gönder</string>
 
     <string name="tellUsHowToImprove">Lütfen neyi geliştirebileceğimizi bize bildirin.</string>
     <string name="thanksForTheFeedback">Geri dönüşünüz için teşekkür ederiz!</string>
@@ -372,8 +372,8 @@
     <string name="whatHaveYouBeenEnjoying">Nelerden hoşlandınız?</string>
     <string name="awesomeToHear">Bunu Duymak Harika!</string>
     <string name="shareTheLoveWithARating">Lütfen Play Store\'da değerlendirin.</string>
-    <string name="rateTheApp">UYGULAMAYI DEĞERLENDİR</string>
-    <string name="declineFurtherFeedback">HAYIR TEŞEKKÜR EDERİM</string>
+    <string name="rateTheApp">Uygulamayı Değerlendir</string>
+    <string name="declineFurtherFeedback">Hayır Teşekkür Ederim</string>
     <string name="whichBrokenSites">Bu sorunları nerede görüyorsunuz?</string>
     <string name="whichBrokenSitesHint">Hangi web sitesinde sorunlar var?</string>
     <string name="feedbackSpecificAsPossible">Lütfen mümkün olduğunca spesifik olun</string>
@@ -389,7 +389,6 @@
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Bu cihazdan</string>
-    <string name="systemSearchOmnibarInputHint"><font size="13">URL\'yi arayın veya bir URL yazın</font></string>
     <string name="systemSearchAppNotFound">Uygulama bulunamadı</string>
     <string name="systemSearchOnboardingText">DuckDuckGo\'yu seçtiğiniz için teşekkürler!\nArama motorumuzu veya uygulamamızı kullanırken tüm aramalarınız güvende.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">DuckDuckGo uygulaması ayrıca:</string>
@@ -408,7 +407,7 @@
     <string name="daxDialogGotIt">Anladım</string>
     <string name="hideTipsTitle">Kalan ipuçları gizlensin mi?</string>
     <string name="hideTipsText">Sadece birkaç tane var ve onları da bilgilendirici hâle getirmeye çalıştık.</string>
-    <string name="hideTipsButton">İpuçlarını sonsuza kadar gizle</string>
+    <string name="hideTipsButton">İpuçlarını Sonsuza Kadar Gizle</string>
 
     <!-- New Onboarding Experience -->
     <string name="onboardingWelcomeTitle">"DuckDuckGo'ya Hoş Geldiniz!"</string>
@@ -432,6 +431,7 @@
     <!-- Onboarding DDG Feature Options -->
     <string name="onboardingFeatureOptionsTitle">Sizi DuckDuckGo\'ya getiren nedir?</string>
     <string name="onboardingFeatureOptionsContinue">Devam et</string>
+    <string name="onboardingFeatureOptionsSkip">Bu Adımı Atlayın</string>
     <!-- smartling.character_limit = 28 -->
     <string name="onboardingFeatureOptionPrivateSearch">Gizli Arama</string>
     <!-- smartling.character_limit = 28 -->
@@ -662,13 +662,13 @@
 
     <!-- Autoconsent -->
     <!-- smartling.character_limit = 82 -->
-    <string name="autoconsentDialogTitle">Görünüşe göre bu sitede çerez izni için açılır pencere var 👇</string>
+    <string name="autoconsentDialogTitle"><![CDATA[<b>Çerez açılır pencerelerini yönetmemi ister misiniz?</b>]]></string>
     <!-- smartling.character_limit = 160 -->
-    <string name="autoconsentDialogDescription">Bunları sizin yerinize halletmemizi ister misiniz? Çerezleri en aza indirmeyi, gizliliği en üst düzeye çıkarmayı ve bunun gibi açılır pencereleri gizlemeyi deneyebiliriz.</string>
+    <string name="autoconsentDialogDescription">Mevcut en gizli ayarları seçmeyi ve bu gibi açılır pencereleri gizlemeyi deneyebilirim.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Çerez Açılır Pencerelerini Yönetin</string>
+    <string name="autoconsentPrimaryCta">Açılır Pencereleri Benim Yerime Yönet</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentSecondaryCta">Hayır Teşekkürler</string>
+    <string name="autoconsentSecondaryCta">Hayır, Kendim Yöneteceğim</string>
 
     <string name="autoconsentSetting">Çerez Açılır Pencerelerini Yönetin</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Açılır Pencere Gizli</string>

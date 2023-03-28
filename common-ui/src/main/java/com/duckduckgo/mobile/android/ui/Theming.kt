@@ -28,6 +28,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.Theming.Constants.BROADCAST_THEME_CHANGED
+import com.duckduckgo.mobile.android.ui.Theming.Constants.FIXED_THEME_ACTIVITIES
 
 enum class DuckDuckGoTheme {
     SYSTEM_DEFAULT,
@@ -65,11 +66,14 @@ object Theming {
 
     object Constants {
         const val BROADCAST_THEME_CHANGED = "BROADCAST_THEME_CHANGED"
+        val FIXED_THEME_ACTIVITIES = listOf("com.duckduckgo.app.onboarding.ui.OnboardingActivity")
     }
 }
 
 fun AppCompatActivity.applyTheme(theme: DuckDuckGoTheme): BroadcastReceiver? {
-    setTheme(getThemeId(theme))
+    if (!FIXED_THEME_ACTIVITIES.contains(this.localClassName)) {
+        setTheme(getThemeId(theme))
+    }
     return registerForThemeChangeBroadcast()
 }
 

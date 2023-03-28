@@ -19,8 +19,6 @@
 <resources>
     <string name="autofillManagementScreenTitle">Preenchimento automático de inícios de sessão</string>
 
-    <string name="managementLockedModeText">Desbloquear o preenchimento automático</string>
-
     <string name="managementDisabledModeCta"><b>Configura nas Definições</b></string>
     <string name="managementDisabledModeSubtitle">É necessário um padrão de bloqueio do dispositivo, um PIN ou dados biométricos para proteger os teus dados de início de sessão com preenchimento automático.</string>
     <string name="managementDisabledModeTitle">Protege o teu dispositivo para usares o preenchimento automático</string>
@@ -40,7 +38,6 @@
     <string name="useSavedLoginDialogGroupThisWebsite">Deste site</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">De %1$s</string>
 
-    <string name="updateLoginDialogTitle">Atualizar palavra-passe?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Atualizar palavra-passe</string>
     <string name="updateLoginDialogButtonNotNow">Agora não</string>
 
@@ -70,7 +67,7 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Os inícios de sessão são armazenados em segurança apenas neste dispositivo.</string>
 
     <string name="autofillManagementAddLogin">Adicionar início de sessão</string>
-    <string name="autofillManagementSearchLogins">Pesquisar</string>
+    <string name="autofillManagementSearchLogins">Pesquisar inícios de sessão</string>
     <string name="autofillManagementSearchClearDescription">Limpar introdução da pesquisa</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Nenhum resultado para \"%1$s\"</string>
 

@@ -21,7 +21,8 @@
     <string name="macos_title">Prenesite DuckDuckGo za računalnike Mac!</string>
 
     <string name="macos_share_title">Daj povezavo v skupno rabo</string>
-    <string name="macos_description_text">DuckDuckGo za računalnike Mac zagotavlja hitrost, ki jo potrebujete, in funkcije brskanja, ki jih pričakujete, ter je opremljen z našimi ključnimi funkcijami zasebnosti, ki so najboljše v tem razredu.V računalniku Mac pojdite na:\n<b><font color="#3969EF">duckduckgo.com/mac</font></b></string>
+    <string name="macos_description_text">DuckDuckGo za računalnike Mac zagotavlja hitrost, ki jo potrebujete, in funkcije brskanja, ki jih pričakujete, ter je opremljen z našimi ključnimi funkcijami zasebnosti, ki so najboljše v tem razredu.\n\nV računalniku Mac odprite:</string>
+    <string name="macos_description_link">duckduckgo.com/mac</string>
     <string name="macos_share_text">Ste pripravljeni na zasebno brskanje v računalniku Mac? \n\nZa prenos obiščite ta naslov URL v računalniku Mac:\n https://duckduckgo.com/mac</string>
 
     <string name="macos_waitlist_windows_link">Iščete različico za sistem Windows?</string>

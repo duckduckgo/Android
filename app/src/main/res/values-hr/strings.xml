@@ -245,7 +245,7 @@
     <string name="surveyCtaLaunchButton">Ispuni anketu</string>
     <string name="surveyCtaDismissButton">Ne, hvala</string>
     <string name="surveyActivityTitle">Anketa o korisniku</string>
-    <string name="surveyTitle">ANKETA DUCKDUCKGO</string>
+    <string name="surveyTitle">Anketa DuckDuckGo</string>
     <string name="surveyDismissContentDescription">Odbaci anketu</string>
     <string name="surveyLoadingErrorTitle">O, ne!</string>
     <string name="surveyLoadingErrorText">Anketa se trenutačno ne učitava.\nPokušaj ponovno kasnije.</string>
@@ -270,7 +270,7 @@
     <string name="appEnjoymentDialogTitle">Sviđa li ti se DuckDuckGo?</string>
     <string name="appEnjoymentDialogMessage">Voljeli bismo znati što misliš.</string>
     <string name="appEnjoymentDialogPositiveButton">Sviđa mi se</string>
-    <string name="appEnjoymentDialogNegativeButton">Treba ga doraditi</string>
+    <string name="appEnjoymentDialogNegativeButton">Treba doradu</string>
 
     <string name="rateAppDialogTitle">Ocijeni aplikaciju</string>
     <string name="rateAppDialogMessage">Tvoje su povratne informacije važne. Pokaži svoju ljubav recenzijom.</string>
@@ -361,19 +361,19 @@
     <string name="otherMainReasonTitleShort">Ostali problemi</string>
 
     <string name="openEndedInputHint">Budi što precizniji/a</string>
-    <string name="submitFeedback">POŠALJI</string>
+    <string name="submitFeedback">Pošalji</string>
 
     <string name="tellUsHowToImprove">Reci nam što možemo poboljšati.</string>
     <string name="thanksForTheFeedback">Hvala na povratnim informacijama!</string>
     <string name="feedbackNegativeMainReasonPageSubtitle">Što te najviše frustrira?</string>
-    <string name="feedbackNegativeMainReasonPageTitle">Žao nam je što to čujemo</string>
+    <string name="feedbackNegativeMainReasonPageTitle">Žao nam je to čuti</string>
     <string name="feedbackShareDetails">Podijeli pojedinosti</string>
     <string name="sharePositiveFeedbackWithTheTeam">Želiš li s timom podijeliti neke pojedinosti?</string>
     <string name="whatHaveYouBeenEnjoying">Što ti se sviđalo?</string>
     <string name="awesomeToHear">Divno je to čuti!</string>
     <string name="shareTheLoveWithARating">Pokaži ljubav ocjenom u trgovini Play.</string>
-    <string name="rateTheApp">OCIJENI APLIKACIJU</string>
-    <string name="declineFurtherFeedback">NE, HVALA; ZAVRŠIO/LA SAM</string>
+    <string name="rateTheApp">Ocijeni aplikaciju</string>
+    <string name="declineFurtherFeedback">Ne, hvala, to je sve</string>
     <string name="whichBrokenSites">Gdje vidiš te probleme?</string>
     <string name="whichBrokenSitesHint">Koje web-mjesto ima problema?</string>
     <string name="feedbackSpecificAsPossible">Budi što precizniji/a</string>
@@ -389,7 +389,6 @@
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Sa ovog uređaja</string>
-    <string name="systemSearchOmnibarInputHint"><font size="13">Traži ili upiši URL adresu</font></string>
     <string name="systemSearchAppNotFound">Aplikaciju nije bilo moguće pronaći</string>
     <string name="systemSearchOnboardingText">Hvala što si odabrao/la DuckDuckGo!\nSada kada koristiš našu tražilicu ili aplikaciju, tvoje su pretrage zaštićene.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Aplikacija DuckDuckGo također:</string>
@@ -436,6 +435,7 @@
     <!-- Onboarding DDG Feature Options -->
     <string name="onboardingFeatureOptionsTitle">Zbog čega ste se odlučili za DuckDuckGo?</string>
     <string name="onboardingFeatureOptionsContinue">Nastavi</string>
+    <string name="onboardingFeatureOptionsSkip">Preskoči ovaj korak</string>
     <!-- smartling.character_limit = 28 -->
     <string name="onboardingFeatureOptionPrivateSearch">Privatno pretraživanje</string>
     <!-- smartling.character_limit = 28 -->
@@ -670,13 +670,13 @@
 
     <!-- Autoconsent -->
     <!-- smartling.character_limit = 82 -->
-    <string name="autoconsentDialogTitle">Čini se da ova stranica ima skočni prozor za pristanak na kolačiće👇</string>
+    <string name="autoconsentDialogTitle"><![CDATA[<b>Želiš li da upravljam skočnim prozorima kolačića?</b>]]></string>
     <!-- smartling.character_limit = 160 -->
-    <string name="autoconsentDialogDescription">Da se ja pobrinem za to umjesto tebe? Mogu pokušati minimizirati kolačiće, maksimalno povećati privatnost i sakriti skočne prozore poput ovih.</string>
+    <string name="autoconsentDialogDescription">Mogu pokušati odabrati najprivatnije dostupne postavke i sakriti skočne prozore poput ovih.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Upravljanje skočnim prozorima kolačića</string>
+    <string name="autoconsentPrimaryCta">Upravljaj skočnim prozorima umjesto mene</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentSecondaryCta">Ne, hvala</string>
+    <string name="autoconsentSecondaryCta">Ne, sam ću njima upravljati</string>
 
     <string name="autoconsentSetting">Upravljanje skočnim prozorima kolačića</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Skočni prozor je sakriven</string>

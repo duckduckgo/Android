@@ -19,8 +19,6 @@
 <resources>
     <string name="autofillManagementScreenTitle">Автозаполнение логинов</string>
 
-    <string name="managementLockedModeText">Разблокировать автозаполнение</string>
-
     <string name="managementDisabledModeCta"><b>Откройте «Настройки»</b></string>
     <string name="managementDisabledModeSubtitle">Для защиты автоматически заполняемой учетной информации нужны биометрические данные, графический ключ или ПИН-код.</string>
     <string name="managementDisabledModeTitle">Защитите свое устройство, чтобы использовать автозаполнение</string>
@@ -40,7 +38,6 @@
     <string name="useSavedLoginDialogGroupThisWebsite">С этого сайта</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">С %1$s</string>
 
-    <string name="updateLoginDialogTitle">Обновить пароль?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Обновить пароль</string>
     <string name="updateLoginDialogButtonNotNow">Не сейчас</string>
 
@@ -70,7 +67,7 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Логины надежно хранятся только на этом устройстве.</string>
 
     <string name="autofillManagementAddLogin">Добавить логин</string>
-    <string name="autofillManagementSearchLogins">Поиск</string>
+    <string name="autofillManagementSearchLogins">Поиск логинов</string>
     <string name="autofillManagementSearchClearDescription">Сбросить поисковый запрос</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Поиск «%1$s» не дал результатов</string>
 

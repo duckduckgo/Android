@@ -68,6 +68,26 @@
                     app:panelDrawable="@drawable/ic_info_panel_alert"
                     app:panelText="@string/atp_ActivityDisabledLabel" />
 
+                <ImageView
+                    android:id="@+id/deviceShieldTrackerShieldImage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:src="@drawable/apptp_shield_enabled"/>
+
+                <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                    android:id="@+id/deviceShieldTrackerBlockingTrackersDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/keyline_5"
+                    android:layout_marginTop="@dimen/keyline_2"
+                    android:layout_marginEnd="@dimen/keyline_5"
+                    android:layout_marginBottom="@dimen/keyline_4"
+                    android:gravity="center"
+                    android:text="@string/atp_ActivityBlockingTrackersEnabledDescription"
+                    app:textType="secondary"
+                    app:typography="body1" />
+
                 <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
                     android:id="@+id/past_week_activity"
                     android:layout_width="match_parent"
@@ -77,9 +97,13 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/keyline_3"
-                    android:layout_marginBottom="@dimen/keyline_3"
-                    android:orientation="horizontal">
+                    android:layout_marginStart="@dimen/keyline_4"
+                    android:layout_marginTop="@dimen/keyline_1"
+                    android:layout_marginEnd="@dimen/keyline_4"
+                    android:layout_marginBottom="@dimen/keyline_4"
+                    android:background="@drawable/apptp_tracker_activity_shape"
+                    android:orientation="horizontal"
+                    android:padding="@dimen/keyline_4">
 
                     <com.duckduckgo.mobile.android.vpn.ui.tracker_activity.PastWeekTrackerActivityContentView
                         android:id="@+id/trackers_blocked_count"
@@ -104,17 +128,6 @@
 
                 </LinearLayout>
 
-                <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
-                    android:id="@+id/horizontal_divider"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
-                    android:id="@+id/most_recent_activity"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:primaryText="@string/atp_ActivityRecentActivityHeader" />
-
                 <androidx.fragment.app.FragmentContainerView
                     android:id="@+id/activity_list"
                     android:layout_width="match_parent"
@@ -132,19 +145,14 @@
                     android:paddingStart="72dp"
                     android:paddingTop="@dimen/keyline_2"
                     android:paddingEnd="@dimen/keyline_4"
-                    android:paddingBottom="@dimen/keyline_2"
+                    android:paddingBottom="@dimen/keyline_empty"
                     android:text="@string/atp_ActivityCtaShowAll"
                     android:visibility="gone" />
-
-                <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/keyline_2"
-                    app:defaultPadding="false" />
 
                 <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_2"
                     app:primaryText="@string/atp_ActivityAbout" />
 
                 <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem

@@ -80,13 +80,6 @@
                     app:primaryText="Always set DNS"
                     app:showSwitch="true"/>
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-                    android:id="@+id/openBetaToggle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:primaryText="Enable Open Beta"
-                    app:showSwitch="true"/>
-
             <!-- Section Trackers -->
             <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
                     android:layout_width="match_parent"

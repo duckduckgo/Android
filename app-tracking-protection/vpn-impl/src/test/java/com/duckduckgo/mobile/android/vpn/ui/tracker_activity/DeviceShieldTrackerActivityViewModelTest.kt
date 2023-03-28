@@ -23,14 +23,12 @@ import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
-import com.duckduckgo.mobile.android.vpn.network.VpnDetector
+import com.duckduckgo.mobile.android.vpn.network.ExternalVpnDetector
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.BannerState
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.Companion.PIXEL_PARAM_NOTIFY_ME_FROM_SCREEN_NAME
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.Companion.PIXEL_PARAM_NOTIFY_ME_FROM_SCREEN_VALUE
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.ViewEvent
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -63,7 +61,7 @@ class DeviceShieldTrackerActivityViewModelTest {
 
     private val appTrackerBlockingStatsRepository = mock<AppTrackerBlockingStatsRepository>()
     private val deviceShieldPixels = mock<DeviceShieldPixels>()
-    private val vpnDetector = mock<VpnDetector>()
+    private val vpnDetector = mock<ExternalVpnDetector>()
     private val vpnStateMonitor = mock<VpnStateMonitor>()
     private val vpnFeatureRemover = mock<VpnFeatureRemover>()
     private val vpnStore = mock<VpnStore>()
@@ -139,7 +137,7 @@ class DeviceShieldTrackerActivityViewModelTest {
 
     @Test
     fun whenToggleIsSwitchedOnAndOtherVPNIsDisabledThenTrackingProtectionIsEnabled() = runBlocking {
-        whenever(vpnDetector.isVpnDetected()).thenReturn(false)
+        whenever(vpnDetector.isExternalVpnDetected()).thenReturn(false)
         viewModel.commands().test {
             viewModel.onAppTPToggleSwitched(true)
             assertEquals(DeviceShieldTrackerActivityViewModel.Command.CheckVPNPermission, awaitItem())
@@ -149,7 +147,7 @@ class DeviceShieldTrackerActivityViewModelTest {
 
     @Test
     fun whenToggleIsSwitchedOffAndOtherVPNIsDisabledThenConfirmationDialogIsShown() = runBlocking {
-        whenever(vpnDetector.isVpnDetected()).thenReturn(false)
+        whenever(vpnDetector.isExternalVpnDetected()).thenReturn(false)
         viewModel.commands().test {
             viewModel.onAppTPToggleSwitched(false)
             assertEquals(DeviceShieldTrackerActivityViewModel.Command.ShowDisableVpnConfirmationDialog, awaitItem())
@@ -178,8 +176,8 @@ class DeviceShieldTrackerActivityViewModelTest {
 
     @Test
     fun whenVpnLaunchedAlwaysOnDisabledAndSystemKilledAppTpThenShowAlwaysOnPromotion() = runBlocking {
-        whenever(vpnStore.isAlwaysOnEnabled()).thenReturn(false)
-        whenever(vpnStore.vpnLastDisabledByAndroid()).thenReturn(true)
+        whenever(vpnStateMonitor.isAlwaysOnEnabled()).thenReturn(false)
+        whenever(vpnStateMonitor.vpnLastDisabledByAndroid()).thenReturn(true)
 
         viewModel.commands().test {
             viewModel.onVPNPermissionResult(AppCompatActivity.RESULT_OK)
@@ -192,8 +190,8 @@ class DeviceShieldTrackerActivityViewModelTest {
 
     @Test
     fun whenVpnLaunchedAlwaysOnDisabledAndSystemDidNotKilledAppTpThenDoNotShowAlwaysOnPromotion() = runBlocking {
-        whenever(vpnStore.isAlwaysOnEnabled()).thenReturn(false)
-        whenever(vpnStore.vpnLastDisabledByAndroid()).thenReturn(false)
+        whenever(vpnStateMonitor.isAlwaysOnEnabled()).thenReturn(false)
+        whenever(vpnStateMonitor.vpnLastDisabledByAndroid()).thenReturn(false)
 
         viewModel.commands().test {
             viewModel.onVPNPermissionResult(AppCompatActivity.RESULT_OK)
@@ -204,8 +202,8 @@ class DeviceShieldTrackerActivityViewModelTest {
 
     @Test
     fun whenVPNInAlwaysOnModeThenShowPromoteAlwaysOnDialogCommandIsNotSent() = runBlocking {
-        whenever(vpnStore.isAlwaysOnEnabled()).thenReturn(true)
-        whenever(vpnStore.vpnLastDisabledByAndroid()).thenReturn(true)
+        whenever(vpnStateMonitor.isAlwaysOnEnabled()).thenReturn(true)
+        whenever(vpnStateMonitor.vpnLastDisabledByAndroid()).thenReturn(true)
 
         viewModel.commands().test {
             viewModel.onVPNPermissionResult(AppCompatActivity.RESULT_OK)
@@ -243,7 +241,7 @@ class DeviceShieldTrackerActivityViewModelTest {
 
     @Test
     fun whenToggleIsSwitchedOnAndOtherVPNIsEnabledThenVpnConflictDialogIsShown() = runBlocking {
-        whenever(vpnDetector.isVpnDetected()).thenReturn(true)
+        whenever(vpnDetector.isExternalVpnDetected()).thenReturn(true)
         viewModel.commands().test {
             viewModel.onAppTPToggleSwitched(true)
             assertEquals(DeviceShieldTrackerActivityViewModel.Command.ShowVpnConflictDialog, awaitItem())
@@ -341,31 +339,5 @@ class DeviceShieldTrackerActivityViewModelTest {
         val bannerState = viewModel.bannerState()
 
         assertEquals(BannerState.OnboardingBanner, bannerState)
-    }
-
-    @Test
-    fun whenUserClickedOnNotifyMeThenPixelIsSentWithCorrectParams() = runBlocking {
-        viewModel.commands().test {
-            viewModel.onViewEvent(ViewEvent.NotifyMeClicked)
-
-            verify(deviceShieldPixels).didPressOnNotifyMeButton(
-                mapOf(PIXEL_PARAM_NOTIFY_ME_FROM_SCREEN_NAME to PIXEL_PARAM_NOTIFY_ME_FROM_SCREEN_VALUE),
-            )
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenUserClickedOnDismissNotifyMeThenPixelIsSentWithCorrectParams() = runBlocking {
-        viewModel.commands().test {
-            viewModel.onViewEvent(ViewEvent.NotifyMeDismissClicked)
-
-            verify(deviceShieldPixels).didPressOnNotifyMeDismissButton(
-                mapOf(PIXEL_PARAM_NOTIFY_ME_FROM_SCREEN_NAME to PIXEL_PARAM_NOTIFY_ME_FROM_SCREEN_VALUE),
-            )
-
-            cancelAndConsumeRemainingEvents()
-        }
     }
 }

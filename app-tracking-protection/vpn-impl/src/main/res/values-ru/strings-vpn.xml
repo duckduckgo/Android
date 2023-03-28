@@ -237,6 +237,10 @@
     <string name="atp_ActivityAbout">О нас</string>
     <string name="atp_ActivityManage">Настроить</string>
     <string name="atp_ActivityRemoveFeature">Отключить и удалить данные</string>
+    <string name="atp_ActivityBlockingTrackersEnabledDescription">DuckDuckGo блокирует скрытые трекеры в различных приложениях.</string>
+    <string name="atp_ActivityBlockingTrackersDisabledDescription">Чтобы повторно включить блокировку трекеров, активируйте функцию защиты от слежки в приложениях.</string>
+    <string name="atp_ActivityBlockedByHeaderText" instruction="Placeholder %1$s is a text containing either Today or Yesterday. Example: Blocked by DuckDuckGo Today">Заблокировано DuckDuckGo %1$s</string>
+    <string name="atp_ActivityBlockedByOnDateHeaderText" instruction="Placeholder %1$s is a text containing a formatted date like Feb 05. Example: Blocked by DuckDuckGo on Feb 05">Заблокировано DuckDuckGo %1$s</string>
 
     <!--  App Tracking Protection FAQ -->
     <string name="atp_FAQActivityTitle">Вопросы и ответы</string>
@@ -283,10 +287,10 @@
         <item quantity="other">Попыток: %1$d. Обычно собирает:</item>
     </plurals>
     <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
-        <item quantity="one">Пресечена %1$d попытка отслеживания</item>
-        <item quantity="few">Пресечено %1$d попытки отслеживания</item>
-        <item quantity="many">Пресечено %1$d попыток отслеживания</item>
-        <item quantity="other">Пресечено попыток отслеживания: %1$d</item>
+        <item quantity="one">DuckDuckGo пресек %1$d попытку отслеживания</item>
+        <item quantity="few">DuckDuckGo пресек %1$d попытки отслеживания</item>
+        <item quantity="many">DuckDuckGo пресек %1$d попыток отслеживания</item>
+        <item quantity="other">DuckDuckGo пресек попытки отслеживания (%1$d)</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Сообщить о проблеме с приложением</string>
     <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">Показать еще %1$d</string>

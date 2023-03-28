@@ -19,8 +19,6 @@
 <resources>
     <string name="autofillManagementScreenTitle">Automatické vyplňovanie prihlasovacích údajov</string>
 
-    <string name="managementLockedModeText">Odomknutie automatického vypĺňania</string>
-
     <string name="managementDisabledModeCta"><b>Nastaviť v Nastaveniach</b></string>
     <string name="managementDisabledModeSubtitle">Na ochranu vašich prihlasovacích údajov pri automatickom vypĺňaní sa vyžaduje vzor uzamknutia zariadenia, kód PIN alebo biometrické údaje.</string>
     <string name="managementDisabledModeTitle">Zabezpečte svoje zariadenie, aby ste mohli používať automatické vypĺňanie</string>
@@ -40,7 +38,6 @@
     <string name="useSavedLoginDialogGroupThisWebsite">Z tejto webovej lokality</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Z adresy %1$s</string>
 
-    <string name="updateLoginDialogTitle">Aktualizovať heslo?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Aktualizovať heslo</string>
     <string name="updateLoginDialogButtonNotNow">Teraz nie</string>
 
@@ -70,7 +67,7 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Prihlásenia sú zabezpečene uložené iba v tomto zariadení.</string>
 
     <string name="autofillManagementAddLogin">Pridať prihlásenie</string>
-    <string name="autofillManagementSearchLogins">Vyhľadávať</string>
+    <string name="autofillManagementSearchLogins">Vyhľadávanie prihlásení</string>
     <string name="autofillManagementSearchClearDescription">Vymazať hľadaný výraz</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Žiadne výsledky pre „%1$s”</string>
 

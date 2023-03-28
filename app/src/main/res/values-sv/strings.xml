@@ -245,7 +245,7 @@
     <string name="surveyCtaLaunchButton">Delta i undersökningen</string>
     <string name="surveyCtaDismissButton">Nej tack</string>
     <string name="surveyActivityTitle">Användarundersökning</string>
-    <string name="surveyTitle">DUCKDUCKGO-UNDERSÖKNING</string>
+    <string name="surveyTitle">DuckDuckGo-undersökning</string>
     <string name="surveyDismissContentDescription">Avvisa undersökning</string>
     <string name="surveyLoadingErrorTitle">Åh nej!</string>
     <string name="surveyLoadingErrorText">Vår undersökning kan inte läsas in just nu.\nFörsök igen senare.</string>
@@ -361,7 +361,7 @@
     <string name="otherMainReasonTitleShort">Andra problem</string>
 
     <string name="openEndedInputHint">Beskriv så noggrant som möjligt</string>
-    <string name="submitFeedback">SKICKA</string>
+    <string name="submitFeedback">Skicka</string>
 
     <string name="tellUsHowToImprove">Berätta vad vi kan förbättra.</string>
     <string name="thanksForTheFeedback">Tack för din återkoppling!</string>
@@ -372,8 +372,8 @@
     <string name="whatHaveYouBeenEnjoying">Vad har du uppskattat med appen?</string>
     <string name="awesomeToHear">Kul att höra!</string>
     <string name="shareTheLoveWithARating">Dela din uppskattning, betygsätt appen på Play Store.</string>
-    <string name="rateTheApp">BETYGSÄTT APPEN</string>
-    <string name="declineFurtherFeedback">NEJ TACK, JAG ÄR KLAR</string>
+    <string name="rateTheApp">Betygsätt appen</string>
+    <string name="declineFurtherFeedback">Nej tack, jag är klar</string>
     <string name="whichBrokenSites">Var ser du dessa problem?</string>
     <string name="whichBrokenSitesHint">På vilken webbplats finns problemen?</string>
     <string name="feedbackSpecificAsPossible">Beskriv så noggrant som möjligt</string>
@@ -389,7 +389,6 @@
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Från den här enheten</string>
-    <string name="systemSearchOmnibarInputHint"><font size="13">Sök eller skriv in URL</font></string>
     <string name="systemSearchAppNotFound">Appen kunde inte hittas</string>
     <string name="systemSearchOnboardingText">Tack för att du valde DuckDuckGo!\nNär du använder vår sökning eller app är dina sökningar skyddade.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Annat som DuckDuckGo-appen gör:</string>
@@ -432,6 +431,7 @@
     <!-- Onboarding DDG Feature Options -->
     <string name="onboardingFeatureOptionsTitle">Varför valde du DuckDuckGo?</string>
     <string name="onboardingFeatureOptionsContinue">Fortsätt</string>
+    <string name="onboardingFeatureOptionsSkip">Hoppa över det här steget</string>
     <!-- smartling.character_limit = 28 -->
     <string name="onboardingFeatureOptionPrivateSearch">Privat sökning</string>
     <!-- smartling.character_limit = 28 -->
@@ -662,13 +662,13 @@
 
     <!-- Autoconsent -->
     <!-- smartling.character_limit = 82 -->
-    <string name="autoconsentDialogTitle">Den här webbplatsen verkar ha ett popup-fönster för godkännande av cookies👇</string>
+    <string name="autoconsentDialogTitle"><![CDATA[<b>Vill du att jag ska hantera popup-fönster för cookies?</b>]]></string>
     <!-- smartling.character_limit = 160 -->
-    <string name="autoconsentDialogDescription">Vill du att jag ska hantera dessa åt dig? Jag kan försöka minimera cookies, maximera integriteten och dölja sådana här popup-fönster.</string>
+    <string name="autoconsentDialogDescription">Jag kan försöka att välja de mest privata inställningarna som finns tillgängliga, och dölja popup-fönster som de här.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Hantera popup-fönster för cookies</string>
+    <string name="autoconsentPrimaryCta">Hantera popup-fönster åt mig</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentSecondaryCta">Nej tack</string>
+    <string name="autoconsentSecondaryCta">Nej, jag hanterar dem själv</string>
 
     <string name="autoconsentSetting">Hantera popup-fönster för cookies</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Popup-fönster dolt</string>

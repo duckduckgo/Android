@@ -155,14 +155,6 @@ class DeviceShieldTrackerActivity :
         binding.ctaShowAll.setOnClickListener {
             viewModel.onViewEvent(ViewEvent.LaunchMostRecentActivity)
         }
-
-        binding.deviceShieldTrackerNotifyMe.onNotifyMeClicked {
-            viewModel.onViewEvent(ViewEvent.NotifyMeClicked)
-        }
-
-        binding.deviceShieldTrackerNotifyMe.onDismissClicked {
-            viewModel.onViewEvent(ViewEvent.NotifyMeDismissClicked)
-        }
     }
 
     override fun onActivityResult(
@@ -514,6 +506,9 @@ class DeviceShieldTrackerActivity :
         bannerState: BannerState,
     ) {
         if (runningState.state == VpnRunningState.ENABLED) {
+            binding.deviceShieldTrackerBlockingTrackersDescription.text =
+                resources.getString(R.string.atp_ActivityBlockingTrackersEnabledDescription)
+            binding.deviceShieldTrackerShieldImage.setImageResource(R.drawable.apptp_shield_enabled)
             if (runningState.alwaysOnState.isAlwaysOnLockedDown()) {
                 binding.deviceShieldTrackerLabelEnabled.gone()
 
@@ -543,6 +538,9 @@ class DeviceShieldTrackerActivity :
                 }
             }
         } else {
+            binding.deviceShieldTrackerBlockingTrackersDescription.text =
+                resources.getString(R.string.atp_ActivityBlockingTrackersDisabledDescription)
+            binding.deviceShieldTrackerShieldImage.setImageResource(R.drawable.apptp_shield_disabled)
             binding.deviceShieldTrackerLabelEnabled.gone()
 
             val (disabledLabel, annotation) = if (runningState.stopReason == REVOKED) {

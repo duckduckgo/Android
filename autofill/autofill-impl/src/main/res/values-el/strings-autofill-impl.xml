@@ -19,8 +19,6 @@
 <resources>
     <string name="autofillManagementScreenTitle">Συνδέσεις αυτόματης συμπλήρωσης</string>
 
-    <string name="managementLockedModeText">Ξεκλείδωμα της αυτόματης συμπλήρωσης</string>
-
     <string name="managementDisabledModeCta"><b>Προσαρμογή στις Ρυθμίσεις</b></string>
     <string name="managementDisabledModeSubtitle">Για προστασία της Αυτόματης συμπλήρωσης στοιχείων σύνδεσης απαιτείται μοτίβο κλειδώματος συσκευής, PIN ή βιομετρικά στοιχεία.</string>
     <string name="managementDisabledModeTitle">Ασφαλίστε τη συσκευή σας για χρήση της Αυτόματης συμπλήρωσης</string>
@@ -40,7 +38,6 @@
     <string name="useSavedLoginDialogGroupThisWebsite">Από αυτόν τον ιστότοπο</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Από %1$s</string>
 
-    <string name="updateLoginDialogTitle">Ενημέρωση κωδικού πρόσβασης;</string>
     <string name="updateLoginDialogButtonUpdatePassword">Ενημέρωση κωδικού πρόσβασης</string>
     <string name="updateLoginDialogButtonNotNow">Όχι τώρα</string>
 
@@ -70,7 +67,7 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Τα στοιχεία σύνδεσης αποθηκεύονται με ασφάλεια μόνο σε αυτήν τη συσκευή.</string>
 
     <string name="autofillManagementAddLogin">Προσθήκη στοιχείων σύνδεσης</string>
-    <string name="autofillManagementSearchLogins">Αναζήτηση</string>
+    <string name="autofillManagementSearchLogins">Αναζήτηση στοιχείων σύνδεσης</string>
     <string name="autofillManagementSearchClearDescription">Εκκαθάριση εισαγωγής αναζήτησης</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Δεν υπάρχουν αποτελέσματα για «%1$s»</string>
 

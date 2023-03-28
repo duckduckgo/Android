@@ -27,12 +27,12 @@ import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
-class RealVpnDetector @Inject constructor(
+class RealExternalVpnDetector @Inject constructor(
     private val context: Context,
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
-) : VpnDetector {
+) : ExternalVpnDetector {
 
-    override fun isVpnDetected(): Boolean {
+    override fun isExternalVpnDetected(): Boolean {
         // if we're the ones using the VPN, no VPN is detected
         if (vpnFeaturesRegistry.isAnyFeatureRegistered()) return false
 

@@ -103,7 +103,7 @@
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Close</string>
     <string name="closeAllTabsMenuItem">Close All Tabs</string>
-    <string name="closeTab">Close tab</string>
+    <string name="closeTab">Close Tab</string>
     <string name="tabClosed">Tab closed</string>
     <string name="tabClosedUndo">Undo</string>
     <string name="downloadsMenuItemTitle">Downloads</string>
@@ -244,9 +244,9 @@
     <string name="surveyCtaTitle">Help us improve the app!</string>
     <string name="surveyCtaDescription">Take our short survey and share your feedback.</string>
     <string name="surveyCtaLaunchButton">Take the Survey</string>
-    <string name="surveyCtaDismissButton">No thanks</string>
+    <string name="surveyCtaDismissButton">No Thanks</string>
     <string name="surveyActivityTitle">User Survey</string>
-    <string name="surveyTitle">DUCKDUCKGO SURVEY</string>
+    <string name="surveyTitle">DuckDuckGo Survey</string>
     <string name="surveyDismissContentDescription">Dismiss survey</string>
     <string name="surveyLoadingErrorTitle">Oh no!</string>
     <string name="surveyLoadingErrorText">Our survey is not currently loading.\nPlease try again later.</string>
@@ -270,8 +270,8 @@
     <!-- App Enjoyment / Rating / Feedback -->
     <string name="appEnjoymentDialogTitle">Enjoying DuckDuckGo?</string>
     <string name="appEnjoymentDialogMessage">We\'d love to know what you think.</string>
-    <string name="appEnjoymentDialogPositiveButton">I like it</string>
-    <string name="appEnjoymentDialogNegativeButton">It needs work</string>
+    <string name="appEnjoymentDialogPositiveButton">I Like It</string>
+    <string name="appEnjoymentDialogNegativeButton">It Needs Work</string>
 
     <string name="rateAppDialogTitle">Rate the app</string>
     <string name="rateAppDialogMessage">Your feedback matters. Please share the love with a review.</string>
@@ -362,19 +362,19 @@
     <string name="otherMainReasonTitleShort">Other Issues</string>
 
     <string name="openEndedInputHint">Please be as specific as possible</string>
-    <string name="submitFeedback">SUBMIT</string>
+    <string name="submitFeedback">Submit</string>
 
     <string name="tellUsHowToImprove">Please tell us what we can improve.</string>
     <string name="thanksForTheFeedback">Thanks for the feedback!</string>
     <string name="feedbackNegativeMainReasonPageSubtitle">What is your frustration most related to?</string>
-    <string name="feedbackNegativeMainReasonPageTitle">We\'re Sorry To Hear That</string>
+    <string name="feedbackNegativeMainReasonPageTitle">We\'re Sorry to Hear That</string>
     <string name="feedbackShareDetails">Share Details</string>
     <string name="sharePositiveFeedbackWithTheTeam">Are there any details you\'d like to share with the team?</string>
     <string name="whatHaveYouBeenEnjoying">What have you been enjoying?</string>
     <string name="awesomeToHear">Awesome to Hear!</string>
     <string name="shareTheLoveWithARating">Please share the love by rating on the Play Store.</string>
-    <string name="rateTheApp">RATE APP</string>
-    <string name="declineFurtherFeedback">NO THANKS, I\'M DONE</string>
+    <string name="rateTheApp">Rate App</string>
+    <string name="declineFurtherFeedback">No Thanks, I\'m Done</string>
     <string name="whichBrokenSites">Where are you seeing these issues?</string>
     <string name="whichBrokenSitesHint">Which website has issues?</string>
     <string name="feedbackSpecificAsPossible">Please be as specific as possible</string>
@@ -390,7 +390,6 @@
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">From this device</string>
-    <string name="systemSearchOmnibarInputHint"><font size="13">Search or type URL</font></string>
     <string name="systemSearchAppNotFound">Application could not be found</string>
     <string name="systemSearchOnboardingText">Thanks for choosing DuckDuckGo!\nNow, when using our search or app, your searches are protected.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">The DuckDuckGo app also:</string>
@@ -409,7 +408,7 @@
     <string name="daxDialogGotIt">Got It</string>
     <string name="hideTipsTitle">Hide remaining tips?</string>
     <string name="hideTipsText">There are only a few, and we tried to make them informative.</string>
-    <string name="hideTipsButton">Hide tips forever</string>
+    <string name="hideTipsButton">Hide Tips Forever</string>
 
     <!-- New Onboarding Experience -->
     <string name="onboardingWelcomeTitle">"Welcome to DuckDuckGo!"</string>
@@ -433,6 +432,7 @@
     <!-- Onboarding DDG Feature Options -->
     <string name="onboardingFeatureOptionsTitle">What brings you to DuckDuckGo?</string>
     <string name="onboardingFeatureOptionsContinue">Continue</string>
+    <string name="onboardingFeatureOptionsSkip">Skip This Step</string>
     <!-- smartling.character_limit = 28 -->
     <string name="onboardingFeatureOptionPrivateSearch">Private search</string>
     <!-- smartling.character_limit = 28 -->
@@ -663,13 +663,13 @@
 
     <!-- Autoconsent -->
     <!-- smartling.character_limit = 82 -->
-    <string name="autoconsentDialogTitle">Looks like this site has a cookie consent pop-up 👇</string>
+    <string name="autoconsentDialogTitle"><![CDATA[<b>Want me to handle cookie pop-ups?</b>]]></string>
     <!-- smartling.character_limit = 160 -->
-    <string name="autoconsentDialogDescription">Want me to handle these for you? I can try to minimize cookies, maximize privacy, and hide pop-ups like these.</string>
+    <string name="autoconsentDialogDescription">I can try to select the most private settings available and hide pop-ups like these.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Manage Cookie Pop-ups</string>
+    <string name="autoconsentPrimaryCta">Handle Pop-ups For Me</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentSecondaryCta">No Thanks</string>
+    <string name="autoconsentSecondaryCta">No, I\'ll Manage Them Myself</string>
 
     <string name="autoconsentSetting">Manage Cookie Pop-ups</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Pop-up Hidden</string>

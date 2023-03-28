@@ -19,8 +19,6 @@
 <resources>
     <string name="autofillManagementScreenTitle">Automatsko popunjavanje prijave</string>
 
-    <string name="managementLockedModeText">Otključaj automatsko popunjavanje</string>
-
     <string name="managementDisabledModeCta"><b>Odredi u Postavkama</b></string>
     <string name="managementDisabledModeSubtitle">Niz za zaključavanje uređaja, PIN ili biometrija potrebni su za zaštitu vaših podataka za prijavu s automatskim popunjavanjem.</string>
     <string name="managementDisabledModeTitle">Osigurajte svoj uređaj za korištenje automatskog popunjavanja</string>
@@ -40,7 +38,6 @@
     <string name="useSavedLoginDialogGroupThisWebsite">S ove web lokacije</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">S %1$s</string>
 
-    <string name="updateLoginDialogTitle">Želiš li ažurirati lozinku?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Ažuriraj lozinku</string>
     <string name="updateLoginDialogButtonNotNow">Ne sada</string>
 
@@ -70,7 +67,7 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Prijave su sigurno spremljene samo na ovom uređaju.</string>
 
     <string name="autofillManagementAddLogin">Dodaj prijavu</string>
-    <string name="autofillManagementSearchLogins">Pretraga</string>
+    <string name="autofillManagementSearchLogins">Pretraživanje prijava</string>
     <string name="autofillManagementSearchClearDescription">Obriši unos pretraživanja</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Nema rezultata za \"%1$s\"</string>
 

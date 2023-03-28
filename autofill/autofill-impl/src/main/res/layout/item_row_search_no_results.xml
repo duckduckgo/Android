@@ -16,12 +16,14 @@
 
 <com.duckduckgo.mobile.android.ui.view.text.DaxTextView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/noMatchingLoginsHint"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center"
     android:paddingStart="16dp"
-    android:paddingTop="24dp"
+    android:layout_marginTop="64dp"
     android:paddingEnd="16dp"
     android:paddingBottom="24dp"
+    app:textType="secondary"
     tools:text="Lorem ipsum dolor sit amet" />

@@ -245,7 +245,7 @@
     <string name="surveyCtaLaunchButton">An der Umfrage teilnehmen</string>
     <string name="surveyCtaDismissButton">Nein, danke</string>
     <string name="surveyActivityTitle">Benutzerumfrage</string>
-    <string name="surveyTitle">DUCKDUCKGO-UMFRAGE</string>
+    <string name="surveyTitle">Duckduckgo-Umfrage</string>
     <string name="surveyDismissContentDescription">Umfrage verwerfen</string>
     <string name="surveyLoadingErrorTitle">Oh nein!</string>
     <string name="surveyLoadingErrorText">Unsere Umfrage kann derzeit nicht geladen werden.\nBitte versuche es zu einem späteren Zeitpunkt erneut.</string>
@@ -361,7 +361,7 @@
     <string name="otherMainReasonTitleShort">Andere Probleme</string>
 
     <string name="openEndedInputHint">Bitte sei so genau wie möglich</string>
-    <string name="submitFeedback">ABSCHICKEN</string>
+    <string name="submitFeedback">Abschicken</string>
 
     <string name="tellUsHowToImprove">Teile uns bitte mit, was wir verbessern können.</string>
     <string name="thanksForTheFeedback">Vielen Dank für dein Feedback!</string>
@@ -372,8 +372,8 @@
     <string name="whatHaveYouBeenEnjoying">Was hat dir gefallen?</string>
     <string name="awesomeToHear">Das freut uns!</string>
     <string name="shareTheLoveWithARating">Bitte teile deine Begeisterung mit einer Bewertung im Play Store.</string>
-    <string name="rateTheApp">APP BEWERTEN</string>
-    <string name="declineFurtherFeedback">NEIN DANKE, ICH BIN FERTIG</string>
+    <string name="rateTheApp">App bewerten</string>
+    <string name="declineFurtherFeedback">Nein danke, ich bin fertig</string>
     <string name="whichBrokenSites">Wo treten diese Probleme auf?</string>
     <string name="whichBrokenSitesHint">Auf welcher Website gibt es Probleme?</string>
     <string name="feedbackSpecificAsPossible">Bitte sei so genau wie möglich</string>
@@ -389,7 +389,6 @@
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Von diesem Gerät</string>
-    <string name="systemSearchOmnibarInputHint"><font size="13">URL eingeben oder suchen</font></string>
     <string name="systemSearchAppNotFound">Die Anwendung konnte nicht gefunden werden.</string>
     <string name="systemSearchOnboardingText">Vielen Dank, dass du dich für DuckDuckGo entschieden hast!\nWenn du jetzt unsere Suche oder App verwendest, sind deine Suchanfragen geschützt.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Das kann die DuckDuckGo App auch:</string>
@@ -432,6 +431,7 @@
     <!-- Onboarding DDG Feature Options -->
     <string name="onboardingFeatureOptionsTitle">Was führt dich zu DuckDuckGo?</string>
     <string name="onboardingFeatureOptionsContinue">Fortsetzen</string>
+    <string name="onboardingFeatureOptionsSkip">Diesen Schritt überspringen</string>
     <!-- smartling.character_limit = 28 -->
     <string name="onboardingFeatureOptionPrivateSearch">Private Suche</string>
     <!-- smartling.character_limit = 28 -->
@@ -662,13 +662,13 @@
 
     <!-- Autoconsent -->
     <!-- smartling.character_limit = 82 -->
-    <string name="autoconsentDialogTitle">Sieht so aus, als hätte diese Website ein Cookie-Zustimmungs-Pop-up👇</string>
+    <string name="autoconsentDialogTitle"><![CDATA[<b>Soll ich mich um Cookie-Pop-ups kümmern?</b>]]></string>
     <!-- smartling.character_limit = 160 -->
-    <string name="autoconsentDialogDescription">Soll ich das für dich erledigen? Ich kann versuchen, Cookies zu minimieren, den Datenschutz zu maximieren und Pop-ups wie diese auszublenden.</string>
+    <string name="autoconsentDialogDescription">Ich kann versuchen, die privatesten Einstellungen auszuwählen und Pop-ups wie diese auszublenden.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Cookie-Pop-ups verwalten</string>
+    <string name="autoconsentPrimaryCta">Kümmere dich für mich um Pop-ups</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentSecondaryCta">Nein, danke</string>
+    <string name="autoconsentSecondaryCta">Nein, ich verwalte sie selbst</string>
 
     <string name="autoconsentSetting">Cookie-Pop-ups verwalten</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Pop-up ausgeblendet</string>

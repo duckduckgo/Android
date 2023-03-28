@@ -21,7 +21,8 @@
     <string name="macos_title">Nabavi DuckDuckGo za Mac!</string>
 
     <string name="macos_share_title">Podijeli poveznicu</string>
-    <string name="macos_description_text">Aplikacija DuckDuckGo za Mac pruža ti potrebnu brzinu i značajke pretraživanja kakve očekuješ, a isporučuje se s našim najboljim alatima za privatnost u svojoj klasi - privacy essentials.\n\nNa svom Macu idi na: \n<b><font color="#3969EF">duckduckgo.com/mac</font></b></string>
+    <string name="macos_description_text">Aplikacija DuckDuckGo za Mac pruža ti potrebnu brzinu i značajke pretraživanja kakve očekuješ, a isporučuje se s našim najboljim alatima za privatnost u svojoj klasi - privacy essentials.\n\nNa Macu idi na:</string>
+    <string name="macos_description_link">duckduckgo.com/mac</string>
     <string name="macos_share_text">Jesi li spreman za početak privatnog pretraživanja na Macu?\n\nPosjeti ovaj URL na svom Macu za preuzimanje:\nhttps://duckduckgo.com/mac</string>
 
     <string name="macos_waitlist_windows_link">Tražiš verziju za Windows?</string>

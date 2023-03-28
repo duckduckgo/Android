@@ -245,7 +245,7 @@
     <string name="surveyCtaLaunchButton">Responder a la encuesta</string>
     <string name="surveyCtaDismissButton">No, gracias</string>
     <string name="surveyActivityTitle">Encuesta de usuario</string>
-    <string name="surveyTitle">ENCUESTA DE DUCKDUCKGO</string>
+    <string name="surveyTitle">Encuesta de DuckDuckGo</string>
     <string name="surveyDismissContentDescription">Omitir encuesta</string>
     <string name="surveyLoadingErrorTitle">¡Vaya!</string>
     <string name="surveyLoadingErrorText">Nuestra encuesta no se ha podido cargar en este momento.\nVuelve a intentarlo más tarde.</string>
@@ -361,7 +361,7 @@
     <string name="otherMainReasonTitleShort">Otros problemas</string>
 
     <string name="openEndedInputHint">Concreta lo máximo posible</string>
-    <string name="submitFeedback">ENVIAR</string>
+    <string name="submitFeedback">Enviar</string>
 
     <string name="tellUsHowToImprove">Dinos cómo podemos mejorar.</string>
     <string name="thanksForTheFeedback">Gracias por compartir tu opinión.</string>
@@ -372,8 +372,8 @@
     <string name="whatHaveYouBeenEnjoying">¿Qué te ha gustado?</string>
     <string name="awesomeToHear">¡Es fantástico oír eso!</string>
     <string name="shareTheLoveWithARating">Comparte tu entusiasmo calificando la aplicación en la Play Store.</string>
-    <string name="rateTheApp">CALIFICAR LA APLICACIÓN</string>
-    <string name="declineFurtherFeedback">NO GRACIAS, HE TERMINADO</string>
+    <string name="rateTheApp">Valora la aplicación</string>
+    <string name="declineFurtherFeedback">No gracias, he terminado</string>
     <string name="whichBrokenSites">¿Dónde surgen estos problemas?</string>
     <string name="whichBrokenSitesHint">¿Qué sitio web no funciona correctamente?</string>
     <string name="feedbackSpecificAsPossible">Concreta lo máximo posible</string>
@@ -389,7 +389,6 @@
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Desde este dispositivo</string>
-    <string name="systemSearchOmnibarInputHint"><font size="13">Buscar o escribir la URL</font></string>
     <string name="systemSearchAppNotFound">No se pudo encontrar la aplicación</string>
     <string name="systemSearchOnboardingText">¡Gracias por elegir DuckDuckGo!\nAhora, cuando uses nuestra búsqueda o aplicación, tus búsquedas estarán protegidas.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">La aplicación de DuckDuckGo también:</string>
@@ -432,6 +431,7 @@
     <!-- Onboarding DDG Feature Options -->
     <string name="onboardingFeatureOptionsTitle">¿Qué te trae a DuckDuckGo?</string>
     <string name="onboardingFeatureOptionsContinue">Continuar</string>
+    <string name="onboardingFeatureOptionsSkip">Omitir este paso</string>
     <!-- smartling.character_limit = 28 -->
     <string name="onboardingFeatureOptionPrivateSearch">Búsquedas privadas</string>
     <!-- smartling.character_limit = 28 -->
@@ -662,13 +662,13 @@
 
     <!-- Autoconsent -->
     <!-- smartling.character_limit = 82 -->
-    <string name="autoconsentDialogTitle">Parece que este sitio tiene una ventana emergente de consentimiento para cookies</string>
+    <string name="autoconsentDialogTitle"><![CDATA[<b>¿Quieres que me encargue de las cookies emergentes?</b>]]></string>
     <!-- smartling.character_limit = 160 -->
-    <string name="autoconsentDialogDescription">¿Quieres que me encargue de ella por ti? Puedo intentar minimizar las cookies, maximizar la privacidad y ocultar ventanas emergentes como estas.</string>
+    <string name="autoconsentDialogDescription">Puedo intentar seleccionar la configuración más privada disponible y ocultar ventanas emergentes como estas.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Administrar ventanas emergentes de cookies</string>
+    <string name="autoconsentPrimaryCta">Gestionar ventanas emergentes por mí</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentSecondaryCta">No, gracias</string>
+    <string name="autoconsentSecondaryCta">No, las gestionaré yo</string>
 
     <string name="autoconsentSetting">Administrar ventanas emergentes de cookies</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Ventana emergente oculta</string>

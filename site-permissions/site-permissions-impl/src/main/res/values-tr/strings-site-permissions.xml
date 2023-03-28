@@ -33,6 +33,6 @@
     <string name="systemPermissionDialogAudioDeniedContent">Siteler mikrofonunuzu yalnızca DuckDuckGo\'nun erişim istemesine izin verirseniz kullanabilir.</string>
     <string name="systemPermissionDialogCameraAndAudioDeniedTitle">DuckDuckGo\'nun bu cihazda kamera ve mikrofon erişimi istemesine izin ver</string>
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">Siteler kameranızı ve mikrofonunuzu yalnızca DuckDuckGo\'nun erişim istemesine izin verirseniz kullanabilir.</string>
-    <string name="systemPermissionsDeniedDialogPositiveButton">Ayarları aç</string>
+    <string name="systemPermissionsDeniedDialogPositiveButton">Ayarları Aç</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">İptal</string>
 </resources>

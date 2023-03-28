@@ -247,7 +247,7 @@ dependencies {
     implementation project(':element-hiding-impl')
     implementation project(':element-hiding-store')
 
-    internalImplementation project(':sync-api')
+    implementation project(':sync-api')
     internalImplementation project(':sync-impl')
     internalImplementation project(':sync-store')
     internalImplementation project(':sync-lib')
@@ -263,6 +263,9 @@ dependencies {
     implementation project(':saved-sites-api')
     implementation project(':saved-sites-impl')
     implementation project(':saved-sites-store')
+
+    implementation project(':runtime-checks-impl')
+    implementation project(':runtime-checks-store')
 
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"

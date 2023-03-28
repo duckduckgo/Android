@@ -15,18 +15,18 @@
  */
 
 plugins {
-    id 'java-library'
-    id 'kotlin'
+    id 'com.android.library'
+    id 'kotlin-android'
 }
 
-apply from: "$rootProject.projectDir/code-formatting.gradle"
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-}
+apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
     implementation Kotlin.stdlib.jdk7
+    api project(path: ':feature-toggles-api')
+}
+
+android {
+    namespace 'com.duckduckgo.sync.api'
 }
 

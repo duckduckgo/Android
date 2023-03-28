@@ -28,6 +28,17 @@ interface VpnStateMonitor {
      * * else it will return the state of the feature
      */
     fun getStateFlow(vpnFeature: VpnFeature): Flow<VpnState>
+
+    /**
+     * @return `true` if always-on is enabled for our VPN profile, `false` otherwise.
+     */
+    suspend fun isAlwaysOnEnabled(): Boolean
+
+    /**
+     * @return `true` if the VPNService has been unexpectedly disabled OR killed by the Android system, `false` otherwise.
+     */
+    suspend fun vpnLastDisabledByAndroid(): Boolean
+
     data class VpnState(
         val state: VpnRunningState,
         val stopReason: VpnStopReason? = null,

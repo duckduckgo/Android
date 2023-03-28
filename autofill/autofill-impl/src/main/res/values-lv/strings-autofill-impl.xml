@@ -19,8 +19,6 @@
 <resources>
     <string name="autofillManagementScreenTitle">Automātiski aizpildīt pieteikšanās datus</string>
 
-    <string name="managementLockedModeText">Atbloķēt automātisko aizpildi</string>
-
     <string name="managementDisabledModeCta"><b>Iestati sadaļā Iestatījumi</b></string>
     <string name="managementDisabledModeSubtitle">Lai aizsargātu automātiskās pierakstīšanās datus, ir nepieciešama ierīces bloķēšanas figūra, PIN kods vai biometriskie dati.</string>
     <string name="managementDisabledModeTitle">Aizsargā savu ierīci, lai izmantotu automātisko aizpildi</string>
@@ -40,7 +38,6 @@
     <string name="useSavedLoginDialogGroupThisWebsite">No šīs vietnes</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">No %1$s</string>
 
-    <string name="updateLoginDialogTitle">Atjaunināt paroli?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Atjaunināt paroli</string>
     <string name="updateLoginDialogButtonNotNow">Ne tagad</string>
 
@@ -70,7 +67,7 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Pieteikšanās dati tiek droši glabāti tikai šajā ierīcē.</string>
 
     <string name="autofillManagementAddLogin">Pievienot pieteikšanās datus</string>
-    <string name="autofillManagementSearchLogins">Meklēt</string>
+    <string name="autofillManagementSearchLogins">Meklēt pieteikšanās datus</string>
     <string name="autofillManagementSearchClearDescription">Notīrīt meklēšanas ievadi</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Vaicājumam “%1$s” nav rezultātu</string>
 

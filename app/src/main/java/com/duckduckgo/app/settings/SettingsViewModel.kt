@@ -48,6 +48,7 @@ import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
+import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.windows.api.WindowsWaitlist
 import com.duckduckgo.windows.api.WindowsWaitlistFeature
 import com.duckduckgo.windows.api.WindowsWaitlistState
@@ -81,6 +82,7 @@ class SettingsViewModel @Inject constructor(
     private val autoconsent: Autoconsent,
     private val windowsWaitlist: WindowsWaitlist,
     private val windowsFeature: WindowsWaitlistFeature,
+    private val deviceSyncState: DeviceSyncState,
 ) : ViewModel() {
 
     data class ViewState(
@@ -99,6 +101,8 @@ class SettingsViewModel @Inject constructor(
         val appTrackingProtectionEnabled: Boolean = false,
         val emailAddress: String? = null,
         val showAutofill: Boolean = false,
+        val showSyncSetting: Boolean = false,
+        val syncEnabled: Boolean = false,
         val autoconsentEnabled: Boolean = false,
         @StringRes val notificationsSettingSubtitleId: Int = R.string.settingsSubtitleNotificationsDisabled,
         val windowsWaitlistState: WindowsWaitlistState? = null,
@@ -135,6 +139,7 @@ class SettingsViewModel @Inject constructor(
         object LaunchMacOs : Command()
         object LaunchNotificationsSettings : Command()
         object LaunchWindows : Command()
+        object LaunchSyncSettings : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
@@ -174,6 +179,8 @@ class SettingsViewModel @Inject constructor(
                     autoconsentEnabled = autoconsent.isSettingEnabled(),
                     notificationsSettingSubtitleId = getNotificationsSettingSubtitleId(notificationsEnabled),
                     windowsWaitlistState = windowsSettingState(),
+                    showSyncSetting = deviceSyncState.isFeatureEnabled(),
+                    syncEnabled = deviceSyncState.isUserSignedInOnDevice(),
                 ),
             )
         }
@@ -483,6 +490,10 @@ class SettingsViewModel @Inject constructor(
         } else {
             R.string.settingsSubtitleNotificationsDisabled
         }
+    }
+
+    fun onSyncSettingClicked() {
+        viewModelScope.launch { command.send(Command.LaunchSyncSettings) }
     }
 
     companion object {

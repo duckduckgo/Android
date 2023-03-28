@@ -361,7 +361,7 @@
     <string name="otherMainReasonTitleShort">Citas problēmas</string>
 
     <string name="openEndedInputHint">Lūdzu, norādiet pēc iespējas precīzāk</string>
-    <string name="submitFeedback">IESNIEGT</string>
+    <string name="submitFeedback">Iesniegt</string>
 
     <string name="tellUsHowToImprove">Lūdzu, pastāsti, ko mēs varam uzlabot.</string>
     <string name="thanksForTheFeedback">Paldies tev par atsauksmēm!</string>
@@ -372,8 +372,8 @@
     <string name="whatHaveYouBeenEnjoying">Kas tev patika?</string>
     <string name="awesomeToHear">Prieks dzirdēt!</string>
     <string name="shareTheLoveWithARating">Dalies savā priekā, novērtējot to Play veikalā.</string>
-    <string name="rateTheApp">NOVĒRTĒT LIETOTNI</string>
-    <string name="declineFurtherFeedback">NĒ, PALDIES! ES PABEIDZU.</string>
+    <string name="rateTheApp">Novērtēt lietotni</string>
+    <string name="declineFurtherFeedback">NĒ, PALDIES! MAN PIETIEK.</string>
     <string name="whichBrokenSites">Kur tu redzi šīs problēmas?</string>
     <string name="whichBrokenSitesHint">Kurai vietnei ir problēmas?</string>
     <string name="feedbackSpecificAsPossible">Lūdzu, norādi pēc iespējas precīzāk</string>
@@ -389,7 +389,6 @@
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">No šīs ierīces</string>
-    <string name="systemSearchOmnibarInputHint"><font size="13">Meklē vai ieraksti URL</font></string>
     <string name="systemSearchAppNotFound">Lietojumprogrammu nevarēja atrast</string>
     <string name="systemSearchOnboardingText">Paldies, ka izvēlējies DuckDuckGo!\nTagad, izmantojot mūsu meklētāju vai lietotni, tavi meklējumi tiks aizsargāti.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Tāpat DuckDuckGo lietotne:</string>
@@ -434,6 +433,7 @@
     <!-- Onboarding DDG Feature Options -->
     <string name="onboardingFeatureOptionsTitle">Kas tevi piesaista DuckDuckGo?</string>
     <string name="onboardingFeatureOptionsContinue">Turpināt</string>
+    <string name="onboardingFeatureOptionsSkip">Izlaist šo soli</string>
     <!-- smartling.character_limit = 28 -->
     <string name="onboardingFeatureOptionPrivateSearch">Privāta meklēšana</string>
     <!-- smartling.character_limit = 28 -->
@@ -666,13 +666,13 @@
 
     <!-- Autoconsent -->
     <!-- smartling.character_limit = 82 -->
-    <string name="autoconsentDialogTitle">Izskatās, ka šajā vietnē ir sīkfailu piekrišanas uznirstošais logs👇</string>
+    <string name="autoconsentDialogTitle"><![CDATA[<b>Vai vēlies, lai es apstrādāju sīkfailu uznirstošos logus?</b>]]></string>
     <!-- smartling.character_limit = 160 -->
-    <string name="autoconsentDialogDescription">Vai vēlies, lai es tos apstrādāju tavā vietā? Es varu mēģināt samazināt sīkfailus, maksimāli pastiprināt privātumu un paslēpt šādus uznirstošos logus.</string>
+    <string name="autoconsentDialogDescription">Es varu mēģināt izvēlēties visprivātākos pieejamos iestatījumus un paslēpt šādus uznirstošos logus.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Pārvaldīt sīkfailu uznirstošos logus</string>
+    <string name="autoconsentPrimaryCta">Apstrādājiet uznirstošos logus manā vietā</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentSecondaryCta">Nē, paldies</string>
+    <string name="autoconsentSecondaryCta">Nē, es tos pārvaldīšu pats</string>
 
     <string name="autoconsentSetting">Pārvaldīt sīkfailu uznirstošos logus</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Uznirstošais logs paslēpts</string>

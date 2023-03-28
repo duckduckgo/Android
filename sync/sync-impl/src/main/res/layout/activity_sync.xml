@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" xmlns:tools="http://schemas.android.com/tools"
+            android:scrollbarAlwaysDrawVerticalTrack="true"
+            android:fadeScrollbars="false"
+            android:scrollbars="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <include
+            android:id="@+id/includeToolbar"
+            layout="@layout/include_default_toolbar"/>
+
+        <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+            android:id="@+id/deviceSyncStatusToggle"
+            app:showSwitch="true"
+            app:primaryText="@string/sync_toggle_text"
+            android:layout_marginTop="@dimen/keyline_4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <ViewSwitcher
+            android:id="@+id/viewSwitcher"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/keyline_4"
+                app:textType="secondary"
+                app:typography="body2"
+                android:text="@string/sync_off_hint"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="@string/synced_devices_section_title"/>
+
+                <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="Android"
+                    app:secondaryText="This device"
+                    app:leadingIcon="@drawable/ic_device_mobile_24"
+                    app:leadingIconBackground="circular"
+                    app:trailingIcon="@drawable/ic_menu_vertical_24"/>
+
+                <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryTextTruncated="true"
+                    app:primaryText="@string/sync_new_device_section_title"/>
+
+                <ImageView
+                    android:id="@+id/qrCodeImageView"
+                    android:layout_width="@dimen/qrSize"
+                    android:layout_height="@dimen/qrSize"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                    tools:ignore="ContentDescription"/>
+
+                <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/keyline_4"
+                    app:textType="secondary"
+                    app:typography="body2"
+                    android:text="@string/sync_new_device_hint"/>
+
+                <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryTextTruncated="true"
+                    app:primaryText="@string/sync_show_text_code_item"/>
+
+                <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryTextTruncated="true"
+                    app:primaryText="@string/sync_show_qr_code_item"/>
+
+                <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryTextTruncated="true"
+                    app:primaryText="@string/sync_save_recovery_code_item"/>
+
+                <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/keyline_4"
+                    app:textType="secondary"
+                    app:typography="body2"
+                    android:text="@string/sync_save_recovery_code_item_hint"/>
+
+                <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryTextTruncated="true"
+                    android:layout_marginBottom="@dimen/keyline_4"
+                    app:primaryText="@string/sync_delete_account_item"/>
+            </LinearLayout>
+        </ViewSwitcher>
+    </LinearLayout>
+</ScrollView>

@@ -245,7 +245,7 @@
     <string name="surveyCtaLaunchButton">Vul de enquête in</string>
     <string name="surveyCtaDismissButton">Nee, bedankt</string>
     <string name="surveyActivityTitle">Gebruikersenquête</string>
-    <string name="surveyTitle">ENQUÊTE DUCKDUCKGO</string>
+    <string name="surveyTitle">Enquête DuckDuckGo</string>
     <string name="surveyDismissContentDescription">Enquête negeren</string>
     <string name="surveyLoadingErrorTitle">Oh nee!</string>
     <string name="surveyLoadingErrorText">Onze enquête kan momenteel niet worden geladen.\nProbeer het later opnieuw.</string>
@@ -361,7 +361,7 @@
     <string name="otherMainReasonTitleShort">Andere problemen</string>
 
     <string name="openEndedInputHint">Wees zo specifiek mogelijk</string>
-    <string name="submitFeedback">VERZENDEN</string>
+    <string name="submitFeedback">Verzend</string>
 
     <string name="tellUsHowToImprove">Vertel ons wat we kunnen verbeteren.</string>
     <string name="thanksForTheFeedback">Bedankt voor de feedback!</string>
@@ -372,8 +372,8 @@
     <string name="whatHaveYouBeenEnjoying">Wat vond je goed?</string>
     <string name="awesomeToHear">Super om te horen!</string>
     <string name="shareTheLoveWithARating">Laat zien hoe blij je ermee bent door ons te beoordelen in de Play Store.</string>
-    <string name="rateTheApp">APP BEOORDELEN</string>
-    <string name="declineFurtherFeedback">NEE BEDANKT, IK BEN KLAAR</string>
+    <string name="rateTheApp">Beoordeel app</string>
+    <string name="declineFurtherFeedback">Nee bedankt, ik ben klaar</string>
     <string name="whichBrokenSites">Waar zie je deze problemen?</string>
     <string name="whichBrokenSitesHint">Welke website heeft problemen?</string>
     <string name="feedbackSpecificAsPossible">Wees zo specifiek mogelijk</string>
@@ -389,7 +389,6 @@
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Van dit apparaat</string>
-    <string name="systemSearchOmnibarInputHint"><font size="13">URL typen of zoeken</font></string>
     <string name="systemSearchAppNotFound">Toepassing kon niet worden gevonden</string>
     <string name="systemSearchOnboardingText">Bedankt dat je voor DuckDuckGo heeft gekozen!\nAls je nu onze zoekmachine of app gebruikt, zijn je zoekopdrachten beschermd.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">De DuckDuckGo-app:</string>
@@ -432,6 +431,7 @@
     <!-- Onboarding DDG Feature Options -->
     <string name="onboardingFeatureOptionsTitle">Wat brengt je naar DuckDuckGo?</string>
     <string name="onboardingFeatureOptionsContinue">Doorgaan</string>
+    <string name="onboardingFeatureOptionsSkip">Deze stap overslaan</string>
     <!-- smartling.character_limit = 28 -->
     <string name="onboardingFeatureOptionPrivateSearch">Privé zoeken</string>
     <!-- smartling.character_limit = 28 -->
@@ -662,13 +662,13 @@
 
     <!-- Autoconsent -->
     <!-- smartling.character_limit = 82 -->
-    <string name="autoconsentDialogTitle">Het lijkt erop dat deze site een pop-up heeft om toestemming voor cookies te vragen👇</string>
+    <string name="autoconsentDialogTitle"><![CDATA[<b>Wil je dat ik cookiepop-ups aanpak?</b>]]></string>
     <!-- smartling.character_limit = 160 -->
-    <string name="autoconsentDialogDescription">Wil je dat ik deze voor je afhandel? Ik kan proberen cookies te minimaliseren, privacy te maximaliseren en pop-ups zoals deze te verbergen.</string>
+    <string name="autoconsentDialogDescription">Ik kan proberen de striktst mogelijke privacyinstellingen te selecteren en pop-ups zoals deze te verbergen.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Cookiepop-ups beheren</string>
+    <string name="autoconsentPrimaryCta">Pop-ups voor mij verbergen</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentSecondaryCta">Nee, bedankt</string>
+    <string name="autoconsentSecondaryCta">Nee, ik beheer ze zelf</string>
 
     <string name="autoconsentSetting">Cookiepop-ups beheren</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Pop-up verborgen</string>

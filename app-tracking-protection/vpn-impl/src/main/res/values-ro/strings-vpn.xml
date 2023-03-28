@@ -231,6 +231,10 @@
     <string name="atp_ActivityAbout">Despre</string>
     <string name="atp_ActivityManage">Gestionează</string>
     <string name="atp_ActivityRemoveFeature">Dezactivează și șterge date</string>
+    <string name="atp_ActivityBlockingTrackersEnabledDescription">DuckDuckGo blochează tehnologiile de urmărire ascunse la nivelul aplicațiilor tale.</string>
+    <string name="atp_ActivityBlockingTrackersDisabledDescription">Reactivează App Tracking Protection pentru a continua să blochezi tehnologiile de urmărire la nivelul aplicațiilor tale.</string>
+    <string name="atp_ActivityBlockedByHeaderText" instruction="Placeholder %1$s is a text containing either Today or Yesterday. Example: Blocked by DuckDuckGo Today">Blocat de DuckDuckGo %1$s</string>
+    <string name="atp_ActivityBlockedByOnDateHeaderText" instruction="Placeholder %1$s is a text containing a formatted date like Feb 05. Example: Blocked by DuckDuckGo on Feb 05">Blocat de DuckDuckGo la %1$s</string>
 
     <!--  App Tracking Protection FAQ -->
     <string name="atp_FAQActivityTitle">ÎNTREBĂRI FRECVENTE</string>
@@ -276,9 +280,9 @@
         <item quantity="other">%1$d încercări. Cunoscute pentru a colecta:</item>
     </plurals>
     <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
-        <item quantity="one">A fost blocată %1$d încercare de urmărire</item>
-        <item quantity="few">Au fost blocate %1$d încercări de urmărire</item>
-        <item quantity="other">Au fost blocate %1$d încercări de urmărire</item>
+        <item quantity="one">DuckDuckGo a blocat %1$d încercare de urmărire</item>
+        <item quantity="few">DuckDuckGo a blocat %1$d încercări de urmărire</item>
+        <item quantity="other">DuckDuckGo a blocat %1$d de încercări de urmărire</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Raportează o problemă cu această aplicație</string>
     <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">Arată încă %1$d</string>

@@ -19,8 +19,6 @@
 <resources>
     <string name="autofillManagementScreenTitle">Anmeldedaten automatisch ausfüllen</string>
 
-    <string name="managementLockedModeText">Autovervollständigen freischalten</string>
-
     <string name="managementDisabledModeCta"><b>In den Einstellungen einrichten</b></string>
     <string name="managementDisabledModeSubtitle">Ein Entsperrmuster, eine PIN oder biometrische Daten sind erforderlich, um deine Anmeldedaten für das automatische Ausfüllen zu schützen.</string>
     <string name="managementDisabledModeTitle">Sichere dein Gerät, um das automatische Ausfüllen zu verwenden</string>
@@ -40,7 +38,6 @@
     <string name="useSavedLoginDialogGroupThisWebsite">Von dieser Website</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Von %1$s</string>
 
-    <string name="updateLoginDialogTitle">Passwort aktualisieren?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Passwort aktualisieren</string>
     <string name="updateLoginDialogButtonNotNow">Jetzt nicht</string>
 
@@ -70,7 +67,7 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Anmeldedaten werden nur auf diesem Gerät sicher gespeichert.</string>
 
     <string name="autofillManagementAddLogin">Anmeldedaten hinzufügen</string>
-    <string name="autofillManagementSearchLogins">Suche</string>
+    <string name="autofillManagementSearchLogins">Anmeldedaten suchen</string>
     <string name="autofillManagementSearchClearDescription">Sucheingabe löschen</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Keine Ergebnisse für „%1$s“</string>
 

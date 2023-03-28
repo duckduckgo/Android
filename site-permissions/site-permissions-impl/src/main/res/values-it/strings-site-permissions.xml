@@ -33,6 +33,6 @@
     <string name="systemPermissionDialogAudioDeniedContent">I siti possono utilizzare il microfono solo se consenti a DuckDuckGo di richiederne l\'accesso.</string>
     <string name="systemPermissionDialogCameraAndAudioDeniedTitle">Consenti a DuckDuckGo di richiedere l\'accesso alla fotocamera e al microfono su questo dispositivo</string>
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">I siti possono utilizzare la fotocamera e il microfono solo se consenti a DuckDuckGo di richiederne l\'accesso.</string>
-    <string name="systemPermissionsDeniedDialogPositiveButton">Apri le impostazioni</string>
+    <string name="systemPermissionsDeniedDialogPositiveButton">Apri Impostazioni</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Annulla</string>
 </resources>

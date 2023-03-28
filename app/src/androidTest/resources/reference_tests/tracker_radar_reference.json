@@ -31,6 +31,59 @@
                 }
             ]
         },
+        "sometimes-bad.third-party.site": {
+            "domain": "sometimes-bad.third-party.site",
+            "owner": {
+                "name": "Test Site for Tracker Blocking",
+                "displayName": "Bad Third Party Site",
+                "privacyPolicy": "",
+                "url": "http://bad.third-party.site"
+            },
+            "prevalence": 0.1,
+            "fingerprinting": 3,
+            "cookies": 0.1,
+            "categories": [],
+            "default": "ignore",
+            "rules": [
+                {
+                    "rule": "sometimes-bad\\.third-party\\.site\\/option-blocking-only",
+                    "options": {
+                        "domains": [
+                            "site-that-tracks.com",
+                            "block-on-subdomain.also-site-that-tracks.com"
+                        ]
+                    },
+                    "exceptions": {
+                        "types": [
+                            "script"
+                        ]
+                    }
+                },
+                {
+                    "rule": "sometimes-bad\\.third-party\\.site\\/surrogate-and-option-blocking-only",
+                    "options": {
+                        "domains": [
+                            "site-that-tracks.com"
+                        ],
+                        "types": [
+                            "image"
+                        ]
+                    },
+                    "surrogate": "tracker"
+                },
+                {
+                    "rule": "sometimes-bad\\.third-party\\.site\\/.*\\/option-blocking-only2",
+                    "options": {
+                        "domains": [
+                            "test-domain.com"
+                        ]
+                    }
+                },
+                {
+                    "rule": "sometimes-bad\\.third-party\\.site\\/option-fallback\\/option-blocking-only2"
+                }
+            ]
+        },
         "broken.third-party.site": {
             "domain": "broken.third-party.site",
             "owner": {
@@ -67,6 +120,14 @@
                 {
                     "action": "unsupported-action",
                     "rule": "tracker\\.test\\/unsupported-action"
+                },
+                {
+                    "rule": "tracker\\.test\\/with-options",
+                    "options": {
+                        "domains": [
+                            "example.com"
+                        ]
+                    }
                 }
             ]
         },
@@ -152,6 +213,7 @@
         "Test Site for Tracker Blocking": {
             "domains": [
                 "bad.third-party.site",
+                "sometimes-bad.third-party.site",
                 "broken.third-party.site",
                 "third-party.site",
                 "tracker.test"
@@ -184,6 +246,7 @@
     },
     "domains": {
         "bad.third-party.site": "Test Site for Tracker Blocking",
+        "sometimes-bad.third-party.site": "Test Site for Tracker Blocking",
         "broken.third-party.site": "Test Site for Tracker Blocking",
         "third-party.site": "Test Site for Tracker Blocking",
         "tracker.test": "Test Site for Tracker Blocking",

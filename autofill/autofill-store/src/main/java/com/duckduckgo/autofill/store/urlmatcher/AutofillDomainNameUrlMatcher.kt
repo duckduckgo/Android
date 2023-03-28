@@ -19,25 +19,34 @@ package com.duckduckgo.autofill.store.urlmatcher
 import androidx.core.net.toUri
 import com.duckduckgo.app.global.extractDomain
 import com.duckduckgo.app.global.normalizeScheme
+import com.duckduckgo.autofill.api.encoding.UrlUnicodeNormalizer
 import com.duckduckgo.autofill.api.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.autofill.api.urlmatcher.AutofillUrlMatcher.ExtractedUrlParts
 import javax.inject.Inject
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import timber.log.Timber
 
-class AutofillDomainNameUrlMatcher @Inject constructor() : AutofillUrlMatcher {
+class AutofillDomainNameUrlMatcher @Inject constructor(
+    private val unicodeNormalizer: UrlUnicodeNormalizer,
+) : AutofillUrlMatcher {
 
     override fun extractUrlPartsForAutofill(originalUrl: String?): ExtractedUrlParts {
         if (originalUrl == null) return unextractable()
 
-        val normalizedUrl = originalUrl.normalizeScheme()
+        val normalizedUrl = unicodeNormalizer.normalizeAscii(originalUrl)?.normalizeScheme() ?: return unextractable()
+
         return try {
             val httpUrl = normalizedUrl.toHttpUrl()
             val eTldPlus1 = httpUrl.topPrivateDomain()
             val domain = originalUrl.extractDomain()
             val port = httpUrl.port
             val subdomain = determineSubdomain(domain, eTldPlus1)
-            ExtractedUrlParts(eTldPlus1, subdomain, port)
+            ExtractedUrlParts(
+                eTldPlus1 = eTldPlus1,
+                userFacingETldPlus1 = unicodeNormalizer.normalizeUnicode(eTldPlus1),
+                subdomain = subdomain,
+                port = port,
+            )
         } catch (e: IllegalArgumentException) {
             Timber.d("Unable to parse e-tld+1 from [%s]", originalUrl)
             unextractable()

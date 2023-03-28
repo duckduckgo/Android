@@ -33,6 +33,6 @@
     <string name="systemPermissionDialogAudioDeniedContent">Svetainės gali naudoti jūsų mikrofoną tik tuo atveju, jei leisite „DuckDuckGo“ prašyti prieigos.</string>
     <string name="systemPermissionDialogCameraAndAudioDeniedTitle">Leisti „DuckDuckGo“ prašyti prieigos prie kameros ir mikrofono šiame įrenginyje</string>
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">Svetainės gali naudoti jūsų kamerą ir mikrofoną tik tada, jei leisite „DuckDuckGo“ prašyti prieigos.</string>
-    <string name="systemPermissionsDeniedDialogPositiveButton">Atidaryti parametrus</string>
+    <string name="systemPermissionsDeniedDialogPositiveButton">Atidaryti nustatymus</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Atšaukti</string>
 </resources>

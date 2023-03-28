@@ -473,6 +473,28 @@ class AutofillSettingsViewModelTest {
         }
     }
 
+    @Test
+    fun whenSearchQueryChangesEmptyThenShouldShowEnableToggle() = runTest {
+        testee.onSearchQueryChanged("")
+
+        testee.observeCredentials()
+        testee.viewState.test {
+            assertEquals(true, this.awaitItem().showAutofillEnabledToggle)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSearchQueryChangesNonEmptyThenShouldNotShowEnableToggle() = runTest {
+        testee.onSearchQueryChanged("foo")
+
+        testee.observeCredentials()
+        testee.viewState.test {
+            assertEquals(false, this.awaitItem().showAutofillEnabledToggle)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     private suspend fun configureStoreToHaveThisManyCredentialsStored(value: Int) {
         whenever(mockStore.getCredentialCount()).thenReturn(flowOf(value))
     }

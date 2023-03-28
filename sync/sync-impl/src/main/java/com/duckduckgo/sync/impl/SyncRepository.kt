@@ -35,6 +35,7 @@ import timber.log.Timber
 
 interface SyncRepository {
     fun createAccount(): Result<Boolean>
+    fun isSignedIn(): Boolean
 
     @Deprecated(message = "Method only used for testing purposes. Relies on a local stored recovery key.", level = DeprecationLevel.WARNING)
     fun login(): Result<Boolean>
@@ -290,7 +291,7 @@ class AppSyncRepository @Inject constructor(
         }
     }
 
-    private fun isSignedIn() = !syncStore.primaryKey.isNullOrEmpty() && !syncStore.userId.isNullOrEmpty()
+    override fun isSignedIn() = !syncStore.primaryKey.isNullOrEmpty() && !syncStore.userId.isNullOrEmpty()
 
     private fun performLogin(
         userId: String,

@@ -21,7 +21,8 @@
     <string name="macos_title">Pořiď si DuckDuckGo pro Mac!</string>
 
     <string name="macos_share_title">Sdílet odkaz</string>
-    <string name="macos_description_text">DuckDuckGo pro Mac má rychlost, kterou potřebuješ, funkce prohlížeče, které očekáváš, a obsahuje naše nejlepší nástroje na ochranu soukromí.\n\nNa Macu přejdi na adresu:\n<b><font color="#3969EF">duckduckgo.com/mac</font></b></string>
+    <string name="macos_description_text">DuckDuckGo pro Mac má rychlost, kterou potřebuješ, funkce prohlížeče, které očekáváš, a hlavně naše nejlepší nástroje na ochranu soukromí.\n\nNa Macu otevři:</string>
+    <string name="macos_description_link">duckduckgo.com/mac</string>
     <string name="macos_share_text">Chceš si na Macu prohlížet web v naprostém soukromí?\n\nAplikaci si do Macu stáhneš z téhle adresy:\nduckduckgo.com/mac</string>
 
     <string name="macos_waitlist_windows_link">Hledáš verzi pro Windows?</string>

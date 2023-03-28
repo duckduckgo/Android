@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,25 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.network
+package com.duckduckgo.autofill.api
 
-interface VpnDetector {
+import com.duckduckgo.autofill.api.encoding.UrlUnicodeNormalizer
 
-    /**
-     * Detects if the current network connection is using a VPN
-     *
-     * @return returns a boolean that identifies the connection being routed through a VPN
-     */
-    fun isVpnDetected(): Boolean
+class TestUrlUnicodeNormalizer : UrlUnicodeNormalizer {
+
+    var overrides = mutableMapOf<String, String>()
+
+    override fun normalizeAscii(url: String?): String? {
+        overrides[url]?.let {
+            return it
+        }
+        return url
+    }
+
+    override fun normalizeUnicode(url: String?): String? {
+        overrides[url]?.let {
+            return it
+        }
+        return url
+    }
 }

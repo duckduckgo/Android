@@ -19,8 +19,6 @@
 <resources>
     <string name="autofillManagementScreenTitle">Completare automată la autentificare</string>
 
-    <string name="managementLockedModeText">Deblochează completarea automată</string>
-
     <string name="managementDisabledModeCta"><b>Configurează în Setări</b></string>
     <string name="managementDisabledModeSubtitle">Este necesar un model de blocare a dispozitivului, un cod PIN sau date biometrice pentru a-ți proteja detaliile de autentificare prin completarea automată.</string>
     <string name="managementDisabledModeTitle">Asigură-ți dispozitivul pentru a utiliza completarea automată</string>
@@ -40,7 +38,6 @@
     <string name="useSavedLoginDialogGroupThisWebsite">De pe acest site web</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Din %1$s</string>
 
-    <string name="updateLoginDialogTitle">Actualizezi parola?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Actualizează parola</string>
     <string name="updateLoginDialogButtonNotNow">Nu acum</string>
 
@@ -70,7 +67,7 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Datele de conectare sunt stocate în siguranță numai pe acest dispozitiv.</string>
 
     <string name="autofillManagementAddLogin">Adaugă date de autentificare</string>
-    <string name="autofillManagementSearchLogins">Căutare</string>
+    <string name="autofillManagementSearchLogins">Date de autentificare pentru căutare</string>
     <string name="autofillManagementSearchClearDescription">Șterge datele introduse pentru căutare</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Nu există rezultate pentru „%1$s”</string>
 

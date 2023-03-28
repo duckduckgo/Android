@@ -225,6 +225,10 @@
     <string name="atp_ActivityAbout">Tietoa meistä</string>
     <string name="atp_ActivityManage">Hallitse</string>
     <string name="atp_ActivityRemoveFeature">Poista käytöstä ja poista tiedot</string>
+    <string name="atp_ActivityBlockingTrackersEnabledDescription">DuckDuckGo estää piilotettuja seurantalaitteita kaikissa sovelluksissasi.</string>
+    <string name="atp_ActivityBlockingTrackersDisabledDescription">Ota App Tracking Protection uudelleen käyttöön estääksesi seurannan kaikissa sovelluksissasi.</string>
+    <string name="atp_ActivityBlockedByHeaderText" instruction="Placeholder %1$s is a text containing either Today or Yesterday. Example: Blocked by DuckDuckGo Today">DuckDuckGo esti %1$s</string>
+    <string name="atp_ActivityBlockedByOnDateHeaderText" instruction="Placeholder %1$s is a text containing a formatted date like Feb 05. Example: Blocked by DuckDuckGo on Feb 05">DuckDuckGo esti %1$s</string>
 
     <!--  App Tracking Protection FAQ -->
     <string name="atp_FAQActivityTitle">Usein kysyttyä</string>
@@ -269,8 +273,8 @@
         <item quantity="other">%1$d yritystä. Tiedetään keräävän:</item>
     </plurals>
     <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
-        <item quantity="one">Estetty %1$d seurantayritys</item>
-        <item quantity="other">Estetty %1$d seurantayritystä</item>
+        <item quantity="one">DuckDuckGo esti %1$d seurantayrityksen</item>
+        <item quantity="other">DuckDuckGo esti %1$d seurantayritystä</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Ilmoita ongelmasta tässä sovelluksessa</string>
     <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">Näytä %1$d lisää</string>

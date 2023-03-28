@@ -44,10 +44,9 @@ import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
-import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
-import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
+import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.windows.api.WindowsWaitlist
 import com.duckduckgo.windows.api.WindowsWaitlistFeature
 import com.duckduckgo.windows.api.WindowsWaitlistState
@@ -115,13 +114,13 @@ class SettingsViewModelTest {
     private lateinit var autoconsent: Autoconsent
 
     @Mock
-    private lateinit var appTpFeatureConfig: AppTpFeatureConfig
-
-    @Mock
     private lateinit var windowsWaitlist: WindowsWaitlist
 
     @Mock
     private lateinit var windowsFeatureToggle: Toggle
+
+    @Mock
+    private lateinit var deviceSyncState: DeviceSyncState
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
@@ -133,7 +132,6 @@ class SettingsViewModelTest {
         val windowsFeature: WindowsWaitlistFeature = mock()
         whenever(windowsFeatureToggle.isEnabled()).thenReturn(false)
         whenever(windowsFeature.self()).thenReturn(windowsFeatureToggle)
-        whenever(appTpFeatureConfig.isEnabled(AppTpSetting.OpenBeta)).thenReturn(false)
         whenever(mockAppSettingsDataStore.automaticallyClearWhenOption).thenReturn(APP_EXIT_ONLY)
         whenever(mockAppSettingsDataStore.automaticallyClearWhatOption).thenReturn(CLEAR_NONE)
         whenever(mockAppSettingsDataStore.appIcon).thenReturn(AppIcon.DEFAULT)
@@ -161,6 +159,7 @@ class SettingsViewModelTest {
             autoconsent,
             windowsWaitlist,
             windowsFeature,
+            deviceSyncState,
         )
 
         runTest {
@@ -774,6 +773,31 @@ class SettingsViewModelTest {
             assertEquals(Command.LaunchNotificationsSettings, awaitItem())
             verify(mockPixel).fire(AppPixelName.SETTINGS_NOTIFICATIONS_PRESSED)
 
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSyncFeatureDisabledThenViewStateIsCorrect() = runTest {
+        whenever(deviceSyncState.isFeatureEnabled()).thenReturn(false)
+        testee.start()
+
+        testee.viewState().test {
+            assertFalse(awaitItem().showSyncSetting)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSyncFeatureEnabledAndUserSignedInOnDeviceThenSettingVisibleAndStateEnabled() = runTest {
+        whenever(deviceSyncState.isFeatureEnabled()).thenReturn(true)
+        whenever(deviceSyncState.isUserSignedInOnDevice()).thenReturn(true)
+        testee.start()
+
+        testee.viewState().test {
+            val viewState = awaitItem()
+            assertTrue(viewState.showSyncSetting)
+            assertTrue(viewState.syncEnabled)
             cancelAndConsumeRemainingEvents()
         }
     }

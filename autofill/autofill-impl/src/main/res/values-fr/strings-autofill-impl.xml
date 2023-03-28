@@ -19,8 +19,6 @@
 <resources>
     <string name="autofillManagementScreenTitle">Saisie automatique des identifiants</string>
 
-    <string name="managementLockedModeText">Déverrouiller la saisie automatique</string>
-
     <string name="managementDisabledModeCta"><b>Configurer dans les paramètres</b></string>
     <string name="managementDisabledModeSubtitle">Un schéma de verrouillage de l\'appareil, un code PIN ou des données biométriques sont nécessaires pour protéger les informations relatives à la saisie automatique de vos identifiants.</string>
     <string name="managementDisabledModeTitle">Sécurisez votre appareil pour utiliser la saisie automatique</string>
@@ -40,7 +38,6 @@
     <string name="useSavedLoginDialogGroupThisWebsite">À partir de ce site Web</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">À partir de %1$s</string>
 
-    <string name="updateLoginDialogTitle">Modifier le mot de passe ?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Modifier le mot de passe</string>
     <string name="updateLoginDialogButtonNotNow">Pas maintenant</string>
 
@@ -70,7 +67,7 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Les identifiants sont stockés de manière sécurisée sur cet appareil uniquement.</string>
 
     <string name="autofillManagementAddLogin">Ajouter un identifiant</string>
-    <string name="autofillManagementSearchLogins">Rechercher</string>
+    <string name="autofillManagementSearchLogins">Recherche d\'identifiants</string>
     <string name="autofillManagementSearchClearDescription">Effacer la recherche</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Aucun résultat pour « %1$s »</string>
 

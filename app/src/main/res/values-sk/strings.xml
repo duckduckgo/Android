@@ -104,7 +104,7 @@
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Zatvoriť</string>
     <string name="closeAllTabsMenuItem">Zatvoriť všetky karty</string>
-    <string name="closeTab">Zatvoriť karta</string>
+    <string name="closeTab">Zavrieť kartu</string>
     <string name="tabClosed">Karta bola zatvorená</string>
     <string name="tabClosedUndo">Vrátenie späť</string>
     <string name="downloadsMenuItemTitle">Stiahnuté</string>
@@ -245,7 +245,7 @@
     <string name="surveyCtaLaunchButton">Zúčastniť sa prieskumu</string>
     <string name="surveyCtaDismissButton">Nie, ďakujem</string>
     <string name="surveyActivityTitle">Používateľský prieskum</string>
-    <string name="surveyTitle">PRIESKUM DUCKDUCKGO</string>
+    <string name="surveyTitle">Prieskum DuckDuckGo</string>
     <string name="surveyDismissContentDescription">Zavrieť prieskum</string>
     <string name="surveyLoadingErrorTitle">Ale nie!</string>
     <string name="surveyLoadingErrorText">Prieskum sa momentálne nenačítava.\nSkúste to znova neskôr.</string>
@@ -361,7 +361,7 @@
     <string name="otherMainReasonTitleShort">Iné problémy</string>
 
     <string name="openEndedInputHint">Buďte čo najkonkrétnejší</string>
-    <string name="submitFeedback">Potvrdiť</string>
+    <string name="submitFeedback">Odoslať</string>
 
     <string name="tellUsHowToImprove">Povedzte nám, čo sa dá zdokonaliť.</string>
     <string name="thanksForTheFeedback">Ďakujeme za spätnú väzbu!</string>
@@ -373,7 +373,7 @@
     <string name="awesomeToHear">Tešíme sa z toho!</string>
     <string name="shareTheLoveWithARating">Podeľte sa o svoju spokojnosť hodnotením v Obchode Play.</string>
     <string name="rateTheApp">Hodnotiť aplikáciu</string>
-    <string name="declineFurtherFeedback">NIE, ĎAKUJEM, SKONČIL SOM.</string>
+    <string name="declineFurtherFeedback">Nie, ďakujem. Skončil som.</string>
     <string name="whichBrokenSites">Kde ste si všimli tieto problémy?</string>
     <string name="whichBrokenSitesHint">Ktorá webová stránka má problémy?</string>
     <string name="feedbackSpecificAsPossible">Buďte čo najkonkrétnejší</string>
@@ -389,7 +389,6 @@
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Z tohto zariadenia</string>
-    <string name="systemSearchOmnibarInputHint"><font size="13">Vyhľadať alebo zadať webovú adresu</font></string>
     <string name="systemSearchAppNotFound">Aplikáciu sa nepodarilo nájsť</string>
     <string name="systemSearchOnboardingText">Ďakujeme, že ste si vybrali aplikáciu DuckDuckGo!\nPri použití nášho vyhľadávača alebo aplikácie je vaše vyhľadávanie chránené.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Aplikácia DuckDuckGo tiež:</string>
@@ -436,6 +435,7 @@
     <!-- Onboarding DDG Feature Options -->
     <string name="onboardingFeatureOptionsTitle">Čo vás privádza do DuckDuckGo?</string>
     <string name="onboardingFeatureOptionsContinue">Pokračovať</string>
+    <string name="onboardingFeatureOptionsSkip">Tento krok preskočte</string>
     <!-- smartling.character_limit = 28 -->
     <string name="onboardingFeatureOptionPrivateSearch">Súkromné vyhľadávanie</string>
     <!-- smartling.character_limit = 28 -->
@@ -670,13 +670,13 @@
 
     <!-- Autoconsent -->
     <!-- smartling.character_limit = 82 -->
-    <string name="autoconsentDialogTitle">Zdá sa, že táto stránka má vyskakovacie okno pre súhlas so súbormi cookie 👇</string>
+    <string name="autoconsentDialogTitle"><![CDATA[<b>Chcete, aby som spravoval automatické okná súborov cookie?</b>]]></string>
     <!-- smartling.character_limit = 160 -->
-    <string name="autoconsentDialogDescription">Chceš, aby som to riešil za teba? Môžem sa pokúsiť minimalizovať súbory cookie, maximalizovať ochranu súkromia a skryť kontextové okná, ako sú tieto.</string>
+    <string name="autoconsentDialogDescription">Môžem sa pokúsiť vybrať najosobnejšie dostupné nastavenia a skryť automatické okná ako sú tieto.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Spravovať kontextové okná súborov cookie</string>
+    <string name="autoconsentPrimaryCta">Spravovať automatické okná za mňa</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentSecondaryCta">Nie, ďakujem</string>
+    <string name="autoconsentSecondaryCta">Nie, budem ich spravovať sám</string>
 
     <string name="autoconsentSetting">Správa kontextových okien súborov cookie</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Kontextové okno je skryté</string>

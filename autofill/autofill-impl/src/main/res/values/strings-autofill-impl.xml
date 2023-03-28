@@ -17,34 +17,31 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Autofill Logins</string>
-
-    <string name="managementLockedModeText">Unlock Autofill</string>
+    <string name="autofillManagementScreenTitle">Logins</string>
 
     <string name="managementDisabledModeCta"><b>Set up in Settings</b></string>
-    <string name="managementDisabledModeSubtitle">A device lock pattern, PIN, or biometrics is required to protect your Autofill Login details.</string>
-    <string name="managementDisabledModeTitle">Secure your device to use Autofill</string>
+    <string name="managementDisabledModeSubtitle">A device lock pattern, PIN, or biometrics is required to protect your Logins.</string>
+    <string name="managementDisabledModeTitle">Secure your device to save Logins</string>
 
-    <string name="saveLoginDialogTitle">Save Login?</string>
-    <string name="saveLoginMissingUsernameDialogTitle">Save Password?</string>
+    <string name="saveLoginDialogTitle">Save login?</string>
+    <string name="saveLoginMissingUsernameDialogTitle">Save password?</string>
     <string name="saveLoginDialogButtonSave">Save Login</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Save Password</string>
     <string name="saveLoginDialogNotNow">Not Now</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">DuckDuckGo will securely store this Login on your device. You can manage saved Logins in Settings.</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">Logins are stored securely on this device only, and can be managed from the Logins menu in Settings.</string>
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Do you want DuckDuckGo to save your Login?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">More Options</string>
 
-    <string name="useSavedLoginDialogTitle">Use a Saved Login?</string>
+    <string name="useSavedLoginDialogTitle">Use a saved Login?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Login for %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Login for site</string>
     <string name="useSavedLoginDialogGroupThisWebsite">From This Website</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">From %1$s</string>
 
-    <string name="updateLoginDialogTitle">Update Password?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Update Password</string>
     <string name="updateLoginDialogButtonNotNow">Not Now</string>
 
-    <string name="updateLoginDialogTitleUpdateUsername">Update Username?</string>
+    <string name="updateLoginDialogTitleUpdateUsername">Update username?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Update Username</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Close Autofill Dialog</string>
@@ -70,7 +67,7 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Logins are stored securely on this device only.</string>
 
     <string name="autofillManagementAddLogin">Add Login</string>
-    <string name="autofillManagementSearchLogins">Search</string>
+    <string name="autofillManagementSearchLogins">Search logins</string>
     <string name="autofillManagementSearchClearDescription">Clear search input</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for 'kittens'">No results for \'%1$s\'</string>
 

@@ -20,9 +20,9 @@
     <string name="autofillSnackbarAction">View</string>
     <string name="autofillLoginSavedSnackbarMessage">Login saved</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Login updated</string>
-    <string name="autofillDisableAutofillPromptTitle">Do you want to keep using Autofill?</string>
-    <string name="autofillDisableAutofillPromptMessage">You can disable Autofill at any time in Settings.</string>
-    <string name="autofillDisableAutofillPromptPositiveButton">Keep using</string>
+    <string name="autofillDisableAutofillPromptTitle">Do you want to keep saving Logins?</string>
+    <string name="autofillDisableAutofillPromptMessage">You can disable this at any time in Settings.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Keep Saving</string>
     <string name="autofillDisableAutofillPromptNegativeButton">Disable</string>
 
     <!-- We won't have a translation for this, to be used later. -->
@@ -39,4 +39,9 @@
         <item quantity="one" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 1 other..."><![CDATA[&#160;and <b>%1$d other</b> were trying to track you. <br/><br/>I\'ll <b>block their trackers</b> from loading.️]]></item>
         <item quantity="other" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 3 others..."><![CDATA[&#160;and <b>%1$d others</b> were trying to track you. <br/><br/>I\'ll <b>block their trackers</b> from loading.️]]></item>
     </plurals>
+
+    <!-- Sync -->
+    <string name="syncSettingsEntry">Sync</string>
+    <string name="syncSettingsDisabled">Off</string>
+    <string name="syncSettingsEnabled">On</string>
 </resources>

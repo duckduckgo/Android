@@ -245,7 +245,7 @@
     <string name="surveyCtaLaunchButton">Участвовать в опросе</string>
     <string name="surveyCtaDismissButton">Нет, спасибо</string>
     <string name="surveyActivityTitle">Опрос пользователей</string>
-    <string name="surveyTitle">ОПРОС DUCKDUCKGO</string>
+    <string name="surveyTitle">Опрос DuckDuckGo</string>
     <string name="surveyDismissContentDescription">Закрыть опрос</string>
     <string name="surveyLoadingErrorTitle">О нет!</string>
     <string name="surveyLoadingErrorText">Сейчас невозможно загрузить опрос.\nПовторите попытку позже.</string>
@@ -269,8 +269,8 @@
     <!-- App Enjoyment / Rating / Feedback -->
     <string name="appEnjoymentDialogTitle">Нравится DuckDuckGo?</string>
     <string name="appEnjoymentDialogMessage">Мы будем рады услышать ваше мнение.</string>
-    <string name="appEnjoymentDialogPositiveButton">Мне нравится приложение</string>
-    <string name="appEnjoymentDialogNegativeButton">Приложение нужно доработать</string>
+    <string name="appEnjoymentDialogPositiveButton">Мне нравится</string>
+    <string name="appEnjoymentDialogNegativeButton">Нужно доработать</string>
 
     <string name="rateAppDialogTitle">Оцените приложение</string>
     <string name="rateAppDialogMessage">Ваше мнение важно для нас. Пожалуйста, оставьте свой отзыв.</string>
@@ -361,19 +361,19 @@
     <string name="otherMainReasonTitleShort">Другие проблемы</string>
 
     <string name="openEndedInputHint">Опишите максимально подробно</string>
-    <string name="submitFeedback">ОТПРАВИТЬ</string>
+    <string name="submitFeedback">Подтвердить</string>
 
     <string name="tellUsHowToImprove">Что мы можем улучшить?</string>
     <string name="thanksForTheFeedback">Спасибо за отзыв!</string>
     <string name="feedbackNegativeMainReasonPageSubtitle">Что именно вам не понравилось?</string>
-    <string name="feedbackNegativeMainReasonPageTitle">Очень жаль.</string>
+    <string name="feedbackNegativeMainReasonPageTitle">Очень жаль</string>
     <string name="feedbackShareDetails">Добавить комментарий</string>
     <string name="sharePositiveFeedbackWithTheTeam">Хотите добавить комментарий для нашей команды разработчиков?</string>
     <string name="whatHaveYouBeenEnjoying">Что вам больше всего понравилось?</string>
     <string name="awesomeToHear">Приятно слышать!</string>
     <string name="shareTheLoveWithARating">Пожалуйста, оцените наше приложение в Play Store.</string>
-    <string name="rateTheApp">ОЦЕНИТЬ</string>
-    <string name="declineFurtherFeedback">НЕТ, СПАСИБО</string>
+    <string name="rateTheApp">Оценить приложение</string>
+    <string name="declineFurtherFeedback">Нет, спасибо</string>
     <string name="whichBrokenSites">Где возникают эти проблемы?</string>
     <string name="whichBrokenSitesHint">На каком сайте возникли проблемы?</string>
     <string name="feedbackSpecificAsPossible">Опишите максимально подробно</string>
@@ -389,7 +389,6 @@
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">С этого устройства</string>
-    <string name="systemSearchOmnibarInputHint"><font size="13">Введите поисковый запрос или адрес сайта</font></string>
     <string name="systemSearchAppNotFound">Приложение не найдено</string>
     <string name="systemSearchOnboardingText">Спасибо, что выбрали DuckDuckGo!\nТеперь информация о ваших поисковых запросах под надежной защитой.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Приложение DuckDuckGo также:</string>
@@ -408,7 +407,7 @@
     <string name="daxDialogGotIt">Понятно</string>
     <string name="hideTipsTitle">Скрыть другие подсказки?</string>
     <string name="hideTipsText">Их немного, и мы постарались сделать их информативными.</string>
-    <string name="hideTipsButton">Скрыть подсказки навсегда</string>
+    <string name="hideTipsButton">Скрыть подсказки насовсем</string>
 
     <!-- New Onboarding Experience -->
     <string name="onboardingWelcomeTitle">"Добро пожаловать в DuckDuckGo!"</string>
@@ -436,6 +435,7 @@
     <!-- Onboarding DDG Feature Options -->
     <string name="onboardingFeatureOptionsTitle">Что заинтересовало вас в DuckDuckGo?</string>
     <string name="onboardingFeatureOptionsContinue">Продолжить</string>
+    <string name="onboardingFeatureOptionsSkip">Пропустить этот шаг</string>
     <!-- smartling.character_limit = 28 -->
     <string name="onboardingFeatureOptionPrivateSearch">Конфиденциальный поиск</string>
     <!-- smartling.character_limit = 28 -->
@@ -670,13 +670,13 @@
 
     <!-- Autoconsent -->
     <!-- smartling.character_limit = 82 -->
-    <string name="autoconsentDialogTitle">Похоже, на этом сайте есть всплывающее окно выбора куки-файлов 👇</string>
+    <string name="autoconsentDialogTitle"><![CDATA[<b>Закрывать всплывающие окна с сообщениями о куки автоматически?</b>]]></string>
     <!-- smartling.character_limit = 160 -->
-    <string name="autoconsentDialogDescription">Хотите, чтобы такие окна закрывались автоматически? Мы можем попытаться минимизировать выбор куки-файлов для большей безопасности ваших данных и автоматически закрывать такие окна.</string>
+    <string name="autoconsentDialogDescription">Насколько это возможно, будут выбираться наиболее ограничительные параметры, и такие окна будут закрываться автоматически.</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentPrimaryCta">Управлять окнами выбора куки-файлов</string>
+    <string name="autoconsentPrimaryCta">Обрабатывать всплывающие окна</string>
     <!-- smartling.character_limit = 42 -->
-    <string name="autoconsentSecondaryCta">Нет, спасибо</string>
+    <string name="autoconsentSecondaryCta">Нет, я буду управлять ими самостоятельно</string>
 
     <string name="autoconsentSetting">Управление окнами выбора куки-файлов</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Всплывающее окно скрыто</string>

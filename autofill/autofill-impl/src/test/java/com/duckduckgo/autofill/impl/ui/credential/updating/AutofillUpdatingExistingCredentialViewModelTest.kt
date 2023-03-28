@@ -16,8 +16,8 @@
 
 package com.duckduckgo.autofill.impl.ui.credential.updating
 
-import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -26,20 +26,33 @@ class AutofillUpdatingExistingCredentialViewModelTest {
     private val testee = AutofillUpdatingExistingCredentialViewModel()
 
     @Test
-    fun whenCredentialsAreEmptyThenEmptyStringReturned() {
-        val credentials = credentials(password = "")
-        val actual = testee.convertPasswordToMaskedView(credentials)
-        assertTrue(actual.isEmpty())
+    fun whenUsernameIsShortThenNoEllipsizing() {
+        val result = testee.ellipsizeIfNecessary("foo")
+        result.assertDoesNotEndInEllipsis()
+        assertEquals("foo", result)
     }
 
     @Test
-    fun whenCredentialsAreNotEmptyThenMaskedCharactersReturned() {
-        val credentials = credentials(password = "hello")
-        val actual = testee.convertPasswordToMaskedView(credentials)
-        assertEquals("•••••", actual)
+    fun whenUsernameIsExactlyOnLimitThenNoEllipsizing() {
+        val usernameExactlyAsLongAsLimit = "A".repeat(50)
+        val result = testee.ellipsizeIfNecessary(usernameExactlyAsLongAsLimit)
+        result.assertDoesNotEndInEllipsis()
+        assertEquals(usernameExactlyAsLongAsLimit, result)
     }
 
-    private fun credentials(password: String?): LoginCredentials {
-        return LoginCredentials(password = password, username = null, domain = null)
+    @Test
+    fun whenUsernameIsLongerThanLimitThenEllipsizing() {
+        val usernameLongerThanLimit = "A".repeat(51)
+        val result = testee.ellipsizeIfNecessary(usernameLongerThanLimit)
+        result.assertEndsInEllipsis()
+        assertEquals(50, result.length)
+    }
+
+    private fun String.assertEndsInEllipsis() {
+        assertTrue(endsWith(Typography.ellipsis))
+    }
+
+    private fun String.assertDoesNotEndInEllipsis() {
+        assertFalse(endsWith(Typography.ellipsis))
     }
 }

@@ -19,8 +19,6 @@
 <resources>
     <string name="autofillManagementScreenTitle">Compilazione automatica dei dati di accesso</string>
 
-    <string name="managementLockedModeText">Sblocca la compilazione automatica</string>
-
     <string name="managementDisabledModeCta"><b>Configura in Impostazioni</b></string>
     <string name="managementDisabledModeSubtitle">Una sequenza di blocco del dispositivo, un PIN o dati biometrici sono necessari per proteggere i dettagli di accesso della compilazione automatica.</string>
     <string name="managementDisabledModeTitle">Proteggi il tuo dispositivo per utilizzare la compilazione automatica</string>
@@ -40,7 +38,6 @@
     <string name="useSavedLoginDialogGroupThisWebsite">Da questo sito web</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Da %1$s</string>
 
-    <string name="updateLoginDialogTitle">Aggiornare password?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Aggiorna password</string>
     <string name="updateLoginDialogButtonNotNow">Non adesso</string>
 
@@ -70,7 +67,7 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">I dati di accesso vengono salvati in modo sicuro solo su questo dispositivo.</string>
 
     <string name="autofillManagementAddLogin">Aggiungi dati di accesso</string>
-    <string name="autofillManagementSearchLogins">Ricerca</string>
+    <string name="autofillManagementSearchLogins">Cerca dati di accesso</string>
     <string name="autofillManagementSearchClearDescription">Elimina input di ricerca</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Nessun risultato per \"%1$s\"</string>
 

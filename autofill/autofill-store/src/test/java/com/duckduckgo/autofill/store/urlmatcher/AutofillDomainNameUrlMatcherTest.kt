@@ -17,6 +17,7 @@
 package com.duckduckgo.autofill.store.urlmatcher
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.autofill.api.TestUrlUnicodeNormalizer
 import com.duckduckgo.autofill.api.urlmatcher.AutofillUrlMatcher.ExtractedUrlParts
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -28,7 +29,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class AutofillDomainNameUrlMatcherTest {
 
-    private val testee = AutofillDomainNameUrlMatcher()
+    private val testee = AutofillDomainNameUrlMatcher(TestUrlUnicodeNormalizer())
 
     @Test
     fun whenBasicDomainThenSameReturnedForEtldPlus1() {
@@ -179,29 +180,29 @@ class AutofillDomainNameUrlMatcherTest {
 
     @Test
     fun whenSavedSiteMatchesVisitedExceptForPortThenNotMatchingForAutofill() {
-        val savedSite = ExtractedUrlParts(eTldPlus1 = "example.com", subdomain = null, port = 8000)
-        val visitedSite = ExtractedUrlParts(eTldPlus1 = "example.com", subdomain = null, port = 1000)
+        val savedSite = ExtractedUrlParts(eTldPlus1 = "example.com", userFacingETldPlus1 = "example.com", subdomain = null, port = 8000)
+        val visitedSite = ExtractedUrlParts(eTldPlus1 = "example.com", userFacingETldPlus1 = "example.com", subdomain = null, port = 1000)
         assertFalse(testee.matchingForAutofill(visitedSite, savedSite))
     }
 
     @Test
     fun whenSavedSiteMatchesVisitedAndEqualPortsThenMatchingForAutofill() {
-        val savedSite = ExtractedUrlParts(eTldPlus1 = "example.com", subdomain = null, port = 8000)
-        val visitedSite = ExtractedUrlParts(eTldPlus1 = "example.com", subdomain = null, port = 8000)
+        val savedSite = ExtractedUrlParts(eTldPlus1 = "example.com", userFacingETldPlus1 = "example.com", subdomain = null, port = 8000)
+        val visitedSite = ExtractedUrlParts(eTldPlus1 = "example.com", userFacingETldPlus1 = "example.com", subdomain = null, port = 8000)
         assertTrue(testee.matchingForAutofill(visitedSite, savedSite))
     }
 
     @Test
     fun whenSavedSiteMatchesVisitedAndSavedSiteMissingPortThenNotMatchingForAutofill() {
-        val savedSite = ExtractedUrlParts(eTldPlus1 = "example.com", subdomain = null, port = null)
-        val visitedSite = ExtractedUrlParts(eTldPlus1 = "example.com", subdomain = null, port = 8000)
+        val savedSite = ExtractedUrlParts(eTldPlus1 = "example.com", userFacingETldPlus1 = "example.com", subdomain = null, port = null)
+        val visitedSite = ExtractedUrlParts(eTldPlus1 = "example.com", userFacingETldPlus1 = "example.com", subdomain = null, port = 8000)
         assertFalse(testee.matchingForAutofill(visitedSite, savedSite))
     }
 
     @Test
     fun whenSavedSiteMatchesVisitedAndVisitedSiteMissingPortThenNotMatchingForAutofill() {
-        val savedSite = ExtractedUrlParts(eTldPlus1 = "example.com", subdomain = null, port = 8000)
-        val visitedSite = ExtractedUrlParts(eTldPlus1 = "example.com", subdomain = null, port = null)
+        val savedSite = ExtractedUrlParts(eTldPlus1 = "example.com", userFacingETldPlus1 = "example.com", subdomain = null, port = 8000)
+        val visitedSite = ExtractedUrlParts(eTldPlus1 = "example.com", userFacingETldPlus1 = "example.com", subdomain = null, port = null)
         assertFalse(testee.matchingForAutofill(visitedSite, savedSite))
     }
 
@@ -274,5 +275,11 @@ class AutofillDomainNameUrlMatcherTest {
         assertEquals("192.168.0.1:9000", testee.cleanRawUrl("http://192.168.0.1:9000"))
         assertEquals("fuu.foo.com:9000", testee.cleanRawUrl("fuu.foo.com:9000"))
         assertEquals("RandomText", testee.cleanRawUrl("thisIs@RandomText"))
+    }
+
+    @Test
+    fun whenDomainContainsValidNonAsciiCharactersThenETldPlusOnePunycodeEncoded() {
+        assertEquals("xn--a-5fa.com", testee.extractUrlPartsForAutofill("ça.com").eTldPlus1)
+        assertEquals("xn--a-5fa.com", testee.extractUrlPartsForAutofill("https://ça.com").eTldPlus1)
     }
 }

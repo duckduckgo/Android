@@ -60,7 +60,7 @@ class RealAutoconsentTest {
             unprotected,
             mockVariantManager,
         )
-        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mq" })
+        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "ms" })
     }
 
     @Test
@@ -194,7 +194,7 @@ class RealAutoconsentTest {
 
     @Test
     fun whenInjectAutoconsentAndCookiePromptManagementExperimentIsEnabledAndAutoconsentIsDisabledAndAlreadyHandledThenDoNothing() {
-        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mr" })
+        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mt" })
 
         settingsRepository.userSetting = false
         settingsRepository.firstPopupHandled = true
@@ -206,7 +206,7 @@ class RealAutoconsentTest {
 
     @Test
     fun whenInjectAutoconsentAndCookiePromptManagementExperimentIsEnabledAndAutoconsentIsEnabledAndNotAlreadyHandledThenCallEvaluate() {
-        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mr" })
+        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mt" })
 
         settingsRepository.userSetting = true
         settingsRepository.firstPopupHandled = false
@@ -218,7 +218,7 @@ class RealAutoconsentTest {
 
     @Test
     fun whenInjectAutoconsentAndCookiePromptManagementExperimentIsEnabledAndAutoconsentIsEnabledAndAlreadyHandledThenCallEvaluate() {
-        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mr" })
+        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mt" })
 
         settingsRepository.userSetting = true
         settingsRepository.firstPopupHandled = true
@@ -230,7 +230,7 @@ class RealAutoconsentTest {
 
     @Test
     fun whenInjectAutoconsentAndCookiePromptManagementExperimentIsEnabledAndAutoconsentIsDisabledAndNotAlreadyHandledThenCallEvaluate() {
-        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mr" })
+        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mt" })
 
         settingsRepository.userSetting = false
         settingsRepository.firstPopupHandled = false
