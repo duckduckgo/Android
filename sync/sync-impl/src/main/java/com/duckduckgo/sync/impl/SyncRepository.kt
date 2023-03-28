@@ -265,11 +265,11 @@ class AppSyncRepository @Inject constructor(
 
     override fun getThisConnectedDevice(): ConnectedDevice {
         return ConnectedDevice(
-                thisDevice = true,
-                deviceName = syncStore.deviceName.orEmpty(),
-                deviceType = syncDeviceIds.deviceType(),
-                deviceId = syncStore.deviceId.orEmpty(),
-            )
+            thisDevice = true,
+            deviceName = syncStore.deviceName.orEmpty(),
+            deviceType = syncDeviceIds.deviceType(),
+            deviceId = syncStore.deviceId.orEmpty(),
+        )
     }
 
     override fun getConnectedDevices(): Result<List<ConnectedDevice>> {
