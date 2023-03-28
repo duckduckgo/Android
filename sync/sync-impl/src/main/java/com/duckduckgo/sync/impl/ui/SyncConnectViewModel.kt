@@ -32,7 +32,6 @@ import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
@@ -42,12 +41,7 @@ class SyncConnectViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
     private val command = Channel<Command>(1, DROP_OLDEST)
-    private val viewState = MutableStateFlow(ViewState)
-
-    fun viewState(): Flow<ViewState> = viewState
     fun commands(): Flow<Command> = command.receiveAsFlow()
-
-    object ViewState
 
     sealed class Command {
         object ReadQRCode : Command()

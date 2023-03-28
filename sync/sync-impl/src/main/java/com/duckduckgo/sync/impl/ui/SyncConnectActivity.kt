@@ -32,7 +32,6 @@ import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSucess
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ReadQRCode
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ReadTextCode
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowQRCode
-import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.setup.ConnectViaQRCodeContract
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanIntentResult
@@ -64,15 +63,10 @@ class SyncConnectActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
         observeUiEvents()
+        configureListeners()
     }
 
     private fun observeUiEvents() {
-        viewModel
-            .viewState()
-            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
-            .onEach { viewState -> renderViewState(viewState) }
-            .launchIn(lifecycleScope)
-
         viewModel
             .commands()
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
@@ -98,7 +92,7 @@ class SyncConnectActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun renderViewState(viewState: ViewState) {
+    private fun configureListeners() {
         binding.readQRCode.setOnClickListener {
             viewModel.onReadQRCodeClicked()
         }

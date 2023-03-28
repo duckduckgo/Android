@@ -49,10 +49,10 @@ class ShowQRCodeViewModel @Inject constructor(
     private val viewState = MutableStateFlow(ViewState())
 
     fun viewState(): Flow<ViewState> = viewState.onStart {
-        startPolling()
+        pollConnectionKeys()
     }
 
-    private fun startPolling() {
+    private fun pollConnectionKeys() {
         viewModelScope.launch(dispatchers.io()) {
             showQRCode()
             var polling = true
