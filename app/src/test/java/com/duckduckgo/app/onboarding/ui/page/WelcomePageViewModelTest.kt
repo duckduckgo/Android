@@ -24,7 +24,6 @@ import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
@@ -66,9 +65,6 @@ class WelcomePageViewModelTest {
     @Mock
     private lateinit var defaultRoleBrowserDialog: DefaultRoleBrowserDialog
 
-    @Mock
-    private lateinit var appBuildConfig: AppBuildConfig
-
     private val events = ConflatedBroadcastChannel<WelcomePageView.Event>()
 
     lateinit var viewModel: WelcomePageViewModel
@@ -83,7 +79,6 @@ class WelcomePageViewModelTest {
             context = mock(),
             pixel = pixel,
             defaultRoleBrowserDialog = defaultRoleBrowserDialog,
-            appBuildConfig = appBuildConfig,
         )
 
         viewEvents = events.asFlow().flatMapLatest { viewModel.reduce(it) }
@@ -132,8 +127,7 @@ class WelcomePageViewModelTest {
     }
 
     @Test
-    fun whenOnDefaultBrowserSetOnAndroid13ThenCallDialogShownFireWithCorrectParamsAndFinish() = runTest {
-        whenever(appBuildConfig.sdkInt).thenReturn(android.os.Build.VERSION_CODES.TIRAMISU)
+    fun whenOnDefaultBrowserSetThenCallDialogShownFireAndFinish() = runTest {
         events.send(WelcomePageView.Event.OnDefaultBrowserSet)
 
         viewEvents.test {
@@ -143,33 +137,13 @@ class WelcomePageViewModelTest {
                 AppPixelName.DEFAULT_BROWSER_SET,
                 mapOf(
                     Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString(),
-                    Pixel.PixelParameter.DEFAULT_BROWSER_SET_ON_ANDROID_13_OR_ABOVE to true.toString(),
                 ),
             )
         }
     }
 
     @Test
-    fun whenOnDefaultBrowserSetOnAndroid12ThenCallDialogShownFireWithCorrectParamsAndFinish() = runTest {
-        whenever(appBuildConfig.sdkInt).thenReturn(android.os.Build.VERSION_CODES.S)
-        events.send(WelcomePageView.Event.OnDefaultBrowserSet)
-
-        viewEvents.test {
-            assertTrue(awaitItem() == WelcomePageView.State.Finish)
-            verify(defaultRoleBrowserDialog).dialogShown()
-            verify(pixel).fire(
-                AppPixelName.DEFAULT_BROWSER_SET,
-                mapOf(
-                    Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString(),
-                    Pixel.PixelParameter.DEFAULT_BROWSER_SET_ON_ANDROID_13_OR_ABOVE to false.toString(),
-                ),
-            )
-        }
-    }
-
-    @Test
-    fun whenOnDefaultBrowserNotSetOnAndroid13ThenCallDialogShownFireWithCorrectParamsAndFinish() = runTest {
-        whenever(appBuildConfig.sdkInt).thenReturn(android.os.Build.VERSION_CODES.TIRAMISU)
+    fun whenOnDefaultBrowserNotSetThenCallDialogShownFireAndFinish() = runTest {
         events.send(WelcomePageView.Event.OnDefaultBrowserNotSet)
 
         viewEvents.test {
@@ -179,25 +153,6 @@ class WelcomePageViewModelTest {
                 AppPixelName.DEFAULT_BROWSER_NOT_SET,
                 mapOf(
                     Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString(),
-                    Pixel.PixelParameter.DEFAULT_BROWSER_SET_ON_ANDROID_13_OR_ABOVE to true.toString(),
-                ),
-            )
-        }
-    }
-
-    @Test
-    fun whenOnDefaultBrowserNotSetOnAndroid12ThenCallDialogShownFireWithCorrectParamsAndFinish() = runTest {
-        whenever(appBuildConfig.sdkInt).thenReturn(android.os.Build.VERSION_CODES.S)
-        events.send(WelcomePageView.Event.OnDefaultBrowserNotSet)
-
-        viewEvents.test {
-            assertTrue(awaitItem() == WelcomePageView.State.Finish)
-            verify(defaultRoleBrowserDialog).dialogShown()
-            verify(pixel).fire(
-                AppPixelName.DEFAULT_BROWSER_NOT_SET,
-                mapOf(
-                    Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString(),
-                    Pixel.PixelParameter.DEFAULT_BROWSER_SET_ON_ANDROID_13_OR_ABOVE to false.toString(),
                 ),
             )
         }

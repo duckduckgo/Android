@@ -43,9 +43,6 @@ class AtpPixelRemovalInterceptorTest {
     companion object {
         private const val PIXEL_TEMPLATE = "https://improving.duckduckgo.com/t/%s_android_phone?atb=v255-7zu&appVersion=5.74.0&test=1"
 
-        private val PIXELS_WITH_ATB_INFO = listOf<String>(
-            DeviceShieldPixelNames.ATP_DID_PRESS_NOTIFY_ME_BUTTON.pixelName,
-            DeviceShieldPixelNames.ATP_DID_PRESS_NOTIFY_ME_DISMISS_BUTTON.pixelName,
-        )
+        private val PIXELS_WITH_ATB_INFO = listOf<String>()
     }
 }

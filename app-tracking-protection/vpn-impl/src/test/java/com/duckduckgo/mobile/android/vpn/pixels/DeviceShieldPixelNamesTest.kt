@@ -16,19 +16,14 @@
 
 package com.duckduckgo.mobile.android.vpn.pixels
 
-import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixelNames.ATP_DID_PRESS_NOTIFY_ME_BUTTON
-import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixelNames.ATP_DID_PRESS_NOTIFY_ME_DISMISS_BUTTON
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class DeviceShieldPixelNamesTest {
     @Test
     fun allAppTrackingProtectionPixelsShallBePrefixed() {
-        DeviceShieldPixelNames.values()
-            // These 2 pixels have the same names across browser and AppTP and should not have the "m_atp" prefix.
-            .filter { it != ATP_DID_PRESS_NOTIFY_ME_BUTTON && it != ATP_DID_PRESS_NOTIFY_ME_DISMISS_BUTTON }
-            .map { it.pixelName }.forEach { pixel ->
-                assertTrue(pixel.startsWith("m_atp"))
-            }
+        DeviceShieldPixelNames.values().map { it.pixelName }.forEach { pixel ->
+            assertTrue(pixel.startsWith("m_atp"))
+        }
     }
 }

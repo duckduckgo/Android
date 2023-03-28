@@ -154,8 +154,6 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
             ViewEvent.PromoteAlwaysOnCancelled -> onAlwaysOnPromotionDialogCancelled()
             is ViewEvent.AlwaysOnInitialState -> onAlwaysOnInitialState(viewEvent.alwaysOnState)
             ViewEvent.LaunchTrackingProtectionExclusionListActivity -> sendCommand(Command.LaunchTrackingProtectionExclusionListActivity)
-            ViewEvent.NotifyMeClicked -> firePixel(viewEvent)
-            ViewEvent.NotifyMeDismissClicked -> firePixel(viewEvent)
         }
     }
 
@@ -192,15 +190,6 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
             if (alwaysOnState.enabled && alwaysOnState.lockedDown) {
                 sendCommand(Command.ShowAlwaysOnLockdownWarningDialog)
             }
-        }
-    }
-
-    private fun firePixel(viewEvent: ViewEvent) {
-        val metadata = mapOf(PIXEL_PARAM_NOTIFY_ME_FROM_SCREEN_NAME to PIXEL_PARAM_NOTIFY_ME_FROM_SCREEN_VALUE)
-        if (viewEvent == ViewEvent.NotifyMeClicked) {
-            deviceShieldPixels.didPressOnNotifyMeButton(metadata)
-        } else if (viewEvent == ViewEvent.NotifyMeDismissClicked) {
-            deviceShieldPixels.didPressOnNotifyMeDismissButton(metadata)
         }
     }
 
@@ -245,8 +234,6 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         object RemoveFeature : ViewEvent()
         object StartVpn : ViewEvent()
         object AskToRemoveFeature : ViewEvent()
-        object NotifyMeClicked : ViewEvent()
-        object NotifyMeDismissClicked : ViewEvent()
 
         object PromoteAlwaysOnOpenSettings : ViewEvent()
         object PromoteAlwaysOnCancelled : ViewEvent()
@@ -273,11 +260,6 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         object CloseScreen : Command()
         object OpenVpnSettings : Command()
         object ShowAppTpEnabledCta : Command()
-    }
-
-    companion object {
-        internal const val PIXEL_PARAM_NOTIFY_ME_FROM_SCREEN_NAME = "from_screen"
-        internal const val PIXEL_PARAM_NOTIFY_ME_FROM_SCREEN_VALUE = "apptp"
     }
 }
 

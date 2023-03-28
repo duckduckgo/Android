@@ -24,7 +24,6 @@ import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.FragmentScope
 import javax.inject.Inject
 
@@ -33,7 +32,6 @@ class DefaultBrowserPageViewModel @Inject constructor(
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val pixel: Pixel,
     private val installStore: AppInstallStore,
-    private val appBuildConfig: AppBuildConfig,
 ) : ViewModel() {
 
     sealed class ViewState {
@@ -173,7 +171,6 @@ class DefaultBrowserPageViewModel @Inject constructor(
             val params = mapOf(
                 Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString(),
                 Pixel.PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to originValue,
-                Pixel.PixelParameter.DEFAULT_BROWSER_SET_ON_ANDROID_13_OR_ABOVE to appBuildConfig.isAndroid13OrAbove().toString(),
             )
             pixel.fire(AppPixelName.DEFAULT_BROWSER_SET, params)
         } else {
@@ -198,8 +195,6 @@ class DefaultBrowserPageViewModel @Inject constructor(
             viewState.value = createViewState
         }
     }
-
-    private fun AppBuildConfig.isAndroid13OrAbove(): Boolean = sdkInt >= android.os.Build.VERSION_CODES.TIRAMISU
 
     companion object {
         const val MAX_DIALOG_ATTEMPTS = 2

@@ -155,14 +155,6 @@ class DeviceShieldTrackerActivity :
         binding.ctaShowAll.setOnClickListener {
             viewModel.onViewEvent(ViewEvent.LaunchMostRecentActivity)
         }
-
-        binding.deviceShieldTrackerNotifyMe.onNotifyMeClicked {
-            viewModel.onViewEvent(ViewEvent.NotifyMeClicked)
-        }
-
-        binding.deviceShieldTrackerNotifyMe.onDismissClicked {
-            viewModel.onViewEvent(ViewEvent.NotifyMeDismissClicked)
-        }
     }
 
     override fun onActivityResult(

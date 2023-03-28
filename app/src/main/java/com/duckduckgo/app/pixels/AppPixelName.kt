@@ -247,7 +247,4 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     REMOTE_MESSAGE_SECONDARY_ACTION_CLICKED("m_remote_message_secondary_action_clicked"),
 
     CREATE_BLOOM_FILTER_ERROR("m_create_bloom_filter_error"),
-
-    NOTIFY_ME_BUTTON_PRESSED("m_notify_me_component_notify_me_button_pressed"),
-    NOTIFY_ME_DISMISS_BUTTON_PRESSED("m_notify_me_component_close_button_pressed"),
 }
