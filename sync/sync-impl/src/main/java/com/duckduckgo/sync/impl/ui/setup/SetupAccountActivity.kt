@@ -174,14 +174,5 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
                 putExtra(SETUP_ACCOUNT_SCREEN_EXTRA, SETUP)
             }
         }
-
-        fun intent(
-            context: Context,
-            screen: Screen,
-        ): Intent {
-            return Intent(context, SetupAccountActivity::class.java).apply {
-                putExtra(SETUP_ACCOUNT_SCREEN_EXTRA, screen)
-            }
-        }
     }
 }
