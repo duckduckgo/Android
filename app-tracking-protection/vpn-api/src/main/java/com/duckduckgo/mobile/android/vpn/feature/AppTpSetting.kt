@@ -24,7 +24,6 @@ enum class AppTpSetting(override val value: String, override val defaultValue: B
     CPUMonitoring("cpuMonitoring"),
     ProtectGames("protectGames"),
     ExceptionLists("exceptionLists", defaultValue = true),
-    OpenBeta("openBeta"),
 }
 
 interface SettingName {
