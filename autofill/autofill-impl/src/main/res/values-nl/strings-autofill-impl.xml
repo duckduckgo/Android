@@ -19,8 +19,6 @@
 <resources>
     <string name="autofillManagementScreenTitle">Login met automatisch invullen</string>
 
-    <string name="managementLockedModeText">Automatisch invullen ontgrendelen</string>
-
     <string name="managementDisabledModeCta"><b>Instellen in Instellingen</b></string>
     <string name="managementDisabledModeSubtitle">Een vergrendelingspatroon, pincode of biometrische gegevens zijn noodzakelijk om uw inloggegevens voor automatisch invullen te beschermen.</string>
     <string name="managementDisabledModeTitle">Beveilig je apparaat om automatisch invullen te gebruiken</string>
@@ -40,7 +38,6 @@
     <string name="useSavedLoginDialogGroupThisWebsite">Van deze website</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Van %1$s</string>
 
-    <string name="updateLoginDialogTitle">Wachtwoord bijwerken?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Wachtwoord bijwerken</string>
     <string name="updateLoginDialogButtonNotNow">Niet nu</string>
 
@@ -70,7 +67,7 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Aanmeldgegevens worden alleen op dit apparaat veilig opgeslagen.</string>
 
     <string name="autofillManagementAddLogin">Aanmeldgegevens toevoegen</string>
-    <string name="autofillManagementSearchLogins">Zoeken</string>
+    <string name="autofillManagementSearchLogins">Aanmeldgegevens zoeken</string>
     <string name="autofillManagementSearchClearDescription">Zoekinvoer wissen</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Geen resultaten voor \'%1$s\'</string>
 

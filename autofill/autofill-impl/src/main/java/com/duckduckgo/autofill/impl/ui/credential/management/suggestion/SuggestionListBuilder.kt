@@ -23,16 +23,22 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementR
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem.CredentialListItem.SuggestedCredential
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem.Divider
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem.GroupHeading
+import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialListSorter
 import javax.inject.Inject
 
-class SuggestionListBuilder @Inject constructor(private val context: Context) {
+class SuggestionListBuilder @Inject constructor(
+    private val context: Context,
+    private val sorter: CredentialListSorter,
+) {
 
-    fun build(suggestions: List<LoginCredentials>): List<ListItem> {
+    fun build(unsortedSuggestions: List<LoginCredentials>): List<ListItem> {
         val list = mutableListOf<ListItem>()
 
-        if (suggestions.isNotEmpty()) {
+        if (unsortedSuggestions.isNotEmpty()) {
+            val sortedSuggestions = sorter.sort(unsortedSuggestions)
+
             list.add(GroupHeading(context.getString(string.credentialManagementSuggestionsLabel)))
-            list.addAll(suggestions.map { SuggestedCredential(it) })
+            list.addAll(sortedSuggestions.map { SuggestedCredential(it) })
             list.add(Divider)
         }
 

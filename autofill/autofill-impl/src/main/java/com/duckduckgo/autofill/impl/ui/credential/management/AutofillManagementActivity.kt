@@ -59,7 +59,7 @@ import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.Error
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.Success
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.UserCancelled
-import com.duckduckgo.deviceauth.api.DeviceAuthenticator.Features.AUTOFILL
+import com.duckduckgo.deviceauth.api.DeviceAuthenticator.Features.AUTOFILL_TO_ACCESS_CREDENTIALS
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.ui.view.SearchBar
@@ -123,7 +123,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
     private fun launchDeviceAuth() {
         viewModel.lock()
 
-        deviceAuthenticator.authenticate(AUTOFILL, this) {
+        deviceAuthenticator.authenticate(AUTOFILL_TO_ACCESS_CREDENTIALS, this) {
             when (it) {
                 Success -> onAuthenticationSuccessful()
                 UserCancelled -> onAuthenticationCancelled()
@@ -158,8 +158,8 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
         var processed = true
         when (command) {
             is ShowCredentialMode -> showCredentialMode()
-            is ShowUserUsernameCopied -> showCopiedToClipboardSnackbar("Username")
-            is ShowUserPasswordCopied -> showCopiedToClipboardSnackbar("Password")
+            is ShowUserUsernameCopied -> showCopiedToClipboardSnackbar(CopiedToClipboardDataType.Username)
+            is ShowUserPasswordCopied -> showCopiedToClipboardSnackbar(CopiedToClipboardDataType.Password)
             is ShowListMode -> showListMode()
             is ShowDisabledMode -> showDisabledMode()
             is ShowLockedMode -> showLockMode()
@@ -177,8 +177,12 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun showCopiedToClipboardSnackbar(type: String) {
-        Snackbar.make(binding.root, "$type copied to clipboard", Snackbar.LENGTH_SHORT).show()
+    private fun showCopiedToClipboardSnackbar(dataType: CopiedToClipboardDataType) {
+        val stringResourceId = when (dataType) {
+            is CopiedToClipboardDataType.Username -> R.string.autofillManagementUsernameCopied
+            is CopiedToClipboardDataType.Password -> R.string.autofillManagementPasswordCopied
+        }
+        Snackbar.make(binding.root, getString(stringResourceId), Snackbar.LENGTH_SHORT).show()
     }
 
     private fun showListMode() {
@@ -327,6 +331,11 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
 
         fun intentDefaultList(context: Context): Intent = Intent(context, AutofillManagementActivity::class.java)
     }
+}
+
+private sealed interface CopiedToClipboardDataType {
+    object Username : CopiedToClipboardDataType
+    object Password : CopiedToClipboardDataType
 }
 
 @ContributesTo(AppScope::class)

@@ -19,8 +19,6 @@
 <resources>
     <string name="autofillManagementScreenTitle">Sisesta sisselogimisandmed automaatselt</string>
 
-    <string name="managementLockedModeText">Ava automaatne täitmine</string>
-
     <string name="managementDisabledModeCta"><b>Seadista sätetes</b></string>
     <string name="managementDisabledModeSubtitle">Automaatse sisselogimise andmete kaitsmiseks on vaja seadme lukustusmustrit, PIN-koodi või biomeetriat.</string>
     <string name="managementDisabledModeTitle">Automaatse täitmise kasutamiseks taga seadme kaitse</string>
@@ -40,7 +38,6 @@
     <string name="useSavedLoginDialogGroupThisWebsite">Sellelt veebisaidilt</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Saidilt %1$s</string>
 
-    <string name="updateLoginDialogTitle">Kas värskendada parooli?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Värskenda parooli</string>
     <string name="updateLoginDialogButtonNotNow">Mitte praegu</string>
 
@@ -70,7 +67,7 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Sisselogimisandmed salvestatakse turvaliselt ainult selles seadmes.</string>
 
     <string name="autofillManagementAddLogin">Lisa sisselogimisandmed</string>
-    <string name="autofillManagementSearchLogins">Otsing</string>
+    <string name="autofillManagementSearchLogins">Otsi sisselogimisandmeid</string>
     <string name="autofillManagementSearchClearDescription">Tühjenda otsingusisend</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Päringule „%1$s” ei leitud tulemusi</string>
 

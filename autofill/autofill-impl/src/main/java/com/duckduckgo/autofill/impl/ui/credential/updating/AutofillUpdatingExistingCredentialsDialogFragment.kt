@@ -113,7 +113,11 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
     ) {
         binding.dialogTitle.text = when (updateType) {
             CredentialUpdateType.Username -> getString(R.string.updateLoginDialogTitleUpdateUsername)
-            CredentialUpdateType.Password -> getString(R.string.updateLoginDialogTitle)
+            CredentialUpdateType.Password -> {
+                val username = (getCredentialsToSave().username ?: "")
+                val usernameLine = viewModel.ellipsizeIfNecessary(username)
+                getString(R.string.updateLoginDialogTitleLine, usernameLine)
+            }
         }
     }
 
@@ -136,7 +140,7 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
                 it.putParcelable(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIALS, credentials)
                 it.putParcelable(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIAL_UPDATE_TYPE, getUpdateType())
             }
-            parentFragment?.setFragmentResult(CredentialUpdateExistingCredentialsDialog.resultKey(getTabId()), result)
+            parentFragment?.setFragmentResult(CredentialUpdateExistingCredentialsDialog.resultKeyCredentialUpdated(getTabId()), result)
 
             ignoreCancellationEvents = true
             animateClosed()
@@ -148,9 +152,9 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
         credentials: LoginCredentials,
         updateType: CredentialUpdateType,
     ) {
-        binding.updatedFieldPreview.text = when (updateType) {
+        binding.dialogSubtitle.text = when (updateType) {
             CredentialUpdateType.Username -> credentials.username
-            CredentialUpdateType.Password -> viewModel.convertPasswordToMaskedView(credentials)
+            CredentialUpdateType.Password -> getString(R.string.updateLoginUpdatePasswordExplanation)
         }
     }
 
@@ -170,7 +174,7 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
         }
 
         Timber.v("onCancel: AutofillUpdatingExistingCredentialsDialogFragment. User declined to update credentials")
-
+        parentFragment?.setFragmentResult(CredentialUpdateExistingCredentialsDialog.resultKeyPromptDismissed(getTabId()), Bundle())
         pixelNameDialogEvent(Dismissed)?.let { pixel.fire(it) }
     }
 

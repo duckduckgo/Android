@@ -19,6 +19,7 @@ package com.duckduckgo.autofill.store
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
+import com.duckduckgo.autofill.api.TestUrlUnicodeNormalizer
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult
 import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult.ExactMatch
@@ -65,7 +66,7 @@ class SecureStoreBackedAutofillStoreTest {
     private lateinit var testee: SecureStoreBackedAutofillStore
     private lateinit var secureStore: FakeSecureStore
 
-    private val autofillUrlMatcher: AutofillUrlMatcher = AutofillDomainNameUrlMatcher()
+    private val autofillUrlMatcher: AutofillUrlMatcher = AutofillDomainNameUrlMatcher(TestUrlUnicodeNormalizer())
 
     @Before
     fun setUp() {
@@ -180,6 +181,14 @@ class SecureStoreBackedAutofillStoreTest {
     fun whenNoCredentialsSavedThenGetAllCredentialsReturnNothing() = runTest {
         setupTesteeWithAutofillAvailable()
         assertEquals(0, testee.getAllCredentials().first().size)
+    }
+
+    @Test
+    fun whenStoredCredentialMissingUsernameAndStoringACredentialWithNoUsernameThenUrlOnlyMatch() = runTest {
+        setupTesteeWithAutofillAvailable()
+        storeCredentials(1, "https://example.com", username = null, password = "password")
+        val result = testee.containsCredentials("example.com", username = null, password = "differentPassword")
+        assertUrlOnlyMatch(result)
     }
 
     @Test
@@ -466,23 +475,23 @@ class SecureStoreBackedAutofillStoreTest {
     }
 
     private fun assertNotMatch(result: ContainsCredentialsResult) {
-        assertTrue(String.format("Expected NoMatch but was %s", result), result is NoMatch)
+        assertTrue(String.format("Expected NoMatch but was %s", result.javaClass.simpleName), result is NoMatch)
     }
 
     private fun assertUrlOnlyMatch(result: ContainsCredentialsResult) {
-        assertTrue(String.format("Expected UrlOnlyMatch but was %s", result), result is UrlOnlyMatch)
+        assertTrue(String.format("Expected UrlOnlyMatch but was %s", result.javaClass.simpleName), result is UrlOnlyMatch)
     }
 
     private fun assertUsernameMissing(result: ContainsCredentialsResult) {
-        assertTrue(String.format("Expected UsernameMissing but was %s", result), result is UsernameMissing)
+        assertTrue(String.format("Expected UsernameMissing but was %s", result.javaClass.simpleName), result is UsernameMissing)
     }
 
     private fun assertUsernameMatch(result: ContainsCredentialsResult) {
-        assertTrue(String.format("Expected UsernameMatch but was %s", result), result is UsernameMatch)
+        assertTrue(String.format("Expected UsernameMatch but was %s", result.javaClass.simpleName), result is UsernameMatch)
     }
 
     private fun assertExactMatch(result: ContainsCredentialsResult) {
-        assertTrue(String.format("Expected ExactMatch but was %s", result), result is ExactMatch)
+        assertTrue(String.format("Expected ExactMatch but was %s", result.javaClass.simpleName), result is ExactMatch)
     }
 
     private suspend fun storeCredentials(

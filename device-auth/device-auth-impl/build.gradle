@@ -33,11 +33,17 @@ dependencies {
 
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation project(path: ':common-test')
 }
 
 android {
     anvil {
         generateDaggerFactories = true // default is false
+    }
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
     }
   namespace 'com.duckduckgo.deviceauth.impl'
 }

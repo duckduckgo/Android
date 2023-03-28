@@ -19,8 +19,6 @@
 <resources>
     <string name="autofillManagementScreenTitle">Fyll i inloggningar automatiskt</string>
 
-    <string name="managementLockedModeText">Lås upp automatisk ifyllning</string>
-
     <string name="managementDisabledModeCta"><b>Konfigurera i Inställningar</b></string>
     <string name="managementDisabledModeSubtitle">För att skydda dina uppgifter för automatisk ifyllning krävs ett enhetslåsmönster, en PIN-kod eller biometri.</string>
     <string name="managementDisabledModeTitle">Säkra din enhet för att använda automatisk ifyllning</string>
@@ -40,7 +38,6 @@
     <string name="useSavedLoginDialogGroupThisWebsite">Från den här webbplatsen</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Från %1$s</string>
 
-    <string name="updateLoginDialogTitle">Uppdatera lösenord?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Uppdatera lösenord</string>
     <string name="updateLoginDialogButtonNotNow">Inte nu</string>
 
@@ -70,7 +67,7 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Inloggningar lagras säkert endast på den här enheten.</string>
 
     <string name="autofillManagementAddLogin">Lägg till inloggning</string>
-    <string name="autofillManagementSearchLogins">Sökning</string>
+    <string name="autofillManagementSearchLogins">Sök inloggningar</string>
     <string name="autofillManagementSearchClearDescription">Rensa sökfältet</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Inga resultat för ”%1$s”</string>
 

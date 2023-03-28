@@ -19,8 +19,6 @@
 <resources>
     <string name="autofillManagementScreenTitle">Автоматично попълване на данни за вход</string>
 
-    <string name="managementLockedModeText">Отключете автоматичното попълване</string>
-
     <string name="managementDisabledModeCta"><b>Настройване в Настройки</b></string>
     <string name="managementDisabledModeSubtitle">Изисква се шаблон за заключване на устройството, ПИН код или биометрични данни, за да защитите информацията си за вход с автоматично попълване.</string>
     <string name="managementDisabledModeTitle">Защитете устройството си, за да използвате автоматично попълване</string>
@@ -40,7 +38,6 @@
     <string name="useSavedLoginDialogGroupThisWebsite">От този уебсайт</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">От %1$s</string>
 
-    <string name="updateLoginDialogTitle">Актуализиране на паролата?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Актуализиране на паролата</string>
     <string name="updateLoginDialogButtonNotNow">Не сега</string>
 
@@ -70,7 +67,7 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Данните за вход се съхраняват на сигурно място само на това устройство.</string>
 
     <string name="autofillManagementAddLogin">Добавяне на данни за вход</string>
-    <string name="autofillManagementSearchLogins">Търсене</string>
+    <string name="autofillManagementSearchLogins">Търсене на данни за вход</string>
     <string name="autofillManagementSearchClearDescription">Изчистване на въведеното търсене</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Няма резултати за \'%1$s\'</string>
 

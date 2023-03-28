@@ -19,8 +19,6 @@
 <resources>
     <string name="autofillManagementScreenTitle">Automatisk udfyldning ved login</string>
 
-    <string name="managementLockedModeText">Lås op for automatisk udfyldning</string>
-
     <string name="managementDisabledModeCta"><b>Konfigurer i Indstillinger</b></string>
     <string name="managementDisabledModeSubtitle">Der kræves et låsemønster, en pinkode eller biometri for at beskytte dine oplysninger om automatisk udfyldning.</string>
     <string name="managementDisabledModeTitle">Beskyt din enhed for at bruge automatisk udfyldning</string>
@@ -40,7 +38,6 @@
     <string name="useSavedLoginDialogGroupThisWebsite">Fra dette websted</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Fra %1$s</string>
 
-    <string name="updateLoginDialogTitle">Opdater adgangskode?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Opdater adgangskode</string>
     <string name="updateLoginDialogButtonNotNow">Ikke nu</string>
 
@@ -70,7 +67,7 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Login gemmes kun sikkert på denne enhed.</string>
 
     <string name="autofillManagementAddLogin">Tilføj login</string>
-    <string name="autofillManagementSearchLogins">Søg</string>
+    <string name="autofillManagementSearchLogins">Søg logins</string>
     <string name="autofillManagementSearchClearDescription">Ryd søgeinput</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Ingen resultater for \"%1$s\"</string>
 

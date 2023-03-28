@@ -19,8 +19,6 @@
 <resources>
     <string name="autofillManagementScreenTitle">Autocompletar inicios de sesión</string>
 
-    <string name="managementLockedModeText">Desbloquear Autocompletar</string>
-
     <string name="managementDisabledModeCta"><b>Configurar en Ajustes</b></string>
     <string name="managementDisabledModeSubtitle">Se requiere un patrón de bloqueo del dispositivo, un PIN o datos biométricos para proteger tus datos de Autocompletar de inicio de sesión.</string>
     <string name="managementDisabledModeTitle">Asegura tu dispositivo para usar Autocompletar</string>
@@ -40,7 +38,6 @@
     <string name="useSavedLoginDialogGroupThisWebsite">Desde este sitio web</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Desde %1$s</string>
 
-    <string name="updateLoginDialogTitle">¿Actualizar contraseña?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Actualizar contraseña</string>
     <string name="updateLoginDialogButtonNotNow">Ahora no</string>
 
@@ -70,7 +67,7 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Los inicios de sesión se almacenan de forma segura únicamente en este dispositivo.</string>
 
     <string name="autofillManagementAddLogin">Añadir inicio de sesión</string>
-    <string name="autofillManagementSearchLogins">Buscar</string>
+    <string name="autofillManagementSearchLogins">Buscar inicios de sesión</string>
     <string name="autofillManagementSearchClearDescription">Borrar búsqueda</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Sin resultados para «%1$s»</string>
 

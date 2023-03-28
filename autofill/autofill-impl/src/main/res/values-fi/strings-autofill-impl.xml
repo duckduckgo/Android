@@ -19,8 +19,6 @@
 <resources>
     <string name="autofillManagementScreenTitle">Täytä kirjautumistiedot automaattisesti</string>
 
-    <string name="managementLockedModeText">Poista automaattisen täytön lukitus</string>
-
     <string name="managementDisabledModeCta"><b>Määritä Asetuksissa</b></string>
     <string name="managementDisabledModeSubtitle">Automaattisen täytön kirjautumistietojen suojaamiseen tarvitaan laitteen lukituskuvio, PIN-koodi tai biometriset tiedot.</string>
     <string name="managementDisabledModeTitle">Suojaa laitteesi automaattisen täytön käyttöä varten</string>
@@ -40,7 +38,6 @@
     <string name="useSavedLoginDialogGroupThisWebsite">Tältä sivustolta</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Sivustolta %1$s</string>
 
-    <string name="updateLoginDialogTitle">Päivitetäänkö salasana?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Päivitä salasana</string>
     <string name="updateLoginDialogButtonNotNow">Ei nyt</string>
 
@@ -70,7 +67,7 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Kirjautumistiedot tallennetaan turvallisesti vain tälle laitteelle.</string>
 
     <string name="autofillManagementAddLogin">Lisää kirjautumistiedot</string>
-    <string name="autofillManagementSearchLogins">Hae</string>
+    <string name="autofillManagementSearchLogins">Hae kirjautumistietoja</string>
     <string name="autofillManagementSearchClearDescription">Tyhjennä hakusyöte</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Ei tuloksia haulla \'%1$s\'</string>
 

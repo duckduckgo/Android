@@ -211,9 +211,9 @@ class SecureStoreBackedAutofillStore(
         credentials.forEach {
             urlMatch = true
 
-            if (it.details.username == null && it.password != null && it.password == password) {
+            if (usernameMissing(it, username, password)) {
                 missingUsername = true
-            } else if (it.details.username == username) {
+            } else if (usernameMatch(it, username)) {
                 usernameMatchFound = true
                 if (it.password == password) {
                     exactMatchFound = true
@@ -221,7 +221,7 @@ class SecureStoreBackedAutofillStore(
             }
         }
 
-        return if (exactMatchFound) {
+        val matchType = if (exactMatchFound) {
             ContainsCredentialsResult.ExactMatch
         } else if (usernameMatchFound) {
             ContainsCredentialsResult.UsernameMatch
@@ -232,6 +232,27 @@ class SecureStoreBackedAutofillStore(
         } else {
             NoMatch
         }
+
+        Timber.v("Determined match type is %s", matchType.javaClass.simpleName)
+        return matchType
+    }
+
+    private fun usernameMatch(
+        credentials: WebsiteLoginDetailsWithCredentials,
+        username: String?,
+    ): Boolean {
+        return credentials.details.username != null && credentials.details.username == username
+    }
+
+    private fun usernameMissing(
+        credentials: WebsiteLoginDetailsWithCredentials,
+        username: String?,
+        password: String?,
+    ): Boolean {
+        return credentials.details.username == null &&
+            !username.isNullOrEmpty() &&
+            credentials.password != null &&
+            credentials.password == password
     }
 
     private fun WebsiteLoginDetailsWithCredentials.toLoginCredentials(): LoginCredentials {

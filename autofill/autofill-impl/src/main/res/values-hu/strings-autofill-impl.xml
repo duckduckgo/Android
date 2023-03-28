@@ -19,8 +19,6 @@
 <resources>
     <string name="autofillManagementScreenTitle">Bejelentkezési adatok automatikus kitöltése</string>
 
-    <string name="managementLockedModeText">Automatikus kitöltés feloldása</string>
-
     <string name="managementDisabledModeCta"><b>Beállítás a Beállításokban</b></string>
     <string name="managementDisabledModeSubtitle">Az automatikus bejelentkezési adatok védelméhez az eszközzár mintája, PIN-kód vagy biometrikus adatok szükségesek.</string>
     <string name="managementDisabledModeTitle">Tedd biztonságossá a készülékedet az automatikus kitöltés használatához</string>
@@ -40,7 +38,6 @@
     <string name="useSavedLoginDialogGroupThisWebsite">Erről a webhelyről</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Innen: %1$s</string>
 
-    <string name="updateLoginDialogTitle">Frissíted a jelszót?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Jelszó frissítése</string>
     <string name="updateLoginDialogButtonNotNow">Most nem</string>
 
@@ -70,7 +67,7 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Csak ezen az eszközön és biztonságosan tároljuk a bejelentkezési adatokat.</string>
 
     <string name="autofillManagementAddLogin">Bejelentkezési adatok hozzáadása</string>
-    <string name="autofillManagementSearchLogins">Keresés</string>
+    <string name="autofillManagementSearchLogins">Bejelentkezési adatok keresése</string>
     <string name="autofillManagementSearchClearDescription">Megadott keresés törlése</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Nincs találat erre: „%1$s”</string>
 

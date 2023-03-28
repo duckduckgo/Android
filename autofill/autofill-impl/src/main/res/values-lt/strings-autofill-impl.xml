@@ -19,8 +19,6 @@
 <resources>
     <string name="autofillManagementScreenTitle">Automatiškai užpildyti prisijungimus</string>
 
-    <string name="managementLockedModeText">Atrakinti automatinį pildymą</string>
-
     <string name="managementDisabledModeCta"><b>Nustatyti nustatymuose</b></string>
     <string name="managementDisabledModeSubtitle">Norint apsaugoti automatinio pildymo prisijungimo duomenis, reikia naudoti įrenginio užrakinimo šabloną, PIN kodą arba biometrinius duomenis.</string>
     <string name="managementDisabledModeTitle">Apsaugokite įrenginį, kad galėtumėte naudoti automatinį pildymą</string>
@@ -40,7 +38,6 @@
     <string name="useSavedLoginDialogGroupThisWebsite">Iš šios svetainės</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Iš %1$s</string>
 
-    <string name="updateLoginDialogTitle">Atnaujinti slaptažodį?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Atnaujinti slaptažodį</string>
     <string name="updateLoginDialogButtonNotNow">Ne dabar</string>
 
@@ -70,7 +67,7 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Prisijungimai saugiai saugomi tik šiame įrenginyje.</string>
 
     <string name="autofillManagementAddLogin">Pridėti prisijungimą</string>
-    <string name="autofillManagementSearchLogins">Paieška</string>
+    <string name="autofillManagementSearchLogins">Ieškoti prisijungimų</string>
     <string name="autofillManagementSearchClearDescription">Išvalyti paieškos įvestį</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Rezultatų pagal paiešką „%1$s“ nerasta</string>
 
