@@ -84,25 +84,12 @@ class SetupAccountViewModel @Inject constructor(
 
     fun onBackPressed() {
         viewModelScope.launch {
-            Timber.i("CRIS: back pressed and value is ${viewState.value}")
             when (viewState.value.viewMode) {
                 AskSyncAnotherDevice -> {
                     viewState.emit(ViewState(viewMode = TurnOnSync))
                 }
 
-                TurnOnSync -> {
-                    viewModelScope.launch {
-                        command.send(Close)
-                    }
-                }
-
-                AskSaveRecoveryCode -> {
-                    viewModelScope.launch {
-                        command.send(Close)
-                    }
-                }
-
-                DeviceConnected -> {
+                TurnOnSync, AskSaveRecoveryCode, DeviceConnected -> {
                     viewModelScope.launch {
                         command.send(Close)
                     }
