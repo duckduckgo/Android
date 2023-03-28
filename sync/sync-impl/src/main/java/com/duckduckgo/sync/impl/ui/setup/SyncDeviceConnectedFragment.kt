@@ -18,6 +18,7 @@ package com.duckduckgo.sync.impl.ui.setup
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
@@ -26,31 +27,30 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoFragment
 import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.mobile.android.ui.view.hide
-import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.R
-import com.duckduckgo.sync.impl.databinding.FragmentRecoveryCodeBinding
-import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command
-import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Error
-import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Finish
-import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.AccountCreated
-import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.CreatingAccount
-import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewState
+import com.duckduckgo.sync.impl.databinding.FragmentDeviceConnectedBinding
+import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.Command
+import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.Command.FinishSetupFlow
+import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.ViewState
 import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(FragmentScope::class)
-class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_code) {
+class SyncDeviceConnectedFragment : DuckDuckGoFragment(R.layout.fragment_device_connected) {
+
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
 
-    private val binding: FragmentRecoveryCodeBinding by viewBinding()
+    private val binding: FragmentDeviceConnectedBinding by viewBinding()
 
-    private val viewModel: SaveRecoveryCodeViewModel by lazy {
-        ViewModelProvider(this, viewModelFactory)[SaveRecoveryCodeViewModel::class.java]
+    private val viewModel: SyncDeviceConnectedViewModel by lazy {
+        ViewModelProvider(this, viewModelFactory)[SyncDeviceConnectedViewModel::class.java]
     }
+
+    private val listener: SetupFlowListener?
+        get() = activity as? SetupFlowListener
 
     override fun onViewCreated(
         view: View,
@@ -58,17 +58,6 @@ class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_c
     ) {
         super.onViewCreated(view, savedInstanceState)
         observeUiEvents()
-        configureListeners()
-    }
-
-    private fun configureListeners() {
-        binding.footerPrimaryButton.setOnClickListener {
-        }
-        binding.footerSecondaryButton.setOnClickListener {
-        }
-        binding.footerNextButton.setOnClickListener {
-            viewModel.onNextClicked()
-        }
     }
 
     private fun observeUiEvents() {
@@ -83,35 +72,23 @@ class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_c
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
-        binding.recoveryCodeSkeleton.startShimmer()
     }
 
     private fun processCommand(it: Command) {
         when (it) {
-            Error -> requireActivity().finish()
-            Finish -> requireActivity().finish()
+            FinishSetupFlow -> listener?.launchFinishSetupFlow()
         }
     }
 
     private fun renderViewState(viewState: ViewState) {
-        when (val viewMode = viewState.viewMode) {
-            is AccountCreated -> {
-                binding.recoveryCodeSkeleton.stopShimmer()
-                binding.recoveryCodeSkeleton.hide()
-                binding.recoverCodeContainer.show()
-                binding.qrCodeImageView.show()
-                binding.qrCodeImageView.setImageBitmap(viewMode.loginQRCode)
-                binding.recoveryCodeText.text = viewMode.b64RecoveryCode
-            }
-
-            CreatingAccount -> {
-                binding.recoverCodeContainer.hide()
-                binding.recoveryCodeSkeleton.startShimmer()
-            }
+        binding.connectedDeviceItem.setPrimaryText(viewState.deviceName)
+        binding.connectedDeviceItem.setLeadingIconDrawable(ContextCompat.getDrawable(requireContext(), viewState.deviceType)!!)
+        binding.footerPrimaryButton.setOnClickListener {
+            viewModel.onNextClicked()
         }
     }
 
     companion object {
-        fun instance() = SaveRecoveryCodeFragment()
+        fun instance() = SyncDeviceConnectedFragment()
     }
 }

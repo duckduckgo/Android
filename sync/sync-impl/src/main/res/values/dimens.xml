@@ -16,6 +16,7 @@
   -->
 
 <resources>
+    <dimen name="qrSizeXLarge">220dp</dimen>
     <dimen name="qrSizeLarge">192dp</dimen>
     <dimen name="qrSizeSmall">96dp</dimen>
 </resources>

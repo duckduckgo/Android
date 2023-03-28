@@ -45,14 +45,6 @@ import kotlinx.coroutines.flow.onEach
 
 @InjectWith(FragmentScope::class)
 class SyncSetupFlowFragment : DuckDuckGoFragment(R.layout.fragment_sync_setup) {
-
-    interface SetupFlowListener {
-        fun askSyncAnotherDevice()
-        fun recoverYourSyncedData()
-        fun syncAnotherDevice()
-        fun launchFinishSetupFlow()
-    }
-
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
 

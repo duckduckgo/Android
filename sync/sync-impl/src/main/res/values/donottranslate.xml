@@ -23,6 +23,10 @@
 
     <!-- Sync -->
     <string name="sync_screen_title">Sync</string>
+    <string name="login_screen_title">Scan QR Code</string>
+    <string name="connect_screen_title">Scan QR Code</string>
+    <string name="show_qr_screen_title">Show QR Code</string>
+    <string name="connected_device_title">Device Synced</string>
     <string name="sync_toggle_text">Sync</string>
     <string name="sync_off_hint">Sync your bookmarks across your devices and save an encrypted backup on DuckDuckGo\'s servers.</string>
     <string name="synced_devices_section_title">Synced Devices</string>
@@ -47,4 +51,10 @@
     <string name="sync_recovery_code_primary_button">Save Recovery PDF</string>
     <string name="sync_recovery_code_secondary_button">Copy Code</string>
     <string name="sync_recovery_code_skip_button">Not Now</string>
+    <string name="sync_connected_device_title">Device Synced!</string>
+    <string name="sync_connected_device_hint">Your bookmarks are now syncing with this device.</string>
+    <string name="sync_connected_device_primary_button">Next</string>
+    <string name="sync_login_device_hint">Scan the QR code on your Recovery PDF, or another synced device, to recover your synced data.</string>
+    <string name="sync_connect_scan_qr_hint">Go to Settings > Sync in the DuckDuckGo App on a different device and scan the QR code to sync.</string>
+    <string name="sync_connect_copy_code">Copy Code</string>
 </resources>
