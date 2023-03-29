@@ -20,6 +20,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.trackerdetection.Client.ClientName.TDS
 import com.duckduckgo.app.trackerdetection.model.Action.BLOCK
 import com.duckduckgo.app.trackerdetection.model.Action.IGNORE
+import com.duckduckgo.app.trackerdetection.model.Options
 import com.duckduckgo.app.trackerdetection.model.Rule
 import com.duckduckgo.app.trackerdetection.model.RuleExceptions
 import com.duckduckgo.app.trackerdetection.model.TdsTracker
@@ -88,7 +89,7 @@ class TdsClientTest {
 
     @Test
     fun whenUrlMatchesRuleWithNoExceptionsAndRuleActionBlockThenMatchesIsTrue() {
-        val rule = Rule("api\\.tracker\\.com\\/auth", BLOCK, null, null)
+        val rule = Rule("api\\.tracker\\.com\\/auth", BLOCK, null, null, null)
         val data = listOf(TdsTracker("tracker.com", BLOCK, OWNER, CATEGORY, listOf(rule)))
         val testee = TdsClient(TDS, data, mockUrlToTypeMapper)
         val result = testee.matches("http://api.tracker.com/auth/script.js", DOCUMENT_URL, mapOf())
@@ -97,7 +98,7 @@ class TdsClientTest {
 
     @Test
     fun whenUrlMatchesRuleWithNoExceptionsAndRuleActionIgnoreThenMatchesIsFalse() {
-        val rule = Rule("api\\.tracker\\.com\\/auth", IGNORE, null, null)
+        val rule = Rule("api\\.tracker\\.com\\/auth", IGNORE, null, null, null)
         val data = listOf(TdsTracker("tracker.com", BLOCK, OWNER, CATEGORY, listOf(rule)))
         val testee = TdsClient(TDS, data, mockUrlToTypeMapper)
         val result = testee.matches("http://api.tracker.com/auth/script.js", DOCUMENT_URL, mapOf())
@@ -106,7 +107,7 @@ class TdsClientTest {
 
     @Test
     fun whenUrlMatchesDomainWithDefaultBlockAndRuleWithNoExceptionsAndNoActionThenMatchesIsTrue() {
-        val rule = Rule("api\\.tracker\\.com\\/auth", null, null, null)
+        val rule = Rule("api\\.tracker\\.com\\/auth", null, null, null, null)
         val data = listOf(TdsTracker("tracker.com", BLOCK, OWNER, CATEGORY, listOf(rule)))
         val testee = TdsClient(TDS, data, mockUrlToTypeMapper)
         val result = testee.matches("http://api.tracker.com/auth/script.js", DOCUMENT_URL, mapOf())
@@ -115,7 +116,7 @@ class TdsClientTest {
 
     @Test
     fun whenUrlMatchesDomainWithDefaultIgnoreAndRuleWithNoExceptionsAndNoActionThenMatchesIsTrue() {
-        val rule = Rule("api\\.tracker\\.com\\/auth", null, null, null)
+        val rule = Rule("api\\.tracker\\.com\\/auth", null, null, null, null)
         val data = listOf(TdsTracker("tracker.com", IGNORE, OWNER, CATEGORY, listOf(rule)))
         val testee = TdsClient(TDS, data, mockUrlToTypeMapper)
         val result = testee.matches("http://api.tracker.com/auth/script.js", DOCUMENT_URL, mapOf())
@@ -126,9 +127,9 @@ class TdsClientTest {
     fun whenUrlMatchesRuleWithExceptionsAndExceptionDomainMatchesDocumentThenMatchesIsFalseIrrespectiveOfAction() {
         val exceptions = RuleExceptions(listOf("example.com"), null)
 
-        val ruleBlock = Rule("api\\.tracker\\.com\\/auth", BLOCK, exceptions, null)
-        val ruleIgnore = Rule("api\\.tracker\\.com\\/auth", IGNORE, exceptions, null)
-        val ruleNone = Rule("api\\.tracker\\.com\\/auth", null, exceptions, null)
+        val ruleBlock = Rule("api\\.tracker\\.com\\/auth", BLOCK, exceptions, null, null)
+        val ruleIgnore = Rule("api\\.tracker\\.com\\/auth", IGNORE, exceptions, null, null)
+        val ruleNone = Rule("api\\.tracker\\.com\\/auth", null, exceptions, null, null)
 
         val testeeBlockRuleBlock = TdsClient(
             TDS,
@@ -173,9 +174,9 @@ class TdsClientTest {
     fun whenUrlMatchesRuleWithExceptionsAndExceptionDomainDoesNotMatchDocumentThenMatchesBehaviorIsStandard() {
         val exceptions = RuleExceptions(listOf("nonmatching.com"), null)
 
-        val ruleBlock = Rule("api\\.tracker\\.com\\/auth", BLOCK, exceptions, null)
-        val ruleIgnore = Rule("api\\.tracker\\.com\\/auth", IGNORE, exceptions, null)
-        val ruleNone = Rule("api\\.tracker\\.com\\/auth", null, exceptions, null)
+        val ruleBlock = Rule("api\\.tracker\\.com\\/auth", BLOCK, exceptions, null, null)
+        val ruleIgnore = Rule("api\\.tracker\\.com\\/auth", IGNORE, exceptions, null, null)
+        val ruleNone = Rule("api\\.tracker\\.com\\/auth", null, exceptions, null, null)
 
         val testeeBlockRuleBlock = TdsClient(
             TDS,
@@ -222,9 +223,9 @@ class TdsClientTest {
 
         val exceptions = RuleExceptions(null, listOf("something"))
 
-        val ruleBlock = Rule("api\\.tracker\\.com\\/auth", BLOCK, exceptions, null)
-        val ruleIgnore = Rule("api\\.tracker\\.com\\/auth", IGNORE, exceptions, null)
-        val ruleNone = Rule("api\\.tracker\\.com\\/auth", null, exceptions, null)
+        val ruleBlock = Rule("api\\.tracker\\.com\\/auth", BLOCK, exceptions, null, null)
+        val ruleIgnore = Rule("api\\.tracker\\.com\\/auth", IGNORE, exceptions, null, null)
+        val ruleNone = Rule("api\\.tracker\\.com\\/auth", null, exceptions, null, null)
 
         val testeeBlockRuleBlock = TdsClient(
             TDS,
@@ -269,9 +270,9 @@ class TdsClientTest {
     fun whenUrlMatchesRuleWithSurrogateThenMatchesIsTrueIrrespectiveOfActionExceptIgnore() {
         val exceptions = RuleExceptions(null, null)
 
-        val ruleBlock = Rule("api\\.tracker\\.com\\/auth", BLOCK, exceptions, "testId")
-        val ruleIgnore = Rule("api\\.tracker\\.com\\/auth", IGNORE, exceptions, "testId")
-        val ruleNone = Rule("api\\.tracker\\.com\\/auth", null, exceptions, "testId")
+        val ruleBlock = Rule("api\\.tracker\\.com\\/auth", BLOCK, exceptions, "testId", null)
+        val ruleIgnore = Rule("api\\.tracker\\.com\\/auth", IGNORE, exceptions, "testId", null)
+        val ruleNone = Rule("api\\.tracker\\.com\\/auth", null, exceptions, "testId", null)
 
         val testeeBlockRuleBlock = TdsClient(
             TDS,
@@ -314,7 +315,7 @@ class TdsClientTest {
 
     @Test
     fun whenUrlMatchesRuleWithSurrogateThenSurrogateScriptIdReturned() {
-        val rule = Rule("api\\.tracker\\.com\\/auth", BLOCK, null, "script.js")
+        val rule = Rule("api\\.tracker\\.com\\/auth", BLOCK, null, "script.js", null)
 
         val testee = TdsClient(TDS, listOf(TdsTracker("tracker.com", BLOCK, OWNER, CATEGORY, listOf(rule))), mockUrlToTypeMapper)
 
@@ -325,7 +326,7 @@ class TdsClientTest {
     fun whenUrlMatchesRuleWithTypeExceptionAndDomainsIsNullThenMatchesIsFalse() {
         whenever(mockUrlToTypeMapper.map(anyString(), anyMap())).thenReturn("image")
         val exceptions = RuleExceptions(null, listOf("image"))
-        val rule = Rule("api\\.tracker\\.com\\/auth", BLOCK, exceptions, null)
+        val rule = Rule("api\\.tracker\\.com\\/auth", BLOCK, exceptions, null, null)
         val data = listOf(TdsTracker("tracker.com", BLOCK, OWNER, CATEGORY, listOf(rule)))
         val testee = TdsClient(TDS, data, mockUrlToTypeMapper)
         val result = testee.matches("http://api.tracker.com/auth/image.png", DOCUMENT_URL, mapOf())
@@ -336,7 +337,7 @@ class TdsClientTest {
     fun whenUrlMatchesRuleWithTypeExceptionAndDomainsIsEmptyThenMatchesIsFalse() {
         whenever(mockUrlToTypeMapper.map(anyString(), anyMap())).thenReturn("image")
         val exceptions = RuleExceptions(emptyList(), listOf("image"))
-        val rule = Rule("api\\.tracker\\.com\\/auth", BLOCK, exceptions, null)
+        val rule = Rule("api\\.tracker\\.com\\/auth", BLOCK, exceptions, null, null)
         val data = listOf(TdsTracker("tracker.com", BLOCK, OWNER, CATEGORY, listOf(rule)))
         val testee = TdsClient(TDS, data, mockUrlToTypeMapper)
         val result = testee.matches("http://api.tracker.com/auth/image.png", DOCUMENT_URL, mapOf())
@@ -347,7 +348,7 @@ class TdsClientTest {
     fun whenUrlMatchesRuleWithDomainExceptionAndTypesIsNullThenMatchesIsFalse() {
         whenever(mockUrlToTypeMapper.map(anyString(), anyMap())).thenReturn("image")
         val exceptions = RuleExceptions(listOf("example.com"), null)
-        val rule = Rule("api\\.tracker\\.com\\/auth", BLOCK, exceptions, null)
+        val rule = Rule("api\\.tracker\\.com\\/auth", BLOCK, exceptions, null, null)
         val data = listOf(TdsTracker("tracker.com", BLOCK, OWNER, CATEGORY, listOf(rule)))
         val testee = TdsClient(TDS, data, mockUrlToTypeMapper)
         val result = testee.matches("http://api.tracker.com/auth/image.png", DOCUMENT_URL, mapOf())
@@ -358,7 +359,7 @@ class TdsClientTest {
     fun whenUrlMatchesRuleWithDomainExceptionAndTypesIsEmptyThenMatchesIsFalse() {
         whenever(mockUrlToTypeMapper.map(anyString(), anyMap())).thenReturn("image")
         val exceptions = RuleExceptions(listOf("example.com"), emptyList())
-        val rule = Rule("api\\.tracker\\.com\\/auth", BLOCK, exceptions, null)
+        val rule = Rule("api\\.tracker\\.com\\/auth", BLOCK, exceptions, null, null)
         val data = listOf(TdsTracker("tracker.com", BLOCK, OWNER, CATEGORY, listOf(rule)))
         val testee = TdsClient(TDS, data, mockUrlToTypeMapper)
         val result = testee.matches("http://api.tracker.com/auth/image.png", DOCUMENT_URL, mapOf())
@@ -369,7 +370,7 @@ class TdsClientTest {
     fun whenUrlMatchesRuleWithDomainAndTypeExceptionThenMatchesIsFalse() {
         whenever(mockUrlToTypeMapper.map(anyString(), anyMap())).thenReturn("image")
         val exceptions = RuleExceptions(listOf("example.com"), listOf("image"))
-        val rule = Rule("api\\.tracker\\.com\\/auth", BLOCK, exceptions, null)
+        val rule = Rule("api\\.tracker\\.com\\/auth", BLOCK, exceptions, null, null)
         val data = listOf(TdsTracker("tracker.com", BLOCK, OWNER, CATEGORY, listOf(rule)))
         val testee = TdsClient(TDS, data, mockUrlToTypeMapper)
         val result = testee.matches("http://api.tracker.com/auth/image.png", DOCUMENT_URL, mapOf())
@@ -380,7 +381,7 @@ class TdsClientTest {
     fun whenUrlMatchesRuleWithDomainExceptionButNotTypeThenMatchesIsTrue() {
         whenever(mockUrlToTypeMapper.map(anyString(), anyMap())).thenReturn("image")
         val exceptions = RuleExceptions(listOf("example.com"), listOf("script"))
-        val rule = Rule("api\\.tracker\\.com\\/auth", BLOCK, exceptions, null)
+        val rule = Rule("api\\.tracker\\.com\\/auth", BLOCK, exceptions, null, null)
         val data = listOf(TdsTracker("tracker.com", BLOCK, OWNER, CATEGORY, listOf(rule)))
         val testee = TdsClient(TDS, data, mockUrlToTypeMapper)
         val result = testee.matches("http://api.tracker.com/auth/image.png", DOCUMENT_URL, mapOf())
@@ -391,7 +392,76 @@ class TdsClientTest {
     fun whenUrlMatchesRuleWithTypeExceptionButNotDomainThenMatchesIsTrue() {
         whenever(mockUrlToTypeMapper.map(anyString(), anyMap())).thenReturn("image")
         val exceptions = RuleExceptions(listOf("foo.com"), listOf("image"))
-        val rule = Rule("api\\.tracker\\.com\\/auth", BLOCK, exceptions, null)
+        val rule = Rule("api\\.tracker\\.com\\/auth", BLOCK, exceptions, null, null)
+        val data = listOf(TdsTracker("tracker.com", BLOCK, OWNER, CATEGORY, listOf(rule)))
+        val testee = TdsClient(TDS, data, mockUrlToTypeMapper)
+        val result = testee.matches("http://api.tracker.com/auth/image.png", DOCUMENT_URL, mapOf())
+        assertTrue(result.matches)
+    }
+
+    @Test
+    fun whenUrlMatchesRuleForBlockedTrackerWithMatchingExceptionAndOptionTypeAndEmptyOptionDomainThenMatchesFalse() {
+        // If option domain is empty and type is matching, should block would be false since exception is matching.
+        val matchingType = "image"
+        whenever(mockUrlToTypeMapper.map(anyString(), anyMap())).thenReturn(matchingType)
+        val exceptions = RuleExceptions(listOf("example.com"), listOf(matchingType))
+        val options = Options(domains = null, types = listOf(matchingType))
+        val rule = Rule("api\\.tracker\\.com\\/auth", BLOCK, exceptions, null, options)
+        val data = listOf(TdsTracker("tracker.com", BLOCK, OWNER, CATEGORY, listOf(rule)))
+        val testee = TdsClient(TDS, data, mockUrlToTypeMapper)
+        val result = testee.matches("http://api.tracker.com/auth/image.png", DOCUMENT_URL, mapOf())
+        assertFalse(result.matches)
+    }
+
+    @Test
+    fun whenUrlMatchesRuleForBlockedTrackerWithMatchingExceptionAndOptionDomainAndEmptyOptionTypeThenMatchesFalse() {
+        // If option type is empty and domain is matching, should block would be false since exception is matching.
+        val matchingDomain = "example.com"
+        whenever(mockUrlToTypeMapper.map(anyString(), anyMap())).thenReturn("image")
+        val exceptions = RuleExceptions(listOf(matchingDomain), listOf("image"))
+        val options = Options(domains = listOf(matchingDomain), types = null)
+        val rule = Rule("api\\.tracker\\.com\\/auth", BLOCK, exceptions, null, options)
+        val data = listOf(TdsTracker("tracker.com", BLOCK, OWNER, CATEGORY, listOf(rule)))
+        val testee = TdsClient(TDS, data, mockUrlToTypeMapper)
+        val result = testee.matches("http://api.tracker.com/auth/image.png", DOCUMENT_URL, mapOf())
+        assertFalse(result.matches)
+    }
+
+    @Test
+    fun whenUrlMatchesRuleForBlockedTrackerWithMatchingExceptionAndOptionDomainButNotOptionTypeThenMatchesTrue() {
+        // If option type is not null and not matching, should block would be true since we will use the tracker's default action.
+        val matchingDomain = "example.com"
+        whenever(mockUrlToTypeMapper.map(anyString(), anyMap())).thenReturn("image")
+        val exceptions = RuleExceptions(listOf(matchingDomain), listOf("image"))
+        val options = Options(domains = listOf(matchingDomain), types = listOf("not-matching-type"))
+        val rule = Rule("api\\.tracker\\.com\\/auth", BLOCK, exceptions, null, options)
+        val data = listOf(TdsTracker("tracker.com", BLOCK, OWNER, CATEGORY, listOf(rule)))
+        val testee = TdsClient(TDS, data, mockUrlToTypeMapper)
+        val result = testee.matches("http://api.tracker.com/auth/image.png", DOCUMENT_URL, mapOf())
+        assertTrue(result.matches)
+    }
+
+    @Test
+    fun whenUrlMatchesRuleForBlockedTrackerWithMatchingExceptionButNotOptionDomainAndOptionTypeThenMatchesTrue() {
+        // If option domain is not null and not matching, should block would be true since we will use the tracker's default action.
+        val matchingType = "image"
+        whenever(mockUrlToTypeMapper.map(anyString(), anyMap())).thenReturn(matchingType)
+        val exceptions = RuleExceptions(listOf("example.com"), listOf(matchingType))
+        val options = Options(domains = listOf("not-matching-domain.com"), types = listOf(matchingType))
+        val rule = Rule("api\\.tracker\\.com\\/auth", BLOCK, exceptions, null, options)
+        val data = listOf(TdsTracker("tracker.com", BLOCK, OWNER, CATEGORY, listOf(rule)))
+        val testee = TdsClient(TDS, data, mockUrlToTypeMapper)
+        val result = testee.matches("http://api.tracker.com/auth/image.png", DOCUMENT_URL, mapOf())
+        assertTrue(result.matches)
+    }
+
+    @Test
+    fun whenHasOptionsButDoesntMatchDomainNorTypeThenMatchesTrue() {
+        // If option type and domain are both not null and not matching, should block would be true since we will use the tracker's default action.
+        whenever(mockUrlToTypeMapper.map(anyString(), anyMap())).thenReturn("image")
+        val exceptions = RuleExceptions(listOf("example.com"), listOf("image"))
+        val options = Options(domains = listOf("not-matching-domain.com"), types = listOf("not-matching-type"))
+        val rule = Rule("api\\.tracker\\.com\\/auth", BLOCK, exceptions, null, options)
         val data = listOf(TdsTracker("tracker.com", BLOCK, OWNER, CATEGORY, listOf(rule)))
         val testee = TdsClient(TDS, data, mockUrlToTypeMapper)
         val result = testee.matches("http://api.tracker.com/auth/image.png", DOCUMENT_URL, mapOf())
