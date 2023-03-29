@@ -16,7 +16,10 @@
 
 package com.duckduckgo.mobile.android.vpn.cohort
 
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.api.InMemorySharedPreferences
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
@@ -24,6 +27,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.*
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
@@ -34,8 +38,16 @@ import org.threeten.bp.LocalDate
 
 @ExperimentalCoroutinesApi
 class RealCohortStoreTest {
+    @get:Rule
+    @Suppress("unused")
+    val coroutineRule = CoroutineTestRule()
+
     @Mock
     private lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
+
+    @Mock
+    private lateinit var appBuildConfig: AppBuildConfig
+
     private val sharedPreferencesProvider = mock<VpnSharedPreferencesProvider>()
 
     private lateinit var cohortStore: CohortStore
@@ -47,8 +59,9 @@ class RealCohortStoreTest {
         whenever(
             sharedPreferencesProvider.getSharedPreferences(eq("com.duckduckgo.mobile.atp.cohort.prefs"), eq(true), eq(true)),
         ).thenReturn(prefs)
+        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
 
-        cohortStore = RealCohortStore(sharedPreferencesProvider, vpnFeaturesRegistry)
+        cohortStore = RealCohortStore(sharedPreferencesProvider, vpnFeaturesRegistry, coroutineRule.testDispatcherProvider, appBuildConfig)
     }
 
     @Test
