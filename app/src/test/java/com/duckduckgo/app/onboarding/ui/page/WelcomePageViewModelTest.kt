@@ -162,4 +162,24 @@ class WelcomePageViewModelTest {
             )
         }
     }
+
+    @Test
+    fun givenExperimentVariantWhenLoadingWelcomeScreenThenReturnMultiselectCta() = runTest {
+        whenever(variantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "mj" })
+        events.send(WelcomePageView.Event.ShowFirstDaxOnboardingDialog)
+
+        viewEvents.test {
+            assertTrue(awaitItem() == WelcomePageView.State.ShowFeatureOptionsCta)
+        }
+    }
+
+    @Test
+    fun givenNonExperimentVariantWhenLoadingWelcomeScreenThenReturnControlCta() = runTest {
+        whenever(variantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "mi" })
+        events.send(WelcomePageView.Event.ShowFirstDaxOnboardingDialog)
+
+        viewEvents.test {
+            assertTrue(awaitItem() == WelcomePageView.State.ShowControlDaxCta)
+        }
+    }
 }
