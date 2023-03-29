@@ -18,4 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="biometric_prompt_title">Prijave zaključane</string>
+    <string name="autofill_auth_text_for_using">Otključaj uređaj za korištenje spremljenih prijava.</string>
+    <string name="autofill_auth_text_for_access">Otključaj uređaj za pristup spremljenim prijavama.</string>
 </resources>
