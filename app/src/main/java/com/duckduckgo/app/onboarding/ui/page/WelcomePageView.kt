@@ -26,6 +26,7 @@ object WelcomePageView {
         object OnDefaultBrowserNotSet : Event()
         object OnSkipOptions : Event()
         data class OnContinueOptions(val options: Map<DDGFeatureOnboardingOption, Boolean>) : Event()
+        object ShowFirstDaxOnboardingDialog : Event()
     }
 
     sealed class State {
@@ -33,5 +34,6 @@ object WelcomePageView {
         data class ShowDefaultBrowserDialog(val intent: Intent) : State()
         object Finish : State()
         object ShowFeatureOptionsCta : State()
+        object ShowControlDaxCta : State()
     }
 }

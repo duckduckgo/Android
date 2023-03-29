@@ -47,26 +47,28 @@ class WelcomePageViewModel(
 
     fun reduce(event: WelcomePageView.Event): Flow<WelcomePageView.State> {
         return when (event) {
-            WelcomePageView.Event.OnPrimaryCtaClicked -> onPrimaryCtaClicked()
+            WelcomePageView.Event.ShowFirstDaxOnboardingDialog -> showFirstDaxOnboardingDialog()
             WelcomePageView.Event.OnSkipOptions -> onSkipOptionsClicked()
             is WelcomePageView.Event.OnContinueOptions -> onContinueWithOptionsClicked(event.options)
+            WelcomePageView.Event.OnPrimaryCtaClicked -> onPrimaryCtaClicked()
             WelcomePageView.Event.OnDefaultBrowserSet -> onDefaultBrowserSet()
             WelcomePageView.Event.OnDefaultBrowserNotSet -> onDefaultBrowserNotSet()
         }
     }
 
-    private fun onPrimaryCtaClicked(): Flow<WelcomePageView.State> =
+    private fun showFirstDaxOnboardingDialog() = flow {
         when (variantManager.isOnboardingCustomizationExperimentEnabled()) {
-            true -> flow { emit(WelcomePageView.State.ShowFeatureOptionsCta) }
-            false -> onCtaOnboardingFlowFinished()
+            true -> emit(WelcomePageView.State.ShowFeatureOptionsCta)
+            false -> emit(WelcomePageView.State.ShowControlDaxCta)
         }
-
-    private fun onSkipOptionsClicked(): Flow<WelcomePageView.State> {
-        pixel.fire(AppPixelName.ONBOARDING_OPTION_SKIP)
-        return onCtaOnboardingFlowFinished()
     }
 
-    private fun onContinueWithOptionsClicked(options: Map<DDGFeatureOnboardingOption, Boolean>): Flow<WelcomePageView.State> {
+    private fun onSkipOptionsClicked(): Flow<WelcomePageView.State> = flow {
+        pixel.fire(AppPixelName.ONBOARDING_OPTION_SKIP)
+        emit(WelcomePageView.State.ShowControlDaxCta)
+    }
+
+    private fun onContinueWithOptionsClicked(options: Map<DDGFeatureOnboardingOption, Boolean>): Flow<WelcomePageView.State> = flow {
         val optionsSelected = options.filter { it.value }.map { it.key }.toList()
         if (optionsSelected.isEmpty()) {
             pixel.fire(AppPixelName.ONBOARDING_OPTION_SKIP)
@@ -83,10 +85,10 @@ class WelcomePageViewModel(
             }
             pixel.fire(AppPixelName.ONBOARDING_OPTIONS_SELECTED)
         }
-        return onCtaOnboardingFlowFinished()
+        emit(WelcomePageView.State.ShowControlDaxCta)
     }
 
-    private fun onCtaOnboardingFlowFinished(): Flow<WelcomePageView.State> = flow {
+    private fun onPrimaryCtaClicked(): Flow<WelcomePageView.State> = flow {
         if (defaultRoleBrowserDialog.shouldShowDialog()) {
             val intent = defaultRoleBrowserDialog.createIntent(context)
             if (intent != null) {

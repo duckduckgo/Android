@@ -117,6 +117,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
                 onContinuePressed()
             }
             WelcomePageView.State.ShowFeatureOptionsCta -> startMultiselectDialogAnimation()
+            WelcomePageView.State.ShowControlDaxCta -> showDaxDialogCta()
         }
     }
 
@@ -137,7 +138,6 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
                         .withEndAction {
                             setMultiselectListeners(this)
                         }
-                    setPrimaryCtaListenerAfterWelcomeAlphaAnimation()
                 }
         }
     }
@@ -250,14 +250,20 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
             .setDuration(ANIMATION_DURATION)
             .setStartDelay(startDelay)
             .withEndAction {
-                typingAnimation = ViewCompat.animate(binding.daxDialogCta.daxCtaContainer)
-                    .alpha(MAX_ALPHA)
-                    .setDuration(ANIMATION_DURATION)
-                    .withEndAction {
-                        welcomeAnimationFinished = true
-                        binding.daxDialogCta.dialogTextCta.startTypingAnimation(ctaText)
-                        setPrimaryCtaListenerAfterWelcomeAlphaAnimation()
-                    }
+                event(WelcomePageView.Event.ShowFirstDaxOnboardingDialog)
+            }
+    }
+
+    private fun showDaxDialogCta() {
+        binding.daxDialogCta.root.show()
+        binding.daxDialogMultiselectCta.root.gone()
+        typingAnimation = ViewCompat.animate(binding.daxDialogCta.daxCtaContainer)
+            .alpha(MAX_ALPHA)
+            .setDuration(ANIMATION_DURATION)
+            .withEndAction {
+                welcomeAnimationFinished = true
+                binding.daxDialogCta.dialogTextCta.startTypingAnimation(ctaText)
+                setPrimaryCtaListenerAfterWelcomeAlphaAnimation()
             }
     }
 
