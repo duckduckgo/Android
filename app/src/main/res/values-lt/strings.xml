@@ -287,6 +287,12 @@
     <!-- Notification Channel Names -->
     <string name="notificationChannelTutorials">Mokymo priemonės</string>
 
+    <!-- AppTP Retention Experiment Notifications-->
+    <string name="enableAppTpNotificationEasyStepTitle">Vienas paprastas programos privatumo veiksmas</string>
+    <string name="enableAppTpNotificationEasyStepDescription">Įjunkite „App Tracking Protection“, kad blokuotumėte programėlėse pasislėpusius sekimo įrenginius net tada, kai nesinaudojate telefonu.</string>
+    <string name="enableAppTpNotificationNextLevelTitle">Perkelkite savo privatumą į kitą lygį</string>
+    <string name="enableAppTpNotificationNextLevelDescription">Įjunkite „App Tracking Protection“, kad blokuotumėte programėlėse pasislėpusius sekimo įrenginius net tada, kai nesinaudojate telefonu.</string>
+
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Duomenų valymas nustatytas į rankinį</string>
     <string name="clearNotificationDescription">Tinkinkite „DuckDuckGo“ automatiškai išvalyti naršymo duomenis po kiekvieno seanso.</string>
@@ -408,6 +414,11 @@
     <string name="hideTipsTitle">Slėpti likusius patarimus?</string>
     <string name="hideTipsText">Jų tik keletas, stengėmės, kad jie būtų informatyvūs.</string>
     <string name="hideTipsButton">Slėpti patarimus visam laikui</string>
+
+    <!-- AppTP Retention Experiment Dax Dialog -->
+    <string name="daxDialogAppTpRetentionText"><![CDATA[Dabar blokuojate sekimo įrenginius internete 🎉<br/><br/>Taip pat galiu blokuoti kitose programėlėse pasislėpusius sekimo įrenginius, net kai nenaudojate telefono.]]></string>
+    <string name="daxDialogAppTpRetentionPrimaryButtonText">Įjungti apsaugą nuo programėlių sekimo</string>
+    <string name="daxDialogAppTpRetentionSecondaryButtonText">Ne dabar</string>
 
     <!-- New Onboarding Experience -->
     <string name="onboardingWelcomeTitle">"Sveiki atvykę į „DuckDuckGo“!"</string>
