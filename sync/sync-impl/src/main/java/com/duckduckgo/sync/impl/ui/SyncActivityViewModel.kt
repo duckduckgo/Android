@@ -24,7 +24,10 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.R
+import com.duckduckgo.sync.impl.Result.Error
+import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncRepository
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AsskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -56,6 +59,7 @@ class SyncActivityViewModel @Inject constructor(
 
     sealed class Command {
         object LaunchDeviceSetupFlow : Command()
+        object AsskTurnOffSync : Command()
     }
 
     fun getSyncState() {
@@ -67,8 +71,9 @@ class SyncActivityViewModel @Inject constructor(
     fun onToggleClicked(isChecked: Boolean) {
         viewModelScope.launch {
             viewState.emit(viewState.value.copy(isDeviceSyncEnabled = isChecked))
-            if (isChecked) {
-                command.send(LaunchDeviceSetupFlow)
+            when (isChecked) {
+                true -> command.send(LaunchDeviceSetupFlow)
+                false -> command.send(AsskTurnOffSync)
             }
         }
     }
@@ -85,5 +90,20 @@ class SyncActivityViewModel @Inject constructor(
                 loginQRCode = qrBitmap,
             ),
         )
+    }
+
+    fun onTurnOffSyncConfirmed() {
+        viewModelScope.launch(dispatchers.io()) {
+            viewState.emit(viewState.value.copy(showAccount = false))
+            val deviceId = syncRepository.getThisConnectedDevice().deviceId
+            when (syncRepository.logout(deviceId)) {
+                is Error -> {
+                    updateViewState()
+                }
+                is Success -> {
+                     updateViewState()
+                }
+            }
+        }
     }
 }

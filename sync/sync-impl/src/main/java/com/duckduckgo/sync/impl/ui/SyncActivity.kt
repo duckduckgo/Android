@@ -26,11 +26,14 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
+import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivitySyncBinding
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AsskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity
@@ -83,7 +86,29 @@ class SyncActivity : DuckDuckGoActivity() {
             LaunchDeviceSetupFlow -> {
                 startActivity(SetupAccountActivity.intentStartSetupFlow(this))
             }
+
+            AsskTurnOffSync -> askTurnOffsync()
         }
+    }
+
+    private fun askTurnOffsync() {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.turn_off_sync_dialog_title)
+            .setMessage(getString(R.string.turn_off_sync_dialog_content))
+            .setPositiveButton(R.string.turn_off_sync_dialog_primary_button)
+            .setNegativeButton(R.string.turn_off_sync_dialog_secondary_button)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onTurnOffSyncConfirmed()
+                    }
+
+                    override fun onDialogDismissed() {
+                        super.onDialogDismissed()
+                    }
+                },
+            )
+            .show()
     }
 
     private fun renderViewState(viewState: ViewState) {
