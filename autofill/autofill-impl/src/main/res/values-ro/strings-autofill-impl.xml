@@ -44,6 +44,9 @@
     <string name="updateLoginDialogTitleUpdateUsername">Actualizezi numele de utilizator?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Actualizează numele de utilizator</string>
 
+    <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Actualizezi parola pentru \n%1$s?</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo va actualiza aceste date de conectare stocate pe dispozitivul tău.</string>
+
     <string name="autofillDialogCloseButtonContentDescription">Închide dialogul de completare automată</string>
 
     <string name="credentialManagementEditLoginTitleHint">Titlu autentificare</string>
@@ -74,4 +77,8 @@
     <string name="autofillDeleteLoginDialogCancel">Anulare</string>
     <string name="autofillDeleteLoginDialogDelete">Ștergere</string>
     <string name="autofillDeleteLoginDialogTitle">Sigur vrei să ștergi aceste date de autentificare?</string>
+
+    <string name="autofillManagementUsernameCopied">Numele de utilizator a fost copiat</string>
+    <string name="autofillManagementPasswordCopied">Parolă copiată</string>
+
 </resources>
