@@ -18,4 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="biometric_prompt_title">Zablokowane dane logowania</string>
+    <string name="autofill_auth_text_for_using">Odblokuj urządzenie, aby użyć zapisanych loginów.</string>
+    <string name="autofill_auth_text_for_access">Odblokuj urządzenie, aby uzyskać dostęp do zapisanych danych logowania.</string>
 </resources>
