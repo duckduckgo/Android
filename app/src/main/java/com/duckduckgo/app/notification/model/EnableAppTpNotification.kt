@@ -24,6 +24,7 @@ import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEv
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.isNextLevelPrivacyNotificationEnabled
 import com.duckduckgo.app.statistics.isOneEasyStepForPrivacyNotificationEnabled
 import timber.log.Timber
 
@@ -40,6 +41,10 @@ class EnableAppTpNotification(
     override suspend fun canShow(): Boolean {
         if (notificationDao.exists(id)) {
             Timber.v("Notification already seen")
+            return false
+        }
+
+        if (!variantManager.isOneEasyStepForPrivacyNotificationEnabled() && !variantManager.isNextLevelPrivacyNotificationEnabled()) {
             return false
         }
 

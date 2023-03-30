@@ -43,9 +43,24 @@ class EnableAppTpNotificationTest {
     }
 
     @Test
-    fun whenNotificationNotSeenThenCanShowIsTrue() = runTest {
+    fun whenNotificationNotSeenAndOneEasyStepForPrivacyNotificationEnabledThenCanShowIsTrue() = runTest {
         whenever(mockNotificationsDao.exists(any())).thenReturn(false)
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zm" })
         assertTrue(testee.canShow())
+    }
+
+    @Test
+    fun whenNotificationNotSeenAndNextLevelPrivacyNotificationEnabledThenCanShowIsTrue() = runTest {
+        whenever(mockNotificationsDao.exists(any())).thenReturn(false)
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zn" })
+        assertTrue(testee.canShow())
+    }
+
+    @Test
+    fun whenNotificationNotSeenAndOtherEnabledThenCanShowIsFalse() = runTest {
+        whenever(mockNotificationsDao.exists(any())).thenReturn(false)
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "ze" })
+        assertFalse(testee.canShow())
     }
 
     @Test
