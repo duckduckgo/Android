@@ -110,8 +110,15 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
+    fun onTurnOffSyncCancelled() {
+        viewModelScope.launch {
+            viewState.emit(viewState.value.copy(isDeviceSyncEnabled = true))
+        }
+    }
+
     fun onDeleteAccountClicked() {
         viewModelScope.launch {
+            viewState.emit(viewState.value.copy(isDeviceSyncEnabled = false))
             command.send(AskDeleteAccount)
         }
     }
@@ -129,6 +136,12 @@ class SyncActivityViewModel @Inject constructor(
                     updateViewState()
                 }
             }
+        }
+    }
+
+    fun onDeleteAccountCancelled() {
+        viewModelScope.launch {
+            viewState.emit(viewState.value.copy(isDeviceSyncEnabled = true))
         }
     }
 }

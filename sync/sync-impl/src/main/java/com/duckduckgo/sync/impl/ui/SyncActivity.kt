@@ -107,8 +107,8 @@ class SyncActivity : DuckDuckGoActivity() {
                         viewModel.onDeleteAccountConfirmed()
                     }
 
-                    override fun onDialogDismissed() {
-                        super.onDialogDismissed()
+                    override fun onNegativeButtonClicked() {
+                        viewModel.onDeleteAccountCancelled()
                     }
                 },
             ).show()
@@ -126,8 +126,8 @@ class SyncActivity : DuckDuckGoActivity() {
                         viewModel.onTurnOffSyncConfirmed()
                     }
 
-                    override fun onDialogDismissed() {
-                        super.onDialogDismissed()
+                    override fun onNegativeButtonClicked() {
+                        viewModel.onTurnOffSyncCancelled()
                     }
                 },
             ).show()
