@@ -18,4 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="biometric_prompt_title">Conectări blocate</string>
+    <string name="autofill_auth_text_for_using">Deblochează dispozitivul pentru a utiliza datele de conectare salvate.</string>
+    <string name="autofill_auth_text_for_access">Deblochează dispozitivul pentru a accesa datele de conectare salvate.</string>
 </resources>
