@@ -589,6 +589,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Blokuoja el. pašto sekimo priemones ir slepia jūsų adresą</string>
     <string name="newEmailAliasMenuTitle">Sukurkite „Duck“ adresą</string>
 
+    <!-- Autofill -->
+    <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Peržiūrėti</string>
+    <string name="autofillLoginSavedSnackbarMessage">Prisijungimas išsaugotas</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Prisijungimas atnaujintas</string>
+    <string name="autofillDisableAutofillPromptTitle">Ar norite toliau įrašyti prisijungimus?</string>
+    <string name="autofillDisableAutofillPromptMessage">Tai galite bet kada išjungti nustatymuose.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Toliau įrašyti</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Išjungti</string>
+
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Ar norėtumėte, kad atsiųstume jums pranešimą, kai ateis jūsų eilė?</string>
     <string name="waitlistNotificationDialogNoThanks">Ne, dėkoju</string>
