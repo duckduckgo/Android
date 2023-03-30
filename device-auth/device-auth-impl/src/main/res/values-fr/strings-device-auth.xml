@@ -18,4 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="biometric_prompt_title">Identifiants verrouillés</string>
+    <string name="autofill_auth_text_for_using">Déverrouillez l\'appareil pour utiliser vos identifiants enregistrés.</string>
+    <string name="autofill_auth_text_for_access">Déverrouillez l\'appareil pour accéder aux identifiants enregistrés.</string>
 </resources>
