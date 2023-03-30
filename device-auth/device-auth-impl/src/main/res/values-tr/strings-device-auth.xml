@@ -18,4 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="biometric_prompt_title">Giriş Bilgileri Kilitli</string>
+    <string name="autofill_auth_text_for_using">Kayıtlı girişlerinizi kullanmak için cihazın kilidini açın.</string>
+    <string name="autofill_auth_text_for_access">Kayıtlı Giriş bilgilerine erişmek için cihazın kilidini açın.</string>
 </resources>
