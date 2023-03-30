@@ -44,6 +44,9 @@
     <string name="updateLoginDialogTitleUpdateUsername">Обновить имя пользователя?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Обновить имя пользователя</string>
 
+    <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Обновить пароль \n%1$s?</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo обновит логин, сохраненный на вашем устройстве.</string>
+
     <string name="autofillDialogCloseButtonContentDescription">Закрыть диалоговое окно автозаполнения</string>
 
     <string name="credentialManagementEditLoginTitleHint">Название логина</string>
@@ -74,4 +77,8 @@
     <string name="autofillDeleteLoginDialogCancel">Отменить</string>
     <string name="autofillDeleteLoginDialogDelete">Удалить</string>
     <string name="autofillDeleteLoginDialogTitle">Действительно удалить этот логин?</string>
+
+    <string name="autofillManagementUsernameCopied">Имя пользователя скопировано</string>
+    <string name="autofillManagementPasswordCopied">Пароль скопирован</string>
+
 </resources>
