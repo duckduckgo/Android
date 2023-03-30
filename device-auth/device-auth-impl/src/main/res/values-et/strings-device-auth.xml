@@ -18,4 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="biometric_prompt_title">Sisselogimine on lukustatud</string>
+    <string name="autofill_auth_text_for_using">Salvestatud sisselogimisandmete kasutamiseks ava seade.</string>
+    <string name="autofill_auth_text_for_access">Salvestatud sisselogimisandmetele juurde pääsemiseks ava seade.</string>
 </resources>
