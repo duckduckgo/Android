@@ -44,6 +44,9 @@
     <string name="updateLoginDialogTitleUpdateUsername">Aktualizovať meno používateľa?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Aktualizovať používateľské meno</string>
 
+    <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Aktualizovať heslo pre \n%1$s?</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo bude aktualizovať tieto uložené prihlasovacie údaje vo vašom zariadení.</string>
+
     <string name="autofillDialogCloseButtonContentDescription">Zavrieť dialógové okno automatického vypĺňania</string>
 
     <string name="credentialManagementEditLoginTitleHint">Prihlasovací názov</string>
@@ -74,4 +77,8 @@
     <string name="autofillDeleteLoginDialogCancel">Zrušiť</string>
     <string name="autofillDeleteLoginDialogDelete">Odstrániť</string>
     <string name="autofillDeleteLoginDialogTitle">Naozaj chcete odstrániť tieto prihlasovacie údaje?</string>
+
+    <string name="autofillManagementUsernameCopied">Meno používateľa bolo skopírované</string>
+    <string name="autofillManagementPasswordCopied">Heslo bolo skopírované</string>
+
 </resources>
