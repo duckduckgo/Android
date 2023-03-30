@@ -444,6 +444,20 @@ class AppSyncRepositoryTest {
         assertTrue(result is Result.Error)
     }
 
+    @Test
+    fun whenGetThisConnectedDeviceThenReturnExpectedDevice() {
+        givenAuthenticatedDevice()
+        whenever(syncStore.deviceId).thenReturn(deviceId)
+        whenever(syncStore.deviceName).thenReturn(deviceName)
+        whenever(syncDeviceIds.deviceType()).thenReturn(deviceType)
+
+        val result = syncRepo.getThisConnectedDevice()
+
+        assertEquals(deviceId, result.deviceId)
+        assertEquals(deviceName, result.deviceName)
+        assertEquals(deviceType, result.deviceType)
+    }
+
     private fun prepareForLoginSuccess() {
         prepareForEncryption()
         whenever(syncDeviceIds.deviceId()).thenReturn(deviceId)

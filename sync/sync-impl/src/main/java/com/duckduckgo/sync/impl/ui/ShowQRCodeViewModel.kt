@@ -24,11 +24,14 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.R
+import com.duckduckgo.sync.impl.Result.Error
+import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncRepository
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
-import javax.inject.Inject
+import com.duckduckgo.sync.impl.ui.ShowQRCodeViewModel.Command.LoginSucess
+import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
@@ -37,53 +40,67 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @ContributesViewModel(ActivityScope::class)
-class SyncActivityViewModel @Inject constructor(
+class ShowQRCodeViewModel @Inject constructor(
     private val qrEncoder: QREncoder,
     private val syncRepository: SyncRepository,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
-
     private val command = Channel<Command>(1, DROP_OLDEST)
     private val viewState = MutableStateFlow(ViewState())
-    fun viewState(): Flow<ViewState> = viewState.onStart { updateViewState() }
-    fun commands(): Flow<Command> = command.receiveAsFlow()
 
-    data class ViewState(
-        val isDeviceSyncEnabled: Boolean = false,
-        val showAccount: Boolean = false,
-        val loginQRCode: Bitmap? = null,
-    )
-
-    sealed class Command {
-        object LaunchDeviceSetupFlow : Command()
+    fun viewState(): Flow<ViewState> = viewState.onStart {
+        pollConnectionKeys()
     }
 
-    fun getSyncState() {
-        viewModelScope.launch {
-            updateViewState()
-        }
-    }
-
-    fun onToggleClicked(isChecked: Boolean) {
-        viewModelScope.launch {
-            viewState.emit(viewState.value.copy(isDeviceSyncEnabled = isChecked))
-            if (isChecked) {
-                command.send(LaunchDeviceSetupFlow)
+    private fun pollConnectionKeys() {
+        viewModelScope.launch(dispatchers.io()) {
+            showQRCode()
+            var polling = true
+            while (polling) {
+                delay(POLLING_INTERVAL)
+                when (syncRepository.pollConnectionKeys()) {
+                    is Success -> {
+                        command.send(LoginSucess)
+                        polling = false
+                    }
+                    else -> {
+                        // noop - keep polling
+                    }
+                }
             }
         }
     }
 
-    private suspend fun updateViewState() {
-        val qrBitmap = withContext(dispatchers.io()) {
-            val recoveryCode = syncRepository.getRecoveryCode() ?: return@withContext null
-            qrEncoder.encodeAsBitmap(recoveryCode, R.dimen.qrSizeLarge, R.dimen.qrSizeLarge)
+    fun commands(): Flow<Command> = command.receiveAsFlow()
+
+    data class ViewState(
+        val qrCodeBitmap: Bitmap? = null,
+    )
+
+    sealed class Command {
+        object LoginSucess : Command()
+        object Error : Command()
+    }
+
+    private suspend fun showQRCode() {
+        when (val result = syncRepository.getConnectQR()) {
+            is Error -> {
+                command.send(Command.Error)
+            }
+            is Success -> {
+                val qrBitmap = withContext(dispatchers.io()) {
+                    qrEncoder.encodeAsBitmap(result.data, R.dimen.qrSizeXLarge, R.dimen.qrSizeXLarge)
+                }
+                viewState.emit(
+                    viewState.value.copy(
+                        qrCodeBitmap = qrBitmap,
+                    ),
+                )
+            }
         }
-        viewState.emit(
-            viewState.value.copy(
-                isDeviceSyncEnabled = syncRepository.isSignedIn(),
-                showAccount = syncRepository.isSignedIn(),
-                loginQRCode = qrBitmap,
-            ),
-        )
+    }
+
+    companion object {
+        const val POLLING_INTERVAL = 5000L
     }
 }

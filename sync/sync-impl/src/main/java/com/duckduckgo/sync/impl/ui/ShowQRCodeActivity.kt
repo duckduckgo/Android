@@ -19,8 +19,6 @@ package com.duckduckgo.sync.impl.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.CompoundButton
-import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -29,38 +27,23 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import com.duckduckgo.sync.impl.databinding.ActivitySyncBinding
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity
+import com.duckduckgo.sync.impl.databinding.ActivityShowQrCodeBinding
+import com.duckduckgo.sync.impl.ui.ShowQRCodeViewModel.Command.Error
+import com.duckduckgo.sync.impl.ui.ShowQRCodeViewModel.Command.LoginSucess
+import com.duckduckgo.sync.impl.ui.ShowQRCodeViewModel.ViewState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
-class SyncActivity : DuckDuckGoActivity() {
-    private val binding: ActivitySyncBinding by viewBinding()
-    private val viewModel: SyncActivityViewModel by bindViewModel()
-
-    private val deviceSyncStatusToggleListener: OnCheckedChangeListener = object : OnCheckedChangeListener {
-        override fun onCheckedChanged(
-            buttonView: CompoundButton?,
-            isChecked: Boolean,
-        ) {
-            viewModel.onToggleClicked(isChecked)
-        }
-    }
+class ShowQRCodeActivity : DuckDuckGoActivity() {
+    private val binding: ActivityShowQrCodeBinding by viewBinding()
+    private val viewModel: ShowQRCodeViewModel by bindViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
         observeUiEvents()
-    }
-
-    override fun onStart() {
-        super.onStart()
-        viewModel.getSyncState()
     }
 
     private fun observeUiEvents() {
@@ -77,27 +60,30 @@ class SyncActivity : DuckDuckGoActivity() {
             .launchIn(lifecycleScope)
     }
 
-    private fun processCommand(it: Command) {
-        when (it) {
-            LaunchDeviceSetupFlow -> {
-                startActivity(SetupAccountActivity.intentStartSetupFlow(this))
-            }
+    private fun renderViewState(viewState: ViewState) {
+        viewState.qrCodeBitmap?.let {
+            binding.qrCodeImageView.show()
+            binding.qrCodeImageView.setImageBitmap(it)
         }
     }
 
-    private fun renderViewState(viewState: ViewState) {
-        binding.deviceSyncStatusToggle.quietlySetIsChecked(viewState.isDeviceSyncEnabled, deviceSyncStatusToggleListener)
-        binding.viewSwitcher.displayedChild = if (viewState.showAccount) 1 else 0
+    private fun processCommand(command: ShowQRCodeViewModel.Command) {
+        when (command) {
+            Error -> {
+                setResult(RESULT_CANCELED)
+                finish()
+            }
 
-        if (viewState.loginQRCode != null) {
-            binding.qrCodeImageView.show()
-            binding.qrCodeImageView.setImageBitmap(viewState.loginQRCode)
+            LoginSucess -> {
+                setResult(RESULT_OK)
+                finish()
+            }
         }
     }
 
     companion object {
         fun intent(context: Context): Intent {
-            return Intent(context, SyncActivity::class.java)
+            return Intent(context, ShowQRCodeActivity::class.java)
         }
     }
 }

@@ -14,19 +14,21 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.impl.ui
+package com.duckduckgo.sync.impl.ui.setup
 
-import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.sync.impl.QREncoder
-import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.SyncRepository
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
-import javax.inject.Inject
+import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.Command.AbortFlow
+import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.Command.AskSyncAnotherDevice
+import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.Command.FinishSetupFlow
+import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.Command.RecoverSyncData
+import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.Command.SyncAnotherDevice
+import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.ViewMode.SyncAnotherDeviceScreen
+import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -34,56 +36,66 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @ContributesViewModel(ActivityScope::class)
-class SyncActivityViewModel @Inject constructor(
-    private val qrEncoder: QREncoder,
+class SyncSetupFlowViewModel @Inject constructor(
     private val syncRepository: SyncRepository,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
     private val viewState = MutableStateFlow(ViewState())
-    fun viewState(): Flow<ViewState> = viewState.onStart { updateViewState() }
+
+    fun viewState(viewMode: ViewMode): Flow<ViewState> = viewState.onStart {
+        viewState.emit(ViewState(viewMode = viewMode))
+    }
+
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
     data class ViewState(
-        val isDeviceSyncEnabled: Boolean = false,
-        val showAccount: Boolean = false,
-        val loginQRCode: Bitmap? = null,
+        val viewMode: ViewMode = SyncAnotherDeviceScreen,
     )
 
+    sealed class ViewMode {
+        object SyncAnotherDeviceScreen : ViewMode()
+        object InitialSetupScreen : ViewMode()
+    }
+
     sealed class Command {
-        object LaunchDeviceSetupFlow : Command()
+        object AskSyncAnotherDevice : Command()
+        object RecoverSyncData : Command()
+        object SyncAnotherDevice : Command()
+        object FinishSetupFlow : Command()
+        object AbortFlow : Command()
     }
 
-    fun getSyncState() {
+    fun onTurnOnSyncClicked() {
         viewModelScope.launch {
-            updateViewState()
+            command.send(AskSyncAnotherDevice)
         }
     }
 
-    fun onToggleClicked(isChecked: Boolean) {
+    fun onRecoverYourSyncDataClicked() {
         viewModelScope.launch {
-            viewState.emit(viewState.value.copy(isDeviceSyncEnabled = isChecked))
-            if (isChecked) {
-                command.send(LaunchDeviceSetupFlow)
-            }
+            command.send(RecoverSyncData)
         }
     }
 
-    private suspend fun updateViewState() {
-        val qrBitmap = withContext(dispatchers.io()) {
-            val recoveryCode = syncRepository.getRecoveryCode() ?: return@withContext null
-            qrEncoder.encodeAsBitmap(recoveryCode, R.dimen.qrSizeLarge, R.dimen.qrSizeLarge)
+    fun onSyncAnotherDeviceClicked() {
+        viewModelScope.launch {
+            command.send(SyncAnotherDevice)
         }
-        viewState.emit(
-            viewState.value.copy(
-                isDeviceSyncEnabled = syncRepository.isSignedIn(),
-                showAccount = syncRepository.isSignedIn(),
-                loginQRCode = qrBitmap,
-            ),
-        )
+    }
+
+    fun onNotNowClicked() {
+        viewModelScope.launch {
+            command.send(FinishSetupFlow)
+        }
+    }
+
+    fun onCloseClicked() {
+        viewModelScope.launch {
+            command.send(AbortFlow)
+        }
     }
 }
