@@ -287,6 +287,12 @@
     <!-- Notification Channel Names -->
     <string name="notificationChannelTutorials">Útmutatók</string>
 
+    <!-- AppTP Retention Experiment Notifications-->
+    <string name="enableAppTpNotificationEasyStepTitle">Egyetlen egyszerű lépés az alkalmazások adatvédelméért</string>
+    <string name="enableAppTpNotificationEasyStepDescription">Engedélyezd az App Tracking Protectiont az alkalmazásokba rejtett nyomkövetők blokkolásához, még akkor is, amikor nem használod a telefont.</string>
+    <string name="enableAppTpNotificationNextLevelTitle">Magasabb szintű adatvédelem</string>
+    <string name="enableAppTpNotificationNextLevelDescription">Engedélyezd az App Tracking Protectiont az alkalmazásokba rejtett nyomkövetők blokkolásához, még akkor is, amikor nem használod a telefont.</string>
+
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Adattörlés manuálisra állítva</string>
     <string name="clearNotificationDescription">A DuckDuckGo testreszabása a böngészési adatok automatikus törlésére minden munkamenet után.</string>
@@ -408,6 +414,11 @@
     <string name="hideTipsTitle">Elrejted a többi tippet?</string>
     <string name="hideTipsText">Csak néhány van, és megpróbáltuk őket informatívvá tenni.</string>
     <string name="hideTipsButton">Tippek elrejtése örökre</string>
+
+    <!-- AppTP Retention Experiment Dax Dialog -->
+    <string name="daxDialogAppTpRetentionText"><![CDATA[Mostantól a teljes weben blokkolod a nyomkövetőket 🎉<br/><br/>A többi alkalmazásba rejtett nyomkövetőket is blokkolhatom, még akkor is, amikor nem használod a telefont.]]></string>
+    <string name="daxDialogAppTpRetentionPrimaryButtonText">App Tracking Protection bekapcsolása</string>
+    <string name="daxDialogAppTpRetentionSecondaryButtonText">Most nem</string>
 
     <!-- New Onboarding Experience -->
     <string name="onboardingWelcomeTitle">"Üdvözlünk a DuckDuckGo-ban!"</string>
