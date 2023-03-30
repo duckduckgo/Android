@@ -512,8 +512,8 @@
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Nikoli</string>
     <string name="disableLoginDetectionDialogTitle">Onemogoči opomnik o požarni zaščiti pri prijavi na spletna mesta?</string>
     <string name="disableLoginDetectionDialogDescription">To nastavitev lahko kadar koli spremenite v možnosti Nastavitve.</string>
-    <string name="disableLoginDetectionDialogPositive">ONEMOGOČI</string>
-    <string name="disableLoginDetectionDialogNegative">PREKLIČI</string>
+    <string name="disableLoginDetectionDialogPositive">Onemogoči</string>
+    <string name="disableLoginDetectionDialogNegative">Preklic</string>
     <string name="automaticFireproofWebsiteLoginDialogTitle">Želite spletne strani samodejno požarno zaščititi pri prijavi?</string>
     <string name="automaticFireproofWebsiteLoginDialogDescription">S požarno zaščito spletnih mest boste po uporabi gumba Fire ostali prijavljeni. To lahko pozneje kadar koli spremenite v nastavitvah. </string>
     <string name="automaticFireproofWebsiteLoginDialogFirstOption">Vedno požarno zaščiti</string>

@@ -510,8 +510,8 @@
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Niciodată</string>
     <string name="disableLoginDetectionDialogTitle">Dezactivezi dialogul de confirmare pentru ștergerea activității și istoricului la conectarea la site-uri?</string>
     <string name="disableLoginDetectionDialogDescription">Poți modifica oricând această preferință în Setări.</string>
-    <string name="disableLoginDetectionDialogPositive">DEZACTIVARE</string>
-    <string name="disableLoginDetectionDialogNegative">ANULARE</string>
+    <string name="disableLoginDetectionDialogPositive">Dezactivează</string>
+    <string name="disableLoginDetectionDialogNegative">Anulează</string>
     <string name="automaticFireproofWebsiteLoginDialogTitle">Ignifughezi automat site-urile la autentificare?</string>
     <string name="automaticFireproofWebsiteLoginDialogDescription">Ignifugarea site-urilor te va menține autentificat și după ce ai utilizat butonul Foc. Poți să modifici ulterior acest lucru din Setări. </string>
     <string name="automaticFireproofWebsiteLoginDialogFirstOption">Ignifughează întotdeauna</string>

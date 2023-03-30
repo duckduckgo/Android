@@ -508,8 +508,8 @@
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Никога</string>
     <string name="disableLoginDetectionDialogTitle">Да се деактивира ли напомняне за огнеустойчивост при вход в сайтове?</string>
     <string name="disableLoginDetectionDialogDescription">Можете да промените това предпочитание по всяко време в настройките.</string>
-    <string name="disableLoginDetectionDialogPositive">ЗАБРАНИ</string>
-    <string name="disableLoginDetectionDialogNegative">ОТМЕНИ</string>
+    <string name="disableLoginDetectionDialogPositive">Забрани</string>
+    <string name="disableLoginDetectionDialogNegative">Отмени</string>
     <string name="automaticFireproofWebsiteLoginDialogTitle">Да се правят ли уебсайтовете огнеустойчиви автоматично при влизане?</string>
     <string name="automaticFireproofWebsiteLoginDialogDescription">Ако направите сайтовете огнеустойчиви, ще останете вписани, след като използвате огнения бутон. Можете винаги да промените това по-късно в Настройки. </string>
     <string name="automaticFireproofWebsiteLoginDialogFirstOption">Винаги прави огнеустойчиви</string>

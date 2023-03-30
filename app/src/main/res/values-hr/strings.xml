@@ -512,8 +512,8 @@
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Nikada</string>
     <string name="disableLoginDetectionDialogTitle">Onemogućiti podsjetnik za označavanje sigurnog web-mjesta prilikom prijave?</string>
     <string name="disableLoginDetectionDialogDescription">Ovu postavku možete promijeniti bilo kada u Postavkama.</string>
-    <string name="disableLoginDetectionDialogPositive">ONEMOGUĆI</string>
-    <string name="disableLoginDetectionDialogNegative">ODUSTANI</string>
+    <string name="disableLoginDetectionDialogPositive">Onemogući</string>
+    <string name="disableLoginDetectionDialogNegative">Odustani</string>
     <string name="automaticFireproofWebsiteLoginDialogTitle">Zaštititi web-mjesta automatski prilikom prijave?</string>
     <string name="automaticFireproofWebsiteLoginDialogDescription">Postavljanjem zaštite za ovo web-mjesto i dalje ćete ostati prijavljeni nakon korištenja gumba Fire. To uvijek možete kasnije promijeniti u Postavkama. </string>
     <string name="automaticFireproofWebsiteLoginDialogFirstOption">Uvijek zaštiti</string>

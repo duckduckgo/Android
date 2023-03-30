@@ -508,8 +508,8 @@
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Nunca</string>
     <string name="disableLoginDetectionDialogTitle">¿Deshabilitar recordatorio de a prueba de fuego al iniciar sesión en los sitios?</string>
     <string name="disableLoginDetectionDialogDescription">Puedes cambiar esta preferencia en cualquier momento en Ajustes.</string>
-    <string name="disableLoginDetectionDialogPositive">DESHABILITAR</string>
-    <string name="disableLoginDetectionDialogNegative">CANCELAR</string>
+    <string name="disableLoginDetectionDialogPositive">Deshabilitar</string>
+    <string name="disableLoginDetectionDialogNegative">Cancelar</string>
     <string name="automaticFireproofWebsiteLoginDialogTitle">¿Marcar los sitios web como a prueba de fuego automáticamente al iniciar sesión?</string>
     <string name="automaticFireproofWebsiteLoginDialogDescription">Marcar estos sitios como a prueba de fuego hará que la sesión se mantenga iniciada después de usar el botón Fuego. Siempre puedes cambiar esto más tarde en Ajustes. </string>
     <string name="automaticFireproofWebsiteLoginDialogFirstOption">Marcar siempre como a prueba de fuego</string>

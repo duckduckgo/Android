@@ -508,8 +508,8 @@
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Nooit</string>
     <string name="disableLoginDetectionDialogTitle">Herinnering voor brandveiligheid uitschakelen bij het inloggen?</string>
     <string name="disableLoginDetectionDialogDescription">Je kunt deze voorkeur op elk moment wijzigen in de instellingen.</string>
-    <string name="disableLoginDetectionDialogPositive">UITSCHAKELEN</string>
-    <string name="disableLoginDetectionDialogNegative">ANNULEREN</string>
+    <string name="disableLoginDetectionDialogPositive">Uitschakelen</string>
+    <string name="disableLoginDetectionDialogNegative">Annuleren</string>
     <string name="automaticFireproofWebsiteLoginDialogTitle">Websites automatisch brandvrij maken bij aanmelden?</string>
     <string name="automaticFireproofWebsiteLoginDialogDescription">Als je deze website brandveilig maakt, blijf je ook na het gebruiken van de vuurknop ingelogd. Je kunt dit later altijd nog wijzigen in Instellingen. </string>
     <string name="automaticFireproofWebsiteLoginDialogFirstOption">Altijd vuurbestendig</string>

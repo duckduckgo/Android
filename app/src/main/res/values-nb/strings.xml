@@ -508,8 +508,8 @@
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Aldri</string>
     <string name="disableLoginDetectionDialogTitle">Vil du deaktivere påminnelser om brannsikring når du logger inn på nettsteder?</string>
     <string name="disableLoginDetectionDialogDescription">Du kan når som helst endre dette under Innstillinger.</string>
-    <string name="disableLoginDetectionDialogPositive">DEAKTIVER</string>
-    <string name="disableLoginDetectionDialogNegative">AVBRYT</string>
+    <string name="disableLoginDetectionDialogPositive">Slå av</string>
+    <string name="disableLoginDetectionDialogNegative">Avbryt</string>
     <string name="automaticFireproofWebsiteLoginDialogTitle">Vil du brannsikre nettsteder automatisk ved pålogging?</string>
     <string name="automaticFireproofWebsiteLoginDialogDescription">Med brannsikrede nettsteder er du fortsatt pålogget etter å ha brukt brannknappen. Du kan når som helst endre dette senere i innstillingene. </string>
     <string name="automaticFireproofWebsiteLoginDialogFirstOption">Alltid brannsikre</string>

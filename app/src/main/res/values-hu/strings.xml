@@ -508,8 +508,8 @@
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Soha</string>
     <string name="disableLoginDetectionDialogTitle">Letiltod a tűzálló emlékeztetőt a weboldalakra történő bejelentkezéskor?</string>
     <string name="disableLoginDetectionDialogDescription">Ezt a beállítást bármikor megváltoztathatod a Beállításokban.</string>
-    <string name="disableLoginDetectionDialogPositive">LETILT</string>
-    <string name="disableLoginDetectionDialogNegative">MÉGSEM</string>
+    <string name="disableLoginDetectionDialogPositive">Letiltás</string>
+    <string name="disableLoginDetectionDialogNegative">Mégse</string>
     <string name="automaticFireproofWebsiteLoginDialogTitle">Bejelentkezéskor automatikusan legyenek tűzállók a weboldalak?</string>
     <string name="automaticFireproofWebsiteLoginDialogDescription">Ha tűzállóvá teszel egy weboldalt, a Fire gomb használata után is bejelentkezve maradsz. Ezt a beállításokban később bármikor módosíthatod. </string>
     <string name="automaticFireproofWebsiteLoginDialogFirstOption">Mindig tűzálló</string>

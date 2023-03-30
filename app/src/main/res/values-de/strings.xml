@@ -508,8 +508,8 @@
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Nie</string>
     <string name="disableLoginDetectionDialogTitle">Erinnerung zur Feuerfest-Einstellung bei der Anmeldung auf Websites deaktivieren?</string>
     <string name="disableLoginDetectionDialogDescription">Diese Auswahl kann in den Einstellungen jederzeit rückgängig gemacht werden.</string>
-    <string name="disableLoginDetectionDialogPositive">DEAKTIVIEREN</string>
-    <string name="disableLoginDetectionDialogNegative">ABBRECHEN</string>
+    <string name="disableLoginDetectionDialogPositive">Deaktivieren</string>
+    <string name="disableLoginDetectionDialogNegative">Abbrechen</string>
     <string name="automaticFireproofWebsiteLoginDialogTitle">Websites bei der Anmeldung automatisch feuerfest machen?</string>
     <string name="automaticFireproofWebsiteLoginDialogDescription">Wenn du Websites feuerfest machst, bleibst du nach Verwendung der Schaltfläche „Feuer“ angemeldet. Du kannst dies jederzeit in den Einstellungen ändern. </string>
     <string name="automaticFireproofWebsiteLoginDialogFirstOption">Immer feuerfest machen</string>

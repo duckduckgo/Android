@@ -508,8 +508,8 @@
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Ei koskaan</string>
     <string name="disableLoginDetectionDialogTitle">Poistetaanko palonkestävyyden muistutus käytöstä sivustoille kirjauduttaessa?</string>
     <string name="disableLoginDetectionDialogDescription">Voit muuttaa valintaa milloin tahansa asetuksista.</string>
-    <string name="disableLoginDetectionDialogPositive">POISTA KÄYTÖSTÄ</string>
-    <string name="disableLoginDetectionDialogNegative">PERUUTA</string>
+    <string name="disableLoginDetectionDialogPositive">Poista käytöstä</string>
+    <string name="disableLoginDetectionDialogNegative">Peruuta</string>
     <string name="automaticFireproofWebsiteLoginDialogTitle">Tehdäänkö sivustoista palonkestäviä kirjautumisen yhteydessä?</string>
     <string name="automaticFireproofWebsiteLoginDialogDescription">Sivustojen tekeminen palonkestäviksi tarkoittaa, että pysyt kirjautuneena, kun käytät Liekki-painiketta. Voit muuttaa tätä asetusta milloin tahansa asetuksissa. </string>
     <string name="automaticFireproofWebsiteLoginDialogFirstOption">Tee aina palonkestäväksi</string>
