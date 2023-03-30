@@ -44,6 +44,9 @@
     <string name="updateLoginDialogTitleUpdateUsername">Päivitetäänkö käyttäjätunnus?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Päivitä käyttäjätunnus</string>
 
+    <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Päivitä käyttäjän \n%1$s salasana?</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo päivittää tämän laitteellesi tallennetun kirjautumistiedon.</string>
+
     <string name="autofillDialogCloseButtonContentDescription">Sulje automaattisen täytön valintaikkuna</string>
 
     <string name="credentialManagementEditLoginTitleHint">Kirjautumistietojen otsikko</string>
@@ -74,4 +77,8 @@
     <string name="autofillDeleteLoginDialogCancel">Peruuta</string>
     <string name="autofillDeleteLoginDialogDelete">Poista</string>
     <string name="autofillDeleteLoginDialogTitle">Haluatko varmasti poistaa nämä kirjautumistiedot?</string>
+
+    <string name="autofillManagementUsernameCopied">Käyttäjätunnus kopioitu</string>
+    <string name="autofillManagementPasswordCopied">Salasana kopioitu</string>
+
 </resources>
