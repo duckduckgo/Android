@@ -44,4 +44,15 @@
     <string name="syncSettingsEntry">Sync</string>
     <string name="syncSettingsDisabled">Off</string>
     <string name="syncSettingsEnabled">On</string>
+
+    <!-- AppTP Retention Experiment Notifications-->
+    <string name="enableAppTpNotificationEasyStepTitle">One easy step for app privacy</string>
+    <string name="enableAppTpNotificationEasyStepDescription">Enable App Tracking Protection to block trackers hiding in apps, even when you aren’t using your phone.</string>
+    <string name="enableAppTpNotificationNextLevelTitle">Take your privacy to the next level</string>
+    <string name="enableAppTpNotificationNextLevelDescription">Enable App Tracking Protection to block trackers hiding in apps, even when you aren’t using your phone.</string>
+
+    <!-- AppTP Retention Experiment Dax Dialog -->
+    <string name="daxDialogAppTpRetentionText"><![CDATA[You\'re now blocking trackers across the web 🎉<br/><br/>I can also block trackers hiding in your other apps, even when you aren\'t using your phone.]]></string>
+    <string name="daxDialogAppTpRetentionPrimaryButtonText">Enable App Tracking Protection</string>
+    <string name="daxDialogAppTpRetentionSecondaryButtonText">Not Now</string>
 </resources>
