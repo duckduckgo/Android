@@ -279,7 +279,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         NetworkProtectionAlwaysOnDialogFragment.newPromotionDialog(
             object : NetworkProtectionAlwaysOnDialogFragment.Listener {
                 override fun onGoToSettingsClicked() {
-                    viewModel.onAlwaysOnOpenSettingsClicked()
+                    viewModel.onOpenSettingsFromAlwaysOnPromotionClicked()
                 }
 
                 override fun onCanceled() {}
@@ -293,7 +293,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         NetworkProtectionAlwaysOnDialogFragment.newLockdownDialog(
             object : NetworkProtectionAlwaysOnDialogFragment.Listener {
                 override fun onGoToSettingsClicked() {
-                    viewModel.onAlwaysOnOpenSettingsClicked()
+                    viewModel.onOpenSettingsFromAlwaysOnLockdownClicked()
                 }
 
                 override fun onCanceled() {}

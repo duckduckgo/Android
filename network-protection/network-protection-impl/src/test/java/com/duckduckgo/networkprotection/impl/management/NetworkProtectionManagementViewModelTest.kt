@@ -45,6 +45,7 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Connecting
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Disconnected
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ViewState
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ReconnectStatus.NotReconnecting
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ReconnectStatus.Reconnecting
@@ -83,6 +84,9 @@ class NetworkProtectionManagementViewModelTest {
 
     @Mock
     private lateinit var externalVpnDetector: ExternalVpnDetector
+
+    @Mock
+    private lateinit var networkProtectionPixels: NetworkProtectionPixels
     private lateinit var testee: NetworkProtectionManagementViewModel
 
     @Before
@@ -96,6 +100,7 @@ class NetworkProtectionManagementViewModelTest {
             coroutineRule.testDispatcherProvider,
             reconnectNotifications,
             externalVpnDetector,
+            networkProtectionPixels,
         )
     }
 
@@ -129,6 +134,7 @@ class NetworkProtectionManagementViewModelTest {
         testee.commands().test {
             testee.onNetpToggleClicked(true)
             assertEquals(ShowVpnConflictDialog, this.awaitItem())
+            verify(networkProtectionPixels).reportVpnConflictDialogShown()
         }
     }
 
@@ -151,6 +157,7 @@ class NetworkProtectionManagementViewModelTest {
             assertEquals(RequestVPNPermission(intent), this.awaitItem())
             assertEquals(ResetToggle, this.awaitItem())
             assertEquals(ShowVpnAlwaysOnConflictDialog, this.awaitItem())
+            verify(networkProtectionPixels).reportAlwaysOnConflictDialogShown()
         }
     }
 
@@ -298,6 +305,7 @@ class NetworkProtectionManagementViewModelTest {
             coroutineRule.testDispatcherProvider,
             reconnectNotifications,
             externalVpnDetector,
+            networkProtectionPixels,
         )
 
         whenever(vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(
@@ -332,6 +340,7 @@ class NetworkProtectionManagementViewModelTest {
             coroutineRule.testDispatcherProvider,
             reconnectNotifications,
             externalVpnDetector,
+            networkProtectionPixels,
         )
 
         whenever(vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(
@@ -366,6 +375,7 @@ class NetworkProtectionManagementViewModelTest {
             coroutineRule.testDispatcherProvider,
             reconnectNotifications,
             externalVpnDetector,
+            networkProtectionPixels,
         )
 
         whenever(vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(
@@ -431,10 +441,20 @@ class NetworkProtectionManagementViewModelTest {
     }
 
     @Test
-    fun whenOnAlwaysOnOpenSettingsClickedThenEmitOpenVPNSettingsCommand() = runTest {
+    fun whenOnAlwaysOnOpenSettingsClickedFromPromotionThenEmitOpenVPNSettingsCommandAndEmitPixels() = runTest {
         testee.commands().test {
-            testee.onAlwaysOnOpenSettingsClicked()
+            testee.onOpenSettingsFromAlwaysOnPromotionClicked()
             assertEquals(OpenVPNSettings, this.awaitItem())
+            verify(networkProtectionPixels).reportOpenSettingsFromAlwaysOnPromotion()
+        }
+    }
+
+    @Test
+    fun whenOnAlwaysOnOpenSettingsClickedFromLockdownThenEmitOpenVPNSettingsCommandAndEmitPixels() = runTest {
+        testee.commands().test {
+            testee.onOpenSettingsFromAlwaysOnLockdownClicked()
+            assertEquals(OpenVPNSettings, this.awaitItem())
+            verify(networkProtectionPixels).reportOpenSettingsFromAlwaysOnLockdown()
         }
     }
 
@@ -446,6 +466,7 @@ class NetworkProtectionManagementViewModelTest {
         testee.commands().test {
             testee.onStartVpn()
             assertEquals(ShowAlwaysOnPromotionDialog, this.expectMostRecentItem())
+            verify(networkProtectionPixels).reportAlwaysOnPromotionDialogShown()
         }
     }
 
@@ -485,6 +506,7 @@ class NetworkProtectionManagementViewModelTest {
         testee.commands().test {
             testee.onCreate(mock())
             assertEquals(ShowAlwaysOnLockdownDialog, this.awaitItem())
+            verify(networkProtectionPixels).reportAlwaysOnLockdownDialogShown()
         }
     }
 

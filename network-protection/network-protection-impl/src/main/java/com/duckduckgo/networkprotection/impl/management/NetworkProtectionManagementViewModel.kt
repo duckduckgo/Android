@@ -47,6 +47,7 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Connecting
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Disconnected
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Unknown
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ReconnectStatus
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ReconnectStatus.NotReconnecting
@@ -69,6 +70,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val reconnectNotifications: NetPReconnectNotifications,
     private val externalVpnDetector: ExternalVpnDetector,
+    private val networkProtectionPixels: NetworkProtectionPixels,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private var reconnectStateFlow = MutableStateFlow(networkProtectionRepository.reconnectStatus)
@@ -215,6 +217,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     fun onNetpToggleClicked(enabled: Boolean) {
         if (enabled) {
             if (externalVpnDetector.isExternalVpnDetected()) {
+                networkProtectionPixels.reportVpnConflictDialogShown()
                 sendCommand(Command.ShowVpnConflictDialog)
             } else {
                 sendCommand(CheckVPNPermission)
@@ -227,6 +230,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     fun onVPNPermissionRejected(rejectTimeInMillis: Long) {
         sendCommand(Command.ResetToggle)
         if (rejectTimeInMillis - lastVpnRequestTime < 500) {
+            networkProtectionPixels.reportAlwaysOnConflictDialogShown()
             sendCommand(Command.ShowVpnAlwaysOnConflictDialog)
         }
         lastVpnRequestTime = -1L
@@ -245,7 +249,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     private fun tryShowAlwaysOnPromotion() {
         viewModelScope.launch(dispatcherProvider.io()) {
             if (shouldShowAlwaysOnPromotion()) {
-                // TODO send pixels
+                networkProtectionPixels.reportAlwaysOnPromotionDialogShown()
                 sendCommand(Command.ShowAlwaysOnPromotionDialog)
             }
         }
@@ -253,12 +257,18 @@ class NetworkProtectionManagementViewModel @Inject constructor(
 
     private fun handleAlwaysOnInitialState(alwaysOnState: VpnStateMonitor.AlwaysOnState) {
         if (alwaysOnState.enabled && alwaysOnState.lockedDown) {
+            networkProtectionPixels.reportAlwaysOnLockdownDialogShown()
             sendCommand(Command.ShowAlwaysOnLockdownDialog)
         }
     }
 
-    fun onAlwaysOnOpenSettingsClicked() {
-        // TODO (send pixels)
+    fun onOpenSettingsFromAlwaysOnPromotionClicked() {
+        networkProtectionPixels.reportOpenSettingsFromAlwaysOnPromotion()
+        sendCommand(OpenVPNSettings)
+    }
+
+    fun onOpenSettingsFromAlwaysOnLockdownClicked() {
+        networkProtectionPixels.reportOpenSettingsFromAlwaysOnLockdown()
         sendCommand(OpenVPNSettings)
     }
 

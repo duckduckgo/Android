@@ -125,4 +125,58 @@ class RealNetworkProtectionPixelTest {
         verify(pixel).fire("m_netp_ev_rekey_completed_d")
         verify(pixel, times(2)).fire("m_netp_ev_rekey_completed_c")
     }
+
+    @Test
+    fun whenReportVpnConflictDialogShownCalledTwiceThenFireDailyPixelOnce() {
+        testee.reportVpnConflictDialogShown()
+        testee.reportVpnConflictDialogShown()
+
+        verify(pixel).fire("m_netp_imp_vpn_conflict_dialog_d")
+        verify(pixel, times(2)).fire("m_netp_imp_vpn_conflict_dialog_c")
+    }
+
+    @Test
+    fun whenReportAlwaysOnConflictDialogShownCalledTwiceThenFireDailyPixelOnce() {
+        testee.reportAlwaysOnConflictDialogShown()
+        testee.reportAlwaysOnConflictDialogShown()
+
+        verify(pixel).fire("m_netp_imp_always_on_conflict_dialog_d")
+        verify(pixel, times(2)).fire("m_netp_imp_always_on_conflict_dialog_c")
+    }
+
+    @Test
+    fun whenReportAlwaysOnPromotionDialogShownCalledTwiceThenFireDailyPixelOnce() {
+        testee.reportAlwaysOnPromotionDialogShown()
+        testee.reportAlwaysOnPromotionDialogShown()
+
+        verify(pixel).fire("m_netp_imp_always_on_promotion_dialog_d")
+        verify(pixel, times(2)).fire("m_netp_imp_always_on_promotion_dialog_c")
+    }
+
+    @Test
+    fun whenReportAlwaysOnLockdownDialogShownCalledTwiceThenFireDailyPixelOnce() {
+        testee.reportAlwaysOnLockdownDialogShown()
+        testee.reportAlwaysOnLockdownDialogShown()
+
+        verify(pixel).fire("m_netp_imp_always_on_lockdown_dialog_d")
+        verify(pixel, times(2)).fire("m_netp_imp_always_on_lockdown_dialog_c")
+    }
+
+    @Test
+    fun whenReportOpenSettingsFromAlwaysOnPromotionCalledTwiceThenFireDailyPixelOnce() {
+        testee.reportOpenSettingsFromAlwaysOnPromotion()
+        testee.reportOpenSettingsFromAlwaysOnPromotion()
+
+        verify(pixel).fire("m_netp_ev_open_settings_from_always_on_promotion_dialog_d")
+        verify(pixel, times(2)).fire("m_netp_ev_open_settings_from_always_on_promotion_dialog_c")
+    }
+
+    @Test
+    fun whenReportOpenSettingsFromAlwaysOnLockdownCalledTwiceThenFireDailyPixelOnce() {
+        testee.reportOpenSettingsFromAlwaysOnLockdown()
+        testee.reportOpenSettingsFromAlwaysOnLockdown()
+
+        verify(pixel).fire("m_netp_ev_open_settings_from_always_on_lockdown_dialog_d")
+        verify(pixel, times(2)).fire("m_netp_ev_open_settings_from_always_on_lockdown_dialog_c")
+    }
 }

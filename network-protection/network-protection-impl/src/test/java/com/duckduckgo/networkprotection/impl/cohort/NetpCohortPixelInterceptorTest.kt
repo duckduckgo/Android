@@ -17,7 +17,8 @@
 package com.duckduckgo.networkprotection.impl.cohort
 
 import com.duckduckgo.app.global.api.FakeChain
-import org.junit.Assert
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
@@ -44,20 +45,32 @@ class NetpCohortPixelInterceptorTest {
 
         val result = testee.intercept(FakeChain(pixelUrl))
 
-        Assert.assertEquals("Dropped NetP pixel because no cohort is assigned", result.message)
-        Assert.assertNotEquals(null, result.body)
+        assertEquals("Dropped NetP pixel because no cohort is assigned", result.message)
+        assertNotEquals(null, result.body)
     }
 
     @Test
-    fun whenCohortLocalDateIsSetThenFireNetpPixelUrl() {
+    fun whenCohortLocalDateIsSetThenFireNetpEvPixelUrl() {
         whenever(netpCohortStore.cohortLocalDate).thenReturn(LocalDate.of(2023, 1, 1))
         val pixelUrl = String.format(PIXEL_TEMPLATE, "m_netp_ev_enabled_d")
 
         val result = testee.intercept(FakeChain(pixelUrl))
 
-        Assert.assertEquals(pixelUrl, result.request.url.toString())
-        Assert.assertEquals("", result.message)
-        Assert.assertEquals(null, result.body)
+        assertEquals(pixelUrl, result.request.url.toString())
+        assertEquals("", result.message)
+        assertEquals(null, result.body)
+    }
+
+    @Test
+    fun whenCohortLocalDateIsSetThenFireNetpImpPixelUrl() {
+        whenever(netpCohortStore.cohortLocalDate).thenReturn(LocalDate.of(2023, 1, 1))
+        val pixelUrl = String.format(PIXEL_TEMPLATE, "m_netp_imp_dialog_d")
+
+        val result = testee.intercept(FakeChain(pixelUrl))
+
+        assertEquals(pixelUrl, result.request.url.toString())
+        assertEquals("", result.message)
+        assertEquals(null, result.body)
     }
 
     @Test
@@ -67,9 +80,9 @@ class NetpCohortPixelInterceptorTest {
 
         val result = testee.intercept(FakeChain(pixelUrl))
 
-        Assert.assertEquals(pixelUrl, result.request.url.toString())
-        Assert.assertEquals("", result.message)
-        Assert.assertEquals(null, result.body)
+        assertEquals(pixelUrl, result.request.url.toString())
+        assertEquals("", result.message)
+        assertEquals(null, result.body)
     }
 
     @Test
@@ -79,9 +92,9 @@ class NetpCohortPixelInterceptorTest {
 
         val result = testee.intercept(FakeChain(pixelUrl))
 
-        Assert.assertEquals(pixelUrl, result.request.url.toString())
-        Assert.assertEquals("", result.message)
-        Assert.assertEquals(null, result.body)
+        assertEquals(pixelUrl, result.request.url.toString())
+        assertEquals("", result.message)
+        assertEquals(null, result.body)
     }
 
     @Test
@@ -91,9 +104,33 @@ class NetpCohortPixelInterceptorTest {
 
         val result = testee.intercept(FakeChain(pixelUrl))
 
-        Assert.assertEquals(pixelUrl, result.request.url.toString())
-        Assert.assertEquals("", result.message)
-        Assert.assertEquals(null, result.body)
+        assertEquals(pixelUrl, result.request.url.toString())
+        assertEquals("", result.message)
+        assertEquals(null, result.body)
+    }
+
+    @Test
+    fun whenCohortLocalDateIsNotSetThenSendExemptedVpnConflictPixelUrl() {
+        whenever(netpCohortStore.cohortLocalDate).thenReturn(null)
+        val pixelUrl = String.format(PIXEL_TEMPLATE, "m_netp_imp_vpn_conflict_dialog_c")
+
+        val result = testee.intercept(FakeChain(pixelUrl))
+
+        assertEquals(pixelUrl, result.request.url.toString())
+        assertEquals("", result.message)
+        assertEquals(null, result.body)
+    }
+
+    @Test
+    fun whenCohortLocalDateIsNotSetThenSendExemptedAlwaysOnConflictPixelUrl() {
+        whenever(netpCohortStore.cohortLocalDate).thenReturn(null)
+        val pixelUrl = String.format(PIXEL_TEMPLATE, "m_netp_imp_always_on_conflict_dialog_d")
+
+        val result = testee.intercept(FakeChain(pixelUrl))
+
+        assertEquals(pixelUrl, result.request.url.toString())
+        assertEquals("", result.message)
+        assertEquals(null, result.body)
     }
 
     companion object {

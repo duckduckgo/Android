@@ -68,10 +68,12 @@ class NetpCohortPixelInterceptor @Inject constructor(
 
     companion object {
         @VisibleForTesting
-        private const val PIXEL_PREFIX = "m_netp_ev"
+        private const val PIXEL_PREFIX = "m_netp"
         private val EXCEPTIONS = listOf(
             "m_netp_ev_backend_api_error",
             "m_netp_ev_wireguard_error",
+            "m_netp_imp_vpn_conflict_dialog",
+            "m_netp_imp_always_on_conflict_dialog",
         )
     }
 }

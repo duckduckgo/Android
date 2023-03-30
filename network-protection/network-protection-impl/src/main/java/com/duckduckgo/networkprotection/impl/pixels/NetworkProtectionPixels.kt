@@ -21,6 +21,16 @@ import androidx.core.content.edit
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_ALWAYSON_CONFLICT_SHOWN
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_ALWAYSON_CONFLICT_SHOWN_DAILY
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_ALWAYSON_LOCKDOWN_OPEN_SETTINGS
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_ALWAYSON_LOCKDOWN_OPEN_SETTINGS_DAILY
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_ALWAYSON_LOCKDOWN_SHOWN
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_ALWAYSON_LOCKDOWN_SHOWN_DAILY
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_ALWAYSON_PROMOTION_OPEN_SETTINGS
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_ALWAYSON_PROMOTION_OPEN_SETTINGS_DAILY
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_ALWAYSON_PROMOTION_SHOWN
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_ALWAYSON_PROMOTION_SHOWN_DAILY
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_BACKEND_API_ERROR_DEVICE_REGISTRATION_FAILED
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_BACKEND_API_ERROR_DEVICE_REGISTRATION_FAILED_DAILY
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_DISABLE_DAILY
@@ -28,6 +38,8 @@ import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_LATENCY_REPORT
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_REKEY_COMPLETED
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_REKEY_COMPLETED_DAILY
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_VPN_CONFLICT_SHOWN
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_VPN_CONFLICT_SHOWN_DAILY
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_VPN_CONNECTIVITY_LOST
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_VPN_CONNECTIVITY_LOST_DAILY
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_VPN_RECONNECT_FAILED
@@ -105,6 +117,48 @@ interface NetworkProtectionPixels {
      * count -> fire a pixel on every call
      */
     fun reportRekeyCompleted()
+
+    /**
+     * This fun will fire two pixels
+     * daily -> fire only once a day no matter how many times we call this fun
+     * count -> fire a pixel on every call
+     */
+    fun reportVpnConflictDialogShown()
+
+    /**
+     * This fun will fire two pixels
+     * daily -> fire only once a day no matter how many times we call this fun
+     * count -> fire a pixel on every call
+     */
+    fun reportAlwaysOnConflictDialogShown()
+
+    /**
+     * This fun will fire two pixels
+     * daily -> fire only once a day no matter how many times we call this fun
+     * count -> fire a pixel on every call
+     */
+    fun reportAlwaysOnPromotionDialogShown()
+
+    /**
+     * This fun will fire two pixels
+     * daily -> fire only once a day no matter how many times we call this fun
+     * count -> fire a pixel on every call
+     */
+    fun reportOpenSettingsFromAlwaysOnPromotion()
+
+    /**
+     * This fun will fire two pixels
+     * daily -> fire only once a day no matter how many times we call this fun
+     * count -> fire a pixel on every call
+     */
+    fun reportAlwaysOnLockdownDialogShown()
+
+    /**
+     * This fun will fire two pixels
+     * daily -> fire only once a day no matter how many times we call this fun
+     * count -> fire a pixel on every call
+     */
+    fun reportOpenSettingsFromAlwaysOnLockdown()
 }
 
 @ContributesBinding(AppScope::class)
@@ -162,6 +216,36 @@ class RealNetworkProtectionPixel @Inject constructor(
     override fun reportRekeyCompleted() {
         tryToFireDailyPixel(NETP_REKEY_COMPLETED_DAILY)
         firePixel(NETP_REKEY_COMPLETED)
+    }
+
+    override fun reportVpnConflictDialogShown() {
+        tryToFireDailyPixel(NETP_VPN_CONFLICT_SHOWN_DAILY)
+        firePixel(NETP_VPN_CONFLICT_SHOWN)
+    }
+
+    override fun reportAlwaysOnConflictDialogShown() {
+        tryToFireDailyPixel(NETP_ALWAYSON_CONFLICT_SHOWN_DAILY)
+        firePixel(NETP_ALWAYSON_CONFLICT_SHOWN)
+    }
+
+    override fun reportAlwaysOnPromotionDialogShown() {
+        tryToFireDailyPixel(NETP_ALWAYSON_PROMOTION_SHOWN_DAILY)
+        firePixel(NETP_ALWAYSON_PROMOTION_SHOWN)
+    }
+
+    override fun reportOpenSettingsFromAlwaysOnPromotion() {
+        tryToFireDailyPixel(NETP_ALWAYSON_PROMOTION_OPEN_SETTINGS_DAILY)
+        firePixel(NETP_ALWAYSON_PROMOTION_OPEN_SETTINGS)
+    }
+
+    override fun reportAlwaysOnLockdownDialogShown() {
+        tryToFireDailyPixel(NETP_ALWAYSON_LOCKDOWN_SHOWN_DAILY)
+        firePixel(NETP_ALWAYSON_LOCKDOWN_SHOWN)
+    }
+
+    override fun reportOpenSettingsFromAlwaysOnLockdown() {
+        tryToFireDailyPixel(NETP_ALWAYSON_LOCKDOWN_OPEN_SETTINGS_DAILY)
+        firePixel(NETP_ALWAYSON_LOCKDOWN_OPEN_SETTINGS)
     }
 
     private fun firePixel(
