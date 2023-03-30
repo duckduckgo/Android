@@ -15,5 +15,5 @@
   -->
 
 <resources>
-    <bool name="portrait_only">true</bool>
+    <bool name="onboarding_force_portrait">true</bool>
 </resources>

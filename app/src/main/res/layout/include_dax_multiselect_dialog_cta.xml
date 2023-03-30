@@ -21,8 +21,7 @@
     android:layout_height="wrap_content"
     android:alpha="0"
     android:clipChildren="false"
-    android:orientation="vertical"
-    android:visibility="gone">
+    android:orientation="vertical">
 
     <ImageView
         android:id="@+id/daxBubbleLogo"

@@ -65,13 +65,13 @@ class OnboardingActivity : DuckDuckGoActivity() {
 
     private fun processCommand(command: Command) {
         when (command) {
-            is Command.SetScreenOrientation -> setScreenOrientation()
+            is Command.ForceToPortraitForMobileDevices -> overrideScreenOrientation()
         }
     }
 
     @SuppressLint("SourceLockedOrientationActivity")
-    private fun setScreenOrientation() {
-        if (resources.getBoolean(R.bool.portrait_only)) {
+    private fun overrideScreenOrientation() {
+        if (resources.getBoolean(R.bool.onboarding_force_portrait)) {
             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         }
     }

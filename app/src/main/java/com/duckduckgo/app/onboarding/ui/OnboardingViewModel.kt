@@ -46,7 +46,7 @@ class OnboardingViewModel @Inject constructor(
 
     fun determineScreenOrientation() {
         if (variantManager.isOnboardingCustomizationExperimentEnabled()) {
-            viewModelScope.launch { command.send(Command.SetScreenOrientation) }
+            viewModelScope.launch { command.send(Command.ForceToPortraitForMobileDevices) }
         }
     }
 
@@ -70,6 +70,6 @@ class OnboardingViewModel @Inject constructor(
     }
 
     internal sealed class Command {
-        object SetScreenOrientation : Command()
+        object ForceToPortraitForMobileDevices : Command()
     }
 }

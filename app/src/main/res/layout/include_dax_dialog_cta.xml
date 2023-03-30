@@ -20,8 +20,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:alpha="0"
-    android:clipChildren="false"
-    android:visibility="gone">
+    android:clipChildren="false">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/logo"

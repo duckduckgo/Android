@@ -123,8 +123,8 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
 
     private fun startMultiselectDialogAnimation() {
         val ctaText = context?.getString(R.string.onboardingFeatureOptionsTitle).orEmpty()
+        binding.daxDialogCta.root.gone()
         binding.daxDialogMultiselectCta.apply {
-            binding.daxDialogCta.root.gone()
             root.show()
             root.dialogTextCta.startTypingAnimation(ctaText)
             ViewCompat.animate(root)
@@ -255,8 +255,8 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
     }
 
     private fun showDaxDialogCta() {
-        binding.daxDialogCta.root.show()
         binding.daxDialogMultiselectCta.root.gone()
+        binding.daxDialogCta.root.show()
         typingAnimation = ViewCompat.animate(binding.daxDialogCta.daxCtaContainer)
             .alpha(MAX_ALPHA)
             .setDuration(ANIMATION_DURATION)
