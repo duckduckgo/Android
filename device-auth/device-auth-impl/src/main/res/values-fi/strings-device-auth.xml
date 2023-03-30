@@ -18,4 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="biometric_prompt_title">Kirjautumistiedot lukittu</string>
+    <string name="autofill_auth_text_for_using">Avaa laite, jotta voit käyttää tallennettuja kirjautumistietoja.</string>
+    <string name="autofill_auth_text_for_access">Avaa laitteen lukitus päästäksesi tallennettuihin kirjautumistietoihin.</string>
 </resources>
