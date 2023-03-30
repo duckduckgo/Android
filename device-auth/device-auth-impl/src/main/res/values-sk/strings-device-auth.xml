@@ -18,4 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="biometric_prompt_title">Prihlasovacie údaje sú uzamknuté</string>
+    <string name="autofill_auth_text_for_using">Na použite uložených prihlasovacích údajov odomknite zariadenie.</string>
+    <string name="autofill_auth_text_for_access">Odomknite zariadenie na prístup k uloženým prihlasovacím údajom.</string>
 </resources>
