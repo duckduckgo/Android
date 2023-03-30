@@ -512,8 +512,8 @@
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Nikdy</string>
     <string name="disableLoginDetectionDialogTitle">Vypnúť pripomienku na zabezpečenie pri prihlasovaní sa na lokalitách?</string>
     <string name="disableLoginDetectionDialogDescription">Tento výber môžete kedykoľvek zmeniť v Nastaveniach.</string>
-    <string name="disableLoginDetectionDialogPositive">VYPNÚŤ</string>
-    <string name="disableLoginDetectionDialogNegative">ZRUŠIŤ</string>
+    <string name="disableLoginDetectionDialogPositive">Zakázať</string>
+    <string name="disableLoginDetectionDialogNegative">Zrušiť</string>
     <string name="automaticFireproofWebsiteLoginDialogTitle">Zabezpečiť webové stránky automaticky pri prihlásení?</string>
     <string name="automaticFireproofWebsiteLoginDialogDescription">Zabezpečenie stránok vás ponechá prihlásených po použitia tlačidla Oheň. Toto nastavenie môžete kedykoľvek zmeniť. </string>
     <string name="automaticFireproofWebsiteLoginDialogFirstOption">Vždy zabezpečiť</string>

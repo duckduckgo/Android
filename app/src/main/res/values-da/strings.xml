@@ -509,7 +509,7 @@
     <string name="disableLoginDetectionDialogTitle">Vil du deaktivere brandsikker-påmindelse, når du logger ind på websteder?</string>
     <string name="disableLoginDetectionDialogDescription">Du kan ændre denne præference til enhver tid i Indstillinger.</string>
     <string name="disableLoginDetectionDialogPositive">Deaktiver</string>
-    <string name="disableLoginDetectionDialogNegative">Afbestil</string>
+    <string name="disableLoginDetectionDialogNegative">Annuller</string>
     <string name="automaticFireproofWebsiteLoginDialogTitle">Automatisk brandsikring af websteder ved login?</string>
     <string name="automaticFireproofWebsiteLoginDialogDescription">Brandsikring af dette websted holder dig logget ind efter brug af Brand-knappen. Du kan altid ændre dette senere i Indstillinger. </string>
     <string name="automaticFireproofWebsiteLoginDialogFirstOption">Altid brandsikring af websteder</string>

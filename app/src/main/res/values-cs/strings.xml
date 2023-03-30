@@ -512,8 +512,8 @@
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Nikdy</string>
     <string name="disableLoginDetectionDialogTitle">Zakázat připomenutí ochrany při přihlašování k webovým stránkám?</string>
     <string name="disableLoginDetectionDialogDescription">Tuto předvolbu můžete v Nastavení kdykoli změnit.</string>
-    <string name="disableLoginDetectionDialogPositive">VYPNOUT</string>
-    <string name="disableLoginDetectionDialogNegative">ZRUŠIT</string>
+    <string name="disableLoginDetectionDialogPositive">Vypnout</string>
+    <string name="disableLoginDetectionDialogNegative">Zrušit</string>
     <string name="automaticFireproofWebsiteLoginDialogTitle">Chránit webové stránky automaticky při přihlášení?</string>
     <string name="automaticFireproofWebsiteLoginDialogDescription">Když je zapnutá ochrana, přihlášení zůstává zachované i po použití tlačítka pro mazání. Kdykoli se to dá změnit v Nastaveních. </string>
     <string name="automaticFireproofWebsiteLoginDialogFirstOption">Vždycky chránit</string>

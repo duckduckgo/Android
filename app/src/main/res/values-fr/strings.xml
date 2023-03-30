@@ -508,8 +508,8 @@
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Jamais</string>
     <string name="disableLoginDetectionDialogTitle">Désactiver le rappel du mode coupe-feu lors de la connexion aux sites ?</string>
     <string name="disableLoginDetectionDialogDescription">Vous pouvez modifier cette préférence à tout moment dans Paramètres.</string>
-    <string name="disableLoginDetectionDialogPositive">DÉSACTIVER</string>
-    <string name="disableLoginDetectionDialogNegative">ANNULER</string>
+    <string name="disableLoginDetectionDialogPositive">Désactiver</string>
+    <string name="disableLoginDetectionDialogNegative">Annuler</string>
     <string name="automaticFireproofWebsiteLoginDialogTitle">Activer automatiquement le coupe-feu des sites Web lors de la connexion ?</string>
     <string name="automaticFireproofWebsiteLoginDialogDescription">Placer les sites en mode coupe-feu et utiliser le bouton en forme de flamme ne vous déconnectera pas. Vous pourrez modifier ce réglage plus tard dans les paramètres. </string>
     <string name="automaticFireproofWebsiteLoginDialogFirstOption">Mode coupe-feu permanent</string>

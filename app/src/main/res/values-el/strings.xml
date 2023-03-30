@@ -508,8 +508,8 @@
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Ποτέ</string>
     <string name="disableLoginDetectionDialogTitle">Απενεργοποίηση της υπενθύμισης Διαγραφής δραστηριότητας κατά τη σύνδεση σε ιστότοπους;</string>
     <string name="disableLoginDetectionDialogDescription">Μπορείτε να αλλάξετε την προτίμηση αυτή οποιαδήποτε στιγμή από τις Ρυθμίσεις.</string>
-    <string name="disableLoginDetectionDialogPositive">ΑΠΕΝΕΡΓΟΠΟΙΗΣΗ</string>
-    <string name="disableLoginDetectionDialogNegative">ΑΚΥΡΩΣΗ</string>
+    <string name="disableLoginDetectionDialogPositive">Απενεργοποίηση</string>
+    <string name="disableLoginDetectionDialogNegative">Ακύρωση</string>
     <string name="automaticFireproofWebsiteLoginDialogTitle">Ασφαλείς ιστότοποι, αυτόματα από τη σύνδεση;</string>
     <string name="automaticFireproofWebsiteLoginDialogDescription">Ενεργοποιώντας τη διαγραφή δραστηριότητας ιστότοπου, θα παραμείνετε συνδεδεμένοι μετά τη χρήση του Κουμπιού διαγραφής δραστηριότητας. Μπορείτε πάντα να αλλάξετε την επιλογή αυτή από τις Ρυθμίσεις. </string>
     <string name="automaticFireproofWebsiteLoginDialogFirstOption">Διαγραφή δραστηριότητας, πάντα</string>
