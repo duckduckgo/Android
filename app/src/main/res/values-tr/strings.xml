@@ -287,6 +287,12 @@
     <!-- Notification Channel Names -->
     <string name="notificationChannelTutorials">Öğreticiler</string>
 
+    <!-- AppTP Retention Experiment Notifications-->
+    <string name="enableAppTpNotificationEasyStepTitle">Uygulama gizliliği için tek bir kolay adım</string>
+    <string name="enableAppTpNotificationEasyStepDescription">Telefonunuzu kullanmadığınız zamanlarda bile uygulamalarda gizlenen izleyicileri engellemek için App Tracking Protection\'ı etkinleştirin.</string>
+    <string name="enableAppTpNotificationNextLevelTitle">Gizliliğinizi bir üst seviyeye taşıyın</string>
+    <string name="enableAppTpNotificationNextLevelDescription">Telefonunuzu kullanmadığınız zamanlarda bile uygulamalarda gizlenen izleyicileri engellemek için App Tracking Protection\'ı etkinleştirin.</string>
+
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Veri temizleme manuel olarak ayarlandı</string>
     <string name="clearNotificationDescription">Her oturumdan sonra tarama verilerini otomatik olarak temizlemek için DuckDuckGo\'yu özelleştirin.</string>
@@ -408,6 +414,11 @@
     <string name="hideTipsTitle">Kalan ipuçları gizlensin mi?</string>
     <string name="hideTipsText">Sadece birkaç tane var ve onları da bilgilendirici hâle getirmeye çalıştık.</string>
     <string name="hideTipsButton">İpuçlarını Sonsuza Kadar Gizle</string>
+
+    <!-- AppTP Retention Experiment Dax Dialog -->
+    <string name="daxDialogAppTpRetentionText"><![CDATA[Artık web genelinde izleyicileri engelliyorsunuz 🎉<br/><br/>Telefonunuzu kullanmadığınız zamanlarda bile diğer uygulamalarınızda gizlenen izleyicileri de engelleyebilirim.]]></string>
+    <string name="daxDialogAppTpRetentionPrimaryButtonText">Uygulama İzleme Korumasını Etkinleştir</string>
+    <string name="daxDialogAppTpRetentionSecondaryButtonText">Şimdi Değil</string>
 
     <!-- New Onboarding Experience -->
     <string name="onboardingWelcomeTitle">"DuckDuckGo'ya Hoş Geldiniz!"</string>
