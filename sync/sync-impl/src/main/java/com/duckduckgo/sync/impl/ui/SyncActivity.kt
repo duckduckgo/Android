@@ -60,7 +60,7 @@ class SyncActivity : DuckDuckGoActivity() {
 
     override fun onStart() {
         super.onStart()
-        viewModel.refreshData()
+        viewModel.getSyncState()
     }
 
     private fun observeUiEvents() {

@@ -28,8 +28,8 @@ import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncRepository
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Finish
-import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.AccountCreated
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.CreatingAccount
+import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.SignedIn
 import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -54,7 +54,7 @@ class SaveRecoveryCodeViewModel @Inject constructor(
         if (syncRepository.isSignedIn()) {
             syncRepository.getRecoveryCode()?.let {
                 val bitmap = qrEncoder.encodeAsBitmap(it, R.dimen.qrSizeSmall, R.dimen.qrSizeSmall)
-                val newState = AccountCreated(
+                val newState = SignedIn(
                     loginQRCode = bitmap,
                     b64RecoveryCode = it,
                 )
@@ -69,7 +69,7 @@ class SaveRecoveryCodeViewModel @Inject constructor(
                 is Success -> {
                     syncRepository.getRecoveryCode()?.let {
                         val bitmap = qrEncoder.encodeAsBitmap(it, R.dimen.qrSizeSmall, R.dimen.qrSizeSmall)
-                        viewState.emit(ViewState(AccountCreated(bitmap, it)))
+                        viewState.emit(ViewState(SignedIn(bitmap, it)))
                     } ?: command.send(Command.Error)
                 }
             }
@@ -84,7 +84,7 @@ class SaveRecoveryCodeViewModel @Inject constructor(
 
     sealed class ViewMode {
         object CreatingAccount : ViewMode()
-        data class AccountCreated(
+        data class SignedIn(
             val loginQRCode: Bitmap,
             val b64RecoveryCode: String,
         ) : ViewMode()

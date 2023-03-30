@@ -39,7 +39,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="@dimen/keyline_4"
-            app:backgroundTint="?attr/daxColorPrimaryIcon"
+            android:visibility="gone"
             android:background="?selectableItemBackground"
             app:srcCompat="@drawable/ic_close_24"/>
 

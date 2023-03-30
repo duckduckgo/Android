@@ -26,6 +26,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoFragment
 import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.hide
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
@@ -34,8 +35,8 @@ import com.duckduckgo.sync.impl.databinding.FragmentRecoveryCodeBinding
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Error
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Finish
-import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.AccountCreated
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.CreatingAccount
+import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.SignedIn
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewState
 import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
@@ -95,9 +96,9 @@ class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_c
 
     private fun renderViewState(viewState: ViewState) {
         when (val viewMode = viewState.viewMode) {
-            is AccountCreated -> {
+            is SignedIn -> {
                 binding.recoveryCodeSkeleton.stopShimmer()
-                binding.recoveryCodeSkeleton.hide()
+                binding.recoveryCodeSkeleton.gone()
                 binding.recoverCodeContainer.show()
                 binding.qrCodeImageView.show()
                 binding.qrCodeImageView.setImageBitmap(viewMode.loginQRCode)

@@ -106,7 +106,7 @@ class SyncActivityViewModelTest {
     fun whenRefreshAndUserSignedInThenDeviceSyncViewStateIsEnabled() = runTest {
         whenever(syncRepository.isSignedIn()).thenReturn(true)
 
-        testee.refreshData()
+        testee.getSyncState()
 
         testee.viewState().test {
             val viewState = awaitItem()

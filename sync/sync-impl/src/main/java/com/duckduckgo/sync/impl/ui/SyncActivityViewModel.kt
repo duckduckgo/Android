@@ -58,7 +58,7 @@ class SyncActivityViewModel @Inject constructor(
         object LaunchDeviceSetupFlow : Command()
     }
 
-    fun refreshData() {
+    fun getSyncState() {
         viewModelScope.launch {
             updateViewState()
         }

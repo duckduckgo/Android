@@ -27,8 +27,8 @@ import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncRepository
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Finish
-import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.AccountCreated
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.CreatingAccount
+import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.SignedIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
@@ -66,7 +66,7 @@ class SaveRecoveryCodeViewModelTest {
 
         testee.viewState().test {
             val viewState = awaitItem()
-            assertTrue(viewState.viewMode is AccountCreated)
+            assertTrue(viewState.viewMode is SignedIn)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -80,7 +80,7 @@ class SaveRecoveryCodeViewModelTest {
 
         testee.viewState().test {
             val viewState = awaitItem()
-            assertTrue(viewState.viewMode is AccountCreated)
+            assertTrue(viewState.viewMode is SignedIn)
             cancelAndIgnoreRemainingEvents()
         }
     }
