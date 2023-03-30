@@ -20,8 +20,8 @@ import android.content.Context
 import android.util.AttributeSet
 import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewMultiselectListItemBinding
-import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class MultiselectListItem @JvmOverloads constructor(
@@ -39,8 +39,8 @@ class MultiselectListItem @JvmOverloads constructor(
     var isItemSelected: Boolean = false
         set(value) {
             when (value) {
-                true -> binding.itemContainer.setBackgroundResource(com.duckduckgo.app.browser.R.drawable.background_multiselect_list_item_selected)
-                false -> binding.itemContainer.setBackgroundResource(com.duckduckgo.app.browser.R.drawable.background_multiselect_list_item)
+                true -> binding.itemContainer.setBackgroundResource(R.drawable.background_multiselect_list_item_selected)
+                false -> binding.itemContainer.setBackgroundResource(R.drawable.background_multiselect_list_item)
             }
             field = value
         }

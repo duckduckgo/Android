@@ -81,7 +81,6 @@
 
         <item name="oneLineListItemStyle">@style/Widget.DuckDuckGo.OneLineListItem</item>
         <item name="twoLineListItemStyle">@style/Widget.DuckDuckGo.TwoLineListItem</item>
-        <item name="multiselectListItemStyle">@style/Widget.DuckDuckGo.MultiselectListItem</item>
 
         <item name="cardViewStyle">@style/Widget.DuckDuckGo.CardView</item>
     </style>
@@ -193,7 +192,7 @@
         <item name="daxInfoPanelTooltipBackgroundColor">@color/daxInfoPanelTooltipBackgroundColorDark</item>
         <item name="daxInfoPanelAlertBackgroundColor">@color/daxInfoPanelAlertBackgroundColorDark</item>
 
-        <!-- Multiselect -->
+        <!-- Temp daxColors -->
         <item name="daxColorMultiselectBackgroundStroke">@color/white12</item>
         <item name="daxColorMultiselectSelectedBackground">@color/gray80</item>
         <item name="daxColorMultiselectSelectedBackgroundStroke">@color/gray80</item>
@@ -270,7 +269,7 @@
         <item name="daxInfoPanelTooltipBackgroundColor">@color/daxInfoPanelTooltipBackgroundColorLight</item>
         <item name="daxInfoPanelAlertBackgroundColor">@color/daxInfoPanelAlertBackgroundColorLight</item>
 
-        <!-- Multiselect -->
+        <!-- Temp daxColors -->
         <item name="daxColorMultiselectBackgroundStroke">@color/gray15</item>
         <item name="daxColorMultiselectSelectedBackground">@color/gray0</item>
         <item name="daxColorMultiselectSelectedBackgroundStroke">@color/blue10</item>
