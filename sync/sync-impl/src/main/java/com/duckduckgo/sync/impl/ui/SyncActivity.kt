@@ -33,12 +33,14 @@ import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivitySyncBinding
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AsskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(SyncActivityWithEmptyParams::class)
@@ -88,7 +90,28 @@ class SyncActivity : DuckDuckGoActivity() {
             }
 
             AsskTurnOffSync -> askTurnOffsync()
+            AskDeleteAccount -> askDeleteAccount()
         }
+    }
+
+    private fun askDeleteAccount() {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.turn_off_sync_dialog_title)
+            .setMessage(getString(R.string.turn_off_sync_dialog_content))
+            .setPositiveButton(R.string.turn_off_sync_dialog_primary_button)
+            .setNegativeButton(R.string.turn_off_sync_dialog_secondary_button)
+            .setDestructiveButtons(true)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onDeleteAccountConfirmed()
+                    }
+
+                    override fun onDialogDismissed() {
+                        super.onDialogDismissed()
+                    }
+                },
+            ).show()
     }
 
     private fun askTurnOffsync() {
@@ -107,17 +130,23 @@ class SyncActivity : DuckDuckGoActivity() {
                         super.onDialogDismissed()
                     }
                 },
-            )
-            .show()
+            ).show()
     }
 
     private fun renderViewState(viewState: ViewState) {
+        Timber.i("CRIS: renderViewState: $viewState")
         binding.deviceSyncStatusToggle.quietlySetIsChecked(viewState.isDeviceSyncEnabled, deviceSyncStatusToggleListener)
         binding.viewSwitcher.displayedChild = if (viewState.showAccount) 1 else 0
 
-        if (viewState.loginQRCode != null) {
-            binding.qrCodeImageView.show()
-            binding.qrCodeImageView.setImageBitmap(viewState.loginQRCode)
+        if (viewState.showAccount) {
+            if (viewState.loginQRCode != null) {
+                binding.qrCodeImageView.show()
+                binding.qrCodeImageView.setImageBitmap(viewState.loginQRCode)
+            }
+
+            binding.deleteAccountButton.setOnClickListener {
+                viewModel.onDeleteAccountClicked()
+            }
         }
     }
 }

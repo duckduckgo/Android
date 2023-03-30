@@ -27,6 +27,7 @@ import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncRepository
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AsskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
 import javax.inject.Inject
@@ -38,6 +39,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
 class SyncActivityViewModel @Inject constructor(
@@ -60,6 +62,7 @@ class SyncActivityViewModel @Inject constructor(
     sealed class Command {
         object LaunchDeviceSetupFlow : Command()
         object AsskTurnOffSync : Command()
+        object AskDeleteAccount : Command()
     }
 
     fun getSyncState() {
@@ -102,6 +105,28 @@ class SyncActivityViewModel @Inject constructor(
                 }
                 is Success -> {
                      updateViewState()
+                }
+            }
+        }
+    }
+
+    fun onDeleteAccountClicked() {
+        viewModelScope.launch {
+            command.send(AskDeleteAccount)
+        }
+    }
+
+    fun onDeleteAccountConfirmed() {
+        viewModelScope.launch(dispatchers.io()) {
+            viewState.emit(viewState.value.copy(showAccount = false))
+            when (syncRepository.deleteAccount()) {
+                is Error -> {
+                    Timber.i("deleteAccount failed")
+                    updateViewState()
+                }
+                is Success -> {
+                    Timber.i("deleteAccount success")
+                    updateViewState()
                 }
             }
         }

@@ -61,4 +61,8 @@
     <string name="turn_off_sync_dialog_content">This will delete your synced data from DuckDuckGo\'s servers. You can turn Sync back on at any time.</string>
     <string name="turn_off_sync_dialog_primary_button">Turn Off</string>
     <string name="turn_off_sync_dialog_secondary_button">Cancel</string>
+    <string name="delete_account_dialog_title">Delete server data?</string>
+    <string name="delete_account_dialog_content">All devices will be disconnected and your synced data will be deleted from the server.</string>
+    <string name="delete_account_dialog_primary_button">Delete Data</string>
+    <string name="delete_account_dialog_secondary_button">Cancel</string>
 </resources>
