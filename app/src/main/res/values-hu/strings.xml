@@ -585,6 +585,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Letiltja az e-mail nyomkövetőket, és elrejti a címedet</string>
     <string name="newEmailAliasMenuTitle">Duck-cím létrehozása</string>
 
+    <!-- Autofill -->
+    <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Megtekintés</string>
+    <string name="autofillLoginSavedSnackbarMessage">Bejelentkezés mentve</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Bejelentkezés frissítve</string>
+    <string name="autofillDisableAutofillPromptTitle">Továbbra is el szeretnéd menteni a bejelentkezéseket?</string>
+    <string name="autofillDisableAutofillPromptMessage">Ez bármikor kikapcsolható a beállításokban.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Mentés folytatása</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Letiltás</string>
+
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Szeretnéd, hogy értesítést küldjünk neked, amikor rád kerül a sor?</string>
     <string name="waitlistNotificationDialogNoThanks">Nem, köszönöm</string>
