@@ -44,6 +44,9 @@
     <string name="updateLoginDialogTitleUpdateUsername">Актуализиране на потребителското име?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Актуализиране на потребителското име</string>
 
+    <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Актуализиране на паролата за \n%1$s?</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo ще актуализира запазените данни за вход във Вашето устройство.</string>
+
     <string name="autofillDialogCloseButtonContentDescription">Затваряне на диалоговия прозорец за автоматично попълване</string>
 
     <string name="credentialManagementEditLoginTitleHint">Име на данните за вход</string>
@@ -74,4 +77,8 @@
     <string name="autofillDeleteLoginDialogCancel">Отмени</string>
     <string name="autofillDeleteLoginDialogDelete">Изтрий</string>
     <string name="autofillDeleteLoginDialogTitle">Сигурни ли сте, че искате да изтриете тези данни за вход?</string>
+
+    <string name="autofillManagementUsernameCopied">Потребителското име е копирано</string>
+    <string name="autofillManagementPasswordCopied">Паролата е копирана</string>
+
 </resources>
