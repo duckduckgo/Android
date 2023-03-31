@@ -18,4 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="biometric_prompt_title">Данните за вход са заключени</string>
+    <string name="autofill_auth_text_for_using">Отключете устройството, за да използвате запазените данни си за вход.</string>
+    <string name="autofill_auth_text_for_access">Отключете устройството, за да получите достъп до запазените данни за вход.</string>
 </resources>
