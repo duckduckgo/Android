@@ -288,6 +288,12 @@
     <!-- Notification Channel Names -->
     <string name="notificationChannelTutorials">Tutorials</string>
 
+    <!-- AppTP Retention Experiment Notifications-->
+    <string name="enableAppTpNotificationEasyStepTitle">One easy step for app privacy</string>
+    <string name="enableAppTpNotificationEasyStepDescription">Enable App Tracking Protection to block trackers hiding in apps, even when you aren’t using your phone.</string>
+    <string name="enableAppTpNotificationNextLevelTitle">Take your privacy to the next level</string>
+    <string name="enableAppTpNotificationNextLevelDescription">Enable App Tracking Protection to block trackers hiding in apps, even when you aren’t using your phone.</string>
+
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Data clearing set to manual</string>
     <string name="clearNotificationDescription">Customize DuckDuckGo to automatically clear browsing data after every session.</string>
@@ -409,6 +415,11 @@
     <string name="hideTipsTitle">Hide remaining tips?</string>
     <string name="hideTipsText">There are only a few, and we tried to make them informative.</string>
     <string name="hideTipsButton">Hide Tips Forever</string>
+
+    <!-- AppTP Retention Experiment Dax Dialog -->
+    <string name="daxDialogAppTpRetentionText"><![CDATA[You\'re now blocking trackers across the web 🎉<br/><br/>I can also block trackers hiding in your other apps, even when you aren\'t using your phone.]]></string>
+    <string name="daxDialogAppTpRetentionPrimaryButtonText">Enable App Tracking Protection</string>
+    <string name="daxDialogAppTpRetentionSecondaryButtonText">Not Now</string>
 
     <!-- New Onboarding Experience -->
     <string name="onboardingWelcomeTitle">"Welcome to DuckDuckGo!"</string>
