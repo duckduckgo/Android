@@ -287,6 +287,12 @@
     <!-- Notification Channel Names -->
     <string name="notificationChannelTutorials">Vodiči</string>
 
+    <!-- AppTP Retention Experiment Notifications-->
+    <string name="enableAppTpNotificationEasyStepTitle">Jedan jednostavan korak za privatnost aplikacije</string>
+    <string name="enableAppTpNotificationEasyStepDescription">Omogući App Tracking Protection za blokiranje alata za praćenje koji se skrivaju u aplikacijama, čak i kad ne koristiš svoj telefon.</string>
+    <string name="enableAppTpNotificationNextLevelTitle">Podigni svoju privatnost na višu razinu</string>
+    <string name="enableAppTpNotificationNextLevelDescription">Omogući App Tracking Protection za blokiranje alata za praćenje koji se skrivaju u aplikacijama, čak i kad ne koristiš svoj telefon.</string>
+
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Brisanje podataka postavljeno na ručno</string>
     <string name="clearNotificationDescription">Prilagodite DuckDuckGo za automatsko brisanje podataka pregledavanja nakon svake sesije.</string>
@@ -408,6 +414,11 @@
     <string name="hideTipsTitle">Sakriti preostale savjete?</string>
     <string name="hideTipsText">Ima ih samo nekoliko, a pokušali smo ih učiniti što informativnijima.</string>
     <string name="hideTipsButton">Sakrij savjete zauvijek</string>
+
+    <!-- AppTP Retention Experiment Dax Dialog -->
+    <string name="daxDialogAppTpRetentionText"><![CDATA[Sad blokiraš alate za praćenje na čitavoj mreži🎉<br/><br/>Također mogu blokirati alate za praćenje koji se skrivaju u tvojim drugim aplikacijama, čak i kad ne koristiš telefon.]]></string>
+    <string name="daxDialogAppTpRetentionPrimaryButtonText">Omogući zaštitu od praćenja aplikacija App Tracking Protection</string>
+    <string name="daxDialogAppTpRetentionSecondaryButtonText">Ne sad</string>
 
     <!-- New Onboarding Experience -->
     <string name="onboardingWelcomeTitle">"Dobro došao/la u DuckDuckGo!"</string>

@@ -287,6 +287,12 @@
     <!-- Notification Channel Names -->
     <string name="notificationChannelTutorials">Õpetused</string>
 
+    <!-- AppTP Retention Experiment Notifications-->
+    <string name="enableAppTpNotificationEasyStepTitle">Üks lihtne samm rakenduse privaatsuse tagamiseks</string>
+    <string name="enableAppTpNotificationEasyStepDescription">Lubage App Tracking Protection , et blokeerida rakendustes peidus olevad jälgurid isegi siis, kui te oma telefoni ei kasuta.</string>
+    <string name="enableAppTpNotificationNextLevelTitle">Viige oma privaatsus järgmisele tasemele</string>
+    <string name="enableAppTpNotificationNextLevelDescription">Lubage App Tracking Protection , et blokeerida rakendustes peidus olevad jälgurid isegi siis, kui te oma telefoni ei kasuta.</string>
+
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Seadistatud on andmete käsitsi kustutamine</string>
     <string name="clearNotificationDescription">Kohandage DuckDuckGo sirvimisandmete automaatseks kustutamiseks pärast igat seanssi.</string>
@@ -408,6 +414,11 @@
     <string name="hideTipsTitle">Kas peita allesjäänud näpunäited?</string>
     <string name="hideTipsText">Neid on üsna vähe ja püüdsime muuta need informatiivseks.</string>
     <string name="hideTipsButton">Peida näpunäited igaveseks</string>
+
+    <!-- AppTP Retention Experiment Dax Dialog -->
+    <string name="daxDialogAppTpRetentionText"><![CDATA[Nüüd blokeerite jälgurid kogu veebis 🎉<br/><br/>Ma saan blokeerida ka teie teistes rakendustes peidus olevad jälgurid, isegi kui te oma telefoni ei kasuta.]]></string>
+    <string name="daxDialogAppTpRetentionPrimaryButtonText">Luba App Tracking Protection</string>
+    <string name="daxDialogAppTpRetentionSecondaryButtonText">Mitte praegu</string>
 
     <!-- New Onboarding Experience -->
     <string name="onboardingWelcomeTitle">"Tere tulemast DuckDuckGo kasutajaks!"</string>

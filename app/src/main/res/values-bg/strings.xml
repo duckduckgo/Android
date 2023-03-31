@@ -287,6 +287,12 @@
     <!-- Notification Channel Names -->
     <string name="notificationChannelTutorials">Указания</string>
 
+    <!-- AppTP Retention Experiment Notifications-->
+    <string name="enableAppTpNotificationEasyStepTitle">Една лесна стъпка за поверителност в приложенията</string>
+    <string name="enableAppTpNotificationEasyStepDescription">Активирайте App Tracking Protection, за да блокирате скритите в приложенията тракери, дори когато не използвате телефона си.</string>
+    <string name="enableAppTpNotificationNextLevelTitle">Издигнете поверителността си на по-високо ниво</string>
+    <string name="enableAppTpNotificationNextLevelDescription">Активирайте App Tracking Protection, за да блокирате скритите в приложенията тракери, дори когато не използвате телефона си.</string>
+
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Ръчно изчистване на данните</string>
     <string name="clearNotificationDescription">Персонализирайте DuckDuckGo да изчиства автоматично данните от сърфирането след всяка сесия.</string>
@@ -408,6 +414,11 @@
     <string name="hideTipsTitle">Скрий оставащите съвети?</string>
     <string name="hideTipsText">Само няколко са и се постарахме да са информативни.</string>
     <string name="hideTipsButton">Скрий съветите за постоянно</string>
+
+    <!-- AppTP Retention Experiment Dax Dialog -->
+    <string name="daxDialogAppTpRetentionText"><![CDATA[Вече блокирате тракерите от мрежата 🎉<br/><br/>Мога също така да блокирам тракери, скрити в другите Ви приложения, дори когато не използвате телефона си.]]></string>
+    <string name="daxDialogAppTpRetentionPrimaryButtonText">Активиране на App Tracking Protection</string>
+    <string name="daxDialogAppTpRetentionSecondaryButtonText">Не сега</string>
 
     <!-- New Onboarding Experience -->
     <string name="onboardingWelcomeTitle">"Добре дошли в DuckDuckGo!"</string>
