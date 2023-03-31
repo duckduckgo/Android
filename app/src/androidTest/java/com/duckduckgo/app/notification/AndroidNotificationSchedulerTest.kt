@@ -79,6 +79,7 @@ class AndroidNotificationSchedulerTest {
         whenever(mockEnableAppTpNotification.canShow()).thenReturn(true)
         whenever(privacyNotification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(true)
+
         testee.scheduleNextNotification()
 
         assertNotificationScheduled(EnableAppTpNotificationWorker::class.javaObjectType.name)
@@ -89,6 +90,7 @@ class AndroidNotificationSchedulerTest {
         whenever(mockEnableAppTpNotification.canShow()).thenReturn(true)
         whenever(privacyNotification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(false)
+
         testee.scheduleNextNotification()
 
         assertNotificationScheduled(EnableAppTpNotificationWorker::class.javaObjectType.name)
@@ -99,6 +101,7 @@ class AndroidNotificationSchedulerTest {
         whenever(mockEnableAppTpNotification.canShow()).thenReturn(true)
         whenever(privacyNotification.canShow()).thenReturn(false)
         whenever(clearNotification.canShow()).thenReturn(true)
+
         testee.scheduleNextNotification()
 
         assertNotificationScheduled(EnableAppTpNotificationWorker::class.javaObjectType.name)
@@ -109,6 +112,7 @@ class AndroidNotificationSchedulerTest {
         whenever(mockEnableAppTpNotification.canShow()).thenReturn(true)
         whenever(privacyNotification.canShow()).thenReturn(false)
         whenever(clearNotification.canShow()).thenReturn(false)
+
         testee.scheduleNextNotification()
 
         assertNotificationScheduled(EnableAppTpNotificationWorker::class.javaObjectType.name)
@@ -119,6 +123,7 @@ class AndroidNotificationSchedulerTest {
         whenever(mockEnableAppTpNotification.canShow()).thenReturn(false)
         whenever(privacyNotification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(true)
+
         testee.scheduleNextNotification()
 
         assertNotificationScheduled(PrivacyNotificationWorker::class.javaObjectType.name)
@@ -129,6 +134,7 @@ class AndroidNotificationSchedulerTest {
         whenever(mockEnableAppTpNotification.canShow()).thenReturn(false)
         whenever(privacyNotification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(false)
+
         testee.scheduleNextNotification()
 
         assertNotificationScheduled(PrivacyNotificationWorker::class.javaObjectType.name)
@@ -139,6 +145,7 @@ class AndroidNotificationSchedulerTest {
         whenever(mockEnableAppTpNotification.canShow()).thenReturn(false)
         whenever(privacyNotification.canShow()).thenReturn(false)
         whenever(clearNotification.canShow()).thenReturn(true)
+
         testee.scheduleNextNotification()
 
         assertNotificationScheduled(ClearDataNotificationWorker::class.javaObjectType.name)
@@ -149,6 +156,7 @@ class AndroidNotificationSchedulerTest {
         whenever(privacyNotification.canShow()).thenReturn(false)
         whenever(clearNotification.canShow()).thenReturn(false)
         whenever(mockEnableAppTpNotification.canShow()).thenReturn(false)
+
         testee.scheduleNextNotification()
 
         assertNoNotificationScheduled()

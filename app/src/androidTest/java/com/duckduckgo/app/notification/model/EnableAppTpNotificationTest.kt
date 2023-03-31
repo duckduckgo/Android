@@ -46,6 +46,7 @@ class EnableAppTpNotificationTest {
     fun whenNotificationNotSeenAndOneEasyStepForPrivacyNotificationEnabledThenCanShowIsTrue() = runTest {
         whenever(mockNotificationsDao.exists(any())).thenReturn(false)
         whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zm" })
+
         assertTrue(testee.canShow())
     }
 
@@ -53,6 +54,7 @@ class EnableAppTpNotificationTest {
     fun whenNotificationNotSeenAndNextLevelPrivacyNotificationEnabledThenCanShowIsTrue() = runTest {
         whenever(mockNotificationsDao.exists(any())).thenReturn(false)
         whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zn" })
+
         assertTrue(testee.canShow())
     }
 
@@ -60,12 +62,14 @@ class EnableAppTpNotificationTest {
     fun whenNotificationNotSeenAndOtherEnabledThenCanShowIsFalse() = runTest {
         whenever(mockNotificationsDao.exists(any())).thenReturn(false)
         whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "ze" })
+
         assertFalse(testee.canShow())
     }
 
     @Test
     fun whenNotificationAlreadySeenThenCanShowIsFalse() = runTest {
         whenever(mockNotificationsDao.exists(any())).thenReturn(true)
+
         assertFalse(testee.canShow())
     }
 
@@ -81,6 +85,7 @@ class EnableAppTpNotificationTest {
     @Test
     fun whenOneEasyStepForPrivacyNotificationNotEnabledThenReturnNextLevelPrivacySpecification() = runTest {
         whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zn" })
+
         val spec = testee.buildSpecification()
 
         assertTrue(spec is NextLevelPrivacySpecification)
