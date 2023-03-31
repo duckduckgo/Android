@@ -8,14 +8,10 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 android {
     namespace 'com.duckduckgo.sync.crypto'
 
-    externalNativeBuild {
-        cmake {
-            path "src/main/cpp/CMakeLists.txt"
+    repositories {
+        flatDir {
+            dirs("sync/sync-lib/libs")
         }
-    }
-
-    buildFeatures {
-        prefab true
     }
 }
 
@@ -23,6 +19,7 @@ dependencies {
     implementation JakeWharton.timber
     implementation Square.okio
     implementation project(':library-loader-api')
+    implementation fileTree(dir: 'libs', include: ['*.aar'])
 
     // Testing dependencies
     androidTestImplementation AndroidX.test.runner
