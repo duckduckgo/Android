@@ -28,7 +28,7 @@ import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncRepository
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccount
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AsskTurnOffSync
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -61,7 +61,7 @@ class SyncActivityViewModel @Inject constructor(
 
     sealed class Command {
         object LaunchDeviceSetupFlow : Command()
-        object AsskTurnOffSync : Command()
+        object AskTurnOffSync : Command()
         object AskDeleteAccount : Command()
     }
 
@@ -76,7 +76,7 @@ class SyncActivityViewModel @Inject constructor(
             viewState.emit(viewState.value.copy(isDeviceSyncEnabled = isChecked))
             when (isChecked) {
                 true -> command.send(LaunchDeviceSetupFlow)
-                false -> command.send(AsskTurnOffSync)
+                false -> command.send(AskTurnOffSync)
             }
         }
     }
@@ -104,7 +104,7 @@ class SyncActivityViewModel @Inject constructor(
                     updateViewState()
                 }
                 is Success -> {
-                     updateViewState()
+                    updateViewState()
                 }
             }
         }

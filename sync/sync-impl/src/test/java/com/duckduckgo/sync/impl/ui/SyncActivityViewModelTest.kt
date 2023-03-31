@@ -19,9 +19,12 @@ package com.duckduckgo.sync.impl.ui
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.sync.TestSyncFixtures.connectedDevice
+import com.duckduckgo.sync.TestSyncFixtures.deviceId
 import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKeyEncoded
 import com.duckduckgo.sync.TestSyncFixtures.qrBitmap
 import com.duckduckgo.sync.impl.QREncoder
+import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncRepository
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
@@ -37,6 +40,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -121,6 +125,91 @@ class SyncActivityViewModelTest {
 
         testee.commands().test {
             awaitItem().assertCommandType(LaunchDeviceSetupFlow::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenToggleDisabledThenAskTurnOffSync() = runTest {
+        testee.onToggleClicked(false)
+
+        testee.commands().test {
+            awaitItem().assertCommandType(Command.AskTurnOffSync::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenTurnOffSyncConfirmedThenLogoutLocalDevice() = runTest {
+        whenever(syncRepository.getThisConnectedDevice()).thenReturn(connectedDevice)
+        whenever(syncRepository.logout(deviceId)).thenReturn(Result.Success(true))
+
+        testee.onTurnOffSyncConfirmed()
+
+        verify(syncRepository).logout(deviceId)
+    }
+
+    @Test
+    fun whenLogoutSuccessThenUpdateViewState() = runTest {
+        whenever(syncRepository.isSignedIn()).thenReturn(true)
+        whenever(syncRepository.getThisConnectedDevice()).thenReturn(connectedDevice)
+        whenever(syncRepository.logout(deviceId)).thenReturn(Result.Success(true))
+
+        testee.viewState().test {
+            var viewState = awaitItem()
+            assertTrue(viewState.isDeviceSyncEnabled)
+            whenever(syncRepository.isSignedIn()).thenReturn(false)
+            testee.onTurnOffSyncConfirmed()
+            viewState = awaitItem()
+            assertFalse(viewState.showAccount)
+            assertFalse(viewState.isDeviceSyncEnabled)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLogoutErrorThenUpdateViewState() = runTest {
+        whenever(syncRepository.isSignedIn()).thenReturn(true)
+        whenever(syncRepository.logout(deviceId)).thenReturn(Result.Error(reason = "error"))
+
+        testee.onTurnOffSyncConfirmed()
+
+        testee.viewState().test {
+            val viewState = awaitItem()
+            assertTrue(viewState.isDeviceSyncEnabled)
+            assertTrue(viewState.showAccount)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenTurnOffSyncCancelledThenDeviceSyncViewStateIsEnabled() = runTest {
+        testee.viewState().test {
+            var viewState = awaitItem()
+            testee.onTurnOffSyncCancelled()
+            viewState = awaitItem()
+            assertTrue(viewState.isDeviceSyncEnabled)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDeleteAccountClickedThenAskDeleteAccount() = runTest {
+        testee.onDeleteAccountClicked()
+
+        testee.commands().test {
+            awaitItem().assertCommandType(Command.AskDeleteAccount::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDeleteAccountCancelledThenDeviceSyncViewStateIsEnabled() = runTest {
+        testee.viewState().test {
+            var viewState = awaitItem()
+            testee.onDeleteAccountCancelled()
+            viewState = awaitItem()
+            assertTrue(viewState.isDeviceSyncEnabled)
             cancelAndIgnoreRemainingEvents()
         }
     }

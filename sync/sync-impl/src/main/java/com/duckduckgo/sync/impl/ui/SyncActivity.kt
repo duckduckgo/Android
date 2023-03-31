@@ -34,7 +34,7 @@ import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivitySyncBinding
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccount
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AsskTurnOffSync
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity
@@ -89,7 +89,7 @@ class SyncActivity : DuckDuckGoActivity() {
                 startActivity(SetupAccountActivity.intentStartSetupFlow(this))
             }
 
-            AsskTurnOffSync -> askTurnOffsync()
+            AskTurnOffSync -> askTurnOffsync()
             AskDeleteAccount -> askDeleteAccount()
         }
     }
