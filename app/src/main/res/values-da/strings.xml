@@ -287,6 +287,12 @@
     <!-- Notification Channel Names -->
     <string name="notificationChannelTutorials">Vejledninger</string>
 
+    <!-- AppTP Retention Experiment Notifications-->
+    <string name="enableAppTpNotificationEasyStepTitle">Et nemt skridt for at få privatliv i apps</string>
+    <string name="enableAppTpNotificationEasyStepDescription">Aktivér App Tracking Protection for at blokere sporingsenheder, der gemmer sig i apps, selv når du ikke bruger telefonen.</string>
+    <string name="enableAppTpNotificationNextLevelTitle">Tag dit privatliv til det næste niveau</string>
+    <string name="enableAppTpNotificationNextLevelDescription">Aktivér App Tracking Protection for at blokere sporingsenheder, der gemmer sig i apps, selv når du ikke bruger telefonen.</string>
+
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Datarydning indstillet til manuel</string>
     <string name="clearNotificationDescription">Tilpas DuckDuckGo til automatisk at rydde browserdata efter hver session.</string>
@@ -408,6 +414,11 @@
     <string name="hideTipsTitle">Skjul de resterende tip?</string>
     <string name="hideTipsText">Der er kun få, og vi forsøgte at gøre dem oplysende.</string>
     <string name="hideTipsButton">Skjul tip for evigt</string>
+
+    <!-- AppTP Retention Experiment Dax Dialog -->
+    <string name="daxDialogAppTpRetentionText"><![CDATA[Du blokerer nu trackere på tværs af internettet 🎉<br/><br/>Jeg kan også blokere trackere, der gemmer sig i dine andre apps, selv når du ikke bruger din telefon.]]></string>
+    <string name="daxDialogAppTpRetentionPrimaryButtonText">Aktiver App Tracking Protection</string>
+    <string name="daxDialogAppTpRetentionSecondaryButtonText">Ikke nu</string>
 
     <!-- New Onboarding Experience -->
     <string name="onboardingWelcomeTitle">"Velkommen til DuckDuckGo!"</string>

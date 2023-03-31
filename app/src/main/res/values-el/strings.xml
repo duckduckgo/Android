@@ -287,6 +287,12 @@
     <!-- Notification Channel Names -->
     <string name="notificationChannelTutorials">Προγράμματα εκμάθησης</string>
 
+    <!-- AppTP Retention Experiment Notifications-->
+    <string name="enableAppTpNotificationEasyStepTitle">Ένα εύκολο βήμα για το απόρρητο των εφαρμογών</string>
+    <string name="enableAppTpNotificationEasyStepDescription">Ενεργοποιήστε την Προστασία παρακολούθησης από εφαρμογές για να αποκλείσετε εφαρμογές παρακολούθησης που κρύβονται σε εφαρμογές, ακόμη και όταν δεν χρησιμοποιείτε το τηλέφωνό σας.</string>
+    <string name="enableAppTpNotificationNextLevelTitle">Πηγαίνετε την ιδιωτικότητά σας στο επόμενο επίπεδο</string>
+    <string name="enableAppTpNotificationNextLevelDescription">Ενεργοποιήστε την Προστασία παρακολούθησης από εφαρμογές για να αποκλείσετε εφαρμογές παρακολούθησης που κρύβονται σε εφαρμογές, ακόμη και όταν δεν χρησιμοποιείτε το τηλέφωνό σας.</string>
+
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Η εκκαθάριση δεδομένων έχει οριστεί ως χειροκίνητη</string>
     <string name="clearNotificationDescription">Προσαρμόστε το DuckDuckGo για αυτόματη εκκαθάριση των δεδομένων περιήγησης μετά από κάθε περίοδο λειτουργίας.</string>
@@ -408,6 +414,11 @@
     <string name="hideTipsTitle">Απόκρυψη συμβουλών που απομένουν;</string>
     <string name="hideTipsText">Υπάρχουν λίγες μόνο και προσπαθήσαμε να τις καταστήσουμε ενημερωτικές.</string>
     <string name="hideTipsButton">Απόκρυψη συμβουλών για πάντα</string>
+
+    <!-- AppTP Retention Experiment Dax Dialog -->
+    <string name="daxDialogAppTpRetentionText"><![CDATA[Πλέον αποκλείετε εφαρμογές παρακολούθησης στο σύνολο του διαδικτύου 🎉<br/><br/>Μπορώ επίσης να αποκλείσω εφαρμογές παρακολούθησης που κρύβονται σε άλλες εφαρμογές σας, ακόμη και όταν δεν χρησιμοποιείτε το τηλέφωνό σας.]]></string>
+    <string name="daxDialogAppTpRetentionPrimaryButtonText">Ενεργοποίηση της Προστασίας παρακολούθησης από εφαρμογές</string>
+    <string name="daxDialogAppTpRetentionSecondaryButtonText">Όχι τώρα</string>
 
     <!-- New Onboarding Experience -->
     <string name="onboardingWelcomeTitle">"Καλώς ορίσατε στον DuckDuckGo!"</string>

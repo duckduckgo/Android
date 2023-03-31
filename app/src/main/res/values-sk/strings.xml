@@ -287,6 +287,12 @@
     <!-- Notification Channel Names -->
     <string name="notificationChannelTutorials">Návody</string>
 
+    <!-- AppTP Retention Experiment Notifications-->
+    <string name="enableAppTpNotificationEasyStepTitle">Jeden jednoduchý krok na ochranu súkromia v aplikáciách</string>
+    <string name="enableAppTpNotificationEasyStepDescription">Aktivujte si App Tracking Protection s cieľom zablokovania sledovaní, ktoré sú v aplikáciách ukryté, a to dokonca aj vtedy, keď nepoužívate svoj telefón.</string>
+    <string name="enableAppTpNotificationNextLevelTitle">Posuňte svoje súkromie na vyššiu úroveň</string>
+    <string name="enableAppTpNotificationNextLevelDescription">Aktivujte si App Tracking Protection s cieľom zablokovania sledovaní, ktoré sú v aplikáciách ukryté, a to dokonca aj vtedy, keď nepoužívate svoj telefón.</string>
+
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Nastavené na manuálne vymazanie údajov</string>
     <string name="clearNotificationDescription">Automatické vymazanie údajov prehliadania s DuckDuckGo po každej relácii.</string>
@@ -408,6 +414,11 @@
     <string name="hideTipsTitle">Skryť zostávajúce tipy?</string>
     <string name="hideTipsText">Je ich len niekoľko, snažili sme sa, aby mali informatívny charakter.</string>
     <string name="hideTipsButton">Navždy skryť tipy</string>
+
+    <!-- AppTP Retention Experiment Dax Dialog -->
+    <string name="daxDialogAppTpRetentionText"><![CDATA[Teraz blokujete sledovania na webe 🎉<br/><br/>Môžem tiež blokovať sledovania, ktoré sa skrývajú v iných aplikáciách, a to aj vtedy, keď svoj telefón nepoužívate.]]></string>
+    <string name="daxDialogAppTpRetentionPrimaryButtonText">Povoliť App Tracking Protection</string>
+    <string name="daxDialogAppTpRetentionSecondaryButtonText">Teraz nie</string>
 
     <!-- New Onboarding Experience -->
     <string name="onboardingWelcomeTitle">"Vitajte v aplikácii DuckDuckGo!"</string>
