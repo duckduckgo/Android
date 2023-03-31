@@ -18,4 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="biometric_prompt_title">Inícios de sessão bloqueados</string>
+    <string name="autofill_auth_text_for_using">Desbloqueia o dispositivo para utilizares os teus inícios de sessão guardados.</string>
+    <string name="autofill_auth_text_for_access">Desbloqueia o dispositivo para aceder aos inícios de sessão guardados.</string>
 </resources>
