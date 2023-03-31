@@ -18,4 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="biometric_prompt_title">Κλειδωμένες «Συνδέσεις»</string>
+    <string name="autofill_auth_text_for_using">Ξεκλειδώστε τη συσκευή για να χρησιμοποιήσετε τα αποθηκευμένα στοιχεία σύνδεσής σας.</string>
+    <string name="autofill_auth_text_for_access">Ξεκλειδώστε τη συσκευή για πρόσβαση στις αποθηκευμένες συνδέσεις.</string>
 </resources>
