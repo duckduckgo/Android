@@ -59,7 +59,15 @@ class SyncActivityViewModel @Inject constructor(
 
     private val command = Channel<Command>(1, DROP_OLDEST)
     private val viewState = MutableStateFlow(ViewState())
-    fun viewState(): Flow<ViewState> = viewState.onStart { updateViewState() }
+    fun viewState(): Flow<ViewState> = viewState.onStart {
+        updateViewState()
+        val connectedDevice = withContext(dispatchers.io()) {
+            syncRepository.getThisConnectedDevice()
+        }
+        viewState.emit(viewState.value.copy(syncedDevices = listOf(SyncedDevice(connectedDevice), LoadingItem)))
+        updateDevicesList()
+    }
+
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
     data class ViewState(
@@ -93,20 +101,26 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
+    private fun updateDevicesList() {
+        viewModelScope.launch(dispatchers.io()) {
+            val result = syncRepository.getConnectedDevices()
+            if (result is Success) {
+                val syncedDevices = result.data.map { SyncedDevice(it) }
+                viewState.emit(viewState.value.copy(syncedDevices = syncedDevices))
+            }
+        }
+    }
+
     private suspend fun updateViewState() {
         val qrBitmap = withContext(dispatchers.io()) {
             val recoveryCode = syncRepository.getRecoveryCode() ?: return@withContext null
             qrEncoder.encodeAsBitmap(recoveryCode, R.dimen.qrSizeLarge, R.dimen.qrSizeLarge)
-        }
-        val connectedDevice = withContext(dispatchers.io()) {
-            syncRepository.getThisConnectedDevice()
         }
         viewState.emit(
             viewState.value.copy(
                 isDeviceSyncEnabled = syncRepository.isSignedIn(),
                 showAccount = syncRepository.isSignedIn(),
                 loginQRCode = qrBitmap,
-                syncedDevices = listOf(SyncedDevice(connectedDevice), LoadingItem, LoadingItem)
             ),
         )
     }
