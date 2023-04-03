@@ -222,7 +222,7 @@ platform :android do
             )
 
             sh "git flow release finish -mnFS '#{newVersion}' '#{newVersion}'"
-            push_git_tags
+            push_git_tags(tag: newVersion)
             sh "git push origin main"
             sh "git push origin develop"
 
