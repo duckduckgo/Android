@@ -78,7 +78,7 @@
     <string name="autofillDeleteLoginDialogDelete">Smazat</string>
     <string name="autofillDeleteLoginDialogTitle">Opravdu chceš tohle přihlášení smazat?</string>
 
-    string name="autofillManagementUsernameCopied">Uživatelské jméno zkopírováno</string>
+    <string name="autofillManagementUsernameCopied">Uživatelské jméno zkopírováno</string>
     <string name="autofillManagementPasswordCopied">Heslo zkopírováno</string>
 
 </resources>
