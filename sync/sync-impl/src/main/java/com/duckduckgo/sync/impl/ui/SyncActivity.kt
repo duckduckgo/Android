@@ -24,6 +24,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DiffUtil
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
@@ -57,6 +58,8 @@ import com.google.android.material.snackbar.Snackbar
 import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 sealed class SyncDeviceListItem {
     data class SyncedDevice(val device: ConnectedDevice) : SyncDeviceListItem()
@@ -106,9 +109,36 @@ class SyncedDevicesAdapter constructor(): RecyclerView.Adapter<RecyclerView.View
         }
     }
 
-    fun updateData(syncedDevices: List<SyncDeviceListItem>) {
-        this.syncedDevices.clear().also { this.syncedDevices.addAll(syncedDevices) }
-        notifyDataSetChanged()
+    fun updateData(data: List<SyncDeviceListItem>) {
+        val newData = data
+        val oldData = this.syncedDevices
+        val diffResult = DiffCallback(oldData, newData).run { DiffUtil.calculateDiff(this) }
+        this.syncedDevices.clear().also { this.syncedDevices.addAll(data) }
+        diffResult.dispatchUpdatesTo(this)
+    }
+
+    private class DiffCallback(
+        private val old: List<SyncDeviceListItem>,
+        private val new: List<SyncDeviceListItem>,
+    ) :
+        DiffUtil.Callback() {
+        override fun getOldListSize() = old.size
+
+        override fun getNewListSize() = new.size
+
+        override fun areItemsTheSame(
+            oldItemPosition: Int,
+            newItemPosition: Int,
+        ): Boolean {
+            return old[oldItemPosition] == new[newItemPosition]
+        }
+
+        override fun areContentsTheSame(
+            oldItemPosition: Int,
+            newItemPosition: Int,
+        ): Boolean {
+            return old[oldItemPosition] == new[newItemPosition]
+        }
     }
 
     companion object {
