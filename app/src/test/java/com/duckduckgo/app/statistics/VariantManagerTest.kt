@@ -18,6 +18,7 @@ package com.duckduckgo.app.statistics
 
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.CookiePromptManagementExperiment
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.OnboardingCustomizationExperiment
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.OptimiseOnboardingExperiment
 import org.junit.Assert.*
 import org.junit.Test
@@ -74,6 +75,22 @@ class VariantManagerTest {
         assertEqualsDouble(1.0, variant.weight)
         assertEquals(1, variant.features.size)
         assertTrue(variant.hasFeature(OptimiseOnboardingExperiment))
+    }
+
+    @Test
+    fun onboardingCustomisationControlVariantHasExpectedWeightAndNoFeatures() {
+        val variant = variants.first { it.key == "mi" }
+        assertEqualsDouble(0.0, variant.weight)
+        assertEquals(0, variant.features.size)
+        assertEquals(0, variant.features.size)
+    }
+
+    @Test
+    fun onboardingCustomisationExperimentalVariantHasExpectedWeightAndFeatures() {
+        val variant = variants.first { it.key == "mj" }
+        assertEqualsDouble(0.0, variant.weight)
+        assertEquals(1, variant.features.size)
+        assertTrue(variant.hasFeature(OnboardingCustomizationExperiment))
     }
 
     @Test
