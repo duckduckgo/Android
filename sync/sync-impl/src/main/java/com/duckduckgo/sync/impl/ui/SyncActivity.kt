@@ -17,12 +17,16 @@
 package com.duckduckgo.sync.impl.ui
 
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.widget.CompoundButton
 import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
@@ -33,9 +37,12 @@ import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.duckduckgo.sync.impl.PermissionRequest
+import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.ShareAction
+import com.duckduckgo.sync.impl.asDrawableRes
 import com.duckduckgo.sync.impl.databinding.ActivitySyncBinding
+import com.duckduckgo.sync.impl.databinding.ItemSyncDeviceBinding
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
@@ -48,6 +55,50 @@ import com.google.android.material.snackbar.Snackbar
 import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+
+
+class SyncedDevicesAdapter constructor(): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    private var syncedDevices = mutableListOf<ConnectedDevice>()
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): ViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
+        return SyncedDeviceViewHolder(ItemSyncDeviceBinding.inflate(inflater, parent, false))
+    }
+
+    override fun getItemCount(): Int {
+        return this.syncedDevices.size
+    }
+
+    override fun onBindViewHolder(
+        holder: ViewHolder,
+        position: Int
+    ) {
+        when(holder) {
+            is SyncedDeviceViewHolder -> {
+                holder.bind(syncedDevices[position])
+            }
+        }
+    }
+
+    fun updateData(syncedDevices: List<ConnectedDevice>) {
+        this.syncedDevices.clear().also { this.syncedDevices.addAll(syncedDevices) }
+        notifyDataSetChanged()
+    }
+}
+
+class SyncedDeviceViewHolder(val binding: ItemSyncDeviceBinding): RecyclerView.ViewHolder(binding.root) {
+    private val context = binding.root.context
+    fun bind(device: ConnectedDevice) {
+        binding.syncDevice.setLeadingIcon(device.deviceType.type().asDrawableRes())
+        binding.syncDevice.setPrimaryText(device.deviceName)
+        if (device.thisDevice) {
+            binding.syncDevice.setSecondaryText(context.getString(R.string.sync_device_this_device_hint))
+        }
+    }
+}
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(SyncActivityWithEmptyParams::class)
@@ -64,6 +115,7 @@ class SyncActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var shareAction: ShareAction
 
+    private val syncedDevicesAdapter = SyncedDevicesAdapter()
     private val deviceSyncStatusToggleListener: OnCheckedChangeListener = object : OnCheckedChangeListener {
         override fun onCheckedChanged(
             buttonView: CompoundButton?,
@@ -79,11 +131,19 @@ class SyncActivity : DuckDuckGoActivity() {
         setupToolbar(binding.includeToolbar.toolbar)
         observeUiEvents()
         registerForPermission()
+        setupRecyclerView()
     }
 
     private fun registerForPermission() {
         storagePermission.registerResultsCallback(this) {
             binding.root.makeSnackbarWithNoBottomInset(R.string.sync_permission_required_store_recovery_code, Snackbar.LENGTH_LONG).show()
+        }
+    }
+
+    private fun setupRecyclerView() {
+        with(binding.syncedDevicesRecyclerView) {
+            adapter = syncedDevicesAdapter
+            layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
         }
     }
 
@@ -175,6 +235,7 @@ class SyncActivity : DuckDuckGoActivity() {
             binding.deleteAccountButton.setOnClickListener {
                 viewModel.onDeleteAccountClicked()
             }
+            syncedDevicesAdapter.updateData(viewState.syncedDevices)
         }
     }
 }

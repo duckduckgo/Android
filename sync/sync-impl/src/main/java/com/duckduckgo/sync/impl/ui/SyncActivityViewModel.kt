@@ -23,6 +23,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.RecoveryCodePDF
@@ -63,6 +64,7 @@ class SyncActivityViewModel @Inject constructor(
         val isDeviceSyncEnabled: Boolean = false,
         val showAccount: Boolean = false,
         val loginQRCode: Bitmap? = null,
+        val syncedDevices: List<ConnectedDevice> = emptyList(),
     )
 
     sealed class Command {
@@ -94,11 +96,15 @@ class SyncActivityViewModel @Inject constructor(
             val recoveryCode = syncRepository.getRecoveryCode() ?: return@withContext null
             qrEncoder.encodeAsBitmap(recoveryCode, R.dimen.qrSizeLarge, R.dimen.qrSizeLarge)
         }
+        val connectedDevice = withContext(dispatchers.io()) {
+            syncRepository.getThisConnectedDevice()
+        }
         viewState.emit(
             viewState.value.copy(
                 isDeviceSyncEnabled = syncRepository.isSignedIn(),
                 showAccount = syncRepository.isSignedIn(),
                 loginQRCode = qrBitmap,
+                syncedDevices = listOf(connectedDevice)
             ),
         )
     }
