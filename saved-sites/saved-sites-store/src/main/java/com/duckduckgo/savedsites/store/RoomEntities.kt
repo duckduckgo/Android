@@ -19,6 +19,7 @@ package com.duckduckgo.savedsites.store
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import java.util.UUID
 
 @Entity(tableName = "entities", primaryKeys = ["entityId"])
@@ -27,6 +28,8 @@ data class Entity(
     var title: String,
     var url: String?,
     var type: EntityType,
+    var lastModified: String = DatabaseDateFormatter.timestamp(),
+    var deleted: Boolean
 )
 
 enum class EntityType {
@@ -57,4 +60,5 @@ data class Relation(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     var folderId: String = UUID.randomUUID().toString(),
     var entityId: String,
+    var lastModified: String = DatabaseDateFormatter.timestamp(),
 )
