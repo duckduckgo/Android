@@ -587,6 +587,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Bloķē e-pasta izsekotājus un paslēpj tavu adresi</string>
     <string name="newEmailAliasMenuTitle">Izveidot Duck adresi</string>
 
+    <!-- Autofill -->
+    <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Skatīt</string>
+    <string name="autofillLoginSavedSnackbarMessage">Pieteikšanās saglabāta</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Pieteikšanās atjaunināta</string>
+    <string name="autofillDisableAutofillPromptTitle">Vai vēlies turpināt saglabāt pieteikšanās datus?</string>
+    <string name="autofillDisableAutofillPromptMessage">Vari to jebkurā laikā atspējot iestatījumos.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Turpināt saglabāt</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Atslēgt</string>
+
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Vai vēlies, lai mēs nosūtām tev paziņojumu, kad pienāks tava kārta?</string>
     <string name="waitlistNotificationDialogNoThanks">Nē, paldies</string>
