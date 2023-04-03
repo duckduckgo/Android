@@ -36,6 +36,8 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasS
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import java.io.File
+import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.LoadingItem
+import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -64,7 +66,7 @@ class SyncActivityViewModel @Inject constructor(
         val isDeviceSyncEnabled: Boolean = false,
         val showAccount: Boolean = false,
         val loginQRCode: Bitmap? = null,
-        val syncedDevices: List<ConnectedDevice> = emptyList(),
+        val syncedDevices: List<SyncDeviceListItem> = emptyList(),
     )
 
     sealed class Command {
@@ -104,7 +106,7 @@ class SyncActivityViewModel @Inject constructor(
                 isDeviceSyncEnabled = syncRepository.isSignedIn(),
                 showAccount = syncRepository.isSignedIn(),
                 loginQRCode = qrBitmap,
-                syncedDevices = listOf(connectedDevice)
+                syncedDevices = listOf(SyncedDevice(connectedDevice), LoadingItem, LoadingItem)
             ),
         )
     }

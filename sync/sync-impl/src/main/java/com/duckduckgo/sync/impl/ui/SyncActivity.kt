@@ -43,6 +43,7 @@ import com.duckduckgo.sync.impl.ShareAction
 import com.duckduckgo.sync.impl.asDrawableRes
 import com.duckduckgo.sync.impl.databinding.ActivitySyncBinding
 import com.duckduckgo.sync.impl.databinding.ItemSyncDeviceBinding
+import com.duckduckgo.sync.impl.databinding.ItemSyncDeviceLoadingBinding
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
@@ -50,22 +51,41 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasS
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
+import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
+sealed class SyncDeviceListItem {
+    data class SyncedDevice(val device: ConnectedDevice) : SyncDeviceListItem()
+    object LoadingItem : SyncDeviceListItem()
+}
 
 class SyncedDevicesAdapter constructor(): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private var syncedDevices = mutableListOf<ConnectedDevice>()
+    private var syncedDevices = mutableListOf<SyncDeviceListItem>()
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
     ): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        return SyncedDeviceViewHolder(ItemSyncDeviceBinding.inflate(inflater, parent, false))
+        return when (viewType) {
+            CONNECTED_DEVICE -> SyncedDeviceViewHolder(ItemSyncDeviceBinding.inflate(inflater, parent, false))
+            LOADING_ITEM -> LoadingViewHolder(ItemSyncDeviceLoadingBinding.inflate(inflater, parent, false))
+            else -> {
+                // This should never happen
+                return SyncedDeviceViewHolder(ItemSyncDeviceBinding.inflate(inflater, parent, false))
+            }
+        }
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return when (syncedDevices[position]) {
+            is SyncedDevice -> CONNECTED_DEVICE
+            is SyncDeviceListItem.LoadingItem -> LOADING_ITEM
+        }
     }
 
     override fun getItemCount(): Int {
@@ -78,25 +98,41 @@ class SyncedDevicesAdapter constructor(): RecyclerView.Adapter<RecyclerView.View
     ) {
         when(holder) {
             is SyncedDeviceViewHolder -> {
-                holder.bind(syncedDevices[position])
+                holder.bind(syncedDevices[position] as SyncedDevice)
+            }
+            is LoadingViewHolder -> {
+                holder.bind()
             }
         }
     }
 
-    fun updateData(syncedDevices: List<ConnectedDevice>) {
+    fun updateData(syncedDevices: List<SyncDeviceListItem>) {
         this.syncedDevices.clear().also { this.syncedDevices.addAll(syncedDevices) }
         notifyDataSetChanged()
+    }
+
+    companion object {
+        private const val CONNECTED_DEVICE = 0
+        private const val LOADING_ITEM = 1
     }
 }
 
 class SyncedDeviceViewHolder(val binding: ItemSyncDeviceBinding): RecyclerView.ViewHolder(binding.root) {
     private val context = binding.root.context
-    fun bind(device: ConnectedDevice) {
-        binding.syncDevice.setLeadingIcon(device.deviceType.type().asDrawableRes())
-        binding.syncDevice.setPrimaryText(device.deviceName)
-        if (device.thisDevice) {
-            binding.syncDevice.setSecondaryText(context.getString(R.string.sync_device_this_device_hint))
+    fun bind(syncDevice: SyncedDevice) {
+        with(syncDevice.device) {
+            binding.syncDevice.setLeadingIcon(deviceType.type().asDrawableRes())
+            binding.syncDevice.setPrimaryText(deviceName)
+            if (thisDevice) {
+                binding.syncDevice.setSecondaryText(context.getString(R.string.sync_device_this_device_hint))
+            }
         }
+    }
+}
+
+class LoadingViewHolder(val binding: ItemSyncDeviceLoadingBinding): RecyclerView.ViewHolder(binding.root) {
+    fun bind() {
+        binding.shimmerFrameLayout.startShimmer()
     }
 }
 
