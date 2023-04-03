@@ -204,6 +204,49 @@ class SyncActivityViewModelTest {
     }
 
     @Test
+    fun whenDeleteAccountSuccessThenUpdateViewState() = runTest {
+        whenever(syncRepository.isSignedIn()).thenReturn(true)
+        whenever(syncRepository.getThisConnectedDevice()).thenReturn(connectedDevice)
+        whenever(syncRepository.deleteAccount()).thenReturn(Result.Success(true))
+
+        testee.viewState().test {
+            var viewState = awaitItem()
+            assertTrue(viewState.isDeviceSyncEnabled)
+            whenever(syncRepository.isSignedIn()).thenReturn(false)
+            testee.onDeleteAccountConfirmed()
+            viewState = awaitItem()
+            assertFalse(viewState.showAccount)
+            assertFalse(viewState.isDeviceSyncEnabled)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDeleteAccountErrorThenUpdateViewState() = runTest {
+        whenever(syncRepository.isSignedIn()).thenReturn(true)
+        whenever(syncRepository.deleteAccount()).thenReturn(Result.Error(reason = "error"))
+
+        testee.onDeleteAccountConfirmed()
+
+        testee.viewState().test {
+            val viewState = awaitItem()
+            assertTrue(viewState.isDeviceSyncEnabled)
+            assertTrue(viewState.showAccount)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDeleteAccountConfirmedThenDeleteAccount() = runTest {
+        whenever(syncRepository.getThisConnectedDevice()).thenReturn(connectedDevice)
+        whenever(syncRepository.logout(deviceId)).thenReturn(Result.Success(true))
+
+        testee.onDeleteAccountConfirmed()
+
+        verify(syncRepository).deleteAccount()
+    }
+
+    @Test
     fun whenDeleteAccountCancelledThenDeviceSyncViewStateIsEnabled() = runTest {
         testee.viewState().test {
             var viewState = awaitItem()
