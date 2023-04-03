@@ -35,11 +35,15 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.D
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.ENABLED
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.ENABLING
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.ERROR
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REVOKED
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.alerts.reconnect.NetPReconnectNotifications
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.None
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowReconnecting
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowReconnectingFailed
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowRevoked
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.CheckVPNPermission
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.OpenVPNSettings
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.RequestVPNPermission
@@ -100,7 +104,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
             return@combine ViewState(
                 connectionState = vpnState.toConnectionState(reconnectState),
                 connectionDetails = connectionDetailsToEmit,
-                alertState = getAlertState(vpnState.state, reconnectState),
+                alertState = getAlertState(vpnState.state, reconnectState, vpnState.stopReason),
             )
         }
     }
@@ -125,11 +129,14 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     internal fun getAlertState(
         vpnRunningState: VpnRunningState,
         reconnectState: ReconnectStatus,
+        vpnStopReason: VpnStopReason?,
     ): AlertState {
         return if (vpnRunningState == DISABLED && (reconnectState == Reconnecting || reconnectState == ReconnectingFailed)) {
             ShowReconnectingFailed
         } else if (reconnectState == Reconnecting) {
             ShowReconnecting
+        } else if (vpnRunningState == DISABLED && (vpnStopReason == REVOKED || vpnStopReason == ERROR)) {
+            ShowRevoked
         } else {
             None
         }
@@ -330,6 +337,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     enum class AlertState {
         ShowReconnecting,
         ShowReconnectingFailed,
+        ShowRevoked,
         None,
     }
 }

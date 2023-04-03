@@ -27,11 +27,14 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.D
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.ENABLED
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.ENABLING
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REVOKED
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.UNKNOWN
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.alerts.reconnect.NetPReconnectNotifications
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.None
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowReconnecting
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowReconnectingFailed
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowRevoked
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.CheckVPNPermission
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.OpenVPNSettings
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.RequestVPNPermission
@@ -417,27 +420,32 @@ class NetworkProtectionManagementViewModelTest {
 
     @Test
     fun whenVpnStateIsDisabledAndReconnectingThenAlertStateIsShowReconnectingFailed() {
-        assertEquals(ShowReconnectingFailed, testee.getAlertState(DISABLED, Reconnecting))
+        assertEquals(ShowReconnectingFailed, testee.getAlertState(DISABLED, Reconnecting, null))
     }
 
     @Test
     fun whenVpnStateIsDisabledAndReconnectingFailedThenAlertStateIsShowReconnectingFailed() {
-        assertEquals(ShowReconnectingFailed, testee.getAlertState(DISABLED, ReconnectingFailed))
+        assertEquals(ShowReconnectingFailed, testee.getAlertState(DISABLED, ReconnectingFailed, UNKNOWN))
     }
 
     @Test
     fun whenVpnStateIsEnabledAndReconnectingThenAlertStateIsShowReconnecting() {
-        assertEquals(ShowReconnecting, testee.getAlertState(ENABLED, Reconnecting))
+        assertEquals(ShowReconnecting, testee.getAlertState(ENABLED, Reconnecting, null))
     }
 
     @Test
     fun whenVpnStateIsEnablingAndReconnectingThenAlertStateIsShowReconnecting() {
-        assertEquals(ShowReconnecting, testee.getAlertState(ENABLING, Reconnecting))
+        assertEquals(ShowReconnecting, testee.getAlertState(ENABLING, Reconnecting, null))
     }
 
     @Test
     fun whenNotReconnectingThenAlertStateIsNone() {
-        assertEquals(None, testee.getAlertState(DISABLED, NotReconnecting))
+        assertEquals(None, testee.getAlertState(DISABLED, NotReconnecting, UNKNOWN))
+    }
+
+    @Test
+    fun whenStopReasonIsRevokedAndNotReconnectingThenAlertStateIsShowRevoked() {
+        assertEquals(ShowRevoked, testee.getAlertState(DISABLED, NotReconnecting, REVOKED))
     }
 
     @Test

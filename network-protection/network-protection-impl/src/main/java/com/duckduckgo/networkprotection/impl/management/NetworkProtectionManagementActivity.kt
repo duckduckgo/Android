@@ -45,6 +45,7 @@ import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpManagementB
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.None
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowReconnecting
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowReconnectingFailed
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowRevoked
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionDetails
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState
@@ -121,17 +122,23 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         when (viewState.alertState) {
             ShowReconnecting -> binding.renderAlertReconnecting()
             ShowReconnectingFailed -> binding.renderAlertReconnectingFailed()
+            ShowRevoked -> binding.renderAlertRevoked()
             None -> binding.netPAlert.gone()
         }
     }
 
     private fun ActivityNetpManagementBinding.renderAlertReconnecting() {
-        netPAlert.setText(resources.getString(R.string.netpBannerReconnecting))
+        netPAlert.setText(getString(R.string.netpBannerReconnecting))
         netPAlert.show()
     }
 
     private fun ActivityNetpManagementBinding.renderAlertReconnectingFailed() {
-        netPAlert.setText(resources.getString(R.string.netpBannerReconnectionFailed))
+        netPAlert.setText(getString(R.string.netpBannerReconnectionFailed))
+        netPAlert.show()
+    }
+
+    private fun ActivityNetpManagementBinding.renderAlertRevoked() {
+        netPAlert.setClickableLink("", getText(R.string.netpBannerVpnRevoked)) {}
         netPAlert.show()
     }
 
