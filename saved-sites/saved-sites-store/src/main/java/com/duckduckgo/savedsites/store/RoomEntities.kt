@@ -28,8 +28,8 @@ data class Entity(
     var title: String,
     var url: String?,
     var type: EntityType,
-    var lastModified: String = DatabaseDateFormatter.timestamp(),
-    var deleted: Boolean
+    var lastModified: String? = DatabaseDateFormatter.timestamp(),
+    var deleted: Boolean = false,
 )
 
 enum class EntityType {
@@ -60,5 +60,4 @@ data class Relation(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     var folderId: String = UUID.randomUUID().toString(),
     var entityId: String,
-    var lastModified: String = DatabaseDateFormatter.timestamp(),
 )
