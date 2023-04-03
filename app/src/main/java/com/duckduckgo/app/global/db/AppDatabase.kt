@@ -70,7 +70,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 
 @Database(
     exportSchema = true,
-    version = 46,
+    version = 47,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -602,6 +602,14 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
+    val MIGRATION_46_TO_47: Migration = object : Migration(46, 47) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("ALTER TABLE `entities` ADD COLUMN `lastModified` TEXT")
+            database.execSQL("ALTER TABLE `entities` ADD COLUMN `deleted` INTEGER NOT NULL DEFAULT 0")
+            database.execSQL("UPDATE `entities` SET deleted=0")
+        }
+    }
+
     val BOOKMARKS_DB_ON_CREATE = object : RoomDatabase.Callback() {
         override fun onCreate(database: SupportSQLiteDatabase) {
             database.execSQL(
@@ -673,6 +681,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             MIGRATION_43_TO_44,
             MIGRATION_44_TO_45,
             MIGRATION_45_TO_46,
+            MIGRATION_46_TO_47,
         )
 
     @Deprecated(
