@@ -190,8 +190,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/keyline_2"
-                    app:primaryText="@string/atp_ActivityRemoveFeature"
-                    app:primaryTextColorOverlay="@color/red_text_color_selector" />
+                    app:primaryText="@string/atp_ActivityRemoveFeature" />
 
             </LinearLayout>
 
