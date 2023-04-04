@@ -302,6 +302,8 @@ class AppSyncRepository @Inject constructor(
                                 DeviceType(nativeLib.decryptData(encryptedDeviceType, primaryKey).decryptedData)
                             } ?: DeviceType(),
                         )
+                    }.sortedWith { a, b ->
+                        if (a.thisDevice) -1 else 1
                     },
                 )
             }
