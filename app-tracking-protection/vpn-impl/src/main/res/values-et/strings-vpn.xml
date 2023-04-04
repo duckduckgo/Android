@@ -361,7 +361,7 @@
     <string name="atp_ManageRecentAppsProtectionEmpty">Siin ilmuvad äsja blokeeritud jälgimiskatsetega rakendused</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
-    <string name="atp_RemoveFeatureDialogTitle">Andmete keelamine ja kustutamine?</string>
+    <string name="atp_RemoveFeatureDialogTitle">Kas keelata ja kustutada andmed?</string>
     <string name="atp_RemoveFeatureDialogMessage">Rakenduse jälgimise kaitse keelatakse ning kõik sätted ja jälgimiskatsete ajalugu kustutatakse. Saad selle igal ajal sätetest uuesti lubada.</string>
     <string name="atp_RemoveFeatureDialogCancel">Tühista</string>
     <string name="atp_RemoveFeatureDialogRemove">Keela</string>
