@@ -603,7 +603,6 @@
     <string name="folderLocationTitle">Select Location</string>
     <string name="addFolder">Add Folder</string>
     <string name="editFolder">Edit Folder</string>
-    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Delete folder and its contents?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Are you sure you want to delete "</string>
     <string name="bookmarkFolderEmpty">Empty</string>
 
