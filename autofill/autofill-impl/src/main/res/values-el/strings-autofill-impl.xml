@@ -17,18 +17,18 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Συνδέσεις αυτόματης συμπλήρωσης</string>
+    <string name="autofillManagementScreenTitle">Συνδέσεις</string>
 
     <string name="managementDisabledModeCta"><b>Προσαρμογή στις Ρυθμίσεις</b></string>
-    <string name="managementDisabledModeSubtitle">Για προστασία της Αυτόματης συμπλήρωσης στοιχείων σύνδεσης απαιτείται μοτίβο κλειδώματος συσκευής, PIN ή βιομετρικά στοιχεία.</string>
-    <string name="managementDisabledModeTitle">Ασφαλίστε τη συσκευή σας για χρήση της Αυτόματης συμπλήρωσης</string>
+    <string name="managementDisabledModeSubtitle">Για προστασία των «Συνδέσεών» σας απαιτείται μοτίβο κλειδώματος συσκευής, PIN ή βιομετρικά στοιχεία.</string>
+    <string name="managementDisabledModeTitle">Ασφαλίστε τη συσκευή σας για να αποθηκεύετε τις «Συνδέσεις»</string>
 
     <string name="saveLoginDialogTitle">Αποθήκευση σύνδεσης;</string>
     <string name="saveLoginMissingUsernameDialogTitle">Αποθήκευση κωδικού πρόσβασης;</string>
     <string name="saveLoginDialogButtonSave">Αποθήκευση σύνδεσης</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Αποθήκευση κωδικού πρόσβασης</string>
     <string name="saveLoginDialogNotNow">Όχι τώρα</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Το DuckDuckGo θα αποθηκεύσει με ασφάλεια αυτά τα στοιχεία σύνδεσης στη συσκευή σας. Μπορείτε να διαχειριστείτε τα αποθηκευμένα στοιχεία σύνδεσής σας από τις Ρυθμίσεις.</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">Οι συνδέσεις αποθηκεύονται με ασφάλεια μόνο σε αυτή τη συσκευή και η διαχείρισή τους γίνεται από το μενού Συνδέσεις, στις Ρυθμίσεις.</string>
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Θέλετε να αποθηκεύσει το DuckDuckGo τη σύνδεσή σας;</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Περισσότερες επιλογές</string>
 

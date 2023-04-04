@@ -17,18 +17,18 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Автозаполнение логинов</string>
+    <string name="autofillManagementScreenTitle">Логины</string>
 
     <string name="managementDisabledModeCta"><b>Откройте «Настройки»</b></string>
-    <string name="managementDisabledModeSubtitle">Для защиты автоматически заполняемой учетной информации нужны биометрические данные, графический ключ или ПИН-код.</string>
-    <string name="managementDisabledModeTitle">Защитите свое устройство, чтобы использовать автозаполнение</string>
+    <string name="managementDisabledModeSubtitle">Для защиты логинов требуются биометрические данные, графический ключ или ПИН-код.</string>
+    <string name="managementDisabledModeTitle">Защитите свое устройство, чтобы сохранять логины</string>
 
     <string name="saveLoginDialogTitle">Сохранить логин?</string>
     <string name="saveLoginMissingUsernameDialogTitle">Сохранить пароль?</string>
     <string name="saveLoginDialogButtonSave">Сохранить логин</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Сохранить пароль</string>
     <string name="saveLoginDialogNotNow">Не сейчас</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">DuckDuckGo безопасно сохранит этот логин на вашем устройстве. Сохраненными учетными данными можно управлять в «Настройках».</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">Логины надежно хранятся только на этом устройстве. Ими можно управлять в меню «Логины» в «Настройках».</string>
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Хотите, чтобы DuckDuckGo сохранил логин?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Другие параметры</string>
 
