@@ -75,5 +75,11 @@
     <string name="sync_instructions_step1">Open DuckDuckGo on another device and go to Sync in Settings.</string>
     <string name="sync_instructions_step2">Scan the QR code or copy and paste the text code into another DuckDuckGo app.</string>
     <string name="sync_instructions_step3">Sync will be activated and you\'ll once again have access to all of your data.</string>
+    <string name="remove_device_dialog_title">Remove device?</string>
+    <string name="remove_device_dialog_content">\"%1$s\" will no longer be able to access your synced data.</string>
+    <string name="remove_device_dialog_primary_button">Remove</string>
+    <string name="remove_device_dialog_secondary_button">Cancel</string>
     <string name="sync_device_this_device_hint">This device</string>
+    <string name="sync_device_menu_option_edit">Edit</string>
+    <string name="sync_device_menu_option_remove">Remove Device</string>
 </resources>

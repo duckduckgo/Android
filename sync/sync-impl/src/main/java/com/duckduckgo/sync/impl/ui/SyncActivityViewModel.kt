@@ -31,6 +31,7 @@ import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncRepository
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccount
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskRemoveDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
@@ -83,6 +84,7 @@ class SyncActivityViewModel @Inject constructor(
         object AskDeleteAccount : Command()
         object CheckIfUserHasStoragePermission : Command()
         data class RecoveryCodePDFSuccess(val recoveryCodePDFFile: File) : Command()
+        data class AskRemoveDevice(val device: ConnectedDevice) : Command()
     }
 
     fun getSyncState() {
@@ -107,6 +109,10 @@ class SyncActivityViewModel @Inject constructor(
             if (result is Success) {
                 val syncedDevices = result.data.map { SyncedDevice(it) }
                 viewState.emit(viewState.value.copy(syncedDevices = syncedDevices))
+            } else {
+                viewState.value.syncedDevices.filterNot { it is LoadingItem }.apply {
+                    viewState.emit(viewState.value.copy(syncedDevices = this))
+                }
             }
         }
     }
@@ -186,6 +192,35 @@ class SyncActivityViewModel @Inject constructor(
             val recoveryCodeB64 = syncRepository.getRecoveryCode() ?: return@launch
             val generateRecoveryCodePDF = recoveryCodePDF.generateAndStoreRecoveryCodePDF(viewContext, recoveryCodeB64)
             command.send(RecoveryCodePDFSuccess(generateRecoveryCodePDF))
+        }
+    }
+
+    fun onEditDeviceClicked(device: ConnectedDevice) {
+        //todo
+    }
+
+    fun onRemoveDeviceClicked(device: ConnectedDevice) {
+        viewModelScope.launch {
+            command.send(AskRemoveDevice(device))
+        }
+    }
+
+    fun onRemoveDeviceConfirmed(device: ConnectedDevice) {
+        viewModelScope.launch(dispatchers.io()) {
+            val oldList = viewState.value.syncedDevices
+            val syncingDeviceList = viewState.value.syncedDevices.map {
+                if (it is SyncedDevice && it.device.deviceId == device.deviceId) {
+                    it.copy(loading = true)
+                } else {
+                    it
+                }
+            }
+            viewState.emit(viewState.value.copy(syncedDevices = syncingDeviceList))
+            val result = syncRepository.logout(device.deviceId)
+            when (result) {
+                is Error -> viewState.emit(viewState.value.copy(syncedDevices = oldList))
+                is Success -> updateDevicesList()
+            }
         }
     }
 }

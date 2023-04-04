@@ -18,6 +18,7 @@ package com.duckduckgo.sync.impl.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
 import android.widget.CompoundButton.OnCheckedChangeListener
@@ -32,6 +33,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.mobile.android.ui.view.gone
@@ -42,12 +44,14 @@ import com.duckduckgo.sync.impl.PermissionRequest
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.ShareAction
+import com.duckduckgo.sync.impl.R.layout
 import com.duckduckgo.sync.impl.asDrawableRes
 import com.duckduckgo.sync.impl.databinding.ActivitySyncBinding
 import com.duckduckgo.sync.impl.databinding.ItemSyncDeviceBinding
 import com.duckduckgo.sync.impl.databinding.ItemSyncDeviceLoadingBinding
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccount
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskRemoveDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
@@ -59,35 +63,54 @@ import com.google.android.material.snackbar.Snackbar
 import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 sealed class SyncDeviceListItem {
-    data class SyncedDevice(val device: ConnectedDevice) : SyncDeviceListItem()
+    data class SyncedDevice(val device: ConnectedDevice, val loading: Boolean = false) : SyncDeviceListItem()
     object LoadingItem : SyncDeviceListItem()
 }
 
-class SyncedDevicesAdapter constructor(): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+interface ConnectedDeviceClickListener {
+    fun onEditDeviceClicked(device: ConnectedDevice)
+    fun onRemoveDeviceClicked(device: ConnectedDevice)
+}
+
+class SyncedDevicesAdapter constructor(private val listener: ConnectedDeviceClickListener) : RecyclerView.Adapter<ViewHolder>() {
 
     private var syncedDevices = mutableListOf<SyncDeviceListItem>()
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
     ): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
-            CONNECTED_DEVICE -> SyncedDeviceViewHolder(ItemSyncDeviceBinding.inflate(inflater, parent, false))
+            CONNECTED_DEVICE -> SyncedDeviceViewHolder(
+                inflater,
+                ItemSyncDeviceBinding.inflate(inflater, parent, false),
+                listener,
+            )
             LOADING_ITEM -> LoadingViewHolder(ItemSyncDeviceLoadingBinding.inflate(inflater, parent, false))
             else -> {
                 // This should never happen
-                return SyncedDeviceViewHolder(ItemSyncDeviceBinding.inflate(inflater, parent, false))
+                return SyncedDeviceViewHolder(
+                    inflater,
+                    ItemSyncDeviceBinding.inflate(inflater, parent, false),
+                    listener,
+                )
             }
         }
     }
 
     override fun getItemViewType(position: Int): Int {
-        return when (syncedDevices[position]) {
-            is SyncedDevice -> CONNECTED_DEVICE
+        return when (val device = syncedDevices[position]) {
+            is SyncedDevice  -> {
+                if (device.loading) {
+                    LOADING_ITEM
+                } else {
+                    CONNECTED_DEVICE
+                }
+            }
             is SyncDeviceListItem.LoadingItem -> LOADING_ITEM
         }
     }
@@ -100,10 +123,11 @@ class SyncedDevicesAdapter constructor(): RecyclerView.Adapter<RecyclerView.View
         holder: ViewHolder,
         position: Int
     ) {
-        when(holder) {
+        when (holder) {
             is SyncedDeviceViewHolder -> {
                 holder.bind(syncedDevices[position] as SyncedDevice)
             }
+
             is LoadingViewHolder -> {
                 holder.bind()
             }
@@ -148,25 +172,59 @@ class SyncedDevicesAdapter constructor(): RecyclerView.Adapter<RecyclerView.View
     }
 }
 
-class SyncedDeviceViewHolder(val binding: ItemSyncDeviceBinding): RecyclerView.ViewHolder(binding.root) {
+class SyncedDeviceViewHolder(
+    private val layoutInflater: LayoutInflater,
+    private val binding: ItemSyncDeviceBinding,
+    private val listener: ConnectedDeviceClickListener,
+) : ViewHolder(binding.root) {
     private val context = binding.root.context
     fun bind(syncDevice: SyncedDevice) {
         with(syncDevice.device) {
-            if(thisDevice) {
+            if (thisDevice) {
                 binding.localSyncDevice.show()
                 binding.localSyncDevice.setLeadingIcon(deviceType.type().asDrawableRes())
                 binding.localSyncDevice.setPrimaryText(deviceName)
                 binding.localSyncDevice.setSecondaryText(context.getString(R.string.sync_device_this_device_hint))
+                binding.localSyncDevice.setTrailingIconClickListener {
+                    showLocalOverFlowMenu(it, syncDevice)
+                }
             } else {
                 binding.remoteSyncDevice.show()
                 binding.remoteSyncDevice.setLeadingIcon(deviceType.type().asDrawableRes())
                 binding.remoteSyncDevice.setPrimaryText(deviceName)
+                binding.remoteSyncDevice.setTrailingIconClickListener {
+                    showRemoteOverFlowMenu(it, syncDevice)
+                }
             }
         }
     }
+
+    private fun showLocalOverFlowMenu(
+        anchor: View,
+        syncDevice: SyncedDevice,
+    ) {
+        val popupMenu = PopupMenu(layoutInflater, R.layout.popup_windows_edit_device_menu)
+        val view = popupMenu.contentView
+        popupMenu.apply {
+            onMenuItemClicked(view.findViewById(R.id.edit)) { listener.onRemoveDeviceClicked(syncDevice.device) }
+        }
+        popupMenu.show(binding.root, anchor)
+    }
+
+    private fun showRemoteOverFlowMenu(
+        anchor: View,
+        syncDevice: SyncedDevice,
+    ) {
+        val popupMenu = PopupMenu(layoutInflater, R.layout.popup_windows_remove_device_menu)
+        val view = popupMenu.contentView
+        popupMenu.apply {
+            onMenuItemClicked(view.findViewById(R.id.remove)) { listener.onRemoveDeviceClicked(syncDevice.device) }
+        }
+        popupMenu.show(binding.root, anchor)
+    }
 }
 
-class LoadingViewHolder(val binding: ItemSyncDeviceLoadingBinding): RecyclerView.ViewHolder(binding.root) {
+class LoadingViewHolder(val binding: ItemSyncDeviceLoadingBinding) : ViewHolder(binding.root) {
     fun bind() {
         binding.shimmerFrameLayout.startShimmer()
     }
@@ -177,6 +235,15 @@ class LoadingViewHolder(val binding: ItemSyncDeviceLoadingBinding): RecyclerView
 class SyncActivity : DuckDuckGoActivity() {
     private val binding: ActivitySyncBinding by viewBinding()
     private val viewModel: SyncActivityViewModel by bindViewModel()
+    private val syncedDevicesAdapter = SyncedDevicesAdapter(object : ConnectedDeviceClickListener {
+        override fun onEditDeviceClicked(device: ConnectedDevice) {
+            viewModel.onEditDeviceClicked(device)
+        }
+
+        override fun onRemoveDeviceClicked(device: ConnectedDevice) {
+            viewModel.onRemoveDeviceClicked(device)
+        }
+    })
 
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
@@ -248,7 +315,24 @@ class SyncActivity : DuckDuckGoActivity() {
                     viewModel.generateRecoveryCode(this@SyncActivity)
                 }
             }
+            is AskRemoveDevice -> askRemoveDevice(it.device)
         }
+    }
+
+    private fun askRemoveDevice(device: ConnectedDevice) {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.remove_device_dialog_title)
+            .setMessage(getString(R.string.remove_device_dialog_content, device.deviceName))
+            .setPositiveButton(R.string.remove_device_dialog_primary_button)
+            .setNegativeButton(R.string.remove_device_dialog_secondary_button)
+            .setDestructiveButtons(true)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onRemoveDeviceConfirmed(device)
+                    }
+                },
+            ).show()
     }
 
     private fun askDeleteAccount() {
