@@ -34,6 +34,7 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.makeSnackbarWithNoBottomInset
+import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
@@ -151,10 +152,15 @@ class SyncedDeviceViewHolder(val binding: ItemSyncDeviceBinding): RecyclerView.V
     private val context = binding.root.context
     fun bind(syncDevice: SyncedDevice) {
         with(syncDevice.device) {
-            binding.syncDevice.setLeadingIcon(deviceType.type().asDrawableRes())
-            binding.syncDevice.setPrimaryText(deviceName)
-            if (thisDevice) {
-                binding.syncDevice.setSecondaryText(context.getString(R.string.sync_device_this_device_hint))
+            if(thisDevice) {
+                binding.localSyncDevice.show()
+                binding.localSyncDevice.setLeadingIcon(deviceType.type().asDrawableRes())
+                binding.localSyncDevice.setPrimaryText(deviceName)
+                binding.localSyncDevice.setSecondaryText(context.getString(R.string.sync_device_this_device_hint))
+            } else {
+                binding.remoteSyncDevice.show()
+                binding.remoteSyncDevice.setLeadingIcon(deviceType.type().asDrawableRes())
+                binding.remoteSyncDevice.setPrimaryText(deviceName)
             }
         }
     }
