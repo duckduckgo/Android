@@ -79,7 +79,12 @@
     <string name="remove_device_dialog_content">\"%1$s\" will no longer be able to access your synced data.</string>
     <string name="remove_device_dialog_primary_button">Remove</string>
     <string name="remove_device_dialog_secondary_button">Cancel</string>
+    <string name="edit_device_dialog_title">Edit</string>
+    <string name="edit_device_dialog_hint">Device Name</string>
+    <string name="edit_device_dialog_primary_button">OK</string>
+    <string name="edit_device_dialog_secondary_button">Cancel</string>
     <string name="sync_device_this_device_hint">This device</string>
     <string name="sync_device_menu_option_edit">Edit</string>
     <string name="sync_device_menu_option_remove">Remove Device</string>
+
 </resources>

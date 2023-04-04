@@ -56,6 +56,7 @@ interface SyncRepository {
     fun pollConnectionKeys(): Result<Boolean>
     fun sendAllData(): Result<Boolean>
     fun fetchAllData(): Result<Boolean>
+    fun renameDevice(device: ConnectedDevice): Result<Boolean>
 }
 
 @ContributesBinding(AppScope::class)
@@ -131,6 +132,12 @@ class AppSyncRepository @Inject constructor(
         val deviceName = syncDeviceIds.deviceName()
 
         return performLogin(userId, deviceId, deviceName, primaryKey)
+    }
+
+    override fun renameDevice(device: ConnectedDevice): Result<Boolean> {
+        val userId = syncStore.userId ?: return Error(reason = "Not existing userId")
+        val primaryKey = syncStore.primaryKey ?: return Error(reason = "Not existing primaryKey")
+        return performLogin(userId, device.deviceId, device.deviceName, primaryKey)
     }
 
     override fun getAccountInfo(): AccountInfo {

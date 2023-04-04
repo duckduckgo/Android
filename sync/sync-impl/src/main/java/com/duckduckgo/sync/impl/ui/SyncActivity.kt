@@ -34,6 +34,7 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
+import com.duckduckgo.mobile.android.ui.view.dialog.CustomAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.mobile.android.ui.view.gone
@@ -47,10 +48,12 @@ import com.duckduckgo.sync.impl.ShareAction
 import com.duckduckgo.sync.impl.R.layout
 import com.duckduckgo.sync.impl.asDrawableRes
 import com.duckduckgo.sync.impl.databinding.ActivitySyncBinding
+import com.duckduckgo.sync.impl.databinding.DialogEditDeviceBinding
 import com.duckduckgo.sync.impl.databinding.ItemSyncDeviceBinding
 import com.duckduckgo.sync.impl.databinding.ItemSyncDeviceLoadingBinding
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccount
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskEditDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskRemoveDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
@@ -206,7 +209,7 @@ class SyncedDeviceViewHolder(
         val popupMenu = PopupMenu(layoutInflater, R.layout.popup_windows_edit_device_menu)
         val view = popupMenu.contentView
         popupMenu.apply {
-            onMenuItemClicked(view.findViewById(R.id.edit)) { listener.onRemoveDeviceClicked(syncDevice.device) }
+            onMenuItemClicked(view.findViewById(R.id.edit)) { listener.onEditDeviceClicked(syncDevice.device) }
         }
         popupMenu.show(binding.root, anchor)
     }
@@ -316,7 +319,27 @@ class SyncActivity : DuckDuckGoActivity() {
                 }
             }
             is AskRemoveDevice -> askRemoveDevice(it.device)
+            is AskEditDevice -> askEditDevice(it.device)
         }
+    }
+
+    private fun askEditDevice(device: ConnectedDevice) {
+        val inputBinding = DialogEditDeviceBinding.inflate(layoutInflater)
+        inputBinding.customDialogTextInput.text = device.deviceName
+        CustomAlertDialogBuilder(this)
+            .setTitle(R.string.edit_device_dialog_title)
+            .setPositiveButton(R.string.edit_device_dialog_primary_button)
+            .setNegativeButton(R.string.edit_device_dialog_secondary_button)
+            .setView(inputBinding)
+            .addEventListener(
+                object : CustomAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        val newText = inputBinding.customDialogTextInput.text
+                        viewModel.onDeviceEdited(device.copy(deviceName = newText))
+                    }
+                },
+            )
+            .show()
     }
 
     private fun askRemoveDevice(device: ConnectedDevice) {

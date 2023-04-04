@@ -31,6 +31,7 @@ import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncRepository
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccount
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskEditDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskRemoveDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
@@ -85,6 +86,7 @@ class SyncActivityViewModel @Inject constructor(
         object CheckIfUserHasStoragePermission : Command()
         data class RecoveryCodePDFSuccess(val recoveryCodePDFFile: File) : Command()
         data class AskRemoveDevice(val device: ConnectedDevice) : Command()
+        data class AskEditDevice(val device: ConnectedDevice) : Command()
     }
 
     fun getSyncState() {
@@ -196,7 +198,9 @@ class SyncActivityViewModel @Inject constructor(
     }
 
     fun onEditDeviceClicked(device: ConnectedDevice) {
-        //todo
+        viewModelScope.launch {
+            command.send(AskEditDevice(device))
+        }
     }
 
     fun onRemoveDeviceClicked(device: ConnectedDevice) {
@@ -217,6 +221,25 @@ class SyncActivityViewModel @Inject constructor(
             }
             viewState.emit(viewState.value.copy(syncedDevices = syncingDeviceList))
             val result = syncRepository.logout(device.deviceId)
+            when (result) {
+                is Error -> viewState.emit(viewState.value.copy(syncedDevices = oldList))
+                is Success -> updateDevicesList()
+            }
+        }
+    }
+
+    fun onDeviceEdited(editedConnectedDevice: ConnectedDevice) {
+        viewModelScope.launch(dispatchers.io()) {
+            val oldList = viewState.value.syncedDevices
+            val syncingDeviceList = viewState.value.syncedDevices.map {
+                if (it is SyncedDevice && it.device.deviceId == editedConnectedDevice.deviceId) {
+                    it.copy(loading = true)
+                } else {
+                    it
+                }
+            }
+            viewState.emit(viewState.value.copy(syncedDevices = syncingDeviceList))
+            val result = syncRepository.renameDevice(editedConnectedDevice)
             when (result) {
                 is Error -> viewState.emit(viewState.value.copy(syncedDevices = oldList))
                 is Success -> updateDevicesList()
