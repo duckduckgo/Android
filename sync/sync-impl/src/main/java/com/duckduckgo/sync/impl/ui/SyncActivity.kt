@@ -84,7 +84,7 @@ class SyncedDevicesAdapter constructor(private val listener: ConnectedDeviceClic
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
-        viewType: Int
+        viewType: Int,
     ): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
@@ -107,7 +107,7 @@ class SyncedDevicesAdapter constructor(private val listener: ConnectedDeviceClic
 
     override fun getItemViewType(position: Int): Int {
         return when (val device = syncedDevices[position]) {
-            is SyncedDevice  -> {
+            is SyncedDevice -> {
                 if (device.loading) {
                     LOADING_ITEM
                 } else {
@@ -124,7 +124,7 @@ class SyncedDevicesAdapter constructor(private val listener: ConnectedDeviceClic
 
     override fun onBindViewHolder(
         holder: ViewHolder,
-        position: Int
+        position: Int,
     ) {
         when (holder) {
             is SyncedDeviceViewHolder -> {
@@ -257,7 +257,6 @@ class SyncActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var shareAction: ShareAction
 
-    private val syncedDevicesAdapter = SyncedDevicesAdapter()
     private val deviceSyncStatusToggleListener: OnCheckedChangeListener = object : OnCheckedChangeListener {
         override fun onCheckedChanged(
             buttonView: CompoundButton?,
@@ -348,7 +347,6 @@ class SyncActivity : DuckDuckGoActivity() {
             .setMessage(getString(R.string.remove_device_dialog_content, device.deviceName))
             .setPositiveButton(R.string.remove_device_dialog_primary_button)
             .setNegativeButton(R.string.remove_device_dialog_secondary_button)
-            .setDestructiveButtons(true)
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
