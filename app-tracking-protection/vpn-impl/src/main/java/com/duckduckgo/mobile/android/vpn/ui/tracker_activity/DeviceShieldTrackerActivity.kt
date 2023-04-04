@@ -298,6 +298,7 @@ class DeviceShieldTrackerActivity :
         TextAlertDialogBuilder(this)
             .setTitle(R.string.atp_RemoveFeatureDialogTitle)
             .setMessage(R.string.atp_RemoveFeatureDialogMessage)
+            .setDestructiveButtons(true)
             .setPositiveButton(R.string.atp_RemoveFeatureDialogRemove)
             .setNegativeButton(R.string.atp_RemoveFeatureDialogCancel)
             .addEventListener(
