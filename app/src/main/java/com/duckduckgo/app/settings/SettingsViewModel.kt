@@ -496,6 +496,10 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch { command.send(Command.LaunchSyncSettings) }
     }
 
+    fun onLaunchedFromNotification(pixelSuffix: String) {
+        pixel.fire(pixelSuffix)
+    }
+
     companion object {
         const val EMAIL_PROTECTION_URL = "https://duckduckgo.com/email"
     }

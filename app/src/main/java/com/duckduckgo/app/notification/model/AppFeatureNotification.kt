@@ -16,14 +16,22 @@
 
 package com.duckduckgo.app.notification.model
 
+import android.app.PendingIntent
 import android.content.Context
 import android.os.Bundle
 import androidx.annotation.StringRes
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.APP_LAUNCH
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
+import com.duckduckgo.app.browser.BrowserActivity
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.notification.NotificationRegistrar
+import com.duckduckgo.app.notification.TaskStackBuilderFactory
 import com.duckduckgo.app.notification.db.NotificationDao
+import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.mobile.android.R as CommonR
+import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 
 class AppFeatureNotification(
     private val context: Context,
@@ -31,12 +39,9 @@ class AppFeatureNotification(
     @StringRes private val title: Int,
     @StringRes private val description: Int,
     private val pixelSuffix: String,
-    override val launchIntent: String = APP_LAUNCH,
 ) : SchedulableNotification {
 
     override val id = "com.duckduckgo.privacy.app.feature.$pixelSuffix"
-
-    override val cancelIntent: String = CANCEL
 
     override suspend fun canShow(): Boolean {
         return !notificationDao.exists(id)
@@ -64,4 +69,50 @@ class AppFeatureNotificationSpecification(
     override val title: String = context.getString(titleRes)
     override val description: String = context.getString(descriptionRes)
     override val color: Int = CommonR.color.ic_launcher_red_background
+}
+
+// This is not used at the moment.
+// @ContributesMultibinding(AppScope::class)
+class AppFeatureNotificationPlugin @Inject constructor(
+    private val context: Context,
+    private val schedulableNotification: AppFeatureNotification,
+    private val taskStackBuilderFactory: TaskStackBuilderFactory,
+    private val pixel: Pixel,
+    private val coroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
+) : SchedulableNotificationPlugin {
+
+    override fun getSchedulableNotification(): SchedulableNotification {
+        return schedulableNotification
+    }
+
+    override fun onNotificationCancelled() {
+        pixel.fire(pixelName(AppPixelName.NOTIFICATION_CANCELLED.pixelName))
+    }
+
+    override fun onNotificationShown() {
+        pixel.fire(pixelName(AppPixelName.NOTIFICATION_SHOWN.pixelName))
+    }
+
+    override fun getSpecification(): NotificationSpec {
+        val deferred = coroutineScope.async(dispatcherProvider.io()) {
+            schedulableNotification.buildSpecification()
+        }
+        return runBlocking {
+            deferred.await()
+        }
+    }
+
+    override fun getLaunchIntent(): PendingIntent? {
+        val intent = BrowserActivity.intent(context, newSearch = true).apply {
+            putExtra(BrowserActivity.LAUNCH_FROM_NOTIFICATION_PIXEL_NAME, pixelName(AppPixelName.NOTIFICATION_LAUNCHED.pixelName))
+        }
+        val pendingIntent: PendingIntent? = taskStackBuilderFactory.createTaskBuilder().run {
+            addNextIntentWithParentStack(intent)
+            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        }
+        return pendingIntent
+    }
+
+    private fun pixelName(notificationType: String) = "${notificationType}_${getSpecification().pixelSuffix}"
 }

@@ -26,8 +26,6 @@ import androidx.annotation.StringRes
  */
 interface SchedulableNotification {
     val id: String
-    val launchIntent: String
-    val cancelIntent: String
     suspend fun canShow(): Boolean
     suspend fun buildSpecification(): NotificationSpec
 }

@@ -16,133 +16,92 @@
 
 package com.duckduckgo.app.notification
 
-import android.app.TaskStackBuilder
 import android.content.Intent
 import android.os.Bundle
-import androidx.core.app.NotificationManagerCompat
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.app.notification.NotificationHandlerService.Companion.PIXEL_SUFFIX_EXTRA
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_LAUNCH
 import com.duckduckgo.app.notification.model.Channel
 import com.duckduckgo.app.notification.model.NotificationSpec
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.notification.model.SchedulableNotificationPlugin
-import com.duckduckgo.app.statistics.pixels.Pixel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import org.junit.Assert.assertEquals
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.*
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
-@ExperimentalCoroutinesApi
 class NotificationHandlerServiceTest {
 
-    @get:Rule
-    var coroutinesTestRule = CoroutineTestRule()
-
     private lateinit var testee: NotificationHandlerService
-    private lateinit var mockPixel: Pixel
-    private val plugin = FakeSchedulablePlugin()
+    private val mockSchedulablePluginPoint = mock<PluginPoint<SchedulableNotificationPlugin>>()
+    private val mockNotificationPlugin = mock<SchedulableNotificationPlugin>()
 
     private val appContext = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext
 
     @Before
-    fun before() {
-        mockPixel = mock()
-        val mockTaskStackBuilderFactory: TaskStackBuilderFactory = mock()
-        val taskStackBuilder: TaskStackBuilder = mock()
-
-        whenever(taskStackBuilder.addNextIntentWithParentStack(any())).thenReturn(taskStackBuilder)
-        whenever(mockTaskStackBuilderFactory.createTaskBuilder()).thenReturn(taskStackBuilder)
-
+    fun setup() {
         testee = NotificationHandlerService().apply {
-            pixel = mockPixel
-            this.context = appContext
-            notificationManager = NotificationManagerCompat.from(context)
-            dispatcher = coroutinesTestRule.testDispatcherProvider
-            taskStackBuilderFactory = mockTaskStackBuilderFactory
-            schedulableNotificationPluginPoint = FakeSchedulablePluginPoint(plugin)
+            schedulableNotificationPluginPoint = mockSchedulablePluginPoint
         }
     }
 
     @Test
-    fun whenIntentIsClearDataLaunchedThenCorrespondingPixelIsFired() {
-        val intent = Intent(appContext, NotificationHandlerService::class.java)
-        intent.type = CLEAR_DATA_LAUNCH
-        intent.putExtra(PIXEL_SUFFIX_EXTRA, "abc")
+    fun whenIntentIsNullThenOnNotificationCancelledIsNotCalledOnAnyPlugin() {
+        val intent = null
+
         testee.onHandleIntent(intent)
-        verify(mockPixel).fire(eq("mnot_l_abc"), any(), any())
+
+        testee.schedulableNotificationPluginPoint.getPlugins().forEach {
+            verify(it, never()).onNotificationCancelled()
+        }
     }
 
     @Test
-    fun whenIntentIsClearDataCancelledThenCorrespondingPixelIsFired() {
-        val intent = Intent(appContext, NotificationHandlerService::class.java)
-        intent.type = CANCEL
-        intent.putExtra(PIXEL_SUFFIX_EXTRA, "abc")
+    fun whenIntentTypeIsNullThenOnNotificationCancelledIsNotCalledOnAnyPlugin() {
+        val intent = Intent(appContext, NotificationHandlerService::class.java).apply {
+            type = null
+        }
+
         testee.onHandleIntent(intent)
-        verify(mockPixel).fire(eq("mnot_c_abc"), any(), any())
+
+        testee.schedulableNotificationPluginPoint.getPlugins().forEach {
+            verify(it, never()).onNotificationCancelled()
+        }
     }
 
     @Test
-    fun whenOnHandleIntentInPluginWithCancelTypeThenExecuteOnNotificationCancelled() {
-        val intent = Intent("test").apply {
-            type = "test.cancel"
-            putExtra("PIXEL_SUFFIX_EXTRA", "test")
+    fun whenIntentTypeDoesntMatchAnyPluginThenOnNotificationCancelledIsNotCalledOnAnyPlugin() {
+        whenever(mockSchedulablePluginPoint.getPlugins()).thenReturn(listOf(mockNotificationPlugin))
+        whenever(mockNotificationPlugin.getSchedulableNotification()).thenReturn(TestNotification())
+        val intent = Intent(appContext, NotificationHandlerService::class.java).apply {
+            type = "unknown"
         }
+
         testee.onHandleIntent(intent)
 
-        assertEquals(3, plugin.schedulable)
+        testee.schedulableNotificationPluginPoint.getPlugins().forEach {
+            verify(it, never()).onNotificationCancelled()
+        }
     }
 
     @Test
-    fun whenOnHandleIntentInPluginWithLaunchTypeThenExecuteOnNotificationLaunched() {
-        val intent = Intent("test").apply {
-            type = "test.launch"
-            putExtra("PIXEL_SUFFIX_EXTRA", "test")
+    fun whenIntentTypeMatchesAnyPluginThenOnNotificationCancelledIsCalledOnThePlugin() {
+        whenever(mockSchedulablePluginPoint.getPlugins()).thenReturn(listOf(mockNotificationPlugin))
+        whenever(mockNotificationPlugin.getSchedulableNotification()).thenReturn(TestNotification())
+        val intent = Intent(appContext, NotificationHandlerService::class.java).apply {
+            type = TestNotification::class.java.simpleName
         }
+
         testee.onHandleIntent(intent)
 
-        assertEquals(2, plugin.schedulable)
-    }
-
-    class FakeSchedulablePluginPoint(private val plugin: SchedulableNotificationPlugin) : PluginPoint<SchedulableNotificationPlugin> {
-        override fun getPlugins(): Collection<SchedulableNotificationPlugin> {
-            return listOf(plugin)
-        }
-    }
-
-    class FakeSchedulablePlugin : SchedulableNotificationPlugin {
-        var schedulable = 0
-
-        override fun getSchedulableNotification(): SchedulableNotification {
-            return TestNotification()
-        }
-
-        override fun onNotificationLaunched() {
-            schedulable = 2
-        }
-
-        override fun onNotificationCancelled() {
-            schedulable = 3
-        }
-
-        override fun onNotificationShown() {
-            schedulable = 4
-        }
-
-        override fun getSpecification(): NotificationSpec {
-            return TestSpec()
+        testee.schedulableNotificationPluginPoint.getPlugins().forEach {
+            verify(it).onNotificationCancelled()
         }
     }
 
     class TestNotification : SchedulableNotification {
         override val id: String = "id"
-        override val launchIntent: String = "test.launch"
-        override val cancelIntent: String = "test.cancel"
         override suspend fun canShow(): Boolean = true
         override suspend fun buildSpecification(): NotificationSpec = TestSpec()
     }
