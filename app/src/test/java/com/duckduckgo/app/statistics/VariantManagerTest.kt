@@ -19,10 +19,10 @@ package com.duckduckgo.app.statistics
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.BlockingTrackersAcrossWebRemoteMessage
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.CookiePromptManagementExperiment
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.OnboardingCustomizationExperiment
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DaxDialogMessage
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.NextLevelPrivacyNotification
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.NextLevelPrivacyRemoteMessage
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.OnboardingCustomizationExperiment
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.OneEasyStepForPrivacyNotification
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.OneEasyStepForPrivacyRemoteMessage
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.OptimiseOnboardingExperiment
