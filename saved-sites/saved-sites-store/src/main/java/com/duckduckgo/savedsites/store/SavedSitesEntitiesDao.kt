@@ -59,17 +59,14 @@ interface SavedSitesEntitiesDao {
     )
     fun entitiesInFolderSync(folderId: String): List<Entity>
 
-    @Delete
-    fun delete(entity: Entity)
-
-    @Query("delete from entities where entityId = :id")
+    @Query("update entities set deleted = 1 where entityId = :id")
     fun delete(id: String)
 
-    @Query("delete from entities where url = :url")
-    fun deleteByUrl(url: String)
-
-    @Delete
-    fun deleteList(entities: List<Entity>)
+    @Query("update entities set deleted = 1 where entityId != :bookmarksRoot AND entityId != :favoritesRoot")
+    fun deleteAll(
+        bookmarksRoot: String = SavedSitesNames.BOOMARKS_ROOT,
+        favoritesRoot: String = SavedSitesNames.FAVORITES_ROOT,
+    )
 
     @Update(onConflict = OnConflictStrategy.IGNORE)
     fun update(entity: Entity)
@@ -101,10 +98,4 @@ interface SavedSitesEntitiesDao {
 
     @Query("select * from entities where type = :type and entities.deleted = 0")
     fun entitiesByTypeSync(type: EntityType): List<Entity>
-
-    @Query("delete from entities where entityId != :bookmarksRoot AND entityId != :favoritesRoot")
-    fun deleteAll(
-        bookmarksRoot: String = SavedSitesNames.BOOMARKS_ROOT,
-        favoritesRoot: String = SavedSitesNames.FAVORITES_ROOT,
-    )
 }
