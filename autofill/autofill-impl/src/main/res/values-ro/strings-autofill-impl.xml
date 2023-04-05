@@ -17,18 +17,18 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Completare automată la autentificare</string>
+    <string name="autofillManagementScreenTitle">Conectări</string>
 
     <string name="managementDisabledModeCta"><b>Configurează în Setări</b></string>
-    <string name="managementDisabledModeSubtitle">Este necesar un model de blocare a dispozitivului, un cod PIN sau date biometrice pentru a-ți proteja detaliile de autentificare prin completarea automată.</string>
-    <string name="managementDisabledModeTitle">Asigură-ți dispozitivul pentru a utiliza completarea automată</string>
+    <string name="managementDisabledModeSubtitle">Este necesar un model de blocare a dispozitivului, un cod PIN sau date biometrice pentru a-ți proteja conectările.</string>
+    <string name="managementDisabledModeTitle">Securizează-ți dispozitivul pentru a salva conectările</string>
 
     <string name="saveLoginDialogTitle">Salvezi autentificarea?</string>
     <string name="saveLoginMissingUsernameDialogTitle">Salvezi parola?</string>
     <string name="saveLoginDialogButtonSave">Salvează autentificarea</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Salvează parola</string>
     <string name="saveLoginDialogNotNow">Nu acum</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">DuckDuckGo va stoca în siguranță aceste date de conectare pe dispozitivul tău. Din Setări poți gestiona datele de conectare salvate.</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">Datele de conectare sunt stocate în siguranță doar pe acest dispozitiv și pot fi gestionate din meniul Date de conectare din Setări.</string>
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Dorești ca DuckDuckGo să îți salveze datele de autentificare?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Mai multe opțiuni</string>
 
@@ -71,4 +71,7 @@
     <string name="autofillManagementSearchClearDescription">Șterge datele introduse pentru căutare</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Nu există rezultate pentru „%1$s”</string>
 
+    <string name="autofillDeleteLoginDialogCancel">Anulare</string>
+    <string name="autofillDeleteLoginDialogDelete">Ștergere</string>
+    <string name="autofillDeleteLoginDialogTitle">Sigur vrei să ștergi aceste date de autentificare?</string>
 </resources>
