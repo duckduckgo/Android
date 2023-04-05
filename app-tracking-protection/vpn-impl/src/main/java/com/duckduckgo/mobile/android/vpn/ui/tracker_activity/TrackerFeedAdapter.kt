@@ -18,7 +18,6 @@ package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 
 import android.content.Context
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -246,7 +245,7 @@ class TrackerFeedAdapter @Inject constructor(
         }
 
         private fun String.asIconDrawable(): TextDrawable {
-            return TextDrawable.builder().buildRound(this.take(1), Color.DKGRAY)
+            return TextDrawable.asIconDrawable(this)
         }
     }
 

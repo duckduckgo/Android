@@ -21,7 +21,9 @@ import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.OvalShape
 import android.graphics.drawable.shapes.RectShape
 import android.graphics.drawable.shapes.RoundRectShape
+import androidx.core.graphics.toColorInt
 import java.util.*
+import kotlin.math.absoluteValue
 
 /**
  * @author amulya
@@ -188,7 +190,7 @@ class TextDrawable private constructor(builder: Builder) : ShapeDrawable(builder
 
         override fun buildRect(
             text: String,
-            color: Int,
+            color: Int?,
         ): TextDrawable {
             rect()
             return build(text, color)
@@ -196,7 +198,7 @@ class TextDrawable private constructor(builder: Builder) : ShapeDrawable(builder
 
         override fun buildRoundRect(
             text: String,
-            color: Int,
+            color: Int?,
             radius: Int,
         ): TextDrawable {
             roundRect(radius)
@@ -205,7 +207,7 @@ class TextDrawable private constructor(builder: Builder) : ShapeDrawable(builder
 
         override fun buildRound(
             text: String,
-            color: Int,
+            color: Int?,
         ): TextDrawable {
             round()
             return build(text, color)
@@ -213,11 +215,38 @@ class TextDrawable private constructor(builder: Builder) : ShapeDrawable(builder
 
         override fun build(
             text: String,
-            color: Int,
+            color: Int?,
         ): TextDrawable {
-            this.color = color
+            this.color = color ?: textToColor(text)
             this.text = text
             return TextDrawable(this)
+        }
+
+        private fun textToColor(text: String): Int {
+            val palette = listOf(
+                "#94B3AF",
+                "#727998",
+                "#645468",
+                "#4D5F7F",
+                "#855DB6",
+                "#5E5ADB",
+                "#678FFF",
+                "#6BB4EF",
+                "#4A9BAE",
+                "#66C4C6",
+                "#55D388",
+                "#99DB7A",
+                "#ECCC7B",
+                "#E7A538",
+                "#DD6B4C",
+                "#D65D62",
+            )
+
+            // hasCode() is consistent for the same text
+            return text.hashCode().absoluteValue.let {
+                val index = (it % palette.size)
+                palette[index]
+            }.toColorInt()
         }
 
         init {
@@ -249,7 +278,7 @@ class TextDrawable private constructor(builder: Builder) : ShapeDrawable(builder
     interface IBuilder {
         fun build(
             text: String,
-            color: Int,
+            color: Int? = null,
         ): TextDrawable
     }
 
@@ -260,18 +289,18 @@ class TextDrawable private constructor(builder: Builder) : ShapeDrawable(builder
         fun roundRect(radius: Int): IBuilder?
         fun buildRect(
             text: String,
-            color: Int,
+            color: Int? = null,
         ): TextDrawable
 
         fun buildRoundRect(
             text: String,
-            color: Int,
+            color: Int? = null,
             radius: Int,
         ): TextDrawable
 
         fun buildRound(
             text: String,
-            color: Int,
+            color: Int? = null,
         ): TextDrawable
     }
 
@@ -281,8 +310,12 @@ class TextDrawable private constructor(builder: Builder) : ShapeDrawable(builder
             return Builder()
         }
 
+        /**
+         * @return a round [TextDrawable] from a given text. The background color is automatically calculated from the
+         * text string
+         */
         fun asIconDrawable(text: String): TextDrawable {
-            return builder().buildRound(text.take(1), Color.DKGRAY)
+            return builder().buildRound(text.take(1))
         }
     }
 

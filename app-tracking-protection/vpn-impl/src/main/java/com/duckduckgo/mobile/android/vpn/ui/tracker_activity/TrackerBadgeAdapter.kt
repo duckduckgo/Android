@@ -63,9 +63,9 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
 
     class TrackerBadgeViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
-        var iconBadge: ImageView = view.findViewById(R.id.tracker_company_badge_icon)
-        var textBadge: TextView = view.findViewById(R.id.tracker_company_badge_text)
-        var largeTextBadge: TextView = view.findViewById(R.id.tracker_company_large_badge_text)
+        private var iconBadge: ImageView = view.findViewById(R.id.tracker_company_badge_icon)
+        private var textBadge: TextView = view.findViewById(R.id.tracker_company_badge_text)
+        private var largeTextBadge: TextView = view.findViewById(R.id.tracker_company_large_badge_text)
 
         companion object {
             fun create(parent: ViewGroup): TrackerBadgeViewHolder {
@@ -91,7 +91,7 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
                         .beginConfig()
                         .fontSize(50)
                         .endConfig()
-                        .buildRound(trackerInfo.companyName.take(1), textColor),
+                        .buildRound(trackerInfo.companyName.take(1)),
                 )
             } else {
                 iconBadge.setImageResource(badge)
@@ -137,10 +137,10 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
         override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
             val oldItem = oldList[oldItemPosition]
             val newItem = newList[newItemPosition]
-            if (oldItem is TrackerCompanyBadge.Company && newItem is TrackerCompanyBadge.Company) {
-                return oldItem.companyName == newItem.companyName
+            return if (oldItem is TrackerCompanyBadge.Company && newItem is TrackerCompanyBadge.Company) {
+                oldItem.companyName == newItem.companyName
             } else {
-                return false
+                false
             }
         }
 
