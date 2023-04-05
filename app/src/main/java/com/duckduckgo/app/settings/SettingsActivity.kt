@@ -30,7 +30,6 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.children
-import androidx.core.view.forEach
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -73,6 +72,8 @@ import com.duckduckgo.autoconsent.impl.ui.AutoconsentSettingsActivity
 import com.duckduckgo.autofill.api.AutofillSettingsActivityLauncher
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.macos_impl.MacOsActivity
+import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackerActivityWithEmptyParams
+import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme.DARK
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme.LIGHT
@@ -81,8 +82,7 @@ import com.duckduckgo.mobile.android.ui.sendThemeChangedBroadcast
 import com.duckduckgo.mobile.android.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnOnboardingActivity
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.sync.api.SyncNav
 import com.duckduckgo.windows.api.WindowsWaitlistState
 import com.duckduckgo.windows.api.WindowsWaitlistState.InBeta
@@ -117,6 +117,9 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var autofillSettingsActivityLauncher: AutofillSettingsActivityLauncher
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
     private val defaultBrowserChangeListener = OnCheckedChangeListener { _, isChecked ->
         viewModel.onDefaultBrowserToggled(isChecked)
@@ -677,11 +680,11 @@ class SettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun launchAppTPTrackersScreen() {
-        startActivity(DeviceShieldTrackerActivity.intent(this))
+        globalActivityStarter.start(this, AppTrackerActivityWithEmptyParams)
     }
 
     private fun launchAppTPOnboardingScreen() {
-        startActivity(VpnOnboardingActivity.intent(this))
+        globalActivityStarter.start(this, AppTrackerOnboardingActivityWithEmptyParamsParams)
     }
 
     private fun launchAddHomeScreenWidget() {

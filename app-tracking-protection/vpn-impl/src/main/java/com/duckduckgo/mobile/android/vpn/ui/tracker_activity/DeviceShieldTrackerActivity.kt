@@ -30,10 +30,12 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackerActivityWithEmptyParams
 import com.duckduckgo.mobile.android.ui.view.DaxDialogListener
 import com.duckduckgo.mobile.android.ui.view.InfoPanel.Companion.APPTP_SETTINGS_ANNOTATION
 import com.duckduckgo.mobile.android.ui.view.InfoPanel.Companion.REPORT_ISSUES_ANNOTATION
@@ -79,6 +81,7 @@ import nl.dionsegijn.konfetti.models.Shape
 import nl.dionsegijn.konfetti.models.Size
 
 @InjectWith(ActivityScope::class)
+@ContributeToActivityStarter(AppTrackerActivityWithEmptyParams::class)
 class DeviceShieldTrackerActivity :
     DuckDuckGoActivity(),
     DeviceShieldActivityFeedFragment.DeviceShieldActivityFeedListener {
@@ -672,7 +675,7 @@ class DeviceShieldTrackerActivity :
 
         private const val REQUEST_ASK_VPN_PERMISSION = 101
 
-        fun intent(
+        internal fun intent(
             context: Context,
             onLaunchCallback: ResultReceiver? = null,
         ): Intent {
