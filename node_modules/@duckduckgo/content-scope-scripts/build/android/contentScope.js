@@ -467,9 +467,23 @@
     }
 
     /**
+     * @typedef {object} Platform
+     * @property {'ios' | 'macos' | 'extension' | 'android' | 'windows'} name
+     * @property {string} [version]
+     */
+
+    /**
+     * @typedef {object} UserPreferences
+     * @property {Platform} platform
+     * @property {boolean} [debug]
+     * @property {boolean} [globalPrivacyControl]
+     * @property {string} sessionKey
+     */
+
+    /**
      * @param {{ features: Record<string, { state: string; settings: any; exceptions: string[] }>; unprotectedTemporary: string; }} data
      * @param {string[]} userList
-     * @param {Record<string, unknown>} preferences
+     * @param {UserPreferences} preferences
      * @param {string[]} platformSpecificFeatures
      */
     function processConfig (data, userList, preferences, platformSpecificFeatures = []) {
@@ -482,26 +496,28 @@
             return feature.state === 'enabled' && !isUnprotectedDomain(topLevelHostname, feature.exceptions)
         }).concat(platformSpecificFeaturesNotInRemoteConfig); // only disable platform specific features if it's explicitly disabled in remote config
         const isBroken = isUnprotectedDomain(topLevelHostname, data.unprotectedTemporary);
-        preferences.site = {
+        /** @type {Record<string, any>} */
+        const output = { ...preferences };
+        output.site = {
             domain: topLevelHostname,
             isBroken,
             allowlisted,
             enabledFeatures
         };
         // TODO
-        preferences.cookie = {};
+        output.cookie = {};
 
         // Copy feature settings from remote config to preferences object
-        preferences.featureSettings = {};
+        output.featureSettings = {};
         remoteFeatureNames.forEach((featureName) => {
             if (!enabledFeatures.includes(featureName)) {
                 return
             }
 
-            preferences.featureSettings[featureName] = data.features[featureName].settings;
+            output.featureSettings[featureName] = data.features[featureName].settings;
         });
 
-        return preferences
+        return output
     }
 
     function isGloballyDisabled (args) {
@@ -584,24 +600,36 @@
     const features = [];
     const alwaysInitFeatures = new Set(['cookie']);
 
-    async function load$2 (args) {
+    /**
+     * @typedef {object} LoadArgs
+     * @property {object} platform
+     * @property {string} platform.name
+     * @property {string} [platform.version]
+     * @property {boolean} [documentOriginIsTracker]
+     * @property {object} [bundledConfig]
+     */
+
+    /**
+     * @param {LoadArgs} args
+     */
+    async function load (args) {
         if (!shouldRun()) {
             return
         }
 
         for (const featureName of featureNames) {
             const filename = featureName.replace(/([a-zA-Z])(?=[A-Z0-9])/g, '$1-').toLowerCase();
-            const feature = __variableDynamicImportRuntime0__(`./features/${filename}.js`).then(({ init, load, update }) => {
-                if (load) {
-                    load(args);
-                }
-                return { featureName, init, update }
+            const feature = __variableDynamicImportRuntime0__(`./features/${filename}.js`).then((exported) => {
+                const ContentFeature = exported.default;
+                const featureInstance = new ContentFeature(featureName);
+                featureInstance.callLoad(args);
+                return { featureName, featureInstance }
             });
             features.push(feature);
         }
     }
 
-    async function init$h (args) {
+    async function init$1 (args) {
         initArgs = args;
         if (!shouldRun()) {
             return
@@ -609,9 +637,9 @@
         registerMessageSecret(args.messageSecret);
         initStringExemptionLists(args);
         const resolvedFeatures = await Promise.all(features);
-        resolvedFeatures.forEach(({ init, featureName }) => {
+        resolvedFeatures.forEach(({ featureInstance, featureName }) => {
             if (!isFeatureBroken(args, featureName) || alwaysInitExtensionFeatures(args, featureName)) {
-                init(args);
+                featureInstance.callInit(args);
             }
         });
         // Fire off updates that came in faster than the init
@@ -627,9 +655,9 @@
 
     async function updateFeaturesInner (args) {
         const resolvedFeatures = await Promise.all(features);
-        resolvedFeatures.forEach(({ update, featureName }) => {
-            if (!isFeatureBroken(initArgs, featureName) && update) {
-                update(args);
+        resolvedFeatures.forEach(({ featureInstance, featureName }) => {
+            if (!isFeatureBroken(initArgs, featureName) && featureInstance.update) {
+                featureInstance.update(args);
             }
         });
     }
@@ -646,11 +674,11 @@
             return
         }
 
-        load$2({
+        load({
             platform: processedConfig.platform
         });
 
-        init$h(processedConfig);
+        init$1(processedConfig);
 
         // Not supported:
         // update(message)
@@ -1682,6 +1710,78 @@
         return { config, sharedStrings }
     }
 
+    class ContentFeature {
+        constructor (featureName) {
+            this.name = featureName;
+            this._args = null;
+        }
+
+        /**
+         * @param {import('./utils').Platform} platform
+         */
+        set platform (platform) {
+            this._platform = platform;
+        }
+
+        get platform () {
+            return this._platform
+        }
+
+        /**
+         * @param {string} attrName
+         * @param {any} defaultValue
+         */
+        getFeatureAttr (attrName, defaultValue) {
+            return getFeatureAttr(this.name, this._args, attrName, defaultValue)
+        }
+
+        /**
+         * @param {string} featureKeyName
+         */
+        getFeatureSetting (featureKeyName) {
+            return getFeatureSetting(this.name, this._args, featureKeyName)
+        }
+
+        /**
+         * @param {string} featureKeyName
+         */
+        getFeatureSettingEnabled (featureKeyName) {
+            return getFeatureSettingEnabled(this.name, this._args, featureKeyName)
+        }
+
+        /**
+         * @param {string} featureKeyName
+         * @return {any[]}
+         */
+        matchDomainFeatureSetting (featureKeyName) {
+            const domains = this.getFeatureSetting(featureKeyName) || [];
+            return domains.filter((rule) => {
+                return matchHostname(this._args.site.domain, rule.domain)
+            })
+        }
+
+        init (args) {
+        }
+
+        callInit (args) {
+            this._args = args;
+            this.platform = args.platform;
+            this.init(args);
+        }
+
+        load (args) {
+        }
+
+        callLoad (args) {
+            this._args = args;
+            this.platform = args.platform;
+            this.load(args);
+        }
+
+        update () {
+        }
+    }
+
     // @ts-nocheck
 
     let devMode$1 = false;
@@ -1701,6 +1801,9 @@
     const entities$1 = [];
     const entityData$1 = {};
 
+    // Used to avoid displaying placeholders for the same tracking element twice.
+    const knownTrackingElements = new WeakSet();
+
     let readyResolver$1;
     const ready$1 = new Promise(resolve => { readyResolver$1 = resolve; });
 
@@ -1712,6 +1815,7 @@
             this.clickAction = { ...widgetData.clickAction }; // shallow copy
             this.replaceSettings = widgetData.replaceSettings;
             this.originalElement = originalElement;
+            this.placeholderElement = null;
             this.dataElements = {};
             this.gatherDataElements();
             this.entity = entity;
@@ -1997,19 +2101,6 @@
                             break
                         }
 
-                        // If hidden, restore the tracking element's styles to make
-                        // it visible again.
-                        if (this.originalElementStyle) {
-                            for (const key of ['display', 'visibility']) {
-                                const { value, priority } = this.originalElementStyle[key];
-                                if (value) {
-                                    fbElement.style.setProperty(key, value, priority);
-                                } else {
-                                    fbElement.style.removeProperty(key);
-                                }
-                            }
-                        }
-
                         /*
                         * Modify the overlay to include a Facebook iFrame, which
                         * starts invisible. Once loaded, fade out and remove the overlay
@@ -2048,33 +2139,13 @@
         }
     };
 
-    function replaceTrackingElement$1 (widget, trackingElement, placeholderElement, hideTrackingElement = false, currentPlaceholder = null) {
+    function replaceTrackingElement$1 (widget, trackingElement, placeholderElement, currentPlaceholder = null) {
+        widget.placeholderElement = placeholderElement;
+
         widget.dispatchEvent(trackingElement, 'ddg-ctp-tracking-element');
 
-        // Usually the tracking element can simply be replaced with the
-        // placeholder, but in some situations that isn't possible and the
-        // tracking element must be hidden instead.
-        if (hideTrackingElement) {
-            // Don't save original element styles if we've already done it
-            if (!widget.originalElementStyle) {
-                // Take care to note existing styles so that they can be restored.
-                widget.originalElementStyle = getOriginalElementStyle$1(trackingElement, widget);
-            }
-            // Hide the tracking element and add the placeholder next to it in
-            // the DOM.
-            trackingElement.style.setProperty('display', 'none', 'important');
-            trackingElement.style.setProperty('visibility', 'hidden', 'important');
-            trackingElement.parentElement.insertBefore(placeholderElement, trackingElement);
-            if (currentPlaceholder) {
-                currentPlaceholder.remove();
-            }
-        } else {
-            if (currentPlaceholder) {
-                currentPlaceholder.replaceWith(placeholderElement);
-            } else {
-                trackingElement.replaceWith(placeholderElement);
-            }
-        }
+        const elementToReplace = currentPlaceholder || trackingElement;
+        elementToReplace.replaceWith(placeholderElement);
 
         widget.dispatchEvent(placeholderElement, 'ddg-ctp-placeholder-element');
     }
@@ -2117,24 +2188,7 @@
             replaceTrackingElement$1(
                 widget, trackingElement, contentBlock
             );
-
-            // Show the extra unblock link in the header if the placeholder or
-            // its parent is too short for the normal unblock button to be visible.
-            // Note: This does not take into account the placeholder's vertical
-            //       position in the parent element.
-            const { height: placeholderHeight } = window.getComputedStyle(contentBlock);
-            const { height: parentHeight } = window.getComputedStyle(contentBlock.parentElement);
-            if (parseInt(placeholderHeight, 10) <= 200 || parseInt(parentHeight, 10) <= 200) {
-                const titleRowTextButton = shadowRoot.querySelector(`#${titleID$1 + 'TextButton'}`);
-                titleRowTextButton.style.display = 'block';
-
-                // Avoid the placeholder being taller than the containing element
-                // and overflowing.
-                const innerDiv = shadowRoot.querySelector('.DuckDuckGoSocialContainer');
-                innerDiv.style.minHeight = '';
-                innerDiv.style.maxHeight = parentHeight;
-                innerDiv.style.overflow = 'hidden';
-            }
+            showExtraUnblockIfShortPlaceholder$1(shadowRoot, contentBlock);
         }
 
         /** YouTube CTL */
@@ -2167,14 +2221,12 @@
         }
 
         // Show YouTube Preview for embedded video
-        // TODO: Fix the hideTrackingElement option and reenable, or remove it. It's
-        //       disabled for YouTube videos so far since it caused multiple
-        //       placeholders to be displayed on the page.
         if (isYoutubePreviewsEnabled$1 === true) {
             const { youTubePreview, shadowRoot } = await createYouTubePreview$1(trackingElement, widget);
-            const currentPlaceholder = togglePlaceholder ? document.getElementById(`yt-ctl-dialog-${widget.widgetID}`) : null;
+            const currentPlaceholder = togglePlaceholder ? widget.placeholderElement : null;
+            resizeElementToMatch(currentPlaceholder || trackingElement, youTubePreview);
             replaceTrackingElement$1(
-                widget, trackingElement, youTubePreview, /* hideTrackingElement= */ false, currentPlaceholder
+                widget, trackingElement, youTubePreview, currentPlaceholder
             );
             showExtraUnblockIfShortPlaceholder$1(shadowRoot, youTubePreview);
 
@@ -2182,28 +2234,40 @@
         } else {
             widget.autoplay = false;
             const { blockingDialog, shadowRoot } = await createYouTubeBlockingDialog$1(trackingElement, widget);
-            const currentPlaceholder = togglePlaceholder ? document.getElementById(`yt-ctl-preview-${widget.widgetID}`) : null;
+            const currentPlaceholder = togglePlaceholder ? widget.placeholderElement : null;
+            resizeElementToMatch(currentPlaceholder || trackingElement, blockingDialog);
             replaceTrackingElement$1(
-                widget, trackingElement, blockingDialog, /* hideTrackingElement= */ false, currentPlaceholder
+                widget, trackingElement, blockingDialog, currentPlaceholder
             );
             showExtraUnblockIfShortPlaceholder$1(shadowRoot, blockingDialog);
         }
     }
 
     /**
-     /* Show the extra unblock link in the header if the placeholder or
-    /* its parent is too short for the normal unblock button to be visible.
-    /* Note: This does not take into account the placeholder's vertical
-    /*       position in the parent element.
-    * @param {Element} shadowRoot
-    * @param {Element} placeholder Placeholder for tracking element
-    */
+     * Show the extra unblock link in the header if the placeholder or
+     * its parent is too short for the normal unblock button to be visible.
+     * Note: This does not take into account the placeholder's vertical
+     *       position in the parent element.
+     * @param {Element} shadowRoot
+     * @param {Element} placeholder Placeholder for tracking element
+     */
     function showExtraUnblockIfShortPlaceholder$1 (shadowRoot, placeholder) {
+        if (!placeholder.parentElement) {
+            return
+        }
+
         const { height: placeholderHeight } = window.getComputedStyle(placeholder);
         const { height: parentHeight } = window.getComputedStyle(placeholder.parentElement);
         if (parseInt(placeholderHeight, 10) <= 200 || parseInt(parentHeight, 10) <= 200) {
             const titleRowTextButton = shadowRoot.querySelector(`#${titleID$1 + 'TextButton'}`);
             titleRowTextButton.style.display = 'block';
+
+            // Avoid the placeholder being taller than the containing element
+            // and overflowing.
+            const innerDiv = shadowRoot.querySelector('.DuckDuckGoSocialContainer');
+            innerDiv.style.minHeight = '';
+            innerDiv.style.maxHeight = parentHeight;
+            innerDiv.style.overflow = 'hidden';
         }
     }
 
@@ -2231,6 +2295,12 @@
                 }
 
                 await Promise.all(trackingElements.map(trackingElement => {
+                    if (knownTrackingElements.has(trackingElement)) {
+                        return Promise.resolve()
+                    }
+
+                    knownTrackingElements.add(trackingElement);
+
                     const widget = new DuckWidget$1(widgetData, trackingElement, entity);
                     return createPlaceholderElementAndReplace$1(widget, trackingElement)
                 }));
@@ -2313,44 +2383,32 @@
     }
 
     /**
-     * Reads and stores a set of styles from the original tracking element, and then returns it.
-     * @param {Element} originalElement Original tracking element (ie iframe)
-     * @param {DuckWidget} widget The widget Object.
-     * @returns {{[key: string]: string[]}} Object with styles read from original element.
+     * Resizes and positions the target element to match the source element.
+     * @param {Element} sourceElement
+     * @param {Element} targetElement
      */
-    function getOriginalElementStyle$1 (originalElement, widget) {
-        if (widget.originalElementStyle) {
-            return widget.originalElementStyle
-        }
-
-        const stylesToCopy = ['display', 'visibility', 'position', 'top', 'bottom', 'left', 'right',
+    function resizeElementToMatch (sourceElement, targetElement) {
+        const computedStyle = window.getComputedStyle(sourceElement);
+        const stylesToCopy = ['position', 'top', 'bottom', 'left', 'right',
             'transform', 'margin'];
-        widget.originalElementStyle = {};
-        const allOriginalElementStyles = getComputedStyle(originalElement);
-        for (const key of stylesToCopy) {
-            widget.originalElementStyle[key] = {
-                value: allOriginalElementStyles[key],
-                priority: originalElement.style.getPropertyPriority(key)
-            };
+
+        // It's apparently preferable to use the source element's size relative to
+        // the current viewport, when resizing the target element. However, the
+        // declarativeNetRequest API "collapses" (hides) blocked elements. When
+        // that happens, getBoundingClientRect will return all zeros.
+        // TODO: Remove this entirely, and always use the computed height/width of
+        //       the source element instead?
+        const { height, width } = sourceElement.getBoundingClientRect();
+        if (height > 0 && width > 0) {
+            targetElement.style.height = height + 'px';
+            targetElement.style.width = width + 'px';
+        } else {
+            stylesToCopy.push('height', 'width');
         }
 
-        // Copy current size of the element
-        const { height: heightViewValue, width: widthViewValue } = originalElement.getBoundingClientRect();
-        widget.originalElementStyle.height = { value: `${heightViewValue}px`, priority: '' };
-        widget.originalElementStyle.width = { value: `${widthViewValue}px`, priority: '' };
-
-        return widget.originalElementStyle
-    }
-
-    /**
-     * Copy list of styles to provided element
-     * @param {{[key: string]: string[]}} originalStyles Object with styles read from original element.
-     * @param {Element} element Node element to have the styles copied to
-     */
-    function copyStylesTo$1 (originalStyles, element) {
-        const { display, visibility, ...filteredStyles } = originalStyles;
-        const cssText = Object.keys(filteredStyles).reduce((cssAcc, key) => (cssAcc + `${key}: ${filteredStyles[key].value};`), '');
-        element.style.cssText += cssText;
+        for (const key of stylesToCopy) {
+            targetElement.style[key] = computedStyle[key];
+        }
     }
 
     /**
@@ -2827,16 +2885,11 @@
         const { contentBlock, shadowRoot } = await createContentBlock$1(
             widget, button, textButton, null, bottomRow
         );
-        contentBlock.id = `yt-ctl-dialog-${widget.widgetID}`;
+        contentBlock.id = trackingElement.id;
         contentBlock.style.cssText += styles$1.wrapperDiv + styles$1.youTubeWrapperDiv;
 
         button.addEventListener('click', widget.clickFunction(trackingElement, contentBlock));
         textButton.addEventListener('click', widget.clickFunction(trackingElement, contentBlock));
-
-        // Size the placeholder element to match the original video element styles.
-        // If no styles are in place, it will get its current size
-        const originalStyles = getOriginalElementStyle$1(trackingElement, widget);
-        copyStylesTo$1(originalStyles, contentBlock);
 
         return {
             blockingDialog: contentBlock,
@@ -2857,15 +2910,10 @@
      */
     async function createYouTubePreview$1 (originalElement, widget) {
         const youTubePreview = document.createElement('div');
-        youTubePreview.id = `yt-ctl-preview-${widget.widgetID}`;
+        youTubePreview.id = originalElement.id;
         youTubePreview.style.cssText = styles$1.wrapperDiv + styles$1.placeholderWrapperDiv;
 
         youTubePreview.appendChild(makeFontFaceStyleElement$1());
-
-        // Size the placeholder element to match the original video element styles.
-        // If no styles are in place, it will get its current size
-        const originalStyles = getOriginalElementStyle$1(originalElement, widget);
-        copyStylesTo$1(originalStyles, youTubePreview);
 
         // Protect the contents of our placeholder inside a shadowRoot, to avoid
         // it being styled by the website's stylesheets.
@@ -3029,100 +3077,101 @@
 
     const knownMessageResponseType$1 = Object.prototype.hasOwnProperty.bind(messageResponseHandlers$1);
 
-    function init$g (args) {
-        const websiteOwner = args?.site?.parentEntity;
-        const settings = args?.featureSettings?.clickToLoad || {};
-        const locale = args?.locale || 'en';
-        const localizedConfig = getConfig$1(locale);
-        config$1 = localizedConfig.config;
-        sharedStrings$1 = localizedConfig.sharedStrings;
+    class ClickToLoad extends ContentFeature {
+        init (args) {
+            const websiteOwner = args?.site?.parentEntity;
+            const settings = args?.featureSettings?.clickToLoad || {};
+            const locale = args?.locale || 'en';
+            const localizedConfig = getConfig$1(locale);
+            config$1 = localizedConfig.config;
+            sharedStrings$1 = localizedConfig.sharedStrings;
 
-        for (const entity of Object.keys(config$1)) {
-            // Strip config entities that are first-party, or aren't enabled in the
-            // extension's clickToLoad settings.
-            if ((websiteOwner && entity === websiteOwner) ||
-                !settings[entity] ||
-                settings[entity].state !== 'enabled') {
-                delete config$1[entity];
-                continue
+            for (const entity of Object.keys(config$1)) {
+                // Strip config entities that are first-party, or aren't enabled in the
+                // extension's clickToLoad settings.
+                if ((websiteOwner && entity === websiteOwner) ||
+                    !settings[entity] ||
+                    settings[entity].state !== 'enabled') {
+                    delete config$1[entity];
+                    continue
+                }
+
+                // Populate the entities and entityData data structures.
+                // TODO: Remove them and this logic, they seem unnecessary.
+
+                entities$1.push(entity);
+
+                const shouldShowLoginModal = !!config$1[entity].informationalModal;
+                const currentEntityData = { shouldShowLoginModal };
+
+                if (shouldShowLoginModal) {
+                    const { informationalModal } = config$1[entity];
+                    currentEntityData.modalIcon = informationalModal.icon;
+                    currentEntityData.modalTitle = informationalModal.messageTitle;
+                    currentEntityData.modalText = informationalModal.messageBody;
+                    currentEntityData.modalAcceptText = informationalModal.confirmButtonText;
+                    currentEntityData.modalRejectText = informationalModal.rejectButtonText;
+                }
+
+                entityData$1[entity] = currentEntityData;
             }
 
-            // Populate the entities and entityData data structures.
-            // TODO: Remove them and this logic, they seem unnecessary.
+            // Listen for events from "surrogate" scripts.
+            addEventListener('ddg-ctp', (event) => {
+                if (!event.detail) return
+                const entity = event.detail.entity;
+                if (!entities$1.includes(entity)) {
+                    // Unknown entity, reject
+                    return
+                }
+                if (event.detail.appID) {
+                    appID$1 = JSON.stringify(event.detail.appID).replace(/"/g, '');
+                }
+                // Handle login call
+                if (event.detail.action === 'login') {
+                    if (entityData$1[entity].shouldShowLoginModal) {
+                        makeModal$1(entity, runLogin$1, entity);
+                    } else {
+                        runLogin$1(entity);
+                    }
+                }
+            });
 
-            entities$1.push(entity);
-
-            const shouldShowLoginModal = !!config$1[entity].informationalModal;
-            const currentEntityData = { shouldShowLoginModal };
-
-            if (shouldShowLoginModal) {
-                const { informationalModal } = config$1[entity];
-                currentEntityData.modalIcon = informationalModal.icon;
-                currentEntityData.modalTitle = informationalModal.messageTitle;
-                currentEntityData.modalText = informationalModal.messageBody;
-                currentEntityData.modalAcceptText = informationalModal.confirmButtonText;
-                currentEntityData.modalRejectText = informationalModal.rejectButtonText;
-            }
-
-            entityData$1[entity] = currentEntityData;
+            // Request the current state of Click to Load from the platform.
+            // Note: When the response is received, the response handler finishes
+            //       starting up the feature.
+            sendMessage('getClickToLoadState');
         }
 
-        // Listen for events from "surrogate" scripts.
-        addEventListener('ddg-ctp', (event) => {
-            if (!event.detail) return
-            const entity = event.detail.entity;
-            if (!entities$1.includes(entity)) {
-                // Unknown entity, reject
-                return
-            }
-            if (event.detail.appID) {
-                appID$1 = JSON.stringify(event.detail.appID).replace(/"/g, '');
-            }
-            // Handle login call
-            if (event.detail.action === 'login') {
-                if (entityData$1[entity].shouldShowLoginModal) {
-                    makeModal$1(entity, runLogin$1, entity);
-                } else {
-                    runLogin$1(entity);
+        update (message) {
+            // TODO: Once all Click to Load messages include the feature property, drop
+            //       messages that don't include the feature property too.
+            if (message?.feature && message?.feature !== 'clickToLoad') return
+
+            const messageType = message?.messageType;
+            if (!messageType) return
+
+            // Message responses.
+            if (messageType === 'response') {
+                const messageResponseType = message?.responseMessageType;
+                if (messageResponseType && knownMessageResponseType$1(messageResponseType)) {
+                    return messageResponseHandlers$1[messageResponseType](message.response)
                 }
             }
-        });
 
-        // Request the current state of Click to Load from the platform.
-        // Note: When the response is received, the response handler finishes
-        //       starting up the feature.
-        sendMessage('getClickToLoadState');
-    }
-
-    function update$2 (message) {
-        // TODO: Once all Click to Load messages include the feature property, drop
-        //       messages that don't include the feature property too.
-        if (message?.feature && message?.feature !== 'clickToLoad') return
-
-        const messageType = message?.messageType;
-        if (!messageType) return
-
-        // Message responses.
-        if (messageType === 'response') {
-            const messageResponseType = message?.responseMessageType;
-            if (messageResponseType && knownMessageResponseType$1(messageResponseType)) {
-                return messageResponseHandlers$1[messageResponseType](message.response)
+            // Other known update messages.
+            if (messageType === 'displayClickToLoadPlaceholders') {
+                // TODO: Pass `message.options.ruleAction` through, that way only
+                //       content corresponding to the entity for that ruleAction need to
+                //       be replaced with a placeholder.
+                return replaceClickToLoadElements$1()
             }
-        }
-
-        // Other known update messages.
-        if (messageType === 'displayClickToLoadPlaceholders') {
-            // TODO: Pass `message.options.ruleAction` through, that way only
-            //       content corresponding to the entity for that ruleAction need to
-            //       be replaced with a placeholder.
-            return replaceClickToLoadElements$1()
         }
     }
 
     var clickToLoad = /*#__PURE__*/Object.freeze({
         __proto__: null,
-        init: init$g,
-        update: update$2
+        default: ClickToLoad
     });
 
     const logoImg = 'data:application/octet-stream;base64,iVBORw0KGgoAAAANSUhEUgAAAIQAAACECAMAAABmmnOVAAA0aXpUWHRSYXcgcHJvZmlsZSB0eXBlIGV4aWYAAHjarZxpkhw5kqX/4xR1BOzLcQAFIDI36OP392BB5lY9Uy0yyWQyMsLpbgaovkVVYe781/+57l//+lcIPXeXS+t11Or5J4884uSL7r9/xvtv8Pn99/3T88/Pwl+/737/IPKtxJ/p+982f14/+X750xv9ep/11++7/vOT2H/eKPx+4/dP0ifr6/3ni+T78ft++LkQN873RR29/flS188b2a8r7n/8zr8v6/tD/+/+8o3GKu3CB6UYTwrJv//m7wqSfoc0+TPx35Aar/Np8HVJ0b1vxZ83Y0H+cnu//vT+zwv0l0X+9ZX7++r//upvix/nz/fT39ay/qwRX/zbH4Tyt++n3x8T//zB6fcVxb/+IIS4/3E7P7/v3f3e893dzJUVrT8R9RY7/HobXrhY8vT+WuVX43fh6/Z+DX51P72x5dubX/yyMEJkV64LOewwww3n/WnBuMQcT2RPYozGRul7nT0a0dgldlG/wo2NHdups5cWj2Mrc4q/ryW8zx3v8yx0PnkHXhoDb8bu/s+/3P/th/+bX+5ee0vs+++14rqiIovL0M7pv7yKDQn3Z9/KW+Bfv3623/8pfhSqmZdpmTs3OP363mKV8EdspbfPidcV/vxSKLi2f96AJeKzCxcTEjvga0gl1OBbjC0E1rGzQZMrjynHxQ6EUuLmImNOqUbXYo/6bP5OC++1scQa9W2wiY0oqabG3pBTbFbOhfhpuRNDs6SSSym1tNJdGWXWVHMttdZWBXKzpZZbabW11ttosycgsPTaW+999DniSGBgGXW00ccYc0Y3+aDJe01eP/nOiiutvMqqq62+xppG+Fi2YtWadRs2d9xpAxO77rb7Hnue4A5IcfIpp552+hlnXmLtpptvufW22++48/eu/ezqP379L3Yt/OxafDul17Xfu8Z3XWu/3iIITor2jB2LObDjTTtAQEftme8h56id0575EUmKErnIor1xO2jH2MJ8Qiw3/N67P3buP9o3V/p/tG/x/7VzTlv3/2PnHFv3z337N7u2xXP2duzLQq2pT2QfPz99utinSG3++z9H9vER0ogNiCz11FFYzM3HZH6SY2UHQOvr7LCJx9/pYxrz3JXnZbdYl+pjGens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';
@@ -5487,7 +5536,7 @@
 
     const knownMessageResponseType = Object.prototype.hasOwnProperty.bind(messageResponseHandlers);
 
-    function init$f (args) {
+    function init (args) {
         const websiteOwner = args?.site?.parentEntity;
         const settings = args?.featureSettings?.clickToPlay || {};
         const locale = args?.locale || 'en';
@@ -5557,7 +5606,7 @@
         sendMessage('getClickToLoadState');
     }
 
-    function update$1 (message) {
+    function update (message) {
         // TODO: Once all Click to Load messages include the feature property, drop
         //       messages that don't include the feature property too.
         if (message?.feature && message?.feature !== 'clickToLoad') return
@@ -5584,8 +5633,8 @@
 
     var clickToPlay = /*#__PURE__*/Object.freeze({
         __proto__: null,
-        init: init$f,
-        update: update$1
+        init: init,
+        update: update
     });
 
     class Cookie {
@@ -5657,8 +5706,6 @@
     };
 
     let loadedPolicyResolve;
-    // Listen for a message from the content script which will configure the policy for this context
-    const trackerHosts = new Set();
 
     /**
      * @param {'ignore' | 'block' | 'restrict'} action
@@ -5692,157 +5739,150 @@
         return cookiePolicy.isFrame && !cookiePolicy.isTracker && cookiePolicy.isThirdParty
     }
 
-    function load$1 (args) {
-        // Feature is only relevant to the extension and windows, we should skip for other platforms for now as the config testing is broken.
-        if (args.platform.name !== 'extension' && args.platform.name !== 'windows') {
-            return
-        }
-        if (args.documentOriginIsTracker) {
-            cookiePolicy.isTracker = true;
-        }
-        if (args.bundledConfig) {
-            // use the bundled config to get a best-effort at the policy, before the background sends the real one
-            const { exceptions, settings } = args.bundledConfig.features.cookie;
-            const tabHostname = getTabHostname();
-            let tabExempted = true;
-
-            if (tabHostname != null) {
-                tabExempted = exceptions.some((exception) => {
-                    return matchHostname(tabHostname, exception.domain)
-                });
-            }
-            const frameExempted = settings.excludedCookieDomains.some((exception) => {
-                return matchHostname(globalThis.location.hostname, exception.domain)
-            });
-            cookiePolicy.shouldBlock = !frameExempted && !tabExempted;
-            cookiePolicy.policy = settings.firstPartyCookiePolicy;
-        }
-        trackerHosts.clear();
-
-        // The cookie policy is injected into every frame immediately so that no cookie will
-        // be missed.
-        const document = globalThis.document;
-        const cookieSetter = Object.getOwnPropertyDescriptor(globalThis.Document.prototype, 'cookie').set;
-        const cookieGetter = Object.getOwnPropertyDescriptor(globalThis.Document.prototype, 'cookie').get;
-
-        const loadPolicy = new Promise((resolve) => {
-            loadedPolicyResolve = resolve;
-        });
-        // Create the then callback now - this ensures that Promise.prototype.then changes won't break
-        // this call.
-        const loadPolicyThen = loadPolicy.then.bind(loadPolicy);
-
-        function getCookiePolicy () {
-            const stack = getStack();
-            const scriptOrigins = getStackTraceOrigins(stack);
-            const getCookieContext = {
-                stack,
-                scriptOrigins,
-                value: 'getter'
-            };
-
-            if (shouldBlockTrackingCookie() || shouldBlockNonTrackingCookie()) {
-                debugHelper('block', '3p frame', getCookieContext);
-                return ''
-            } else if (isTrackingCookie() || isNonTrackingCookie()) {
-                debugHelper('ignore', '3p frame', getCookieContext);
-            }
-            return cookieGetter.call(document)
-        }
-
-        function setCookiePolicy (value) {
-            const stack = getStack();
-            const scriptOrigins = getStackTraceOrigins(stack);
-            const setCookieContext = {
-                stack,
-                scriptOrigins,
-                value
-            };
-
-            if (shouldBlockTrackingCookie() || shouldBlockNonTrackingCookie()) {
-                debugHelper('block', '3p frame', setCookieContext);
+    class CookieFeature extends ContentFeature {
+        load (args) {
+            // Feature is only relevant to the extension and windows, we should skip for other platforms for now as the config testing is broken.
+            if (this.platform.name !== 'extension' && this.platform.name !== 'windows') {
                 return
-            } else if (isTrackingCookie() || isNonTrackingCookie()) {
-                debugHelper('ignore', '3p frame', setCookieContext);
             }
-            // call the native document.cookie implementation. This will set the cookie immediately
-            // if the value is valid. We will override this set later if the policy dictates that
-            // the expiry should be changed.
-            cookieSetter.call(document, value);
+            if (args.documentOriginIsTracker) {
+                cookiePolicy.isTracker = true;
+            }
+            if (args.bundledConfig) {
+                // use the bundled config to get a best-effort at the policy, before the background sends the real one
+                const { exceptions, settings } = args.bundledConfig.features.cookie;
+                const tabHostname = getTabHostname();
+                let tabExempted = true;
 
-            try {
-                // wait for config before doing same-site tests
-                loadPolicyThen(() => {
-                    const { shouldBlock, policy } = cookiePolicy;
-
-                    if (!shouldBlock) {
-                        debugHelper('ignore', 'disabled', setCookieContext);
-                        return
-                    }
-
-                    // extract cookie expiry from cookie string
-                    const cookie = new Cookie(value);
-                    // apply cookie policy
-                    if (cookie.getExpiry() > policy.threshold) {
-                        // check if the cookie still exists
-                        if (document.cookie.split(';').findIndex(kv => kv.trim().startsWith(cookie.parts[0].trim())) !== -1) {
-                            cookie.maxAge = policy.maxAge;
-
-                            debugHelper('restrict', 'expiry', setCookieContext);
-
-                            cookieSetter.apply(document, [cookie.toString()]);
-                        } else {
-                            debugHelper('ignore', 'dissappeared', setCookieContext);
-                        }
-                    } else {
-                        debugHelper('ignore', 'expiry', setCookieContext);
-                    }
+                if (tabHostname != null) {
+                    tabExempted = exceptions.some((exception) => {
+                        return matchHostname(tabHostname, exception.domain)
+                    });
+                }
+                const frameExempted = settings.excludedCookieDomains.some((exception) => {
+                    return matchHostname(globalThis.location.hostname, exception.domain)
                 });
-            } catch (e) {
-                debugHelper('ignore', 'error', setCookieContext);
-                // suppress error in cookie override to avoid breakage
-                console.warn('Error in cookie override', e);
+                cookiePolicy.shouldBlock = !frameExempted && !tabExempted;
+                cookiePolicy.policy = settings.firstPartyCookiePolicy;
             }
+
+            // The cookie policy is injected into every frame immediately so that no cookie will
+            // be missed.
+            const document = globalThis.document;
+            const cookieSetter = Object.getOwnPropertyDescriptor(globalThis.Document.prototype, 'cookie').set;
+            const cookieGetter = Object.getOwnPropertyDescriptor(globalThis.Document.prototype, 'cookie').get;
+
+            const loadPolicy = new Promise((resolve) => {
+                loadedPolicyResolve = resolve;
+            });
+            // Create the then callback now - this ensures that Promise.prototype.then changes won't break
+            // this call.
+            const loadPolicyThen = loadPolicy.then.bind(loadPolicy);
+
+            function getCookiePolicy () {
+                const stack = getStack();
+                const scriptOrigins = getStackTraceOrigins(stack);
+                const getCookieContext = {
+                    stack,
+                    scriptOrigins,
+                    value: 'getter'
+                };
+
+                if (shouldBlockTrackingCookie() || shouldBlockNonTrackingCookie()) {
+                    debugHelper('block', '3p frame', getCookieContext);
+                    return ''
+                } else if (isTrackingCookie() || isNonTrackingCookie()) {
+                    debugHelper('ignore', '3p frame', getCookieContext);
+                }
+                return cookieGetter.call(document)
+            }
+
+            function setCookiePolicy (value) {
+                const stack = getStack();
+                const scriptOrigins = getStackTraceOrigins(stack);
+                const setCookieContext = {
+                    stack,
+                    scriptOrigins,
+                    value
+                };
+
+                if (shouldBlockTrackingCookie() || shouldBlockNonTrackingCookie()) {
+                    debugHelper('block', '3p frame', setCookieContext);
+                    return
+                } else if (isTrackingCookie() || isNonTrackingCookie()) {
+                    debugHelper('ignore', '3p frame', setCookieContext);
+                }
+                // call the native document.cookie implementation. This will set the cookie immediately
+                // if the value is valid. We will override this set later if the policy dictates that
+                // the expiry should be changed.
+                cookieSetter.call(document, value);
+
+                try {
+                    // wait for config before doing same-site tests
+                    loadPolicyThen(() => {
+                        const { shouldBlock, policy } = cookiePolicy;
+
+                        if (!shouldBlock) {
+                            debugHelper('ignore', 'disabled', setCookieContext);
+                            return
+                        }
+
+                        // extract cookie expiry from cookie string
+                        const cookie = new Cookie(value);
+                        // apply cookie policy
+                        if (cookie.getExpiry() > policy.threshold) {
+                            // check if the cookie still exists
+                            if (document.cookie.split(';').findIndex(kv => kv.trim().startsWith(cookie.parts[0].trim())) !== -1) {
+                                cookie.maxAge = policy.maxAge;
+
+                                debugHelper('restrict', 'expiry', setCookieContext);
+
+                                cookieSetter.apply(document, [cookie.toString()]);
+                            } else {
+                                debugHelper('ignore', 'dissappeared', setCookieContext);
+                            }
+                        } else {
+                            debugHelper('ignore', 'expiry', setCookieContext);
+                        }
+                    });
+                } catch (e) {
+                    debugHelper('ignore', 'error', setCookieContext);
+                    // suppress error in cookie override to avoid breakage
+                    console.warn('Error in cookie override', e);
+                }
+            }
+
+            defineProperty(document, 'cookie', {
+                configurable: true,
+                set: setCookiePolicy,
+                get: getCookiePolicy
+            });
         }
 
-        defineProperty(document, 'cookie', {
-            configurable: true,
-            set: setCookiePolicy,
-            get: getCookiePolicy
-        });
-    }
+        init (args) {
+            if (args.cookie) {
+                cookiePolicy = args.cookie;
+                args.cookie.debug = args.debug;
 
-    function init$e (args) {
-        if (args.cookie) {
-            cookiePolicy = args.cookie;
-            args.cookie.debug = args.debug;
-
-            const featureName = 'cookie';
-            cookiePolicy.shouldBlockTrackerCookie = getFeatureSettingEnabled(featureName, args, 'trackerCookie');
-            cookiePolicy.shouldBlockNonTrackerCookie = getFeatureSettingEnabled(featureName, args, 'nonTrackerCookie');
-            const policy = getFeatureSetting(featureName, args, 'firstPartyCookiePolicy');
-            if (policy) {
-                cookiePolicy.policy = policy;
+                const featureName = 'cookie';
+                cookiePolicy.shouldBlockTrackerCookie = getFeatureSettingEnabled(featureName, args, 'trackerCookie');
+                cookiePolicy.shouldBlockNonTrackerCookie = getFeatureSettingEnabled(featureName, args, 'nonTrackerCookie');
+                const policy = getFeatureSetting(featureName, args, 'firstPartyCookiePolicy');
+                if (policy) {
+                    cookiePolicy.policy = policy;
+                }
+            } else {
+                // no cookie information - disable protections
+                cookiePolicy.shouldBlock = false;
             }
-        } else {
-            // no cookie information - disable protections
-            cookiePolicy.shouldBlock = false;
-        }
 
-        loadedPolicyResolve();
-    }
-
-    function update (args) {
-        if (args.trackerDefinition) {
-            trackerHosts.add(args.hostname);
+            loadedPolicyResolve();
         }
     }
 
     var cookie = /*#__PURE__*/Object.freeze({
         __proto__: null,
-        init: init$e,
-        load: load$1,
-        update: update
+        default: CookieFeature
     });
 
     let adLabelStrings = [];
@@ -6120,71 +6160,66 @@
         });
     }
 
-    function init$d (args) {
-        if (isBeingFramed()) {
-            return
-        }
-
-        const featureName = 'elementHiding';
-        const domain = args.site.domain;
-        const domainRules = getFeatureSetting(featureName, args, 'domains');
-        const globalRules = getFeatureSetting(featureName, args, 'rules');
-        const styleTagExceptions = getFeatureSetting(featureName, args, 'styleTagExceptions');
-        adLabelStrings = getFeatureSetting(featureName, args, 'adLabelStrings');
-        shouldInjectStyleTag = getFeatureSetting(featureName, args, 'useStrictHideStyleTag');
-        mediaAndFormSelectors = getFeatureSetting(featureName, args, 'mediaAndFormSelectors') || mediaAndFormSelectors;
-
-        // determine whether strict hide rules should be injected as a style tag
-        if (shouldInjectStyleTag) {
-            shouldInjectStyleTag = !styleTagExceptions.some((exception) => {
-                return matchHostname(domain, exception.domain)
-            });
-        }
-
-        // collect all matching rules for domain
-        const activeDomainRules = domainRules.filter((rule) => {
-            return matchHostname(domain, rule.domain)
-        }).flatMap((item) => item.rules);
-
-        const overrideRules = activeDomainRules.filter((rule) => {
-            return rule.type === 'override'
-        });
-
-        let activeRules = activeDomainRules.concat(globalRules);
-
-        // remove overrides and rules that match overrides from array of rules to be applied to page
-        overrideRules.forEach((override) => {
-            activeRules = activeRules.filter((rule) => {
-                return rule.selector !== override.selector
-            });
-        });
-
-        // now have the final list of rules to apply, so we apply them when document is loaded
-        if (document.readyState === 'loading') {
-            window.addEventListener('DOMContentLoaded', (event) => {
-                applyRules(activeRules);
-            });
-        } else {
-            applyRules(activeRules);
-        }
-        // single page applications don't have a DOMContentLoaded event on navigations, so
-        // we use proxy/reflect on history.pushState to call applyRules on page navigations
-        const historyMethodProxy = new DDGProxy(featureName, History.prototype, 'pushState', {
-            apply (target, thisArg, args) {
-                applyRules(activeRules);
-                return DDGReflect.apply(target, thisArg, args)
+    class ElementHiding extends ContentFeature {
+        init () {
+            if (isBeingFramed()) {
+                return
             }
-        });
-        historyMethodProxy.overload();
-        // listen for popstate events in order to run on back/forward navigations
-        window.addEventListener('popstate', (event) => {
-            applyRules(activeRules);
-        });
+
+            const featureName = 'elementHiding';
+            const globalRules = this.getFeatureSetting('rules');
+            adLabelStrings = this.getFeatureSetting('adLabelStrings');
+            shouldInjectStyleTag = this.getFeatureSetting('useStrictHideStyleTag');
+            mediaAndFormSelectors = this.getFeatureSetting('mediaAndFormSelectors') || mediaAndFormSelectors;
+
+            // determine whether strict hide rules should be injected as a style tag
+            if (shouldInjectStyleTag) {
+                shouldInjectStyleTag = this.matchDomainFeatureSetting('styleTagExceptions').length === 0;
+            }
+
+            // collect all matching rules for domain
+            const activeDomainRules = this.matchDomainFeatureSetting('domains').flatMap((item) => item.rules);
+
+            const overrideRules = activeDomainRules.filter((rule) => {
+                return rule.type === 'override'
+            });
+
+            let activeRules = activeDomainRules.concat(globalRules);
+
+            // remove overrides and rules that match overrides from array of rules to be applied to page
+            overrideRules.forEach((override) => {
+                activeRules = activeRules.filter((rule) => {
+                    return rule.selector !== override.selector
+                });
+            });
+
+            // now have the final list of rules to apply, so we apply them when document is loaded
+            if (document.readyState === 'loading') {
+                window.addEventListener('DOMContentLoaded', (event) => {
+                    applyRules(activeRules);
+                });
+            } else {
+                applyRules(activeRules);
+            }
+            // single page applications don't have a DOMContentLoaded event on navigations, so
+            // we use proxy/reflect on history.pushState to call applyRules on page navigations
+            const historyMethodProxy = new DDGProxy(featureName, History.prototype, 'pushState', {
+                apply (target, thisArg, args) {
+                    applyRules(activeRules);
+                    return DDGReflect.apply(target, thisArg, args)
+                }
+            });
+            historyMethodProxy.overload();
+            // listen for popstate events in order to run on back/forward navigations
+            window.addEventListener('popstate', (event) => {
+                applyRules(activeRules);
+            });
+        }
     }
 
     var elementHiding = /*#__PURE__*/Object.freeze({
         __proto__: null,
-        init: init$d
+        default: ElementHiding
     });
 
     // @ts-nocheck
@@ -6859,114 +6894,116 @@
         return sjcl.codec.hex.fromBits(hmac.encrypt(inputData))
     }
 
-    function init$c (args) {
-        const { sessionKey, site } = args;
-        const domainKey = site.domain;
-        const featureName = 'fingerprinting-audio';
+    class FingerprintingAudio extends ContentFeature {
+        init (args) {
+            const { sessionKey, site } = args;
+            const domainKey = site.domain;
+            const featureName = 'fingerprinting-audio';
 
-        // In place modify array data to remove fingerprinting
-        function transformArrayData (channelData, domainKey, sessionKey, thisArg) {
-            let { audioKey } = getCachedResponse(thisArg, args);
-            if (!audioKey) {
-                let cdSum = 0;
-                for (const k in channelData) {
-                    cdSum += channelData[k];
+            // In place modify array data to remove fingerprinting
+            function transformArrayData (channelData, domainKey, sessionKey, thisArg) {
+                let { audioKey } = getCachedResponse(thisArg, args);
+                if (!audioKey) {
+                    let cdSum = 0;
+                    for (const k in channelData) {
+                        cdSum += channelData[k];
+                    }
+                    // If the buffer is blank, skip adding data
+                    if (cdSum === 0) {
+                        return
+                    }
+                    audioKey = getDataKeySync(sessionKey, domainKey, cdSum);
+                    setCache(thisArg, args, audioKey);
                 }
-                // If the buffer is blank, skip adding data
-                if (cdSum === 0) {
-                    return
-                }
-                audioKey = getDataKeySync(sessionKey, domainKey, cdSum);
-                setCache(thisArg, args, audioKey);
+                iterateDataKey(audioKey, (item, byte) => {
+                    const itemAudioIndex = item % channelData.length;
+
+                    let factor = byte * 0.0000001;
+                    if (byte ^ 0x1) {
+                        factor = 0 - factor;
+                    }
+                    channelData[itemAudioIndex] = channelData[itemAudioIndex] + factor;
+                });
             }
-            iterateDataKey(audioKey, (item, byte) => {
-                const itemAudioIndex = item % channelData.length;
 
-                let factor = byte * 0.0000001;
-                if (byte ^ 0x1) {
-                    factor = 0 - factor;
-                }
-                channelData[itemAudioIndex] = channelData[itemAudioIndex] + factor;
-            });
-        }
-
-        const copyFromChannelProxy = new DDGProxy(featureName, AudioBuffer.prototype, 'copyFromChannel', {
-            apply (target, thisArg, args) {
-                const [source, channelNumber, startInChannel] = args;
-                // This is implemented in a different way to canvas purely because calling the function copied the original value, which is not ideal
-                if (// If channelNumber is longer than arrayBuffer number of channels then call the default method to throw
-                    channelNumber > thisArg.numberOfChannels ||
-                    // If startInChannel is longer than the arrayBuffer length then call the default method to throw
-                    startInChannel > thisArg.length) {
-                    // The normal return value
-                    return DDGReflect.apply(target, thisArg, args)
-                }
-                try {
-                    // Call the protected getChannelData we implement, slice from the startInChannel value and assign to the source array
-                    thisArg.getChannelData(channelNumber).slice(startInChannel).forEach((val, index) => {
-                        source[index] = val;
-                    });
-                } catch {
-                    return DDGReflect.apply(target, thisArg, args)
-                }
-            }
-        });
-        copyFromChannelProxy.overload();
-
-        const cacheExpiry = 60;
-        const cacheData = new WeakMap();
-        function getCachedResponse (thisArg, args) {
-            const data = cacheData.get(thisArg);
-            const timeNow = Date.now();
-            if (data &&
-                data.args === JSON.stringify(args) &&
-                data.expires > timeNow) {
-                data.expires = timeNow + cacheExpiry;
-                cacheData.set(thisArg, data);
-                return data
-            }
-            return { audioKey: null }
-        }
-
-        function setCache (thisArg, args, audioKey) {
-            cacheData.set(thisArg, { args: JSON.stringify(args), expires: Date.now() + cacheExpiry, audioKey });
-        }
-
-        const getChannelDataProxy = new DDGProxy(featureName, AudioBuffer.prototype, 'getChannelData', {
-            apply (target, thisArg, args) {
-                // The normal return value
-                const channelData = DDGReflect.apply(target, thisArg, args);
-                // Anything we do here should be caught and ignored silently
-                try {
-                    // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
-                    transformArrayData(channelData, domainKey, sessionKey, thisArg, args);
-                } catch {
-                }
-                return channelData
-            }
-        });
-        getChannelDataProxy.overload();
-
-        const audioMethods = ['getByteTimeDomainData', 'getFloatTimeDomainData', 'getByteFrequencyData', 'getFloatFrequencyData'];
-        for (const methodName of audioMethods) {
-            const proxy = new DDGProxy(featureName, AnalyserNode.prototype, methodName, {
+            const copyFromChannelProxy = new DDGProxy(featureName, AudioBuffer.prototype, 'copyFromChannel', {
                 apply (target, thisArg, args) {
-                    DDGReflect.apply(target, thisArg, args);
-                    // Anything we do here should be caught and ignored silently
+                    const [source, channelNumber, startInChannel] = args;
+                    // This is implemented in a different way to canvas purely because calling the function copied the original value, which is not ideal
+                    if (// If channelNumber is longer than arrayBuffer number of channels then call the default method to throw
+                        channelNumber > thisArg.numberOfChannels ||
+                        // If startInChannel is longer than the arrayBuffer length then call the default method to throw
+                        startInChannel > thisArg.length) {
+                        // The normal return value
+                        return DDGReflect.apply(target, thisArg, args)
+                    }
                     try {
-                        // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
-                        transformArrayData(args[0], domainKey, sessionKey, thisArg, args);
+                        // Call the protected getChannelData we implement, slice from the startInChannel value and assign to the source array
+                        thisArg.getChannelData(channelNumber).slice(startInChannel).forEach((val, index) => {
+                            source[index] = val;
+                        });
                     } catch {
+                        return DDGReflect.apply(target, thisArg, args)
                     }
                 }
             });
-            proxy.overload();
+            copyFromChannelProxy.overload();
+
+            const cacheExpiry = 60;
+            const cacheData = new WeakMap();
+            function getCachedResponse (thisArg, args) {
+                const data = cacheData.get(thisArg);
+                const timeNow = Date.now();
+                if (data &&
+                    data.args === JSON.stringify(args) &&
+                    data.expires > timeNow) {
+                    data.expires = timeNow + cacheExpiry;
+                    cacheData.set(thisArg, data);
+                    return data
+                }
+                return { audioKey: null }
+            }
+
+            function setCache (thisArg, args, audioKey) {
+                cacheData.set(thisArg, { args: JSON.stringify(args), expires: Date.now() + cacheExpiry, audioKey });
+            }
+
+            const getChannelDataProxy = new DDGProxy(featureName, AudioBuffer.prototype, 'getChannelData', {
+                apply (target, thisArg, args) {
+                    // The normal return value
+                    const channelData = DDGReflect.apply(target, thisArg, args);
+                    // Anything we do here should be caught and ignored silently
+                    try {
+                        // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
+                        transformArrayData(channelData, domainKey, sessionKey, thisArg, args);
+                    } catch {
+                    }
+                    return channelData
+                }
+            });
+            getChannelDataProxy.overload();
+
+            const audioMethods = ['getByteTimeDomainData', 'getFloatTimeDomainData', 'getByteFrequencyData', 'getFloatFrequencyData'];
+            for (const methodName of audioMethods) {
+                const proxy = new DDGProxy(featureName, AnalyserNode.prototype, methodName, {
+                    apply (target, thisArg, args) {
+                        DDGReflect.apply(target, thisArg, args);
+                        // Anything we do here should be caught and ignored silently
+                        try {
+                            // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
+                            transformArrayData(args[0], domainKey, sessionKey, thisArg, args);
+                        } catch {
+                        }
+                    }
+                });
+                proxy.overload();
+            }
         }
     }
 
     var fingerprintingAudio = /*#__PURE__*/Object.freeze({
         __proto__: null,
-        init: init$c
+        default: FingerprintingAudio
     });
 
     /**
@@ -6974,35 +7011,37 @@
      * It will return the values defined in the getBattery function to the client,
      * as well as prevent any script from listening to events.
      */
-    function init$b (args) {
-        // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
-        if (globalThis.navigator.getBattery) {
-            const BatteryManager = globalThis.BatteryManager;
+    class FingerprintingBattery extends ContentFeature {
+        init () {
+            // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
+            if (globalThis.navigator.getBattery) {
+                const BatteryManager = globalThis.BatteryManager;
 
-            const spoofedValues = {
-                charging: true,
-                chargingTime: 0,
-                dischargingTime: Infinity,
-                level: 1
-            };
-            const eventProperties = ['onchargingchange', 'onchargingtimechange', 'ondischargingtimechange', 'onlevelchange'];
+                const spoofedValues = {
+                    charging: true,
+                    chargingTime: 0,
+                    dischargingTime: Infinity,
+                    level: 1
+                };
+                const eventProperties = ['onchargingchange', 'onchargingtimechange', 'ondischargingtimechange', 'onlevelchange'];
 
-            for (const [prop, val] of Object.entries(spoofedValues)) {
-                try {
-                    defineProperty(BatteryManager.prototype, prop, { get: () => val });
-                } catch (e) { }
-            }
-            for (const eventProp of eventProperties) {
-                try {
-                    defineProperty(BatteryManager.prototype, eventProp, { get: () => null });
-                } catch (e) { }
+                for (const [prop, val] of Object.entries(spoofedValues)) {
+                    try {
+                        defineProperty(BatteryManager.prototype, prop, { get: () => val });
+                    } catch (e) { }
+                }
+                for (const eventProp of eventProperties) {
+                    try {
+                        defineProperty(BatteryManager.prototype, eventProp, { get: () => null });
+                    } catch (e) { }
+                }
             }
         }
     }
 
     var fingerprintingBattery = /*#__PURE__*/Object.freeze({
         __proto__: null,
-        init: init$b
+        default: FingerprintingBattery
     });
 
     var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
@@ -8166,224 +8205,224 @@
         return false
     }
 
-    function init$a (args) {
-        const { sessionKey, site } = args;
-        const domainKey = site.domain;
-        const featureName = 'fingerprinting-canvas';
-        const supportsWebGl = getFeatureSettingEnabled(featureName, args, 'webGl');
+    class FingerprintingCanvas extends ContentFeature {
+        init (args) {
+            const { sessionKey, site } = args;
+            const domainKey = site.domain;
+            const featureName = 'fingerprinting-canvas';
+            const supportsWebGl = this.getFeatureSettingEnabled('webGl');
 
-        const unsafeCanvases = new WeakSet();
-        const canvasContexts = new WeakMap();
-        const canvasCache = new WeakMap();
+            const unsafeCanvases = new WeakSet();
+            const canvasContexts = new WeakMap();
+            const canvasCache = new WeakMap();
 
-        /**
-         * Clear cache as canvas has changed
-         * @param {OffscreenCanvas | HTMLCanvasElement} canvas
-         */
-        function clearCache (canvas) {
-            canvasCache.delete(canvas);
-        }
-
-        /**
-         * @param {OffscreenCanvas | HTMLCanvasElement} canvas
-         */
-        function treatAsUnsafe (canvas) {
-            unsafeCanvases.add(canvas);
-            clearCache(canvas);
-        }
-
-        const proxy = new DDGProxy(featureName, HTMLCanvasElement.prototype, 'getContext', {
-            apply (target, thisArg, args) {
-                const context = DDGReflect.apply(target, thisArg, args);
-                try {
-                    canvasContexts.set(thisArg, context);
-                } catch {
-                }
-                return context
+            /**
+             * Clear cache as canvas has changed
+             * @param {OffscreenCanvas | HTMLCanvasElement} canvas
+             */
+            function clearCache (canvas) {
+                canvasCache.delete(canvas);
             }
-        });
-        proxy.overload();
 
-        // Known data methods
-        const safeMethods = ['putImageData', 'drawImage'];
-        for (const methodName of safeMethods) {
-            const safeMethodProxy = new DDGProxy(featureName, CanvasRenderingContext2D.prototype, methodName, {
+            /**
+             * @param {OffscreenCanvas | HTMLCanvasElement} canvas
+             */
+            function treatAsUnsafe (canvas) {
+                unsafeCanvases.add(canvas);
+                clearCache(canvas);
+            }
+
+            const proxy = new DDGProxy(featureName, HTMLCanvasElement.prototype, 'getContext', {
                 apply (target, thisArg, args) {
-                    // Don't apply escape hatch for canvases
-                    if (methodName === 'drawImage' && args[0] && args[0] instanceof HTMLCanvasElement) {
-                        treatAsUnsafe(args[0]);
-                    } else {
-                        clearCache(thisArg.canvas);
-                    }
-                    return DDGReflect.apply(target, thisArg, args)
-                }
-            });
-            safeMethodProxy.overload();
-        }
-
-        const unsafeMethods = [
-            'strokeRect',
-            'bezierCurveTo',
-            'quadraticCurveTo',
-            'arcTo',
-            'ellipse',
-            'rect',
-            'fill',
-            'stroke',
-            'lineTo',
-            'beginPath',
-            'closePath',
-            'arc',
-            'fillText',
-            'fillRect',
-            'strokeText',
-            'createConicGradient',
-            'createLinearGradient',
-            'createRadialGradient',
-            'createPattern'
-        ];
-        for (const methodName of unsafeMethods) {
-            // Some methods are browser specific
-            if (methodName in CanvasRenderingContext2D.prototype) {
-                const unsafeProxy = new DDGProxy(featureName, CanvasRenderingContext2D.prototype, methodName, {
-                    apply (target, thisArg, args) {
-                        treatAsUnsafe(thisArg.canvas);
-                        return DDGReflect.apply(target, thisArg, args)
-                    }
-                });
-                unsafeProxy.overload();
-            }
-        }
-
-        if (supportsWebGl) {
-            const unsafeGlMethods = [
-                'commit',
-                'compileShader',
-                'shaderSource',
-                'attachShader',
-                'createProgram',
-                'linkProgram',
-                'drawElements',
-                'drawArrays'
-            ];
-            const glContexts = [
-                WebGLRenderingContext
-            ];
-            if ('WebGL2RenderingContext' in globalThis) {
-                glContexts.push(WebGL2RenderingContext);
-            }
-            for (const context of glContexts) {
-                for (const methodName of unsafeGlMethods) {
-                    // Some methods are browser specific
-                    if (methodName in context.prototype) {
-                        const unsafeProxy = new DDGProxy(featureName, context.prototype, methodName, {
-                            apply (target, thisArg, args) {
-                                treatAsUnsafe(thisArg.canvas);
-                                return DDGReflect.apply(target, thisArg, args)
-                            }
-                        });
-                        unsafeProxy.overload();
-                    }
-                }
-            }
-        }
-
-        // Using proxies here to swallow calls to toString etc
-        const getImageDataProxy = new DDGProxy(featureName, CanvasRenderingContext2D.prototype, 'getImageData', {
-            apply (target, thisArg, args) {
-                if (!unsafeCanvases.has(thisArg.canvas)) {
-                    return DDGReflect.apply(target, thisArg, args)
-                }
-                // Anything we do here should be caught and ignored silently
-                try {
-                    const { offScreenCtx } = getCachedOffScreenCanvasOrCompute(thisArg.canvas, domainKey, sessionKey);
-                    // Call the original method on the modified off-screen canvas
-                    return DDGReflect.apply(target, offScreenCtx, args)
-                } catch {
-                }
-
-                return DDGReflect.apply(target, thisArg, args)
-            }
-        });
-        getImageDataProxy.overload();
-
-        /**
-         * Get cached offscreen if one exists, otherwise compute one
-         *
-         * @param {HTMLCanvasElement} canvas
-         * @param {string} domainKey
-         * @param {string} sessionKey
-         */
-        function getCachedOffScreenCanvasOrCompute (canvas, domainKey, sessionKey) {
-            let result;
-            if (canvasCache.has(canvas)) {
-                result = canvasCache.get(canvas);
-            } else {
-                const ctx = canvasContexts.get(canvas);
-                result = computeOffScreenCanvas(canvas, domainKey, sessionKey, getImageDataProxy, ctx);
-                canvasCache.set(canvas, result);
-            }
-            return result
-        }
-
-        const canvasMethods = ['toDataURL', 'toBlob'];
-        for (const methodName of canvasMethods) {
-            const proxy = new DDGProxy(featureName, HTMLCanvasElement.prototype, methodName, {
-                apply (target, thisArg, args) {
-                    // Short circuit for low risk canvas calls
-                    if (!unsafeCanvases.has(thisArg)) {
-                        return DDGReflect.apply(target, thisArg, args)
-                    }
+                    const context = DDGReflect.apply(target, thisArg, args);
                     try {
-                        const { offScreenCanvas } = getCachedOffScreenCanvasOrCompute(thisArg, domainKey, sessionKey);
-                        // Call the original method on the modified off-screen canvas
-                        return DDGReflect.apply(target, offScreenCanvas, args)
+                        canvasContexts.set(thisArg, context);
                     } catch {
-                        // Something we did caused an exception, fall back to the native
-                        return DDGReflect.apply(target, thisArg, args)
                     }
+                    return context
                 }
             });
             proxy.overload();
+
+            // Known data methods
+            const safeMethods = ['putImageData', 'drawImage'];
+            for (const methodName of safeMethods) {
+                const safeMethodProxy = new DDGProxy(featureName, CanvasRenderingContext2D.prototype, methodName, {
+                    apply (target, thisArg, args) {
+                        // Don't apply escape hatch for canvases
+                        if (methodName === 'drawImage' && args[0] && args[0] instanceof HTMLCanvasElement) {
+                            treatAsUnsafe(args[0]);
+                        } else {
+                            clearCache(thisArg.canvas);
+                        }
+                        return DDGReflect.apply(target, thisArg, args)
+                    }
+                });
+                safeMethodProxy.overload();
+            }
+
+            const unsafeMethods = [
+                'strokeRect',
+                'bezierCurveTo',
+                'quadraticCurveTo',
+                'arcTo',
+                'ellipse',
+                'rect',
+                'fill',
+                'stroke',
+                'lineTo',
+                'beginPath',
+                'closePath',
+                'arc',
+                'fillText',
+                'fillRect',
+                'strokeText',
+                'createConicGradient',
+                'createLinearGradient',
+                'createRadialGradient',
+                'createPattern'
+            ];
+            for (const methodName of unsafeMethods) {
+                // Some methods are browser specific
+                if (methodName in CanvasRenderingContext2D.prototype) {
+                    const unsafeProxy = new DDGProxy(featureName, CanvasRenderingContext2D.prototype, methodName, {
+                        apply (target, thisArg, args) {
+                            treatAsUnsafe(thisArg.canvas);
+                            return DDGReflect.apply(target, thisArg, args)
+                        }
+                    });
+                    unsafeProxy.overload();
+                }
+            }
+
+            if (supportsWebGl) {
+                const unsafeGlMethods = [
+                    'commit',
+                    'compileShader',
+                    'shaderSource',
+                    'attachShader',
+                    'createProgram',
+                    'linkProgram',
+                    'drawElements',
+                    'drawArrays'
+                ];
+                const glContexts = [
+                    WebGLRenderingContext
+                ];
+                if ('WebGL2RenderingContext' in globalThis) {
+                    glContexts.push(WebGL2RenderingContext);
+                }
+                for (const context of glContexts) {
+                    for (const methodName of unsafeGlMethods) {
+                        // Some methods are browser specific
+                        if (methodName in context.prototype) {
+                            const unsafeProxy = new DDGProxy(featureName, context.prototype, methodName, {
+                                apply (target, thisArg, args) {
+                                    treatAsUnsafe(thisArg.canvas);
+                                    return DDGReflect.apply(target, thisArg, args)
+                                }
+                            });
+                            unsafeProxy.overload();
+                        }
+                    }
+                }
+            }
+
+            // Using proxies here to swallow calls to toString etc
+            const getImageDataProxy = new DDGProxy(featureName, CanvasRenderingContext2D.prototype, 'getImageData', {
+                apply (target, thisArg, args) {
+                    if (!unsafeCanvases.has(thisArg.canvas)) {
+                        return DDGReflect.apply(target, thisArg, args)
+                    }
+                    // Anything we do here should be caught and ignored silently
+                    try {
+                        const { offScreenCtx } = getCachedOffScreenCanvasOrCompute(thisArg.canvas, domainKey, sessionKey);
+                        // Call the original method on the modified off-screen canvas
+                        return DDGReflect.apply(target, offScreenCtx, args)
+                    } catch {
+                    }
+
+                    return DDGReflect.apply(target, thisArg, args)
+                }
+            });
+            getImageDataProxy.overload();
+
+            /**
+             * Get cached offscreen if one exists, otherwise compute one
+             *
+             * @param {HTMLCanvasElement} canvas
+             * @param {string} domainKey
+             * @param {string} sessionKey
+             */
+            function getCachedOffScreenCanvasOrCompute (canvas, domainKey, sessionKey) {
+                let result;
+                if (canvasCache.has(canvas)) {
+                    result = canvasCache.get(canvas);
+                } else {
+                    const ctx = canvasContexts.get(canvas);
+                    result = computeOffScreenCanvas(canvas, domainKey, sessionKey, getImageDataProxy, ctx);
+                    canvasCache.set(canvas, result);
+                }
+                return result
+            }
+
+            const canvasMethods = ['toDataURL', 'toBlob'];
+            for (const methodName of canvasMethods) {
+                const proxy = new DDGProxy(featureName, HTMLCanvasElement.prototype, methodName, {
+                    apply (target, thisArg, args) {
+                        // Short circuit for low risk canvas calls
+                        if (!unsafeCanvases.has(thisArg)) {
+                            return DDGReflect.apply(target, thisArg, args)
+                        }
+                        try {
+                            const { offScreenCanvas } = getCachedOffScreenCanvasOrCompute(thisArg, domainKey, sessionKey);
+                            // Call the original method on the modified off-screen canvas
+                            return DDGReflect.apply(target, offScreenCanvas, args)
+                        } catch {
+                            // Something we did caused an exception, fall back to the native
+                            return DDGReflect.apply(target, thisArg, args)
+                        }
+                    }
+                });
+                proxy.overload();
+            }
         }
     }
 
     var fingerprintingCanvas = /*#__PURE__*/Object.freeze({
         __proto__: null,
-        init: init$a
+        default: FingerprintingCanvas
     });
 
-    const featureName$2 = 'fingerprinting-hardware';
+    class FingerprintingHardware extends ContentFeature {
+        init () {
+            const Navigator = globalThis.Navigator;
+            const navigator = globalThis.navigator;
 
-    function init$9 (args) {
-        const Navigator = globalThis.Navigator;
-        const navigator = globalThis.navigator;
-
-        overrideProperty('keyboard', {
-            object: Navigator.prototype,
-            // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
-            origValue: navigator.keyboard,
-            targetValue: getFeatureAttr(featureName$2, args, 'keyboard')
-        });
-        overrideProperty('hardwareConcurrency', {
-            object: Navigator.prototype,
-            origValue: navigator.hardwareConcurrency,
-            targetValue: getFeatureAttr(featureName$2, args, 'hardwareConcurrency', 2)
-        });
-        overrideProperty('deviceMemory', {
-            object: Navigator.prototype,
-            // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
-            origValue: navigator.deviceMemory,
-            targetValue: getFeatureAttr(featureName$2, args, 'deviceMemory', 8)
-        });
+            overrideProperty('keyboard', {
+                object: Navigator.prototype,
+                // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
+                origValue: navigator.keyboard,
+                targetValue: this.getFeatureAttr('keyboard')
+            });
+            overrideProperty('hardwareConcurrency', {
+                object: Navigator.prototype,
+                origValue: navigator.hardwareConcurrency,
+                targetValue: this.getFeatureAttr('hardwareConcurrency', 2)
+            });
+            overrideProperty('deviceMemory', {
+                object: Navigator.prototype,
+                // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
+                origValue: navigator.deviceMemory,
+                targetValue: this.getFeatureAttr('deviceMemory', 8)
+            });
+        }
     }
 
     var fingerprintingHardware = /*#__PURE__*/Object.freeze({
         __proto__: null,
-        init: init$9
+        default: FingerprintingHardware
     });
-
-    const featureName$1 = 'fingerprinting-screen-size';
 
     /**
      * normalize window dimensions, if more than one monitor is in play.
@@ -8467,209 +8506,221 @@
         }
     }
 
-    function init$8 (args) {
-        const Screen = globalThis.Screen;
-        const screen = globalThis.screen;
+    class FingerprintingScreenSize extends ContentFeature {
+        init () {
+            const Screen = globalThis.Screen;
+            const screen = globalThis.screen;
 
-        origPropertyValues.availTop = overrideProperty('availTop', {
-            object: Screen.prototype,
-            // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
-            origValue: screen.availTop,
-            targetValue: getFeatureAttr(featureName$1, args, 'availTop', 0)
-        });
-        origPropertyValues.availLeft = overrideProperty('availLeft', {
-            object: Screen.prototype,
-            // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
-            origValue: screen.availLeft,
-            targetValue: getFeatureAttr(featureName$1, args, 'availLeft', 0)
-        });
-        origPropertyValues.availWidth = overrideProperty('availWidth', {
-            object: Screen.prototype,
-            origValue: screen.availWidth,
-            targetValue: screen.width
-        });
-        origPropertyValues.availHeight = overrideProperty('availHeight', {
-            object: Screen.prototype,
-            origValue: screen.availHeight,
-            targetValue: screen.height
-        });
-        overrideProperty('colorDepth', {
-            object: Screen.prototype,
-            origValue: screen.colorDepth,
-            targetValue: getFeatureAttr(featureName$1, args, 'colorDepth', 24)
-        });
-        overrideProperty('pixelDepth', {
-            object: Screen.prototype,
-            origValue: screen.pixelDepth,
-            targetValue: getFeatureAttr(featureName$1, args, 'pixelDepth', 24)
-        });
+            origPropertyValues.availTop = overrideProperty('availTop', {
+                object: Screen.prototype,
+                // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
+                origValue: screen.availTop,
+                targetValue: this.getFeatureAttr('availTop', 0)
+            });
+            origPropertyValues.availLeft = overrideProperty('availLeft', {
+                object: Screen.prototype,
+                // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
+                origValue: screen.availLeft,
+                targetValue: this.getFeatureAttr('availLeft', 0)
+            });
+            origPropertyValues.availWidth = overrideProperty('availWidth', {
+                object: Screen.prototype,
+                origValue: screen.availWidth,
+                targetValue: screen.width
+            });
+            origPropertyValues.availHeight = overrideProperty('availHeight', {
+                object: Screen.prototype,
+                origValue: screen.availHeight,
+                targetValue: screen.height
+            });
+            overrideProperty('colorDepth', {
+                object: Screen.prototype,
+                origValue: screen.colorDepth,
+                targetValue: this.getFeatureAttr('colorDepth', 24)
+            });
+            overrideProperty('pixelDepth', {
+                object: Screen.prototype,
+                origValue: screen.pixelDepth,
+                targetValue: this.getFeatureAttr('pixelDepth', 24)
+            });
 
-        window.addEventListener('resize', function () {
+            window.addEventListener('resize', function () {
+                setWindowDimensions();
+            });
             setWindowDimensions();
-        });
-        setWindowDimensions();
+        }
     }
 
     var fingerprintingScreenSize = /*#__PURE__*/Object.freeze({
         __proto__: null,
-        init: init$8
+        default: FingerprintingScreenSize
     });
 
-    function init$7 () {
-        const navigator = globalThis.navigator;
-        const Navigator = globalThis.Navigator;
+    class FingerprintingTemporaryStorage extends ContentFeature {
+        init () {
+            const navigator = globalThis.navigator;
+            const Navigator = globalThis.Navigator;
 
-        /**
-         * Temporary storage can be used to determine hard disk usage and size.
-         * This will limit the max storage to 4GB without completely disabling the
-         * feature.
-         */
-        // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
-        if (navigator.webkitTemporaryStorage) {
-            try {
-                // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
-                const org = navigator.webkitTemporaryStorage.queryUsageAndQuota;
-                // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
-                const tStorage = navigator.webkitTemporaryStorage;
-                tStorage.queryUsageAndQuota = function queryUsageAndQuota (callback, err) {
-                    const modifiedCallback = function (usedBytes, grantedBytes) {
-                        const maxBytesGranted = 4 * 1024 * 1024 * 1024;
-                        const spoofedGrantedBytes = Math.min(grantedBytes, maxBytesGranted);
-                        callback(usedBytes, spoofedGrantedBytes);
-                    };
+            /**
+             * Temporary storage can be used to determine hard disk usage and size.
+             * This will limit the max storage to 4GB without completely disabling the
+             * feature.
+             */
+            // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
+            if (navigator.webkitTemporaryStorage) {
+                try {
                     // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
-                    org.call(navigator.webkitTemporaryStorage, modifiedCallback, err);
-                };
-                defineProperty(Navigator.prototype, 'webkitTemporaryStorage', { get: () => tStorage });
-            } catch (e) {}
+                    const org = navigator.webkitTemporaryStorage.queryUsageAndQuota;
+                    // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
+                    const tStorage = navigator.webkitTemporaryStorage;
+                    tStorage.queryUsageAndQuota = function queryUsageAndQuota (callback, err) {
+                        const modifiedCallback = function (usedBytes, grantedBytes) {
+                            const maxBytesGranted = 4 * 1024 * 1024 * 1024;
+                            const spoofedGrantedBytes = Math.min(grantedBytes, maxBytesGranted);
+                            callback(usedBytes, spoofedGrantedBytes);
+                        };
+                        // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
+                        org.call(navigator.webkitTemporaryStorage, modifiedCallback, err);
+                    };
+                    defineProperty(Navigator.prototype, 'webkitTemporaryStorage', { get: () => tStorage });
+                } catch (e) {}
+            }
         }
     }
 
     var fingerprintingTemporaryStorage = /*#__PURE__*/Object.freeze({
         __proto__: null,
-        init: init$7
+        default: FingerprintingTemporaryStorage
     });
 
-    function init$6 () {
-        try {
-            if ('browsingTopics' in Document.prototype) {
-                delete Document.prototype.browsingTopics;
+    class GoogleRejected extends ContentFeature {
+        init () {
+            try {
+                if ('browsingTopics' in Document.prototype) {
+                    delete Document.prototype.browsingTopics;
+                }
+                if ('joinAdInterestGroup' in Navigator.prototype) {
+                    delete Navigator.prototype.joinAdInterestGroup;
+                }
+                if ('leaveAdInterestGroup' in Navigator.prototype) {
+                    delete Navigator.prototype.leaveAdInterestGroup;
+                }
+                if ('updateAdInterestGroups' in Navigator.prototype) {
+                    delete Navigator.prototype.updateAdInterestGroups;
+                }
+                if ('runAdAuction' in Navigator.prototype) {
+                    delete Navigator.prototype.runAdAuction;
+                }
+                if ('adAuctionComponents' in Navigator.prototype) {
+                    delete Navigator.prototype.adAuctionComponents;
+                }
+            } catch {
+                // Throw away this exception, it's likely a confict with another extension
             }
-            if ('joinAdInterestGroup' in Navigator.prototype) {
-                delete Navigator.prototype.joinAdInterestGroup;
-            }
-            if ('leaveAdInterestGroup' in Navigator.prototype) {
-                delete Navigator.prototype.leaveAdInterestGroup;
-            }
-            if ('updateAdInterestGroups' in Navigator.prototype) {
-                delete Navigator.prototype.updateAdInterestGroups;
-            }
-            if ('runAdAuction' in Navigator.prototype) {
-                delete Navigator.prototype.runAdAuction;
-            }
-            if ('adAuctionComponents' in Navigator.prototype) {
-                delete Navigator.prototype.adAuctionComponents;
-            }
-        } catch {
-            // Throw away this exception, it's likely a confict with another extension
         }
     }
 
     var googleRejected = /*#__PURE__*/Object.freeze({
         __proto__: null,
-        init: init$6
+        default: GoogleRejected
     });
 
     // Set Global Privacy Control property on DOM
-    function init$5 (args) {
-        try {
-            // If GPC on, set DOM property prototype to true if not already true
-            if (args.globalPrivacyControlValue) {
-                // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
-                if (navigator.globalPrivacyControl) return
-                defineProperty(Navigator.prototype, 'globalPrivacyControl', {
-                    get: () => true,
-                    configurable: true,
-                    enumerable: true
-                });
-            } else {
-                // If GPC off & unsupported by browser, set DOM property prototype to false
-                // this may be overwritten by the user agent or other extensions
-                // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
-                if (typeof navigator.globalPrivacyControl !== 'undefined') return
-                defineProperty(Navigator.prototype, 'globalPrivacyControl', {
-                    get: () => false,
-                    configurable: true,
-                    enumerable: true
-                });
+    class GlobalPrivacyControl extends ContentFeature {
+        init (args) {
+            try {
+                // If GPC on, set DOM property prototype to true if not already true
+                if (args.globalPrivacyControlValue) {
+                    // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
+                    if (navigator.globalPrivacyControl) return
+                    defineProperty(Navigator.prototype, 'globalPrivacyControl', {
+                        get: () => true,
+                        configurable: true,
+                        enumerable: true
+                    });
+                } else {
+                    // If GPC off & unsupported by browser, set DOM property prototype to false
+                    // this may be overwritten by the user agent or other extensions
+                    // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
+                    if (typeof navigator.globalPrivacyControl !== 'undefined') return
+                    defineProperty(Navigator.prototype, 'globalPrivacyControl', {
+                        get: () => false,
+                        configurable: true,
+                        enumerable: true
+                    });
+                }
+            } catch {
+                // Ignore exceptions that could be caused by conflicting with other extensions
             }
-        } catch {
-            // Ignore exceptions that could be caused by conflicting with other extensions
         }
     }
 
     var gpc = /*#__PURE__*/Object.freeze({
         __proto__: null,
-        init: init$5
+        default: GlobalPrivacyControl
     });
 
-    function init$4 (args) {
-        try {
-            // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
-            if (navigator.duckduckgo) {
-                return
+    class NavigatorInterface extends ContentFeature {
+        init (args) {
+            try {
+                // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
+                if (navigator.duckduckgo) {
+                    return
+                }
+                if (!args.platform || !args.platform.name) {
+                    return
+                }
+                defineProperty(Navigator.prototype, 'duckduckgo', {
+                    value: {
+                        platform: args.platform.name,
+                        isDuckDuckGo () {
+                            return DDGPromise.resolve(true)
+                        }
+                    },
+                    enumerable: true,
+                    configurable: false,
+                    writable: false
+                });
+            } catch {
+                // todo: Just ignore this exception?
             }
-            if (!args.platform || !args.platform.name) {
-                return
-            }
-            defineProperty(Navigator.prototype, 'duckduckgo', {
-                value: {
-                    platform: args.platform.name,
-                    isDuckDuckGo () {
-                        return DDGPromise.resolve(true)
-                    }
-                },
-                enumerable: true,
-                configurable: false,
-                writable: false
-            });
-        } catch {
-            // todo: Just ignore this exception?
         }
     }
 
     var navigatorInterface = /*#__PURE__*/Object.freeze({
         __proto__: null,
-        init: init$4
+        default: NavigatorInterface
     });
 
-    function init$3 (args) {
-        // Unfortunately, we only have limited information about the referrer and current frame. A single
-        // page may load many requests and sub frames, all with different referrers. Since we
-        if (args.referrer && // make sure the referrer was set correctly
-            args.referrer.referrer !== undefined && // referrer value will be undefined when it should be unchanged.
-            document.referrer && // don't change the value if it isn't set
-            document.referrer !== '' && // don't add referrer information
-            new URL(document.URL).hostname !== new URL(document.referrer).hostname) { // don't replace the referrer for the current host.
-            let trimmedReferer = document.referrer;
-            if (new URL(document.referrer).hostname === args.referrer.referrerHost) {
-                // make sure the real referrer & replacement referrer match if we're going to replace it
-                trimmedReferer = args.referrer.referrer;
-            } else {
-                // if we don't have a matching referrer, just trim it to origin.
-                trimmedReferer = new URL(document.referrer).origin + '/';
+    class Referrer extends ContentFeature {
+        init (args) {
+            // Unfortunately, we only have limited information about the referrer and current frame. A single
+            // page may load many requests and sub frames, all with different referrers. Since we
+            if (args.referrer && // make sure the referrer was set correctly
+                args.referrer.referrer !== undefined && // referrer value will be undefined when it should be unchanged.
+                document.referrer && // don't change the value if it isn't set
+                document.referrer !== '' && // don't add referrer information
+                new URL(document.URL).hostname !== new URL(document.referrer).hostname) { // don't replace the referrer for the current host.
+                let trimmedReferer = document.referrer;
+                if (new URL(document.referrer).hostname === args.referrer.referrerHost) {
+                    // make sure the real referrer & replacement referrer match if we're going to replace it
+                    trimmedReferer = args.referrer.referrer;
+                } else {
+                    // if we don't have a matching referrer, just trim it to origin.
+                    trimmedReferer = new URL(document.referrer).origin + '/';
+                }
+                overrideProperty('referrer', {
+                    object: Document.prototype,
+                    origValue: document.referrer,
+                    targetValue: trimmedReferer
+                });
             }
-            overrideProperty('referrer', {
-                object: Document.prototype,
-                origValue: document.referrer,
-                targetValue: trimmedReferer
-            });
         }
     }
 
     var referrer = /*#__PURE__*/Object.freeze({
         __proto__: null,
-        init: init$3
+        default: Referrer
     });
 
     /* global TrustedScriptURL, TrustedScript */
@@ -8681,6 +8732,9 @@
     let tagModifiers = {};
     let shadowDomEnabled = false;
     let scriptOverload = {};
+    // Ignore monitoring properties that are only relevant once and already handled
+    const defaultIgnoreMonitorList = ['onerror', 'onload'];
+    let ignoreMonitorList = defaultIgnoreMonitorList;
 
     /**
      * @param {string} tagName
@@ -8777,6 +8831,7 @@
                         },
                         set (value) {
                             if (shouldFilterKey(this.#tagName, 'property', prop)) return
+                            if (ignoreMonitorList.includes(prop)) return
                             el[prop] = value;
                         }
                     });
@@ -9116,52 +9171,50 @@
         initialCreateElement = proxy._native;
     }
 
-    function load () {
-        // This shouldn't happen, but if it does we don't want to break the page
-        try {
-            // @ts-expect-error TS node return here
-            customElements.define('ddg-runtime-checks', DDGRuntimeChecks);
-        } catch {}
-    }
-
-    function init$2 (args) {
-        const domain = args.site.domain;
-        const domains = getFeatureSetting(featureName, args, 'domains') || [];
-        let enabled = getFeatureSettingEnabled(featureName, args, 'matchAllDomains');
-        if (!enabled) {
-            enabled = domains.find((rule) => {
-                return matchHostname(domain, rule.domain)
-            });
-        }
-        if (!enabled) return
-
-        taintCheck = getFeatureSettingEnabled(featureName, args, 'taintCheck');
-        matchAllStackDomains = getFeatureSettingEnabled(featureName, args, 'matchAllStackDomains');
-        stackDomains = getFeatureSetting(featureName, args, 'stackDomains') || [];
-        elementRemovalTimeout = getFeatureSetting(featureName, args, 'elementRemovalTimeout') || 1000;
-        tagModifiers = getFeatureSetting(featureName, args, 'tagModifiers') || {};
-        shadowDomEnabled = getFeatureSettingEnabled(featureName, args, 'shadowDom') || false;
-        scriptOverload = getFeatureSetting(featureName, args, 'scriptOverload') || {};
-
-        overrideCreateElement();
-
-        if (getFeatureSettingEnabled(featureName, args, 'overloadInstanceOf')) {
-            overloadInstanceOfChecks(HTMLScriptElement);
+    class RuntimeChecks extends ContentFeature {
+        load () {
+            // This shouldn't happen, but if it does we don't want to break the page
+            try {
+                // @ts-expect-error TS node return here
+                customElements.define('ddg-runtime-checks', DDGRuntimeChecks);
+            } catch {}
         }
 
-        if (getFeatureSettingEnabled(featureName, args, 'injectGlobalStyles')) {
-            injectGlobalStyles(`
-            ddg-runtime-checks {
-                display: none;
+        init () {
+            let enabled = this.getFeatureSettingEnabled('matchAllDomains');
+            if (!enabled) {
+                enabled = this.matchDomainFeatureSetting('domains').length > 0;
             }
-        `);
+            if (!enabled) return
+
+            taintCheck = this.getFeatureSettingEnabled('taintCheck');
+            matchAllStackDomains = this.getFeatureSettingEnabled('matchAllStackDomains');
+            stackDomains = this.getFeatureSetting('stackDomains') || [];
+            elementRemovalTimeout = this.getFeatureSetting('elementRemovalTimeout') || 1000;
+            tagModifiers = this.getFeatureSetting('tagModifiers') || {};
+            shadowDomEnabled = this.getFeatureSettingEnabled('shadowDom') || false;
+            scriptOverload = this.getFeatureSetting('scriptOverload') || {};
+            ignoreMonitorList = this.getFeatureSetting('ignoreMonitorList') || defaultIgnoreMonitorList;
+
+            overrideCreateElement();
+
+            if (this.getFeatureSettingEnabled('overloadInstanceOf')) {
+                overloadInstanceOfChecks(HTMLScriptElement);
+            }
+
+            if (this.getFeatureSettingEnabled('injectGlobalStyles')) {
+                injectGlobalStyles(`
+                ddg-runtime-checks {
+                    display: none;
+                }
+            `);
+            }
         }
     }
 
     var runtimeChecks = /*#__PURE__*/Object.freeze({
         __proto__: null,
-        init: init$2,
-        load: load
+        default: RuntimeChecks
     });
 
     /**
@@ -9255,442 +9308,444 @@
         }
     }
 
-    function init$1 (args) {
-        const featureName = 'web-compat';
-        if (getFeatureSettingEnabled(featureName, args, 'windowSizing')) {
-            windowSizingFix();
-        }
-        if (getFeatureSettingEnabled(featureName, args, 'navigatorCredentials')) {
-            navigatorCredentialsFix();
-        }
-        if (getFeatureSettingEnabled(featureName, args, 'safariObject')) {
-            safariObjectFix();
+    class WebCompat extends ContentFeature {
+        init () {
+            if (this.getFeatureSettingEnabled('windowSizing')) {
+                windowSizingFix();
+            }
+            if (this.getFeatureSettingEnabled('navigatorCredentials')) {
+                navigatorCredentialsFix();
+            }
+            if (this.getFeatureSettingEnabled('safariObject')) {
+                safariObjectFix();
+            }
         }
     }
 
     var webCompat = /*#__PURE__*/Object.freeze({
         __proto__: null,
-        init: init$1
+        default: WebCompat
     });
 
     /* global Bluetooth, Geolocation, HID, Serial, USB */
 
-    function init () {
-        const featureName = 'windows-permission-usage';
+    class WindowsPermissionUsage extends ContentFeature {
+        init () {
+            const featureName = 'windows-permission-usage';
 
-        const Permission = {
-            Geolocation: 'geolocation',
-            Camera: 'camera',
-            Microphone: 'microphone'
-        };
+            const Permission = {
+                Geolocation: 'geolocation',
+                Camera: 'camera',
+                Microphone: 'microphone'
+            };
 
-        const Status = {
-            Inactive: 'inactive',
-            Accessed: 'accessed',
-            Active: 'active',
-            Paused: 'paused'
-        };
+            const Status = {
+                Inactive: 'inactive',
+                Accessed: 'accessed',
+                Active: 'active',
+                Paused: 'paused'
+            };
 
-        const isFrameInsideFrame = window.self !== window.top && window.parent !== window.top;
+            const isFrameInsideFrame = window.self !== window.top && window.parent !== window.top;
 
-        function windowsPostMessage (name, data) {
-            // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
-            window.chrome.webview.postMessage({
-                Feature: 'Permissions',
-                Name: name,
-                Data: data
-            });
-        }
-
-        function signalPermissionStatus (permission, status) {
-            windowsPostMessage('PermissionStatusMessage', { permission, status });
-            console.debug(`Permission '${permission}' is ${status}`);
-        }
-
-        let pauseWatchedPositions = false;
-        const watchedPositions = new Set();
-        // proxy for navigator.geolocation.watchPosition -> show red geolocation indicator
-        const watchPositionProxy = new DDGProxy(featureName, Geolocation.prototype, 'watchPosition', {
-            apply (target, thisArg, args) {
-                if (isFrameInsideFrame) {
-                    // we can't communicate with iframes inside iframes -> deny permission instead of putting users at risk
-                    throw new DOMException('Permission denied')
-                }
-
-                const successHandler = args[0];
-                args[0] = function (position) {
-                    if (pauseWatchedPositions) {
-                        signalPermissionStatus(Permission.Geolocation, Status.Paused);
-                    } else {
-                        signalPermissionStatus(Permission.Geolocation, Status.Active);
-                        successHandler?.(position);
-                    }
-                };
-                const id = DDGReflect.apply(target, thisArg, args);
-                watchedPositions.add(id);
-                return id
-            }
-        });
-        watchPositionProxy.overload();
-
-        // proxy for navigator.geolocation.clearWatch -> clear red geolocation indicator
-        const clearWatchProxy = new DDGProxy(featureName, Geolocation.prototype, 'clearWatch', {
-            apply (target, thisArg, args) {
-                DDGReflect.apply(target, thisArg, args);
-                if (args[0] && watchedPositions.delete(args[0]) && watchedPositions.size === 0) {
-                    signalPermissionStatus(Permission.Geolocation, Status.Inactive);
-                }
-            }
-        });
-        clearWatchProxy.overload();
-
-        // proxy for navigator.geolocation.getCurrentPosition -> normal geolocation indicator
-        const getCurrentPositionProxy = new DDGProxy(featureName, Geolocation.prototype, 'getCurrentPosition', {
-            apply (target, thisArg, args) {
-                const successHandler = args[0];
-                args[0] = function (position) {
-                    signalPermissionStatus(Permission.Geolocation, Status.Accessed);
-                    successHandler?.(position);
-                };
-                return DDGReflect.apply(target, thisArg, args)
-            }
-        });
-        getCurrentPositionProxy.overload();
-
-        const userMediaStreams = new Set();
-        const videoTracks = new Set();
-        const audioTracks = new Set();
-
-        // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
-        function getTracks (permission) {
-            switch (permission) {
-            case Permission.Camera:
-                return videoTracks
-            case Permission.Microphone:
-                return audioTracks
-            }
-        }
-
-        function stopTracks (streamTracks) {
-            streamTracks?.forEach(track => track.stop());
-        }
-
-        function clearAllGeolocationWatch () {
-            watchedPositions.forEach(id => navigator.geolocation.clearWatch(id));
-        }
-
-        function pause (permission) {
-            switch (permission) {
-            case Permission.Camera:
-            case Permission.Microphone: {
-                const streamTracks = getTracks(permission);
-                streamTracks?.forEach(track => {
-                    track.enabled = false;
+            function windowsPostMessage (name, data) {
+                // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
+                window.chrome.webview.postMessage({
+                    Feature: 'Permissions',
+                    Name: name,
+                    Data: data
                 });
-                break
-            }
-            case Permission.Geolocation:
-                pauseWatchedPositions = true;
-                signalPermissionStatus(Permission.Geolocation, Status.Paused);
-                break
-            }
-        }
-
-        function resume (permission) {
-            switch (permission) {
-            case Permission.Camera:
-            case Permission.Microphone: {
-                const streamTracks = getTracks(permission);
-                streamTracks?.forEach(track => {
-                    track.enabled = true;
-                });
-                break
-            }
-            case Permission.Geolocation:
-                pauseWatchedPositions = false;
-                signalPermissionStatus(Permission.Geolocation, Status.Active);
-                break
-            }
-        }
-
-        function stop (permission) {
-            switch (permission) {
-            case Permission.Camera:
-                stopTracks(videoTracks);
-                break
-            case Permission.Microphone:
-                stopTracks(audioTracks);
-                break
-            case Permission.Geolocation:
-                pauseWatchedPositions = false;
-                clearAllGeolocationWatch();
-                break
-            }
-        }
-
-        function monitorTrack (track) {
-            if (track.readyState === 'ended') return
-
-            if (track.kind === 'video' && !videoTracks.has(track)) {
-                console.debug(`New video stream track ${track.id}`);
-                track.addEventListener('ended', videoTrackEnded);
-                track.addEventListener('mute', signalVideoTracksState);
-                track.addEventListener('unmute', signalVideoTracksState);
-                videoTracks.add(track);
-            } else if (track.kind === 'audio' && !audioTracks.has(track)) {
-                console.debug(`New audio stream track ${track.id}`);
-                track.addEventListener('ended', audioTrackEnded);
-                track.addEventListener('mute', signalAudioTracksState);
-                track.addEventListener('unmute', signalAudioTracksState);
-                audioTracks.add(track);
-            }
-        }
-
-        function handleTrackEnded (track) {
-            if (track.kind === 'video' && videoTracks.has(track)) {
-                console.debug(`Video stream track ${track.id} ended`);
-                track.removeEventListener('ended', videoTrackEnded);
-                track.removeEventListener('mute', signalVideoTracksState);
-                track.removeEventListener('unmute', signalVideoTracksState);
-                videoTracks.delete(track);
-                signalVideoTracksState();
-            } else if (track.kind === 'audio' && audioTracks.has(track)) {
-                console.debug(`Audio stream track ${track.id} ended`);
-                track.removeEventListener('ended', audioTrackEnded);
-                track.removeEventListener('mute', signalAudioTracksState);
-                track.removeEventListener('unmute', signalAudioTracksState);
-                audioTracks.delete(track);
-                signalAudioTracksState();
-            }
-        }
-
-        function videoTrackEnded (e) {
-            handleTrackEnded(e.target);
-        }
-
-        function audioTrackEnded (e) {
-            handleTrackEnded(e.target);
-        }
-
-        function signalTracksState (permission) {
-            const tracks = getTracks(permission);
-            if (!tracks) return
-
-            const allTrackCount = tracks.size;
-            if (allTrackCount === 0) {
-                signalPermissionStatus(permission, Status.Inactive);
-                return
             }
 
-            let mutedTrackCount = 0;
-            tracks.forEach(track => {
-                mutedTrackCount += ((!track.enabled || track.muted) ? 1 : 0);
-            });
-            if (mutedTrackCount === allTrackCount) {
-                signalPermissionStatus(permission, Status.Paused);
-            } else {
-                if (mutedTrackCount > 0) {
-                    console.debug(`Some ${permission} tracks are still active: ${allTrackCount - mutedTrackCount}/${allTrackCount}`);
-                }
-                signalPermissionStatus(permission, Status.Active);
+            function signalPermissionStatus (permission, status) {
+                windowsPostMessage('PermissionStatusMessage', { permission, status });
+                console.debug(`Permission '${permission}' is ${status}`);
             }
-        }
 
-        let signalVideoTracksStateTimer;
-        function signalVideoTracksState () {
-            clearTimeout(signalVideoTracksStateTimer);
-            signalVideoTracksStateTimer = setTimeout(() => signalTracksState(Permission.Camera), 100);
-        }
-
-        let signalAudioTracksStateTimer;
-        function signalAudioTracksState () {
-            clearTimeout(signalAudioTracksStateTimer);
-            signalAudioTracksStateTimer = setTimeout(() => signalTracksState(Permission.Microphone), 100);
-        }
-
-        // proxy for track.stop -> clear camera/mic indicator manually here because no ended event raised this way
-        const stopTrackProxy = new DDGProxy(featureName, MediaStreamTrack.prototype, 'stop', {
-            apply (target, thisArg, args) {
-                handleTrackEnded(thisArg);
-                return DDGReflect.apply(target, thisArg, args)
-            }
-        });
-        stopTrackProxy.overload();
-
-        // proxy for track.clone -> monitor the cloned track
-        const cloneTrackProxy = new DDGProxy(featureName, MediaStreamTrack.prototype, 'clone', {
-            apply (target, thisArg, args) {
-                const clonedTrack = DDGReflect.apply(target, thisArg, args);
-                if (clonedTrack && (videoTracks.has(thisArg) || audioTracks.has(thisArg))) {
-                    console.debug(`Media stream track ${thisArg.id} has been cloned to track ${clonedTrack.id}`);
-                    monitorTrack(clonedTrack);
-                }
-                return clonedTrack
-            }
-        });
-        cloneTrackProxy.overload();
-
-        // override MediaStreamTrack.enabled -> update active/paused status when enabled is set
-        const trackEnabledPropertyDescriptor = Object.getOwnPropertyDescriptor(MediaStreamTrack.prototype, 'enabled');
-        defineProperty(MediaStreamTrack.prototype, 'enabled', {
-            configurable: trackEnabledPropertyDescriptor.configurable,
-            enumerable: trackEnabledPropertyDescriptor.enumerable,
-            get: function () {
-                return trackEnabledPropertyDescriptor.get.bind(this)()
-            },
-            set: function (value) {
-                const result = trackEnabledPropertyDescriptor.set.bind(this)(...arguments);
-                if (videoTracks.has(this)) {
-                    signalVideoTracksState();
-                } else if (audioTracks.has(this)) {
-                    signalAudioTracksState();
-                }
-                return result
-            }
-        });
-
-        // proxy for get*Tracks methods -> needed to monitor tracks returned by saved media stream coming for MediaDevices.getUserMedia
-        const getTracksMethodNames = ['getTracks', 'getAudioTracks', 'getVideoTracks'];
-        for (const methodName of getTracksMethodNames) {
-            const getTracksProxy = new DDGProxy(featureName, MediaStream.prototype, methodName, {
-                apply (target, thisArg, args) {
-                    const tracks = DDGReflect.apply(target, thisArg, args);
-                    if (userMediaStreams.has(thisArg)) {
-                        tracks.forEach(monitorTrack);
-                    }
-                    return tracks
-                }
-            });
-            getTracksProxy.overload();
-        }
-
-        // proxy for MediaStream.clone -> needed to monitor cloned MediaDevices.getUserMedia streams
-        const cloneMediaStreamProxy = new DDGProxy(featureName, MediaStream.prototype, 'clone', {
-            apply (target, thisArg, args) {
-                const clonedStream = DDGReflect.apply(target, thisArg, args);
-                if (userMediaStreams.has(thisArg)) {
-                    console.debug(`User stream ${thisArg.id} has been cloned to stream ${clonedStream.id}`);
-                    userMediaStreams.add(clonedStream);
-                }
-                return clonedStream
-            }
-        });
-        cloneMediaStreamProxy.overload();
-
-        // proxy for navigator.mediaDevices.getUserMedia -> show red camera/mic indicators
-        if (MediaDevices) {
-            const getUserMediaProxy = new DDGProxy(featureName, MediaDevices.prototype, 'getUserMedia', {
+            let pauseWatchedPositions = false;
+            const watchedPositions = new Set();
+            // proxy for navigator.geolocation.watchPosition -> show red geolocation indicator
+            const watchPositionProxy = new DDGProxy(featureName, Geolocation.prototype, 'watchPosition', {
                 apply (target, thisArg, args) {
                     if (isFrameInsideFrame) {
                         // we can't communicate with iframes inside iframes -> deny permission instead of putting users at risk
-                        return Promise.reject(new DOMException('Permission denied'))
+                        throw new DOMException('Permission denied')
                     }
 
-                    const videoRequested = args[0]?.video;
-                    const audioRequested = args[0]?.audio;
-
-                    if (videoRequested && (videoRequested.pan || videoRequested.tilt || videoRequested.zoom)) {
-                        // WebView2 doesn't support acquiring pan-tilt-zoom from its API at the moment
-                        return Promise.reject(new DOMException('Pan-tilt-zoom is not supported'))
-                    }
-
-                    return DDGReflect.apply(target, thisArg, args).then(function (stream) {
-                        console.debug(`User stream ${stream.id} has been acquired`);
-                        userMediaStreams.add(stream);
-                        if (videoRequested) {
-                            const newVideoTracks = stream.getVideoTracks();
-                            if (newVideoTracks?.length > 0) {
-                                signalPermissionStatus(Permission.Camera, Status.Active);
-                            }
-                            newVideoTracks.forEach(monitorTrack);
+                    const successHandler = args[0];
+                    args[0] = function (position) {
+                        if (pauseWatchedPositions) {
+                            signalPermissionStatus(Permission.Geolocation, Status.Paused);
+                        } else {
+                            signalPermissionStatus(Permission.Geolocation, Status.Active);
+                            successHandler?.(position);
                         }
-
-                        if (audioRequested) {
-                            const newAudioTracks = stream.getAudioTracks();
-                            if (newAudioTracks?.length > 0) {
-                                signalPermissionStatus(Permission.Microphone, Status.Active);
-                            }
-                            newAudioTracks.forEach(monitorTrack);
-                        }
-                        return stream
-                    })
+                    };
+                    const id = DDGReflect.apply(target, thisArg, args);
+                    watchedPositions.add(id);
+                    return id
                 }
             });
-            getUserMediaProxy.overload();
-        }
+            watchPositionProxy.overload();
 
-        function performAction (action, permission) {
-            if (action && permission) {
-                switch (action) {
-                case 'pause':
-                    pause(permission);
+            // proxy for navigator.geolocation.clearWatch -> clear red geolocation indicator
+            const clearWatchProxy = new DDGProxy(featureName, Geolocation.prototype, 'clearWatch', {
+                apply (target, thisArg, args) {
+                    DDGReflect.apply(target, thisArg, args);
+                    if (args[0] && watchedPositions.delete(args[0]) && watchedPositions.size === 0) {
+                        signalPermissionStatus(Permission.Geolocation, Status.Inactive);
+                    }
+                }
+            });
+            clearWatchProxy.overload();
+
+            // proxy for navigator.geolocation.getCurrentPosition -> normal geolocation indicator
+            const getCurrentPositionProxy = new DDGProxy(featureName, Geolocation.prototype, 'getCurrentPosition', {
+                apply (target, thisArg, args) {
+                    const successHandler = args[0];
+                    args[0] = function (position) {
+                        signalPermissionStatus(Permission.Geolocation, Status.Accessed);
+                        successHandler?.(position);
+                    };
+                    return DDGReflect.apply(target, thisArg, args)
+                }
+            });
+            getCurrentPositionProxy.overload();
+
+            const userMediaStreams = new Set();
+            const videoTracks = new Set();
+            const audioTracks = new Set();
+
+            // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
+            function getTracks (permission) {
+                switch (permission) {
+                case Permission.Camera:
+                    return videoTracks
+                case Permission.Microphone:
+                    return audioTracks
+                }
+            }
+
+            function stopTracks (streamTracks) {
+                streamTracks?.forEach(track => track.stop());
+            }
+
+            function clearAllGeolocationWatch () {
+                watchedPositions.forEach(id => navigator.geolocation.clearWatch(id));
+            }
+
+            function pause (permission) {
+                switch (permission) {
+                case Permission.Camera:
+                case Permission.Microphone: {
+                    const streamTracks = getTracks(permission);
+                    streamTracks?.forEach(track => {
+                        track.enabled = false;
+                    });
                     break
-                case 'resume':
-                    resume(permission);
-                    break
-                case 'stop':
-                    stop(permission);
+                }
+                case Permission.Geolocation:
+                    pauseWatchedPositions = true;
+                    signalPermissionStatus(Permission.Geolocation, Status.Paused);
                     break
                 }
             }
-        }
 
-        // handle actions from browser
-        // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
-        window.chrome.webview.addEventListener('message', function ({ data }) {
-            if (data?.action && data?.permission) {
-                performAction(data?.action, data?.permission);
+            function resume (permission) {
+                switch (permission) {
+                case Permission.Camera:
+                case Permission.Microphone: {
+                    const streamTracks = getTracks(permission);
+                    streamTracks?.forEach(track => {
+                        track.enabled = true;
+                    });
+                    break
+                }
+                case Permission.Geolocation:
+                    pauseWatchedPositions = false;
+                    signalPermissionStatus(Permission.Geolocation, Status.Active);
+                    break
+                }
             }
-        });
 
-        // these permissions cannot be disabled using WebView2 or DevTools protocol
-        const permissionsToDisable = [
-            // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
-            { name: 'Bluetooth', prototype: Bluetooth.prototype, method: 'requestDevice', isPromise: true },
-            // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
-            { name: 'USB', prototype: USB.prototype, method: 'requestDevice', isPromise: true },
-            // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
-            { name: 'Serial', prototype: Serial.prototype, method: 'requestPort', isPromise: true },
-            // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
-            { name: 'HID', prototype: HID.prototype, method: 'requestDevice', isPromise: true },
-            { name: 'Protocol handler', prototype: Navigator.prototype, method: 'registerProtocolHandler', isPromise: false },
-            { name: 'MIDI', prototype: Navigator.prototype, method: 'requestMIDIAccess', isPromise: true }
-        ];
-        for (const { name, prototype, method, isPromise } of permissionsToDisable) {
-            try {
-                const proxy = new DDGProxy(featureName, prototype, method, {
-                    apply () {
-                        if (isPromise) {
-                            return Promise.reject(new DOMException('Permission denied'))
-                        } else {
-                            throw new DOMException('Permission denied')
+            function stop (permission) {
+                switch (permission) {
+                case Permission.Camera:
+                    stopTracks(videoTracks);
+                    break
+                case Permission.Microphone:
+                    stopTracks(audioTracks);
+                    break
+                case Permission.Geolocation:
+                    pauseWatchedPositions = false;
+                    clearAllGeolocationWatch();
+                    break
+                }
+            }
+
+            function monitorTrack (track) {
+                if (track.readyState === 'ended') return
+
+                if (track.kind === 'video' && !videoTracks.has(track)) {
+                    console.debug(`New video stream track ${track.id}`);
+                    track.addEventListener('ended', videoTrackEnded);
+                    track.addEventListener('mute', signalVideoTracksState);
+                    track.addEventListener('unmute', signalVideoTracksState);
+                    videoTracks.add(track);
+                } else if (track.kind === 'audio' && !audioTracks.has(track)) {
+                    console.debug(`New audio stream track ${track.id}`);
+                    track.addEventListener('ended', audioTrackEnded);
+                    track.addEventListener('mute', signalAudioTracksState);
+                    track.addEventListener('unmute', signalAudioTracksState);
+                    audioTracks.add(track);
+                }
+            }
+
+            function handleTrackEnded (track) {
+                if (track.kind === 'video' && videoTracks.has(track)) {
+                    console.debug(`Video stream track ${track.id} ended`);
+                    track.removeEventListener('ended', videoTrackEnded);
+                    track.removeEventListener('mute', signalVideoTracksState);
+                    track.removeEventListener('unmute', signalVideoTracksState);
+                    videoTracks.delete(track);
+                    signalVideoTracksState();
+                } else if (track.kind === 'audio' && audioTracks.has(track)) {
+                    console.debug(`Audio stream track ${track.id} ended`);
+                    track.removeEventListener('ended', audioTrackEnded);
+                    track.removeEventListener('mute', signalAudioTracksState);
+                    track.removeEventListener('unmute', signalAudioTracksState);
+                    audioTracks.delete(track);
+                    signalAudioTracksState();
+                }
+            }
+
+            function videoTrackEnded (e) {
+                handleTrackEnded(e.target);
+            }
+
+            function audioTrackEnded (e) {
+                handleTrackEnded(e.target);
+            }
+
+            function signalTracksState (permission) {
+                const tracks = getTracks(permission);
+                if (!tracks) return
+
+                const allTrackCount = tracks.size;
+                if (allTrackCount === 0) {
+                    signalPermissionStatus(permission, Status.Inactive);
+                    return
+                }
+
+                let mutedTrackCount = 0;
+                tracks.forEach(track => {
+                    mutedTrackCount += ((!track.enabled || track.muted) ? 1 : 0);
+                });
+                if (mutedTrackCount === allTrackCount) {
+                    signalPermissionStatus(permission, Status.Paused);
+                } else {
+                    if (mutedTrackCount > 0) {
+                        console.debug(`Some ${permission} tracks are still active: ${allTrackCount - mutedTrackCount}/${allTrackCount}`);
+                    }
+                    signalPermissionStatus(permission, Status.Active);
+                }
+            }
+
+            let signalVideoTracksStateTimer;
+            function signalVideoTracksState () {
+                clearTimeout(signalVideoTracksStateTimer);
+                signalVideoTracksStateTimer = setTimeout(() => signalTracksState(Permission.Camera), 100);
+            }
+
+            let signalAudioTracksStateTimer;
+            function signalAudioTracksState () {
+                clearTimeout(signalAudioTracksStateTimer);
+                signalAudioTracksStateTimer = setTimeout(() => signalTracksState(Permission.Microphone), 100);
+            }
+
+            // proxy for track.stop -> clear camera/mic indicator manually here because no ended event raised this way
+            const stopTrackProxy = new DDGProxy(featureName, MediaStreamTrack.prototype, 'stop', {
+                apply (target, thisArg, args) {
+                    handleTrackEnded(thisArg);
+                    return DDGReflect.apply(target, thisArg, args)
+                }
+            });
+            stopTrackProxy.overload();
+
+            // proxy for track.clone -> monitor the cloned track
+            const cloneTrackProxy = new DDGProxy(featureName, MediaStreamTrack.prototype, 'clone', {
+                apply (target, thisArg, args) {
+                    const clonedTrack = DDGReflect.apply(target, thisArg, args);
+                    if (clonedTrack && (videoTracks.has(thisArg) || audioTracks.has(thisArg))) {
+                        console.debug(`Media stream track ${thisArg.id} has been cloned to track ${clonedTrack.id}`);
+                        monitorTrack(clonedTrack);
+                    }
+                    return clonedTrack
+                }
+            });
+            cloneTrackProxy.overload();
+
+            // override MediaStreamTrack.enabled -> update active/paused status when enabled is set
+            const trackEnabledPropertyDescriptor = Object.getOwnPropertyDescriptor(MediaStreamTrack.prototype, 'enabled');
+            defineProperty(MediaStreamTrack.prototype, 'enabled', {
+                configurable: trackEnabledPropertyDescriptor.configurable,
+                enumerable: trackEnabledPropertyDescriptor.enumerable,
+                get: function () {
+                    return trackEnabledPropertyDescriptor.get.bind(this)()
+                },
+                set: function (value) {
+                    const result = trackEnabledPropertyDescriptor.set.bind(this)(...arguments);
+                    if (videoTracks.has(this)) {
+                        signalVideoTracksState();
+                    } else if (audioTracks.has(this)) {
+                        signalAudioTracksState();
+                    }
+                    return result
+                }
+            });
+
+            // proxy for get*Tracks methods -> needed to monitor tracks returned by saved media stream coming for MediaDevices.getUserMedia
+            const getTracksMethodNames = ['getTracks', 'getAudioTracks', 'getVideoTracks'];
+            for (const methodName of getTracksMethodNames) {
+                const getTracksProxy = new DDGProxy(featureName, MediaStream.prototype, methodName, {
+                    apply (target, thisArg, args) {
+                        const tracks = DDGReflect.apply(target, thisArg, args);
+                        if (userMediaStreams.has(thisArg)) {
+                            tracks.forEach(monitorTrack);
                         }
+                        return tracks
                     }
                 });
-                proxy.overload();
-            } catch (error) {
-                console.info(`Could not disable access to ${name} because of error`, error);
+                getTracksProxy.overload();
             }
-        }
 
-        // these permissions can be disabled using DevTools protocol but it's not reliable and can throw exception sometimes
-        const permissionsToDelete = [
-            { name: 'Idle detection', permission: 'IdleDetector' },
-            { name: 'NFC', permission: 'NDEFReader' },
-            { name: 'Orientation', permission: 'ondeviceorientation' },
-            { name: 'Motion', permission: 'ondevicemotion' }
-        ];
-        for (const { permission } of permissionsToDelete) {
-            if (permission in window) {
-                delete window[permission];
+            // proxy for MediaStream.clone -> needed to monitor cloned MediaDevices.getUserMedia streams
+            const cloneMediaStreamProxy = new DDGProxy(featureName, MediaStream.prototype, 'clone', {
+                apply (target, thisArg, args) {
+                    const clonedStream = DDGReflect.apply(target, thisArg, args);
+                    if (userMediaStreams.has(thisArg)) {
+                        console.debug(`User stream ${thisArg.id} has been cloned to stream ${clonedStream.id}`);
+                        userMediaStreams.add(clonedStream);
+                    }
+                    return clonedStream
+                }
+            });
+            cloneMediaStreamProxy.overload();
+
+            // proxy for navigator.mediaDevices.getUserMedia -> show red camera/mic indicators
+            if (MediaDevices) {
+                const getUserMediaProxy = new DDGProxy(featureName, MediaDevices.prototype, 'getUserMedia', {
+                    apply (target, thisArg, args) {
+                        if (isFrameInsideFrame) {
+                            // we can't communicate with iframes inside iframes -> deny permission instead of putting users at risk
+                            return Promise.reject(new DOMException('Permission denied'))
+                        }
+
+                        const videoRequested = args[0]?.video;
+                        const audioRequested = args[0]?.audio;
+
+                        if (videoRequested && (videoRequested.pan || videoRequested.tilt || videoRequested.zoom)) {
+                            // WebView2 doesn't support acquiring pan-tilt-zoom from its API at the moment
+                            return Promise.reject(new DOMException('Pan-tilt-zoom is not supported'))
+                        }
+
+                        return DDGReflect.apply(target, thisArg, args).then(function (stream) {
+                            console.debug(`User stream ${stream.id} has been acquired`);
+                            userMediaStreams.add(stream);
+                            if (videoRequested) {
+                                const newVideoTracks = stream.getVideoTracks();
+                                if (newVideoTracks?.length > 0) {
+                                    signalPermissionStatus(Permission.Camera, Status.Active);
+                                }
+                                newVideoTracks.forEach(monitorTrack);
+                            }
+
+                            if (audioRequested) {
+                                const newAudioTracks = stream.getAudioTracks();
+                                if (newAudioTracks?.length > 0) {
+                                    signalPermissionStatus(Permission.Microphone, Status.Active);
+                                }
+                                newAudioTracks.forEach(monitorTrack);
+                            }
+                            return stream
+                        })
+                    }
+                });
+                getUserMediaProxy.overload();
+            }
+
+            function performAction (action, permission) {
+                if (action && permission) {
+                    switch (action) {
+                    case 'pause':
+                        pause(permission);
+                        break
+                    case 'resume':
+                        resume(permission);
+                        break
+                    case 'stop':
+                        stop(permission);
+                        break
+                    }
+                }
+            }
+
+            // handle actions from browser
+            // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
+            window.chrome.webview.addEventListener('message', function ({ data }) {
+                if (data?.action && data?.permission) {
+                    performAction(data?.action, data?.permission);
+                }
+            });
+
+            // these permissions cannot be disabled using WebView2 or DevTools protocol
+            const permissionsToDisable = [
+                // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
+                { name: 'Bluetooth', prototype: Bluetooth.prototype, method: 'requestDevice', isPromise: true },
+                // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
+                { name: 'USB', prototype: USB.prototype, method: 'requestDevice', isPromise: true },
+                // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
+                { name: 'Serial', prototype: Serial.prototype, method: 'requestPort', isPromise: true },
+                // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
+                { name: 'HID', prototype: HID.prototype, method: 'requestDevice', isPromise: true },
+                { name: 'Protocol handler', prototype: Navigator.prototype, method: 'registerProtocolHandler', isPromise: false },
+                { name: 'MIDI', prototype: Navigator.prototype, method: 'requestMIDIAccess', isPromise: true }
+            ];
+            for (const { name, prototype, method, isPromise } of permissionsToDisable) {
+                try {
+                    const proxy = new DDGProxy(featureName, prototype, method, {
+                        apply () {
+                            if (isPromise) {
+                                return Promise.reject(new DOMException('Permission denied'))
+                            } else {
+                                throw new DOMException('Permission denied')
+                            }
+                        }
+                    });
+                    proxy.overload();
+                } catch (error) {
+                    console.info(`Could not disable access to ${name} because of error`, error);
+                }
+            }
+
+            // these permissions can be disabled using DevTools protocol but it's not reliable and can throw exception sometimes
+            const permissionsToDelete = [
+                { name: 'Idle detection', permission: 'IdleDetector' },
+                { name: 'NFC', permission: 'NDEFReader' },
+                { name: 'Orientation', permission: 'ondeviceorientation' },
+                { name: 'Motion', permission: 'ondevicemotion' }
+            ];
+            for (const { permission } of permissionsToDelete) {
+                if (permission in window) {
+                    delete window[permission];
+                }
             }
         }
     }
 
     var windowsPermissionUsage = /*#__PURE__*/Object.freeze({
         __proto__: null,
-        init: init
+        default: WindowsPermissionUsage
     });
 
 })();
-
