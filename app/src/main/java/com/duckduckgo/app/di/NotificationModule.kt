@@ -32,6 +32,7 @@ import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
@@ -80,8 +81,9 @@ object NotificationModule {
         context: Context,
         notificationDao: NotificationDao,
         variantManager: VariantManager,
+        vpnFeaturesRegistry: VpnFeaturesRegistry,
     ): EnableAppTpNotification {
-        return EnableAppTpNotification(context, notificationDao, variantManager)
+        return EnableAppTpNotification(context, notificationDao, variantManager, vpnFeaturesRegistry)
     }
 
     @Provides

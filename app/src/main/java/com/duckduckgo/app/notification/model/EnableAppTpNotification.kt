@@ -16,31 +16,46 @@
 
 package com.duckduckgo.app.notification.model
 
+import android.app.PendingIntent
 import android.content.Context
 import android.os.Bundle
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.APPTP_LAUNCH
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.notification.NotificationRegistrar
+import com.duckduckgo.app.notification.TaskStackBuilderFactory
 import com.duckduckgo.app.notification.db.NotificationDao
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.isNextLevelPrivacyNotificationEnabled
 import com.duckduckgo.app.statistics.isOneEasyStepForPrivacyNotificationEnabled
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnOnboardingActivity
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 
 class EnableAppTpNotification(
     private val context: Context,
     private val notificationDao: NotificationDao,
     private val variantManager: VariantManager,
+    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
 ) : SchedulableNotification {
 
     override val id = "com.duckduckgo.protection.enableapptp"
-    override val launchIntent = APPTP_LAUNCH
-    override val cancelIntent = CANCEL
 
     override suspend fun canShow(): Boolean {
         if (notificationDao.exists(id)) {
             Timber.v("Notification already seen")
+            return false
+        }
+
+        if (vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)) {
             return false
         }
 
@@ -88,4 +103,49 @@ class NextLevelPrivacySpecification(context: Context) : NotificationSpec {
     override val autoCancel = true
     override val bundle: Bundle = Bundle()
     override val color: Int = com.duckduckgo.mobile.android.R.color.ic_launcher_red_background
+}
+
+@ContributesMultibinding(AppScope::class)
+class EnableAppTpNotificationPlugin @Inject constructor(
+    private val context: Context,
+    private val schedulableNotification: EnableAppTpNotification,
+    private val taskStackBuilderFactory: TaskStackBuilderFactory,
+    private val pixel: Pixel,
+    private val coroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
+) : SchedulableNotificationPlugin {
+
+    override fun getSchedulableNotification(): SchedulableNotification {
+        return schedulableNotification
+    }
+
+    override fun onNotificationCancelled() {
+        pixel.fire(pixelName(AppPixelName.NOTIFICATION_CANCELLED.pixelName))
+    }
+
+    override fun onNotificationShown() {
+        pixel.fire(pixelName(AppPixelName.NOTIFICATION_SHOWN.pixelName))
+    }
+
+    override fun getSpecification(): NotificationSpec {
+        val deferred = coroutineScope.async(dispatcherProvider.io()) {
+            schedulableNotification.buildSpecification()
+        }
+        return runBlocking {
+            deferred.await()
+        }
+    }
+
+    override fun getLaunchIntent(): PendingIntent? {
+        val intent = VpnOnboardingActivity.intent(context).apply {
+            putExtra(VpnOnboardingActivity.LAUNCH_FROM_NOTIFICATION_PIXEL_NAME, pixelName(AppPixelName.NOTIFICATION_LAUNCHED.pixelName))
+        }
+        val pendingIntent: PendingIntent? = taskStackBuilderFactory.createTaskBuilder().run {
+            addNextIntentWithParentStack(intent)
+            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        }
+        return pendingIntent
+    }
+
+    private fun pixelName(notificationType: String) = "${notificationType}_${getSpecification().pixelSuffix}"
 }

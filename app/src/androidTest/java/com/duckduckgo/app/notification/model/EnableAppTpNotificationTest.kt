@@ -19,6 +19,8 @@ package com.duckduckgo.app.notification.model
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -34,12 +36,21 @@ class EnableAppTpNotificationTest {
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val mockNotificationsDao: NotificationDao = mock()
     private val mockVariantManager: VariantManager = mock()
+    private val mockVpnFeaturesRegistry: VpnFeaturesRegistry = mock()
 
     private lateinit var testee: EnableAppTpNotification
 
     @Before
     fun setup() {
-        testee = EnableAppTpNotification(context, mockNotificationsDao, mockVariantManager)
+        testee = EnableAppTpNotification(context, mockNotificationsDao, mockVariantManager, mockVpnFeaturesRegistry)
+    }
+
+    @Test
+    fun whenAppTPEnabledThenCanShowIsFalse() = runTest {
+        whenever(mockNotificationsDao.exists(any())).thenReturn(false)
+        whenever(mockVpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)).thenReturn(true)
+
+        assertFalse(testee.canShow())
     }
 
     @Test
