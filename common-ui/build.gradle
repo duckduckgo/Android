@@ -46,7 +46,6 @@ dependencies {
     implementation AndroidX.constraintLayout
     implementation AndroidX.recyclerView
     implementation AndroidX.lifecycle.viewModelKtx
-    implementation Square.okio
     // just to get the dagger annotations
     implementation Google.dagger
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.ui
+package com.duckduckgo.mobile.android.vpn.ui.util
 
 import android.graphics.*
 import android.graphics.drawable.ShapeDrawable
