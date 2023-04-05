@@ -107,9 +107,11 @@ class SyncActivityViewModel @Inject constructor(
     private fun fetchRemoteDevices() {
         viewModelScope.launch(dispatchers.io()) {
             val result = syncRepository.getConnectedDevices()
-            viewState.emit(viewState.value.hideDeviceListItemLoading())
             if (result is Success) {
-                viewState.emit(viewState.value.setDevices(result.data.map { SyncedDevice(it) }))
+                val newState = viewState.value.hideDeviceListItemLoading().setDevices(result.data.map { SyncedDevice(it) })
+                viewState.emit(newState)
+            } else {
+                viewState.emit(viewState.value.hideDeviceListItemLoading())
             }
         }
     }
@@ -224,8 +226,8 @@ class SyncActivityViewModel @Inject constructor(
         } else if (syncRepository.isSignedIn() && !viewState.value.showAccount) {
             initViewStateThisDevice()
             viewState.emit(viewState.value.showDeviceListItemLoading())
+            fetchRemoteDevices()
         }
-        fetchRemoteDevices()
     }
 
     private suspend fun hideOrShowAccountDetails() {
