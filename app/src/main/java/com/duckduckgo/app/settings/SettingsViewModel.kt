@@ -496,8 +496,8 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch { command.send(Command.LaunchSyncSettings) }
     }
 
-    fun onLaunchedFromNotification(pixelSuffix: String) {
-        pixel.fire(pixelSuffix)
+    fun onLaunchedFromNotification(pixelName: String) {
+        pixel.fire(pixelName)
     }
 
     companion object {

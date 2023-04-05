@@ -113,7 +113,7 @@ class WindowsWaitlistViewModel @Inject constructor(
         }
     }
 
-    fun onLaunchedFromNotification(pixelSuffix: String) {
-        pixel.fire(pixelSuffix)
+    fun onLaunchedFromNotification(pixelName: String) {
+        pixel.fire(pixelName)
     }
 }
