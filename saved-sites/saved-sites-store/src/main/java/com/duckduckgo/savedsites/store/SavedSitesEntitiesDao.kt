@@ -60,14 +60,17 @@ interface SavedSitesEntitiesDao {
     )
     fun entitiesInFolderSync(folderId: String): List<Entity>
 
-    @Query("update entities set deleted = 1 where entityId = :id")
-    fun delete(id: String)
+    @Query("update entities set deleted = 1, lastModified = :lastModified where entityId = :id")
+    fun delete(id: String, lastModified: String = DatabaseDateFormatter.timestamp())
 
-    @Query("update entities set deleted = 1 where entityId != :bookmarksRoot AND entityId != :favoritesRoot")
+    @Query("update entities set deleted = 1, lastModified = :lastModified where entityId != :bookmarksRoot AND entityId != :favoritesRoot")
     fun deleteAll(
         bookmarksRoot: String = SavedSitesNames.BOOMARKS_ROOT,
         favoritesRoot: String = SavedSitesNames.FAVORITES_ROOT,
+        lastModified: String = DatabaseDateFormatter.timestamp()
     )
+    @Delete
+    fun deletePermanently(entity: Entity)
 
     @Update(onConflict = OnConflictStrategy.IGNORE)
     fun update(entity: Entity)
