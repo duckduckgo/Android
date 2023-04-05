@@ -271,6 +271,7 @@ class RealSavedSitesRepository(
         val entity = Entity(title = titleOrFallback, url = url, type = BOOKMARK)
         savedSitesEntitiesDao.insert(entity)
         savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.BOOMARKS_ROOT, entityId = entity.entityId))
+        savedSitesEntitiesDao.updateModified(SavedSitesNames.BOOMARKS_ROOT)
 
         return entity.mapToBookmark(SavedSitesNames.BOOMARKS_ROOT)
     }
@@ -286,10 +287,12 @@ class RealSavedSitesRepository(
             savedSitesEntitiesDao.insert(entity)
             savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.BOOMARKS_ROOT, entityId = entity.entityId))
             savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.FAVORITES_ROOT, entityId = entity.entityId))
+            savedSitesEntitiesDao.updateModified(SavedSitesNames.BOOMARKS_ROOT)
+            savedSitesEntitiesDao.updateModified(SavedSitesNames.FAVORITES_ROOT)
         } else {
             savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.FAVORITES_ROOT, entityId = existentBookmark.entityId))
+            savedSitesEntitiesDao.updateModified(SavedSitesNames.FAVORITES_ROOT)
         }
-        savedSitesEntitiesDao.updateModified(SavedSitesNames.FAVORITES_ROOT)
         return getFavorite(url)!!
     }
 
@@ -324,9 +327,12 @@ class RealSavedSitesRepository(
     }
 
     private fun deleteBookmark(bookmark: Bookmark) {
+        if (getFavorite(bookmark.url) != null){
+            savedSitesEntitiesDao.updateModified(SavedSitesNames.FAVORITES_ROOT)
+        }
+        savedSitesEntitiesDao.updateModified(bookmark.parentId)
         savedSitesEntitiesDao.delete(bookmark.id)
         savedSitesRelationsDao.deleteRelationByEntity(bookmark.id)
-        savedSitesEntitiesDao.updateModified(bookmark.parentId)
     }
 
     override fun updateFavourite(favorite: Favorite) {
