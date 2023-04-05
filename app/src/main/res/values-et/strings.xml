@@ -602,6 +602,7 @@
     <string name="folderLocationTitle">Vali asukoht</string>
     <string name="addFolder">Lisa kaust</string>
     <string name="editFolder">Redigeeri kausta</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Kas kustutada kaust ja selle sisu?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Kas soovid kindlasti kustutada "</string>
     <string name="bookmarkFolderEmpty">Tühi</string>
 
