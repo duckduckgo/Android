@@ -81,7 +81,7 @@ class SyncActivityViewModel @Inject constructor(
 
     sealed class Command {
         object LaunchDeviceSetupFlow : Command()
-        object AskTurnOffSync : Command()
+        data class AskTurnOffSync(val device: ConnectedDevice) : Command()
         object AskDeleteAccount : Command()
         object CheckIfUserHasStoragePermission : Command()
         data class RecoveryCodePDFSuccess(val recoveryCodePDFFile: File) : Command()
@@ -100,7 +100,11 @@ class SyncActivityViewModel @Inject constructor(
             viewState.emit(viewState.value.copy(isDeviceSyncEnabled = isChecked))
             when (isChecked) {
                 true -> command.send(LaunchDeviceSetupFlow)
-                false -> command.send(AskTurnOffSync)
+                false -> {
+                    syncRepository.getThisConnectedDevice()?.let {
+                        command.send(AskTurnOffSync(it))
+                    } ?: viewState.emit(viewState.value.copy(isDeviceSyncEnabled = false, showAccount = false))
+                }
             }
         }
     }
@@ -133,11 +137,10 @@ class SyncActivityViewModel @Inject constructor(
         )
     }
 
-    fun onTurnOffSyncConfirmed() {
+    fun onTurnOffSyncConfirmed(connectedDevice: ConnectedDevice) {
         viewModelScope.launch(dispatchers.io()) {
             viewState.emit(viewState.value.copy(showAccount = false))
-            val deviceId = syncRepository.getThisConnectedDevice().deviceId
-            when (syncRepository.logout(deviceId)) {
+            when (syncRepository.logout(connectedDevice.deviceId)) {
                 is Error -> {
                     updateViewState()
                 }

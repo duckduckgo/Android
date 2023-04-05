@@ -307,7 +307,8 @@ class SyncActivity : DuckDuckGoActivity() {
             LaunchDeviceSetupFlow -> {
                 startActivity(SetupAccountActivity.intentStartSetupFlow(this))
             }
-            AskTurnOffSync -> askTurnOffsync()
+
+            is AskTurnOffSync -> askTurnOffsync(it.device)
             AskDeleteAccount -> askDeleteAccount()
             is RecoveryCodePDFSuccess -> {
                 shareAction.shareFile(this@SyncActivity, it.recoveryCodePDFFile)
@@ -376,7 +377,7 @@ class SyncActivity : DuckDuckGoActivity() {
             ).show()
     }
 
-    private fun askTurnOffsync() {
+    private fun askTurnOffsync(device: ConnectedDevice) {
         TextAlertDialogBuilder(this)
             .setTitle(R.string.turn_off_sync_dialog_title)
             .setMessage(getString(R.string.turn_off_sync_dialog_content))
@@ -385,7 +386,7 @@ class SyncActivity : DuckDuckGoActivity() {
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
-                        viewModel.onTurnOffSyncConfirmed()
+                        viewModel.onTurnOffSyncConfirmed(device)
                     }
 
                     override fun onNegativeButtonClicked() {
