@@ -48,6 +48,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.*
 
 @ContributesViewModel(ActivityScope::class)
@@ -61,10 +62,7 @@ class SyncActivityViewModel @Inject constructor(
     private val command = Channel<Command>(1, DROP_OLDEST)
     private val viewState = MutableStateFlow(ViewState())
     fun viewState(): Flow<ViewState> = viewState.onStart {
-        initViewStateThisDevice()
-        val syncedDevices = viewState.value.syncedDevices
-        viewState.emit(viewState.value.copy(syncedDevices = syncedDevices + LoadingItem))
-        fetchRemoteDevices()
+        updateAccountDetails()
     }
 
     fun commands(): Flow<Command> = command.receiveAsFlow()
@@ -88,9 +86,7 @@ class SyncActivityViewModel @Inject constructor(
 
     fun getSyncState() {
         viewModelScope.launch {
-            initViewStateThisDevice()
-            viewState.emit(viewState.value.showDeviceListItemLoading())
-            fetchRemoteDevices()
+            updateAccountDetails()
         }
     }
 
@@ -219,6 +215,17 @@ class SyncActivityViewModel @Inject constructor(
                 syncedDevices = listOf(SyncedDevice(connectedDevice)),
             ),
         )
+    }
+
+    private suspend fun updateAccountDetails() {
+        if (!syncRepository.isSignedIn()) {
+            viewState.emit(signedOutState())
+            return
+        } else if (syncRepository.isSignedIn() && !viewState.value.showAccount) {
+            initViewStateThisDevice()
+            viewState.emit(viewState.value.showDeviceListItemLoading())
+        }
+        fetchRemoteDevices()
     }
 
     private suspend fun hideOrShowAccountDetails() {

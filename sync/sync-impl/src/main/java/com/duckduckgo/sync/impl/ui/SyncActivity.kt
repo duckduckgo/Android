@@ -413,7 +413,7 @@ class SyncActivity : DuckDuckGoActivity() {
             binding.deleteAccountButton.setOnClickListener {
                 viewModel.onDeleteAccountClicked()
             }
-            syncedDevicesAdapter.updateData(viewState.syncedDevices)
         }
+        syncedDevicesAdapter.updateData(viewState.syncedDevices)
     }
 }
