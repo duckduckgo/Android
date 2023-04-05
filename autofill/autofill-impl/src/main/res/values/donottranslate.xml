@@ -19,4 +19,8 @@
     <string name="updateLoginUpdatePasswordExplanation" >DuckDuckGo will update this stored Login on your device.</string>
     <string name="autofillManagementUsernameCopied">Username copied</string>
     <string name="autofillManagementPasswordCopied">Password copied</string>
+
+    <string name="autofillDeleteLoginDialogCancel">Cancel</string>
+    <string name="autofillDeleteLoginDialogDelete">Delete</string>
+    <string name="autofillDeleteLoginDialogTitle">Are you sure you want to delete this Login?</string>
 </resources>
