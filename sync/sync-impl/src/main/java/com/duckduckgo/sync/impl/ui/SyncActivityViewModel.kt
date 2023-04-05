@@ -64,7 +64,7 @@ class SyncActivityViewModel @Inject constructor(
         initViewStateThisDevice()
         val syncedDevices = viewState.value.syncedDevices
         viewState.emit(viewState.value.copy(syncedDevices = syncedDevices + LoadingItem))
-        updateDevicesList()
+        fetchRemoteDevices()
     }
 
     fun commands(): Flow<Command> = command.receiveAsFlow()
@@ -91,7 +91,7 @@ class SyncActivityViewModel @Inject constructor(
             initViewStateThisDevice()
             val syncedDevices = viewState.value.syncedDevices
             viewState.emit(viewState.value.copy(syncedDevices = syncedDevices + LoadingItem))
-            updateDevicesList()
+            fetchRemoteDevices()
         }
     }
 
@@ -109,7 +109,7 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
-    private fun updateDevicesList() {
+    private fun fetchRemoteDevices() {
         viewModelScope.launch(dispatchers.io()) {
             val result = syncRepository.getConnectedDevices()
             if (result is Success) {
@@ -254,7 +254,7 @@ class SyncActivityViewModel @Inject constructor(
             val result = syncRepository.logout(device.deviceId)
             when (result) {
                 is Error -> viewState.emit(viewState.value.copy(syncedDevices = oldList))
-                is Success -> updateDevicesList()
+                is Success -> fetchRemoteDevices()
             }
         }
     }
@@ -273,7 +273,7 @@ class SyncActivityViewModel @Inject constructor(
             val result = syncRepository.renameDevice(editedConnectedDevice)
             when (result) {
                 is Error -> viewState.emit(viewState.value.copy(syncedDevices = oldList))
-                is Success -> updateDevicesList()
+                is Success -> fetchRemoteDevices()
             }
         }
     }
