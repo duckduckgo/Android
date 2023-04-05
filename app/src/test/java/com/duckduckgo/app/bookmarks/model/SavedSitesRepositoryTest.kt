@@ -51,6 +51,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.verify
 
 @RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -865,6 +866,48 @@ class SavedSitesRepositoryTest {
 
         assertTrue(bookmarks.size == 10)
         assertTrue(bookmarks[0].parentId == parentFolder.id)
+    }
+
+    @Test
+    fun whenDeleteBookmarkIsUndoneThenFolderStillHasBookmark() = runTest {
+        val rootFolder = BookmarkFolder(id = SavedSitesNames.BOOMARKS_ROOT, name = "root", parentId = "")
+        repository.insert(rootFolder)
+
+        val parentFolder = BookmarkFolder(id = "folder1", name = "name", parentId = SavedSitesNames.BOOMARKS_ROOT)
+        repository.insert(parentFolder)
+
+        val bookmark = repository.insertBookmark("https://favorite.com", "favorite")
+
+        assert(repository.getBookmark("https://favorite.com") != null)
+
+        val updatedBookmark = bookmark.copy(parentId = parentFolder.id)
+        repository.updateBookmark(updatedBookmark, bookmark.parentId)
+
+        repository.delete(bookmark)
+        assert(repository.getBookmark("https://favorite.com") == null)
+
+        repository.insert(updatedBookmark)
+
+        repository.getSavedSites(parentFolder.id).test {
+            val savedSites = awaitItem()
+            assertTrue(savedSites.bookmarks.size == 1)
+            assertTrue(savedSites.favorites.isEmpty())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenBookmarkIsUpdatedThenLastModifiedIsAlsoUpdated() {
+        givenNoBookmarksStored()
+
+        val bookmark = repository.insert(Bookmark(id = "bookmark1", title = "title", url = "foo.com", parentId = SavedSitesNames.BOOMARKS_ROOT))
+        val updatedBookmark = Bookmark(id = bookmark.id, title = "title", url = "foo.com", parentId = "folder2")
+
+        repository.updateBookmark(updatedBookmark, "folder1")
+        val bookmarkUpdated = repository.getBookmark(bookmark.url)!!
+
+        Assert.assertEquals(updatedBookmark.id, bookmarkUpdated.id)
+
     }
 
     private fun givenNoFavoritesStored() {
