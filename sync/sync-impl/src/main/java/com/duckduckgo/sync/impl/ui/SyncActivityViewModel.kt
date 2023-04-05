@@ -40,7 +40,6 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDF
 import java.io.File
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.LoadingItem
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
-import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -49,7 +48,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import javax.inject.*
 
 @ContributesViewModel(ActivityScope::class)
 class SyncActivityViewModel @Inject constructor(
@@ -62,11 +61,9 @@ class SyncActivityViewModel @Inject constructor(
     private val command = Channel<Command>(1, DROP_OLDEST)
     private val viewState = MutableStateFlow(ViewState())
     fun viewState(): Flow<ViewState> = viewState.onStart {
-        updateViewState()
-        val connectedDevice = withContext(dispatchers.io()) {
-            syncRepository.getThisConnectedDevice()
-        }
-        viewState.emit(viewState.value.copy(syncedDevices = listOf(SyncedDevice(connectedDevice), LoadingItem)))
+        initViewStateThisDevice()
+        val syncedDevices = viewState.value.syncedDevices
+        viewState.emit(viewState.value.copy(syncedDevices = syncedDevices + LoadingItem))
         updateDevicesList()
     }
 
@@ -91,7 +88,10 @@ class SyncActivityViewModel @Inject constructor(
 
     fun getSyncState() {
         viewModelScope.launch {
-            updateViewState()
+            initViewStateThisDevice()
+            val syncedDevices = viewState.value.syncedDevices
+            viewState.emit(viewState.value.copy(syncedDevices = syncedDevices + LoadingItem))
+            updateDevicesList()
         }
     }
 
@@ -103,7 +103,7 @@ class SyncActivityViewModel @Inject constructor(
                 false -> {
                     syncRepository.getThisConnectedDevice()?.let {
                         command.send(AskTurnOffSync(it))
-                    } ?: viewState.emit(viewState.value.copy(isDeviceSyncEnabled = false, showAccount = false))
+                    } ?: updateAccountViewState()
                 }
             }
         }
@@ -123,18 +123,48 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
-    private suspend fun updateViewState() {
+    private suspend fun initViewStateThisDevice() {
+        if (!syncRepository.isSignedIn()) {
+            viewState.emit(ViewState(isDeviceSyncEnabled = false, showAccount = false))
+            return
+        }
+
         val qrBitmap = withContext(dispatchers.io()) {
             val recoveryCode = syncRepository.getRecoveryCode() ?: return@withContext null
             qrEncoder.encodeAsBitmap(recoveryCode, R.dimen.qrSizeLarge, R.dimen.qrSizeLarge)
         }
+
+        val connectedDevice = syncRepository.getThisConnectedDevice() ?: return
+
         viewState.emit(
             viewState.value.copy(
                 isDeviceSyncEnabled = syncRepository.isSignedIn(),
                 showAccount = syncRepository.isSignedIn(),
                 loginQRCode = qrBitmap,
+                syncedDevices = listOf(SyncedDevice(connectedDevice))
             ),
         )
+    }
+
+    private suspend fun updateAccountViewState() {
+        if (!syncRepository.isSignedIn()) {
+            viewState.emit(
+                ViewState(
+                    isDeviceSyncEnabled = false,
+                    showAccount = false,
+                    loginQRCode = null,
+                    syncedDevices = emptyList(),
+                )
+            )
+            return
+        } else {
+            viewState.emit(
+                viewState.value.copy(
+                    isDeviceSyncEnabled = true,
+                    showAccount = true,
+                )
+            )
+        }
     }
 
     fun onTurnOffSyncConfirmed(connectedDevice: ConnectedDevice) {
@@ -142,10 +172,10 @@ class SyncActivityViewModel @Inject constructor(
             viewState.emit(viewState.value.copy(showAccount = false))
             when (syncRepository.logout(connectedDevice.deviceId)) {
                 is Error -> {
-                    updateViewState()
+                    updateAccountViewState()
                 }
                 is Success -> {
-                    updateViewState()
+                    updateAccountViewState()
                 }
             }
         }
@@ -153,7 +183,7 @@ class SyncActivityViewModel @Inject constructor(
 
     fun onTurnOffSyncCancelled() {
         viewModelScope.launch {
-            viewState.emit(viewState.value.copy(isDeviceSyncEnabled = true))
+            updateAccountViewState()
         }
     }
 
@@ -169,12 +199,10 @@ class SyncActivityViewModel @Inject constructor(
             viewState.emit(viewState.value.copy(showAccount = false))
             when (syncRepository.deleteAccount()) {
                 is Error -> {
-                    Timber.i("deleteAccount failed")
-                    updateViewState()
+                    updateAccountViewState()
                 }
                 is Success -> {
-                    Timber.i("deleteAccount success")
-                    updateViewState()
+                    updateAccountViewState()
                 }
             }
         }
@@ -182,7 +210,7 @@ class SyncActivityViewModel @Inject constructor(
 
     fun onDeleteAccountCancelled() {
         viewModelScope.launch {
-            viewState.emit(viewState.value.copy(isDeviceSyncEnabled = true))
+            updateAccountViewState()
         }
     }
 
