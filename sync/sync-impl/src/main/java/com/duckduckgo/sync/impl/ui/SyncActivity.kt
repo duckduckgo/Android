@@ -16,19 +16,19 @@
 
 package com.duckduckgo.sync.impl.ui
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.widget.CompoundButton
 import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.duckduckgo.sync.impl.databinding.ActivitySyncBinding
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
@@ -38,6 +38,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
+@ContributeToActivityStarter(SyncActivityWithEmptyParams::class)
 class SyncActivity : DuckDuckGoActivity() {
     private val binding: ActivitySyncBinding by viewBinding()
     private val viewModel: SyncActivityViewModel by bindViewModel()
@@ -92,12 +93,6 @@ class SyncActivity : DuckDuckGoActivity() {
         if (viewState.loginQRCode != null) {
             binding.qrCodeImageView.show()
             binding.qrCodeImageView.setImageBitmap(viewState.loginQRCode)
-        }
-    }
-
-    companion object {
-        fun intent(context: Context): Intent {
-            return Intent(context, SyncActivity::class.java)
         }
     }
 }

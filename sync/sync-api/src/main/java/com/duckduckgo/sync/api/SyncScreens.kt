@@ -16,9 +16,12 @@
 
 package com.duckduckgo.sync.api
 
-import android.content.Context
-import android.content.Intent
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 
-interface SyncNav {
-    fun openSyncActivity(context: Context): Intent
-}
+/**
+ * Use this class to launch the sync screen without parameters
+ * ```kotlin
+ * globalActivityStarter.start(context, SyncActivityWithEmptyParams)
+ * ```
+ */
+object SyncActivityWithEmptyParams : GlobalActivityStarter.ActivityParams
