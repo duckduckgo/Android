@@ -602,6 +602,7 @@
     <string name="folderLocationTitle">Изберете местоположение</string>
     <string name="addFolder">Добавяне на папка</string>
     <string name="editFolder">Редактиране на папка</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Изтриване на папката и нейното съдържание?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Сигурни ли сте, че искате да изтриете "</string>
     <string name="bookmarkFolderEmpty">Празна</string>
 
