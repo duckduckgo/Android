@@ -115,7 +115,7 @@
                 android:id="@+id/codeFrame"
                 android:visibility="gone"
                 android:layout_width="220dp"
-                android:layout_height="100dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="28dp"
                 android:background="@drawable/background_code_frame"
                 android:orientation="vertical"
@@ -135,7 +135,7 @@
                 <TextView
                     android:id="@+id/inviteCode"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_margin="5dp"
                     android:background="@drawable/background_code_text"
                     android:fontFamily="@font/roboto_mono"
