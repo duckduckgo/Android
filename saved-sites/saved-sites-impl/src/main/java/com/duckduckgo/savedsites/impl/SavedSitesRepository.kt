@@ -342,7 +342,10 @@ class RealSavedSitesRepository(
         }
     }
 
-    override fun updateBookmark(bookmark: Bookmark, oldFolderId: String) {
+    override fun updateBookmark(
+        bookmark: Bookmark,
+        oldFolderId: String
+    ) {
         if (bookmark.parentId != oldFolderId) {
             // bookmark has moved to another folder
             savedSitesRelationsDao.deleteRelationByEntityAndFolder(bookmark.id, oldFolderId)
@@ -380,7 +383,9 @@ class RealSavedSitesRepository(
 
         savedSitesRelationsDao.deleteRelationByEntity(folder.id)
         savedSitesRelationsDao.delete(folder.id)
-        savedSitesEntitiesDao.deleteList(entities.toList())
+        entities.forEach {
+            savedSitesEntitiesDao.delete(it.entityId)
+        }
         savedSitesEntitiesDao.delete(folder.id)
     }
 
