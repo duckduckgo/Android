@@ -35,12 +35,12 @@ interface SavedSitesEntitiesDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertList(entities: List<Entity>)
 
-    @Query("select * from entities")
+    @Query("select * from entities where deleted=0")
     fun entities(): List<Entity>
 
     @Query(
-        "select * from  entities inner join relations on entities.entityId = relations.entityId " +
-            "and entities.type = :type and relations.folderId = :folderId",
+        "select * from entities inner join relations on entities.entityId = relations.entityId " +
+            "and entities.type = :type and relations.folderId = :folderId and entities.deleted = 0",
     )
     fun entitiesInFolder(
         folderId: String,
@@ -49,13 +49,13 @@ interface SavedSitesEntitiesDao {
 
     @Query(
         "select * from entities inner join relations on entities.entityId = relations.entityId " +
-            "where relations.folderId = :folderId",
+            "where relations.folderId = :folderId and entities.deleted = 0",
     )
     fun entitiesInFolder(folderId: String): Flow<List<Entity>>
 
     @Query(
         "select * from entities inner join relations on entities.entityId = relations.entityId " +
-            "where relations.folderId = :folderId",
+            "where relations.folderId = :folderId and entities.deleted = 0",
     )
     fun entitiesInFolderSync(folderId: String): List<Entity>
 
@@ -74,32 +74,32 @@ interface SavedSitesEntitiesDao {
     @Update(onConflict = OnConflictStrategy.IGNORE)
     fun update(entity: Entity)
 
-    @Query("select * from entities where url = :url limit 1")
+    @Query("select * from entities where url = :url and entities.deleted = 0 limit 1")
     fun entityByUrl(url: String): Entity?
 
     @Query(
-        "select count(*) from entities where entities.url LIKE :domain",
+        "select count(*) from entities where entities.url and entities.deleted = 0 LIKE :domain",
     )
     fun countEntitiesByUrl(
         domain: String,
     ): Int
 
-    @Query("select CAST(COUNT(*) AS BIT) from entities")
+    @Query("select CAST(COUNT(*) AS BIT) from entities where entities.deleted = 0")
     fun hasEntities(): Boolean
 
-    @Query("select * from entities where entityId = :id")
+    @Query("select * from entities where entityId = :id and entities.deleted = 0")
     fun entityById(id: String): Entity?
 
-    @Query("select * from entities where title = :name")
+    @Query("select * from entities where title = :name and entities.deleted = 0")
     fun entityByName(name: String): Entity?
 
-    @Query("select * from entities where type = :type")
+    @Query("select * from entities where type = :type and entities.deleted = 0")
     fun entitiesByType(type: EntityType): Flow<List<Entity>>
 
-    @Query("select * from entities where type = :type")
+    @Query("select * from entities where type = :type and entities.deleted = 0")
     fun entitiesByTypeObservable(type: EntityType): Single<List<Entity>>
 
-    @Query("select * from entities where type = :type")
+    @Query("select * from entities where type = :type and entities.deleted = 0")
     fun entitiesByTypeSync(type: EntityType): List<Entity>
 
     @Query("delete from entities where entityId != :bookmarksRoot AND entityId != :favoritesRoot")
