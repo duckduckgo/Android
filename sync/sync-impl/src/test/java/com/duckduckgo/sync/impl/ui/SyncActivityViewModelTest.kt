@@ -71,7 +71,7 @@ class SyncActivityViewModelTest {
 
         testee.viewState().test {
             val viewState = awaitItem()
-            assertTrue(viewState.isDeviceSyncEnabled)
+            assertTrue(viewState.syncToggleState)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -107,7 +107,7 @@ class SyncActivityViewModelTest {
 
         testee.viewState().test {
             val viewState = awaitItem()
-            assertFalse(viewState.isDeviceSyncEnabled)
+            assertFalse(viewState.syncToggleState)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -120,7 +120,7 @@ class SyncActivityViewModelTest {
 
         testee.viewState().test {
             val viewState = awaitItem()
-            assertTrue(viewState.isDeviceSyncEnabled)
+            assertTrue(viewState.syncToggleState)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -163,12 +163,12 @@ class SyncActivityViewModelTest {
 
         testee.viewState().test {
             var viewState = awaitItem()
-            assertTrue(viewState.isDeviceSyncEnabled)
+            assertTrue(viewState.syncToggleState)
             whenever(syncRepository.isSignedIn()).thenReturn(false)
             testee.onTurnOffSyncConfirmed()
             viewState = awaitItem()
             assertFalse(viewState.showAccount)
-            assertFalse(viewState.isDeviceSyncEnabled)
+            assertFalse(viewState.syncToggleState)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -182,7 +182,7 @@ class SyncActivityViewModelTest {
 
         testee.viewState().test {
             val viewState = awaitItem()
-            assertTrue(viewState.isDeviceSyncEnabled)
+            assertTrue(viewState.syncToggleState)
             assertTrue(viewState.showAccount)
             cancelAndIgnoreRemainingEvents()
         }
@@ -194,7 +194,7 @@ class SyncActivityViewModelTest {
             var viewState = awaitItem()
             testee.onTurnOffSyncCancelled()
             viewState = awaitItem()
-            assertTrue(viewState.isDeviceSyncEnabled)
+            assertTrue(viewState.syncToggleState)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -217,12 +217,12 @@ class SyncActivityViewModelTest {
 
         testee.viewState().test {
             var viewState = awaitItem()
-            assertTrue(viewState.isDeviceSyncEnabled)
+            assertTrue(viewState.syncToggleState)
             whenever(syncRepository.isSignedIn()).thenReturn(false)
             testee.onDeleteAccountConfirmed()
             viewState = awaitItem()
             assertFalse(viewState.showAccount)
-            assertFalse(viewState.isDeviceSyncEnabled)
+            assertFalse(viewState.syncToggleState)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -236,7 +236,7 @@ class SyncActivityViewModelTest {
 
         testee.viewState().test {
             val viewState = awaitItem()
-            assertTrue(viewState.isDeviceSyncEnabled)
+            assertTrue(viewState.syncToggleState)
             assertTrue(viewState.showAccount)
             cancelAndIgnoreRemainingEvents()
         }
@@ -258,7 +258,7 @@ class SyncActivityViewModelTest {
             var viewState = awaitItem()
             testee.onDeleteAccountCancelled()
             viewState = awaitItem()
-            assertTrue(viewState.isDeviceSyncEnabled)
+            assertTrue(viewState.syncToggleState)
             cancelAndIgnoreRemainingEvents()
         }
     }

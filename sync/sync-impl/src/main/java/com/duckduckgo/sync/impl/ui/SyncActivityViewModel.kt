@@ -70,7 +70,7 @@ class SyncActivityViewModel @Inject constructor(
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
     data class ViewState(
-        val isDeviceSyncEnabled: Boolean = false,
+        val syncToggleState: Boolean = false,
         val showAccount: Boolean = false,
         val loginQRCode: Bitmap? = null,
         val syncedDevices: List<SyncDeviceListItem> = emptyList(),
@@ -97,7 +97,7 @@ class SyncActivityViewModel @Inject constructor(
 
     fun onToggleClicked(isChecked: Boolean) {
         viewModelScope.launch {
-            viewState.emit(viewState.value.copy(isDeviceSyncEnabled = isChecked))
+            viewState.emit(viewState.value.copy(syncToggleState = isChecked))
             when (isChecked) {
                 true -> command.send(LaunchDeviceSetupFlow)
                 false -> {
@@ -125,7 +125,7 @@ class SyncActivityViewModel @Inject constructor(
 
     private suspend fun initViewStateThisDevice() {
         if (!syncRepository.isSignedIn()) {
-            viewState.emit(ViewState(isDeviceSyncEnabled = false, showAccount = false))
+            viewState.emit(ViewState(syncToggleState = false, showAccount = false))
             return
         }
 
@@ -138,7 +138,7 @@ class SyncActivityViewModel @Inject constructor(
 
         viewState.emit(
             viewState.value.copy(
-                isDeviceSyncEnabled = syncRepository.isSignedIn(),
+                syncToggleState = syncRepository.isSignedIn(),
                 showAccount = syncRepository.isSignedIn(),
                 loginQRCode = qrBitmap,
                 syncedDevices = listOf(SyncedDevice(connectedDevice))
@@ -150,7 +150,7 @@ class SyncActivityViewModel @Inject constructor(
         if (!syncRepository.isSignedIn()) {
             viewState.emit(
                 ViewState(
-                    isDeviceSyncEnabled = false,
+                    syncToggleState = false,
                     showAccount = false,
                     loginQRCode = null,
                     syncedDevices = emptyList(),
@@ -160,7 +160,7 @@ class SyncActivityViewModel @Inject constructor(
         } else {
             viewState.emit(
                 viewState.value.copy(
-                    isDeviceSyncEnabled = true,
+                    syncToggleState = true,
                     showAccount = true,
                 )
             )
@@ -189,7 +189,7 @@ class SyncActivityViewModel @Inject constructor(
 
     fun onDeleteAccountClicked() {
         viewModelScope.launch {
-            viewState.emit(viewState.value.copy(isDeviceSyncEnabled = false))
+            viewState.emit(viewState.value.copy(syncToggleState = false))
             command.send(AskDeleteAccount)
         }
     }
