@@ -327,7 +327,7 @@ class RealSavedSitesRepository(
     }
 
     private fun deleteBookmark(bookmark: Bookmark) {
-        if (getFavorite(bookmark.url) != null){
+        if (getFavorite(bookmark.url) != null) {
             savedSitesEntitiesDao.updateModified(SavedSitesNames.FAVORITES_ROOT)
         }
         savedSitesEntitiesDao.updateModified(bookmark.parentId)
@@ -355,7 +355,7 @@ class RealSavedSitesRepository(
 
     override fun updateBookmark(
         bookmark: Bookmark,
-        fromFolderId: String
+        fromFolderId: String,
     ) {
         if (bookmark.parentId != fromFolderId) {
             // bookmark has moved to another folder

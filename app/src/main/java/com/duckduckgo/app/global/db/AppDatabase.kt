@@ -573,7 +573,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
-    private val MIGRATION_43_TO_44: Migration = object : Migration(43, 44) {
+    val MIGRATION_43_TO_44: Migration = object : Migration(43, 44) {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS `tds_cname_entity` (`cloakedHostName` TEXT NOT NULL, " +
@@ -582,7 +582,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
-    private val MIGRATION_44_TO_45: Migration = object : Migration(44, 45) {
+    val MIGRATION_44_TO_45: Migration = object : Migration(44, 45) {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS `entities` (`entityId` TEXT NOT NULL, " +
@@ -602,7 +602,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
-    val MIGRATION_46_TO_47: Migration = object : Migration(46, 47) {
+    private val MIGRATION_46_TO_47: Migration = object : Migration(46, 47) {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL("ALTER TABLE `entities` ADD COLUMN `lastModified` TEXT")
             database.execSQL("ALTER TABLE `entities` ADD COLUMN `deleted` INTEGER NOT NULL DEFAULT 0")

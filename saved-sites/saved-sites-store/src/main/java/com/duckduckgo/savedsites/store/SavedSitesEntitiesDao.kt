@@ -67,8 +67,9 @@ interface SavedSitesEntitiesDao {
     fun deleteAll(
         bookmarksRoot: String = SavedSitesNames.BOOMARKS_ROOT,
         favoritesRoot: String = SavedSitesNames.FAVORITES_ROOT,
-        lastModified: String = DatabaseDateFormatter.timestamp()
+        lastModified: String = DatabaseDateFormatter.timestamp(),
     )
+
     @Delete
     fun deletePermanently(entity: Entity)
 
