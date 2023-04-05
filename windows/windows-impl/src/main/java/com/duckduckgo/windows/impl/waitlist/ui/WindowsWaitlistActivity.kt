@@ -87,6 +87,10 @@ class WindowsWaitlistActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(toolbar)
         configureUiEventHandlers()
+
+        intent?.getStringExtra(LAUNCH_FROM_NOTIFICATION_PIXEL_NAME)?.let {
+            viewModel.onLaunchedFromNotification(it)
+        }
     }
 
     private fun configureUiEventHandlers() {
@@ -218,6 +222,7 @@ class WindowsWaitlistActivity : DuckDuckGoActivity() {
 
     companion object {
         const val CLIPBOARD_LABEL = "INVITE_CODE"
+        const val LAUNCH_FROM_NOTIFICATION_PIXEL_NAME = "LAUNCH_FROM_NOTIFICATION_PIXEL_NAME"
 
         fun intent(context: Context): Intent {
             return Intent(context, WindowsWaitlistActivity::class.java)

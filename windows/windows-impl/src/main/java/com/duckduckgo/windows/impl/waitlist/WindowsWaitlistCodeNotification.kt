@@ -16,6 +16,7 @@
 
 package com.duckduckgo.windows.impl.waitlist
 
+import android.app.PendingIntent
 import android.content.Context
 import android.os.Bundle
 import androidx.core.app.NotificationManagerCompat
@@ -44,8 +45,6 @@ class WindowsWaitlistCodeNotification @Inject constructor(
 ) : SchedulableNotification {
 
     override val id = "com.duckduckgo.windows.waitlist"
-    override val launchIntent = "com.duckduckgo.notification.windows.waitlist.code"
-    override val cancelIntent: String = "com.duckduckgo.notification.windows.waitlist.code.cancel"
 
     override suspend fun canShow(): Boolean {
         if (notificationRepository.exists(id)) {
@@ -105,11 +104,14 @@ class WindowsWaitlistNotificationPlugin @Inject constructor(
         pixel.fire(WINDOWS_WAITLIST_NOTIFICATION_SHOWN)
     }
 
-    override fun onNotificationLaunched() {
-        pixel.fire(WINDOWS_WAITLIST_NOTIFICATION_LAUNCHED)
-        val intent = WindowsWaitlistActivity.intent(context)
-        taskStackBuilderFactory.createTaskBuilder()
-            .addNextIntentWithParentStack(intent)
-            .startActivities()
+    override fun getLaunchIntent(): PendingIntent? {
+        val intent = WindowsWaitlistActivity.intent(context).apply {
+            putExtra(WindowsWaitlistActivity.LAUNCH_FROM_NOTIFICATION_PIXEL_NAME, WINDOWS_WAITLIST_NOTIFICATION_LAUNCHED.pixelName)
+        }
+        val pendingIntent: PendingIntent? = taskStackBuilderFactory.createTaskBuilder().run {
+            addNextIntentWithParentStack(intent)
+            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        }
+        return pendingIntent
     }
 }

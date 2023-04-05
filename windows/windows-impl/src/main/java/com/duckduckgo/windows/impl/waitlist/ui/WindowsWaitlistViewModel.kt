@@ -112,4 +112,8 @@ class WindowsWaitlistViewModel @Inject constructor(
             commandChannel.send(GoToMacClientSettings)
         }
     }
+
+    fun onLaunchedFromNotification(pixelName: String) {
+        pixel.fire(pixelName)
+    }
 }

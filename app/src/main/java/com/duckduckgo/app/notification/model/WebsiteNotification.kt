@@ -19,8 +19,6 @@ package com.duckduckgo.app.notification.model
 import android.content.Context
 import android.os.Bundle
 import androidx.annotation.StringRes
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.WEBSITE
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.mobile.android.R as CommonR
@@ -35,10 +33,6 @@ class WebsiteNotification(
 ) : SchedulableNotification {
 
     override val id = "com.duckduckgo.privacy.website.$pixelSuffix"
-
-    override val launchIntent: String = WEBSITE
-
-    override val cancelIntent: String = CANCEL
 
     override suspend fun canShow(): Boolean {
         return !notificationDao.exists(id)

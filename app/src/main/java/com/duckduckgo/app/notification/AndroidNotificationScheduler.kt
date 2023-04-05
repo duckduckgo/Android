@@ -129,12 +129,12 @@ class PrivacyNotificationWorker(
     override lateinit var notification: PrivacyProtectionNotification
 }
 
-open class SchedulableNotificationWorker<T : SchedulableNotification>(
+abstract class SchedulableNotificationWorker<T : SchedulableNotification>(
     val context: Context,
     params: WorkerParameters,
 ) : CoroutineWorker(context, params) {
-    open lateinit var notificationSender: NotificationSender
-    open lateinit var notification: T
+    abstract var notificationSender: NotificationSender
+    abstract var notification: T
 
     override suspend fun doWork(): Result {
         notificationSender.sendNotification(notification)
