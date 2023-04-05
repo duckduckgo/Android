@@ -46,7 +46,7 @@ interface SavedSitesRelationsDao {
 
     @Query(
         "select count(*) from entities inner join relations on entities.entityId = relations.entityId " +
-            "and entities.type = :type and relations.folderId = :folderId",
+            "and entities.type = :type and relations.folderId = :folderId and entities.deleted = 0",
     )
     fun countEntitiesInFolder(
         folderId: String,
@@ -85,7 +85,7 @@ interface SavedSitesRelationsDao {
 
     @Query(
         "select count(*) from entities inner join relations on entities.entityId = relations.entityId " +
-            "where entities.url LIKE :domain AND folderId == :folderId",
+            "where entities.url LIKE :domain AND folderId == :folderId AND entities.deleted = 0",
     )
     fun countFavouritesByUrl(
         domain: String,
