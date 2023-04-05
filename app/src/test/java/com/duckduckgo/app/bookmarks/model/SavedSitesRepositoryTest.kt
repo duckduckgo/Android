@@ -51,7 +51,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.verify
 
 @RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -907,7 +906,6 @@ class SavedSitesRepositoryTest {
         val bookmarkUpdated = repository.getBookmark(bookmark.url)!!
 
         Assert.assertEquals(updatedBookmark.id, bookmarkUpdated.id)
-
     }
 
     private fun givenNoFavoritesStored() {
