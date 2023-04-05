@@ -103,7 +103,7 @@ class VariantManagerTest {
     fun appTPPromotionsControlVariantHasExpectedWeightAndNoFeatures() {
         val variant = variants.first { it.key == "ze" }
 
-        assertEqualsDouble(1.0, variant.weight)
+        assertEqualsDouble(0.0, variant.weight)
         assertEquals(0, variant.features.size)
     }
 
@@ -111,7 +111,7 @@ class VariantManagerTest {
     fun appTPPromotionsOneEasyStepForPrivacyRemoteMessageVariantHasExpectedWeightAndFeatures() {
         val variant = variants.first { it.key == "zh" }
 
-        assertEqualsDouble(1.0, variant.weight)
+        assertEqualsDouble(0.0, variant.weight)
         assertEquals(1, variant.features.size)
         assertTrue(variant.hasFeature(OneEasyStepForPrivacyRemoteMessage))
     }
@@ -120,7 +120,7 @@ class VariantManagerTest {
     fun appTPPromotionsBlockingTrackersAcrossWebRemoteMessageVariantHasExpectedWeightAndFeatures() {
         val variant = variants.first { it.key == "zi" }
 
-        assertEqualsDouble(1.0, variant.weight)
+        assertEqualsDouble(0.0, variant.weight)
         assertEquals(1, variant.features.size)
         assertTrue(variant.hasFeature(BlockingTrackersAcrossWebRemoteMessage))
     }
@@ -129,7 +129,7 @@ class VariantManagerTest {
     fun appTPPromotionsNextLevelPrivacyRemoteMessageVariantHasExpectedWeightAndFeatures() {
         val variant = variants.first { it.key == "zl" }
 
-        assertEqualsDouble(1.0, variant.weight)
+        assertEqualsDouble(0.0, variant.weight)
         assertEquals(1, variant.features.size)
         assertTrue(variant.hasFeature(NextLevelPrivacyRemoteMessage))
     }
@@ -138,7 +138,7 @@ class VariantManagerTest {
     fun appTPPromotionsOneEasyStepForPrivacyNotificationVariantHasExpectedWeightAndFeatures() {
         val variant = variants.first { it.key == "zm" }
 
-        assertEqualsDouble(1.0, variant.weight)
+        assertEqualsDouble(0.0, variant.weight)
         assertEquals(1, variant.features.size)
         assertTrue(variant.hasFeature(OneEasyStepForPrivacyNotification))
     }
@@ -147,7 +147,7 @@ class VariantManagerTest {
     fun appTPPromotionsNextLevelPrivacyNotificationVariantHasExpectedWeightAndFeatures() {
         val variant = variants.first { it.key == "zn" }
 
-        assertEqualsDouble(1.0, variant.weight)
+        assertEqualsDouble(0.0, variant.weight)
         assertEquals(1, variant.features.size)
         assertTrue(variant.hasFeature(NextLevelPrivacyNotification))
     }
@@ -156,7 +156,7 @@ class VariantManagerTest {
     fun appTPPromotionsDaxDialogMessageVariantHasExpectedWeightAndFeatures() {
         val variant = variants.first { it.key == "zo" }
 
-        assertEqualsDouble(1.0, variant.weight)
+        assertEqualsDouble(0.0, variant.weight)
         assertEquals(1, variant.features.size)
         assertTrue(variant.hasFeature(DaxDialogMessage))
     }
