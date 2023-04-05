@@ -60,8 +60,8 @@ interface VariantManager {
                 features = listOf(VariantFeature.OptimiseOnboardingExperiment),
                 filterBy = { isEnglishLocale() && !isGBCountry() },
             ),
-            Variant(key = "mi", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
-            Variant(key = "mj", weight = 0.0, features = listOf(VariantFeature.OnboardingCustomizationExperiment), filterBy = { noFilter() }),
+            Variant(key = "mi", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
+            Variant(key = "mj", weight = 1.0, features = listOf(VariantFeature.OnboardingCustomizationExperiment), filterBy = { noFilter() }),
         )
 
         val REFERRER_VARIANTS = listOf(
