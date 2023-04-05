@@ -56,10 +56,10 @@ class AppDatabaseBookmarksMigrationCallback(
     private fun addRootFolders() {
         with(appDatabase.get()) {
             if (syncEntitiesDao().entityById(SavedSitesNames.BOOMARKS_ROOT) == null){
-                syncEntitiesDao().insert(Entity(SavedSitesNames.BOOMARKS_ROOT, SavedSitesNames.BOOKMARKS_NAME, "", FOLDER))
+                syncEntitiesDao().insert(Entity(SavedSitesNames.BOOMARKS_ROOT, SavedSitesNames.BOOKMARKS_NAME, "", FOLDER, lastModified = null))
             }
             if (syncEntitiesDao().entityById(SavedSitesNames.FAVORITES_ROOT) == null){
-                syncEntitiesDao().insert(Entity(SavedSitesNames.FAVORITES_ROOT, SavedSitesNames.FAVORITES_NAME, "", FOLDER))
+                syncEntitiesDao().insert(Entity(SavedSitesNames.FAVORITES_ROOT, SavedSitesNames.FAVORITES_NAME, "", FOLDER, lastModified = null))
             }
         }
     }

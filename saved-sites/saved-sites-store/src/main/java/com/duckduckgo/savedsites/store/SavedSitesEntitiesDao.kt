@@ -22,6 +22,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
@@ -70,6 +71,9 @@ interface SavedSitesEntitiesDao {
 
     @Update(onConflict = OnConflictStrategy.IGNORE)
     fun update(entity: Entity)
+
+    @Query("update entities set lastModified = :lastModified where entityId = :entityId")
+    fun updateModified(entityId: String, lastModified: String = DatabaseDateFormatter.timestamp())
 
     @Query("select * from entities where url = :url and entities.deleted = 0 limit 1")
     fun entityByUrl(url: String): Entity?
