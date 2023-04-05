@@ -271,6 +271,7 @@ class RealSavedSitesRepository(
         val entity = Entity(title = titleOrFallback, url = url, type = BOOKMARK)
         savedSitesEntitiesDao.insert(entity)
         savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.BOOMARKS_ROOT, entityId = entity.entityId))
+
         return entity.mapToBookmark(SavedSitesNames.BOOMARKS_ROOT)
     }
 
@@ -288,6 +289,7 @@ class RealSavedSitesRepository(
         } else {
             savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.FAVORITES_ROOT, entityId = existentBookmark.entityId))
         }
+        savedSitesEntitiesDao.updateModified(SavedSitesNames.FAVORITES_ROOT)
         return getFavorite(url)!!
     }
 
@@ -303,6 +305,7 @@ class RealSavedSitesRepository(
                 val entity = Entity(entityId = savedSite.id, title = titleOrFallback, url = savedSite.url, type = BOOKMARK)
                 savedSitesEntitiesDao.insert(entity)
                 savedSitesRelationsDao.insert(Relation(folderId = savedSite.parentId, entityId = entity.entityId))
+                savedSitesEntitiesDao.updateModified(savedSite.parentId)
                 entity.mapToBookmark(savedSite.parentId)
             }
         }
@@ -317,11 +320,13 @@ class RealSavedSitesRepository(
 
     private fun deleteFavorite(favorite: Favorite) {
         savedSitesRelationsDao.deleteRelationByEntity(favorite.id, SavedSitesNames.FAVORITES_ROOT)
+        savedSitesEntitiesDao.updateModified(SavedSitesNames.FAVORITES_ROOT)
     }
 
     private fun deleteBookmark(bookmark: Bookmark) {
         savedSitesEntitiesDao.delete(bookmark.id)
         savedSitesRelationsDao.deleteRelationByEntity(bookmark.id)
+        savedSitesEntitiesDao.updateModified(bookmark.parentId)
     }
 
     override fun updateFavourite(favorite: Favorite) {
@@ -344,15 +349,17 @@ class RealSavedSitesRepository(
 
     override fun updateBookmark(
         bookmark: Bookmark,
-        oldFolderId: String
+        fromFolderId: String
     ) {
-        if (bookmark.parentId != oldFolderId) {
+        if (bookmark.parentId != fromFolderId) {
             // bookmark has moved to another folder
-            savedSitesRelationsDao.deleteRelationByEntityAndFolder(bookmark.id, oldFolderId)
+            savedSitesRelationsDao.deleteRelationByEntityAndFolder(bookmark.id, fromFolderId)
             savedSitesRelationsDao.insert(Relation(folderId = bookmark.parentId, entityId = bookmark.id))
         }
 
         savedSitesEntitiesDao.update(Entity(bookmark.id, bookmark.title, bookmark.url, BOOKMARK))
+        savedSitesEntitiesDao.updateModified(fromFolderId)
+        savedSitesEntitiesDao.updateModified(bookmark.parentId)
     }
 
     override fun insert(folder: BookmarkFolder): BookmarkFolder {
@@ -431,6 +438,7 @@ class RealSavedSitesRepository(
         savedSitesRelationsDao.delete(SavedSitesNames.FAVORITES_ROOT)
         val relations = favorites.map { Relation(folderId = SavedSitesNames.FAVORITES_ROOT, entityId = it.id) }
         savedSitesRelationsDao.insertList(relations)
+        savedSitesEntitiesDao.updateModified(SavedSitesNames.FAVORITES_ROOT)
     }
 
     private fun Entity.mapToBookmark(relationId: String): Bookmark = Bookmark(this.entityId, this.title, this.url.orEmpty(), relationId)
