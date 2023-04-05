@@ -369,7 +369,7 @@
     <string name="atp_ManageRecentAppsProtectionEmpty">Aplicațiile cu încercări de urmărire blocate recent vor apărea aici</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
-    <string name="atp_RemoveFeatureDialogTitle">Dezactivează și șterge datele?</string>
+    <string name="atp_RemoveFeatureDialogTitle">Dezactivezi și ștergi datele?</string>
     <string name="atp_RemoveFeatureDialogMessage">Protecția împotriva urmăririi de către aplicație va fi dezactivată, iar toate setările și istoricul încercărilor de urmărire vor fi șterse. O poți activa din nou oricând din Setări.</string>
     <string name="atp_RemoveFeatureDialogCancel">Anulează</string>
     <string name="atp_RemoveFeatureDialogRemove">Dezactivează</string>
