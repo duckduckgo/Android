@@ -17,18 +17,18 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Girişleri Otomatik Doldur</string>
+    <string name="autofillManagementScreenTitle">Giriş bilgileri</string>
 
     <string name="managementDisabledModeCta"><b>Ayarlarda Ayarlama</b></string>
-    <string name="managementDisabledModeSubtitle">Otomatik Doldurulan Giriş bilgilerinizin güvenliğini sağlamak için bir cihaz kilidi deseni, PIN veya biyometrik veri gereklidir.</string>
-    <string name="managementDisabledModeTitle">Cihazınızı Otomatik Doldurma özelliğini kullanmak için güvenli hâle getirin</string>
+    <string name="managementDisabledModeSubtitle">Giriş bilgilerinizin güvenliğini sağlamak için bir cihaz kilidi deseni, PIN veya biyometrik veri gereklidir.</string>
+    <string name="managementDisabledModeTitle">Giriş bilgilerini kaydetmek için cihazınızın güvenliğini sağlayın</string>
 
-    <string name="saveLoginDialogTitle">Giriş Kaydedilsin mi?</string>
-    <string name="saveLoginMissingUsernameDialogTitle">Şifre Kaydedilsin mi?</string>
+    <string name="saveLoginDialogTitle">Giriş kaydedilsin mi?</string>
+    <string name="saveLoginMissingUsernameDialogTitle">Şifre kaydedilsin mi?</string>
     <string name="saveLoginDialogButtonSave">Girişi Kaydet</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Şifre Kaydet</string>
     <string name="saveLoginDialogNotNow">Şimdi Değil</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">DuckDuckGo bu Girişi cihazınızda güvenli bir şekilde saklayacaktır. Kayıtlı Girişleri Ayarlar\'dan yönetebilirsiniz.</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">Giriş bilgileri yalnızca bu cihazda güvenli bir şekilde saklanır ve Ayarlar\'daki Giriş Bilgileri menüsünden yönetilebilir.</string>
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">DuckDuckGo\'nun Girişinizi kaydetmesini istiyor musunuz?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Diğer Seçenekler</string>
 
@@ -41,7 +41,7 @@
     <string name="updateLoginDialogButtonUpdatePassword">Şifreyi Güncelle</string>
     <string name="updateLoginDialogButtonNotNow">Şimdi Değil</string>
 
-    <string name="updateLoginDialogTitleUpdateUsername">Kullanıcı Adı Güncellensin mi?</string>
+    <string name="updateLoginDialogTitleUpdateUsername">Kullanıcı adı güncellensin mi?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Kullanıcı Adını Güncelle</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Otomatik Doldurma İletişim Kutusunu Kapat</string>
@@ -71,4 +71,7 @@
     <string name="autofillManagementSearchClearDescription">Arama girişini temizle</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">\'%1$s\' için sonuç yok</string>
 
+    <string name="autofillDeleteLoginDialogCancel">Vazgeç</string>
+    <string name="autofillDeleteLoginDialogDelete">Sil</string>
+    <string name="autofillDeleteLoginDialogTitle">Bu Girişi silmek istediğinizden emin misiniz?</string>
 </resources>
