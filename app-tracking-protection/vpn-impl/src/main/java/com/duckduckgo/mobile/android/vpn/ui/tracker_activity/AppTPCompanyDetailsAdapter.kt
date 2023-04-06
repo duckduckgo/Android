@@ -17,7 +17,6 @@
 package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 
 import android.content.Context
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,11 +26,11 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.duckduckgo.mobile.android.ui.TextDrawable
 import com.duckduckgo.mobile.android.ui.view.Chip
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.ui.util.TextDrawable
 import java.util.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -120,13 +119,13 @@ class AppTPCompanyDetailsAdapter : RecyclerView.Adapter<AppTPCompanyDetailsAdapt
             }
         }
 
-        var badgeImage: ImageView = view.findViewById(R.id.tracking_company_icon)
-        var companyName: TextView = view.findViewById(R.id.tracking_company_name)
-        var trackingAttempts: TextView = view.findViewById(R.id.tracking_company_attempts)
-        var showMore: TextView = view.findViewById(R.id.tracking_company_show_more)
-        var topSignalsLayout: LinearLayout = view.findViewById(R.id.tracking_company_top_signals)
-        var bottomSignalsLayout: LinearLayout = view.findViewById(R.id.tracking_company_bottom_signals)
-        var showLess: TextView = view.findViewById(R.id.tracking_company_show_less)
+        private var badgeImage: ImageView = view.findViewById(R.id.tracking_company_icon)
+        private var companyName: TextView = view.findViewById(R.id.tracking_company_name)
+        private var trackingAttempts: TextView = view.findViewById(R.id.tracking_company_attempts)
+        private var showMore: TextView = view.findViewById(R.id.tracking_company_show_more)
+        private var topSignalsLayout: LinearLayout = view.findViewById(R.id.tracking_company_top_signals)
+        private var bottomSignalsLayout: LinearLayout = view.findViewById(R.id.tracking_company_bottom_signals)
+        private var showLess: TextView = view.findViewById(R.id.tracking_company_show_less)
 
         fun bind(
             companyDetails: AppTPCompanyTrackersViewModel.CompanyTrackingDetails,
@@ -139,7 +138,7 @@ class AppTPCompanyDetailsAdapter : RecyclerView.Adapter<AppTPCompanyDetailsAdapt
                         .beginConfig()
                         .fontSize(50)
                         .endConfig()
-                        .buildRound(companyDetails.companyName.take(1), Color.DKGRAY),
+                        .buildRound(companyDetails.companyName.take(1)),
                 )
             } else {
                 badgeImage.setImageResource(badge)
