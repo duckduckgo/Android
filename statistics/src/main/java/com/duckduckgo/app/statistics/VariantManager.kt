@@ -53,10 +53,10 @@ interface VariantManager {
                 features = listOf(VariantFeature.CookiePromptManagementExperiment),
                 filterBy = { isEuropeanCountry() },
             ),
-            Variant(key = "za", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() && !isGBCountry() }),
+            Variant(key = "za", weight = 0.0, features = emptyList(), filterBy = { isEnglishLocale() && !isGBCountry() }),
             Variant(
                 key = "zb",
-                weight = 1.0,
+                weight = 0.0,
                 features = listOf(VariantFeature.OptimiseOnboardingExperiment),
                 filterBy = { isEnglishLocale() && !isGBCountry() },
             ),
