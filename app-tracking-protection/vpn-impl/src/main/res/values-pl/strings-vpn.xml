@@ -377,7 +377,7 @@
     <string name="atp_ManageRecentAppsProtectionEmpty">Tutaj pojawią się aplikacje, w których ostatnio zablokowano próby śledzenia.</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
-    <string name="atp_RemoveFeatureDialogTitle">Czy chcesz wyłączyć i usunąć dane?</string>
+    <string name="atp_RemoveFeatureDialogTitle">Chcesz wyłączyć i usunąć dane?</string>
     <string name="atp_RemoveFeatureDialogMessage">Ochrona przed śledzeniem zostanie wyłączona, a wszelkie ustawienia i historia prób śledzenia zostaną usunięte. Możesz ją ponownie włączyć w dowolnym momencie w Ustawieniach.</string>
     <string name="atp_RemoveFeatureDialogCancel">Anuluj</string>
     <string name="atp_RemoveFeatureDialogRemove">Wyłącz</string>
