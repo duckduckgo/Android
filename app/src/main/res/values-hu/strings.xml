@@ -602,6 +602,7 @@
     <string name="folderLocationTitle">Hely kiválasztása</string>
     <string name="addFolder">Mappa hozzáadása</string>
     <string name="editFolder">Mappa szerkesztése</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Törlöd a mappát a tartalmával együtt?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Biztosan törlöd a(z) "</string>
     <string name="bookmarkFolderEmpty">Üres</string>
 
