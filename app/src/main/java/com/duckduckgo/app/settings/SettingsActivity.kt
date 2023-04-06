@@ -85,17 +85,23 @@ import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme.LIGHT
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme.SYSTEM_DEFAULT
 import com.duckduckgo.mobile.android.ui.sendThemeChangedBroadcast
 import com.duckduckgo.mobile.android.ui.view.dialog.RadioListAlertDialogBuilder
+import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementActivity
+import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistActivity
+import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState
 import com.duckduckgo.windows.api.WindowsWaitlistState
 import com.duckduckgo.windows.api.WindowsWaitlistState.InBeta
 import com.duckduckgo.windows.api.WindowsWaitlistState.JoinedWaitlist
 import com.duckduckgo.windows.api.WindowsWaitlistState.NotJoinedQueue
 import com.duckduckgo.windows.api.ui.WindowsWaitlistScreenWithEmptyParams
-import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementActivity
+import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
+import kotlinx.android.synthetic.main.content_settings_other.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
@@ -156,6 +162,8 @@ class SettingsActivity : DuckDuckGoActivity() {
     private val viewsOther
         get() = binding.includeSettings.contentSettingsOther
 
+    private var netPEasterEggCounter = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -178,6 +186,12 @@ class SettingsActivity : DuckDuckGoActivity() {
         viewModel.start(notificationsEnabled)
         viewModel.startPollingAppTpEnableState()
         viewModel.startPollingNetPEnableState()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        netPEasterEggCounter = 0
     }
 
     private fun configureUiEventHandlers() {
@@ -235,6 +249,25 @@ class SettingsActivity : DuckDuckGoActivity() {
             windowsSetting.setClickListener { viewModel.windowsSettingClicked() }
             netpPSetting.setClickListener { viewModel.onNetPSettingClicked() }
         }
+
+        with(viewsOther) {
+            version.setClickListener {
+                if (viewModel.viewState().value.networkProtectionWaitlistState == NetPWaitlistState.NotUnlocked) {
+                    netPEasterEggCounter++
+                    if (netPEasterEggCounter >= 7) {
+                        viewModel.unlockNetP()
+                        Snackbar.make(
+                            binding.root,
+                            R.string.netpUnlockedSnackbar,
+                            Snackbar.LENGTH_LONG,
+                        ).setAction(R.string.netpUnlockedSnackbarAction) {
+                            launchNetpWaitlist()
+                        }.setDuration(3500) // LENGTH_LONG is not long enough, increase to 3.5 sec
+                            .show()
+                    }
+                }
+            }
+        }
     }
 
     private fun configureInternalFeatures() {
@@ -275,7 +308,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                         it.appTrackingProtectionEnabled,
                         it.appTrackingProtectionOnboardingShown,
                     )
-                    updateNetPSettings(it.networkProtectionState)
+                    updateNetPSettings(it.networkProtectionState, it.networkProtectionWaitlistState)
                     updateEmailSubtitle(it.emailAddress)
                     updateWindowsSettings(it.windowsWaitlistState)
                     updateFeaturesSection(it)
@@ -456,6 +489,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             is Command.LaunchGlobalPrivacyControl -> launchGlobalPrivacyControl()
             is Command.LaunchAppTPTrackersScreen -> launchAppTPTrackersScreen()
             is Command.LaunchNetPManagementScreen -> launchNetpManagementScreen()
+            is Command.LaunchNetPWaitlist -> launchNetpWaitlist()
             is Command.LaunchAppTPOnboarding -> launchAppTPOnboardingScreen()
             is Command.UpdateTheme -> sendThemeChangedBroadcast()
             is Command.LaunchEmailProtection -> launchEmailProtectionScreen(it.url)
@@ -503,15 +537,25 @@ class SettingsActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun updateNetPSettings(networkProtectionState: NetPState) {
+    private fun updateNetPSettings(networkProtectionState: NetPState, networkProtectionWaitlistState: NetPWaitlistState) {
         with(viewsMore) {
-            when (networkProtectionState) {
-                CONNECTING -> R.string.netpSettingsConnecting
-                CONNECTED -> R.string.netpSettingsConnected
-                DISCONNECTED -> R.string.netpSettingsDisconnected
-                INVALID -> null
-            }?.run {
-                netpPSetting.setSecondaryText(getString(this))
+            when (networkProtectionWaitlistState) {
+                NetPWaitlistState.InBeta -> {
+                    netpPSetting.show()
+                    when (networkProtectionState) {
+                        CONNECTING -> R.string.netpSettingsConnecting
+                        CONNECTED -> R.string.netpSettingsConnected
+                        DISCONNECTED -> R.string.netpSettingsDisconnected
+                        INVALID -> null
+                    }?.run {
+                        netpPSetting.setSecondaryText(getString(this))
+                    }
+                }
+                NetPWaitlistState.NotUnlocked -> netpPSetting.gone()
+                else -> {
+                    netpPSetting.show()
+                    netpPSetting.setSecondaryText(getString(R.string.netpSettingsNeverEnabled))
+                }
             }
         }
     }
@@ -705,6 +749,10 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     private fun launchNetpManagementScreen() {
         startActivity(NetworkProtectionManagementActivity.intent(this))
+    }
+
+    private fun launchNetpWaitlist() {
+        startActivity(NetPWaitlistActivity.intent(this))
     }
 
     private fun launchAppTPOnboardingScreen() {

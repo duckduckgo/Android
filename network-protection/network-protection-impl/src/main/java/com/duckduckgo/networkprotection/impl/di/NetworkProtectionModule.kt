@@ -19,6 +19,9 @@ package com.duckduckgo.networkprotection.impl.di
 import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
+import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistDataStoreSharedPreferences
+import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
+import com.duckduckgo.networkprotection.impl.waitlist.store.RealNetPWaitlistRepository
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.store.RealNetworkProtectionPrefs
 import com.duckduckgo.networkprotection.store.RealNetworkProtectionRepository
@@ -33,7 +36,11 @@ class DataModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun provideNetworkProtectionRepository(
-        context: Context,
         vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
     ): NetworkProtectionRepository = RealNetworkProtectionRepository(RealNetworkProtectionPrefs(vpnSharedPreferencesProvider))
+
+    @Provides
+    fun provideNetPWaitlistRepository(context: Context): NetPWaitlistRepository = RealNetPWaitlistRepository(
+        NetPWaitlistDataStoreSharedPreferences(context),
+    )
 }

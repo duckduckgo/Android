@@ -23,5 +23,17 @@
             android:name=".management.NetworkProtectionManagementActivity"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
             android:exported="false" />
+        <activity
+            android:name=".waitlist.NetPWaitlistActivity"
+            android:label="@string/netpWaitlistActivityLabel"
+            android:screenOrientation="portrait"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".waitlist.NetPWaitlistRedeemCodeActivity"
+            android:label="@string/netpWaitlistRedeemCodeActivityLabel"
+            android:screenOrientation="portrait"
+            android:parentActivityName="com.duckduckgo.app.settings.NetPWaitlistActivity"
+            android:exported="false" />
     </application>
 </manifest>

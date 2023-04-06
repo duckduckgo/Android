@@ -41,6 +41,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.di.scopes.ActivityScope
@@ -53,6 +54,8 @@ import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
+import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState
+import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.sync.api.DeviceSyncState
@@ -93,6 +96,7 @@ class SettingsViewModel @Inject constructor(
     private val windowsFeature: WindowsWaitlistFeature,
     private val deviceSyncState: DeviceSyncState,
     private val vpnStateMonitor: VpnStateMonitor,
+    private val netpWaitlistRepository: NetPWaitlistRepository,
 ) : ViewModel() {
 
     data class ViewState(
@@ -117,6 +121,7 @@ class SettingsViewModel @Inject constructor(
         @StringRes val notificationsSettingSubtitleId: Int = R.string.settingsSubtitleNotificationsDisabled,
         val windowsWaitlistState: WindowsWaitlistState? = null,
         val networkProtectionState: NetPState = DISCONNECTED,
+        val networkProtectionWaitlistState: NetPWaitlistState = NetPWaitlistState.NotUnlocked,
     )
 
     data class AutomaticallyClearData(
@@ -151,6 +156,7 @@ class SettingsViewModel @Inject constructor(
         object LaunchAutoconsent : Command()
         object LaunchAppTPTrackersScreen : Command()
         object LaunchNetPManagementScreen : Command()
+        object LaunchNetPWaitlist : Command()
         object LaunchAppTPOnboarding : Command()
         object UpdateTheme : Command()
         data class ShowClearWhatDialog(val option: ClearWhatOption) : Command()
@@ -200,6 +206,7 @@ class SettingsViewModel @Inject constructor(
                     windowsWaitlistState = windowsSettingState(),
                     showSyncSetting = deviceSyncState.isFeatureEnabled(),
                     syncEnabled = deviceSyncState.isUserSignedInOnDevice(),
+                    networkProtectionWaitlistState = netpWaitlistRepository.getState(appBuildConfig.isInternalBuild()),
                 ),
             )
         }
@@ -236,6 +243,13 @@ class SettingsViewModel @Inject constructor(
                     },
                 )
             }.launchIn(viewModelScope)
+    }
+
+    fun unlockNetP() {
+        netpWaitlistRepository.unlock()
+        viewState.value = currentViewState().copy(
+            networkProtectionWaitlistState = netpWaitlistRepository.getState(appBuildConfig.isInternalBuild()),
+        )
     }
 
     fun viewState(): StateFlow<ViewState> {
@@ -349,7 +363,11 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onNetPSettingClicked() {
-        viewModelScope.launch { command.send(Command.LaunchNetPManagementScreen) }
+        if (netpWaitlistRepository.getState(appBuildConfig.isInternalBuild()) == NetPWaitlistState.InBeta) {
+            viewModelScope.launch { command.send(Command.LaunchNetPManagementScreen) }
+        } else {
+            viewModelScope.launch { command.send(Command.LaunchNetPWaitlist) }
+        }
     }
 
     fun onAutocompleteSettingChanged(enabled: Boolean) {

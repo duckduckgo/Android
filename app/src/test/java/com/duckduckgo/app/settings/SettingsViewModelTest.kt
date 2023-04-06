@@ -49,6 +49,8 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
+import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState
+import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.sync.api.DeviceSyncState
@@ -131,6 +133,9 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var mockVpnStateMonitor: VpnStateMonitor
 
+    @Mock
+    private lateinit var mockNetPWaitlistRepository: NetPWaitlistRepository
+
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
@@ -151,6 +156,8 @@ class SettingsViewModelTest {
         whenever(mockAppBuildConfig.versionCode).thenReturn(1)
         whenever(windowsWaitlist.getWaitlistState()).thenReturn(WindowsWaitlistState.NotJoinedQueue)
 
+        whenever(mockNetPWaitlistRepository.getState(any())).thenReturn(NetPWaitlistState.NotUnlocked)
+
         testee = SettingsViewModel(
             mockThemeSettingsDataStore,
             mockAppSettingsDataStore,
@@ -170,6 +177,7 @@ class SettingsViewModelTest {
             windowsFeature,
             deviceSyncState,
             mockVpnStateMonitor,
+            mockNetPWaitlistRepository,
         )
 
         runTest {

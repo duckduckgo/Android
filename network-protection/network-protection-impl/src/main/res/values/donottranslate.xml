@@ -57,4 +57,31 @@
     <string name="netpAlwaysOnLockdownHeading">Change your VPN settings</string>
     <string name="netpBannerVpnRevoked"><b>Network Protection is disabled.</b>\nA VPN app on your device may have disabled it. Use the toggle to re-enable.</string>
 
+    <!-- Waitlist -->
+    <string name="netpWaitlistActivityLabel">Network Protection</string>
+    <string name="netpWaitlistTitle">You\'re invited to try Network Protection!</string>
+    <string name="netpJoinWaitlist">Join the Private Waitlist</string>
+    <string name="netpJoinWaitlistError">Error joining the Waitlist, please try again later</string>
+    <string name="netpEnterCode">I Have An Invite Code</string>
+    <string name="netpWaitlistFooter">DuckDuckGo Network Protection is currently in closed, invite-only beta.</string>
+    <string name="netpWaitlistFooterRedeemed">DuckDuckGo will never log, track, or share your network data.</string>
+
+    <string name="netpWaitlistOnTheListTitle">You\'re on the list!</string>
+    <string name="netpWaitlistOnTheListNotificationEnabled">We\'ll send you a notification when Network Protection is ready for you.</string>
+    <string name="netpWaitlistOnTheListNotificationDisabled">Your invite to try Network Protection will arrive here. Check back soon, or we can send you a notification when it\'s your turn.</string>
+    <string name="netpWaitlistNotifyMeTitle">Know the instant you’re invited</string>
+    <string name="netpWaitlistNotifyMeSubtitle">Get a notification when Network Protection is ready for you.</string>
+
+    <string name="netpWaitlistRedeemCodeActivityLabel">Enter Your Invite Code</string>
+    <string name="netpWaitlistRedeemCodeTitle">Almost there…</string>
+    <string name="netpWaitlistRedeemCodeBody">Enter your invite code below to continue.</string>
+    <string name="netpWaitlistRedeemCodeCta">Continue</string>
+    <string name="netpWaitlistRedeemCodeError">We didn\'t recognise this Invite Code.</string>
+    <string name="netpWaitlistRedeemCodeGeneralError">Error redeeming code, please try again later</string>
+    <string name="netpWaitlistCodeInvite">Invite Code</string>
+
+    <string name="netpWaitlistRedeemedCodeStatus">Success! You\'re in.</string>
+    <string name="netpWaitlistGetStartedCta">Get Started</string>
+
+    <string name="netpWaitlistInBetaDescription">Hide your location from websites and conceal your online activity from Internet providers and others on your network.</string>
 </resources>
