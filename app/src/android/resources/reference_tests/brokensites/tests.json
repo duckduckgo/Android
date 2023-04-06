@@ -8,17 +8,69 @@
                 "wasUpgraded": true,
                 "category": "content",
                 "blockedTrackers": ["bad.tracker.test", "tracking.test"],
-                "surrogates": ["surrogate.domain.test"],
+                "surrogates": ["surrogate.domain.test", "domain2.test"],
                 "atb": "v123-456g",
                 "blocklistVersion": "abc123",
+                "remoteConfigEtag": "abd142",
+                "remoteConfigVersion": "1234",
                 "expectReportURLPrefix": "https://improving.duckduckgo.com/t/epbf",
                 "expectReportURLParams": [
                     {"name": "category", "value": "content"},
                     {"name": "siteUrl", "value": "https%3A%2F%2Fexample.test%2F"},
                     {"name": "upgradedHttps", "value": "true"},
                     {"name": "tds", "value": "abc123"},
+                    {"name": "remoteConfigEtag", "value": "abd142"},
+                    {"name": "remoteConfigVersion", "value": "1234"},
                     {"name": "blockedTrackers", "value": "bad.tracker.test,tracking.test"},
-                    {"name": "surrogates", "value": "surrogate.domain.test"}
+                    {"name": "surrogates", "value": "surrogate.domain.test,domain2.test"}
+                ],
+                "exceptPlatforms": []
+            },
+            {
+                "name": "Test correct encoding of weak etags.",
+                "siteURL": "https://example.test/",
+                "wasUpgraded": true,
+                "category": "content",
+                "blockedTrackers": ["bad.tracker.test", "tracking.test"],
+                "surrogates": ["surrogate.domain.test", "domain2.test"],
+                "atb": "v123-456g",
+                "blocklistVersion": "W/\"cb62f38dda52e13f76c06147b7aea50c\"",
+                "remoteConfigEtag": "W/\"4acd4754aff66f5da1ea044580a60cd3\"",
+                "remoteConfigVersion": "1234",
+                "expectReportURLPrefix": "https://improving.duckduckgo.com/t/epbf",
+                "expectReportURLParams": [
+                    {"name": "category", "value": "content"},
+                    {"name": "siteUrl", "value": "https%3A%2F%2Fexample.test%2F"},
+                    {"name": "upgradedHttps", "value": "true"},
+                    {"name": "tds", "value": "W%2F%22cb62f38dda52e13f76c06147b7aea50c%22"},
+                    {"name": "remoteConfigEtag", "value": "W%2F%224acd4754aff66f5da1ea044580a60cd3%22"},
+                    {"name": "remoteConfigVersion", "value": "1234"},
+                    {"name": "blockedTrackers", "value": "bad.tracker.test,tracking.test"},
+                    {"name": "surrogates", "value": "surrogate.domain.test,domain2.test"}
+                ],
+                "exceptPlatforms": []
+            },
+            {
+                "name": "Test correct encoding of non-weak etags.",
+                "siteURL": "https://example.test/",
+                "wasUpgraded": true,
+                "category": "content",
+                "blockedTrackers": ["bad.tracker.test", "tracking.test"],
+                "surrogates": ["surrogate.domain.test", "domain2.test"],
+                "atb": "v123-456g",
+                "blocklistVersion": "\"cb62f38dda52e13f76c06147b7aea50c\"",
+                "remoteConfigEtag": "\"4acd4754aff66f5da1ea044580a60cd3\"",
+                "remoteConfigVersion": "1234",
+                "expectReportURLPrefix": "https://improving.duckduckgo.com/t/epbf",
+                "expectReportURLParams": [
+                    {"name": "category", "value": "content"},
+                    {"name": "siteUrl", "value": "https%3A%2F%2Fexample.test%2F"},
+                    {"name": "upgradedHttps", "value": "true"},
+                    {"name": "tds", "value": "%22cb62f38dda52e13f76c06147b7aea50c%22"},
+                    {"name": "remoteConfigEtag", "value": "%224acd4754aff66f5da1ea044580a60cd3%22"},
+                    {"name": "remoteConfigVersion", "value": "1234"},
+                    {"name": "blockedTrackers", "value": "bad.tracker.test,tracking.test"},
+                    {"name": "surrogates", "value": "surrogate.domain.test,domain2.test"}
                 ],
                 "exceptPlatforms": []
             },
@@ -41,6 +93,32 @@
                     {"name": "surrogates", "value": ""}
                 ],
                 "exceptPlatforms": []
+            },
+            {
+                "name": "Test that descriptions are correctly encoded",
+                "siteURL": "https://example.test/",
+                "wasUpgraded": true,
+                "category": "content",
+                "blockedTrackers": ["bad.tracker.test", "tracking.test"],
+                "surrogates": ["surrogate.domain.test", "domain2.test"],
+                "atb": "v123-456g",
+                "blocklistVersion": "abc123",
+                "providedDescription": "This is+a&description./\nThat spans %20lines\"'. With \\emoji: 😀",
+                "expectReportURLPrefix": "https://improving.duckduckgo.com/t/epbf",
+                "expectReportURLParams": [
+                    {"name": "category", "value": "content"},
+                    {"name": "siteUrl", "value": "https%3A%2F%2Fexample.test%2F"},
+                    {"name": "description", "value": "This+is%2Ba%26description.%2F%0AThat+spans+%2520lines%22%27.+With+%5Cemoji%3A+%F0%9F%98%80"},
+                    {"name": "upgradedHttps", "value": "true"},
+                    {"name": "tds", "value": "abc123"},
+                    {"name": "blockedTrackers", "value": "bad.tracker.test,tracking.test"},
+                    {"name": "surrogates", "value": "surrogate.domain.test,domain2.test"}
+                ],
+                "exceptPlatforms": [
+                    "android-browser",
+                    "ios-browser",
+                    "safari-extension"
+                ]
             },
             {
                 "name": "Native app specific fields",
@@ -72,6 +150,169 @@
                     "web-extension",
                     "safari-extension",
                     "macos-browser",
+                    "windows-browser"
+                ]
+            },
+            {
+                "name": "Test encoding of tracker blocking fields",
+                "siteURL": "https://example.test/",
+                "wasUpgraded": true,
+                "category": "content",
+                "blockedTrackers": ["bad.tracker.test", "tracking.test"],
+                "ignoreRequests": ["ignored1.test", "sub.ignored2.test"],
+                "noActionRequests": ["noaction1.test", "sub.noaction2.test"],
+                "adAttributionRequests": ["adattr1.test", "sub.adattr2.test"],
+                "ignoredByUserRequests": ["ignoreuser1.test", "sub.ignoreuser2.test"],
+                "surrogates": ["surrogate.domain.test", "domain2.com", "nested.sub.domain3.com"],
+                "atb": "v123-456g",
+                "blocklistVersion": "abc123",
+                "expectReportURLPrefix": "https://improving.duckduckgo.com/t/epbf",
+                "expectReportURLParams": [
+                    {"name": "category", "value": "content"},
+                    {"name": "siteUrl", "value": "https%3A%2F%2Fexample.test%2F"},
+                    {"name": "upgradedHttps", "value": "true"},
+                    {"name": "tds", "value": "abc123"},
+                    {"name": "blockedTrackers", "value": "bad.tracker.test,tracking.test"},
+                    {"name": "ignoreRequests", "value": "ignored1.test,sub.ignored2.test"},
+                    {"name": "noActionRequests", "value": "noaction1.test,sub.noaction2.test"},
+                    {"name": "adAttributionRequests", "value": "adattr1.test,sub.adattr2.test"},
+                    {"name": "ignoredByUserRequests", "value": "ignoreuser1.test,sub.ignoreuser2.test"},
+                    {"name": "surrogates", "value": "surrogate.domain.test,domain2.com,nested.sub.domain3.com"}
+                ],
+                "exceptPlatforms": [
+                    "android-browser",
+                    "ios-browser",
+                    "macos-browser",
+                    "safari-extension",
+                    "windows-browser"
+                ]
+            },
+            {
+                "name": "Test encoding of tracker blocking fields (as if protections disabled by user)",
+                "siteURL": "https://example.test/",
+                "wasUpgraded": true,
+                "category": "content",
+                "blockedTrackers": [],
+                "ignoreRequests": [],
+                "noActionRequests": [],
+                "adAttributionRequests": [],
+                "ignoredByUserRequests": ["ignoreuser1.test", "sub.ignoreuser2.test"],
+                "surrogates": [],
+                "atb": "v123-456g",
+                "blocklistVersion": "abc123",
+                "expectReportURLPrefix": "https://improving.duckduckgo.com/t/epbf",
+                "expectReportURLParams": [
+                    {"name": "category", "value": "content"},
+                    {"name": "siteUrl", "value": "https%3A%2F%2Fexample.test%2F"},
+                    {"name": "upgradedHttps", "value": "true"},
+                    {"name": "tds", "value": "abc123"},
+                    {"name": "blockedTrackers", "value": ""},
+                    {"name": "ignoreRequests", "value": ""},
+                    {"name": "noActionRequests", "value": ""},
+                    {"name": "adAttributionRequests", "value": ""},
+                    {"name": "ignoredByUserRequests", "value": "ignoreuser1.test,sub.ignoreuser2.test"},
+                    {"name": "surrogates", "value": ""}
+                ],
+                "exceptPlatforms": [
+                    "android-browser",
+                    "ios-browser",
+                    "macos-browser",
+                    "safari-extension",
+                    "windows-browser"
+                ]
+            },
+            {
+                "name": "Test truncation when report is too long (URL)",
+                "siteURL": "https://example.test/abcd000abcd001abcd002abcd003abcd004abcd005abcd006abcd007abcd008abcd009abcd010abcd011abcd012abcd013abcd014abcd015abcd016abcd017abcd018abcd019abcd020abcd021abcd022abcd023abcd024abcd025abcd026abcd027abcd028abcd029abcd030abcd031abcd032abcd033abcd034abcd035abcd036abcd037abcd038abcd039abcd040abcd041abcd042abcd043abcd044abcd045abcd046abcd047abcd048abcd049abcd050abcd051abcd052abcd053abcd054abcd055abcd056abcd057abcd058abcd059abcd060abcd061abcd062abcd063abcd064abcd065abcd066abcd067abcd068abcd069abcd070abcd071abcd072abcd073abcd074abcd075abcd076abcd077abcd078abcd079abcd080abcd081abcd082abcd083abcd084abcd085abcd086abcd087abcd088abcd089abcd090abcd091abcd092abcd093abcd094abcd095abcd096abcd097abcd098abcd099abcd100abcd101abcd102abcd103abcd104abcd105abcd106abcd107abcd108abcd109abcd110abcd111abcd112abcd113abcd114abcd115abcd116abcd117abcd118abcd119abcd120abcd121abcd122abcd123abcd124abcd125abcd126abcd127abcd128abcd129abcd130abcd131abcd132abcd133abcd134abcd135abcd136abcd137abcd138abcd139abcd140abcd141abcd142abcd143abcd144abcd145abcd146abcd147abcd148abcd149abcd150abcd151abcd152abcd153abcd154abcd155abcd156abcd157abcd158abcd159abcd160abcd161abcd162abcd163abcd164abcd165abcd166abcd167abcd168abcd169abcd170abcd171abcd172abcd173abcd174abcd175abcd176abcd177abcd178abcd179abcd180abcd181abcd182abcd183abcd184abcd185abcd186abcd187abcd188abcd189abcd190abcd191abcd192abcd193abcd194abcd195abcd196abcd197abcd198abcd199abcd200abcd201abcd202abcd203abcd204abcd205abcd206abcd207abcd208abcd209abcd210abcd211abcd212abcd213abcd214abcd215abcd216abcd217abcd218abcd219abcd220abcd221abcd222abcd223abcd224abcd225abcd226abcd227abcd228abcd229abcd230abcd231abcd232abcd233abcd234abcd235abcd236abcd237abcd238abcd239abcd240abcd241abcd242abcd243abcd244abcd245abcd246abcd247abcd248abcd249abcd250abcd251abcd252abcd253abcd254abcd255abcd256abcd257abcd258abcd259abcd260abcd261abcd262abcd263abcd264abcd265abcd266abcd267abcd268abcd269abcd270abcd271abcd272abcd273abcd274abcd275abcd276abcd277abcd278abcd279abcd280abcd281abcd282abcd283abcd284abcd285abcd286abcd287abcd288abcd289abcd290abcd291abcd292abcd293abcd294abcd295abcd296abcd297abcd298abcd299abcd300abcd301abcd302abcd303abcd304abcd305abcd306abcd307abcd308abcd309abcd310abcd311abcd312abcd313abcd314abcd315abcd316abcd317abcd318abcd319abcd320abcd321abcd322abcd323abcd324abcd325abcd326abcd327abcd328abcd329abcd330abcd331abcd332abcd333abcd334abcd335abcd336abcd337abcd338abcd339abcd340abcd341abcd342abcd343abcd344abcd345abcd346abcd347abcd348abcd349abcd350abcd351abcd352abcd353abcd354abcd355abcd356abcd357abcd358abcd359abcd360abcd361abcd362abcd363abcd364abcd365abcd366abcd367abcd368abcd369abcd370abcd371abcd372abcd373abcd374abcd375abcd376abcd377abcd378abcd379abcd380abcd381abcd382abcd383abcd384abcd385abcd386abcd387abcd388abcd389abcd390abcd391abcd392abcd393abcd394abcd395abcd396abcd397abcd398abcd399abcd400abcd401abcd402abcd403abcd404abcd405abcd406abcd407abcd408abcd409abcd410abcd411abcd412abcd413abcd414abcd415abcd416abcd417abcd418abcd419abcd420abcd421abcd422abcd423abcd424abcd425abcd426abcd427abcd428abcd429abcd430abcd431abcd432abcd433abcd434abcd435abcd436abcd437abcd438abcd439abcd440abcd441abcd442abcd443abcd444abcd445abcd446abcd447abcd448abcd449abcd450abcd451abcd452abcd453abcd454abcd455abcd456abcd457abcd458abcd459abcd460abcd461abcd462abcd463abcd464abcd465abcd466abcd467abcd468abcd469abcd470abcd471abcd472abcd473abcd474abcd475abcd476abcd477abcd478abcd479abcd480abcd481abcd482abcd483abcd484abcd485abcd486abcd487abcd488abcd489abcd490abcd491abcd492abcd493abcd494abcd495abcd496abcd497abcd498abcd499abcd500abcd501abcd502abcd503abcd504abcd505abcd506abcd507abcd508abcd509abcd510abcd511abcd512abcd513abcd514abcd515abcd516abcd517abcd518abcd519abcd520abcd521abcd522abcd523abcd524abcd525abcd526abcd527abcd528abcd529abcd530abcd531abcd532abcd533abcd534abcd535abcd536abcd537abcd538abcd539abcd540abcd541abcd542abcd543abcd544abcd545abcd546abcd547abcd548abcd549abcd550abcd551abcd552abcd553abcd554abcd555abcd556abcd557abcd558abcd559abcd560abcd561abcd562abcd563abcd564abcd565abcd566abcd567abcd568abcd569abcd570abcd571abcd572abcd573abcd574abcd575abcd576abcd577abcd578abcd579abcd580abcd581abcd582abcd583abcd584abcd585abcd586abcd587abcd588abcd589abcd590abcd591abcd592abcd593abcd594abcd595abcd596abcd597abcd598abcd599abcd600abcd601abcd602abcd603abcd604abcd605abcd606abcd607abcd608abcd609abcd610abcd611abcd612abcd613abcd614abcd615abcd616abcd617abcd618abcd619abcd620abcd621abcd622abcd623abcd624abcd625abcd626abcd627abcd628abcd629abcd630abcd631abcd632abcd633abcd634abcd635abcd636abcd637abcd638abcd639abcd640abcd641abcd642abcd643abcd644abcd645abcd646abcd647abcd648abcd649abcd650abcd651abcd652abcd653abcd654abcd655abcd656abcd657abcd658abcd659abcd660abcd661abcd662abcd663abcd664abcd665abcd666abcd667abcd668abcd669abcd670abcd671abcd672abcd673abcd674abcd675abcd676abcd677abcd678abcd679abcd680abcd681abcd682abcd683abcd684abcd685abcd686abcd687abcd688abcd689abcd690abcd691abcd692abcd693abcd694abcd695abcd696abcd697abcd698abcd699abcd700abcd701abcd702abcd703abcd704abcd705abcd706abcd707abcd708abcd709abcd710abcd711abcd712abcd713abcd714abcd715abcd716abcd717abcd718abcd719abcd720abcd721abcd722abcd723abcd724abcd725abcd726abcd727abcd728abcd729abcd730abcd731abcd732abcd733abcd734abcd735abcd736abcd737abcd738abcd739abcd740abcd741abcd742abcd743abcd744abcd745abcd746abcd747abcd748abcd749abcd750abcd751abcd752abcd753abcd754abcd755abcd756abcd757abcd758abcd759abcd760abcd761abcd762abcd763abcd764abcd765abcd766abcd767abcd768abcd769abcd770abcd771abcd772abcd773abcd774abcd775abcd776abcd777abcd778abcd779abcd780abcd781abcd782abcd783abcd784abcd785abcd786abcd787abcd788abcd789abcd790abcd791abcd792abcd793abcd794abcd795abcd796abcd797abcd798abcd799abcd800abcd801abcd802abcd803abcd804abcd805abcd806abcd807abcd808abcd809abcd810abcd811abcd812abcd813abcd814abcd815abcd816abcd817abcd818abcd819abcd820abcd821abcd822abcd823abcd824abcd825abcd826abcd827abcd828abcd829abcd830abcd831abcd832abcd833abcd834abcd835abcd836abcd837abcd838abcd839abcd840abcd841abcd842abcd843abcd844abcd845abcd846abcd847abcd848abcd849abcd850abcd851abcd852abcd853abcd854abcd855abcd856abcd857abcd858abcd859abcd860abcd861abcd862abcd863abcd864abcd865abcd866abcd867abcd868abcd869abcd870abcd871abcd872abcd873abcd874abcd875abcd876abcd877abcd878abcd879abcd880abcd881abcd882abcd883abcd884abcd885abcd886abcd887abcd888abcd889abcd890abcd891abcd892abcd893abcd894abcd895abcd896abcd897abcd898abcd899abcd900abcd901abcd902abcd903abcd904abcd905abcd906abcd907abcd908abcd909abcd910abcd911abcd912abcd913abcd914abcd915abcd916abcd917abcd918abcd919abcd920abcd921abcd922abcd923abcd924abcd925abcd926abcd927abcd928abcd929abcd930abcd931abcd932abcd933abcd934abcd935abcd936abcd937abcd938abcd939abcd940abcd941abcd942abcd943abcd944abcd945abcd946abcd947abcd948abcd949abcd950abcd951abcd952abcd953abcd954abcd955abcd956abcd957abcd958abcd959abcd960abcd961abcd962abcd963abcd964abcd965abcd966abcd967abcd968abcd969abcd970abcd971abcd972abcd973abcd974abcd975abcd976abcd977abcd978abcd979abcd980abcd981abcd982abcd983abcd984abcd985abcd986abcd987abcd988abcd989abcd990abcd991abcd992abcd993abcd994abcd995abcd996abcd997abcd998abcd999",
+                "wasUpgraded": true,
+                "category": "content",
+                "blockedTrackers": ["bad.tracker.test", "tracking.test"],
+                "ignoreRequests": ["ignored1.test", "sub.ignored2.test"],
+                "noActionRequests": ["noaction1.test", "sub.noaction2.test"],
+                "adAttributionRequests": ["adattr1.test", "sub.adattr2.test"],
+                "ignoredByUserRequests": ["ignoreuser1.test", "sub.ignoreuser2.test"],
+                "surrogates": ["surrogate.domain.test", "domain2.com", "nested.sub.domain3.com"],
+                "atb": "v123-456g",
+                "blocklistVersion": "abc123",
+                "expectReportURLPrefix": "https://improving.duckduckgo.com/t/epbf",
+                "expectReportURLParams": [
+                    {"name": "category", "value": "content"},
+                    {"name": "siteUrl", "value": "https%3A%2F%2Fexample.test%2Fabcd000abcd001abcd002abcd003abcd004abcd005abcd006abcd007abcd008abcd009abcd010abcd011abcd012abcd013abcd014abcd015abcd016abcd017abcd018abcd019abcd020abcd021abcd022abcd023abcd024abcd025abcd026abcd027abcd028abcd029abcd030abcd031abcd032abcd033abcd034abcd035abcd036abcd037abcd038abcd039abcd040abcd041abcd042abcd043abcd044abcd045abcd046abcd047abcd048abcd049abcd050abcd051abcd052abcd053abcd054abcd055abcd056abcd057abcd058abcd059abcd060abcd061abcd062abcd063abcd064abcd065abcd066abcd067abcd068abcd069abcd070abcd071abcd072abcd073abcd074abcd075abcd076abcd077abcd078abcd079abcd080abcd081abcd082abcd083abcd084abcd085abcd086abcd087abcd088abcd089abcd090abcd091abcd092abcd093abcd094abcd095abcd096abcd097abcd098abcd099abcd100abcd101abcd102abcd103abcd104abcd105abcd106abcd107abcd108abcd109abcd110abcd111abcd112abcd113abcd114abcd115abcd116abcd117abcd118abcd119abcd120abcd121abcd122abcd123abcd124abcd125abcd126abcd127abcd128abcd129abcd130abcd131abcd132abcd133abcd134abcd135abcd136abcd137abcd138abcd139abcd140abcd141abcd142abcd143abcd144abcd145abcd146abcd147abcd148abcd149abcd150abcd151abcd152abcd153abcd154abcd155abcd156abcd157abcd158abcd159abcd160abcd161abcd162abcd163abcd164abcd165abcd166abcd167abcd168abcd169abcd170abcd171abcd172abcd173abcd174abcd175abcd176abcd177abcd178abcd179abcd180abcd181abcd182abcd183abcd184abcd185abcd186abcd187abcd188abcd189abcd190abcd191abcd192abcd193abcd194abcd195abcd196abcd197abcd198abcd199abcd200abcd201abcd202abcd203abcd204abcd205abcd206abcd207abcd208abcd209abcd210abcd211abcd212abcd213abcd214abcd215abcd216abcd217abcd218abcd219abcd220abcd221abcd222abcd223abcd224abcd225abcd226abcd227abcd228abcd229abcd230abcd231abcd232abcd233abcd234abcd235abcd236abcd237abcd238abcd239abcd240abcd241abcd242abcd243abcd244abcd245abcd246abcd247abcd248abcd249abcd250abcd251abcd252abcd253abcd254abcd255abcd256abcd257abcd258abcd259abcd260abcd261abcd262abcd263abcd264abcd265abcd266abcd267abcd268abcd269abcd270abcd271abcd272abcd273abcd274abcd275abcd276abcd277abcd278abcd279abcd280abcd281abcd282abcd283abcd284abcd285abcd286abcd287abcd288abcd289abcd290abcd291abcd292abcd293abcd294abcd295abcd296abcd297abcd298abcd299abcd300abcd301abcd302abcd303abcd304abcd305abcd306abcd307abcd308abcd309abcd310abcd311abcd312abcd313abcd314abcd315abcd316abcd317abcd318abcd319abcd320abcd321abcd322abcd323abcd324abcd325abcd326abcd327abcd328abcd329abcd330abcd331abcd332abcd333abcd334abcd335abcd336abcd337abcd338abcd339abcd340abcd341abcd342abcd343abcd344abcd345abcd346abcd347abcd348abcd349abcd350abcd351abcd352abcd353abcd354abcd355abcd356abcd357abcd358abcd359abcd360abcd361abcd362abcd363abcd364abcd365abcd366abcd367abcd368abcd369abcd370abcd371abcd372abcd373abcd374abcd375abcd376abcd377abcd378abcd379abcd380abcd381abcd382abcd383abcd384abcd385abcd386abcd387abcd388abcd389abcd390abcd391abcd392abcd393abcd394abcd395abcd396abcd397abcd398abcd399abcd400abcd401abcd402abcd403abcd404abcd405abcd406abcd407abcd408abcd409abcd410abcd411abcd412abcd413abcd414abcd415abcd416abcd417abcd418abcd419abcd420abcd421abcd422abcd423abcd424abcd425abcd426abcd427abcd428abcd429abcd430abcd431abcd432abcd433abcd434abcd435abcd436abcd437abcd438abcd439abcd440abcd441abcd442abcd443abcd444abcd445abcd446abcd447abcd448abcd449abcd450abcd451abcd452abcd453abcd454abcd455abcd456abcd457abcd458abcd459abcd460abcd461abcd462abcd463abcd464abcd465abcd466abcd467abcd468abcd469abcd470abcd471abcd472abcd473abcd474abcd475abcd476abcd477abcd478abcd479abcd480abcd481abcd482abcd483abcd484abcd485abcd486abcd487abcd488abcd489abcd490abcd491abcd492abcd493abcd494abcd495abcd496abcd497abcd498abcd499abcd500abcd501abcd502abcd503abcd504abcd505abcd506abcd507abcd508abcd509abcd510abcd511abcd512abcd513abcd514abcd515abcd516abcd517abcd518abcd519abcd520abcd521abcd522abcd523abcd524abcd525abcd526abcd527abcd528abcd529abcd530abcd531abcd532abcd533abcd534abcd535abcd536abcd537abcd538abcd539abcd540abcd541abcd542abcd543abcd544abcd545abcd546abcd547abcd548abcd549abcd550abcd551abcd552abcd553abcd554abcd555abcd556abcd557abcd558abcd559abcd560abcd561abcd562abcd563abcd564abcd565abcd566abcd567abcd568abcd569abcd570abcd571abcd572abcd573abcd574abcd575abcd576abcd577abcd578abcd579abcd580abcd581abcd582abcd583abcd584abcd585abcd586abcd587abcd588abcd589abcd590abcd591abcd592abcd593abcd594abcd595abcd596abcd597abcd598abcd599abcd600abcd601abcd602abcd603abcd604abcd605abcd606abcd607abcd608abcd609abcd610abcd611abcd612abcd613abcd614abcd615abcd616abcd617abcd618abcd619abcd620abcd621abcd622abcd623abcd624abcd625abcd626abcd627abcd628abcd629abcd630abcd631abcd632abcd633abcd634abcd635abcd636abcd637abcd638abcd639abcd640abcd641abcd642abcd643abcd644abcd645abcd646abcd647abcd648abcd649abcd650abcd651abcd652abcd653abcd654abcd655abcd656abcd657abcd658abcd659abcd660abcd661abcd662abcd663abcd664abcd665abcd666abcd667abcd668abcd669abcd670abcd671abcd672abcd673abcd674abcd675abcd676abcd677abcd678abcd679abcd680abcd681abcd682abcd683abcd684abcd685abcd686abcd687abcd688abcd689abcd690abcd691abcd692abcd693abcd694abcd695abcd696abcd697abcd698abcd699abcd700abcd701abcd702abcd703abcd704abcd705abcd706abcd707abcd708abcd709abcd710abcd711abcd712abcd713abcd714abcd715abcd716abcd717abcd718abcd719abcd720abcd721abcd722abcd723abcd724abcd725abcd726abcd727abcd728abcd729abcd730abcd731abcd732abcd733abcd734abcd735abcd736abcd737abcd738abcd739abcd740abcd741abcd742abcd743abcd744abcd745abcd746abcd747abcd748abcd749abcd750abcd751abcd752abcd753abcd754abcd755abcd756abcd757abcd758abcd759abcd760abcd761abcd762abcd763abcd764abcd765abcd766abcd767abcd768abcd769abcd770abcd771abcd772abcd773abcd774abcd775abcd776abcd777abcd778abcd779abcd780abcd781abcd782abcd783abcd784abcd785abcd786abcd787abcd788abcd789abcd790abcd791abcd792abcd793abcd794abcd795abcd796abcd797abcd798abcd799abcd800abcd801abcd802abcd803abcd804abcd805abcd806abcd807abcd808abcd809abcd810abcd811abcd812abcd813abcd814abcd815abcd816abcd817abcd818abcd819abcd820abcd821abcd822abcd823abcd824abcd825abcd826abcd827abcd828abcd829abcd830abcd831abcd832abcd833abcd834abcd835abcd836abcd837abcd838abcd839abcd840abcd841abcd842abcd843abcd844abcd845abcd846abcd847abcd848abcd849abcd850abcd851abcd852abcd853abcd854abcd855abcd856abcd857abcd858abcd859abcd860abcd861abcd862abcd863abcd864abcd865abcd866abcd867abcd868abcd869abcd870abcd871abcd872abcd873abcd874abcd875abcd876abcd877abcd878abcd879abcd880abcd881abcd882abcd883abcd884abcd885abcd886abcd887abcd888abcd889abcd890abcd891abcd892abcd893abcd894abcd895abcd896abcd897abcd898abcd899abcd900abcd901abcd902abcd903abcd904abcd905abcd906abcd907abcd908abcd909abcd910abcd911abcd912abcd913abcd914abcd915abcd916abcd917abcd918abcd919abcd920abcd921abcd922abcd923abcd924abcd925abcd926abcd927abcd928abcd929abcd930abcd931abcd932abcd933abcd934abcd935abcd936abcd937abcd938abcd939abcd940abcd941abcd942abcd943abcd944abcd945abcd946abcd947abcd948abcd949abcd950abcd951abcd952abcd953abcd954abcd955abcd956abcd957abcd958abcd959abcd960abcd961abcd962abcd963abcd964abcd965abcd966abcd967abcd968abcd969abcd970abcd971abcd972abcd973abcd974abcd975abcd976abcd977abcd978abcd979abcd980abcd981abcd982abcd983abcd984abcd985abcd986abcd987abcd988abcd989abcd990abcd991abcd992abcd993abcd994abcd995abcd996abcd997abcd998abcd999"},
+                    {"name": "upgradedHttps", "value": "true"},
+                    {"name": "tds", "value": "abc123"},
+                    {"name": "blockedTrackers", "value": "bad.tracker.test,tracking.test"},
+                    {"name": "surrogates", "value": "surrogate.domain.test,domain2.com,nested.sub.domain3.com"},
+                    {"name": "truncated", "value": "1"}
+                ],
+                "exceptPlatforms": [
+                    "android-browser",
+                    "ios-browser",
+                    "macos-browser",
+                    "safari-extension",
+                    "windows-browser"
+                ]
+            },
+            {
+                "name": "Test truncation when report is too long (description)",
+                "siteURL": "https://example.test/",
+                "providedDescription": "abcd000abcd001abcd002abcd003abcd004abcd005abcd006abcd007abcd008abcd009abcd010abcd011abcd012abcd013abcd014abcd015abcd016abcd017abcd018abcd019abcd020abcd021abcd022abcd023abcd024abcd025abcd026abcd027abcd028abcd029abcd030abcd031abcd032abcd033abcd034abcd035abcd036abcd037abcd038abcd039abcd040abcd041abcd042abcd043abcd044abcd045abcd046abcd047abcd048abcd049abcd050abcd051abcd052abcd053abcd054abcd055abcd056abcd057abcd058abcd059abcd060abcd061abcd062abcd063abcd064abcd065abcd066abcd067abcd068abcd069abcd070abcd071abcd072abcd073abcd074abcd075abcd076abcd077abcd078abcd079abcd080abcd081abcd082abcd083abcd084abcd085abcd086abcd087abcd088abcd089abcd090abcd091abcd092abcd093abcd094abcd095abcd096abcd097abcd098abcd099abcd100abcd101abcd102abcd103abcd104abcd105abcd106abcd107abcd108abcd109abcd110abcd111abcd112abcd113abcd114abcd115abcd116abcd117abcd118abcd119abcd120abcd121abcd122abcd123abcd124abcd125abcd126abcd127abcd128abcd129abcd130abcd131abcd132abcd133abcd134abcd135abcd136abcd137abcd138abcd139abcd140abcd141abcd142abcd143abcd144abcd145abcd146abcd147abcd148abcd149abcd150abcd151abcd152abcd153abcd154abcd155abcd156abcd157abcd158abcd159abcd160abcd161abcd162abcd163abcd164abcd165abcd166abcd167abcd168abcd169abcd170abcd171abcd172abcd173abcd174abcd175abcd176abcd177abcd178abcd179abcd180abcd181abcd182abcd183abcd184abcd185abcd186abcd187abcd188abcd189abcd190abcd191abcd192abcd193abcd194abcd195abcd196abcd197abcd198abcd199abcd200abcd201abcd202abcd203abcd204abcd205abcd206abcd207abcd208abcd209abcd210abcd211abcd212abcd213abcd214abcd215abcd216abcd217abcd218abcd219abcd220abcd221abcd222abcd223abcd224abcd225abcd226abcd227abcd228abcd229abcd230abcd231abcd232abcd233abcd234abcd235abcd236abcd237abcd238abcd239abcd240abcd241abcd242abcd243abcd244abcd245abcd246abcd247abcd248abcd249abcd250abcd251abcd252abcd253abcd254abcd255abcd256abcd257abcd258abcd259abcd260abcd261abcd262abcd263abcd264abcd265abcd266abcd267abcd268abcd269abcd270abcd271abcd272abcd273abcd274abcd275abcd276abcd277abcd278abcd279abcd280abcd281abcd282abcd283abcd284abcd285abcd286abcd287abcd288abcd289abcd290abcd291abcd292abcd293abcd294abcd295abcd296abcd297abcd298abcd299abcd300abcd301abcd302abcd303abcd304abcd305abcd306abcd307abcd308abcd309abcd310abcd311abcd312abcd313abcd314abcd315abcd316abcd317abcd318abcd319abcd320abcd321abcd322abcd323abcd324abcd325abcd326abcd327abcd328abcd329abcd330abcd331abcd332abcd333abcd334abcd335abcd336abcd337abcd338abcd339abcd340abcd341abcd342abcd343abcd344abcd345abcd346abcd347abcd348abcd349abcd350abcd351abcd352abcd353abcd354abcd355abcd356abcd357abcd358abcd359abcd360abcd361abcd362abcd363abcd364abcd365abcd366abcd367abcd368abcd369abcd370abcd371abcd372abcd373abcd374abcd375abcd376abcd377abcd378abcd379abcd380abcd381abcd382abcd383abcd384abcd385abcd386abcd387abcd388abcd389abcd390abcd391abcd392abcd393abcd394abcd395abcd396abcd397abcd398abcd399abcd400abcd401abcd402abcd403abcd404abcd405abcd406abcd407abcd408abcd409abcd410abcd411abcd412abcd413abcd414abcd415abcd416abcd417abcd418abcd419abcd420abcd421abcd422abcd423abcd424abcd425abcd426abcd427abcd428abcd429abcd430abcd431abcd432abcd433abcd434abcd435abcd436abcd437abcd438abcd439abcd440abcd441abcd442abcd443abcd444abcd445abcd446abcd447abcd448abcd449abcd450abcd451abcd452abcd453abcd454abcd455abcd456abcd457abcd458abcd459abcd460abcd461abcd462abcd463abcd464abcd465abcd466abcd467abcd468abcd469abcd470abcd471abcd472abcd473abcd474abcd475abcd476abcd477abcd478abcd479abcd480abcd481abcd482abcd483abcd484abcd485abcd486abcd487abcd488abcd489abcd490abcd491abcd492abcd493abcd494abcd495abcd496abcd497abcd498abcd499abcd500abcd501abcd502abcd503abcd504abcd505abcd506abcd507abcd508abcd509abcd510abcd511abcd512abcd513abcd514abcd515abcd516abcd517abcd518abcd519abcd520abcd521abcd522abcd523abcd524abcd525abcd526abcd527abcd528abcd529abcd530abcd531abcd532abcd533abcd534abcd535abcd536abcd537abcd538abcd539abcd540abcd541abcd542abcd543abcd544abcd545abcd546abcd547abcd548abcd549abcd550abcd551abcd552abcd553abcd554abcd555abcd556abcd557abcd558abcd559abcd560abcd561abcd562abcd563abcd564abcd565abcd566abcd567abcd568abcd569abcd570abcd571abcd572abcd573abcd574abcd575abcd576abcd577abcd578abcd579abcd580abcd581abcd582abcd583abcd584abcd585abcd586abcd587abcd588abcd589abcd590abcd591abcd592abcd593abcd594abcd595abcd596abcd597abcd598abcd599abcd600abcd601abcd602abcd603abcd604abcd605abcd606abcd607abcd608abcd609abcd610abcd611abcd612abcd613abcd614abcd615abcd616abcd617abcd618abcd619abcd620abcd621abcd622abcd623abcd624abcd625abcd626abcd627abcd628abcd629abcd630abcd631abcd632abcd633abcd634abcd635abcd636abcd637abcd638abcd639abcd640abcd641abcd642abcd643abcd644abcd645abcd646abcd647abcd648abcd649abcd650abcd651abcd652abcd653abcd654abcd655abcd656abcd657abcd658abcd659abcd660abcd661abcd662abcd663abcd664abcd665abcd666abcd667abcd668abcd669abcd670abcd671abcd672abcd673abcd674abcd675abcd676abcd677abcd678abcd679abcd680abcd681abcd682abcd683abcd684abcd685abcd686abcd687abcd688abcd689abcd690abcd691abcd692abcd693abcd694abcd695abcd696abcd697abcd698abcd699abcd700abcd701abcd702abcd703abcd704abcd705abcd706abcd707abcd708abcd709abcd710abcd711abcd712abcd713abcd714abcd715abcd716abcd717abcd718abcd719abcd720abcd721abcd722abcd723abcd724abcd725abcd726abcd727abcd728abcd729abcd730abcd731abcd732abcd733abcd734abcd735abcd736abcd737abcd738abcd739abcd740abcd741abcd742abcd743abcd744abcd745abcd746abcd747abcd748abcd749abcd750abcd751abcd752abcd753abcd754abcd755abcd756abcd757abcd758abcd759abcd760abcd761abcd762abcd763abcd764abcd765abcd766abcd767abcd768abcd769abcd770abcd771abcd772abcd773abcd774abcd775abcd776abcd777abcd778abcd779abcd780abcd781abcd782abcd783abcd784abcd785abcd786abcd787abcd788abcd789abcd790abcd791abcd792abcd793abcd794abcd795abcd796abcd797abcd798abcd799abcd800abcd801abcd802abcd803abcd804abcd805abcd806abcd807abcd808abcd809abcd810abcd811abcd812abcd813abcd814abcd815abcd816abcd817abcd818abcd819abcd820abcd821abcd822abcd823abcd824abcd825abcd826abcd827abcd828abcd829abcd830abcd831abcd832abcd833abcd834abcd835abcd836abcd837abcd838abcd839abcd840abcd841abcd842abcd843abcd844abcd845abcd846abcd847abcd848abcd849abcd850abcd851abcd852abcd853abcd854abcd855abcd856abcd857abcd858abcd859abcd860abcd861abcd862abcd863abcd864abcd865abcd866abcd867abcd868abcd869abcd870abcd871abcd872abcd873abcd874abcd875abcd876abcd877abcd878abcd879abcd880abcd881abcd882abcd883abcd884abcd885abcd886abcd887abcd888abcd889abcd890abcd891abcd892abcd893abcd894abcd895abcd896abcd897abcd898abcd899abcd900abcd901abcd902abcd903abcd904abcd905abcd906abcd907abcd908abcd909abcd910abcd911abcd912abcd913abcd914abcd915abcd916abcd917abcd918abcd919abcd920abcd921abcd922abcd923abcd924abcd925abcd926abcd927abcd928abcd929abcd930abcd931abcd932abcd933abcd934abcd935abcd936abcd937abcd938abcd939abcd940abcd941abcd942abcd943abcd944abcd945abcd946abcd947abcd948abcd949abcd950abcd951abcd952abcd953abcd954abcd955abcd956abcd957abcd958abcd959abcd960abcd961abcd962abcd963abcd964abcd965abcd966abcd967abcd968abcd969abcd970abcd971abcd972abcd973abcd974abcd975abcd976abcd977abcd978abcd979abcd980abcd981abcd982abcd983abcd984abcd985abcd986abcd987abcd988abcd989abcd990abcd991abcd992abcd993abcd994abcd995abcd996abcd997abcd998abcd999",
+                "wasUpgraded": true,
+                "category": "content",
+                "blockedTrackers": ["bad.tracker.test", "tracking.test"],
+                "ignoreRequests": ["ignored1.test", "sub.ignored2.test"],
+                "noActionRequests": ["noaction1.test", "sub.noaction2.test"],
+                "adAttributionRequests": ["adattr1.test", "sub.adattr2.test"],
+                "ignoredByUserRequests": ["ignoreuser1.test", "sub.ignoreuser2.test"],
+                "surrogates": ["surrogate.domain.test", "domain2.com", "nested.sub.domain3.com"],
+                "atb": "v123-456g",
+                "blocklistVersion": "abc123",
+                "expectReportURLPrefix": "https://improving.duckduckgo.com/t/epbf",
+                "expectReportURLParams": [
+                    {"name": "category", "value": "content"},
+                    {"name": "siteUrl", "value": "https%3A%2F%2Fexample.test%2F"},
+                    {"name": "description", "value": "abcd000abcd001abcd002abcd003abcd004abcd005abcd006abcd007abcd008abcd009abcd010abcd011abcd012abcd013abcd014abcd015abcd016abcd017abcd018abcd019abcd020abcd021abcd022abcd023abcd024abcd025abcd026abcd027abcd028abcd029abcd030abcd031abcd032abcd033abcd034abcd035abcd036abcd037abcd038abcd039abcd040abcd041abcd042abcd043abcd044abcd045abcd046abcd047abcd048abcd049abcd050abcd051abcd052abcd053abcd054abcd055abcd056abcd057abcd058abcd059abcd060abcd061abcd062abcd063abcd064abcd065abcd066abcd067abcd068abcd069abcd070abcd071abcd072abcd073abcd074abcd075abcd076abcd077abcd078abcd079abcd080abcd081abcd082abcd083abcd084abcd085abcd086abcd087abcd088abcd089abcd090abcd091abcd092abcd093abcd094abcd095abcd096abcd097abcd098abcd099abcd100abcd101abcd102abcd103abcd104abcd105abcd106abcd107abcd108abcd109abcd110abcd111abcd112abcd113abcd114abcd115abcd116abcd117abcd118abcd119abcd120abcd121abcd122abcd123abcd124abcd125abcd126abcd127abcd128abcd129abcd130abcd131abcd132abcd133abcd134abcd135abcd136abcd137abcd138abcd139abcd140abcd141abcd142abcd143abcd144abcd145abcd146abcd147abcd148abcd149abcd150abcd151abcd152abcd153abcd154abcd155abcd156abcd157abcd158abcd159abcd160abcd161abcd162abcd163abcd164abcd165abcd166abcd167abcd168abcd169abcd170abcd171abcd172abcd173abcd174abcd175abcd176abcd177abcd178abcd179abcd180abcd181abcd182abcd183abcd184abcd185abcd186abcd187abcd188abcd189abcd190abcd191abcd192abcd193abcd194abcd195abcd196abcd197abcd198abcd199abcd200abcd201abcd202abcd203abcd204abcd205abcd206abcd207abcd208abcd209abcd210abcd211abcd212abcd213abcd214abcd215abcd216abcd217abcd218abcd219abcd220abcd221abcd222abcd223abcd224abcd225abcd226abcd227abcd228abcd229abcd230abcd231abcd232abcd233abcd234abcd235abcd236abcd237abcd238abcd239abcd240abcd241abcd242abcd243abcd244abcd245abcd246abcd247abcd248abcd249abcd250abcd251abcd252abcd253abcd254abcd255abcd256abcd257abcd258abcd259abcd260abcd261abcd262abcd263abcd264abcd265abcd266abcd267abcd268abcd269abcd270abcd271abcd272abcd273abcd274abcd275abcd276abcd277abcd278abcd279abcd280abcd281abcd282abcd283abcd284abcd285abcd286abcd287abcd288abcd289abcd290abcd291abcd292abcd293abcd294abcd295abcd296abcd297abcd298abcd299abcd300abcd301abcd302abcd303abcd304abcd305abcd306abcd307abcd308abcd309abcd310abcd311abcd312abcd313abcd314abcd315abcd316abcd317abcd318abcd319abcd320abcd321abcd322abcd323abcd324abcd325abcd326abcd327abcd328abcd329abcd330abcd331abcd332abcd333abcd334abcd335abcd336abcd337abcd338abcd339abcd340abcd341abcd342abcd343abcd344abcd345abcd346abcd347abcd348abcd349abcd350abcd351abcd352abcd353abcd354abcd355abcd356abcd357abcd358abcd359abcd360abcd361abcd362abcd363abcd364abcd365abcd366abcd367abcd368abcd369abcd370abcd371abcd372abcd373abcd374abcd375abcd376abcd377abcd378abcd379abcd380abcd381abcd382abcd383abcd384abcd385abcd386abcd387abcd388abcd389abcd390abcd391abcd392abcd393abcd394abcd395abcd396abcd397abcd398abcd399abcd400abcd401abcd402abcd403abcd404abcd405abcd406abcd407abcd408abcd409abcd410abcd411abcd412abcd413abcd414abcd415abcd416abcd417abcd418abcd419abcd420abcd421abcd422abcd423abcd424abcd425abcd426abcd427abcd428abcd429abcd430abcd431abcd432abcd433abcd434abcd435abcd436abcd437abcd438abcd439abcd440abcd441abcd442abcd443abcd444abcd445abcd446abcd447abcd448abcd449abcd450abcd451abcd452abcd453abcd454abcd455abcd456abcd457abcd458abcd459abcd460abcd461abcd462abcd463abcd464abcd465abcd466abcd467abcd468abcd469abcd470abcd471abcd472abcd473abcd474abcd475abcd476abcd477abcd478abcd479abcd480abcd481abcd482abcd483abcd484abcd485abcd486abcd487abcd488abcd489abcd490abcd491abcd492abcd493abcd494abcd495abcd496abcd497abcd498abcd499abcd500abcd501abcd502abcd503abcd504abcd505abcd506abcd507abcd508abcd509abcd510abcd511abcd512abcd513abcd514abcd515abcd516abcd517abcd518abcd519abcd520abcd521abcd522abcd523abcd524abcd525abcd526abcd527abcd528abcd529abcd530abcd531abcd532abcd533abcd534abcd535abcd536abcd537abcd538abcd539abcd540abcd541abcd542abcd543abcd544abcd545abcd546abcd547abcd548abcd549abcd550abcd551abcd552abcd553abcd554abcd555abcd556abcd557abcd558abcd559abcd560abcd561abcd562abcd563abcd564abcd565abcd566abcd567abcd568abcd569abcd570abcd571abcd572abcd573abcd574abcd575abcd576abcd577abcd578abcd579abcd580abcd581abcd582abcd583abcd584abcd585abcd586abcd587abcd588abcd589abcd590abcd591abcd592abcd593abcd594abcd595abcd596abcd597abcd598abcd599abcd600abcd601abcd602abcd603abcd604abcd605abcd606abcd607abcd608abcd609abcd610abcd611abcd612abcd613abcd614abcd615abcd616abcd617abcd618abcd619abcd620abcd621abcd622abcd623abcd624abcd625abcd626abcd627abcd628abcd629abcd630abcd631abcd632abcd633abcd634abcd635abcd636abcd637abcd638abcd639abcd640abcd641abcd642abcd643abcd644abcd645abcd646abcd647abcd648abcd649abcd650abcd651abcd652abcd653abcd654abcd655abcd656abcd657abcd658abcd659abcd660abcd661abcd662abcd663abcd664abcd665abcd666abcd667abcd668abcd669abcd670abcd671abcd672abcd673abcd674abcd675abcd676abcd677abcd678abcd679abcd680abcd681abcd682abcd683abcd684abcd685abcd686abcd687abcd688abcd689abcd690abcd691abcd692abcd693abcd694abcd695abcd696abcd697abcd698abcd699abcd700abcd701abcd702abcd703abcd704abcd705abcd706abcd707abcd708abcd709abcd710abcd711abcd712abcd713abcd714abcd715abcd716abcd717abcd718abcd719abcd720abcd721abcd722abcd723abcd724abcd725abcd726abcd727abcd728abcd729abcd730abcd731abcd732abcd733abcd734abcd735abcd736abcd737abcd738abcd739abcd740abcd741abcd742abcd743abcd744abcd745abcd746abcd747abcd748abcd749abcd750abcd751abcd752abcd753abcd754abcd755abcd756abcd757abcd758abcd759abcd760abcd761abcd762abcd763abcd764abcd765abcd766abcd767abcd768abcd769abcd770abcd771abcd772abcd773abcd774abcd775abcd776abcd777abcd778abcd779abcd780abcd781abcd782abcd783abcd784abcd785abcd786abcd787abcd788abcd789abcd790abcd791abcd792abcd793abcd794abcd795abcd796abcd797abcd798abcd799abcd800abcd801abcd802abcd803abcd804abcd805abcd806abcd807abcd808abcd809abcd810abcd811abcd812abcd813abcd814abcd815abcd816abcd817abcd818abcd819abcd820abcd821abcd822abcd823abcd824abcd825abcd826abcd827abcd828abcd829abcd830abcd831abcd832abcd833abcd834abcd835abcd836abcd837abcd838abcd839abcd840abcd841abcd842abcd843abcd844abcd845abcd846abcd847abcd848abcd849abcd850abcd851abcd852abcd853abcd854abcd855abcd856abcd857abcd858abcd859abcd860abcd861abcd862abcd863abcd864abcd865abcd866abcd867abcd868abcd869abcd870abcd871abcd872abcd873abcd874abcd875abcd876abcd877abcd878abcd879abcd880abcd881abcd882abcd883abcd884abcd885abcd886abcd887abcd888abcd889abcd890abcd891abcd892abcd893abcd894abcd895abcd896abcd897abcd898abcd899abcd900abcd901abcd902abcd903abcd904abcd905abcd906abcd907abcd908abcd909abcd910abcd911abcd912abcd913abcd914abcd915abcd916abcd917abcd918abcd919abcd920abcd921abcd922abcd923abcd924abcd925abcd926abcd927abcd928abcd929abcd930abcd931abcd932abcd933abcd934abcd935abcd936abcd937abcd938abcd939abcd940abcd941abcd942abcd943abcd944abcd945abcd946abcd947abcd948abcd949abcd950abcd951abcd952abcd953abcd954abcd955abcd956abcd957abcd958abcd959abcd960abcd961abcd962abcd963abcd964abcd965abcd966abcd967abcd968abcd969abcd970abcd971abcd972abcd973abcd974abcd975abcd976abcd977abcd978abcd979abcd980abcd981abcd982abcd983abcd984abcd985abcd986abcd987abcd988abcd989abcd990abcd991abcd992abcd993abcd994abcd995abcd996abcd997abcd998abcd999"},
+                    {"name": "upgradedHttps", "value": "true"},
+                    {"name": "tds", "value": "abc123"},
+                    {"name": "blockedTrackers", "value": "bad.tracker.test,tracking.test"},
+                    {"name": "surrogates", "value": "surrogate.domain.test,domain2.com,nested.sub.domain3.com"},
+                    {"name": "truncated", "value": "1"}
+                ],
+                "exceptPlatforms": [
+                    "android-browser",
+                    "ios-browser",
+                    "macos-browser",
+                    "safari-extension",
+                    "windows-browser"
+                ]
+            },
+            {
+                "name": "Test truncation when report is too long (noActionRequests)",
+                "siteURL": "https://example.test/",
+                "wasUpgraded": true,
+                "category": "content",
+                "blockedTrackers": ["bad.tracker.test", "tracking.test"],
+                "ignoreRequests": ["ignored1.test", "sub.ignored2.test"],
+                "noActionRequests": ["a.domain1.com", "a.domain2.com", "a.domain3.com", "a.domain4.com", "a.domain5.com", "a.domain6.com", "a.domain7.com", "a.domain8.com", "a.domain9.com", "a.domain10.com", "a.domain11.com", "a.domain12.com", "a.domain13.com", "a.domain14.com", "a.domain15.com", "a.domain16.com", "a.domain17.com", "a.domain18.com", "a.domain19.com", "b.domain1.com", "b.domain2.com", "b.domain3.com", "b.domain4.com", "b.domain5.com", "b.domain6.com", "b.domain7.com", "b.domain8.com", "b.domain9.com", "b.domain10.com", "b.domain11.com", "b.domain12.com", "b.domain13.com", "b.domain14.com", "b.domain15.com", "b.domain16.com", "b.domain17.com", "b.domain18.com", "b.domain19.com", "c.domain1.com", "c.domain2.com", "c.domain3.com", "c.domain4.com", "c.domain5.com", "c.domain6.com", "c.domain7.com", "c.domain8.com", "c.domain9.com", "c.domain10.com", "c.domain11.com", "c.domain12.com", "c.domain13.com", "c.domain14.com", "c.domain15.com", "c.domain16.com", "c.domain17.com", "c.domain18.com", "c.domain19.com", "d.domain1.com", "d.domain2.com", "d.domain3.com", "d.domain4.com", "d.domain5.com", "d.domain6.com", "d.domain7.com", "d.domain8.com", "d.domain9.com", "d.domain10.com", "d.domain11.com", "d.domain12.com", "d.domain13.com", "d.domain14.com", "d.domain15.com", "d.domain16.com", "d.domain17.com", "d.domain18.com", "d.domain19.com", "e.domain1.com", "e.domain2.com", "e.domain3.com", "e.domain4.com", "e.domain5.com", "e.domain6.com", "e.domain7.com", "e.domain8.com", "e.domain9.com", "e.domain10.com", "e.domain11.com", "e.domain12.com", "e.domain13.com", "e.domain14.com", "e.domain15.com", "e.domain16.com", "e.domain17.com", "e.domain18.com", "e.domain19.com", "f.domain1.com", "f.domain2.com", "f.domain3.com", "f.domain4.com", "f.domain5.com", "f.domain6.com", "f.domain7.com", "f.domain8.com", "f.domain9.com", "f.domain10.com", "f.domain11.com", "f.domain12.com", "f.domain13.com", "f.domain14.com", "f.domain15.com", "f.domain16.com", "f.domain17.com", "f.domain18.com", "f.domain19.com", "g.domain1.com", "g.domain2.com", "g.domain3.com", "g.domain4.com", "g.domain5.com", "g.domain6.com", "g.domain7.com", "g.domain8.com", "g.domain9.com", "g.domain10.com", "g.domain11.com", "g.domain12.com", "g.domain13.com", "g.domain14.com", "g.domain15.com", "g.domain16.com", "g.domain17.com", "g.domain18.com", "g.domain19.com", "h.domain1.com", "h.domain2.com", "h.domain3.com", "h.domain4.com", "h.domain5.com", "h.domain6.com", "h.domain7.com", "h.domain8.com", "h.domain9.com", "h.domain10.com", "h.domain11.com", "h.domain12.com", "h.domain13.com", "h.domain14.com", "h.domain15.com", "h.domain16.com", "h.domain17.com", "h.domain18.com", "h.domain19.com", "i.domain1.com", "i.domain2.com", "i.domain3.com", "i.domain4.com", "i.domain5.com", "i.domain6.com", "i.domain7.com", "i.domain8.com", "i.domain9.com", "i.domain10.com", "i.domain11.com", "i.domain12.com", "i.domain13.com", "i.domain14.com", "i.domain15.com", "i.domain16.com", "i.domain17.com", "i.domain18.com", "i.domain19.com", "j.domain1.com", "j.domain2.com", "j.domain3.com", "j.domain4.com", "j.domain5.com", "j.domain6.com", "j.domain7.com", "j.domain8.com", "j.domain9.com", "j.domain10.com", "j.domain11.com", "j.domain12.com", "j.domain13.com", "j.domain14.com", "j.domain15.com", "j.domain16.com", "j.domain17.com", "j.domain18.com", "j.domain19.com", "k.domain1.com", "k.domain2.com", "k.domain3.com", "k.domain4.com", "k.domain5.com", "k.domain6.com", "k.domain7.com", "k.domain8.com", "k.domain9.com", "k.domain10.com", "k.domain11.com", "k.domain12.com", "k.domain13.com", "k.domain14.com", "k.domain15.com", "k.domain16.com", "k.domain17.com", "k.domain18.com", "k.domain19.com", "l.domain1.com", "l.domain2.com", "l.domain3.com", "l.domain4.com", "l.domain5.com", "l.domain6.com", "l.domain7.com", "l.domain8.com", "l.domain9.com", "l.domain10.com", "l.domain11.com", "l.domain12.com", "l.domain13.com", "l.domain14.com", "l.domain15.com", "l.domain16.com", "l.domain17.com", "l.domain18.com", "l.domain19.com", "m.domain1.com", "m.domain2.com", "m.domain3.com", "m.domain4.com", "m.domain5.com", "m.domain6.com", "m.domain7.com", "m.domain8.com", "m.domain9.com", "m.domain10.com", "m.domain11.com", "m.domain12.com", "m.domain13.com", "m.domain14.com", "m.domain15.com", "m.domain16.com", "m.domain17.com", "m.domain18.com", "m.domain19.com", "n.domain1.com", "n.domain2.com", "n.domain3.com", "n.domain4.com", "n.domain5.com", "n.domain6.com", "n.domain7.com", "n.domain8.com", "n.domain9.com", "n.domain10.com", "n.domain11.com", "n.domain12.com", "n.domain13.com", "n.domain14.com", "n.domain15.com", "n.domain16.com", "n.domain17.com", "n.domain18.com", "n.domain19.com", "o.domain1.com", "o.domain2.com", "o.domain3.com", "o.domain4.com", "o.domain5.com", "o.domain6.com", "o.domain7.com", "o.domain8.com", "o.domain9.com", "o.domain10.com", "o.domain11.com", "o.domain12.com", "o.domain13.com", "o.domain14.com", "o.domain15.com", "o.domain16.com", "o.domain17.com", "o.domain18.com", "o.domain19.com", "p.domain1.com", "p.domain2.com", "p.domain3.com", "p.domain4.com", "p.domain5.com", "p.domain6.com", "p.domain7.com", "p.domain8.com", "p.domain9.com", "p.domain10.com", "p.domain11.com", "p.domain12.com", "p.domain13.com", "p.domain14.com", "p.domain15.com", "p.domain16.com", "p.domain17.com", "p.domain18.com", "p.domain19.com", "q.domain1.com", "q.domain2.com", "q.domain3.com", "q.domain4.com", "q.domain5.com", "q.domain6.com", "q.domain7.com", "q.domain8.com", "q.domain9.com", "q.domain10.com", "q.domain11.com", "q.domain12.com", "q.domain13.com", "q.domain14.com", "q.domain15.com", "q.domain16.com", "q.domain17.com", "q.domain18.com", "q.domain19.com", "r.domain1.com", "r.domain2.com", "r.domain3.com", "r.domain4.com", "r.domain5.com", "r.domain6.com", "r.domain7.com", "r.domain8.com", "r.domain9.com", "r.domain10.com", "r.domain11.com", "r.domain12.com", "r.domain13.com", "r.domain14.com", "r.domain15.com", "r.domain16.com", "r.domain17.com", "r.domain18.com", "r.domain19.com", "s.domain1.com", "s.domain2.com", "s.domain3.com", "s.domain4.com", "s.domain5.com", "s.domain6.com", "s.domain7.com", "s.domain8.com", "s.domain9.com", "s.domain10.com", "s.domain11.com", "s.domain12.com", "s.domain13.com", "s.domain14.com", "s.domain15.com", "s.domain16.com", "s.domain17.com", "s.domain18.com", "s.domain19.com", "t.domain1.com", "t.domain2.com", "t.domain3.com", "t.domain4.com", "t.domain5.com", "t.domain6.com", "t.domain7.com", "t.domain8.com", "t.domain9.com", "t.domain10.com", "t.domain11.com", "t.domain12.com", "t.domain13.com", "t.domain14.com", "t.domain15.com", "t.domain16.com", "t.domain17.com", "t.domain18.com", "t.domain19.com", "u.domain1.com", "u.domain2.com", "u.domain3.com", "u.domain4.com", "u.domain5.com", "u.domain6.com", "u.domain7.com", "u.domain8.com", "u.domain9.com", "u.domain10.com", "u.domain11.com", "u.domain12.com", "u.domain13.com", "u.domain14.com", "u.domain15.com", "u.domain16.com", "u.domain17.com", "u.domain18.com", "u.domain19.com", "v.domain1.com", "v.domain2.com", "v.domain3.com", "v.domain4.com", "v.domain5.com", "v.domain6.com", "v.domain7.com", "v.domain8.com", "v.domain9.com", "v.domain10.com", "v.domain11.com", "v.domain12.com", "v.domain13.com", "v.domain14.com", "v.domain15.com", "v.domain16.com", "v.domain17.com", "v.domain18.com", "v.domain19.com", "w.domain1.com", "w.domain2.com", "w.domain3.com", "w.domain4.com", "w.domain5.com", "w.domain6.com", "w.domain7.com", "w.domain8.com", "w.domain9.com", "w.domain10.com", "w.domain11.com", "w.domain12.com", "w.domain13.com", "w.domain14.com", "w.domain15.com", "w.domain16.com", "w.domain17.com", "w.domain18.com", "w.domain19.com", "x.domain1.com", "x.domain2.com", "x.domain3.com", "x.domain4.com", "x.domain5.com", "x.domain6.com", "x.domain7.com", "x.domain8.com", "x.domain9.com", "x.domain10.com", "x.domain11.com", "x.domain12.com", "x.domain13.com", "x.domain14.com", "x.domain15.com", "x.domain16.com", "x.domain17.com", "x.domain18.com", "x.domain19.com", "y.domain1.com", "y.domain2.com", "y.domain3.com", "y.domain4.com", "y.domain5.com", "y.domain6.com", "y.domain7.com", "y.domain8.com", "y.domain9.com", "y.domain10.com", "y.domain11.com", "y.domain12.com", "y.domain13.com", "y.domain14.com", "y.domain15.com", "y.domain16.com", "y.domain17.com", "y.domain18.com", "y.domain19.com", "z.domain1.com", "z.domain2.com", "z.domain3.com", "z.domain4.com", "z.domain5.com", "z.domain6.com", "z.domain7.com", "z.domain8.com", "z.domain9.com", "z.domain10.com", "z.domain11.com", "z.domain12.com", "z.domain13.com", "z.domain14.com", "z.domain15.com", "z.domain16.com", "z.domain17.com", "z.domain18.com", "z.domain19.com"],
+                "adAttributionRequests": ["adattr1.test", "sub.adattr2.test"],
+                "ignoredByUserRequests": ["ignoreuser1.test", "sub.ignoreuser2.test"],
+                "surrogates": ["surrogate.domain.test", "domain2.com", "nested.sub.domain3.com"],
+                "atb": "v123-456g",
+                "blocklistVersion": "abc123",
+                "expectReportURLPrefix": "https://improving.duckduckgo.com/t/epbf",
+                "expectReportURLParams": [
+                    {"name": "category", "value": "content"},
+                    {"name": "siteUrl", "value": "https%3A%2F%2Fexample.test%2F"},
+                    {"name": "upgradedHttps", "value": "true"},
+                    {"name": "tds", "value": "abc123"},
+                    {"name": "blockedTrackers", "value": "bad.tracker.test,tracking.test"},
+                    {"name": "surrogates", "value": "surrogate.domain.test,domain2.com,nested.sub.domain3.com"},
+                    {"name": "truncated", "value": "1"}
+                ],
+                "exceptPlatforms": [
+                    "android-browser",
+                    "ios-browser",
+                    "macos-browser",
+                    "safari-extension",
                     "windows-browser"
                 ]
             }
