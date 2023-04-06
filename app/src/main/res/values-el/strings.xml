@@ -602,6 +602,7 @@
     <string name="folderLocationTitle">Επιλέξτε τοποθεσία</string>
     <string name="addFolder">Προσθήκη φακέλου</string>
     <string name="editFolder">Επεξεργασία φακέλου</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Διαγραφή φακέλου και των περιεχομένων του;"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Θέλετε σίγουρα να διαγράψετε "</string>
     <string name="bookmarkFolderEmpty">Κενό</string>
 
