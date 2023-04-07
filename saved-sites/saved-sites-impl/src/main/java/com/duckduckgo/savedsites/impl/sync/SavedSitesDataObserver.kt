@@ -21,7 +21,7 @@ import com.duckduckgo.sync.api.SyncChanges
 import com.duckduckgo.sync.api.SyncEngine
 import com.duckduckgo.sync.api.SyncablePlugin
 
-class SavedSitesSyncableObserver(
+class SavedSitesDataObserver(
     val syncEngine: SyncEngine,
     val savedSitesRepository: SavedSitesRepository
 ) : SyncablePlugin {
