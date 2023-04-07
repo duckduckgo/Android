@@ -802,6 +802,14 @@ class SettingsViewModelTest {
         }
     }
 
+    @Test
+    fun whenOnLaunchedFromNotificationCalledWithPixelNameThePixelFired() {
+        val pixelName = "pixel_name"
+        testee.onLaunchedFromNotification(pixelName)
+
+        verify(mockPixel).fire(pixelName)
+    }
+
     private fun givenSelectedFireAnimation(fireAnimation: FireAnimation) {
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(fireAnimation)
         whenever(mockAppSettingsDataStore.isCurrentlySelected(fireAnimation)).thenReturn(true)

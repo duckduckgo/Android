@@ -247,6 +247,14 @@ class BrowserViewModelTest {
         )
     }
 
+    @Test
+    fun whenOnLaunchedFromNotificationCalledWithPixelNameThePixelFired() {
+        val pixelName = "pixel_name"
+        testee.onLaunchedFromNotification(pixelName)
+
+        verify(mockPixel).fire(pixelName)
+    }
+
     companion object {
         const val TAB_ID = "TAB_ID"
     }

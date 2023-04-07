@@ -159,6 +159,10 @@ class SettingsActivity : DuckDuckGoActivity() {
         configureInternalFeatures()
         configureAppLinksSettingVisibility()
         observeViewModel()
+
+        intent?.getStringExtra(BrowserActivity.LAUNCH_FROM_NOTIFICATION_PIXEL_NAME)?.let {
+            viewModel.onLaunchedFromNotification(it)
+        }
     }
 
     override fun onStart() {
@@ -733,6 +737,8 @@ class SettingsActivity : DuckDuckGoActivity() {
         private const val ANDROID_M_APP_NOTIFICATION_SETTINGS = "android.settings.APP_NOTIFICATION_SETTINGS"
         private const val ANDROID_M_APP_PACKAGE = "app_package"
         private const val ANDROID_M_APP_UID = "app_uid"
+
+        const val LAUNCH_FROM_NOTIFICATION_PIXEL_NAME = "LAUNCH_FROM_NOTIFICATION_PIXEL_NAME"
 
         fun intent(context: Context): Intent {
             return Intent(context, SettingsActivity::class.java)

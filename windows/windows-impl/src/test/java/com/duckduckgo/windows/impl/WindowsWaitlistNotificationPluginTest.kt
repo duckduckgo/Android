@@ -16,22 +16,17 @@
 
 package com.duckduckgo.windows.impl
 
-import android.app.TaskStackBuilder
 import com.duckduckgo.app.notification.TaskStackBuilderFactory
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.windows.impl.WindowsPixelNames.WINDOWS_WAITLIST_NOTIFICATION_CANCELLED
-import com.duckduckgo.windows.impl.WindowsPixelNames.WINDOWS_WAITLIST_NOTIFICATION_LAUNCHED
 import com.duckduckgo.windows.impl.WindowsPixelNames.WINDOWS_WAITLIST_NOTIFICATION_SHOWN
 import com.duckduckgo.windows.impl.waitlist.WindowsWaitlistNotificationPlugin
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.doNothing
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
 class WindowsWaitlistNotificationPluginTest {
 
@@ -60,16 +55,5 @@ class WindowsWaitlistNotificationPluginTest {
     fun whenOnNotificationShownThenPixelFired() {
         testee.onNotificationShown()
         verify(mockPixel).fire(WINDOWS_WAITLIST_NOTIFICATION_SHOWN)
-    }
-
-    @Test
-    fun whenOnNotificationLaunchedThenPixelFired() {
-        val stackBuilder: TaskStackBuilder = mock()
-        whenever(mockTaskStackBuilderFactory.createTaskBuilder()).thenReturn(stackBuilder)
-        whenever(stackBuilder.addNextIntentWithParentStack(any())).thenReturn(stackBuilder)
-        doNothing().whenever(stackBuilder).startActivities()
-
-        testee.onNotificationLaunched()
-        verify(mockPixel).fire(WINDOWS_WAITLIST_NOTIFICATION_LAUNCHED)
     }
 }
