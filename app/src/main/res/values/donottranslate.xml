@@ -45,6 +45,4 @@
     <string name="syncSettingsDisabled">Off</string>
     <string name="syncSettingsEnabled">On</string>
 
-    <!-- Bookmarks -->
-    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Delete folder and its contents?"</string>
 </resources>
