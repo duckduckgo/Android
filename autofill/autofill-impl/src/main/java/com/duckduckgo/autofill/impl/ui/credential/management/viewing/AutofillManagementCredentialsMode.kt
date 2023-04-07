@@ -54,6 +54,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.InitialExtractor
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.R.dimen
+import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
@@ -133,8 +134,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
             }
 
             R.id.view_menu_delete -> {
-                viewModel.onDeleteCurrentCredentials()
-                viewModel.onExitCredentialMode()
+                launchDeleteLoginConfirmationDialog()
                 true
             }
 
@@ -157,6 +157,25 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
         configureUiEventHandlers()
         disableSystemAutofillServiceOnPasswordField()
         initialiseToolbar()
+    }
+
+    private fun launchDeleteLoginConfirmationDialog() {
+        this.context?.let {
+            TextAlertDialogBuilder(it)
+                .setTitle(R.string.autofillDeleteLoginDialogTitle)
+                .setDestructiveButtons(true)
+                .setPositiveButton(R.string.autofillDeleteLoginDialogDelete)
+                .setNegativeButton(R.string.autofillDeleteLoginDialogCancel)
+                .addEventListener(
+                    object : TextAlertDialogBuilder.EventListener() {
+                        override fun onPositiveButtonClicked() {
+                            viewModel.onDeleteCurrentCredentials()
+                            viewModel.onExitCredentialMode()
+                        }
+                    },
+                )
+                .show()
+        }
     }
 
     private fun startEditTextWatchers() {

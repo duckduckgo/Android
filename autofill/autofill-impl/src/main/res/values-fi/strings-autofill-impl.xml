@@ -17,18 +17,18 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Täytä kirjautumistiedot automaattisesti</string>
+    <string name="autofillManagementScreenTitle">Kirjautumistiedot</string>
 
     <string name="managementDisabledModeCta"><b>Määritä Asetuksissa</b></string>
-    <string name="managementDisabledModeSubtitle">Automaattisen täytön kirjautumistietojen suojaamiseen tarvitaan laitteen lukituskuvio, PIN-koodi tai biometriset tiedot.</string>
-    <string name="managementDisabledModeTitle">Suojaa laitteesi automaattisen täytön käyttöä varten</string>
+    <string name="managementDisabledModeSubtitle">Kirjautumistietojen suojaamiseen tarvitaan laitteen lukituskuvio, PIN-koodi tai biometriset tiedot.</string>
+    <string name="managementDisabledModeTitle">Suojaa laitteesi kirjautumistietojen tallentamiseksi</string>
 
     <string name="saveLoginDialogTitle">Tallennetaanko kirjautumistiedot?</string>
     <string name="saveLoginMissingUsernameDialogTitle">Tallennetaanko salasana?</string>
     <string name="saveLoginDialogButtonSave">Tallenna kirjautumistiedot</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Tallenna salasana</string>
     <string name="saveLoginDialogNotNow">Ei nyt</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">DuckDuckGo tallentaa nämä kirjautumistiedot turvallisesti laitteellesi. Voit hallita tallennettuja kirjautumistietoja asetuksissa.</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">Kirjautumistiedot tallennetaan turvallisesti vain tähän laitteeseen. Niitä voi hallita asetusten kirjautumistiedot-valikosta.</string>
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Haluatko, että DuckDuckGo tallentaa kirjautumistietosi?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Lisää vaihtoehtoja</string>
 
@@ -71,4 +71,7 @@
     <string name="autofillManagementSearchClearDescription">Tyhjennä hakusyöte</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Ei tuloksia haulla \'%1$s\'</string>
 
+    <string name="autofillDeleteLoginDialogCancel">Peruuta</string>
+    <string name="autofillDeleteLoginDialogDelete">Poista</string>
+    <string name="autofillDeleteLoginDialogTitle">Haluatko varmasti poistaa nämä kirjautumistiedot?</string>
 </resources>

@@ -53,6 +53,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.suggestion.Suggesti
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.mobile.android.ui.view.SearchBar
+import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
@@ -265,12 +266,30 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
             onContextMenuItemClicked = {
                 when (it) {
                     is Edit -> viewModel.onEditCredentials(it.credentials)
-                    is Delete -> viewModel.onDeleteCredentials(it.credentials)
+                    is Delete -> launchDeleteLoginConfirmationDialog(it.credentials)
                     is CopyUsername -> onCopyUsername(it.credentials)
                     is CopyPassword -> onCopyPassword(it.credentials)
                 }
             },
         ).also { binding.logins.adapter = it }
+    }
+
+    private fun launchDeleteLoginConfirmationDialog(loginCredentials: LoginCredentials) {
+        this.context?.let {
+            TextAlertDialogBuilder(it)
+                .setTitle(R.string.autofillDeleteLoginDialogTitle)
+                .setDestructiveButtons(true)
+                .setPositiveButton(R.string.autofillDeleteLoginDialogDelete)
+                .setNegativeButton(R.string.autofillDeleteLoginDialogCancel)
+                .addEventListener(
+                    object : TextAlertDialogBuilder.EventListener() {
+                        override fun onPositiveButtonClicked() {
+                            viewModel.onDeleteCredentials(loginCredentials)
+                        }
+                    },
+                )
+                .show()
+        }
     }
 
     private fun onCredentialsSelected(credentials: LoginCredentials) {

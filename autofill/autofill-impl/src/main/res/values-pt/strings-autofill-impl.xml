@@ -17,18 +17,18 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Preenchimento automático de inícios de sessão</string>
+    <string name="autofillManagementScreenTitle">Inícios de sessão</string>
 
     <string name="managementDisabledModeCta"><b>Configura nas Definições</b></string>
-    <string name="managementDisabledModeSubtitle">É necessário um padrão de bloqueio do dispositivo, um PIN ou dados biométricos para proteger os teus dados de início de sessão com preenchimento automático.</string>
-    <string name="managementDisabledModeTitle">Protege o teu dispositivo para usares o preenchimento automático</string>
+    <string name="managementDisabledModeSubtitle">É necessário um padrão de bloqueio de dispositivo, PIN ou biometria para proteger os teus inícios de sessão.</string>
+    <string name="managementDisabledModeTitle">Proteger o dispositivo para guardar inícios de sessão</string>
 
     <string name="saveLoginDialogTitle">Guardar início de sessão?</string>
     <string name="saveLoginMissingUsernameDialogTitle">Guardar palavra-passe?</string>
     <string name="saveLoginDialogButtonSave">Guardar início de sessão</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Guardar palavra-passe</string>
     <string name="saveLoginDialogNotNow">Agora não</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">O DuckDuckGo vai armazenar este início de sessão em segurança no teu dispositivo. Podes gerir os inícios de sessão guardados nas Definições.</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">Os inícios de sessão são armazenados com segurança apenas neste dispositivo, e podes efetuar a gestão dos mesmos a partir do menu de Inícios de sessão nas Definições.</string>
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Queres que o DuckDuckGo guarde o teu início de sessão?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Mais opções</string>
 
@@ -71,4 +71,7 @@
     <string name="autofillManagementSearchClearDescription">Limpar introdução da pesquisa</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Nenhum resultado para \"%1$s\"</string>
 
+    <string name="autofillDeleteLoginDialogCancel">Cancelar</string>
+    <string name="autofillDeleteLoginDialogDelete">Eliminar</string>
+    <string name="autofillDeleteLoginDialogTitle">Tens a certeza de que pretendes eliminar este início de sessão?</string>
 </resources>
