@@ -17,18 +17,18 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Fyll inn pålogginger automatisk</string>
+    <string name="autofillManagementScreenTitle">Pålogginger</string>
 
     <string name="managementDisabledModeCta"><b>Konfigurer i Innstillinger</b></string>
-    <string name="managementDisabledModeSubtitle">Du trenger låsemønster, PIN-kode eller biometri på enheten for å beskytte påloggingsinformasjonen din når du bruker Autofyll.</string>
-    <string name="managementDisabledModeTitle">Sikre enheten din for å bruke Autofyll</string>
+    <string name="managementDisabledModeSubtitle">Du trenger låsemønster, PIN-kode eller biometri på enheten for å beskytte påloggingene dine.</string>
+    <string name="managementDisabledModeTitle">Sikre enheten din for å lagre pålogginger</string>
 
     <string name="saveLoginDialogTitle">Vil du lagre påloggingen?</string>
     <string name="saveLoginMissingUsernameDialogTitle">Vil du lagre passordet?</string>
     <string name="saveLoginDialogButtonSave">Lagre påloggingen</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Lagre passordet</string>
     <string name="saveLoginDialogNotNow">Ikke nå</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">DuckDuckGo lagrer denne påloggingen på en sikker måte på enheten din. Du kan administrere lagrede pålogginger i innstillingene.</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">Pålogginger lagres bare på denne enheten og kan administreres i påloggingsmenyen i innstillinger.</string>
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Vil du at DuckDuckGo skal lagre påloggingen din?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Flere alternativer</string>
 
@@ -71,4 +71,7 @@
     <string name="autofillManagementSearchClearDescription">Tøm søkefeltet</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Ingen resultater for «%1$s»</string>
 
+    <string name="autofillDeleteLoginDialogCancel">Avbryt</string>
+    <string name="autofillDeleteLoginDialogDelete">Slett</string>
+    <string name="autofillDeleteLoginDialogTitle">Er du sikker på at du vil slette denne påloggingen?</string>
 </resources>

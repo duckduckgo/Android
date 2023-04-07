@@ -17,18 +17,18 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Automatiškai užpildyti prisijungimus</string>
+    <string name="autofillManagementScreenTitle">Prisijungimai</string>
 
     <string name="managementDisabledModeCta"><b>Nustatyti nustatymuose</b></string>
-    <string name="managementDisabledModeSubtitle">Norint apsaugoti automatinio pildymo prisijungimo duomenis, reikia naudoti įrenginio užrakinimo šabloną, PIN kodą arba biometrinius duomenis.</string>
-    <string name="managementDisabledModeTitle">Apsaugokite įrenginį, kad galėtumėte naudoti automatinį pildymą</string>
+    <string name="managementDisabledModeSubtitle">Prisijungimams apsaugoti reikia naudoti prietaiso užrakinimo šabloną, PIN kodą arba biometrinius duomenis.</string>
+    <string name="managementDisabledModeTitle">Apsaugokite įrenginį, kad išsaugotumėte prisijungimus</string>
 
     <string name="saveLoginDialogTitle">Išsaugoti prisijungimą?</string>
     <string name="saveLoginMissingUsernameDialogTitle">Išsaugoti slaptažodį?</string>
     <string name="saveLoginDialogButtonSave">Išsaugoti prisijungimą</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Išsaugoti slaptažodį</string>
     <string name="saveLoginDialogNotNow">Ne dabar</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">„DuckDuckGo“ saugiai išsaugos šį prisijungimą jūsų įrenginyje. Išsaugotus prisijungimus galite tvarkyti nustatymuose.</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">Prisijungimai saugiai laikomi tik šiame įrenginyje, o juos galima tvarkyti nustatymuose, prisijungimų meniu.</string>
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Ar norite, kad „DuckDuckGo“ išsaugotų jūsų prisijungimą?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Daugiau parinkčių</string>
 
@@ -71,4 +71,7 @@
     <string name="autofillManagementSearchClearDescription">Išvalyti paieškos įvestį</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Rezultatų pagal paiešką „%1$s“ nerasta</string>
 
+    <string name="autofillDeleteLoginDialogCancel">Atšaukti</string>
+    <string name="autofillDeleteLoginDialogDelete">Trinti</string>
+    <string name="autofillDeleteLoginDialogTitle">Ar tikrai norite ištrinti šį prisijungimą?</string>
 </resources>
