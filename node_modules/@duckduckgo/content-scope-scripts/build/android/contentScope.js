@@ -271,23 +271,6 @@
         return bestOption
     }
 
-    /**
-     * Get the value of a config setting.
-     * If the value is not set, return the default value.
-     * If the value is not an object, return the value.
-     * If the value is an object, check its type property.
-     *
-     * @param {string} featureName
-     * @param {object} args
-     * @param {string} prop
-     * @param {any} defaultValue - The default value to use if the config setting is not set
-     * @returns The value of the config setting or the default value
-     */
-    function getFeatureAttr (featureName, args, prop, defaultValue) {
-        const configSetting = getFeatureSetting(featureName, args, prop);
-        return processAttr(configSetting, defaultValue)
-    }
-
     const functionMap = {
         /** Useful for debugging APIs in the wild, shouldn't be used */
         debug: (...args) => {
@@ -336,28 +319,6 @@
         default:
             return defaultValue
         }
-    }
-
-    /**
-     * @param {string} featureName
-     * @param {object} args
-     * @param {string} prop
-     * @returns {any}
-     */
-    function getFeatureSetting (featureName, args, prop) {
-        const camelFeatureName = camelcase(featureName);
-        return args.featureSettings?.[camelFeatureName]?.[prop]
-    }
-
-    /**
-     * @param {string} featureName
-     * @param {object} args
-     * @param {string} prop
-     * @returns {boolean}
-     */
-    function getFeatureSettingEnabled (featureName, args, prop) {
-        const result = getFeatureSetting(featureName, args, prop);
-        return result === 'enabled'
     }
 
     function getStack () {
@@ -649,6 +610,17 @@
         }
     }
 
+    async function update$1 (args) {
+        if (!shouldRun()) {
+            return
+        }
+        if (initArgs === null) {
+            updates.push(args);
+            return
+        }
+        updateFeaturesInner(args);
+    }
+
     function alwaysInitExtensionFeatures (args, featureName) {
         return args.platform.name === 'extension' && alwaysInitFeatures.has(featureName)
     }
@@ -667,6 +639,15 @@
      * @category Content Scope Scripts Integrations
      */
 
+    const allowedMessages = [
+        'getClickToLoadState',
+        'getYouTubeVideoDetails',
+        'openShareFeedbackPage',
+        'setYoutubePreviewsEnabled',
+        'unblockClickToLoadContent',
+        'updateYouTubeCTLAddedFlag'
+    ];
+
     function initCode () {
         // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
         const processedConfig = processConfig($CONTENT_SCOPE$, $USER_UNPROTECTED_DOMAINS$, $USER_PREFERENCES$);
@@ -678,10 +659,47 @@
             platform: processedConfig.platform
         });
 
+        const messageSecret = processedConfig.messageSecret;
+        // Receives messages from the platform
+        const messageCallback = processedConfig.messageCallback;
+        // Sends messages to the platform
+        const messageInterface = processedConfig.messageInterface;
+
+        const wrappedUpdate = ((providedSecret, ...args) => {
+            if (providedSecret === messageSecret) {
+                update$1(...args);
+            }
+        }).bind();
+
+        Object.defineProperty(window, messageCallback, {
+            value: wrappedUpdate
+        });
+
+        // @ts-ignore
+        const sendMessageToAndroid = window[messageInterface].process.bind(window[messageInterface]);
+        delete window[messageInterface];
+
         init$1(processedConfig);
 
-        // Not supported:
-        // update(message)
+        window.addEventListener('sendMessageProxy' + messageSecret, event => {
+            event.stopImmediatePropagation();
+
+            if (!(event instanceof CustomEvent) || !event?.detail) {
+                return console.warn('no details in sendMessage proxy', event)
+            }
+
+            const messageType = event.detail?.messageType;
+            if (!allowedMessages.includes(messageType)) {
+                return console.warn('Ignoring invalid sendMessage messageType', messageType)
+            }
+
+            const message = {
+                type: messageType,
+                options: event.detail?.options
+            };
+            const stringifiedArgs = JSON.stringify(message);
+            sendMessageToAndroid(stringifiedArgs, messageSecret);
+        });
     }
 
     initCode();
@@ -1710,6 +1728,468 @@
         return { config, sharedStrings }
     }
 
+    function _typeof$2(obj) { "@babel/helpers - typeof"; return _typeof$2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof$2(obj); }
+    function isJSONArray(value) {
+      return Array.isArray(value);
+    }
+    function isJSONObject(value) {
+      return value !== null && _typeof$2(value) === 'object' && value.constructor === Object // do not match on classes or Array
+      ;
+    }
+
+    function _typeof$1(obj) { "@babel/helpers - typeof"; return _typeof$1 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof$1(obj); }
+    /**
+     * Test deep equality of two JSON values, objects, or arrays
+     */
+    // TODO: write unit tests
+    function isEqual(a, b) {
+      // FIXME: this function will return false for two objects with the same keys
+      //  but different order of keys
+      return JSON.stringify(a) === JSON.stringify(b);
+    }
+
+    /**
+     * Get all but the last items from an array
+     */
+    // TODO: write unit tests
+    function initial(array) {
+      return array.slice(0, array.length - 1);
+    }
+
+    /**
+     * Get the last item from an array
+     */
+    // TODO: write unit tests
+    function last(array) {
+      return array[array.length - 1];
+    }
+
+    /**
+     * Test whether a value is an Object or an Array (and not a primitive JSON value)
+     */
+    // TODO: write unit tests
+    function isObjectOrArray(value) {
+      return _typeof$1(value) === 'object' && value !== null;
+    }
+
+    function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+    function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+    function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+    function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+    function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+    function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+
+    /**
+     * Shallow clone of an Object, Array, or value
+     * Symbols are cloned too.
+     */
+    function shallowClone(value) {
+      if (isJSONArray(value)) {
+        // copy array items
+        var copy = value.slice();
+
+        // copy all symbols
+        Object.getOwnPropertySymbols(value).forEach(function (symbol) {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          copy[symbol] = value[symbol];
+        });
+        return copy;
+      } else if (isJSONObject(value)) {
+        // copy object properties
+        var _copy = _objectSpread({}, value);
+
+        // copy all symbols
+        Object.getOwnPropertySymbols(value).forEach(function (symbol) {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          _copy[symbol] = value[symbol];
+        });
+        return _copy;
+      } else {
+        return value;
+      }
+    }
+
+    /**
+     * Update a value in an object in an immutable way.
+     * If the value is unchanged, the original object will be returned
+     */
+    function applyProp(object, key, value) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      if (object[key] === value) {
+        // return original object unchanged when the new value is identical to the old one
+        return object;
+      } else {
+        var updatedObject = shallowClone(object);
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        updatedObject[key] = value;
+        return updatedObject;
+      }
+    }
+
+    /**
+     * helper function to get a nested property in an object or array
+     *
+     * @return Returns the field when found, or undefined when the path doesn't exist
+     */
+    function getIn(object, path) {
+      var value = object;
+      var i = 0;
+      while (i < path.length) {
+        if (isJSONObject(value)) {
+          value = value[path[i]];
+        } else if (isJSONArray(value)) {
+          value = value[parseInt(path[i])];
+        } else {
+          value = undefined;
+        }
+        i++;
+      }
+      return value;
+    }
+
+    /**
+     * helper function to replace a nested property in an object with a new value
+     * without mutating the object itself.
+     *
+     * @param object
+     * @param path
+     * @param value
+     * @param [createPath=false]
+     *                    If true, `path` will be created when (partly) missing in
+     *                    the object. For correctly creating nested Arrays or
+     *                    Objects, the function relies on `path` containing number
+     *                    in case of array indexes.
+     *                    If false (default), an error will be thrown when the
+     *                    path doesn't exist.
+     * @return Returns a new, updated object or array
+     */
+    function setIn(object, path, value) {
+      var createPath = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+      if (path.length === 0) {
+        return value;
+      }
+      var key = path[0];
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      var updatedValue = setIn(object ? object[key] : undefined, path.slice(1), value, createPath);
+      if (isJSONObject(object) || isJSONArray(object)) {
+        return applyProp(object, key, updatedValue);
+      } else {
+        if (createPath) {
+          var newObject = IS_INTEGER_REGEX.test(key) ? [] : {};
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          newObject[key] = updatedValue;
+          return newObject;
+        } else {
+          throw new Error('Path does not exist');
+        }
+      }
+    }
+    var IS_INTEGER_REGEX = /^\d+$/;
+
+    /**
+     * helper function to replace a nested property in an object with a new value
+     * without mutating the object itself.
+     *
+     * @return  Returns a new, updated object or array
+     */
+    function updateIn(object, path, callback) {
+      if (path.length === 0) {
+        return callback(object);
+      }
+      if (!isObjectOrArray(object)) {
+        throw new Error('Path doesn\'t exist');
+      }
+      var key = path[0];
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      var updatedValue = updateIn(object[key], path.slice(1), callback);
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      return applyProp(object, key, updatedValue);
+    }
+
+    /**
+     * helper function to delete a nested property in an object
+     * without mutating the object itself.
+     *
+     * @return Returns a new, updated object or array
+     */
+    function deleteIn(object, path) {
+      if (path.length === 0) {
+        return object;
+      }
+      if (!isObjectOrArray(object)) {
+        throw new Error('Path does not exist');
+      }
+      if (path.length === 1) {
+        var _key = path[0];
+        if (!(_key in object)) {
+          // key doesn't exist. return object unchanged
+          return object;
+        } else {
+          var updatedObject = shallowClone(object);
+          if (isJSONArray(updatedObject)) {
+            updatedObject.splice(parseInt(_key), 1);
+          }
+          if (isJSONObject(updatedObject)) {
+            delete updatedObject[_key];
+          }
+          return updatedObject;
+        }
+      }
+      var key = path[0];
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      var updatedValue = deleteIn(object[key], path.slice(1));
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      return applyProp(object, key, updatedValue);
+    }
+
+    /**
+     * Insert a new item in an array at a specific index.
+     * Example usage:
+     *
+     *     insertAt({arr: [1,2,3]}, ['arr', '2'], 'inserted')  // [1,2,'inserted',3]
+     */
+    function insertAt(document, path, value) {
+      var parentPath = path.slice(0, path.length - 1);
+      var index = path[path.length - 1];
+      return updateIn(document, parentPath, function (items) {
+        if (!Array.isArray(items)) {
+          throw new TypeError('Array expected at path ' + JSON.stringify(parentPath));
+        }
+        var updatedItems = shallowClone(items);
+        updatedItems.splice(parseInt(index), 0, value);
+        return updatedItems;
+      });
+    }
+
+    /**
+     * Test whether a path exists in a JSON object
+     * @return Returns true if the path exists, else returns false
+     */
+    function existsIn(document, path) {
+      if (document === undefined) {
+        return false;
+      }
+      if (path.length === 0) {
+        return true;
+      }
+      if (document === null) {
+        return false;
+      }
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      return existsIn(document[path[0]], path.slice(1));
+    }
+
+    /**
+     * Parse a JSON Pointer
+     */
+    function parseJSONPointer(pointer) {
+      var path = pointer.split('/');
+      path.shift(); // remove the first empty entry
+
+      return path.map(function (p) {
+        return p.replace(/~1/g, '/').replace(/~0/g, '~');
+      });
+    }
+
+    /**
+     * Compile a JSON Pointer
+     */
+    function compileJSONPointer(path) {
+      return path.map(compileJSONPointerProp).join('');
+    }
+
+    /**
+     * Compile a single path property from a JSONPath
+     */
+    function compileJSONPointerProp(pathProp) {
+      return '/' + String(pathProp).replace(/~/g, '~0').replace(/\//g, '~1');
+    }
+
+    /**
+     * Apply a patch to a JSON object
+     * The original JSON object will not be changed,
+     * instead, the patch is applied in an immutable way
+     */
+    function immutableJSONPatch(document, operations, options) {
+      var updatedDocument = document;
+      for (var i = 0; i < operations.length; i++) {
+        validateJSONPatchOperation(operations[i]);
+        var operation = operations[i];
+
+        // TODO: test before
+        if (options && options.before) {
+          var result = options.before(updatedDocument, operation);
+          if (result !== undefined) {
+            if (result.document !== undefined) {
+              updatedDocument = result.document;
+            }
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            if (result.json !== undefined) {
+              // TODO: deprecated since v5.0.0. Cleanup this warning some day
+              throw new Error('Deprecation warning: returned object property ".json" has been renamed to ".document"');
+            }
+            if (result.operation !== undefined) {
+              operation = result.operation;
+            }
+          }
+        }
+        var previousDocument = updatedDocument;
+        var path = parsePath(updatedDocument, operation.path);
+        if (operation.op === 'add') {
+          updatedDocument = add(updatedDocument, path, operation.value);
+        } else if (operation.op === 'remove') {
+          updatedDocument = remove(updatedDocument, path);
+        } else if (operation.op === 'replace') {
+          updatedDocument = replace(updatedDocument, path, operation.value);
+        } else if (operation.op === 'copy') {
+          updatedDocument = copy(updatedDocument, path, parseFrom(operation.from));
+        } else if (operation.op === 'move') {
+          updatedDocument = move(updatedDocument, path, parseFrom(operation.from));
+        } else if (operation.op === 'test') {
+          test(updatedDocument, path, operation.value);
+        } else {
+          throw new Error('Unknown JSONPatch operation ' + JSON.stringify(operation));
+        }
+
+        // TODO: test after
+        if (options && options.after) {
+          var _result = options.after(updatedDocument, operation, previousDocument);
+          if (_result !== undefined) {
+            updatedDocument = _result;
+          }
+        }
+      }
+      return updatedDocument;
+    }
+
+    /**
+     * Replace an existing item
+     */
+    function replace(document, path, value) {
+      return setIn(document, path, value);
+    }
+
+    /**
+     * Remove an item or property
+     */
+    function remove(document, path) {
+      return deleteIn(document, path);
+    }
+
+    /**
+     * Add an item or property
+     */
+    function add(document, path, value) {
+      if (isArrayItem(document, path)) {
+        return insertAt(document, path, value);
+      } else {
+        return setIn(document, path, value);
+      }
+    }
+
+    /**
+     * Copy a value
+     */
+    function copy(document, path, from) {
+      var value = getIn(document, from);
+      if (isArrayItem(document, path)) {
+        return insertAt(document, path, value);
+      } else {
+        var _value = getIn(document, from);
+        return setIn(document, path, _value);
+      }
+    }
+
+    /**
+     * Move a value
+     */
+    function move(document, path, from) {
+      var value = getIn(document, from);
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      var removedJson = deleteIn(document, from);
+      return isArrayItem(removedJson, path) ? insertAt(removedJson, path, value) : setIn(removedJson, path, value);
+    }
+
+    /**
+     * Test whether the data contains the provided value at the specified path.
+     * Throws an error when the test fails
+     */
+    function test(document, path, value) {
+      if (value === undefined) {
+        throw new Error("Test failed: no value provided (path: \"".concat(compileJSONPointer(path), "\")"));
+      }
+      if (!existsIn(document, path)) {
+        throw new Error("Test failed: path not found (path: \"".concat(compileJSONPointer(path), "\")"));
+      }
+      var actualValue = getIn(document, path);
+      if (!isEqual(actualValue, value)) {
+        throw new Error("Test failed, value differs (path: \"".concat(compileJSONPointer(path), "\")"));
+      }
+    }
+    function isArrayItem(document, path) {
+      if (path.length === 0) {
+        return false;
+      }
+      var parent = getIn(document, initial(path));
+      return Array.isArray(parent);
+    }
+
+    /**
+     * Resolve the path index of an array, resolves indexes '-'
+     * @returns Returns the resolved path
+     */
+    function resolvePathIndex(document, path) {
+      if (last(path) !== '-') {
+        return path;
+      }
+      var parentPath = initial(path);
+      var parent = getIn(document, parentPath);
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      return parentPath.concat(parent.length);
+    }
+
+    /**
+     * Validate a JSONPatch operation.
+     * Throws an error when there is an issue
+     */
+    function validateJSONPatchOperation(operation) {
+      // TODO: write unit tests
+      var ops = ['add', 'remove', 'replace', 'copy', 'move', 'test'];
+      if (!ops.includes(operation.op)) {
+        throw new Error('Unknown JSONPatch op ' + JSON.stringify(operation.op));
+      }
+      if (typeof operation.path !== 'string') {
+        throw new Error('Required property "path" missing or not a string in operation ' + JSON.stringify(operation));
+      }
+      if (operation.op === 'copy' || operation.op === 'move') {
+        if (typeof operation.from !== 'string') {
+          throw new Error('Required property "from" missing or not a string in operation ' + JSON.stringify(operation));
+        }
+      }
+    }
+    function parsePath(document, pointer) {
+      return resolvePathIndex(document, parseJSONPointer(pointer));
+    }
+    function parseFrom(fromPointer) {
+      return parseJSONPointer(fromPointer);
+    }
+
     class ContentFeature {
         constructor (featureName) {
             this.name = featureName;
@@ -1728,25 +2208,56 @@
         }
 
         /**
+         * Get the value of a config setting.
+         * If the value is not set, return the default value.
+         * If the value is not an object, return the value.
+         * If the value is an object, check its type property.
          * @param {string} attrName
-         * @param {any} defaultValue
+         * @param {any} defaultValue - The default value to use if the config setting is not set
+         * @returns The value of the config setting or the default value
          */
         getFeatureAttr (attrName, defaultValue) {
-            return getFeatureAttr(this.name, this._args, attrName, defaultValue)
+            const configSetting = this.getFeatureSetting(attrName);
+            return processAttr(configSetting, defaultValue)
         }
 
         /**
          * @param {string} featureKeyName
+         * @returns {any}
          */
         getFeatureSetting (featureKeyName) {
-            return getFeatureSetting(this.name, this._args, featureKeyName)
+            let result = this._getFeatureSetting();
+            if (featureKeyName === 'domains') {
+                throw new Error('domains is a reserved feature setting key name')
+            }
+            const domainMatch = [...this.matchDomainFeatureSetting('domains')].sort((a, b) => {
+                return a.domain.length - b.domain.length
+            });
+            for (const match of domainMatch) {
+                if (match.patchSettings === undefined) {
+                    continue
+                }
+                try {
+                    result = immutableJSONPatch(result, match.patchSettings);
+                } catch (e) {
+                    console.error('Error applying patch settings', e);
+                }
+            }
+            return result?.[featureKeyName]
+        }
+
+        _getFeatureSetting () {
+            const camelFeatureName = camelcase(this.name);
+            return this._args.featureSettings?.[camelFeatureName]
         }
 
         /**
          * @param {string} featureKeyName
+         * @returns {boolean}
          */
         getFeatureSettingEnabled (featureKeyName) {
-            return getFeatureSettingEnabled(this.name, this._args, featureKeyName)
+            const result = this.getFeatureSetting(featureKeyName);
+            return result === 'enabled'
         }
 
         /**
@@ -1754,7 +2265,7 @@
          * @return {any[]}
          */
         matchDomainFeatureSetting (featureKeyName) {
-            const domains = this.getFeatureSetting(featureKeyName) || [];
+            const domains = this._getFeatureSetting()?.[featureKeyName] || [];
             return domains.filter((rule) => {
                 return matchHostname(this._args.site.domain, rule.domain)
             })
@@ -5864,10 +6375,9 @@
                 cookiePolicy = args.cookie;
                 args.cookie.debug = args.debug;
 
-                const featureName = 'cookie';
-                cookiePolicy.shouldBlockTrackerCookie = getFeatureSettingEnabled(featureName, args, 'trackerCookie');
-                cookiePolicy.shouldBlockNonTrackerCookie = getFeatureSettingEnabled(featureName, args, 'nonTrackerCookie');
-                const policy = getFeatureSetting(featureName, args, 'firstPartyCookiePolicy');
+                cookiePolicy.shouldBlockTrackerCookie = this.getFeatureSettingEnabled('trackerCookie');
+                cookiePolicy.shouldBlockNonTrackerCookie = this.getFeatureSettingEnabled('nonTrackerCookie');
+                const policy = this.getFeatureSetting('firstPartyCookiePolicy');
                 if (policy) {
                     cookiePolicy.policy = policy;
                 }
@@ -8723,6 +9233,180 @@
         default: Referrer
     });
 
+    /**
+     * Indent a code block using braces
+     * @param {string} string
+     * @returns {string}
+     */
+    function removeIndent (string) {
+        const lines = string.split('\n');
+        const indentSize = 2;
+        let currentIndent = 0;
+        const indentedLines = lines.map((line) => {
+            if (line.trim().startsWith('}')) {
+                currentIndent -= indentSize;
+            }
+            const indentedLine = ' '.repeat(currentIndent) + line.trim();
+            if (line.trim().endsWith('{')) {
+                currentIndent += indentSize;
+            }
+
+            return indentedLine
+        });
+        return indentedLines.filter(a => a.trim()).join('\n')
+    }
+
+    const lookup = {};
+    function getOrGenerateIdentifier (path) {
+        if (!(path in lookup)) {
+            lookup[path] = generateAlphaIdentifier(Object.keys(lookup).length + 1);
+        }
+        return lookup[path]
+    }
+
+    function generateAlphaIdentifier (num) {
+        if (num < 1) {
+            throw new Error('Input must be a positive integer')
+        }
+        const charCodeOffset = 97;
+        let identifier = '';
+        while (num > 0) {
+            num--;
+            const remainder = num % 26;
+            const charCode = remainder + charCodeOffset;
+            identifier = String.fromCharCode(charCode) + identifier;
+            num = Math.floor(num / 26);
+        }
+        return '_ddg_' + identifier
+    }
+
+    /**
+     * @param {*} scope
+     * @param {Record<string, any>} outputs
+     * @returns {Proxy}
+     */
+    function constructProxy (scope, outputs) {
+        if (Object.is(scope)) {
+            // Should not happen, but just in case fail safely
+            console.error('Runtime checks: Scope must be an object', scope, outputs);
+            return scope
+        }
+        return new Proxy(scope, {
+            get (target, property, receiver) {
+                const targetObj = target[property];
+                if (typeof targetObj === 'function') {
+                    return (...args) => {
+                        return Reflect.apply(target[property], target, args)
+                    }
+                } else {
+                    if (typeof property === 'string' && property in outputs) {
+                        return Reflect.get(outputs, property, receiver)
+                    }
+                    return Reflect.get(target, property, receiver)
+                }
+            }
+        })
+    }
+
+    function valToString (val) {
+        if (typeof val === 'function') {
+            return val.toString()
+        }
+        return JSON.stringify(val)
+    }
+
+    /**
+     * Output scope variable definitions to arbitrary depth
+     */
+    function stringifyScope (scope, scopePath) {
+        let output = '';
+        for (const [key, value] of scope) {
+            const varOutName = getOrGenerateIdentifier([...scopePath, key]);
+            if (value instanceof Map) {
+                const proxyName = getOrGenerateIdentifier(['_proxyFor_', varOutName]);
+                output += `
+            let ${proxyName} = ${scopePath.join('?.')}?.${key} ? ${scopePath.join('.')}.${key} : Object.bind(null);
+            `;
+                const keys = Array.from(value.keys());
+                output += stringifyScope(value, [...scopePath, key]);
+                const proxyOut = keys.map((keyName) => `${keyName}: ${getOrGenerateIdentifier([...scopePath, key, keyName])}`);
+                output += `
+            let ${varOutName} = constructProxy(${proxyName}, {
+                ${proxyOut.join(',\n')}
+            });
+            `;
+                // If we're at the top level, we need to add the window and globalThis variables (Eg: let navigator = parentScope_navigator)
+                if (scopePath.length === 1) {
+                    output += `
+                let ${key} = ${varOutName};
+                `;
+                }
+            } else {
+                output += `
+            let ${varOutName} = ${valToString(value)};
+            `;
+            }
+        }
+        return output
+    }
+
+    /**
+     * Code generates wrapping variables for code that is injected into the page
+     * @param {*} code
+     * @param {*} config
+     * @returns {string}
+     */
+    function wrapScriptCodeOverload (code, config) {
+        const processedConfig = {};
+        for (const [key, value] of Object.entries(config)) {
+            processedConfig[key] = processAttr(value);
+        }
+        // Don't do anything if the config is empty
+        if (Object.keys(processedConfig).length === 0) return code
+
+        let prepend = '';
+        const aggregatedLookup = new Map();
+        let currentScope = null;
+        /* Convert the config into a map of scopePath -> { key: value } */
+        for (const [key, value] of Object.entries(processedConfig)) {
+            const path = key.split('.');
+
+            currentScope = aggregatedLookup;
+            const pathOut = path[path.length - 1];
+            // Traverse the path and create the nested objects
+            path.slice(0, -1).forEach((pathPart, index) => {
+                if (!currentScope.has(pathPart)) {
+                    currentScope.set(pathPart, new Map());
+                }
+                currentScope = currentScope.get(pathPart);
+            });
+            currentScope.set(pathOut, value);
+        }
+
+        prepend += stringifyScope(aggregatedLookup, ['parentScope']);
+        // Stringify top level keys
+        const keysOut = [...aggregatedLookup.keys()].map((keyName) => `${keyName}: ${getOrGenerateIdentifier(['parentScope', keyName])}`).join(',\n');
+        prepend += `
+    const window = constructProxy(parentScope, {
+        ${keysOut}
+    });
+    const globalThis = constructProxy(parentScope, {
+        ${keysOut}
+    });
+    `;
+        return removeIndent(`(function (parentScope) {
+        /**
+         * DuckDuckGo Runtime Checks injected code.
+         * If you're reading this, you're probably trying to debug a site that is breaking due to our runtime checks.
+         * Please raise an issues on our GitHub repo: https://github.com/duckduckgo/content-scope-scripts/
+         */
+        ${constructProxy.toString()}
+        ${prepend}
+        ${code}
+    })(globalThis)
+    `)
+    }
+
     /* global TrustedScriptURL, TrustedScript */
 
     let stackDomains = [];
@@ -8846,75 +9530,7 @@
             // @ts-expect-error TrustedScript is not defined in the TS lib
             if (supportedTrustedTypes && el.textContent instanceof TrustedScript) return
 
-            const config = scriptOverload;
-            const processedConfig = {};
-            for (const [key, value] of Object.entries(config)) {
-                processedConfig[key] = processAttr(value);
-            }
-            // Don't do anything if the config is empty
-            if (Object.keys(processedConfig).length === 0) return
-
-            /**
-             * @param {*} scope
-             * @param {Record<string, any>} outputs
-             * @returns {Proxy}
-             */
-            function constructProxy (scope, outputs) {
-                return new Proxy(scope, {
-                    get (target, property, receiver) {
-                        const targetObj = target[property];
-                        if (typeof targetObj === 'function') {
-                            return (...args) => {
-                                return Reflect.apply(target[property], target, args)
-                            }
-                        } else {
-                            if (typeof property === 'string' && property in outputs) {
-                                return Reflect.get(outputs, property, receiver)
-                            }
-                            return Reflect.get(target, property, receiver)
-                        }
-                    }
-                })
-            }
-
-            let prepend = '';
-            const aggregatedLookup = new Map();
-            /* Convert the config into a map of scopePath -> { key: value } */
-            for (const [key, value] of Object.entries(processedConfig)) {
-                const path = key.split('.');
-                const scopePath = path.slice(0, -1).join('.');
-                const pathOut = path[path.length - 1];
-                if (aggregatedLookup.has(scopePath)) {
-                    aggregatedLookup.get(scopePath)[pathOut] = value;
-                } else {
-                    aggregatedLookup.set(scopePath, {
-                        [pathOut]: value
-                    });
-                }
-            }
-
-            for (const [key, value] of aggregatedLookup) {
-                const path = key.split('.');
-                if (path.length !== 1) {
-                    console.error('Invalid config, currently only one layer depth is supported');
-                    continue
-                }
-                const scopeName = path[0];
-                prepend += `
-            let ${scopeName} = constructProxy(parentScope.${scopeName}, ${JSON.stringify(value)});
-            `;
-            }
-            const keysOut = [...aggregatedLookup.keys()].join(',\n');
-            prepend += `
-        const window = constructProxy(parentScope, {
-            ${keysOut}
-        });
-        const globalThis = constructProxy(parentScope, {
-            ${keysOut}
-        });
-        `;
-            const innerCode = prepend + el.textContent;
-            el.textContent = '(function (parentScope) {' + constructProxy.toString() + ' ' + innerCode + '})(globalThis)';
+            el.textContent = wrapScriptCodeOverload(el.textContent, scriptOverload);
         }
 
         /**
@@ -9156,7 +9772,8 @@
         const proxy = new DDGProxy(featureName, Document.prototype, 'createElement', {
             apply (fn, scope, args) {
                 if (args.length >= 1) {
-                    const initialTagName = args[0].toLowerCase();
+                    // String() is used to coerce the value to a string (For: ProseMirror/prosemirror-model/src/to_dom.ts)
+                    const initialTagName = String(args[0]).toLowerCase();
                     if (shouldInterrogate(initialTagName)) {
                         args[0] = 'ddg-runtime-checks';
                         const el = Reflect.apply(fn, scope, args);
