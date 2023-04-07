@@ -19,6 +19,10 @@ package com.duckduckgo.sync.impl.parser
 interface SyncCrypter {
     fun generateAllData(): SyncDataRequest
     fun store(entries: List<SyncBookmarkEntry>): Boolean
+
+    fun encrypt(text: String): String
+
+    fun decrypt(data: String): String
 }
 
 data class SyncBookmarkPage(val url: String)

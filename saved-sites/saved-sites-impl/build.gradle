@@ -28,6 +28,7 @@ dependencies {
     implementation project(path: ':common')
     implementation project(path: ':common-ui')
     implementation project(path: ':saved-sites-api')
+    implementation project(path: ':sync-api')
     api project(path: ':saved-sites-store')
 
     anvil project(path: ':anvil-compiler')
