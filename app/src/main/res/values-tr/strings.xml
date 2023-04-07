@@ -602,6 +602,7 @@
     <string name="folderLocationTitle">Konum Seç</string>
     <string name="addFolder">Klasör Ekle</string>
     <string name="editFolder">Klasörü Düzenle</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Klasör ve içeriği silinsin mi?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Silmek istediğinizden emin misiniz: "</string>
     <string name="bookmarkFolderEmpty">Boş</string>
 

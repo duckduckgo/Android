@@ -606,6 +606,7 @@
     <string name="folderLocationTitle">Wybierz lokalizację</string>
     <string name="addFolder">Dodaj folder</string>
     <string name="editFolder">Edytuj folder</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Usunąć folder i jego zawartość?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Czy na pewno chcesz usunąć "</string>
     <string name="bookmarkFolderEmpty">Pusty</string>
 

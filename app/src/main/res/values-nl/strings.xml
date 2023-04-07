@@ -602,6 +602,7 @@
     <string name="folderLocationTitle">Locatie selecteren</string>
     <string name="addFolder">Map toevoegen</string>
     <string name="editFolder">Map bewerken</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Map en inhoud verwijderen?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Doorgaan met het verwijderen van "</string>
     <string name="bookmarkFolderEmpty">Leeg</string>
 

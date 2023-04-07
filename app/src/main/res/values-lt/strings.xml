@@ -606,6 +606,7 @@
     <string name="folderLocationTitle">Pasirinkti vietą</string>
     <string name="addFolder">Pridėti aplanką</string>
     <string name="editFolder">Redaguoti aplanką</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Ištrinti aplanką ir jo turinį?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Ar tikrai norite ištrinti "</string>
     <string name="bookmarkFolderEmpty">Tuščia</string>
 

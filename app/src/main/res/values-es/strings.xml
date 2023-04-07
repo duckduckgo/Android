@@ -602,6 +602,7 @@
     <string name="folderLocationTitle">Seleccionar ubicación</string>
     <string name="addFolder">Añadir carpeta</string>
     <string name="editFolder">Editar carpeta</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"¿Borrar carpeta y su contenido?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"¿Seguro que deseas eliminar "</string>
     <string name="bookmarkFolderEmpty">Vacío</string>
 

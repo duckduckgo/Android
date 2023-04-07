@@ -17,18 +17,18 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Anmeldedaten automatisch ausfüllen</string>
+    <string name="autofillManagementScreenTitle">Anmeldungen</string>
 
     <string name="managementDisabledModeCta"><b>In den Einstellungen einrichten</b></string>
-    <string name="managementDisabledModeSubtitle">Ein Entsperrmuster, eine PIN oder biometrische Daten sind erforderlich, um deine Anmeldedaten für das automatische Ausfüllen zu schützen.</string>
-    <string name="managementDisabledModeTitle">Sichere dein Gerät, um das automatische Ausfüllen zu verwenden</string>
+    <string name="managementDisabledModeSubtitle">Es sind ein Entsperrmuster, eine PIN oder biometrische Daten erforderlich, um deine Anmeldedaten zu schützen.</string>
+    <string name="managementDisabledModeTitle">Sichere dein Gerät, um Anmeldungen zu speichern</string>
 
     <string name="saveLoginDialogTitle">Anmeldedaten speichern?</string>
     <string name="saveLoginMissingUsernameDialogTitle">Passwort speichern?</string>
     <string name="saveLoginDialogButtonSave">Anmeldedaten speichern</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Passwort speichern</string>
     <string name="saveLoginDialogNotNow">Jetzt nicht</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">DuckDuckGo speichert diese Anmeldedaten sicher auf deinem Gerät. Du kannst die gespeicherten Anmeldedaten in den Einstellungen verwalten.</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">Anmeldedaten werden nur auf diesem Gerät sicher gespeichert und können über das Anmeldedaten-Menü in den Einstellungen verwaltet werden.</string>
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Möchtest du, dass DuckDuckGo deine Anmeldedaten speichert?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Weitere Optionen</string>
 

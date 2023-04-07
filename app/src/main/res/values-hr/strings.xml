@@ -606,6 +606,7 @@
     <string name="folderLocationTitle">Odaberi lokaciju</string>
     <string name="addFolder">Dodaj mapu</string>
     <string name="editFolder">Uredi mapu</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Želiš li izbrisati mapu i njezin sadržaj?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Jesi li siguran da ovo želiš izbrisati "</string>
     <string name="bookmarkFolderEmpty">Prazno</string>
 

@@ -604,6 +604,7 @@
     <string name="folderLocationTitle">Selectează locația</string>
     <string name="addFolder">Adaugă dosar</string>
     <string name="editFolder">Editează dosarul</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Ștergi folderul și conținutul acestuia?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Sigur dorești să ștergi "</string>
     <string name="bookmarkFolderEmpty">Gol</string>
 

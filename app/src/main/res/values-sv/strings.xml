@@ -602,6 +602,7 @@
     <string name="folderLocationTitle">Välj plats</string>
     <string name="addFolder">Lägg till mapp</string>
     <string name="editFolder">Redigera mapp</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Ta bort mappen och dess innehåll?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Är du säker att du vill ta bort "</string>
     <string name="bookmarkFolderEmpty">Tom</string>
 
