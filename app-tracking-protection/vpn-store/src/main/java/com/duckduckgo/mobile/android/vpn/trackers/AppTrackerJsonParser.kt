@@ -46,7 +46,7 @@ class AppTrackerJsonParser {
                         hostname = it.key,
                         trackerCompanyId = it.value.owner.name.hashCode(),
                         owner = it.value.owner,
-                        app = it.value.app,
+                        app = TrackerApp(1, 1.0),
                     )
                 }
                 .map { it.value }
