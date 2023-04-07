@@ -16,7 +16,6 @@
 
 package com.duckduckgo.networkprotection.impl.waitlist.store
 
-import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState
 
 interface NetPWaitlistRepository {

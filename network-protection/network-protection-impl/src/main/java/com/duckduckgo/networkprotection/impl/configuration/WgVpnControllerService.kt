@@ -17,14 +17,18 @@
 package com.duckduckgo.networkprotection.impl.configuration
 
 import com.duckduckgo.anvil.annotations.ContributesServiceApi
-import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.di.scopes.AppScope
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.POST
 
-@ContributesServiceApi(VpnScope::class)
+@ContributesServiceApi(AppScope::class)
 interface WgVpnControllerService {
+    @Headers("Content-Type: application/json")
+    @POST("https://staging.netp.duckduckgo.com/redeem")
+    suspend fun redeemCode(@Body code: NetPRedeemCodeRequest): NetPRedeemCodeResponse
+
     @GET("https://staging.netp.duckduckgo.com/servers")
     suspend fun getServers(): List<RegisteredServerInfo>
 
@@ -33,6 +37,20 @@ interface WgVpnControllerService {
     suspend fun registerKey(
         @Body registerKeyBody: RegisterKeyBody,
     ): List<EligibleServerInfo>
+}
+
+data class NetPRedeemCodeRequest(
+    val code: String,
+)
+
+data class NetPRedeemCodeResponse(
+    val token: String,
+)
+
+data class NetPRedeemCodeError(val message: String) {
+    companion object {
+        const val INVALID = "invalid code"
+    }
 }
 
 data class RegisteredServerInfo(
