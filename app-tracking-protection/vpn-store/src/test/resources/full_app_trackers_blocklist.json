@@ -2828,6 +2828,7 @@
     },
     "entities": {
         "33Across, Inc.": {
+            "score": 590,
             "signals": [
                 "unique_identifier",
                 "cookies",
@@ -2843,6 +2844,7 @@
             ]
         },
         "A.Mob SAS": {
+            "score": 585,
             "signals": [
                 "unique_identifier",
                 "cookies",
@@ -2857,6 +2859,7 @@
             ]
         },
         "AcuityAds": {
+            "score": 702,
             "signals": [
                 "unique_identifier",
                 "cookies",
@@ -2872,6 +2875,7 @@
             ]
         },
         "Adform A/S": {
+            "score": 1680,
             "signals": [
                 "unique_identifier",
                 "cookies",
@@ -2887,6 +2891,7 @@
             ]
         },
         "Adjust GmbH": {
+            "score": 18942,
             "signals": [
                 "phone_number",
                 "email_address",
@@ -2911,6 +2916,7 @@
             ]
         },
         "Adkernel, LLC": {
+            "score": 530,
             "signals": [
                 "unique_identifier",
                 "cookies",
@@ -2927,6 +2933,7 @@
             ]
         },
         "ADman Media": {
+            "score": 702,
             "signals": [
                 "unique_identifier",
                 "cookies",
@@ -2942,6 +2949,7 @@
             ]
         },
         "Adobe Inc.": {
+            "score": 20715,
             "signals": [
                 "gps_coordinates",
                 "email_address",
@@ -2968,6 +2976,7 @@
             ]
         },
         "AdRoll, Inc.": {
+            "score": 1008,
             "signals": [
                 "AAID",
                 "unique_identifier",
@@ -2984,6 +2993,7 @@
             ]
         },
         "Adscore Technologies DMCC": {
+            "score": 704,
             "signals": [
                 "city",
                 "unique_identifier",
@@ -3001,6 +3011,7 @@
             ]
         },
         "AdTheorent Inc": {
+            "score": 585,
             "signals": [
                 "unique_identifier",
                 "cookies",
@@ -3015,6 +3026,7 @@
             ]
         },
         "Amazon Technologies, Inc.": {
+            "score": 27934,
             "signals": [
                 "email_address",
                 "password",
@@ -3048,6 +3060,7 @@
             ]
         },
         "Amobee, Inc": {
+            "score": 2260,
             "signals": [
                 "unique_identifier",
                 "cookies",
@@ -3063,6 +3076,7 @@
             ]
         },
         "Amplitude": {
+            "score": 7196,
             "signals": [
                 "gps_coordinates",
                 "username",
@@ -3095,6 +3109,7 @@
             ]
         },
         "AppLovin Corporation": {
+            "score": 26675,
             "signals": [
                 "gps_coordinates",
                 "neighborhood",
@@ -3119,6 +3134,7 @@
             ]
         },
         "AppsFlyer": {
+            "score": 15310,
             "signals": [
                 "device_magnetometer",
                 "AAID",
@@ -3145,6 +3161,7 @@
             ]
         },
         "Apptentive Inc.": {
+            "score": 1915,
             "signals": [
                 "phone_number",
                 "birthday",
@@ -3164,6 +3181,7 @@
             ]
         },
         "Avocet Systems Ltd.": {
+            "score": 625,
             "signals": [
                 "unique_identifier",
                 "cookies",
@@ -3179,6 +3197,7 @@
             ]
         },
         "Beeswax": {
+            "score": 3600,
             "signals": [
                 "unique_identifier",
                 "cookies",
@@ -3194,6 +3213,7 @@
             ]
         },
         "Bidtellect, Inc": {
+            "score": 1365,
             "signals": [
                 "unique_identifier",
                 "cookies",
@@ -3210,6 +3230,7 @@
             ]
         },
         "Branch Metrics, Inc.": {
+            "score": 33342,
             "signals": [
                 "email_address",
                 "username",
@@ -3239,6 +3260,7 @@
             ]
         },
         "Braze, Inc.": {
+            "score": 10584,
             "signals": [
                 "gps_coordinates",
                 "email_address",
@@ -3264,6 +3286,7 @@
             ]
         },
         "Bugsnag Inc.": {
+            "score": 2201,
             "signals": [
                 "city",
                 "unique_identifier",
@@ -3288,6 +3311,7 @@
             ]
         },
         "ByteDance Ltd.": {
+            "score": 1452,
             "signals": [
                 "AAID",
                 "unique_identifier",
@@ -3304,6 +3328,7 @@
             ]
         },
         "Centro, Inc.": {
+            "score": 2400,
             "signals": [
                 "unique_identifier",
                 "cookies",
@@ -3319,6 +3344,7 @@
             ]
         },
         "Collective Roll": {
+            "score": 2750,
             "signals": [
                 "neighborhood",
                 "unique_identifier",
@@ -3336,6 +3362,7 @@
             ]
         },
         "comScore, Inc": {
+            "score": 14164,
             "signals": [
                 "gps_coordinates",
                 "postal_code",
@@ -3360,6 +3387,7 @@
             ]
         },
         "Criteo SA": {
+            "score": 10557,
             "signals": [
                 "AAID",
                 "city",
@@ -3381,6 +3409,7 @@
             ]
         },
         "Datadog, Inc.": {
+            "score": 1305,
             "signals": [
                 "gps_coordinates",
                 "postal_code",
@@ -3400,6 +3429,7 @@
             ]
         },
         "DeepIntent Inc": {
+            "score": 625,
             "signals": [
                 "unique_identifier",
                 "cookies",
@@ -3415,6 +3445,7 @@
             ]
         },
         "Digital Turbine": {
+            "score": 6813,
             "signals": [
                 "AAID",
                 "unique_identifier",
@@ -3442,6 +3473,7 @@
             ]
         },
         "Dotmetrics": {
+            "score": 1228,
             "signals": [
                 "unique_identifier",
                 "cookies",
@@ -3461,6 +3493,7 @@
             ]
         },
         "DoubleVerify": {
+            "score": 9921,
             "signals": [
                 "gps_coordinates",
                 "neighborhood",
@@ -3480,6 +3513,7 @@
             ]
         },
         "Engine USA LLC": {
+            "score": 1524,
             "signals": [
                 "city",
                 "AAID",
@@ -3497,6 +3531,7 @@
             ]
         },
         "Exponential Interactive Inc.": {
+            "score": 726,
             "signals": [
                 "unique_identifier",
                 "cookies",
@@ -3512,6 +3547,7 @@
             ]
         },
         "eyeota Limited": {
+            "score": 1400,
             "signals": [
                 "unique_identifier",
                 "cookies",
@@ -3527,6 +3563,7 @@
             ]
         },
         "Facebook, Inc.": {
+            "score": 119895,
             "signals": [
                 "gps_coordinates",
                 "email_address",
@@ -3568,6 +3605,7 @@
             ]
         },
         "Fastly, Inc.": {
+            "score": 792,
             "signals": [
                 "city",
                 "unique_identifier",
@@ -3584,6 +3622,7 @@
             ]
         },
         "Flashtalking Inc": {
+            "score": 2050,
             "signals": [
                 "unique_identifier",
                 "cookies",
@@ -3603,6 +3642,7 @@
             ]
         },
         "Foursquare Labs, Inc.": {
+            "score": 1395,
             "signals": [
                 "postal_code",
                 "AAID",
@@ -3617,6 +3657,7 @@
             ]
         },
         "FreeWheel": {
+            "score": 1896,
             "signals": [
                 "gps_coordinates",
                 "AAID",
@@ -3635,6 +3676,7 @@
             ]
         },
         "Functional Software, Inc.": {
+            "score": 6310,
             "signals": [
                 "device_name",
                 "device_boot_time",
@@ -3662,6 +3704,7 @@
             ]
         },
         "GameAnalytics ApS": {
+            "score": 955,
             "signals": [
                 "AAID",
                 "unique_identifier",
@@ -3679,6 +3722,7 @@
             ]
         },
         "Google LLC": {
+            "score": 326430,
             "signals": [
                 "gps_coordinates",
                 "email_address",
@@ -3724,6 +3768,7 @@
             ]
         },
         "Hexagon Data, S.A.P.I. de C.V.": {
+            "score": 774,
             "signals": [
                 "AAID",
                 "unique_identifier",
@@ -3741,6 +3786,7 @@
             ]
         },
         "Human Security, Inc.": {
+            "score": 378,
             "signals": [
                 "AAID",
                 "cookies",
@@ -3752,6 +3798,7 @@
             ]
         },
         "ID5 Technology Ltd": {
+            "score": 861,
             "signals": [
                 "city",
                 "AAID",
@@ -3771,6 +3818,7 @@
             ]
         },
         "Index Exchange, Inc.": {
+            "score": 11308,
             "signals": [
                 "gps_coordinates",
                 "city",
@@ -3789,6 +3837,7 @@
             ]
         },
         "Inmar, Inc.": {
+            "score": 2486,
             "signals": [
                 "city",
                 "unique_identifier",
@@ -3806,6 +3855,7 @@
             ]
         },
         "InMobi Pte Ltd": {
+            "score": 800,
             "signals": [
                 "AAID",
                 "unique_identifier",
@@ -3826,6 +3876,7 @@
             ]
         },
         "Innovid Media": {
+            "score": 3400,
             "signals": [
                 "gps_coordinates",
                 "postal_code",
@@ -3847,6 +3898,7 @@
             ]
         },
         "Integral Ad Science, Inc.": {
+            "score": 18228,
             "signals": [
                 "postal_code",
                 "AAID",
@@ -3869,6 +3921,7 @@
             ]
         },
         "Intuition Machines, Inc.": {
+            "score": 460,
             "signals": [
                 "unique_identifier",
                 "cookies",
@@ -3885,6 +3938,7 @@
             ]
         },
         "IPONWEB GmbH": {
+            "score": 9445,
             "signals": [
                 "gps_coordinates",
                 "postal_code",
@@ -3906,6 +3960,7 @@
             ]
         },
         "ironSource Ltd": {
+            "score": 29113,
             "signals": [
                 "postal_code",
                 "neighborhood",
@@ -3935,6 +3990,7 @@
             ]
         },
         "iSpot.tv": {
+            "score": 670,
             "signals": [
                 "city",
                 "cookies",
@@ -3950,6 +4006,7 @@
             ]
         },
         "Iterable, Inc.": {
+            "score": 1395,
             "signals": [
                 "email_address",
                 "AAID",
@@ -3964,6 +4021,7 @@
             ]
         },
         "Kantar Operations": {
+            "score": 1098,
             "signals": [
                 "device_magnetometer",
                 "AAID",
@@ -3981,6 +4039,7 @@
             ]
         },
         "Kochava": {
+            "score": 11696,
             "signals": [
                 "gps_coordinates",
                 "wifi_ssid",
@@ -4012,6 +4071,7 @@
             ]
         },
         "Liftoff Mobile, Inc.": {
+            "score": 7491,
             "signals": [
                 "gps_coordinates",
                 "postal_code",
@@ -4032,6 +4092,7 @@
             ]
         },
         "LiveIntent Inc.": {
+            "score": 1044,
             "signals": [
                 "AAID",
                 "unique_identifier",
@@ -4047,6 +4108,7 @@
             ]
         },
         "LiveRamp Holdings, Inc.": {
+            "score": 6738,
             "signals": [
                 "AAID",
                 "city",
@@ -4064,6 +4126,7 @@
             ]
         },
         "Lotame Solutions, Inc.": {
+            "score": 2102,
             "signals": [
                 "AAID",
                 "unique_identifier",
@@ -4080,6 +4143,7 @@
             ]
         },
         "Magnite, Inc.": {
+            "score": 8432,
             "signals": [
                 "gps_coordinates",
                 "AAID",
@@ -4101,6 +4165,7 @@
             ]
         },
         "Mapbox Inc.": {
+            "score": 1662,
             "signals": [
                 "gps_coordinates",
                 "AAID",
@@ -4121,6 +4186,7 @@
             ]
         },
         "Media.net Advertising FZ-LLC": {
+            "score": 530,
             "signals": [
                 "city",
                 "cookies",
@@ -4136,6 +4202,7 @@
             ]
         },
         "MediaMath, Inc.": {
+            "score": 4429,
             "signals": [
                 "city",
                 "unique_identifier",
@@ -4152,6 +4219,7 @@
             ]
         },
         "Microsoft Corporation": {
+            "score": 37698,
             "signals": [
                 "gps_coordinates",
                 "username",
@@ -4178,6 +4246,7 @@
             ]
         },
         "Mixpanel, Inc.": {
+            "score": 2984,
             "signals": [
                 "email_address",
                 "phone_number",
@@ -4202,6 +4271,7 @@
             ]
         },
         "Mobiquity Inc.": {
+            "score": 702,
             "signals": [
                 "unique_identifier",
                 "cookies",
@@ -4216,6 +4286,7 @@
             ]
         },
         "Moloco Inc.": {
+            "score": 1904,
             "signals": [
                 "neighborhood",
                 "os_build_version",
@@ -4230,6 +4301,7 @@
             ]
         },
         "Neustar, Inc.": {
+            "score": 3528,
             "signals": [
                 "postal_code",
                 "AAID",
@@ -4248,6 +4320,7 @@
             ]
         },
         "New Relic": {
+            "score": 828,
             "signals": [
                 "unique_identifier",
                 "network_carrier",
@@ -4265,6 +4338,7 @@
             ]
         },
         "Ogury Limited": {
+            "score": 696,
             "signals": [
                 "AAID",
                 "cpu_data",
@@ -4281,6 +4355,7 @@
             ]
         },
         "OnAudience Ltd.": {
+            "score": 630,
             "signals": [
                 "unique_identifier",
                 "cookies",
@@ -4296,6 +4371,7 @@
             ]
         },
         "OneSignal": {
+            "score": 4452,
             "signals": [
                 "gps_coordinates",
                 "first_name",
@@ -4315,6 +4391,7 @@
             ]
         },
         "OpenX Technologies Inc": {
+            "score": 3391,
             "signals": [
                 "city",
                 "unique_identifier",
@@ -4331,6 +4408,7 @@
             ]
         },
         "Optimizely, Inc.": {
+            "score": 1790,
             "signals": [
                 "unique_identifier",
                 "os_build_version",
@@ -4345,6 +4423,7 @@
             ]
         },
         "Oracle Corporation": {
+            "score": 8083,
             "signals": [
                 "AAID",
                 "unique_identifier",
@@ -4366,6 +4445,7 @@
             ]
         },
         "Outbrain": {
+            "score": 1250,
             "signals": [
                 "unique_identifier",
                 "cookies",
@@ -4381,6 +4461,7 @@
             ]
         },
         "Parsely, Inc.": {
+            "score": 720,
             "signals": [
                 "AAID",
                 "unique_identifier",
@@ -4397,6 +4478,7 @@
             ]
         },
         "Permutive, Inc.": {
+            "score": 2010,
             "signals": [
                 "neighborhood",
                 "city",
@@ -4415,6 +4497,7 @@
             ]
         },
         "Pinterest, Inc.": {
+            "score": 3092,
             "signals": [
                 "AAID",
                 "city",
@@ -4434,6 +4517,7 @@
             ]
         },
         "Pixalate, Inc.": {
+            "score": 3330,
             "signals": [
                 "gps_coordinates",
                 "AAID",
@@ -4453,6 +4537,7 @@
             ]
         },
         "Prospect One": {
+            "score": 816,
             "signals": [
                 "AAID",
                 "os_build_version",
@@ -4467,6 +4552,7 @@
             ]
         },
         "PubMatic, Inc.": {
+            "score": 17734,
             "signals": [
                 "gps_coordinates",
                 "city",
@@ -4487,6 +4573,7 @@
             ]
         },
         "Pulsepoint, Inc.": {
+            "score": 1629,
             "signals": [
                 "city",
                 "AAID",
@@ -4505,6 +4592,7 @@
             ]
         },
         "Quantcast Corporation": {
+            "score": 1408,
             "signals": [
                 "unique_identifier",
                 "cookies",
@@ -4522,6 +4610,7 @@
             ]
         },
         "Reddit Inc.": {
+            "score": 1038,
             "signals": [
                 "AAID",
                 "unique_identifier",
@@ -4537,6 +4626,7 @@
             ]
         },
         "RevenueCat": {
+            "score": 1773,
             "signals": [
                 "AAID",
                 "unique_identifier",
@@ -4551,6 +4641,7 @@
             ]
         },
         "RhythmOne": {
+            "score": 1584,
             "signals": [
                 "city",
                 "unique_identifier",
@@ -4568,6 +4659,7 @@
             ]
         },
         "Riskified Ltd.": {
+            "score": 1318,
             "signals": [
                 "gps_coordinates",
                 "first_name",
@@ -4587,6 +4679,7 @@
             ]
         },
         "Roku, Inc.": {
+            "score": 1400,
             "signals": [
                 "unique_identifier",
                 "cookies",
@@ -4602,6 +4695,7 @@
             ]
         },
         "RTB House S.A.": {
+            "score": 575,
             "signals": [
                 "unique_identifier",
                 "cookies",
@@ -4616,6 +4710,7 @@
             ]
         },
         "Salesforce.com, Inc.": {
+            "score": 8391,
             "signals": [
                 "email_address",
                 "postal_code",
@@ -4637,6 +4732,7 @@
             ]
         },
         "Segment.io, Inc.": {
+            "score": 4752,
             "signals": [
                 "email_address",
                 "username",
@@ -4667,6 +4763,7 @@
             ]
         },
         "Sharethrough, Inc.": {
+            "score": 2380,
             "signals": [
                 "city",
                 "unique_identifier",
@@ -4684,6 +4781,7 @@
             ]
         },
         "Sift Science, Inc.": {
+            "score": 2563,
             "signals": [
                 "gps_coordinates",
                 "neighborhood",
@@ -4705,6 +4803,7 @@
             ]
         },
         "Simplifi Holdings Inc.": {
+            "score": 1375,
             "signals": [
                 "unique_identifier",
                 "cookies",
@@ -4720,6 +4819,7 @@
             ]
         },
         "Smaato Inc.": {
+            "score": 2760,
             "signals": [
                 "gps_coordinates",
                 "postal_code",
@@ -4741,6 +4841,7 @@
             ]
         },
         "Smartadserver S.A.S": {
+            "score": 3495,
             "signals": [
                 "gps_coordinates",
                 "postal_code",
@@ -4761,6 +4862,7 @@
             ]
         },
         "Snap Inc.": {
+            "score": 2702,
             "signals": [
                 "AAID",
                 "unique_identifier",
@@ -4778,6 +4880,7 @@
             ]
         },
         "Sovrn Holdings": {
+            "score": 1625,
             "signals": [
                 "AAID",
                 "unique_identifier",
@@ -4795,6 +4898,7 @@
             ]
         },
         "SpotX, Inc.": {
+            "score": 4326,
             "signals": [
                 "gps_coordinates",
                 "AAID",
@@ -4814,6 +4918,7 @@
             ]
         },
         "Synacor, Inc.": {
+            "score": 1600,
             "signals": [
                 "unique_identifier",
                 "cookies",
@@ -4830,6 +4935,7 @@
             ]
         },
         "Taboola, Inc.": {
+            "score": 14406,
             "signals": [
                 "gps_coordinates",
                 "neighborhood",
@@ -4853,6 +4959,7 @@
             ]
         },
         "Take-Two Interactive Software, Inc.": {
+            "score": 858,
             "signals": [
                 "AAID",
                 "unique_identifier",
@@ -4872,6 +4979,7 @@
             ]
         },
         "Talent Game Box": {
+            "score": 2183,
             "signals": [
                 "neighborhood",
                 "AAID",
@@ -4892,6 +5000,7 @@
             ]
         },
         "Tapad, Inc.": {
+            "score": 7850,
             "signals": [
                 "postal_code",
                 "AAID",
@@ -4912,6 +5021,7 @@
             ]
         },
         "Tapjoy, Inc.": {
+            "score": 9396,
             "signals": [
                 "AAID",
                 "unique_identifier",
@@ -4933,6 +5043,7 @@
             ]
         },
         "Tappcelator Media S.L.": {
+            "score": 822,
             "signals": [
                 "gps_coordinates",
                 "AAID",
@@ -4948,6 +5059,7 @@
             ]
         },
         "Teads ( Luxenbourg ) SA": {
+            "score": 880,
             "signals": [
                 "city",
                 "unique_identifier",
@@ -4964,6 +5076,7 @@
             ]
         },
         "Telaria": {
+            "score": 870,
             "signals": [
                 "AAID",
                 "unique_identifier",
@@ -4980,6 +5093,7 @@
             ]
         },
         "The Nielsen Company": {
+            "score": 4327,
             "signals": [
                 "AAID",
                 "city",
@@ -4999,6 +5113,7 @@
             ]
         },
         "The Trade Desk Inc": {
+            "score": 18988,
             "signals": [
                 "gps_coordinates",
                 "postal_code",
@@ -5019,6 +5134,7 @@
             ]
         },
         "TripleLift": {
+            "score": 3543,
             "signals": [
                 "city",
                 "unique_identifier",
@@ -5036,6 +5152,7 @@
             ]
         },
         "TrustArc Inc.": {
+            "score": 1014,
             "signals": [
                 "AAID",
                 "unique_identifier",
@@ -5048,6 +5165,7 @@
             ]
         },
         "Twitter, Inc.": {
+            "score": 13507,
             "signals": [
                 "email_address",
                 "password",
@@ -5069,6 +5187,7 @@
             ]
         },
         "Undertone Networks": {
+            "score": 740,
             "signals": [
                 "unique_identifier",
                 "cookies",
@@ -5083,6 +5202,7 @@
             ]
         },
         "Unity Technologies ApS": {
+            "score": 27349,
             "signals": [
                 "neighborhood",
                 "postal_code",
@@ -5119,6 +5239,7 @@
             ]
         },
         "Unruly Group Limited": {
+            "score": 1162,
             "signals": [
                 "city",
                 "unique_identifier",
@@ -5136,6 +5257,7 @@
             ]
         },
         "Upland Software Inc.": {
+            "score": 930,
             "signals": [
                 "postal_code",
                 "city",
@@ -5156,6 +5278,7 @@
             ]
         },
         "Urban Airship, Inc.": {
+            "score": 4751,
             "signals": [
                 "gps_coordinates",
                 "email_address",
@@ -5175,6 +5298,7 @@
             ]
         },
         "Verizon Media": {
+            "score": 18260,
             "signals": [
                 "gps_coordinates",
                 "birthday",
@@ -5211,6 +5335,7 @@
             ]
         },
         "Vungle Inc": {
+            "score": 6282,
             "signals": [
                 "AAID",
                 "unique_identifier",
@@ -5233,6 +5358,7 @@
             ]
         },
         "WPP plc": {
+            "score": 2992,
             "signals": [
                 "AAID",
                 "unique_identifier",
@@ -5249,6 +5375,7 @@
             ]
         },
         "Yandex LLC": {
+            "score": 1219,
             "signals": [
                 "gps_coordinates",
                 "AAID",
@@ -5265,6 +5392,7 @@
             ]
         },
         "YieldMo, Inc.": {
+            "score": 675,
             "signals": [
                 "unique_identifier",
                 "cookies",
@@ -5279,6 +5407,7 @@
             ]
         },
         "Zeotap GmbH": {
+            "score": 1614,
             "signals": [
                 "AAID",
                 "unique_identifier",
@@ -5295,6 +5424,7 @@
             ]
         },
         "Zeta Global": {
+            "score": 625,
             "signals": [
                 "city",
                 "unique_identifier",
