@@ -14,18 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.savedsites.impl.sync
+package com.duckduckgo.sync.api
 
-import com.duckduckgo.savedsites.api.SavedSitesRepository
-import com.duckduckgo.sync.api.SyncChanges
-import com.duckduckgo.sync.api.SyncCrypto
-import com.duckduckgo.sync.api.SyncParser
+interface SyncCrypto {
+    fun encrypt(text: String): String
 
-class SavedSitesSyncParser(
-    val savedSitesRepository: SavedSitesRepository,
-    val syncCrypto: SyncCrypto
-) : SyncParser {
-    override fun parseChanges(since: String): SyncChanges {
-        TODO("Not yet implemented")
-    }
+    fun decrypt(data: String): String
 }

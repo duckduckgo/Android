@@ -16,11 +16,12 @@
 
 package com.duckduckgo.savedsites.impl.sync
 
+import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.sync.api.SyncChanges
 import com.duckduckgo.sync.api.SyncMergeResult
 import com.duckduckgo.sync.api.SyncMerger
 
-class SavedSitesSyncMerger(): SyncMerger {
+class SavedSitesSyncMerger(val savedSitesRepository: SavedSitesRepository): SyncMerger {
     override fun merge(changes: SyncChanges): SyncMergeResult<Boolean> {
         TODO("Not yet implemented")
     }
