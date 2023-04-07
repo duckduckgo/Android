@@ -604,6 +604,7 @@
     <string name="folderLocationTitle">Atlasi atrašanās vietu</string>
     <string name="addFolder">Pievienot mapi</string>
     <string name="editFolder">Rediģēt mapi</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Dzēst mapi un tās saturu?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Vai tiešām vēlies dzēst "</string>
     <string name="bookmarkFolderEmpty">Tukšs</string>
 
