@@ -208,7 +208,7 @@ class ExperimentationVariantManager(
         var newVariant = generateVariant(activeVariants)
         val compliesWithFilters = newVariant.filterBy(appBuildConfig)
 
-        if (!compliesWithFilters) {
+        if (!compliesWithFilters || appBuildConfig.isDefaultVariantForced) {
             newVariant = DEFAULT_VARIANT
         }
         Timber.i("Current variant is null; allocating new one $newVariant")

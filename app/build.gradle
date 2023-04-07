@@ -49,6 +49,11 @@ android {
         } else {
             buildConfigField "boolean", "IS_PERFORMANCE_TEST", "false"
         }
+        if (project.hasProperty('force-default-variant')) {
+            buildConfigField "boolean", "FORCE_DEFAULT_VARIANT", "true"
+        } else {
+            buildConfigField "boolean", "FORCE_DEFAULT_VARIANT", "false"
+        }
     }
     buildFeatures {
         viewBinding = true

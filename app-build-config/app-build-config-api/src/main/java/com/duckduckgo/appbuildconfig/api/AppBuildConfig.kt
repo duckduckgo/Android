@@ -31,6 +31,7 @@ interface AppBuildConfig {
     val manufacturer: String
     val model: String
     val deviceLocale: Locale
+    val isDefaultVariantForced: Boolean
 }
 
 enum class BuildFlavor {

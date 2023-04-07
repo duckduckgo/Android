@@ -32,7 +32,7 @@ jobs:
       - name: Build
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: assembleInternalDebug
+          arguments: assembleInternalDebug -Pforce-default-variant
 
       - name: Obtain debug apk
         if: always()
