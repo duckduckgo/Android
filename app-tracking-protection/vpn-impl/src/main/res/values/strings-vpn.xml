@@ -364,7 +364,7 @@
     <string name="atp_ManageRecentAppsProtectionEmpty">Apps with recently blocked tracking attempts will appear here</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
-    <string name="atp_RemoveFeatureDialogTitle">Disable and Delete Data?</string>
+    <string name="atp_RemoveFeatureDialogTitle">Disable and delete data?</string>
     <string name="atp_RemoveFeatureDialogMessage">App Tracking Protection will be disabled and any settings and history of tracking attempts will be deleted. You can enable it again at any time in Settings.</string>
     <string name="atp_RemoveFeatureDialogCancel">Cancel</string>
     <string name="atp_RemoveFeatureDialogRemove">Disable</string>

@@ -602,6 +602,7 @@
     <string name="folderLocationTitle">Valitse sijainti</string>
     <string name="addFolder">Lisää kansio</string>
     <string name="editFolder">Muokkaa kansiota</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Poista kansio ja sen sisältö?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Haluatko varmasti poistaa "</string>
     <string name="bookmarkFolderEmpty">Tyhjä</string>
 

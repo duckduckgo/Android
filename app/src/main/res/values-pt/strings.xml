@@ -602,6 +602,7 @@
     <string name="folderLocationTitle">Selecione a localização</string>
     <string name="addFolder">Adicionar pasta</string>
     <string name="editFolder">Editar pasta</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Eliminar pasta e respetivo conteúdo?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Tem a certeza de que quer eliminar "</string>
     <string name="bookmarkFolderEmpty">Vazio</string>
 

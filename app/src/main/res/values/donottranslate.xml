@@ -44,4 +44,5 @@
     <string name="syncSettingsEntry">Sync</string>
     <string name="syncSettingsDisabled">Off</string>
     <string name="syncSettingsEnabled">On</string>
+
 </resources>

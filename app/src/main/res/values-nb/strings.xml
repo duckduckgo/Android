@@ -602,6 +602,7 @@
     <string name="folderLocationTitle">Velg sted</string>
     <string name="addFolder">Legg til mappe</string>
     <string name="editFolder">Rediger mappe</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Vil du slette mappen og innholdet?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Er du sikker på at du vil slette "</string>
     <string name="bookmarkFolderEmpty">Tom</string>
 

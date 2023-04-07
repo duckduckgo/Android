@@ -602,6 +602,7 @@
     <string name="folderLocationTitle">Seleziona la posizione</string>
     <string name="addFolder">Aggiungi cartella</string>
     <string name="editFolder">Modifica cartella</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Eliminare la cartella e i relativi contenuti?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Eliminare "</string>
     <string name="bookmarkFolderEmpty">Vuoto</string>
 

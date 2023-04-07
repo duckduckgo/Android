@@ -606,6 +606,7 @@
     <string name="folderLocationTitle">Vyberte polohu</string>
     <string name="addFolder">Pridať priečinok</string>
     <string name="editFolder">Úprava priečinka</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Má sa odstrániť priečinok a jeho obsah?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Určite chcete odstrániť "</string>
     <string name="bookmarkFolderEmpty">Prázdne</string>
 

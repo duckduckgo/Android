@@ -606,6 +606,7 @@
     <string name="folderLocationTitle">Vybrat umístění</string>
     <string name="addFolder">Přidat složku</string>
     <string name="editFolder">Upravit složku</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Smazat složku a její obsah?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Opravdu chceš smazat "</string>
     <string name="bookmarkFolderEmpty">Prázdné</string>
 
