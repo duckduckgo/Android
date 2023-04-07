@@ -32,7 +32,7 @@ class AppTrackerJsonParserTest {
 
         Assert.assertEquals("1680299195572", blocklist.version)
         Assert.assertEquals(345, blocklist.trackers.count())
-        Assert.assertEquals(406, blocklist.packageNames.count())
+        Assert.assertEquals(406, blocklist.packages.count())
         Assert.assertEquals(130, blocklist.entities.count())
     }
 }
