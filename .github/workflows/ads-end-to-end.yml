@@ -47,7 +47,7 @@ jobs:
       - name: Assemble release APK
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: assembleInternalRelease
+          arguments: assembleInternalRelease -Pforce-default-variant
 
       - name: Move APK to new folder
         if: always()
