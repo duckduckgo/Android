@@ -43,10 +43,12 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpManagementBinding
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.None
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowAlwaysOnLockdownEnabled
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowReconnecting
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowReconnectingFailed
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowRevoked
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowAlwaysOnLockdownDialog
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionDetails
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ViewState
@@ -123,6 +125,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
             ShowReconnecting -> binding.renderAlertReconnecting()
             ShowReconnectingFailed -> binding.renderAlertReconnectingFailed()
             ShowRevoked -> binding.renderAlertRevoked()
+            ShowAlwaysOnLockdownEnabled -> binding.renderAlertLockdownEnabled()
             None -> binding.netPAlert.gone()
         }
     }
@@ -139,6 +142,13 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
 
     private fun ActivityNetpManagementBinding.renderAlertRevoked() {
         netPAlert.setClickableLink("", getText(R.string.netpBannerVpnRevoked)) {}
+        netPAlert.show()
+    }
+
+    private fun ActivityNetpManagementBinding.renderAlertLockdownEnabled() {
+        netPAlert.setClickableLink(OPEN_SETTINGS_ANNOTATION, getText(R.string.netpBannerAlwaysOnLockDownEnabled)) {
+            openVPNSettings()
+        }
         netPAlert.show()
     }
 
@@ -325,6 +335,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
 
     companion object {
         private const val REPORT_ISSUES_ANNOTATION = "report_issues_link"
+        private const val OPEN_SETTINGS_ANNOTATION = "open_settings_link"
         private const val TAG_ALWAYS_ON_DIALOG = "NETP_ALWAYS_ON_DIALOG"
         val FEEDBACK_URL = "https://form.asana.com/?k=_wNLt6YcT5ILpQjDuW0Mxw&d=137249556945".toUri()
         fun intent(context: Context): Intent {

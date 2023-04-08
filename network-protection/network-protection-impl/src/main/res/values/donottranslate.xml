@@ -56,6 +56,7 @@
     <string name="netpAlwaysOnLockdownBody"><![CDATA[To avoid app issues, go to your device\'s <b>VPN Settings for DuckDuckGo</b> and disable <b>Block connections without VPN</b>]]></string>
     <string name="netpAlwaysOnLockdownHeading">Change your VPN settings</string>
     <string name="netpBannerVpnRevoked"><b>Network Protection is disabled.</b>\nA VPN app on your device may have disabled it. Use the toggle to re-enable.</string>
+    <string name="netpBannerAlwaysOnLockDownEnabled"><b>Action required!</b> To avoid app issues, you need to change your Android settings. <annotation type="open_settings_link">Change settings</annotation></string>
 
     <!-- Waitlist -->
     <string name="netpWaitlistActivityLabel">Network Protection</string>

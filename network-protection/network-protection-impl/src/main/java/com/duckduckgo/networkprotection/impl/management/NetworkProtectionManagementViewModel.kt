@@ -30,6 +30,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.network.ExternalVpnDetector
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.AlwaysOnState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.DISABLED
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.ENABLED
@@ -41,6 +42,7 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REV
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.alerts.reconnect.NetPReconnectNotifications
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.None
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowAlwaysOnLockdownEnabled
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowReconnecting
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowReconnectingFailed
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowRevoked
@@ -104,7 +106,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
             return@combine ViewState(
                 connectionState = vpnState.toConnectionState(reconnectState),
                 connectionDetails = connectionDetailsToEmit,
-                alertState = getAlertState(vpnState.state, reconnectState, vpnState.stopReason),
+                alertState = getAlertState(vpnState.state, reconnectState, vpnState.stopReason, vpnState.alwaysOnState),
             )
         }
     }
@@ -130,6 +132,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         vpnRunningState: VpnRunningState,
         reconnectState: ReconnectStatus,
         vpnStopReason: VpnStopReason?,
+        vpnAlwaysOnState: AlwaysOnState,
     ): AlertState {
         return if (vpnRunningState == DISABLED && (reconnectState == Reconnecting || reconnectState == ReconnectingFailed)) {
             ShowReconnectingFailed
@@ -137,6 +140,8 @@ class NetworkProtectionManagementViewModel @Inject constructor(
             ShowReconnecting
         } else if (vpnRunningState == DISABLED && (vpnStopReason == REVOKED || vpnStopReason == ERROR)) {
             ShowRevoked
+        } else if (vpnRunningState == ENABLED && vpnAlwaysOnState.isAlwaysOnLockedDown()) {
+            ShowAlwaysOnLockdownEnabled
         } else {
             None
         }
@@ -338,6 +343,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         ShowReconnecting,
         ShowReconnectingFailed,
         ShowRevoked,
+        ShowAlwaysOnLockdownEnabled,
         None,
     }
 }
