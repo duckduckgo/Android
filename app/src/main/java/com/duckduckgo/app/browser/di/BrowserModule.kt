@@ -21,7 +21,6 @@ import android.content.Context
 import android.content.pm.PackageManager
 import androidx.work.WorkManager
 import com.duckduckgo.adclick.api.AdClickManager
-import com.duckduckgo.app.accessibility.AccessibilityManager
 import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.addtohome.AddToHomeSystemCapabilityDetector
@@ -36,7 +35,6 @@ import com.duckduckgo.app.browser.favicon.FaviconPersister
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.*
-import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewGenerator
@@ -54,7 +52,6 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.events.db.UserEventsStore
-import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.plugins.PluginPoint
@@ -66,16 +63,12 @@ import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.trackerdetection.CloakedCnameDetector
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.autoconsent.api.Autoconsent
-import com.duckduckgo.autofill.api.BrowserAutofill
-import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
@@ -109,55 +102,6 @@ class BrowserModule {
         appReferrerDataStore: AppReferrerDataStore,
     ): RequestRewriter {
         return DuckDuckGoRequestRewriter(urlDetector, statisticsStore, variantManager, appReferrerDataStore)
-    }
-
-    @Provides
-    fun browserWebViewClient(
-        webViewHttpAuthStore: WebViewHttpAuthStore,
-        trustedCertificateStore: TrustedCertificateStore,
-        requestRewriter: RequestRewriter,
-        specialUrlDetector: SpecialUrlDetector,
-        requestInterceptor: RequestInterceptor,
-        offlinePixelCountDataStore: OfflinePixelCountDataStore,
-        uncaughtExceptionRepository: UncaughtExceptionRepository,
-        cookieManagerProvider: CookieManagerProvider,
-        loginDetector: DOMLoginDetector,
-        dosDetector: DosDetector,
-        thirdPartyCookieManager: ThirdPartyCookieManager,
-        @AppCoroutineScope appCoroutineScope: CoroutineScope,
-        dispatcherProvider: DispatcherProvider,
-        accessibilityManager: AccessibilityManager,
-        browserAutofillConfigurator: BrowserAutofill.Configurator,
-        ampLinks: AmpLinks,
-        printInjector: PrintInjector,
-        internalTestUserChecker: InternalTestUserChecker,
-        adClickManager: AdClickManager,
-        autoconsent: Autoconsent,
-        contentScopeScripts: ContentScopeScripts,
-    ): BrowserWebViewClient {
-        return BrowserWebViewClient(
-            webViewHttpAuthStore,
-            trustedCertificateStore,
-            requestRewriter,
-            specialUrlDetector,
-            requestInterceptor,
-            offlinePixelCountDataStore,
-            uncaughtExceptionRepository,
-            cookieManagerProvider,
-            loginDetector,
-            dosDetector,
-            thirdPartyCookieManager,
-            appCoroutineScope,
-            dispatcherProvider,
-            browserAutofillConfigurator,
-            accessibilityManager,
-            ampLinks,
-            printInjector,
-            internalTestUserChecker,
-            adClickManager,
-            autoconsent,
-            contentScopeScripts,
-        )
     }
 
     @Provides

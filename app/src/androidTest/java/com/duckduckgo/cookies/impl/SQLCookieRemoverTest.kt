@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.webkit.CookieManager
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.fire.DatabaseLocator
 import com.duckduckgo.app.fire.FireproofRepository
 import com.duckduckgo.app.fire.WebViewDatabaseLocator
@@ -28,8 +29,6 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryI
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.global.exception.RootExceptionFinder
-import com.duckduckgo.app.statistics.pixels.ExceptionPixel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.cookies.impl.CookiesPixelName.COOKIE_DATABASE_EXCEPTION_OPEN_ERROR
@@ -139,7 +138,7 @@ class SQLCookieRemoverTest {
         databaseLocator: DatabaseLocator = webViewDatabaseLocator,
         repository: FireproofRepository = FireproofWebsiteRepositoryImpl(fireproofWebsiteDao, DefaultDispatcherProvider(), mock()),
         offlinePixelCountDataStore: OfflinePixelCountDataStore = mockOfflinePixelCountDataStore,
-        exceptionPixel: ExceptionPixel = ExceptionPixel(mockPixel, RootExceptionFinder()),
+        exceptionPixel: CrashLogger = mock(),
         dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
     ): SQLCookieRemover {
         return SQLCookieRemover(

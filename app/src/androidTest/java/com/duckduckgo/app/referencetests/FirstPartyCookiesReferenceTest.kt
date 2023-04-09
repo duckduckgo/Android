@@ -26,9 +26,7 @@ import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.app.fire.FireproofRepository
 import com.duckduckgo.app.fire.WebViewDatabaseLocator
 import com.duckduckgo.app.global.DefaultDispatcherProvider
-import com.duckduckgo.app.global.exception.RootExceptionFinder
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
-import com.duckduckgo.app.statistics.pixels.ExceptionPixel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.cookies.api.CookieException
 import com.duckduckgo.cookies.impl.DefaultCookieManagerProvider
@@ -110,7 +108,7 @@ class FirstPartyCookiesReferenceTest(private val testCase: TestCase) {
             unprotectedTemporary,
             userAllowListRepository,
             webViewDatabaseLocator,
-            ExceptionPixel(mockPixel, RootExceptionFinder()),
+            mock(),
             fireproofRepository,
             DefaultDispatcherProvider(),
         )

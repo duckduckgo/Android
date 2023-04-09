@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,43 +14,47 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global
+package com.duckduckgo.app.anr
 
+import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
-import com.duckduckgo.app.global.exception.UncaughtExceptionSource
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import java.io.InterruptedIOException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.*
 
 @ExperimentalCoroutinesApi
-class AlertingUncaughtExceptionHandlerTest {
+class GlobalUncaughtExceptionHandlerTest {
 
-    private lateinit var testee: AlertingUncaughtExceptionHandler
+    private lateinit var testee: GlobalUncaughtExceptionHandler
     private val mockDefaultExceptionHandler: Thread.UncaughtExceptionHandler = mock()
-    private val mockPixelCountDataStore: OfflinePixelCountDataStore = mock()
-    private val mockUncaughtExceptionRepository: UncaughtExceptionRepository = mock()
+    private val crashLogger: CrashLogger = mock()
     private val mockAppBuildConfig: AppBuildConfig = mock()
+
+    private lateinit var fakeDataStore: OfflinePixelCountDataStore
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     @Before
     fun setup() {
-        whenever(mockAppBuildConfig.isDebug).thenReturn(true)
+        whenever(mockAppBuildConfig.isInternalBuild()).thenReturn(true)
+        fakeDataStore = FakeDataStore()
 
-        testee = AlertingUncaughtExceptionHandler(
+        testee = GlobalUncaughtExceptionHandler(
             mockDefaultExceptionHandler,
-            mockPixelCountDataStore,
-            mockUncaughtExceptionRepository,
+            fakeDataStore,
+            crashLogger,
             coroutineTestRule.testDispatcherProvider,
             TestScope(),
             mockAppBuildConfig,
@@ -62,7 +66,13 @@ class AlertingUncaughtExceptionHandlerTest {
         testee.uncaughtException(Thread.currentThread(), NullPointerException("Deliberate"))
         advanceUntilIdle()
 
-        verify(mockUncaughtExceptionRepository).recordUncaughtException(any(), eq(UncaughtExceptionSource.GLOBAL))
+        verify(crashLogger).logCrash(
+            CrashLogger.Crash(
+                pixelName = Pixel.StatisticsPixelName.APPLICATION_CRASH_GLOBAL.pixelName,
+                t = NullPointerException("Deliberate"),
+            ),
+        )
+        Assert.assertEquals(1, fakeDataStore.applicationCrashCount)
     }
 
     @Test
@@ -72,6 +82,7 @@ class AlertingUncaughtExceptionHandlerTest {
         advanceUntilIdle()
 
         verify(mockDefaultExceptionHandler).uncaughtException(any(), eq(exception))
+        Assert.assertEquals(1, fakeDataStore.applicationCrashCount)
     }
 
     @Test
@@ -79,7 +90,8 @@ class AlertingUncaughtExceptionHandlerTest {
         testee.uncaughtException(Thread.currentThread(), InterruptedIOException("Deliberate"))
         advanceUntilIdle()
 
-        verify(mockUncaughtExceptionRepository, never()).recordUncaughtException(any(), any())
+        verify(crashLogger, never()).logCrash(any())
+        Assert.assertEquals(0, fakeDataStore.applicationCrashCount)
     }
 
     @Test
@@ -87,15 +99,39 @@ class AlertingUncaughtExceptionHandlerTest {
         testee.uncaughtException(Thread.currentThread(), InterruptedException("Deliberate"))
         advanceUntilIdle()
 
-        verify(mockUncaughtExceptionRepository, never()).recordUncaughtException(any(), any())
+        verify(crashLogger, never()).logCrash(any())
+        Assert.assertEquals(0, fakeDataStore.applicationCrashCount)
     }
 
     @Test
-    fun whenExceptionIsNotRecordedButInDebugModeThenDefaultExceptionHandlerCalled() = runTest {
+    fun whenExceptionIsNotRecordedButInInternalBuildThenDefaultExceptionHandlerCalled() = runTest {
         val exception = InterruptedIOException("Deliberate")
         testee.uncaughtException(Thread.currentThread(), exception)
         advanceUntilIdle()
 
         verify(mockDefaultExceptionHandler).uncaughtException(any(), eq(exception))
+        Assert.assertEquals(1, fakeDataStore.applicationCrashCount)
     }
+}
+
+private class FakeDataStore : OfflinePixelCountDataStore {
+    override var applicationCrashCount: Int = 0
+    override var webRendererGoneCrashCount: Int
+        get() = TODO("Not yet implemented")
+        set(value) {}
+    override var webRendererGoneKilledCount: Int
+        get() = TODO("Not yet implemented")
+        set(value) {}
+    override var cookieDatabaseNotFoundCount: Int
+        get() = TODO("Not yet implemented")
+        set(value) {}
+    override var cookieDatabaseOpenErrorCount: Int
+        get() = TODO("Not yet implemented")
+        set(value) {}
+    override var cookieDatabaseCorruptedCount: Int
+        get() = TODO("Not yet implemented")
+        set(value) {}
+    override var cookieDatabaseDeleteErrorCount: Int
+        get() = TODO("Not yet implemented")
+        set(value) {}
 }

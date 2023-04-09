@@ -21,12 +21,12 @@ import android.net.Uri
 import android.os.Message
 import android.view.View
 import android.webkit.*
+import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
-import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
+import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName.*
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.privacy.config.api.Drm
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
@@ -36,7 +36,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class BrowserChromeClient @Inject constructor(
-    private val uncaughtExceptionRepository: UncaughtExceptionRepository,
+    private val crashLogger: CrashLogger,
     private val drm: Drm,
     private val appBuildConfig: AppBuildConfig,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
@@ -62,8 +62,8 @@ class BrowserChromeClient @Inject constructor(
             customView = view
             webViewClientListener?.goFullScreen(view)
         } catch (e: Throwable) {
-            appCoroutineScope.launch(coroutineDispatcher.default()) {
-                uncaughtExceptionRepository.recordUncaughtException(e, SHOW_CUSTOM_VIEW)
+            appCoroutineScope.launch(coroutineDispatcher.io()) {
+                crashLogger.logCrash(CrashLogger.Crash(pixelName = APPLICATION_CRASH_WEBVIEW_SHOW_CUSTOM_VIEW.pixelName, t = e))
                 throw e
             }
         }
@@ -75,8 +75,8 @@ class BrowserChromeClient @Inject constructor(
             webViewClientListener?.exitFullScreen()
             customView = null
         } catch (e: Throwable) {
-            appCoroutineScope.launch(coroutineDispatcher.default()) {
-                uncaughtExceptionRepository.recordUncaughtException(e, HIDE_CUSTOM_VIEW)
+            appCoroutineScope.launch(coroutineDispatcher.io()) {
+                crashLogger.logCrash(CrashLogger.Crash(pixelName = APPLICATION_CRASH_WEBVIEW_HIDE_CUSTOM_VIEW.pixelName, t = e))
                 throw e
             }
         }
@@ -96,8 +96,8 @@ class BrowserChromeClient @Inject constructor(
             webViewClientListener?.progressChanged(webView.progress)
             webViewClientListener?.onCertificateReceived(webView.certificate)
         } catch (e: Throwable) {
-            appCoroutineScope.launch(coroutineDispatcher.default()) {
-                uncaughtExceptionRepository.recordUncaughtException(e, ON_PROGRESS_CHANGED)
+            appCoroutineScope.launch(coroutineDispatcher.io()) {
+                crashLogger.logCrash(CrashLogger.Crash(pixelName = APPLICATION_CRASH_WEBVIEW_ON_PROGRESS_CHANGED.pixelName, t = e))
                 throw e
             }
         }
@@ -132,8 +132,8 @@ class BrowserChromeClient @Inject constructor(
         try {
             webViewClientListener?.titleReceived(title)
         } catch (e: Throwable) {
-            appCoroutineScope.launch(coroutineDispatcher.default()) {
-                uncaughtExceptionRepository.recordUncaughtException(e, RECEIVED_PAGE_TITLE)
+            appCoroutineScope.launch(coroutineDispatcher.io()) {
+                crashLogger.logCrash(CrashLogger.Crash(pixelName = APPLICATION_CRASH_WEBVIEW_RECEIVED_PAGE_TITLE.pixelName, t = e))
                 throw e
             }
         }
@@ -151,8 +151,8 @@ class BrowserChromeClient @Inject constructor(
             // cancel the request using the documented way
             filePathCallback.onReceiveValue(null)
 
-            appCoroutineScope.launch(coroutineDispatcher.default()) {
-                uncaughtExceptionRepository.recordUncaughtException(e, SHOW_FILE_CHOOSER)
+            appCoroutineScope.launch(coroutineDispatcher.io()) {
+                crashLogger.logCrash(CrashLogger.Crash(pixelName = APPLICATION_CRASH_WEBVIEW_SHOW_FILE_CHOOSER.pixelName, t = e))
                 throw e
             }
 

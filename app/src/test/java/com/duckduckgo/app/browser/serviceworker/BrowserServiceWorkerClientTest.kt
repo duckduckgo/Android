@@ -18,9 +18,9 @@ package com.duckduckgo.app.browser.serviceworker
 
 import android.webkit.WebResourceRequest
 import androidx.test.filters.SdkSuppress
+import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.RequestInterceptor
-import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -38,13 +38,13 @@ class BrowserServiceWorkerClientTest {
     var coroutinesTestRule = CoroutineTestRule()
 
     private val requestInterceptor: RequestInterceptor = mock()
-    private val uncaughtExceptionRepository: UncaughtExceptionRepository = mock()
+    private val crashLogger: CrashLogger = mock()
 
     private lateinit var testee: BrowserServiceWorkerClient
 
     @Before
     fun setup() {
-        testee = BrowserServiceWorkerClient(requestInterceptor, uncaughtExceptionRepository)
+        testee = BrowserServiceWorkerClient(requestInterceptor, crashLogger)
     }
 
     @Test

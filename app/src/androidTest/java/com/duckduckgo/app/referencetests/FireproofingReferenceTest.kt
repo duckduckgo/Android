@@ -30,8 +30,6 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryI
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.domain
-import com.duckduckgo.app.global.exception.RootExceptionFinder
-import com.duckduckgo.app.statistics.pixels.ExceptionPixel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.cookies.impl.CookieManagerRemover
@@ -97,7 +95,7 @@ class FireproofingReferenceTest(private val testCase: TestCase) {
             webViewDatabaseLocator,
             fireproofWebsiteRepositoryImpl,
             mockOfflinePixelCountDataStore,
-            ExceptionPixel(mockPixel, RootExceptionFinder()),
+            mock(),
             DefaultDispatcherProvider(),
         )
 

@@ -27,6 +27,7 @@ import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import com.duckduckgo.adclick.api.AdClickManager
+import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.accessibility.AccessibilityManager
 import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationState
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
@@ -38,8 +39,11 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
-import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
+import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName.APPLICATION_CRASH_WEBVIEW_HTTP_AUTH_REQUEST
+import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName.APPLICATION_CRASH_WEBVIEW_OVERRIDE_REQUEST
+import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName.APPLICATION_CRASH_WEBVIEW_PAGE_FINISHED
+import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName.APPLICATION_CRASH_WEBVIEW_PAGE_STARTED
+import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName.APPLICATION_CRASH_WEBVIEW_SHOULD_INTERCEPT
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill
@@ -48,17 +52,18 @@ import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.privacy.config.api.AmpLinks
 import java.net.URI
+import javax.inject.Inject
 import kotlinx.coroutines.*
 import timber.log.Timber
 
-class BrowserWebViewClient(
+class BrowserWebViewClient @Inject constructor(
     private val webViewHttpAuthStore: WebViewHttpAuthStore,
     private val trustedCertificateStore: TrustedCertificateStore,
     private val requestRewriter: RequestRewriter,
     private val specialUrlDetector: SpecialUrlDetector,
     private val requestInterceptor: RequestInterceptor,
     private val offlinePixelCountDataStore: OfflinePixelCountDataStore,
-    private val uncaughtExceptionRepository: UncaughtExceptionRepository,
+    private val crashLogger: CrashLogger,
     private val cookieManagerProvider: CookieManagerProvider,
     private val loginDetector: DOMLoginDetector,
     private val dosDetector: DosDetector,
@@ -217,8 +222,8 @@ class BrowserWebViewClient(
                 }
             }
         } catch (e: Throwable) {
-            appCoroutineScope.launch(dispatcherProvider.default()) {
-                uncaughtExceptionRepository.recordUncaughtException(e, SHOULD_OVERRIDE_REQUEST)
+            appCoroutineScope.launch(dispatcherProvider.io()) {
+                crashLogger.logCrash(CrashLogger.Crash(pixelName = APPLICATION_CRASH_WEBVIEW_OVERRIDE_REQUEST.pixelName, t = e))
                 throw e
             }
             return false
@@ -266,8 +271,8 @@ class BrowserWebViewClient(
             webView.evaluateJavascript("javascript:${contentScopeScripts.getScript()}", null)
             loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
         } catch (e: Throwable) {
-            appCoroutineScope.launch(dispatcherProvider.default()) {
-                uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_STARTED)
+            appCoroutineScope.launch(dispatcherProvider.io()) {
+                crashLogger.logCrash(CrashLogger.Crash(pixelName = APPLICATION_CRASH_WEBVIEW_PAGE_STARTED.pixelName, t = e))
                 throw e
             }
         }
@@ -293,8 +298,8 @@ class BrowserWebViewClient(
             flushCookies()
             printInjector.injectPrint(webView)
         } catch (e: Throwable) {
-            appCoroutineScope.launch(dispatcherProvider.default()) {
-                uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_FINISHED)
+            appCoroutineScope.launch(dispatcherProvider.io()) {
+                crashLogger.logCrash(CrashLogger.Crash(pixelName = APPLICATION_CRASH_WEBVIEW_PAGE_FINISHED.pixelName, t = e))
                 throw e
             }
         }
@@ -320,8 +325,10 @@ class BrowserWebViewClient(
                 Timber.v("Intercepting resource ${request.url} type:${request.method} on page $documentUrl")
                 requestInterceptor.shouldIntercept(request, webView, documentUrl, webViewClientListener)
             } catch (e: Throwable) {
-                uncaughtExceptionRepository.recordUncaughtException(e, SHOULD_INTERCEPT_REQUEST)
-                throw e
+                withContext(dispatcherProvider.io()) {
+                    crashLogger.logCrash(CrashLogger.Crash(pixelName = APPLICATION_CRASH_WEBVIEW_SHOULD_INTERCEPT.pixelName, t = e))
+                    throw e
+                }
             }
         }
     }
@@ -370,8 +377,8 @@ class BrowserWebViewClient(
                 super.onReceivedHttpAuthRequest(view, handler, host, realm)
             }
         } catch (e: Throwable) {
-            appCoroutineScope.launch(dispatcherProvider.default()) {
-                uncaughtExceptionRepository.recordUncaughtException(e, ON_HTTP_AUTH_REQUEST)
+            appCoroutineScope.launch(dispatcherProvider.io()) {
+                crashLogger.logCrash(CrashLogger.Crash(pixelName = APPLICATION_CRASH_WEBVIEW_HTTP_AUTH_REQUEST.pixelName, t = e))
                 throw e
             }
         }

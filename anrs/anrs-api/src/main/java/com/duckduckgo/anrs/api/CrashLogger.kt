@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global.exception
+package com.duckduckgo.anrs.api
 
-fun Throwable?.extractExceptionCause(): String {
-    if (this == null) {
-        return "Exception missing"
-    }
-    return "${this.javaClass.name} - ${this.stackTrace?.firstOrNull()}"
+import androidx.annotation.WorkerThread
+
+interface CrashLogger {
+    @WorkerThread
+    fun logCrash(crash: Crash)
+
+    data class Crash(
+        val pixelName: String,
+        val t: Throwable,
+    )
 }

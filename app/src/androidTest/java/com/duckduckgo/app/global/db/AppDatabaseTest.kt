@@ -27,7 +27,6 @@ import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ASK_EVERY_TIME
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.NEVER
-import com.duckduckgo.app.global.exception.UncaughtExceptionSource
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import org.junit.Assert.assertEquals
@@ -232,7 +231,7 @@ class AppDatabaseTest {
     @Test
     fun whenMigratingFromVersion18To19ThenValidationSucceedsAndRowsDeletedFromTable() {
         testHelper.createDatabase(TEST_DB_NAME, 18).use {
-            it.execSQL("INSERT INTO `UncaughtExceptionEntity` values (1, '${UncaughtExceptionSource.GLOBAL.name}', 'message') ")
+            it.execSQL("INSERT INTO `UncaughtExceptionEntity` values (1, 'GLOBAL', 'message') ")
 
             testHelper.runMigrationsAndValidate(TEST_DB_NAME, 19, true, migrationsProvider.MIGRATION_18_TO_19)
 

@@ -33,9 +33,6 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.global.events.db.UserEventEntity
 import com.duckduckgo.app.global.events.db.UserEventTypeConverter
 import com.duckduckgo.app.global.events.db.UserEventsDao
-import com.duckduckgo.app.global.exception.UncaughtExceptionDao
-import com.duckduckgo.app.global.exception.UncaughtExceptionEntity
-import com.duckduckgo.app.global.exception.UncaughtExceptionSourceConverter
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
 import com.duckduckgo.app.httpsupgrade.model.HttpsFalsePositiveDomain
 import com.duckduckgo.app.httpsupgrade.store.HttpsBloomFilterSpecDao
@@ -72,7 +69,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 
 @Database(
     exportSchema = true,
-    version = 45,
+    version = 46,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -95,7 +92,6 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
         AppEnjoymentEntity::class,
         Notification::class,
         PrivacyProtectionCountsEntity::class,
-        UncaughtExceptionEntity::class,
         TdsMetadata::class,
         UserStage::class,
         FireproofWebsiteEntity::class,
@@ -117,7 +113,6 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
     ActionTypeConverter::class,
     RuleTypeConverter::class,
     CategoriesTypeConverter::class,
-    UncaughtExceptionSourceConverter::class,
     StageTypeConverter::class,
     UserEventTypeConverter::class,
     LocationPermissionTypeConverter::class,
@@ -145,7 +140,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun appEnjoymentDao(): AppEnjoymentDao
     abstract fun notificationDao(): NotificationDao
     abstract fun privacyProtectionCountsDao(): PrivacyProtectionCountDao
-    abstract fun uncaughtExceptionDao(): UncaughtExceptionDao
     abstract fun tdsDao(): TdsMetadataDao
     abstract fun userStageDao(): UserStageDao
     abstract fun fireproofWebsiteDao(): FireproofWebsiteDao
@@ -578,7 +572,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
-    val MIGRATION_43_TO_44: Migration = object : Migration(43, 44) {
+    private val MIGRATION_43_TO_44: Migration = object : Migration(43, 44) {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS `tds_cname_entity` (`cloakedHostName` TEXT NOT NULL, " +
@@ -587,7 +581,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
-    val MIGRATION_44_TO_45: Migration = object : Migration(44, 45) {
+    private val MIGRATION_44_TO_45: Migration = object : Migration(44, 45) {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS `entities` (`entityId` TEXT NOT NULL, " +
@@ -598,6 +592,13 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
                 "CREATE TABLE IF NOT EXISTS `relations` (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
                     "`folderId` TEXT NOT NULL, `entityId` TEXT NOT NULL)",
             )
+        }
+    }
+
+    private val MIGRATION_45_TO_46: Migration = object : Migration(45, 46) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("DROP TABLE `UncaughtExceptionEntity`")
+            database.execSQL("VACUUM")
         }
     }
 
@@ -671,6 +672,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             MIGRATION_42_TO_43,
             MIGRATION_43_TO_44,
             MIGRATION_44_TO_45,
+            MIGRATION_45_TO_46,
         )
 
     @Deprecated(

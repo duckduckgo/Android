@@ -78,9 +78,6 @@ object DaoModule {
     fun privacyProtectionCounts(database: AppDatabase) = database.privacyProtectionCountsDao()
 
     @Provides
-    fun uncaughtExceptionDao(database: AppDatabase) = database.uncaughtExceptionDao()
-
-    @Provides
     fun tdsDao(database: AppDatabase) = database.tdsDao()
 
     @Provides

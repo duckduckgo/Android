@@ -30,9 +30,9 @@ import android.webkit.WebView
 import androidx.core.net.toUri
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
-import com.duckduckgo.app.global.exception.UncaughtExceptionSource
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.privacy.config.api.Drm
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
@@ -53,7 +53,7 @@ class BrowserChromeClientTest {
     private lateinit var testee: BrowserChromeClient
     private lateinit var webView: TestWebView
     private lateinit var mockWebViewClientListener: WebViewClientListener
-    private lateinit var mockUncaughtExceptionRepository: UncaughtExceptionRepository
+    private lateinit var mockCrashLogger: CrashLogger
     private lateinit var mockFilePathCallback: ValueCallback<Array<Uri>>
     private lateinit var mockFileChooserParams: WebChromeClient.FileChooserParams
     private lateinit var mockDrm: Drm
@@ -68,12 +68,12 @@ class BrowserChromeClientTest {
     @UiThreadTest
     @Before
     fun setup() {
-        mockUncaughtExceptionRepository = mock()
+        mockCrashLogger = mock()
         mockDrm = mock()
         mockAppBuildConfig = mock()
         mockSitePermissionsManager = mock()
         testee = BrowserChromeClient(
-            mockUncaughtExceptionRepository,
+            mockCrashLogger,
             mockDrm,
             mockAppBuildConfig,
             TestScope(),
@@ -123,7 +123,9 @@ class BrowserChromeClientTest {
         val exception = RuntimeException()
         whenever(mockWebViewClientListener.goFullScreen(any())).thenThrow(exception)
         testee.onShowCustomView(fakeView, null)
-        verify(mockUncaughtExceptionRepository).recordUncaughtException(exception, UncaughtExceptionSource.SHOW_CUSTOM_VIEW)
+        verify(mockCrashLogger).logCrash(
+            CrashLogger.Crash(Pixel.StatisticsPixelName.APPLICATION_CRASH_WEBVIEW_SHOW_CUSTOM_VIEW.pixelName, exception),
+        )
     }
 
     @Test
@@ -137,7 +139,9 @@ class BrowserChromeClientTest {
         val exception = RuntimeException()
         whenever(mockWebViewClientListener.exitFullScreen()).thenThrow(exception)
         testee.onHideCustomView()
-        verify(mockUncaughtExceptionRepository).recordUncaughtException(exception, UncaughtExceptionSource.HIDE_CUSTOM_VIEW)
+        verify(mockCrashLogger).logCrash(
+            CrashLogger.Crash(Pixel.StatisticsPixelName.APPLICATION_CRASH_WEBVIEW_HIDE_CUSTOM_VIEW.pixelName, exception),
+        )
     }
 
     @UiThreadTest
@@ -170,7 +174,9 @@ class BrowserChromeClientTest {
         val exception = RuntimeException()
         whenever(mockWebViewClientListener.progressChanged(anyInt())).thenThrow(exception)
         testee.onProgressChanged(webView, 10)
-        verify(mockUncaughtExceptionRepository).recordUncaughtException(exception, UncaughtExceptionSource.ON_PROGRESS_CHANGED)
+        verify(mockCrashLogger).logCrash(
+            CrashLogger.Crash(Pixel.StatisticsPixelName.APPLICATION_CRASH_WEBVIEW_ON_PROGRESS_CHANGED.pixelName, exception),
+        )
     }
 
     @UiThreadTest
@@ -207,7 +213,9 @@ class BrowserChromeClientTest {
         val exception = RuntimeException()
         whenever(mockWebViewClientListener.titleReceived(anyString())).thenThrow(exception)
         testee.onReceivedTitle(webView, "")
-        verify(mockUncaughtExceptionRepository).recordUncaughtException(exception, UncaughtExceptionSource.RECEIVED_PAGE_TITLE)
+        verify(mockCrashLogger).logCrash(
+            CrashLogger.Crash(Pixel.StatisticsPixelName.APPLICATION_CRASH_WEBVIEW_RECEIVED_PAGE_TITLE.pixelName, exception),
+        )
     }
 
     @Test
@@ -223,7 +231,9 @@ class BrowserChromeClientTest {
         whenever(mockWebViewClientListener.showFileChooser(any(), any())).thenThrow(exception)
         testee.onShowFileChooser(webView, mockFilePathCallback, mockFileChooserParams)
 
-        verify(mockUncaughtExceptionRepository).recordUncaughtException(exception, UncaughtExceptionSource.SHOW_FILE_CHOOSER)
+        verify(mockCrashLogger).logCrash(
+            CrashLogger.Crash(Pixel.StatisticsPixelName.APPLICATION_CRASH_WEBVIEW_SHOW_FILE_CHOOSER.pixelName, exception),
+        )
         verify(mockFilePathCallback).onReceiveValue(null)
     }
 

@@ -26,7 +26,6 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.lifecycle.VpnProcessLifecycleObserver
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.di.DaggerMap
-import com.duckduckgo.mobile.android.vpn.service.VpnUncaughtExceptionHandler
 import com.jakewharton.threetenabp.AndroidThreeTen
 import dagger.android.AndroidInjector
 import dagger.android.HasDaggerInjector
@@ -43,10 +42,7 @@ private const val VPN_PROCESS_NAME = "vpn"
 open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() {
 
     @Inject
-    lateinit var alertingUncaughtExceptionHandler: AlertingUncaughtExceptionHandler
-
-    @Inject
-    lateinit var vpnUncaughtExceptionHandler: VpnUncaughtExceptionHandler
+    lateinit var uncaughtExceptionHandler: Thread.UncaughtExceptionHandler
 
     @Inject
     lateinit var referralStateListener: AppInstallationReferrerStateListener
@@ -119,18 +115,18 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
     }
 
     private fun configureUncaughtExceptionHandlerBrowser() {
-        Thread.setDefaultUncaughtExceptionHandler(alertingUncaughtExceptionHandler)
+        Thread.setDefaultUncaughtExceptionHandler(uncaughtExceptionHandler)
         RxJavaPlugins.setErrorHandler { throwable ->
             if (throwable is UndeliverableException) {
                 Timber.w(throwable, "An exception happened inside RxJava code but no subscriber was still around to handle it")
             } else {
-                alertingUncaughtExceptionHandler.uncaughtException(Thread.currentThread(), throwable)
+                uncaughtExceptionHandler.uncaughtException(Thread.currentThread(), throwable)
             }
         }
     }
 
     private fun configureUncaughtExceptionHandlerVpn() {
-        Thread.setDefaultUncaughtExceptionHandler(vpnUncaughtExceptionHandler)
+        Thread.setDefaultUncaughtExceptionHandler(uncaughtExceptionHandler)
     }
 
     private fun configureLogging() {

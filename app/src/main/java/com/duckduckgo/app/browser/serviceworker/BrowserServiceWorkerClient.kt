@@ -19,21 +19,24 @@ package com.duckduckgo.app.browser.serviceworker
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import androidx.webkit.ServiceWorkerClientCompat
+import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.browser.RequestInterceptor
-import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
-import com.duckduckgo.app.global.exception.UncaughtExceptionSource
+import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName.APPLICATION_CRASH_WEBVIEW_SHOULD_INTERCEPT_SERVICE_WORKER
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class BrowserServiceWorkerClient @Inject constructor(
     private val requestInterceptor: RequestInterceptor,
-    private val uncaughtExceptionRepository: UncaughtExceptionRepository,
+    private val dispatcherProvider: DispatcherProvider,
+    private val crashLogger: CrashLogger,
 ) : ServiceWorkerClientCompat() {
 
     override fun shouldInterceptRequest(request: WebResourceRequest): WebResourceResponse? {
@@ -43,14 +46,16 @@ class BrowserServiceWorkerClient @Inject constructor(
                 Timber.v("Intercepting Service Worker resource ${request.url} type:${request.method} on page $documentUrl")
                 requestInterceptor.shouldInterceptFromServiceWorker(request, documentUrl)
             } catch (e: Throwable) {
-                uncaughtExceptionRepository.recordUncaughtException(e, UncaughtExceptionSource.SHOULD_INTERCEPT_REQUEST_FROM_SERVICE_WORKER)
-                throw e
+                withContext(dispatcherProvider.io()) {
+                    crashLogger.logCrash(CrashLogger.Crash(pixelName = APPLICATION_CRASH_WEBVIEW_SHOULD_INTERCEPT_SERVICE_WORKER.pixelName, t = e))
+                    throw e
+                }
             }
         }
     }
 
     companion object {
-        const val HEADER_ORIGIN = "Origin"
-        const val HEADER_REFERER = "Referer"
+        private const val HEADER_ORIGIN = "Origin"
+        private const val HEADER_REFERER = "Referer"
     }
 }

@@ -30,6 +30,7 @@ import androidx.test.annotation.UiThreadTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.adclick.api.AdClickManager
+import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.accessibility.AccessibilityManager
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
@@ -39,8 +40,7 @@ import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.print.PrintInjector
-import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
-import com.duckduckgo.app.global.exception.UncaughtExceptionSource
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill
@@ -83,7 +83,7 @@ class BrowserWebViewClientTest {
     private val cookieManager: CookieManager = mock()
     private val loginDetector: DOMLoginDetector = mock()
     private val offlinePixelCountDataStore: OfflinePixelCountDataStore = mock()
-    private val uncaughtExceptionRepository: UncaughtExceptionRepository = mock()
+    private val crashLogger: CrashLogger = mock()
     private val dosDetector: DosDetector = DosDetector()
     private val accessibilitySettings: AccessibilityManager = mock()
     private val trustedCertificateStore: TrustedCertificateStore = mock()
@@ -109,7 +109,7 @@ class BrowserWebViewClientTest {
             specialUrlDetector,
             requestInterceptor,
             offlinePixelCountDataStore,
-            uncaughtExceptionRepository,
+            crashLogger,
             cookieManagerProvider,
             loginDetector,
             dosDetector,
@@ -212,7 +212,9 @@ class BrowserWebViewClientTest {
         val mockWebView = mock<WebView>()
         whenever(mockWebView.url).thenThrow(exception)
         testee.onReceivedHttpAuthRequest(mockWebView, mockHandler, EXAMPLE_URL, EXAMPLE_URL)
-        verify(uncaughtExceptionRepository).recordUncaughtException(exception, UncaughtExceptionSource.ON_HTTP_AUTH_REQUEST)
+        verify(crashLogger).logCrash(
+            CrashLogger.Crash(Pixel.StatisticsPixelName.APPLICATION_CRASH_WEBVIEW_HTTP_AUTH_REQUEST.pixelName, exception),
+        )
     }
 
     @UiThreadTest
@@ -278,7 +280,9 @@ class BrowserWebViewClientTest {
         val mockWebView: WebView = mock()
         whenever(mockWebView.url).thenThrow(exception)
         testee.onPageFinished(mockWebView, null)
-        verify(uncaughtExceptionRepository).recordUncaughtException(exception, UncaughtExceptionSource.ON_PAGE_FINISHED)
+        verify(crashLogger).logCrash(
+            CrashLogger.Crash(Pixel.StatisticsPixelName.APPLICATION_CRASH_WEBVIEW_PAGE_FINISHED.pixelName, exception),
+        )
     }
 
     @UiThreadTest
@@ -302,7 +306,9 @@ class BrowserWebViewClientTest {
         val mockWebView: WebView = mock()
         whenever(mockWebView.url).thenThrow(exception)
         testee.onPageStarted(mockWebView, null, null)
-        verify(uncaughtExceptionRepository).recordUncaughtException(exception, UncaughtExceptionSource.ON_PAGE_STARTED)
+        verify(crashLogger).logCrash(
+            CrashLogger.Crash(Pixel.StatisticsPixelName.APPLICATION_CRASH_WEBVIEW_PAGE_STARTED.pixelName, exception),
+        )
     }
 
     @Test
@@ -310,7 +316,9 @@ class BrowserWebViewClientTest {
         val exception = RuntimeException()
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenThrow(exception)
         testee.shouldOverrideUrlLoading(webView, "")
-        verify(uncaughtExceptionRepository).recordUncaughtException(exception, UncaughtExceptionSource.SHOULD_OVERRIDE_REQUEST)
+        verify(crashLogger).logCrash(
+            CrashLogger.Crash(Pixel.StatisticsPixelName.APPLICATION_CRASH_WEBVIEW_OVERRIDE_REQUEST.pixelName, exception),
+        )
     }
 
     @Test
