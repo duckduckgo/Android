@@ -63,17 +63,26 @@ internal fun Throwable.asAnrData(): AnrData {
 
 internal fun CrashLogger.Crash.asCrashEntity(
     appVersion: String,
+    processName: String,
 ): ExceptionEntity {
     val timestamp = FORMATTER_SECONDS.format(LocalDateTime.now())
     val stacktrace = this.t.asLog()
     return ExceptionEntity(
         hash = (stacktrace + timestamp).encode().md5().hex(),
-        pixelName = this.pixelName,
-        message = this.t.message.orEmpty(),
+        shortName = this.shortName,
+        processName = processName,
+        message = this.t.extractExceptionCause(),
         stackTrace = stacktrace,
         version = appVersion,
         timestamp = timestamp,
     )
+}
+
+private fun Throwable?.extractExceptionCause(): String {
+    if (this == null) {
+        return "Exception missing"
+    }
+    return "${this.javaClass.name} - ${this.stackTrace.firstOrNull()}"
 }
 
 internal fun Array<StackTraceElement>.asStringArray(): ArrayList<String> {

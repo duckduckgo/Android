@@ -29,9 +29,6 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryI
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
-import com.duckduckgo.cookies.impl.CookiesPixelName.COOKIE_DATABASE_EXCEPTION_OPEN_ERROR
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.Dispatchers
@@ -40,7 +37,8 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import org.junit.After
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.*
 
@@ -52,9 +50,13 @@ class SQLCookieRemoverTest {
     private val db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
     private val cookieManager = CookieManager.getInstance()
     private val fireproofWebsiteDao = db.fireproofWebsiteDao()
-    private val mockPixel = mock<Pixel>()
-    private val mockOfflinePixelCountDataStore = mock<OfflinePixelCountDataStore>()
+    private lateinit var crashLogger: FakeCraskLogger
     private val webViewDatabaseLocator = WebViewDatabaseLocator(context)
+
+    @Before
+    fun setup() {
+        crashLogger = FakeCraskLogger()
+    }
 
     @After
     fun after() = runBlocking {
@@ -93,19 +95,7 @@ class SQLCookieRemoverTest {
     }
 
     @Test
-    fun whenDatabasePathNotFoundThenPixelFired() = runTest {
-        val mockDatabaseLocator = mock<DatabaseLocator> {
-            on { getDatabasePath() } doReturn ""
-        }
-        val sqlCookieRemover = givenSQLCookieRemover(databaseLocator = mockDatabaseLocator)
-
-        sqlCookieRemover.removeCookies()
-
-        verify(mockOfflinePixelCountDataStore).cookieDatabaseNotFoundCount = 1
-    }
-
-    @Test
-    fun whenUnableToOpenDatabaseThenPixelFiredAndSaveOfflineCount() = runTest {
+    fun whenUnableToOpenDatabaseThenLogCrash() = runTest {
         val mockDatabaseLocator = mock<DatabaseLocator> {
             on { getDatabasePath() } doReturn "fakePath"
         }
@@ -113,8 +103,8 @@ class SQLCookieRemoverTest {
 
         sqlCookieRemover.removeCookies()
 
-        verify(mockOfflinePixelCountDataStore).cookieDatabaseOpenErrorCount = 1
-        verify(mockPixel).fire(eq(COOKIE_DATABASE_EXCEPTION_OPEN_ERROR), any(), any())
+        assertNotNull(crashLogger.crash)
+        assertEquals("cookie_db_open_error", crashLogger.crash?.shortName)
     }
 
     private fun givenFireproofWebsitesStored() {
@@ -137,16 +127,22 @@ class SQLCookieRemoverTest {
     private fun givenSQLCookieRemover(
         databaseLocator: DatabaseLocator = webViewDatabaseLocator,
         repository: FireproofRepository = FireproofWebsiteRepositoryImpl(fireproofWebsiteDao, DefaultDispatcherProvider(), mock()),
-        offlinePixelCountDataStore: OfflinePixelCountDataStore = mockOfflinePixelCountDataStore,
-        exceptionPixel: CrashLogger = mock(),
+        exceptionPixel: CrashLogger = crashLogger,
         dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
     ): SQLCookieRemover {
         return SQLCookieRemover(
             databaseLocator,
             repository,
-            offlinePixelCountDataStore,
             exceptionPixel,
             dispatcherProvider,
         )
+    }
+}
+
+internal class FakeCraskLogger : CrashLogger {
+    var crash: CrashLogger.Crash? = null
+
+    override fun logCrash(crash: CrashLogger.Crash) {
+        this.crash = crash
     }
 }

@@ -30,8 +30,6 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryI
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.domain
-import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.cookies.impl.CookieManagerRemover
 import com.duckduckgo.cookies.impl.DefaultCookieManagerProvider
 import com.duckduckgo.cookies.impl.RemoveCookies
@@ -64,8 +62,6 @@ class FireproofingReferenceTest(private val testCase: TestCase) {
     private val cookieManagerProvider = DefaultCookieManagerProvider()
     private val cookieManager = cookieManagerProvider.get()
     private val fireproofWebsiteDao = db.fireproofWebsiteDao()
-    private val mockPixel = mock<Pixel>()
-    private val mockOfflinePixelCountDataStore = mock<OfflinePixelCountDataStore>()
     private val webViewDatabaseLocator = WebViewDatabaseLocator(context)
     private val fireproofWebsiteRepositoryImpl = FireproofWebsiteRepositoryImpl(fireproofWebsiteDao, DefaultDispatcherProvider(), mock())
     private lateinit var testee: WebViewCookieManager
@@ -94,7 +90,6 @@ class FireproofingReferenceTest(private val testCase: TestCase) {
         val sqlCookieRemover = SQLCookieRemover(
             webViewDatabaseLocator,
             fireproofWebsiteRepositoryImpl,
-            mockOfflinePixelCountDataStore,
             mock(),
             DefaultDispatcherProvider(),
         )

@@ -18,6 +18,7 @@ package com.duckduckgo.app.anr
 
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.anrs.store.UncaughtExceptionDao
+import com.duckduckgo.app.di.ProcessName
 import com.duckduckgo.app.utils.checkMainThread
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
@@ -28,10 +29,11 @@ import javax.inject.Inject
 class RealCrashLogger @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val uncaughtExceptionDao: UncaughtExceptionDao,
+    @ProcessName private val processName: String,
 ) : CrashLogger {
     override fun logCrash(crash: CrashLogger.Crash) {
         checkMainThread()
 
-        uncaughtExceptionDao.add(crash.asCrashEntity(appBuildConfig.versionName))
+        uncaughtExceptionDao.add(crash.asCrashEntity(appBuildConfig.versionName, processName))
     }
 }

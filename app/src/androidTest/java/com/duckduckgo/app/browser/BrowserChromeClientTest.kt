@@ -30,9 +30,7 @@ import android.webkit.WebView
 import androidx.core.net.toUri
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
-import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.privacy.config.api.Drm
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
@@ -43,8 +41,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.ArgumentMatchers.anyInt
-import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.*
 
 @ExperimentalCoroutinesApi
@@ -53,7 +49,6 @@ class BrowserChromeClientTest {
     private lateinit var testee: BrowserChromeClient
     private lateinit var webView: TestWebView
     private lateinit var mockWebViewClientListener: WebViewClientListener
-    private lateinit var mockCrashLogger: CrashLogger
     private lateinit var mockFilePathCallback: ValueCallback<Array<Uri>>
     private lateinit var mockFileChooserParams: WebChromeClient.FileChooserParams
     private lateinit var mockDrm: Drm
@@ -68,12 +63,10 @@ class BrowserChromeClientTest {
     @UiThreadTest
     @Before
     fun setup() {
-        mockCrashLogger = mock()
         mockDrm = mock()
         mockAppBuildConfig = mock()
         mockSitePermissionsManager = mock()
         testee = BrowserChromeClient(
-            mockCrashLogger,
             mockDrm,
             mockAppBuildConfig,
             TestScope(),
@@ -119,29 +112,9 @@ class BrowserChromeClientTest {
     }
 
     @Test
-    fun whenCustomViewShownThrowsExceptionThenRecordException() = runTest {
-        val exception = RuntimeException()
-        whenever(mockWebViewClientListener.goFullScreen(any())).thenThrow(exception)
-        testee.onShowCustomView(fakeView, null)
-        verify(mockCrashLogger).logCrash(
-            CrashLogger.Crash(Pixel.StatisticsPixelName.APPLICATION_CRASH_WEBVIEW_SHOW_CUSTOM_VIEW.pixelName, exception),
-        )
-    }
-
-    @Test
     fun whenHideCustomViewCalledThenListenerInstructedToExistFullScreen() = runTest {
         testee.onHideCustomView()
         verify(mockWebViewClientListener).exitFullScreen()
-    }
-
-    @Test
-    fun whenHideCustomViewThrowsExceptionThenRecordException() = runTest {
-        val exception = RuntimeException()
-        whenever(mockWebViewClientListener.exitFullScreen()).thenThrow(exception)
-        testee.onHideCustomView()
-        verify(mockCrashLogger).logCrash(
-            CrashLogger.Crash(Pixel.StatisticsPixelName.APPLICATION_CRASH_WEBVIEW_HIDE_CUSTOM_VIEW.pixelName, exception),
-        )
     }
 
     @UiThreadTest
@@ -166,17 +139,6 @@ class BrowserChromeClientTest {
         testee.onProgressChanged(mockWebView, 10)
         verify(mockWebViewClientListener, never()).navigationStateChanged(any())
         verify(mockWebViewClientListener, never()).progressChanged(any())
-    }
-
-    @UiThreadTest
-    @Test
-    fun whenOnProgressChangedThrowsExceptionThenRecordException() = runTest {
-        val exception = RuntimeException()
-        whenever(mockWebViewClientListener.progressChanged(anyInt())).thenThrow(exception)
-        testee.onProgressChanged(webView, 10)
-        verify(mockCrashLogger).logCrash(
-            CrashLogger.Crash(Pixel.StatisticsPixelName.APPLICATION_CRASH_WEBVIEW_ON_PROGRESS_CHANGED.pixelName, exception),
-        )
     }
 
     @UiThreadTest
@@ -209,31 +171,18 @@ class BrowserChromeClientTest {
     }
 
     @Test
-    fun whenOnReceivedTitleThrowsExceptionThenRecordException() = runTest {
-        val exception = RuntimeException()
-        whenever(mockWebViewClientListener.titleReceived(anyString())).thenThrow(exception)
-        testee.onReceivedTitle(webView, "")
-        verify(mockCrashLogger).logCrash(
-            CrashLogger.Crash(Pixel.StatisticsPixelName.APPLICATION_CRASH_WEBVIEW_RECEIVED_PAGE_TITLE.pixelName, exception),
-        )
-    }
-
-    @Test
     fun whenOnShowFileChooserCalledThenShowFileChooser() {
         assertTrue(testee.onShowFileChooser(webView, mockFilePathCallback, mockFileChooserParams))
         verify(mockWebViewClientListener).showFileChooser(mockFilePathCallback, mockFileChooserParams)
     }
 
-    @Test
+    @Test(expected = java.lang.RuntimeException::class)
     fun whenShowFileChooserThrowsExceptionThenRecordException() = runTest {
         val exception = RuntimeException("deliberate")
 
         whenever(mockWebViewClientListener.showFileChooser(any(), any())).thenThrow(exception)
         testee.onShowFileChooser(webView, mockFilePathCallback, mockFileChooserParams)
 
-        verify(mockCrashLogger).logCrash(
-            CrashLogger.Crash(Pixel.StatisticsPixelName.APPLICATION_CRASH_WEBVIEW_SHOW_FILE_CHOOSER.pixelName, exception),
-        )
         verify(mockFilePathCallback).onReceiveValue(null)
     }
 

@@ -598,7 +598,6 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
     private val MIGRATION_45_TO_46: Migration = object : Migration(45, 46) {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL("DROP TABLE `UncaughtExceptionEntity`")
-            database.execSQL("VACUUM")
         }
     }
 

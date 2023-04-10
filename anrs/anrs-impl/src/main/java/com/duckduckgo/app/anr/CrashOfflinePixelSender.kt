@@ -20,6 +20,7 @@ import android.util.Base64
 import com.duckduckgo.app.anrs.store.UncaughtExceptionDao
 import com.duckduckgo.app.statistics.api.OfflinePixel
 import com.duckduckgo.app.statistics.api.PixelSender
+import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName.APPLICATION_CRASH_GLOBAL
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.Completable
@@ -41,14 +42,16 @@ class CrashOfflinePixelSender @Inject constructor(
                 val ss = Base64.encodeToString(exception.stackTrace.toByteArray(), Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE)
                 val params =
                     mapOf(
+                        EXCEPTION_SHORT_NAME to exception.shortName,
                         EXCEPTION_MESSAGE to exception.message,
+                        EXCEPTION_PROCESS_NAME to exception.processName,
                         EXCEPTION_STACK_TRACE to ss,
                         EXCEPTION_APP_VERSION to exception.version,
                         EXCEPTION_TIMESTAMP to exception.timestamp,
                     )
 
                 val pixel =
-                    pixelSender.sendPixel(exception.pixelName, params, emptyMap()).doOnComplete {
+                    pixelSender.sendPixel(APPLICATION_CRASH_GLOBAL.pixelName, params, emptyMap()).doOnComplete {
                         logcat { "Sent pixel with params: $params containing exception; deleting exception with id=${exception.hash}" }
                         uncaughtExceptionDao.delete(exception)
                     }
@@ -61,7 +64,9 @@ class CrashOfflinePixelSender @Inject constructor(
     }
 
     companion object {
+        private const val EXCEPTION_SHORT_NAME = "sn"
         private const val EXCEPTION_MESSAGE = "m"
+        private const val EXCEPTION_PROCESS_NAME = "pn"
         private const val EXCEPTION_STACK_TRACE = "ss"
         private const val EXCEPTION_APP_VERSION = "v"
         private const val EXCEPTION_TIMESTAMP = "t"

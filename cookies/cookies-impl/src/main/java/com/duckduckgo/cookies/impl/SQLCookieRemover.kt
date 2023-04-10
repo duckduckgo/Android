@@ -23,7 +23,6 @@ import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.fire.DatabaseLocator
 import com.duckduckgo.app.fire.FireproofRepository
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.cookies.api.CookieRemover
 import com.duckduckgo.di.scopes.AppScope
@@ -54,12 +53,11 @@ class CookieManagerRemover @Inject constructor(private val cookieManagerProvider
 class SQLCookieRemover @Inject constructor(
     @Named("webViewDbLocator") private val webViewDatabaseLocator: DatabaseLocator,
     private val fireproofRepository: FireproofRepository,
-    private val offlinePixelCountDataStore: OfflinePixelCountDataStore,
     private val crashLogger: CrashLogger,
     private val dispatcherProvider: DispatcherProvider,
 ) : CookieRemover {
 
-    private val databaseErrorHandler = PixelSenderDatabaseErrorHandler(offlinePixelCountDataStore)
+    private val databaseErrorHandler = PixelSenderDatabaseErrorHandler()
 
     override suspend fun removeCookies(): Boolean {
         return withContext(dispatcherProvider.io()) {
@@ -67,8 +65,6 @@ class SQLCookieRemover @Inject constructor(
             if (databasePath.isNotEmpty()) {
                 val excludedHosts = fireproofRepository.fireproofWebsites()
                 return@withContext removeCookies(databasePath, excludedHosts)
-            } else {
-                offlinePixelCountDataStore.cookieDatabaseNotFoundCount += 1
             }
             return@withContext false
         }
@@ -78,8 +74,7 @@ class SQLCookieRemover @Inject constructor(
         return try {
             SQLiteDatabase.openDatabase(databasePath, null, SQLiteDatabase.OPEN_READWRITE, databaseErrorHandler)
         } catch (exception: Exception) {
-            offlinePixelCountDataStore.cookieDatabaseOpenErrorCount += 1
-            crashLogger.logCrash(CrashLogger.Crash(pixelName = CookiesPixelName.COOKIE_DATABASE_EXCEPTION_OPEN_ERROR.pixelName, t = exception))
+            crashLogger.logCrash(CrashLogger.Crash(shortName = "cookie_db_open_error", t = exception))
             null
         }
     }
@@ -98,8 +93,7 @@ class SQLCookieRemover @Inject constructor(
                 Timber.v("$number cookies removed")
             } catch (exception: Exception) {
                 Timber.e(exception)
-                offlinePixelCountDataStore.cookieDatabaseDeleteErrorCount += 1
-                crashLogger.logCrash(CrashLogger.Crash(pixelName = CookiesPixelName.COOKIE_DATABASE_EXCEPTION_DELETE_ERROR.pixelName, t = exception))
+                crashLogger.logCrash(CrashLogger.Crash(shortName = "cookie_db_delete_error", t = exception))
             } finally {
                 close()
             }
@@ -126,15 +120,12 @@ class SQLCookieRemover @Inject constructor(
         const val COOKIES_TABLE_NAME = "cookies"
     }
 
-    private class PixelSenderDatabaseErrorHandler(
-        private val offlinePixelCountDataStore: OfflinePixelCountDataStore,
-    ) : DatabaseErrorHandler {
+    private class PixelSenderDatabaseErrorHandler() : DatabaseErrorHandler {
 
         private val delegate = DefaultDatabaseErrorHandler()
 
         override fun onCorruption(dbObj: SQLiteDatabase?) {
             delegate.onCorruption(dbObj)
-            offlinePixelCountDataStore.cookieDatabaseCorruptedCount += 1
         }
     }
 }

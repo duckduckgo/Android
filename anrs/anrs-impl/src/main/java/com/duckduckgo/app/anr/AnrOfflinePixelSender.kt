@@ -51,6 +51,6 @@ class AnrOfflinePixelSender @Inject constructor(
     }
 }
 
-internal enum class AnrPixelName(override val pixelName: String) : Pixel.PixelName {
+enum class AnrPixelName(override val pixelName: String) : Pixel.PixelName {
     ANR_PIXEL("m_anr_exception"),
 }

@@ -19,9 +19,6 @@ package com.duckduckgo.app.anr
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesTo
@@ -40,11 +37,9 @@ import logcat.logcat
 @ContributesBinding(AppScope::class)
 class GlobalUncaughtExceptionHandler @Inject constructor(
     @InternalApi private val originalHandler: Thread.UncaughtExceptionHandler,
-    private val offlinePixelCountDataStore: OfflinePixelCountDataStore,
     private val crashLogger: CrashLogger,
     private val dispatcherProvider: DispatcherProvider,
     private val appCoroutineScope: CoroutineScope,
-    private val appBuildConfig: AppBuildConfig,
 ) : Thread.UncaughtExceptionHandler {
 
     override fun uncaughtException(
@@ -54,10 +49,6 @@ class GlobalUncaughtExceptionHandler @Inject constructor(
         if (shouldRecordExceptionAndCrashApp(originalException)) {
             recordExceptionAndAllowCrash(thread, originalException)
             return
-        }
-
-        if (shouldCrashApp()) {
-            originalHandler.uncaughtException(thread, originalException)
         }
     }
 
@@ -74,11 +65,6 @@ class GlobalUncaughtExceptionHandler @Inject constructor(
         }
     }
 
-    /**
-     * If the exception is one we don't report on, we still want to see a crash when we're in DEBUG builds for safety we aren't ignoring important issues
-     */
-    private fun shouldCrashApp(): Boolean = appBuildConfig.isInternalBuild()
-
     private fun recordExceptionAndAllowCrash(
         thread: Thread?,
         originalException: Throwable?,
@@ -88,12 +74,11 @@ class GlobalUncaughtExceptionHandler @Inject constructor(
                 originalException?.let {
                     crashLogger.logCrash(
                         CrashLogger.Crash(
-                            pixelName = Pixel.StatisticsPixelName.APPLICATION_CRASH_GLOBAL.pixelName,
+                            shortName = Pixel.StatisticsPixelName.APPLICATION_CRASH_GLOBAL.pixelName,
                             t = it,
                         ),
                     )
                 }
-                offlinePixelCountDataStore.applicationCrashCount += 1
             } catch (e: Throwable) {
                 logcat(LogPriority.ERROR) { e.asLog() }
             } finally {

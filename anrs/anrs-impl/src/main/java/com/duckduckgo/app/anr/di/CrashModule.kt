@@ -40,6 +40,7 @@ object CrashModule {
     fun provideCrashDatabase(context: Context): CrashDatabase {
         return Room.databaseBuilder(context, CrashDatabase::class.java, "crash_database.db")
             .fallbackToDestructiveMigration()
+            .enableMultiInstanceInvalidation()
             .build()
     }
 

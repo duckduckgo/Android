@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.cookies.impl
+package com.duckduckgo.app.di
 
-import com.duckduckgo.app.statistics.pixels.Pixel
+import javax.inject.Qualifier
 
-enum class CookiesPixelName(override val pixelName: String) : Pixel.PixelName {
-    COOKIE_DATABASE_EXCEPTION_OPEN_ERROR("m_cdb_e_oe"),
-    COOKIE_DATABASE_EXCEPTION_DELETE_ERROR("m_cdb_e_de"),
-    COOKIE_DATABASE_EXCEPTION_EXPIRE_ERROR("m_cookie_db_expire_error"),
-}
+@Retention(AnnotationRetention.BINARY)
+@Qualifier
+annotation class ProcessName

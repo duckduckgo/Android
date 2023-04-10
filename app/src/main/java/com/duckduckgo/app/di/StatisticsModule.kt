@@ -24,7 +24,6 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.AtbInitializer
 import com.duckduckgo.app.statistics.AtbInitializerListener
 import com.duckduckgo.app.statistics.api.*
-import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.di.DaggerSet
@@ -42,10 +41,8 @@ object StatisticsModule {
 
     @Provides
     fun offlinePixelSender(
-        offlinePixelCountDataStore: OfflinePixelCountDataStore,
-        pixelSender: PixelSender,
         offlinePixels: DaggerSet<OfflinePixel>,
-    ): OfflinePixelSender = OfflinePixelSender(offlinePixelCountDataStore, pixelSender, offlinePixels)
+    ): OfflinePixelSender = OfflinePixelSender(offlinePixels)
 
     @Provides
     fun deviceInfo(context: Context): DeviceInfo = ContextDeviceInfo(context)
