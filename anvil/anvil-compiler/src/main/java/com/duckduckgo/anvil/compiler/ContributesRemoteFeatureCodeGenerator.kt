@@ -419,7 +419,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                             this.feature.get().invokeMethod(subfeature.key).setEnabled(
                                 Toggle.State(
                                     enable = jsonToggle.state == "enabled" || (appBuildConfig.flavor == %T && jsonToggle.state == "internal"),
-                                    minSupportedVersion = jsonToggle.minSupportedVersion,
+                                    minSupportedVersion = jsonToggle.minSupportedVersion?.toInt(),
                                 ),
                             )
                         }
@@ -592,7 +592,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             )
             .addProperty(
                 PropertySpec
-                    .builder("minSupportedVersion", Int::class.asClassName().copy(nullable = true))
+                    .builder("minSupportedVersion", Double::class.asClassName().copy(nullable = true))
                     .delegate("attributes")
                     .build(),
             )
