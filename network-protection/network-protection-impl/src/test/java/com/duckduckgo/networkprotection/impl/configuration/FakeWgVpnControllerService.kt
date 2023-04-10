@@ -26,6 +26,7 @@ class FakeWgVpnControllerService : WgVpnControllerService {
         Types.newParameterizedType(List::class.java, RegisteredServerInfo::class.java),
     )
     private val servers = configAdapter.fromJson(SERVERS_JSON) ?: emptyList()
+
     override suspend fun redeemCode(code: NetPRedeemCodeRequest): NetPRedeemCodeResponse {
         return NetPRedeemCodeResponse("fake token")
     }
