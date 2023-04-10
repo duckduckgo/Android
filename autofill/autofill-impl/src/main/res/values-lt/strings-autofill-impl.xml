@@ -44,6 +44,9 @@
     <string name="updateLoginDialogTitleUpdateUsername">Atnaujinti naudotojo vardą?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Atnaujinti naudotojo vardą</string>
 
+    <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Atnaujinti \n%1$s slaptažodį?</string>
+    <string name="updateLoginUpdatePasswordExplanation">„DuckDuckGo“ atnaujins šį jūsų įrenginyje įrašytą prisijungimą.</string>
+
     <string name="autofillDialogCloseButtonContentDescription">Uždaryti automatinio pildymo dialogo langą</string>
 
     <string name="credentialManagementEditLoginTitleHint">Prisijungimo pavadinimas</string>
@@ -74,4 +77,8 @@
     <string name="autofillDeleteLoginDialogCancel">Atšaukti</string>
     <string name="autofillDeleteLoginDialogDelete">Trinti</string>
     <string name="autofillDeleteLoginDialogTitle">Ar tikrai norite ištrinti šį prisijungimą?</string>
+
+    <string name="autofillManagementUsernameCopied">Naudotojo vardas nukopijuotas</string>
+    <string name="autofillManagementPasswordCopied">Slaptažodis nukopijuotas</string>
+
 </resources>

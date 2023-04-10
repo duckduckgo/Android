@@ -44,6 +44,9 @@
     <string name="updateLoginDialogTitleUpdateUsername">Ενημέρωση ονόματος χρήστη;</string>
     <string name="updateLoginDialogButtonUpdateUsername">Ενημέρωση ονόματος χρήστη</string>
 
+    <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Ενημέρωση κωδικού πρόσβασης για \n%1$s;</string>
+    <string name="updateLoginUpdatePasswordExplanation">Το DuckDuckGo θα ενημερώσει αυτήν την αποθηκευμένη σύνδεση στη συσκευή σας.</string>
+
     <string name="autofillDialogCloseButtonContentDescription">Κλείσιμο διαλόγου αυτόματης συμπλήρωσης</string>
 
     <string name="credentialManagementEditLoginTitleHint">Τίτλος σύνδεσης</string>
@@ -74,4 +77,8 @@
     <string name="autofillDeleteLoginDialogCancel">Ακύρωση</string>
     <string name="autofillDeleteLoginDialogDelete">Διαγραφή</string>
     <string name="autofillDeleteLoginDialogTitle">Θέλετε σίγουρα να διαγράψετε αυτά τα στοιχεία σύνδεσης;</string>
+
+    <string name="autofillManagementUsernameCopied">Το όνομα χρήστη αντιγράφηκε</string>
+    <string name="autofillManagementPasswordCopied">Ο κωδικός πρόσβασης αντιγράφηκε</string>
+
 </resources>

@@ -589,6 +589,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Blokira sledilce e-pošte in skrije vaš naslov</string>
     <string name="newEmailAliasMenuTitle">Ustvari naslov Duck Address</string>
 
+    <!-- Autofill -->
+    <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Oglejte si</string>
+    <string name="autofillLoginSavedSnackbarMessage">Prijava shranjena</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Prijava posodobljena</string>
+    <string name="autofillDisableAutofillPromptTitle">Ali želite še naprej shranjevati prijave?</string>
+    <string name="autofillDisableAutofillPromptMessage">To lahko kadar koli onemogočite v nastavitvah.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Še naprej shranjujte</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Onemogoči</string>
+
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Želite, da vam pošljemo obvestilo, ko ste na vrsti?</string>
     <string name="waitlistNotificationDialogNoThanks">Ne, hvala</string>

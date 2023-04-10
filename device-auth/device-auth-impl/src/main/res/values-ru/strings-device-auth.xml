@@ -18,4 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="biometric_prompt_title">Логины заблокированы</string>
+    <string name="autofill_auth_text_for_using">Чтобы использовать сохраненные логины, разблокируйте устройство.</string>
+    <string name="autofill_auth_text_for_access">Чтобы открыть сохраненные логины, разблокируйте устройство.</string>
 </resources>

@@ -44,6 +44,9 @@
     <string name="updateLoginDialogTitleUpdateUsername">Aktualizovat uživatelské jméno?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Aktualizovat uživatelské jméno</string>
 
+    <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Aktualizovat heslo pro \n%1$s?</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo zaktualizuje toto uložené přihlášení ve tvém zařízení.</string>
+
     <string name="autofillDialogCloseButtonContentDescription">Zavřít dialogové okno Automatické vyplňování</string>
 
     <string name="credentialManagementEditLoginTitleHint">Přihlašovací jméno</string>
@@ -74,4 +77,8 @@
     <string name="autofillDeleteLoginDialogCancel">Zrušit</string>
     <string name="autofillDeleteLoginDialogDelete">Smazat</string>
     <string name="autofillDeleteLoginDialogTitle">Opravdu chceš tohle přihlášení smazat?</string>
+
+    <string name="autofillManagementUsernameCopied">Uživatelské jméno zkopírováno</string>
+    <string name="autofillManagementPasswordCopied">Heslo zkopírováno</string>
+
 </resources>

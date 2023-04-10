@@ -44,6 +44,9 @@
     <string name="updateLoginDialogTitleUpdateUsername">¿Actualizar nombre de usuario?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Actualizar nombre de usuario</string>
 
+    <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">¿Actualizar contraseña de \n%1$s?</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo actualizará este inicio de sesión almacenado en tu dispositivo.</string>
+
     <string name="autofillDialogCloseButtonContentDescription">Cerrar cuadro de diálogo de Autocompletar</string>
 
     <string name="credentialManagementEditLoginTitleHint">Título de inicio de sesión</string>
@@ -74,4 +77,8 @@
     <string name="autofillDeleteLoginDialogCancel">Cancelar</string>
     <string name="autofillDeleteLoginDialogDelete">Eliminar</string>
     <string name="autofillDeleteLoginDialogTitle">¿Seguro que quieres eliminar este inicio de sesión?</string>
+
+    <string name="autofillManagementUsernameCopied">Nombre de usuario copiado</string>
+    <string name="autofillManagementPasswordCopied">Contraseña copiada</string>
+
 </resources>

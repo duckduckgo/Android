@@ -585,6 +585,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Bloquea los rastreadores de correo electrónico y oculta tu dirección</string>
     <string name="newEmailAliasMenuTitle">Generar Duck Address</string>
 
+    <!-- Autofill -->
+    <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Ver</string>
+    <string name="autofillLoginSavedSnackbarMessage">Inicio de sesión guardado</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Inicio de sesión actualizado</string>
+    <string name="autofillDisableAutofillPromptTitle">¿Deseas seguir guardando inicios de sesión?</string>
+    <string name="autofillDisableAutofillPromptMessage">Puedes desactivar esta opción en cualquier momento en Ajustes.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Seguir guardando</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Deshabilitar</string>
+
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">¿Quieres que te enviemos una notificación cuando te toque?</string>
     <string name="waitlistNotificationDialogNoThanks">No, gracias</string>

@@ -44,6 +44,9 @@
     <string name="updateLoginDialogTitleUpdateUsername">Gebruikersnaam bijwerken?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Gebruikersnaam bijwerken</string>
 
+    <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Wachtwoord bijwerken voor \n%1$s?</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo werkt deze opgeslagen aanmeldgegevens op je apparaat bij.</string>
+
     <string name="autofillDialogCloseButtonContentDescription">Dialoogvenster Automatisch invullen sluiten</string>
 
     <string name="credentialManagementEditLoginTitleHint">Aanmeldgegevens Titel</string>
@@ -74,4 +77,8 @@
     <string name="autofillDeleteLoginDialogCancel">Annuleren</string>
     <string name="autofillDeleteLoginDialogDelete">Verwijderen</string>
     <string name="autofillDeleteLoginDialogTitle">Weet je zeker dat je deze aanmeldgegevens wilt verwijderen?</string>
+
+    <string name="autofillManagementUsernameCopied">Gebruikersnaam gekopieerd</string>
+    <string name="autofillManagementPasswordCopied">Wachtwoord gekopieerd</string>
+
 </resources>

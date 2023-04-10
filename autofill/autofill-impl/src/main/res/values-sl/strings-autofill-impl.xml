@@ -44,6 +44,9 @@
     <string name="updateLoginDialogTitleUpdateUsername">Želite posodobiti uporabniško ime?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Posodobi uporabniško ime</string>
 
+    <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Želite posodobiti geslo za \n%1$s?</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo bo posodobil to shranjeno prijavo v vaši napravi.</string>
+
     <string name="autofillDialogCloseButtonContentDescription">Zapri pogovorno okno za samodejno izpolnjevanje</string>
 
     <string name="credentialManagementEditLoginTitleHint">Naslov prijave</string>
@@ -74,4 +77,8 @@
     <string name="autofillDeleteLoginDialogCancel">Prekliči</string>
     <string name="autofillDeleteLoginDialogDelete">Izbriši</string>
     <string name="autofillDeleteLoginDialogTitle">Ali ste prepričani, da želite izbrisati te podatke za prijavo?</string>
+
+    <string name="autofillManagementUsernameCopied">Uporabniško ime je bilo kopirano</string>
+    <string name="autofillManagementPasswordCopied">Geslo je bilo kopirano</string>
+
 </resources>

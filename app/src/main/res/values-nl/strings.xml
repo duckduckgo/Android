@@ -585,6 +585,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Blokkeert e-mailtrackers en verbergt je adres</string>
     <string name="newEmailAliasMenuTitle">Duck Address genereren</string>
 
+    <!-- Autofill -->
+    <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Weergeven</string>
+    <string name="autofillLoginSavedSnackbarMessage">Aanmeldgegevens opgeslagen</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Aanmeldgegevens bijgewerkt</string>
+    <string name="autofillDisableAutofillPromptTitle">Wil je aanmeldgegevens blijven opslaan?</string>
+    <string name="autofillDisableAutofillPromptMessage">Je kunt dit op elk moment uitschakelen in de instellingen.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Blijf opslaan</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Uitschakelen</string>
+
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Wil je dat we je een melding sturen als je aan de beurt bent?</string>
     <string name="waitlistNotificationDialogNoThanks">Nee, bedankt</string>

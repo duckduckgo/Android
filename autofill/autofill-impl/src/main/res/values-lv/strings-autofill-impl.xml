@@ -44,6 +44,9 @@
     <string name="updateLoginDialogTitleUpdateUsername">Atjaunināt lietotājvārdu?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Atjaunināt lietotājvārdu</string>
 
+    <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Atjaunināt paroli lietotājvārdam \n%1$s?</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo atjauninās šos saglabātos pieteikšanās datus tavā ierīcē.</string>
+
     <string name="autofillDialogCloseButtonContentDescription">Aizvērt automātiskās aizpildes dialoglodziņu</string>
 
     <string name="credentialManagementEditLoginTitleHint">Pieteikšanās datu nosaukums</string>
@@ -74,4 +77,8 @@
     <string name="autofillDeleteLoginDialogCancel">Atcelt</string>
     <string name="autofillDeleteLoginDialogDelete">Dzēst</string>
     <string name="autofillDeleteLoginDialogTitle">Vai tiešām vēlies dzēst šos pieteikšanās datus?</string>
+
+    <string name="autofillManagementUsernameCopied">Lietotājvārds nokopēts</string>
+    <string name="autofillManagementPasswordCopied">Parole nokopēta</string>
+
 </resources>

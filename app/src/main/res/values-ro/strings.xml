@@ -587,6 +587,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Blochează modulele cookie de urmărire pentru e-mail și îți ascunde adresa</string>
     <string name="newEmailAliasMenuTitle">Generează Duck Address</string>
 
+    <!-- Autofill -->
+    <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Vezi</string>
+    <string name="autofillLoginSavedSnackbarMessage">Date de conectare salvate</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Date de conectare actualizate</string>
+    <string name="autofillDisableAutofillPromptTitle">Vrei să salvezi în continuare datele de conectare?</string>
+    <string name="autofillDisableAutofillPromptMessage">Poți dezactiva oricând acest lucru din Setări.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Continuă să salvezi</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Dezactivează</string>
+
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Dorești să îți trimitem o notificare când este rândul tău?</string>
     <string name="waitlistNotificationDialogNoThanks">Nu, mulțumesc</string>

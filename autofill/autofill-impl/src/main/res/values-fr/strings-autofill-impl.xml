@@ -44,6 +44,9 @@
     <string name="updateLoginDialogTitleUpdateUsername">Modifier le nom d\'utilisateur ?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Modifier le nom d\'utilisateur</string>
 
+    <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Mettre à jour le mot de passe pour \n%1$s ?</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo mettra à jour cet identifiant enregistré sur votre appareil.</string>
+
     <string name="autofillDialogCloseButtonContentDescription">Fermer la boîte de dialogue de saisie automatique</string>
 
     <string name="credentialManagementEditLoginTitleHint">Titre de l\'identifiant</string>
@@ -74,4 +77,8 @@
     <string name="autofillDeleteLoginDialogCancel">Annuler</string>
     <string name="autofillDeleteLoginDialogDelete">Supprimer</string>
     <string name="autofillDeleteLoginDialogTitle">Voulez-vous vraiment supprimer cet identifiant ?</string>
+
+    <string name="autofillManagementUsernameCopied">Nom d\'utilisateur copié</string>
+    <string name="autofillManagementPasswordCopied">Mot de passe copié</string>
+
 </resources>

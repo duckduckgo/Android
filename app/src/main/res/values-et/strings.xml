@@ -585,6 +585,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Blokeerib e-posti jälgijad ja peidab teie aadressi</string>
     <string name="newEmailAliasMenuTitle">Loo Duck Address</string>
 
+    <!-- Autofill -->
+    <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Kuva</string>
+    <string name="autofillLoginSavedSnackbarMessage">Sisselogimisandmed salvestatud</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Sisselogimisandmed värskendatud</string>
+    <string name="autofillDisableAutofillPromptTitle">Kas soovid sisselogimisandmete salvestamist jätkata?</string>
+    <string name="autofillDisableAutofillPromptMessage">Saad selle igal ajal sätetes keelata.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Jätka salvestamist</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Keela</string>
+
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Kas soovite, et me saadame teile teavituse, kui on teie kord?</string>
     <string name="waitlistNotificationDialogNoThanks">Ei aitäh</string>

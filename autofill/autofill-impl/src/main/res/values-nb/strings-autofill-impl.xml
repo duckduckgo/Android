@@ -44,6 +44,9 @@
     <string name="updateLoginDialogTitleUpdateUsername">Vil du oppdatere brukernavnet?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Oppdater brukernavn</string>
 
+    <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Vil du oppdatere passordet for \n%1$s?</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo oppdaterer denne lagrede påloggingen på enheten din.</string>
+
     <string name="autofillDialogCloseButtonContentDescription">Lukk Autofyll-dialogboksen</string>
 
     <string name="credentialManagementEditLoginTitleHint">Påloggingstittel</string>
@@ -74,4 +77,8 @@
     <string name="autofillDeleteLoginDialogCancel">Avbryt</string>
     <string name="autofillDeleteLoginDialogDelete">Slett</string>
     <string name="autofillDeleteLoginDialogTitle">Er du sikker på at du vil slette denne påloggingen?</string>
+
+    <string name="autofillManagementUsernameCopied">Brukernavnet er kopiert</string>
+    <string name="autofillManagementPasswordCopied">Passordet er kopiert</string>
+
 </resources>

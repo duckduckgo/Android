@@ -18,4 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="biometric_prompt_title">Prisijungimai užrakinti</string>
+    <string name="autofill_auth_text_for_using">Atrakinkite įrenginį, kad galėtumėte naudoti išsaugotus prisijungimus.</string>
+    <string name="autofill_auth_text_for_access">Atrakinkite įrenginį, kad pasiektumėte įrašytus prisijungimus.</string>
 </resources>

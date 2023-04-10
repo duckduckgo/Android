@@ -585,6 +585,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Blockiert E-Mail-Tracker und verbirgt deine Adresse</string>
     <string name="newEmailAliasMenuTitle">Duck-Adresse generieren</string>
 
+    <!-- Autofill -->
+    <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Ansehen</string>
+    <string name="autofillLoginSavedSnackbarMessage">Anmeldedaten gespeichert</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Anmeldedaten aktualisiert</string>
+    <string name="autofillDisableAutofillPromptTitle">Möchtest du weiterhin Anmeldedaten speichern?</string>
+    <string name="autofillDisableAutofillPromptMessage">Du kannst dies jederzeit in den Einstellungen deaktivieren.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Weiterhin speichern</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Deaktivieren</string>
+
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Möchtest du eine Benachrichtigung erhalten, wenn du die E-Mail-Schutzfunktion testen kannst?</string>
     <string name="waitlistNotificationDialogNoThanks">Nein, danke</string>

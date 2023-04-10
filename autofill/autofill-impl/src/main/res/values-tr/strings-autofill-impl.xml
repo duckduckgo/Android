@@ -44,6 +44,9 @@
     <string name="updateLoginDialogTitleUpdateUsername">Kullanıcı adı güncellensin mi?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Kullanıcı Adını Güncelle</string>
 
+    <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">%1$s için şifre güncellensin mi?</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo, cihazınızdaki bu kayıtlı Giriş bilgisini güncelleyecektir.</string>
+
     <string name="autofillDialogCloseButtonContentDescription">Otomatik Doldurma İletişim Kutusunu Kapat</string>
 
     <string name="credentialManagementEditLoginTitleHint">Giriş Başlığı</string>
@@ -74,4 +77,8 @@
     <string name="autofillDeleteLoginDialogCancel">Vazgeç</string>
     <string name="autofillDeleteLoginDialogDelete">Sil</string>
     <string name="autofillDeleteLoginDialogTitle">Bu Girişi silmek istediğinizden emin misiniz?</string>
+
+    <string name="autofillManagementUsernameCopied">Kullanıcı adı kopyalandı</string>
+    <string name="autofillManagementPasswordCopied">Şifre kopyalandı</string>
+
 </resources>

@@ -44,6 +44,9 @@
     <string name="updateLoginDialogTitleUpdateUsername">Zaktualizować nazwę użytkownika?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Zaktualizuj nazwę użytkownika</string>
 
+    <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Zaktualizować hasło \n%1$s?</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo zaktualizuje ten zapisany login na Twoim urządzeniu.</string>
+
     <string name="autofillDialogCloseButtonContentDescription">Zamknij okno dialogowe autouzupełniania</string>
 
     <string name="credentialManagementEditLoginTitleHint">Nazwa loginu</string>
@@ -74,4 +77,8 @@
     <string name="autofillDeleteLoginDialogCancel">Anuluj</string>
     <string name="autofillDeleteLoginDialogDelete">Usuń</string>
     <string name="autofillDeleteLoginDialogTitle">Na pewno chcesz usunąć ten login?</string>
+
+    <string name="autofillManagementUsernameCopied">Skopiowano nazwę użytkownika</string>
+    <string name="autofillManagementPasswordCopied">Skopiowano hasło</string>
+
 </resources>

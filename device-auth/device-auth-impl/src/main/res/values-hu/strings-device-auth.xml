@@ -18,4 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="biometric_prompt_title">Bejelentkezések zárolva</string>
+    <string name="autofill_auth_text_for_using">A mentett bejelentkezések használatához oldd fel az eszköz zárolását.</string>
+    <string name="autofill_auth_text_for_access">A mentett bejelentkezésekhez való hozzáférésért oldd fel az eszközt.</string>
 </resources>

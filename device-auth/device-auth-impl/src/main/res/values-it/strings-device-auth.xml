@@ -18,4 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="biometric_prompt_title">Accessi bloccati</string>
+    <string name="autofill_auth_text_for_using">Sblocca il dispositivo per utilizzare i dati di accesso salvati.</string>
+    <string name="autofill_auth_text_for_access">Sblocca il dispositivo per accedere ai dati di accesso salvati.</string>
 </resources>

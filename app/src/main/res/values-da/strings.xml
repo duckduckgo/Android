@@ -585,6 +585,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Blokerer e-mailtrackere og skjuler din adresse</string>
     <string name="newEmailAliasMenuTitle">Generér Duck-adresse</string>
 
+    <!-- Autofill -->
+    <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Se</string>
+    <string name="autofillLoginSavedSnackbarMessage">Login er gemt</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Login er opdateret</string>
+    <string name="autofillDisableAutofillPromptTitle">Vil du fortsat gemme logins?</string>
+    <string name="autofillDisableAutofillPromptMessage">Du kan til enhver tid deaktivere automatisk udfyldning i Indstillinger.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Fortsæt med at gemme</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Deaktiver</string>
+
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Vil du have os til at sende dig en meddelelse, når det er din tur?</string>
     <string name="waitlistNotificationDialogNoThanks">Nej tak.</string>

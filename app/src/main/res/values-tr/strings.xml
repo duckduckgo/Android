@@ -585,6 +585,15 @@
     <string name="autofillTooltipGenerateAddressDescription">E-posta izleyicileri engeller ve adresinizi gizler</string>
     <string name="newEmailAliasMenuTitle">Duck Address Oluştur</string>
 
+    <!-- Autofill -->
+    <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Görüntüle</string>
+    <string name="autofillLoginSavedSnackbarMessage">Giriş kaydedildi</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Giriş güncellendi</string>
+    <string name="autofillDisableAutofillPromptTitle">Giriş bilgilerini kaydetmeye devam etmek istiyor musunuz?</string>
+    <string name="autofillDisableAutofillPromptMessage">Bunu dilediğiniz zaman Ayarlar\'dan devre dışı bırakabilirsiniz.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Kaydetmeye Devam Et</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Devre dışı bırak</string>
+
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Sıra size geldiğinde size bir bildirim göndermemizi ister misiniz?</string>
     <string name="waitlistNotificationDialogNoThanks">Hayır Teşekkürler</string>

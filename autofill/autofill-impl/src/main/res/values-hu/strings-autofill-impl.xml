@@ -44,6 +44,9 @@
     <string name="updateLoginDialogTitleUpdateUsername">Frissíted a felhasználónevet?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Felhasználónév frissítése</string>
 
+    <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Frissíted \n%1$s jelszavát?</string>
+    <string name="updateLoginUpdatePasswordExplanation">A DuckDuckGo frissíti az eszközödön ezt a tárolt bejelentkezést.</string>
+
     <string name="autofillDialogCloseButtonContentDescription">Automatikus kitöltési párbeszédablak bezárása</string>
 
     <string name="credentialManagementEditLoginTitleHint">Bejelentkezési cím</string>
@@ -74,4 +77,8 @@
     <string name="autofillDeleteLoginDialogCancel">Mégsem</string>
     <string name="autofillDeleteLoginDialogDelete">Törlés</string>
     <string name="autofillDeleteLoginDialogTitle">Biztosan törlöd ezen bejelentkezési adatokat?</string>
+
+    <string name="autofillManagementUsernameCopied">Felhasználónév másolva</string>
+    <string name="autofillManagementPasswordCopied">Jelszó másolva</string>
+
 </resources>

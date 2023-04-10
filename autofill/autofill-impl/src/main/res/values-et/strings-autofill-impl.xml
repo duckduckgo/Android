@@ -44,6 +44,9 @@
     <string name="updateLoginDialogTitleUpdateUsername">Kas värskendada kasutajanime?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Värskenda kasutajanime</string>
 
+    <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Kas värskendada kasutajanime \n%1$s parooli?</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo värskendab need salvestatud sisselogimisandmed sinu seadmes.</string>
+
     <string name="autofillDialogCloseButtonContentDescription">Sulge automaatse täitmise dialoog</string>
 
     <string name="credentialManagementEditLoginTitleHint">Sisselogimise pealkiri</string>
@@ -74,4 +77,8 @@
     <string name="autofillDeleteLoginDialogCancel">Loobu</string>
     <string name="autofillDeleteLoginDialogDelete">Kustuta</string>
     <string name="autofillDeleteLoginDialogTitle">Kas oled kindel, et soovid need sisselogimisandmed kustutada?</string>
+
+    <string name="autofillManagementUsernameCopied">Kasutajanimi on kopeeritud</string>
+    <string name="autofillManagementPasswordCopied">Parool on kopeeritud</string>
+
 </resources>

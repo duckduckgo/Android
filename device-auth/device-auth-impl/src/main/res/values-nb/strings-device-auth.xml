@@ -18,4 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="biometric_prompt_title">Pålogginger er låst</string>
+    <string name="autofill_auth_text_for_using">Lås opp enheten for å bruke lagrede pålogginger.</string>
+    <string name="autofill_auth_text_for_access">Lås opp enheten for å få tilgang til lagrede pålogginger.</string>
 </resources>
