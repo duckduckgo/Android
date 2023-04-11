@@ -16,7 +16,11 @@
 
 package com.duckduckgo.sync.impl.ui
 
+import android.graphics.pdf.PdfDocument
+import android.graphics.pdf.PdfDocument.PageInfo.Builder
 import android.os.Bundle
+import android.os.Environment
+import android.view.View
 import android.widget.CompoundButton
 import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.lifecycle.Lifecycle
@@ -32,15 +36,19 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivitySyncBinding
+import com.duckduckgo.sync.impl.databinding.ViewRecoveryCodeBinding
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.StoreRecoveryCodePDF
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
+import java.io.File
+import java.io.FileOutputStream
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(SyncActivityWithEmptyParams::class)
@@ -91,6 +99,43 @@ class SyncActivity : DuckDuckGoActivity() {
 
             AskTurnOffSync -> askTurnOffsync()
             AskDeleteAccount -> askDeleteAccount()
+
+            is StoreRecoveryCodePDF -> {
+                layoutAsPdfTest(it)
+            }
+        }
+    }
+
+    private fun screenAsPdfTest() {
+        PdfDocument().apply {
+            val page = startPage(Builder(2250, 1400, 1).create())
+            binding.root.draw(page.canvas)
+            finishPage(page)
+            val downloads = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+            val file = File(downloads, "recovery-code.pdf")
+            writeTo(FileOutputStream(file))
+            close()
+        }
+    }
+
+    private fun layoutAsPdfTest(command: StoreRecoveryCodePDF) {
+        PdfDocument().apply {
+            val page = startPage(Builder(1500, 2115, 1).create())
+
+            ViewRecoveryCodeBinding.inflate(layoutInflater, null, false).apply {
+                this.qrCodeImageView.setImageBitmap(command.recoveryCodeB64)
+                this.recoveryCodeText.text = command.recoveryCode
+                val measureWidth: Int = View.MeasureSpec.makeMeasureSpec(page.canvas.width, View.MeasureSpec.EXACTLY)
+                val measuredHeight: Int = View.MeasureSpec.makeMeasureSpec(page.canvas.height, View.MeasureSpec.EXACTLY)
+                this.root.measure(measureWidth, measuredHeight)
+                this.root.layout(0, 0, page.canvas.width, page.canvas.height)
+                this.root.draw(page.canvas)
+            }
+            finishPage(page)
+            val downloads = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+            val file = File(downloads, "recovery-code.pdf")
+            writeTo(FileOutputStream(file))
+            close()
         }
     }
 
@@ -142,6 +187,10 @@ class SyncActivity : DuckDuckGoActivity() {
             if (viewState.loginQRCode != null) {
                 binding.qrCodeImageView.show()
                 binding.qrCodeImageView.setImageBitmap(viewState.loginQRCode)
+            }
+
+            binding.saveRecoveryCodeItem.setOnClickListener {
+                viewModel.onSaveRecoveryCodeClicked()
             }
 
             binding.deleteAccountButton.setOnClickListener {

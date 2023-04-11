@@ -30,6 +30,7 @@ import com.duckduckgo.sync.impl.SyncRepository
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.StoreRecoveryCodePDF
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -63,6 +64,10 @@ class SyncActivityViewModel @Inject constructor(
         object LaunchDeviceSetupFlow : Command()
         object AskTurnOffSync : Command()
         object AskDeleteAccount : Command()
+        data class StoreRecoveryCodePDF(
+            val recoveryCodeB64: Bitmap?,
+            val recoveryCode: String?
+        ) : Command()
     }
 
     fun getSyncState() {
@@ -142,6 +147,12 @@ class SyncActivityViewModel @Inject constructor(
     fun onDeleteAccountCancelled() {
         viewModelScope.launch {
             viewState.emit(viewState.value.copy(isDeviceSyncEnabled = true))
+        }
+    }
+
+    fun onSaveRecoveryCodeClicked() {
+        viewModelScope.launch {
+            command.send(StoreRecoveryCodePDF(viewState.value.loginQRCode, syncRepository.getRecoveryCode()))
         }
     }
 }
