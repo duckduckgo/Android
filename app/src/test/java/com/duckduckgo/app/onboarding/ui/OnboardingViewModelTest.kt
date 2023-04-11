@@ -17,15 +17,22 @@
 package com.duckduckgo.app.onboarding.ui
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.app.onboarding.ui.OnboardingViewModel.Command.ForceToPortraitForMobileDevices
+import com.duckduckgo.app.statistics.VariantManager
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @Suppress("EXPERIMENTAL_API_USAGE")
 class OnboardingViewModelTest {
 
@@ -37,16 +44,36 @@ class OnboardingViewModelTest {
     var coroutineRule = CoroutineTestRule()
 
     private var userStageStore: UserStageStore = mock()
-
     private val pageLayout: OnboardingPageManager = mock()
+    private val mockVariantManager: VariantManager = mock()
 
     private val testee: OnboardingViewModel by lazy {
-        OnboardingViewModel(userStageStore, pageLayout, coroutineRule.testDispatcherProvider)
+        OnboardingViewModel(userStageStore, pageLayout, coroutineRule.testDispatcherProvider, mockVariantManager)
     }
 
     @Test
     fun whenOnboardingDoneThenCompleteStage() = runTest {
         testee.onOnboardingDone()
         verify(userStageStore).stageCompleted(AppStage.NEW)
+    }
+
+    @Test
+    fun givenExperimentalVariantThenForceToPortraitCalled() = runTest {
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "mj" })
+        testee.determineScreenOrientation()
+
+        testee.commands().test {
+            Assert.assertEquals(ForceToPortraitForMobileDevices, awaitItem())
+        }
+    }
+
+    @Test
+    fun givenNonExperimentalVariantThenForceToPortraitNotCalled() = runTest {
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "mi" })
+        testee.determineScreenOrientation()
+
+        testee.commands().test {
+            expectNoEvents()
+        }
     }
 }

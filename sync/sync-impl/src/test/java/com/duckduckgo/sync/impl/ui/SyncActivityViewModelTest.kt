@@ -16,8 +16,12 @@
 
 package com.duckduckgo.sync.impl.ui
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKeyEncoded
+import com.duckduckgo.sync.TestSyncFixtures.qrBitmap
+import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.SyncRepository
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
@@ -25,20 +29,28 @@ import java.lang.String.format
 import kotlin.reflect.KClass
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
+@RunWith(AndroidJUnit4::class)
 class SyncActivityViewModelTest {
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
+    private val qrEncoder: QREncoder = mock()
     private val syncRepository: SyncRepository = mock()
+
     private val testee = SyncActivityViewModel(
+        qrEncoder = qrEncoder,
         syncRepository = syncRepository,
         dispatchers = coroutineTestRule.testDispatcherProvider,
     )
@@ -46,6 +58,55 @@ class SyncActivityViewModelTest {
     @Test
     fun whenUserSignedInThenDeviceSyncViewStateIsEnabled() = runTest {
         whenever(syncRepository.isSignedIn()).thenReturn(true)
+
+        testee.viewState().test {
+            val viewState = awaitItem()
+            assertTrue(viewState.isDeviceSyncEnabled)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserSignedInThenShowAccount() = runTest {
+        whenever(syncRepository.isSignedIn()).thenReturn(true)
+
+        testee.viewState().test {
+            val viewState = awaitItem()
+            assertTrue(viewState.showAccount)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserSignedInThenLoginQRCodeIsNotNull() = runTest {
+        val bitmap = qrBitmap()
+        whenever(syncRepository.isSignedIn()).thenReturn(true)
+        whenever(syncRepository.getRecoveryCode()).thenReturn(jsonRecoveryKeyEncoded)
+        whenever(qrEncoder.encodeAsBitmap(eq(jsonRecoveryKeyEncoded), any(), any())).thenReturn(bitmap)
+
+        testee.viewState().test {
+            val viewState = awaitItem()
+            assertTrue(viewState.loginQRCode != null)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenToggleDisabledThenLaunchSetupFlow() = runTest {
+        testee.onToggleClicked(false)
+
+        testee.viewState().test {
+            val viewState = awaitItem()
+            assertFalse(viewState.isDeviceSyncEnabled)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenRefreshAndUserSignedInThenDeviceSyncViewStateIsEnabled() = runTest {
+        whenever(syncRepository.isSignedIn()).thenReturn(true)
+
+        testee.getSyncState()
 
         testee.viewState().test {
             val viewState = awaitItem()

@@ -72,7 +72,6 @@ import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridActivity
 import javax.inject.Inject
-import kotlin.collections.ArrayList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -155,6 +154,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
         viewModel.awaitClearDataFinishedNotification()
         initializeServiceWorker()
+
+        intent?.getStringExtra(LAUNCH_FROM_NOTIFICATION_PIXEL_NAME)?.let {
+            viewModel.onLaunchedFromNotification(it)
+        }
     }
 
     override fun onStop() {
@@ -525,6 +528,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         const val NOTIFY_DATA_CLEARED_EXTRA = "NOTIFY_DATA_CLEARED_EXTRA"
         const val LAUNCH_FROM_DEFAULT_BROWSER_DIALOG = "LAUNCH_FROM_DEFAULT_BROWSER_DIALOG"
         const val LAUNCH_FROM_FAVORITES_WIDGET = "LAUNCH_FROM_FAVORITES_WIDGET"
+        const val LAUNCH_FROM_NOTIFICATION_PIXEL_NAME = "LAUNCH_FROM_NOTIFICATION_PIXEL_NAME"
 
         private const val APP_ENJOYMENT_DIALOG_TAG = "AppEnjoyment"
 

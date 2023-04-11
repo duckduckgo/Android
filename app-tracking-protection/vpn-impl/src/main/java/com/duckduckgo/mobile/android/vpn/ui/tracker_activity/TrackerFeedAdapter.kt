@@ -18,7 +18,6 @@ package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 
 import android.content.Context
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,7 +31,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.extensions.safeGetApplicationIcon
-import com.duckduckgo.mobile.android.ui.TextDrawable
 import com.duckduckgo.mobile.android.ui.recyclerviewext.StickyHeaders
 import com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
 import com.duckduckgo.mobile.android.ui.view.gone
@@ -41,6 +39,7 @@ import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.AppsProtectionStateView
+import com.duckduckgo.mobile.android.vpn.ui.util.TextDrawable
 import com.facebook.shimmer.ShimmerFrameLayout
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
@@ -246,7 +245,7 @@ class TrackerFeedAdapter @Inject constructor(
         }
 
         private fun String.asIconDrawable(): TextDrawable {
-            return TextDrawable.builder().buildRound(this.take(1), Color.DKGRAY)
+            return TextDrawable.asIconDrawable(this)
         }
     }
 

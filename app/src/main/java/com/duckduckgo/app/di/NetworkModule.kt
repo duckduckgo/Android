@@ -38,6 +38,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
 import com.squareup.moshi.Moshi
+import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
@@ -102,12 +103,12 @@ class NetworkModule {
     @SingleInstanceIn(AppScope::class)
     @Named("api")
     fun apiRetrofit(
-        @Named("api") okHttpClient: OkHttpClient,
+        @Named("api") okHttpClient: Lazy<OkHttpClient>,
         moshi: Moshi,
     ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(Url.API)
-            .client(okHttpClient)
+            .callFactory { okHttpClient.get().newCall(it) }
             .addConverterFactory(ScalarsConverterFactory.create())
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(MoshiConverterFactory.create(moshi))
@@ -118,12 +119,12 @@ class NetworkModule {
     @SingleInstanceIn(AppScope::class)
     @Named("nonCaching")
     fun nonCachingRetrofit(
-        @Named("nonCaching") okHttpClient: OkHttpClient,
+        @Named("nonCaching") okHttpClient: Lazy<OkHttpClient>,
         moshi: Moshi,
     ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(Url.API)
-            .client(okHttpClient)
+            .callFactory { okHttpClient.get().newCall(it) }
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()

@@ -508,8 +508,8 @@
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Aldri</string>
     <string name="disableLoginDetectionDialogTitle">Vil du deaktivere påminnelser om brannsikring når du logger inn på nettsteder?</string>
     <string name="disableLoginDetectionDialogDescription">Du kan når som helst endre dette under Innstillinger.</string>
-    <string name="disableLoginDetectionDialogPositive">DEAKTIVER</string>
-    <string name="disableLoginDetectionDialogNegative">AVBRYT</string>
+    <string name="disableLoginDetectionDialogPositive">Slå av</string>
+    <string name="disableLoginDetectionDialogNegative">Avbryt</string>
     <string name="automaticFireproofWebsiteLoginDialogTitle">Vil du brannsikre nettsteder automatisk ved pålogging?</string>
     <string name="automaticFireproofWebsiteLoginDialogDescription">Med brannsikrede nettsteder er du fortsatt pålogget etter å ha brukt brannknappen. Du kan når som helst endre dette senere i innstillingene. </string>
     <string name="automaticFireproofWebsiteLoginDialogFirstOption">Alltid brannsikre</string>
@@ -585,6 +585,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Blokkerer e-postsporere og skjuler adressen din</string>
     <string name="newEmailAliasMenuTitle">Generer Duck-adresse</string>
 
+    <!-- Autofill -->
+    <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Vis</string>
+    <string name="autofillLoginSavedSnackbarMessage">Pålogging lagret</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Pålogging oppdatert</string>
+    <string name="autofillDisableAutofillPromptTitle">Vil du fortsette å lagre pålogginger?</string>
+    <string name="autofillDisableAutofillPromptMessage">Du kan deaktivere dette når som helst i innstillingene.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Fortsett å lagre</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Slå av</string>
+
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Skal vi sende et varsel til deg når det er din tur?</string>
     <string name="waitlistNotificationDialogNoThanks">Nei takk</string>
@@ -602,6 +611,7 @@
     <string name="folderLocationTitle">Velg sted</string>
     <string name="addFolder">Legg til mappe</string>
     <string name="editFolder">Rediger mappe</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Vil du slette mappen og innholdet?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Er du sikker på at du vil slette "</string>
     <string name="bookmarkFolderEmpty">Tom</string>
 

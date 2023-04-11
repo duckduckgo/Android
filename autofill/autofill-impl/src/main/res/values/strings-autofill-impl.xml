@@ -44,6 +44,9 @@
     <string name="updateLoginDialogTitleUpdateUsername">Update username?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Update Username</string>
 
+    <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user's username for this site">Update password for \n%1$s?</string>
+    <string name="updateLoginUpdatePasswordExplanation" >DuckDuckGo will update this stored Login on your device.</string>
+
     <string name="autofillDialogCloseButtonContentDescription">Close Autofill Dialog</string>
 
     <string name="credentialManagementEditLoginTitleHint">Login Title</string>
@@ -70,5 +73,12 @@
     <string name="autofillManagementSearchLogins">Search logins</string>
     <string name="autofillManagementSearchClearDescription">Clear search input</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for 'kittens'">No results for \'%1$s\'</string>
+
+    <string name="autofillDeleteLoginDialogCancel">Cancel</string>
+    <string name="autofillDeleteLoginDialogDelete">Delete</string>
+    <string name="autofillDeleteLoginDialogTitle">Are you sure you want to delete this Login?</string>
+
+    <string name="autofillManagementUsernameCopied">Username copied</string>
+    <string name="autofillManagementPasswordCopied">Password copied</string>
 
 </resources>

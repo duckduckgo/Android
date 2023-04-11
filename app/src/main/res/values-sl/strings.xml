@@ -512,8 +512,8 @@
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Nikoli</string>
     <string name="disableLoginDetectionDialogTitle">Onemogoči opomnik o požarni zaščiti pri prijavi na spletna mesta?</string>
     <string name="disableLoginDetectionDialogDescription">To nastavitev lahko kadar koli spremenite v možnosti Nastavitve.</string>
-    <string name="disableLoginDetectionDialogPositive">ONEMOGOČI</string>
-    <string name="disableLoginDetectionDialogNegative">PREKLIČI</string>
+    <string name="disableLoginDetectionDialogPositive">Onemogoči</string>
+    <string name="disableLoginDetectionDialogNegative">Preklic</string>
     <string name="automaticFireproofWebsiteLoginDialogTitle">Želite spletne strani samodejno požarno zaščititi pri prijavi?</string>
     <string name="automaticFireproofWebsiteLoginDialogDescription">S požarno zaščito spletnih mest boste po uporabi gumba Fire ostali prijavljeni. To lahko pozneje kadar koli spremenite v nastavitvah. </string>
     <string name="automaticFireproofWebsiteLoginDialogFirstOption">Vedno požarno zaščiti</string>
@@ -589,6 +589,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Blokira sledilce e-pošte in skrije vaš naslov</string>
     <string name="newEmailAliasMenuTitle">Ustvari naslov Duck Address</string>
 
+    <!-- Autofill -->
+    <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Oglejte si</string>
+    <string name="autofillLoginSavedSnackbarMessage">Prijava shranjena</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Prijava posodobljena</string>
+    <string name="autofillDisableAutofillPromptTitle">Ali želite še naprej shranjevati prijave?</string>
+    <string name="autofillDisableAutofillPromptMessage">To lahko kadar koli onemogočite v nastavitvah.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Še naprej shranjujte</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Onemogoči</string>
+
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Želite, da vam pošljemo obvestilo, ko ste na vrsti?</string>
     <string name="waitlistNotificationDialogNoThanks">Ne, hvala</string>
@@ -606,6 +615,7 @@
     <string name="folderLocationTitle">Izberite lokacijo</string>
     <string name="addFolder">Dodaj mapo</string>
     <string name="editFolder">Uredi mapo</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Želite izbrisati mapo in njeno vsebino?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Ste prepričani, da želite izbrisati "</string>
     <string name="bookmarkFolderEmpty">Prazno</string>
 

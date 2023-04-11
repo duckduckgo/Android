@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2023 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -17,5 +17,7 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="biometric_prompt_title">Samodejno izpolnjevanje je zaklenjeno</string>
+    <string name="biometric_prompt_title">Prijave so zaklenjene</string>
+    <string name="autofill_auth_text_for_using">Odklenite napravo, če želite uporabiti shranjene podatke za prijavo.</string>
+    <string name="autofill_auth_text_for_access">Odklenite napravo za dostop do shranjenih prijav.</string>
 </resources>

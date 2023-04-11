@@ -17,18 +17,18 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Saisie automatique des identifiants</string>
+    <string name="autofillManagementScreenTitle">Identifiants</string>
 
     <string name="managementDisabledModeCta"><b>Configurer dans les paramètres</b></string>
-    <string name="managementDisabledModeSubtitle">Un schéma de verrouillage de l\'appareil, un code PIN ou des données biométriques sont nécessaires pour protéger les informations relatives à la saisie automatique de vos identifiants.</string>
-    <string name="managementDisabledModeTitle">Sécurisez votre appareil pour utiliser la saisie automatique</string>
+    <string name="managementDisabledModeSubtitle">Un schéma de verrouillage de l\'appareil, un code PIN ou des données biométriques sont nécessaires pour protéger vos identifiants.</string>
+    <string name="managementDisabledModeTitle">Sécurisez votre appareil pour enregistrer des identifiants</string>
 
     <string name="saveLoginDialogTitle">Enregistrer l\'identifiant ?</string>
     <string name="saveLoginMissingUsernameDialogTitle">Enregistrer le mot de passe ?</string>
     <string name="saveLoginDialogButtonSave">Enregistrer l\'identifiant</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Enregistrer le mot de passe</string>
     <string name="saveLoginDialogNotNow">Pas maintenant</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">DuckDuckGo stockera cet identifiant en toute sécurité sur votre appareil. Vous pouvez gérer les identifiants enregistrés dans les paramètres.</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">Les identifiants sont stockés en toute sécurité sur cet appareil uniquement et peuvent être gérés à partir du menu Identifiants dans Paramètres.</string>
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Voulez-vous que DuckDuckGo enregistre votre identifiant ?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Plus d\'options</string>
 
@@ -43,6 +43,9 @@
 
     <string name="updateLoginDialogTitleUpdateUsername">Modifier le nom d\'utilisateur ?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Modifier le nom d\'utilisateur</string>
+
+    <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Mettre à jour le mot de passe pour \n%1$s ?</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo mettra à jour cet identifiant enregistré sur votre appareil.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Fermer la boîte de dialogue de saisie automatique</string>
 
@@ -70,5 +73,12 @@
     <string name="autofillManagementSearchLogins">Recherche d\'identifiants</string>
     <string name="autofillManagementSearchClearDescription">Effacer la recherche</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Aucun résultat pour « %1$s »</string>
+
+    <string name="autofillDeleteLoginDialogCancel">Annuler</string>
+    <string name="autofillDeleteLoginDialogDelete">Supprimer</string>
+    <string name="autofillDeleteLoginDialogTitle">Voulez-vous vraiment supprimer cet identifiant ?</string>
+
+    <string name="autofillManagementUsernameCopied">Nom d\'utilisateur copié</string>
+    <string name="autofillManagementPasswordCopied">Mot de passe copié</string>
 
 </resources>

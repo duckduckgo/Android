@@ -31,6 +31,7 @@ interface VariantManager {
     sealed class VariantFeature {
         object CookiePromptManagementExperiment : VariantFeature()
         object OptimiseOnboardingExperiment : VariantFeature()
+        object OnboardingCustomizationExperiment : VariantFeature()
     }
 
     companion object {
@@ -52,13 +53,15 @@ interface VariantManager {
                 features = listOf(VariantFeature.CookiePromptManagementExperiment),
                 filterBy = { isEuropeanCountry() },
             ),
-            Variant(key = "za", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() && !isGBCountry() }),
+            Variant(key = "za", weight = 0.0, features = emptyList(), filterBy = { isEnglishLocale() && !isGBCountry() }),
             Variant(
                 key = "zb",
-                weight = 1.0,
+                weight = 0.0,
                 features = listOf(VariantFeature.OptimiseOnboardingExperiment),
                 filterBy = { isEnglishLocale() && !isGBCountry() },
             ),
+            Variant(key = "mi", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
+            Variant(key = "mj", weight = 1.0, features = listOf(VariantFeature.OnboardingCustomizationExperiment), filterBy = { noFilter() }),
         )
 
         val REFERRER_VARIANTS = listOf(
@@ -205,7 +208,7 @@ class ExperimentationVariantManager(
         var newVariant = generateVariant(activeVariants)
         val compliesWithFilters = newVariant.filterBy(appBuildConfig)
 
-        if (!compliesWithFilters) {
+        if (!compliesWithFilters || appBuildConfig.isDefaultVariantForced) {
             newVariant = DEFAULT_VARIANT
         }
         Timber.i("Current variant is null; allocating new one $newVariant")
@@ -258,6 +261,9 @@ fun VariantManager.isCookiePromptManagementExperimentEnabled() =
 
 fun VariantManager.isOptimiseOnboardingExperimentEnabled() =
     this.getVariant().hasFeature(VariantManager.VariantFeature.OptimiseOnboardingExperiment)
+
+fun VariantManager.isOnboardingCustomizationExperimentEnabled() =
+    this.getVariant().hasFeature(VariantManager.VariantFeature.OnboardingCustomizationExperiment)
 
 /**
  * A variant which can be used for experimentation.

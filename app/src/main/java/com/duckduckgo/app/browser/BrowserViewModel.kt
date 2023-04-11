@@ -272,4 +272,8 @@ class BrowserViewModel @Inject constructor(
             pixel.fire(AppPixelName.SHORTCUT_OPENED)
         }
     }
+
+    fun onLaunchedFromNotification(pixelName: String) {
+        pixel.fire(pixelName)
+    }
 }

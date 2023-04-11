@@ -508,8 +508,8 @@
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Nooit</string>
     <string name="disableLoginDetectionDialogTitle">Herinnering voor brandveiligheid uitschakelen bij het inloggen?</string>
     <string name="disableLoginDetectionDialogDescription">Je kunt deze voorkeur op elk moment wijzigen in de instellingen.</string>
-    <string name="disableLoginDetectionDialogPositive">UITSCHAKELEN</string>
-    <string name="disableLoginDetectionDialogNegative">ANNULEREN</string>
+    <string name="disableLoginDetectionDialogPositive">Uitschakelen</string>
+    <string name="disableLoginDetectionDialogNegative">Annuleren</string>
     <string name="automaticFireproofWebsiteLoginDialogTitle">Websites automatisch brandvrij maken bij aanmelden?</string>
     <string name="automaticFireproofWebsiteLoginDialogDescription">Als je deze website brandveilig maakt, blijf je ook na het gebruiken van de vuurknop ingelogd. Je kunt dit later altijd nog wijzigen in Instellingen. </string>
     <string name="automaticFireproofWebsiteLoginDialogFirstOption">Altijd vuurbestendig</string>
@@ -585,6 +585,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Blokkeert e-mailtrackers en verbergt je adres</string>
     <string name="newEmailAliasMenuTitle">Duck Address genereren</string>
 
+    <!-- Autofill -->
+    <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Weergeven</string>
+    <string name="autofillLoginSavedSnackbarMessage">Aanmeldgegevens opgeslagen</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Aanmeldgegevens bijgewerkt</string>
+    <string name="autofillDisableAutofillPromptTitle">Wil je aanmeldgegevens blijven opslaan?</string>
+    <string name="autofillDisableAutofillPromptMessage">Je kunt dit op elk moment uitschakelen in de instellingen.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Blijf opslaan</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Uitschakelen</string>
+
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Wil je dat we je een melding sturen als je aan de beurt bent?</string>
     <string name="waitlistNotificationDialogNoThanks">Nee, bedankt</string>
@@ -602,6 +611,7 @@
     <string name="folderLocationTitle">Locatie selecteren</string>
     <string name="addFolder">Map toevoegen</string>
     <string name="editFolder">Map bewerken</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Map en inhoud verwijderen?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Doorgaan met het verwijderen van "</string>
     <string name="bookmarkFolderEmpty">Leeg</string>
 

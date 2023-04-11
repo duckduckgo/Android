@@ -18,4 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="biometric_prompt_title">Logins Locked</string>
+    <string name="autofill_auth_text_for_using">Unlock device to use your saved Logins.</string>
+    <string name="autofill_auth_text_for_access">Unlock device to access saved Logins.</string>
 </resources>

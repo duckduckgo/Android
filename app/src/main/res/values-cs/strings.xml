@@ -512,8 +512,8 @@
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Nikdy</string>
     <string name="disableLoginDetectionDialogTitle">Zakázat připomenutí ochrany při přihlašování k webovým stránkám?</string>
     <string name="disableLoginDetectionDialogDescription">Tuto předvolbu můžete v Nastavení kdykoli změnit.</string>
-    <string name="disableLoginDetectionDialogPositive">VYPNOUT</string>
-    <string name="disableLoginDetectionDialogNegative">ZRUŠIT</string>
+    <string name="disableLoginDetectionDialogPositive">Vypnout</string>
+    <string name="disableLoginDetectionDialogNegative">Zrušit</string>
     <string name="automaticFireproofWebsiteLoginDialogTitle">Chránit webové stránky automaticky při přihlášení?</string>
     <string name="automaticFireproofWebsiteLoginDialogDescription">Když je zapnutá ochrana, přihlášení zůstává zachované i po použití tlačítka pro mazání. Kdykoli se to dá změnit v Nastaveních. </string>
     <string name="automaticFireproofWebsiteLoginDialogFirstOption">Vždycky chránit</string>
@@ -589,6 +589,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Blokuje sledování e-mailů a skryje vaši adresu</string>
     <string name="newEmailAliasMenuTitle">Vygenerovat adresu Duck</string>
 
+    <!-- Autofill -->
+    <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Zobrazit</string>
+    <string name="autofillLoginSavedSnackbarMessage">Přihlašovací údaje uloženy</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Příhlašovací údaje aktualizovány</string>
+    <string name="autofillDisableAutofillPromptTitle">Chceš dál ukládat přihlašovací údaje?</string>
+    <string name="autofillDisableAutofillPromptMessage">Funkci můžeš kdykoli vypnout v Nastaveních.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Dál ukládat</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Vypnout</string>
+
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Chcete, abychom vám poslali upozornění, až na vás bude řada?</string>
     <string name="waitlistNotificationDialogNoThanks">Ne, děkuji</string>
@@ -606,6 +615,7 @@
     <string name="folderLocationTitle">Vybrat umístění</string>
     <string name="addFolder">Přidat složku</string>
     <string name="editFolder">Upravit složku</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Smazat složku a její obsah?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Opravdu chceš smazat "</string>
     <string name="bookmarkFolderEmpty">Prázdné</string>
 

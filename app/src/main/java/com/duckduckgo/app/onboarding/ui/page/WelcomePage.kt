@@ -32,11 +32,16 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomeBinding
+import com.duckduckgo.app.browser.databinding.IncludeDaxMultiselectDialogCtaBinding
 import com.duckduckgo.app.global.extensions.html
+import com.duckduckgo.app.onboarding.ui.customisationexperiment.DDGFeatureOnboardingOption
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
+import kotlinx.android.synthetic.main.include_dax_multiselect_dialog_cta.view.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.flow.*
@@ -111,6 +116,62 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
             WelcomePageView.State.Finish -> {
                 onContinuePressed()
             }
+            WelcomePageView.State.ShowFeatureOptionsCta -> startMultiselectDialogAnimation()
+            WelcomePageView.State.ShowControlDaxCta -> showDaxDialogCta()
+        }
+    }
+
+    private fun startMultiselectDialogAnimation() {
+        val ctaText = context?.getString(R.string.onboardingFeatureOptionsTitle).orEmpty()
+        binding.daxDialogCta.root.gone()
+        binding.daxDialogMultiselectCta.apply {
+            root.show()
+            root.dialogTextCta.startTypingAnimation(ctaText)
+            ViewCompat.animate(root)
+                .alpha(MAX_ALPHA)
+                .setDuration(ANIMATION_DURATION)
+                .withEndAction {
+                    ViewCompat.animate(root.featureOptionsContainer)
+                        .alpha(MAX_ALPHA)
+                        .setDuration(ANIMATION_DURATION)
+                        .setStartDelay(ANIMATION_DURATION)
+                        .withEndAction {
+                            setMultiselectListeners(this)
+                        }
+                }
+        }
+    }
+
+    private fun setMultiselectListeners(binding: IncludeDaxMultiselectDialogCtaBinding) {
+        binding.primaryCta.setOnClickListener { getSelectedOptionsAndContinue() }
+        binding.secondaryCta.setOnClickListener { event(WelcomePageView.Event.OnSkipOptions) }
+        binding.optionPrivateSearch.setOnClickListener { showContinueButton() }
+        binding.optionTrackerBlocking.setOnClickListener { showContinueButton() }
+        binding.optionSmallerFootprint.setOnClickListener { showContinueButton() }
+        binding.optionFasterPageLoads.setOnClickListener { showContinueButton() }
+        binding.optionFewerAds.setOnClickListener { showContinueButton() }
+        binding.optionOneClickDataClearing.setOnClickListener { showContinueButton() }
+    }
+
+    private fun getSelectedOptionsAndContinue() {
+        var options: Map<DDGFeatureOnboardingOption, Boolean> = mapOf()
+        binding.daxDialogMultiselectCta.apply {
+            options = mapOf(
+                DDGFeatureOnboardingOption.PRIVATE_SEARCH to optionPrivateSearch.isItemSelected,
+                DDGFeatureOnboardingOption.TRACKER_BLOCKING to optionTrackerBlocking.isItemSelected,
+                DDGFeatureOnboardingOption.SMALLER_DIGITAL_FOOTPRINT to optionSmallerFootprint.isItemSelected,
+                DDGFeatureOnboardingOption.FASTER_PAGE_LOADS to optionFasterPageLoads.isItemSelected,
+                DDGFeatureOnboardingOption.FEWER_ADS to optionFewerAds.isItemSelected,
+                DDGFeatureOnboardingOption.ONE_CLICK_DATA_CLEARING to optionOneClickDataClearing.isItemSelected,
+            )
+        }
+        event(WelcomePageView.Event.OnContinueOptions(options))
+    }
+
+    private fun showContinueButton() {
+        binding.daxDialogMultiselectCta.apply {
+            primaryCta.show()
+            secondaryCta.gone()
         }
     }
 
@@ -189,14 +250,20 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
             .setDuration(ANIMATION_DURATION)
             .setStartDelay(startDelay)
             .withEndAction {
-                typingAnimation = ViewCompat.animate(binding.daxDialogCta.daxCtaContainer)
-                    .alpha(MAX_ALPHA)
-                    .setDuration(ANIMATION_DURATION)
-                    .withEndAction {
-                        welcomeAnimationFinished = true
-                        binding.daxDialogCta.dialogTextCta.startTypingAnimation(ctaText)
-                        setPrimaryCtaListenerAfterWelcomeAlphaAnimation()
-                    }
+                event(WelcomePageView.Event.ShowFirstDaxOnboardingDialog)
+            }
+    }
+
+    private fun showDaxDialogCta() {
+        binding.daxDialogMultiselectCta.root.gone()
+        binding.daxDialogCta.root.show()
+        typingAnimation = ViewCompat.animate(binding.daxDialogCta.daxCtaContainer)
+            .alpha(MAX_ALPHA)
+            .setDuration(ANIMATION_DURATION)
+            .withEndAction {
+                welcomeAnimationFinished = true
+                binding.daxDialogCta.dialogTextCta.startTypingAnimation(ctaText)
+                setPrimaryCtaListenerAfterWelcomeAlphaAnimation()
             }
     }
 

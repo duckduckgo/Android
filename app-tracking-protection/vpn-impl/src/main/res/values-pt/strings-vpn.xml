@@ -361,7 +361,7 @@
     <string name="atp_ManageRecentAppsProtectionEmpty">As aplicações com tentativas de rastreamento bloqueadas recentemente aparecem aqui</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
-    <string name="atp_RemoveFeatureDialogTitle">Desativar e Eliminar os Dados?</string>
+    <string name="atp_RemoveFeatureDialogTitle">Desativar e eliminar os dados?</string>
     <string name="atp_RemoveFeatureDialogMessage">A App Tracking Protection será desativada. Quaisquer definições e o histórico de tentativas de rastreamento serão eliminados. Podes ativar novamente a funcionalidade em qualquer altura nas Definições.</string>
     <string name="atp_RemoveFeatureDialogCancel">Cancelar</string>
     <string name="atp_RemoveFeatureDialogRemove">Desabilitar (fora)</string>

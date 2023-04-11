@@ -23,13 +23,10 @@ import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.notification.model.SchedulableNotificationPlugin
-import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.statistics.pixels.Pixel
 import timber.log.Timber
 
 class AppNotificationSender(
     private val context: Context,
-    private val pixel: Pixel,
     private val manager: NotificationManagerCompat,
     private val factory: NotificationFactory,
     private val notificationDao: NotificationDao,
@@ -38,25 +35,27 @@ class AppNotificationSender(
 
     override suspend fun sendNotification(notification: SchedulableNotification) {
         if (!notification.canShow()) {
-            Timber.v("Notification no longer showable")
+            Timber.v("Notification should not be shown")
             return
         }
 
         val specification = notification.buildSpecification()
-        val launchIntent = NotificationHandlerService.pendingNotificationHandlerIntent(context, notification.launchIntent, specification)
-        val cancelIntent = NotificationHandlerService.pendingNotificationHandlerIntent(context, notification.cancelIntent, specification)
+
+        val notificationPlugin = schedulableNotificationPluginPoint.getPlugins().firstOrNull {
+            notification.javaClass == it.getSchedulableNotification().javaClass
+        }
+
+        if (notificationPlugin == null) {
+            Timber.v("No plugin found for notification class ${notification.javaClass}")
+            return
+        }
+
+        val launchIntent = notificationPlugin.getLaunchIntent()
+        val cancelIntent = NotificationHandlerService.pendingCancelNotificationHandlerIntent(context, notification.javaClass)
         val systemNotification = factory.createNotification(specification, launchIntent, cancelIntent)
         notificationDao.insert(Notification(notification.id))
         manager.notify(specification.systemId, systemNotification)
 
-        val plugin = schedulableNotificationPluginPoint.getPlugins().firstOrNull {
-            notification.javaClass == it.getSchedulableNotification().javaClass
-        }
-
-        if (plugin != null) {
-            plugin.onNotificationShown()
-        } else {
-            pixel.fire("${AppPixelName.NOTIFICATION_SHOWN.pixelName}_${specification.pixelSuffix}")
-        }
+        notificationPlugin.onNotificationShown()
     }
 }

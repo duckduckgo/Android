@@ -512,8 +512,8 @@
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Nigdy</string>
     <string name="disableLoginDetectionDialogTitle">Wyłączyć przypomnienie o zabezpieczeniach podczas logowania się do witryn internetowych?</string>
     <string name="disableLoginDetectionDialogDescription">W każdej chwili można zmienić ten wybór w Ustawieniach.</string>
-    <string name="disableLoginDetectionDialogPositive">WYŁĄCZ</string>
-    <string name="disableLoginDetectionDialogNegative">ANULUJ</string>
+    <string name="disableLoginDetectionDialogPositive">Wyłącz</string>
+    <string name="disableLoginDetectionDialogNegative">Anuluj</string>
     <string name="automaticFireproofWebsiteLoginDialogTitle">Zabezpieczać automatycznie witryny internetowe po zalogowaniu?</string>
     <string name="automaticFireproofWebsiteLoginDialogDescription">Zabezpieczenie witryn za pomocą przycisku Zabezpiecz nie spowoduje wylogowania. Zawsze można później zmienić ten wybór w Ustawieniach. </string>
     <string name="automaticFireproofWebsiteLoginDialogFirstOption">Zawsze zabezpieczaj</string>
@@ -589,6 +589,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Blokuje skrypty śledzące wiadomości e-mail i ukrywa Twój adres e-mail</string>
     <string name="newEmailAliasMenuTitle">Wygeneruj Duck Address</string>
 
+    <!-- Autofill -->
+    <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Wyświetl</string>
+    <string name="autofillLoginSavedSnackbarMessage">Zapisano logowanie</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Zaktualizowano logowanie</string>
+    <string name="autofillDisableAutofillPromptTitle">Czy chcesz nadal zapisywać dane logowania?</string>
+    <string name="autofillDisableAutofillPromptMessage">Możesz to wyłączyć w każdej chwili w ustawieniach.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Nadal zapisuj</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Wyłącz</string>
+
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Czy chcesz, abyśmy wysłali Ci powiadomienie, gdy nadejdzie Twoja kolej?</string>
     <string name="waitlistNotificationDialogNoThanks">Nie, dziękuję</string>
@@ -606,6 +615,7 @@
     <string name="folderLocationTitle">Wybierz lokalizację</string>
     <string name="addFolder">Dodaj folder</string>
     <string name="editFolder">Edytuj folder</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Usunąć folder i jego zawartość?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Czy na pewno chcesz usunąć "</string>
     <string name="bookmarkFolderEmpty">Pusty</string>
 

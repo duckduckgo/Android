@@ -25,7 +25,6 @@ import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.annotation.ColorRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewOneLineListItemBinding
 import com.duckduckgo.mobile.android.ui.view.gone
@@ -103,8 +102,7 @@ class OneLineListItem @JvmOverloads constructor(
 
     /** Sets the leading icon image resource */
     fun setLeadingIcon(idRes: Int) {
-        val drawable = VectorDrawableCompat.create(resources, idRes, null)
-        binding.leadingIcon.setImageDrawable(drawable)
+        binding.leadingIcon.setImageResource(idRes)
         binding.leadingIconBackground.show()
     }
 
@@ -121,8 +119,7 @@ class OneLineListItem @JvmOverloads constructor(
 
     /** Sets the trailing icon image resource */
     fun setTrailingIcon(idRes: Int) {
-        val drawable = VectorDrawableCompat.create(resources, idRes, null)
-        binding.trailingIcon.setImageDrawable(drawable)
+        binding.trailingIcon.setImageResource(idRes)
         binding.trailingIcon.show()
     }
 
