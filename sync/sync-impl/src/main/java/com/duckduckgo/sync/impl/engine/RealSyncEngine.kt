@@ -16,17 +16,22 @@
 
 package com.duckduckgo.sync.impl.engine
 
-import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.SyncEngine
-import com.duckduckgo.sync.api.SyncablePlugin
+import com.duckduckgo.sync.impl.SyncRepository
+import com.squareup.anvil.annotations.ContributesBinding
 import timber.log.Timber
+import javax.inject.Inject
 
-class RealSyncEngine(private val plugins: PluginPoint<SyncablePlugin>) : SyncEngine {
+@ContributesBinding(scope = AppScope::class)
+class RealSyncEngine @Inject constructor(private val syncRepository: SyncRepository) : SyncEngine {
+
     override fun syncNow() {
         Timber.d("RealSyncEngine syncNow")
     }
 
     override fun notifyDataChanged() {
         Timber.d("RealSyncEngine notifyDataChanged")
+
     }
 }

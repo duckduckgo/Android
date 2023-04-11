@@ -16,20 +16,35 @@
 
 package com.duckduckgo.savedsites.impl.sync
 
+import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.sync.api.SyncChanges
 import com.duckduckgo.sync.api.SyncCrypto
 import com.duckduckgo.sync.api.SyncParser
+import com.duckduckgo.sync.api.SyncablePlugin
 import com.duckduckgo.sync.api.SyncableType.BOOKMARKS
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 
-@ContributesBinding(AppScope::class)
-class SavedSitesSyncParser(
-    val savedSitesRepository: SavedSitesRepository,
-    val syncCrypto: SyncCrypto
-) : SyncParser {
+@ContributesMultibinding(scope = AppScope::class, boundType = SyncablePlugin::class)
+@ContributesBinding(scope = AppScope::class, boundType = SyncParser::class)
+class SavedSitesSyncParser @Inject constructor(
+    val savedSitesRepository: SavedSitesRepository
+) : SyncParser, SyncablePlugin {
     override fun parseChanges(since: String): SyncChanges {
         return SyncChanges(BOOKMARKS, "")
+    }
+
+    override fun getChanges(since: String): SyncChanges {
+        return parseChanges(since)
+    }
+
+    override fun syncChanges(
+        changes: List<SyncChanges>,
+        timestamp: String
+    ) {
+
     }
 }

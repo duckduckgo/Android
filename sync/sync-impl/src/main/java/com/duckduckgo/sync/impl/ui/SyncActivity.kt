@@ -244,9 +244,15 @@ class SyncActivity : DuckDuckGoActivity() {
             binding.deleteAccountButton.setOnClickListener {
                 viewModel.onDeleteAccountClicked()
             }
+
+            binding.syncEngineNow.setOnClickListener {
+                viewModel.syncNow()
+            }
+
             binding.scanQrCodeItem.setOnClickListener {
                 viewModel.onScanQRCodeClicked()
             }
+
             binding.showTextCodeItem.setOnClickListener {
                 viewModel.onShowTextCodeClicked()
             }

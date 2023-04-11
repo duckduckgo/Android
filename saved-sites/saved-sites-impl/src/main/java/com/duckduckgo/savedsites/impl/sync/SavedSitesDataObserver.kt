@@ -38,16 +38,13 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
-@ContributesMultibinding(scope = AppScope::class, boundType = SyncablePlugin::class)
-@ContributesBinding(scope = AppScope::class, boundType = BrowserLifecycleObserver::class)
+@ContributesBinding(scope = AppScope::class, boundType = BrowserLifecycleObserver::class )
 class SavedSitesDataObserver @Inject constructor(
     private val syncEngine: SyncEngine,
-    private val syncMerger: SavedSitesSyncMerger,
-    private val syncParser: SavedSitesSyncParser,
     private val savedSitesRepository: SavedSitesEntitiesDao,
     private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope
-) : BrowserLifecycleObserver, SyncablePlugin {
+) : BrowserLifecycleObserver {
 
     override fun onOpen(isFreshLaunch: Boolean) {
         super.onOpen(isFreshLaunch)
@@ -58,19 +55,10 @@ class SavedSitesDataObserver @Inject constructor(
                 syncEngine.notifyDataChanged()
             }
         }
-
     }
 
-    override fun getChanges(since: String): SyncChanges {
-        return syncParser.parseChanges(since)
-    }
-
-    override fun syncChanges(
-        changes: List<SyncChanges>,
-        timestamp: String
-    ) {
-        changes.find { it.type == BOOKMARKS }?.let { bookmarkChanges ->
-            syncMerger.merge(bookmarkChanges)
-        }
+    override fun onForeground() {
+        super.onForeground()
+        Timber.d("SavedSitesDataObserver onForeground")
     }
 }
