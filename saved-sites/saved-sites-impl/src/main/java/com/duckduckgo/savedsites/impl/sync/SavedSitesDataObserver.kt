@@ -16,23 +16,61 @@
 
 package com.duckduckgo.savedsites.impl.sync
 
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DefaultDispatcherProvider
+import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.statistics.api.BrowserFeatureStateReporterPlugin
+import com.duckduckgo.browser.api.BrowserLifecycleObserver
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.sync.api.SyncChanges
 import com.duckduckgo.sync.api.SyncEngine
+import com.duckduckgo.sync.api.SyncParser
 import com.duckduckgo.sync.api.SyncablePlugin
+import com.duckduckgo.sync.api.SyncableType.BOOKMARKS
+import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import timber.log.Timber
+import javax.inject.Inject
 
-class SavedSitesDataObserver(
-    val syncEngine: SyncEngine,
-    val savedSitesRepository: SavedSitesRepository
-) : SyncablePlugin {
+@ContributesMultibinding(scope = AppScope::class, boundType = SyncablePlugin::class)
+@ContributesBinding(scope = AppScope::class, boundType = BrowserLifecycleObserver::class)
+class SavedSitesDataObserver @Inject constructor(
+    private val syncEngine: SyncEngine,
+    private val syncMerger: SavedSitesSyncMerger,
+    private val syncParser: SavedSitesSyncParser,
+    private val savedSitesRepository: SavedSitesEntitiesDao,
+    private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope
+) : BrowserLifecycleObserver, SyncablePlugin {
+
+    override fun onOpen(isFreshLaunch: Boolean) {
+        super.onOpen(isFreshLaunch)
+        Timber.d("SavedSitesDataObserver onOpen")
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            savedSitesRepository.lastModified().collectLatest {
+                Timber.d("SavedSitesDataObserver changes to LastModified")
+                syncEngine.notifyDataChanged()
+            }
+        }
+
+    }
+
     override fun getChanges(since: String): SyncChanges {
-        TODO("Not yet implemented")
+        return syncParser.parseChanges(since)
     }
 
     override fun syncChanges(
         changes: List<SyncChanges>,
         timestamp: String
     ) {
-        TODO("Not yet implemented")
+        changes.find { it.type == BOOKMARKS }?.let { bookmarkChanges ->
+            syncMerger.merge(bookmarkChanges)
+        }
     }
 }

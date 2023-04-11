@@ -113,6 +113,14 @@ class RealSyncCrypter(
         return true
     }
 
+    override fun encrypt(text: String): String {
+        TODO("Not yet implemented")
+    }
+
+    override fun decrypt(data: String): String {
+        TODO("Not yet implemented")
+    }
+
     private fun encryptFolder(
         bookmarkFolder: BookmarkFolder,
         children: List<String>,
