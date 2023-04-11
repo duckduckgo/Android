@@ -17,6 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.ui.onboarding
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.net.VpnService
 import android.os.Build
@@ -72,6 +73,10 @@ class VpnOnboardingActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         configureUI()
         observeViewModel()
+
+        intent?.getStringExtra(LAUNCH_FROM_NOTIFICATION_PIXEL_NAME)?.let {
+            viewModel.onLaunchedFromNotification(it)
+        }
     }
 
     private fun configureUI() {
@@ -301,5 +306,12 @@ class VpnOnboardingActivity : DuckDuckGoActivity() {
 
     companion object {
         private const val REQUEST_ASK_VPN_PERMISSION = 101
+
+        const val LAUNCH_FROM_NOTIFICATION_PIXEL_NAME = "LAUNCH_FROM_NOTIFICATION_PIXEL_NAME"
+
+        // TODO: ANA remove this.
+        fun intent(context: Context): Intent {
+            return Intent(context, VpnOnboardingActivity::class.java)
+        }
     }
 }
