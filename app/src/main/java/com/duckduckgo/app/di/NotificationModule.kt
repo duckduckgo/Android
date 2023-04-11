@@ -25,11 +25,14 @@ import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.notification.*
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.ClearDataNotification
+import com.duckduckgo.app.notification.model.EnableAppTpNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.notification.model.SchedulableNotificationPlugin
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
@@ -74,16 +77,28 @@ object NotificationModule {
     }
 
     @Provides
+    fun provideEnableAppTpNotification(
+        context: Context,
+        notificationDao: NotificationDao,
+        variantManager: VariantManager,
+        vpnFeaturesRegistry: VpnFeaturesRegistry,
+    ): EnableAppTpNotification {
+        return EnableAppTpNotification(context, notificationDao, variantManager, vpnFeaturesRegistry)
+    }
+
+    @Provides
     @SingleInstanceIn(AppScope::class)
     fun providesNotificationScheduler(
         workManager: WorkManager,
         clearDataNotification: ClearDataNotification,
         privacyProtectionNotification: PrivacyProtectionNotification,
+        enableAppTpNotification: EnableAppTpNotification,
     ): AndroidNotificationScheduler {
         return NotificationScheduler(
             workManager,
             clearDataNotification,
             privacyProtectionNotification,
+            enableAppTpNotification,
         )
     }
 

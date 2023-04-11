@@ -70,6 +70,10 @@ class VpnOnboardingActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         configureUI()
         observeViewModel()
+
+        intent?.getStringExtra(LAUNCH_FROM_NOTIFICATION_PIXEL_NAME)?.let {
+            viewModel.onLaunchedFromNotification(it)
+        }
     }
 
     private fun configureUI() {
@@ -299,6 +303,8 @@ class VpnOnboardingActivity : DuckDuckGoActivity() {
 
     companion object {
         private const val REQUEST_ASK_VPN_PERMISSION = 101
+
+        const val LAUNCH_FROM_NOTIFICATION_PIXEL_NAME = "LAUNCH_FROM_NOTIFICATION_PIXEL_NAME"
 
         fun intent(context: Context): Intent {
             return Intent(context, VpnOnboardingActivity::class.java)
