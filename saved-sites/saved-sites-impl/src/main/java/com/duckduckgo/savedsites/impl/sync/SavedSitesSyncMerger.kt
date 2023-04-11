@@ -21,11 +21,30 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.sync.api.SyncChanges
 import com.duckduckgo.sync.api.SyncMergeResult
 import com.duckduckgo.sync.api.SyncMerger
+import com.duckduckgo.sync.api.SyncParser
+import com.duckduckgo.sync.api.SyncablePlugin
+import com.duckduckgo.sync.api.SyncableType.BOOKMARKS
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 
-@ContributesBinding(AppScope::class)
-class SavedSitesSyncMerger(val savedSitesRepository: SavedSitesRepository): SyncMerger {
+@ContributesMultibinding(scope = AppScope::class, boundType = SyncablePlugin::class)
+@ContributesBinding(scope = AppScope::class, boundType = SyncMerger::class)
+class SavedSitesSyncMerger @Inject constructor(val savedSitesRepository: SavedSitesRepository): SyncMerger, SyncablePlugin {
     override fun merge(changes: SyncChanges): SyncMergeResult<Boolean> {
         return SyncMergeResult.Success(true)
+    }
+
+    override fun getChanges(since: String): SyncChanges {
+        TODO("Not yet implemented")
+    }
+
+    override fun syncChanges(
+        changes: List<SyncChanges>,
+        timestamp: String
+    ) {
+        changes.find { it.type == BOOKMARKS }?.let { bookmarkChanges ->
+            merge(bookmarkChanges)
+        }
     }
 }

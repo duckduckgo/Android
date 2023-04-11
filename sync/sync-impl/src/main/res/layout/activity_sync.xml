@@ -100,7 +100,6 @@
                     android:text="@string/sync_new_device_hint"/>
 
                 <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-                    android:id="@+id/showTextCodeItem"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryTextTruncated="true"

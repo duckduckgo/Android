@@ -31,6 +31,9 @@ import com.duckduckgo.savedsites.impl.service.RealSavedSitesImporter
 import com.duckduckgo.savedsites.impl.service.RealSavedSitesManager
 import com.duckduckgo.savedsites.impl.service.RealSavedSitesParser
 import com.duckduckgo.savedsites.impl.service.SavedSitesParser
+import com.duckduckgo.savedsites.impl.sync.SavedSitesDataObserver
+import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncMerger
+import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncParser
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import com.squareup.anvil.annotations.ContributesTo
@@ -90,4 +93,5 @@ class SavedSitesModule {
     ): SavedSitesRepository {
         return RealSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao, coroutineDispatcher)
     }
+
 }
