@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/tracker-blocklists",
-    "version": 1680299195572,
+    "version": 1639624032609,
     "trackers": {
         "15.taboola.com": {
             "owner": {
@@ -9,10 +9,10 @@
             },
             "default": "block"
         },
-        "a.applovin.com": {
+        "a.teads.tv": {
             "owner": {
-                "name": "AppLovin Corporation",
-                "displayName": "AppLovin"
+                "name": "Teads ( Luxenbourg ) SA",
+                "displayName": "Teads"
             },
             "default": "block"
         },
@@ -30,38 +30,24 @@
             },
             "default": "block"
         },
-        "aax-eu.amazon-adsystem.com": {
-            "owner": {
-                "name": "Amazon Technologies, Inc.",
-                "displayName": "Amazon.com"
-            },
-            "default": "block"
-        },
         "aax-us-east.amazon-adsystem.com": {
             "owner": {
                 "name": "Amazon Technologies, Inc.",
-                "displayName": "Amazon.com"
+                "displayName": "Amazon"
             },
             "default": "block"
         },
         "aax.amazon-adsystem.com": {
             "owner": {
                 "name": "Amazon Technologies, Inc.",
-                "displayName": "Amazon.com"
+                "displayName": "Amazon"
             },
             "default": "block"
         },
-        "accounts.google.com": {
-            "owner": {
-                "name": "Google LLC",
-                "displayName": "Google"
-            },
-            "default": "ignore"
-        },
         "acdn.adnxs.com": {
             "owner": {
-                "name": "Microsoft Corporation",
-                "displayName": "Microsoft"
+                "name": "WarnerMedia, LLC",
+                "displayName": "WarnerMedia"
             },
             "default": "block"
         },
@@ -83,13 +69,6 @@
             "owner": {
                 "name": "Amobee, Inc",
                 "displayName": "Amobee"
-            },
-            "default": "block"
-        },
-        "adc3-launch.adcolony.com": {
-            "owner": {
-                "name": "Digital Turbine",
-                "displayName": "AdColony"
             },
             "default": "block"
         },
@@ -121,6 +100,13 @@
             },
             "default": "block"
         },
+        "ads.betweendigital.com": {
+            "owner": {
+                "name": "SSP Network Ltd",
+                "displayName": "SSP Network"
+            },
+            "default": "block"
+        },
         "ads.inmobi.com": {
             "owner": {
                 "name": "InMobi Pte Ltd",
@@ -137,8 +123,8 @@
         },
         "ads.mopub.com": {
             "owner": {
-                "name": "AppLovin Corporation",
-                "displayName": "AppLovin"
+                "name": "Twitter, Inc.",
+                "displayName": "Twitter"
             },
             "default": "block"
         },
@@ -156,24 +142,10 @@
             },
             "default": "block"
         },
-        "ads.stickyadstv.com": {
-            "owner": {
-                "name": "FreeWheel",
-                "displayName": "FreeWheel"
-            },
-            "default": "block"
-        },
         "ads.tremorhub.com": {
             "owner": {
                 "name": "Telaria",
                 "displayName": "Telaria"
-            },
-            "default": "block"
-        },
-        "ads.undertone.com": {
-            "owner": {
-                "name": "Undertone Networks",
-                "displayName": "Undertone Networks"
             },
             "default": "block"
         },
@@ -198,6 +170,13 @@
             },
             "default": "block"
         },
+        "adsximg.com": {
+            "owner": {
+                "name": "Human Security, Inc.",
+                "displayName": "Human Security"
+            },
+            "default": "ignore"
+        },
         "ag.innovid.com": {
             "owner": {
                 "name": "Innovid Media",
@@ -211,34 +190,6 @@
                 "displayName": "Google"
             },
             "default": "ignore"
-        },
-        "alb.reddit.com": {
-            "owner": {
-                "name": "Reddit Inc.",
-                "displayName": "Reddit"
-            },
-            "default": "block"
-        },
-        "analytics.google.com": {
-            "owner": {
-                "name": "Google LLC",
-                "displayName": "Google"
-            },
-            "default": "ignore"
-        },
-        "analytics.localytics.com": {
-            "owner": {
-                "name": "Upland Software Inc.",
-                "displayName": "Upland Software"
-            },
-            "default": "block"
-        },
-        "analytics.rayjump.com": {
-            "owner": {
-                "name": "Talent Game Box",
-                "displayName": "Talent Game Box"
-            },
-            "default": "block"
         },
         "analytics.tiktok.com": {
             "owner": {
@@ -258,13 +209,6 @@
             "owner": {
                 "name": "Verizon Media",
                 "displayName": "Verizon Media"
-            },
-            "default": "block"
-        },
-        "androidads4-5.adcolony.com": {
-            "owner": {
-                "name": "Digital Turbine",
-                "displayName": "AdColony"
             },
             "default": "block"
         },
@@ -296,24 +240,10 @@
             },
             "default": "block"
         },
-        "api.branch.io": {
+        "api.instabug.com": {
             "owner": {
-                "name": "Branch Metrics, Inc.",
-                "displayName": "Branch Metrics"
-            },
-            "default": "block"
-        },
-        "api.gameanalytics.com": {
-            "owner": {
-                "name": "GameAnalytics ApS",
-                "displayName": "GameAnalytics"
-            },
-            "default": "block"
-        },
-        "api.iterable.com": {
-            "owner": {
-                "name": "Iterable, Inc.",
-                "displayName": "Iterable"
+                "name": "Instabug",
+                "displayName": "Instabug"
             },
             "default": "block"
         },
@@ -331,13 +261,6 @@
             },
             "default": "ignore"
         },
-        "api.mixpanel.com": {
-            "owner": {
-                "name": "Mixpanel, Inc.",
-                "displayName": "Mixpanel"
-            },
-            "default": "block"
-        },
         "api.onesignal.com": {
             "owner": {
                 "name": "OneSignal",
@@ -345,23 +268,9 @@
             },
             "default": "block"
         },
-        "api.permutive.com": {
-            "owner": {
-                "name": "Permutive, Inc.",
-                "displayName": "Permutive"
-            },
-            "default": "block"
-        },
-        "api.revenuecat.com": {
-            "owner": {
-                "name": "RevenueCat",
-                "displayName": "RevenueCat"
-            },
-            "default": "block"
-        },
         "api.rlcdn.com": {
             "owner": {
-                "name": "LiveRamp Holdings, Inc.",
+                "name": "LiveRamp",
                 "displayName": "LiveRamp"
             },
             "default": "block"
@@ -377,13 +286,6 @@
             "owner": {
                 "name": "Tappcelator Media S.L.",
                 "displayName": "Tappx"
-            },
-            "default": "block"
-        },
-        "api.twitter.com": {
-            "owner": {
-                "name": "Twitter, Inc.",
-                "displayName": "Twitter"
             },
             "default": "block"
         },
@@ -408,13 +310,6 @@
             },
             "default": "block"
         },
-        "api3.siftscience.com": {
-            "owner": {
-                "name": "Sift Science, Inc.",
-                "displayName": "Sift Science"
-            },
-            "default": "ignore"
-        },
         "apis.google.com": {
             "owner": {
                 "name": "Google LLC",
@@ -429,13 +324,6 @@
             },
             "default": "block"
         },
-        "app.appsflyer.com": {
-            "owner": {
-                "name": "AppsFlyer",
-                "displayName": "AppsFlyer"
-            },
-            "default": "block"
-        },
         "appmetrica.yandex.net": {
             "owner": {
                 "name": "Yandex LLC",
@@ -443,17 +331,17 @@
             },
             "default": "block"
         },
-        "assets.hcaptcha.com": {
+        "as-sec.casalemedia.com": {
             "owner": {
-                "name": "Intuition Machines, Inc.",
-                "displayName": "Intuition Machines"
+                "name": "Index Exchange, Inc.",
+                "displayName": "Index Exchange"
             },
-            "default": "ignore"
+            "default": "block"
         },
-        "aud.pubmatic.com": {
+        "aws.oath.cloud": {
             "owner": {
-                "name": "PubMatic, Inc.",
-                "displayName": "PubMatic"
+                "name": "Verizon Media",
+                "displayName": "Verizon Media"
             },
             "default": "block"
         },
@@ -492,13 +380,6 @@
             },
             "default": "block"
         },
-        "beacon.riskified.com": {
-            "owner": {
-                "name": "Riskified Ltd.",
-                "displayName": "Riskified"
-            },
-            "default": "ignore"
-        },
         "bh.contextweb.com": {
             "owner": {
                 "name": "Pulsepoint, Inc.",
@@ -513,13 +394,6 @@
             },
             "default": "block"
         },
-        "btlr.sharethrough.com": {
-            "owner": {
-                "name": "Sharethrough, Inc.",
-                "displayName": "Sharethrough"
-            },
-            "default": "block"
-        },
         "bttrack.com": {
             "owner": {
                 "name": "Bidtellect, Inc",
@@ -530,23 +404,9 @@
         "c.amazon-adsystem.com": {
             "owner": {
                 "name": "Amazon Technologies, Inc.",
-                "displayName": "Amazon.com"
+                "displayName": "Amazon"
             },
             "default": "block"
-        },
-        "c.bing.com": {
-            "owner": {
-                "name": "Microsoft Corporation",
-                "displayName": "Microsoft"
-            },
-            "default": "block"
-        },
-        "c.riskified.com": {
-            "owner": {
-                "name": "Riskified Ltd.",
-                "displayName": "Riskified"
-            },
-            "default": "ignore"
         },
         "c1.adform.net": {
             "owner": {
@@ -555,24 +415,10 @@
             },
             "default": "block"
         },
-        "cb.mopub.com": {
+        "cdn.amplitude.com": {
             "owner": {
-                "name": "AppLovin Corporation",
-                "displayName": "AppLovin"
-            },
-            "default": "block"
-        },
-        "cdn-f.adsmoloco.com": {
-            "owner": {
-                "name": "Moloco Inc.",
-                "displayName": "Moloco"
-            },
-            "default": "block"
-        },
-        "cdn-lb.vungle.com": {
-            "owner": {
-                "name": "Vungle Inc",
-                "displayName": "Vungle"
+                "name": "Amplitude",
+                "displayName": "Amplitude"
             },
             "default": "block"
         },
@@ -597,20 +443,6 @@
             },
             "default": "block"
         },
-        "cdn.permutive.com": {
-            "owner": {
-                "name": "Permutive, Inc.",
-                "displayName": "Permutive"
-            },
-            "default": "block"
-        },
-        "cdn.siftscience.com": {
-            "owner": {
-                "name": "Sift Science, Inc.",
-                "displayName": "Sift Science"
-            },
-            "default": "ignore"
-        },
         "cdn.taboola.com": {
             "owner": {
                 "name": "Taboola, Inc.",
@@ -632,6 +464,13 @@
             },
             "default": "block"
         },
+        "ch-vid-events.taboola.com": {
+            "owner": {
+                "name": "Taboola, Inc.",
+                "displayName": "Taboola"
+            },
+            "default": "block"
+        },
         "ch-wf.taboola.com": {
             "owner": {
                 "name": "Taboola, Inc.",
@@ -639,31 +478,17 @@
             },
             "default": "block"
         },
-        "choices.truste.com": {
-            "owner": {
-                "name": "TrustArc Inc.",
-                "displayName": "TrustArc"
-            },
-            "default": "block"
-        },
-        "click-haproxy.supersonicads.com": {
-            "owner": {
-                "name": "ironSource Ltd",
-                "displayName": "ironSource"
-            },
-            "default": "block"
-        },
-        "cloud.unity3d.com": {
-            "owner": {
-                "name": "Unity Technologies ApS",
-                "displayName": "Unity"
-            },
-            "default": "block"
-        },
         "cm.everesttech.net": {
             "owner": {
                 "name": "Adobe Inc.",
                 "displayName": "Adobe"
+            },
+            "default": "block"
+        },
+        "cms-xch-chicago.33across.com": {
+            "owner": {
+                "name": "33Across, Inc.",
+                "displayName": "33Across"
             },
             "default": "block"
         },
@@ -681,24 +506,10 @@
             },
             "default": "block"
         },
-        "configure.rayjump.com": {
-            "owner": {
-                "name": "Talent Game Box",
-                "displayName": "Talent Game Box"
-            },
-            "default": "block"
-        },
         "connect.facebook.net": {
             "owner": {
                 "name": "Facebook, Inc.",
                 "displayName": "Facebook"
-            },
-            "default": "block"
-        },
-        "connect.tapjoy.com": {
-            "owner": {
-                "name": "Tapjoy, Inc.",
-                "displayName": "Tapjoy"
             },
             "default": "block"
         },
@@ -744,13 +555,6 @@
             },
             "default": "block"
         },
-        "cs.emxdgt.com": {
-            "owner": {
-                "name": "Engine USA LLC",
-                "displayName": "Engine USA"
-            },
-            "default": "block"
-        },
         "csi.gstatic.com": {
             "owner": {
                 "name": "Google LLC",
@@ -793,13 +597,6 @@
             },
             "default": "block"
         },
-        "data.ad-score.com": {
-            "owner": {
-                "name": "Adscore Technologies DMCC",
-                "displayName": "Adscore"
-            },
-            "default": "block"
-        },
         "data.flurry.com": {
             "owner": {
                 "name": "Verizon Media",
@@ -830,7 +627,7 @@
         },
         "di.rlcdn.com": {
             "owner": {
-                "name": "LiveRamp Holdings, Inc.",
+                "name": "LiveRamp",
                 "displayName": "LiveRamp"
             },
             "default": "block"
@@ -842,17 +639,24 @@
             },
             "default": "block"
         },
-        "dlsdk.appsflyer.com": {
-            "owner": {
-                "name": "AppsFlyer",
-                "displayName": "AppsFlyer"
-            },
-            "default": "block"
-        },
         "dlx.addthis.com": {
             "owner": {
                 "name": "Oracle Corporation",
                 "displayName": "Oracle"
+            },
+            "default": "block"
+        },
+        "dmp.brand-display.com": {
+            "owner": {
+                "name": "Knorex Pte. Ltd.",
+                "displayName": "Knorex"
+            },
+            "default": "block"
+        },
+        "dmx.districtm.io": {
+            "owner": {
+                "name": "District M Inc.",
+                "displayName": "District M"
             },
             "default": "block"
         },
@@ -907,8 +711,8 @@
         },
         "eus.rubiconproject.com": {
             "owner": {
-                "name": "Magnite, Inc.",
-                "displayName": "Magnite"
+                "name": "The Rubicon Project, Inc.",
+                "displayName": "The Rubicon Project"
             },
             "default": "block"
         },
@@ -928,17 +732,10 @@
         },
         "fastlane.rubiconproject.com": {
             "owner": {
-                "name": "Magnite, Inc.",
-                "displayName": "Magnite"
+                "name": "The Rubicon Project, Inc.",
+                "displayName": "The Rubicon Project"
             },
             "default": "block"
-        },
-        "firebaseinstallations.googleapis.com": {
-            "owner": {
-                "name": "Google LLC",
-                "displayName": "Google"
-            },
-            "default": "ignore"
         },
         "firebaselogging-pa.googleapis.com": {
             "owner": {
@@ -982,13 +779,6 @@
             },
             "default": "block"
         },
-        "fundingchoicesmessages.google.com": {
-            "owner": {
-                "name": "Google LLC",
-                "displayName": "Google"
-            },
-            "default": "ignore"
-        },
         "fw.adsafeprotected.com": {
             "owner": {
                 "name": "Integral Ad Science, Inc.",
@@ -1017,6 +807,13 @@
             },
             "default": "block"
         },
+        "go.sonobi.com": {
+            "owner": {
+                "name": "Sonobi, Inc",
+                "displayName": "Sonobi"
+            },
+            "default": "block"
+        },
         "gql.reddit.com": {
             "owner": {
                 "name": "Reddit Inc.",
@@ -1024,12 +821,26 @@
             },
             "default": "ignore"
         },
+        "graph.accountkit.com": {
+            "owner": {
+                "name": "Facebook, Inc.",
+                "displayName": "Facebook"
+            },
+            "default": "block"
+        },
         "graph.facebook.com": {
             "owner": {
                 "name": "Facebook, Inc.",
                 "displayName": "Facebook"
             },
             "default": "ignore"
+        },
+        "graph.instagram.com": {
+            "owner": {
+                "name": "Facebook, Inc.",
+                "displayName": "Facebook"
+            },
+            "default": "block"
         },
         "gum.criteo.com": {
             "owner": {
@@ -1042,6 +853,13 @@
             "owner": {
                 "name": "Adobe Inc.",
                 "displayName": "Adobe"
+            },
+            "default": "block"
+        },
+        "hblg.media.net": {
+            "owner": {
+                "name": "Media.net Advertising FZ-LLC",
+                "displayName": "Media.net Advertising"
             },
             "default": "block"
         },
@@ -1080,13 +898,6 @@
             },
             "default": "block"
         },
-        "iab-imp-gateway.supersonicads.com": {
-            "owner": {
-                "name": "ironSource Ltd",
-                "displayName": "ironSource"
-            },
-            "default": "block"
-        },
         "iad-01.braze.com": {
             "owner": {
                 "name": "Braze, Inc.",
@@ -1103,14 +914,14 @@
         },
         "ib.adnxs.com": {
             "owner": {
-                "name": "Microsoft Corporation",
-                "displayName": "Microsoft"
+                "name": "WarnerMedia, LLC",
+                "displayName": "WarnerMedia"
             },
             "default": "block"
         },
         "id.rlcdn.com": {
             "owner": {
-                "name": "LiveRamp Holdings, Inc.",
+                "name": "LiveRamp",
                 "displayName": "LiveRamp"
             },
             "default": "block"
@@ -1124,7 +935,7 @@
         },
         "idsync.rlcdn.com": {
             "owner": {
-                "name": "LiveRamp Holdings, Inc.",
+                "name": "LiveRamp",
                 "displayName": "LiveRamp"
             },
             "default": "block"
@@ -1171,28 +982,14 @@
             },
             "default": "ignore"
         },
-        "img.riskified.com": {
+        "imprchmp.taboola.com": {
             "owner": {
-                "name": "Riskified Ltd.",
-                "displayName": "Riskified"
-            },
-            "default": "ignore"
-        },
-        "imgs.hcaptcha.com": {
-            "owner": {
-                "name": "Intuition Machines, Inc.",
-                "displayName": "Intuition Machines"
-            },
-            "default": "ignore"
-        },
-        "impression-east.liftoff.io": {
-            "owner": {
-                "name": "Liftoff Mobile, Inc.",
-                "displayName": "Liftoff"
+                "name": "Taboola, Inc.",
+                "displayName": "Taboola"
             },
             "default": "block"
         },
-        "impression-europe.liftoff.io": {
+        "impression-east.liftoff.io": {
             "owner": {
                 "name": "Liftoff Mobile, Inc.",
                 "displayName": "Liftoff"
@@ -1220,6 +1017,13 @@
             },
             "default": "block"
         },
+        "in.treasuredata.com": {
+            "owner": {
+                "name": "Treasure Data, Inc",
+                "displayName": "Treasure Data"
+            },
+            "default": "block"
+        },
         "ingest.sentry.io": {
             "owner": {
                 "name": "Functional Software, Inc.",
@@ -1231,34 +1035,6 @@
             "owner": {
                 "name": "The Trade Desk Inc",
                 "displayName": "The Trade Desk"
-            },
-            "default": "block"
-        },
-        "internal.unity3d.com": {
-            "owner": {
-                "name": "Unity Technologies ApS",
-                "displayName": "Unity"
-            },
-            "default": "block"
-        },
-        "ipds.adrta.com": {
-            "owner": {
-                "name": "Pixalate, Inc.",
-                "displayName": "Pixalate"
-            },
-            "default": "ignore"
-        },
-        "ipv6.adrta.com": {
-            "owner": {
-                "name": "Pixalate, Inc.",
-                "displayName": "Pixalate"
-            },
-            "default": "ignore"
-        },
-        "is-gateway.supersonicads.com": {
-            "owner": {
-                "name": "ironSource Ltd",
-                "displayName": "ironSource"
             },
             "default": "block"
         },
@@ -1276,31 +1052,17 @@
             },
             "default": "block"
         },
+        "krk.kargo.com": {
+            "owner": {
+                "name": "Kargo Global, Inc.",
+                "displayName": "Kargo"
+            },
+            "default": "block"
+        },
         "lbs.yandex.net": {
             "owner": {
                 "name": "Yandex LLC",
                 "displayName": "Yandex"
-            },
-            "default": "block"
-        },
-        "lh3.googleusercontent.com": {
-            "owner": {
-                "name": "Google LLC",
-                "displayName": "Google"
-            },
-            "default": "ignore"
-        },
-        "live.chartboost.com": {
-            "owner": {
-                "name": "Take-Two Interactive Software, Inc.",
-                "displayName": "Take-Two Interactive Software"
-            },
-            "default": "block"
-        },
-        "load77.exelator.com": {
-            "owner": {
-                "name": "The Nielsen Company",
-                "displayName": "The Nielsen Company"
             },
             "default": "block"
         },
@@ -1325,13 +1087,6 @@
             },
             "default": "block"
         },
-        "logs.ironsrc.mobi": {
-            "owner": {
-                "name": "ironSource Ltd",
-                "displayName": "ironSource"
-            },
-            "default": "block"
-        },
         "logx.optimizely.com": {
             "owner": {
                 "name": "Optimizely, Inc.",
@@ -1339,10 +1094,10 @@
             },
             "default": "block"
         },
-        "m.facebook.com": {
+        "lynx.cognitivlabs.com": {
             "owner": {
-                "name": "Facebook, Inc.",
-                "displayName": "Facebook"
+                "name": "Cognitiv Corp.",
+                "displayName": "Cognitiv"
             },
             "default": "block"
         },
@@ -1360,10 +1115,10 @@
             },
             "default": "block"
         },
-        "match.deepintent.com": {
+        "match.bnmla.com": {
             "owner": {
-                "name": "DeepIntent Inc",
-                "displayName": "DeepIntent"
+                "name": "engageBDR",
+                "displayName": "engageBDR"
             },
             "default": "block"
         },
@@ -1378,6 +1133,13 @@
             "owner": {
                 "name": "Yandex LLC",
                 "displayName": "Yandex"
+            },
+            "default": "block"
+        },
+        "mid.rkdms.com": {
+            "owner": {
+                "name": "Merkle Inc",
+                "displayName": "Merkle"
             },
             "default": "block"
         },
@@ -1411,15 +1173,8 @@
         },
         "mpx.mopub.com": {
             "owner": {
-                "name": "AppLovin Corporation",
-                "displayName": "AppLovin"
-            },
-            "default": "block"
-        },
-        "ms.applovin.com": {
-            "owner": {
-                "name": "AppLovin Corporation",
-                "displayName": "AppLovin"
+                "name": "Twitter, Inc.",
+                "displayName": "Twitter"
             },
             "default": "block"
         },
@@ -1437,17 +1192,10 @@
             },
             "default": "block"
         },
-        "networksdk.ssacdn.com": {
+        "network.bazaarvoice.com": {
             "owner": {
-                "name": "ironSource Ltd",
-                "displayName": "ironSource"
-            },
-            "default": "block"
-        },
-        "notify.bugsnag.com": {
-            "owner": {
-                "name": "Bugsnag Inc.",
-                "displayName": "Bugsnag"
+                "name": "Bazaarvoice, Inc.",
+                "displayName": "Bazaarvoice"
             },
             "default": "block"
         },
@@ -1460,22 +1208,8 @@
         },
         "odr.mookie1.com": {
             "owner": {
-                "name": "WPP plc",
-                "displayName": "WPP"
-            },
-            "default": "block"
-        },
-        "outcome-cdn.supersonicads.com": {
-            "owner": {
-                "name": "ironSource Ltd",
-                "displayName": "ironSource"
-            },
-            "default": "block"
-        },
-        "outcome-ssp.supersonicads.com": {
-            "owner": {
-                "name": "ironSource Ltd",
-                "displayName": "ironSource"
+                "name": "Xaxis",
+                "displayName": "Xaxis"
             },
             "default": "block"
         },
@@ -1500,10 +1234,10 @@
             },
             "default": "block"
         },
-        "pad-v3.presage.io": {
+        "p.tvpixel.com": {
             "owner": {
-                "name": "Ogury Limited",
-                "displayName": "Ogury"
+                "name": "Data Plus Math",
+                "displayName": "Data Plus Math"
             },
             "default": "block"
         },
@@ -1516,17 +1250,10 @@
         },
         "pippio.com": {
             "owner": {
-                "name": "LiveRamp Holdings, Inc.",
+                "name": "LiveRamp",
                 "displayName": "LiveRamp"
             },
             "default": "block"
-        },
-        "pix.adrta.com": {
-            "owner": {
-                "name": "Pixalate, Inc.",
-                "displayName": "Pixalate"
-            },
-            "default": "ignore"
         },
         "pixel-sync.sitescout.com": {
             "owner": {
@@ -1537,8 +1264,8 @@
         },
         "pixel-us-east.rubiconproject.com": {
             "owner": {
-                "name": "Magnite, Inc.",
-                "displayName": "Magnite"
+                "name": "The Rubicon Project, Inc.",
+                "displayName": "The Rubicon Project"
             },
             "default": "block"
         },
@@ -1563,13 +1290,6 @@
             },
             "default": "block"
         },
-        "pixel.onaudience.com": {
-            "owner": {
-                "name": "OnAudience Ltd.",
-                "displayName": "OnAudience"
-            },
-            "default": "block"
-        },
         "pixel.parsely.com": {
             "owner": {
                 "name": "Parsely, Inc.",
@@ -1586,8 +1306,8 @@
         },
         "pixel.rubiconproject.com": {
             "owner": {
-                "name": "Magnite, Inc.",
-                "displayName": "Magnite"
+                "name": "The Rubicon Project, Inc.",
+                "displayName": "The Rubicon Project"
             },
             "default": "block"
         },
@@ -1598,20 +1318,6 @@
             },
             "default": "block"
         },
-        "placements.tapjoy.com": {
-            "owner": {
-                "name": "Tapjoy, Inc.",
-                "displayName": "Tapjoy"
-            },
-            "default": "block"
-        },
-        "platform.ssacdn.com": {
-            "owner": {
-                "name": "ironSource Ltd",
-                "displayName": "ironSource"
-            },
-            "default": "block"
-        },
         "platform.twitter.com": {
             "owner": {
                 "name": "Twitter, Inc.",
@@ -1619,38 +1325,17 @@
             },
             "default": "ignore"
         },
-        "play.google.com": {
-            "owner": {
-                "name": "Google LLC",
-                "displayName": "Google"
-            },
-            "default": "ignore"
-        },
-        "pm-gateway.supersonicads.com": {
-            "owner": {
-                "name": "ironSource Ltd",
-                "displayName": "ironSource"
-            },
-            "default": "block"
-        },
         "pm.w55c.net": {
             "owner": {
-                "name": "Roku, Inc.",
-                "displayName": "Roku"
-            },
-            "default": "block"
-        },
-        "prebid-server.rubiconproject.com": {
-            "owner": {
-                "name": "Magnite, Inc.",
-                "displayName": "Magnite"
+                "name": "DataXu",
+                "displayName": "DataXu"
             },
             "default": "block"
         },
         "prebid.adnxs.com": {
             "owner": {
-                "name": "Microsoft Corporation",
-                "displayName": "Microsoft"
+                "name": "WarnerMedia, LLC",
+                "displayName": "WarnerMedia"
             },
             "default": "block"
         },
@@ -1658,20 +1343,6 @@
             "owner": {
                 "name": "Smartadserver S.A.S",
                 "displayName": "Smartadserver"
-            },
-            "default": "block"
-        },
-        "prod-a.applovin.com": {
-            "owner": {
-                "name": "AppLovin Corporation",
-                "displayName": "AppLovin"
-            },
-            "default": "block"
-        },
-        "prod-ms.applovin.com": {
-            "owner": {
-                "name": "AppLovin Corporation",
-                "displayName": "AppLovin"
             },
             "default": "block"
         },
@@ -1689,13 +1360,6 @@
             },
             "default": "block"
         },
-        "pt.ispot.tv": {
-            "owner": {
-                "name": "iSpot.tv",
-                "displayName": "iSpot.tv"
-            },
-            "default": "block"
-        },
         "px.moatads.com": {
             "owner": {
                 "name": "Oracle Corporation",
@@ -1710,17 +1374,10 @@
             },
             "default": "block"
         },
-        "q.adrta.com": {
+        "pxl.connexity.net": {
             "owner": {
-                "name": "Pixalate, Inc.",
-                "displayName": "Pixalate"
-            },
-            "default": "ignore"
-        },
-        "r.casalemedia.com": {
-            "owner": {
-                "name": "Index Exchange, Inc.",
-                "displayName": "Index Exchange"
+                "name": "Connexity, Inc.",
+                "displayName": "Connexity"
             },
             "default": "block"
         },
@@ -1731,19 +1388,12 @@
             },
             "default": "block"
         },
-        "rpc.tapjoy.com": {
+        "riskified.com": {
             "owner": {
-                "name": "Tapjoy, Inc.",
-                "displayName": "Tapjoy"
+                "name": "Riskified Ltd.",
+                "displayName": "Riskified"
             },
-            "default": "block"
-        },
-        "rt.applovin.com": {
-            "owner": {
-                "name": "AppLovin Corporation",
-                "displayName": "AppLovin"
-            },
-            "default": "block"
+            "default": "ignore"
         },
         "rtb-csync.smartadserver.com": {
             "owner": {
@@ -1759,10 +1409,24 @@
             },
             "default": "block"
         },
+        "rtb.gumgum.com": {
+            "owner": {
+                "name": "GumGum",
+                "displayName": "GumGum"
+            },
+            "default": "block"
+        },
         "rtb.mfadsrvr.com": {
             "owner": {
                 "name": "IPONWEB GmbH",
                 "displayName": "IPONWEB"
+            },
+            "default": "block"
+        },
+        "rtb.ninthdecimal.com": {
+            "owner": {
+                "name": "NinthDecimal, Inc",
+                "displayName": "NinthDecimal"
             },
             "default": "block"
         },
@@ -1773,24 +1437,17 @@
             },
             "default": "block"
         },
-        "rv-gateway.supersonicads.com": {
+        "s-static.innovid.com": {
             "owner": {
-                "name": "ironSource Ltd",
-                "displayName": "ironSource"
+                "name": "Innovid Media",
+                "displayName": "Innovid Media"
             },
             "default": "block"
-        },
-        "s.adsximg.com": {
-            "owner": {
-                "name": "Human Security, Inc.",
-                "displayName": "Human Security"
-            },
-            "default": "ignore"
         },
         "s.amazon-adsystem.com": {
             "owner": {
                 "name": "Amazon Technologies, Inc.",
-                "displayName": "Amazon.com"
+                "displayName": "Amazon"
             },
             "default": "block"
         },
@@ -1815,17 +1472,10 @@
             },
             "default": "block"
         },
-        "s2s.adjust.com": {
-            "owner": {
-                "name": "Adjust GmbH",
-                "displayName": "Adjust"
-            },
-            "default": "block"
-        },
         "s3.amazonaws.com": {
             "owner": {
                 "name": "Amazon Technologies, Inc.",
-                "displayName": "Amazon.com"
+                "displayName": "Amazon"
             },
             "default": "ignore"
         },
@@ -1857,24 +1507,10 @@
             },
             "default": "block"
         },
-        "sdk-events.inner-active.mobi": {
-            "owner": {
-                "name": "Digital Turbine",
-                "displayName": "AdColony"
-            },
-            "default": "block"
-        },
         "search.spotxchange.com": {
             "owner": {
                 "name": "SpotX, Inc.",
                 "displayName": "SpotX"
-            },
-            "default": "block"
-        },
-        "secure-dcr.imrworldwide.com": {
-            "owner": {
-                "name": "The Nielsen Company",
-                "displayName": "The Nielsen Company"
             },
             "default": "block"
         },
@@ -1887,8 +1523,8 @@
         },
         "secure.adnxs.com": {
             "owner": {
-                "name": "Microsoft Corporation",
-                "displayName": "Microsoft"
+                "name": "WarnerMedia, LLC",
+                "displayName": "WarnerMedia"
             },
             "default": "block"
         },
@@ -1906,20 +1542,6 @@
             },
             "default": "block"
         },
-        "servedby.flashtalking.com": {
-            "owner": {
-                "name": "Flashtalking Inc",
-                "displayName": "Flashtalking"
-            },
-            "default": "block"
-        },
-        "servicebus.windows.net": {
-            "owner": {
-                "name": "Microsoft Corporation",
-                "displayName": "Microsoft"
-            },
-            "default": "ignore"
-        },
         "sessions.bugsnag.com": {
             "owner": {
                 "name": "Bugsnag Inc.",
@@ -1927,24 +1549,17 @@
             },
             "default": "block"
         },
+        "siftscience.com": {
+            "owner": {
+                "name": "Sift Science, Inc.",
+                "displayName": "Sift Science"
+            },
+            "default": "ignore"
+        },
         "simage2.pubmatic.com": {
             "owner": {
                 "name": "PubMatic, Inc.",
                 "displayName": "PubMatic"
-            },
-            "default": "block"
-        },
-        "simage4.pubmatic.com": {
-            "owner": {
-                "name": "PubMatic, Inc.",
-                "displayName": "PubMatic"
-            },
-            "default": "block"
-        },
-        "sonic-us.supersonicads.com": {
-            "owner": {
-                "name": "ironSource Ltd",
-                "displayName": "ironSource"
             },
             "default": "block"
         },
@@ -2039,10 +1654,10 @@
             },
             "default": "block"
         },
-        "sync.adotmob.com": {
+        "sync.bfmio.com": {
             "owner": {
-                "name": "A.Mob SAS",
-                "displayName": "A.Mob"
+                "name": "Beachfront Media LLC",
+                "displayName": "Beachfront Media"
             },
             "default": "block"
         },
@@ -2050,6 +1665,20 @@
             "owner": {
                 "name": "Lotame Solutions, Inc.",
                 "displayName": "Lotame Solutions"
+            },
+            "default": "block"
+        },
+        "sync.extend.tv": {
+            "owner": {
+                "name": "ZypMedia, Inc.",
+                "displayName": "ZypMedia"
+            },
+            "default": "block"
+        },
+        "sync.intentiq.com": {
+            "owner": {
+                "name": "Intent IQ, LLC",
+                "displayName": "Intent IQ"
             },
             "default": "block"
         },
@@ -2081,6 +1710,13 @@
             },
             "default": "block"
         },
+        "sync1.intentiq.com": {
+            "owner": {
+                "name": "Intent IQ, LLC",
+                "displayName": "Intent IQ"
+            },
+            "default": "block"
+        },
         "syndication.twitter.com": {
             "owner": {
                 "name": "Twitter, Inc.",
@@ -2101,6 +1737,13 @@
                 "displayName": "Twitter"
             },
             "default": "ignore"
+        },
+        "t.myvisualiq.net": {
+            "owner": {
+                "name": "The Nielsen Company",
+                "displayName": "The Nielsen Company"
+            },
+            "default": "block"
         },
         "tags.bluekai.com": {
             "owner": {
@@ -2130,13 +1773,6 @@
             },
             "default": "block"
         },
-        "token.rubiconproject.com": {
-            "owner": {
-                "name": "Magnite, Inc.",
-                "displayName": "Magnite"
-            },
-            "default": "block"
-        },
         "tpc.googlesyndication.com": {
             "owner": {
                 "name": "Google LLC",
@@ -2155,13 +1791,6 @@
             "owner": {
                 "name": "Snap Inc.",
                 "displayName": "Snap"
-            },
-            "default": "block"
-        },
-        "track.atom-data.io": {
-            "owner": {
-                "name": "ironSource Ltd",
-                "displayName": "ironSource"
             },
             "default": "block"
         },
@@ -2186,20 +1815,6 @@
             },
             "default": "block"
         },
-        "twitter.com": {
-            "owner": {
-                "name": "Twitter, Inc.",
-                "displayName": "Twitter"
-            },
-            "default": "block"
-        },
-        "uk-script.dotmetrics.net": {
-            "owner": {
-                "name": "Dotmetrics",
-                "displayName": "Dotmetrics"
-            },
-            "default": "block"
-        },
         "um.simpli.fi": {
             "owner": {
                 "name": "Simplifi Holdings Inc.",
@@ -2221,17 +1836,10 @@
             },
             "default": "block"
         },
-        "update.googleapis.com": {
-            "owner": {
-                "name": "Google LLC",
-                "displayName": "Google"
-            },
-            "default": "ignore"
-        },
         "us-east-1.amazonaws.com": {
             "owner": {
                 "name": "Amazon Technologies, Inc.",
-                "displayName": "Amazon.com"
+                "displayName": "Amazon"
             },
             "default": "ignore"
         },
@@ -2298,27 +1906,6 @@
             },
             "default": "block"
         },
-        "wins.isprog.com": {
-            "owner": {
-                "name": "ironSource Ltd",
-                "displayName": "ironSource"
-            },
-            "default": "block"
-        },
-        "ws.tapjoyads.com": {
-            "owner": {
-                "name": "Tapjoy, Inc.",
-                "displayName": "Tapjoy"
-            },
-            "default": "block"
-        },
-        "wv.inner-active.mobi": {
-            "owner": {
-                "name": "Digital Turbine",
-                "displayName": "AdColony"
-            },
-            "default": "block"
-        },
         "www.facebook.com": {
             "owner": {
                 "name": "Facebook, Inc.",
@@ -2327,13 +1914,6 @@
             "default": "block"
         },
         "www.google-analytics.com": {
-            "owner": {
-                "name": "Google LLC",
-                "displayName": "Google"
-            },
-            "default": "block"
-        },
-        "www.google.co.uk": {
             "owner": {
                 "name": "Google LLC",
                 "displayName": "Google"
@@ -2353,13 +1933,6 @@
                 "displayName": "Google"
             },
             "default": "block"
-        },
-        "www.googleapis.com": {
-            "owner": {
-                "name": "Google LLC",
-                "displayName": "Google"
-            },
-            "default": "ignore"
         },
         "www.googletagmanager.com": {
             "owner": {
@@ -2389,10 +1962,10 @@
             },
             "default": "block"
         },
-        "www.linkedin.com": {
+        "www.storygize.net": {
             "owner": {
-                "name": "Microsoft Corporation",
-                "displayName": "Microsoft"
+                "name": "Storygize",
+                "displayName": "Storygize"
             },
             "default": "block"
         },
@@ -2402,6 +1975,13 @@
                 "displayName": "Google"
             },
             "default": "ignore"
+        },
+        "www9.smartadserver.com": {
+            "owner": {
+                "name": "Smartadserver S.A.S",
+                "displayName": "Smartadserver"
+            },
+            "default": "block"
         },
         "x.bidswitch.net": {
             "owner": {
@@ -2419,37 +1999,35 @@
         }
     },
     "packageNames": {
-        "air.com.adobe.connectpro": "Adobe Inc.",
-        "amazon.speech.sim": "Amazon Technologies, Inc.",
-        "app.zenly.locator": "Snap Inc.",
-        "co.vine.android": "Twitter, Inc.",
         "com.adjust.insights": "Adjust GmbH",
-        "com.adobe.adobephotoshopfix": "Adobe Inc.",
-        "com.adobe.aem.forms": "Adobe Inc.",
-        "com.adobe.aero.android": "Adobe Inc.",
-        "com.adobe.analyticsdashboards": "Adobe Inc.",
-        "com.adobe.captivateprime": "Adobe Inc.",
-        "com.adobe.cc": "Adobe Inc.",
-        "com.adobe.comp": "Adobe Inc.",
-        "com.adobe.creativeapps.draw": "Adobe Inc.",
-        "com.adobe.creativeapps.gather": "Adobe Inc.",
-        "com.adobe.creativeapps.sketch": "Adobe Inc.",
-        "com.adobe.digitaleditions": "Adobe Inc.",
-        "com.adobe.echosign": "Adobe Inc.",
+        "air.com.adobe.connectpro": "Adobe Inc.",
+        "com.adobe.reader": "Adobe Inc.",
+        "com.adobe.lrmobile": "Adobe Inc.",
+        "com.adobe.scan.android": "Adobe Inc.",
+        "com.adobe.psmobile": "Adobe Inc.",
         "com.adobe.fas": "Adobe Inc.",
+        "com.adobe.spark.post": "Adobe Inc.",
+        "com.adobe.creativeapps.sketch": "Adobe Inc.",
+        "com.adobe.creativeapps.draw": "Adobe Inc.",
+        "com.adobe.photoshopmix": "Adobe Inc.",
+        "com.adobe.cc": "Adobe Inc.",
+        "com.adobe.lens.android": "Adobe Inc.",
+        "com.adobe.premiererush.videoeditor": "Adobe Inc.",
+        "com.adobe.adobephotoshopfix": "Adobe Inc.",
         "com.adobe.ims.accountaccess": "Adobe Inc.",
         "com.adobe.ims.push.android": "Adobe Inc.",
-        "com.adobe.lens.android": "Adobe Inc.",
-        "com.adobe.lrmobile": "Adobe Inc.",
-        "com.adobe.monocle.companion": "Adobe Inc.",
-        "com.adobe.phonegap.app": "Adobe Inc.",
-        "com.adobe.photoshopmix": "Adobe Inc.",
-        "com.adobe.premiererush.videoeditor": "Adobe Inc.",
-        "com.adobe.psmobile": "Adobe Inc.",
-        "com.adobe.reader": "Adobe Inc.",
-        "com.adobe.scan.android": "Adobe Inc.",
-        "com.adobe.spark.post": "Adobe Inc.",
+        "com.adobe.creativeapps.gather": "Adobe Inc.",
+        "com.adobe.digitaleditions": "Adobe Inc.",
+        "com.adobe.echosign": "Adobe Inc.",
         "com.adobe.sparklerandroid": "Adobe Inc.",
+        "com.adobe.comp": "Adobe Inc.",
+        "com.adobe.captivateprime": "Adobe Inc.",
+        "com.adobe.aem.forms": "Adobe Inc.",
+        "com.adobe.phonegap.app": "Adobe Inc.",
+        "com.adobe.analyticsdashboards": "Adobe Inc.",
+        "com.adobe.monocle.companion": "Adobe Inc.",
+        "com.adobe.aero.android": "Adobe Inc.",
+        "amazon.speech.sim": "Amazon Technologies, Inc.",
         "com.amazon.aa": "Amazon Technologies, Inc.",
         "com.amazon.aa.attribution": "Amazon Technologies, Inc.",
         "com.amazon.amazonvideo.livingroom": "Amazon Technologies, Inc.",
@@ -2477,30 +2055,30 @@
         "com.amazon.sellermobile.android": "Amazon Technologies, Inc.",
         "com.amazon.shopperpanel.android.mobile.app": "Amazon Technologies, Inc.",
         "com.amazon.storm.lightning.client.aosp": "Amazon Technologies, Inc.",
-        "com.amazon.venezia": "Amazon Technologies, Inc.",
         "com.amazon.widgets": "Amazon Technologies, Inc.",
         "com.amazon.windowshop": "Amazon Technologies, Inc.",
+        "com.amazon.venezia": "Amazon Technologies, Inc.",
         "com.amazon.ziggy.android": "Amazon Technologies, Inc.",
-        "com.android.chrome": "Google LLC",
-        "com.android.hotwordenrollment.okgoogle": "Google LLC",
-        "com.android.hotwordenrollment.xgoogle": "Google LLC",
-        "com.android.partnerbrowsercustomizations.chromeHomepage": "Google LLC",
-        "com.android.vending": "Google LLC",
-        "com.aol.mobile.aolapp": "Verizon Media",
-        "com.aol.mobile.techcrunch": "Verizon Media",
-        "com.appsflyer.adNetworkTest": "AppsFlyer",
-        "com.appsflyer.afsupportapp": "AppsFlyer",
+        "com.imdb.mobile": "Amazon Technologies, Inc.",
+        "com.imdb.pro.mobile.android": "Amazon Technologies, Inc.",
+        "com.imdbtv.livingroom": "Amazon Technologies, Inc.",
+        "com.ringapp": "Amazon Technologies, Inc.",
+        "in.amazon.mShop.android.shopping": "Amazon Technologies, Inc.",
+        "tv.twitch.android.app": "Amazon Technologies, Inc.",
         "com.appsflyer.analytics": "AppsFlyer",
         "com.appsflyer.android.deviceid": "AppsFlyer",
-        "com.appsflyer.app.ezshop": "AppsFlyer",
         "com.appsflyer.onelinksimulator": "AppsFlyer",
-        "com.azure.authenticator": "Microsoft Corporation",
-        "com.bitstrips.imoji": "Snap Inc.",
-        "com.chrome.beta": "Google LLC",
-        "com.chrome.canary": "Google LLC",
-        "com.chrome.dev": "Google LLC",
-        "com.desk.android": "Salesforce.com, Inc.",
-        "com.facebook.Origami": "Facebook, Inc.",
+        "com.appsflyer.app.ezshop": "AppsFlyer",
+        "com.appsflyer.afsupportapp": "AppsFlyer",
+        "com.appsflyer.adNetworkTest": "AppsFlyer",
+        "io.branch.deviceid": "Branch Metrics, Inc.",
+        "io.branch.android.discovery": "Branch Metrics, Inc.",
+        "io.branch.branchster": "Branch Metrics, Inc.",
+        "io.branch.sample.hellobranch": "Branch Metrics, Inc.",
+        "com.ss.android.ugc.trill": "ByteDance Ltd.",
+        "com.zhiliaoapp.musically": "ByteDance Ltd.",
+        "com.zhiliao.musically.livewallpaper": "ByteDance Ltd.",
+        "com.lemon.lvoverseas": "ByteDance Ltd.",
         "com.facebook.adsmanager": "Facebook, Inc.",
         "com.facebook.analytics": "Facebook, Inc.",
         "com.facebook.appmanager": "Facebook, Inc.",
@@ -2511,6 +2089,7 @@
         "com.facebook.katana": "Facebook, Inc.",
         "com.facebook.lite": "Facebook, Inc.",
         "com.facebook.mlite": "Facebook, Inc.",
+        "com.facebook.Origami": "Facebook, Inc.",
         "com.facebook.orca": "Facebook, Inc.",
         "com.facebook.pages.app": "Facebook, Inc.",
         "com.facebook.services": "Facebook, Inc.",
@@ -2520,13 +2099,26 @@
         "com.facebook.viewpoints": "Facebook, Inc.",
         "com.facebook.work": "Facebook, Inc.",
         "com.facebook.workchat": "Facebook, Inc.",
-        "com.fitbit.FitbitMobile": "Google LLC",
-        "com.flurry.instantapp.test.app": "Verizon Media",
-        "com.foursquare.marsbot": "Foursquare Labs, Inc.",
-        "com.foursquare.pilgrimdemo": "Foursquare Labs, Inc.",
+        "com.instagram.android": "Facebook, Inc.",
+        "com.instagram.boomerang": "Facebook, Inc.",
+        "com.instagram.igtv": "Facebook, Inc.",
+        "com.instagram.layout": "Facebook, Inc.",
+        "com.instagram.threadsapp": "Facebook, Inc.",
+        "com.whatsapp": "Facebook, Inc.",
+        "com.joelapenna.foursquared": "Foursquare Labs, Inc.",
+        "com.sewichi.client.panel": "Foursquare Labs, Inc.",
         "com.foursquare.robin": "Foursquare Labs, Inc.",
-        "com.gamepass": "Microsoft Corporation",
-        "com.gamepass.beta": "Microsoft Corporation",
+        "com.foursquare.pilgrimdemo": "Foursquare Labs, Inc.",
+        "com.foursquare.marsbot": "Foursquare Labs, Inc.",
+        "com.android.hotwordenrollment.okgoogle": "Google LLC",
+        "com.android.hotwordenrollment.xgoogle": "Google LLC",
+        "com.android.partnerbrowsercustomizations.chromeHomepage": "Google LLC",
+        "com.android.chrome": "Google LLC",
+        "com.android.vending": "Google LLC",
+        "com.chrome.beta": "Google LLC",
+        "com.chrome.canary": "Google LLC",
+        "com.chrome.dev": "Google LLC",
+        "com.fitbit.FitbitMobile": "Google LLC",
         "com.google.android.apps.access.wifi.consumer": "Google LLC",
         "com.google.android.apps.adm": "Google LLC",
         "com.google.android.apps.ads.publisher": "Google LLC",
@@ -2572,10 +2164,10 @@
         "com.google.android.apps.photosgo": "Google LLC",
         "com.google.android.apps.plus": "Google LLC",
         "com.google.android.apps.podcasts": "Google LLC",
-        "com.google.android.apps.recorder": "Google LLC",
         "com.google.android.apps.restore": "Google LLC",
-        "com.google.android.apps.santatracker": "Google LLC",
+        "com.google.android.apps.recorder": "Google LLC",
         "com.google.android.apps.setupwizard.searchselector": "Google LLC",
+        "com.google.android.apps.santatracker": "Google LLC",
         "com.google.android.apps.subscriptions.red": "Google LLC",
         "com.google.android.apps.tachyon": "Google LLC",
         "com.google.android.apps.tasks": "Google LLC",
@@ -2587,7 +2179,6 @@
         "com.google.android.apps.walletnfcrel": "Google LLC",
         "com.google.android.apps.wallpaper": "Google LLC",
         "com.google.android.apps.wellbeing": "Google LLC",
-        "com.google.android.apps.work.oobconfig": "Google LLC",
         "com.google.android.apps.youtube.creator": "Google LLC",
         "com.google.android.apps.youtube.gaming": "Google LLC",
         "com.google.android.apps.youtube.kids": "Google LLC",
@@ -2602,12 +2193,9 @@
         "com.google.android.contacts": "Google LLC",
         "com.google.android.deskclock": "Google LLC",
         "com.google.android.dialer": "Google LLC",
-        "com.google.android.email": "Google LLC",
         "com.google.android.feedback": "Google LLC",
         "com.google.android.gm": "Google LLC",
         "com.google.android.gm.lite": "Google LLC",
-        "com.google.android.gms.location.history": "Google LLC",
-        "com.google.android.gms.policy_sidecar_aps": "Google LLC",
         "com.google.android.googlequicksearchbox": "Google LLC",
         "com.google.android.inputmethod.latin": "Google LLC",
         "com.google.android.instantapps.supervisor": "Google LLC",
@@ -2616,19 +2204,17 @@
         "com.google.android.marvin.talkback": "Google LLC",
         "com.google.android.music": "Google LLC",
         "com.google.android.onetimeinitializer": "Google LLC",
-        "com.google.android.partnersetup": "Google LLC",
-        "com.google.android.pixel.setupwizard": "Google LLC",
         "com.google.android.play.games": "Google LLC",
         "com.google.android.printservice.recommendation": "Google LLC",
         "com.google.android.projection.gearhead": "Google LLC",
         "com.google.android.setupwizard": "Google LLC",
         "com.google.android.setupwizard.a_overlay": "Google LLC",
+        "com.google.android.pixel.setupwizard": "Google LLC",
         "com.google.android.soundpicker": "Google LLC",
         "com.google.android.street": "Google LLC",
         "com.google.android.syncadapters.bookmarks": "Google LLC",
         "com.google.android.syncadapters.calendar": "Google LLC",
         "com.google.android.syncadapters.contacts": "Google LLC",
-        "com.google.android.tag": "Google LLC",
         "com.google.android.talk": "Google LLC",
         "com.google.android.tts": "Google LLC",
         "com.google.android.tv.remote": "Google LLC",
@@ -2641,7 +2227,6 @@
         "com.google.android.youtube": "Google LLC",
         "com.google.ar.core": "Google LLC",
         "com.google.ar.lens": "Google LLC",
-        "com.google.audio.hearing.visualization.accessibility.scribe": "Google LLC",
         "com.google.chromeremotedesktop": "Google LLC",
         "com.google.earth": "Google LLC",
         "com.google.marvin.talkback": "Google LLC",
@@ -2652,27 +2237,31 @@
         "com.google.vr.expeditions": "Google LLC",
         "com.google.vr.vrcore": "Google LLC",
         "com.google.zxing.client.android": "Google LLC",
+        "com.google.android.apps.work.oobconfig": "Google LLC",
+        "com.google.android.email": "Google LLC",
+        "com.google.android.tag": "Google LLC",
+        "com.google.android.gms.location.history": "Google LLC",
+        "com.google.android.gms.policy_sidecar_aps": "Google LLC",
+        "com.google.android.partnersetup": "Google LLC",
+        "com.google.audio.hearing.visualization.accessibility.scribe": "Google LLC",
+        "com.nest.android": "Google LLC",
+        "com.niksoftware.snapseed": "Google LLC",
+        "com.waze": "Google LLC",
+        "dev.firebase.appdistribution": "Google LLC",
+        "com.mapbox.mapboxandroiddemo": "Mapbox Inc.",
+        "com.mapbox.studio": "Mapbox Inc.",
+        "com.mapbox.locate": "Mapbox Inc.",
+        "com.mapbox.vision.teaser": "Mapbox Inc.",
+        "com.azure.authenticator": "Microsoft Corporation",
+        "com.gamepass": "Microsoft Corporation",
+        "com.gamepass.beta": "Microsoft Corporation",
         "com.groupme.android": "Microsoft Corporation",
-        "com.imdb.mobile": "Amazon Technologies, Inc.",
-        "com.imdb.pro.mobile.android": "Amazon Technologies, Inc.",
-        "com.imdbtv.livingroom": "Amazon Technologies, Inc.",
-        "com.instagram.android": "Facebook, Inc.",
-        "com.instagram.boomerang": "Facebook, Inc.",
-        "com.instagram.igtv": "Facebook, Inc.",
-        "com.instagram.layout": "Facebook, Inc.",
-        "com.instagram.threadsapp": "Facebook, Inc.",
-        "com.joelapenna.foursquared": "Foursquare Labs, Inc.",
-        "com.lemon.lvoverseas": "ByteDance Ltd.",
         "com.linkedin.android": "Microsoft Corporation",
         "com.linkedin.android.learning": "Microsoft Corporation",
         "com.linkedin.android.salesnavigator": "Microsoft Corporation",
         "com.linkedin.leap": "Microsoft Corporation",
         "com.linkedin.recruiter": "Microsoft Corporation",
         "com.lynda.android.root": "Microsoft Corporation",
-        "com.mapbox.locate": "Mapbox Inc.",
-        "com.mapbox.mapboxandroiddemo": "Mapbox Inc.",
-        "com.mapbox.studio": "Mapbox Inc.",
-        "com.mapbox.vision.teaser": "Mapbox Inc.",
         "com.microsoft.amp.apps.bingfinance": "Microsoft Corporation",
         "com.microsoft.amp.apps.bingnews": "Microsoft Corporation",
         "com.microsoft.android.smsorganizer": "Microsoft Corporation",
@@ -2694,8 +2283,8 @@
         "com.microsoft.msapps": "Microsoft Corporation",
         "com.microsoft.office.excel": "Microsoft Corporation",
         "com.microsoft.office.lync15": "Microsoft Corporation",
-        "com.microsoft.office.officehub": "Microsoft Corporation",
         "com.microsoft.office.officehubhl": "Microsoft Corporation",
+        "com.microsoft.office.officehub": "Microsoft Corporation",
         "com.microsoft.office.officehubrow": "Microsoft Corporation",
         "com.microsoft.office.officelens": "Microsoft Corporation",
         "com.microsoft.office.onenote": "Microsoft Corporation",
@@ -2721,47 +2310,41 @@
         "com.microsoft.xboxone.smartglass": "Microsoft Corporation",
         "com.microsoft.xboxone.smartglass.beta": "Microsoft Corporation",
         "com.microsoft.xcloud": "Microsoft Corporation",
-        "com.mobilemotion.dubsmash": "Reddit Inc.",
         "com.ms.office365admin": "Microsoft Corporation",
-        "com.nest.android": "Google LLC",
-        "com.newrelic.rpm": "New Relic",
-        "com.niksoftware.snapseed": "Google LLC",
-        "com.oath.MediaAnalytics": "Verizon Media",
-        "com.pinterest": "Pinterest, Inc.",
-        "com.pinterest.twa": "Pinterest, Inc.",
-        "com.reddit.frontpage": "Reddit Inc.",
-        "com.relateiq.android": "Salesforce.com, Inc.",
-        "com.ringapp": "Amazon Technologies, Inc.",
-        "com.roku.remote": "Roku, Inc.",
-        "com.salesforce.admin1": "Salesforce.com, Inc.",
-        "com.salesforce.authenticator": "Salesforce.com, Inc.",
-        "com.salesforce.chatter": "Salesforce.com, Inc.",
-        "com.salesforce.dreamoji": "Salesforce.com, Inc.",
-        "com.salesforce.fieldservice.app": "Salesforce.com, Inc.",
-        "com.salesforce.marketingcloud": "Salesforce.com, Inc.",
-        "com.salesforce.socialstudio": "Salesforce.com, Inc.",
-        "com.salesforce.trailheadgo.app": "Salesforce.com, Inc.",
-        "com.salesforce.wave": "Salesforce.com, Inc.",
-        "com.sewichi.client.panel": "Foursquare Labs, Inc.",
         "com.skype.insiders": "Microsoft Corporation",
         "com.skype.raider": "Microsoft Corporation",
-        "com.snapchat.android": "Snap Inc.",
-        "com.ss.android.ugc.trill": "ByteDance Ltd.",
-        "com.taboola.newsroomMobile": "Taboola, Inc.",
         "com.touchtype.swiftkey": "Microsoft Corporation",
         "com.touchtype.swiftkey.beta": "Microsoft Corporation",
+        "com.newrelic.rpm": "New Relic",
+        "com.pinterest": "Pinterest, Inc.",
+        "com.pinterest.twa": "Pinterest, Inc.",
+        "com.desk.android": "Salesforce.com, Inc.",
+        "com.salesforce.chatter": "Salesforce.com, Inc.",
+        "com.salesforce.authenticator": "Salesforce.com, Inc.",
+        "com.salesforce.trailheadgo.app": "Salesforce.com, Inc.",
+        "com.salesforce.fieldservice.app": "Salesforce.com, Inc.",
+        "com.salesforce.admin1": "Salesforce.com, Inc.",
+        "com.relateiq.android": "Salesforce.com, Inc.",
+        "com.salesforce.dreamoji": "Salesforce.com, Inc.",
+        "com.salesforce.wave": "Salesforce.com, Inc.",
+        "com.salesforce.marketingcloud": "Salesforce.com, Inc.",
+        "com.salesforce.socialstudio": "Salesforce.com, Inc.",
+        "org.salesforce.philanthropycloud": "Salesforce.com, Inc.",
+        "app.zenly.locator": "Snap Inc.",
+        "com.snapchat.android": "Snap Inc.",
+        "com.bitstrips.imoji": "Snap Inc.",
+        "com.taboola.newsroomMobile": "Taboola, Inc.",
         "com.twitter.android": "Twitter, Inc.",
+        "co.vine.android": "Twitter, Inc.",
+        "com.flurry.instantapp.test.app": "Verizon Media",
+        "com.aol.mobile.aolapp": "Verizon Media",
+        "com.aol.mobile.techcrunch": "Verizon Media",
+        "com.oath.MediaAnalytics": "Verizon Media",
         "com.verizonmedia.makers": "Verizon Media",
-        "com.waze": "Google LLC",
-        "com.whatsapp": "Facebook, Inc.",
-        "com.yahoo.apps.yahooapp": "Verizon Media",
-        "com.yahoo.flurry": "Verizon Media",
-        "com.yahoo.harmony": "Verizon Media",
-        "com.yahoo.infohub": "Verizon Media",
         "com.yahoo.mobile.client.android.ecshopping": "Verizon Media",
-        "com.yahoo.mobile.client.android.fantasyfootball": "Verizon Media",
         "com.yahoo.mobile.client.android.finance": "Verizon Media",
         "com.yahoo.mobile.client.android.finance.androidtv": "Verizon Media",
+        "com.yahoo.mobile.client.android.fantasyfootball": "Verizon Media",
         "com.yahoo.mobile.client.android.mail": "Verizon Media",
         "com.yahoo.mobile.client.android.mail.lite": "Verizon Media",
         "com.yahoo.mobile.client.android.nativemail": "Verizon Media",
@@ -2769,144 +2352,180 @@
         "com.yahoo.mobile.client.android.sportacular": "Verizon Media",
         "com.yahoo.mobile.client.android.weather": "Verizon Media",
         "com.yahoo.mobile.client.android.yahoo": "Verizon Media",
+        "com.yahoo.apps.yahooapp": "Verizon Media",
+        "com.yahoo.flurry": "Verizon Media",
+        "com.yahoo.harmony": "Verizon Media",
+        "com.yahoo.infohub": "Verizon Media",
         "com.yahoo.onesearch": "Verizon Media",
         "com.yahoo.otterdroid": "Verizon Media",
         "com.yahoo.wwww.twa": "Verizon Media",
-        "com.yandex.browser": "Yandex LLC",
-        "com.yandex.courier": "Yandex LLC",
-        "com.yandex.mobile.drive": "Yandex LLC",
-        "com.yandex.q": "Yandex LLC",
-        "com.yandex.qmobile": "Yandex LLC",
-        "com.yandex.yamb": "Yandex LLC",
-        "com.zhiliao.musically.livewallpaper": "ByteDance Ltd.",
-        "com.zhiliaoapp.musically": "ByteDance Ltd.",
-        "dev.firebase.appdistribution": "Google LLC",
-        "in.amazon.mShop.android.shopping": "Amazon Technologies, Inc.",
-        "io.branch.android.discovery": "Branch Metrics, Inc.",
-        "io.branch.branchster": "Branch Metrics, Inc.",
-        "io.branch.deviceid": "Branch Metrics, Inc.",
-        "io.branch.sample.hellobranch": "Branch Metrics, Inc.",
         "nexti.android.bustaichung": "Verizon Media",
         "nexti.android.bustaipei": "Verizon Media",
         "nexti.android.bustaiwan": "Verizon Media",
-        "org.salesforce.philanthropycloud": "Salesforce.com, Inc.",
+        "com.adultswim.videoapp.android": "WarnerMedia, LLC",
+        "com.cnn.mobile.android.phone": "WarnerMedia, LLC",
+        "com.cnn.mobile.android.tv": "WarnerMedia, LLC",
+        "com.hbo.android.app": "WarnerMedia, LLC",
+        "com.hbo.hbonow": "WarnerMedia, LLC",
+        "com.tcm.tcm": "WarnerMedia, LLC",
+        "com.turner.cnvideoapp": "WarnerMedia, LLC",
+        "com.turner.tbs.android.networkapp": "WarnerMedia, LLC",
+        "com.turner.tnt.android.networkapp": "WarnerMedia, LLC",
+        "com.turner.trutv": "WarnerMedia, LLC",
+        "com.turner.trutv.wheelofdoom": "WarnerMedia, LLC",
+        "com.warnermedia.wmce.ride": "WarnerMedia, LLC",
+        "com.wb.goog.mkx": "WarnerMedia, LLC",
+        "com.wb.goog.injustice.brawler2017": "WarnerMedia, LLC",
+        "com.wb.goog.dc.legends": "WarnerMedia, LLC",
+        "com.wb.goog.dcuniverse": "WarnerMedia, LLC",
+        "com.wb.goog.ellentube": "WarnerMedia, LLC",
+        "com.wb.goog.injustice": "WarnerMedia, LLC",
+        "com.wb.goog.got.conquest": "WarnerMedia, LLC",
+        "com.wb.goog.emojiexplojipaid": "WarnerMedia, LLC",
+        "com.wb.goog.phonelog": "WarnerMedia, LLC",
+        "com.wb.goog.scribblenauts3": "WarnerMedia, LLC",
+        "com.wb.goog.scribbleremix": "WarnerMedia, LLC",
+        "com.wb.goog.shoutrageous": "WarnerMedia, LLC",
+        "com.wb.headsup": "WarnerMedia, LLC",
+        "com.wb.map": "WarnerMedia, LLC",
+        "com.wb.wbtvdistribution": "WarnerMedia, LLC",
+        "com.wb.wbfyc": "WarnerMedia, LLC",
+        "com.rhythmnewmedia.tmz": "WarnerMedia, LLC",
+        "eu.hbogo.android": "WarnerMedia, LLC",
+        "com.yandex.browser": "Yandex LLC",
+        "ru.yandex.searchplugin": "Yandex LLC",
+        "ru.yandex.searchplugin.beta": "Yandex LLC",
+        "ru.yandex.taxi": "Yandex LLC",
+        "ru.yandex.yandexmaps": "Yandex LLC",
+        "ru.yandex.yandexnavi": "Yandex LLC",
+        "ru.yandex.disk": "Yandex LLC",
+        "ru.yandex.disk.beta": "Yandex LLC",
+        "ru.yandex.music": "Yandex LLC",
+        "ru.kinopoisk": "Yandex LLC",
+        "ru.kinopoisk.tv": "Yandex LLC",
+        "ru.yandex.mail": "Yandex LLC",
+        "ru.yandex.taximeter": "Yandex LLC",
+        "ru.yandex.taximeter.beta": "Yandex LLC",
         "ru.auto.ara": "Yandex LLC",
         "ru.foodfox.client": "Yandex LLC",
         "ru.foodfox.courier.debug.releaseserver": "Yandex LLC",
         "ru.foodfox.vendor": "Yandex LLC",
-        "ru.kinopoisk": "Yandex LLC",
-        "ru.kinopoisk.tv": "Yandex LLC",
-        "ru.theexpert.app": "Yandex LLC",
-        "ru.yandex.direct": "Yandex LLC",
-        "ru.yandex.disk": "Yandex LLC",
-        "ru.yandex.disk.beta": "Yandex LLC",
-        "ru.yandex.key": "Yandex LLC",
-        "ru.yandex.mail": "Yandex LLC",
-        "ru.yandex.market": "Yandex LLC",
-        "ru.yandex.market.partner": "Yandex LLC",
-        "ru.yandex.med": "Yandex LLC",
         "ru.yandex.metro": "Yandex LLC",
-        "ru.yandex.mobile.appmetrica": "Yandex LLC",
-        "ru.yandex.mobile.avia": "Yandex LLC",
-        "ru.yandex.mobile.gasstations": "Yandex LLC",
-        "ru.yandex.mobile.metrica": "Yandex LLC",
-        "ru.yandex.music": "Yandex LLC",
-        "ru.yandex.nokiasystemservice": "Yandex LLC",
-        "ru.yandex.rasp": "Yandex LLC",
-        "ru.yandex.searchplugin": "Yandex LLC",
-        "ru.yandex.searchplugin.beta": "Yandex LLC",
-        "ru.yandex.taxi": "Yandex LLC",
-        "ru.yandex.taximeter": "Yandex LLC",
-        "ru.yandex.taximeter.beta": "Yandex LLC",
-        "ru.yandex.telemed.doctor": "Yandex LLC",
-        "ru.yandex.telemost": "Yandex LLC",
         "ru.yandex.weatherplugin": "Yandex LLC",
-        "ru.yandex.yandexmaps": "Yandex LLC",
-        "ru.yandex.yandexnavi": "Yandex LLC",
-        "tv.twitch.android.app": "Amazon Technologies, Inc.",
-        "yandex.auto.mobile": "Yandex LLC"
+        "ru.yandex.telemost": "Yandex LLC",
+        "ru.yandex.key": "Yandex LLC",
+        "ru.yandex.rasp": "Yandex LLC",
+        "com.yandex.mobile.drive": "Yandex LLC",
+        "ru.yandex.mobile.avia": "Yandex LLC",
+        "com.yandex.yamb": "Yandex LLC",
+        "ru.yandex.market.partner": "Yandex LLC",
+        "ru.yandex.market": "Yandex LLC",
+        "ru.yandex.mobile.gasstations": "Yandex LLC",
+        "ru.yandex.direct": "Yandex LLC",
+        "yandex.auto.mobile": "Yandex LLC",
+        "ru.yandex.mobile.appmetrica": "Yandex LLC",
+        "ru.yandex.mobile.metrica": "Yandex LLC",
+        "com.yandex.courier": "Yandex LLC",
+        "ru.yandex.nokiasystemservice": "Yandex LLC",
+        "com.yandex.q": "Yandex LLC",
+        "com.yandex.qmobile": "Yandex LLC",
+        "ru.yandex.med": "Yandex LLC",
+        "ru.yandex.telemed.doctor": "Yandex LLC",
+        "ru.theexpert.app": "Yandex LLC"
     },
     "entities": {
-        "33Across, Inc.": {
-            "score": 590,
+        "Google LLC": {
+            "score": 97594,
             "signals": [
-                "unique_identifier",
-                "cookies",
-                "os_build_version",
-                "device_language",
-                "device_model",
-                "app_version",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "platform"
-            ]
-        },
-        "A.Mob SAS": {
-            "score": 585,
-            "signals": [
-                "unique_identifier",
-                "cookies",
-                "os_build_version",
-                "device_model",
-                "device_language",
-                "device_make",
-                "os_version",
-                "country",
-                "app_name",
-                "platform"
-            ]
-        },
-        "AcuityAds": {
-            "score": 702,
-            "signals": [
-                "unique_identifier",
-                "cookies",
-                "os_build_version",
-                "device_model",
-                "app_version",
-                "device_language",
-                "device_make",
-                "os_version",
-                "app_name",
-                "country",
-                "platform"
-            ]
-        },
-        "Adform A/S": {
-            "score": 1680,
-            "signals": [
-                "unique_identifier",
-                "cookies",
-                "os_build_version",
-                "app_version",
-                "device_language",
-                "device_model",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "platform"
-            ]
-        },
-        "Adjust GmbH": {
-            "score": 18942,
-            "signals": [
-                "phone_number",
+                "gps_coordinates",
                 "email_address",
+                "first_name",
+                "last_name",
+                "device_name",
                 "postal_code",
-                "AAID",
+                "device_boot_time",
                 "city",
+                "AAID",
                 "unique_identifier",
+                "local_ip",
+                "gender",
+                "device_free_storage",
+                "state",
                 "cookies",
-                "cpu_data",
+                "device_battery_level",
+                "device_volume",
+                "device_total_memory",
+                "device_headphone_status",
                 "os_build_version",
                 "device_resolution",
                 "device_model",
                 "app_version",
                 "device_connectivity",
                 "device_language",
+                "cpu_data",
+                "app_name",
+                "device_charging_status",
+                "device_make",
+                "os_version",
+                "country",
+                "device_screen_density",
+                "timezone",
+                "device_orientation",
+                "platform"
+            ]
+        },
+        "Facebook, Inc.": {
+            "score": 42596,
+            "signals": [
+                "gps_coordinates",
+                "postal_code",
+                "AAID",
+                "city",
+                "unique_identifier",
+                "gender",
+                "accelerometer_data",
+                "device_free_storage",
+                "rotation_data",
+                "state",
+                "device_free_memory",
+                "network_carrier",
+                "cookies",
+                "device_volume",
+                "device_total_memory",
+                "cpu_data",
+                "device_headphone_status",
+                "os_build_version",
+                "device_resolution",
+                "device_model",
+                "app_version",
+                "device_connectivity",
+                "device_language",
+                "app_name",
+                "device_charging_status",
+                "device_make",
+                "os_version",
+                "country",
+                "timezone",
+                "device_screen_density",
+                "platform",
+                "device_orientation"
+            ]
+        },
+        "Branch Metrics, Inc.": {
+            "score": 13976,
+            "signals": [
+                "email_address",
+                "postal_code",
+                "AAID",
+                "city",
+                "unique_identifier",
+                "local_ip",
+                "os_build_version",
+                "device_resolution",
+                "app_version",
+                "device_language",
+                "device_model",
+                "install_date",
                 "app_name",
                 "device_make",
                 "os_version",
@@ -2915,126 +2534,30 @@
                 "platform"
             ]
         },
-        "Adkernel, LLC": {
-            "score": 530,
-            "signals": [
-                "unique_identifier",
-                "cookies",
-                "os_build_version",
-                "app_version",
-                "device_connectivity",
-                "device_model",
-                "device_language",
-                "app_name",
-                "os_version",
-                "device_make",
-                "country",
-                "platform"
-            ]
-        },
-        "ADman Media": {
-            "score": 702,
-            "signals": [
-                "unique_identifier",
-                "cookies",
-                "os_build_version",
-                "device_model",
-                "app_version",
-                "device_language",
-                "device_make",
-                "os_version",
-                "app_name",
-                "country",
-                "platform"
-            ]
-        },
-        "Adobe Inc.": {
-            "score": 20715,
+        "The Trade Desk Inc": {
+            "score": 12664,
             "signals": [
                 "gps_coordinates",
-                "email_address",
-                "neighborhood",
                 "postal_code",
                 "AAID",
-                "unique_identifier",
-                "network_carrier",
-                "cookies",
-                "os_build_version",
-                "device_resolution",
-                "app_version",
-                "device_model",
-                "install_date",
-                "device_language",
-                "device_connectivity",
-                "app_name",
-                "os_version",
-                "device_make",
-                "country",
-                "timezone",
-                "platform",
-                "device_orientation"
-            ]
-        },
-        "AdRoll, Inc.": {
-            "score": 1008,
-            "signals": [
-                "AAID",
-                "unique_identifier",
-                "cookies",
-                "os_build_version",
-                "app_version",
-                "device_model",
-                "device_language",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "platform"
-            ]
-        },
-        "Adscore Technologies DMCC": {
-            "score": 704,
-            "signals": [
                 "city",
                 "unique_identifier",
+                "state",
                 "cookies",
                 "os_build_version",
+                "device_model",
                 "app_version",
-                "device_model",
-                "device_language",
                 "app_name",
                 "device_make",
                 "os_version",
-                "country",
-                "timezone",
-                "platform"
-            ]
-        },
-        "AdTheorent Inc": {
-            "score": 585,
-            "signals": [
-                "unique_identifier",
-                "cookies",
-                "os_build_version",
-                "device_model",
-                "device_language",
-                "device_make",
-                "os_version",
-                "app_name",
                 "country",
                 "platform"
             ]
         },
         "Amazon Technologies, Inc.": {
-            "score": 27934,
+            "score": 12477,
             "signals": [
-                "email_address",
-                "password",
-                "username",
                 "gps_coordinates",
-                "first_name",
-                "last_name",
-                "neighborhood",
                 "AAID",
                 "city",
                 "unique_identifier",
@@ -3047,94 +2570,277 @@
                 "device_resolution",
                 "device_model",
                 "app_version",
-                "device_language",
                 "device_connectivity",
-                "app_name",
+                "device_language",
                 "device_make",
                 "os_version",
+                "app_name",
                 "country",
-                "timezone",
                 "device_screen_density",
                 "platform",
                 "device_orientation"
             ]
         },
-        "Amobee, Inc": {
-            "score": 2260,
-            "signals": [
-                "unique_identifier",
-                "cookies",
-                "os_build_version",
-                "app_version",
-                "device_language",
-                "device_model",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "platform"
-            ]
-        },
-        "Amplitude": {
-            "score": 7196,
+        "Taboola, Inc.": {
+            "score": 12245,
             "signals": [
                 "gps_coordinates",
-                "username",
-                "first_name",
-                "birthday",
-                "neighborhood",
-                "postal_code",
                 "AAID",
-                "city",
-                "device_boot_time",
                 "unique_identifier",
                 "state",
-                "device_font_size",
-                "birth_year",
-                "network_carrier",
-                "device_headphone_status",
+                "cookies",
+                "device_total_memory",
                 "os_build_version",
                 "device_resolution",
                 "app_version",
+                "device_connectivity",
                 "device_language",
                 "device_model",
+                "app_name",
+                "device_make",
+                "os_version",
+                "platform"
+            ]
+        },
+        "Integral Ad Science, Inc.": {
+            "score": 10518,
+            "signals": [
+                "postal_code",
+                "AAID",
+                "city",
+                "unique_identifier",
+                "state",
+                "device_volume",
+                "device_total_memory",
+                "os_build_version",
+                "device_resolution",
+                "device_model",
+                "app_version",
+                "app_name",
+                "device_make",
+                "os_version",
+                "device_screen_density",
+                "platform"
+            ]
+        },
+        "Verizon Media": {
+            "score": 10342,
+            "signals": [
+                "gps_coordinates",
+                "postal_code",
+                "AAID",
+                "device_boot_time",
+                "city",
+                "unique_identifier",
+                "device_free_storage",
+                "state",
+                "device_free_memory",
+                "network_carrier",
+                "cookies",
+                "device_battery_level",
+                "device_total_storage",
+                "device_total_memory",
+                "device_headphone_status",
+                "os_build_version",
+                "device_resolution",
+                "device_model",
+                "app_version",
                 "device_connectivity",
+                "device_language",
+                "app_name",
+                "device_charging_status",
                 "device_make",
                 "os_version",
                 "country",
+                "timezone",
+                "device_screen_density",
+                "device_orientation",
+                "platform"
+            ]
+        },
+        "WarnerMedia, LLC": {
+            "score": 9846,
+            "signals": [
+                "gps_coordinates",
+                "postal_code",
+                "city",
+                "AAID",
+                "unique_identifier",
+                "state",
+                "cookies",
+                "os_build_version",
+                "device_resolution",
+                "app_version",
+                "device_connectivity",
+                "device_language",
+                "device_model",
                 "app_name",
+                "os_version",
+                "country",
+                "device_make",
+                "timezone",
+                "platform"
+            ]
+        },
+        "Adobe Inc.": {
+            "score": 9528,
+            "signals": [
+                "gps_coordinates",
+                "email_address",
+                "postal_code",
+                "AAID",
+                "unique_identifier",
+                "network_carrier",
+                "cookies",
+                "os_build_version",
+                "device_resolution",
+                "app_version",
+                "device_model",
+                "install_date",
+                "device_connectivity",
+                "device_language",
+                "app_name",
+                "os_version",
+                "country",
+                "device_make",
+                "timezone",
+                "platform",
+                "device_orientation"
+            ]
+        },
+        "Twitter, Inc.": {
+            "score": 8444,
+            "signals": [
+                "gps_coordinates",
+                "AAID",
+                "city",
+                "unique_identifier",
+                "cookies",
+                "os_build_version",
+                "device_resolution",
+                "device_model",
+                "app_version",
+                "device_language",
+                "device_connectivity",
+                "app_name",
+                "device_make",
+                "country",
+                "os_version",
                 "device_screen_density",
                 "timezone",
                 "platform"
             ]
         },
-        "AppLovin Corporation": {
-            "score": 26675,
+        "Oracle Corporation": {
+            "score": 6426,
             "signals": [
-                "gps_coordinates",
-                "neighborhood",
-                "postal_code",
                 "AAID",
-                "city",
                 "unique_identifier",
+                "network_carrier",
                 "cookies",
+                "device_total_memory",
                 "os_build_version",
                 "device_resolution",
                 "device_model",
                 "app_version",
                 "device_language",
+                "app_name",
+                "device_make",
+                "os_version",
+                "country",
+                "device_screen_density",
+                "platform",
+                "device_orientation"
+            ]
+        },
+        "comScore, Inc": {
+            "score": 6342,
+            "signals": [
+                "gps_coordinates",
+                "postal_code",
+                "city",
+                "AAID",
+                "unique_identifier",
+                "state",
+                "cookies",
+                "device_total_memory",
+                "device_model",
+                "os_build_version",
+                "device_resolution",
+                "app_version",
+                "app_name",
+                "os_version",
+                "device_make",
+                "country",
+                "platform"
+            ]
+        },
+        "IPONWEB GmbH": {
+            "score": 6265,
+            "signals": [
+                "gps_coordinates",
+                "postal_code",
+                "AAID",
+                "city",
+                "unique_identifier",
+                "state",
+                "cookies",
+                "os_build_version",
+                "device_model",
+                "app_version",
                 "device_connectivity",
                 "app_name",
                 "device_make",
-                "country",
                 "os_version",
-                "device_screen_density",
+                "country",
+                "platform"
+            ]
+        },
+        "Criteo SA": {
+            "score": 6006,
+            "signals": [
+                "AAID",
+                "city",
+                "unique_identifier",
+                "state",
+                "cookies",
+                "os_build_version",
+                "device_resolution",
+                "app_version",
+                "device_model",
+                "device_language",
+                "device_connectivity",
+                "app_name",
+                "os_version",
+                "device_make",
+                "platform",
+                "device_orientation"
+            ]
+        },
+        "Braze, Inc.": {
+            "score": 5918,
+            "signals": [
+                "gps_coordinates",
+                "email_address",
+                "first_name",
+                "last_name",
+                "postal_code",
+                "city",
+                "AAID",
+                "unique_identifier",
+                "os_build_version",
+                "device_resolution",
+                "app_version",
+                "device_language",
+                "device_model",
+                "app_name",
+                "os_version",
                 "timezone",
                 "platform"
             ]
         },
         "AppsFlyer": {
-            "score": 15310,
+            "score": 5351,
             "signals": [
                 "device_magnetometer",
                 "AAID",
@@ -3160,13 +2866,55 @@
                 "platform"
             ]
         },
-        "Apptentive Inc.": {
-            "score": 1915,
+        "Tapad, Inc.": {
+            "score": 5313,
             "signals": [
-                "phone_number",
-                "birthday",
+                "postal_code",
+                "AAID",
+                "city",
                 "unique_identifier",
-                "network_carrier",
+                "state",
+                "cookies",
+                "device_total_memory",
+                "os_build_version",
+                "device_model",
+                "app_version",
+                "app_name",
+                "device_make",
+                "os_version",
+                "platform"
+            ]
+        },
+        "Salesforce.com, Inc.": {
+            "score": 5262,
+            "signals": [
+                "email_address",
+                "postal_code",
+                "AAID",
+                "unique_identifier",
+                "state",
+                "cookies",
+                "device_total_memory",
+                "os_build_version",
+                "app_version",
+                "device_language",
+                "device_model",
+                "app_name",
+                "device_make",
+                "os_version",
+                "country",
+                "timezone",
+                "platform"
+            ]
+        },
+        "Adjust GmbH": {
+            "score": 5010,
+            "signals": [
+                "email_address",
+                "postal_code",
+                "AAID",
+                "unique_identifier",
+                "cookies",
                 "cpu_data",
                 "os_build_version",
                 "device_model",
@@ -3177,124 +2925,539 @@
                 "device_make",
                 "os_version",
                 "country",
+                "device_screen_density",
                 "platform"
             ]
         },
-        "Avocet Systems Ltd.": {
-            "score": 625,
+        "PubMatic, Inc.": {
+            "score": 4926,
             "signals": [
+                "city",
+                "AAID",
                 "unique_identifier",
                 "cookies",
                 "os_build_version",
+                "device_resolution",
+                "app_version",
+                "device_model",
+                "device_connectivity",
                 "device_language",
+                "app_name",
+                "device_make",
+                "os_version",
+                "platform"
+            ]
+        },
+        "Kochava": {
+            "score": 4884,
+            "signals": [
+                "device_name",
+                "wifi_ssid",
+                "postal_code",
+                "AAID",
+                "device_boot_time",
+                "unique_identifier",
+                "network_carrier",
+                "screen_brightness",
+                "device_battery_level",
+                "device_volume",
+                "cpu_data",
+                "os_build_version",
+                "device_resolution",
+                "device_model",
+                "app_version",
+                "device_connectivity",
+                "device_language",
+                "app_name",
+                "device_charging_status",
+                "device_make",
+                "os_version",
+                "timezone",
+                "device_orientation",
+                "platform"
+            ]
+        },
+        "Microsoft Corporation": {
+            "score": 4804,
+            "signals": [
+                "gps_coordinates",
+                "city",
+                "AAID",
+                "unique_identifier",
+                "state",
+                "network_carrier",
+                "cookies",
+                "os_build_version",
+                "device_resolution",
+                "device_language",
+                "device_model",
+                "app_version",
+                "app_name",
+                "os_version",
+                "country",
+                "device_make",
+                "timezone",
+                "platform"
+            ]
+        },
+        "Index Exchange, Inc.": {
+            "score": 4300,
+            "signals": [
+                "gps_coordinates",
+                "city",
+                "unique_identifier",
+                "cookies",
+                "os_build_version",
+                "device_resolution",
                 "device_model",
                 "app_version",
                 "device_make",
                 "os_version",
-                "country",
                 "app_name",
                 "platform"
             ]
         },
-        "Beeswax": {
-            "score": 3600,
+        "Amplitude": {
+            "score": 4265,
             "signals": [
+                "gps_coordinates",
+                "postal_code",
+                "AAID",
+                "city",
+                "device_boot_time",
                 "unique_identifier",
-                "cookies",
+                "state",
+                "device_font_size",
+                "network_carrier",
+                "device_headphone_status",
                 "os_build_version",
+                "device_resolution",
+                "app_version",
                 "device_language",
                 "device_model",
-                "app_version",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "platform"
-            ]
-        },
-        "Bidtellect, Inc": {
-            "score": 1365,
-            "signals": [
-                "unique_identifier",
-                "cookies",
-                "os_build_version",
-                "device_language",
-                "device_model",
-                "app_version",
                 "device_connectivity",
                 "device_make",
                 "os_version",
                 "country",
                 "app_name",
+                "device_screen_density",
+                "timezone",
                 "platform"
             ]
         },
-        "Branch Metrics, Inc.": {
-            "score": 33342,
+        "DoubleVerify": {
+            "score": 3510,
             "signals": [
-                "email_address",
-                "username",
-                "phone_number",
-                "first_name",
+                "AAID",
+                "unique_identifier",
+                "device_total_memory",
+                "os_build_version",
+                "device_resolution",
+                "device_model",
+                "app_version",
+                "app_name",
+                "device_make",
+                "os_version",
+                "platform"
+            ]
+        },
+        "Smartadserver S.A.S": {
+            "score": 3334,
+            "signals": [
+                "gps_coordinates",
+                "postal_code",
+                "AAID",
+                "city",
+                "unique_identifier",
+                "cookies",
+                "os_build_version",
+                "device_model",
+                "app_version",
+                "app_name",
+                "os_version",
+                "country",
+                "device_make",
+                "platform"
+            ]
+        },
+        "The Nielsen Company": {
+            "score": 3306,
+            "signals": [
+                "postal_code",
+                "AAID",
+                "city",
+                "unique_identifier",
+                "state",
+                "cookies",
+                "os_build_version",
+                "device_resolution",
+                "device_model",
+                "app_version",
+                "device_language",
+                "app_name",
+                "device_make",
+                "os_version",
+                "platform"
+            ]
+        },
+        "The Rubicon Project, Inc.": {
+            "score": 2982,
+            "signals": [
+                "city",
+                "unique_identifier",
+                "cookies",
+                "os_build_version",
+                "device_resolution",
+                "device_model",
+                "app_version",
+                "device_connectivity",
+                "device_make",
+                "os_version",
+                "app_name",
+                "platform"
+            ]
+        },
+        "LiveRamp": {
+            "score": 2967,
+            "signals": [
+                "AAID",
+                "city",
+                "unique_identifier",
+                "cookies",
+                "os_build_version",
+                "device_model",
+                "app_version",
+                "device_make",
+                "os_version",
+                "app_name",
+                "platform"
+            ]
+        },
+        "Segment.io, Inc.": {
+            "score": 2950,
+            "signals": [
+                "gps_coordinates",
                 "postal_code",
                 "AAID",
                 "city",
                 "unique_identifier",
                 "local_ip",
+                "state",
                 "network_carrier",
-                "cpu_data",
+                "device_model",
                 "os_build_version",
                 "device_resolution",
-                "app_version",
+                "device_connectivity",
                 "device_language",
-                "device_model",
-                "install_date",
+                "app_version",
                 "app_name",
                 "device_make",
                 "os_version",
                 "country",
-                "dialing_code",
                 "device_screen_density",
                 "timezone",
                 "platform"
             ]
         },
-        "Braze, Inc.": {
-            "score": 10584,
+        "Pixalate, Inc.": {
+            "score": 2654,
+            "signals": [
+                "gps_coordinates",
+                "AAID",
+                "cookies",
+                "device_total_memory",
+                "os_build_version",
+                "device_resolution",
+                "device_model",
+                "app_name",
+                "os_version",
+                "device_make",
+                "platform",
+                "device_orientation"
+            ]
+        },
+        "Urban Airship, Inc.": {
+            "score": 2641,
             "signals": [
                 "gps_coordinates",
                 "email_address",
-                "first_name",
-                "last_name",
-                "postal_code",
-                "neighborhood",
                 "city",
-                "AAID",
                 "unique_identifier",
+                "network_carrier",
+                "app_version",
+                "device_model",
+                "app_name",
+                "os_version",
+                "timezone",
+                "platform"
+            ]
+        },
+        "Functional Software, Inc.": {
+            "score": 2540,
+            "signals": [
+                "device_name",
+                "device_boot_time",
+                "unique_identifier",
+                "device_free_memory",
+                "device_battery_level",
+                "device_total_storage",
+                "cpu_data",
+                "device_total_memory",
                 "os_build_version",
                 "device_resolution",
                 "app_version",
+                "device_connectivity",
+                "device_language",
+                "device_model",
+                "app_name",
+                "device_charging_status",
+                "device_make",
+                "os_version",
+                "country",
+                "device_screen_density",
+                "timezone",
+                "device_orientation",
+                "platform"
+            ]
+        },
+        "Innovid Media": {
+            "score": 2538,
+            "signals": [
+                "gps_coordinates",
+                "postal_code",
+                "AAID",
+                "city",
+                "unique_identifier",
+                "device_total_memory",
+                "os_build_version",
+                "device_resolution",
+                "device_model",
+                "app_name",
+                "os_version",
+                "platform"
+            ]
+        },
+        "MediaMath, Inc.": {
+            "score": 2472,
+            "signals": [
+                "city",
+                "unique_identifier",
+                "cookies",
+                "os_build_version",
+                "device_model",
+                "app_version",
+                "device_language",
+                "device_make",
+                "os_version",
+                "app_name",
+                "country",
+                "platform"
+            ]
+        },
+        "Xaxis": {
+            "score": 2176,
+            "signals": [
+                "AAID",
+                "unique_identifier",
+                "cookies",
+                "os_build_version",
+                "device_model",
+                "app_name",
+                "device_make",
+                "os_version",
+                "platform"
+            ]
+        },
+        "SpotX, Inc.": {
+            "score": 2163,
+            "signals": [
+                "gps_coordinates",
+                "AAID",
+                "unique_identifier",
+                "cookies",
+                "os_build_version",
+                "device_resolution",
+                "device_connectivity",
+                "device_language",
+                "device_model",
+                "app_version",
+                "app_name",
+                "os_version",
+                "device_make",
+                "platform"
+            ]
+        },
+        "Liftoff Mobile, Inc.": {
+            "score": 2054,
+            "signals": [
+                "gps_coordinates",
+                "postal_code",
+                "AAID",
+                "city",
+                "unique_identifier",
+                "state",
+                "device_total_memory",
+                "os_build_version",
                 "device_language",
                 "device_model",
                 "app_name",
                 "os_version",
-                "device_make",
                 "country",
-                "timezone",
-                "device_screen_density",
                 "platform"
             ]
         },
-        "Bugsnag Inc.": {
-            "score": 2201,
+        "Smaato Inc.": {
+            "score": 1932,
+            "signals": [
+                "gps_coordinates",
+                "postal_code",
+                "AAID",
+                "unique_identifier",
+                "network_carrier",
+                "cookies",
+                "os_build_version",
+                "device_resolution",
+                "device_language",
+                "device_model",
+                "device_connectivity",
+                "app_name",
+                "device_make",
+                "os_version",
+                "timezone",
+                "platform"
+            ]
+        },
+        "OpenX Technologies Inc": {
+            "score": 1905,
             "signals": [
                 "city",
                 "unique_identifier",
-                "device_free_storage",
-                "device_free_memory",
-                "device_battery_level",
+                "cookies",
+                "os_build_version",
+                "app_version",
+                "device_model",
+                "app_name",
+                "device_make",
+                "os_version",
+                "platform"
+            ]
+        },
+        "Pinterest, Inc.": {
+            "score": 1896,
+            "signals": [
+                "AAID",
+                "city",
+                "unique_identifier",
+                "state",
+                "cookies",
+                "os_build_version",
+                "device_resolution",
+                "app_version",
+                "device_model",
+                "device_language",
+                "app_name",
+                "device_make",
+                "os_version",
+                "country",
+                "platform"
+            ]
+        },
+        "OneSignal": {
+            "score": 1855,
+            "signals": [
+                "gps_coordinates",
+                "AAID",
+                "unique_identifier",
+                "cookies",
+                "os_build_version",
+                "device_model",
+                "app_name",
+                "os_version",
+                "timezone",
+                "platform"
+            ]
+        },
+        "Neustar, Inc.": {
+            "score": 1689,
+            "signals": [
+                "postal_code",
+                "AAID",
+                "unique_identifier",
+                "cookies",
                 "device_total_memory",
-                "cpu_data",
+                "os_build_version",
+                "app_version",
+                "device_model",
+                "app_name",
+                "device_make",
+                "os_version",
+                "country",
+                "platform"
+            ]
+        },
+        "Centro, Inc.": {
+            "score": 1496,
+            "signals": [
+                "unique_identifier",
+                "cookies",
+                "os_build_version",
+                "device_model",
+                "app_version",
+                "device_make",
+                "os_version",
+                "app_name",
+                "platform"
+            ]
+        },
+        "TripleLift": {
+            "score": 1496,
+            "signals": [
+                "city",
+                "unique_identifier",
+                "cookies",
+                "os_build_version",
+                "device_resolution",
+                "device_model",
+                "app_version",
+                "device_make",
+                "os_version",
+                "app_name",
+                "platform"
+            ]
+        },
+        "Sift Science, Inc.": {
+            "score": 1492,
+            "signals": [
+                "gps_coordinates",
+                "unique_identifier",
+                "local_ip",
+                "device_battery_level",
+                "device_model",
+                "os_build_version",
+                "device_resolution",
+                "app_version",
+                "app_name",
+                "device_charging_status",
+                "device_make",
+                "os_version",
+                "country",
+                "platform"
+            ]
+        },
+        "Unity Technologies ApS": {
+            "score": 1488,
+            "signals": [
+                "AAID",
+                "device_free_storage",
+                "external_free_storage",
+                "device_free_memory",
+                "screen_brightness",
+                "device_battery_level",
+                "device_total_storage",
+                "external_total_storage",
+                "device_volume",
+                "device_total_memory",
+                "device_headphone_status",
                 "os_build_version",
                 "device_resolution",
                 "app_version",
@@ -3306,106 +3469,84 @@
                 "device_make",
                 "os_version",
                 "device_screen_density",
+                "timezone",
                 "device_orientation",
                 "platform"
             ]
         },
-        "ByteDance Ltd.": {
-            "score": 1452,
+        "Snap Inc.": {
+            "score": 1480,
             "signals": [
                 "AAID",
                 "unique_identifier",
                 "cookies",
                 "os_build_version",
+                "device_resolution",
                 "app_version",
                 "device_model",
                 "device_language",
                 "app_name",
                 "device_make",
                 "os_version",
-                "country",
                 "platform"
             ]
         },
-        "Centro, Inc.": {
-            "score": 2400,
+        "Foursquare Labs, Inc.": {
+            "score": 1395,
             "signals": [
-                "unique_identifier",
-                "cookies",
-                "os_build_version",
-                "device_language",
-                "device_model",
-                "app_version",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "platform"
-            ]
-        },
-        "Collective Roll": {
-            "score": 2750,
-            "signals": [
-                "neighborhood",
-                "unique_identifier",
-                "cookies",
-                "os_build_version",
-                "app_version",
-                "device_connectivity",
-                "device_language",
-                "device_model",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "platform"
-            ]
-        },
-        "comScore, Inc": {
-            "score": 14164,
-            "signals": [
-                "gps_coordinates",
                 "postal_code",
-                "city",
                 "AAID",
                 "unique_identifier",
-                "state",
                 "cookies",
                 "device_total_memory",
-                "cpu_data",
-                "device_model",
                 "os_build_version",
-                "device_resolution",
-                "app_version",
-                "device_language",
-                "device_connectivity",
+                "device_model",
                 "app_name",
                 "os_version",
-                "device_make",
-                "country",
                 "platform"
             ]
         },
-        "Criteo SA": {
-            "score": 10557,
+        "Amobee, Inc": {
+            "score": 1331,
             "signals": [
-                "AAID",
-                "city",
                 "unique_identifier",
-                "state",
                 "cookies",
                 "os_build_version",
-                "device_resolution",
-                "app_version",
                 "device_model",
-                "device_language",
+                "app_name",
+                "device_make",
+                "os_version",
+                "platform"
+            ]
+        },
+        "Instabug": {
+            "score": 1320,
+            "signals": [
+                "gps_coordinates",
+                "wifi_ssid",
+                "postal_code",
+                "city",
+                "unique_identifier",
+                "device_free_storage",
+                "state",
+                "device_free_memory",
+                "network_carrier",
+                "device_battery_level",
+                "device_total_storage",
+                "cpu_data",
+                "os_build_version",
+                "device_resolution",
+                "device_model",
+                "app_version",
                 "device_connectivity",
                 "app_name",
-                "os_version",
+                "device_charging_status",
                 "device_make",
+                "os_version",
                 "country",
-                "platform",
-                "device_orientation"
+                "device_screen_density",
+                "device_orientation",
+                "platform"
             ]
         },
         "Datadog, Inc.": {
@@ -3428,236 +3569,55 @@
                 "platform"
             ]
         },
-        "DeepIntent Inc": {
-            "score": 625,
+        "Beeswax": {
+            "score": 1290,
             "signals": [
                 "unique_identifier",
                 "cookies",
                 "os_build_version",
-                "device_language",
-                "device_model",
                 "app_version",
-                "device_make",
-                "os_version",
-                "country",
+                "device_model",
                 "app_name",
+                "os_version",
+                "device_make",
                 "platform"
             ]
         },
-        "Digital Turbine": {
-            "score": 6813,
+        "Pulsepoint, Inc.": {
+            "score": 1267,
             "signals": [
+                "city",
                 "AAID",
                 "unique_identifier",
-                "mac_address",
-                "device_free_memory",
-                "network_carrier",
                 "cookies",
-                "device_battery_level",
-                "cpu_data",
-                "device_headphone_status",
                 "os_build_version",
-                "device_resolution",
                 "app_version",
                 "device_connectivity",
-                "device_language",
                 "device_model",
                 "app_name",
-                "device_make",
                 "os_version",
-                "country",
-                "device_screen_density",
-                "timezone",
-                "device_orientation",
+                "device_make",
                 "platform"
             ]
         },
-        "Dotmetrics": {
-            "score": 1228,
-            "signals": [
-                "unique_identifier",
-                "cookies",
-                "device_total_memory",
-                "cpu_data",
-                "os_build_version",
-                "device_resolution",
-                "app_version",
-                "device_language",
-                "device_model",
-                "device_make",
-                "os_version",
-                "country",
-                "app_name",
-                "timezone",
-                "platform"
-            ]
-        },
-        "DoubleVerify": {
-            "score": 9921,
-            "signals": [
-                "gps_coordinates",
-                "neighborhood",
-                "AAID",
-                "unique_identifier",
-                "device_total_memory",
-                "os_build_version",
-                "device_resolution",
-                "device_language",
-                "device_model",
-                "app_version",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "platform"
-            ]
-        },
-        "Engine USA LLC": {
-            "score": 1524,
+        "RhythmOne": {
+            "score": 1232,
             "signals": [
                 "city",
-                "AAID",
                 "unique_identifier",
                 "cookies",
                 "os_build_version",
                 "app_version",
                 "device_model",
-                "device_language",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "platform"
-            ]
-        },
-        "Exponential Interactive Inc.": {
-            "score": 726,
-            "signals": [
-                "unique_identifier",
-                "cookies",
-                "os_build_version",
-                "device_model",
-                "app_version",
-                "device_language",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "platform"
-            ]
-        },
-        "eyeota Limited": {
-            "score": 1400,
-            "signals": [
-                "unique_identifier",
-                "cookies",
-                "os_build_version",
-                "app_version",
-                "device_language",
-                "device_model",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "platform"
-            ]
-        },
-        "Facebook, Inc.": {
-            "score": 119895,
-            "signals": [
-                "gps_coordinates",
-                "email_address",
-                "username",
-                "first_name",
-                "last_name",
-                "postal_code",
-                "birthday",
-                "neighborhood",
-                "AAID",
-                "city",
-                "unique_identifier",
-                "gender",
-                "accelerometer_data",
-                "device_free_storage",
-                "rotation_data",
-                "state",
-                "device_free_memory",
-                "network_carrier",
-                "cookies",
-                "device_volume",
-                "device_total_memory",
-                "device_headphone_status",
-                "os_build_version",
-                "device_resolution",
-                "device_model",
-                "app_version",
                 "device_connectivity",
-                "device_language",
-                "app_name",
-                "device_charging_status",
-                "device_make",
-                "os_version",
-                "country",
-                "timezone",
-                "device_screen_density",
-                "platform",
-                "device_orientation"
-            ]
-        },
-        "Fastly, Inc.": {
-            "score": 792,
-            "signals": [
-                "city",
-                "unique_identifier",
-                "cookies",
-                "os_build_version",
-                "app_version",
-                "device_model",
-                "device_language",
                 "app_name",
                 "device_make",
-                "os_version",
-                "country",
-                "platform"
-            ]
-        },
-        "Flashtalking Inc": {
-            "score": 2050,
-            "signals": [
-                "unique_identifier",
-                "cookies",
-                "cpu_data",
-                "device_total_memory",
-                "os_build_version",
-                "device_resolution",
-                "device_language",
-                "device_model",
-                "app_version",
-                "device_make",
-                "os_version",
-                "country",
-                "app_name",
-                "platform",
-                "device_orientation"
-            ]
-        },
-        "Foursquare Labs, Inc.": {
-            "score": 1395,
-            "signals": [
-                "postal_code",
-                "AAID",
-                "unique_identifier",
-                "cookies",
-                "device_total_memory",
-                "os_build_version",
-                "device_model",
-                "app_name",
                 "os_version",
                 "platform"
             ]
         },
-        "FreeWheel": {
-            "score": 1896,
+        "Yandex LLC": {
+            "score": 1219,
             "signals": [
                 "gps_coordinates",
                 "AAID",
@@ -3666,169 +3626,21 @@
                 "os_build_version",
                 "device_resolution",
                 "device_model",
-                "app_version",
                 "device_language",
-                "app_name",
                 "device_make",
-                "os_version",
-                "country",
-                "platform"
-            ]
-        },
-        "Functional Software, Inc.": {
-            "score": 6310,
-            "signals": [
-                "device_name",
-                "device_boot_time",
-                "unique_identifier",
-                "device_free_memory",
-                "device_battery_level",
-                "device_total_storage",
-                "cpu_data",
-                "device_total_memory",
-                "os_build_version",
-                "device_resolution",
-                "app_version",
-                "device_connectivity",
-                "device_language",
-                "device_model",
-                "app_name",
-                "device_charging_status",
-                "device_make",
-                "os_version",
-                "country",
-                "device_screen_density",
-                "timezone",
-                "device_orientation",
-                "platform"
-            ]
-        },
-        "GameAnalytics ApS": {
-            "score": 955,
-            "signals": [
-                "AAID",
-                "unique_identifier",
-                "os_build_version",
-                "device_resolution",
-                "app_version",
-                "device_language",
-                "device_model",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "device_screen_density",
-                "platform"
-            ]
-        },
-        "Google LLC": {
-            "score": 326430,
-            "signals": [
-                "gps_coordinates",
-                "email_address",
-                "phone_number",
-                "username",
-                "password",
-                "first_name",
-                "last_name",
-                "neighborhood",
-                "device_name",
-                "postal_code",
-                "AAID",
-                "device_boot_time",
-                "city",
-                "unique_identifier",
-                "local_ip",
-                "gender",
-                "device_free_storage",
-                "state",
-                "network_carrier",
-                "cookies",
-                "device_battery_level",
-                "device_volume",
-                "device_total_memory",
-                "cpu_data",
-                "device_headphone_status",
-                "os_build_version",
-                "device_resolution",
-                "device_model",
-                "app_version",
-                "device_connectivity",
-                "device_language",
-                "install_date",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "device_charging_status",
-                "timezone",
-                "device_screen_density",
-                "platform",
-                "device_orientation"
-            ]
-        },
-        "Hexagon Data, S.A.P.I. de C.V.": {
-            "score": 774,
-            "signals": [
-                "AAID",
-                "unique_identifier",
-                "cpu_data",
-                "os_build_version",
-                "device_resolution",
-                "app_version",
-                "device_language",
-                "device_model",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "platform"
-            ]
-        },
-        "Human Security, Inc.": {
-            "score": 378,
-            "signals": [
-                "AAID",
-                "cookies",
-                "os_build_version",
-                "device_model",
                 "app_name",
                 "os_version",
                 "platform"
             ]
         },
-        "ID5 Technology Ltd": {
-            "score": 861,
+        "Zeotap GmbH": {
+            "score": 1176,
             "signals": [
-                "city",
                 "AAID",
                 "unique_identifier",
                 "cookies",
                 "os_build_version",
-                "device_resolution",
                 "device_model",
-                "app_version",
-                "device_connectivity",
-                "device_language",
-                "device_make",
-                "os_version",
-                "app_name",
-                "country",
-                "platform"
-            ]
-        },
-        "Index Exchange, Inc.": {
-            "score": 11308,
-            "signals": [
-                "gps_coordinates",
-                "city",
-                "unique_identifier",
-                "cookies",
-                "os_build_version",
-                "device_resolution",
-                "device_language",
-                "device_model",
-                "app_version",
                 "app_name",
                 "device_make",
                 "os_version",
@@ -3837,7 +3649,7 @@
             ]
         },
         "Inmar, Inc.": {
-            "score": 2486,
+            "score": 1130,
             "signals": [
                 "city",
                 "unique_identifier",
@@ -3846,326 +3658,47 @@
                 "os_build_version",
                 "app_version",
                 "device_model",
-                "device_language",
                 "app_name",
                 "device_make",
                 "os_version",
-                "country",
                 "platform"
             ]
         },
-        "InMobi Pte Ltd": {
-            "score": 800,
-            "signals": [
-                "AAID",
-                "unique_identifier",
-                "device_volume",
-                "os_build_version",
-                "device_resolution",
-                "app_version",
-                "device_connectivity",
-                "device_language",
-                "device_model",
-                "app_name",
-                "device_make",
-                "os_version",
-                "device_screen_density",
-                "timezone",
-                "device_orientation",
-                "platform"
-            ]
-        },
-        "Innovid Media": {
-            "score": 3400,
-            "signals": [
-                "gps_coordinates",
-                "postal_code",
-                "neighborhood",
-                "AAID",
-                "city",
-                "unique_identifier",
-                "cookies",
-                "device_total_memory",
-                "os_build_version",
-                "device_resolution",
-                "device_model",
-                "device_language",
-                "app_name",
-                "os_version",
-                "device_make",
-                "country",
-                "platform"
-            ]
-        },
-        "Integral Ad Science, Inc.": {
-            "score": 18228,
+        "Media.net Advertising FZ-LLC": {
+            "score": 1114,
             "signals": [
                 "postal_code",
-                "AAID",
                 "city",
                 "unique_identifier",
-                "state",
-                "device_volume",
-                "device_total_memory",
-                "os_build_version",
-                "device_resolution",
-                "device_model",
-                "device_language",
-                "app_version",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "device_screen_density",
-                "platform"
-            ]
-        },
-        "Intuition Machines, Inc.": {
-            "score": 460,
-            "signals": [
-                "unique_identifier",
                 "cookies",
-                "cpu_data",
-                "os_build_version",
-                "device_resolution",
-                "device_language",
-                "device_model",
-                "app_version",
-                "app_name",
-                "os_version",
-                "device_make",
-                "platform"
-            ]
-        },
-        "IPONWEB GmbH": {
-            "score": 9445,
-            "signals": [
-                "gps_coordinates",
-                "postal_code",
-                "AAID",
-                "city",
-                "unique_identifier",
-                "state",
-                "cookies",
-                "os_build_version",
-                "device_model",
-                "device_language",
-                "app_version",
-                "device_connectivity",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "platform"
-            ]
-        },
-        "ironSource Ltd": {
-            "score": 29113,
-            "signals": [
-                "postal_code",
-                "neighborhood",
-                "AAID",
-                "city",
-                "unique_identifier",
-                "local_ip",
-                "device_free_storage",
-                "network_isp",
-                "network_carrier",
-                "device_free_memory",
-                "device_battery_level",
-                "os_build_version",
-                "device_resolution",
-                "device_connectivity",
-                "device_model",
-                "device_language",
-                "app_version",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "device_screen_density",
-                "timezone",
-                "device_orientation",
-                "platform"
-            ]
-        },
-        "iSpot.tv": {
-            "score": 670,
-            "signals": [
-                "city",
-                "cookies",
-                "os_build_version",
-                "app_version",
-                "device_model",
-                "device_language",
-                "app_name",
-                "os_version",
-                "device_make",
-                "country",
-                "platform"
-            ]
-        },
-        "Iterable, Inc.": {
-            "score": 1395,
-            "signals": [
-                "email_address",
-                "AAID",
-                "unique_identifier",
-                "os_build_version",
-                "device_model",
-                "app_version",
-                "app_name",
-                "device_make",
-                "os_version",
-                "platform"
-            ]
-        },
-        "Kantar Operations": {
-            "score": 1098,
-            "signals": [
-                "device_magnetometer",
-                "AAID",
-                "accelerometer_data",
-                "cookies",
-                "os_build_version",
-                "device_language",
-                "device_model",
-                "app_version",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "platform"
-            ]
-        },
-        "Kochava": {
-            "score": 11696,
-            "signals": [
-                "gps_coordinates",
-                "wifi_ssid",
-                "device_name",
-                "postal_code",
-                "AAID",
-                "device_boot_time",
-                "unique_identifier",
-                "network_isp",
-                "network_carrier",
-                "screen_brightness",
-                "device_battery_level",
-                "device_volume",
-                "cpu_data",
                 "os_build_version",
                 "device_resolution",
                 "device_model",
                 "app_version",
-                "device_connectivity",
-                "device_language",
                 "app_name",
                 "device_make",
                 "os_version",
-                "country",
-                "device_charging_status",
-                "timezone",
-                "device_orientation",
                 "platform"
             ]
         },
-        "Liftoff Mobile, Inc.": {
-            "score": 7491,
-            "signals": [
-                "gps_coordinates",
-                "postal_code",
-                "AAID",
-                "city",
-                "unique_identifier",
-                "state",
-                "device_total_memory",
-                "os_build_version",
-                "device_resolution",
-                "device_language",
-                "device_model",
-                "app_name",
-                "os_version",
-                "country",
-                "device_make",
-                "platform"
-            ]
-        },
-        "LiveIntent Inc.": {
-            "score": 1044,
-            "signals": [
-                "AAID",
-                "unique_identifier",
-                "cookies",
-                "os_build_version",
-                "device_model",
-                "device_language",
-                "app_name",
-                "os_version",
-                "device_make",
-                "country",
-                "platform"
-            ]
-        },
-        "LiveRamp Holdings, Inc.": {
-            "score": 6738,
-            "signals": [
-                "AAID",
-                "city",
-                "unique_identifier",
-                "cookies",
-                "os_build_version",
-                "app_version",
-                "device_language",
-                "device_model",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "platform"
-            ]
-        },
-        "Lotame Solutions, Inc.": {
-            "score": 2102,
-            "signals": [
-                "AAID",
-                "unique_identifier",
-                "cookies",
-                "os_build_version",
-                "app_version",
-                "device_language",
-                "device_model",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "platform"
-            ]
-        },
-        "Magnite, Inc.": {
-            "score": 8432,
+        "FreeWheel": {
+            "score": 1070,
             "signals": [
                 "gps_coordinates",
                 "AAID",
-                "city",
                 "unique_identifier",
                 "cookies",
                 "os_build_version",
-                "device_resolution",
-                "app_version",
-                "device_connectivity",
                 "device_model",
-                "device_language",
+                "app_version",
                 "app_name",
                 "device_make",
                 "os_version",
-                "country",
-                "device_screen_density",
                 "platform"
             ]
         },
         "Mapbox Inc.": {
-            "score": 1662,
+            "score": 1040,
             "signals": [
                 "gps_coordinates",
                 "AAID",
@@ -4176,146 +3709,99 @@
                 "device_model",
                 "app_version",
                 "device_connectivity",
-                "device_language",
                 "app_name",
                 "os_version",
                 "device_make",
-                "country",
                 "platform",
                 "device_orientation"
             ]
         },
-        "Media.net Advertising FZ-LLC": {
-            "score": 530,
-            "signals": [
-                "city",
-                "cookies",
-                "os_build_version",
-                "app_version",
-                "device_model",
-                "device_language",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "platform"
-            ]
-        },
-        "MediaMath, Inc.": {
-            "score": 4429,
+        "Teads ( Luxenbourg ) SA": {
+            "score": 1022,
             "signals": [
                 "city",
                 "unique_identifier",
                 "cookies",
                 "os_build_version",
-                "device_language",
-                "device_model",
                 "app_version",
+                "device_model",
+                "app_name",
                 "device_make",
                 "os_version",
-                "country",
-                "app_name",
                 "platform"
             ]
         },
-        "Microsoft Corporation": {
-            "score": 37698,
+        "Lotame Solutions, Inc.": {
+            "score": 1011,
             "signals": [
-                "gps_coordinates",
-                "username",
-                "postal_code",
-                "birthday",
-                "city",
                 "AAID",
                 "unique_identifier",
-                "state",
-                "network_carrier",
+                "cookies",
+                "os_build_version",
+                "device_model",
+                "app_name",
+                "device_make",
+                "os_version",
+                "platform"
+            ]
+        },
+        "Sovrn Holdings": {
+            "score": 975,
+            "signals": [
+                "AAID",
+                "unique_identifier",
                 "cookies",
                 "os_build_version",
                 "device_resolution",
-                "app_version",
-                "device_connectivity",
-                "device_language",
                 "device_model",
-                "app_name",
-                "os_version",
-                "country",
+                "app_version",
                 "device_make",
-                "timezone",
+                "os_version",
+                "app_name",
                 "platform"
             ]
         },
-        "Mixpanel, Inc.": {
-            "score": 2984,
+        "LiveIntent Inc.": {
+            "score": 870,
             "signals": [
-                "email_address",
-                "phone_number",
-                "username",
-                "first_name",
                 "AAID",
-                "device_boot_time",
                 "unique_identifier",
-                "gender",
-                "network_carrier",
+                "cookies",
                 "os_build_version",
-                "device_resolution",
-                "app_version",
-                "device_connectivity",
-                "device_language",
                 "device_model",
                 "app_name",
-                "device_make",
                 "os_version",
-                "country",
+                "device_make",
                 "platform"
             ]
         },
-        "Mobiquity Inc.": {
-            "score": 702,
+        "Sharethrough, Inc.": {
+            "score": 868,
             "signals": [
                 "unique_identifier",
                 "cookies",
                 "os_build_version",
                 "device_model",
-                "device_language",
-                "device_make",
-                "os_version",
-                "app_name",
-                "country",
-                "platform"
-            ]
-        },
-        "Moloco Inc.": {
-            "score": 1904,
-            "signals": [
-                "neighborhood",
-                "os_build_version",
                 "app_version",
-                "device_language",
-                "device_model",
                 "app_name",
                 "os_version",
-                "country",
                 "device_make",
                 "platform"
             ]
         },
-        "Neustar, Inc.": {
-            "score": 3528,
+        "Unruly Group Limited": {
+            "score": 830,
             "signals": [
-                "postal_code",
-                "AAID",
+                "city",
                 "unique_identifier",
                 "cookies",
-                "device_total_memory",
                 "os_build_version",
                 "app_version",
-                "device_language",
                 "device_model",
+                "device_connectivity",
                 "app_name",
                 "device_make",
                 "os_version",
-                "country",
                 "platform"
             ]
         },
@@ -4337,126 +3823,159 @@
                 "platform"
             ]
         },
-        "Ogury Limited": {
-            "score": 696,
-            "signals": [
-                "AAID",
-                "cpu_data",
-                "device_resolution",
-                "device_connectivity",
-                "device_language",
-                "device_model",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "timezone",
-                "platform"
-            ]
-        },
-        "OnAudience Ltd.": {
-            "score": 630,
-            "signals": [
-                "unique_identifier",
-                "cookies",
-                "os_build_version",
-                "app_version",
-                "device_language",
-                "device_model",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "platform"
-            ]
-        },
-        "OneSignal": {
-            "score": 4452,
+        "Tappcelator Media S.L.": {
+            "score": 822,
             "signals": [
                 "gps_coordinates",
-                "first_name",
                 "AAID",
                 "unique_identifier",
                 "cookies",
                 "os_build_version",
                 "device_model",
-                "install_date",
                 "app_version",
                 "app_name",
-                "os_version",
-                "country",
                 "device_make",
-                "timezone",
+                "os_version",
                 "platform"
             ]
         },
-        "OpenX Technologies Inc": {
-            "score": 3391,
+        "Engine USA LLC": {
+            "score": 820,
+            "signals": [
+                "AAID",
+                "unique_identifier",
+                "cookies",
+                "os_build_version",
+                "device_model",
+                "app_version",
+                "app_name",
+                "os_version",
+                "device_make",
+                "platform"
+            ]
+        },
+        "Intent IQ, LLC": {
+            "score": 767,
+            "signals": [
+                "AAID",
+                "unique_identifier",
+                "cookies",
+                "os_build_version",
+                "device_model",
+                "device_make",
+                "os_version",
+                "app_name",
+                "platform"
+            ]
+        },
+        "Bugsnag Inc.": {
+            "score": 760,
             "signals": [
                 "city",
                 "unique_identifier",
-                "cookies",
-                "os_build_version",
-                "app_version",
-                "device_model",
-                "device_language",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "platform"
-            ]
-        },
-        "Optimizely, Inc.": {
-            "score": 1790,
-            "signals": [
-                "unique_identifier",
-                "os_build_version",
-                "device_model",
-                "device_language",
-                "app_version",
-                "device_make",
-                "os_version",
-                "country",
-                "app_name",
-                "platform"
-            ]
-        },
-        "Oracle Corporation": {
-            "score": 8083,
-            "signals": [
-                "AAID",
-                "unique_identifier",
-                "network_carrier",
-                "cookies",
+                "cpu_data",
                 "device_total_memory",
                 "os_build_version",
                 "device_resolution",
-                "device_model",
-                "device_language",
                 "app_version",
+                "device_language",
+                "device_model",
                 "app_name",
                 "device_make",
                 "os_version",
-                "country",
-                "device_screen_density",
-                "platform",
-                "device_orientation"
+                "platform"
             ]
         },
-        "Outbrain": {
-            "score": 1250,
+        "AdRoll, Inc.": {
+            "score": 756,
+            "signals": [
+                "AAID",
+                "unique_identifier",
+                "cookies",
+                "os_build_version",
+                "app_version",
+                "device_model",
+                "app_name",
+                "device_make",
+                "os_version",
+                "platform"
+            ]
+        },
+        "NinthDecimal, Inc": {
+            "score": 754,
+            "signals": [
+                "gps_coordinates",
+                "postal_code",
+                "AAID",
+                "city",
+                "unique_identifier",
+                "os_build_version",
+                "device_model",
+                "app_name",
+                "os_version",
+                "country",
+                "device_make",
+                "platform"
+            ]
+        },
+        "eyeota Limited": {
+            "score": 744,
             "signals": [
                 "unique_identifier",
                 "cookies",
                 "os_build_version",
-                "device_language",
+                "device_model",
+                "app_name",
+                "os_version",
+                "device_make",
+                "platform"
+            ]
+        },
+        "ID5 Technology Ltd": {
+            "score": 738,
+            "signals": [
+                "city",
+                "AAID",
+                "unique_identifier",
+                "cookies",
+                "os_build_version",
+                "device_resolution",
                 "device_model",
                 "app_version",
+                "device_connectivity",
                 "device_make",
                 "os_version",
-                "country",
                 "app_name",
+                "platform"
+            ]
+        },
+        "Riskified Ltd.": {
+            "score": 732,
+            "signals": [
+                "gps_coordinates",
+                "AAID",
+                "network_carrier",
+                "os_build_version",
+                "device_model",
+                "app_version",
+                "device_language",
+                "app_name",
+                "os_version",
+                "timezone",
+                "platform"
+            ]
+        },
+        "Simplifi Holdings Inc.": {
+            "score": 726,
+            "signals": [
+                "unique_identifier",
+                "cookies",
+                "os_build_version",
+                "device_model",
+                "app_version",
+                "app_name",
+                "device_make",
+                "os_version",
                 "platform"
             ]
         },
@@ -4477,320 +3996,28 @@
                 "platform"
             ]
         },
-        "Permutive, Inc.": {
-            "score": 2010,
+        "33Across, Inc.": {
+            "score": 684,
             "signals": [
-                "neighborhood",
-                "city",
                 "unique_identifier",
-                "state",
-                "network_isp",
                 "cookies",
                 "os_build_version",
-                "device_language",
                 "device_model",
-                "app_name",
+                "app_version",
                 "device_make",
                 "os_version",
-                "country",
+                "app_name",
                 "platform"
             ]
         },
-        "Pinterest, Inc.": {
-            "score": 3092,
+        "Vungle Inc": {
+            "score": 660,
             "signals": [
                 "AAID",
-                "city",
-                "unique_identifier",
-                "state",
-                "cookies",
-                "os_build_version",
-                "device_resolution",
-                "app_version",
-                "device_model",
-                "device_language",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "platform"
-            ]
-        },
-        "Pixalate, Inc.": {
-            "score": 3330,
-            "signals": [
-                "gps_coordinates",
-                "AAID",
-                "cookies",
-                "device_total_memory",
-                "os_build_version",
-                "device_resolution",
-                "device_model",
-                "device_language",
-                "app_version",
-                "app_name",
-                "os_version",
-                "device_make",
-                "country",
-                "platform",
-                "device_orientation"
-            ]
-        },
-        "Prospect One": {
-            "score": 816,
-            "signals": [
-                "AAID",
-                "os_build_version",
-                "app_version",
-                "device_model",
-                "device_language",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "platform"
-            ]
-        },
-        "PubMatic, Inc.": {
-            "score": 17734,
-            "signals": [
-                "gps_coordinates",
-                "city",
-                "AAID",
-                "unique_identifier",
-                "cookies",
-                "os_build_version",
-                "device_resolution",
-                "device_language",
-                "device_model",
-                "app_version",
-                "device_connectivity",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "platform"
-            ]
-        },
-        "Pulsepoint, Inc.": {
-            "score": 1629,
-            "signals": [
-                "city",
-                "AAID",
-                "unique_identifier",
-                "cookies",
-                "os_build_version",
-                "app_version",
-                "device_connectivity",
-                "device_model",
-                "device_language",
-                "app_name",
-                "os_version",
-                "device_make",
-                "country",
-                "platform"
-            ]
-        },
-        "Quantcast Corporation": {
-            "score": 1408,
-            "signals": [
-                "unique_identifier",
-                "cookies",
-                "os_build_version",
-                "device_resolution",
-                "device_connectivity",
-                "device_model",
-                "device_language",
-                "app_version",
-                "device_make",
-                "os_version",
-                "country",
-                "app_name",
-                "platform"
-            ]
-        },
-        "Reddit Inc.": {
-            "score": 1038,
-            "signals": [
-                "AAID",
-                "unique_identifier",
-                "os_build_version",
-                "device_resolution",
-                "device_language",
-                "device_model",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "platform"
-            ]
-        },
-        "RevenueCat": {
-            "score": 1773,
-            "signals": [
-                "AAID",
-                "unique_identifier",
-                "os_build_version",
-                "app_version",
-                "device_language",
-                "device_model",
-                "device_make",
-                "os_version",
-                "country",
-                "platform"
-            ]
-        },
-        "RhythmOne": {
-            "score": 1584,
-            "signals": [
-                "city",
-                "unique_identifier",
-                "cookies",
-                "os_build_version",
-                "app_version",
-                "device_model",
-                "device_language",
-                "device_connectivity",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "platform"
-            ]
-        },
-        "Riskified Ltd.": {
-            "score": 1318,
-            "signals": [
-                "gps_coordinates",
-                "first_name",
-                "last_name",
-                "AAID",
-                "network_carrier",
-                "os_build_version",
-                "device_model",
-                "app_version",
-                "device_language",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "timezone",
-                "platform"
-            ]
-        },
-        "Roku, Inc.": {
-            "score": 1400,
-            "signals": [
-                "unique_identifier",
-                "cookies",
-                "os_build_version",
-                "app_version",
-                "device_language",
-                "device_model",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "platform"
-            ]
-        },
-        "RTB House S.A.": {
-            "score": 575,
-            "signals": [
-                "unique_identifier",
-                "cookies",
-                "os_build_version",
-                "device_language",
-                "device_model",
-                "device_make",
-                "os_version",
-                "country",
-                "app_name",
-                "platform"
-            ]
-        },
-        "Salesforce.com, Inc.": {
-            "score": 8391,
-            "signals": [
-                "email_address",
-                "postal_code",
-                "AAID",
-                "unique_identifier",
-                "state",
-                "cookies",
-                "device_total_memory",
-                "os_build_version",
-                "device_language",
-                "device_model",
-                "app_version",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "timezone",
-                "platform"
-            ]
-        },
-        "Segment.io, Inc.": {
-            "score": 4752,
-            "signals": [
-                "email_address",
-                "username",
-                "gps_coordinates",
-                "first_name",
-                "last_name",
-                "neighborhood",
-                "postal_code",
-                "AAID",
-                "city",
-                "unique_identifier",
-                "local_ip",
-                "state",
-                "network_carrier",
-                "device_model",
-                "os_build_version",
-                "device_resolution",
-                "app_version",
-                "device_connectivity",
-                "device_language",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "device_screen_density",
-                "timezone",
-                "platform"
-            ]
-        },
-        "Sharethrough, Inc.": {
-            "score": 2380,
-            "signals": [
-                "city",
-                "unique_identifier",
-                "cookies",
-                "os_build_version",
-                "device_resolution",
-                "device_language",
-                "device_model",
-                "app_version",
-                "device_make",
-                "os_version",
-                "country",
-                "app_name",
-                "platform"
-            ]
-        },
-        "Sift Science, Inc.": {
-            "score": 2563,
-            "signals": [
-                "gps_coordinates",
-                "neighborhood",
-                "unique_identifier",
-                "local_ip",
+                "device_free_storage",
                 "network_carrier",
                 "device_battery_level",
                 "os_build_version",
-                "device_resolution",
                 "device_model",
                 "app_version",
                 "device_language",
@@ -4798,154 +4025,44 @@
                 "device_charging_status",
                 "device_make",
                 "os_version",
-                "country",
-                "platform"
-            ]
-        },
-        "Simplifi Holdings Inc.": {
-            "score": 1375,
-            "signals": [
-                "unique_identifier",
-                "cookies",
-                "os_build_version",
-                "device_language",
-                "device_model",
-                "app_version",
-                "device_make",
-                "os_version",
-                "country",
-                "app_name",
-                "platform"
-            ]
-        },
-        "Smaato Inc.": {
-            "score": 2760,
-            "signals": [
-                "gps_coordinates",
-                "postal_code",
-                "AAID",
-                "unique_identifier",
-                "network_carrier",
-                "cookies",
-                "os_build_version",
-                "device_resolution",
-                "device_language",
-                "device_model",
-                "device_connectivity",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
                 "timezone",
                 "platform"
             ]
         },
-        "Smartadserver S.A.S": {
-            "score": 3495,
+        "Collective Roll": {
+            "score": 660,
             "signals": [
-                "gps_coordinates",
-                "postal_code",
-                "AAID",
-                "city",
                 "unique_identifier",
                 "cookies",
                 "os_build_version",
-                "device_resolution",
-                "device_model",
-                "app_version",
-                "device_language",
-                "app_name",
-                "os_version",
-                "country",
-                "device_make",
-                "platform"
-            ]
-        },
-        "Snap Inc.": {
-            "score": 2702,
-            "signals": [
-                "AAID",
-                "unique_identifier",
-                "cookies",
-                "os_build_version",
-                "device_resolution",
-                "app_version",
-                "device_model",
-                "device_language",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "platform"
-            ]
-        },
-        "Sovrn Holdings": {
-            "score": 1625,
-            "signals": [
-                "AAID",
-                "unique_identifier",
-                "cookies",
-                "os_build_version",
-                "device_resolution",
-                "device_language",
                 "device_model",
                 "app_version",
                 "device_make",
                 "os_version",
-                "country",
                 "app_name",
                 "platform"
             ]
         },
-        "SpotX, Inc.": {
-            "score": 4326,
+        "DataXu": {
+            "score": 620,
             "signals": [
-                "gps_coordinates",
-                "AAID",
                 "unique_identifier",
                 "cookies",
                 "os_build_version",
-                "device_resolution",
-                "device_connectivity",
-                "device_language",
                 "device_model",
-                "app_version",
                 "app_name",
                 "os_version",
                 "device_make",
-                "country",
                 "platform"
             ]
         },
-        "Synacor, Inc.": {
-            "score": 1600,
+        "InMobi Pte Ltd": {
+            "score": 600,
             "signals": [
-                "unique_identifier",
-                "cookies",
-                "os_build_version",
-                "device_language",
-                "device_model",
-                "device_connectivity",
-                "app_version",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "platform"
-            ]
-        },
-        "Taboola, Inc.": {
-            "score": 14406,
-            "signals": [
-                "gps_coordinates",
-                "neighborhood",
                 "AAID",
                 "unique_identifier",
-                "state",
-                "cookies",
-                "device_total_memory",
+                "device_volume",
                 "os_build_version",
-                "device_resolution",
                 "app_version",
                 "device_connectivity",
                 "device_language",
@@ -4953,490 +4070,613 @@
                 "app_name",
                 "device_make",
                 "os_version",
-                "country",
-                "timezone",
-                "platform"
-            ]
-        },
-        "Take-Two Interactive Software, Inc.": {
-            "score": 858,
-            "signals": [
-                "AAID",
-                "unique_identifier",
-                "network_carrier",
-                "os_build_version",
-                "device_resolution",
-                "app_version",
-                "device_language",
-                "device_model",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
                 "device_screen_density",
-                "timezone",
-                "platform"
-            ]
-        },
-        "Talent Game Box": {
-            "score": 2183,
-            "signals": [
-                "neighborhood",
-                "AAID",
-                "unique_identifier",
-                "os_build_version",
-                "device_resolution",
-                "app_version",
-                "device_connectivity",
-                "device_language",
-                "device_model",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
                 "timezone",
                 "device_orientation",
                 "platform"
             ]
         },
-        "Tapad, Inc.": {
-            "score": 7850,
+        "Bidtellect, Inc": {
+            "score": 585,
             "signals": [
-                "postal_code",
-                "AAID",
-                "city",
-                "unique_identifier",
-                "state",
-                "cookies",
-                "device_total_memory",
-                "os_build_version",
-                "device_model",
-                "device_language",
-                "app_version",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "platform"
-            ]
-        },
-        "Tapjoy, Inc.": {
-            "score": 9396,
-            "signals": [
-                "AAID",
-                "unique_identifier",
-                "mac_address",
-                "network_carrier",
-                "device_volume",
-                "os_build_version",
-                "device_resolution",
-                "app_version",
-                "device_language",
-                "device_model",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "device_screen_density",
-                "timezone",
-                "platform"
-            ]
-        },
-        "Tappcelator Media S.L.": {
-            "score": 822,
-            "signals": [
-                "gps_coordinates",
-                "AAID",
                 "unique_identifier",
                 "cookies",
                 "os_build_version",
                 "device_model",
                 "app_version",
-                "app_name",
+                "device_connectivity",
                 "device_make",
                 "os_version",
+                "app_name",
                 "platform"
             ]
         },
-        "Teads ( Luxenbourg ) SA": {
-            "score": 880,
+        "Outbrain": {
+            "score": 585,
             "signals": [
-                "city",
                 "unique_identifier",
                 "cookies",
                 "os_build_version",
-                "app_version",
                 "device_model",
-                "device_language",
-                "app_name",
                 "device_make",
                 "os_version",
-                "country",
+                "app_name",
                 "platform"
             ]
         },
         "Telaria": {
-            "score": 870,
+            "score": 522,
             "signals": [
                 "AAID",
                 "unique_identifier",
                 "cookies",
                 "os_build_version",
                 "device_model",
-                "app_version",
-                "device_language",
                 "app_name",
                 "os_version",
                 "device_make",
-                "country",
                 "platform"
             ]
         },
-        "The Nielsen Company": {
-            "score": 4327,
-            "signals": [
-                "AAID",
-                "city",
-                "unique_identifier",
-                "state",
-                "cookies",
-                "os_build_version",
-                "device_resolution",
-                "device_model",
-                "device_language",
-                "app_version",
-                "app_name",
-                "os_version",
-                "device_make",
-                "country",
-                "platform"
-            ]
-        },
-        "The Trade Desk Inc": {
-            "score": 18988,
-            "signals": [
-                "gps_coordinates",
-                "postal_code",
-                "AAID",
-                "city",
-                "unique_identifier",
-                "state",
-                "cookies",
-                "os_build_version",
-                "device_model",
-                "device_language",
-                "app_version",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "platform"
-            ]
-        },
-        "TripleLift": {
-            "score": 3543,
-            "signals": [
-                "city",
-                "unique_identifier",
-                "cookies",
-                "os_build_version",
-                "device_resolution",
-                "device_language",
-                "device_model",
-                "app_version",
-                "device_make",
-                "os_version",
-                "country",
-                "app_name",
-                "platform"
-            ]
-        },
-        "TrustArc Inc.": {
-            "score": 1014,
+        "Hexagon Data, S.A.P.I. de C.V.": {
+            "score": 516,
             "signals": [
                 "AAID",
                 "unique_identifier",
-                "os_build_version",
-                "device_language",
-                "device_model",
-                "app_name",
-                "os_version",
-                "platform"
-            ]
-        },
-        "Twitter, Inc.": {
-            "score": 13507,
-            "signals": [
-                "email_address",
-                "password",
-                "username",
-                "AAID",
-                "city",
-                "unique_identifier",
-                "cookies",
-                "os_build_version",
-                "device_language",
-                "device_model",
-                "app_version",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "timezone",
-                "platform"
-            ]
-        },
-        "Undertone Networks": {
-            "score": 740,
-            "signals": [
-                "unique_identifier",
-                "cookies",
-                "os_build_version",
-                "device_language",
-                "device_model",
-                "device_make",
-                "os_version",
-                "country",
-                "app_name",
-                "platform"
-            ]
-        },
-        "Unity Technologies ApS": {
-            "score": 27349,
-            "signals": [
-                "neighborhood",
-                "postal_code",
-                "device_name",
-                "AAID",
-                "device_boot_time",
-                "unique_identifier",
-                "device_free_storage",
-                "external_free_storage",
-                "accelerometer_data",
-                "device_free_memory",
-                "screen_brightness",
-                "device_battery_level",
-                "device_total_storage",
-                "external_total_storage",
-                "device_volume",
-                "device_total_memory",
-                "device_headphone_status",
-                "os_build_version",
-                "device_resolution",
-                "app_version",
-                "device_connectivity",
-                "device_language",
-                "device_model",
-                "app_name",
-                "device_charging_status",
-                "device_make",
-                "os_version",
-                "country",
-                "device_screen_density",
-                "timezone",
-                "device_orientation",
-                "platform"
-            ]
-        },
-        "Unruly Group Limited": {
-            "score": 1162,
-            "signals": [
-                "city",
-                "unique_identifier",
-                "cookies",
-                "os_build_version",
-                "app_version",
-                "device_model",
-                "device_language",
-                "device_connectivity",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "platform"
-            ]
-        },
-        "Upland Software Inc.": {
-            "score": 930,
-            "signals": [
-                "postal_code",
-                "city",
-                "AAID",
-                "unique_identifier",
-                "state",
-                "os_build_version",
-                "app_version",
-                "device_connectivity",
-                "device_model",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "timezone",
-                "device_orientation",
-                "platform"
-            ]
-        },
-        "Urban Airship, Inc.": {
-            "score": 4751,
-            "signals": [
-                "gps_coordinates",
-                "email_address",
-                "neighborhood",
-                "city",
-                "unique_identifier",
-                "network_carrier",
-                "app_version",
-                "device_model",
-                "app_name",
-                "device_make",
-                "os_version",
-                "country",
-                "timezone",
-                "device_screen_density",
-                "platform"
-            ]
-        },
-        "Verizon Media": {
-            "score": 18260,
-            "signals": [
-                "gps_coordinates",
-                "birthday",
-                "AAID",
-                "device_boot_time",
-                "city",
-                "unique_identifier",
-                "device_free_storage",
-                "external_free_storage",
-                "device_free_memory",
-                "network_carrier",
-                "cookies",
-                "device_battery_level",
-                "device_total_storage",
-                "external_total_storage",
                 "cpu_data",
-                "device_total_memory",
-                "device_headphone_status",
                 "os_build_version",
                 "device_resolution",
+                "app_version",
+                "device_language",
+                "device_model",
+                "app_name",
+                "device_make",
+                "os_version",
+                "platform"
+            ]
+        },
+        "Quantcast Corporation": {
+            "score": 512,
+            "signals": [
+                "unique_identifier",
+                "cookies",
+                "os_build_version",
+                "device_resolution",
+                "device_connectivity",
+                "device_model",
+                "app_version",
+                "device_language",
+                "device_make",
+                "os_version",
+                "app_name",
+                "platform"
+            ]
+        },
+        "Synacor, Inc.": {
+            "score": 488,
+            "signals": [
+                "unique_identifier",
+                "cookies",
+                "os_build_version",
+                "device_connectivity",
+                "device_model",
+                "app_version",
+                "device_make",
+                "os_version",
+                "app_name",
+                "platform"
+            ]
+        },
+        "ByteDance Ltd.": {
+            "score": 484,
+            "signals": [
+                "AAID",
+                "unique_identifier",
+                "os_build_version",
+                "app_version",
+                "device_model",
+                "app_name",
+                "device_make",
+                "os_version",
+                "platform"
+            ]
+        },
+        "Fastly, Inc.": {
+            "score": 480,
+            "signals": [
+                "city",
+                "cookies",
+                "os_build_version",
+                "app_version",
+                "device_model",
+                "app_name",
+                "device_make",
+                "os_version",
+                "platform"
+            ]
+        },
+        "Kantar Operations": {
+            "score": 470,
+            "signals": [
+                "AAID",
+                "cookies",
+                "os_build_version",
+                "app_version",
+                "device_model",
+                "app_name",
+                "os_version",
+                "platform"
+            ]
+        },
+        "Beachfront Media LLC": {
+            "score": 468,
+            "signals": [
+                "unique_identifier",
+                "cookies",
+                "os_build_version",
+                "device_model",
+                "app_version",
+                "device_make",
+                "os_version",
+                "app_name",
+                "platform"
+            ]
+        },
+        "Adform A/S": {
+            "score": 468,
+            "signals": [
+                "unique_identifier",
+                "cookies",
+                "os_build_version",
+                "device_model",
+                "device_make",
+                "os_version",
+                "app_name",
+                "platform"
+            ]
+        },
+        "AcuityAds": {
+            "score": 468,
+            "signals": [
+                "unique_identifier",
+                "cookies",
+                "os_build_version",
+                "device_model",
+                "device_make",
+                "os_version",
+                "app_name",
+                "platform"
+            ]
+        },
+        "ADman Media": {
+            "score": 468,
+            "signals": [
+                "unique_identifier",
+                "cookies",
+                "os_build_version",
+                "device_model",
+                "app_version",
+                "device_make",
+                "os_version",
+                "app_name",
+                "platform"
+            ]
+        },
+        "Apptentive Inc.": {
+            "score": 440,
+            "signals": [
+                "unique_identifier",
+                "network_carrier",
+                "cpu_data",
+                "os_build_version",
                 "device_model",
                 "app_version",
                 "device_connectivity",
                 "device_language",
                 "app_name",
-                "device_charging_status",
-                "device_make",
-                "os_version",
-                "country",
-                "timezone",
-                "device_screen_density",
-                "platform",
-                "device_orientation"
-            ]
-        },
-        "Vungle Inc": {
-            "score": 6282,
-            "signals": [
-                "AAID",
-                "unique_identifier",
-                "device_free_storage",
-                "network_carrier",
-                "device_battery_level",
-                "device_volume",
-                "os_build_version",
-                "device_resolution",
-                "device_model",
-                "app_version",
-                "device_language",
-                "app_name",
-                "device_charging_status",
-                "device_make",
-                "os_version",
-                "country",
-                "timezone",
-                "platform"
-            ]
-        },
-        "WPP plc": {
-            "score": 2992,
-            "signals": [
-                "AAID",
-                "unique_identifier",
-                "cookies",
-                "os_build_version",
-                "device_model",
-                "app_version",
-                "device_language",
-                "app_name",
                 "device_make",
                 "os_version",
                 "country",
                 "platform"
             ]
         },
-        "Yandex LLC": {
-            "score": 1219,
+        "Reddit Inc.": {
+            "score": 438,
             "signals": [
-                "gps_coordinates",
+                "AAID",
+                "unique_identifier",
+                "platform"
+            ]
+        },
+        "Adkernel, LLC": {
+            "score": 424,
+            "signals": [
+                "unique_identifier",
+                "cookies",
+                "os_build_version",
+                "app_version",
+                "device_connectivity",
+                "device_model",
+                "app_name",
+                "os_version",
+                "platform"
+            ]
+        },
+        "Flashtalking Inc": {
+            "score": 423,
+            "signals": [
+                "unique_identifier",
+                "cookies",
+                "cpu_data",
+                "os_build_version",
+                "device_resolution",
+                "device_language",
+                "device_model",
+                "app_version",
+                "app_name",
+                "os_version",
+                "device_orientation",
+                "platform"
+            ]
+        },
+        "Data Plus Math": {
+            "score": 416,
+            "signals": [
+                "AAID",
+                "cookies",
+                "device_total_memory",
+                "os_build_version",
+                "device_model",
+                "app_version",
+                "app_name",
+                "os_version",
+                "device_make",
+                "platform"
+            ]
+        },
+        "Prospect One": {
+            "score": 408,
+            "signals": [
+                "AAID",
+                "os_build_version",
+                "app_version",
+                "device_model",
+                "app_name",
+                "device_make",
+                "os_version",
+                "platform"
+            ]
+        },
+        "GumGum": {
+            "score": 384,
+            "signals": [
+                "city",
+                "cookies",
+                "os_build_version",
+                "app_version",
+                "device_model",
+                "app_name",
+                "device_make",
+                "os_version",
+                "platform"
+            ]
+        },
+        "Human Security, Inc.": {
+            "score": 378,
+            "signals": [
+                "AAID",
+                "cookies",
+                "os_build_version",
+                "device_model",
+                "app_name",
+                "os_version",
+                "platform"
+            ]
+        },
+        "engageBDR": {
+            "score": 372,
+            "signals": [
+                "unique_identifier",
+                "cookies",
+                "os_build_version",
+                "device_model",
+                "app_version",
+                "app_name",
+                "os_version",
+                "device_make",
+                "platform"
+            ]
+        },
+        "SSP Network Ltd": {
+            "score": 372,
+            "signals": [
+                "unique_identifier",
+                "cookies",
+                "os_build_version",
+                "device_model",
+                "app_version",
+                "app_name",
+                "os_version",
+                "device_make",
+                "platform"
+            ]
+        },
+        "Exponential Interactive Inc.": {
+            "score": 363,
+            "signals": [
+                "unique_identifier",
+                "cookies",
+                "os_build_version",
+                "device_model",
+                "app_name",
+                "device_make",
+                "os_version",
+                "platform"
+            ]
+        },
+        "Cognitiv Corp.": {
+            "score": 363,
+            "signals": [
+                "unique_identifier",
+                "cookies",
+                "os_build_version",
+                "device_model",
+                "app_name",
+                "device_make",
+                "os_version",
+                "platform"
+            ]
+        },
+        "Optimizely, Inc.": {
+            "score": 356,
+            "signals": [
+                "unique_identifier",
+                "os_build_version",
+                "device_model",
+                "app_version",
+                "app_name",
+                "os_version",
+                "device_make",
+                "platform"
+            ]
+        },
+        "ZypMedia, Inc.": {
+            "score": 351,
+            "signals": [
+                "unique_identifier",
+                "cookies",
+                "os_build_version",
+                "device_model",
+                "device_make",
+                "os_version",
+                "app_name",
+                "platform"
+            ]
+        },
+        "Zeta Global": {
+            "score": 351,
+            "signals": [
+                "city",
+                "unique_identifier",
+                "cookies",
+                "os_build_version",
+                "device_model",
+                "app_version",
+                "device_make",
+                "os_version",
+                "app_name",
+                "platform"
+            ]
+        },
+        "Merkle Inc": {
+            "score": 351,
+            "signals": [
+                "unique_identifier",
+                "cookies",
+                "os_build_version",
+                "device_model",
+                "app_version",
+                "device_make",
+                "os_version",
+                "app_name",
+                "platform"
+            ]
+        },
+        "Kargo Global, Inc.": {
+            "score": 351,
+            "signals": [
+                "city",
+                "unique_identifier",
+                "cookies",
+                "os_build_version",
+                "device_model",
+                "app_version",
+                "device_make",
+                "os_version",
+                "app_name",
+                "platform"
+            ]
+        },
+        "Sonobi, Inc": {
+            "score": 351,
+            "signals": [
+                "city",
+                "unique_identifier",
+                "cookies",
+                "os_build_version",
+                "device_model",
+                "app_version",
+                "device_make",
+                "os_version",
+                "app_name",
+                "country",
+                "platform"
+            ]
+        },
+        "District M Inc.": {
+            "score": 351,
+            "signals": [
+                "unique_identifier",
+                "cookies",
+                "os_build_version",
+                "device_model",
+                "app_version",
+                "device_make",
+                "os_version",
+                "app_name",
+                "platform"
+            ]
+        },
+        "Connexity, Inc.": {
+            "score": 351,
+            "signals": [
                 "AAID",
                 "unique_identifier",
                 "cookies",
                 "os_build_version",
+                "device_model",
+                "device_make",
+                "os_version",
+                "app_name",
+                "platform"
+            ]
+        },
+        "Knorex Pte. Ltd.": {
+            "score": 351,
+            "signals": [
+                "unique_identifier",
+                "cookies",
+                "os_build_version",
+                "device_model",
+                "device_make",
+                "os_version",
+                "app_name",
+                "platform"
+            ]
+        },
+        "Avocet Systems Ltd.": {
+            "score": 351,
+            "signals": [
+                "unique_identifier",
+                "cookies",
+                "os_build_version",
+                "device_model",
+                "app_version",
+                "device_make",
+                "os_version",
+                "app_name",
+                "platform"
+            ]
+        },
+        "Mobiquity Inc.": {
+            "score": 351,
+            "signals": [
+                "unique_identifier",
+                "cookies",
+                "os_build_version",
+                "device_model",
+                "device_make",
+                "os_version",
+                "app_name",
+                "platform"
+            ]
+        },
+        "AdTheorent Inc": {
+            "score": 351,
+            "signals": [
+                "unique_identifier",
+                "cookies",
+                "os_build_version",
+                "device_model",
+                "device_make",
+                "os_version",
+                "app_name",
+                "platform"
+            ]
+        },
+        "Intuition Machines, Inc.": {
+            "score": 336,
+            "signals": [
+                "unique_identifier",
+                "cookies",
+                "cpu_data",
+                "os_build_version",
                 "device_resolution",
+                "device_language",
+                "device_model",
+                "app_version",
+                "app_name",
+                "os_version",
+                "device_make",
+                "platform"
+            ]
+        },
+        "Storygize": {
+            "score": 327,
+            "signals": [
+                "AAID",
+                "cookies",
+                "os_build_version",
+                "device_connectivity",
+                "device_model",
+                "app_version",
+                "app_name",
+                "os_version",
+                "platform"
+            ]
+        },
+        "RTB House S.A.": {
+            "score": 321,
+            "signals": [
+                "unique_identifier",
+                "cookies",
+                "os_build_version",
                 "device_model",
                 "device_language",
                 "device_make",
+                "os_version",
+                "app_name",
+                "platform"
+            ]
+        },
+        "Bazaarvoice, Inc.": {
+            "score": 321,
+            "signals": [
+                "AAID",
+                "cookies",
+                "os_build_version",
+                "device_model",
+                "app_version",
+                "device_connectivity",
+                "device_language",
                 "app_name",
                 "os_version",
                 "platform"
             ]
         },
         "YieldMo, Inc.": {
-            "score": 675,
+            "score": 321,
             "signals": [
                 "unique_identifier",
                 "cookies",
                 "os_build_version",
-                "device_language",
                 "device_model",
-                "app_name",
                 "device_make",
                 "os_version",
-                "country",
+                "app_name",
                 "platform"
             ]
         },
-        "Zeotap GmbH": {
-            "score": 1614,
+        "Treasure Data, Inc": {
+            "score": 312,
             "signals": [
                 "AAID",
-                "unique_identifier",
                 "cookies",
                 "os_build_version",
                 "device_model",
-                "device_language",
-                "app_version",
                 "app_name",
-                "device_make",
                 "os_version",
-                "country",
-                "platform"
-            ]
-        },
-        "Zeta Global": {
-            "score": 625,
-            "signals": [
-                "city",
-                "unique_identifier",
-                "cookies",
-                "os_build_version",
-                "device_language",
-                "device_model",
-                "app_version",
                 "device_make",
-                "os_version",
-                "country",
-                "app_name",
                 "platform"
             ]
         }
