@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/tracker-blocklists",
-    "version": "1680299195572",
+    "version": 1680299195572,
     "trackers": {
         "15.taboola.com": {
             "owner": {
