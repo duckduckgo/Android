@@ -17,13 +17,16 @@
 package com.duckduckgo.sync.impl.di
 
 import android.content.Context
-import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.sync.api.SyncEngine
+import com.duckduckgo.sync.api.SyncablePlugin
 import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.crypto.SyncNativeLib
 import com.duckduckgo.sync.impl.AppQREncoder
 import com.duckduckgo.sync.impl.QREncoder
+import com.duckduckgo.sync.impl.engine.RealSyncEngine
 import com.duckduckgo.sync.impl.parser.RealSyncCrypter
 import com.duckduckgo.sync.impl.parser.SyncCrypter
 import com.duckduckgo.sync.store.EncryptedSharedPrefsProvider
@@ -79,5 +82,13 @@ object SyncStoreModule {
     ): QREncoder {
         // create instance of BarcodeEncoder here so we don't need to add third-party dependency to :app module (classpath)
         return AppQREncoder(context, BarcodeEncoder())
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun provideSyncEngine(
+        plugins: PluginPoint<SyncablePlugin>,
+    ): SyncEngine {
+        return RealSyncEngine(plugins)
     }
 }

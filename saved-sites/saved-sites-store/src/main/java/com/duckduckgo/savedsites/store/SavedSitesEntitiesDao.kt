@@ -79,6 +79,9 @@ interface SavedSitesEntitiesDao {
     @Query("update entities set lastModified = :lastModified where entityId = :entityId")
     fun updateModified(entityId: String, lastModified: String = DatabaseDateFormatter.timestamp())
 
+    @Query("select * from entities limit 1")
+    fun lastModified(): Flow<Entity>
+
     @Query("select * from entities where url = :url and entities.deleted = 0 limit 1")
     fun entityByUrl(url: String): Entity?
 

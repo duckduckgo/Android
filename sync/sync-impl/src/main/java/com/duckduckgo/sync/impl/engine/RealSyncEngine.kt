@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.savedsites.impl.sync
+package com.duckduckgo.sync.impl.engine
 
-import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.savedsites.api.SavedSitesRepository
-import com.duckduckgo.sync.api.SyncChanges
-import com.duckduckgo.sync.api.SyncMergeResult
-import com.duckduckgo.sync.api.SyncMerger
-import com.squareup.anvil.annotations.ContributesBinding
+import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.sync.api.SyncEngine
+import com.duckduckgo.sync.api.SyncablePlugin
+import timber.log.Timber
 
-@ContributesBinding(AppScope::class)
-class SavedSitesSyncMerger(val savedSitesRepository: SavedSitesRepository): SyncMerger {
-    override fun merge(changes: SyncChanges): SyncMergeResult<Boolean> {
-        return SyncMergeResult.Success(true)
+class RealSyncEngine(private val plugins: PluginPoint<SyncablePlugin>) : SyncEngine {
+    override fun syncNow() {
+        Timber.d("RealSyncEngine syncNow")
+    }
+
+    override fun notifyDataChanged() {
+        Timber.d("RealSyncEngine notifyDataChanged")
     }
 }

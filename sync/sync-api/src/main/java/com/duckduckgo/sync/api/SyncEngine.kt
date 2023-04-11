@@ -16,10 +16,6 @@
 
 package com.duckduckgo.sync.api
 
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
-import com.duckduckgo.di.scopes.AppScope
-
-@ContributesPluginPoint(AppScope::class)
 interface SyncablePlugin {
 
     /**

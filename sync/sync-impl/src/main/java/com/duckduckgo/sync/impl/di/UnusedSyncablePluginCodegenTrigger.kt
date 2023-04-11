@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.sync
+package com.duckduckgo.sync.impl.di
 
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.api.DeviceSyncState
-import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.*
+import com.duckduckgo.sync.api.SyncablePlugin
 
 /**
- * We need to provide this fake implementation for non internal builds until we can add sync modules dependencies for all flavors.
+ * This is here to trigger the code generations
+ * [SyncablePlugin] lives in the api module but we don't want to add
+ * anvil dependencies
+ * CodeGen should not be generated in public api modules.
  */
-@ContributesBinding(
+@ContributesPluginPoint(
     scope = AppScope::class,
-    // mitigation for https://app.asana.com/0/414730916066338/1204248963638410/f
-    priority = ContributesBinding.Priority.HIGHEST,
+    boundType = SyncablePlugin::class,
 )
-class FakeDeviceSyncState @Inject constructor() : DeviceSyncState {
-    override fun isFeatureEnabled(): Boolean = false
-    override fun isUserSignedInOnDevice(): Boolean = false
-}
+@Suppress("unused")
+private interface UnusedSyncablePluginCodegenTrigger

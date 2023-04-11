@@ -16,16 +16,20 @@
 
 package com.duckduckgo.savedsites.impl.sync
 
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.sync.api.SyncChanges
 import com.duckduckgo.sync.api.SyncCrypto
 import com.duckduckgo.sync.api.SyncParser
+import com.duckduckgo.sync.api.SyncableType.BOOKMARKS
+import com.squareup.anvil.annotations.ContributesBinding
 
+@ContributesBinding(AppScope::class)
 class SavedSitesSyncParser(
     val savedSitesRepository: SavedSitesRepository,
     val syncCrypto: SyncCrypto
 ) : SyncParser {
     override fun parseChanges(since: String): SyncChanges {
-        TODO("Not yet implemented")
+        return SyncChanges(BOOKMARKS, "")
     }
 }
