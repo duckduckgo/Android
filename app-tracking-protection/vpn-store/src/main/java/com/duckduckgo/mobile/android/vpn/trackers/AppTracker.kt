@@ -105,7 +105,6 @@ data class JsonAppBlockingList(
 
 class JsonAppTracker(
     val owner: TrackerOwner,
-    // val app: TrackerApp,
     @field:Json(name = "default")
     val defaultAction: String? = null,
 )
