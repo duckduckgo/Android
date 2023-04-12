@@ -96,13 +96,12 @@ interface Pixel {
         const val DAX_NO_TRACKERS_CTA = "nt"
         const val DAX_FIRE_DIALOG_CTA = "fd"
         const val DAX_AUTOCONSENT_CTA = "autoconsent"
+        const val DAX_APPTP_CTA = "apptp"
 
         const val FIRE_ANIMATION_INFERNO = "fai"
         const val FIRE_ANIMATION_AIRSTREAM = "faas"
         const val FIRE_ANIMATION_WHIRLPOOL = "fawp"
         const val FIRE_ANIMATION_NONE = "fann"
-
-        const val NOTIFY_ME_DOWNLOADS_SCREEN = "downloads"
     }
 
     fun fire(
