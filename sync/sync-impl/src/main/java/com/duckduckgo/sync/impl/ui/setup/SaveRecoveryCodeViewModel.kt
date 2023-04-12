@@ -95,11 +95,7 @@ class SaveRecoveryCodeViewModel @Inject constructor(
     sealed class Command {
         object Finish : Command()
         object Error : Command()
-
-        data class StoreRecoveryCodePDF(
-            val recoveryCodeBitmap: Bitmap,
-            val recoveryCodeB64: String,
-        ) : Command()
+        data class StoreRecoveryCodePDF(val recoveryCodeB64: String) : Command()
     }
 
     fun onNextClicked() {
@@ -109,9 +105,9 @@ class SaveRecoveryCodeViewModel @Inject constructor(
     }
 
     fun onSaveRecoveryCodeClicked() {
-        val viewMode = viewState.value.viewMode as? SignedIn ?: return
         viewModelScope.launch {
-            command.send(StoreRecoveryCodePDF(viewMode.loginQRCode, viewMode.b64RecoveryCode))
+            val recoveryCodeB64 = syncRepository.getRecoveryCode() ?: return@launch
+            command.send(StoreRecoveryCodePDF(recoveryCodeB64))
         }
     }
 }

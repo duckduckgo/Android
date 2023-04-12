@@ -51,6 +51,7 @@ import com.google.android.material.snackbar.Snackbar
 import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(SyncActivityWithEmptyParams::class)
@@ -115,8 +116,10 @@ class SyncActivity : DuckDuckGoActivity() {
 
             is StoreRecoveryCodePDF -> {
                 storagePermission.invokeOrRequestPermission {
-                    val generateRecoveryCodePDF = recoveryCodePDF.generateAndStoreRecoveryCodePDF(this, it.recoveryCodeBitmap, it.recoveryCodeB64)
-                    shareAction.shareFile(this, generateRecoveryCodePDF)
+                    lifecycleScope.launch {
+                        val generateRecoveryCodePDF = recoveryCodePDF.generateAndStoreRecoveryCodePDF(this@SyncActivity, it.recoveryCodeB64)
+                        shareAction.shareFile(this@SyncActivity, generateRecoveryCodePDF)
+                    }
                 }
             }
         }

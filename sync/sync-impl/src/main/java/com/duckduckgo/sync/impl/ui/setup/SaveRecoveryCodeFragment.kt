@@ -46,6 +46,7 @@ import com.google.android.material.snackbar.Snackbar
 import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 @InjectWith(FragmentScope::class)
 class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_code) {
@@ -114,12 +115,10 @@ class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_c
             Finish -> requireActivity().finish()
             is Command.StoreRecoveryCodePDF -> {
                 storagePermission.invokeOrRequestPermission {
-                    val generateRecoveryCodePDF = recoveryCodePDF.generateAndStoreRecoveryCodePDF(
-                        requireContext(),
-                        it.recoveryCodeBitmap,
-                        it.recoveryCodeB64,
-                    )
-                    shareAction.shareFile(requireContext(), generateRecoveryCodePDF)
+                    lifecycleScope.launch {
+                        val generateRecoveryCodePDF = recoveryCodePDF.generateAndStoreRecoveryCodePDF(requireContext(), it.recoveryCodeB64)
+                        shareAction.shareFile(requireContext(), generateRecoveryCodePDF)
+                    }
                 }
             }
         }
