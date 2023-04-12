@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global
+package com.duckduckgo.app.anr
 
+import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
-import com.duckduckgo.app.global.exception.UncaughtExceptionSource
-import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import java.io.InterruptedIOException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
@@ -32,28 +29,22 @@ import org.junit.Test
 import org.mockito.kotlin.*
 
 @ExperimentalCoroutinesApi
-class AlertingUncaughtExceptionHandlerTest {
+class GlobalUncaughtExceptionHandlerTest {
 
-    private lateinit var testee: AlertingUncaughtExceptionHandler
+    private lateinit var testee: GlobalUncaughtExceptionHandler
     private val mockDefaultExceptionHandler: Thread.UncaughtExceptionHandler = mock()
-    private val mockPixelCountDataStore: OfflinePixelCountDataStore = mock()
-    private val mockUncaughtExceptionRepository: UncaughtExceptionRepository = mock()
-    private val mockAppBuildConfig: AppBuildConfig = mock()
+    private val crashLogger: CrashLogger = mock()
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     @Before
     fun setup() {
-        whenever(mockAppBuildConfig.isDebug).thenReturn(true)
-
-        testee = AlertingUncaughtExceptionHandler(
+        testee = GlobalUncaughtExceptionHandler(
             mockDefaultExceptionHandler,
-            mockPixelCountDataStore,
-            mockUncaughtExceptionRepository,
+            crashLogger,
             coroutineTestRule.testDispatcherProvider,
             TestScope(),
-            mockAppBuildConfig,
         )
     }
 
@@ -62,7 +53,8 @@ class AlertingUncaughtExceptionHandlerTest {
         testee.uncaughtException(Thread.currentThread(), NullPointerException("Deliberate"))
         advanceUntilIdle()
 
-        verify(mockUncaughtExceptionRepository).recordUncaughtException(any(), eq(UncaughtExceptionSource.GLOBAL))
+        verify(crashLogger).logCrash(any())
+        verify(mockDefaultExceptionHandler).uncaughtException(any(), any())
     }
 
     @Test
@@ -71,31 +63,27 @@ class AlertingUncaughtExceptionHandlerTest {
         testee.uncaughtException(Thread.currentThread(), exception)
         advanceUntilIdle()
 
+        verify(crashLogger).logCrash(any())
         verify(mockDefaultExceptionHandler).uncaughtException(any(), eq(exception))
     }
 
     @Test
     fun whenExceptionIsInterruptedIoExceptionThenCrashNotRecorded() = runTest {
-        testee.uncaughtException(Thread.currentThread(), InterruptedIOException("Deliberate"))
-        advanceUntilIdle()
-
-        verify(mockUncaughtExceptionRepository, never()).recordUncaughtException(any(), any())
-    }
-
-    @Test
-    fun whenExceptionIsInterruptedExceptionThenCrashNotRecorded() = runTest {
-        testee.uncaughtException(Thread.currentThread(), InterruptedException("Deliberate"))
-        advanceUntilIdle()
-
-        verify(mockUncaughtExceptionRepository, never()).recordUncaughtException(any(), any())
-    }
-
-    @Test
-    fun whenExceptionIsNotRecordedButInDebugModeThenDefaultExceptionHandlerCalled() = runTest {
         val exception = InterruptedIOException("Deliberate")
         testee.uncaughtException(Thread.currentThread(), exception)
         advanceUntilIdle()
 
-        verify(mockDefaultExceptionHandler).uncaughtException(any(), eq(exception))
+        verify(crashLogger, never()).logCrash(any())
+        verify(mockDefaultExceptionHandler, never()).uncaughtException(any(), eq(exception))
+    }
+
+    @Test
+    fun whenExceptionIsInterruptedExceptionThenCrashNotRecorded() = runTest {
+        val exception = InterruptedException("Deliberate")
+        testee.uncaughtException(Thread.currentThread(), exception)
+        advanceUntilIdle()
+
+        verify(crashLogger, never()).logCrash(any())
+        verify(mockDefaultExceptionHandler, never()).uncaughtException(any(), eq(exception))
     }
 }

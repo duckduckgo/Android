@@ -18,12 +18,11 @@ package com.duckduckgo.cookies.impl.features.firstparty
 
 import android.database.sqlite.SQLiteDatabase
 import androidx.core.net.toUri
+import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.fire.DatabaseLocator
 import com.duckduckgo.app.fire.FireproofRepository
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
-import com.duckduckgo.app.statistics.pixels.ExceptionPixel
-import com.duckduckgo.cookies.impl.CookiesPixelName
 import com.duckduckgo.cookies.impl.SQLCookieRemover
 import com.duckduckgo.cookies.impl.WebViewCookieManager.Companion.DDG_COOKIE_DOMAINS
 import com.duckduckgo.cookies.store.CookiesRepository
@@ -45,7 +44,7 @@ class RealFirstPartyCookiesModifier @Inject constructor(
     private val unprotectedTemporary: UnprotectedTemporary,
     private val userAllowListRepository: UserAllowListRepository,
     @Named("webViewDbLocator") private val webViewDatabaseLocator: DatabaseLocator,
-    private val exceptionPixel: ExceptionPixel,
+    private val crashLogger: CrashLogger,
     private val fireproofRepository: FireproofRepository,
     private val dispatcherProvider: DispatcherProvider,
 ) : FirstPartyCookiesModifier {
@@ -112,7 +111,7 @@ class RealFirstPartyCookiesModifier @Inject constructor(
                 updateExecuted = true
             } catch (exception: Exception) {
                 Timber.e(exception)
-                exceptionPixel.sendExceptionPixel(CookiesPixelName.COOKIE_DATABASE_EXCEPTION_EXPIRE_ERROR, exception)
+                crashLogger.logCrash(CrashLogger.Crash(shortName = "m_cookie_db_expire_error", t = exception))
             } finally {
                 close()
             }
@@ -129,7 +128,7 @@ class RealFirstPartyCookiesModifier @Inject constructor(
     }
 
     companion object {
-        const val TIME_1601_IN_MICRO = 11644473600000
-        const val MULTIPLIER = 1000
+        private const val TIME_1601_IN_MICRO = 11644473600000
+        private const val MULTIPLIER = 1000
     }
 }

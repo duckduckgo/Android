@@ -25,8 +25,6 @@ import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
-import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.privacy.config.api.Drm
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
@@ -36,7 +34,6 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class BrowserChromeClient @Inject constructor(
-    private val uncaughtExceptionRepository: UncaughtExceptionRepository,
     private val drm: Drm,
     private val appBuildConfig: AppBuildConfig,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
@@ -52,55 +49,34 @@ class BrowserChromeClient @Inject constructor(
         view: View,
         callback: CustomViewCallback?,
     ) {
-        try {
-            Timber.d("on show custom view")
-            if (customView != null) {
-                callback?.onCustomViewHidden()
-                return
-            }
-
-            customView = view
-            webViewClientListener?.goFullScreen(view)
-        } catch (e: Throwable) {
-            appCoroutineScope.launch(coroutineDispatcher.default()) {
-                uncaughtExceptionRepository.recordUncaughtException(e, SHOW_CUSTOM_VIEW)
-                throw e
-            }
+        Timber.d("on show custom view")
+        if (customView != null) {
+            callback?.onCustomViewHidden()
+            return
         }
+
+        customView = view
+        webViewClientListener?.goFullScreen(view)
     }
 
     override fun onHideCustomView() {
-        try {
-            Timber.d("on hide custom view")
-            webViewClientListener?.exitFullScreen()
-            customView = null
-        } catch (e: Throwable) {
-            appCoroutineScope.launch(coroutineDispatcher.default()) {
-                uncaughtExceptionRepository.recordUncaughtException(e, HIDE_CUSTOM_VIEW)
-                throw e
-            }
-        }
+        Timber.d("on hide custom view")
+        webViewClientListener?.exitFullScreen()
+        customView = null
     }
 
     override fun onProgressChanged(
         webView: WebView,
         newProgress: Int,
     ) {
-        try {
-            // We want to use webView.progress rather than newProgress because the former gives you the overall progress of the new site
-            // and the latter gives you the progress of the current main request being loaded and one site could have several redirects.
-            Timber.d("onProgressChanged ${webView.url}, ${webView.progress}")
-            if (webView.progress == 0) return
-            val navigationList = webView.safeCopyBackForwardList() ?: return
-            webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList, webView.progress))
-            webViewClientListener?.progressChanged(webView.progress)
-            webViewClientListener?.onCertificateReceived(webView.certificate)
-        } catch (e: Throwable) {
-            appCoroutineScope.launch(coroutineDispatcher.default()) {
-                uncaughtExceptionRepository.recordUncaughtException(e, ON_PROGRESS_CHANGED)
-                throw e
-            }
-        }
+        // We want to use webView.progress rather than newProgress because the former gives you the overall progress of the new site
+        // and the latter gives you the progress of the current main request being loaded and one site could have several redirects.
+        Timber.d("onProgressChanged ${webView.url}, ${webView.progress}")
+        if (webView.progress == 0) return
+        val navigationList = webView.safeCopyBackForwardList() ?: return
+        webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList, webView.progress))
+        webViewClientListener?.progressChanged(webView.progress)
+        webViewClientListener?.onCertificateReceived(webView.certificate)
     }
 
     override fun onReceivedIcon(
@@ -129,14 +105,7 @@ class BrowserChromeClient @Inject constructor(
         view: WebView,
         title: String,
     ) {
-        try {
-            webViewClientListener?.titleReceived(title)
-        } catch (e: Throwable) {
-            appCoroutineScope.launch(coroutineDispatcher.default()) {
-                uncaughtExceptionRepository.recordUncaughtException(e, RECEIVED_PAGE_TITLE)
-                throw e
-            }
-        }
+        webViewClientListener?.titleReceived(title)
     }
 
     override fun onShowFileChooser(
@@ -150,13 +119,7 @@ class BrowserChromeClient @Inject constructor(
         } catch (e: Throwable) {
             // cancel the request using the documented way
             filePathCallback.onReceiveValue(null)
-
-            appCoroutineScope.launch(coroutineDispatcher.default()) {
-                uncaughtExceptionRepository.recordUncaughtException(e, SHOW_FILE_CHOOSER)
-                throw e
-            }
-
-            true
+            throw e
         }
     }
 

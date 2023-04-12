@@ -20,8 +20,6 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import androidx.webkit.ServiceWorkerClientCompat
 import com.duckduckgo.app.browser.RequestInterceptor
-import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
-import com.duckduckgo.app.global.exception.UncaughtExceptionSource
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -33,24 +31,18 @@ import timber.log.Timber
 @SingleInstanceIn(AppScope::class)
 class BrowserServiceWorkerClient @Inject constructor(
     private val requestInterceptor: RequestInterceptor,
-    private val uncaughtExceptionRepository: UncaughtExceptionRepository,
 ) : ServiceWorkerClientCompat() {
 
     override fun shouldInterceptRequest(request: WebResourceRequest): WebResourceResponse? {
         return runBlocking {
-            try {
-                val documentUrl: String? = request.requestHeaders[HEADER_ORIGIN] ?: request.requestHeaders[HEADER_REFERER]
-                Timber.v("Intercepting Service Worker resource ${request.url} type:${request.method} on page $documentUrl")
-                requestInterceptor.shouldInterceptFromServiceWorker(request, documentUrl)
-            } catch (e: Throwable) {
-                uncaughtExceptionRepository.recordUncaughtException(e, UncaughtExceptionSource.SHOULD_INTERCEPT_REQUEST_FROM_SERVICE_WORKER)
-                throw e
-            }
+            val documentUrl: String? = request.requestHeaders[HEADER_ORIGIN] ?: request.requestHeaders[HEADER_REFERER]
+            Timber.v("Intercepting Service Worker resource ${request.url} type:${request.method} on page $documentUrl")
+            requestInterceptor.shouldInterceptFromServiceWorker(request, documentUrl)
         }
     }
 
     companion object {
-        const val HEADER_ORIGIN = "Origin"
-        const val HEADER_REFERER = "Referer"
+        private const val HEADER_ORIGIN = "Origin"
+        private const val HEADER_REFERER = "Referer"
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,25 +14,32 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global
+package com.duckduckgo.app.anr
 
-import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
-import com.duckduckgo.app.global.exception.UncaughtExceptionSource
-import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.anrs.api.CrashLogger
+import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Module
+import dagger.Provides
 import java.io.InterruptedIOException
+import javax.inject.Inject
+import javax.inject.Qualifier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority
+import logcat.asLog
+import logcat.logcat
 
-class AlertingUncaughtExceptionHandler(
-    private val originalHandler: Thread.UncaughtExceptionHandler,
-    private val offlinePixelCountDataStore: OfflinePixelCountDataStore,
-    private val uncaughtExceptionRepository: UncaughtExceptionRepository,
+@ContributesBinding(AppScope::class)
+class GlobalUncaughtExceptionHandler @Inject constructor(
+    @InternalApi private val originalHandler: Thread.UncaughtExceptionHandler,
+    private val crashLogger: CrashLogger,
     private val dispatcherProvider: DispatcherProvider,
     private val appCoroutineScope: CoroutineScope,
-    private val appBuildConfig: AppBuildConfig,
 ) : Thread.UncaughtExceptionHandler {
 
     override fun uncaughtException(
@@ -42,10 +49,6 @@ class AlertingUncaughtExceptionHandler(
         if (shouldRecordExceptionAndCrashApp(originalException)) {
             recordExceptionAndAllowCrash(thread, originalException)
             return
-        }
-
-        if (shouldCrashApp()) {
-            originalHandler.uncaughtException(thread, originalException)
         }
     }
 
@@ -62,24 +65,37 @@ class AlertingUncaughtExceptionHandler(
         }
     }
 
-    /**
-     * If the exception is one we don't report on, we still want to see a crash when we're in DEBUG builds for safety we aren't ignoring important issues
-     */
-    private fun shouldCrashApp(): Boolean = appBuildConfig.isDebug
-
     private fun recordExceptionAndAllowCrash(
         thread: Thread?,
         originalException: Throwable?,
     ) {
         appCoroutineScope.launch(dispatcherProvider.io() + NonCancellable) {
             try {
-                uncaughtExceptionRepository.recordUncaughtException(originalException, UncaughtExceptionSource.GLOBAL)
-                offlinePixelCountDataStore.applicationCrashCount += 1
+                originalException?.let {
+                    crashLogger.logCrash(
+                        CrashLogger.Crash(
+                            shortName = Pixel.StatisticsPixelName.APPLICATION_CRASH_GLOBAL.pixelName,
+                            t = it,
+                        ),
+                    )
+                }
             } catch (e: Throwable) {
-                Timber.e(e, "Failed to record exception")
+                logcat(LogPriority.ERROR) { e.asLog() }
             } finally {
                 originalHandler.uncaughtException(thread, originalException)
             }
         }
     }
+}
+
+@Retention(AnnotationRetention.BINARY)
+@Qualifier
+private annotation class InternalApi
+
+@Module
+@ContributesTo(AppScope::class)
+object UncaughtExceptionHandlerModule {
+    @Provides
+    @InternalApi
+    fun provideDefaultUncaughtExceptionHandler(): Thread.UncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler()
 }

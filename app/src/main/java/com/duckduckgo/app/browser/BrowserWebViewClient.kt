@@ -38,9 +38,6 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
-import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
-import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.InternalTestUserChecker
@@ -48,17 +45,16 @@ import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.privacy.config.api.AmpLinks
 import java.net.URI
+import javax.inject.Inject
 import kotlinx.coroutines.*
 import timber.log.Timber
 
-class BrowserWebViewClient(
+class BrowserWebViewClient @Inject constructor(
     private val webViewHttpAuthStore: WebViewHttpAuthStore,
     private val trustedCertificateStore: TrustedCertificateStore,
     private val requestRewriter: RequestRewriter,
     private val specialUrlDetector: SpecialUrlDetector,
     private val requestInterceptor: RequestInterceptor,
-    private val offlinePixelCountDataStore: OfflinePixelCountDataStore,
-    private val uncaughtExceptionRepository: UncaughtExceptionRepository,
     private val cookieManagerProvider: CookieManagerProvider,
     private val loginDetector: DOMLoginDetector,
     private val dosDetector: DosDetector,
@@ -217,10 +213,7 @@ class BrowserWebViewClient(
                 }
             }
         } catch (e: Throwable) {
-            appCoroutineScope.launch(dispatcherProvider.default()) {
-                uncaughtExceptionRepository.recordUncaughtException(e, SHOULD_OVERRIDE_REQUEST)
-                throw e
-            }
+            Timber.e(e.localizedMessage)
             return false
         }
     }
@@ -245,32 +238,25 @@ class BrowserWebViewClient(
         url: String?,
         favicon: Bitmap?,
     ) {
-        try {
-            Timber.v("onPageStarted webViewUrl: ${webView.url} URL: $url")
+        Timber.v("onPageStarted webViewUrl: ${webView.url} URL: $url")
 
-            url?.let {
-                autoconsent.injectAutoconsent(webView, url)
-                adClickManager.detectAdDomain(url)
-                requestInterceptor.onPageStarted(url)
-                appCoroutineScope.launch(dispatcherProvider.default()) {
-                    thirdPartyCookieManager.processUriForThirdPartyCookies(webView, url.toUri())
-                }
-            }
-            val navigationList = webView.safeCopyBackForwardList() ?: return
-            webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
-            if (url != null && url == lastPageStarted) {
-                webViewClientListener?.pageRefreshed(url)
-            }
-            lastPageStarted = url
-            browserAutofillConfigurator.configureAutofillForCurrentPage(webView, url)
-            webView.evaluateJavascript("javascript:${contentScopeScripts.getScript()}", null)
-            loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
-        } catch (e: Throwable) {
+        url?.let {
+            autoconsent.injectAutoconsent(webView, url)
+            adClickManager.detectAdDomain(url)
+            requestInterceptor.onPageStarted(url)
             appCoroutineScope.launch(dispatcherProvider.default()) {
-                uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_STARTED)
-                throw e
+                thirdPartyCookieManager.processUriForThirdPartyCookies(webView, url.toUri())
             }
         }
+        val navigationList = webView.safeCopyBackForwardList() ?: return
+        webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
+        if (url != null && url == lastPageStarted) {
+            webViewClientListener?.pageRefreshed(url)
+        }
+        lastPageStarted = url
+        browserAutofillConfigurator.configureAutofillForCurrentPage(webView, url)
+        webView.evaluateJavascript("javascript:${contentScopeScripts.getScript()}", null)
+        loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
     }
 
     @UiThread
@@ -278,26 +264,19 @@ class BrowserWebViewClient(
         webView: WebView,
         url: String?,
     ) {
-        try {
-            accessibilityManager.onPageFinished(webView, url)
-            url?.let {
-                // We call this for any url but it will only be processed for an internal tester verification url
-                internalTestUserChecker.verifyVerificationCompleted(it)
-            }
-            Timber.v("onPageFinished webViewUrl: ${webView.url} URL: $url")
-            val navigationList = webView.safeCopyBackForwardList() ?: return
-            webViewClientListener?.run {
-                navigationStateChanged(WebViewNavigationState(navigationList))
-                url?.let { prefetchFavicon(url) }
-            }
-            flushCookies()
-            printInjector.injectPrint(webView)
-        } catch (e: Throwable) {
-            appCoroutineScope.launch(dispatcherProvider.default()) {
-                uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_FINISHED)
-                throw e
-            }
+        accessibilityManager.onPageFinished(webView, url)
+        url?.let {
+            // We call this for any url but it will only be processed for an internal tester verification url
+            internalTestUserChecker.verifyVerificationCompleted(it)
         }
+        Timber.v("onPageFinished webViewUrl: ${webView.url} URL: $url")
+        val navigationList = webView.safeCopyBackForwardList() ?: return
+        webViewClientListener?.run {
+            navigationStateChanged(WebViewNavigationState(navigationList))
+            url?.let { prefetchFavicon(url) }
+        }
+        flushCookies()
+        printInjector.injectPrint(webView)
     }
 
     private fun flushCookies() {
@@ -312,17 +291,12 @@ class BrowserWebViewClient(
         request: WebResourceRequest,
     ): WebResourceResponse? {
         return runBlocking {
-            try {
-                val documentUrl = withContext(dispatcherProvider.main()) { webView.url }
-                withContext(dispatcherProvider.main()) {
-                    loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
-                }
-                Timber.v("Intercepting resource ${request.url} type:${request.method} on page $documentUrl")
-                requestInterceptor.shouldIntercept(request, webView, documentUrl, webViewClientListener)
-            } catch (e: Throwable) {
-                uncaughtExceptionRepository.recordUncaughtException(e, SHOULD_INTERCEPT_REQUEST)
-                throw e
+            val documentUrl = withContext(dispatcherProvider.main()) { webView.url }
+            withContext(dispatcherProvider.main()) {
+                loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
             }
+            Timber.v("Intercepting resource ${request.url} type:${request.method} on page $documentUrl")
+            requestInterceptor.shouldIntercept(request, webView, documentUrl, webViewClientListener)
         }
     }
 
@@ -332,12 +306,6 @@ class BrowserWebViewClient(
         detail: RenderProcessGoneDetail?,
     ): Boolean {
         Timber.w("onRenderProcessGone. Did it crash? ${detail?.didCrash()}")
-        if (detail?.didCrash() == true) {
-            offlinePixelCountDataStore.webRendererGoneCrashCount += 1
-        } else {
-            offlinePixelCountDataStore.webRendererGoneKilledCount += 1
-        }
-
         webViewClientListener?.recoverFromRenderProcessGone()
         return true
     }
@@ -349,31 +317,24 @@ class BrowserWebViewClient(
         host: String?,
         realm: String?,
     ) {
-        try {
-            Timber.v("onReceivedHttpAuthRequest ${view?.url} $realm, $host")
-            if (handler != null) {
-                Timber.v("onReceivedHttpAuthRequest - useHttpAuthUsernamePassword [${handler.useHttpAuthUsernamePassword()}]")
-                if (handler.useHttpAuthUsernamePassword()) {
-                    val credentials = view?.let {
-                        webViewHttpAuthStore.getHttpAuthUsernamePassword(it, host.orEmpty(), realm.orEmpty())
-                    }
+        Timber.v("onReceivedHttpAuthRequest ${view?.url} $realm, $host")
+        if (handler != null) {
+            Timber.v("onReceivedHttpAuthRequest - useHttpAuthUsernamePassword [${handler.useHttpAuthUsernamePassword()}]")
+            if (handler.useHttpAuthUsernamePassword()) {
+                val credentials = view?.let {
+                    webViewHttpAuthStore.getHttpAuthUsernamePassword(it, host.orEmpty(), realm.orEmpty())
+                }
 
-                    if (credentials != null) {
-                        handler.proceed(credentials.username, credentials.password)
-                    } else {
-                        requestAuthentication(view, handler, host, realm)
-                    }
+                if (credentials != null) {
+                    handler.proceed(credentials.username, credentials.password)
                 } else {
                     requestAuthentication(view, handler, host, realm)
                 }
             } else {
-                super.onReceivedHttpAuthRequest(view, handler, host, realm)
+                requestAuthentication(view, handler, host, realm)
             }
-        } catch (e: Throwable) {
-            appCoroutineScope.launch(dispatcherProvider.default()) {
-                uncaughtExceptionRepository.recordUncaughtException(e, ON_HTTP_AUTH_REQUEST)
-                throw e
-            }
+        } else {
+            super.onReceivedHttpAuthRequest(view, handler, host, realm)
         }
     }
 

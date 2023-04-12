@@ -39,9 +39,6 @@ import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.print.PrintInjector
-import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
-import com.duckduckgo.app.global.exception.UncaughtExceptionSource
-import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.InternalTestUserChecker
@@ -82,8 +79,6 @@ class BrowserWebViewClientTest {
     private val cookieManagerProvider: CookieManagerProvider = mock()
     private val cookieManager: CookieManager = mock()
     private val loginDetector: DOMLoginDetector = mock()
-    private val offlinePixelCountDataStore: OfflinePixelCountDataStore = mock()
-    private val uncaughtExceptionRepository: UncaughtExceptionRepository = mock()
     private val dosDetector: DosDetector = DosDetector()
     private val accessibilitySettings: AccessibilityManager = mock()
     private val trustedCertificateStore: TrustedCertificateStore = mock()
@@ -108,8 +103,6 @@ class BrowserWebViewClientTest {
             requestRewriter,
             specialUrlDetector,
             requestInterceptor,
-            offlinePixelCountDataStore,
-            uncaughtExceptionRepository,
             cookieManagerProvider,
             loginDetector,
             dosDetector,
@@ -206,39 +199,10 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnReceivedHttpAuthRequestThrowsExceptionThenRecordException() = runTest {
-        val exception = RuntimeException()
-        val mockHandler = mock<HttpAuthHandler>()
-        val mockWebView = mock<WebView>()
-        whenever(mockWebView.url).thenThrow(exception)
-        testee.onReceivedHttpAuthRequest(mockWebView, mockHandler, EXAMPLE_URL, EXAMPLE_URL)
-        verify(uncaughtExceptionRepository).recordUncaughtException(exception, UncaughtExceptionSource.ON_HTTP_AUTH_REQUEST)
-    }
-
-    @UiThreadTest
-    @Test
     fun whenShouldInterceptRequestThenEventSentToLoginDetector() = runTest {
         val webResourceRequest = mock<WebResourceRequest>()
         testee.shouldInterceptRequest(webView, webResourceRequest)
         verify(loginDetector).onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, webResourceRequest))
-    }
-
-    @Test
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-    fun whenRenderProcessGoneDueToCrashThenCrashDataStoreEntryIsIncremented() {
-        val detail: RenderProcessGoneDetail = mock()
-        whenever(detail.didCrash()).thenReturn(true)
-        testee.onRenderProcessGone(webView, detail)
-        verify(offlinePixelCountDataStore, times(1)).webRendererGoneCrashCount = 1
-    }
-
-    @Test
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-    fun whenRenderProcessGoneDueToNonCrashThenOtherDataStoreEntryIsIncremented() {
-        val detail: RenderProcessGoneDetail = mock()
-        whenever(detail.didCrash()).thenReturn(false)
-        testee.onRenderProcessGone(webView, detail)
-        verify(offlinePixelCountDataStore, times(1)).webRendererGoneKilledCount = 1
     }
 
     @Test
@@ -273,16 +237,6 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnPageFinishedThrowsExceptionThenRecordException() = runTest {
-        val exception = RuntimeException()
-        val mockWebView: WebView = mock()
-        whenever(mockWebView.url).thenThrow(exception)
-        testee.onPageFinished(mockWebView, null)
-        verify(uncaughtExceptionRepository).recordUncaughtException(exception, UncaughtExceptionSource.ON_PAGE_FINISHED)
-    }
-
-    @UiThreadTest
-    @Test
     fun whenOnPageFinishedThenNotifyAccessibilityManager() {
         testee.onPageFinished(webView, "http://example.com")
 
@@ -294,23 +248,6 @@ class BrowserWebViewClientTest {
     fun whenOnPageStartedCalledThenInjectEmailAutofillJsCalled() {
         testee.onPageStarted(webView, null, null)
         verify(browserAutofillConfigurator).configureAutofillForCurrentPage(webView, null)
-    }
-
-    @Test
-    fun whenOnPageStartedThrowsExceptionThenRecordException() = runTest {
-        val exception = RuntimeException()
-        val mockWebView: WebView = mock()
-        whenever(mockWebView.url).thenThrow(exception)
-        testee.onPageStarted(mockWebView, null, null)
-        verify(uncaughtExceptionRepository).recordUncaughtException(exception, UncaughtExceptionSource.ON_PAGE_STARTED)
-    }
-
-    @Test
-    fun whenShouldOverrideThrowsExceptionThenRecordException() = runTest {
-        val exception = RuntimeException()
-        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenThrow(exception)
-        testee.shouldOverrideUrlLoading(webView, "")
-        verify(uncaughtExceptionRepository).recordUncaughtException(exception, UncaughtExceptionSource.SHOULD_OVERRIDE_REQUEST)
     }
 
     @Test
@@ -593,9 +530,11 @@ class BrowserWebViewClientTest {
 
     @Test
     fun whenOnPageFinishedThenCallVerifyVerificationCompleted() {
-        testee.onPageFinished(webView, EXAMPLE_URL)
-
-        verify(internalTestUserChecker).verifyVerificationCompleted(EXAMPLE_URL)
+        // run on the webview thread
+        webView.post {
+            testee.onPageFinished(webView, EXAMPLE_URL)
+            verify(internalTestUserChecker).verifyVerificationCompleted(EXAMPLE_URL)
+        }
     }
 
     @Test
