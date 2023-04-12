@@ -25,6 +25,7 @@
     position: absolute;
     width: 300px;
     max-width: calc(100vw - 25px);
+    transform: translate(-1000px, -1000px);
     z-index: 2147483647;
 }
 .tooltip--data, #topAutofill {
@@ -69,6 +70,7 @@
 }
 .tooltip--email__caret {
     position: absolute;
+    transform: translate(-1000px, -1000px);
     z-index: 2147483647;
 }
 .tooltip--email__caret::before,
