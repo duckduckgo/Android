@@ -65,8 +65,8 @@ class SyncActivityViewModel @Inject constructor(
         object AskTurnOffSync : Command()
         object AskDeleteAccount : Command()
         data class StoreRecoveryCodePDF(
-            val recoveryCodeB64: Bitmap?,
-            val recoveryCode: String?
+            val recoveryCodeBitmap: Bitmap,
+            val recoveryCodeB64: String
         ) : Command()
     }
 
@@ -152,7 +152,9 @@ class SyncActivityViewModel @Inject constructor(
 
     fun onSaveRecoveryCodeClicked() {
         viewModelScope.launch {
-            command.send(StoreRecoveryCodePDF(viewState.value.loginQRCode, syncRepository.getRecoveryCode()))
+            val recoveryCodeBitmap = viewState.value.loginQRCode ?: return@launch
+            val recoveryCodeB64 = syncRepository.getRecoveryCode() ?: return@launch
+            command.send(StoreRecoveryCodePDF(recoveryCodeBitmap, recoveryCodeB64))
         }
     }
 }

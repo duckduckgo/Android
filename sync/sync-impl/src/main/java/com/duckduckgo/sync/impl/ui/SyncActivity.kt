@@ -31,10 +31,14 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.mobile.android.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
+import com.duckduckgo.sync.impl.PermissionRequest
 import com.duckduckgo.sync.impl.R
+import com.duckduckgo.sync.impl.RecoveryCodePDF
+import com.duckduckgo.sync.impl.ShareAction
 import com.duckduckgo.sync.impl.databinding.ActivitySyncBinding
 import com.duckduckgo.sync.impl.databinding.ViewRecoveryCodeBinding
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
@@ -44,17 +48,27 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSet
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.StoreRecoveryCodePDF
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
+import javax.inject.*
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(SyncActivityWithEmptyParams::class)
 class SyncActivity : DuckDuckGoActivity() {
     private val binding: ActivitySyncBinding by viewBinding()
     private val viewModel: SyncActivityViewModel by bindViewModel()
+
+    @Inject
+    lateinit var storagePermission: PermissionRequest
+
+    @Inject
+    lateinit var recoveryCodePDF: RecoveryCodePDF
+
+    @Inject
+    lateinit var shareAction: ShareAction
 
     private val deviceSyncStatusToggleListener: OnCheckedChangeListener = object : OnCheckedChangeListener {
         override fun onCheckedChanged(
@@ -70,6 +84,13 @@ class SyncActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
         observeUiEvents()
+        registerForPermission()
+    }
+
+    private fun registerForPermission() {
+        storagePermission.registerResultsCallback(this) {
+            binding.root.makeSnackbarWithNoBottomInset(R.string.sync_permission_required_store_recovery_code, Snackbar.LENGTH_LONG).show()
+        }
     }
 
     override fun onStart() {
@@ -78,17 +99,12 @@ class SyncActivity : DuckDuckGoActivity() {
     }
 
     private fun observeUiEvents() {
-        viewModel
-            .viewState()
+        viewModel.viewState()
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { viewState -> renderViewState(viewState) }
             .launchIn(lifecycleScope)
 
-        viewModel
-            .commands()
-            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
-            .onEach { processCommand(it) }
-            .launchIn(lifecycleScope)
+        viewModel.commands().flowWithLifecycle(lifecycle, Lifecycle.State.CREATED).onEach { processCommand(it) }.launchIn(lifecycleScope)
     }
 
     private fun processCommand(it: Command) {
@@ -101,41 +117,11 @@ class SyncActivity : DuckDuckGoActivity() {
             AskDeleteAccount -> askDeleteAccount()
 
             is StoreRecoveryCodePDF -> {
-                layoutAsPdfTest(it)
+                storagePermission.invokeOrRequestPermission {
+                    val generateRecoveryCodePDF = recoveryCodePDF.generateRecoveryCodePDF(this, it.recoveryCodeBitmap, it.recoveryCodeB64)
+                    shareAction.shareFile(this, generateRecoveryCodePDF)
+                }
             }
-        }
-    }
-
-    private fun screenAsPdfTest() {
-        PdfDocument().apply {
-            val page = startPage(Builder(2250, 1400, 1).create())
-            binding.root.draw(page.canvas)
-            finishPage(page)
-            val downloads = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-            val file = File(downloads, "recovery-code.pdf")
-            writeTo(FileOutputStream(file))
-            close()
-        }
-    }
-
-    private fun layoutAsPdfTest(command: StoreRecoveryCodePDF) {
-        PdfDocument().apply {
-            val page = startPage(Builder(1500, 2115, 1).create())
-
-            ViewRecoveryCodeBinding.inflate(layoutInflater, null, false).apply {
-                this.qrCodeImageView.setImageBitmap(command.recoveryCodeB64)
-                this.recoveryCodeText.text = command.recoveryCode
-                val measureWidth: Int = View.MeasureSpec.makeMeasureSpec(page.canvas.width, View.MeasureSpec.EXACTLY)
-                val measuredHeight: Int = View.MeasureSpec.makeMeasureSpec(page.canvas.height, View.MeasureSpec.EXACTLY)
-                this.root.measure(measureWidth, measuredHeight)
-                this.root.layout(0, 0, page.canvas.width, page.canvas.height)
-                this.root.draw(page.canvas)
-            }
-            finishPage(page)
-            val downloads = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-            val file = File(downloads, "recovery-code.pdf")
-            writeTo(FileOutputStream(file))
-            close()
         }
     }
 

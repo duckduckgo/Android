@@ -65,4 +65,6 @@
     <string name="delete_account_dialog_content">All devices will be disconnected and your synced data will be deleted from the server.</string>
     <string name="delete_account_dialog_primary_button">Delete Data</string>
     <string name="delete_account_dialog_secondary_button">Cancel</string>
+    <string name="sync_permission_required_store_recovery_code">Save recovery PDF requires storage permission</string>
+    <string name="sync_share_title">Share with…</string>
 </resources>
