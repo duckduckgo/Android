@@ -16,8 +16,11 @@
 
 package com.duckduckgo.sync.impl.engine
 
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.store.dao.SyncAttemptDao
 import com.duckduckgo.sync.store.model.SyncAttempt
+import com.duckduckgo.sync.store.model.SyncState
+import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -27,6 +30,8 @@ interface SyncStateRepository {
     fun current(): SyncAttempt?
 
     fun all(): Flow<List<SyncAttempt>>
+
+    fun updateSyncState(state: SyncState)
 }
 
 class AppSyncStateRepository @Inject constructor(private val syncAttemptDao: SyncAttemptDao) : SyncStateRepository {
@@ -42,5 +47,10 @@ class AppSyncStateRepository @Inject constructor(private val syncAttemptDao: Syn
         return syncAttemptDao.attempts()
     }
 
+    override fun updateSyncState(state: SyncState) {
+        val last = syncAttemptDao.lastAttempt()!!
+        val updated = last.copy(state = state)
+        syncAttemptDao.insert(updated)
+    }
 }
 

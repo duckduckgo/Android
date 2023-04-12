@@ -73,10 +73,10 @@ interface SyncService {
     fun patch(
         @Header("Authorization") token: String,
         @Body request: SyncDataRequest,
-    ): Call<DataResponse>
+    ): Call<SyncDataResponse>
 
     @GET("https://dev-sync-use.duckduckgo.com/sync/data")
-    fun data(@Header("Authorization") token: String): Call<DataResponse>
+    fun data(@Header("Authorization") token: String): Call<SyncDataResponse>
 }
 
 data class Login(
@@ -164,7 +164,7 @@ data class DeviceDataResponse(
     val entries: List<Device>,
 )
 
-data class DataResponse(
+data class SyncDataResponse(
     val bookmarks: BookmarksResponse,
     val settings: SettingsResponse,
     val devices: DeviceDataResponse,

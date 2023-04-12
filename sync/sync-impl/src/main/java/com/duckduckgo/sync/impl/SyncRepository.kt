@@ -332,9 +332,8 @@ class AppSyncRepository @Inject constructor(
         val allData = syncCrypter.generateAllData()
         val allDataJSON = Adapters.patchAdapter.toJson(allData)
         Timber.d("SYNC: initial patch data generated $allDataJSON")
-        return when (val result = syncApi.sendAllBookmarks(token, allData)) {
-            is Error -> {
-                result.removeKeysIfInvalid()
+        return when (val result = syncApi.patch(token, allData)) {
+            is Result.Error -> {
                 result
             }
 
