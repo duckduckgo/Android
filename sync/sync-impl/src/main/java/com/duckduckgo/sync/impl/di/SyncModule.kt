@@ -17,6 +17,7 @@
 package com.duckduckgo.sync.impl.di
 
 import android.content.Context
+import androidx.room.Room
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.sync.crypto.SyncLib
@@ -27,6 +28,7 @@ import com.duckduckgo.sync.impl.parser.RealSyncCrypter
 import com.duckduckgo.sync.impl.parser.SyncCrypter
 import com.duckduckgo.sync.store.EncryptedSharedPrefsProvider
 import com.duckduckgo.sync.store.SharedPrefsProvider
+import com.duckduckgo.sync.store.SyncDatabase
 import com.duckduckgo.sync.store.SyncSharedPrefsStore
 import com.duckduckgo.sync.store.SyncStore
 import com.journeyapps.barcodescanner.BarcodeEncoder
@@ -78,5 +80,13 @@ object SyncStoreModule {
     ): QREncoder {
         // create instance of BarcodeEncoder here so we don't need to add third-party dependency to :app module (classpath)
         return AppQREncoder(context, BarcodeEncoder())
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun provideSyncDatabase(context: Context): SyncDatabase {
+        return Room.databaseBuilder(context, SyncDatabase::class.java, "sync.db")
+            .fallbackToDestructiveMigration()
+            .build()
     }
 }

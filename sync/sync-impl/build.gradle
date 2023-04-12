@@ -54,6 +54,10 @@ dependencies {
     // Shimmer
     implementation "com.facebook.shimmer:shimmer:_"
 
+    // Room
+    implementation AndroidX.room.runtime
+    implementation AndroidX.room.ktx
+
     // Testing dependencies
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4
