@@ -16,6 +16,8 @@
 
 package com.duckduckgo.sync.api
 
+import com.duckduckgo.sync.api.SyncableType.BOOKMARKS
+
 interface SyncablePlugin {
 
     /**
@@ -79,7 +81,17 @@ interface SyncParser {
 data class SyncChanges(
     val type: SyncableType,
     val updatesJSON: String
-)
+) {
+
+    fun isEmpty(): Boolean {
+        return this.updatesJSON.isEmpty()
+    }
+    companion object {
+        fun empty(): SyncChanges {
+            return SyncChanges(BOOKMARKS, "")
+        }
+    }
+}
 
 enum class SyncableType {
     BOOKMARKS

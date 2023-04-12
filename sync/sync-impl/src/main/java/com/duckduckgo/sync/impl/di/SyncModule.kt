@@ -24,6 +24,8 @@ import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.crypto.SyncNativeLib
 import com.duckduckgo.sync.impl.AppQREncoder
 import com.duckduckgo.sync.impl.QREncoder
+import com.duckduckgo.sync.impl.engine.AppSyncStateRepository
+import com.duckduckgo.sync.impl.engine.SyncStateRepository
 import com.duckduckgo.sync.impl.parser.RealSyncCrypter
 import com.duckduckgo.sync.impl.parser.SyncCrypter
 import com.duckduckgo.sync.store.EncryptedSharedPrefsProvider
@@ -88,5 +90,10 @@ object SyncStoreModule {
         return Room.databaseBuilder(context, SyncDatabase::class.java, "sync.db")
             .fallbackToDestructiveMigration()
             .build()
+    }
+
+    @Provides
+    fun provideSyncStateRepository(syncDatabase: SyncDatabase): SyncStateRepository {
+        return AppSyncStateRepository(syncDatabase.syncAttemptsDao())
     }
 }

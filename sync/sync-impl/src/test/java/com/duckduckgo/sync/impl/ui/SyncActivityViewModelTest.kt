@@ -24,6 +24,7 @@ import com.duckduckgo.sync.TestSyncFixtures.connectedDevice
 import com.duckduckgo.sync.TestSyncFixtures.deviceId
 import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKeyEncoded
 import com.duckduckgo.sync.TestSyncFixtures.qrBitmap
+import com.duckduckgo.sync.api.SyncEngine
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.RecoveryCodePDF
 import com.duckduckgo.sync.impl.Result
@@ -61,11 +62,12 @@ class SyncActivityViewModelTest {
     private val qrEncoder: QREncoder = mock()
     private val recoveryPDF: RecoveryCodePDF = mock()
     private val syncRepository: SyncRepository = mock()
-    lateinit var isSignedInFlow: MutableStateFlow<Boolean>
+    private val syncEngine: SyncEngine = mock()
 
     private val testee = SyncActivityViewModel(
         qrEncoder = qrEncoder,
         syncRepository = syncRepository,
+        syncEngine = syncEngine,
         dispatchers = coroutineTestRule.testDispatcherProvider,
         recoveryCodePDF = recoveryPDF,
     )

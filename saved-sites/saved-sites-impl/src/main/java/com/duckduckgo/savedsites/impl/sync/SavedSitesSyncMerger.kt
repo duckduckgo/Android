@@ -30,13 +30,13 @@ import javax.inject.Inject
 
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncablePlugin::class)
 @ContributesBinding(scope = AppScope::class, boundType = SyncMerger::class)
-class SavedSitesSyncMerger @Inject constructor(val savedSitesRepository: SavedSitesRepository): SyncMerger, SyncablePlugin {
+class SavedSitesSyncMerger @Inject constructor(val savedSitesRepository: SavedSitesRepository) : SyncMerger, SyncablePlugin {
     override fun merge(changes: SyncChanges): SyncMergeResult<Boolean> {
         return SyncMergeResult.Success(true)
     }
 
     override fun getChanges(since: String): SyncChanges {
-        TODO("Not yet implemented")
+        return SyncChanges.empty()
     }
 
     override fun syncChanges(

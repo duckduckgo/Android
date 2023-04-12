@@ -46,6 +46,9 @@ dependencies {
 
     kapt AndroidX.room.compiler
 
+    implementation "com.jakewharton.threetenabp:threetenabp:_"
+    testImplementation "org.threeten:threetenbp:_"
+
     testImplementation Testing.junit4
     testImplementation Testing.robolectric
     testImplementation AndroidX.test.ext.junit
