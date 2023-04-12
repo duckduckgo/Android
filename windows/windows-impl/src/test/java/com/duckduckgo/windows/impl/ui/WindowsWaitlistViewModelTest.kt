@@ -213,6 +213,14 @@ class WindowsWaitlistViewModelTest {
         }
     }
 
+    @Test
+    fun whenOnLaunchedFromNotificationCalledWithPixelNameThePixelFired() {
+        val pixelName = "pixel_name"
+        testee.onLaunchedFromNotification(pixelName)
+
+        verify(mockPixel).fire(pixelName)
+    }
+
     private fun assertWaitlistWorkerIsEnqueued() {
         val scheduledWorkers = getScheduledWorkers()
         assertFalse(scheduledWorkers.isEmpty())

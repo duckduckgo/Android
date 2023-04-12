@@ -509,7 +509,7 @@
     <string name="disableLoginDetectionDialogTitle">Vil du deaktivere brandsikker-påmindelse, når du logger ind på websteder?</string>
     <string name="disableLoginDetectionDialogDescription">Du kan ændre denne præference til enhver tid i Indstillinger.</string>
     <string name="disableLoginDetectionDialogPositive">Deaktiver</string>
-    <string name="disableLoginDetectionDialogNegative">Afbestil</string>
+    <string name="disableLoginDetectionDialogNegative">Annuller</string>
     <string name="automaticFireproofWebsiteLoginDialogTitle">Automatisk brandsikring af websteder ved login?</string>
     <string name="automaticFireproofWebsiteLoginDialogDescription">Brandsikring af dette websted holder dig logget ind efter brug af Brand-knappen. Du kan altid ændre dette senere i Indstillinger. </string>
     <string name="automaticFireproofWebsiteLoginDialogFirstOption">Altid brandsikring af websteder</string>
@@ -585,6 +585,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Blokerer e-mailtrackere og skjuler din adresse</string>
     <string name="newEmailAliasMenuTitle">Generér Duck-adresse</string>
 
+    <!-- Autofill -->
+    <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Se</string>
+    <string name="autofillLoginSavedSnackbarMessage">Login er gemt</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Login er opdateret</string>
+    <string name="autofillDisableAutofillPromptTitle">Vil du fortsat gemme logins?</string>
+    <string name="autofillDisableAutofillPromptMessage">Du kan til enhver tid deaktivere automatisk udfyldning i Indstillinger.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Fortsæt med at gemme</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Deaktiver</string>
+
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Vil du have os til at sende dig en meddelelse, når det er din tur?</string>
     <string name="waitlistNotificationDialogNoThanks">Nej tak.</string>
@@ -602,6 +611,7 @@
     <string name="folderLocationTitle">Vælg placering</string>
     <string name="addFolder">Tilføj mappe</string>
     <string name="editFolder">Rediger mappe</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Vil du slette mappen og dens indhold?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Er du sikker på, at du vil slette "</string>
     <string name="bookmarkFolderEmpty">Tom</string>
 

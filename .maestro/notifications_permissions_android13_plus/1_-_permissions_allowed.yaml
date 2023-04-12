@@ -3,6 +3,7 @@ appId: com.duckduckgo.mobile.android
 - launchApp:
     clearState: true
     stopApp: true
+    permissions: { all: unset }
 - assertVisible:
     text: ".*Allow DuckDuckGo to send you notifications.*"
 - tapOn: "Allow"

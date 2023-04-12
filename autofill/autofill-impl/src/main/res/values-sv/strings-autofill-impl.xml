@@ -17,18 +17,18 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Fyll i inloggningar automatiskt</string>
+    <string name="autofillManagementScreenTitle">Inloggningar</string>
 
     <string name="managementDisabledModeCta"><b>Konfigurera i Inställningar</b></string>
-    <string name="managementDisabledModeSubtitle">För att skydda dina uppgifter för automatisk ifyllning krävs ett enhetslåsmönster, en PIN-kod eller biometri.</string>
-    <string name="managementDisabledModeTitle">Säkra din enhet för att använda automatisk ifyllning</string>
+    <string name="managementDisabledModeSubtitle">För att skydda dina inloggningar krävs ett enhetslåsmönster, en PIN-kod eller biometri.</string>
+    <string name="managementDisabledModeTitle">Säkra din enhet för att spara inloggningar</string>
 
     <string name="saveLoginDialogTitle">Spara inloggning?</string>
     <string name="saveLoginMissingUsernameDialogTitle">Spara lösenord?</string>
     <string name="saveLoginDialogButtonSave">Spara inloggning</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Spara lösenord</string>
     <string name="saveLoginDialogNotNow">Inte nu</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">DuckDuckGo lagrar denna inloggning säkert på din enhet. Du kan hantera sparade inloggningar i Inställningar.</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">Inloggningar lagras säkert, enbart på den här enheten, och kan hanteras genom menyn Inloggningar i inställningarna.</string>
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Vill du att DuckDuckGo ska spara din inloggning?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Fler alternativ</string>
 
@@ -43,6 +43,9 @@
 
     <string name="updateLoginDialogTitleUpdateUsername">Uppdatera användarnamn?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Uppdatera användarnamn</string>
+
+    <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Uppdatera lösenordet för \n%1$s?</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo uppdaterar den här lagrade inloggningen på din enhet.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Stäng dialogrutan för automatisk ifyllning</string>
 
@@ -70,5 +73,12 @@
     <string name="autofillManagementSearchLogins">Sök inloggningar</string>
     <string name="autofillManagementSearchClearDescription">Rensa sökfältet</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Inga resultat för ”%1$s”</string>
+
+    <string name="autofillDeleteLoginDialogCancel">Avbryt</string>
+    <string name="autofillDeleteLoginDialogDelete">Ta bort</string>
+    <string name="autofillDeleteLoginDialogTitle">Är du säker på att du vill radera inloggningen?</string>
+
+    <string name="autofillManagementUsernameCopied">Användarnamn kopierat</string>
+    <string name="autofillManagementPasswordCopied">Lösenord kopierat</string>
 
 </resources>

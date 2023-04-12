@@ -13,72 +13,71 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<androidx.constraintlayout.widget.ConstraintLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/daxCtaContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:clipChildren="false"
-        android:alpha="0">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/daxCtaContainer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:alpha="0"
+    android:clipChildren="false">
 
     <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/logo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/keyline_5"
-            app:srcCompat="@drawable/ic_dax_icon"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"/>
+        android:id="@+id/logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_dax_icon" />
 
     <com.duckduckgo.mobile.android.ui.view.shape.DaxBubbleCardView
-            android:id="@+id/cardView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/keyline_4"
-            app:layout_constraintTop_toBottomOf="@id/logo"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintWidth_max="600dp">
+        android:id="@+id/cardView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/keyline_4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/logo"
+        app:layout_constraintWidth_max="600dp">
 
         <FrameLayout
-                android:id="@+id/cardContainer"
-                style="@style/Widget.DuckDuckGo.DaxDialog.Content"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+            android:id="@+id/cardContainer"
+            style="@style/Widget.DuckDuckGo.DaxDialog.Content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
             <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
-                    android:id="@+id/hiddenTextCta"
-                    app:typography="body1"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="@dimen/keyline_1"
-                    android:visibility="invisible"
-                    tools:visibility="visible"
-                    tools:text="@string/onboardingDaxText"/>
+                android:id="@+id/hiddenTextCta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="@dimen/keyline_1"
+                android:visibility="invisible"
+                app:typography="body1"
+                tools:text="@string/onboardingDaxText"
+                tools:visibility="visible" />
 
             <com.duckduckgo.mobile.android.ui.view.TypeAnimationTextView
-                    android:id="@+id/dialogTextCta"
-                    style="@style/Typography.DuckDuckGo.Body1"
-                    android:textColor="?attr/daxColorPrimaryText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:clickable="true"
-                    android:focusable="true"/>
+                android:id="@+id/dialogTextCta"
+                style="@style/Typography.DuckDuckGo.Body1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
+                android:textColor="?attr/daxColorPrimaryText" />
 
         </FrameLayout>
     </com.duckduckgo.mobile.android.ui.view.shape.DaxBubbleCardView>
 
     <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
-            android:id="@+id/primaryCta"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:buttonSize="large"
-            android:layout_marginTop="@dimen/daxDialogButtonSpacing"
-            android:text="@string/onboardingLetsDoItButton"
-            app:layout_constraintEnd_toEndOf="@id/cardView"
-            app:layout_constraintStart_toStartOf="@id/cardView"
-            app:layout_constraintTop_toBottomOf="@id/cardView"/>
+        android:id="@+id/primaryCta"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/daxDialogButtonSpacing"
+        android:text="@string/onboardingLetsDoItButton"
+        app:buttonSize="large"
+        app:layout_constraintEnd_toEndOf="@id/cardView"
+        app:layout_constraintStart_toStartOf="@id/cardView"
+        app:layout_constraintTop_toBottomOf="@id/cardView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

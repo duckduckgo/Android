@@ -509,8 +509,8 @@
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Never</string>
     <string name="disableLoginDetectionDialogTitle">Disable Fireproof reminder when signing in to sites?</string>
     <string name="disableLoginDetectionDialogDescription">You can change this preference anytime in Settings.</string>
-    <string name="disableLoginDetectionDialogPositive">DISABLE</string>
-    <string name="disableLoginDetectionDialogNegative">CANCEL</string>
+    <string name="disableLoginDetectionDialogPositive">Disable</string>
+    <string name="disableLoginDetectionDialogNegative">Cancel</string>
     <string name="automaticFireproofWebsiteLoginDialogTitle">Fireproof websites automatically on sign-in?</string>
     <string name="automaticFireproofWebsiteLoginDialogDescription">Fireproofing sites will keep you signed in after using the Fire Button. You can always change this later in Settings. </string>
     <string name="automaticFireproofWebsiteLoginDialogFirstOption">Always Fireproof</string>
@@ -586,6 +586,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Blocks email trackers and hides your address</string>
     <string name="newEmailAliasMenuTitle">Generate Duck Address</string>
 
+    <!-- Autofill -->
+    <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">View</string>
+    <string name="autofillLoginSavedSnackbarMessage">Login saved</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Login updated</string>
+    <string name="autofillDisableAutofillPromptTitle">Do you want to keep saving Logins?</string>
+    <string name="autofillDisableAutofillPromptMessage">You can disable this at any time in Settings.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Keep Saving</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Disable</string>
+
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Would you like us to send you a notification when it\'s your turn?</string>
     <string name="waitlistNotificationDialogNoThanks">No Thanks</string>
@@ -603,6 +612,7 @@
     <string name="folderLocationTitle">Select Location</string>
     <string name="addFolder">Add Folder</string>
     <string name="editFolder">Edit Folder</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Delete folder and its contents?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Are you sure you want to delete "</string>
     <string name="bookmarkFolderEmpty">Empty</string>
 

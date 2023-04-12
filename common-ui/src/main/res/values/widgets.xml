@@ -200,7 +200,6 @@
         <item name="android:minHeight">@dimen/twoLineItemHeight</item>
     </style>
 
-
     <!-- SearchBarView -->
     <style name="Widget.DuckDuckGo.SearchBarView">
         <item name="android:background">@drawable/omnibar_field_background</item>

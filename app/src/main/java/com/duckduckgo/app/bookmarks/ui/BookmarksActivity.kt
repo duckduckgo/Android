@@ -367,10 +367,11 @@ class BookmarksActivity : DuckDuckGoActivity() {
 
     private fun deleteBookmarkFolder(bookmarkFolder: BookmarkFolder) {
         TextAlertDialogBuilder(this)
-            .setTitle(R.string.delete)
+            .setTitle(R.string.bookmarkFolderDeleteDialogTitle)
             .setMessage(getMessageString(bookmarkFolder))
-            .setPositiveButton(R.string.yes)
-            .setNegativeButton(R.string.no)
+            .setDestructiveButtons(true)
+            .setPositiveButton(R.string.delete)
+            .setNegativeButton(R.string.cancel)
             .addEventListener(
                 object : EventListener() {
                     override fun onPositiveButtonClicked() {
@@ -381,7 +382,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
             .show()
     }
 
-    fun getMessageString(bookmarkFolder: BookmarkFolder): SpannableString {
+    private fun getMessageString(bookmarkFolder: BookmarkFolder): SpannableString {
         val totalItems = bookmarkFolder.numBookmarks + bookmarkFolder.numFolders
         val message = getString(R.string.bookmarkFolderDeleteDialogMessage)
         val string = SpannableString(

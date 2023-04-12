@@ -97,7 +97,8 @@
                     "reason": "site breakage"
                 }
             ],
-            "state": "enabled"
+            "state": "enabled",
+            "hash": "0"
         },
         "clickToPlay": {
             "exceptions": [],

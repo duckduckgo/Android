@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2023 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -17,5 +17,7 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="biometric_prompt_title">Automatisk udfyldning låst</string>
+    <string name="biometric_prompt_title">Logins låst</string>
+    <string name="autofill_auth_text_for_using">Lås enheden op for at bruge dine gemte logins.</string>
+    <string name="autofill_auth_text_for_access">Lås enheden op for at få adgang til gemte logins.</string>
 </resources>

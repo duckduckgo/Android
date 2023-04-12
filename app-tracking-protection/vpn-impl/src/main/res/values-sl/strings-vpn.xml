@@ -377,7 +377,7 @@
     <string name="atp_ManageRecentAppsProtectionEmpty">Aplikacije z nedavno blokiranimi poskusi sledenja bodo prikazane tukaj</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
-    <string name="atp_RemoveFeatureDialogTitle">Onemogočiti in izbrisati podatke?</string>
+    <string name="atp_RemoveFeatureDialogTitle">Želite onemogočiti in izbrisati podatke?</string>
     <string name="atp_RemoveFeatureDialogMessage">Zaščita sledenja aplikacij bo onemogočena, vse nastavitve in zgodovina poskusov sledenja pa bodo izbrisane. Ponovno ga lahko kadar koli omogočite v nastavitvah.</string>
     <string name="atp_RemoveFeatureDialogCancel">Preklic</string>
     <string name="atp_RemoveFeatureDialogRemove">Onemogoči</string>

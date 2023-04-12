@@ -361,7 +361,7 @@
     <string name="atp_ManageRecentAppsProtectionEmpty">Yakın zamanda izleme girişimleri engellenen uygulamalar burada gösterilir</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
-    <string name="atp_RemoveFeatureDialogTitle">Veriler Devre Dışı Bırakılsın ve Silinsin mi?</string>
+    <string name="atp_RemoveFeatureDialogTitle">Veriler devre dışı bırakılsın ve silinsin mi?</string>
     <string name="atp_RemoveFeatureDialogMessage">Uygulama İzleme Koruması devre dışı bırakılacak ve tüm ayarlar ve izleme girişimlerinin geçmişi silinecektir. Ayarlar\'da istediğiniz zaman tekrar etkinleştirebilirsiniz.</string>
     <string name="atp_RemoveFeatureDialogCancel">İptal</string>
     <string name="atp_RemoveFeatureDialogRemove">Devre dışı bırak</string>

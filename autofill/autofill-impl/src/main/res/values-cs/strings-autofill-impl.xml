@@ -17,18 +17,18 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Automatické vyplňování přihlašovacích údajů</string>
+    <string name="autofillManagementScreenTitle">Přihlášení</string>
 
     <string name="managementDisabledModeCta"><b>Nastavit v Nastaveních</b></string>
-    <string name="managementDisabledModeSubtitle">Na ochranu automaticky vyplňovaných přihlašovacích údajů je nutný vzor zámku zařízení, kód PIN nebo biometrické ověření.</string>
-    <string name="managementDisabledModeTitle">Pokud chceš automatické vyplňování používat, zabezpeč své zařízení</string>
+    <string name="managementDisabledModeSubtitle">Na ochranu přihlašovacích údajů se vyžaduje gesto zámku obrazovky, PIN nebo biometrické ověření.</string>
+    <string name="managementDisabledModeTitle">Zabezpeč si zařízení, ať si můžeš ukládat přihlašovací údaje</string>
 
     <string name="saveLoginDialogTitle">Uložit přihlašovací údaje?</string>
     <string name="saveLoginMissingUsernameDialogTitle">Uložit heslo?</string>
     <string name="saveLoginDialogButtonSave">Uložit přihlašovací údaje</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Uložit heslo</string>
     <string name="saveLoginDialogNotNow">Teď ne</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">DuckDuckGo tyto přihlašovací údaje bezpečně uloží do tvého zařízení. Uložená přihlášení můžeš spravovat v Nastaveních.</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">Přihlašovací údaje jsou bezpečně uložené jen na tomhle zařízení a dají se spravovat v nabídce Přihlášení v Nastavení.</string>
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Má DuckDuckGo uložit přihlašovací údaje?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Další možnosti</string>
 
@@ -43,6 +43,9 @@
 
     <string name="updateLoginDialogTitleUpdateUsername">Aktualizovat uživatelské jméno?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Aktualizovat uživatelské jméno</string>
+
+    <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Aktualizovat heslo pro \n%1$s?</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo zaktualizuje toto uložené přihlášení ve tvém zařízení.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Zavřít dialogové okno Automatické vyplňování</string>
 
@@ -70,5 +73,12 @@
     <string name="autofillManagementSearchLogins">Hledání přihlašovacích údajů</string>
     <string name="autofillManagementSearchClearDescription">Vymazat vyhledávací vstup</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Žádné výsledky pro dotaz „%1$s“</string>
+
+    <string name="autofillDeleteLoginDialogCancel">Zrušit</string>
+    <string name="autofillDeleteLoginDialogDelete">Smazat</string>
+    <string name="autofillDeleteLoginDialogTitle">Opravdu chceš tohle přihlášení smazat?</string>
+
+    <string name="autofillManagementUsernameCopied">Uživatelské jméno zkopírováno</string>
+    <string name="autofillManagementPasswordCopied">Heslo zkopírováno</string>
 
 </resources>

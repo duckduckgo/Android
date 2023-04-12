@@ -508,8 +508,8 @@
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Hiçbir zaman</string>
     <string name="disableLoginDetectionDialogTitle">Sitelerde oturum açılırken Koruma hatırlatıcısı devre dışı bırakılsın mı?</string>
     <string name="disableLoginDetectionDialogDescription">Bu tercihi istediğiniz zaman Ayarlar\'dan değiştirebilirsiniz.</string>
-    <string name="disableLoginDetectionDialogPositive">DEVRE DIŞI BIRAK</string>
-    <string name="disableLoginDetectionDialogNegative">İPTAL</string>
+    <string name="disableLoginDetectionDialogPositive">Devre dışı bırak</string>
+    <string name="disableLoginDetectionDialogNegative">Vazgeç</string>
     <string name="automaticFireproofWebsiteLoginDialogTitle">Oturum açıldığında web siteleri otomatik olarak korumalı yapılsın mı?</string>
     <string name="automaticFireproofWebsiteLoginDialogDescription">Siteleri korumalı yaptığınızda, Yangın düğmesini kullandıktan sonra da oturumunuz açık kalır. Bunu daha sonra Ayarlar\'dan istediğiniz zaman değiştirebilirsiniz. </string>
     <string name="automaticFireproofWebsiteLoginDialogFirstOption">Her Zaman Korumalı Yap</string>
@@ -585,6 +585,15 @@
     <string name="autofillTooltipGenerateAddressDescription">E-posta izleyicileri engeller ve adresinizi gizler</string>
     <string name="newEmailAliasMenuTitle">Duck Address Oluştur</string>
 
+    <!-- Autofill -->
+    <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Görüntüle</string>
+    <string name="autofillLoginSavedSnackbarMessage">Giriş kaydedildi</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Giriş güncellendi</string>
+    <string name="autofillDisableAutofillPromptTitle">Giriş bilgilerini kaydetmeye devam etmek istiyor musunuz?</string>
+    <string name="autofillDisableAutofillPromptMessage">Bunu dilediğiniz zaman Ayarlar\'dan devre dışı bırakabilirsiniz.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Kaydetmeye Devam Et</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Devre dışı bırak</string>
+
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Sıra size geldiğinde size bir bildirim göndermemizi ister misiniz?</string>
     <string name="waitlistNotificationDialogNoThanks">Hayır Teşekkürler</string>
@@ -602,6 +611,7 @@
     <string name="folderLocationTitle">Konum Seç</string>
     <string name="addFolder">Klasör Ekle</string>
     <string name="editFolder">Klasörü Düzenle</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Klasör ve içeriği silinsin mi?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Silmek istediğinizden emin misiniz: "</string>
     <string name="bookmarkFolderEmpty">Boş</string>
 

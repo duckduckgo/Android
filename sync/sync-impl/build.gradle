@@ -51,6 +51,9 @@ dependencies {
     implementation('com.journeyapps:zxing-android-embedded:_') { transitive = false }
     implementation 'com.google.zxing:core:_'
 
+    // Shimmer
+    implementation "com.facebook.shimmer:shimmer:_"
+
     // Testing dependencies
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4

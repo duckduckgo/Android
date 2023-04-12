@@ -508,8 +508,8 @@
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Никога</string>
     <string name="disableLoginDetectionDialogTitle">Да се деактивира ли напомняне за огнеустойчивост при вход в сайтове?</string>
     <string name="disableLoginDetectionDialogDescription">Можете да промените това предпочитание по всяко време в настройките.</string>
-    <string name="disableLoginDetectionDialogPositive">ЗАБРАНИ</string>
-    <string name="disableLoginDetectionDialogNegative">ОТМЕНИ</string>
+    <string name="disableLoginDetectionDialogPositive">Забрани</string>
+    <string name="disableLoginDetectionDialogNegative">Отмени</string>
     <string name="automaticFireproofWebsiteLoginDialogTitle">Да се правят ли уебсайтовете огнеустойчиви автоматично при влизане?</string>
     <string name="automaticFireproofWebsiteLoginDialogDescription">Ако направите сайтовете огнеустойчиви, ще останете вписани, след като използвате огнения бутон. Можете винаги да промените това по-късно в Настройки. </string>
     <string name="automaticFireproofWebsiteLoginDialogFirstOption">Винаги прави огнеустойчиви</string>
@@ -585,6 +585,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Блокира имейл тракерите и скрива Вашия адрес</string>
     <string name="newEmailAliasMenuTitle">Генериране на Duck Address</string>
 
+    <!-- Autofill -->
+    <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Преглед</string>
+    <string name="autofillLoginSavedSnackbarMessage">Данните за вход са запазени</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Данните за вход са актуализирани</string>
+    <string name="autofillDisableAutofillPromptTitle">Искате ли да продължите да запазвате данни за вход?</string>
+    <string name="autofillDisableAutofillPromptMessage">Можете да деактивирате тази функция по всяко време в Настройки.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Продължаване на запазването</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Забрани</string>
+
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Искате ли да Ви изпратим известие, когато дойде Вашият ред?</string>
     <string name="waitlistNotificationDialogNoThanks">Не, благодаря</string>
@@ -602,6 +611,7 @@
     <string name="folderLocationTitle">Изберете местоположение</string>
     <string name="addFolder">Добавяне на папка</string>
     <string name="editFolder">Редактиране на папка</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Изтриване на папката и нейното съдържание?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Сигурни ли сте, че искате да изтриете "</string>
     <string name="bookmarkFolderEmpty">Празна</string>
 

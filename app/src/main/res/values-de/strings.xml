@@ -508,8 +508,8 @@
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Nie</string>
     <string name="disableLoginDetectionDialogTitle">Erinnerung zur Feuerfest-Einstellung bei der Anmeldung auf Websites deaktivieren?</string>
     <string name="disableLoginDetectionDialogDescription">Diese Auswahl kann in den Einstellungen jederzeit rückgängig gemacht werden.</string>
-    <string name="disableLoginDetectionDialogPositive">DEAKTIVIEREN</string>
-    <string name="disableLoginDetectionDialogNegative">ABBRECHEN</string>
+    <string name="disableLoginDetectionDialogPositive">Deaktivieren</string>
+    <string name="disableLoginDetectionDialogNegative">Abbrechen</string>
     <string name="automaticFireproofWebsiteLoginDialogTitle">Websites bei der Anmeldung automatisch feuerfest machen?</string>
     <string name="automaticFireproofWebsiteLoginDialogDescription">Wenn du Websites feuerfest machst, bleibst du nach Verwendung der Schaltfläche „Feuer“ angemeldet. Du kannst dies jederzeit in den Einstellungen ändern. </string>
     <string name="automaticFireproofWebsiteLoginDialogFirstOption">Immer feuerfest machen</string>
@@ -585,6 +585,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Blockiert E-Mail-Tracker und verbirgt deine Adresse</string>
     <string name="newEmailAliasMenuTitle">Duck-Adresse generieren</string>
 
+    <!-- Autofill -->
+    <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Ansehen</string>
+    <string name="autofillLoginSavedSnackbarMessage">Anmeldedaten gespeichert</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Anmeldedaten aktualisiert</string>
+    <string name="autofillDisableAutofillPromptTitle">Möchtest du weiterhin Anmeldedaten speichern?</string>
+    <string name="autofillDisableAutofillPromptMessage">Du kannst dies jederzeit in den Einstellungen deaktivieren.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Weiterhin speichern</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Deaktivieren</string>
+
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Möchtest du eine Benachrichtigung erhalten, wenn du die E-Mail-Schutzfunktion testen kannst?</string>
     <string name="waitlistNotificationDialogNoThanks">Nein, danke</string>
@@ -602,6 +611,7 @@
     <string name="folderLocationTitle">Speicherort auswählen</string>
     <string name="addFolder">Ordner hinzufügen</string>
     <string name="editFolder">Ordner bearbeiten</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Ordner und seinen Inhalt löschen?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Möchtest du wirklich löschen "</string>
     <string name="bookmarkFolderEmpty">Leer</string>
 

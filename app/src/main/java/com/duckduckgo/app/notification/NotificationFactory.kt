@@ -32,8 +32,8 @@ class NotificationFactory @Inject constructor(
 
     fun createNotification(
         specification: NotificationSpec,
-        launchIntent: PendingIntent,
-        cancelIntent: PendingIntent,
+        launchIntent: PendingIntent?,
+        cancelIntent: PendingIntent?,
     ): Notification {
         val builder = NotificationCompat.Builder(context, specification.channel.id)
             .setPriority(specification.channel.priority)
@@ -44,6 +44,7 @@ class NotificationFactory @Inject constructor(
             .setColor(ContextCompat.getColor(context, specification.color))
             .setContentIntent(launchIntent)
             .setDeleteIntent(cancelIntent)
+            .setAutoCancel(specification.autoCancel)
 
         specification.launchButton?.let {
             builder.addAction(specification.icon, it, launchIntent)

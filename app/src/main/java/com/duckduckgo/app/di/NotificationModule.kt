@@ -29,7 +29,6 @@ import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.notification.model.SchedulableNotificationPlugin
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import dagger.Module
 import dagger.Provides
@@ -101,12 +100,11 @@ object NotificationModule {
     @SingleInstanceIn(AppScope::class)
     fun providesNotificationSender(
         context: Context,
-        pixel: Pixel,
         manager: NotificationManagerCompat,
         factory: NotificationFactory,
         notificationDao: NotificationDao,
         pluginPoint: PluginPoint<SchedulableNotificationPlugin>,
     ): NotificationSender {
-        return AppNotificationSender(context, pixel, manager, factory, notificationDao, pluginPoint)
+        return AppNotificationSender(context, manager, factory, notificationDao, pluginPoint)
     }
 }

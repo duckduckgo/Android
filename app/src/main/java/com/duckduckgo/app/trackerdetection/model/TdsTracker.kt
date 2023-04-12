@@ -43,9 +43,15 @@ class Rule(
     val action: Action?,
     val exceptions: RuleExceptions?,
     val surrogate: String?,
+    val options: Options?,
 )
 
 class RuleExceptions(
+    val domains: List<String>?,
+    val types: List<String>?,
+)
+
+class Options(
     val domains: List<String>?,
     val types: List<String>?,
 )

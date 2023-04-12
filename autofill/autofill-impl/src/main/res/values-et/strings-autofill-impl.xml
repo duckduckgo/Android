@@ -17,18 +17,18 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Sisesta sisselogimisandmed automaatselt</string>
+    <string name="autofillManagementScreenTitle">Sisselogimine</string>
 
     <string name="managementDisabledModeCta"><b>Seadista sätetes</b></string>
-    <string name="managementDisabledModeSubtitle">Automaatse sisselogimise andmete kaitsmiseks on vaja seadme lukustusmustrit, PIN-koodi või biomeetriat.</string>
-    <string name="managementDisabledModeTitle">Automaatse täitmise kasutamiseks taga seadme kaitse</string>
+    <string name="managementDisabledModeSubtitle">Sisselogimise kaitsmiseks on vaja seadme lukustusmustrit, PIN-koodi või biomeetriat.</string>
+    <string name="managementDisabledModeTitle">Sisselogimise salvestamiseks kaitske oma seadet</string>
 
     <string name="saveLoginDialogTitle">Kas salvestada sisselogimisandmed?</string>
     <string name="saveLoginMissingUsernameDialogTitle">Kas salvestada parool?</string>
     <string name="saveLoginDialogButtonSave">Salvesta sisselogimisandmed</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Salvesta parool</string>
     <string name="saveLoginDialogNotNow">Mitte praegu</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">DuckDuckGo salvestab need sisselogimisandmed turvaliselt sinu seadmes. Salvestatud sisselogimisandmeid saad hallata seadetes.</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">Sisselogimisandmed salvestatakse turvaliselt ainult selles seadmes ja neid saab hallata sätete menüüst Sisselogimisandmed.</string>
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Kas soovid, et DuckDuckGo salvestaks sinu sisselogimisandmed?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Veel valikuid</string>
 
@@ -43,6 +43,9 @@
 
     <string name="updateLoginDialogTitleUpdateUsername">Kas värskendada kasutajanime?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Värskenda kasutajanime</string>
+
+    <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Kas värskendada kasutajanime \n%1$s parooli?</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo värskendab need salvestatud sisselogimisandmed sinu seadmes.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Sulge automaatse täitmise dialoog</string>
 
@@ -70,5 +73,12 @@
     <string name="autofillManagementSearchLogins">Otsi sisselogimisandmeid</string>
     <string name="autofillManagementSearchClearDescription">Tühjenda otsingusisend</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Päringule „%1$s” ei leitud tulemusi</string>
+
+    <string name="autofillDeleteLoginDialogCancel">Loobu</string>
+    <string name="autofillDeleteLoginDialogDelete">Kustuta</string>
+    <string name="autofillDeleteLoginDialogTitle">Kas oled kindel, et soovid need sisselogimisandmed kustutada?</string>
+
+    <string name="autofillManagementUsernameCopied">Kasutajanimi on kopeeritud</string>
+    <string name="autofillManagementPasswordCopied">Parool on kopeeritud</string>
 
 </resources>

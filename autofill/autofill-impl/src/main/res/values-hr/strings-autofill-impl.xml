@@ -17,18 +17,18 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Automatsko popunjavanje prijave</string>
+    <string name="autofillManagementScreenTitle">Prijave</string>
 
     <string name="managementDisabledModeCta"><b>Odredi u Postavkama</b></string>
-    <string name="managementDisabledModeSubtitle">Niz za zaključavanje uređaja, PIN ili biometrija potrebni su za zaštitu vaših podataka za prijavu s automatskim popunjavanjem.</string>
-    <string name="managementDisabledModeTitle">Osigurajte svoj uređaj za korištenje automatskog popunjavanja</string>
+    <string name="managementDisabledModeSubtitle">Uzorak za zaključavanje uređaja, PIN ili biometrija potrebni su za zaštitu vaših prijava.</string>
+    <string name="managementDisabledModeTitle">Osigurajte svoj uređaj da biste spremili prijave</string>
 
     <string name="saveLoginDialogTitle">Želiš li spremiti prijavu?</string>
     <string name="saveLoginMissingUsernameDialogTitle">Želiš li spremiti lozinku?</string>
     <string name="saveLoginDialogButtonSave">Spremi prijavu</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Spremi lozinku</string>
     <string name="saveLoginDialogNotNow">Ne sada</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">DuckDuckGo će sigurno spremiti ovu prijavu na tvoj uređaj. Spremljenim prijavama možeš upravljati u Postavkama.</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">Prijave se sigurno spremaju samo na ovom uređaju i njima se može upravljati iz izbornika Automatsko popunjavanje u Postavkama.</string>
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Želiš li da DuckDuckGo spremi tvoju prijavu?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Dodatne mogućnosti</string>
 
@@ -43,6 +43,9 @@
 
     <string name="updateLoginDialogTitleUpdateUsername">Želiš li ažurirati korisničko ime?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Ažuriraj korisničko ime</string>
+
+    <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Želiš li ažurirati lozinku za korisnika \n%1$s?</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo će ažurirati ovu spremljenu prijavu na tvom uređaju.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Zatvori dijaloški okvir za automatsko popunjavanje</string>
 
@@ -70,5 +73,12 @@
     <string name="autofillManagementSearchLogins">Pretraživanje prijava</string>
     <string name="autofillManagementSearchClearDescription">Obriši unos pretraživanja</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Nema rezultata za \"%1$s\"</string>
+
+    <string name="autofillDeleteLoginDialogCancel">Odustani</string>
+    <string name="autofillDeleteLoginDialogDelete">Izbriši</string>
+    <string name="autofillDeleteLoginDialogTitle">Jesi li siguran da želiš izbrisati ovu prijavu?</string>
+
+    <string name="autofillManagementUsernameCopied">Korisničko ime je kopirano</string>
+    <string name="autofillManagementPasswordCopied">Lozinka je kopirana</string>
 
 </resources>

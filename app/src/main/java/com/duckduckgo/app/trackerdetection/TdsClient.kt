@@ -20,7 +20,6 @@ import androidx.core.net.toUri
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.trackerdetection.model.Action.BLOCK
 import com.duckduckgo.app.trackerdetection.model.Action.IGNORE
-import com.duckduckgo.app.trackerdetection.model.RuleExceptions
 import com.duckduckgo.app.trackerdetection.model.TdsTracker
 import java.net.URI
 
@@ -58,12 +57,23 @@ class TdsClient(
             if (url.matches(regex)) {
                 val type = urlToTypeMapper.map(url, requestHeaders)
 
-                if (matchedException(rule.exceptions, documentUrl, type)) {
-                    return MatchedResult(shouldBlock = false, isATracker = true)
+                if (rule.options != null) {
+                    if (!matchedDomainAndTypes(rule.options.domains, rule.options.types, documentUrl, type)) {
+                        // Continue to the next rule instead
+                        return@forEach
+                    }
                 }
+
+                if (rule.exceptions != null) {
+                    if (matchedDomainAndTypes(rule.exceptions.domains, rule.exceptions.types, documentUrl, type)) {
+                        return MatchedResult(shouldBlock = false, isATracker = true)
+                    }
+                }
+
                 if (rule.action == IGNORE) {
                     return MatchedResult(shouldBlock = false, isATracker = true)
                 }
+
                 if (rule.surrogate?.isNotEmpty() == true) {
                     return MatchedResult(shouldBlock = true, surrogate = rule.surrogate, isATracker = true)
                 }
@@ -77,24 +87,20 @@ class TdsClient(
         return MatchedResult(shouldBlock = (tracker.defaultAction == BLOCK), isATracker = true)
     }
 
-    private fun matchedException(
-        exceptions: RuleExceptions?,
+    private fun matchedDomainAndTypes(
+        ruleDomains: List<String>?,
+        ruleTypes: List<String>?,
         documentUrl: String,
         type: String?,
     ): Boolean {
-        if (exceptions == null) return false
-
-        val domains = exceptions.domains
-        val types = exceptions.types
-
-        val matchesDomain = domains?.any { domain -> sameOrSubdomain(documentUrl, domain) }
-        val matchesType = types?.contains(type)
+        val matchesDomain = ruleDomains?.any { domain -> sameOrSubdomain(documentUrl, domain) }
+        val matchesType = ruleTypes?.contains(type)
 
         return when {
-            types.isNullOrEmpty() && matchesDomain == true -> {
+            ruleTypes.isNullOrEmpty() && matchesDomain == true -> {
                 true
             }
-            domains.isNullOrEmpty() && matchesType == true -> {
+            ruleDomains.isNullOrEmpty() && matchesType == true -> {
                 true
             }
             matchesDomain == true && matchesType == true -> {

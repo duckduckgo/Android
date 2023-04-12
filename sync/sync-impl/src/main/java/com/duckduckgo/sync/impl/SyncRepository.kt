@@ -49,6 +49,7 @@ interface SyncRepository {
     fun deleteAccount(): Result<Boolean>
     fun latestToken(): String
     fun getRecoveryCode(): String?
+    fun getThisConnectedDevice(): ConnectedDevice
     fun getConnectedDevices(): Result<List<ConnectedDevice>>
     fun getConnectQR(): Result<String>
     fun connectDevice(contents: String): Result<Boolean>
@@ -260,6 +261,15 @@ class AppSyncRepository @Inject constructor(
 
     override fun latestToken(): String {
         return syncStore.token ?: ""
+    }
+
+    override fun getThisConnectedDevice(): ConnectedDevice {
+        return ConnectedDevice(
+            thisDevice = true,
+            deviceName = syncStore.deviceName.orEmpty(),
+            deviceType = syncDeviceIds.deviceType(),
+            deviceId = syncStore.deviceId.orEmpty(),
+        )
     }
 
     override fun getConnectedDevices(): Result<List<ConnectedDevice>> {

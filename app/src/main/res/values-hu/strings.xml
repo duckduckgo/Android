@@ -508,8 +508,8 @@
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Soha</string>
     <string name="disableLoginDetectionDialogTitle">Letiltod a tűzálló emlékeztetőt a weboldalakra történő bejelentkezéskor?</string>
     <string name="disableLoginDetectionDialogDescription">Ezt a beállítást bármikor megváltoztathatod a Beállításokban.</string>
-    <string name="disableLoginDetectionDialogPositive">LETILT</string>
-    <string name="disableLoginDetectionDialogNegative">MÉGSEM</string>
+    <string name="disableLoginDetectionDialogPositive">Letiltás</string>
+    <string name="disableLoginDetectionDialogNegative">Mégse</string>
     <string name="automaticFireproofWebsiteLoginDialogTitle">Bejelentkezéskor automatikusan legyenek tűzállók a weboldalak?</string>
     <string name="automaticFireproofWebsiteLoginDialogDescription">Ha tűzállóvá teszel egy weboldalt, a Fire gomb használata után is bejelentkezve maradsz. Ezt a beállításokban később bármikor módosíthatod. </string>
     <string name="automaticFireproofWebsiteLoginDialogFirstOption">Mindig tűzálló</string>
@@ -585,6 +585,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Letiltja az e-mail nyomkövetőket, és elrejti a címedet</string>
     <string name="newEmailAliasMenuTitle">Duck-cím létrehozása</string>
 
+    <!-- Autofill -->
+    <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Megtekintés</string>
+    <string name="autofillLoginSavedSnackbarMessage">Bejelentkezés mentve</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Bejelentkezés frissítve</string>
+    <string name="autofillDisableAutofillPromptTitle">Továbbra is el szeretnéd menteni a bejelentkezéseket?</string>
+    <string name="autofillDisableAutofillPromptMessage">Ez bármikor kikapcsolható a beállításokban.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Mentés folytatása</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Letiltás</string>
+
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Szeretnéd, hogy értesítést küldjünk neked, amikor rád kerül a sor?</string>
     <string name="waitlistNotificationDialogNoThanks">Nem, köszönöm</string>
@@ -602,6 +611,7 @@
     <string name="folderLocationTitle">Hely kiválasztása</string>
     <string name="addFolder">Mappa hozzáadása</string>
     <string name="editFolder">Mappa szerkesztése</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Törlöd a mappát a tartalmával együtt?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Biztosan törlöd a(z) "</string>
     <string name="bookmarkFolderEmpty">Üres</string>
 

@@ -510,8 +510,8 @@
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Nekad</string>
     <string name="disableLoginDetectionDialogTitle">Vai atspējot atgādinājumu par ugunsdrošību, kad pierakstāties vietnēs?</string>
     <string name="disableLoginDetectionDialogDescription">Šo preferenci varēsi jebkurā laikā mainīt iestatījumu sadaļā.</string>
-    <string name="disableLoginDetectionDialogPositive">ATSPĒJOT</string>
-    <string name="disableLoginDetectionDialogNegative">ATCELT</string>
+    <string name="disableLoginDetectionDialogPositive">Atslēgt</string>
+    <string name="disableLoginDetectionDialogNegative">Atcelt</string>
     <string name="automaticFireproofWebsiteLoginDialogTitle">Automātiski padarīt vietnes ugunsdrošas pierakstoties?</string>
     <string name="automaticFireproofWebsiteLoginDialogDescription">Padarot vietnes ugunsdrošas, paliksi pierakstījies(-usies) arī pēc Uguns pogas nospiešanas. Vēlāk to vienmēr vari mainīt sadaļā Iestatījumi. </string>
     <string name="automaticFireproofWebsiteLoginDialogFirstOption">Vienmēr padarīt ugunsdrošu</string>
@@ -587,6 +587,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Bloķē e-pasta izsekotājus un paslēpj tavu adresi</string>
     <string name="newEmailAliasMenuTitle">Izveidot Duck adresi</string>
 
+    <!-- Autofill -->
+    <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Skatīt</string>
+    <string name="autofillLoginSavedSnackbarMessage">Pieteikšanās saglabāta</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Pieteikšanās atjaunināta</string>
+    <string name="autofillDisableAutofillPromptTitle">Vai vēlies turpināt saglabāt pieteikšanās datus?</string>
+    <string name="autofillDisableAutofillPromptMessage">Vari to jebkurā laikā atspējot iestatījumos.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Turpināt saglabāt</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Atslēgt</string>
+
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Vai vēlies, lai mēs nosūtām tev paziņojumu, kad pienāks tava kārta?</string>
     <string name="waitlistNotificationDialogNoThanks">Nē, paldies</string>
@@ -604,6 +613,7 @@
     <string name="folderLocationTitle">Atlasi atrašanās vietu</string>
     <string name="addFolder">Pievienot mapi</string>
     <string name="editFolder">Rediģēt mapi</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Dzēst mapi un tās saturu?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Vai tiešām vēlies dzēst "</string>
     <string name="bookmarkFolderEmpty">Tukšs</string>
 

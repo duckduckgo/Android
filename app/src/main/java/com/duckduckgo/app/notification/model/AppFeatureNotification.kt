@@ -19,8 +19,6 @@ package com.duckduckgo.app.notification.model
 import android.content.Context
 import android.os.Bundle
 import androidx.annotation.StringRes
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.APP_LAUNCH
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.mobile.android.R as CommonR
@@ -31,12 +29,9 @@ class AppFeatureNotification(
     @StringRes private val title: Int,
     @StringRes private val description: Int,
     private val pixelSuffix: String,
-    override val launchIntent: String = APP_LAUNCH,
 ) : SchedulableNotification {
 
     override val id = "com.duckduckgo.privacy.app.feature.$pixelSuffix"
-
-    override val cancelIntent: String = CANCEL
 
     override suspend fun canShow(): Boolean {
         return !notificationDao.exists(id)

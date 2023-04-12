@@ -508,8 +508,8 @@
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Ποτέ</string>
     <string name="disableLoginDetectionDialogTitle">Απενεργοποίηση της υπενθύμισης Διαγραφής δραστηριότητας κατά τη σύνδεση σε ιστότοπους;</string>
     <string name="disableLoginDetectionDialogDescription">Μπορείτε να αλλάξετε την προτίμηση αυτή οποιαδήποτε στιγμή από τις Ρυθμίσεις.</string>
-    <string name="disableLoginDetectionDialogPositive">ΑΠΕΝΕΡΓΟΠΟΙΗΣΗ</string>
-    <string name="disableLoginDetectionDialogNegative">ΑΚΥΡΩΣΗ</string>
+    <string name="disableLoginDetectionDialogPositive">Απενεργοποίηση</string>
+    <string name="disableLoginDetectionDialogNegative">Ακύρωση</string>
     <string name="automaticFireproofWebsiteLoginDialogTitle">Ασφαλείς ιστότοποι, αυτόματα από τη σύνδεση;</string>
     <string name="automaticFireproofWebsiteLoginDialogDescription">Ενεργοποιώντας τη διαγραφή δραστηριότητας ιστότοπου, θα παραμείνετε συνδεδεμένοι μετά τη χρήση του Κουμπιού διαγραφής δραστηριότητας. Μπορείτε πάντα να αλλάξετε την επιλογή αυτή από τις Ρυθμίσεις. </string>
     <string name="automaticFireproofWebsiteLoginDialogFirstOption">Διαγραφή δραστηριότητας, πάντα</string>
@@ -585,6 +585,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Αποκλείει εφαρμογές παρακολούθησης email και αποκρύπτει τη διεύθυνσή σας</string>
     <string name="newEmailAliasMenuTitle">Δημιουργήστε Duck Address</string>
 
+    <!-- Autofill -->
+    <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Προβολή</string>
+    <string name="autofillLoginSavedSnackbarMessage">Η σύνδεση αποθηκεύτηκε</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Η σύνδεση ενημερώθηκε</string>
+    <string name="autofillDisableAutofillPromptTitle">Θέλετε να συνεχίσετε να αποθηκεύετε τις συνδέσεις;</string>
+    <string name="autofillDisableAutofillPromptMessage">Μπορείτε να απενεργοποιήσετε τη λειτουργία αυτή οποιαδήποτε στιγμή από τις Ρυθμίσεις.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Συνεχίστε την αποθήκευση</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Απενεργοποίηση</string>
+
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Θα θέλατε να σας στείλουμε ειδοποίηση για το πότε θα είναι η σειρά σας;</string>
     <string name="waitlistNotificationDialogNoThanks">Όχι, ευχαριστώ</string>
@@ -602,6 +611,7 @@
     <string name="folderLocationTitle">Επιλέξτε τοποθεσία</string>
     <string name="addFolder">Προσθήκη φακέλου</string>
     <string name="editFolder">Επεξεργασία φακέλου</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Διαγραφή φακέλου και των περιεχομένων του;"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Θέλετε σίγουρα να διαγράψετε "</string>
     <string name="bookmarkFolderEmpty">Κενό</string>
 

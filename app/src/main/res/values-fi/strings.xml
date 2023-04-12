@@ -508,8 +508,8 @@
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Ei koskaan</string>
     <string name="disableLoginDetectionDialogTitle">Poistetaanko palonkestävyyden muistutus käytöstä sivustoille kirjauduttaessa?</string>
     <string name="disableLoginDetectionDialogDescription">Voit muuttaa valintaa milloin tahansa asetuksista.</string>
-    <string name="disableLoginDetectionDialogPositive">POISTA KÄYTÖSTÄ</string>
-    <string name="disableLoginDetectionDialogNegative">PERUUTA</string>
+    <string name="disableLoginDetectionDialogPositive">Poista käytöstä</string>
+    <string name="disableLoginDetectionDialogNegative">Peruuta</string>
     <string name="automaticFireproofWebsiteLoginDialogTitle">Tehdäänkö sivustoista palonkestäviä kirjautumisen yhteydessä?</string>
     <string name="automaticFireproofWebsiteLoginDialogDescription">Sivustojen tekeminen palonkestäviksi tarkoittaa, että pysyt kirjautuneena, kun käytät Liekki-painiketta. Voit muuttaa tätä asetusta milloin tahansa asetuksissa. </string>
     <string name="automaticFireproofWebsiteLoginDialogFirstOption">Tee aina palonkestäväksi</string>
@@ -585,6 +585,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Estää sähköpostiseurannan ja piilottaa osoitteesi</string>
     <string name="newEmailAliasMenuTitle">Luo Duck Address</string>
 
+    <!-- Autofill -->
+    <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Näytä</string>
+    <string name="autofillLoginSavedSnackbarMessage">Kirjautumistiedot tallennettu</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Kirjautumistiedot päivitetty</string>
+    <string name="autofillDisableAutofillPromptTitle">Haluatko jatkaa kirjautumistietojen tallentamista?</string>
+    <string name="autofillDisableAutofillPromptMessage">Voit poistaa sen käytöstä milloin vain asetuksissa.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Jatka tallentamista</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Poista käytöstä</string>
+
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Haluatko saada ilmoituksen, kun on sinun vuorosi?</string>
     <string name="waitlistNotificationDialogNoThanks">Ei kiitos</string>
@@ -602,6 +611,7 @@
     <string name="folderLocationTitle">Valitse sijainti</string>
     <string name="addFolder">Lisää kansio</string>
     <string name="editFolder">Muokkaa kansiota</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Poista kansio ja sen sisältö?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Haluatko varmasti poistaa "</string>
     <string name="bookmarkFolderEmpty">Tyhjä</string>
 

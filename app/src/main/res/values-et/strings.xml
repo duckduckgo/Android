@@ -508,8 +508,8 @@
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Mitte kunagi</string>
     <string name="disableLoginDetectionDialogTitle">Kas keelata tulekindel meeldetuletus saitidele sisselogimisel?</string>
     <string name="disableLoginDetectionDialogDescription">Seda eelistust saate seadetes igal ajal muuta.</string>
-    <string name="disableLoginDetectionDialogPositive">KEELA</string>
-    <string name="disableLoginDetectionDialogNegative">TÜHISTA</string>
+    <string name="disableLoginDetectionDialogPositive">Keela</string>
+    <string name="disableLoginDetectionDialogNegative">Loobu</string>
     <string name="automaticFireproofWebsiteLoginDialogTitle">Automaatselt tulekindlad veebisaidid sisselogimisel?</string>
     <string name="automaticFireproofWebsiteLoginDialogDescription">Saitide muutmine tulekindaks hoiab sind sisse logitud pärast tulenupu kasutamist. Seda saab sätete alt alati muuta. </string>
     <string name="automaticFireproofWebsiteLoginDialogFirstOption">Alati tulekindel</string>
@@ -585,6 +585,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Blokeerib e-posti jälgijad ja peidab teie aadressi</string>
     <string name="newEmailAliasMenuTitle">Loo Duck Address</string>
 
+    <!-- Autofill -->
+    <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Kuva</string>
+    <string name="autofillLoginSavedSnackbarMessage">Sisselogimisandmed salvestatud</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Sisselogimisandmed värskendatud</string>
+    <string name="autofillDisableAutofillPromptTitle">Kas soovid sisselogimisandmete salvestamist jätkata?</string>
+    <string name="autofillDisableAutofillPromptMessage">Saad selle igal ajal sätetes keelata.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Jätka salvestamist</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Keela</string>
+
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Kas soovite, et me saadame teile teavituse, kui on teie kord?</string>
     <string name="waitlistNotificationDialogNoThanks">Ei aitäh</string>
@@ -602,6 +611,7 @@
     <string name="folderLocationTitle">Vali asukoht</string>
     <string name="addFolder">Lisa kaust</string>
     <string name="editFolder">Redigeeri kausta</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Kas kustutada kaust ja selle sisu?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Kas soovid kindlasti kustutada "</string>
     <string name="bookmarkFolderEmpty">Tühi</string>
 

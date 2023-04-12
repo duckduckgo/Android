@@ -17,18 +17,18 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Bejelentkezési adatok automatikus kitöltése</string>
+    <string name="autofillManagementScreenTitle">Bejelentkezések</string>
 
     <string name="managementDisabledModeCta"><b>Beállítás a Beállításokban</b></string>
-    <string name="managementDisabledModeSubtitle">Az automatikus bejelentkezési adatok védelméhez az eszközzár mintája, PIN-kód vagy biometrikus adatok szükségesek.</string>
-    <string name="managementDisabledModeTitle">Tedd biztonságossá a készülékedet az automatikus kitöltés használatához</string>
+    <string name="managementDisabledModeSubtitle">A bejelentkezések védelméhez az eszköz zárolási mintája, PIN-kód vagy biometrikus adatok szükségesek.</string>
+    <string name="managementDisabledModeTitle">Tedd biztonságossá a készülékedet a bejelentkezések mentéséhez</string>
 
     <string name="saveLoginDialogTitle">Mented a bejelentkezést?</string>
     <string name="saveLoginMissingUsernameDialogTitle">Mented a jelszót?</string>
     <string name="saveLoginDialogButtonSave">Bejelentkezés mentése</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Jelszó mentése</string>
     <string name="saveLoginDialogNotNow">Most nem</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">A DuckDuckGo biztonságosan tárolja ezen bejelentkezési adatokat az eszközödön. A mentett bejelentkezési adatokat a Beállításokban kezelheted.</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">A bejelentkezési adatok csak ezen az eszközön lesznek biztonságosan tárolva, és a Beállítások &gt; Bejelentkezések menüpontban kezelhetők.</string>
     <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">A DuckDuckGo mentse a bejelentkezést?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">További lehetőségek</string>
 
@@ -43,6 +43,9 @@
 
     <string name="updateLoginDialogTitleUpdateUsername">Frissíted a felhasználónevet?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Felhasználónév frissítése</string>
+
+    <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Frissíted \n%1$s jelszavát?</string>
+    <string name="updateLoginUpdatePasswordExplanation">A DuckDuckGo frissíti az eszközödön ezt a tárolt bejelentkezést.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Automatikus kitöltési párbeszédablak bezárása</string>
 
@@ -70,5 +73,12 @@
     <string name="autofillManagementSearchLogins">Bejelentkezési adatok keresése</string>
     <string name="autofillManagementSearchClearDescription">Megadott keresés törlése</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Nincs találat erre: „%1$s”</string>
+
+    <string name="autofillDeleteLoginDialogCancel">Mégsem</string>
+    <string name="autofillDeleteLoginDialogDelete">Törlés</string>
+    <string name="autofillDeleteLoginDialogTitle">Biztosan törlöd ezen bejelentkezési adatokat?</string>
+
+    <string name="autofillManagementUsernameCopied">Felhasználónév másolva</string>
+    <string name="autofillManagementPasswordCopied">Jelszó másolva</string>
 
 </resources>

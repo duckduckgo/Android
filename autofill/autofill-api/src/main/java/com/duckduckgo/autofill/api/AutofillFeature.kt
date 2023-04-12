@@ -30,23 +30,23 @@ interface AutofillFeature {
     fun self(): Toggle
 
     /**
-     * @return `true` when the remote config has the global "injectCredentials" autofill sub-feature flag enabled
+     * @return `true` when the remote config has the global "canInjectCredentials" autofill sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
      */
     @Toggle.DefaultValue(false)
-    fun injectCredentials(): Toggle
+    fun canInjectCredentials(): Toggle
 
     /**
-     * @return `true` when the remote config has the global "saveCredentials" autofill sub-feature flag enabled
+     * @return `true` when the remote config has the global "canSaveCredentials" autofill sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
      */
     @Toggle.DefaultValue(false)
-    fun saveCredentials(): Toggle
+    fun canSaveCredentials(): Toggle
 
     /**
-     * @return `true` when the remote config has the global "accessCredentialManagement" autofill sub-feature flag enabled
+     * @return `true` when the remote config has the global "canAccessCredentialManagement" autofill sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
      */
     @Toggle.DefaultValue(false)
-    fun accessCredentialManagement(): Toggle
+    fun canAccessCredentialManagement(): Toggle
 }

@@ -508,8 +508,8 @@
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Mai</string>
     <string name="disableLoginDetectionDialogTitle">Disabilitare il promemoria per la protezione quando si accede ai siti?</string>
     <string name="disableLoginDetectionDialogDescription">Puoi modificare questa preferenza in qualsiasi momento nella sezione Impostazioni.</string>
-    <string name="disableLoginDetectionDialogPositive">DISABILITA</string>
-    <string name="disableLoginDetectionDialogNegative">ANNULLA</string>
+    <string name="disableLoginDetectionDialogPositive">Disabilita</string>
+    <string name="disableLoginDetectionDialogNegative">Annulla</string>
     <string name="automaticFireproofWebsiteLoginDialogTitle">Proteggere automaticamente i siti web al momento dell\'accesso?</string>
     <string name="automaticFireproofWebsiteLoginDialogDescription">L\'attivazione della protezione ti consentirà di effettuare l\'accesso dopo aver utilizzato il pulsante Proteggi (icona del fuoco). Puoi sempre modificare questa scelta in un secondo momento in Impostazioni. </string>
     <string name="automaticFireproofWebsiteLoginDialogFirstOption">Proteggi sempre</string>
@@ -585,6 +585,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Blocca il sistema di tracciamento e-mail e nasconde il tuo indirizzo</string>
     <string name="newEmailAliasMenuTitle">Genera Duck Address</string>
 
+    <!-- Autofill -->
+    <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Visualizza</string>
+    <string name="autofillLoginSavedSnackbarMessage">Dati di accesso salvati</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Dati di accesso aggiornati</string>
+    <string name="autofillDisableAutofillPromptTitle">Vuoi continuare a salvare i dati di accesso?</string>
+    <string name="autofillDisableAutofillPromptMessage">Puoi disattivare questa funzione in qualsiasi momento in Impostazioni.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Continua a salvare</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Disabilita</string>
+
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Vuoi ricevere una notifica quando è il tuo turno?</string>
     <string name="waitlistNotificationDialogNoThanks">No, grazie</string>
@@ -602,6 +611,7 @@
     <string name="folderLocationTitle">Seleziona la posizione</string>
     <string name="addFolder">Aggiungi cartella</string>
     <string name="editFolder">Modifica cartella</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Eliminare la cartella e i relativi contenuti?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Eliminare "</string>
     <string name="bookmarkFolderEmpty">Vuoto</string>
 

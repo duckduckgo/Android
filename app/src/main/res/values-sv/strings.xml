@@ -508,8 +508,8 @@
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Aldrig</string>
     <string name="disableLoginDetectionDialogTitle">Vill du inaktivera påminnelse om brandsäkring när du loggar in på webbplatser?</string>
     <string name="disableLoginDetectionDialogDescription">Du kan när som helst ändra denna inställning i Inställningar.</string>
-    <string name="disableLoginDetectionDialogPositive">INAKTIVERA</string>
-    <string name="disableLoginDetectionDialogNegative">AVBRYT</string>
+    <string name="disableLoginDetectionDialogPositive">Inaktivera</string>
+    <string name="disableLoginDetectionDialogNegative">Avbryt</string>
     <string name="automaticFireproofWebsiteLoginDialogTitle">Brandsäkra webbplatser automatiskt vid inloggning?</string>
     <string name="automaticFireproofWebsiteLoginDialogDescription">Om du brandsäkrar webbplatser förblir du inloggad även efter att du har använt brännarknappen. Du kan alltid ändra det här senare i inställningarna. </string>
     <string name="automaticFireproofWebsiteLoginDialogFirstOption">Brandsäkra alltid</string>
@@ -585,6 +585,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Blockerar e-postspårare och döljer din adress</string>
     <string name="newEmailAliasMenuTitle">Generera en Duck-adress</string>
 
+    <!-- Autofill -->
+    <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Visa</string>
+    <string name="autofillLoginSavedSnackbarMessage">Inloggning sparad</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Inloggning uppdaterad</string>
+    <string name="autofillDisableAutofillPromptTitle">Vill du fortsätta att spara inloggningar?</string>
+    <string name="autofillDisableAutofillPromptMessage">Du kan inaktivera det här när som helst i inställningarna.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Fortsätt att spara</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Inaktivera</string>
+
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Vill du att vi ska skicka ett meddelande när det är din tur?</string>
     <string name="waitlistNotificationDialogNoThanks">Nej tack</string>
@@ -602,6 +611,7 @@
     <string name="folderLocationTitle">Välj plats</string>
     <string name="addFolder">Lägg till mapp</string>
     <string name="editFolder">Redigera mapp</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Ta bort mappen och dess innehåll?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Är du säker att du vill ta bort "</string>
     <string name="bookmarkFolderEmpty">Tom</string>
 
