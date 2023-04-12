@@ -25,7 +25,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SyncAttemptDao {
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(attempt: SyncAttempt)
 
     @Query("SELECT * FROM sync_attempts ORDER BY id DESC LIMIT 1")

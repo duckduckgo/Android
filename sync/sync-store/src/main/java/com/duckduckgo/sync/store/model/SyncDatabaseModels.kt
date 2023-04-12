@@ -43,8 +43,3 @@ enum class SyncState {
     SUCCESS,
     FAIL
 }
-
-private fun getUtcIsoLocalDate(): String {
-    // returns YYYY-MM-dd
-    return Instant.now().atOffset(ZoneOffset.UTC).format(DateTimeFormatter.ISO_LOCAL_DATE)
-}
