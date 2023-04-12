@@ -16,20 +16,21 @@
 
 package com.duckduckgo.networkprotection.impl.waitlist.store
 
-import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 
 interface NetPWaitlistDataStore {
     var settingUnlocked: Boolean
     var authToken: String?
 }
 
-class NetPWaitlistDataStoreSharedPreferences constructor(private val context: Context) :
-    NetPWaitlistDataStore {
+class NetPWaitlistDataStoreSharedPreferences constructor(
+    private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
+) : NetPWaitlistDataStore {
 
     private val preferences: SharedPreferences
-        get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
+        get() = vpnSharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = true, migrate = false)
 
     override var settingUnlocked: Boolean
         get() = preferences.getBoolean(KEY_SETTING_UNLOCKED, false)

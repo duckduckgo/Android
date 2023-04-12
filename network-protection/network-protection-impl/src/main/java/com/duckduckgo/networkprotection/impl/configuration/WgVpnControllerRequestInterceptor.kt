@@ -21,7 +21,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
-import logcat.LogPriority
 import logcat.logcat
 import okhttp3.Interceptor
 import okhttp3.Response
@@ -44,8 +43,6 @@ class WgVpnControllerRequestInterceptor @Inject constructor(
                 name = "Authorization",
                 value = "bearer ${netpWaitlistRepository.getAuthenticationToken()}",
             )
-        } else {
-            logcat(LogPriority.ERROR) { "Missing VPN auth token" }
         }
 
         return chain.proceed(newRequest.build())
