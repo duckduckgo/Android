@@ -38,7 +38,7 @@ import com.duckduckgo.privacy.config.store.features.useragent.UserAgentDao
 )
 @Database(
     exportSchema = true,
-    version = 11,
+    version = 12,
     entities = [
         TrackerAllowlistEntity::class,
         UnprotectedTemporaryEntity::class,
@@ -92,4 +92,10 @@ val MIGRATION_10_11 = object : Migration(10, 11) {
     }
 }
 
-val ALL_MIGRATIONS = arrayOf(MIGRATION_2_3, MIGRATION_3_4, MIGRATION_10_11)
+val MIGRATION_11_12 = object : Migration(11, 12) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("DELETE FROM privacy_config")
+    }
+}
+
+val ALL_MIGRATIONS = arrayOf(MIGRATION_2_3, MIGRATION_3_4, MIGRATION_10_11, MIGRATION_11_12)

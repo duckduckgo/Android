@@ -40,7 +40,7 @@ class AutofillCapabilityCheckerImpl @Inject constructor(
 
         if (isInternalTester()) return@withContext true
 
-        return@withContext autofillFeature.injectCredentials().isEnabled()
+        return@withContext autofillFeature.canInjectCredentials().isEnabled()
     }
 
     override suspend fun canSaveCredentialsFromWebView(url: String): Boolean = withContext(dispatcherProvider.io()) {
@@ -50,7 +50,7 @@ class AutofillCapabilityCheckerImpl @Inject constructor(
 
         if (isInternalTester()) return@withContext true
 
-        return@withContext autofillFeature.saveCredentials().isEnabled()
+        return@withContext autofillFeature.canSaveCredentials().isEnabled()
     }
 
     /**
@@ -62,7 +62,7 @@ class AutofillCapabilityCheckerImpl @Inject constructor(
     override suspend fun canAccessCredentialManagementScreen(): Boolean = withContext(dispatcherProvider.io()) {
         if (isInternalTester()) return@withContext true
         if (!isGlobalFeatureEnabled()) return@withContext false
-        return@withContext autofillFeature.accessCredentialManagement().isEnabled()
+        return@withContext autofillFeature.canAccessCredentialManagement().isEnabled()
     }
 
     private suspend fun isInternalTester(): Boolean {
