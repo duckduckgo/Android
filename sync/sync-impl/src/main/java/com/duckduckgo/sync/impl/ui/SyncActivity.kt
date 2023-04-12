@@ -18,9 +18,9 @@ package com.duckduckgo.sync.impl.ui
 
 import android.graphics.pdf.PdfDocument
 import android.graphics.pdf.PdfDocument.PageInfo.Builder
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
-import android.os.Environment
-import android.view.View
 import android.widget.CompoundButton
 import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.lifecycle.Lifecycle
@@ -40,7 +40,6 @@ import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.RecoveryCodePDF
 import com.duckduckgo.sync.impl.ShareAction
 import com.duckduckgo.sync.impl.databinding.ActivitySyncBinding
-import com.duckduckgo.sync.impl.databinding.ViewRecoveryCodeBinding
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
@@ -49,11 +48,9 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.StoreRecoveryCo
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity
 import com.google.android.material.snackbar.Snackbar
+import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import java.io.File
-import java.io.FileOutputStream
-import javax.inject.*
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(SyncActivityWithEmptyParams::class)
@@ -118,7 +115,7 @@ class SyncActivity : DuckDuckGoActivity() {
 
             is StoreRecoveryCodePDF -> {
                 storagePermission.invokeOrRequestPermission {
-                    val generateRecoveryCodePDF = recoveryCodePDF.generateRecoveryCodePDF(this, it.recoveryCodeBitmap, it.recoveryCodeB64)
+                    val generateRecoveryCodePDF = recoveryCodePDF.generateAndStoreRecoveryCodePDF(this, it.recoveryCodeBitmap, it.recoveryCodeB64)
                     shareAction.shareFile(this, generateRecoveryCodePDF)
                 }
             }

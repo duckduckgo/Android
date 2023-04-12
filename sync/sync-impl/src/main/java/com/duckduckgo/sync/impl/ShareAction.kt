@@ -24,9 +24,9 @@ import android.net.Uri
 import android.os.Build
 import androidx.core.content.FileProvider
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import timber.log.Timber
 import java.io.File
 import javax.inject.*
+import timber.log.Timber
 
 class ShareAction @Inject constructor(private val appBuildConfig: AppBuildConfig) {
 

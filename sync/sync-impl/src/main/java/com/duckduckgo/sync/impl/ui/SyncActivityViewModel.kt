@@ -66,7 +66,7 @@ class SyncActivityViewModel @Inject constructor(
         object AskDeleteAccount : Command()
         data class StoreRecoveryCodePDF(
             val recoveryCodeBitmap: Bitmap,
-            val recoveryCodeB64: String
+            val recoveryCodeB64: String,
         ) : Command()
     }
 

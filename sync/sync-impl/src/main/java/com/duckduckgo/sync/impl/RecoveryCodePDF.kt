@@ -24,6 +24,7 @@ import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.ui.view.toPx
 import com.duckduckgo.sync.impl.databinding.ViewRecoveryCodeBinding
 import com.squareup.anvil.annotations.ContributesBinding
 import java.io.File
@@ -31,17 +32,16 @@ import java.io.FileOutputStream
 import javax.inject.Inject
 
 interface RecoveryCodePDF {
-    fun generateRecoveryCodePDF(viewContext: Context, recoveryCode: Bitmap, recoveryCodeB64: String): File
+    fun generateAndStoreRecoveryCodePDF(viewContext: Context, recoveryCode: Bitmap, recoveryCodeB64: String): File
 }
 
 @ContributesBinding(ActivityScope::class)
-class RecoveryCodePDFImpl @Inject constructor(
-) : RecoveryCodePDF {
+class RecoveryCodePDFImpl @Inject constructor() : RecoveryCodePDF {
 
-    override fun generateRecoveryCodePDF(viewContext: Context, recoveryCode: Bitmap, recoveryCodeB64: String): File {
+    override fun generateAndStoreRecoveryCodePDF(viewContext: Context, recoveryCode: Bitmap, recoveryCodeB64: String): File {
         PdfDocument().apply {
             val inflater = LayoutInflater.from(viewContext)
-            val page = startPage(Builder(1500, 2115, 1).create())
+            val page = startPage(Builder(a4PageWidth.toPx(), a4PageHeight.toPx(), 1).create())
             ViewRecoveryCodeBinding.inflate(inflater, null, false).apply {
                 this.qrCodeImageView.setImageBitmap(recoveryCode)
                 this.recoveryCodeText.text = recoveryCodeB64
@@ -53,10 +53,16 @@ class RecoveryCodePDFImpl @Inject constructor(
             }
             finishPage(page)
             val downloads = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-            val file = File(downloads, "recovery-code.pdf")
+            val file = File(downloads, PDF_FILE_NAME)
             writeTo(FileOutputStream(file))
             close()
             return file
         }
+    }
+
+    companion object {
+        private const val PDF_FILE_NAME = "Sync Data Recovery - DuckDuckGo.pdf"
+        private const val a4PageWidth = 612
+        private const val a4PageHeight = 792
     }
 }

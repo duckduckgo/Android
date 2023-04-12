@@ -27,7 +27,9 @@ import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncRepository
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Finish
+import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.StoreRecoveryCodePDF
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.CreatingAccount
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.SignedIn
 import javax.inject.*
@@ -93,11 +95,23 @@ class SaveRecoveryCodeViewModel @Inject constructor(
     sealed class Command {
         object Finish : Command()
         object Error : Command()
+
+        data class StoreRecoveryCodePDF(
+            val recoveryCodeBitmap: Bitmap,
+            val recoveryCodeB64: String,
+        ) : Command()
     }
 
     fun onNextClicked() {
         viewModelScope.launch {
             command.send(Finish)
+        }
+    }
+
+    fun onSaveRecoveryCodeClicked() {
+        val viewMode = viewState.value.viewMode as? SignedIn ?: return
+        viewModelScope.launch {
+            command.send(StoreRecoveryCodePDF(viewMode.loginQRCode, viewMode.b64RecoveryCode))
         }
     }
 }

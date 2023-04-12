@@ -36,7 +36,7 @@ interface PermissionRequest {
     )
 
     fun invokeOrRequestPermission(
-        invoke: () -> Unit
+        invoke: () -> Unit,
     )
 }
 
@@ -44,16 +44,17 @@ interface PermissionRequest {
 class StoragePermissionRequest @Inject constructor(
     val appBuildConfig: AppBuildConfig,
     val context: Context,
-): PermissionRequest {
+) : PermissionRequest {
 
-    private lateinit var permissionRequest: ActivityResultLauncher<String>
+    private var permissionRequest: ActivityResultLauncher<String>? = null
+
     private var onPermissionGranted: (() -> Unit)? = null
     override fun registerResultsCallback(
         caller: ActivityResultCaller,
         onPermissionDenied: () -> Unit,
     ) {
         permissionRequest = caller.registerForActivityResult(RequestPermission()) {
-            if(it) {
+            if (it) {
                 onPermissionGranted?.invoke()
             } else {
                 onPermissionDenied.invoke()
@@ -62,9 +63,11 @@ class StoragePermissionRequest @Inject constructor(
     }
 
     override fun invokeOrRequestPermission(
-        invoke: () -> Unit
+        invoke: () -> Unit,
     ) {
-        if(hasWriteStoragePermission()) {
+        val permissionRequest = permissionRequest ?: throw IllegalStateException("registerResultsCallback must be called before invoking this method")
+
+        if (hasWriteStoragePermission()) {
             invoke.invoke()
         } else {
             onPermissionGranted = invoke
