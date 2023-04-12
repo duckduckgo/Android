@@ -68,6 +68,21 @@ class AtpPixelRemovalInterceptorTest {
             "m_atp_ev_disabled_on_launch_c",
             "m_atp_ev_enabled_on_search_c",
             "m_atp_ev_disabled_on_search_c",
+            "m_atp_ev_enabled_onboarding_u",
+            "m_atp_ev_enabled_onboarding_c",
+            "m_atp_ev_enabled_onboarding_d",
+            "m_atp_ev_apptp_enabled_cta_button_press",
+            "m_atp_imp_disable_protection_dialog_c",
+            "m_atp_ev_disabled_tracker_activity_d",
+            "m_atp_imp_manage_recent_app_settings_activity_d",
+            "m_atp_imp_manage_recent_app_settings_activity_c",
+            "m_atp_imp_manage_recent_app_settings_activity_u",
+            "m_atp_imp_disable_app_protection_all_c",
+            "m_atp_ev_submit_disable_app_protection_dialog_c",
+            "m_atp_ev_submit_disable_app_protection_dialog_d",
+            "m_atp_ev_skip_disable_app_protection_dialog_d",
+            "m_atp_ev_skip_disable_app_protection_dialog_c",
+            "m_atp_imp_disable_app_protection_detail_c",
         )
     }
 }
