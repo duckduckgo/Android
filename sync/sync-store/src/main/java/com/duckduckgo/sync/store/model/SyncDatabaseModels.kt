@@ -17,21 +17,34 @@
 package com.duckduckgo.sync.store.model
 
 import androidx.room.Entity
-import androidx.room.Index
 import androidx.room.PrimaryKey
+import org.threeten.bp.Instant
+import org.threeten.bp.ZoneOffset
+import org.threeten.bp.format.DateTimeFormatter
 
 @Entity(
     tableName = "sync_attempts",
 )
 data class SyncAttempt(
-    @PrimaryKey(autoGenerate = true) val id: Int,
-    val timestamp: String,
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    val timestamp: String = getUtcIsoLocalDate(),
     val state: SyncState,
     val meta: String
-)
+) {
+    companion object {
+        private fun getUtcIsoLocalDate(): String {
+            return Instant.now().atOffset(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT)
+        }
+    }
+}
 
 enum class SyncState {
     IN_PROGRESS,
     SUCCESS,
     FAIL
+}
+
+private fun getUtcIsoLocalDate(): String {
+    // returns YYYY-MM-dd
+    return Instant.now().atOffset(ZoneOffset.UTC).format(DateTimeFormatter.ISO_LOCAL_DATE)
 }

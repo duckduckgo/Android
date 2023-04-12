@@ -59,7 +59,7 @@ class SavedSitesDataObserver @Inject constructor(
     @SuppressLint("CheckResult")
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
-        Timber.d("SavedSitesDataObserver onCreate")
+        Timber.d("Sync: onCreate")
         observeChanges()
     }
 
@@ -67,12 +67,12 @@ class SavedSitesDataObserver @Inject constructor(
         if (syncState.isUserSignedInOnDevice()){
             appCoroutineScope.launch(dispatcherProvider.io()) {
                 savedSitesRepository.lastModified().collectLatest {
-                    Timber.d("SavedSitesDataObserver changes to LastModified")
+                    Timber.d("Sync: changes to LastModified")
                     syncEngine.notifyDataChanged()
                 }
             }
         } else {
-            Timber.d("SavedSitesDataObserver: user not signed in, no need to observer changes")
+            Timber.d("Sync: user not signed in, no need to observer changes")
         }
     }
 }

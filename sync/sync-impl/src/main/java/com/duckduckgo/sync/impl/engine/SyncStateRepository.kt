@@ -14,29 +14,33 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.store.dao
+package com.duckduckgo.sync.impl.engine
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import com.duckduckgo.sync.store.dao.SyncAttemptDao
 import com.duckduckgo.sync.store.model.SyncAttempt
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-@Dao
-interface SyncAttemptDao {
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insert(attempt: SyncAttempt)
+interface SyncStateRepository {
+    fun store(syncAttempt: SyncAttempt)
 
-    @Query("SELECT * FROM sync_attempts ORDER BY id DESC LIMIT 1")
-    fun lastAttempt(): SyncAttempt?
+    fun current(): SyncAttempt?
 
-    @Query("SELECT * FROM sync_attempts")
-    fun attempts(): Flow<List<SyncAttempt>>
-
-    @Query("DELETE from sync_attempts")
-    fun clear()
-
+    fun all(): Flow<List<SyncAttempt>>
 }
 
+class AppSyncStateRepository @Inject constructor(private val syncAttemptDao: SyncAttemptDao) : SyncStateRepository {
+    override fun store(syncAttempt: SyncAttempt) {
+        syncAttemptDao.insert(syncAttempt)
+    }
+
+    override fun current(): SyncAttempt? {
+        return syncAttemptDao.lastAttempt()
+    }
+
+    override fun all(): Flow<List<SyncAttempt>> {
+        return syncAttemptDao.attempts()
+    }
+
+}
 
