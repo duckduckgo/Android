@@ -43,6 +43,31 @@ class AtpPixelRemovalInterceptorTest {
     companion object {
         private const val PIXEL_TEMPLATE = "https://improving.duckduckgo.com/t/%s_android_phone?atb=v255-7zu&appVersion=5.74.0&test=1"
 
-        private val PIXELS_WITH_ATB_INFO = listOf<String>()
+        private val PIXELS_WITH_ATB_INFO = listOf(
+            "m_atp_ev_enabled_tracker_activity_d",
+            "m_atp_ev_enabled_tracker_activity_c",
+            "m_atp_ev_enabled_tracker_activity_u",
+            "m_atp_imp_exclusion_list_activity_d",
+            "m_atp_imp_exclusion_list_activity_c",
+            "m_atp_imp_exclusion_list_activity_u",
+            "m_atp_imp_company_trackers_activity_d",
+            "m_atp_imp_company_trackers_activity_c",
+            "m_atp_imp_company_trackers_activity_u",
+            "m_atp_imp_tracker_activity_detail_d",
+            "m_atp_imp_tracker_activity_detail_c",
+            "m_atp_imp_tracker_activity_detail_u",
+            "m_atp_ev_selected_cancel_app_protection_c",
+            "m_atp_ev_selected_disable_app_protection_c",
+            "m_atp_ev_selected_disable_protection_c",
+            "m_atp_ev_disabled_tracker_activity_c",
+            "m_atp_ev_enabled_on_search_d",
+            "m_atp_ev_disabled_on_search_d",
+            "m_atp_ev_enabled_on_launch_d",
+            "m_atp_ev_enabled_on_launch_c",
+            "m_atp_ev_disabled_on_launch_d",
+            "m_atp_ev_disabled_on_launch_c",
+            "m_atp_ev_enabled_on_search_c",
+            "m_atp_ev_disabled_on_search_c",
+        )
     }
 }
