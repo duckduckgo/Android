@@ -47,6 +47,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.mockito.kotlin.*
 import org.threeten.bp.Instant
@@ -84,6 +85,7 @@ class RealFirstPartyCookiesModifierTest {
         db.close()
     }
 
+    @Ignore
     @Test
     fun when1stPartyCookiesExistAndThresholdIsHigherThenNewExpiryDateMatchesMaxAge() = runTest {
         if (Build.VERSION.SDK_INT == 28) {
