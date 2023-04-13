@@ -41,32 +41,57 @@
         app:layout_constraintTop_toBottomOf="@id/logo"
         app:layout_constraintWidth_max="600dp">
 
-        <FrameLayout
+        <LinearLayout
             android:id="@+id/cardContainer"
             style="@style/Widget.DuckDuckGo.DaxDialog.Content"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
-                android:id="@+id/hiddenTextCta"
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                    android:id="@+id/hiddenTextCta"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="@dimen/keyline_1"
+                    android:visibility="invisible"
+                    app:typography="body1"
+                    tools:text="@string/onboardingDaxText"
+                    tools:visibility="visible" />
+
+                <com.duckduckgo.mobile.android.ui.view.TypeAnimationTextView
+                    android:id="@+id/dialogTextCta"
+                    style="@style/Typography.DuckDuckGo.Body1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:textColor="?attr/daxColorPrimaryText" />
+
+            </FrameLayout>
+
+            <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+                android:id="@+id/primaryCtaVariant"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingBottom="@dimen/keyline_1"
-                android:visibility="invisible"
-                app:typography="body1"
-                tools:text="@string/onboardingDaxText"
-                tools:visibility="visible" />
+                app:buttonSize="large"
+                android:visibility="gone"
+                android:text="@string/daxDialogAppTpRetentionPrimaryButtonText"
+                android:layout_marginTop="@dimen/daxDialogButtonSpacing"/>
 
-            <com.duckduckgo.mobile.android.ui.view.TypeAnimationTextView
-                android:id="@+id/dialogTextCta"
-                style="@style/Typography.DuckDuckGo.Body1"
+            <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
+                android:id="@+id/secondaryCtaVariant"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:clickable="true"
-                android:focusable="true"
-                android:textColor="?attr/daxColorPrimaryText" />
+                app:buttonSize="large"
+                android:visibility="gone"
+                android:text="@string/daxDialogAppTpRetentionSecondaryButtonText"
+                android:layout_marginTop="@dimen/keyline_1"/>
 
-        </FrameLayout>
+        </LinearLayout>
     </com.duckduckgo.mobile.android.ui.view.shape.DaxBubbleCardView>
 
     <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
