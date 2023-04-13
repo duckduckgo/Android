@@ -28,6 +28,8 @@ import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncRepository
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.StoreRecoveryCodePDF
+import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel
 import java.lang.String.format
 import kotlin.reflect.KClass
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -253,6 +255,17 @@ class SyncActivityViewModelTest {
             testee.onDeleteAccountCancelled()
             viewState = awaitItem()
             assertTrue(viewState.isDeviceSyncEnabled)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserClicksOnSaveRecoveryCodeThenEmitSaveRecoveryCodeCommand() = runTest {
+        whenever(syncRepository.getRecoveryCode()).thenReturn(jsonRecoveryKeyEncoded)
+        testee.commands().test {
+            testee.onSaveRecoveryCodeClicked()
+            val command = awaitItem()
+            assertTrue(command is StoreRecoveryCodePDF)
             cancelAndIgnoreRemainingEvents()
         }
     }

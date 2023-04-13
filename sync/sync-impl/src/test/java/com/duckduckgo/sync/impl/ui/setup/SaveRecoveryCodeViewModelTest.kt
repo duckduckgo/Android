@@ -112,4 +112,15 @@ class SaveRecoveryCodeViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    fun whenUserClicksOnSaveRecoveryCodeThenEmitSaveRecoveryCodeCommand() = runTest {
+        whenever(syncRepostitory.getRecoveryCode()).thenReturn(jsonRecoveryKeyEncoded)
+        testee.commands().test {
+            testee.onSaveRecoveryCodeClicked()
+            val command = awaitItem()
+            assertTrue(command is Command.StoreRecoveryCodePDF)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 }
