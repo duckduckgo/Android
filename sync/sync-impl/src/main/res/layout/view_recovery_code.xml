@@ -47,7 +47,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/content_illustration"
         app:typography="body1_bold"
-        android:text="Sync Recovery Code"/>
+        android:text="@string/sync_pdf_title"/>
 
     <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/pdf_hint"
@@ -62,8 +62,7 @@
         android:textColor="?attr/daxColorBlack"
         android:gravity="center"
         app:typography="caption"
-        android:text="The Recovery Code allows you to sync your bookmarks across multiple devices and recover your synced data if you lose access to a device."
-    />
+        android:text="@string/sync_pdf_description"/>
 
     <LinearLayout
         android:id="@+id/recover_code_container_header"
@@ -85,7 +84,7 @@
             android:gravity="center"
             app:typography="body2_bold"
             android:textColor="?attr/daxColorWhite"
-            android:text="Keep this information safe and secure. "/>
+            android:text="@string/sync_code_box_title"/>
 
         <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:layout_width="match_parent"
@@ -93,7 +92,7 @@
             android:gravity="center"
             app:typography="caption"
             android:textColor="?attr/daxColorWhite"
-            android:text="Anyone with access to this code can access your synced data."/>
+            android:text="@string/sync_code_box_description"/>
     </LinearLayout>
 
     <LinearLayout
@@ -138,8 +137,7 @@
         app:layout_constraintTop_toBottomOf="@id/recover_code_container"
         app:typography="body1_bold"
         android:textColor="?attr/daxColorBlack"
-        android:text="How does this work?"
-    />
+        android:text="@string/sync_instructions_title"/>
 
     <LinearLayout
         android:id="@+id/questions_group"
@@ -161,9 +159,7 @@
             android:orientation="vertical"
             android:layout_weight="1"
             android:layout_marginStart="@dimen/keyline_4"
-            android:layout_marginEnd="@dimen/keyline_4"
-        >
-
+            android:layout_marginEnd="@dimen/keyline_4">
             <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:layout_width="36dp"
                 android:layout_height="36sp"
@@ -173,7 +169,7 @@
                 android:textColor="?attr/daxColorWhite"
                 app:typography="body1_bold"
                 android:background="@drawable/circled_accent_background"
-                android:text="1"/>
+                android:text="1" tools:ignore="HardcodedText"/>
 
             <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:layout_width="match_parent"
@@ -182,10 +178,8 @@
                 android:gravity="center"
                 android:textColor="?attr/daxColorBlack"
                 app:typography="caption"
-                android:text="Open DuckDuckGo on another device and go to Sync in Settings."
-            />
+                android:text="@string/sync_instructions_step1"/>
         </LinearLayout>
-
 
         <LinearLayout
             android:layout_width="0dp"
@@ -193,9 +187,7 @@
             android:orientation="vertical"
             android:layout_weight="1"
             android:layout_marginStart="@dimen/keyline_4"
-            android:layout_marginEnd="@dimen/keyline_4"
-        >
-
+            android:layout_marginEnd="@dimen/keyline_4">
             <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:layout_width="36dp"
                 android:layout_height="36sp"
@@ -205,7 +197,7 @@
                 android:textColor="?attr/daxColorWhite"
                 app:typography="body1_bold"
                 android:background="@drawable/circled_accent_background"
-                android:text="2"/>
+                android:text="2" tools:ignore="HardcodedText"/>
 
             <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:layout_width="match_parent"
@@ -214,10 +206,8 @@
                 android:gravity="center"
                 android:textColor="?attr/daxColorBlack"
                 app:typography="caption"
-                android:text="Scan the QR code or copy and paste the text code into another DuckDuckGo app."
-            />
+                android:text="@string/sync_instructions_step2"/>
         </LinearLayout>
-
 
         <LinearLayout
             android:layout_width="0dp"
@@ -225,9 +215,7 @@
             android:orientation="vertical"
             android:layout_weight="1"
             android:layout_marginStart="@dimen/keyline_4"
-            android:layout_marginEnd="@dimen/keyline_4"
-        >
-
+            android:layout_marginEnd="@dimen/keyline_4">
             <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:layout_width="36dp"
                 android:layout_height="36sp"
@@ -237,7 +225,7 @@
                 android:textColor="?attr/daxColorWhite"
                 app:typography="body1_bold"
                 android:background="@drawable/circled_accent_background"
-                android:text="3"/>
+                android:text="3" tools:ignore="HardcodedText"/>
 
             <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:layout_width="match_parent"
@@ -246,7 +234,7 @@
                 android:gravity="center"
                 android:textColor="?attr/daxColorBlack"
                 app:typography="caption"
-                android:text="Sync will be activated and you'll once again have access to all of your data."
+                android:text="@string/sync_instructions_step3"
             />
         </LinearLayout>
     </LinearLayout>
@@ -259,8 +247,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/questions_group"
-        android:layout_marginTop="@dimen/keyline_3"
-    />
+        android:layout_marginTop="@dimen/keyline_3"/>
 
     <ImageView
         android:id="@+id/dax_logo"
@@ -274,6 +261,4 @@
         app:srcCompat="@drawable/ic_dax_stacked"
         android:layout_gravity="center_horizontal"
         tools:ignore="ContentDescription"/>
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>
