@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,28 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global.exception
+package com.duckduckgo.app.anrs.store
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.text.SimpleDateFormat
-import java.util.*
 
-@Entity
-data class UncaughtExceptionEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val exceptionSource: UncaughtExceptionSource,
+@Entity(tableName = "uncaught_exception_entity")
+data class ExceptionEntity(
+    @PrimaryKey val hash: String,
+    val shortName: String,
+    val processName: String,
     val message: String,
+    val stackTrace: String,
     val version: String,
-    val timestamp: Long = System.currentTimeMillis(),
-) {
-
-    fun formattedTimestamp(): String = formatter.format(Date(timestamp))
-
-    companion object {
-        val formatter: SimpleDateFormat =
-            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US).apply {
-                timeZone = TimeZone.getTimeZone("UTC")
-            }
-    }
-}
+    val timestamp: String,
+)

@@ -16,7 +16,10 @@
 
 package com.duckduckgo.app.anr
 
+import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.anrs.store.AnrEntity
+import com.duckduckgo.app.anrs.store.ExceptionEntity
+import logcat.asLog
 import okio.ByteString.Companion.encode
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
@@ -34,11 +37,7 @@ internal data class AnrData(
     val lineNumber: Int,
     val stackTrace: ArrayList<String>,
     val timeStamp: String = FORMATTER_SECONDS.format(LocalDateTime.now()),
-) {
-    companion object {
-        private val FORMATTER_SECONDS: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
-    }
-}
+)
 
 internal fun AnrData.asAnrEntity(): AnrEntity {
     return AnrEntity(
@@ -52,7 +51,7 @@ internal fun AnrData.asAnrEntity(): AnrEntity {
     )
 }
 
-internal fun Throwable.asExceptionData(): AnrData {
+internal fun Throwable.asAnrData(): AnrData {
     return AnrData(
         name = this.toString().replace(": $message", "", true),
         message = message,
@@ -60,6 +59,30 @@ internal fun Throwable.asExceptionData(): AnrData {
         file = stackTrace.getOrNull(0)?.fileName,
         lineNumber = stackTrace.getOrNull(0)?.lineNumber ?: Int.MIN_VALUE,
     )
+}
+
+internal fun CrashLogger.Crash.asCrashEntity(
+    appVersion: String,
+    processName: String,
+): ExceptionEntity {
+    val timestamp = FORMATTER_SECONDS.format(LocalDateTime.now())
+    val stacktrace = this.t.asLog()
+    return ExceptionEntity(
+        hash = (stacktrace + timestamp).encode().md5().hex(),
+        shortName = this.shortName,
+        processName = processName,
+        message = this.t.extractExceptionCause(),
+        stackTrace = stacktrace,
+        version = appVersion,
+        timestamp = timestamp,
+    )
+}
+
+private fun Throwable?.extractExceptionCause(): String {
+    if (this == null) {
+        return "Exception missing"
+    }
+    return "${this.javaClass.name} - ${this.stackTrace.firstOrNull()}"
 }
 
 internal fun Array<StackTraceElement>.asStringArray(): ArrayList<String> {
@@ -73,3 +96,5 @@ internal fun Array<StackTraceElement>.asStringArray(): ArrayList<String> {
     }
     return array
 }
+
+private val FORMATTER_SECONDS: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")

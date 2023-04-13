@@ -27,8 +27,6 @@ import com.duckduckgo.app.onboarding.store.AppUserStageStore
 import com.duckduckgo.app.onboarding.store.OnboardingSharedPreferences
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
-import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
-import com.duckduckgo.app.statistics.store.OfflinePixelCountSharedPreferences
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.statistics.store.StatisticsSharedPreferences
 import com.duckduckgo.app.tabs.db.TabsDbSanitizer
@@ -67,9 +65,6 @@ abstract class StoreModule {
 
     @Binds
     abstract fun bindDataClearingStore(store: UnsentForgetAllPixelStoreSharedPreferences): UnsentForgetAllPixelStore
-
-    @Binds
-    abstract fun bindOfflinePixelDataStore(store: OfflinePixelCountSharedPreferences): OfflinePixelCountDataStore
 
     @Binds
     abstract fun bindUserStageStore(userStageStore: AppUserStageStore): UserStageStore

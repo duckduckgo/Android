@@ -23,24 +23,33 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    implementation project(path: ':anrs-api')
-    implementation project(path: ':anrs-store')
-    implementation project(path: ':common')
-    implementation project(path: ':di')
-    implementation project(path: ':browser-api')
-    implementation project(path: ':statistics')
+    implementation project(':app-build-config-api')
+    implementation project(':anrs-api')
+    implementation project(':anrs-store')
+    implementation project(':common')
+    implementation project(':di')
+    implementation project(':browser-api')
+    implementation project(':statistics')
 
     implementation Kotlin.stdlib.jdk7
     implementation AndroidX.core.ktx
     implementation KotlinX.coroutines.core
     implementation Google.dagger
-    implementation JakeWharton.timber
+    implementation "com.squareup.logcat:logcat:_"
     implementation Square.okio
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
     implementation AndroidX.room.ktx
     implementation AndroidX.room.rxJava2
     implementation "com.jakewharton.threetenabp:threetenabp:_"
+
+    testImplementation project(':common-test')
+    testImplementation Testing.junit4
+    testImplementation AndroidX.archCore.testing
+    testImplementation AndroidX.test.ext.junit
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation Testing.robolectric
+    testImplementation "org.threeten:threetenbp:_"
 }
 
 android {

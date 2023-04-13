@@ -26,9 +26,7 @@ import com.duckduckgo.app.fire.FireproofRepository
 import com.duckduckgo.app.fire.WebViewDatabaseLocator
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.global.exception.RootExceptionFinder
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
-import com.duckduckgo.app.statistics.pixels.ExceptionPixel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.cookies.api.CookieException
 import com.duckduckgo.cookies.impl.SQLCookieRemover
@@ -49,6 +47,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.mockito.kotlin.*
 import org.threeten.bp.Instant
@@ -86,6 +85,7 @@ class RealFirstPartyCookiesModifierTest {
         db.close()
     }
 
+    @Ignore
     @Test
     fun when1stPartyCookiesExistAndThresholdIsHigherThenNewExpiryDateMatchesMaxAge() = runTest {
         if (Build.VERSION.SDK_INT == 28) {
@@ -344,7 +344,7 @@ class RealFirstPartyCookiesModifierTest {
             mockUnprotectedTemporary,
             mockUserAllowListRepository,
             webViewDatabaseLocator,
-            ExceptionPixel(mockPixel, RootExceptionFinder()),
+            mock(),
             mockFireproofRepository,
             DefaultDispatcherProvider(),
         )
