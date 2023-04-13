@@ -29,7 +29,6 @@ import com.duckduckgo.sync.impl.SyncRepository
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.StoreRecoveryCodePDF
-import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel
 import java.lang.String.format
 import kotlin.reflect.KClass
 import kotlinx.coroutines.ExperimentalCoroutinesApi
