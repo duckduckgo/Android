@@ -14,17 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.network
+package com.duckduckgo.privacy.config.api
 
-import com.duckduckgo.anvil.annotations.ContributesServiceApi
-import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.privacy.config.api.PRIVACY_REMOTE_CONFIG_URL
-import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
-import retrofit2.Response
-import retrofit2.http.GET
-
-@ContributesServiceApi(AppScope::class)
-interface PrivacyConfigService {
-    @GET(PRIVACY_REMOTE_CONFIG_URL)
-    suspend fun privacyConfig(): Response<JsonPrivacyConfig>
+/** Public interface for the Privacy Config feature */
+interface PrivacyConfig {
+    fun privacyConfigData(): PrivacyConfigData?
 }
+
+/** Public data class for PrivacyConfig data. */
+data class PrivacyConfigData(val version: String, var eTag: String? = null)

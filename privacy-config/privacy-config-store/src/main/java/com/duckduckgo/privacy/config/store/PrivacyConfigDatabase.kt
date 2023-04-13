@@ -38,7 +38,7 @@ import com.duckduckgo.privacy.config.store.features.useragent.UserAgentDao
 )
 @Database(
     exportSchema = true,
-    version = 12,
+    version = 13,
     entities = [
         TrackerAllowlistEntity::class,
         UnprotectedTemporaryEntity::class,

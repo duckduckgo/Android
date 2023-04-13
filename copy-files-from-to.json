@@ -38,7 +38,7 @@
     },
     {
       "from": "node_modules/@duckduckgo/privacy-reference-tests/broken-site-reporting/tests.json",
-      "to": "app/src/android/resources/reference_tests/brokensites/tests.json"
+      "to": "app/src/test/resources/reference_tests/brokensites/tests.json"
     },
     {
       "from": "node_modules/@duckduckgo/privacy-reference-tests/amp-protections/tests.json",

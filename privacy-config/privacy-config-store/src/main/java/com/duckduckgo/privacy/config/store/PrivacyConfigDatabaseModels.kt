@@ -25,6 +25,7 @@ import com.duckduckgo.privacy.config.api.DrmException
 import com.duckduckgo.privacy.config.api.GpcException
 import com.duckduckgo.privacy.config.api.GpcHeaderEnabledSite
 import com.duckduckgo.privacy.config.api.HttpsException
+import com.duckduckgo.privacy.config.api.PrivacyConfigData
 import com.duckduckgo.privacy.config.api.TrackingParameterException
 import com.duckduckgo.privacy.config.api.UnprotectedTemporaryException
 import com.duckduckgo.privacy.config.api.UserAgentException
@@ -130,7 +131,12 @@ data class PrivacyConfig(
     @PrimaryKey val id: Int = 1,
     val version: Long,
     val readme: String,
+    val eTag: String?,
 )
+
+fun PrivacyConfig.toPrivacyConfigData(): PrivacyConfigData {
+    return PrivacyConfigData(version = this.version.toString(), eTag = this.eTag)
+}
 
 @Entity(tableName = "amp_link_formats")
 data class AmpLinkFormatEntity(
