@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,23 +17,22 @@
 package com.duckduckgo.mobile.android.vpn.integration
 
 import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 import org.json.JSONObject
+import javax.inject.Inject
 
 @ContributesMultibinding(VpnScope::class)
-class VpnNetworkLayerStateCollector @Inject constructor(
-    // TODO avoid circular dependency when introducing the VpnSocketProtector, see https://app.asana.com/0/0/1203590158968622/f
-//    private val vpnNetworkStackProvider: VpnNetworkStackProvider,
-) : VpnStateCollectorPlugin {
-
+class AppTPStateCollector @Inject constructor(
+    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
+): VpnStateCollectorPlugin {
     override suspend fun collectVpnRelatedState(appPackageId: String?): JSONObject {
         return JSONObject().apply {
-//            put("name", vpnNetworkStackProvider.provideNetworkStack().name)
-            put("name", "netp-ng")
+            put("enabled", vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN))
         }
     }
 
-    override val collectorName: String = "networkLayer"
+    override val collectorName: String = "appTpState"
 }
