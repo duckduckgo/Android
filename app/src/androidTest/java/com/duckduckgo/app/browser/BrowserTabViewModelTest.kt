@@ -43,7 +43,6 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.A
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
-import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.LoadExtractedUrl
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShowBackNavigationHistory
@@ -110,6 +109,8 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.CTA_SHOWN
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_APPTP_CTA
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
@@ -130,6 +131,7 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.mobile.android.ui.store.AppTheme
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.privacy.config.api.*
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
@@ -212,9 +214,6 @@ class BrowserTabViewModelTest {
 
     @Mock
     private lateinit var mockSettingsStore: SettingsDataStore
-
-    @Mock
-    private lateinit var mockBookmarksDao: BookmarksDao
 
     @Mock
     private lateinit var mockSavedSitesRepository: SavedSitesRepository
@@ -391,6 +390,8 @@ class BrowserTabViewModelTest {
 
     private val autofillFireproofDialogSuppressor: AutofillFireproofDialogSuppressor = mock()
 
+    private val mockVpnFeaturesRegistry: VpnFeaturesRegistry = mock()
+
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
@@ -433,6 +434,7 @@ class BrowserTabViewModelTest {
             duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),
             appTheme = mockAppTheme,
             variantManager = mockVariantManager,
+            vpnFeaturesRegistry = mockVpnFeaturesRegistry,
         )
 
         val siteFactory = SiteFactoryImpl(mockEntityLookup, mockUserWhitelistDao, mockContentBlocking, TestScope())
@@ -2136,6 +2138,27 @@ class BrowserTabViewModelTest {
         setCta(cta)
         testee.onUserClickCtaOkButton()
         assertCommandIssued<Command.LaunchAddWidget>()
+    }
+
+    @Test
+    fun whenUserClickedEnableAppTPCtaButtonThenLaunchAppTPOnboardingCommand() {
+        val cta = DaxBubbleCta.DaxEndEnableAppTpCta(mockOnboardingStore, mockAppInstallStore)
+        setCta(cta)
+
+        testee.onUserClickCtaOkButton()
+
+        assertCommandIssued<Command.LaunchAppTPOnboarding>()
+        verify(mockPixel).fire(cta.okPixel!!, cta.pixelOkParameters())
+    }
+
+    @Test
+    fun whenUserDismissedEnableAppTPCtaThenPixelFired() {
+        val cta = DaxBubbleCta.DaxEndEnableAppTpCta(mockOnboardingStore, mockAppInstallStore)
+        setCta(cta)
+
+        testee.onUserDismissedCta()
+
+        verify(mockPixel).fire(AppPixelName.ONBOARDING_DAX_CTA_CANCEL_BUTTON, mapOf(CTA_SHOWN to DAX_APPTP_CTA))
     }
 
     @Test

@@ -374,6 +374,31 @@ sealed class DaxBubbleCta(
         onboardingStore,
         appInstallStore,
     )
+
+    class DaxEndEnableAppTpCta(
+        override val onboardingStore: OnboardingStore,
+        override val appInstallStore: AppInstallStore,
+    ) : DaxBubbleCta(
+        ctaId = CtaId.DAX_END,
+        shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
+        okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        cancelPixel = AppPixelName.ONBOARDING_DAX_CTA_CANCEL_BUTTON,
+        ctaPixelParam = Pixel.PixelValues.DAX_APPTP_CTA,
+        description = R.string.daxDialogAppTpRetentionText,
+        onboardingStore = onboardingStore,
+        appInstallStore = appInstallStore,
+    ) {
+        override fun showCta(view: View) {
+            val daxText = view.context.getString(description)
+            view.show()
+            view.alpha = 1f
+            view.findViewById<TextView>(R.id.hiddenTextCta).text = daxText.html(view.context)
+            view.findViewById<View>(R.id.primaryCta).hide()
+            view.findViewById<View>(R.id.primaryCtaVariant).show()
+            view.findViewById<View>(R.id.secondaryCtaVariant).show()
+            view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).startTypingAnimation(daxText, true)
+        }
+    }
 }
 
 sealed class BubbleCta(
