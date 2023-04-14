@@ -33,6 +33,7 @@ import javax.inject.Inject
 interface SyncApiClient {
 
     fun patch(changes: List<SyncChanges>): Result<SyncDataResponse>
+
 }
 
 @ContributesBinding(AppScope::class)
@@ -44,6 +45,10 @@ class AppSyncApiClient @Inject constructor(
         val token =
             syncStore.token.takeUnless { it.isNullOrEmpty() }
                 ?: return Result.Error(reason = "Token Empty")
+
+        if (changes.isEmpty()){
+            return Result.Error(reason = "Changes Empty")
+        }
 
         val localChangesJSON = mapChanges(changes)
         Timber.d("Sync: patch data generated $localChangesJSON")

@@ -25,6 +25,8 @@ import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncDataResponse
 import com.duckduckgo.sync.impl.SyncRepository
+import com.duckduckgo.sync.impl.engine.SyncOperation.DISCARD
+import com.duckduckgo.sync.impl.engine.SyncOperation.EXECUTE
 import com.duckduckgo.sync.store.model.SyncAttempt
 import com.duckduckgo.sync.store.model.SyncState.FAIL
 import com.duckduckgo.sync.store.model.SyncState.IN_PROGRESS
@@ -37,11 +39,25 @@ import javax.inject.Inject
 class RealSyncEngine @Inject constructor(
     private val syncRepository: SyncRepository,
     private val syncApi: SyncApiClient,
+    private val syncScheduler: SyncScheduler,
     private val syncStateRepository: SyncStateRepository,
     private val plugins: PluginPoint<SyncablePlugin>,
 ) : SyncEngine {
 
     override fun syncNow() {
+        Timber.d("Sync: petition to sync now")
+        when (syncScheduler.scheduleOperation()){
+            DISCARD -> {
+                Timber.d("Sync: petition to sync denied, debouncing")
+            }
+            EXECUTE -> {
+                Timber.d("Sync: petition to sync accepted, syncing now")
+                performSync()
+            }
+        }
+    }
+
+    private fun performSync(){
         // get all changes from last sync
         // send changes to api
         // receive api changes
@@ -49,28 +65,36 @@ class RealSyncEngine @Inject constructor(
         // send changes to observers
         val changes = getListOfChanges()
 
+        val syncAttempt = SyncAttempt(state = IN_PROGRESS, meta = "Manual launch")
+        syncStateRepository.store(syncAttempt)
+
         if (changes.isEmpty()) {
-            Timber.d("Sync: no changes to sync")
+            Timber.d("Sync: no changes to sync, asking for remote changes")
+            receiveRemoteChange()
         } else {
             Timber.d("Sync: changes to update $changes")
             Timber.d("Sync: starting to sync")
+            sendLocalChanges(changes)
+        }
+    }
 
-            val syncAttempt = SyncAttempt(state = IN_PROGRESS, meta = "Manual launch")
-            syncStateRepository.store(syncAttempt)
+    private fun sendLocalChanges(changes: List<SyncChanges>) {
+        when (val result = syncApi.patch(changes)) {
+            is Error -> {
+                Timber.d("Sync: patch failed ${result.reason}")
+                syncStateRepository.updateSyncState(FAIL)
+            }
 
-            when (val result = syncApi.patch(changes)) {
-                is Error -> {
-                    Timber.d("Sync: patch failed ${result.reason}")
-                    syncStateRepository.updateSyncState(FAIL)
-                }
-
-                is Success -> {
-                    Timber.d("Sync: patch success")
-                    syncStateRepository.updateSyncState(SUCCESS)
-                    sendChanges(result.data)
-                }
+            is Success -> {
+                Timber.d("Sync: patch success")
+                syncStateRepository.updateSyncState(SUCCESS)
+                sendChanges(result.data)
             }
         }
+    }
+
+    private fun receiveRemoteChange(){
+        // calls to GET
     }
 
     private fun getListOfChanges(): List<SyncChanges> {
@@ -101,7 +125,7 @@ class RealSyncEngine @Inject constructor(
         // if so then call syncNow
         // otherwise do nothing
         Timber.d("Sync: notifyDataChanged")
-        syncNow()
+        performSync()
     }
 
     private fun sendChanges(data: SyncDataResponse) {

@@ -337,7 +337,7 @@ class AppSyncRepositoryTest {
     fun whenInitialPatchSucceedsThenReturnSuccess() = runTest {
         whenever(syncStore.token).thenReturn(token)
         whenever(syncCrypter.generateAllData()).thenReturn(syncData)
-        whenever(syncApi.sendAllBookmarks(token, syncData)).thenReturn(patchAllSuccess)
+        whenever(syncApi.patch(token, syncData)).thenReturn(patchAllSuccess)
 
         val result = syncRepo.sendAllData()
 
@@ -348,7 +348,7 @@ class AppSyncRepositoryTest {
     fun whenInitialPatchFailsThenReturnError() = runTest {
         whenever(syncStore.token).thenReturn(token)
         whenever(syncCrypter.generateAllData()).thenReturn(syncData)
-        whenever(syncApi.sendAllBookmarks(token, syncData)).thenReturn(patchAllError)
+        whenever(syncApi.patch(token, syncData)).thenReturn(patchAllError)
 
         val result = syncRepo.sendAllData()
 
