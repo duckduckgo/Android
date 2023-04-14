@@ -270,7 +270,11 @@
                 "siteURL": "https://ok-subdomain.also-site-that-tracks.com",
                 "requestURL": "https://sometimes-bad.third-party.site/option-blocking-only",
                 "requestType": "image",
-                "expectAction": "ignore"
+                "expectAction": "ignore",
+                "exceptPlatforms": [
+                    "web-extension",
+                    "web-extension-mv3"
+                ]
             },
             {
                 "name": "don't block tracker with site matching options domains but not types",
