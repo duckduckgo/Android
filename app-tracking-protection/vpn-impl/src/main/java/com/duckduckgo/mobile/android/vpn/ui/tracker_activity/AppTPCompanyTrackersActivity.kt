@@ -237,7 +237,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
         private const val EXTRA_APP_NAME = "EXTRA_APP_NAME"
         private const val EXTRA_DATE = "EXTRA_DATE"
 
-        fun intent(
+        internal fun intent(
             context: Context,
             packageName: String,
             appDisplayName: String,

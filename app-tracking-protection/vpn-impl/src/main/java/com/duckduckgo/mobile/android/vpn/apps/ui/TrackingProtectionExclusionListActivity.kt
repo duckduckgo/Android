@@ -305,7 +305,7 @@ class TrackingProtectionExclusionListActivity :
             UNPROTECTED_ONLY,
         }
 
-        fun intent(
+        internal fun intent(
             context: Context,
             isRunning: Boolean = true,
             filter: AppsFilter = AppsFilter.ALL,

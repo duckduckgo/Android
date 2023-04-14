@@ -99,7 +99,11 @@ subprojects {
                                     "Only :app module can depend on 'impl' modules")
                         }
                         // API modules can depend on :feature-toggles-api
-                        if (projectPath.endsWith("api") && dependencyPath.endsWith("api") && dependencyPath != ":feature-toggles-api") {
+                        if (projectPath.endsWith("api")
+                                && dependencyPath.endsWith("api")
+                                && dependencyPath != ":feature-toggles-api"
+                                && dependencyPath != ":navigation-api"
+                        ) {
                             throw new GradleException("Invalid dependency $projectPath -> $dependencyPath. " +
                                     "'api' modules can't depend on other 'api' modules")
                         }

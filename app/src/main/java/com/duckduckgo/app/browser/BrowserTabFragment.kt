@@ -194,6 +194,7 @@ import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
 import com.duckduckgo.downloads.api.DownloadCommand
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.mobile.android.ui.store.BrowserAppTheme
 import com.duckduckgo.mobile.android.ui.view.*
 import com.duckduckgo.mobile.android.ui.view.DaxDialog
@@ -204,7 +205,7 @@ import com.duckduckgo.mobile.android.ui.view.dialog.DaxAlertDialog
 import com.duckduckgo.mobile.android.ui.view.dialog.StackedAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnOnboardingActivity
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
@@ -378,6 +379,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var sitePermissionsDialogLauncher: SitePermissionsDialogLauncher
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
     private var urlExtractingWebView: UrlExtractingWebView? = null
 
@@ -2500,7 +2504,7 @@ class BrowserTabFragment :
     }
 
     private fun launchAppTPOnboardingScreen() {
-        startActivity(VpnOnboardingActivity.intent(requireContext()))
+        globalActivityStarter.start(requireContext(), AppTrackerOnboardingActivityWithEmptyParamsParams)
     }
 
     private fun launchSurvey(survey: Survey) {

@@ -14,21 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.impl.ui
+package com.duckduckgo.sync.api
 
-import android.content.Context
-import android.content.Intent
-import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.api.SyncNav
-import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.*
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 
-@ContributesBinding(
-    scope = AppScope::class,
-    priority = ContributesBinding.Priority.HIGHEST,
-)
-class AppSyncNav @Inject constructor() : SyncNav {
-    override fun openSyncActivity(context: Context): Intent {
-        return SyncActivity.intent(context)
-    }
-}
+/**
+ * Use this class to launch the sync screen without parameters
+ * ```kotlin
+ * globalActivityStarter.start(context, SyncActivityWithEmptyParams)
+ * ```
+ */
+object SyncActivityWithEmptyParams : GlobalActivityStarter.ActivityParams

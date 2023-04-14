@@ -162,6 +162,9 @@ fladle {
 }
 
 dependencies {
+    implementation project(':navigation-api')
+    implementation project(':navigation-impl')
+
     implementation project(path: ':vpn-network-api')
     implementation project(path: ':vpn-network-impl')
 

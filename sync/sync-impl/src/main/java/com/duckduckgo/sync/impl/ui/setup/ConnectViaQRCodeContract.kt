@@ -22,7 +22,7 @@ import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
 import com.duckduckgo.sync.impl.ui.ShowQRCodeActivity
 
-class ConnectViaQRCodeContract : ActivityResultContract<Void?, Boolean>() {
+internal class ConnectViaQRCodeContract : ActivityResultContract<Void?, Boolean>() {
     override fun createIntent(
         context: Context,
         input: Void?,
