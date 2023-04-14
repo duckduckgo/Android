@@ -19,6 +19,8 @@ package com.duckduckgo.mobile.android.vpn.processor.tcp.tracker
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
@@ -45,7 +47,10 @@ interface AppTrackerRecorder {
     boundType = AppTrackerRecorder::class,
 )
 @SingleInstanceIn(VpnScope::class)
-class BatchedAppTrackerRecorder @Inject constructor(vpnDatabase: VpnDatabase) : VpnServiceCallbacks, AppTrackerRecorder {
+class BatchedAppTrackerRecorder @Inject constructor(
+    vpnDatabase: VpnDatabase,
+    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
+) : VpnServiceCallbacks, AppTrackerRecorder {
 
     private val batchedTrackers = mutableListOf<VpnTracker>()
     private val dao = vpnDatabase.vpnTrackerDao()
@@ -53,8 +58,9 @@ class BatchedAppTrackerRecorder @Inject constructor(vpnDatabase: VpnDatabase) : 
     private val periodicInsertionJob = ConflatedJob()
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        logcat { "Batched app tracker recorder starting" }
+        if (!vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)) return
 
+        logcat { "Batched app tracker recorder starting" }
         periodicInsertionJob += coroutineScope.launch(insertionDispatcher) {
             while (isActive) {
                 flushInMemoryTrackersToDatabase()

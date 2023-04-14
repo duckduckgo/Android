@@ -103,6 +103,7 @@ class NewAppBroadcastReceiver @Inject constructor(
     }
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
+        if (!vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)) return
         logcat { "New app receiver started" }
         register()
     }
