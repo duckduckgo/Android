@@ -177,7 +177,7 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
 
         const val SETUP_ACCOUNT_SCREEN_EXTRA = "SETUP_ACCOUNT_SCREEN_EXTRA"
 
-        fun intentStartSetupFlow(context: Context): Intent {
+        internal fun intentStartSetupFlow(context: Context): Intent {
             return Intent(context, SetupAccountActivity::class.java).apply {
                 putExtra(SETUP_ACCOUNT_SCREEN_EXTRA, SETUP)
             }

@@ -83,7 +83,7 @@ import com.duckduckgo.mobile.android.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.sync.api.SyncNav
+import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.duckduckgo.windows.api.WindowsWaitlistState
 import com.duckduckgo.windows.api.WindowsWaitlistState.InBeta
 import com.duckduckgo.windows.api.WindowsWaitlistState.JoinedWaitlist
@@ -111,9 +111,6 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
-
-    @Inject
-    lateinit var syncNav: SyncNav
 
     @Inject
     lateinit var autofillSettingsActivityLauncher: AutofillSettingsActivityLauncher
@@ -656,7 +653,7 @@ class SettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun launchSyncSettings() {
-        startActivity(syncNav.openSyncActivity(this))
+        globalActivityStarter.start(this, SyncActivityWithEmptyParams)
     }
 
     private fun launchAutoconsent() {

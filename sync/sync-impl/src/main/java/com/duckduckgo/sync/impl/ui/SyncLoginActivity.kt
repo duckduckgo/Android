@@ -103,7 +103,7 @@ class SyncLoginActivity : DuckDuckGoActivity() {
     }
 
     companion object {
-        fun intent(context: Context): Intent {
+        internal fun intent(context: Context): Intent {
             return Intent(context, SyncLoginActivity::class.java)
         }
     }
