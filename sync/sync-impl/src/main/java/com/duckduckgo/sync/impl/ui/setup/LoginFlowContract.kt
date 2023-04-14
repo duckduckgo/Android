@@ -22,7 +22,7 @@ import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
 import com.duckduckgo.sync.impl.ui.SyncLoginActivity
 
-class LoginContract : ActivityResultContract<Void?, Boolean>() {
+internal class LoginContract : ActivityResultContract<Void?, Boolean>() {
     override fun createIntent(
         context: Context,
         input: Void?,

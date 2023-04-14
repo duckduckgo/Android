@@ -23,7 +23,8 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
     implementation Kotlin.stdlib.jdk7
-    api project(path: ':feature-toggles-api')
+    api project(':feature-toggles-api')
+    api project(':navigation-api')
 }
 
 android {

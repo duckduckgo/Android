@@ -235,7 +235,7 @@ class ManageRecentAppsProtectionActivity :
 
     companion object {
         private const val REPORT_ISSUES_ANNOTATION = "report_issues_link"
-        fun intent(
+        internal fun intent(
             context: Context,
         ): Intent {
             return Intent(context, ManageRecentAppsProtectionActivity::class.java)
