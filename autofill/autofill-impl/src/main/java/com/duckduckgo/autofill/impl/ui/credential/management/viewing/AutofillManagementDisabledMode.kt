@@ -17,9 +17,14 @@
 package com.duckduckgo.autofill.impl.ui.credential.management.viewing
 
 import android.annotation.SuppressLint
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings.ACTION_BIOMETRIC_ENROLL
+import android.provider.Settings.ACTION_FINGERPRINT_ENROLL
+import android.provider.Settings.ACTION_SECURITY_SETTINGS
+import android.provider.Settings.ACTION_SETTINGS
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,6 +34,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.impl.databinding.FragmentAutofillManagementDisabledBinding
 import com.duckduckgo.di.scopes.FragmentScope
 import javax.inject.Inject
+import timber.log.Timber
 
 @InjectWith(FragmentScope::class)
 class AutofillManagementDisabledMode : DuckDuckGoFragment() {
@@ -60,21 +66,44 @@ class AutofillManagementDisabledMode : DuckDuckGoFragment() {
     @SuppressLint("InlinedApi", "DEPRECATION")
     private fun launchDeviceAuthEnrollment() {
         when {
-            appBuildConfig.manufacturer == "Xiaomi" ->
+            appBuildConfig.manufacturer == "Xiaomi" -> {
                 // Issue on Xiaomi: https://stackoverflow.com/questions/68484485/intent-action-fingerprint-enroll-on-redmi-results-in-exception
-                requireActivity().startActivity(Intent(android.provider.Settings.ACTION_SETTINGS))
-            appBuildConfig.sdkInt >= Build.VERSION_CODES.R ->
-                requireActivity().startActivity(Intent(android.provider.Settings.ACTION_BIOMETRIC_ENROLL))
-            appBuildConfig.sdkInt >= Build.VERSION_CODES.P ->
-                requireActivity().startActivity(Intent(android.provider.Settings.ACTION_FINGERPRINT_ENROLL))
-            else ->
-                requireActivity().startActivity(Intent(android.provider.Settings.ACTION_SECURITY_SETTINGS))
+                SYSTEM_SETTINGS_ACTION.safeLaunchSettingsActivity(tryFallback = false)
+            }
+
+            appBuildConfig.sdkInt >= Build.VERSION_CODES.R -> {
+                ACTION_BIOMETRIC_ENROLL.safeLaunchSettingsActivity(tryFallback = true)
+            }
+
+            appBuildConfig.sdkInt >= Build.VERSION_CODES.P -> {
+                ACTION_FINGERPRINT_ENROLL.safeLaunchSettingsActivity(tryFallback = true)
+            }
+
+            else -> {
+                ACTION_SECURITY_SETTINGS.safeLaunchSettingsActivity(tryFallback = true)
+            }
         }
 
         requireActivity().finish()
     }
 
+    /**
+     * Attempt to launch the given activity.
+     * If it fails because the activity wasn't found, try launching the main settings activity if tryFallback=true.
+     */
+    private fun String.safeLaunchSettingsActivity(tryFallback: Boolean) {
+        try {
+            requireActivity().startActivity(Intent(this))
+        } catch (e: ActivityNotFoundException) {
+            Timber.w("%s. Trying fallback? %s", e.message, tryFallback)
+            if (tryFallback) {
+                SYSTEM_SETTINGS_ACTION.safeLaunchSettingsActivity(tryFallback = false)
+            }
+        }
+    }
+
     companion object {
         fun instance() = AutofillManagementDisabledMode()
+        private const val SYSTEM_SETTINGS_ACTION = ACTION_SETTINGS
     }
 }
