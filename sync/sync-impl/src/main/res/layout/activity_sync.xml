@@ -43,7 +43,8 @@
         <ViewSwitcher
             android:id="@+id/viewSwitcher"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:measureAllChildren="false">
 
             <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:layout_width="match_parent"
@@ -137,6 +138,7 @@
                     android:layout_height="wrap_content"/>
 
                 <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+                    android:id="@+id/deleteAccountButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryTextTruncated="true"

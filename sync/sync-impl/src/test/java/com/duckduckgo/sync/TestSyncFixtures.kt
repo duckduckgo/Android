@@ -152,7 +152,8 @@ object TestSyncFixtures {
 
     val getDevicesSuccess = Result.Success(listOfDevices)
     val getDevicesError = Result.Error(code = invalidCodeErr, reason = invalidMessageErr)
-    val listOfConnectedDevices = listOf(ConnectedDevice(thisDevice = true, deviceName = deviceName, deviceId = deviceId, deviceType = deviceType))
+    val connectedDevice = ConnectedDevice(thisDevice = true, deviceName = deviceName, deviceId = deviceId, deviceType = deviceType)
+    val listOfConnectedDevices = listOf(connectedDevice)
 
     val connectKey = ConnectKey(encryptedRecoveryCode)
     const val keysNotFoundErr = "connection_keys_not_found"

@@ -26,16 +26,21 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
+import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivitySyncBinding
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccount
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(SyncActivityWithEmptyParams::class)
@@ -83,16 +88,65 @@ class SyncActivity : DuckDuckGoActivity() {
             LaunchDeviceSetupFlow -> {
                 startActivity(SetupAccountActivity.intentStartSetupFlow(this))
             }
+
+            AskTurnOffSync -> askTurnOffsync()
+            AskDeleteAccount -> askDeleteAccount()
         }
     }
 
+    private fun askDeleteAccount() {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.turn_off_sync_dialog_title)
+            .setMessage(getString(R.string.turn_off_sync_dialog_content))
+            .setPositiveButton(R.string.turn_off_sync_dialog_primary_button)
+            .setNegativeButton(R.string.turn_off_sync_dialog_secondary_button)
+            .setDestructiveButtons(true)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onDeleteAccountConfirmed()
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        viewModel.onDeleteAccountCancelled()
+                    }
+                },
+            ).show()
+    }
+
+    private fun askTurnOffsync() {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.turn_off_sync_dialog_title)
+            .setMessage(getString(R.string.turn_off_sync_dialog_content))
+            .setPositiveButton(R.string.turn_off_sync_dialog_primary_button)
+            .setNegativeButton(R.string.turn_off_sync_dialog_secondary_button)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onTurnOffSyncConfirmed()
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        viewModel.onTurnOffSyncCancelled()
+                    }
+                },
+            ).show()
+    }
+
     private fun renderViewState(viewState: ViewState) {
+        Timber.i("CRIS: renderViewState: $viewState")
         binding.deviceSyncStatusToggle.quietlySetIsChecked(viewState.isDeviceSyncEnabled, deviceSyncStatusToggleListener)
         binding.viewSwitcher.displayedChild = if (viewState.showAccount) 1 else 0
 
-        if (viewState.loginQRCode != null) {
-            binding.qrCodeImageView.show()
-            binding.qrCodeImageView.setImageBitmap(viewState.loginQRCode)
+        if (viewState.showAccount) {
+            if (viewState.loginQRCode != null) {
+                binding.qrCodeImageView.show()
+                binding.qrCodeImageView.setImageBitmap(viewState.loginQRCode)
+            }
+
+            binding.deleteAccountButton.setOnClickListener {
+                viewModel.onDeleteAccountClicked()
+            }
         }
     }
 }
