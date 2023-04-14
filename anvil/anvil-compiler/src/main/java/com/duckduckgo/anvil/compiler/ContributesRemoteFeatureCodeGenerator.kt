@@ -33,7 +33,6 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import dagger.BindsOptionalOf
 import dagger.Provides
 import java.io.File
-import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.name.FqName
@@ -43,10 +42,6 @@ import org.jetbrains.kotlin.utils.addToStdlib.ifFalse
 @OptIn(ExperimentalAnvilApi::class)
 @AutoService(CodeGenerator::class)
 class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
-
-    private val settingsStorePresent = AtomicBoolean(true)
-    private val exceptionStorePresent = AtomicBoolean(true)
-    private val toggleStorePresent = AtomicBoolean(false)
 
     override fun isApplicable(context: AnvilContext): Boolean = true
 
@@ -58,11 +53,12 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
         return projectFiles.classAndInnerClassReferences(module)
             .toList()
             .filter { it.isAnnotatedWith(ContributesRemoteFeature::class.fqName) }
-            .onEach { validateRemoteFeatureInterface(it, module) }
-            .flatMap {
+            .map { validateRemoteFeatureInterface(it, module) to it }
+            .flatMap { info ->
+                val (customStorePresence, classRef) = info
                 listOf(
-                    generateRemoteFeature(it, codeGenDir, module),
-                    generateFeatureToggleProxy(it, codeGenDir, module),
+                    generateRemoteFeature(classRef, codeGenDir, module, customStorePresence),
+                    generateFeatureToggleProxy(classRef, codeGenDir, module, customStorePresence),
 //                    generateOptionalBindings(it, codeGenDir, module),
                 )
             }
@@ -73,6 +69,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
         vmClass: ClassReference.Psi,
         codeGenDir: File,
         module: ModuleDescriptor,
+        customStorePresence: CustomStorePresence,
     ): GeneratedFile {
         val generatedPackage = vmClass.packageFqName.toString()
         val generatedClassName = "${vmClass.shortName}_ProxyModule"
@@ -125,7 +122,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                             .returns(boundType.asClassName())
                             .build(),
                     ).apply {
-                        if (!settingsStorePresent.get()) {
+                        if (!customStorePresence.settingsStorePresent) {
                             addFunction(
                                 FunSpec.builder("providesNoopSettingsStore")
                                     .addAnnotation(Provides::class.asClassName())
@@ -146,7 +143,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                     .build(),
                             )
                         }
-                        if (!exceptionStorePresent.get()) {
+                        if (!customStorePresence.exceptionStorePresent) {
                             addFunction(
                                 FunSpec.builder("providesNoopExceptionsStore")
                                     .addAnnotation(Provides::class.asClassName())
@@ -179,6 +176,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
         vmClass: ClassReference.Psi,
         codeGenDir: File,
         module: ModuleDescriptor,
+        customStorePresence: CustomStorePresence,
     ): GeneratedFile {
         val generatedPackage = vmClass.packageFqName.toString()
         val generatedClassName = "${vmClass.shortName}_RemoteFeature"
@@ -200,7 +198,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                     .addMember("ignoreQualifier = true")
                                     .build(),
                             )
-                            toggleStorePresent.get().ifFalse {
+                            customStorePresence.toggleStorePresent.ifFalse {
                                 add(
                                     AnnotationSpec
                                         .builder(ContributesBinding::class)
@@ -738,7 +736,11 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
     private fun validateRemoteFeatureInterface(
         vmClass: ClassReference.Psi,
         module: ModuleDescriptor,
-    ) {
+    ): CustomStorePresence {
+        var exceptionStore = false
+        var settingsStore = false
+        var toggleStore = false
+
         // validate type must be an interface
         if (!vmClass.isInterface()) {
             throw AnvilCompilationException(
@@ -775,7 +777,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             )
         }
         with(annotation.settingsStoreOrNull()) {
-            settingsStorePresent.set(this != null)
+            settingsStore = this != null
             if (this != null && this.directSuperTypeReferences()
                 .none { it.asClassReferenceOrNull()?.fqName == FeatureSettings.Store::class.fqName }
             ) {
@@ -786,7 +788,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             }
         }
         with(annotation.exceptionsStoreOrNull()) {
-            exceptionStorePresent.set(this != null)
+            exceptionStore = this != null
             if (this != null && this.directSuperTypeReferences()
                 .none { it.asClassReferenceOrNull()?.fqName == FeatureExceptions.Store::class.fqName }
             ) {
@@ -797,7 +799,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             }
         }
         with(annotation.toggleStoreOrNull()) {
-            toggleStorePresent.set(this != null)
+            toggleStore = this != null
             if (this != null && this.directSuperTypeReferences().none { it.asClassReferenceOrNull()?.fqName == Toggle.Store::class.fqName }) {
                 throw AnvilCompilationException(
                     "${vmClass.fqName} [toggleStore] must extend [Toggle.Store]",
@@ -839,6 +841,12 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                 element = vmClass.clazz.identifyingElement,
             )
         }
+
+        return CustomStorePresence(
+            exceptionStorePresent = exceptionStore,
+            toggleStorePresent = toggleStore,
+            settingsStorePresent = settingsStore,
+        )
     }
 
     private fun AnnotationReference.featureNameOrNull(): String? {
@@ -882,3 +890,9 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
         private val okioBuffer = FqName("okio.Buffer")
     }
 }
+
+private data class CustomStorePresence(
+    val settingsStorePresent: Boolean = false,
+    val exceptionStorePresent: Boolean = false,
+    val toggleStorePresent: Boolean = false,
+)
