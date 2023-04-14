@@ -8,7 +8,7 @@ appId: com.duckduckgo.mobile.android
 - tapOn: "cancel"
 - assertVisible:
     text: ".*I'll also upgrade the security of your connection if possible.*"
-- inputText: "https://www.search-company.site/"
+- inputText: "https://www.search-company.site/#ad-id-3"
 - pressKey: Enter
 - assertVisible:
     text: ".*Got It.*"
