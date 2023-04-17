@@ -2359,7 +2359,8 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun showOrHideKeyboard(cta: Cta?) {
-        command.value = if (cta is DialogCta || cta is HomePanelCta) HideKeyboard else ShowKeyboard
+        command.value =
+            if (cta is DialogCta || cta is HomePanelCta || cta is DaxBubbleCta.DaxEndEnableAppTpCta) HideKeyboard else ShowKeyboard
     }
 
     fun registerDaxBubbleCtaDismissed() {
