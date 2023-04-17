@@ -23,17 +23,18 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    anvil project(path: ':anvil-compiler')
-    implementation project(path: ':anvil-annotations')
-    implementation project(path: ':di')
-    implementation project(path: ':privacy-dashboard-api')
-    implementation project(path: ':privacy-config-api')
-    implementation project(path: ':statistics')
-    implementation project(path: ':common')
-    implementation project(path: ':common-ui')
-    implementation project(path: ':browser-api')
-    implementation project(path: ':autoconsent-api')
-    implementation project(path: ':app-build-config-api')
+    anvil project(':anvil-compiler')
+    implementation project(':anvil-annotations')
+    implementation project(':di')
+    implementation project(':privacy-dashboard-api')
+    implementation project(':privacy-config-api')
+    implementation project(':statistics')
+    implementation project(':common')
+    implementation project(':common-ui')
+    implementation project(':browser-api')
+    implementation project(':autoconsent-api')
+    implementation project(':app-build-config-api')
+    implementation project(':navigation-api')
 
     implementation Google.dagger
     implementation AndroidX.appCompat
@@ -47,7 +48,7 @@ dependencies {
     implementation "com.airbnb.android:lottie:_"
     implementation Square.okHttp3.okHttp
 
-    testImplementation project(path: ':common-test')
+    testImplementation project(':common-test')
     testImplementation Testing.junit4
     testImplementation AndroidX.test.ext.junit
     testImplementation CashApp.turbine
@@ -61,7 +62,7 @@ dependencies {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
 
-    androidTestImplementation project(path: ':common-test')
+    androidTestImplementation project(':common-test')
     androidTestImplementation AndroidX.archCore.testing
     androidTestImplementation AndroidX.test.runner
     androidTestImplementation AndroidX.test.rules
