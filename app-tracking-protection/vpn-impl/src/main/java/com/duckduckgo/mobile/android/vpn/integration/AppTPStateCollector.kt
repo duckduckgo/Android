@@ -21,13 +21,13 @@ import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
-import org.json.JSONObject
 import javax.inject.Inject
+import org.json.JSONObject
 
 @ContributesMultibinding(VpnScope::class)
 class AppTPStateCollector @Inject constructor(
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
-): VpnStateCollectorPlugin {
+) : VpnStateCollectorPlugin {
     override suspend fun collectVpnRelatedState(appPackageId: String?): JSONObject {
         return JSONObject().apply {
             put("enabled", vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN))
