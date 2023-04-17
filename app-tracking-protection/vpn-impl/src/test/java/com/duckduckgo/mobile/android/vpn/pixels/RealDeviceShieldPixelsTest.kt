@@ -47,6 +47,7 @@ class RealDeviceShieldPixelsTest {
         deviceShieldPixels.deviceShieldEnabledOnSearch()
 
         verify(pixel).fire(DeviceShieldPixelNames.ATP_ENABLE_UPON_SEARCH_DAILY.pixelName)
+        verify(pixel, times(2)).fire(DeviceShieldPixelNames.ATP_ENABLE_UPON_SEARCH.pixelName)
         verifyNoMoreInteractions(pixel)
     }
 
@@ -56,6 +57,7 @@ class RealDeviceShieldPixelsTest {
         deviceShieldPixels.deviceShieldDisabledOnSearch()
 
         verify(pixel).fire(DeviceShieldPixelNames.ATP_DISABLE_UPON_SEARCH_DAILY.pixelName)
+        verify(pixel, times(2)).fire(DeviceShieldPixelNames.ATP_DISABLE_UPON_SEARCH.pixelName)
         verifyNoMoreInteractions(pixel)
     }
 
