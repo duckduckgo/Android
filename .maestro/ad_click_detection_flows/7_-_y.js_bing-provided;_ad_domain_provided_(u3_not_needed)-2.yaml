@@ -21,6 +21,8 @@ appId: com.duckduckgo.mobile.android
 - scrollUntilVisible:
     element:
         id: "ad-id-7"
+- assertVisible:
+      id: "ad-id-7"
 - tapOn:
     id: "ad-id-7"
 - assertVisible:
