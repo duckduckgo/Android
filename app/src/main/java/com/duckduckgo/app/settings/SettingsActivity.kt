@@ -88,7 +88,7 @@ import com.duckduckgo.windows.api.WindowsWaitlistState
 import com.duckduckgo.windows.api.WindowsWaitlistState.InBeta
 import com.duckduckgo.windows.api.WindowsWaitlistState.JoinedWaitlist
 import com.duckduckgo.windows.api.WindowsWaitlistState.NotJoinedQueue
-import com.duckduckgo.windows.impl.waitlist.ui.WindowsWaitlistActivity
+import com.duckduckgo.windows.api.ui.WindowsWaitlistScreenWithEmptyParams
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -649,7 +649,7 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     private fun launchWindowsScreen() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivity(WindowsWaitlistActivity.intent(this), options)
+        globalActivityStarter.start(this, WindowsWaitlistScreenWithEmptyParams, options)
     }
 
     private fun launchSyncSettings() {

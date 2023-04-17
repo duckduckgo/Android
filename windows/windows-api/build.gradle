@@ -32,5 +32,6 @@ android {
 
 dependencies {
     implementation Kotlin.stdlib.jdk7
-    api project(path: ':feature-toggles-api')
+    api project(':navigation-api')
+    api project(':feature-toggles-api')
 }

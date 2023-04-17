@@ -33,6 +33,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
@@ -46,6 +47,7 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.windows.api.WindowsWaitlistState.InBeta
 import com.duckduckgo.windows.api.WindowsWaitlistState.JoinedWaitlist
 import com.duckduckgo.windows.api.WindowsWaitlistState.NotJoinedQueue
+import com.duckduckgo.windows.api.ui.WindowsWaitlistScreenWithEmptyParams
 import com.duckduckgo.windows.impl.R
 import com.duckduckgo.windows.impl.databinding.ActivityWindowsWaitlistBinding
 import com.duckduckgo.windows.impl.waitlist.ui.WindowsWaitlistViewModel.Command
@@ -60,6 +62,7 @@ import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
+@ContributeToActivityStarter(WindowsWaitlistScreenWithEmptyParams::class)
 class WindowsWaitlistActivity : DuckDuckGoActivity() {
 
     private val viewModel: WindowsWaitlistViewModel by bindViewModel()
@@ -221,10 +224,10 @@ class WindowsWaitlistActivity : DuckDuckGoActivity() {
     }
 
     companion object {
-        const val CLIPBOARD_LABEL = "INVITE_CODE"
-        const val LAUNCH_FROM_NOTIFICATION_PIXEL_NAME = "LAUNCH_FROM_NOTIFICATION_PIXEL_NAME"
+        private const val CLIPBOARD_LABEL = "INVITE_CODE"
+        internal const val LAUNCH_FROM_NOTIFICATION_PIXEL_NAME = "LAUNCH_FROM_NOTIFICATION_PIXEL_NAME"
 
-        fun intent(context: Context): Intent {
+        internal fun intent(context: Context): Intent {
             return Intent(context, WindowsWaitlistActivity::class.java)
         }
     }
