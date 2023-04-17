@@ -354,10 +354,12 @@ class RealDeviceShieldPixels @Inject constructor(
 
     override fun deviceShieldEnabledOnSearch() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ENABLE_UPON_SEARCH_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_ENABLE_UPON_SEARCH)
     }
 
     override fun deviceShieldDisabledOnSearch() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DISABLE_UPON_SEARCH_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DISABLE_UPON_SEARCH)
     }
 
     override fun deviceShieldEnabledOnAppLaunch() {
