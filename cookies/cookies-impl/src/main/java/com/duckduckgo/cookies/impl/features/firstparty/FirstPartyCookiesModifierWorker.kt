@@ -50,12 +50,8 @@ class FirstPartyCookiesModifierWorker(
 
     override suspend fun doWork(): Result {
         return withContext(dispatcherProvider.io()) {
-            val result = firstPartyCookiesModifier.expireFirstPartyCookies()
-            return@withContext if (result) {
-                Result.success()
-            } else {
-                Result.retry()
-            }
+            firstPartyCookiesModifier.expireFirstPartyCookies()
+            Result.success()
         }
     }
 }
@@ -78,12 +74,16 @@ class FirstPartyCookiesModifierWorkerScheduler @Inject constructor(
     override fun onStop(owner: LifecycleOwner) {
         if (isFeatureEnabled()) {
             workManager.enqueueUniquePeriodicWork(FIRST_PARTY_COOKIES_EXPIRE_WORKER_TAG, ExistingPeriodicWorkPolicy.REPLACE, workerRequest)
+        } else {
+            workManager.cancelAllWorkByTag(FIRST_PARTY_COOKIES_EXPIRE_WORKER_TAG)
         }
     }
 
     override fun onStart(owner: LifecycleOwner) {
         if (isFeatureEnabled()) {
             workManager.enqueueUniquePeriodicWork(FIRST_PARTY_COOKIES_EXPIRE_WORKER_TAG, ExistingPeriodicWorkPolicy.KEEP, workerRequest)
+        } else {
+            workManager.cancelAllWorkByTag(FIRST_PARTY_COOKIES_EXPIRE_WORKER_TAG)
         }
     }
 

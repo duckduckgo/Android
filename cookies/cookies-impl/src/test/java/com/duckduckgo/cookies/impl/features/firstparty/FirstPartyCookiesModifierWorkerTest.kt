@@ -27,7 +27,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 
 class FirstPartyCookiesModifierWorkerTest {
     @get:Rule var coroutineRule = CoroutineTestRule()
@@ -41,9 +40,7 @@ class FirstPartyCookiesModifierWorkerTest {
     }
 
     @Test
-    fun whenDoWorkIfExpireFirstPartyCookiesReturnsTrueThenReturnSuccess() = runTest {
-        whenever(mockFirstPartyCookiesModifier.expireFirstPartyCookies()).thenReturn(true)
-
+    fun whenDoWorkThenReturnSuccess() = runTest {
         val worker = TestListenableWorkerBuilder<FirstPartyCookiesModifierWorker>(context = context).build()
 
         worker.firstPartyCookiesModifier = mockFirstPartyCookiesModifier
@@ -51,18 +48,5 @@ class FirstPartyCookiesModifierWorkerTest {
 
         val result = worker.doWork()
         assertThat(result, `is`(Result.success()))
-    }
-
-    @Test
-    fun whenDoWorkIfExpireFirstPartyCookiesReturnsFalseThenReturnRetry() = runTest {
-        whenever(mockFirstPartyCookiesModifier.expireFirstPartyCookies()).thenReturn(false)
-
-        val worker = TestListenableWorkerBuilder<FirstPartyCookiesModifierWorker>(context = context).build()
-
-        worker.firstPartyCookiesModifier = mockFirstPartyCookiesModifier
-        worker.dispatcherProvider = coroutineRule.testDispatcherProvider
-
-        val result = worker.doWork()
-        assertThat(result, `is`(Result.retry()))
     }
 }
