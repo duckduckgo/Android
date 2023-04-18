@@ -27,7 +27,6 @@ import com.duckduckgo.app.fire.FireproofRepository
 import com.duckduckgo.app.fire.WebViewDatabaseLocator
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.cookies.api.CookieException
 import com.duckduckgo.cookies.impl.DefaultCookieManagerProvider
 import com.duckduckgo.cookies.impl.SQLCookieRemover
@@ -73,7 +72,6 @@ class FirstPartyCookiesReferenceTest(private val testCase: TestCase) {
     private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
     private val cookieManagerProvider = DefaultCookieManagerProvider()
     private val cookieManager = cookieManagerProvider.get()
-    private val mockPixel = mock<Pixel>()
     private val cookiesRepository = mock<CookiesRepository>()
     private val unprotectedTemporary = mock<UnprotectedTemporary>()
     private val userAllowListRepository = mock<UserAllowListRepository>()
