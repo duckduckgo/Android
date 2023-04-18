@@ -105,7 +105,6 @@ data class JsonAppBlockingList(
 
 class JsonAppTracker(
     val owner: TrackerOwner,
-    val app: TrackerApp,
     @field:Json(name = "default")
     val defaultAction: String? = null,
 )
@@ -120,6 +119,7 @@ data class TrackerOwner(
     val displayName: String,
 )
 
+@Deprecated("This obj is no longer used. Stays to avoid db migration, SQLite doesn't allow renaming columns")
 data class TrackerApp(
     val score: Int,
     val prevalence: Double,
