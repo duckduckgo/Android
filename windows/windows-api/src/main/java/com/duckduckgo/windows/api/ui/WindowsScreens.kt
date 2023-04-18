@@ -14,18 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.windows.impl.waitlist.ui
+package com.duckduckgo.windows.api.ui
 
-import android.content.Context
-import android.content.Intent
-import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.windows.api.WindowsSettingsNav
-import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 
-@ContributesBinding(AppScope::class)
-class WindowsSettingsNavImpl @Inject constructor() : WindowsSettingsNav {
-    override fun openWindowsSettings(activityContext: Context): Intent {
-        return WindowsWaitlistActivity.intent(activityContext)
-    }
-}
+/**
+ * Use this model to start the windows waitlist activity with no arguments
+ */
+object WindowsWaitlistScreenWithEmptyParams : GlobalActivityStarter.ActivityParams
