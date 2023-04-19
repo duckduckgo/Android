@@ -123,9 +123,10 @@ class AppSyncRepository @Inject constructor(
     }
 
     override fun login(recoveryCodeRawJson: String): Result<Boolean> {
-        val recoveryCode = Adapters.recoveryCodeAdapter.fromJson(recoveryCodeRawJson.decodeB64())?.recovery ?: return Result.Error(
-            reason = "Failed reading json",
-        )
+        val recoveryCode = kotlin.runCatching {
+            Adapters.recoveryCodeAdapter.fromJson(recoveryCodeRawJson.decodeB64())?.recovery
+        }.getOrNull() ?: return Result.Error(reason = "Failed to decode recovery code")
+
         val primaryKey = recoveryCode.primaryKey
         val userId = recoveryCode.userId
         val deviceId = syncDeviceIds.deviceId()

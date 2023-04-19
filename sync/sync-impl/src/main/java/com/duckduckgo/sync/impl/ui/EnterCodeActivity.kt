@@ -26,12 +26,15 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.ui.view.hide
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.databinding.ActivityEnterCodeBinding
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command
+import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.Error
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.LoginSucess
+import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.ShowLoading
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.ViewState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -78,9 +81,14 @@ class EnterCodeActivity : DuckDuckGoActivity() {
                 finish()
             }
 
-            Command.Error -> {
-                setResult(RESULT_CANCELED)
-                finish()
+            Error -> {
+                binding.loadingIndicatorContainer.hide()
+                binding.errorAuthStateHint.show()
+            }
+
+            ShowLoading -> {
+                binding.loadingIndicatorContainer.show()
+                binding.errorAuthStateHint.hide()
             }
         }
     }

@@ -15,7 +15,8 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:app="http://schemas.android.com/apk/res-auto"
               android:orientation="vertical"
               android:layout_width="match_parent"
@@ -26,8 +27,12 @@
         layout="@layout/include_default_toolbar"/>
 
     <FrameLayout
+        android:id="@+id/enterCodeContainer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/includeToolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
         <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/enterCodeHint"
             android:layout_width="310dp"
@@ -37,8 +42,6 @@
             app:typography="caption"
             app:textType="secondary"
             android:text="Copy the code from the Settings > Sync page in the DuckDuckGo App on another synced device and paste it here to sync this device."/>
-
-
         <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/pastedCode"
             android:layout_width="310dp"
@@ -49,16 +52,67 @@
             android:text="Copy the code from the Settings > Sync page in the DuckDuckGo App on another synced device and paste it here to sync this device."/>
     </FrameLayout>
 
+    <LinearLayout
+        android:id="@+id/loadingIndicatorContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/enterCodeContainer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:visibility="invisible">
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/loadingIndicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:indicatorSize="16dp"
+            app:trackThickness="1dp"
+            style="@style/Widget.App.CircularProgressIndicator"
+            android:indeterminate="true" />
+
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            android:id="@+id/verifyingAuthStateHint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            app:typography="caption"
+            app:textType="secondary"
+            android:text="Verifying code"/>
+    </LinearLayout>
+
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        android:id="@+id/errorAuthStateHint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/enterCodeContainer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:gravity="center"
+        app:typography="caption"
+        app:textType="secondary"
+        android:visibility="invisible"
+        android:text="⚠️ Invalid Code"/>
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/hintBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="errorAuthStateHint,loadingIndicatorContainer" />
+
     <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
         android:id="@+id/pasteCodeButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/hintBarrier"
         android:gravity="center"
-        app:buttonSize="large"
-        android:layout_marginBottom="@dimen/keyline_5"
-        android:layout_marginStart="@dimen/keyline_5"
-        android:layout_marginEnd="@dimen/keyline_5"
+        app:buttonSize="small"
+        android:layout_margin="@dimen/keyline_4"
         android:layout_gravity="center"
         android:text="Paste Code"/>
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

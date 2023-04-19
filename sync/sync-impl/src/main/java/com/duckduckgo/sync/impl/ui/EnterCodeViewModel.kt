@@ -22,6 +22,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.Clipboard
+import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncRepository
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -47,7 +48,7 @@ class EnterCodeViewModel @Inject constructor(
     fun viewState(): Flow<ViewState> = viewState
 
     data class ViewState(
-        val code: String = ""
+        val code: String = "",
     )
 
     sealed class Command {
@@ -58,7 +59,13 @@ class EnterCodeViewModel @Inject constructor(
 
     fun onPasteCodeClicked() {
         viewModelScope.launch {
+            val pastedCode = clipboard.pasteFromClipboard()
             viewState.value = viewState.value.copy(code = clipboard.pasteFromClipboard())
+            command.send(Command.ShowLoading)
+            when (syncRepository.login(pastedCode)) {
+                is Result.Success -> command.send(Command.LoginSucess)
+                is Result.Error -> command.send(Command.Error)
+            }
         }
     }
 }
