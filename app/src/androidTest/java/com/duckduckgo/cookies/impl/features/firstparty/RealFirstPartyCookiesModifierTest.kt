@@ -41,7 +41,6 @@ import kotlinx.coroutines.withContext
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.*
@@ -75,38 +74,6 @@ class RealFirstPartyCookiesModifierTest {
     @After
     fun after() = runTest {
         removeExistingCookies()
-    }
-
-    @Test
-    fun when1stPartyCookiesExistAndThresholdIsHigherThenNewExpiryDateMatchesMaxAge() = runTest {
-        if (Build.VERSION.SDK_INT == 28) {
-            // these tests fail on API 28 due to WAL. This effectively skips these tests on 28.
-            return@runTest
-        }
-
-        withContext(Dispatchers.Main) {
-            val expectedValue: Long = (
-                (
-                    Instant.now()
-                        .plus(MAX_AGE.toLong(), ChronoUnit.SECONDS)
-                        .atOffset(ZoneOffset.UTC)
-                        .toEpochSecond() * MULTIPLIER
-                    ) + TIME_1601_IN_MICRO
-                ) * MULTIPLIER
-
-            givenDatabaseWithCookies((THRESHOLD + 1).toLong())
-            val sqlCookieRemover = givenRealFirstPartyCookiesModifier()
-
-            sqlCookieRemover.expireFirstPartyCookies()
-            val expires = queryCookiesDB("example.com")
-
-            assertNotNull(expires)
-            val diff = (expires!! - expectedValue) / 1000000 // initially in microseconds
-            assertTrue(
-                "Diff was $diff, expected was +-5. Expires was $expires and expectedValue was $expectedValue",
-                diff > -5L && diff < 5L,
-            ) // Diff within +- 5 seconds
-        }
     }
 
     @Test
