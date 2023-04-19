@@ -30,9 +30,10 @@ import com.duckduckgo.app.statistics.isNextLevelPrivacyNotificationEnabled
 import com.duckduckgo.app.statistics.isOneEasyStepForPrivacyNotificationEnabled
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackerOnboardingActivityWithNotificationParams
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnOnboardingActivity
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -113,6 +114,7 @@ class EnableAppTpNotificationPlugin @Inject constructor(
     private val pixel: Pixel,
     private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val globalActivityStarter: GlobalActivityStarter,
 ) : SchedulableNotificationPlugin {
 
     override fun getSchedulableNotification(): SchedulableNotification {
@@ -137,9 +139,10 @@ class EnableAppTpNotificationPlugin @Inject constructor(
     }
 
     override fun getLaunchIntent(): PendingIntent? {
-        val intent = VpnOnboardingActivity.intent(context).apply {
-            putExtra(VpnOnboardingActivity.LAUNCH_FROM_NOTIFICATION_PIXEL_NAME, pixelName(AppPixelName.NOTIFICATION_LAUNCHED.pixelName))
-        }
+        val intent = globalActivityStarter.startIntent(
+            context,
+            AppTrackerOnboardingActivityWithNotificationParams(pixelName = pixelName(AppPixelName.NOTIFICATION_LAUNCHED.pixelName)),
+        )
         val pendingIntent: PendingIntent? = taskStackBuilderFactory.createTaskBuilder().run {
             addNextIntentWithParentStack(intent)
             getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
