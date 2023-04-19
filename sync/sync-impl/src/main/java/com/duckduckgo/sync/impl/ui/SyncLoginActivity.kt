@@ -71,7 +71,7 @@ class SyncLoginActivity : DuckDuckGoActivity() {
         when (it) {
             ReadQRCode -> barcodeConnectLauncher.launch(getScanOptions())
             ReadTextCode -> {
-                // noop
+                startActivity(EnterCodeActivity.intent(this))
             }
             Error -> {
                 setResult(RESULT_CANCELED)
