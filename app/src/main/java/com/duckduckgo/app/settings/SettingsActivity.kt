@@ -71,7 +71,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.impl.ui.AutoconsentSettingsActivity
 import com.duckduckgo.autofill.api.AutofillSettingsActivityLauncher
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.macos_impl.MacOsActivity
+import com.duckduckgo.macos.api.MacOsScreenWithEmptyParams
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackerActivityWithEmptyParams
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
@@ -644,7 +644,7 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     private fun launchMacOsScreen() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivity(MacOsActivity.intent(this), options)
+        globalActivityStarter.start(this, MacOsScreenWithEmptyParams, options)
     }
 
     private fun launchWindowsScreen() {
