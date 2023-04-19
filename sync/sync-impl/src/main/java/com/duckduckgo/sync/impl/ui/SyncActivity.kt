@@ -16,6 +16,7 @@
 
 package com.duckduckgo.sync.impl.ui
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -26,9 +27,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
@@ -66,7 +67,6 @@ import com.google.android.material.snackbar.Snackbar
 import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
 
 sealed class SyncDeviceListItem {
     data class SyncedDevice(val device: ConnectedDevice, val loading: Boolean = false) : SyncDeviceListItem()
@@ -137,12 +137,10 @@ class SyncedDevicesAdapter constructor(private val listener: ConnectedDeviceClic
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun updateData(data: List<SyncDeviceListItem>) {
-        val newData = data
-        val oldData = this.syncedDevices
-        val diffResult = DiffCallback(oldData, newData).run { DiffUtil.calculateDiff(this) }
         this.syncedDevices.clear().also { this.syncedDevices.addAll(data) }
-        diffResult.dispatchUpdatesTo(this)
+        notifyDataSetChanged() // there's a weird bug when using DiffUtil with duplicated devices after login, need to investigate
     }
 
     private class DiffCallback(
@@ -158,6 +156,9 @@ class SyncedDevicesAdapter constructor(private val listener: ConnectedDeviceClic
             oldItemPosition: Int,
             newItemPosition: Int,
         ): Boolean {
+            if (old[oldItemPosition] is SyncedDevice && new[newItemPosition] is SyncedDevice) {
+                return (old[oldItemPosition] as SyncedDevice).device.deviceId == (new[newItemPosition] as SyncedDevice).device.deviceId
+            }
             return old[oldItemPosition] == new[newItemPosition]
         }
 
@@ -238,10 +239,12 @@ class LoadingViewHolder(val binding: ItemSyncDeviceLoadingBinding) : ViewHolder(
 class SyncActivity : DuckDuckGoActivity() {
     private val binding: ActivitySyncBinding by viewBinding()
     private val viewModel: SyncActivityViewModel by bindViewModel()
-    private val syncedDevicesAdapter = SyncedDevicesAdapter(object : ConnectedDeviceClickListener {
-        override fun onEditDeviceClicked(device: ConnectedDevice) {
-            viewModel.onEditDeviceClicked(device)
-        }
+
+    private val syncedDevicesAdapter = SyncedDevicesAdapter(
+        object : ConnectedDeviceClickListener {
+            override fun onEditDeviceClicked(device: ConnectedDevice) {
+                viewModel.onEditDeviceClicked(device)
+            }
 
         override fun onRemoveDeviceClicked(device: ConnectedDevice) {
             viewModel.onRemoveDeviceClicked(device)
