@@ -109,6 +109,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/hintBarrier"
+        app:icon="@drawable/ic_copy"
         android:gravity="center"
         app:buttonSize="small"
         android:layout_margin="@dimen/keyline_4"

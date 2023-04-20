@@ -32,6 +32,7 @@ import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.Error
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.LoginSucess
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.ReadQRCode
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.ReadTextCode
+import com.duckduckgo.sync.impl.ui.setup.EnterCodeContract
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanIntentResult
 import com.journeyapps.barcodescanner.ScanOptions
@@ -48,6 +49,14 @@ class SyncLoginActivity : DuckDuckGoActivity() {
     ) { result: ScanIntentResult ->
         if (result.contents != null) {
             viewModel.onConnectQRScanned(result.contents)
+        }
+    }
+
+    private val enterCodeLauncher = registerForActivityResult(
+        EnterCodeContract(),
+    ) { resultOk ->
+        if (resultOk) {
+            viewModel.onLoginSuccess()
         }
     }
 
@@ -71,7 +80,7 @@ class SyncLoginActivity : DuckDuckGoActivity() {
         when (it) {
             ReadQRCode -> barcodeConnectLauncher.launch(getScanOptions())
             ReadTextCode -> {
-                startActivity(EnterCodeActivity.intent(this))
+                enterCodeLauncher.launch(null)
             }
             Error -> {
                 setResult(RESULT_CANCELED)
