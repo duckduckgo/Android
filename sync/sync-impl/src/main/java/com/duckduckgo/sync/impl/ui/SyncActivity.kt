@@ -46,8 +46,11 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskRemoveDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ScanQRCode
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
+import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
+import com.duckduckgo.sync.impl.ui.setup.ConnectFlowContract
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.*
@@ -88,6 +91,10 @@ class SyncActivity : DuckDuckGoActivity() {
         ) {
             viewModel.onToggleClicked(isChecked)
         }
+    }
+
+    private val connectFlow = registerForActivityResult(ConnectFlowContract()) { resultOk ->
+        // no-op
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -131,7 +138,9 @@ class SyncActivity : DuckDuckGoActivity() {
             LaunchDeviceSetupFlow -> {
                 startActivity(SetupAccountActivity.intentStartSetupFlow(this))
             }
-
+            is ScanQRCode -> {
+                connectFlow.launch(null)
+            }
             is AskTurnOffSync -> askTurnOffsync(it.device)
             AskDeleteAccount -> askDeleteAccount()
             is RecoveryCodePDFSuccess -> {
@@ -236,6 +245,9 @@ class SyncActivity : DuckDuckGoActivity() {
 
             binding.deleteAccountButton.setOnClickListener {
                 viewModel.onDeleteAccountClicked()
+            }
+            binding.scanQrCodeItem.setOnClickListener {
+                viewModel.onScanQRCodeClicked()
             }
         }
         syncedDevicesAdapter.updateData(viewState.syncedDevices)

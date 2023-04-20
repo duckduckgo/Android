@@ -25,6 +25,8 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.ui.view.hide
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.databinding.ActivityConnectSyncBinding
 import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code
@@ -33,6 +35,9 @@ import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSucess
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ReadQRCode
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ReadTextCode
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowQRCode
+import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.ViewMode.SignedIn
+import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.ViewMode.UnAuthenticated
+import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.setup.ConnectViaQRCodeContract
 import com.duckduckgo.sync.impl.ui.setup.EnterCodeContract
 import com.journeyapps.barcodescanner.ScanContract
@@ -78,10 +83,26 @@ class SyncConnectActivity : DuckDuckGoActivity() {
 
     private fun observeUiEvents() {
         viewModel
+            .viewState()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
+            .onEach { render(it) }
+            .launchIn(lifecycleScope)
+        viewModel
             .commands()
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
+    }
+
+    private fun render(it: ViewState) {
+        when(it.viewMode) {
+            SignedIn -> {
+                binding.showQRCode.hide()
+            }
+            UnAuthenticated -> {
+                binding.showQRCode.show()
+            }
+        }
     }
 
     private fun processCommand(it: Command) {

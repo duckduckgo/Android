@@ -49,6 +49,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.*
 
 @ContributesViewModel(ActivityScope::class)
 class SyncActivityViewModel @Inject constructor(
@@ -74,6 +75,7 @@ class SyncActivityViewModel @Inject constructor(
     )
 
     sealed class Command {
+        object ScanQRCode : Command()
         object LaunchDeviceSetupFlow : Command()
         data class AskTurnOffSync(val device: ConnectedDevice) : Command()
         object AskDeleteAccount : Command()
@@ -256,6 +258,12 @@ class SyncActivityViewModel @Inject constructor(
             },
         )
     }
+
     private fun ViewState.showAccount() = copy(showAccount = true)
     private fun ViewState.hideAccount() = copy(showAccount = false)
+    fun onScanQRCodeClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            command.send(Command.ScanQRCode)
+        }
+    }
 }
