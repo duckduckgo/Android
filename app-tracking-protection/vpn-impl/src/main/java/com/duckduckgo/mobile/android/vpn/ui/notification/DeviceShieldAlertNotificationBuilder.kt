@@ -18,13 +18,14 @@ package com.duckduckgo.mobile.android.vpn.ui.notification
 
 import android.app.Notification
 import android.app.NotificationChannel
-import android.app.NotificationManager
+import android.app.NotificationManager.IMPORTANCE_DEFAULT
 import android.app.PendingIntent
 import android.content.Context
 import android.os.Build
 import android.os.ResultReceiver
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
@@ -68,12 +69,11 @@ class AndroidDeviceShieldAlertNotificationBuilder constructor(
     @Suppress("NewApi") // we use appBuildConfig
     private fun registerAlertChannel(context: Context) {
         if (appBuildConfig.sdkInt >= Build.VERSION_CODES.O) {
-            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            val notificationManager = NotificationManagerCompat.from(context)
             if (notificationManager.getNotificationChannel(VPN_ALERTS_CHANNEL_ID) == null) {
-                val channel = NotificationChannel(VPN_ALERTS_CHANNEL_ID, VPN_ALERTS_CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT)
+                val channel = NotificationChannel(VPN_ALERTS_CHANNEL_ID, VPN_ALERTS_CHANNEL_NAME, IMPORTANCE_DEFAULT)
                 channel.description = VPN_ALERTS_CHANNEL_DESCRIPTION
                 notificationManager.createNotificationChannel(channel)
-                notificationManager.isNotificationPolicyAccessGranted
             }
         }
     }

@@ -18,7 +18,6 @@ package com.duckduckgo.app.notification
 
 import android.annotation.TargetApi
 import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.app.NotificationManager.IMPORTANCE_NONE
 import android.content.Context
 import android.os.Build.VERSION_CODES.O
@@ -50,7 +49,6 @@ import timber.log.Timber
 class NotificationRegistrar @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val context: Context,
-    private val manager: NotificationManager,
     private val compatManager: NotificationManagerCompat,
     private val settingsDataStore: SettingsDataStore,
     private val pixel: Pixel,
@@ -81,14 +79,10 @@ class NotificationRegistrar @Inject constructor(
         appCoroutineScope.launch { registerApp() }
     }
 
-    @Suppress("NewApi") // we use appBuildConfig
+    @Suppress("NewApi") // we use NotificationCompatManager to retrieve channels
     override fun onResume(owner: LifecycleOwner) {
         val systemEnabled = compatManager.areNotificationsEnabled()
-        val allChannelsEnabled = when {
-            appBuildConfig.sdkInt >= O -> manager.notificationChannels.all { it.importance != IMPORTANCE_NONE }
-            else -> true
-        }
-
+        val allChannelsEnabled = compatManager.notificationChannels.all { it.importance != IMPORTANCE_NONE }
         updateStatus(systemEnabled && allChannelsEnabled)
     }
 
@@ -120,13 +114,13 @@ class NotificationRegistrar @Inject constructor(
             }
             list.toList()
         }
-        manager.createNotificationChannels(notificationChannels + pluginChannels)
+        compatManager.createNotificationChannels(notificationChannels + pluginChannels)
 
         // TODO this is hack because we don't have a good way to remove channels when we no longer use them
         // if we don't call deleteNotificationChannel() method, the channel only disappears on fresh installs, not app updates
         // See https://app.asana.com/0/1125189844152671/1201842645469204 for more info
         // This was the AppTP waitlist notification channel
-        manager.deleteNotificationChannel("com.duckduckgo.apptp")
+        compatManager.deleteNotificationChannel("com.duckduckgo.apptp")
     }
 
     @VisibleForTesting
