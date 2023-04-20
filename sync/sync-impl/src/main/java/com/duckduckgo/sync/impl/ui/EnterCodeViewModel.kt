@@ -24,11 +24,13 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncRepository
+import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code
+import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code.CONNECT_CODE
+import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code.RECOVERY_CODE
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.*
@@ -57,15 +59,26 @@ class EnterCodeViewModel @Inject constructor(
         object Error : Command()
     }
 
-    fun onPasteCodeClicked() {
+    fun onPasteCodeClicked(codeType: Code) {
         viewModelScope.launch(dispatchers.io()) {
             val pastedCode = clipboard.pasteFromClipboard()
             viewState.value = viewState.value.copy(code = clipboard.pasteFromClipboard())
             command.send(Command.ShowLoading)
-            when (syncRepository.login(pastedCode)) {
-                is Result.Success -> command.send(Command.LoginSucess)
-                is Result.Error -> command.send(Command.Error)
-            }
+            authFlow(codeType, pastedCode)
+        }
+    }
+
+    private suspend fun authFlow(
+        codeType: Code,
+        pastedCode: String
+    ) {
+        val result = when(codeType) {
+            RECOVERY_CODE -> syncRepository.login(pastedCode)
+            CONNECT_CODE -> syncRepository.connectDevice(pastedCode)
+        }
+        when (result) {
+            is Result.Success -> command.send(Command.LoginSucess)
+            is Result.Error -> command.send(Command.Error)
         }
     }
 }

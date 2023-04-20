@@ -185,7 +185,10 @@ class AppSyncRepository @Inject constructor(
     }
 
     override fun connectDevice(contents: String): Result<Boolean> {
-        val connectKeys = Adapters.recoveryCodeAdapter.fromJson(contents.decodeB64())?.connect ?: return Result.Error(reason = "Error reading json")
+        val connectKeys = kotlin.runCatching {
+            Adapters.recoveryCodeAdapter.fromJson(contents.decodeB64())?.connect
+        }.getOrNull() ?: return Resul.tError(reason = "Failed to decode connect code")
+
         if (!isSignedIn()) {
             val result = createAccount()
             if (result is Error) return result

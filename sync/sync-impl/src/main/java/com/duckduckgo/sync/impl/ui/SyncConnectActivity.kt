@@ -27,12 +27,14 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.databinding.ActivityConnectSyncBinding
+import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSucess
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ReadQRCode
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ReadTextCode
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowQRCode
 import com.duckduckgo.sync.impl.ui.setup.ConnectViaQRCodeContract
+import com.duckduckgo.sync.impl.ui.setup.EnterCodeContract
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanIntentResult
 import com.journeyapps.barcodescanner.ScanOptions
@@ -58,6 +60,14 @@ class SyncConnectActivity : DuckDuckGoActivity() {
         }
     }
 
+    private val enterCodeLauncher = registerForActivityResult(
+        EnterCodeContract(),
+    ) { resultOk ->
+        if (resultOk) {
+            viewModel.onLoginSucess()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -78,7 +88,7 @@ class SyncConnectActivity : DuckDuckGoActivity() {
         when (it) {
             ReadQRCode -> barcodeConnectLauncher.launch(getScanOptions())
             ReadTextCode -> {
-                // not implemented yet
+                enterCodeLauncher.launch(Code.CONNECT_CODE)
             }
             LoginSucess -> {
                 setResult(RESULT_OK)

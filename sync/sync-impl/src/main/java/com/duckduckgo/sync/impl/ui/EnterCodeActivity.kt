@@ -29,7 +29,6 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.hide
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.databinding.ActivityEnterCodeBinding
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.Error
@@ -38,15 +37,17 @@ import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.ShowLoading
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.ViewState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class EnterCodeActivity : DuckDuckGoActivity() {
     private val binding: ActivityEnterCodeBinding by viewBinding()
     private val viewModel: EnterCodeViewModel by bindViewModel()
 
+    private lateinit var codeType: Code
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        codeType = intent.getSerializableExtra(EXTRA_CODE_TYPE) as? Code ?: Code.RECOVERY_CODE
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
         observeUiEvents()
@@ -55,7 +56,7 @@ class EnterCodeActivity : DuckDuckGoActivity() {
 
     private fun configureListeners() {
         binding.pasteCodeButton.setOnClickListener {
-            viewModel.onPasteCodeClicked()
+            viewModel.onPasteCodeClicked(codeType)
         }
     }
 
@@ -94,8 +95,17 @@ class EnterCodeActivity : DuckDuckGoActivity() {
     }
 
     companion object {
-        internal fun intent(context: Context): Intent {
-            return Intent(context, EnterCodeActivity::class.java)
+        enum class Code {
+            RECOVERY_CODE,
+            CONNECT_CODE
+        }
+
+        private const val EXTRA_CODE_TYPE = "codeType"
+
+        internal fun intent(context: Context, codeType: Code): Intent {
+            return Intent(context, EnterCodeActivity::class.java).apply {
+                putExtra(EXTRA_CODE_TYPE, codeType)
+            }
         }
     }
 }

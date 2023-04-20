@@ -27,6 +27,7 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.databinding.ActivityLoginSyncBinding
+import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.Error
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.LoginSucess
@@ -80,7 +81,7 @@ class SyncLoginActivity : DuckDuckGoActivity() {
         when (it) {
             ReadQRCode -> barcodeConnectLauncher.launch(getScanOptions())
             ReadTextCode -> {
-                enterCodeLauncher.launch(null)
+                enterCodeLauncher.launch(Code.RECOVERY_CODE)
             }
             Error -> {
                 setResult(RESULT_CANCELED)

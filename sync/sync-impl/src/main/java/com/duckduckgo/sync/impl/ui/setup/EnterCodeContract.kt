@@ -21,14 +21,15 @@ import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
 import com.duckduckgo.sync.impl.ui.EnterCodeActivity
+import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code
 import com.duckduckgo.sync.impl.ui.SyncLoginActivity
 
-class EnterCodeContract : ActivityResultContract<Void?, Boolean>() {
+class EnterCodeContract : ActivityResultContract<Code, Boolean>() {
     override fun createIntent(
         context: Context,
-        input: Void?,
+        codeType: Code,
     ): Intent {
-        return EnterCodeActivity.intent(context)
+        return EnterCodeActivity.intent(context, codeType)
     }
 
     override fun parseResult(
