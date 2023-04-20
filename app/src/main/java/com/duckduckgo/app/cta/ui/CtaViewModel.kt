@@ -37,7 +37,6 @@ import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.isDaxDialogMessageEnabled
-import com.duckduckgo.app.statistics.isOptimiseOnboardingExperimentEnabled
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
@@ -74,7 +73,6 @@ class CtaViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val appTheme: AppTheme,
-    private val variantManager: VariantManager,
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
 ) {
     val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()
@@ -176,10 +174,6 @@ class CtaViewModel @Inject constructor(
         cta.okPixel?.let {
             pixel.fire(it, cta.pixelOkParameters())
         }
-    }
-
-    fun onUserClickOnboardingPrivacyShield() {
-        pixel.fire(AppPixelName.ONBOARDING_PRIVACY_SHIELD_BUTTON)
     }
 
     suspend fun refreshCta(
@@ -304,11 +298,7 @@ class CtaViewModel @Inject constructor(
 
             // Trackers blocked
             if (!daxDialogTrackersFoundShown() && !isSerpUrl(it.url) && it.orderedTrackerBlockedEntities().isNotEmpty()) {
-                return if (variantManager.isOptimiseOnboardingExperimentEnabled()) {
-                    DaxDialogCta.DaxTrackersBlockedExperimentCta(onboardingStore, appInstallStore, it.orderedTrackerBlockedEntities(), host)
-                } else {
-                    DaxDialogCta.DaxTrackersBlockedCta(onboardingStore, appInstallStore, it.orderedTrackerBlockedEntities(), host)
-                }
+                return DaxDialogCta.DaxTrackersBlockedCta(onboardingStore, appInstallStore, it.orderedTrackerBlockedEntities(), host)
             }
 
             // Is major network

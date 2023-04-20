@@ -106,7 +106,6 @@ import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.CTA_SHOWN
@@ -384,8 +383,6 @@ class BrowserTabViewModelTest {
 
     private val mockAppTheme: AppTheme = mock()
 
-    private val mockVariantManager: VariantManager = mock()
-
     private val autofillCapabilityChecker: FakeCapabilityChecker = FakeCapabilityChecker(enabled = false)
 
     private val autofillFireproofDialogSuppressor: AutofillFireproofDialogSuppressor = mock()
@@ -433,7 +430,6 @@ class BrowserTabViewModelTest {
             dispatchers = coroutineRule.testDispatcherProvider,
             duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),
             appTheme = mockAppTheme,
-            variantManager = mockVariantManager,
             vpnFeaturesRegistry = mockVpnFeaturesRegistry,
         )
 
@@ -4309,14 +4305,6 @@ class BrowserTabViewModelTest {
         assertCommandIssued<Command.ShowUserCredentialSavedOrUpdatedConfirmation> {
             assertFalse(this.includeShortcutToViewCredential)
         }
-    }
-
-    @Test
-    fun whenUserClickedPrivacyShieldFromOnboardingDialogThenLaunchPrivacyDashboardCommand() {
-        val cta = DaxDialogCta.DaxTrackersBlockedExperimentCta(mockOnboardingStore, mockAppInstallStore, emptyList(), "")
-        setCta(cta)
-        testee.onUserClickOnboardingPrivacyShieldModal()
-        assertCommandIssued<Command.LaunchPrivacyDashboard>()
     }
 
     private fun aCredential(): LoginCredentials {
