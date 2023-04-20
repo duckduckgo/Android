@@ -1,0 +1,60 @@
+appId: com.duckduckgo.mobile.android
+---
+- runScript: 3_script.js
+
+- repeat:
+      while:
+          true: ${output.addLogins.counter < output.addLogins.domains.length}
+      commands:
+          - tapOn:
+                  id: addLoginManually
+          - assertVisible:
+                  text: Add Login
+          - assertNotVisible:
+                  id: view_menu_save
+
+          - tapOn:
+                id: usernameEditText
+          - inputText: "user"
+
+          - assertVisible:
+                id: view_menu_save
+
+          - tapOn:
+                id: passwordEditText
+          - inputText: "123"
+
+          - tapOn:
+                id: domainEditText
+          - inputText: "${output.addLogins.domains[output.addLogins.counter]}"
+
+          - tapOn:
+                id: notesEditText
+          - inputText: "a note"
+
+          - tapOn:
+                id: view_menu_save
+                retryTapIfNoChange: false
+
+          - assertVisible: "Login last updated.*"
+
+          - tapOn: "Navigate up"
+
+          - assertVisible:
+                text: "Save and Autofill Logins"
+          - evalScript: ${output.addLogins.counter++}
+
+- assertVisible:
+    text: "#"
+
+- assertVisible:
+    text: "a.example.com"
+
+- assertNotVisible:
+    text: "https://a.example.com"
+
+- assertVisible:
+    text: "fill.dev"
+
+- assertNotVisible:
+    text: "fill.dev/example"
