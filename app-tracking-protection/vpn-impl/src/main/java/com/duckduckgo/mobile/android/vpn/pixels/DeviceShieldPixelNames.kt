@@ -30,7 +30,9 @@ import com.duckduckgo.app.statistics.pixels.Pixel
  */
 enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: Boolean = false) : Pixel.PixelName {
     ATP_ENABLE_UPON_SEARCH_DAILY("m_atp_ev_enabled_on_search_d"),
+    ATP_ENABLE_UPON_SEARCH("m_atp_ev_enabled_on_search_c"),
     ATP_DISABLE_UPON_SEARCH_DAILY("m_atp_ev_disabled_on_search_d"),
+    ATP_DISABLE_UPON_SEARCH("m_atp_ev_disabled_on_search_c"),
     ATP_ENABLE_UPON_APP_LAUNCH("m_atp_ev_enabled_on_launch_c"),
     ATP_ENABLE_UPON_APP_LAUNCH_DAILY("m_atp_ev_enabled_on_launch_d"),
     ATP_DISABLE_UPON_APP_LAUNCH("m_atp_ev_disabled_on_launch_c"),
