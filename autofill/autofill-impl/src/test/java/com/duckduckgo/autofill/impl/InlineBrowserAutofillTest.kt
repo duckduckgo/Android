@@ -22,6 +22,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.autofill.api.Callback
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
+import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.impl.InlineBrowserAutofillTest.FakeAutofillJavascriptInterface.Actions.CredentialsInjected
 import com.duckduckgo.autofill.impl.InlineBrowserAutofillTest.FakeAutofillJavascriptInterface.Actions.GetAutoFillData
 import com.duckduckgo.autofill.impl.InlineBrowserAutofillTest.FakeAutofillJavascriptInterface.Actions.NoCredentialsInjected
@@ -32,14 +33,17 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.mock
 
 @RunWith(AndroidJUnit4::class)
 class InlineBrowserAutofillTest {
 
     private lateinit var testee: InlineBrowserAutofill
+    private val automaticSavedLoginsMonitor: AutomaticSavedLoginsMonitor = mock()
     private lateinit var autofillJavascriptInterface: FakeAutofillJavascriptInterface
 
     private lateinit var testWebView: WebView
+
     private val testCallback = object : Callback {
         override suspend fun onCredentialsAvailableToInject(
             originalUrl: String,
@@ -54,7 +58,16 @@ class InlineBrowserAutofillTest {
         ) {
         }
 
+        override suspend fun onGeneratedPasswordAvailableToUse(
+            originalUrl: String,
+            generatedPassword: String,
+        ) {
+        }
+
         override fun noCredentialsAvailable(originalUrl: String) {
+        }
+
+        override fun onCredentialsSaved(savedCredentials: LoginCredentials) {
         }
     }
 
@@ -63,12 +76,12 @@ class InlineBrowserAutofillTest {
         MockitoAnnotations.openMocks(this)
         autofillJavascriptInterface = FakeAutofillJavascriptInterface()
         testWebView = WebView(getApplicationContext())
-        testee = InlineBrowserAutofill(autofillJavascriptInterface)
+        testee = InlineBrowserAutofill(autofillInterface = autofillJavascriptInterface, autoSavedLoginsMonitor = automaticSavedLoginsMonitor)
     }
 
     @Test
     fun whenRemoveJsInterfaceThenRemoveReferenceToWebview() {
-        testee.addJsInterface(testWebView, testCallback)
+        testee.addJsInterface(testWebView, testCallback, "tabId")
 
         assertNotNull(autofillJavascriptInterface.webView)
 
@@ -121,7 +134,15 @@ class InlineBrowserAutofillTest {
         override fun cancelRetrievingStoredLogins() {
         }
 
+        override fun acceptGeneratedPassword() {
+        }
+
+        override fun rejectGeneratedPassword() {
+        }
+
         override var callback: Callback? = null
         override var webView: WebView? = null
+        override var autoSavedLoginsMonitor: AutomaticSavedLoginsMonitor? = null
+        override var tabId: String? = null
     }
 }

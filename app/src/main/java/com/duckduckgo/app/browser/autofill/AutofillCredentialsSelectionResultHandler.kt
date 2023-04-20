@@ -30,6 +30,7 @@ import com.duckduckgo.autofill.api.CredentialAutofillPickerDialog
 import com.duckduckgo.autofill.api.CredentialSavePickerDialog
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
+import com.duckduckgo.autofill.api.GenerateSecurePasswordDialog
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.api.ui.credential.saving.declines.AutofillDeclineCounter
@@ -164,6 +165,16 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(
         val updateType =
             result.getParcelable<CredentialUpdateType>(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIAL_UPDATE_TYPE) ?: return null
         return credentialSaver.updateCredentials(originalUrl, selectedCredentials, updateType)
+    }
+
+    suspend fun processGeneratePasswordResult(result: Bundle, viewModel: BrowserTabViewModel) {
+        val originalUrl = result.getString(GenerateSecurePasswordDialog.KEY_URL) ?: return
+        val acceptGeneratedPassword = result.getBoolean(GenerateSecurePasswordDialog.KEY_ACCEPTED)
+        if (acceptGeneratedPassword) {
+            viewModel.acceptGeneratedPassword(originalUrl)
+        } else {
+            viewModel.rejectGeneratedPassword(originalUrl)
+        }
     }
 
     private suspend fun refreshCurrentWebPageToDisableAutofill(viewModel: BrowserTabViewModel) {

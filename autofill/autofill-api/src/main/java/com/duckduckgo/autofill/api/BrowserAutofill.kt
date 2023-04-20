@@ -38,7 +38,11 @@ interface BrowserAutofill {
      * Adds the native->JS interface to the given WebView
      * This should be called once per WebView where autofill is to be available in it
      */
-    fun addJsInterface(webView: WebView, callback: Callback)
+    fun addJsInterface(
+        webView: WebView,
+        callback: Callback,
+        tabId: String,
+    )
 
     /**
      * Removes the JS interface as a clean-up. Recommended to call from onDestroy() of Fragment/Activity containing the WebView
@@ -57,6 +61,9 @@ interface BrowserAutofill {
      * This would only normally be needed if a user-interaction happened such that showing autofill prompt would be undesirable.
      */
     fun cancelPendingAutofillRequestToChooseCredentials()
+
+    fun acceptGeneratedPassword()
+    fun rejectGeneratedPassword()
 }
 
 /**
@@ -65,5 +72,7 @@ interface BrowserAutofill {
 interface Callback {
     suspend fun onCredentialsAvailableToInject(originalUrl: String, credentials: List<LoginCredentials>, triggerType: LoginTriggerType)
     suspend fun onCredentialsAvailableToSave(currentUrl: String, credentials: LoginCredentials)
+    suspend fun onGeneratedPasswordAvailableToUse(originalUrl: String, generatedPassword: String)
     fun noCredentialsAvailable(originalUrl: String)
+    fun onCredentialsSaved(savedCredentials: LoginCredentials)
 }

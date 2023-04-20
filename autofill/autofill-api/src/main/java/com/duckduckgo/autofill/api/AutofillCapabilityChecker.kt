@@ -34,6 +34,11 @@ interface AutofillCapabilityChecker {
     suspend fun canSaveCredentialsFromWebView(url: String): Boolean
 
     /**
+     * Whether autofill can generate a password into a WebView
+     */
+    suspend fun canGeneratePasswordFromWebView(url: String): Boolean
+
+    /**
      * Whether a user can access the credential management screen.
      */
     suspend fun canAccessCredentialManagementScreen(): Boolean

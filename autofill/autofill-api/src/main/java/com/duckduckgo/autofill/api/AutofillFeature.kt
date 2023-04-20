@@ -44,6 +44,13 @@ interface AutofillFeature {
     fun canSaveCredentials(): Toggle
 
     /**
+     * @return `true` when the remote config has the global "canGeneratePassword" autofill sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(false)
+    fun canGeneratePassword(): Toggle
+
+    /**
      * @return `true` when the remote config has the global "canAccessCredentialManagement" autofill sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
      */

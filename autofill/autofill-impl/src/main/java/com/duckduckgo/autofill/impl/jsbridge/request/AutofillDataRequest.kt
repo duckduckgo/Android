@@ -16,19 +16,33 @@
 
 package com.duckduckgo.autofill.impl.jsbridge.request
 
+import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillInputSubType.PASSWORD
 import com.squareup.moshi.Json
 
 data class AutofillDataRequest(
     val mainType: SupportedAutofillInputMainType,
     val subType: SupportedAutofillInputSubType,
     val trigger: SupportedAutofillTriggerType,
+    val generatedPassword: GeneratedPasswordRequest?,
 ) {
 
-    data class InputType(
-        val title: String,
-        val description: String,
-        val type: String,
-    )
+    fun isGeneratedPasswordAvailable(): Boolean {
+        return mainType == SupportedAutofillInputMainType.CREDENTIALS &&
+            subType == PASSWORD &&
+            generatedPassword?.value != null
+    }
+}
+
+data class GeneratedPasswordRequest(
+    val value: String?,
+)
+
+enum class SupportedAutofillInputType {
+    @Json(name = "credentials.password")
+    AUTOFILL_PASSWORD,
+
+    @Json(name = "credentials.username")
+    AUTOFILL_CREDENTIALS,
 }
 
 enum class SupportedAutofillInputMainType {
