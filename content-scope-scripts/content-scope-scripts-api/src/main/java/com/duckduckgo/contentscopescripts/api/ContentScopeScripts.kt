@@ -16,6 +16,8 @@
 
 package com.duckduckgo.contentscopescripts.api
 
+import android.webkit.WebView
+
 /** Public interface for the Content Scope Scripts feature */
 interface ContentScopeScripts {
 
@@ -24,4 +26,16 @@ interface ContentScopeScripts {
      * @return a [String] containing the JS content scope code.
      */
     fun getScript(): String
+
+    /**
+     * This method adds the JS interface for Content Scope Scripts to create a bridge between JS and our client.
+     * It requires a [WebView] instance.
+     */
+    fun addJsInterface(webView: WebView)
+
+    /**
+     * This method sends a message to Content Scope Scripts.
+     * It requires a JSON message [String] and a [WebView] instance.
+     */
+    fun sendMessage(message: String, webView: WebView)
 }
