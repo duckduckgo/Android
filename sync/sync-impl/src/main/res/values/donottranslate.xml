@@ -87,4 +87,6 @@
     <string name="sync_device_menu_option_edit">Edit</string>
     <string name="sync_device_menu_option_remove">Remove Device</string>
 
+    <string name="sync_code_copied_message">Recovery Code Copied</string>
+
 </resources>

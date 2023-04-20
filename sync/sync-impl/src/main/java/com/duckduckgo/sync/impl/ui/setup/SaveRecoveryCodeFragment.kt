@@ -18,6 +18,7 @@ package com.duckduckgo.sync.impl.ui.setup
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
@@ -93,6 +94,7 @@ class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_c
             viewModel.onSaveRecoveryCodeClicked()
         }
         binding.footerSecondaryButton.setOnClickListener {
+            viewModel.onCopyCodeClicked()
         }
         binding.footerNextButton.setOnClickListener {
             viewModel.onNextClicked()
@@ -117,7 +119,12 @@ class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_c
     private fun processCommand(it: Command) {
         when (it) {
             Error -> requireActivity().finish()
-            Finish -> requireActivity().finish()
+            is Finish -> {
+                it.message?.let { message ->
+                    Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+                }
+                requireActivity().finish()
+            }
             is RecoveryCodePDFSuccess -> {
                 shareAction.shareFile(requireContext(), it.recoveryCodePDFFile)
             }
