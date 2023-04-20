@@ -41,7 +41,7 @@ class RealClipboard @Inject constructor(
     }
 
     override fun pasteFromClipboard(): String {
-        return if (clipboardManager.hasPrimaryClip() && clipboardManager.primaryClipDescription!!.hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)) {
+        return if (clipboardManager.hasPrimaryClip()) {
             clipboardManager.primaryClip!!.getItemAt(0).text.toString()
         } else ""
     }

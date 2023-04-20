@@ -22,13 +22,15 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.R
+import com.duckduckgo.sync.impl.R.string
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncRepository
 import com.duckduckgo.sync.impl.ui.ShowQRCodeViewModel.Command.LoginSucess
-import javax.inject.*
+import com.duckduckgo.sync.impl.ui.ShowQRCodeViewModel.Command.ShowMessage
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -38,11 +40,13 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.*
 
 @ContributesViewModel(ActivityScope::class)
 class ShowQRCodeViewModel @Inject constructor(
     private val qrEncoder: QREncoder,
     private val syncRepository: SyncRepository,
+    private val clipboard: Clipboard,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -63,6 +67,7 @@ class ShowQRCodeViewModel @Inject constructor(
                         command.send(LoginSucess)
                         polling = false
                     }
+
                     else -> {
                         // noop - keep polling
                     }
@@ -78,6 +83,7 @@ class ShowQRCodeViewModel @Inject constructor(
     )
 
     sealed class Command {
+        data class ShowMessage(val messageId: Int) : Command()
         object LoginSucess : Command()
         object Error : Command()
     }
@@ -87,6 +93,7 @@ class ShowQRCodeViewModel @Inject constructor(
             is Error -> {
                 command.send(Command.Error)
             }
+
             is Success -> {
                 val qrBitmap = withContext(dispatchers.io()) {
                     qrEncoder.encodeAsBitmap(result.data, R.dimen.qrSizeXLarge, R.dimen.qrSizeXLarge)
@@ -96,6 +103,18 @@ class ShowQRCodeViewModel @Inject constructor(
                         qrCodeBitmap = qrBitmap,
                     ),
                 )
+            }
+        }
+    }
+
+    fun onCopyCodeClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            when (val result = syncRepository.getConnectQR()) {
+                is Error -> command.send(Command.Error)
+                is Success -> {
+                    clipboard.copyToClipboard(result.data)
+                    command.send(ShowMessage(string.sync_code_copied_message))
+                }
             }
         }
     }
