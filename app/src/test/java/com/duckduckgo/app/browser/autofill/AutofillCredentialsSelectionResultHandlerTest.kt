@@ -31,7 +31,9 @@ import com.duckduckgo.autofill.api.CredentialAutofillPickerDialog
 import com.duckduckgo.autofill.api.CredentialSavePickerDialog
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
+import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.api.ui.credential.saving.declines.AutofillDeclineCounter
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
@@ -59,6 +61,8 @@ class AutofillCredentialsSelectionResultHandlerTest {
     private val autofillDialogSuppressor: AutofillFireproofDialogSuppressor = mock()
     private lateinit var deviceAuthenticator: FakeAuthenticator
     private lateinit var testee: AutofillCredentialsSelectionResultHandler
+    private val autoSavedLoginsMonitor: AutomaticSavedLoginsMonitor = mock()
+    private val existingCredentialMatchDetector: ExistingCredentialMatchDetector = mock()
 
     @Test
     fun whenSaveBundleMissingUrlThenNoAttemptToSaveMade() = runTest {
@@ -323,6 +327,8 @@ class AutofillCredentialsSelectionResultHandlerTest {
             appCoroutineScope = this,
             pixel = pixel,
             autofillDialogSuppressor = autofillDialogSuppressor,
+            autoSavedLoginsMonitor = autoSavedLoginsMonitor,
+            existingCredentialMatchDetector = existingCredentialMatchDetector,
         )
     }
 

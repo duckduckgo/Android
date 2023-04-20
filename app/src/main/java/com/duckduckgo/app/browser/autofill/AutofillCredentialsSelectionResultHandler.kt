@@ -30,8 +30,13 @@ import com.duckduckgo.autofill.api.CredentialAutofillPickerDialog
 import com.duckduckgo.autofill.api.CredentialSavePickerDialog
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
+import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector
+import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.api.store.AutofillStore
+import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult
+import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult.ExactMatch
 import com.duckduckgo.autofill.api.ui.credential.saving.declines.AutofillDeclineCounter
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_AUTHENTICATION_TO_AUTOFILL_AUTH_CANCELLED
@@ -57,6 +62,8 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(
     private val autofillStore: AutofillStore,
     private val pixel: Pixel,
     private val autofillDialogSuppressor: AutofillFireproofDialogSuppressor,
+    private val autoSavedLoginsMonitor: AutomaticSavedLoginsMonitor,
+    private val existingCredentialMatchDetector: ExistingCredentialMatchDetector,
 ) {
 
     fun processAutofillCredentialSelectionResult(
@@ -164,6 +171,79 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(
         val updateType =
             result.getParcelable<CredentialUpdateType>(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIAL_UPDATE_TYPE) ?: return null
         return credentialSaver.updateCredentials(originalUrl, selectedCredentials, updateType)
+    }
+
+    suspend fun processGeneratePasswordResult(
+        result: Bundle,
+        viewModel: BrowserTabViewModel,
+        tabId: String,
+    ) {
+        val originalUrl = result.getString(UseGeneratedPasswordDialog.KEY_URL) ?: return
+        if (result.getBoolean(UseGeneratedPasswordDialog.KEY_ACCEPTED)) {
+            onUserAcceptedToUseGeneratedPassword(result, tabId, originalUrl, viewModel)
+        } else {
+            viewModel.rejectGeneratedPassword(originalUrl)
+        }
+    }
+
+    private suspend fun onUserAcceptedToUseGeneratedPassword(
+        result: Bundle,
+        tabId: String,
+        originalUrl: String,
+        viewModel: BrowserTabViewModel,
+    ) {
+        val username = result.getString(UseGeneratedPasswordDialog.KEY_USERNAME)
+        val password = result.getString(UseGeneratedPasswordDialog.KEY_PASSWORD) ?: return
+        val autologinId = autoSavedLoginsMonitor.getAutoSavedLoginId(tabId)
+        val matchType = existingCredentialMatchDetector.determine(originalUrl, username, password)
+        Timber.v("autoSavedLoginId: %s. Match type against existing entries: %s", autologinId, matchType.javaClass.simpleName)
+
+        if (autologinId == null) {
+            saveLoginIfNotAlreadySaved(matchType, originalUrl, username, password, tabId)
+        } else {
+            val existingAutoSavedLogin = autofillStore.getCredentialsWithId(autologinId)
+            if (existingAutoSavedLogin == null) {
+                Timber.w("Can't find saved login with autosavedLoginId: $autologinId")
+                saveLoginIfNotAlreadySaved(matchType, originalUrl, username, password, tabId)
+            } else {
+                updateLoginIfDifferent(existingAutoSavedLogin, username, password)
+            }
+        }
+        viewModel.acceptGeneratedPassword(originalUrl)
+    }
+
+    private suspend fun updateLoginIfDifferent(
+        autosavedLogin: LoginCredentials,
+        username: String?,
+        password: String,
+    ) {
+        if (username == autosavedLogin.username && password == autosavedLogin.password) {
+            Timber.i("Generated password (and username) matches existing login; nothing to do here")
+        } else {
+            Timber.i("Updating existing login with new username and/or password. Login id is: %s", autosavedLogin.id)
+            autofillStore.updateCredentials(autosavedLogin.copy(username = username, password = password))
+        }
+    }
+
+    private suspend fun saveLoginIfNotAlreadySaved(
+        matchType: ContainsCredentialsResult,
+        originalUrl: String,
+        username: String?,
+        password: String,
+        tabId: String,
+    ) {
+        when (matchType) {
+            ExactMatch -> Timber.v("Already got an exact match; nothing to do here")
+            else -> {
+                autofillStore.saveCredentials(
+                    originalUrl,
+                    LoginCredentials(domain = originalUrl, username = username, password = password),
+                )?.id?.let { savedId ->
+                    Timber.i("New login saved because no exact matches were found, with ID: $savedId")
+                    autoSavedLoginsMonitor.setAutoSavedLoginId(savedId, tabId)
+                }
+            }
+        }
     }
 
     private suspend fun refreshCurrentWebPageToDisableAutofill(viewModel: BrowserTabViewModel) {

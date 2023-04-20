@@ -87,7 +87,7 @@ class AutofillSettingsViewModelTest {
     fun whenUserCopiesPasswordThenCommandIssuedToShowChange() = runTest {
         testee.onCopyPassword("hello")
 
-        verify(clipboardInteractor).copyToClipboard("hello")
+        verify(clipboardInteractor).copyToClipboard("hello", isSensitive = true)
         testee.commands.test {
             awaitItem().first().assertCommandType(ShowUserPasswordCopied::class)
             cancelAndIgnoreRemainingEvents()
@@ -98,7 +98,7 @@ class AutofillSettingsViewModelTest {
     fun whenUserCopiesUsernameThenCommandIssuedToShowChange() = runTest {
         testee.onCopyUsername("username")
 
-        verify(clipboardInteractor).copyToClipboard("username")
+        verify(clipboardInteractor).copyToClipboard("username", isSensitive = false)
         testee.commands.test {
             awaitItem().first().assertCommandType(ShowUserUsernameCopied::class)
             cancelAndIgnoreRemainingEvents()
