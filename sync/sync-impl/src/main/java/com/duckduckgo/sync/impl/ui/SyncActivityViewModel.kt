@@ -76,6 +76,7 @@ class SyncActivityViewModel @Inject constructor(
 
     sealed class Command {
         object ScanQRCode : Command()
+        object ShowTextCode : Command()
         object LaunchDeviceSetupFlow : Command()
         data class AskTurnOffSync(val device: ConnectedDevice) : Command()
         object AskDeleteAccount : Command()
@@ -264,6 +265,12 @@ class SyncActivityViewModel @Inject constructor(
     fun onScanQRCodeClicked() {
         viewModelScope.launch(dispatchers.io()) {
             command.send(Command.ScanQRCode)
+        }
+    }
+
+    fun onShowTextCodeClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            command.send(Command.ShowTextCode)
         }
     }
 }

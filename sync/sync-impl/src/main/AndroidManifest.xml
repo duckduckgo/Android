@@ -66,6 +66,12 @@
             android:parentActivityName=".ui.setup.SetupAccountActivity"/>
 
         <activity
+            android:name=".ui.ShowCodeActivity"
+            android:exported="false"
+            android:label="@string/show_code_screen_title"
+            android:parentActivityName=".ui.SyncActivity"/>
+
+        <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="portrait"
             tools:replace="screenOrientation" />

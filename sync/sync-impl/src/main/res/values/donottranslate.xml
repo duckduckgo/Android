@@ -26,6 +26,7 @@
     <string name="login_screen_title">Scan QR Code</string>
     <string name="connect_screen_title">Scan QR Code</string>
     <string name="show_qr_screen_title">Show QR Code</string>
+    <string name="show_code_screen_title">Code</string>
     <string name="connected_device_title">Device Synced</string>
     <string name="sync_toggle_text">Sync</string>
     <string name="sync_off_hint">Sync your bookmarks across your devices and save an encrypted backup on DuckDuckGo\'s servers.</string>

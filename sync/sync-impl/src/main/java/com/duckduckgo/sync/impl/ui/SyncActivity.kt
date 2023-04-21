@@ -47,6 +47,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ScanQRCode
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowTextCode
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
@@ -153,6 +154,9 @@ class SyncActivity : DuckDuckGoActivity() {
             }
             is AskRemoveDevice -> askRemoveDevice(it.device)
             is AskEditDevice -> askEditDevice(it.device)
+            ShowTextCode -> {
+                startActivity(ShowCodeActivity.intent(this))
+            }
         }
     }
 
@@ -248,6 +252,9 @@ class SyncActivity : DuckDuckGoActivity() {
             }
             binding.scanQrCodeItem.setOnClickListener {
                 viewModel.onScanQRCodeClicked()
+            }
+            binding.showTextCodeItem.setOnClickListener {
+                viewModel.onShowTextCodeClicked()
             }
         }
         syncedDevicesAdapter.updateData(viewState.syncedDevices)
