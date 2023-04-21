@@ -91,6 +91,7 @@ class FireproofingReferenceTest(private val testCase: TestCase) {
             webViewDatabaseLocator,
             fireproofWebsiteRepositoryImpl,
             mock(),
+            mock(),
             DefaultDispatcherProvider(),
         )
 

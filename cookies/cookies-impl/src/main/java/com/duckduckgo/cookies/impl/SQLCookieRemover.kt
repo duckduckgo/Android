@@ -23,6 +23,7 @@ import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.fire.DatabaseLocator
 import com.duckduckgo.app.fire.FireproofRepository
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.cookies.api.CookieRemover
 import com.duckduckgo.di.scopes.AppScope
@@ -54,6 +55,7 @@ class SQLCookieRemover @Inject constructor(
     @Named("webViewDbLocator") private val webViewDatabaseLocator: DatabaseLocator,
     private val fireproofRepository: FireproofRepository,
     private val crashLogger: CrashLogger,
+    private val pixel: Pixel,
     private val dispatcherProvider: DispatcherProvider,
 ) : CookieRemover {
 
@@ -74,7 +76,7 @@ class SQLCookieRemover @Inject constructor(
         return try {
             SQLiteDatabase.openDatabase(databasePath, null, SQLiteDatabase.OPEN_READWRITE, databaseErrorHandler)
         } catch (exception: Exception) {
-            crashLogger.logCrash(CrashLogger.Crash(shortName = "cookie_db_open_error", t = exception))
+            pixel.fire(CookiesPixelName.COOKIE_DB_OPEN_ERROR)
             null
         }
     }
@@ -86,13 +88,18 @@ class SQLCookieRemover @Inject constructor(
         var deleteExecuted = false
         openReadableDatabase(databasePath)?.apply {
             try {
-                val whereClause = buildSQLWhereClause(excludedSites)
-                val number = delete(COOKIES_TABLE_NAME, whereClause, excludedSites.toTypedArray())
-                execSQL("VACUUM")
-                deleteExecuted = true
-                Timber.v("$number cookies removed")
+                // check table exists before executing query
+                val tableExists =
+                    rawQuery("PRAGMA table_info('$COOKIES_TABLE_NAME')", null).use {
+                        return@use it.count
+                    }
+                if (tableExists > 0) {
+                    val whereClause = buildSQLWhereClause(excludedSites)
+                    delete(COOKIES_TABLE_NAME, whereClause, excludedSites.toTypedArray())
+                    execSQL("VACUUM")
+                    deleteExecuted = true
+                }
             } catch (exception: Exception) {
-                Timber.e(exception)
                 crashLogger.logCrash(CrashLogger.Crash(shortName = "cookie_db_delete_error", t = exception))
             } finally {
                 close()
