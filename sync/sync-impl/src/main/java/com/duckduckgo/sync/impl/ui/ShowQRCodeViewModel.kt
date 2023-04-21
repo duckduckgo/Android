@@ -31,6 +31,7 @@ import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncRepository
 import com.duckduckgo.sync.impl.ui.ShowQRCodeViewModel.Command.LoginSucess
 import com.duckduckgo.sync.impl.ui.ShowQRCodeViewModel.Command.ShowMessage
+import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -40,7 +41,6 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.*
 
 @ContributesViewModel(ActivityScope::class)
 class ShowQRCodeViewModel @Inject constructor(

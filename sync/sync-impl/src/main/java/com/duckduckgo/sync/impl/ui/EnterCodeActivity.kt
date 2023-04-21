@@ -97,7 +97,7 @@ class EnterCodeActivity : DuckDuckGoActivity() {
     companion object {
         enum class Code {
             RECOVERY_CODE,
-            CONNECT_CODE
+            CONNECT_CODE,
         }
 
         private const val EXTRA_CODE_TYPE = "codeType"

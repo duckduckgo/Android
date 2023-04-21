@@ -17,7 +17,6 @@
 package com.duckduckgo.sync.impl
 
 import android.content.ClipData
-import android.content.ClipDescription
 import android.content.ClipboardManager
 import android.content.Context
 import com.duckduckgo.di.scopes.ActivityScope
@@ -43,6 +42,8 @@ class RealClipboard @Inject constructor(
     override fun pasteFromClipboard(): String {
         return if (clipboardManager.hasPrimaryClip()) {
             clipboardManager.primaryClip!!.getItemAt(0).text.toString()
-        } else ""
+        } else {
+            ""
+        }
     }
 }

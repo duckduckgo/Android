@@ -95,7 +95,7 @@ class SyncConnectActivity : DuckDuckGoActivity() {
     }
 
     private fun render(it: ViewState) {
-        when(it.viewMode) {
+        when (it.viewMode) {
             SignedIn -> {
                 binding.showQRCode.hide()
             }

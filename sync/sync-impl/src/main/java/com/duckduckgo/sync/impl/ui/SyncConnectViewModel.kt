@@ -16,7 +16,6 @@
 
 package com.duckduckgo.sync.impl.ui
 
-import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -30,7 +29,6 @@ import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSucess
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ReadQRCode
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ReadTextCode
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowQRCode
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel
 import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel

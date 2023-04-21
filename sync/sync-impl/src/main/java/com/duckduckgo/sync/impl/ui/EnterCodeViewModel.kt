@@ -27,13 +27,13 @@ import com.duckduckgo.sync.impl.SyncRepository
 import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code
 import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code.CONNECT_CODE
 import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code.RECOVERY_CODE
+import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import javax.inject.*
 
 @ContributesViewModel(ActivityScope::class)
 class EnterCodeViewModel @Inject constructor(
@@ -70,9 +70,9 @@ class EnterCodeViewModel @Inject constructor(
 
     private suspend fun authFlow(
         codeType: Code,
-        pastedCode: String
+        pastedCode: String,
     ) {
-        val result = when(codeType) {
+        val result = when (codeType) {
             RECOVERY_CODE -> syncRepository.login(pastedCode)
             CONNECT_CODE -> syncRepository.connectDevice(pastedCode)
         }

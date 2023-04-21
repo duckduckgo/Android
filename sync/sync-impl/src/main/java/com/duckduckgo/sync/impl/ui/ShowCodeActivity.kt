@@ -27,19 +27,15 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import com.duckduckgo.sync.impl.databinding.ActivityEnterCodeBinding
 import com.duckduckgo.sync.impl.databinding.ActivityShowCodeBinding
-import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion
-import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code
 import com.duckduckgo.sync.impl.ui.ShowCodeViewModel.Command
 import com.duckduckgo.sync.impl.ui.ShowCodeViewModel.Command.Error
 import com.duckduckgo.sync.impl.ui.ShowCodeViewModel.ViewState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-class ShowCodeActivity: DuckDuckGoActivity() {
+class ShowCodeActivity : DuckDuckGoActivity() {
     private val binding: ActivityShowCodeBinding by viewBinding()
     private val viewModel: ShowCodeViewModel by bindViewModel()
 
@@ -61,7 +57,7 @@ class ShowCodeActivity: DuckDuckGoActivity() {
     }
 
     private fun processCommand(it: Command) {
-        when(it) {
+        when (it) {
             Error -> finish()
         }
     }

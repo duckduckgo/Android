@@ -22,7 +22,6 @@ import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
 import com.duckduckgo.sync.impl.ui.EnterCodeActivity
 import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code
-import com.duckduckgo.sync.impl.ui.SyncLoginActivity
 
 class EnterCodeContract : ActivityResultContract<Code, Boolean>() {
     override fun createIntent(
