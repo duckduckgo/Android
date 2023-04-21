@@ -22,6 +22,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
@@ -87,7 +88,7 @@ class ExceptionRulesDebugReceiverRegister @Inject constructor(
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         // only for debug builds
-        if (appBuildConfig.isDebug) {
+        if (appBuildConfig.isDebug || appBuildConfig.isInternalBuild()) {
             logcat { "Debug receiver ExceptionRulesDebugReceiver registered" }
 
             ExceptionRulesDebugReceiver(context) { intent ->
@@ -112,7 +113,7 @@ class ExceptionRulesDebugReceiverRegister @Inject constructor(
         vpnStopReason: VpnStopReason,
     ) {
         // only for debug builds
-        if (appBuildConfig.isDebug) {
+        if (appBuildConfig.isDebug || appBuildConfig.isInternalBuild()) {
             logcat { "Debug receiver ExceptionRulesDebugReceiver restoring exception rules" }
 
             coroutineScope.launch(dispatchers.io()) {
