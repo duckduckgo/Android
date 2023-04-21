@@ -26,9 +26,13 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
+import com.duckduckgo.privacy.config.api.PrivacyConfig
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
+import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -37,7 +41,8 @@ interface BrokenSiteSender {
     fun submitBrokenSiteFeedback(brokenSite: BrokenSite)
 }
 
-class BrokenSiteSubmitter(
+@ContributesBinding(AppScope::class)
+class BrokenSiteSubmitter @Inject constructor(
     private val statisticsStore: StatisticsDataStore,
     private val variantManager: VariantManager,
     private val tdsMetadataDao: TdsMetadataDao,
@@ -47,6 +52,7 @@ class BrokenSiteSubmitter(
     private val appCoroutineScope: CoroutineScope,
     private val appBuildConfig: AppBuildConfig,
     private val dispatcherProvider: DispatcherProvider,
+    private val privacyConfig: PrivacyConfig,
 ) : BrokenSiteSender {
 
     override fun submitBrokenSiteFeedback(brokenSite: BrokenSite) {
@@ -71,6 +77,8 @@ class BrokenSiteSubmitter(
                 CONSENT_MANAGED to brokenSite.consentManaged.toBinaryString(),
                 CONSENT_OPT_OUT_FAILED to brokenSite.consentOptOutFailed.toBinaryString(),
                 CONSENT_SELF_TEST_FAILED to brokenSite.consentSelfTestFailed.toBinaryString(),
+                REMOTE_CONFIG_VERSION to privacyConfig.privacyConfigData()?.version.orEmpty(),
+                REMOTE_CONFIG_ETAG to privacyConfig.privacyConfigData()?.eTag.orEmpty(),
             )
             val encodedParams = mapOf(
                 BLOCKED_TRACKERS_KEY to brokenSite.blockedTrackers,
@@ -107,6 +115,8 @@ class BrokenSiteSubmitter(
         private const val CONSENT_MANAGED = "consentManaged"
         private const val CONSENT_OPT_OUT_FAILED = "consentOptoutFailed"
         private const val CONSENT_SELF_TEST_FAILED = "consentSelftestFailed"
+        private const val REMOTE_CONFIG_VERSION = "remoteConfigVersion"
+        private const val REMOTE_CONFIG_ETAG = "remoteConfigEtag"
     }
 }
 

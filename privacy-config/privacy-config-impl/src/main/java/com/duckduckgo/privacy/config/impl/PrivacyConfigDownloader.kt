@@ -17,6 +17,7 @@
 package com.duckduckgo.privacy.config.impl
 
 import androidx.annotation.WorkerThread
+import com.duckduckgo.app.global.extensions.extractETag
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.impl.network.PrivacyConfigService
 import com.squareup.anvil.annotations.ContributesBinding
@@ -38,8 +39,11 @@ class RealPrivacyConfigDownloader @Inject constructor(
         Timber.d("Downloading privacy config")
         val response = runCatching {
             privacyConfigService.privacyConfig()
-        }.onSuccess {
-            privacyConfigPersister.persistPrivacyConfig(it)
+        }.onSuccess { response ->
+            val eTag = response.headers().extractETag()
+            response.body()?.let {
+                privacyConfigPersister.persistPrivacyConfig(it, eTag)
+            }
         }.onFailure {
             Timber.w(it.localizedMessage)
         }

@@ -31,13 +31,14 @@ import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
+import com.duckduckgo.privacy.config.api.PrivacyConfig
+import com.duckduckgo.privacy.config.api.PrivacyConfigData
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import java.net.URLEncoder
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
-import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -74,10 +75,12 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
 
     private val mockAppBuildConfig: AppBuildConfig = mock()
 
+    private val mockPrivacyConfig: PrivacyConfig = mock()
+
     private lateinit var testee: BrokenSiteSubmitter
 
     companion object {
-        val encodedParamsList = listOf("siteUrl")
+        val encodedParamsList = listOf("siteUrl", "tds", "remoteConfigEtag")
         private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
         val adapter: JsonAdapter<ReferenceTest> = moshi.adapter(ReferenceTest::class.java)
 
@@ -98,13 +101,17 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
     fun before() {
         MockitoAnnotations.openMocks(this)
         testee = BrokenSiteSubmitter(
-            mockStatisticsDataStore, mockVariantManager, mockTdsMetadataDao, mockGpc, mockFeatureToggle, mockPixel,
-            TestScope(), mockAppBuildConfig, coroutineRule.testDispatcherProvider,
+            mockStatisticsDataStore,
+            mockVariantManager,
+            mockTdsMetadataDao,
+            mockGpc,
+            mockFeatureToggle,
+            mockPixel,
+            TestScope(),
+            mockAppBuildConfig,
+            coroutineRule.testDispatcherProvider,
+            mockPrivacyConfig,
         )
-    }
-
-    @After
-    fun after() {
     }
 
     @Test
@@ -117,6 +124,9 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
         whenever(mockTdsMetadataDao.eTag()).thenReturn(testCase.blocklistVersion)
         whenever(mockStatisticsDataStore.atb).thenReturn(Atb("v123-456"))
         whenever(mockVariantManager.getVariant()).thenReturn(Variant("g", 1.0, emptyList()) { true })
+        whenever(mockPrivacyConfig.privacyConfigData()).thenReturn(
+            PrivacyConfigData(version = testCase.remoteConfigVersion ?: "v", eTag = testCase.remoteConfigEtag ?: "e"),
+        )
 
         val brokenSite = BrokenSite(
             category = testCase.category,
@@ -152,7 +162,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
                     params[param.name]
                 }
                 assertTrue(params.containsKey(param.name))
-                assertEquals(param.value, result)
+                assertEquals("${param.name} failed", param.value, result)
             }
         }
     }
@@ -177,6 +187,8 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
         val consentManaged: String,
         val consentOptOutFailed: String,
         val consentSelfTestFailed: String,
+        val remoteConfigEtag: String?,
+        val remoteConfigVersion: String?,
     )
 
     data class UrlParam(

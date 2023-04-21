@@ -17,26 +17,20 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
-import com.duckduckgo.app.brokensite.api.BrokenSiteSender
-import com.duckduckgo.app.brokensite.api.BrokenSiteSubmitter
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.feedback.api.FeedbackService
 import com.duckduckgo.app.feedback.api.FeedbackSubmitter
 import com.duckduckgo.app.feedback.api.FireAndForgetFeedbackSubmitter
 import com.duckduckgo.app.feedback.api.SubReasonApiMapper
 import com.duckduckgo.app.global.AppUrl.Url
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.api.*
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.global.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
-import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.FeatureToggle
-import com.duckduckgo.privacy.config.api.Gpc
 import com.squareup.moshi.Moshi
 import dagger.Lazy
 import dagger.Module
@@ -143,23 +137,6 @@ class NetworkModule {
     fun pixelReQueryInterceptor(): PixelReQueryInterceptor {
         return PixelReQueryInterceptor()
     }
-
-    @Provides
-    fun brokenSiteSender(
-        statisticsStore: StatisticsDataStore,
-        variantManager: VariantManager,
-        tdsMetadataDao: TdsMetadataDao,
-        pixel: Pixel,
-        gpc: Gpc,
-        featureToggle: FeatureToggle,
-        @AppCoroutineScope appCoroutineScope: CoroutineScope,
-        appBuildConfig: AppBuildConfig,
-        dispatcherProvider: DispatcherProvider,
-    ): BrokenSiteSender =
-        BrokenSiteSubmitter(
-            statisticsStore, variantManager, tdsMetadataDao, gpc, featureToggle,
-            pixel, appCoroutineScope, appBuildConfig, dispatcherProvider,
-        )
 
     @Provides
     fun feedbackSubmitter(
