@@ -102,7 +102,7 @@ class RealFirstPartyCookiesModifier @Inject constructor(
                 // check table and column exist before executing query
                 // old WebView versions use httponly, newer use is_httponly
                 val columnExists =
-                    rawQuery("PRAGMA table_info('cookies')", null).use {
+                    rawQuery("PRAGMA table_info('${SQLCookieRemover.COOKIES_TABLE_NAME}')", null).use {
                         while (it.moveToNext()) {
                             val index = it.getColumnIndex("name")
                             if (it.getString(index).equals("is_httponly")) {
