@@ -92,6 +92,7 @@ class AppSyncRepository @Inject constructor(
 
         return when (result) {
             is Result.Error -> {
+                result.removeKeysIfInvalid()
                 Timber.i("SYNC signup failed $result")
                 result
             }
@@ -242,6 +243,7 @@ class AppSyncRepository @Inject constructor(
         return when (val result = syncApi.logout(token, deviceId)) {
             is Result.Error -> {
                 Timber.i("SYNC logout failed $result")
+                result.removeKeysIfInvalid()
                 result
             }
 
@@ -260,6 +262,7 @@ class AppSyncRepository @Inject constructor(
         return when (val result = syncApi.deleteAccount(token)) {
             is Result.Error -> {
                 Timber.i("SYNC deleteAccount failed $result")
+                result.removeKeysIfInvalid()
                 result
             }
 
@@ -293,6 +296,7 @@ class AppSyncRepository @Inject constructor(
         return when (val result = syncApi.getDevices(token)) {
             is Result.Error -> {
                 Timber.i("SYNC getDevices failed $result")
+                result.removeKeysIfInvalid()
                 result
             }
 
@@ -339,6 +343,7 @@ class AppSyncRepository @Inject constructor(
 
         return when (result) {
             is Result.Error -> {
+                result.removeKeysIfInvalid()
                 result
             }
 
@@ -366,7 +371,8 @@ class AppSyncRepository @Inject constructor(
         val allDataJSON = Adapters.patchAdapter.toJson(allData)
         Timber.d("SYNC: initial patch data generated $allDataJSON")
         return when (val result = syncApi.sendAllBookmarks(token, allData)) {
-            is Result.Error -> {
+            is Error -> {
+                result.removeKeysIfInvalid()
                 result
             }
 
@@ -383,8 +389,9 @@ class AppSyncRepository @Inject constructor(
                 ?: return Result.Error(reason = "Token Empty")
 
         return when (val result = syncApi.getAllData(token)) {
-            is Result.Error -> {
-                Result.Error(reason = "SYNC get data failed $result")
+            is Error -> {
+                result.removeKeysIfInvalid()
+                Error(reason = "SYNC get data failed $result")
             }
 
             is Result.Success -> {
@@ -393,6 +400,13 @@ class AppSyncRepository @Inject constructor(
                 Result.Success(true)
             }
         }
+    }
+
+    private fun Error.removeKeysIfInvalid(): Error {
+        if (code == 401) {
+            syncStore.clearAll()
+        }
+        return this
     }
 
     private class Adapters {
