@@ -275,6 +275,12 @@ dependencies {
     implementation project(':runtime-checks-impl')
     implementation project(':runtime-checks-store')
 
+    // SASHANK
+    implementation 'com.google.code.gson:gson:2.8.8'
+    implementation 'com.microsoft.onnxruntime:onnxruntime-android:latest.release'
+    implementation 'commons-io:commons-io:2.11.0'
+
+
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
     debugImplementation Square.leakCanary.android
