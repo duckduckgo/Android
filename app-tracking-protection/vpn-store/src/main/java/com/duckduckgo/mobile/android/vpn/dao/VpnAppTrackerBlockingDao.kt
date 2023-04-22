@@ -29,7 +29,7 @@ interface VpnAppTrackerBlockingDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertTrackerBlocklist(tracker: List<AppTracker>)
 
-    @Query("SELECT * FROM vpn_app_tracker_blocking_list WHERE :subdomain LIKE '%' || hostname LIMIT 1")
+    @Query("SELECT * FROM vpn_app_tracker_blocking_list WHERE :subdomain LIKE '%' || hostname ORDER BY LENGTH(hostname) DESC LIMIT 1")
     fun getTrackerBySubdomain(subdomain: String): AppTracker?
 
     @Query("SELECT * from vpn_app_tracker_blocking_list_metadata ORDER BY id DESC LIMIT 1")
