@@ -41,7 +41,6 @@ import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.include_dax_multiselect_dialog_cta.view.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.flow.*
@@ -126,12 +125,12 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
         binding.daxDialogCta.root.gone()
         binding.daxDialogMultiselectCta.apply {
             root.show()
-            root.dialogTextCta.startTypingAnimation(ctaText)
+            binding.daxDialogMultiselectCta.dialogTextCta.startTypingAnimation(ctaText)
             ViewCompat.animate(root)
                 .alpha(MAX_ALPHA)
                 .setDuration(ANIMATION_DURATION)
                 .withEndAction {
-                    ViewCompat.animate(root.featureOptionsContainer)
+                    ViewCompat.animate(binding.daxDialogMultiselectCta.featureOptionsContainer)
                         .alpha(MAX_ALPHA)
                         .setDuration(ANIMATION_DURATION)
                         .setStartDelay(ANIMATION_DURATION)
