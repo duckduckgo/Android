@@ -225,7 +225,9 @@ class SyncActivityViewModel @Inject constructor(
         } else if (syncRepository.isSignedIn() && !viewState.value.showAccount) {
             initViewStateThisDevice()
             viewState.emit(viewState.value.showDeviceListItemLoading())
-            fetchRemoteDevices()
+            viewModelScope.launch(dispatchers.io()) {
+                fetchRemoteDevices()
+            }
         }
     }
 
