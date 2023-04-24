@@ -18,7 +18,6 @@ package com.duckduckgo.app.statistics
 
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.BlockingTrackersAcrossWebRemoteMessage
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.CookiePromptManagementExperiment
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DaxDialogMessage
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.NextLevelPrivacyNotification
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.NextLevelPrivacyRemoteMessage
@@ -48,22 +47,6 @@ class VariantManagerTest {
         val variant = variants.first { it.key == "se" }
         assertEqualsDouble(0.0, variant.weight)
         assertEquals(0, variant.features.size)
-    }
-
-    @Test
-    fun cookiePromptManagementControlVariantHasExpectedWeightAndNoFeatures() {
-        val variant = variants.first { it.key == "ms" }
-        assertEqualsDouble(1.0, variant.weight)
-        assertEquals(0, variant.features.size)
-        assertEquals(0, variant.features.size)
-    }
-
-    @Test
-    fun cookiePromptManagementExperimentalVariantHasExpectedWeightAndFeatures() {
-        val variant = variants.first { it.key == "mt" }
-        assertEqualsDouble(1.0, variant.weight)
-        assertEquals(1, variant.features.size)
-        assertTrue(variant.hasFeature(CookiePromptManagementExperiment))
     }
 
     @Test

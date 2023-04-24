@@ -35,7 +35,6 @@ interface VariantManager {
 
     // variant-dependant features listed here
     sealed class VariantFeature {
-        object CookiePromptManagementExperiment : VariantFeature()
         object OnboardingCustomizationExperiment : VariantFeature()
 
         object OneEasyStepForPrivacyRemoteMessage : VariantFeature()
@@ -58,13 +57,6 @@ interface VariantManager {
             // the future if we can filter by app version
             Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
             Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
-            Variant(key = "ms", weight = 1.0, features = emptyList(), filterBy = { isEuropeanCountry() }),
-            Variant(
-                key = "mt",
-                weight = 1.0,
-                features = listOf(VariantFeature.CookiePromptManagementExperiment),
-                filterBy = { isEuropeanCountry() },
-            ),
             Variant(key = "mi", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
             Variant(key = "mj", weight = 1.0, features = listOf(VariantFeature.OnboardingCustomizationExperiment), filterBy = { noFilter() }),
 
@@ -98,60 +90,6 @@ interface VariantManager {
             "GB",
         )
 
-        private val europeanCountries = listOf(
-            "AD",
-            "AL",
-            "AT",
-            "AZ",
-            "BA",
-            "BE",
-            "BG",
-            "BY",
-            "CH",
-            "CY",
-            "CZ",
-            "DE",
-            "DK",
-            "EE",
-            "ES",
-            "FI",
-            "FR",
-            "GB",
-            "GE",
-            "GI",
-            "GR",
-            "HR",
-            "HU",
-            "IE",
-            "IS",
-            "IT",
-            "KZ",
-            "LI",
-            "LT",
-            "LU",
-            "LV",
-            "MC",
-            "MD",
-            "ME",
-            "MK",
-            "MT",
-            "NL",
-            "NO",
-            "PL",
-            "PT",
-            "RO",
-            "RS",
-            "RU",
-            "SE",
-            "SI",
-            "SK",
-            "SM",
-            "TR",
-            "UA",
-            "UK",
-            "VA",
-        )
-
         fun referrerVariant(key: String): Variant {
             val knownReferrer = REFERRER_VARIANTS.firstOrNull { it.key == key }
             return knownReferrer ?: Variant(key, features = emptyList(), filterBy = { noFilter() })
@@ -162,11 +100,6 @@ interface VariantManager {
         private fun isEnglishLocale(): Boolean {
             val locale = Locale.getDefault()
             return locale != null && locale.language == "en"
-        }
-
-        private fun isEuropeanCountry(): Boolean {
-            val locale = Locale.getDefault()
-            return locale != null && europeanCountries.contains(locale.country)
         }
 
         private fun isSerpRegionToggleCountry(): Boolean {
@@ -264,9 +197,6 @@ class ExperimentationVariantManager(
         return activeVariants[randomizedIndex]
     }
 }
-
-fun VariantManager.isCookiePromptManagementExperimentEnabled() =
-    this.getVariant().hasFeature(VariantManager.VariantFeature.CookiePromptManagementExperiment)
 
 fun VariantManager.isOnboardingCustomizationExperimentEnabled() =
     this.getVariant().hasFeature(VariantManager.VariantFeature.OnboardingCustomizationExperiment)
