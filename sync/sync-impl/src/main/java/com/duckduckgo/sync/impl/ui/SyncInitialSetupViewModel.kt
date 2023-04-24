@@ -79,6 +79,7 @@ constructor(
                 command.send(Command.ShowMessage("$result"))
             }
             getConnectedDevices()
+            startInitialSync()
         }
     }
 
@@ -122,6 +123,23 @@ constructor(
 
     private fun getConnectedDevices() {
         viewModelScope.launch(dispatchers.io()) {
+            when (val connectedDevices = syncRepository.getConnectedDevices()) {
+                is Error -> command.send(Command.ShowMessage(connectedDevices.reason))
+                is Success -> {
+                    viewState.emit(
+                        viewState.value.copy(
+                            connectedDevices = connectedDevices.data,
+                        ),
+                    )
+                }
+            }
+            updateViewState()
+        }
+    }
+
+    private fun startInitialSync(){
+        viewModelScope.launch(dispatchers.io()) {
+
             when (val connectedDevices = syncRepository.getConnectedDevices()) {
                 is Error -> command.send(Command.ShowMessage(connectedDevices.reason))
                 is Success -> {
