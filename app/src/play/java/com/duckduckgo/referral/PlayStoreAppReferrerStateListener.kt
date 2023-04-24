@@ -20,6 +20,8 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.pm.ResolveInfo
+import android.os.Build
 import com.android.installreferrer.api.InstallReferrerClient
 import com.android.installreferrer.api.InstallReferrerClient.InstallReferrerResponse.*
 import com.android.installreferrer.api.InstallReferrerStateListener
@@ -152,9 +154,15 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
     private fun playStoreReferralServiceInstalled(): Boolean {
         val playStoreConnectionServiceIntent = Intent()
         playStoreConnectionServiceIntent.component = ComponentName(PLAY_STORE_PACKAGE, PLAY_STORE_REFERRAL_SERVICE)
-        val matchingServices = packageManager.queryIntentServices(playStoreConnectionServiceIntent, 0)
-        return matchingServices.size > 0
+        return getMatchingServices(playStoreConnectionServiceIntent).size > 0
     }
+
+    private fun getMatchingServices(serviceIntent: Intent): List<ResolveInfo> =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            packageManager.queryIntentServices(serviceIntent, PackageManager.ResolveInfoFlags.of(0))
+        } else {
+            packageManager.queryIntentServices(serviceIntent, 0)
+        }
 
     private fun referralResultReceived(result: ParsedReferrerResult) {
         referralResult = result
