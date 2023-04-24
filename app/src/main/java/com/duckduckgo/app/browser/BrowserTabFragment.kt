@@ -1375,16 +1375,24 @@ class BrowserTabFragment :
         if (appLink.appIntent != null) {
             appLink.appIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             try {
-                startActivity(appLink.appIntent)
+                startActivityOrQuietlyFail(appLink.appIntent)
             } catch (e: SecurityException) {
                 showToast(R.string.unableToOpenLink)
             }
         } else if (appLink.excludedComponents != null && appBuildConfig.sdkInt >= Build.VERSION_CODES.N) {
             val title = getString(R.string.appLinkIntentChooserTitle)
             val chooserIntent = getChooserIntent(appLink.uriString, title, appLink.excludedComponents)
-            startActivity(chooserIntent)
+            startActivityOrQuietlyFail(chooserIntent)
         }
         viewModel.clearPreviousUrl()
+    }
+
+    private fun startActivityOrQuietlyFail(intent: Intent) {
+        try {
+            startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            Timber.w(e, "Activity not found")
+        }
     }
 
     private fun dismissAppLinkSnackBar() {
