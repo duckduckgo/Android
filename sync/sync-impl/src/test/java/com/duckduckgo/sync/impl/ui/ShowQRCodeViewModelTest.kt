@@ -21,6 +21,7 @@ import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.sync.TestSyncFixtures.jsonConnectKeyEncoded
 import com.duckduckgo.sync.TestSyncFixtures.qrBitmap
+import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncRepository
@@ -46,10 +47,12 @@ class ShowQRCodeViewModelTest {
 
     private val qrEncoder: QREncoder = mock()
     private val syncRepostitory: SyncRepository = mock()
+    private val clipboard: Clipboard = mock()
 
     private val testee = ShowQRCodeViewModel(
         qrEncoder,
         syncRepostitory,
+        clipboard,
         coroutineTestRule.testDispatcherProvider,
     )
 

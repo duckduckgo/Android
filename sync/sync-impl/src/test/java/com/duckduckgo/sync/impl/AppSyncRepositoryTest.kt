@@ -454,9 +454,9 @@ class AppSyncRepositoryTest {
 
         val result = syncRepo.getThisConnectedDevice()!!
 
-        assertEquals(deviceId, result.deviceId)
-        assertEquals(deviceName, result.deviceName)
-        assertEquals(deviceType, result.deviceType)
+        assertEquals(deviceId, result?.deviceId)
+        assertEquals(deviceName, result?.deviceName)
+        assertEquals(deviceType, result?.deviceType)
     }
 
     @Test
