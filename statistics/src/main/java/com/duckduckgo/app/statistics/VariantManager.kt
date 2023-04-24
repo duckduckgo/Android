@@ -36,7 +36,6 @@ interface VariantManager {
     // variant-dependant features listed here
     sealed class VariantFeature {
         object CookiePromptManagementExperiment : VariantFeature()
-        object OptimiseOnboardingExperiment : VariantFeature()
         object OnboardingCustomizationExperiment : VariantFeature()
 
         object OneEasyStepForPrivacyRemoteMessage : VariantFeature()
@@ -65,13 +64,6 @@ interface VariantManager {
                 weight = 1.0,
                 features = listOf(VariantFeature.CookiePromptManagementExperiment),
                 filterBy = { isEuropeanCountry() },
-            ),
-            Variant(key = "za", weight = 0.0, features = emptyList(), filterBy = { isEnglishLocale() && !isGBCountry() }),
-            Variant(
-                key = "zb",
-                weight = 0.0,
-                features = listOf(VariantFeature.OptimiseOnboardingExperiment),
-                filterBy = { isEnglishLocale() && !isGBCountry() },
             ),
             Variant(key = "mi", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
             Variant(key = "mj", weight = 1.0, features = listOf(VariantFeature.OnboardingCustomizationExperiment), filterBy = { noFilter() }),
@@ -177,11 +169,6 @@ interface VariantManager {
             return locale != null && europeanCountries.contains(locale.country)
         }
 
-        private fun isGBCountry(): Boolean {
-            val locale = Locale.getDefault()
-            return locale != null && locale.country == "GB"
-        }
-
         private fun isSerpRegionToggleCountry(): Boolean {
             val locale = Locale.getDefault()
             return locale != null && serpRegionToggleTargetCountries.contains(locale.country)
@@ -280,9 +267,6 @@ class ExperimentationVariantManager(
 
 fun VariantManager.isCookiePromptManagementExperimentEnabled() =
     this.getVariant().hasFeature(VariantManager.VariantFeature.CookiePromptManagementExperiment)
-
-fun VariantManager.isOptimiseOnboardingExperimentEnabled() =
-    this.getVariant().hasFeature(VariantManager.VariantFeature.OptimiseOnboardingExperiment)
 
 fun VariantManager.isOnboardingCustomizationExperimentEnabled() =
     this.getVariant().hasFeature(VariantManager.VariantFeature.OnboardingCustomizationExperiment)
