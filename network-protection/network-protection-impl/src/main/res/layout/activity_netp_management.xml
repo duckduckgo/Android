@@ -67,6 +67,7 @@
                 android:layout_marginBottom="@dimen/keyline_3"
                 android:gravity="center"
                 android:text="@string/netpManagementDescription"
+                app:textType="secondary"
                 app:typography="body1" />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
@@ -88,6 +89,7 @@
                 android:layout_margin="@dimen/keyline_4"
                 android:layout_marginBottom="@dimen/keyline_2"
                 android:text="@string/netpManagementBetaDescription"
+                app:textType="secondary"
                 app:typography="body2" />
 
         </LinearLayout>
