@@ -73,6 +73,7 @@ class CtaViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val appTheme: AppTheme,
+    private val variantManager: VariantManager,
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
 ) {
     val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()

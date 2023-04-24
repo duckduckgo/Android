@@ -39,6 +39,7 @@ import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
@@ -121,6 +122,8 @@ class CtaViewModelTest {
     @Mock
     private lateinit var mockAppTheme: AppTheme
 
+    private var mockVariantManager: VariantManager = mock()
+
     private var mockVpnFeaturesRegistry: VpnFeaturesRegistry = mock()
 
     private val requiredDaxOnboardingCtas: List<CtaId> = listOf(
@@ -147,6 +150,7 @@ class CtaViewModelTest {
         whenever(mockUserWhitelistDao.contains(any())).thenReturn(false)
         whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(db.dismissedCtaDao().dismissedCtas())
         whenever(mockTabRepository.flowTabs).thenReturn(db.tabsDao().flowTabs())
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
 
         testee = CtaViewModel(
             appInstallStore = mockAppInstallStore,
@@ -162,6 +166,7 @@ class CtaViewModelTest {
             dispatchers = coroutineRule.testDispatcherProvider,
             duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),
             appTheme = mockAppTheme,
+            variantManager = mockVariantManager,
             vpnFeaturesRegistry = mockVpnFeaturesRegistry,
         )
     }
