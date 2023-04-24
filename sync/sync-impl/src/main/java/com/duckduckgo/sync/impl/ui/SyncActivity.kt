@@ -16,25 +16,17 @@
 
 package com.duckduckgo.sync.impl.ui
 
-import android.annotation.SuppressLint
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.CompoundButton
 import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.mobile.android.ui.view.dialog.CustomAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.makeSnackbarWithNoBottomInset
@@ -50,8 +42,6 @@ import com.duckduckgo.sync.impl.R.layout
 import com.duckduckgo.sync.impl.asDrawableRes
 import com.duckduckgo.sync.impl.databinding.ActivitySyncBinding
 import com.duckduckgo.sync.impl.databinding.DialogEditDeviceBinding
-import com.duckduckgo.sync.impl.databinding.ItemSyncDeviceBinding
-import com.duckduckgo.sync.impl.databinding.ItemSyncDeviceLoadingBinding
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskEditDevice
@@ -61,22 +51,11 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasS
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
-import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-
-sealed class SyncDeviceListItem {
-    data class SyncedDevice(val device: ConnectedDevice, val loading: Boolean = false) : SyncDeviceListItem()
-    object LoadingItem : SyncDeviceListItem()
-}
-
-interface ConnectedDeviceClickListener {
-    fun onEditDeviceClicked(device: ConnectedDevice)
-    fun onRemoveDeviceClicked(device: ConnectedDevice)
-}
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(SyncActivityWithEmptyParams::class)

@@ -103,8 +103,8 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
-    private fun fetchRemoteDevices() {
-        viewModelScope.launch(dispatchers.io()) {
+    private suspend fun fetchRemoteDevices() {
+        withContext(dispatchers.io()) {
             val result = syncRepository.getConnectedDevices()
             if (result is Success) {
                 val newState = viewState.value.hideDeviceListItemLoading().setDevices(result.data.map { SyncedDevice(it) })
@@ -145,7 +145,7 @@ class SyncActivityViewModel @Inject constructor(
     }
 
     fun onDeleteAccountCancelled() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatchers.io()) {
             hideOrShowAccountDetails()
         }
     }

@@ -25,8 +25,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.view.hide
 import com.duckduckgo.mobile.android.ui.view.show
+import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.R.layout
 import com.duckduckgo.sync.impl.asDrawableRes
@@ -186,4 +186,14 @@ class LoadingViewHolder(val binding: ItemSyncDeviceLoadingBinding) : ViewHolder(
     fun bind() {
         binding.shimmerFrameLayout.startShimmer()
     }
+}
+
+sealed class SyncDeviceListItem {
+    data class SyncedDevice(val device: ConnectedDevice, val loading: Boolean = false) : SyncDeviceListItem()
+    object LoadingItem : SyncDeviceListItem()
+}
+
+interface ConnectedDeviceClickListener {
+    fun onEditDeviceClicked(device: ConnectedDevice)
+    fun onRemoveDeviceClicked(device: ConnectedDevice)
 }

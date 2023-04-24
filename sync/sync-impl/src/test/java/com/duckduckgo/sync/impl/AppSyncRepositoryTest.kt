@@ -24,6 +24,7 @@ import com.duckduckgo.sync.TestSyncFixtures.accountKeysFailed
 import com.duckduckgo.sync.TestSyncFixtures.connectDeviceKeysNotFoundError
 import com.duckduckgo.sync.TestSyncFixtures.connectDeviceSuccess
 import com.duckduckgo.sync.TestSyncFixtures.connectKeys
+import com.duckduckgo.sync.TestSyncFixtures.connectedDevice
 import com.duckduckgo.sync.TestSyncFixtures.decryptedSecretKey
 import com.duckduckgo.sync.TestSyncFixtures.deleteAccountInvalid
 import com.duckduckgo.sync.TestSyncFixtures.deleteAccountSuccess
@@ -451,11 +452,36 @@ class AppSyncRepositoryTest {
         whenever(syncStore.deviceName).thenReturn(deviceName)
         whenever(syncDeviceIds.deviceType()).thenReturn(deviceType)
 
-        val result = syncRepo.getThisConnectedDevice()
+        val result = syncRepo.getThisConnectedDevice()!!
 
         assertEquals(deviceId, result.deviceId)
         assertEquals(deviceName, result.deviceName)
         assertEquals(deviceType, result.deviceType)
+    }
+
+    @Test
+    fun whenGetThisConnectedDeviceAndNotAuthenticatedThenReturnNull() {
+        val result = syncRepo.getThisConnectedDevice()
+
+        assertNull(result)
+    }
+
+    @Test
+    fun whenRenameDeviceUnAuthenticatedThenReturnError() {
+        val result = syncRepo.renameDevice(connectedDevice)
+
+        assertTrue(result is Result.Error)
+    }
+
+    @Test
+    fun whenRenameDeviceSuccessThenReturnSuccess() {
+        givenAuthenticatedDevice()
+        prepareForLoginSuccess()
+
+        val result = syncRepo.renameDevice(connectedDevice)
+
+        verify(syncApi).login(anyString(), anyString(), eq(connectedDevice.deviceId), anyString(), anyString())
+        assertTrue(result is Result.Success)
     }
 
     private fun prepareForLoginSuccess() {

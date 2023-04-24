@@ -73,7 +73,7 @@ class AppSyncRepository @Inject constructor(
         val userId = syncDeviceIds.userId()
 
         val account: AccountKeys = nativeLib.generateAccountKeys(userId = userId)
-        if (account.result != 0L) return Error(code = account.result.toInt(), reason = "Account keys failed")
+        if (account.result != 0L) return Result.Error(code = account.result.toInt(), reason = "Account keys failed")
 
         val deviceId = syncDeviceIds.deviceId()
         val deviceName = syncDeviceIds.deviceName()
@@ -91,7 +91,7 @@ class AppSyncRepository @Inject constructor(
         )
 
         return when (result) {
-            is Error -> {
+            is Result.Error -> {
                 Timber.i("SYNC signup failed $result")
                 result
             }
@@ -110,9 +110,9 @@ class AppSyncRepository @Inject constructor(
 
     @Deprecated("Method only used for testing purposes. Relies on a local stored recovery key.", level = WARNING)
     override fun login(): Result<Boolean> {
-        val recoveryCodeJson = syncStore.recoveryCode ?: return Error(reason = "Not existing recovery code")
+        val recoveryCodeJson = syncStore.recoveryCode ?: return Result.Error(reason = "Not existing recovery code")
         val recoveryCode =
-            Adapters.recoveryCodeAdapter.fromJson(recoveryCodeJson)?.recovery ?: return Error(reason = "Failed reading json recovery code")
+            Adapters.recoveryCodeAdapter.fromJson(recoveryCodeJson)?.recovery ?: return Result.Error(reason = "Failed reading json recovery code")
 
         val primaryKey = recoveryCode.primaryKey
         val userId = recoveryCode.userId
@@ -123,7 +123,7 @@ class AppSyncRepository @Inject constructor(
     }
 
     override fun login(recoveryCodeRawJson: String): Result<Boolean> {
-        val recoveryCode = Adapters.recoveryCodeAdapter.fromJson(recoveryCodeRawJson.decodeB64())?.recovery ?: return Error(
+        val recoveryCode = Adapters.recoveryCodeAdapter.fromJson(recoveryCodeRawJson.decodeB64())?.recovery ?: return Result.Error(
             reason = "Failed reading json",
         )
         val primaryKey = recoveryCode.primaryKey
@@ -184,15 +184,15 @@ class AppSyncRepository @Inject constructor(
     }
 
     override fun connectDevice(contents: String): Result<Boolean> {
-        val connectKeys = Adapters.recoveryCodeAdapter.fromJson(contents.decodeB64())?.connect ?: return Error(reason = "Error reading json")
+        val connectKeys = Adapters.recoveryCodeAdapter.fromJson(contents.decodeB64())?.connect ?: return Result.Error(reason = "Error reading json")
         if (!isSignedIn()) {
             val result = createAccount()
             if (result is Error) return result
         }
 
-        val primaryKey = syncStore.primaryKey ?: return Error(reason = "Error reading PK")
-        val userId = syncStore.userId ?: return Error(reason = "Error reading UserId")
-        val token = syncStore.token ?: return Error(reason = "Error token")
+        val primaryKey = syncStore.primaryKey ?: return Result.Error(reason = "Error reading PK")
+        val userId = syncStore.userId ?: return Result.Error(reason = "Error reading UserId")
+        val token = syncStore.token ?: return Result.Error(reason = "Error token")
         val recoverKey = Adapters.recoveryCodeAdapter.toJson(LinkCode(RecoveryCode(primaryKey = primaryKey, userId = userId)))
         val seal = nativeLib.seal(recoverKey, connectKeys.secretKey)
 
@@ -204,13 +204,13 @@ class AppSyncRepository @Inject constructor(
         val result = syncApi.connectDevice(deviceId)
 
         return when (result) {
-            is Error -> {
+            is Result.Error -> {
                 result
             }
 
             is Result.Success -> {
                 val sealOpen = nativeLib.sealOpen(result.data, syncStore.primaryKey!!, syncStore.secretKey!!)
-                val recoveryCode = Adapters.recoveryCodeAdapter.fromJson(sealOpen)?.recovery ?: return Error(reason = "Error reading json")
+                val recoveryCode = Adapters.recoveryCodeAdapter.fromJson(sealOpen)?.recovery ?: return Result.Error(reason = "Error reading json")
                 syncStore.userId = recoveryCode.userId
                 syncStore.primaryKey = recoveryCode.primaryKey
                 return performLogin(recoveryCode.userId, deviceId, syncDeviceIds.deviceName(), recoveryCode.primaryKey)
@@ -224,19 +224,19 @@ class AppSyncRepository @Inject constructor(
 
     override fun logout(deviceId: String): Result<Boolean> {
         val token = syncStore.token.takeUnless { it.isNullOrEmpty() }
-            ?: return Error(reason = "Token Empty")
+            ?: return Result.Error(reason = "Token Empty")
 
         val logoutThisDevice = deviceId.isEmpty() || deviceId == syncStore.deviceId
 
         val deviceId = if (logoutThisDevice) {
             syncStore.deviceId.takeUnless { it.isNullOrEmpty() }
-                ?: return Error(reason = "Device Id Empty")
+                ?: return Result.Error(reason = "Device Id Empty")
         } else {
             deviceId
         }
 
         return when (val result = syncApi.logout(token, deviceId)) {
-            is Error -> {
+            is Result.Error -> {
                 Timber.i("SYNC logout failed $result")
                 result
             }
@@ -251,10 +251,10 @@ class AppSyncRepository @Inject constructor(
     }
 
     override fun deleteAccount(): Result<Boolean> {
-        val token = syncStore.token.takeUnless { it.isNullOrEmpty() } ?: return Error(reason = "Token Empty")
+        val token = syncStore.token.takeUnless { it.isNullOrEmpty() } ?: return Result.Error(reason = "Token Empty")
 
         return when (val result = syncApi.deleteAccount(token)) {
-            is Error -> {
+            is Result.Error -> {
                 Timber.i("SYNC deleteAccount failed $result")
                 result
             }
@@ -282,12 +282,12 @@ class AppSyncRepository @Inject constructor(
 
     override fun getConnectedDevices(): Result<List<ConnectedDevice>> {
         val token = syncStore.token.takeUnless { it.isNullOrEmpty() }
-            ?: return Error(reason = "Token Empty")
+            ?: return Result.Error(reason = "Token Empty")
         val primaryKey = syncStore.primaryKey.takeUnless { it.isNullOrEmpty() }
-            ?: return Error(reason = "PrimaryKey not found")
+            ?: return Result.Error(reason = "PrimaryKey not found")
 
         return when (val result = syncApi.getDevices(token)) {
-            is Error -> {
+            is Result.Error -> {
                 Timber.i("SYNC getDevices failed $result")
                 result
             }
@@ -320,7 +320,7 @@ class AppSyncRepository @Inject constructor(
         primaryKey: String,
     ): Result<Boolean> {
         val preLogin: LoginKeys = nativeLib.prepareForLogin(primaryKey)
-        if (preLogin.result != 0L) return Error(code = preLogin.result.toInt(), reason = "Login account keys failed")
+        if (preLogin.result != 0L) return Result.Error(code = preLogin.result.toInt(), reason = "Login account keys failed")
 
         val deviceType = syncDeviceIds.deviceType()
         val encryptedDeviceType = nativeLib.encryptData(deviceType.deviceFactor, preLogin.primaryKey).encryptedData
@@ -334,13 +334,13 @@ class AppSyncRepository @Inject constructor(
         )
 
         return when (result) {
-            is Error -> {
+            is Result.Error -> {
                 result
             }
 
             is Result.Success -> {
                 val decryptResult = nativeLib.decrypt(result.data.protected_encryption_key, preLogin.stretchedPrimaryKey)
-                if (decryptResult.result != 0L) return Error(code = decryptResult.result.toInt(), reason = "Decrypt failed")
+                if (decryptResult.result != 0L) return Result.Error(code = decryptResult.result.toInt(), reason = "Decrypt failed")
                 syncStore.userId = userId
                 syncStore.deviceId = deviceId
                 syncStore.deviceName = deviceName
@@ -356,13 +356,13 @@ class AppSyncRepository @Inject constructor(
     override fun sendAllData(): Result<Boolean> {
         val token =
             syncStore.token.takeUnless { it.isNullOrEmpty() }
-                ?: return Error(reason = "Token Empty")
+                ?: return Result.Error(reason = "Token Empty")
 
         val allData = syncCrypter.generateAllData()
         val allDataJSON = Adapters.patchAdapter.toJson(allData)
         Timber.d("SYNC: initial patch data generated $allDataJSON")
         return when (val result = syncApi.sendAllBookmarks(token, allData)) {
-            is Error -> {
+            is Result.Error -> {
                 result
             }
 
@@ -376,11 +376,11 @@ class AppSyncRepository @Inject constructor(
     override fun fetchAllData(): Result<Boolean> {
         val token =
             syncStore.token.takeUnless { it.isNullOrEmpty() }
-                ?: return Error(reason = "Token Empty")
+                ?: return Result.Error(reason = "Token Empty")
 
         return when (val result = syncApi.getAllData(token)) {
-            is Error -> {
-                Error(reason = "SYNC get data failed $result")
+            is Result.Error -> {
+                Result.Error(reason = "SYNC get data failed $result")
             }
 
             is Result.Success -> {
