@@ -61,7 +61,7 @@
         <activity
             android:name=".ui.EnterCodeActivity"
             android:exported="false"
-            android:label="@string/show_qr_screen_title"
+            android:label="@string/enter_code_screen_title"
             android:theme="@style/Theme.DuckDuckGo.Dark"
             android:parentActivityName=".ui.setup.SetupAccountActivity"/>
 

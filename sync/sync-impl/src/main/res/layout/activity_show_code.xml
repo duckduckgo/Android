@@ -51,7 +51,7 @@
         app:buttonSize="small"
         android:layout_margin="@dimen/keyline_4"
         android:layout_gravity="center"
-        android:text="@string/sync_connect_copy_code"/>
+        android:text="@string/sync_show_code_copy"/>
 
     <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/copyCodeHint"
@@ -64,7 +64,7 @@
         android:gravity="center"
         app:typography="body2"
         app:textType="secondary"
-        android:text="Use this code after choosing “Manually Enter Code” during sync setup on a second device"
+        android:text="@string/sync_show_code_copy_hint"
     />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -41,15 +41,14 @@
             android:gravity="center"
             app:typography="caption"
             app:textType="secondary"
-            android:text="Copy the code from the Settings > Sync page in the DuckDuckGo App on another synced device and paste it here to sync this device."/>
+            android:text="@string/sync_enter_code_hint"/>
         <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/pastedCode"
             android:layout_width="310dp"
             android:layout_height="214dp"
             android:layout_margin="@dimen/keyline_6"
             android:gravity="center"
-            app:typography="body1"
-            android:text="Copy the code from the Settings > Sync page in the DuckDuckGo App on another synced device and paste it here to sync this device."/>
+            app:typography="body1"/>
     </FrameLayout>
 
     <LinearLayout
@@ -79,7 +78,7 @@
             android:gravity="center"
             app:typography="caption"
             app:textType="secondary"
-            android:text="Verifying code"/>
+            android:text="@string/sync_enter_code_verifying"/>
     </LinearLayout>
 
     <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
@@ -93,7 +92,7 @@
         app:typography="caption"
         app:textType="secondary"
         android:visibility="invisible"
-        android:text="⚠️ Invalid Code"/>
+        android:text="@string/sync_enter_code_invalid"/>
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/hintBarrier"
@@ -114,6 +113,6 @@
         app:buttonSize="small"
         android:layout_margin="@dimen/keyline_4"
         android:layout_gravity="center"
-        android:text="Paste Code"/>
+        android:text="@string/sync_enter_code_paste"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
