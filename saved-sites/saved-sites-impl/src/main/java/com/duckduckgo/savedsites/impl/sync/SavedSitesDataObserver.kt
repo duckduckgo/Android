@@ -22,21 +22,13 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.app.statistics.api.BrowserFeatureStateReporterPlugin
-import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
-import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.sync.api.DeviceSyncState
-import com.duckduckgo.sync.api.SyncChanges
-import com.duckduckgo.sync.api.SyncEngine
-import com.duckduckgo.sync.api.SyncParser
-import com.duckduckgo.sync.api.SyncablePlugin
-import com.duckduckgo.sync.api.SyncableType.BOOKMARKS
+import com.duckduckgo.sync.api.engine.SyncEngine
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -51,7 +43,7 @@ interface SyncDataObserver {
 class SavedSitesDataObserver @Inject constructor(
     private val syncEngine: SyncEngine,
     private val syncState: DeviceSyncState,
-    private val savedSitesRepository: SavedSitesEntitiesDao,
+    private val savedSitesRepository: SavedSitesRepository,
     private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope
 ) : SyncDataObserver, MainProcessLifecycleObserver {
@@ -64,7 +56,7 @@ class SavedSitesDataObserver @Inject constructor(
     }
 
     override fun observeChanges() {
-        if (syncState.isUserSignedInOnDevice()){
+        if (syncState.isUserSignedInOnDevice()) {
             appCoroutineScope.launch(dispatcherProvider.io()) {
                 savedSitesRepository.lastModified().collectLatest {
                     Timber.d("Sync: changes to LastModified")

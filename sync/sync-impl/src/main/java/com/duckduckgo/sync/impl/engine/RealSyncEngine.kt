@@ -18,9 +18,9 @@ package com.duckduckgo.sync.impl.engine
 
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.api.SyncChanges
-import com.duckduckgo.sync.api.SyncEngine
-import com.duckduckgo.sync.api.SyncablePlugin
+import com.duckduckgo.sync.api.engine.SyncChanges
+import com.duckduckgo.sync.api.engine.SyncEngine
+import com.duckduckgo.sync.api.engine.SyncablePlugin
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncDataResponse

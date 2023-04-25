@@ -48,9 +48,11 @@ class AppSyncStateRepository @Inject constructor(private val syncAttemptDao: Syn
     }
 
     override fun updateSyncState(state: SyncState) {
-        val last = syncAttemptDao.lastAttempt()!!
-        val updated = last.copy(state = state)
-        syncAttemptDao.insert(updated)
+        val last = syncAttemptDao.lastAttempt()
+        if (last != null) {
+            val updated = last.copy(state = state)
+            syncAttemptDao.insert(updated)
+        }
     }
 }
 

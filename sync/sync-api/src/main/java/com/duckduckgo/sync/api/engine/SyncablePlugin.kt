@@ -14,21 +14,23 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.impl.di
+package com.duckduckgo.sync.api.engine
 
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
-import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.api.engine.SyncablePlugin
+interface SyncablePlugin {
 
-/**
- * This is here to trigger the code generations
- * [SyncablePlugin] lives in the api module but we don't want to add
- * anvil dependencies
- * CodeGen should not be generated in public api modules.
- */
-@ContributesPluginPoint(
-    scope = AppScope::class,
-    boundType = SyncablePlugin::class,
-)
-@Suppress("unused")
-private interface UnusedSyncablePluginCodegenTrigger
+    /**
+     * Used by the SyncClient to get all the updates from each syncable feature
+     * since a specific time
+     * This data that will be sent to the Sync API
+     */
+    fun getChanges(since: String): SyncChanges
+
+    /**
+     * Changes from Sync Client have been received
+     * Each feature is responsible for merging and solving conflicts
+     */
+    fun syncChanges(
+        changes: List<SyncChanges>,
+        timestamp: String
+    )
+}

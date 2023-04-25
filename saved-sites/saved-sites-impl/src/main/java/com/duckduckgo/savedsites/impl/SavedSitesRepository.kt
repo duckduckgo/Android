@@ -440,6 +440,10 @@ class RealSavedSitesRepository(
         return savedSitesEntitiesDao.entitiesInFolderSync(SavedSitesNames.FAVORITES_ROOT).size.toLong()
     }
 
+    override fun lastModified(): Flow<SavedSite> {
+        return savedSitesEntitiesDao.lastModified().map { it.mapToFavorite(0) }
+    }
+
     override fun updateWithPosition(favorites: List<Favorite>) {
         savedSitesRelationsDao.delete(SavedSitesNames.FAVORITES_ROOT)
         val relations = favorites.map { Relation(folderId = SavedSitesNames.FAVORITES_ROOT, entityId = it.id) }
