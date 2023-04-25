@@ -136,6 +136,9 @@ interface VpnAppTrackerBlockingDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertIntoManualAppExclusionList(excludedApp: AppTrackerManualExcludedApp)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertIntoManualAppExclusionList(excludedApps: List<AppTrackerManualExcludedApp>)
+
     @Query("DELETE from vpn_app_tracker_manual_exclusion_list")
     fun deleteManualAppExclusionList()
 }
