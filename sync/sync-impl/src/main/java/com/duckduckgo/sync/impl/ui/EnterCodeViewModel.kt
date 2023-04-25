@@ -62,7 +62,7 @@ class EnterCodeViewModel @Inject constructor(
     fun onPasteCodeClicked(codeType: Code) {
         viewModelScope.launch(dispatchers.io()) {
             val pastedCode = clipboard.pasteFromClipboard()
-            viewState.value = viewState.value.copy(code = clipboard.pasteFromClipboard())
+            viewState.value = viewState.value.copy(code = pastedCode)
             command.send(Command.ShowLoading)
             authFlow(codeType, pastedCode)
         }

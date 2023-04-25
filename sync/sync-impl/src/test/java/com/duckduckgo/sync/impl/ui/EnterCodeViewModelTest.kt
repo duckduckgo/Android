@@ -45,11 +45,11 @@ internal class EnterCodeViewModelTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private val syncRepostitory: SyncRepository = mock()
+    private val syncRepository: SyncRepository = mock()
     private val clipboard: Clipboard = mock()
 
     private val testee = EnterCodeViewModel(
-        syncRepostitory,
+        syncRepository,
         clipboard,
         coroutineTestRule.testDispatcherProvider,
     )
@@ -66,7 +66,7 @@ internal class EnterCodeViewModelTest {
     @Test
     fun whenUserClicksOnPasteCodeWithRecoveryCodeThenLoginWithCode() = runTest {
         whenever(clipboard.pasteFromClipboard()).thenReturn(jsonRecoveryKeyEncoded)
-        whenever(syncRepostitory.login(jsonRecoveryKeyEncoded)).thenReturn(Success(true))
+        whenever(syncRepository.login(jsonRecoveryKeyEncoded)).thenReturn(Success(true))
 
         testee.onPasteCodeClicked(Code.RECOVERY_CODE)
 
@@ -80,7 +80,7 @@ internal class EnterCodeViewModelTest {
     @Test
     fun whenUserClicksOnPasteCodeWithConnectCodeThenConnectWithCode() = runTest {
         whenever(clipboard.pasteFromClipboard()).thenReturn(jsonConnectKeyEncoded)
-        whenever(syncRepostitory.connectDevice(jsonConnectKeyEncoded)).thenReturn(Success(true))
+        whenever(syncRepository.connectDevice(jsonConnectKeyEncoded)).thenReturn(Success(true))
 
         testee.onPasteCodeClicked(Code.CONNECT_CODE)
 
@@ -94,7 +94,7 @@ internal class EnterCodeViewModelTest {
     @Test
     fun whenPastedCodeFailsThenEmitError() = runTest {
         whenever(clipboard.pasteFromClipboard()).thenReturn(jsonRecoveryKeyEncoded)
-        whenever(syncRepostitory.login(jsonRecoveryKeyEncoded)).thenReturn(Error(reason = "error"))
+        whenever(syncRepository.login(jsonRecoveryKeyEncoded)).thenReturn(Error(reason = "error"))
 
         testee.onPasteCodeClicked(Code.RECOVERY_CODE)
 

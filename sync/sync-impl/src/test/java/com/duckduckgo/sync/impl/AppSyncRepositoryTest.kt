@@ -333,6 +333,20 @@ class AppSyncRepositoryTest {
     }
 
     @Test
+    fun getConnectedDevicesReturnsListWithLocalDeviceInFirstPosition() {
+        givenAuthenticatedDevice()
+        prepareForEncryption()
+        val thisDevice = Device(deviceId = deviceId, deviceName = deviceName, jwIat = "", deviceType = deviceFactor)
+        val anotherDevice = Device(deviceId = "anotherDeviceId", deviceName = deviceName, jwIat = "", deviceType = deviceFactor)
+        val anotherRemoteDevice = Device(deviceId = "anotherRemoteDeviceId", deviceName = deviceName, jwIat = "", deviceType = deviceFactor)
+        whenever(syncApi.getDevices(anyString())).thenReturn(Result.Success(listOf(anotherDevice, anotherRemoteDevice, thisDevice)))
+
+        val result = syncRepo.getConnectedDevices() as Success
+
+        assertTrue(result.data.first().thisDevice)
+    }
+
+    @Test
     fun getConnectedDevicesFailsThenReturnError() {
         whenever(syncStore.token).thenReturn(token)
         whenever(syncStore.deviceId).thenReturn(deviceId)

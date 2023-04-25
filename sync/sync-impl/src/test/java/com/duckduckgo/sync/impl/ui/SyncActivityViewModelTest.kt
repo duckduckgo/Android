@@ -377,6 +377,26 @@ class SyncActivityViewModelTest {
         }
     }
 
+    @Test
+    fun whenOnScanQRCodeClickedThenEmitCommandScanQRCode() = runTest {
+        testee.onScanQRCodeClicked()
+
+        testee.commands().test {
+            awaitItem().assertCommandType(Command.ScanQRCode::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnShowTextCodeClickedThenEmitCommandShowTextCode() = runTest {
+        testee.onShowTextCodeClicked()
+
+        testee.commands().test {
+            awaitItem().assertCommandType(Command.ShowTextCode::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     private fun Command.assertCommandType(expectedType: KClass<out Command>) {
         assertTrue(format("Unexpected command type: %s", this::class.simpleName), this::class == expectedType)
     }

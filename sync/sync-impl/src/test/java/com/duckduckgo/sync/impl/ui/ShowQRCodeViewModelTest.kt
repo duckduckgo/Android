@@ -37,6 +37,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -99,5 +100,27 @@ class ShowQRCodeViewModelTest {
             assertTrue(command is LoginSucess)
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenOnCopyCodeClickedThenShowMessage() = runTest {
+        whenever(syncRepostitory.getConnectQR()).thenReturn(Result.Success(jsonConnectKeyEncoded))
+
+        testee.onCopyCodeClicked()
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is Command.ShowMessage)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnCopyCodeClickedThenCopyCodeToClipboard() = runTest {
+        whenever(syncRepostitory.getConnectQR()).thenReturn(Result.Success(jsonConnectKeyEncoded))
+
+        testee.onCopyCodeClicked()
+
+        verify(clipboard).copyToClipboard(jsonConnectKeyEncoded)
     }
 }

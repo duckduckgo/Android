@@ -200,6 +200,18 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
+    fun onScanQRCodeClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            command.send(Command.ScanQRCode)
+        }
+    }
+
+    fun onShowTextCodeClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            command.send(Command.ShowTextCode)
+        }
+    }
+
     private suspend fun initViewStateThisDevice() {
         if (!syncRepository.isSignedIn()) {
             viewState.emit(signedOutState())
@@ -261,15 +273,4 @@ class SyncActivityViewModel @Inject constructor(
 
     private fun ViewState.showAccount() = copy(showAccount = true)
     private fun ViewState.hideAccount() = copy(showAccount = false)
-    fun onScanQRCodeClicked() {
-        viewModelScope.launch(dispatchers.io()) {
-            command.send(Command.ScanQRCode)
-        }
-    }
-
-    fun onShowTextCodeClicked() {
-        viewModelScope.launch(dispatchers.io()) {
-            command.send(Command.ShowTextCode)
-        }
-    }
 }
