@@ -17,8 +17,8 @@
 package com.duckduckgo.sync.impl.engine
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.api.SyncChanges
-import com.duckduckgo.sync.api.SyncableType.BOOKMARKS
+import com.duckduckgo.sync.api.engine.SyncChanges
+import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.duckduckgo.sync.impl.SyncDataResponse
 import com.duckduckgo.sync.impl.SyncApi
 import com.duckduckgo.sync.impl.Result

@@ -265,4 +265,10 @@ interface SavedSitesRepository {
      * @return [Long] with total amount of [Favorite]
      */
     fun favoritesCount(): Long
+
+    /**
+     * Returns the last modified [SavedSite]
+     * @return [Flow] of [SavedSite]
+     */
+    fun lastModified(): Flow<SavedSite>
 }

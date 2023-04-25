@@ -18,12 +18,11 @@ package com.duckduckgo.savedsites.impl.sync
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
-import com.duckduckgo.sync.api.SyncChanges
-import com.duckduckgo.sync.api.SyncMergeResult
-import com.duckduckgo.sync.api.SyncMerger
-import com.duckduckgo.sync.api.SyncParser
-import com.duckduckgo.sync.api.SyncablePlugin
-import com.duckduckgo.sync.api.SyncableType.BOOKMARKS
+import com.duckduckgo.sync.api.engine.SyncChanges
+import com.duckduckgo.sync.api.engine.SyncMergeResult
+import com.duckduckgo.sync.api.engine.SyncMerger
+import com.duckduckgo.sync.api.engine.SyncablePlugin
+import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
