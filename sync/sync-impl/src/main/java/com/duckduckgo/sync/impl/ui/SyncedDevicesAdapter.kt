@@ -89,7 +89,6 @@ class SyncedDevicesAdapter constructor(private val listener: ConnectedDeviceClic
     @SuppressLint("NotifyDataSetChanged")
     fun updateData(data: List<SyncDeviceListItem>) {
         val oldData = this.syncedDevices
-        notifyDataSetChanged() // there's a weird bug when using DiffUtil with duplicated devices after login, need to investigate
         val diffResult = DiffCallback(oldData, data).run { DiffUtil.calculateDiff(this) }
         this.syncedDevices.clear().also { this.syncedDevices.addAll(data) }
         diffResult.dispatchUpdatesTo(this)
@@ -98,8 +97,7 @@ class SyncedDevicesAdapter constructor(private val listener: ConnectedDeviceClic
     private class DiffCallback(
         private val old: List<SyncDeviceListItem>,
         private val new: List<SyncDeviceListItem>,
-    ) :
-        DiffUtil.Callback() {
+    ) : DiffUtil.Callback() {
         override fun getOldListSize() = old.size
 
         override fun getNewListSize() = new.size
