@@ -47,7 +47,6 @@
             android:layout_width="310dp"
             android:layout_height="214dp"
             android:layout_margin="@dimen/keyline_6"
-            android:gravity="center"
             app:typography="body1"/>
     </FrameLayout>
 
