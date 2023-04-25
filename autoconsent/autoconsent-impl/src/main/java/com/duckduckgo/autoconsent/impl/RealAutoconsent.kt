@@ -20,8 +20,6 @@ import android.webkit.WebView
 import com.duckduckgo.app.global.UriString
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
-import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.isCookiePromptManagementExperimentEnabled
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.api.AutoconsentFeatureName
@@ -43,7 +41,6 @@ class RealAutoconsent @Inject constructor(
     private val featureToggle: FeatureToggle,
     private val userAllowlistRepository: UserAllowListRepository,
     private val unprotectedTemporary: UnprotectedTemporary,
-    private val variantManager: VariantManager,
 ) : Autoconsent {
 
     private lateinit var autoconsentJs: String
@@ -103,11 +100,9 @@ class RealAutoconsent @Inject constructor(
     }
 
     private fun canBeInjected(): Boolean {
-        return if (variantManager.isCookiePromptManagementExperimentEnabled()) {
-            isEnabled() && (settingsRepository.userSetting || !settingsRepository.firstPopupHandled)
-        } else {
-            isEnabled() && settingsRepository.userSetting
-        }
+        // Remove comment to promote feature
+        // return isEnabled() && (settingsRepository.userSetting || !settingsRepository.firstPopupHandled)
+        return isEnabled() && settingsRepository.userSetting
     }
 
     private fun getFunctionsJS(): String {

@@ -22,8 +22,6 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.isHttp
 import com.duckduckgo.app.global.isHttps
-import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.isCookiePromptManagementExperimentEnabled
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.impl.JsReader
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
@@ -46,7 +44,6 @@ class InitMessageHandlerPlugin @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val settingsRepository: AutoconsentSettingsRepository,
     private val repository: AutoconsentRepository,
-    private val variantManager: VariantManager,
 ) : MessageHandlerPlugin {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -64,11 +61,8 @@ class InitMessageHandlerPlugin @Inject constructor(
                         return@launch
                     }
 
-                    val isAutoconsentDisabled = if (variantManager.isCookiePromptManagementExperimentEnabled()) {
-                        !settingsRepository.userSetting && settingsRepository.firstPopupHandled
-                    } else {
-                        !settingsRepository.userSetting
-                    }
+                    // Remove comment to promote feature
+                    val isAutoconsentDisabled = !settingsRepository.userSetting // && settingsRepository.firstPopupHandled
 
                     if (isAutoconsentDisabled) {
                         return@launch
@@ -97,12 +91,10 @@ class InitMessageHandlerPlugin @Inject constructor(
 
     override val supportedTypes: List<String> = listOf("init")
 
-    private fun getAutoAction(): String? {
-        return if (variantManager.isCookiePromptManagementExperimentEnabled()) {
-            if (!settingsRepository.firstPopupHandled) null else "optOut"
-        } else {
-            "optOut"
-        }
+    private fun getAutoAction(): String {
+        // Remove comment to promote feature
+        // return if (!settingsRepository.firstPopupHandled) null else "optOut"
+        return "optOut"
     }
 
     private fun parseMessage(jsonString: String): InitMessage? {
