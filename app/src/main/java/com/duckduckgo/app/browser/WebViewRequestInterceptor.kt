@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser
 
 import android.content.Context
 import android.net.Uri
+import android.os.Environment
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
@@ -41,6 +42,8 @@ import com.duckduckgo.request.filterer.api.RequestFilterer
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import com.duckduckgo.app.browser.ClassifyJS
+import java.io.File
+import java.nio.charset.StandardCharsets
 
 interface RequestInterceptor {
 
@@ -78,9 +81,15 @@ class WebViewRequestInterceptor(
 
     // initialize the classifier
     private val classifyJS = ClassifyJS(context)
+    private val downloadsDirectory: File = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+    val file = File(downloadsDirectory, "test.txt")
 
     override fun onPageStarted(url: String) {
         requestFilterer.registerOnPageCreated(url)
+
+        if (!file.exists()) {
+            file.createNewFile()
+        }
     }
 
     /**
@@ -101,15 +110,14 @@ class WebViewRequestInterceptor(
 
         ): WebResourceResponse? {
         val url = request.url
-        // initialize another variable to store the url string
         val urlString = url.toString()
         if (!urlString.contains("/player/") && urlString.contains(".js")) {
             val urlTillJs = url.toString().substring(0, url.toString().indexOf(".js") + 3)
             val pred = classifyJS.predict(urlTillJs)
             Timber.d("Prediction: " + pred.first + " " + pred.second)
-            if (pred.first == "ads" || pred.first == "marketing" || pred.first == "analytics" || pred.first == "social") {
-                if (pred.second > 0.0) {
-                    Timber.d("URL Blocked: $urlTillJs, Prediction: ${pred.first}, Confidence: ${pred.second}")
+            if (pred.first == "ads"  || pred.first == "analytics" || pred.first == "social" || pred.first == "marketing") { //|| pred.first == "marketing" || pred.first == "social"
+                if (pred.second > 0.8) {
+                    file.appendText("$urlTillJs, ${pred.first}, ${pred.second}\n", StandardCharsets.UTF_8)
                     return WebResourceResponse(null, null, null)
                 }
             }
