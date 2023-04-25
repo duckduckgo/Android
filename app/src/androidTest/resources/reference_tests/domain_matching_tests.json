@@ -309,16 +309,10 @@
                 "siteURL": "https://example2.com",
                 "requestURL": "https://tracker.test/with-options",
                 "requestType": "image",
-                "expectAction": "block"
-            },
-            {
-                "name": "options1 - block on matching options with surrogate",
-                "siteURL": "https://example.com",
-                "requestURL": "https://options1.test/script.js",
-                "requestType": "script",
-                "expectAction": "redirect",
-                "expectRedirect": "data:application/javascript;base64,KGZ1bmN0aW9uKCkge3dpbmRvdy5zdXJyb2dhdGUxPXRydWV9KSgpOw==",
-                "expectExpression": "window.surrogate1 === true"
+                "expectAction": "block",
+                "exceptPlatforms": [
+                    "ios-browser"
+                ]
             },
             {
                 "name": "options1 - ignore on catch ignore after options",
@@ -335,15 +329,6 @@
                 "expectAction": "block"
             },
             {
-                "name": "options2 - block on matching options with surrogate",
-                "siteURL": "https://example.com",
-                "requestURL": "https://options2.test/script.js",
-                "requestType": "script",
-                "expectAction": "redirect",
-                "expectRedirect": "data:application/javascript;base64,KGZ1bmN0aW9uKCkge3dpbmRvdy5zdXJyb2dhdGUxPXRydWV9KSgpOw==",
-                "expectExpression": "window.surrogate1 === true"
-            },
-            {
                 "name": "options2 - ignore on non-matching options fallback ignore",
                 "siteURL": "https://example2.com",
                 "requestURL": "https://options2.test/script.js",
@@ -355,21 +340,30 @@
                 "siteURL": "https://example3.com",
                 "requestURL": "https://options2.test/script.js",
                 "requestType": "script",
-                "expectAction": "block"
+                "expectAction": "block",
+                "exceptPlatforms": [
+                    "ios-browser"
+                ]
             },
             {
                 "name": "options2 - block on matching options (fallthrough)",
                 "siteURL": "https://example2.com",
                 "requestURL": "https://options2.test/script2.js",
                 "requestType": "script",
-                "expectAction": "block"
+                "expectAction": "block",
+                "exceptPlatforms": [
+                    "ios-browser"
+                ]
             },
             {
                 "name": "options2 - block on matching options (subpath match)",
                 "siteURL": "https://example3.com",
                 "requestURL": "https://options2.test/script2.js",
                 "requestType": "script",
-                "expectAction": "block"
+                "expectAction": "block",
+                "exceptPlatforms": [
+                    "ios-browser"
+                ]
             }
         ]
     },
@@ -438,6 +432,24 @@
                 "requestURL": "https://surrogates.test/tracker?abc=2",
                 "requestType": "script",
                 "expectAction": "ignore"
+            },
+            {
+                "name": "options1 - block on matching options with surrogate",
+                "siteURL": "https://example.com",
+                "requestURL": "https://options1.test/script.js",
+                "requestType": "script",
+                "expectAction": "redirect",
+                "expectRedirect": "data:application/javascript;base64,KGZ1bmN0aW9uKCkge3dpbmRvdy5zdXJyb2dhdGUxPXRydWV9KSgpOw==",
+                "expectExpression": "window.surrogate1 === true"
+            },
+            {
+                "name": "options2 - block on matching options with surrogate",
+                "siteURL": "https://example.com",
+                "requestURL": "https://options2.test/script.js",
+                "requestType": "script",
+                "expectAction": "redirect",
+                "expectRedirect": "data:application/javascript;base64,KGZ1bmN0aW9uKCkge3dpbmRvdy5zdXJyb2dhdGUxPXRydWV9KSgpOw==",
+                "expectExpression": "window.surrogate1 === true"
             }
         ]
     }
