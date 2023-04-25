@@ -23,10 +23,10 @@ import android.view.ViewGroup.LayoutParams
 import androidx.core.view.isVisible
 import com.duckduckgo.app.browser.BrowserTabViewModel.BrowserViewState
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.PopupWindowBrowserMenuBinding
 import com.duckduckgo.mobile.android.R.dimen
 import com.duckduckgo.mobile.android.R.drawable
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
-import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
 
 class BrowserPopupMenu(
     context: Context,
@@ -36,39 +36,44 @@ class BrowserPopupMenu(
     resourceId = R.layout.popup_window_browser_menu,
     width = getPopupMenuWidth(context),
 ) {
+    private val binding = PopupWindowBrowserMenuBinding.inflate(layoutInflater)
+
+    init {
+        contentView = binding.root
+    }
 
     fun renderState(
         browserShowing: Boolean,
         viewState: BrowserViewState,
     ) {
         contentView.apply {
-            backMenuItem.isEnabled = viewState.canGoBack
-            forwardMenuItem.isEnabled = viewState.canGoForward
-            refreshMenuItem.isEnabled = browserShowing
-            printPageMenuItem.isEnabled = browserShowing
+            binding.backMenuItem.isEnabled = viewState.canGoBack
+            binding.forwardMenuItem.isEnabled = viewState.canGoForward
+            binding.refreshMenuItem.isEnabled = browserShowing
+            binding.printPageMenuItem.isEnabled = browserShowing
 
-            newTabMenuItem.isVisible = browserShowing
-            sharePageMenuItem?.isVisible = viewState.canSharePage
-            addBookmarksMenuItem?.isVisible = viewState.canSaveSite
+            binding.newTabMenuItem.isVisible = browserShowing
+            binding.sharePageMenuItem.isVisible = viewState.canSharePage
+            binding.addBookmarksMenuItem.isVisible = viewState.canSaveSite
             val isBookmark = viewState.bookmark != null
-            addBookmarksMenuItem?.label {
+            binding.addBookmarksMenuItem.label {
                 context.getString(if (isBookmark) R.string.editBookmarkMenuTitle else R.string.addBookmarkMenuTitle)
             }
-            addBookmarksMenuItem?.setIcon(if (isBookmark) drawable.ic_bookmark_solid_16 else drawable.ic_bookmark_16)
+            binding.addBookmarksMenuItem.setIcon(if (isBookmark) drawable.ic_bookmark_solid_16 else drawable.ic_bookmark_16)
 
             val isFavorite = viewState.favorite != null
-            addFavoriteMenuItem?.isVisible = viewState.addFavorite.isEnabled()
-            addFavoriteMenuItem.label {
+            binding.addFavoriteMenuItem.isVisible = viewState.addFavorite.isEnabled()
+            binding.addFavoriteMenuItem.label {
                 when {
                     viewState.addFavorite.isHighlighted() -> context.getString(R.string.addFavoriteMenuTitleHighlighted)
                     isFavorite -> context.getString(R.string.removeFavoriteMenuTitle)
                     else -> context.getString(R.string.addFavoriteMenuTitle)
                 }
             }
-            addFavoriteMenuItem.setIcon(if (isFavorite) drawable.ic_favorite_solid_16 else drawable.ic_favorite_16)
+            binding.addFavoriteMenuItem.setIcon(if (isFavorite) drawable.ic_favorite_solid_16 else drawable.ic_favorite_16)
 
-            fireproofWebsiteMenuItem?.isVisible = viewState.canFireproofSite
-            fireproofWebsiteMenuItem?.label {
+            binding.fireproofWebsiteMenuItem.isVisible = viewState.canFireproofSite
+            binding.fireproofWebsiteMenuItem.label {
                 context.getString(
                     if (viewState.isFireproofWebsite) {
                         R.string.fireproofWebsiteMenuTitleRemove
@@ -77,12 +82,12 @@ class BrowserPopupMenu(
                     },
                 )
             }
-            fireproofWebsiteMenuItem?.setIcon(if (viewState.isFireproofWebsite) drawable.ic_fire_16 else drawable.ic_fireproofed_16)
+            binding.fireproofWebsiteMenuItem.setIcon(if (viewState.isFireproofWebsite) drawable.ic_fire_16 else drawable.ic_fireproofed_16)
 
-            createAliasMenuItem?.isVisible = viewState.isEmailSignedIn
+            binding.createAliasMenuItem.isVisible = viewState.isEmailSignedIn
 
-            changeBrowserModeMenuItem?.isVisible = viewState.canChangeBrowsingMode
-            changeBrowserModeMenuItem.label {
+            binding.changeBrowserModeMenuItem.isVisible = viewState.canChangeBrowsingMode
+            binding.changeBrowserModeMenuItem.label {
                 context.getString(
                     if (viewState.isDesktopBrowsingMode) {
                         R.string.requestMobileSiteMenuTitle
@@ -91,15 +96,15 @@ class BrowserPopupMenu(
                     },
                 )
             }
-            changeBrowserModeMenuItem?.setIcon(
+            binding.changeBrowserModeMenuItem.setIcon(
                 if (viewState.isDesktopBrowsingMode) drawable.ic_device_mobile_16 else drawable.ic_device_desktop_16,
             )
 
-            openInAppMenuItem.isVisible = viewState.previousAppLink != null
-            findInPageMenuItem.isVisible = viewState.canFindInPage
-            addToHomeMenuItem.isVisible = viewState.addToHomeVisible && viewState.addToHomeEnabled
-            privacyProtectionMenuItem?.isVisible = viewState.canChangePrivacyProtection
-            privacyProtectionMenuItem?.label {
+            binding.openInAppMenuItem.isVisible = viewState.previousAppLink != null
+            binding.findInPageMenuItem.isVisible = viewState.canFindInPage
+            binding.addToHomeMenuItem.isVisible = viewState.addToHomeVisible && viewState.addToHomeEnabled
+            binding.privacyProtectionMenuItem.isVisible = viewState.canChangePrivacyProtection
+            binding.privacyProtectionMenuItem.label {
                 context.getText(
                     if (viewState.isPrivacyProtectionEnabled) {
                         R.string.enablePrivacyProtection
@@ -108,16 +113,16 @@ class BrowserPopupMenu(
                     },
                 ).toString()
             }
-            privacyProtectionMenuItem?.setIcon(
+            binding.privacyProtectionMenuItem.setIcon(
                 if (viewState.isPrivacyProtectionEnabled) drawable.ic_protections_16 else drawable.ic_protections_blocked_16,
             )
-            brokenSiteMenuItem?.isVisible = viewState.canReportSite
+            binding.brokenSiteMenuItem.isVisible = viewState.canReportSite
 
-            siteOptionsMenuDivider.isVisible = viewState.browserShowing
-            browserOptionsMenuDivider.isVisible = viewState.browserShowing
-            settingsMenuDivider.isVisible = viewState.browserShowing
-            printPageMenuItem?.isVisible = viewState.canPrintPage
-            autofillMenuItem?.isVisible = viewState.showAutofill
+            binding.siteOptionsMenuDivider.isVisible = viewState.browserShowing
+            binding.browserOptionsMenuDivider.isVisible = viewState.browserShowing
+            binding.settingsMenuDivider.isVisible = viewState.browserShowing
+            binding.printPageMenuItem.isVisible = viewState.canPrintPage
+            binding.autofillMenuItem.isVisible = viewState.showAutofill
         }
     }
 }

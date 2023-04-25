@@ -20,7 +20,6 @@ import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
-import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.fingerprintprotection.api.FingerprintProtectionManager
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
@@ -33,6 +32,10 @@ import dagger.SingleInstanceIn
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 
+interface CoreContentScopeScripts {
+    fun getScript(): String
+}
+
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealContentScopeScripts @Inject constructor(
@@ -42,7 +45,7 @@ class RealContentScopeScripts @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val unprotectedTemporary: UnprotectedTemporary,
     private val fingerprintProtectionManager: FingerprintProtectionManager,
-) : ContentScopeScripts {
+) : CoreContentScopeScripts {
 
     private var cachedContentScopeJson: String = getContentScopeJson("", emptyList())
 
@@ -153,7 +156,7 @@ class RealContentScopeScripts @Inject constructor(
     }
 
     private fun getUserPreferencesJson(userPreferences: String): String {
-        val defaultParameters = "${getVersionNumberKeyValuePair()},${getPlatformKeyValuePair()},${getSessionKeyValuePair()}"
+        val defaultParameters = "${getVersionNumberKeyValuePair()},${getPlatformKeyValuePair()},${getSessionKeyValuePair()},$messagingParameters"
         if (userPreferences.isEmpty()) {
             return "{$defaultParameters}"
         }
@@ -161,7 +164,6 @@ class RealContentScopeScripts @Inject constructor(
     }
 
     private fun getVersionNumberKeyValuePair() = "\"versionNumber\":${appBuildConfig.versionCode}"
-
     private fun getPlatformKeyValuePair() = "\"platform\":{\"name\":\"android\"}"
     private fun getSessionKeyValuePair() = "\"sessionKey\":\"${fingerprintProtectionManager.getSeed()}\""
 
@@ -175,6 +177,7 @@ class RealContentScopeScripts @Inject constructor(
         const val contentScope = "\$CONTENT_SCOPE$"
         const val userUnprotectedDomains = "\$USER_UNPROTECTED_DOMAINS$"
         const val userPreferences = "\$USER_PREFERENCES$"
+        const val messagingParameters = "\$ANDROID_MESSAGING_PARAMETERS$"
     }
 }
 

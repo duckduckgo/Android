@@ -57,4 +57,12 @@
     <string name="sync_login_device_hint">Scan the QR code on your Recovery PDF, or another synced device, to recover your synced data.</string>
     <string name="sync_connect_scan_qr_hint">Go to Settings > Sync in the DuckDuckGo App on a different device and scan the QR code to sync.</string>
     <string name="sync_connect_copy_code">Copy Code</string>
+    <string name="turn_off_sync_dialog_title">Turn off sync?</string>
+    <string name="turn_off_sync_dialog_content">This Device will no longer be able to access your synced data</string>
+    <string name="turn_off_sync_dialog_primary_button">Turn Off</string>
+    <string name="turn_off_sync_dialog_secondary_button">Cancel</string>
+    <string name="delete_account_dialog_title">Delete server data?</string>
+    <string name="delete_account_dialog_content">All devices will be disconnected and your synced data will be deleted from the server.</string>
+    <string name="delete_account_dialog_primary_button">Delete Data</string>
+    <string name="delete_account_dialog_secondary_button">Cancel</string>
 </resources>

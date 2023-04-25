@@ -27,7 +27,6 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -54,12 +53,12 @@ class FirstPartyCookiesModifierWorkerSchedulerTest {
     }
 
     @Test
-    fun whenOnStopIfFeatureNotEnabledThenDoNothing() {
+    fun whenOnStopIfFeatureNotEnabledThenDeleteTag() {
         whenever(mockToggle.isFeatureEnabled(CookiesFeatureName.Cookie.value)).thenReturn(false)
 
         firstPartyCookiesModifierWorkerScheduler.onStop(mockOwner)
 
-        verify(mockWorkManager, never()).enqueueUniquePeriodicWork(any(), any(), any())
+        verify(mockWorkManager).cancelAllWorkByTag(any())
     }
 
     @Test
@@ -72,11 +71,11 @@ class FirstPartyCookiesModifierWorkerSchedulerTest {
     }
 
     @Test
-    fun whenOnStartIfFeatureNotEnabledThenDoNothing() {
+    fun whenOnStartIfFeatureNotEnabledThenDeleteTag() {
         whenever(mockToggle.isFeatureEnabled(CookiesFeatureName.Cookie.value)).thenReturn(false)
 
         firstPartyCookiesModifierWorkerScheduler.onStart(mockOwner)
 
-        verify(mockWorkManager, never()).enqueueUniquePeriodicWork(any(), any(), any())
+        verify(mockWorkManager).cancelAllWorkByTag(any())
     }
 }

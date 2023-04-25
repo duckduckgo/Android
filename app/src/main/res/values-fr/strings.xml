@@ -287,6 +287,12 @@
     <!-- Notification Channel Names -->
     <string name="notificationChannelTutorials">Tutoriels</string>
 
+    <!-- AppTP Retention Experiment Notifications-->
+    <string name="enableAppTpNotificationEasyStepTitle">Un geste simple pour préserver la confidentialité des applications</string>
+    <string name="enableAppTpNotificationEasyStepDescription">Activez App Tracking Protection pour bloquer les traqueurs cachés dans les applications, même lorsque vous n\'utilisez pas votre téléphone.</string>
+    <string name="enableAppTpNotificationNextLevelTitle">Renforcez votre confidentialité</string>
+    <string name="enableAppTpNotificationNextLevelDescription">Activez App Tracking Protection pour bloquer les traqueurs cachés dans les applications, même lorsque vous n\'utilisez pas votre téléphone.</string>
+
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Effacement des données configuré sur manuel</string>
     <string name="clearNotificationDescription">Personnalisez DuckDuckGo pour effacer automatiquement les données de navigation après chaque session.</string>
@@ -408,6 +414,11 @@
     <string name="hideTipsTitle">Masquer les conseils restants ?</string>
     <string name="hideTipsText">Il n\'y en a que quelques-uns et nous avons essayé de les rendre aussi utiles que possible.</string>
     <string name="hideTipsButton">Masquer les conseils définitivement</string>
+
+    <!-- AppTP Retention Experiment Dax Dialog -->
+    <string name="daxDialogAppTpRetentionText"><![CDATA[Vous bloquez désormais les traqueurs sur le Web 🎉<br/><br/>Je peux également bloquer les traqueurs qui se cachent dans vos autres applications, même lorsque vous n\'utilisez pas votre téléphone.]]></string>
+    <string name="daxDialogAppTpRetentionPrimaryButtonText">Activer App Tracking Protection</string>
+    <string name="daxDialogAppTpRetentionSecondaryButtonText">Pas maintenant</string>
 
     <!-- New Onboarding Experience -->
     <string name="onboardingWelcomeTitle">"Bienvenue sur DuckDuckGo !"</string>

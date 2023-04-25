@@ -449,7 +449,6 @@ class BrowserTabViewModel @Inject constructor(
             val includeShortcutToViewCredential: Boolean,
             val messageResourceId: Int,
         ) : Command()
-        object LaunchPrivacyDashboard : Command()
     }
 
     sealed class NavigationCommand : Command() {
@@ -2359,7 +2358,8 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun showOrHideKeyboard(cta: Cta?) {
-        command.value = if (cta is DialogCta || cta is HomePanelCta) HideKeyboard else ShowKeyboard
+        command.value =
+            if (cta is DialogCta || cta is HomePanelCta || cta is DaxBubbleCta.DaxEndEnableAppTpCta) HideKeyboard else ShowKeyboard
     }
 
     fun registerDaxBubbleCtaDismissed() {
@@ -2376,6 +2376,7 @@ class BrowserTabViewModel @Inject constructor(
         command.value = when (cta) {
             is HomePanelCta.Survey -> LaunchSurvey(cta.survey)
             is HomePanelCta.AddWidgetAuto, is HomePanelCta.AddWidgetInstructions -> LaunchAddWidget
+            is DaxBubbleCta.DaxEndEnableAppTpCta -> LaunchAppTPOnboarding
             else -> return
         }
     }
@@ -2384,15 +2385,6 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch {
             val cta = currentCtaViewState().cta ?: return@launch
             ctaViewModel.onUserDismissedCta(cta)
-        }
-    }
-
-    fun onUserClickOnboardingPrivacyShieldModal() {
-        viewModelScope.launch {
-            val cta = currentCtaViewState().cta ?: return@launch
-            ctaViewModel.onUserDismissedCta(cta)
-            ctaViewModel.onUserClickOnboardingPrivacyShield()
-            command.value = LaunchPrivacyDashboard
         }
     }
 

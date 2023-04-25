@@ -30,6 +30,8 @@ import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
@@ -39,6 +41,8 @@ import dagger.Provides
 import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @Module
@@ -46,7 +50,10 @@ import timber.log.Timber
 class AppShortcutCreatorModule {
     @Provides
     @IntoSet
-    fun provideAppShortcutCreatorObserver(appShortcutCreator: AppShortcutCreator, appBuildConfig: AppBuildConfig): MainProcessLifecycleObserver {
+    fun provideAppShortcutCreatorObserver(
+        appShortcutCreator: AppShortcutCreator,
+        appBuildConfig: AppBuildConfig,
+    ): MainProcessLifecycleObserver {
         return AppShortcutCreatorLifecycleObserver(appShortcutCreator, appBuildConfig)
     }
 }
@@ -66,18 +73,24 @@ class AppShortcutCreatorLifecycleObserver(
 }
 
 @SingleInstanceIn(AppScope::class)
-class AppShortcutCreator @Inject constructor(private val context: Context) {
+class AppShortcutCreator @Inject constructor(
+    private val context: Context,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val dispatchers: DispatcherProvider,
+) {
 
     @RequiresApi(Build.VERSION_CODES.N_MR1)
     fun configureAppShortcuts() {
-        val shortcutList = mutableListOf<ShortcutInfo>()
+        appCoroutineScope.launch(dispatchers.io()) {
+            val shortcutList = mutableListOf<ShortcutInfo>()
 
-        shortcutList.add(buildNewTabShortcut(context))
-        shortcutList.add(buildClearDataShortcut(context))
-        shortcutList.add(buildBookmarksShortcut(context))
+            shortcutList.add(buildNewTabShortcut(context))
+            shortcutList.add(buildClearDataShortcut(context))
+            shortcutList.add(buildBookmarksShortcut(context))
 
-        val shortcutManager = context.getSystemService(ShortcutManager::class.java)
-        kotlin.runCatching { shortcutManager.dynamicShortcuts = shortcutList }
+            val shortcutManager = context.getSystemService(ShortcutManager::class.java)
+            kotlin.runCatching { shortcutManager.dynamicShortcuts = shortcutList }
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.N_MR1)

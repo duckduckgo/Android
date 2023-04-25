@@ -1,7 +1,6 @@
 apply plugin: 'com.android.application'
 
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'com.squareup.anvil'
 apply from: '../versioning.gradle'
@@ -162,6 +161,9 @@ fladle {
 }
 
 dependencies {
+    implementation project(':navigation-api')
+    implementation project(':navigation-impl')
+
     implementation project(path: ':vpn-network-api')
     implementation project(path: ':vpn-network-impl')
 

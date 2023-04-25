@@ -33,6 +33,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import retrofit2.Response
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
@@ -69,22 +70,24 @@ class RealPrivacyConfigDownloaderTest {
         runTest {
             testee.download()
 
-            verify(mockPrivacyConfigPersister).persistPrivacyConfig(any())
+            verify(mockPrivacyConfigPersister).persistPrivacyConfig(any(), any())
         }
 
     class TestFailingPrivacyConfigService : PrivacyConfigService {
-        override suspend fun privacyConfig(): JsonPrivacyConfig {
+        override suspend fun privacyConfig(): Response<JsonPrivacyConfig> {
             throw Exception()
         }
     }
 
     class TestPrivacyConfigService : PrivacyConfigService {
-        override suspend fun privacyConfig(): JsonPrivacyConfig {
-            return JsonPrivacyConfig(
-                version = 1,
-                readme = "readme",
-                features = mapOf(FEATURE_NAME to JSONObject(FEATURE_JSON)),
-                unprotectedTemporaryList,
+        override suspend fun privacyConfig(): Response<JsonPrivacyConfig> {
+            return Response.success(
+                JsonPrivacyConfig(
+                    version = 1,
+                    readme = "readme",
+                    features = mapOf(FEATURE_NAME to JSONObject(FEATURE_JSON)),
+                    unprotectedTemporaryList,
+                ),
             )
         }
     }

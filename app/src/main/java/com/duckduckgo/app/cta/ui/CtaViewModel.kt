@@ -36,7 +36,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.isOptimiseOnboardingExperimentEnabled
+import com.duckduckgo.app.statistics.isDaxDialogMessageEnabled
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
@@ -44,6 +44,8 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.ui.store.AppTheme
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import dagger.SingleInstanceIn
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
@@ -72,6 +74,7 @@ class CtaViewModel @Inject constructor(
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val appTheme: AppTheme,
     private val variantManager: VariantManager,
+    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
 ) {
     val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()
     var canShowAutoconsentCta: AtomicBoolean = AtomicBoolean(false)
@@ -174,10 +177,6 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    fun onUserClickOnboardingPrivacyShield() {
-        pixel.fire(AppPixelName.ONBOARDING_PRIVACY_SHIELD_BUTTON)
-    }
-
     suspend fun refreshCta(
         dispatcher: CoroutineContext,
         isBrowserShowing: Boolean,
@@ -218,7 +217,11 @@ class CtaViewModel @Inject constructor(
                 DaxBubbleCta.DaxIntroCta(onboardingStore, appInstallStore)
             }
             canShowDaxCtaEndOfJourney() -> {
-                DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
+                if (variantManager.isDaxDialogMessageEnabled() && !vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)) {
+                    DaxBubbleCta.DaxEndEnableAppTpCta(onboardingStore, appInstallStore)
+                } else {
+                    DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
+                }
             }
             canShowWidgetCta() -> {
                 if (widgetCapabilities.supportsAutomaticWidgetAdd) AddWidgetAuto else AddWidgetInstructions
@@ -296,11 +299,7 @@ class CtaViewModel @Inject constructor(
 
             // Trackers blocked
             if (!daxDialogTrackersFoundShown() && !isSerpUrl(it.url) && it.orderedTrackerBlockedEntities().isNotEmpty()) {
-                return if (variantManager.isOptimiseOnboardingExperimentEnabled()) {
-                    DaxDialogCta.DaxTrackersBlockedExperimentCta(onboardingStore, appInstallStore, it.orderedTrackerBlockedEntities(), host)
-                } else {
-                    DaxDialogCta.DaxTrackersBlockedCta(onboardingStore, appInstallStore, it.orderedTrackerBlockedEntities(), host)
-                }
+                return DaxDialogCta.DaxTrackersBlockedCta(onboardingStore, appInstallStore, it.orderedTrackerBlockedEntities(), host)
             }
 
             // Is major network

@@ -32,10 +32,9 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import javax.inject.Named
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 
 interface FirstPartyCookiesModifier {
-    suspend fun expireFirstPartyCookies(): Boolean
+    suspend fun expireFirstPartyCookies()
 }
 
 @ContributesBinding(AppScope::class)
@@ -49,13 +48,12 @@ class RealFirstPartyCookiesModifier @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : FirstPartyCookiesModifier {
 
-    override suspend fun expireFirstPartyCookies(): Boolean {
-        return withContext(dispatcherProvider.io()) {
+    override suspend fun expireFirstPartyCookies() {
+        withContext(dispatcherProvider.io()) {
             val databasePath: String = webViewDatabaseLocator.getDatabasePath()
             if (databasePath.isNotEmpty()) {
-                return@withContext expireFirstPartyCookies(databasePath)
+                expireFirstPartyCookies(databasePath)
             }
-            return@withContext false
         }
     }
 
@@ -73,16 +71,17 @@ class RealFirstPartyCookiesModifier @Inject constructor(
             fireproofRepository.fireproofWebsites() +
             DDG_COOKIE_DOMAINS.map { it.toUri().host!! }
 
-    private fun buildSQLWhereClause(timestampThreshold: Long): String {
+    private fun buildSQLWhereClause(timestampThreshold: Long, isOldDb: Boolean): String {
+        val httpOnly = if (isOldDb) "httponly" else "is_httponly"
         val excludedSites: List<String> = excludedSites()
         if (excludedSites.isEmpty()) {
-            return "expires_utc > $timestampThreshold AND is_httponly = 0"
+            return "expires_utc > $timestampThreshold AND $httpOnly = 0"
         }
         return excludedSites.foldIndexed(
             "",
         ) { pos, acc, site ->
             if (pos == 0) {
-                "expires_utc > $timestampThreshold AND is_httponly = 0 AND host_key != '$site' AND host_key NOT LIKE '%.$site'"
+                "expires_utc > $timestampThreshold AND $httpOnly = 0 AND host_key != '$site' AND host_key NOT LIKE '%.$site'"
             } else {
                 "$acc AND host_key != '$site' AND host_key NOT LIKE '%.$site'"
             }
@@ -90,8 +89,7 @@ class RealFirstPartyCookiesModifier @Inject constructor(
     }
     private fun expireFirstPartyCookies(
         databasePath: String,
-    ): Boolean {
-        var updateExecuted = false
+    ) {
         openReadableDatabase(databasePath)?.apply {
             try {
                 val maxAge = cookiesRepository.firstPartyCookiePolicy.maxAge // in seconds
@@ -101,22 +99,38 @@ class RealFirstPartyCookiesModifier @Inject constructor(
                 val timestampThreshold = (System.currentTimeMillis() + TIME_1601_IN_MICRO + (threshold * MULTIPLIER)) * MULTIPLIER
                 val timestampMaxAge = (System.currentTimeMillis() + TIME_1601_IN_MICRO + (maxAge * MULTIPLIER)) * MULTIPLIER
 
-                execSQL(
-                    """
+                // check table and column exist before executing query
+                // old WebView versions use httponly, newer use is_httponly
+                val columnExists =
+                    rawQuery("PRAGMA table_info('${SQLCookieRemover.COOKIES_TABLE_NAME}')", null).use {
+                        while (it.moveToNext()) {
+                            val index = it.getColumnIndex("name")
+                            if (it.getString(index).equals("is_httponly")) {
+                                return@use 1
+                            }
+                            if (it.getString(index).equals("httponly")) {
+                                return@use 2
+                            }
+                        }
+                        return@use 0
+                    }
+
+                if (columnExists > 0) {
+                    val isOldDb = (columnExists == 2)
+                    execSQL(
+                        """
                      UPDATE ${SQLCookieRemover.COOKIES_TABLE_NAME}
                      SET expires_utc=$timestampMaxAge
-                     WHERE ${buildSQLWhereClause(timestampThreshold)}
-                    """.trimIndent(),
-                )
-                updateExecuted = true
+                     WHERE ${buildSQLWhereClause(timestampThreshold, isOldDb)}
+                        """.trimIndent(),
+                    )
+                }
             } catch (exception: Exception) {
-                Timber.e(exception)
                 crashLogger.logCrash(CrashLogger.Crash(shortName = "m_cookie_db_expire_error", t = exception))
             } finally {
                 close()
             }
         }
-        return updateExecuted
     }
 
     private fun openReadableDatabase(databasePath: String): SQLiteDatabase? {

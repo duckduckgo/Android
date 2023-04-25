@@ -38,7 +38,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     ONBOARDING_DAX_CTA_SHOWN("m_odc_s"),
     ONBOARDING_DAX_ALL_CTA_HIDDEN("m_odc_h"),
     ONBOARDING_DAX_CTA_OK_BUTTON("m_odc_ok"),
-    ONBOARDING_PRIVACY_SHIELD_BUTTON("m_onboarding_privacy_shield_button"),
+    ONBOARDING_DAX_CTA_CANCEL_BUTTON("m_onboarding_dax_cta_cancel"),
 
     ONBOARDING_OPTION_PRIVATE_SEARCH_SELECTED("m_onboarding_option_private_search_selected"),
     ONBOARDING_OPTION_TRACKER_BLOCKING_SELECTED("m_onboarding_option_tracker_blocking_selected"),
@@ -256,4 +256,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     REMOTE_MESSAGE_SECONDARY_ACTION_CLICKED("m_remote_message_secondary_action_clicked"),
 
     CREATE_BLOOM_FILTER_ERROR("m_create_bloom_filter_error"),
+
+    APP_INSTALLER_PACKAGE_NAME("m_installsource"),
 }

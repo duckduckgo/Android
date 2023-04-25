@@ -164,7 +164,7 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
 
         private const val APP_PACKAGE_ID_EXTRA = "APP_PACKAGE_ID_EXTRA"
 
-        fun intent(context: Context, brokenApp: BrokenApp): Intent {
+        internal fun intent(context: Context, brokenApp: BrokenApp): Intent {
             return Intent(context, ReportBreakageCategorySingleChoiceActivity::class.java).apply {
                 putExtra(APP_PACKAGE_ID_EXTRA, brokenApp)
             }

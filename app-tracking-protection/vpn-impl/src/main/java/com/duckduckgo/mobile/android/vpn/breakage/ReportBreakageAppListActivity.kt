@@ -208,7 +208,7 @@ class ReportBreakageAppListActivity : DuckDuckGoActivity(), ReportBreakageAppLis
 
     companion object {
         private const val USE_THIS_FORM_ANNOTATION = "use_this_form_link"
-        fun intent(context: Context): Intent {
+        internal fun intent(context: Context): Intent {
             return Intent(context, ReportBreakageAppListActivity::class.java)
         }
     }

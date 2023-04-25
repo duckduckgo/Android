@@ -287,6 +287,12 @@
     <!-- Notification Channel Names -->
     <string name="notificationChannelTutorials">Opetusmateriaalit</string>
 
+    <!-- AppTP Retention Experiment Notifications-->
+    <string name="enableAppTpNotificationEasyStepTitle">Yksi helppo askel kohti sovellusten tietosuojaa</string>
+    <string name="enableAppTpNotificationEasyStepDescription">Ota käyttöön App Tracking Protection ja estä seurantaohjelmat, jotka piileskelevät sovelluksissa, vaikka et käyttäisi puhelintasi.</string>
+    <string name="enableAppTpNotificationNextLevelTitle">Vie tietosuojasi uudelle tasolle</string>
+    <string name="enableAppTpNotificationNextLevelDescription">Ota käyttöön App Tracking Protection ja estä seurantaohjelmat, jotka piileskelevät sovelluksissa, vaikka et käyttäisi puhelintasi.</string>
+
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Tietojen tyhjennys asetettu manuaaliseksi</string>
     <string name="clearNotificationDescription">Mukauta DuckDuckGo poistamaan selaustiedot automaattisesti jokaisen istunnon jälkeen.</string>
@@ -408,6 +414,11 @@
     <string name="hideTipsTitle">Piilotetaanko jäljellä olevat vinkit?</string>
     <string name="hideTipsText">Niitä on vain pari, ja yritimme tehdä niistä informatiivisia.</string>
     <string name="hideTipsButton">Piilota vinkit ikuisesti</string>
+
+    <!-- AppTP Retention Experiment Dax Dialog -->
+    <string name="daxDialogAppTpRetentionText"><![CDATA[Nyt estät seurantaohjelmia kaikkialla verkossa 🎉<br/><br/>Voin estää myös seurantaohjelmat, jotka piileskelevät muissa sovelluksissa, vaikka et käyttäisi puhelintasi.]]></string>
+    <string name="daxDialogAppTpRetentionPrimaryButtonText">Ota App Tracking Protection käyttöön</string>
+    <string name="daxDialogAppTpRetentionSecondaryButtonText">Ei nyt</string>
 
     <!-- New Onboarding Experience -->
     <string name="onboardingWelcomeTitle">"Tervetuloa DuckDuckGo-sovellukseen!"</string>

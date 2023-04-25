@@ -132,10 +132,9 @@ import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.browser.webview.enableDarkMode
 import com.duckduckgo.app.browser.webview.enableLightMode
-import com.duckduckgo.app.cta.onboarding_experiment.DaxDialogExperimentListener
 import com.duckduckgo.app.cta.ui.*
-import com.duckduckgo.app.cta.ui.DaxDialogCta.DaxAutoconsentCta
-import com.duckduckgo.app.cta.ui.DaxDialogCta.DaxTrackersBlockedCta
+import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxEndEnableAppTpCta
+import com.duckduckgo.app.cta.ui.DaxDialogCta.*
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.downloads.DownloadsFileActions
 import com.duckduckgo.app.email.EmailAutofillTooltipFragment
@@ -162,7 +161,6 @@ import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.isCookiePromptManagementExperimentEnabled
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.survey.model.Survey
@@ -188,12 +186,14 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult.*
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
+import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
 import com.duckduckgo.downloads.api.DownloadCommand
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.mobile.android.ui.store.BrowserAppTheme
 import com.duckduckgo.mobile.android.ui.view.*
 import com.duckduckgo.mobile.android.ui.view.DaxDialog
@@ -204,7 +204,7 @@ import com.duckduckgo.mobile.android.ui.view.dialog.DaxAlertDialog
 import com.duckduckgo.mobile.android.ui.view.dialog.StackedAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnOnboardingActivity
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
@@ -379,6 +379,12 @@ class BrowserTabFragment :
     @Inject
     lateinit var sitePermissionsDialogLauncher: SitePermissionsDialogLauncher
 
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var contentScopeScripts: ContentScopeScripts
+
     private var urlExtractingWebView: UrlExtractingWebView? = null
 
     var messageFromPreviousTab: Message? = null
@@ -488,12 +494,11 @@ class BrowserTabFragment :
 
     private val autoconsentCallback = object : AutoconsentCallback {
         override fun onFirstPopUpHandled() {
-            if (variantManager.isCookiePromptManagementExperimentEnabled()) {
-                ctaViewModel.enableAutoconsentCta()
-                launch {
-                    viewModel.refreshCta()
-                }
-            }
+            // Remove comment to promote feature
+            // ctaViewModel.enableAutoconsentCta()
+            // launch {
+            //     viewModel.refreshCta()
+            // }
         }
 
         override fun onPopUpHandled(isCosmetic: Boolean) {
@@ -1089,7 +1094,6 @@ class BrowserTabFragment :
                 messageResourceId = it.messageResourceId,
                 includeShortcutToViewCredential = it.includeShortcutToViewCredential,
             )
-            is Command.LaunchPrivacyDashboard -> browserActivity?.launchPrivacyDashboard()
             else -> {
                 // NO OP
             }
@@ -1367,16 +1371,24 @@ class BrowserTabFragment :
         if (appLink.appIntent != null) {
             appLink.appIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             try {
-                startActivity(appLink.appIntent)
+                startActivityOrQuietlyFail(appLink.appIntent)
             } catch (e: SecurityException) {
                 showToast(R.string.unableToOpenLink)
             }
         } else if (appLink.excludedComponents != null && appBuildConfig.sdkInt >= Build.VERSION_CODES.N) {
             val title = getString(R.string.appLinkIntentChooserTitle)
             val chooserIntent = getChooserIntent(appLink.uriString, title, appLink.excludedComponents)
-            startActivity(chooserIntent)
+            startActivityOrQuietlyFail(chooserIntent)
         }
         viewModel.clearPreviousUrl()
+    }
+
+    private fun startActivityOrQuietlyFail(intent: Intent) {
+        try {
+            startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            Timber.w(e, "Activity not found")
+        }
     }
 
     private fun dismissAppLinkSnackBar() {
@@ -1856,6 +1868,7 @@ class BrowserTabFragment :
             configureWebViewForAutofill(it)
             printInjector.addJsInterface(it) { viewModel.printFromWebView() }
             autoconsent.addJsInterface(it, autoconsentCallback)
+            contentScopeScripts.addJsInterface(it)
         }
 
         if (appBuildConfig.isDebug) {
@@ -2500,7 +2513,7 @@ class BrowserTabFragment :
     }
 
     private fun launchAppTPOnboardingScreen() {
-        startActivity(VpnOnboardingActivity.intent(requireContext()))
+        globalActivityStarter.start(requireContext(), AppTrackerOnboardingActivityWithEmptyParamsParams)
     }
 
     private fun launchSurvey(survey: Survey) {
@@ -3128,6 +3141,7 @@ class BrowserTabFragment :
         ) {
             when (configuration) {
                 is HomePanelCta -> showHomeCta(configuration, favorites)
+                is DaxEndEnableAppTpCta -> showDaxEndEnableAppTpCta(configuration)
                 is DaxBubbleCta -> showDaxCta(configuration)
                 is BubbleCta -> showBubbleCta(configuration)
                 is DialogCta -> showDaxDialogCta(configuration)
@@ -3180,7 +3194,7 @@ class BrowserTabFragment :
             }
         }
 
-        private val daxListener = object : DaxDialogExperimentListener {
+        private val daxListener = object : DaxDialogListener {
             override fun onDaxDialogDismiss() {
                 viewModel.onDaxDialogDismissed()
             }
@@ -3196,16 +3210,30 @@ class BrowserTabFragment :
             override fun onDaxDialogSecondaryCtaClick() {
                 viewModel.onUserClickCtaSecondaryButton()
             }
-
-            override fun onPrivacyShieldClick() {
-                viewModel.onUserClickOnboardingPrivacyShieldModal()
-            }
         }
 
         private fun showDaxCta(configuration: DaxBubbleCta) {
             hideHomeBackground()
             hideHomeCta()
             configuration.showCta(daxDialogCta.daxCtaContainer)
+            newBrowserTab.newTabLayout.setOnClickListener { daxDialogCta.dialogTextCta.finishAnimation() }
+
+            viewModel.onCtaShown()
+        }
+
+        private fun showDaxEndEnableAppTpCta(configuration: DaxEndEnableAppTpCta) {
+            hideHomeBackground()
+            hideHomeCta()
+            configuration.showCta(daxDialogCta.daxCtaContainer)
+
+            daxDialogCta.daxCtaContainer.findViewById<View>(R.id.primaryCtaVariant).setOnClickListener {
+                viewModel.onUserClickCtaOkButton()
+            }
+
+            daxDialogCta.daxCtaContainer.findViewById<View>(R.id.secondaryCtaVariant).setOnClickListener {
+                viewModel.onUserDismissedCta()
+            }
+
             newBrowserTab.newTabLayout.setOnClickListener { daxDialogCta.dialogTextCta.finishAnimation() }
 
             viewModel.onCtaShown()

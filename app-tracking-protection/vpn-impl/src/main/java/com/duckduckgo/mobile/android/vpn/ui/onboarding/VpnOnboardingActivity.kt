@@ -17,7 +17,6 @@
 package com.duckduckgo.mobile.android.vpn.ui.onboarding
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.net.VpnService
 import android.os.Build
@@ -27,10 +26,13 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackerOnboardingActivityWithEmptyParamsParams
+import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackerOnboardingActivityWithNotificationParams
 import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.getColorFromAttr
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
@@ -45,11 +47,14 @@ import com.duckduckgo.mobile.android.vpn.ui.onboarding.Command.RequestVPNPermiss
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.Command.ShowVpnAlwaysOnConflictDialog
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.Command.ShowVpnConflictDialog
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
+import com.duckduckgo.navigation.api.getActivityParams
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
+@ContributeToActivityStarter(AppTrackerOnboardingActivityWithEmptyParamsParams::class)
+@ContributeToActivityStarter(AppTrackerOnboardingActivityWithNotificationParams::class)
 class VpnOnboardingActivity : DuckDuckGoActivity() {
 
     @Inject
@@ -70,6 +75,10 @@ class VpnOnboardingActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         configureUI()
         observeViewModel()
+
+        intent?.getActivityParams(AppTrackerOnboardingActivityWithNotificationParams::class.java)?.let {
+            viewModel.onLaunchedFromNotification(it.pixelName)
+        }
     }
 
     private fun configureUI() {
@@ -299,9 +308,5 @@ class VpnOnboardingActivity : DuckDuckGoActivity() {
 
     companion object {
         private const val REQUEST_ASK_VPN_PERMISSION = 101
-
-        fun intent(context: Context): Intent {
-            return Intent(context, VpnOnboardingActivity::class.java)
-        }
     }
 }

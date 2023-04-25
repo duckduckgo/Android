@@ -35,7 +35,8 @@ import com.duckduckgo.macos_impl.MacOsViewModel.Command.ShareLink
 import com.duckduckgo.macos_impl.MacOsViewModel.ViewState
 import com.duckduckgo.macos_impl.databinding.ActivityMacosBinding
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import com.duckduckgo.windows.api.WindowsSettingsNav
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.windows.api.ui.WindowsWaitlistScreenWithEmptyParams
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -47,7 +48,7 @@ class MacOsActivity : DuckDuckGoActivity() {
     private val viewModel: MacOsViewModel by bindViewModel()
     private val binding: ActivityMacosBinding by viewBinding()
 
-    @Inject lateinit var windowsSettingsNav: WindowsSettingsNav
+    @Inject lateinit var globalActivityStarter: GlobalActivityStarter
 
     private val toolbar
         get() = binding.includeToolbar.toolbar
@@ -87,7 +88,7 @@ class MacOsActivity : DuckDuckGoActivity() {
     }
 
     private fun launchWindowsClientSettings() {
-        startActivity(windowsSettingsNav.openWindowsSettings(this))
+        globalActivityStarter.start(this, WindowsWaitlistScreenWithEmptyParams)
         finish()
     }
 

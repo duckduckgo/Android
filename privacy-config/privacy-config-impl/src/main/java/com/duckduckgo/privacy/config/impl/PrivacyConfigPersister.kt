@@ -36,7 +36,7 @@ import javax.inject.Inject
 import timber.log.Timber
 
 interface PrivacyConfigPersister {
-    suspend fun persistPrivacyConfig(jsonPrivacyConfig: JsonPrivacyConfig)
+    suspend fun persistPrivacyConfig(jsonPrivacyConfig: JsonPrivacyConfig, eTag: String? = null)
 }
 
 private const val PRIVACY_SIGNATURE_KEY = "plugin_signature"
@@ -53,7 +53,7 @@ class RealPrivacyConfigPersister @Inject constructor(
     @ConfigPersisterPreferences private val persisterPreferences: SharedPreferences,
 ) : PrivacyConfigPersister {
 
-    override suspend fun persistPrivacyConfig(jsonPrivacyConfig: JsonPrivacyConfig) {
+    override suspend fun persistPrivacyConfig(jsonPrivacyConfig: JsonPrivacyConfig, eTag: String?) {
         val privacyConfig = privacyConfigRepository.get()
         val newVersion = jsonPrivacyConfig.version
         val previousVersion = privacyConfig?.version ?: 0
@@ -64,7 +64,7 @@ class RealPrivacyConfigPersister @Inject constructor(
             database.runInTransaction {
                 persisterPreferences.setSignature(currentPluginHashCode)
                 privacyFeatureTogglesRepository.deleteAll()
-                privacyConfigRepository.insert(PrivacyConfig(version = jsonPrivacyConfig.version, readme = jsonPrivacyConfig.readme))
+                privacyConfigRepository.insert(PrivacyConfig(version = jsonPrivacyConfig.version, readme = jsonPrivacyConfig.readme, eTag = eTag))
                 unprotectedTemporaryRepository.updateAll(jsonPrivacyConfig.unprotectedTemporary)
                 jsonPrivacyConfig.features.forEach { feature ->
                     feature.value?.let { jsonObject ->

@@ -31,6 +31,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -64,7 +65,7 @@ class LocalPrivacyConfigObserverTest {
 
             testee.onCreate(lifecycleOwner)
 
-            verify(mockPrivacyConfigPersister).persistPrivacyConfig(any())
+            verify(mockPrivacyConfigPersister).persistPrivacyConfig(any(), eq(null))
         }
 
     private fun givenLocalPrivacyConfigFileExists() {

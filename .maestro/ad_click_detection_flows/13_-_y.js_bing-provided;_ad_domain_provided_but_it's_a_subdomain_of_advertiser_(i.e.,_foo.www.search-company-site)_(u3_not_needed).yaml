@@ -8,7 +8,7 @@ appId: com.duckduckgo.mobile.android
 - tapOn: "cancel"
 - assertVisible:
     text: ".*I'll also upgrade the security of your connection if possible.*"
-- inputText: "https://www.search-company.site/"
+- inputText: "https://www.search-company.site/#ad-id-13"
 - pressKey: Enter
 - assertVisible:
     text: ".*Got It.*"
@@ -18,11 +18,6 @@ appId: com.duckduckgo.mobile.android
     text: "HIDE TIPS FOREVER"
 - tapOn:
     text: "HIDE TIPS FOREVER"
-- scroll
-- scroll
-- scroll
-- scroll
-- scroll
 - assertVisible:
     id: "ad-id-13"
 - tapOn:

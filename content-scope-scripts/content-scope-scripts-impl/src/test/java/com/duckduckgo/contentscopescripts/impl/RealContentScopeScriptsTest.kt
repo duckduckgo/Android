@@ -20,7 +20,6 @@ import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
-import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
 import com.duckduckgo.fingerprintprotection.api.FingerprintProtectionManager
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.api.UnprotectedTemporaryException
@@ -44,7 +43,7 @@ class RealContentScopeScriptsTest {
     private val mockUnprotectedTemporary: UnprotectedTemporary = mock()
     private val mockFingerprintProtectionManager: FingerprintProtectionManager = mock()
 
-    lateinit var testee: ContentScopeScripts
+    lateinit var testee: CoreContentScopeScripts
 
     @Before
     fun setup() {
@@ -98,7 +97,8 @@ class RealContentScopeScriptsTest {
                 "\"config1\":{\"state\":\"enabled\"}," +
                 "\"config2\":{\"state\":\"disabled\"}}," +
                 "\"unprotectedTemporary\":[{\"domain\":\"example.com\",\"reason\":\"reason\"},{\"domain\":\"foo.com\",\"reason\":\"reason2\"}]}," +
-                " [\"foo.com\"], {\"versionNumber\":1234,\"platform\":{\"name\":\"android\"},\"sessionKey\":\"5678\"})",
+                " [\"foo.com\"], {\"versionNumber\":1234,\"platform\":{\"name\":\"android\"},\"sessionKey\":\"5678\"," +
+                "\$ANDROID_MESSAGING_PARAMETERS\$})",
             js,
         )
 
@@ -124,7 +124,8 @@ class RealContentScopeScriptsTest {
                 "\"config2\":{\"state\":\"disabled\"}}," +
                 "\"unprotectedTemporary\":[{\"domain\":\"example.com\",\"reason\":\"reason\"},{\"domain\":\"foo.com\",\"reason\":\"reason2\"}]}," +
                 " [\"example.com\"], {\"globalPrivacyControlValue\":false,\"versionNumber\":1234,\"platform\":{\"name\":\"android\"}," +
-                "\"sessionKey\":\"5678\"})",
+                "\"sessionKey\":\"5678\"," +
+                "\$ANDROID_MESSAGING_PARAMETERS\$})",
             js,
         )
 
@@ -151,7 +152,8 @@ class RealContentScopeScriptsTest {
                 "\"config1\":{\"state\":\"enabled\"}}," +
                 "\"unprotectedTemporary\":[{\"domain\":\"example.com\",\"reason\":\"reason\"},{\"domain\":\"foo.com\",\"reason\":\"reason2\"}]}," +
                 " [\"example.com\"], {\"globalPrivacyControlValue\":true,\"versionNumber\":1234,\"platform\":{\"name\":\"android\"}," +
-                "\"sessionKey\":\"5678\"})",
+                "\"sessionKey\":\"5678\"," +
+                "\$ANDROID_MESSAGING_PARAMETERS\$})",
             js,
         )
 
@@ -176,7 +178,8 @@ class RealContentScopeScriptsTest {
                 "\"config1\":{\"state\":\"enabled\"}," +
                 "\"config2\":{\"state\":\"disabled\"}}," +
                 "\"unprotectedTemporary\":[{\"domain\":\"example.com\",\"reason\":\"reason\"}]}," +
-                " [\"example.com\"], {\"versionNumber\":1234,\"platform\":{\"name\":\"android\"},\"sessionKey\":\"5678\"})",
+                " [\"example.com\"], {\"versionNumber\":1234,\"platform\":{\"name\":\"android\"},\"sessionKey\":\"5678\"," +
+                "\$ANDROID_MESSAGING_PARAMETERS\$})",
             js,
         )
 
@@ -196,7 +199,8 @@ class RealContentScopeScriptsTest {
             "\"config1\":{\"state\":\"enabled\"}," +
             "\"config2\":{\"state\":\"disabled\"}}," +
             "\"unprotectedTemporary\":[{\"domain\":\"example.com\",\"reason\":\"reason\"},{\"domain\":\"foo.com\",\"reason\":\"reason2\"}]}, " +
-            "[\"example.com\"], {\"versionNumber\":1234,\"platform\":{\"name\":\"android\"},\"sessionKey\":\"5678\"})"
+            "[\"example.com\"], {\"versionNumber\":1234,\"platform\":{\"name\":\"android\"},\"sessionKey\":\"5678\"," +
+            "\$ANDROID_MESSAGING_PARAMETERS\$})"
         const val versionCode = 1234
         const val sessionKey = "5678"
         val unprotectedTemporaryException = UnprotectedTemporaryException(domain = "example.com", reason = "reason")
