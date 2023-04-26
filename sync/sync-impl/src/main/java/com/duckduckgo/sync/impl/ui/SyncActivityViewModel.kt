@@ -70,7 +70,7 @@ class SyncActivityViewModel @Inject constructor(
             signedOutState()
         } else if (viewState.loginQRCode == null) {
             Timber.i("CRIS: viewState.combine: loginQRNULL")
-            initViewStateThisDevice()
+            initViewStateThisDeviceState()
         } else {
             viewState
         }
@@ -79,7 +79,7 @@ class SyncActivityViewModel @Inject constructor(
         fetchRemoteDevices()
     }.flowOn(dispatchers.io())
 
-    private suspend fun initViewStateThisDevice(): ViewState {
+    private suspend fun initViewStateThisDeviceState(): ViewState {
         if (!syncRepository.isSignedIn()) {
             return signedOutState()
         }
