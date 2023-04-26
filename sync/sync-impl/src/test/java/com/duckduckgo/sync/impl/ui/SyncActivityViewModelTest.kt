@@ -19,16 +19,19 @@ package com.duckduckgo.sync.impl.ui
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.sync.TestSyncFixtures
 import com.duckduckgo.sync.TestSyncFixtures.connectedDevice
 import com.duckduckgo.sync.TestSyncFixtures.deviceId
 import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKeyEncoded
 import com.duckduckgo.sync.TestSyncFixtures.qrBitmap
 import com.duckduckgo.sync.impl.QREncoder
+import com.duckduckgo.sync.impl.RecoveryCodePDF
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncRepository
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.StoreRecoveryCodePDF
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import java.lang.String.format
 import kotlin.reflect.KClass
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -52,12 +55,14 @@ class SyncActivityViewModelTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val qrEncoder: QREncoder = mock()
+    private val recoveryPDF: RecoveryCodePDF = mock()
     private val syncRepository: SyncRepository = mock()
 
     private val testee = SyncActivityViewModel(
         qrEncoder = qrEncoder,
         syncRepository = syncRepository,
         dispatchers = coroutineTestRule.testDispatcherProvider,
+        recoveryCodePDF = recoveryPDF,
     )
 
     @Test
@@ -259,12 +264,25 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenUserClicksOnSaveRecoveryCodeThenEmitSaveRecoveryCodeCommand() = runTest {
+    fun whenUserClicksOnSaveRecoveryCodeThenEmitCheckIfUserHasPermissionCommand() = runTest {
         whenever(syncRepository.getRecoveryCode()).thenReturn(jsonRecoveryKeyEncoded)
         testee.commands().test {
             testee.onSaveRecoveryCodeClicked()
             val command = awaitItem()
-            assertTrue(command is StoreRecoveryCodePDF)
+            assertTrue(command is CheckIfUserHasStoragePermission)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenGenerateRecoveryCodeThenGenerateFileAndEmitSuccessCommand() = runTest {
+        whenever(syncRepository.getRecoveryCode()).thenReturn(jsonRecoveryKeyEncoded)
+        whenever(recoveryPDF.generateAndStoreRecoveryCodePDF(any(), eq(jsonRecoveryKeyEncoded))).thenReturn(TestSyncFixtures.pdfFile())
+
+        testee.commands().test {
+            testee.generateRecoveryCode(mock())
+            val command = awaitItem()
+            assertTrue(command is RecoveryCodePDFSuccess)
             cancelAndIgnoreRemainingEvents()
         }
     }

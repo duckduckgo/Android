@@ -16,10 +16,6 @@
 
 package com.duckduckgo.sync.impl.ui
 
-import android.graphics.pdf.PdfDocument
-import android.graphics.pdf.PdfDocument.PageInfo.Builder
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.widget.CompoundButton
 import android.widget.CompoundButton.OnCheckedChangeListener
@@ -38,21 +34,20 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.duckduckgo.sync.impl.PermissionRequest
 import com.duckduckgo.sync.impl.R
-import com.duckduckgo.sync.impl.RecoveryCodePDF
 import com.duckduckgo.sync.impl.ShareAction
 import com.duckduckgo.sync.impl.databinding.ActivitySyncBinding
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.StoreRecoveryCodePDF
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(SyncActivityWithEmptyParams::class)
@@ -65,9 +60,6 @@ class SyncActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var storagePermission: PermissionRequest
-
-    @Inject
-    lateinit var recoveryCodePDF: RecoveryCodePDF
 
     @Inject
     lateinit var shareAction: ShareAction
@@ -114,16 +106,14 @@ class SyncActivity : DuckDuckGoActivity() {
             LaunchDeviceSetupFlow -> {
                 startActivity(SetupAccountActivity.intentStartSetupFlow(this))
             }
-
             AskTurnOffSync -> askTurnOffsync()
             AskDeleteAccount -> askDeleteAccount()
-
-            is StoreRecoveryCodePDF -> {
+            is RecoveryCodePDFSuccess -> {
+                shareAction.shareFile(this@SyncActivity, it.recoveryCodePDFFile)
+            }
+            CheckIfUserHasStoragePermission -> {
                 storagePermission.invokeOrRequestPermission {
-                    lifecycleScope.launch(dispatcherProvider.io()) {
-                        val generateRecoveryCodePDF = recoveryCodePDF.generateAndStoreRecoveryCodePDF(this@SyncActivity, it.recoveryCodeB64)
-                        shareAction.shareFile(this@SyncActivity, generateRecoveryCodePDF)
-                    }
+                    viewModel.generateRecoveryCode(this@SyncActivity)
                 }
             }
         }

@@ -38,6 +38,7 @@ import com.duckduckgo.sync.impl.encodeB64
 import com.duckduckgo.sync.impl.parser.SyncBookmarkEntry
 import com.duckduckgo.sync.impl.parser.SyncBookmarkUpdates
 import com.duckduckgo.sync.impl.parser.SyncDataRequest
+import java.io.File
 import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.Response
 
@@ -207,4 +208,6 @@ object TestSyncFixtures {
     fun qrBitmap(): Bitmap {
         return Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)
     }
+
+    fun pdfFile(): File = File("Sync Data Recovery - DuckDuckGo.pdf")
 }

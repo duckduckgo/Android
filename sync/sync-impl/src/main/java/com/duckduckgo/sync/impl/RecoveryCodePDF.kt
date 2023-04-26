@@ -23,7 +23,6 @@ import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import androidx.annotation.WorkerThread
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.utils.checkMainThread
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.toPx
@@ -32,7 +31,6 @@ import com.squareup.anvil.annotations.ContributesBinding
 import java.io.File
 import java.io.FileOutputStream
 import javax.inject.*
-import kotlinx.coroutines.withContext
 
 interface RecoveryCodePDF {
     @WorkerThread

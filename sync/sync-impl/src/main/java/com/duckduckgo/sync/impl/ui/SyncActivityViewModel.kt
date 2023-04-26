@@ -16,6 +16,7 @@
 
 package com.duckduckgo.sync.impl.ui
 
+import android.content.Context
 import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -24,13 +25,16 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.R
+import com.duckduckgo.sync.impl.RecoveryCodePDF
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncRepository
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.StoreRecoveryCodePDF
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
+import java.io.File
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -45,6 +49,7 @@ import timber.log.Timber
 @ContributesViewModel(ActivityScope::class)
 class SyncActivityViewModel @Inject constructor(
     private val qrEncoder: QREncoder,
+    private val recoveryCodePDF: RecoveryCodePDF,
     private val syncRepository: SyncRepository,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
@@ -64,7 +69,8 @@ class SyncActivityViewModel @Inject constructor(
         object LaunchDeviceSetupFlow : Command()
         object AskTurnOffSync : Command()
         object AskDeleteAccount : Command()
-        data class StoreRecoveryCodePDF(val recoveryCodeB64: String) : Command()
+        object CheckIfUserHasStoragePermission : Command()
+        data class RecoveryCodePDFSuccess(val recoveryCodePDFFile: File) : Command()
     }
 
     fun getSyncState() {
@@ -149,8 +155,15 @@ class SyncActivityViewModel @Inject constructor(
 
     fun onSaveRecoveryCodeClicked() {
         viewModelScope.launch {
+            command.send(CheckIfUserHasStoragePermission)
+        }
+    }
+
+    fun generateRecoveryCode(viewContext: Context) {
+        viewModelScope.launch(dispatchers.io()) {
             val recoveryCodeB64 = syncRepository.getRecoveryCode() ?: return@launch
-            command.send(StoreRecoveryCodePDF(recoveryCodeB64))
+            val generateRecoveryCodePDF = recoveryCodePDF.generateAndStoreRecoveryCodePDF(viewContext, recoveryCodeB64)
+            command.send(RecoveryCodePDFSuccess(generateRecoveryCodePDF))
         }
     }
 }

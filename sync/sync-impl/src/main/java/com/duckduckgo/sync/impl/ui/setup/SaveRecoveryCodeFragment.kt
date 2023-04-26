@@ -38,8 +38,10 @@ import com.duckduckgo.sync.impl.RecoveryCodePDF
 import com.duckduckgo.sync.impl.ShareAction
 import com.duckduckgo.sync.impl.databinding.FragmentRecoveryCodeBinding
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command
+import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Error
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Finish
+import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.CreatingAccount
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.SignedIn
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewState
@@ -47,7 +49,6 @@ import com.google.android.material.snackbar.Snackbar
 import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 
 @InjectWith(FragmentScope::class)
 class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_code) {
@@ -117,12 +118,12 @@ class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_c
         when (it) {
             Error -> requireActivity().finish()
             Finish -> requireActivity().finish()
-            is Command.StoreRecoveryCodePDF -> {
+            is RecoveryCodePDFSuccess -> {
+                shareAction.shareFile(requireContext(), it.recoveryCodePDFFile)
+            }
+            CheckIfUserHasStoragePermission -> {
                 storagePermission.invokeOrRequestPermission {
-                    lifecycleScope.launch(dispatcherProvider.io()) {
-                        val generateRecoveryCodePDF = recoveryCodePDF.generateAndStoreRecoveryCodePDF(requireContext(), it.recoveryCodeB64)
-                        shareAction.shareFile(requireContext(), generateRecoveryCodePDF)
-                    }
+                    viewModel.generateRecoveryCode(requireContext())
                 }
             }
         }
