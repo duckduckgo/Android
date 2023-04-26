@@ -45,10 +45,13 @@ import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
 class SyncActivityViewModel @Inject constructor(
@@ -60,8 +63,38 @@ class SyncActivityViewModel @Inject constructor(
 
     private val command = Channel<Command>(1, DROP_OLDEST)
     private val viewState = MutableStateFlow(ViewState())
-    fun viewState(): Flow<ViewState> = viewState.onStart {
-        updateAccountDetails()
+
+    fun viewState(): Flow<ViewState> = viewState.combine(syncRepository.signedIn()) { viewState, signedIn ->
+        Timber.i("CRIS: viewState.combine: viewState=$viewState, signedIn=$signedIn")
+        val newState = if (!signedIn) {
+            signedOutState()
+        } else if (viewState.loginQRCode == null) {
+            Timber.i("CRIS: viewState.combine: loginQRNULL")
+            initViewStateThisDevice()
+        } else {
+            viewState
+        }
+        newState
+    }.onStart {
+        fetchRemoteDevices()
+    }.flowOn(dispatchers.io())
+
+    private suspend fun initViewStateThisDevice(): ViewState {
+        if (!syncRepository.isSignedIn()) {
+            return signedOutState()
+        }
+        val qrBitmap = withContext(dispatchers.io()) {
+            val recoveryCode = syncRepository.getRecoveryCode() ?: return@withContext null
+            qrEncoder.encodeAsBitmap(recoveryCode, R.dimen.qrSizeLarge, R.dimen.qrSizeLarge)
+        } ?: return signedOutState()
+        val connectedDevice = syncRepository.getThisConnectedDevice() ?: return signedOutState()
+
+        return ViewState(
+            syncToggleState = syncRepository.isSignedIn(),
+            showAccount = syncRepository.isSignedIn(),
+            loginQRCode = qrBitmap,
+            syncedDevices = listOf(SyncedDevice(connectedDevice)),
+        )
     }
 
     fun commands(): Flow<Command> = command.receiveAsFlow()
@@ -83,12 +116,6 @@ class SyncActivityViewModel @Inject constructor(
         data class RecoveryCodePDFSuccess(val recoveryCodePDFFile: File) : Command()
         data class AskRemoveDevice(val device: ConnectedDevice) : Command()
         data class AskEditDevice(val device: ConnectedDevice) : Command()
-    }
-
-    fun getSyncState() {
-        viewModelScope.launch {
-            updateAccountDetails()
-        }
     }
 
     fun onToggleClicked(isChecked: Boolean) {
@@ -120,8 +147,10 @@ class SyncActivityViewModel @Inject constructor(
     fun onTurnOffSyncConfirmed(connectedDevice: ConnectedDevice) {
         viewModelScope.launch(dispatchers.io()) {
             viewState.emit(viewState.value.hideAccount())
-            syncRepository.logout(connectedDevice.deviceId)
-            hideOrShowAccountDetails()
+            val result = syncRepository.logout(connectedDevice.deviceId)
+            if (result is Error) {
+                hideOrShowAccountDetails()
+            }
         }
     }
 
@@ -141,8 +170,10 @@ class SyncActivityViewModel @Inject constructor(
     fun onDeleteAccountConfirmed() {
         viewModelScope.launch(dispatchers.io()) {
             viewState.emit(viewState.value.hideAccount())
-            syncRepository.deleteAccount()
-            hideOrShowAccountDetails()
+            val result = syncRepository.deleteAccount()
+            if (result is Error) {
+                hideOrShowAccountDetails()
+            }
         }
     }
 

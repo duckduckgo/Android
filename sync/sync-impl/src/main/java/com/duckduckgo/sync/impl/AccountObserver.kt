@@ -23,8 +23,8 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.launch
 import javax.inject.*
+import kotlinx.coroutines.launch
 
 @ContributesMultibinding(
     scope = AppScope::class,
