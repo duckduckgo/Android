@@ -36,7 +36,4 @@ interface SyncAttemptDao {
 
     @Query("DELETE from sync_attempts")
     fun clear()
-
 }
-
-

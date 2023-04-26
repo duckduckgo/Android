@@ -33,8 +33,8 @@ internal class SyncApiClientTest {
     private lateinit var apiClient: SyncApiClient
 
     @Before
-    fun before(){
-        apiClient= AppSyncApiClient(syncStore, syncApi)
+    fun before() {
+        apiClient = AppSyncApiClient(syncStore, syncApi)
     }
 
     @Test
@@ -54,5 +54,4 @@ internal class SyncApiClientTest {
 
         assertEquals(result, Result.Error(reason = "Changes Empty"))
     }
-
 }

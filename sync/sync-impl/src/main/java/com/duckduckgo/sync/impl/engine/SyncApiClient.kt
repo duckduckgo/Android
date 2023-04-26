@@ -19,21 +19,20 @@ package com.duckduckgo.sync.impl.engine
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.engine.SyncChanges
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
-import com.duckduckgo.sync.impl.SyncDataResponse
-import com.duckduckgo.sync.impl.SyncApi
 import com.duckduckgo.sync.impl.Result
+import com.duckduckgo.sync.impl.SyncApi
+import com.duckduckgo.sync.impl.SyncDataResponse
 import com.duckduckgo.sync.impl.parser.SyncDataRequest
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 interface SyncApiClient {
 
     fun patch(changes: List<SyncChanges>): Result<SyncDataResponse>
-
 }
 
 @ContributesBinding(AppScope::class)
@@ -46,7 +45,7 @@ class AppSyncApiClient @Inject constructor(
             syncStore.token.takeUnless { it.isNullOrEmpty() }
                 ?: return Result.Error(reason = "Token Empty")
 
-        if (changes.isEmpty()){
+        if (changes.isEmpty()) {
             return Result.Error(reason = "Changes Empty")
         }
 

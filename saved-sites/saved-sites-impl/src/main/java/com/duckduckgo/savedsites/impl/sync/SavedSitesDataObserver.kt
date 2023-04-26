@@ -28,11 +28,11 @@ import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 interface SyncDataObserver {
     fun observeChanges()
@@ -45,7 +45,7 @@ class SavedSitesDataObserver @Inject constructor(
     private val syncState: DeviceSyncState,
     private val savedSitesRepository: SavedSitesRepository,
     private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : SyncDataObserver, MainProcessLifecycleObserver {
 
     @SuppressLint("CheckResult")

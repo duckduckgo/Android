@@ -40,7 +40,7 @@ class SavedSitesSyncMerger @Inject constructor(val savedSitesRepository: SavedSi
 
     override fun syncChanges(
         changes: List<SyncChanges>,
-        timestamp: String
+        timestamp: String,
     ) {
         changes.find { it.type == BOOKMARKS }?.let { bookmarkChanges ->
             merge(bookmarkChanges)

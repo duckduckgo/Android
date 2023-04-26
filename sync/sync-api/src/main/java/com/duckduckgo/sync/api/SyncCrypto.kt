@@ -17,7 +17,7 @@
 package com.duckduckgo.sync.api
 
 interface SyncCrypto {
-    fun encrypt(text: String): String
+    fun encrypt(text: String): Result<String>
 
-    fun decrypt(data: String): String
+    fun decrypt(data: String): Result<String>
 }

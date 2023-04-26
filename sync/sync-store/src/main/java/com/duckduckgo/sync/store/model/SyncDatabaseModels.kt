@@ -29,7 +29,7 @@ data class SyncAttempt(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val timestamp: String = getUtcIsoLocalDate(),
     val state: SyncState,
-    val meta: String = ""
+    val meta: String = "",
 ) {
     companion object {
         private fun getUtcIsoLocalDate(): String {
@@ -41,5 +41,5 @@ data class SyncAttempt(
 enum class SyncState {
     IN_PROGRESS,
     SUCCESS,
-    FAIL
+    FAIL,
 }

@@ -20,18 +20,15 @@ import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.sync.store.SyncDatabase
-import com.duckduckgo.sync.store.SyncStore
 import com.duckduckgo.sync.store.dao.SyncAttemptDao
 import com.duckduckgo.sync.store.model.SyncAttempt
 import com.duckduckgo.sync.store.model.SyncState
 import com.duckduckgo.sync.store.model.SyncState.SUCCESS
 import junit.framework.Assert.assertTrue
-import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.mock
 
 @RunWith(AndroidJUnit4::class)
 class SyncStateRepositoryTest {
@@ -58,7 +55,7 @@ class SyncStateRepositoryTest {
     }
 
     @Test
-    fun whenSyncInProgressThenCurrentReturnsAttempt(){
+    fun whenSyncInProgressThenCurrentReturnsAttempt() {
         val sync = SyncAttempt(state = SyncState.IN_PROGRESS)
         repository.store(sync)
 
@@ -67,7 +64,7 @@ class SyncStateRepositoryTest {
     }
 
     @Test
-    fun whenSyncStateIsUpdatedThenDaoIsUpdated(){
+    fun whenSyncStateIsUpdatedThenDaoIsUpdated() {
         val syncInProgress = SyncAttempt(state = SyncState.IN_PROGRESS)
         repository.store(syncInProgress)
 
