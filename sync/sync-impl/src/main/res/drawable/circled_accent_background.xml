@@ -15,7 +15,7 @@
   ~ limitations under the License.
   -->
 
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="?attr/daxColorAccentBlue" />
-    <corners android:radius="1000dp" /> <!-- Set the radius to a large value to make it look like a circle -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+       android:shape="oval">
+    <solid android:color="?attr/daxColorAccentBlue"/>
 </shape>
