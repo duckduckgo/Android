@@ -44,7 +44,6 @@ interface RecoveryCodePDF {
 
 @ContributesBinding(ActivityScope::class)
 class RecoveryCodePDFImpl @Inject constructor(
-    private val dispatchers: DispatcherProvider,
     private val qrEncoder: QREncoder,
 ) : RecoveryCodePDF {
 
