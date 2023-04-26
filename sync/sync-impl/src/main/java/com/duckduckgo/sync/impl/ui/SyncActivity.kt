@@ -28,6 +28,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
@@ -58,6 +59,9 @@ import kotlinx.coroutines.launch
 class SyncActivity : DuckDuckGoActivity() {
     private val binding: ActivitySyncBinding by viewBinding()
     private val viewModel: SyncActivityViewModel by bindViewModel()
+
+    @Inject
+    lateinit var dispatcherProvider: DispatcherProvider
 
     @Inject
     lateinit var storagePermission: PermissionRequest
@@ -116,7 +120,7 @@ class SyncActivity : DuckDuckGoActivity() {
 
             is StoreRecoveryCodePDF -> {
                 storagePermission.invokeOrRequestPermission {
-                    lifecycleScope.launch {
+                    lifecycleScope.launch(dispatcherProvider.io()) {
                         val generateRecoveryCodePDF = recoveryCodePDF.generateAndStoreRecoveryCodePDF(this@SyncActivity, it.recoveryCodeB64)
                         shareAction.shareFile(this@SyncActivity, generateRecoveryCodePDF)
                     }
@@ -165,7 +169,6 @@ class SyncActivity : DuckDuckGoActivity() {
     }
 
     private fun renderViewState(viewState: ViewState) {
-        Timber.i("CRIS: renderViewState: $viewState")
         binding.deviceSyncStatusToggle.quietlySetIsChecked(viewState.isDeviceSyncEnabled, deviceSyncStatusToggleListener)
         binding.viewSwitcher.displayedChild = if (viewState.showAccount) 1 else 0
 

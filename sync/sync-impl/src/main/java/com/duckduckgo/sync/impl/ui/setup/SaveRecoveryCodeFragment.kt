@@ -23,6 +23,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoFragment
 import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
@@ -52,6 +53,9 @@ import kotlinx.coroutines.launch
 class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_code) {
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
+
+    @Inject
+    lateinit var dispatcherProvider: DispatcherProvider
 
     @Inject
     lateinit var storagePermission: PermissionRequest
@@ -115,7 +119,7 @@ class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_c
             Finish -> requireActivity().finish()
             is Command.StoreRecoveryCodePDF -> {
                 storagePermission.invokeOrRequestPermission {
-                    lifecycleScope.launch {
+                    lifecycleScope.launch(dispatcherProvider.io()) {
                         val generateRecoveryCodePDF = recoveryCodePDF.generateAndStoreRecoveryCodePDF(requireContext(), it.recoveryCodeB64)
                         shareAction.shareFile(requireContext(), generateRecoveryCodePDF)
                     }
