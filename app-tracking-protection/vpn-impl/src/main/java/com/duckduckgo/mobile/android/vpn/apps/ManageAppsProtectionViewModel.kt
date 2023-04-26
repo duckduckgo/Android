@@ -164,7 +164,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
             excludedApps.manuallyExcludeApp(packageName)
             pixel.didSubmitManuallyDisableAppProtectionDialog()
             if (report) {
-                command.send(Command.LaunchFeedback(ReportBreakageScreen.IssueDescriptionForm(appName, packageName)))
+                command.send(Command.LaunchFeedback(ReportBreakageScreen.IssueDescriptionForm("apptp", appName, packageName)))
             } else {
                 pixel.didSkipManuallyDisableAppProtectionDialog()
             }
@@ -263,7 +263,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
     fun launchFeedback() {
         pixel.launchAppTPFeedback()
         viewModelScope.launch {
-            command.send(Command.LaunchFeedback(ReportBreakageScreen.ListOfInstalledApps))
+            command.send(Command.LaunchFeedback(ReportBreakageScreen.ListOfInstalledApps("apptp")))
         }
     }
 

@@ -21,18 +21,31 @@ import android.content.Context
 import android.content.Intent
 import android.os.Parcelable
 import androidx.activity.result.contract.ActivityResultContract
+import com.duckduckgo.mobile.android.vpn.ui.OpenVpnBreakageCategoryWithBrokenApp
+import com.duckduckgo.mobile.android.vpn.ui.OpenVpnReportBreakageFrom
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import javax.inject.Inject
 import kotlinx.android.parcel.Parcelize
 
-class ReportBreakageContract : ActivityResultContract<ReportBreakageScreen, IssueReport>() {
+class ReportBreakageContract @Inject constructor(
+    private val globalActivityStarter: GlobalActivityStarter,
+) : ActivityResultContract<ReportBreakageScreen, IssueReport>() {
 
     override fun createIntent(
         context: Context,
         input: ReportBreakageScreen,
     ): Intent {
         return when (input) {
-            ReportBreakageScreen.ListOfInstalledApps -> ReportBreakageAppListActivity.intent(context)
+            is ReportBreakageScreen.ListOfInstalledApps -> globalActivityStarter.startIntent(context, OpenVpnReportBreakageFrom(input.origin))!!
             is ReportBreakageScreen.IssueDescriptionForm -> {
-                ReportBreakageCategorySingleChoiceActivity.intent(context, BrokenApp(appName = input.appName, appPackageId = input.appPackageId))
+                globalActivityStarter.startIntent(
+                    context,
+                    OpenVpnBreakageCategoryWithBrokenApp(
+                        launchFrom = input.origin,
+                        appName = input.appName,
+                        appPackageId = input.appPackageId,
+                    ),
+                )!!
             }
         }
     }
@@ -48,22 +61,18 @@ class ReportBreakageContract : ActivityResultContract<ReportBreakageScreen, Issu
     }
 }
 
-sealed class ReportBreakageScreen {
-    object ListOfInstalledApps : ReportBreakageScreen()
+sealed class ReportBreakageScreen(open val origin: String) {
+    data class ListOfInstalledApps(override val origin: String) : ReportBreakageScreen(origin)
     data class IssueDescriptionForm(
+        override val origin: String,
         val appName: String,
         val appPackageId: String,
-    ) : ReportBreakageScreen()
+    ) : ReportBreakageScreen(origin)
 }
 
 @Parcelize
-data class BrokenApp(
-    val appName: String,
-    val appPackageId: String,
-) : Parcelable
-
-@Parcelize
 data class IssueReport(
+    val reportedFrom: String? = null,
     val appName: String? = null,
     val appPackageId: String? = null,
     val description: String? = null,
@@ -73,6 +82,7 @@ data class IssueReport(
 
     fun toMap(): Map<String, String> {
         return mutableMapOf<String, String>().apply {
+            reportedFrom?.let { this["reportedFrom"] = it }
             appName?.let { this["appName"] = it }
             appPackageId?.let { this["appPackageId"] = it }
             description?.let { this["breakageDescription"] = it }

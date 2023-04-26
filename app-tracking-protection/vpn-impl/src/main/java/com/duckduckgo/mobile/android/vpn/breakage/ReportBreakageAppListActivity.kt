@@ -29,10 +29,12 @@ import android.text.style.ForegroundColorSpan
 import android.text.style.UnderlineSpan
 import android.view.View
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
@@ -41,41 +43,59 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityReportBreakageAppListBinding
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import com.duckduckgo.mobile.android.vpn.ui.OpenVpnReportBreakageFrom
+import com.duckduckgo.navigation.api.getActivityParams
 import javax.inject.Inject
+import javax.inject.Provider
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
+@ContributeToActivityStarter(OpenVpnReportBreakageFrom::class)
 class ReportBreakageAppListActivity : DuckDuckGoActivity(), ReportBreakageAppListAdapter.Listener {
 
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels
 
+    @Inject
+    lateinit var appFeedbackContract: Provider<AppFeedbackContract>
+
+    @Inject
+    lateinit var reportBreakageContract: Provider<ReportBreakageContract>
+
     private val viewModel: ReportBreakageAppListViewModel by bindViewModel()
 
     private lateinit var adapter: ReportBreakageAppListAdapter
+
+    private lateinit var launchedFrom: String
 
     private val binding: ActivityReportBreakageAppListBinding by viewBinding()
 
     private val toolbar
         get() = binding.includeToolbar.toolbar
 
-    private val reportBreakage = registerForActivityResult(ReportBreakageContract()) { result ->
-        if (!result.isEmpty()) {
-            viewModel.onBreakageSubmitted(result)
-        }
-    }
+    private lateinit var reportBreakage: ActivityResultLauncher<ReportBreakageScreen>
 
-    private val sendAppFeedback = registerForActivityResult(AppFeedbackContract()) { resultOk ->
-        if (resultOk) {
-            Toast.makeText(this, R.string.atp_ThanksForTheFeedback, Toast.LENGTH_LONG).show()
-            finish()
-        }
-    }
+    private lateinit var sendAppFeedback: ActivityResultLauncher<Void?>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        reportBreakage = registerForActivityResult(reportBreakageContract.get()) { result ->
+            if (!result.isEmpty()) {
+                viewModel.onBreakageSubmitted(result)
+            }
+        }
+
+        sendAppFeedback = registerForActivityResult(appFeedbackContract.get()) { resultOk ->
+            if (resultOk) {
+                Toast.makeText(this, R.string.atp_ThanksForTheFeedback, Toast.LENGTH_LONG).show()
+                finish()
+            }
+        }
+
+        launchedFrom = intent.getActivityParams(OpenVpnReportBreakageFrom::class.java)?.launchFrom ?: "unknown"
 
         setContentView(binding.root)
         setupToolbar(toolbar)
@@ -184,6 +204,7 @@ class ReportBreakageAppListActivity : DuckDuckGoActivity(), ReportBreakageAppLis
             is ReportBreakageAppListView.Command.LaunchBreakageForm -> {
                 reportBreakage.launch(
                     ReportBreakageScreen.IssueDescriptionForm(
+                        origin = runCatching { launchedFrom }.getOrDefault("unknown"),
                         appName = command.selectedApp.name,
                         appPackageId = command.selectedApp.packageName,
                     ),

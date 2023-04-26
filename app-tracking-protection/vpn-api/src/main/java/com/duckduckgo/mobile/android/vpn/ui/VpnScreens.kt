@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,13 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-}
+package com.duckduckgo.mobile.android.vpn.ui
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 
-dependencies {
-    implementation project(':navigation-api')
-
-    implementation Kotlin.stdlib.jdk7
-    implementation AndroidX.core.ktx
-    implementation KotlinX.coroutines.core
-
-    testImplementation project(':vpn-api-test')
-    androidTestImplementation project(':vpn-api-test')
-}
-android {
-  namespace 'com.duckduckgo.mobile.android.vpn.api'
-}
+data class OpenVpnReportBreakageFrom(val launchFrom: String) : GlobalActivityStarter.ActivityParams
+data class OpenVpnBreakageCategoryWithBrokenApp(
+    val launchFrom: String,
+    val appName: String,
+    val appPackageId: String,
+) : GlobalActivityStarter.ActivityParams

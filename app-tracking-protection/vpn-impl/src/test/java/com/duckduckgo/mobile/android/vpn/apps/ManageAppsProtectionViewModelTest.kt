@@ -133,7 +133,7 @@ class ManageAppsProtectionViewModelTest {
         viewModel.commands().test {
             viewModel.onAppProtectionDisabled(appName, packageName, report)
 
-            assertEquals(Command.LaunchFeedback(ReportBreakageScreen.IssueDescriptionForm(appName, packageName)), awaitItem())
+            assertEquals(Command.LaunchFeedback(ReportBreakageScreen.IssueDescriptionForm("apptp", appName, packageName)), awaitItem())
             cancelAndConsumeRemainingEvents()
         }
     }
