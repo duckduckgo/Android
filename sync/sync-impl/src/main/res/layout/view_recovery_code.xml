@@ -162,7 +162,7 @@
             android:layout_marginEnd="@dimen/keyline_4">
             <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:layout_width="36dp"
-                android:layout_height="36sp"
+                android:layout_height="36dp"
                 android:layout_gravity="center_horizontal"
                 android:padding="@dimen/keyline_1"
                 android:gravity="center"
