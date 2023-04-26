@@ -29,7 +29,7 @@ import javax.inject.Inject
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncablePlugin::class)
 @ContributesBinding(scope = AppScope::class, boundType = SyncParser::class)
 class SavedSitesSyncParser @Inject constructor(
-    val savedSitesRepository: SavedSitesRepository
+    val savedSitesRepository: SavedSitesRepository,
 ) : SyncParser, SyncablePlugin {
     override fun parseChanges(since: String): SyncChanges {
         return SyncChanges(BOOKMARKS, "")
@@ -41,8 +41,7 @@ class SavedSitesSyncParser @Inject constructor(
 
     override fun syncChanges(
         changes: List<SyncChanges>,
-        timestamp: String
+        timestamp: String,
     ) {
-
     }
 }

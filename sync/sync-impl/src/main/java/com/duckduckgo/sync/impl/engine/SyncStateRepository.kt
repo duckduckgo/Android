@@ -16,13 +16,11 @@
 
 package com.duckduckgo.sync.impl.engine
 
-import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.store.dao.SyncAttemptDao
 import com.duckduckgo.sync.store.model.SyncAttempt
 import com.duckduckgo.sync.store.model.SyncState
-import com.squareup.anvil.annotations.ContributesBinding
-import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
 
 interface SyncStateRepository {
     fun store(syncAttempt: SyncAttempt)
@@ -55,4 +53,3 @@ class AppSyncStateRepository @Inject constructor(private val syncAttemptDao: Syn
         }
     }
 }
-

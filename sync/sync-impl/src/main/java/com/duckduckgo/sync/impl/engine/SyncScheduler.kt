@@ -22,24 +22,23 @@ import com.duckduckgo.sync.impl.engine.SyncOperation.EXECUTE
 import com.duckduckgo.sync.store.model.SyncState.FAIL
 import com.duckduckgo.sync.store.model.SyncState.IN_PROGRESS
 import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 import org.threeten.bp.Duration
 import org.threeten.bp.Instant
-import javax.inject.Inject
 
 interface SyncScheduler {
 
     fun scheduleOperation(): SyncOperation
-
 }
 
 @ContributesBinding(scope = AppScope::class)
-class RealSyncScheduler @Inject constructor(private val syncStateRepository: SyncStateRepository): SyncScheduler {
+class RealSyncScheduler @Inject constructor(private val syncStateRepository: SyncStateRepository) : SyncScheduler {
     override fun scheduleOperation(): SyncOperation {
         // for non-immediate sync operations we apply a debounce of 10 minutes.
         // on a rudimentary level, without using coroutines
         // we only allow sync operations if the last sync happened more than 10 minutes ago.
         val lastSync = syncStateRepository.current()
-        return if (lastSync != null){
+        return if (lastSync != null) {
             when (lastSync.state) {
                 IN_PROGRESS -> DISCARD
                 FAIL -> EXECUTE
@@ -47,7 +46,7 @@ class RealSyncScheduler @Inject constructor(private val syncStateRepository: Syn
                     val syncTime = Instant.parse(lastSync.timestamp)
                     val now = Instant.now()
                     val duration = Duration.between(syncTime, now)
-                    if (duration.toMinutes() > DEBOUNCE_PERIOD_IN_MINUTES){
+                    if (duration.toMinutes() > DEBOUNCE_PERIOD_IN_MINUTES) {
                         EXECUTE
                     } else {
                         DISCARD

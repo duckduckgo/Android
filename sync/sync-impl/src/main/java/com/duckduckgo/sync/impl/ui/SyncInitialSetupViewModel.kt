@@ -137,9 +137,8 @@ constructor(
         }
     }
 
-    private fun startInitialSync(){
+    private fun startInitialSync() {
         viewModelScope.launch(dispatchers.io()) {
-
             when (val connectedDevices = syncRepository.getConnectedDevices()) {
                 is Error -> command.send(Command.ShowMessage(connectedDevices.reason))
                 is Success -> {

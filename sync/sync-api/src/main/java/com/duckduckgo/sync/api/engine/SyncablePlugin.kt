@@ -31,6 +31,6 @@ interface SyncablePlugin {
      */
     fun syncChanges(
         changes: List<SyncChanges>,
-        timestamp: String
+        timestamp: String,
     )
 }

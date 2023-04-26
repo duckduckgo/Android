@@ -32,8 +32,8 @@ import com.duckduckgo.sync.store.model.SyncState.FAIL
 import com.duckduckgo.sync.store.model.SyncState.IN_PROGRESS
 import com.duckduckgo.sync.store.model.SyncState.SUCCESS
 import com.squareup.anvil.annotations.ContributesBinding
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 @ContributesBinding(scope = AppScope::class)
 class RealSyncEngine @Inject constructor(
@@ -46,7 +46,7 @@ class RealSyncEngine @Inject constructor(
 
     override fun syncNow() {
         Timber.d("Sync: petition to sync now")
-        when (syncScheduler.scheduleOperation()){
+        when (syncScheduler.scheduleOperation()) {
             DISCARD -> {
                 Timber.d("Sync: petition to sync denied, debouncing")
             }
@@ -57,7 +57,7 @@ class RealSyncEngine @Inject constructor(
         }
     }
 
-    private fun performSync(){
+    private fun performSync() {
         // get all changes from last sync
         // send changes to api
         // receive api changes
@@ -93,7 +93,7 @@ class RealSyncEngine @Inject constructor(
         }
     }
 
-    private fun receiveRemoteChange(){
+    private fun receiveRemoteChange() {
         // calls to GET
     }
 

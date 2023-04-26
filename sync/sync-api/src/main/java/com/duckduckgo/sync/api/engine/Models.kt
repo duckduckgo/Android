@@ -20,7 +20,7 @@ import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 
 data class SyncChanges(
     val type: SyncableType,
-    val updatesJSON: String
+    val updatesJSON: String,
 ) {
 
     fun isEmpty(): Boolean {
@@ -34,5 +34,5 @@ data class SyncChanges(
 }
 
 enum class SyncableType {
-    BOOKMARKS
+    BOOKMARKS,
 }

@@ -17,12 +17,9 @@
 package com.duckduckgo.sync.store
 
 import androidx.room.Database
-import androidx.room.DatabaseConfiguration
-import androidx.room.InvalidationTracker
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import androidx.sqlite.db.SupportSQLiteOpenHelper
 import com.duckduckgo.sync.store.dao.SyncAttemptDao
 import com.duckduckgo.sync.store.model.SyncAttempt
 import com.duckduckgo.sync.store.model.SyncState
@@ -32,14 +29,13 @@ import com.duckduckgo.sync.store.model.SyncState
     version = 1,
     entities = [
         SyncAttempt::class,
-    ]
+    ],
 )
 @TypeConverters(SyncTypeConverters::class)
 
-abstract class SyncDatabase: RoomDatabase() {
+abstract class SyncDatabase : RoomDatabase() {
 
     abstract fun syncAttemptsDao(): SyncAttemptDao
-
 }
 
 object SyncTypeConverters {
@@ -59,6 +55,4 @@ object SyncTypeConverters {
     fun fromSyncState(syncState: SyncState): String {
         return syncState.name
     }
-
-
 }
