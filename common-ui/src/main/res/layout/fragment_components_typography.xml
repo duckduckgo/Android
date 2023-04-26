@@ -295,6 +295,26 @@
             android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
             tools:ignore="HardcodedText"/>
 
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"
+            android:layout_marginBottom="@dimen/keyline_2"
+            app:typography="mono"
+            android:text="Text Appearance Mono"
+            tools:ignore="HardcodedText"/>
+
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"
+            app:typography="mono"
+            android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+            tools:ignore="HardcodedText"/>
+
         <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
