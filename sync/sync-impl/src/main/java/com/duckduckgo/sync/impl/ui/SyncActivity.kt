@@ -24,29 +24,45 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.mobile.android.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
+import com.duckduckgo.sync.impl.PermissionRequest
 import com.duckduckgo.sync.impl.R
+import com.duckduckgo.sync.impl.ShareAction
 import com.duckduckgo.sync.impl.databinding.ActivitySyncBinding
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity
+import com.google.android.material.snackbar.Snackbar
+import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(SyncActivityWithEmptyParams::class)
 class SyncActivity : DuckDuckGoActivity() {
     private val binding: ActivitySyncBinding by viewBinding()
     private val viewModel: SyncActivityViewModel by bindViewModel()
+
+    @Inject
+    lateinit var dispatcherProvider: DispatcherProvider
+
+    @Inject
+    lateinit var storagePermission: PermissionRequest
+
+    @Inject
+    lateinit var shareAction: ShareAction
 
     private val deviceSyncStatusToggleListener: OnCheckedChangeListener = object : OnCheckedChangeListener {
         override fun onCheckedChanged(
@@ -62,6 +78,13 @@ class SyncActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
         observeUiEvents()
+        registerForPermission()
+    }
+
+    private fun registerForPermission() {
+        storagePermission.registerResultsCallback(this) {
+            binding.root.makeSnackbarWithNoBottomInset(R.string.sync_permission_required_store_recovery_code, Snackbar.LENGTH_LONG).show()
+        }
     }
 
     override fun onStart() {
@@ -70,17 +93,12 @@ class SyncActivity : DuckDuckGoActivity() {
     }
 
     private fun observeUiEvents() {
-        viewModel
-            .viewState()
+        viewModel.viewState()
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { viewState -> renderViewState(viewState) }
             .launchIn(lifecycleScope)
 
-        viewModel
-            .commands()
-            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
-            .onEach { processCommand(it) }
-            .launchIn(lifecycleScope)
+        viewModel.commands().flowWithLifecycle(lifecycle, Lifecycle.State.CREATED).onEach { processCommand(it) }.launchIn(lifecycleScope)
     }
 
     private fun processCommand(it: Command) {
@@ -88,9 +106,16 @@ class SyncActivity : DuckDuckGoActivity() {
             LaunchDeviceSetupFlow -> {
                 startActivity(SetupAccountActivity.intentStartSetupFlow(this))
             }
-
             AskTurnOffSync -> askTurnOffsync()
             AskDeleteAccount -> askDeleteAccount()
+            is RecoveryCodePDFSuccess -> {
+                shareAction.shareFile(this@SyncActivity, it.recoveryCodePDFFile)
+            }
+            CheckIfUserHasStoragePermission -> {
+                storagePermission.invokeOrRequestPermission {
+                    viewModel.generateRecoveryCode(this@SyncActivity)
+                }
+            }
         }
     }
 
@@ -134,7 +159,6 @@ class SyncActivity : DuckDuckGoActivity() {
     }
 
     private fun renderViewState(viewState: ViewState) {
-        Timber.i("CRIS: renderViewState: $viewState")
         binding.deviceSyncStatusToggle.quietlySetIsChecked(viewState.isDeviceSyncEnabled, deviceSyncStatusToggleListener)
         binding.viewSwitcher.displayedChild = if (viewState.showAccount) 1 else 0
 
@@ -142,6 +166,10 @@ class SyncActivity : DuckDuckGoActivity() {
             if (viewState.loginQRCode != null) {
                 binding.qrCodeImageView.show()
                 binding.qrCodeImageView.setImageBitmap(viewState.loginQRCode)
+            }
+
+            binding.saveRecoveryCodeItem.setOnClickListener {
+                viewModel.onSaveRecoveryCodeClicked()
             }
 
             binding.deleteAccountButton.setOnClickListener {
