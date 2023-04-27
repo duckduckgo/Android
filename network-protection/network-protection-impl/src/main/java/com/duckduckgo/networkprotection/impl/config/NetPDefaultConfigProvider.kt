@@ -25,7 +25,7 @@ import javax.inject.Inject
 interface NetPDefaultConfigProvider {
     fun mtu(): Int = 1280
 
-    fun exclusionList(): Set<String> = setOf("com.google.android.gms")
+    fun exclusionList(): Set<String> = emptySet()
 
     fun fallbackDns(): Set<InetAddress> = emptySet()
 

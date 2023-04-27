@@ -103,7 +103,7 @@ class WgVpnNetworkStackTest {
         assertNotNull(actual)
         assertEquals(1280, actual!!.mtu)
         assertEquals(emptyMap<InetAddress, Int>(), actual.addresses)
-        assertEquals(setOf("com.google.android.gms"), actual.appExclusionList)
+        assertEquals(emptySet<String>(), actual.appExclusionList)
         assertEquals(mapOf("10.11.12.1" to 32), actual.routes)
         assertEquals(expectedDns.size, actual.dns.size)
         assertTrue(actual.dns.any { it.hostAddress == "1.2.3.4" })
