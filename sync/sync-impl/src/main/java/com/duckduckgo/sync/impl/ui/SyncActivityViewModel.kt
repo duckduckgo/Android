@@ -45,8 +45,9 @@ import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -64,20 +65,30 @@ class SyncActivityViewModel @Inject constructor(
     private val command = Channel<Command>(1, DROP_OLDEST)
     private val viewState = MutableStateFlow(ViewState())
 
-    fun viewState(): Flow<ViewState> = viewState.combine(syncRepository.signedIn()) { viewState, signedIn ->
-        Timber.i("CRIS: viewState.combine: viewState=$viewState, signedIn=$signedIn")
-        val newState = if (!signedIn) {
-            signedOutState()
-        } else if (viewState.loginQRCode == null) {
-            Timber.i("CRIS: viewState.combine: loginQRNULL")
-            initViewStateThisDeviceState()
-        } else {
-            viewState
+    fun viewState(): Flow<ViewState> = viewState.onStart {
+        viewState.emit(initViewStateThisDeviceState())
+        viewModelScope.launch(dispatchers.io()) {
+            viewState.emit(viewState.value.showDeviceListItemLoading())
+            fetchRemoteDevices()
         }
-        newState
-    }.onStart {
-        fetchRemoteDevices()
+        observerSignedInState()
+    }.onEach {
+        Timber.i("CRIS: viewState.combine: onEach: $it")
     }.flowOn(dispatchers.io())
+
+    private fun observerSignedInState() {
+        syncRepository.signedIn().onEach { signedIn ->
+            Timber.i("CRIS: observerSignedInState: signedIn=$signedIn")
+            when (signedIn) {
+                true -> {
+                    if (viewState.value.loginQRCode == null) {
+                        viewState.emit(initViewStateThisDeviceState())
+                    }
+                }
+                false -> viewState.emit(signedOutState())
+            }
+        }.flowOn(dispatchers.io()).launchIn(viewModelScope)
+    }
 
     private suspend fun initViewStateThisDeviceState(): ViewState {
         if (!syncRepository.isSignedIn()) {
@@ -133,14 +144,13 @@ class SyncActivityViewModel @Inject constructor(
     }
 
     private suspend fun fetchRemoteDevices() {
-        withContext(dispatchers.io()) {
-            val result = syncRepository.getConnectedDevices()
-            if (result is Success) {
-                val newState = viewState.value.hideDeviceListItemLoading().setDevices(result.data.map { SyncedDevice(it) })
-                viewState.emit(newState)
-            } else {
-                viewState.emit(viewState.value.hideDeviceListItemLoading())
-            }
+        Timber.i("CRIS: fetchRemoteDevices")
+        val result = syncRepository.getConnectedDevices()
+        if (result is Success) {
+            val newState = viewState.value.hideDeviceListItemLoading().setDevices(result.data.map { SyncedDevice(it) })
+            viewState.emit(newState)
+        } else {
+            viewState.emit(viewState.value.hideDeviceListItemLoading())
         }
     }
 

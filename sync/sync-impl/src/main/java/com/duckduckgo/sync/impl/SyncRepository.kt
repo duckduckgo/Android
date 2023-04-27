@@ -17,7 +17,6 @@
 package com.duckduckgo.sync.impl
 
 import androidx.annotation.WorkerThread
-import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.crypto.AccountKeys
 import com.duckduckgo.sync.crypto.LoginKeys
@@ -33,10 +32,7 @@ import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
 import javax.inject.*
 import kotlin.DeprecationLevel.WARNING
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 interface SyncRepository {
@@ -76,11 +72,8 @@ class AppSyncRepository @Inject constructor(
     private val syncApi: SyncApi,
     private val syncStore: SyncStore,
     private val syncCrypter: SyncCrypter,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : SyncRepository {
-
-    private val isSignedInStateFlow = MutableStateFlow(isSignedIn())
-    override fun signedIn(): Flow<Boolean> = isSignedInStateFlow
+    override fun signedIn(): Flow<Boolean> = syncStore.isSignedInFlow()
 
     override fun createAccount(): Result<Boolean> {
         val userId = syncDeviceIds.userId()
@@ -106,12 +99,11 @@ class AppSyncRepository @Inject constructor(
         return when (result) {
             is Result.Error -> {
                 result.removeKeysIfInvalid()
-                Timber.i("SYNC signup failed $result")
                 result
             }
 
             is Result.Success -> {
-                storeCredentials(account.userId, deviceId, deviceName, account.primaryKey, account.secretKey, result.data.token)
+                syncStore.storeCredentials(account.userId, deviceId, deviceName, account.primaryKey, account.secretKey, result.data.token)
                 Result.Success(true)
             }
         }
@@ -250,7 +242,6 @@ class AppSyncRepository @Inject constructor(
 
         return when (val result = syncApi.logout(token, deviceId)) {
             is Result.Error -> {
-                Timber.i("SYNC logout failed $result")
                 result.removeKeysIfInvalid()
                 result
             }
@@ -258,10 +249,6 @@ class AppSyncRepository @Inject constructor(
             is Result.Success -> {
                 if (logoutThisDevice) {
                     syncStore.clearAll()
-                    appCoroutineScope.launch {
-                        Timber.i("CRIS: SYNC logout success")
-                        isSignedInStateFlow.emit(false)
-                    }
                 }
                 Result.Success(true)
             }
@@ -273,17 +260,12 @@ class AppSyncRepository @Inject constructor(
 
         return when (val result = syncApi.deleteAccount(token)) {
             is Result.Error -> {
-                Timber.i("SYNC deleteAccount failed $result")
                 result.removeKeysIfInvalid()
                 result
             }
 
             is Result.Success -> {
                 syncStore.clearAll()
-                appCoroutineScope.launch {
-                    Timber.i("CRIS: SYNC deleteAccount success")
-                    isSignedInStateFlow.emit(false)
-                }
                 Result.Success(true)
             }
         }
@@ -311,7 +293,6 @@ class AppSyncRepository @Inject constructor(
 
         return when (val result = syncApi.getDevices(token)) {
             is Result.Error -> {
-                Timber.i("SYNC getDevices failed $result")
                 result.removeKeysIfInvalid()
                 result
             }
@@ -335,7 +316,7 @@ class AppSyncRepository @Inject constructor(
         }
     }
 
-    override fun isSignedIn() = !syncStore.primaryKey.isNullOrEmpty() && !syncStore.userId.isNullOrEmpty()
+    override fun isSignedIn() = syncStore.isSignedIn()
 
     private fun performLogin(
         userId: String,
@@ -366,7 +347,7 @@ class AppSyncRepository @Inject constructor(
             is Result.Success -> {
                 val decryptResult = nativeLib.decrypt(result.data.protected_encryption_key, preLogin.stretchedPrimaryKey)
                 if (decryptResult.result != 0L) return Error(code = decryptResult.result.toInt(), reason = "Decrypt failed")
-                storeCredentials(userId, deviceId, deviceName, preLogin.primaryKey, decryptResult.decryptedData, result.data.token)
+                syncStore.storeCredentials(userId, deviceId, deviceName, preLogin.primaryKey, decryptResult.decryptedData, result.data.token)
                 Result.Success(true)
             }
         }
@@ -413,34 +394,9 @@ class AppSyncRepository @Inject constructor(
         }
     }
 
-    private fun storeCredentials(
-        userId: String,
-        deviceId: String,
-        deviceName: String,
-        primaryKey: String,
-        secretKey: String,
-        token: String,
-    ) {
-        syncStore.userId = userId
-        syncStore.deviceId = deviceId
-        syncStore.deviceName = deviceName
-        syncStore.token = token
-        syncStore.primaryKey = primaryKey
-        syncStore.secretKey = secretKey
-
-        appCoroutineScope.launch {
-            Timber.i("CRIS emit signedIn")
-            isSignedInStateFlow.emit(true)
-        }
-    }
-
     private fun Error.removeKeysIfInvalid(): Error {
         if (code == 401) {
             syncStore.clearAll()
-            appCoroutineScope.launch {
-                Timber.i("CRIS removeKeys invalid")
-                isSignedInStateFlow.emit(false)
-            }
         }
         return this
     }
