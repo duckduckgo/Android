@@ -94,7 +94,7 @@ constructor(
         Button,
         Caption,
         CaptionAllCaps,
-        Mono,
+        Body1Mono,
         ;
 
         companion object {
@@ -114,7 +114,7 @@ constructor(
                     10 -> Button
                     11 -> Caption
                     12 -> CaptionAllCaps
-                    13 -> Mono
+                    13 -> Body1Mono
                     else -> Body1
                 }
             }
@@ -134,7 +134,7 @@ constructor(
                     Button -> R.style.Typography_DuckDuckGo_Button
                     Caption -> R.style.Typography_DuckDuckGo_Caption
                     CaptionAllCaps -> R.style.Typography_DuckDuckGo_Caption_AllCaps
-                    Mono -> R.style.Typography_DuckDuckGo_Mono
+                    Body1Mono -> R.style.Typography_DuckDuckGo_Body1_Mono
                 }
             }
         }

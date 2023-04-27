@@ -32,7 +32,7 @@
             <enum name="button" value="10"/>
             <enum name="caption" value="11"/>
             <enum name="caption_allCaps" value="12"/>
-            <enum name="mono" value="13" />
+            <enum name="body1_mono" value="13"/>
         </attr>
         <attr name="textType" format="enum" >
             <enum name="primary" value="0"/>
