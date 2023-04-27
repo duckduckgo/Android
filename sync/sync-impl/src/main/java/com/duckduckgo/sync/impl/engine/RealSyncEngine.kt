@@ -58,7 +58,9 @@ class RealSyncEngine @Inject constructor(
     }
 
     private fun performSync() {
-        // get all changes from last sync
+        // is this the first ever sync? we need to PATCH all data
+        // is this triggered after a login? We need to call GET and then PATCH
+        // is this a triggered sync? we need to PATCH all data modified after last sync
         // send changes to api
         // receive api changes
         // store state
