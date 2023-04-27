@@ -310,7 +310,7 @@
                 "other-surrogates.test",
                 "surrogates.test",
                 "blockedsurrogates.test"
-              ],
+            ],
             "prevalence": 0.1,
             "displayName": "Test Site for Surrogates"
         }
