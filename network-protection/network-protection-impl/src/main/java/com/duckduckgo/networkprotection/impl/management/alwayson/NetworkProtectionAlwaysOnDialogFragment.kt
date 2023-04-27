@@ -22,7 +22,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.StringRes
-import androidx.core.text.HtmlCompat
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.store.AppTheme
@@ -123,7 +122,7 @@ class NetworkProtectionAlwaysOnDialogFragment private constructor() : BottomShee
             binding.apply {
                 alwaysOnModalHeading.text = getAlwaysOnStringForType(R.string.netpAlwaysOnPromotionHeading, R.string.netpAlwaysOnLockdownHeading)
                 alwaysOnModalDescription.text = getAlwaysOnStringForType(R.string.netpAlwaysOnPromotionBody, R.string.netpAlwaysOnLockdownBody)
-                goToSettingsButton.text = getString(R.string.netpActionOpenSettings)
+                goToSettingsButton.text = getString(R.string.netpActionGoToSettings)
                 notNowButton.text = getString(R.string.netpActionNotNow)
             }
         }
@@ -142,7 +141,7 @@ class NetworkProtectionAlwaysOnDialogFragment private constructor() : BottomShee
     } else {
         lockdownString
     }.run {
-        HtmlCompat.fromHtml(getString(this), 0)
+        getText(this)
     }
 
     interface Listener {
