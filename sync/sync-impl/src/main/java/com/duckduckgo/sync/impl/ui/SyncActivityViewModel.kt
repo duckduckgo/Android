@@ -52,7 +52,6 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
 class SyncActivityViewModel @Inject constructor(
@@ -72,16 +71,13 @@ class SyncActivityViewModel @Inject constructor(
             fetchRemoteDevices()
         }
         observerSignedInState()
-    }.onEach {
-        Timber.i("CRIS: viewState.combine: onEach: $it")
     }.flowOn(dispatchers.io())
 
     private fun observerSignedInState() {
         syncRepository.signedIn().onEach { signedIn ->
-            Timber.i("CRIS: observerSignedInState: signedIn=$signedIn")
             when (signedIn) {
                 true -> {
-                    if (viewState.value.loginQRCode == null) {
+                    if (!viewState.value.isSignedInState()) {
                         viewState.emit(initViewStateThisDeviceState())
                     }
                 }
@@ -144,7 +140,6 @@ class SyncActivityViewModel @Inject constructor(
     }
 
     private suspend fun fetchRemoteDevices() {
-        Timber.i("CRIS: fetchRemoteDevices")
         val result = syncRepository.getConnectedDevices()
         if (result is Success) {
             val newState = viewState.value.hideDeviceListItemLoading().setDevices(result.data.map { SyncedDevice(it) })
@@ -253,39 +248,6 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
-    private suspend fun initViewStateThisDevice() {
-        if (!syncRepository.isSignedIn()) {
-            viewState.emit(signedOutState())
-            return
-        }
-        val qrBitmap = withContext(dispatchers.io()) {
-            val recoveryCode = syncRepository.getRecoveryCode() ?: return@withContext null
-            qrEncoder.encodeAsBitmap(recoveryCode, R.dimen.qrSizeLarge, R.dimen.qrSizeLarge)
-        } ?: return
-        val connectedDevice = syncRepository.getThisConnectedDevice() ?: return
-        viewState.emit(
-            ViewState(
-                syncToggleState = syncRepository.isSignedIn(),
-                showAccount = syncRepository.isSignedIn(),
-                loginQRCode = qrBitmap,
-                syncedDevices = listOf(SyncedDevice(connectedDevice)),
-            ),
-        )
-    }
-
-    private suspend fun updateAccountDetails() {
-        if (!syncRepository.isSignedIn()) {
-            viewState.emit(signedOutState())
-            return
-        } else if (syncRepository.isSignedIn() && !viewState.value.showAccount) {
-            initViewStateThisDevice()
-            viewState.emit(viewState.value.showDeviceListItemLoading())
-            viewModelScope.launch(dispatchers.io()) {
-                fetchRemoteDevices()
-            }
-        }
-    }
-
     private suspend fun hideOrShowAccountDetails() {
         if (!syncRepository.isSignedIn()) {
             viewState.emit(signedOutState())
@@ -296,6 +258,7 @@ class SyncActivityViewModel @Inject constructor(
     }
 
     private fun signedOutState(): ViewState = ViewState()
+    private fun ViewState.isSignedInState() = this.loginQRCode != null && this.showAccount
     private fun ViewState.toggle(isChecked: Boolean) = copy(syncToggleState = isChecked)
     private fun ViewState.setDevices(devices: List<SyncDeviceListItem>) = copy(syncedDevices = devices)
     private fun ViewState.hideDeviceListItemLoading() = copy(syncedDevices = syncedDevices.filterNot { it is LoadingItem })

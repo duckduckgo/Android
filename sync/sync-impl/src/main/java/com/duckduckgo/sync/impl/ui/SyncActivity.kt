@@ -127,7 +127,7 @@ class SyncActivity : DuckDuckGoActivity() {
 
     private fun observeUiEvents() {
         viewModel.viewState()
-            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { viewState -> renderViewState(viewState) }
             .launchIn(lifecycleScope)
 
