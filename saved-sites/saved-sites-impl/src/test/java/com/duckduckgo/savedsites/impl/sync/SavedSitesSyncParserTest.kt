@@ -17,10 +17,13 @@
 package com.duckduckgo.savedsites.impl.sync
 
 import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.sync.api.SyncCrypto
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.mockito.ArgumentMatchers
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -33,6 +36,9 @@ class SavedSitesSyncParserTest {
     @Before
     fun before() {
         parser = SavedSitesSyncParser(repository, syncCrypto)
+
+        whenever(syncCrypto.encrypt(ArgumentMatchers.anyString()))
+            .thenAnswer { invocation -> invocation.getArgument(0) }
     }
 
     @Test
@@ -41,5 +47,27 @@ class SavedSitesSyncParserTest {
         whenever(repository.hasFavorites()).thenReturn(false)
         val syncChanges = parser.getChanges("")
         assertTrue(syncChanges.updatesJSON.isEmpty())
+    }
+
+    @Test
+    fun whenFirstSyncAndUsersHasFavoritesThenChangesAreFormatted() {
+        whenever(repository.hasBookmarks()).thenReturn(true)
+        whenever(repository.hasFavorites()).thenReturn(true)
+        whenever(repository.getFavoritesSync()).thenReturn(listOf(aFavorite("bookmark1", "Bookmark 1", "https://bookmark1.com", 0)))
+
+        val syncChanges = parser.getChanges("")
+        assertEquals(
+            syncChanges.updatesJSON,
+            "{\"bookmarks\":{\"updates\":[{\"folder\":{\"children\":[\"bookmark1\"]},\"id\":\"favorites_root\",\"title\":\"Favorites\"}]}}",
+        )
+    }
+
+    private fun aFavorite(
+        id: String,
+        title: String,
+        url: String,
+        position: Int,
+    ): Favorite {
+        return Favorite(id, title, url, position)
     }
 }
