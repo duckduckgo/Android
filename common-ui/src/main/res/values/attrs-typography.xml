@@ -27,12 +27,12 @@
             <enum name="h5" value="5"/>
             <enum name="body1" value="6"/>
             <enum name="body1_bold" value="7"/>
-            <enum name="body2" value="8"/>
-            <enum name="body2_bold" value="9"/>
-            <enum name="button" value="10"/>
-            <enum name="caption" value="11"/>
-            <enum name="caption_allCaps" value="12"/>
-            <enum name="body1_mono" value="13"/>
+            <enum name="body1_mono" value="8"/>
+            <enum name="body2" value="9"/>
+            <enum name="body2_bold" value="10"/>
+            <enum name="button" value="11"/>
+            <enum name="caption" value="12"/>
+            <enum name="caption_allCaps" value="13"/>
         </attr>
         <attr name="textType" format="enum" >
             <enum name="primary" value="0"/>
