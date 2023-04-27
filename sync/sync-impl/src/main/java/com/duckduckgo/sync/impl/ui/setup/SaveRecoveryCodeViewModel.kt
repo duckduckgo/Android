@@ -37,7 +37,6 @@ import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.Crea
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.SignedIn
 import java.io.File
 import javax.inject.*
-import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -59,7 +58,7 @@ class SaveRecoveryCodeViewModel @Inject constructor(
     private val viewState = MutableStateFlow(ViewState())
     fun viewState(): Flow<ViewState> = viewState.onStart { createAccount() }
 
-    private fun createAccount() = viewModelScope.launch(dispatchers.io() + NonCancellable) {
+    private fun createAccount() = viewModelScope.launch(dispatchers.io()) {
         if (syncRepository.isSignedIn()) {
             syncRepository.getRecoveryCode()?.let {
                 val bitmap = qrEncoder.encodeAsBitmap(it, R.dimen.qrSizeSmall, R.dimen.qrSizeSmall)

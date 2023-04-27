@@ -74,7 +74,7 @@ class SyncActivityViewModel @Inject constructor(
     }.flowOn(dispatchers.io())
 
     private fun observerSignedInState() {
-        syncRepository.signedIn().onEach { signedIn ->
+        syncRepository.isSignedInFlow().onEach { signedIn ->
             when (signedIn) {
                 true -> {
                     if (!viewState.value.isSignedInState()) {

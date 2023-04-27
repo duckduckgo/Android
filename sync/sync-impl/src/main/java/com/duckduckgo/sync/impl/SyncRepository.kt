@@ -37,7 +37,7 @@ import timber.log.Timber
 
 interface SyncRepository {
 
-    fun signedIn(): Flow<Boolean>
+    fun isSignedInFlow(): Flow<Boolean>
     fun createAccount(): Result<Boolean>
     fun isSignedIn(): Boolean
 
@@ -73,7 +73,7 @@ class AppSyncRepository @Inject constructor(
     private val syncStore: SyncStore,
     private val syncCrypter: SyncCrypter,
 ) : SyncRepository {
-    override fun signedIn(): Flow<Boolean> = syncStore.isSignedInFlow()
+    override fun isSignedInFlow(): Flow<Boolean> = syncStore.isSignedInFlow()
 
     override fun createAccount(): Result<Boolean> {
         val userId = syncDeviceIds.userId()
