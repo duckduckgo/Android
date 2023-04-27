@@ -18,6 +18,7 @@ package com.duckduckgo.savedsites.impl.sync
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.sync.api.SyncCrypto
 import com.duckduckgo.sync.api.engine.SyncChanges
 import com.duckduckgo.sync.api.engine.SyncParser
 import com.duckduckgo.sync.api.engine.SyncablePlugin
@@ -29,13 +30,31 @@ import javax.inject.Inject
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncablePlugin::class)
 @ContributesBinding(scope = AppScope::class, boundType = SyncParser::class)
 class SavedSitesSyncParser @Inject constructor(
-    val savedSitesRepository: SavedSitesRepository,
+    private val repository: SavedSitesRepository,
+    private val syncCrypto: SyncCrypto,
 ) : SyncParser, SyncablePlugin {
     override fun parseChanges(since: String): SyncChanges {
+        return if (since.isEmpty()) {
+            // when since isEmpty it means we want all changes
+            parseAllBookmarks()
+        } else {
+            SyncChanges(BOOKMARKS, "")
+        }
+    }
+
+    private fun parseAllBookmarks(): SyncChanges {
+        val hasFavorites = repository.hasFavorites()
+        val hasBookmarks = repository.hasBookmarks()
+
+        if (!hasFavorites && !hasBookmarks) {
+            return SyncChanges(BOOKMARKS, "")
+        }
+
         return SyncChanges(BOOKMARKS, "")
     }
 
     override fun getChanges(since: String): SyncChanges {
+
         return parseChanges(since)
     }
 

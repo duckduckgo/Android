@@ -20,6 +20,11 @@ import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.engine.SyncChanges
 import com.duckduckgo.sync.api.engine.SyncEngine
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_CREATION
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_LOGIN
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.BACKGROUND_SYNC
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import com.duckduckgo.sync.api.engine.SyncablePlugin
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
@@ -38,18 +43,28 @@ import timber.log.Timber
 @ContributesBinding(scope = AppScope::class)
 class RealSyncEngine @Inject constructor(
     private val syncRepository: SyncRepository,
-    private val syncApi: SyncApiClient,
+    private val syncApiClient: SyncApiClient,
     private val syncScheduler: SyncScheduler,
     private val syncStateRepository: SyncStateRepository,
     private val plugins: PluginPoint<SyncablePlugin>,
 ) : SyncEngine {
 
-    override fun syncNow() {
-        Timber.d("Sync: petition to sync now")
+    override fun syncNow(trigger: SyncTrigger) {
+        Timber.d("Sync: petition to sync now trigger: $trigger")
+        when (trigger) {
+            BACKGROUND_SYNC -> scheduleSync()
+            FEATURE_READ -> performSync()
+            ACCOUNT_CREATION -> performSync()
+            ACCOUNT_LOGIN -> performSync()
+        }
+    }
+
+    private fun scheduleSync() {
         when (syncScheduler.scheduleOperation()) {
             DISCARD -> {
                 Timber.d("Sync: petition to sync denied, debouncing")
             }
+
             EXECUTE -> {
                 Timber.d("Sync: petition to sync accepted, syncing now")
                 performSync()
@@ -81,7 +96,7 @@ class RealSyncEngine @Inject constructor(
     }
 
     private fun sendLocalChanges(changes: List<SyncChanges>) {
-        when (val result = syncApi.patch(changes)) {
+        when (val result = syncApiClient.patch(changes)) {
             is Error -> {
                 Timber.d("Sync: patch failed ${result.reason}")
                 syncStateRepository.updateSyncState(FAIL)
