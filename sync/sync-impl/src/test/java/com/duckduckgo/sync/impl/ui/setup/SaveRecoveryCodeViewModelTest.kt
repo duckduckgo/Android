@@ -22,8 +22,8 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.sync.TestSyncFixtures
 import com.duckduckgo.sync.TestSyncFixtures.accountCreatedFailInvalid
 import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKeyEncoded
-import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.TestSyncFixtures.pdfFile
+import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.RecoveryCodePDF
 import com.duckduckgo.sync.impl.Result
