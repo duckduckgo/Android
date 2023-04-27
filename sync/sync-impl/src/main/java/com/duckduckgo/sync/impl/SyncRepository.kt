@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl
 import androidx.annotation.WorkerThread
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.engine.SyncEngine
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_CREATION
 import com.duckduckgo.sync.crypto.AccountKeys
 import com.duckduckgo.sync.crypto.LoginKeys
 import com.duckduckgo.sync.crypto.SyncLib
@@ -100,7 +101,7 @@ class AppSyncRepository @Inject constructor(
 
             is Result.Success -> {
                 syncStore.storeCredentials(account.userId, deviceId, deviceName, account.primaryKey, account.secretKey, result.data.token)
-                syncEngine.syncNow()
+                syncEngine.syncNow(ACCOUNT_CREATION)
                 Result.Success(true)
             }
         }
