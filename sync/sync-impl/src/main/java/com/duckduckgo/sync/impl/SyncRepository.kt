@@ -18,6 +18,7 @@ package com.duckduckgo.sync.impl
 
 import androidx.annotation.WorkerThread
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.crypto.AccountKeys
 import com.duckduckgo.sync.crypto.LoginKeys
 import com.duckduckgo.sync.crypto.SyncLib
@@ -66,6 +67,7 @@ class AppSyncRepository @Inject constructor(
     private val syncApi: SyncApi,
     private val syncStore: SyncStore,
     private val syncCrypter: SyncCrypter,
+    private val syncEngine: SyncEngine
 ) : SyncRepository {
     override fun isSignedInFlow(): Flow<Boolean> = syncStore.isSignedInFlow()
 
@@ -98,6 +100,7 @@ class AppSyncRepository @Inject constructor(
 
             is Result.Success -> {
                 syncStore.storeCredentials(account.userId, deviceId, deviceName, account.primaryKey, account.secretKey, result.data.token)
+                syncEngine.syncNow()
                 Result.Success(true)
             }
         }
