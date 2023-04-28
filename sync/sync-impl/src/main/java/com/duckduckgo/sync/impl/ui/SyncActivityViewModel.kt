@@ -26,6 +26,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.api.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_CREATION
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.RecoveryCodePDF
@@ -261,7 +262,7 @@ class SyncActivityViewModel @Inject constructor(
     }
 
     fun syncNow() {
-        syncEngine.syncNow()
+        syncEngine.syncNow(ACCOUNT_CREATION)
     }
 
     private fun signedOutState(): ViewState = ViewState()

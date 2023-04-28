@@ -467,9 +467,11 @@ class RealSavedSitesRepository(
 
     private fun Entity.mapToBookmark(relationId: String): Bookmark = Bookmark(this.entityId, this.title, this.url.orEmpty(), relationId)
     private fun Entity.mapToBookmarkFolder(relationId: String): BookmarkFolder =
-        BookmarkFolder(id = this.entityId, name = this.title, parentId =  relationId, lastModified = this.lastModified)
+        BookmarkFolder(id = this.entityId, name = this.title, parentId = relationId, lastModified = this.lastModified)
 
-    private fun Entity.mapToFavorite(index: Int = 0): Favorite = Favorite(this.entityId, this.title, this.url.orEmpty(), index)
+    private fun Entity.mapToFavorite(index: Int = 0): Favorite =
+        Favorite(this.entityId, this.title, this.url.orEmpty(), lastModified = this.lastModified, index)
+
     private fun List<Entity>.mapToBookmarks(folderId: String = SavedSitesNames.BOOMARKS_ROOT): List<Bookmark> =
         this.map { it.mapToBookmark(folderId) }
 
