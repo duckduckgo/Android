@@ -33,6 +33,7 @@ import com.duckduckgo.sync.impl.SyncRepository
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Finish
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.RecoveryCodePDFSuccess
+import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.CreatingAccount
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.SignedIn
 import java.io.File
@@ -100,7 +101,8 @@ class SaveRecoveryCodeViewModel @Inject constructor(
     }
 
     sealed class Command {
-        data class Finish(val message: Int? = null) : Command()
+        object Finish : Command()
+        data class ShowMessage(val message: Int) : Command()
         object Error : Command()
         object CheckIfUserHasStoragePermission : Command()
         data class RecoveryCodePDFSuccess(val recoveryCodePDFFile: File) : Command()
@@ -108,7 +110,7 @@ class SaveRecoveryCodeViewModel @Inject constructor(
 
     fun onNextClicked() {
         viewModelScope.launch {
-            command.send(Finish())
+            command.send(Finish)
         }
     }
 
@@ -116,7 +118,7 @@ class SaveRecoveryCodeViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             val recoveryCodeB64 = syncRepository.getRecoveryCode() ?: return@launch
             clipboard.copyToClipboard(recoveryCodeB64)
-            command.send(Finish(R.string.sync_code_copied_message))
+            command.send(ShowMessage(R.string.sync_code_copied_message))
         }
     }
 

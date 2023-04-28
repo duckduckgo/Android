@@ -237,13 +237,13 @@ class SyncActivityViewModel @Inject constructor(
     }
 
     fun onScanQRCodeClicked() {
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             command.send(Command.ScanQRCode)
         }
     }
 
     fun onShowTextCodeClicked() {
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             command.send(Command.ShowTextCode)
         }
     }

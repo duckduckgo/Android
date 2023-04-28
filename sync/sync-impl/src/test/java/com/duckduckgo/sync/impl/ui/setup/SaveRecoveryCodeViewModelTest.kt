@@ -153,7 +153,7 @@ class SaveRecoveryCodeViewModelTest {
             testee.onCopyCodeClicked()
             val command = awaitItem()
             verify(clipboard).copyToClipboard(eq(jsonRecoveryKeyEncoded))
-            assertTrue(command is Command.Finish)
+            assertTrue(command is Command.ShowMessage)
             cancelAndIgnoreRemainingEvents()
         }
     }

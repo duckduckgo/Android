@@ -20,6 +20,6 @@
     </style>
 
     <style name="ThemeOverlay.App.CircularProgressIndicator" parent="">
-        <item name="colorPrimary">?colorAccent</item>
+        <item name="colorPrimary">?daxColorAccentBlue</item>
     </style>
 </resources>

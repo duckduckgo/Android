@@ -18,7 +18,6 @@ package com.duckduckgo.sync.impl.ui.setup
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
@@ -43,6 +42,7 @@ import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Check
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Error
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Finish
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.RecoveryCodePDFSuccess
+import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.CreatingAccount
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.SignedIn
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewState
@@ -120,9 +120,6 @@ class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_c
         when (it) {
             Error -> requireActivity().finish()
             is Finish -> {
-                it.message?.let { message ->
-                    Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
-                }
                 requireActivity().finish()
             }
             is RecoveryCodePDFSuccess -> {
@@ -132,6 +129,10 @@ class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_c
                 storagePermission.invokeOrRequestPermission {
                     viewModel.generateRecoveryCode(requireContext())
                 }
+            }
+
+            is ShowMessage -> {
+                Snackbar.make(binding.root, it.message, Snackbar.LENGTH_LONG).show()
             }
         }
     }

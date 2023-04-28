@@ -60,7 +60,7 @@ class SyncDeviceConnectedViewModel @Inject constructor(
     }
 
     fun onNextClicked() {
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             command.send(FinishSetupFlow)
         }
     }
