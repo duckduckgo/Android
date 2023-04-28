@@ -26,7 +26,7 @@ import dagger.SingleInstanceIn
 import javax.inject.*
 import kotlinx.coroutines.launch
 
-//This class can be removed when we have real sync observer for data
+// This class can be removed when we have real sync observer for data
 @ContributesMultibinding(
     scope = AppScope::class,
     boundType = MainProcessLifecycleObserver::class,
