@@ -21,6 +21,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
+import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.sync.api.SyncCrypto
 import com.duckduckgo.sync.api.engine.SyncChanges
@@ -156,14 +157,8 @@ data class SyncBookmarkEntry(
     val client_last_modified: String
 ) {
     companion object {
-        fun toBookmark(
-            id: String,
-            title: String,
-            url: String,
-            parentId: String,
-            lastModified: String
-        ): SavedSite.Bookmark {
-            return SavedSite.Bookmark(id, title, url, parentId, lastModified)
+
+        fun toBookmarkFolder(): BookmarkFolder {
         }
 
         fun asBookmark(
@@ -197,6 +192,13 @@ data class SyncBookmarkEntry(
 
 fun SyncBookmarkEntry.isFolder(): Boolean = this.folder != null
 fun SyncBookmarkEntry.isBookmark(): Boolean = this.page != null
+
+fun SyncBookmarkEntry.mapToFolder(parentId: String = ""): BookmarkFolder {
+    return BookmarkFolder(id, title, parentId, lastModified = client_last_modified)
+}
+fun SyncBookmarkEntry.mapToBookmark(parentId: String): Bookmark {
+    return SavedSite.Bookmark(id, title, page!!.url, parentId, client_last_modified)
+}
 
 class SyncDataRequest(val bookmarks: SyncBookmarkUpdates)
 class SyncBookmarkUpdates(
