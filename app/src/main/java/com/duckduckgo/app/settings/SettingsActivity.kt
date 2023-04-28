@@ -101,7 +101,6 @@ import com.duckduckgo.windows.api.WindowsWaitlistState.NotJoinedQueue
 import com.duckduckgo.windows.api.ui.WindowsWaitlistScreenWithEmptyParams
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.content_settings_other.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
