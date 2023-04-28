@@ -60,9 +60,9 @@ class SyncCrypterTest {
     @Before fun before() {
         syncCrypter = RealSyncCrypter(repository, nativeLib, store)
 
-        whenever(repository.getFolder(SavedSitesNames.BOOMARKS_ROOT)).thenReturn(BookmarkFolder(SavedSitesNames.BOOMARKS_ROOT, "Bookmarks", "", 0, 0))
+        whenever(repository.getFolder(SavedSitesNames.BOOMARKS_ROOT)).thenReturn(BookmarkFolder(SavedSitesNames.BOOMARKS_ROOT, "Bookmarks", "", 0, 0, ""))
         whenever(repository.getFolder(SavedSitesNames.FAVORITES_ROOT)).thenReturn(
-            BookmarkFolder(SavedSitesNames.FAVORITES_ROOT, "Favorites", "", 0, 0),
+            BookmarkFolder(SavedSitesNames.FAVORITES_ROOT, "Favorites", "", 0, 0, ""),
         )
         whenever(store.primaryKey).thenReturn("primaryKey")
 
@@ -90,7 +90,7 @@ class SyncCrypterTest {
                 listOf(aFolder("folder1", "Folder One", SavedSitesNames.BOOMARKS_ROOT)),
             ),
         )
-        whenever(repository.getFolder("folder1")).thenReturn(BookmarkFolder("folder 1", "Folder One", SavedSitesNames.BOOMARKS_ROOT, 2, 0))
+        whenever(repository.getFolder("folder1")).thenReturn(BookmarkFolder("folder 1", "Folder One", SavedSitesNames.BOOMARKS_ROOT, 2, 0, ""))
         whenever(repository.getFolderContentSync("folder1")).thenReturn(
             Pair(
                 listOf(
@@ -150,7 +150,7 @@ class SyncCrypterTest {
                 listOf(aFolder("folder1", "Folder One", SavedSitesNames.BOOMARKS_ROOT)),
             ),
         )
-        whenever(repository.getFolder("folder1")).thenReturn(BookmarkFolder("folder 1", "Folder One", SavedSitesNames.BOOMARKS_ROOT, 2, 0))
+        whenever(repository.getFolder("folder1")).thenReturn(BookmarkFolder("folder 1", "Folder One", SavedSitesNames.BOOMARKS_ROOT, 2, 0, ""))
         whenever(repository.getFolderContentSync("folder1")).thenReturn(
             Pair(
                 listOf(
@@ -190,7 +190,7 @@ class SyncCrypterTest {
                 listOf(aFolder("folder1", "Folder One", SavedSitesNames.BOOMARKS_ROOT)),
             ),
         )
-        whenever(repository.getFolder("folder1")).thenReturn(BookmarkFolder("folder 1", "Folder One", SavedSitesNames.BOOMARKS_ROOT, 2, 0))
+        whenever(repository.getFolder("folder1")).thenReturn(BookmarkFolder("folder 1", "Folder One", SavedSitesNames.BOOMARKS_ROOT, 2, 0, ""))
         whenever(repository.getFolderContentSync("folder1")).thenReturn(
             Pair(
                 listOf(
@@ -291,7 +291,7 @@ class SyncCrypterTest {
         name: String,
         parentId: String,
     ): BookmarkFolder {
-        return BookmarkFolder(id = id, name = name, parentId = parentId)
+        return BookmarkFolder(id = id, name = name, parentId = parentId, lastModified = "")
     }
 
     private fun aBookmark(
@@ -299,7 +299,7 @@ class SyncCrypterTest {
         title: String,
         url: String,
     ): Bookmark {
-        return Bookmark(id, title, url)
+        return Bookmark(id, title, url, "")
     }
 
     private fun aFavorite(
@@ -308,6 +308,6 @@ class SyncCrypterTest {
         url: String,
         position: Int,
     ): Favorite {
-        return Favorite(id, title, url, position)
+        return Favorite(id, title, url, "", position)
     }
 }
