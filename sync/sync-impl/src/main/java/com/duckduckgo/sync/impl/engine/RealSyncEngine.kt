@@ -42,7 +42,6 @@ import timber.log.Timber
 
 @ContributesBinding(scope = AppScope::class)
 class RealSyncEngine @Inject constructor(
-    private val syncRepository: SyncRepository,
     private val syncApiClient: SyncApiClient,
     private val syncScheduler: SyncScheduler,
     private val syncStateRepository: SyncStateRepository,
@@ -54,7 +53,7 @@ class RealSyncEngine @Inject constructor(
         when (trigger) {
             BACKGROUND_SYNC -> scheduleSync()
             FEATURE_READ -> performSync()
-            ACCOUNT_CREATION -> performSync()
+            ACCOUNT_CREATION -> sendAllLocalData()
             ACCOUNT_LOGIN -> performSync()
         }
     }
@@ -72,6 +71,20 @@ class RealSyncEngine @Inject constructor(
         }
     }
 
+    private fun sendAllLocalData(){
+        Timber.d("Sync: initiating first sync")
+        val changes = initialSync()
+
+        if (changes.isEmpty()) {
+            Timber.d("Sync: local data empty, nothing to send")
+            return
+        }
+
+        Timber.d("Sync: sending local changes $changes")
+        syncStateRepository.store(SyncAttempt(state = IN_PROGRESS, meta = "Initial sync"))
+        sendLocalChanges(changes)
+    }
+
     private fun performSync() {
         // is this the first ever sync? we need to PATCH all data
         // is this triggered after a login? We need to call GET and then PATCH
@@ -82,8 +95,7 @@ class RealSyncEngine @Inject constructor(
         // send changes to observers
         val changes = getListOfChanges()
 
-        val syncAttempt = SyncAttempt(state = IN_PROGRESS, meta = "Manual launch")
-        syncStateRepository.store(syncAttempt)
+        syncStateRepository.store(SyncAttempt(state = IN_PROGRESS, meta = "Manual launch"))
 
         if (changes.isEmpty()) {
             Timber.d("Sync: no changes to sync, asking for remote changes")

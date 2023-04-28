@@ -17,14 +17,30 @@
 package com.duckduckgo.sync.impl.engine
 
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.sync.api.engine.SyncChanges
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_CREATION
 import com.duckduckgo.sync.api.engine.SyncablePlugin
-import com.duckduckgo.sync.impl.SyncRepository
+import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
+import com.duckduckgo.sync.impl.BookmarksResponse
+import com.duckduckgo.sync.impl.DeviceDataResponse
+import com.duckduckgo.sync.impl.Result
+import com.duckduckgo.sync.impl.Result.Success
+import com.duckduckgo.sync.impl.SettingsResponse
+import com.duckduckgo.sync.impl.SyncDataResponse
+import com.duckduckgo.sync.store.model.SyncAttempt
+import com.duckduckgo.sync.store.model.SyncState.FAIL
+import com.duckduckgo.sync.store.model.SyncState.IN_PROGRESS
+import com.duckduckgo.sync.store.model.SyncState.SUCCESS
 import org.junit.Before
+import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.whenever
 
 internal class SyncEngineTest {
 
-    private val syncRepository: SyncRepository = mock()
     private val syncApiClient: SyncApiClient = mock()
     private val syncScheduler: SyncScheduler = mock()
     private val syncStateRepository: SyncStateRepository = mock()
@@ -33,9 +49,53 @@ internal class SyncEngineTest {
 
     @Before
     fun before() {
-        syncEngine = RealSyncEngine(syncRepository, syncApiClient, syncScheduler, syncStateRepository, plugins)
+        syncEngine = RealSyncEngine(syncApiClient, syncScheduler, syncStateRepository, plugins)
     }
 
+    @Test
+    fun whenFirstSyncAndNoLocalChangesThenNothingIsSent() {
+        syncEngine.syncNow(ACCOUNT_CREATION)
+        verifyNoInteractions(syncStateRepository)
+        verifyNoInteractions(syncApiClient)
+    }
 
+    @Test
+    fun whenFirstSyncLocalChangesThenDataIsSentAndStateUpdatedWithSuccess() {
+        val localChanges = SyncChanges(BOOKMARKS, firstSyncWithBookmarksAndFavorites)
+        val fakeSyncablePlugin = FakeSyncablePlugin(localChanges)
+        whenever(plugins.getPlugins()).thenReturn(listOf(fakeSyncablePlugin))
+        whenever(syncApiClient.patch(listOf(localChanges))).thenReturn(
+            Success(
+                SyncDataResponse(
+                    BookmarksResponse("", emptyList()),
+                    SettingsResponse("", emptyList()),
+                    DeviceDataResponse("", emptyList()),
+                ),
+            ),
+        )
 
+        syncEngine.syncNow(ACCOUNT_CREATION)
+
+        verify(syncStateRepository).store(any())
+        verify(syncApiClient).patch(any())
+        verify(syncStateRepository).updateSyncState(SUCCESS)
+    }
+
+    @Test
+    fun whenFirstSyncLocalChangesThenDataIsSentAndStateUpdatedWithError() {
+        val localChanges = SyncChanges(BOOKMARKS, firstSyncWithBookmarksAndFavorites)
+        val fakeSyncablePlugin = FakeSyncablePlugin(localChanges)
+        whenever(plugins.getPlugins()).thenReturn(listOf(fakeSyncablePlugin))
+        whenever(syncApiClient.patch(listOf(localChanges))).thenReturn(
+            Result.Error(400, "patch failed")
+        )
+
+        syncEngine.syncNow(ACCOUNT_CREATION)
+
+        verify(syncStateRepository).store(any())
+        verify(syncApiClient).patch(any())
+        verify(syncStateRepository).updateSyncState(FAIL)
+    }
 }
+
+val firstSyncWithBookmarksAndFavorites = "{\"bookmarks\":{\"updates\":[{\"client_last_modified\":\"timestamp\",\"folder\":{\"children\":[\"bookmark1\"]},\"id\":\"favorites_root\",\"title\":\"Favorites\"},{\"client_last_modified\":\"timestamp\",\"id\":\"bookmark3\",\"page\":{\"url\":\"https://bookmark3.com\"},\"title\":\"Bookmark 3\"},{\"client_last_modified\":\"timestamp\",\"id\":\"bookmark4\",\"page\":{\"url\":\"https://bookmark4.com\"},\"title\":\"Bookmark 4\"},{\"client_last_modified\":\"timestamp\",\"folder\":{\"children\":[\"bookmark3\",\"bookmark4\"]},\"id\":\"bookmarks_root\",\"title\":\"Bookmarks\"}]}}"

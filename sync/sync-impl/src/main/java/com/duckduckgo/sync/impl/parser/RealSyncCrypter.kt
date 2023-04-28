@@ -164,6 +164,7 @@ class RealSyncCrypter(
             title = decrypt(entry.title, primaryKey),
             url = decrypt(entry.page!!.url, primaryKey),
             parentId = parentId,
+            lastModified = "",
         )
     }
 
@@ -172,7 +173,7 @@ class RealSyncCrypter(
         primaryKey: String,
         parentId: String,
     ): BookmarkFolder {
-        return BookmarkFolder(id = entry.id, name = decrypt(entry.title, primaryKey), parentId = parentId, 0, 0)
+        return BookmarkFolder(id = entry.id, name = decrypt(entry.title, primaryKey), parentId = parentId, 0, 0, lastModified = "")
     }
 
     private fun decrypt(

@@ -56,10 +56,12 @@ import com.duckduckgo.sync.TestSyncFixtures.syncData
 import com.duckduckgo.sync.TestSyncFixtures.token
 import com.duckduckgo.sync.TestSyncFixtures.userId
 import com.duckduckgo.sync.TestSyncFixtures.validLoginKeys
+import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.crypto.DecryptResult
 import com.duckduckgo.sync.crypto.EncryptResult
 import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.impl.Result.Success
+import com.duckduckgo.sync.impl.engine.SyncEngineTest
 import com.duckduckgo.sync.impl.parser.SyncCrypter
 import com.duckduckgo.sync.store.SyncStore
 import kotlinx.coroutines.test.runTest
@@ -86,12 +88,13 @@ class AppSyncRepositoryTest {
     private var syncApi: SyncApi = mock()
     private var syncStore: SyncStore = mock()
     private var syncCrypter: SyncCrypter = mock()
+    private var syncEngine: SyncEngine = mock()
 
     private lateinit var syncRepo: SyncRepository
 
     @Before
     fun before() {
-        syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore, syncCrypter)
+        syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore, syncCrypter, syncEngine)
     }
 
     @Test
