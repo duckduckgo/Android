@@ -84,11 +84,7 @@ class SyncInitialSetupActivity : DuckDuckGoActivity() {
         }
         binding.createAccountButton.setOnClickListener { viewModel.onCreateAccountClicked() }
         binding.readQRButton.setOnClickListener { viewModel.onReadQRClicked() }
-        binding.storeRecoveryCodeButton.setOnClickListener {
-            viewModel.onStoreRecoveryCodeClicked()
-        }
         binding.resetButton.setOnClickListener { viewModel.onResetClicked() }
-        binding.loginAccountButton.setOnClickListener { viewModel.loginAccountClicked() }
         binding.logoutButton.setOnClickListener { viewModel.onLogoutClicked() }
         binding.deleteAccountButton.setOnClickListener { viewModel.onDeleteAccountClicked() }
         binding.connectQRCode.setOnClickListener { viewModel.onConnectStart() }

@@ -14,7 +14,6 @@ interface SyncStore {
     var token: String?
     var primaryKey: String?
     var secretKey: String?
-    var recoveryCode: String?
     fun isSignedInFlow(): Flow<Boolean>
     fun isSignedIn(): Boolean
     fun storeCredentials(
@@ -25,7 +24,7 @@ interface SyncStore {
         secretKey: String,
         token: String,
     )
-    fun clearAll(keepRecoveryCode: Boolean = true)
+    fun clearAll()
 }
 
 class SyncSharedPrefsStore
@@ -114,17 +113,6 @@ constructor(
                 }
             }
         }
-    override var recoveryCode: String?
-        get() = encryptedPreferences?.getString(KEY_RECOVERY_CODE, null)
-        set(value) {
-            encryptedPreferences?.edit(commit = true) {
-                if (value == null) {
-                    remove(KEY_RECOVERY_CODE)
-                } else {
-                    putString(KEY_RECOVERY_CODE, value)
-                }
-            }
-        }
 
     override fun isSignedInFlow(): Flow<Boolean> = isSignedInStateFlow
 
@@ -149,12 +137,8 @@ constructor(
             isSignedInStateFlow.emit(true)
         }
     }
-    override fun clearAll(keepRecoveryCode: Boolean) {
-        val recoveryCodeBackup = recoveryCode
+    override fun clearAll() {
         encryptedPreferences?.edit(commit = true) { clear() }
-        if (keepRecoveryCode) {
-            recoveryCode = recoveryCodeBackup
-        }
         appCoroutineScope.launch {
             isSignedInStateFlow.emit(false)
         }
@@ -168,6 +152,5 @@ constructor(
         private const val KEY_TOKEN = "KEY_TOKEN"
         private const val KEY_PK = "KEY_PK"
         private const val KEY_SK = "KEY_SK"
-        private const val KEY_RECOVERY_CODE = "KEY_RECOVERY_CODE"
     }
 }
