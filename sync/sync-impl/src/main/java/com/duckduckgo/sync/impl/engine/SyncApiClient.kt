@@ -16,12 +16,14 @@
 
 package com.duckduckgo.sync.impl.engine
 
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.engine.SyncChanges
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncApi
 import com.duckduckgo.sync.impl.SyncDataResponse
+import com.duckduckgo.sync.impl.parser.SyncBookmarkUpdates
 import com.duckduckgo.sync.impl.parser.SyncDataRequest
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
@@ -31,7 +33,6 @@ import javax.inject.Inject
 import timber.log.Timber
 
 interface SyncApiClient {
-
     fun patch(changes: List<SyncChanges>): Result<SyncDataResponse>
 }
 
@@ -49,9 +50,8 @@ class AppSyncApiClient @Inject constructor(
             return Result.Error(reason = "Changes Empty")
         }
 
-        val localChangesJSON = mapChanges(changes)
-        Timber.d("Sync: patch data generated $localChangesJSON")
-        val localChanges = Adapters.patchAdapter.fromJson(localChangesJSON)!!
+        val localChanges = mapChanges(changes)
+        Timber.d("Sync: patch data generated $localChanges")
         return when (val result = syncApi.patch(token, localChanges)) {
             is Result.Error -> {
                 result
@@ -63,17 +63,17 @@ class AppSyncApiClient @Inject constructor(
         }
     }
 
-    private fun mapChanges(changes: List<SyncChanges>): String {
-        // for each item in the list, add new JSON Object
-        // add client timestamp
-        return changes.first { it.type == BOOKMARKS }.updatesJSON
+    private fun mapChanges(changes: List<SyncChanges>): SyncDataRequest {
+        val bookmarksJSON = changes.first { it.type == BOOKMARKS }.updatesJSON
+        val bookmarkUpdates = Adapters.patchAdapter.fromJson(bookmarksJSON)!!
+        return SyncDataRequest(client_timestamp = DatabaseDateFormatter.timestamp(), bookmarkUpdates)
     }
 
     private class Adapters {
         companion object {
             private val moshi = Moshi.Builder().build()
-            val patchAdapter: JsonAdapter<SyncDataRequest> =
-                moshi.adapter(SyncDataRequest::class.java)
+            val patchAdapter: JsonAdapter<SyncBookmarkUpdates> =
+                moshi.adapter(SyncBookmarkUpdates::class.java)
         }
     }
 }

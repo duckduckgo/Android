@@ -59,5 +59,9 @@ data class SyncBookmarkEntry(
 fun SyncBookmarkEntry.isFolder(): Boolean = this.folder != null
 fun SyncBookmarkEntry.isBookmark(): Boolean = this.page != null
 
-class SyncDataRequest(val bookmarks: SyncBookmarkUpdates)
+class SyncDataRequest(
+    val client_timestamp: String,
+    val bookmarks: SyncBookmarkUpdates
+)
+
 class SyncBookmarkUpdates(val updates: List<SyncBookmarkEntry>)

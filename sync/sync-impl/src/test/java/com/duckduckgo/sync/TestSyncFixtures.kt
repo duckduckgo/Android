@@ -17,6 +17,8 @@
 package com.duckduckgo.sync
 
 import android.graphics.Bitmap
+import com.duckduckgo.sync.api.engine.SyncChanges
+import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.duckduckgo.sync.crypto.AccountKeys
 import com.duckduckgo.sync.crypto.ConnectKeys
 import com.duckduckgo.sync.crypto.DecryptResult
@@ -191,6 +193,9 @@ object TestSyncFixtures {
     val patchAllSuccess = Result.Success(syncDataResponse)
     val patchAllError = Result.Error(-1, "Patch All Error")
 
+    val firstSyncWithBookmarksAndFavorites = "{\"bookmarks\":{\"updates\":[{\"client_last_modified\":\"timestamp\",\"folder\":{\"children\":[\"bookmark1\"]},\"id\":\"favorites_root\",\"title\":\"Favorites\"},{\"client_last_modified\":\"timestamp\",\"id\":\"bookmark3\",\"page\":{\"url\":\"https://bookmark3.com\"},\"title\":\"Bookmark 3\"},{\"client_last_modified\":\"timestamp\",\"id\":\"bookmark4\",\"page\":{\"url\":\"https://bookmark4.com\"},\"title\":\"Bookmark 4\"},{\"client_last_modified\":\"timestamp\",\"folder\":{\"children\":[\"bookmark3\",\"bookmark4\"]},\"id\":\"bookmarks_root\",\"title\":\"Bookmarks\"}]}}"
+    val bookmarkChanges = SyncChanges(BOOKMARKS, firstSyncWithBookmarksAndFavorites)
+
     private fun aBookmarkEntry(index: Int): SyncBookmarkEntry {
         return SyncBookmarkEntry.asBookmark("bookmark$index", "title$index", "https://bookmark$index.com", null)
     }
@@ -213,7 +218,7 @@ object TestSyncFixtures {
         )
     }
 
-    val syncData = SyncDataRequest(someBookmarkEntries())
+    val syncData = SyncDataRequest("timestamp", someBookmarkEntries())
 
     fun qrBitmap(): Bitmap {
         return Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)
