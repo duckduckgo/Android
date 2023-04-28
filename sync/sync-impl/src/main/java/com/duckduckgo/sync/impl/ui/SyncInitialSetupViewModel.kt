@@ -82,13 +82,6 @@ constructor(
         }
     }
 
-    fun onStoreRecoveryCodeClicked() {
-        viewModelScope.launch(dispatchers.io()) {
-            syncRepository.storeRecoveryCode()
-            updateViewState()
-        }
-    }
-
     fun onResetClicked() {
         viewModelScope.launch(dispatchers.io()) {
             syncRepository.removeAccount()
@@ -123,17 +116,6 @@ constructor(
             if (result is Error) {
                 command.send(Command.ShowMessage("$result"))
             }
-            updateViewState()
-        }
-    }
-
-    fun loginAccountClicked() {
-        viewModelScope.launch(dispatchers.io()) {
-            val result = syncRepository.login()
-            if (result is Error) {
-                command.send(Command.ShowMessage("$result"))
-            }
-            getConnectedDevices()
             updateViewState()
         }
     }

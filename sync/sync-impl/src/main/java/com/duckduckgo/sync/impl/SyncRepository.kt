@@ -41,14 +41,8 @@ interface SyncRepository {
     fun isSignedInFlow(): Flow<Boolean>
     fun createAccount(): Result<Boolean>
     fun isSignedIn(): Boolean
-
-    @Deprecated(message = "Method only used for testing purposes. Relies on a local stored recovery key.", level = DeprecationLevel.WARNING)
-    fun login(): Result<Boolean>
     fun login(recoveryCodeRawJson: String): Result<Boolean>
     fun getAccountInfo(): AccountInfo
-
-    @Deprecated(message = "Method only used for testing purposes.", level = DeprecationLevel.WARNING)
-    fun storeRecoveryCode()
     fun removeAccount()
     fun logout(deviceId: String): Result<Boolean>
     fun deleteAccount(): Result<Boolean>
@@ -110,20 +104,6 @@ class AppSyncRepository @Inject constructor(
         }
     }
 
-    @Deprecated("Method only used for testing purposes. Relies on a local stored recovery key.", level = WARNING)
-    override fun login(): Result<Boolean> {
-        val recoveryCodeJson = syncStore.recoveryCode ?: return Result.Error(reason = "Not existing recovery code")
-        val recoveryCode =
-            Adapters.recoveryCodeAdapter.fromJson(recoveryCodeJson)?.recovery ?: return Result.Error(reason = "Failed reading json recovery code")
-
-        val primaryKey = recoveryCode.primaryKey
-        val userId = recoveryCode.userId
-        val deviceId = syncDeviceIds.deviceId()
-        val deviceName = syncDeviceIds.deviceName()
-
-        return performLogin(userId, deviceId, deviceName, primaryKey)
-    }
-
     override fun login(recoveryCodeRawJson: String): Result<Boolean> {
         val recoveryCode = kotlin.runCatching {
             Adapters.recoveryCodeAdapter.fromJson(recoveryCodeRawJson.decodeB64())?.recovery
@@ -154,16 +134,6 @@ class AppSyncRepository @Inject constructor(
             primaryKey = syncStore.primaryKey.orEmpty(),
             secretKey = syncStore.secretKey.orEmpty(),
         )
-    }
-
-    @Deprecated("Method only used for testing purposes.", level = WARNING)
-    override fun storeRecoveryCode() {
-        val primaryKey = syncStore.primaryKey ?: return
-        val userID = syncStore.userId ?: return
-        val recoveryCodeJson = Adapters.recoveryCodeAdapter.toJson(LinkCode(RecoveryCode(primaryKey, userID)))
-
-        Timber.i("SYNC store recoverCode: $recoveryCodeJson")
-        syncStore.recoveryCode = recoveryCodeJson
     }
 
     override fun getRecoveryCode(): String? {
@@ -225,7 +195,7 @@ class AppSyncRepository @Inject constructor(
     }
 
     override fun removeAccount() {
-        syncStore.clearAll(keepRecoveryCode = false)
+        syncStore.clearAll()
     }
 
     override fun logout(deviceId: String): Result<Boolean> {
