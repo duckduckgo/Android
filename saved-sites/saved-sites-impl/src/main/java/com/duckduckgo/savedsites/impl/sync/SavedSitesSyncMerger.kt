@@ -43,17 +43,22 @@ class SavedSitesSyncMerger @Inject constructor(
 ) : SyncMerger, SyncablePlugin {
     override fun merge(changes: SyncChanges): SyncMergeResult<Boolean> {
         Timber.d("Sync: merging remote bookmarks changes $changes")
-        val remoteBookmarks = Adapters.updatesAdapter.fromJson(changes.updatesJSON)
+        val remoteUpdates = Adapters.updatesAdapter.fromJson(changes.updatesJSON)
             ?: return SyncMergeResult.Error(reason = "Sync: merging failed, JSON format incorrect")
 
-        // parse folders
-        // parse bookmarks
-        // parse favourites
         val folders = mutableListOf<BookmarkFolder>()
         val bookmarks = mutableListOf<Bookmark>()
         val favorites = mutableListOf<Favorite>()
-        remoteBookmarks.entries.forEach {
-            
+        val remoteFolders = remoteUpdates.entries.filter { it.isFolder() }
+        val remoteBookmarks = remoteUpdates.entries.filter { it.isBookmark() }
+        remoteUpdates.entries.forEach {
+            if (it.isFolder()){
+                folders.add(it.mapToFolder())
+            }
+            if (it.isBookmark()){
+
+                bookmarks.add(it.mapToBookmark())
+            }
         }
         return SyncMergeResult.Success(true)
     }
