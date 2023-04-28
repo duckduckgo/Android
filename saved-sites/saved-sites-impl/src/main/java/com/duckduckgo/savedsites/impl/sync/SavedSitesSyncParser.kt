@@ -31,7 +31,6 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import timber.log.Timber
 import javax.inject.Inject
 
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncablePlugin::class)
@@ -157,6 +156,16 @@ data class SyncBookmarkEntry(
     val client_last_modified: String
 ) {
     companion object {
+        fun toBookmark(
+            id: String,
+            title: String,
+            url: String,
+            parentId: String,
+            lastModified: String
+        ): SavedSite.Bookmark {
+            return SavedSite.Bookmark(id, title, url, parentId, lastModified)
+        }
+
         fun asBookmark(
             id: String,
             title: String,
@@ -190,4 +199,7 @@ fun SyncBookmarkEntry.isFolder(): Boolean = this.folder != null
 fun SyncBookmarkEntry.isBookmark(): Boolean = this.page != null
 
 class SyncDataRequest(val bookmarks: SyncBookmarkUpdates)
-class SyncBookmarkUpdates(val updates: List<SyncBookmarkEntry>)
+class SyncBookmarkUpdates(
+    val updates: List<SyncBookmarkEntry>,
+    val modified_since: String = "0"
+)

@@ -299,7 +299,7 @@ class SyncCrypterTest {
         title: String,
         url: String,
     ): Bookmark {
-        return Bookmark(id, title, url, "")
+        return Bookmark(id, title, url, "", "")
     }
 
     private fun aFavorite(

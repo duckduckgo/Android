@@ -46,6 +46,7 @@ internal class SyncApiClientTest {
     val devicessResponse = DeviceDataResponse("lastModified", emptyList())
     val syncDataResponse = SyncDataResponse(bookmarksResponse, settingsResponse, devicessResponse)
     val patchAllError = Result.Error(-1, "Patch All Error")
+    val getAllError = Result.Error(-1, "Get All Error")
 
     @Before
     fun before() {
@@ -93,8 +94,26 @@ internal class SyncApiClientTest {
     @Test
     fun whenMappingChangesThenGeneratedObjectIsCorrect(){
         val bookmarksChanges = SyncChanges(BOOKMARKS, firstSyncWithBookmarksAndFavorites)
-        val changes = apiClient.mapChanges(listOf(bookmarksChanges))
-        assertTrue(changes.bookmarks.updates.isEmpty())
+        val changes = apiClient.mapRequest(listOf(bookmarksChanges))
+        assertTrue(changes.clientTimestamp.isNotEmpty())
+        assertTrue(changes.bookmarks.updates.size == 4)
+    }
 
+    @Test
+    fun whenGetAndTokenEmptyThenReturnError() {
+        whenever(syncStore.token).thenReturn("")
+
+        val result = apiClient.get()
+
+        assertEquals(result, Result.Error(reason = "Token Empty"))
+    }
+
+    @Test
+    fun whenGetAndApiFailsThenResultIsError(){
+        whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
+        whenever(syncApi.getAllData(any())).thenReturn(getAllError)
+
+        val result = apiClient.get()
+        assertTrue(result is Result.Error)
     }
 }

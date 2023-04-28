@@ -16,6 +16,8 @@
 
 package com.duckduckgo.sync.impl.parser
 
+import com.squareup.moshi.Json
+
 interface SyncCrypter {
     fun generateAllData(): SyncDataRequest
     fun store(entries: List<SyncBookmarkEntry>): Boolean
@@ -68,4 +70,7 @@ class SyncDataRequest(
 )
 
 class SyncBookmarks(val bookmarks: SyncBookmarkUpdates)
-class SyncBookmarkUpdates(val updates: List<SyncBookmarkEntry>)
+class SyncBookmarkUpdates(
+    val updates: List<SyncBookmarkEntry>,
+    val modified_since: String = "0"
+)

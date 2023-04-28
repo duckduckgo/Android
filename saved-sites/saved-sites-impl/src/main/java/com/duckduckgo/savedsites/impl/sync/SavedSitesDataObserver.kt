@@ -26,6 +26,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.sync.api.engine.SyncEngine
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.APP_OPEN
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -58,10 +59,8 @@ class SavedSitesDataObserver @Inject constructor(
     override fun observeChanges() {
         if (syncState.isUserSignedInOnDevice()) {
             appCoroutineScope.launch(dispatcherProvider.io()) {
-                savedSitesRepository.lastModified().collectLatest {
-                    Timber.d("Sync: changes to LastModified")
-                    syncEngine.notifyDataChanged()
-                }
+                Timber.d("Sync: triggering sync on App open to LastModified")
+                syncEngine.syncNow(APP_OPEN)
             }
         } else {
             Timber.d("Sync: user not signed in, no need to observer changes")

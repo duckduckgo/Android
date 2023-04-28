@@ -20,6 +20,7 @@ import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.sync.TestSyncFixtures.bookmarkChanges
 import com.duckduckgo.sync.api.engine.SyncChanges
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_CREATION
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.APP_OPEN
 import com.duckduckgo.sync.api.engine.SyncablePlugin
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.duckduckgo.sync.impl.BookmarksResponse
@@ -69,11 +70,7 @@ internal class SyncEngineTest {
         whenever(plugins.getPlugins()).thenReturn(listOf(fakeSyncablePlugin))
         whenever(syncApiClient.patch(listOf(localChanges))).thenReturn(
             Success(
-                SyncDataResponse(
-                    BookmarksResponse("", emptyList()),
-                    SettingsResponse("", emptyList()),
-                    DeviceDataResponse("", emptyList()),
-                ),
+                listOf(SyncChanges.empty())
             ),
         )
 
@@ -98,5 +95,16 @@ internal class SyncEngineTest {
         verify(syncStateRepository).store(any())
         verify(syncApiClient).patch(any())
         verify(syncStateRepository).updateSyncState(FAIL)
+    }
+
+    @Test
+    fun whenSyncAndNoLocalChangesThenGetRemoteChanges() {
+        val localChanges = SyncChanges.empty()
+        val fakeSyncablePlugin = FakeSyncablePlugin(localChanges)
+        whenever(plugins.getPlugins()).thenReturn(listOf(fakeSyncablePlugin))
+
+        syncEngine.syncNow(APP_OPEN)
+
+        verify(syncApiClient).get()
     }
 }

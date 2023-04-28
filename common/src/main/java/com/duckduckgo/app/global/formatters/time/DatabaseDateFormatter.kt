@@ -40,10 +40,9 @@ class DatabaseDateFormatter {
             return FORMATTER_SECONDS.format(date)
         }
 
-        fun iso8601(): String {
-            val localDate = LocalDateTime.now()
-            val offsetDate = OffsetDateTime.of(localDate, ZoneOffset.UTC)
-            return offsetDate.format(DateTimeFormatter.ISO_DATE_TIME)
+        fun iso8601(date: LocalDateTime = LocalDateTime.now()): String {
+            val offsetDate = OffsetDateTime.of(date, ZoneOffset.UTC)
+            return offsetDate.format(DateTimeFormatter.ISO_INSTANT)
         }
 
         fun duration(

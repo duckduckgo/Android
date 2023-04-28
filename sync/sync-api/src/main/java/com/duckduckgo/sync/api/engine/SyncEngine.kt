@@ -26,6 +26,7 @@ interface SyncEngine {
 
     enum class SyncTrigger {
         BACKGROUND_SYNC,
+        APP_OPEN,
         FEATURE_READ,
         ACCOUNT_CREATION,
         ACCOUNT_LOGIN

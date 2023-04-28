@@ -245,9 +245,9 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
         }
 
         return onSuccess(response) {
-            val data = response.body() ?: throw IllegalStateException("SYNC get data not parsed")
-            val allDataJSON = ResponseAdapters.dataAdapter.toJson(data.bookmarks)
-            Timber.i("SYNC get data $allDataJSON")
+            val data = response.body() ?: throw IllegalStateException("Sync: get data not parsed")
+            val allDataJSON = ResponseAdapters.dataAdapter.toJson(data)
+            Timber.i("Sync: get data $allDataJSON")
             Result.Success(data)
         }
     }
@@ -256,8 +256,8 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
         companion object {
             private val moshi = Moshi.Builder().build()
 
-            val dataAdapter: JsonAdapter<BookmarksResponse> =
-                moshi.adapter(BookmarksResponse::class.java)
+            val dataAdapter: JsonAdapter<SyncDataResponse> =
+                moshi.adapter(SyncDataResponse::class.java)
         }
     }
 
