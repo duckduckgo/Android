@@ -108,7 +108,6 @@ class AppSyncDeviceIdsTest {
             override var token: String? = "token"
             override var primaryKey: String? = "primaryKey"
             override var secretKey: String? = "secretKey"
-            override var recoveryCode: String? = "recoveryCode"
 
             override fun isSignedInFlow() = emptyFlow<Boolean>()
 
@@ -125,7 +124,7 @@ class AppSyncDeviceIdsTest {
                 /* no-op */
             }
 
-            override fun clearAll(keepRecoveryCode: Boolean) {
+            override fun clearAll() {
                 /* no-op */
             }
         }
@@ -139,7 +138,6 @@ class AppSyncDeviceIdsTest {
             override var token: String? = null
             override var primaryKey: String? = null
             override var secretKey: String? = null
-            override var recoveryCode: String? = null
             override fun isSignedInFlow() = emptyFlow<Boolean>()
 
             override fun isSignedIn(): Boolean = false
@@ -155,7 +153,7 @@ class AppSyncDeviceIdsTest {
                 /* no-op */
             }
 
-            override fun clearAll(keepRecoveryCode: Boolean) {
+            override fun clearAll() {
                 /* no-op */
             }
         }
