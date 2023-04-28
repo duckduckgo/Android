@@ -21,6 +21,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.crypto.AccountKeys
 import com.duckduckgo.sync.crypto.LoginKeys
 import com.duckduckgo.sync.crypto.SyncLib
+import com.duckduckgo.sync.impl.API_CODE.INVALID_LOGIN_CREDENTIALS
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.parser.SyncCrypter
 import com.duckduckgo.sync.impl.parser.SyncDataRequest
@@ -395,7 +396,7 @@ class AppSyncRepository @Inject constructor(
     }
 
     private fun Error.removeKeysIfInvalid(): Error {
-        if (code == 401) {
+        if (code == INVALID_LOGIN_CREDENTIALS.code) {
             syncStore.clearAll()
         }
         return this
