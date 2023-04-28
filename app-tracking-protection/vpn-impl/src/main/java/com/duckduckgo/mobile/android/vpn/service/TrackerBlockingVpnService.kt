@@ -188,6 +188,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
 
         if (restartRequested) {
             restartRequested = false
+            logcat { "VPN log start from onDestroy" }
             startService(this)
         }
     }
