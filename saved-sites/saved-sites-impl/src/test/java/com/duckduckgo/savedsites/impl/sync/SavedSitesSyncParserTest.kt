@@ -17,7 +17,9 @@
 package com.duckduckgo.savedsites.impl.sync
 
 import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.sync.api.SyncCrypto
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -54,12 +56,21 @@ class SavedSitesSyncParserTest {
         whenever(repository.hasBookmarks()).thenReturn(true)
         whenever(repository.hasFavorites()).thenReturn(true)
         whenever(repository.getFavoritesSync()).thenReturn(listOf(aFavorite("bookmark1", "Bookmark 1", "https://bookmark1.com", 0)))
+        whenever(repository.getFolder(SavedSitesNames.FAVORITES_ROOT)).thenReturn(aFolder("folder1", "favorites", ""))
 
         val syncChanges = parser.getChanges("")
         assertEquals(
             syncChanges.updatesJSON,
-            "{\"bookmarks\":{\"updates\":[{\"folder\":{\"children\":[\"bookmark1\"]},\"id\":\"favorites_root\",\"title\":\"Favorites\"}]}}",
+            "{\"bookmarks\":{\"updates\":[{\"client_last_modified\":\"timestamp\",\"folder\":{\"children\":[\"bookmark1\"]},\"id\":\"folder1\",\"title\":\"Favorites\"}]}}",
         )
+    }
+
+    private fun aFolder(
+        id: String,
+        name: String,
+        parentId: String,
+    ): BookmarkFolder {
+        return BookmarkFolder(id = id, name = name, parentId = parentId, lastModified = "timestamp")
     }
 
     private fun aFavorite(

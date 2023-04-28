@@ -73,6 +73,7 @@ data class BookmarkFolder(
     val parentId: String,
     val numBookmarks: Int = 0,
     val numFolders: Int = 0,
+    val lastModified: String?,
 ) : Serializable
 
 object SavedSitesNames {

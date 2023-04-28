@@ -16,6 +16,7 @@
 
 package com.duckduckgo.savedsites.impl.sync
 
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
@@ -58,21 +59,25 @@ class SavedSitesSyncParser @Inject constructor(
         // favorites (we don't add individual items, they are added as we go through bookmark folders)
         if (hasFavorites) {
             val favorites = repository.getFavoritesSync()
-            updates.add(
-                SyncBookmarkEntry.asFolder(
-                    id = SavedSitesNames.FAVORITES_ROOT,
-                    title = syncCrypto.encrypt(SavedSitesNames.FAVORITES_NAME),
-                    children = favorites.map { it.id },
-                    deleted = null,
-                ),
-            )
+            val favoriteFolder = repository.getFolder(SavedSitesNames.FAVORITES_ROOT)
+            favoriteFolder?.let {
+                updates.add(
+                    SyncBookmarkEntry.asFolder(
+                        id = favoriteFolder.id,
+                        title = syncCrypto.encrypt(SavedSitesNames.FAVORITES_NAME),
+                        children = favorites.map { it.id },
+                        deleted = null,
+                        clientLastModified = favoriteFolder.lastModified?: DatabaseDateFormatter.timestamp(),
+                        ),
+                )
+
+            }
         }
 
         return formatUpdates(updates)
     }
 
     override fun getChanges(since: String): SyncChanges {
-
         return parseChanges(since)
     }
 
@@ -108,6 +113,7 @@ data class SyncBookmarkEntry(
     val page: SyncBookmarkPage?,
     val folder: SyncFolderChildren?,
     val deleted: String?,
+    val client_last_modified: String
 ) {
     companion object {
         fun asBookmark(
@@ -115,8 +121,9 @@ data class SyncBookmarkEntry(
             title: String,
             url: String,
             deleted: String?,
+            clientLastModified: String
         ): SyncBookmarkEntry {
-            return SyncBookmarkEntry(id, title, SyncBookmarkPage(url), null, deleted)
+            return SyncBookmarkEntry(id, title, SyncBookmarkPage(url), null, deleted, clientLastModified)
         }
 
         fun asFolder(
@@ -124,8 +131,9 @@ data class SyncBookmarkEntry(
             title: String,
             children: List<String>,
             deleted: String?,
+            clientLastModified: String
         ): SyncBookmarkEntry {
-            return SyncBookmarkEntry(id, title, null, SyncFolderChildren(children), deleted)
+            return SyncBookmarkEntry(id, title, null, SyncFolderChildren(children), deleted, clientLastModified)
         }
     }
 }
