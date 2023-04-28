@@ -59,6 +59,19 @@
             android:parentActivityName=".ui.setup.SetupAccountActivity"/>
 
         <activity
+            android:name=".ui.EnterCodeActivity"
+            android:exported="false"
+            android:label="@string/enter_code_screen_title"
+            android:theme="@style/Theme.DuckDuckGo.Dark"
+            android:parentActivityName=".ui.setup.SetupAccountActivity"/>
+
+        <activity
+            android:name=".ui.ShowCodeActivity"
+            android:exported="false"
+            android:label="@string/show_code_screen_title"
+            android:parentActivityName=".ui.SyncActivity"/>
+
+        <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="portrait"
             tools:replace="screenOrientation" />
