@@ -36,6 +36,7 @@ import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
 import java.lang.String.format
 import kotlin.reflect.KClass
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -45,6 +46,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -59,6 +61,7 @@ class SyncActivityViewModelTest {
     private val qrEncoder: QREncoder = mock()
     private val recoveryPDF: RecoveryCodePDF = mock()
     private val syncRepository: SyncRepository = mock()
+    lateinit var isSignedInFlow: MutableStateFlow<Boolean>
 
     private val testee = SyncActivityViewModel(
         qrEncoder = qrEncoder,
@@ -107,8 +110,10 @@ class SyncActivityViewModelTest {
         whenever(syncRepository.getConnectedDevices()).thenReturn(Result.Success(connectedDevices))
 
         testee.viewState().test {
-            val viewState = awaitItem()
-            assertEquals(connectedDevices.size, viewState.syncedDevices.size)
+            val initialState = awaitItem()
+            assertEquals(1, initialState.syncedDevices.size)
+            val fetchViewState = awaitItem()
+            assertEquals(connectedDevices.size, fetchViewState.syncedDevices.size)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -120,19 +125,6 @@ class SyncActivityViewModelTest {
         testee.viewState().test {
             val viewState = awaitItem()
             assertFalse(viewState.syncToggleState)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenRefreshAndUserSignedInThenDeviceSyncViewStateIsEnabled() = runTest {
-        givenAuthenticatedUser()
-
-        testee.getSyncState()
-
-        testee.viewState().test {
-            val viewState = awaitItem()
-            assertTrue(viewState.syncToggleState)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -172,12 +164,13 @@ class SyncActivityViewModelTest {
     @Test
     fun whenLogoutSuccessThenUpdateViewState() = runTest {
         givenAuthenticatedUser()
-        whenever(syncRepository.logout(deviceId)).thenReturn(Result.Success(true))
+        whenever(syncRepository.logout(deviceId)).thenReturn(Result.Success(true)).also {
+            isSignedInFlow.emit(false)
+        }
 
         testee.viewState().test {
             var viewState = awaitItem()
             assertTrue(viewState.syncToggleState)
-            whenever(syncRepository.isSignedIn()).thenReturn(false)
             testee.onTurnOffSyncConfirmed(connectedDevice)
             viewState = awaitItem()
             assertFalse(viewState.showAccount)
@@ -188,7 +181,7 @@ class SyncActivityViewModelTest {
 
     @Test
     fun whenLogoutErrorThenUpdateViewState() = runTest {
-        whenever(syncRepository.isSignedIn()).thenReturn(true)
+        givenAuthenticatedUser()
         whenever(syncRepository.logout(deviceId)).thenReturn(Result.Error(reason = "error"))
 
         testee.onTurnOffSyncConfirmed(connectedDevice)
@@ -226,12 +219,13 @@ class SyncActivityViewModelTest {
     @Test
     fun whenDeleteAccountSuccessThenUpdateViewState() = runTest {
         givenAuthenticatedUser()
-        whenever(syncRepository.deleteAccount()).thenReturn(Result.Success(true))
+        whenever(syncRepository.deleteAccount()).thenReturn(Result.Success(true)).also {
+            isSignedInFlow.emit(false)
+        }
 
         testee.viewState().test {
             var viewState = awaitItem()
             assertTrue(viewState.syncToggleState)
-            whenever(syncRepository.isSignedIn()).thenReturn(false)
             testee.onDeleteAccountConfirmed()
             viewState = awaitItem()
             assertFalse(viewState.showAccount)
@@ -242,7 +236,7 @@ class SyncActivityViewModelTest {
 
     @Test
     fun whenDeleteAccountErrorThenUpdateViewState() = runTest {
-        whenever(syncRepository.isSignedIn()).thenReturn(true)
+        givenAuthenticatedUser()
         whenever(syncRepository.deleteAccount()).thenReturn(Result.Error(reason = "error"))
 
         testee.onDeleteAccountConfirmed()
@@ -403,6 +397,8 @@ class SyncActivityViewModelTest {
 
     private fun givenAuthenticatedUser() {
         whenever(syncRepository.isSignedIn()).thenReturn(true)
+        isSignedInFlow = MutableStateFlow(true)
+        whenever(syncRepository.isSignedInFlow()).thenReturn(isSignedInFlow)
         whenever(syncRepository.getRecoveryCode()).thenReturn(jsonRecoveryKeyEncoded)
         whenever(syncRepository.getThisConnectedDevice()).thenReturn(connectedDevice)
         whenever(syncRepository.getConnectedDevices()).thenReturn(Result.Success(listOf(connectedDevice)))
