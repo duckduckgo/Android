@@ -23,6 +23,7 @@ import com.duckduckgo.sync.TestSyncFixtures.jsonConnectKeyEncoded
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncRepository
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command
+import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.ViewMode
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
@@ -44,6 +45,26 @@ class SyncConnectViewModelTest {
         syncRepostitory,
         coroutineTestRule.testDispatcherProvider,
     )
+
+    @Test
+    fun whenUserNotSignedInThenViewModeIsUnAuthenticated() = runTest {
+        whenever(syncRepostitory.isSignedIn()).thenReturn(false)
+        testee.viewState().test {
+            val viewState = awaitItem()
+            assertTrue(viewState.viewMode is ViewMode.UnAuthenticated)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserSignedIntThenViewModeIsSignedIn() = runTest {
+        whenever(syncRepostitory.isSignedIn()).thenReturn(true)
+        testee.viewState().test {
+            val viewState = awaitItem()
+            assertTrue(viewState.viewMode is ViewMode.SignedIn)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 
     @Test
     fun whenUserClicksOnReadQRCodeThenCommandIsReadQRCode() = runTest {
