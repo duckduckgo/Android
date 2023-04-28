@@ -32,7 +32,6 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
 import javax.inject.*
-import kotlin.DeprecationLevel.WARNING
 import kotlinx.coroutines.flow.Flow
 import timber.log.Timber
 
