@@ -77,6 +77,11 @@ interface SyncService {
 
     @GET("https://dev-sync-use.duckduckgo.com/sync/data")
     fun data(@Header("Authorization") token: String): Call<SyncDataResponse>
+
+    @GET("https://dev-sync-use.duckduckgo.com/sync/bookmarks")
+    fun bookmarks(
+        @Header("Authorization") token: String,
+    ): Call<BookmarksResponse>
 }
 
 data class Login(
