@@ -19,6 +19,8 @@ package com.duckduckgo.savedsites.impl.sync
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.savedsites.api.models.BookmarkFolder
+import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.sync.api.SyncCrypto
 import com.duckduckgo.sync.api.engine.SyncChanges
@@ -61,20 +63,59 @@ class SavedSitesSyncParser @Inject constructor(
             val favorites = repository.getFavoritesSync()
             val favoriteFolder = repository.getFolder(SavedSitesNames.FAVORITES_ROOT)
             favoriteFolder?.let {
-                updates.add(
-                    SyncBookmarkEntry.asFolder(
-                        id = favoriteFolder.id,
-                        title = syncCrypto.encrypt(SavedSitesNames.FAVORITES_NAME),
-                        children = favorites.map { it.id },
-                        deleted = null,
-                        clientLastModified = favoriteFolder.lastModified?: DatabaseDateFormatter.timestamp(),
-                        ),
-                )
-
+                updates.add(encryptFolder(favoriteFolder, favorites.map { it.id }))
             }
         }
 
-        return formatUpdates(updates)
+        val bookmarks = addFolderContent(SavedSitesNames.BOOMARKS_ROOT, updates)
+
+        return formatUpdates(bookmarks)
+    }
+
+    private fun addFolderContent(
+        folderId: String,
+        updates: MutableList<SyncBookmarkEntry>
+    ): List<SyncBookmarkEntry> {
+        repository.getFolderContentSync(folderId).apply {
+            val folder = repository.getFolder(folderId)
+            if (folder != null) {
+                val childrenIds = mutableListOf<String>()
+                for (bookmark in this.first) {
+                    childrenIds.add(bookmark.id)
+                    updates.add(encryptSavedSite(bookmark))
+                }
+                updates.add(encryptFolder(folder, childrenIds))
+                for (eachFolder in this.second) {
+                    addFolderContent(eachFolder.id, updates)
+                }
+            }
+        }
+        return updates
+    }
+
+    private fun encryptSavedSite(
+        savedSite: SavedSite,
+    ): SyncBookmarkEntry {
+        return SyncBookmarkEntry.asBookmark(
+            id = savedSite.id,
+            title = syncCrypto.encrypt(savedSite.title),
+            url = syncCrypto.encrypt(savedSite.url),
+            deleted = null,
+            clientLastModified = savedSite.lastModified ?: DatabaseDateFormatter.timestamp(),
+        )
+    }
+
+    private fun encryptFolder(
+        bookmarkFolder: BookmarkFolder,
+        children: List<String>,
+    ): SyncBookmarkEntry {
+        return SyncBookmarkEntry.asFolder(
+            id = bookmarkFolder.id,
+            title = syncCrypto.encrypt(bookmarkFolder.name),
+            children = children,
+            deleted = null,
+            clientLastModified = bookmarkFolder.lastModified ?: DatabaseDateFormatter.timestamp(),
+        )
     }
 
     override fun getChanges(since: String): SyncChanges {

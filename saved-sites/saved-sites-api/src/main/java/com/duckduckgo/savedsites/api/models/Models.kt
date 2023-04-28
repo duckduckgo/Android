@@ -31,20 +31,23 @@ sealed class SavedSite(
     open val id: String,
     open val title: String,
     open val url: String,
+    open val lastModified: String?
 ) : Serializable {
     data class Favorite(
         override val id: String,
         override val title: String,
         override val url: String,
+        override val lastModified: String?,
         val position: Int,
-    ) : SavedSite(id, title, url)
+    ) : SavedSite(id, title, url, lastModified)
 
     data class Bookmark(
         override val id: String,
         override val title: String,
         override val url: String,
+        override val lastModified: String?,
         val parentId: String = SavedSitesNames.BOOMARKS_ROOT,
-    ) : SavedSite(id, title, url)
+    ) : SavedSite(id, title, url, lastModified)
 }
 
 /**

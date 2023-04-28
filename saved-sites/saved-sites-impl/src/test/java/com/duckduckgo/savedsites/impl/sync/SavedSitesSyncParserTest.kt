@@ -18,6 +18,7 @@ package com.duckduckgo.savedsites.impl.sync
 
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
+import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.sync.api.SyncCrypto
@@ -56,7 +57,17 @@ class SavedSitesSyncParserTest {
         whenever(repository.hasBookmarks()).thenReturn(true)
         whenever(repository.hasFavorites()).thenReturn(true)
         whenever(repository.getFavoritesSync()).thenReturn(listOf(aFavorite("bookmark1", "Bookmark 1", "https://bookmark1.com", 0)))
-        whenever(repository.getFolder(SavedSitesNames.FAVORITES_ROOT)).thenReturn(aFolder("folder1", "favorites", ""))
+        val favoritesFolder = aFolder(SavedSitesNames.FAVORITES_ROOT, SavedSitesNames.FAVORITES_NAME, "")
+        whenever(repository.getFolder(favoritesFolder.id)).thenReturn(favoritesFolder)
+        whenever(repository.getFolderContentSync(favoritesFolder.id)).thenReturn(
+            Pair(
+                listOf(
+                    aBookmark("bookmark3", "Bookmark 3", "https://bookmark3.com"),
+                    aBookmark("bookmark4", "Bookmark 4", "https://bookmark4.com"),
+                ),
+                emptyList(),
+            ),
+        )
 
         val syncChanges = parser.getChanges("")
         assertEquals(
@@ -79,6 +90,14 @@ class SavedSitesSyncParserTest {
         url: String,
         position: Int,
     ): Favorite {
-        return Favorite(id, title, url, position)
+        return Favorite(id, title, url, lastModified = "timestamp", position)
+    }
+
+    private fun aBookmark(
+        id: String,
+        title: String,
+        url: String,
+    ): Bookmark {
+        return Bookmark(id, title, url, lastModified = "timestamp")
     }
 }

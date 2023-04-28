@@ -169,7 +169,7 @@ class RealSavedSitesParser : SavedSitesParser {
                             val bookmarkFolder = BookmarkFolder(
                                 name = folderName,
                                 parentId = folderParentId,
-                                lastModified = DatabaseDateFormatter.timestamp()
+                                lastModified = DatabaseDateFormatter.timestamp(),
                             )
                             // if folder exists we use that one instead
                             val existingFolder = savedSitesRepository.getFolderByName(folderName)
@@ -186,10 +186,24 @@ class RealSavedSitesParser : SavedSitesParser {
                             val link = linkItem.attr("href")
                             val title = linkItem.text()
                             if (inFavorite) {
-                                savedSites.add(SavedSite.Favorite(UUID.randomUUID().toString(), title = title, url = link, favorites))
+                                savedSites.add(
+                                    SavedSite.Favorite(
+                                        UUID.randomUUID().toString(),
+                                        title = title,
+                                        url = link,
+                                        lastModified = DatabaseDateFormatter.timestamp(),
+                                        favorites,
+                                    ),
+                                )
                                 favorites++
                             } else {
-                                val bookmark = SavedSite.Bookmark(UUID.randomUUID().toString(), title = title, url = link, parentId = parentId)
+                                val bookmark = SavedSite.Bookmark(
+                                    UUID.randomUUID().toString(),
+                                    title = title,
+                                    url = link,
+                                    parentId = parentId,
+                                    lastModified = DatabaseDateFormatter.timestamp(),
+                                )
                                 savedSites.add(bookmark)
                             }
                         }
