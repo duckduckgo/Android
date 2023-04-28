@@ -17,6 +17,7 @@
 package com.duckduckgo.sync.impl.parser
 
 import androidx.annotation.WorkerThread
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
@@ -53,14 +54,15 @@ class RealSyncCrypter(
                     title = encrypt(SavedSitesNames.FAVORITES_NAME, primaryKey),
                     children = favorites.map { it.id },
                     deleted = null,
+                    clientLastModified = DatabaseDateFormatter.iso8601()
                 ),
             )
         }
 
         val bookmarks = addFolderContent(SavedSitesNames.BOOMARKS_ROOT, updates, primaryKey)
 
-        val bookmarkUpdates = SyncBookmarkUpdates(bookmarks)
-        return SyncDataRequest("", bookmarkUpdates)
+        val bookmarkUpdates = SyncBookmarks(SyncBookmarkUpdates(bookmarks))
+        return SyncDataRequest("", bookmarkUpdates.bookmarks)
     }
 
     private fun addFolderContent(
@@ -131,6 +133,7 @@ class RealSyncCrypter(
             title = encrypt(bookmarkFolder.name, primaryKey),
             children = children,
             deleted = null,
+            clientLastModified = DatabaseDateFormatter.iso8601()
         )
     }
 
@@ -151,6 +154,7 @@ class RealSyncCrypter(
             title = encrypt(savedSite.title, primaryKey),
             url = encrypt(savedSite.url, primaryKey),
             deleted = null,
+            clientLastModified = DatabaseDateFormatter.iso8601()
         )
     }
 

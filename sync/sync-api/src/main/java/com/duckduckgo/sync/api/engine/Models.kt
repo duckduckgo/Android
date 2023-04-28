@@ -26,6 +26,7 @@ data class SyncChanges(
     fun isEmpty(): Boolean {
         return this.updatesJSON.isEmpty()
     }
+
     companion object {
         fun empty(): SyncChanges {
             return SyncChanges(BOOKMARKS, "")

@@ -90,7 +90,15 @@ class RealSavedSitesRepository(
             val numBookmarks = savedSitesRelationsDao.countEntitiesInFolder(entity.entityId, BOOKMARK)
             folders.add(BookmarkFolder(entity.entityId, entity.title, folderId, numBookmarks, numFolders, entity.lastModified))
         } else {
-            bookmarks.add(Bookmark(entity.entityId, entity.title, entity.url.orEmpty(), folderId))
+            bookmarks.add(
+                Bookmark(
+                    id = entity.entityId,
+                    title = entity.title,
+                    url = entity.url.orEmpty(),
+                    parentId = folderId,
+                    lastModified = entity.lastModified,
+                ),
+            )
         }
     }
 
@@ -465,7 +473,7 @@ class RealSavedSitesRepository(
         savedSitesEntitiesDao.updateModified(SavedSitesNames.FAVORITES_ROOT)
     }
 
-    private fun Entity.mapToBookmark(relationId: String): Bookmark = Bookmark(this.entityId, this.title, this.url.orEmpty(), relationId)
+    private fun Entity.mapToBookmark(relationId: String): Bookmark = Bookmark(this.entityId, this.title, this.url.orEmpty(), relationId, this.lastModified)
     private fun Entity.mapToBookmarkFolder(relationId: String): BookmarkFolder =
         BookmarkFolder(id = this.entityId, name = this.title, parentId = relationId, lastModified = this.lastModified)
 

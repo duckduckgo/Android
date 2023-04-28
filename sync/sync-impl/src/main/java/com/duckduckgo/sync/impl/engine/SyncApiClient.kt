@@ -16,6 +16,7 @@
 
 package com.duckduckgo.sync.impl.engine
 
+import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.engine.SyncChanges
@@ -23,7 +24,7 @@ import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncApi
 import com.duckduckgo.sync.impl.SyncDataResponse
-import com.duckduckgo.sync.impl.parser.SyncBookmarkUpdates
+import com.duckduckgo.sync.impl.parser.SyncBookmarks
 import com.duckduckgo.sync.impl.parser.SyncDataRequest
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
@@ -51,29 +52,37 @@ class AppSyncApiClient @Inject constructor(
         }
 
         val localChanges = mapChanges(changes)
-        Timber.d("Sync: patch data generated $localChanges")
+        val localChangesJSON = Adapters.patchAdapter.toJson(localChanges)
+        Timber.d("Sync: patch data generated $localChangesJSON")
         return when (val result = syncApi.patch(token, localChanges)) {
             is Result.Error -> {
                 result
             }
 
             is Result.Success -> {
-                Result.Success(result.data)
+                if (result.data == null){
+                    Result.Success(SyncDataResponse.empty())
+                } else {
+                    Result.Success(result.data)
+                }
             }
         }
     }
 
-    private fun mapChanges(changes: List<SyncChanges>): SyncDataRequest {
+    @VisibleForTesting
+    fun mapChanges(changes: List<SyncChanges>): SyncDataRequest {
         val bookmarksJSON = changes.first { it.type == BOOKMARKS }.updatesJSON
-        val bookmarkUpdates = Adapters.patchAdapter.fromJson(bookmarksJSON)!!
-        return SyncDataRequest(client_timestamp = DatabaseDateFormatter.timestamp(), bookmarkUpdates)
+        val bookmarkUpdates = Adapters.bookmarksAdapter.fromJson(bookmarksJSON)!!
+        return SyncDataRequest(client_timestamp = DatabaseDateFormatter.iso8601(), bookmarkUpdates.bookmarks)
     }
 
     private class Adapters {
         companion object {
             private val moshi = Moshi.Builder().build()
-            val patchAdapter: JsonAdapter<SyncBookmarkUpdates> =
-                moshi.adapter(SyncBookmarkUpdates::class.java)
+            val bookmarksAdapter: JsonAdapter<SyncBookmarks> =
+                moshi.adapter(SyncBookmarks::class.java)
+            val patchAdapter: JsonAdapter<SyncDataRequest> =
+                moshi.adapter(SyncDataRequest::class.java)
         }
     }
 }

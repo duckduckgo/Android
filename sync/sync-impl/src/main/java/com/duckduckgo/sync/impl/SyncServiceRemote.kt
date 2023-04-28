@@ -66,7 +66,7 @@ interface SyncApi {
     fun patch(
         token: String,
         bookmarks: SyncDataRequest,
-    ): Result<SyncDataResponse>
+    ): Result<SyncDataResponse?>
 
     fun getAllData(token: String): Result<SyncDataResponse>
 }
@@ -223,7 +223,7 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
     override fun patch(
         token: String,
         bookmarks: SyncDataRequest,
-    ): Result<SyncDataResponse> {
+    ): Result<SyncDataResponse?> {
         val response = runCatching {
             val patchCall = syncService.patch("Bearer $token", bookmarks)
             patchCall.execute()
@@ -232,7 +232,7 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
         }
 
         return onSuccess(response) {
-            Result.Success(response.body()!!)
+            Result.Success(response.body())
         }
     }
 

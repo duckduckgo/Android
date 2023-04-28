@@ -28,7 +28,7 @@ data class Entity(
     var title: String,
     var url: String?,
     var type: EntityType,
-    var lastModified: String? = DatabaseDateFormatter.timestamp(),
+    var lastModified: String? = DatabaseDateFormatter.iso8601(),
     var deleted: Boolean = false,
 )
 
