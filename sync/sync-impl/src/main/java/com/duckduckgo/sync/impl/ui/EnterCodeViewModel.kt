@@ -51,19 +51,23 @@ class EnterCodeViewModel @Inject constructor(
 
     data class ViewState(
         val code: String = "",
+        val authState: AuthState = AuthState.Idle,
     )
 
+    sealed class AuthState {
+        object Idle : AuthState()
+        object Loading : AuthState()
+        object Error : AuthState()
+    }
+
     sealed class Command {
-        object ShowLoading : Command()
         object LoginSucess : Command()
-        object Error : Command()
     }
 
     fun onPasteCodeClicked(codeType: Code) {
         viewModelScope.launch(dispatchers.io()) {
             val pastedCode = clipboard.pasteFromClipboard()
-            viewState.value = viewState.value.copy(code = pastedCode)
-            command.send(Command.ShowLoading)
+            viewState.value = viewState.value.copy(code = pastedCode, authState = AuthState.Loading)
             authFlow(codeType, pastedCode)
         }
     }
@@ -78,7 +82,9 @@ class EnterCodeViewModel @Inject constructor(
         }
         when (result) {
             is Result.Success -> command.send(Command.LoginSucess)
-            is Result.Error -> command.send(Command.Error)
+            is Result.Error -> {
+                viewState.value = viewState.value.copy(authState = AuthState.Error)
+            }
         }
     }
 }

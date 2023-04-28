@@ -26,11 +26,12 @@ import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncRepository
 import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code
-import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command
+import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.AuthState
+import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.AuthState.Idle
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.LoginSucess
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -55,6 +56,15 @@ internal class EnterCodeViewModelTest {
     )
 
     @Test
+    fun whenUIStartsThenViewStateIsIdle() = runTest {
+        testee.viewState().test {
+            val item = awaitItem()
+            assertTrue(item.authState is Idle)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenUserClicksOnPasteCodeThenClipboardIsPasted() = runTest {
         whenever(clipboard.pasteFromClipboard()).thenReturn(jsonRecoveryKeyEncoded)
 
@@ -72,7 +82,7 @@ internal class EnterCodeViewModelTest {
 
         testee.commands().test {
             val command = awaitItem()
-            Assert.assertTrue(command is LoginSucess)
+            assertTrue(command is LoginSucess)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -86,7 +96,7 @@ internal class EnterCodeViewModelTest {
 
         testee.commands().test {
             val command = awaitItem()
-            Assert.assertTrue(command is LoginSucess)
+            assertTrue(command is LoginSucess)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -98,9 +108,9 @@ internal class EnterCodeViewModelTest {
 
         testee.onPasteCodeClicked(Code.RECOVERY_CODE)
 
-        testee.commands().test {
-            val command = awaitItem()
-            Assert.assertTrue(command is Command.Error)
+        testee.viewState().test {
+            val item = awaitItem()
+            assertTrue(item.authState is AuthState.Error)
             cancelAndIgnoreRemainingEvents()
         }
     }

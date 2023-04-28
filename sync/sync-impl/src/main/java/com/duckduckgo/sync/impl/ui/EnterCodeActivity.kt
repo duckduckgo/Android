@@ -30,10 +30,11 @@ import com.duckduckgo.mobile.android.ui.view.hide
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.databinding.ActivityEnterCodeBinding
+import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.AuthState
+import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.AuthState.Idle
+import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.AuthState.Loading
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command
-import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.Error
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.LoginSucess
-import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.ShowLoading
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.ViewState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -73,6 +74,20 @@ class EnterCodeActivity : DuckDuckGoActivity() {
         binding.enterCodeHint.isVisible = viewState.code.isEmpty()
         binding.pastedCode.isVisible = viewState.code.isNotEmpty()
         binding.pastedCode.text = viewState.code
+        when (viewState.authState) {
+            AuthState.Error -> {
+                binding.loadingIndicatorContainer.hide()
+                binding.errorAuthStateHint.show()
+            }
+            Idle -> {
+                binding.loadingIndicatorContainer.hide()
+                binding.errorAuthStateHint.hide()
+            }
+            Loading -> {
+                binding.loadingIndicatorContainer.show()
+                binding.errorAuthStateHint.hide()
+            }
+        }
     }
 
     private fun processCommand(command: Command) {
@@ -80,16 +95,6 @@ class EnterCodeActivity : DuckDuckGoActivity() {
             LoginSucess -> {
                 setResult(RESULT_OK)
                 finish()
-            }
-
-            Error -> {
-                binding.loadingIndicatorContainer.hide()
-                binding.errorAuthStateHint.show()
-            }
-
-            ShowLoading -> {
-                binding.loadingIndicatorContainer.show()
-                binding.errorAuthStateHint.hide()
             }
         }
     }
