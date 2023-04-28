@@ -279,10 +279,10 @@ class SyncCrypterTest {
         val entries = mutableListOf<SyncBookmarkEntry>()
         val childrenId = mutableListOf<String>()
         for (index in 1..totalEntries) {
-            entries.add(SyncBookmarkEntry("entity$index", "title$index", SyncBookmarkPage("https://testUrl$index"), null, null))
+            entries.add(SyncBookmarkEntry("entity$index", "title$index", SyncBookmarkPage("https://testUrl$index"), null, null, "timestamp"))
             childrenId.add("entity$index")
         }
-        entries.add(SyncBookmarkEntry(folderId, "Bookmarks $folderId", null, SyncFolderChildren(childrenId), null))
+        entries.add(SyncBookmarkEntry(folderId, "Bookmarks $folderId", null, SyncFolderChildren(childrenId), null, "timestamp"))
         return entries
     }
 

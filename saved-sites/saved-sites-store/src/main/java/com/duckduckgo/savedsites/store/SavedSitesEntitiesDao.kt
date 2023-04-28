@@ -61,13 +61,13 @@ interface SavedSitesEntitiesDao {
     fun entitiesInFolderSync(folderId: String): List<Entity>
 
     @Query("update entities set deleted = 1, lastModified = :lastModified where entityId = :id")
-    fun delete(id: String, lastModified: String = DatabaseDateFormatter.timestamp())
+    fun delete(id: String, lastModified: String = DatabaseDateFormatter.iso8601())
 
     @Query("update entities set deleted = 1, lastModified = :lastModified where entityId != :bookmarksRoot AND entityId != :favoritesRoot")
     fun deleteAll(
         bookmarksRoot: String = SavedSitesNames.BOOMARKS_ROOT,
         favoritesRoot: String = SavedSitesNames.FAVORITES_ROOT,
-        lastModified: String = DatabaseDateFormatter.timestamp(),
+        lastModified: String = DatabaseDateFormatter.iso8601(),
     )
 
     @Delete
@@ -77,7 +77,7 @@ interface SavedSitesEntitiesDao {
     fun update(entity: Entity)
 
     @Query("update entities set lastModified = :lastModified where entityId = :entityId")
-    fun updateModified(entityId: String, lastModified: String = DatabaseDateFormatter.timestamp())
+    fun updateModified(entityId: String, lastModified: String = DatabaseDateFormatter.iso8601())
 
     @Query("select * from entities order by rowid desc limit 1")
     fun lastModified(): Flow<Entity>

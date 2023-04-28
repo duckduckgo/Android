@@ -45,8 +45,8 @@ sealed class SavedSite(
         override val id: String,
         override val title: String,
         override val url: String,
-        override val lastModified: String?,
         val parentId: String = SavedSitesNames.BOOMARKS_ROOT,
+        override val lastModified: String?,
     ) : SavedSite(id, title, url, lastModified)
 }
 

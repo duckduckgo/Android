@@ -43,6 +43,7 @@ import com.duckduckgo.sync.impl.SyncDataResponse
 import com.duckduckgo.sync.impl.encodeB64
 import com.duckduckgo.sync.impl.parser.SyncBookmarkEntry
 import com.duckduckgo.sync.impl.parser.SyncBookmarkUpdates
+import com.duckduckgo.sync.impl.parser.SyncBookmarks
 import com.duckduckgo.sync.impl.parser.SyncDataRequest
 import java.io.File
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -197,28 +198,28 @@ object TestSyncFixtures {
     val bookmarkChanges = SyncChanges(BOOKMARKS, firstSyncWithBookmarksAndFavorites)
 
     private fun aBookmarkEntry(index: Int): SyncBookmarkEntry {
-        return SyncBookmarkEntry.asBookmark("bookmark$index", "title$index", "https://bookmark$index.com", null)
+        return SyncBookmarkEntry.asBookmark("bookmark$index", "title$index", "https://bookmark$index.com", null, "timestamp")
     }
 
     private fun aBookmarkFolderEntry(
         index: Int,
         children: List<Int>,
     ): SyncBookmarkEntry {
-        return SyncBookmarkEntry.asFolder("folder$index", "title$index", children.map { "bookmark$index" }, null)
+        return SyncBookmarkEntry.asFolder("folder$index", "title$index", children.map { "bookmark$index" }, null, "timestamp")
     }
 
-    private fun someBookmarkEntries(): SyncBookmarkUpdates {
-        return SyncBookmarkUpdates(
+    private fun someBookmarkEntries(): SyncBookmarks {
+        return SyncBookmarks(SyncBookmarkUpdates(
             listOf(
                 aBookmarkEntry(1),
                 aBookmarkEntry(2),
                 aBookmarkEntry(3),
                 aBookmarkFolderEntry(1, listOf(1, 2, 3)),
             ),
-        )
+        ))
     }
 
-    val syncData = SyncDataRequest("timestamp", someBookmarkEntries())
+    val syncData = SyncDataRequest("timestamp", someBookmarkEntries().bookmarks)
 
     fun qrBitmap(): Bitmap {
         return Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)

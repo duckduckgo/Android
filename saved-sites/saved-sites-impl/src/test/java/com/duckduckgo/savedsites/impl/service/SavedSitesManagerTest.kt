@@ -124,6 +124,6 @@ class SavedSitesManagerTest {
     }
 
     private fun aFavorite(): SavedSite.Favorite {
-        return SavedSite.Favorite(UUID.randomUUID().toString(), "title", "url", lastModified = DatabaseDateFormatter.timestamp(),0)
+        return SavedSite.Favorite(UUID.randomUUID().toString(), "title", "url", lastModified = DatabaseDateFormatter.iso8601(),0)
     }
 }

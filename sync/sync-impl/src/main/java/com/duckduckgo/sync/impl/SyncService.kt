@@ -168,7 +168,16 @@ data class SyncDataResponse(
     val bookmarks: BookmarksResponse,
     val settings: SettingsResponse,
     val devices: DeviceDataResponse,
-)
+) {
+    companion object {
+        fun empty(): SyncDataResponse {
+            val bookmarksResponse = BookmarksResponse("lastModified", emptyList())
+            val settingsResponse = SettingsResponse("lastModified", emptyList())
+            val devicessResponse = DeviceDataResponse("lastModified", emptyList())
+            return SyncDataResponse(bookmarksResponse, settingsResponse, devicessResponse)
+        }
+     }
+}
 
 enum class API_CODE(val code: Int) {
     INVALID_LOGIN_CREDENTIALS(401),

@@ -169,7 +169,7 @@ class RealSavedSitesParser : SavedSitesParser {
                             val bookmarkFolder = BookmarkFolder(
                                 name = folderName,
                                 parentId = folderParentId,
-                                lastModified = DatabaseDateFormatter.timestamp(),
+                                lastModified = DatabaseDateFormatter.iso8601(),
                             )
                             // if folder exists we use that one instead
                             val existingFolder = savedSitesRepository.getFolderByName(folderName)
@@ -191,7 +191,7 @@ class RealSavedSitesParser : SavedSitesParser {
                                         UUID.randomUUID().toString(),
                                         title = title,
                                         url = link,
-                                        lastModified = DatabaseDateFormatter.timestamp(),
+                                        lastModified = DatabaseDateFormatter.iso8601(),
                                         favorites,
                                     ),
                                 )
@@ -202,7 +202,7 @@ class RealSavedSitesParser : SavedSitesParser {
                                     title = title,
                                     url = link,
                                     parentId = parentId,
-                                    lastModified = DatabaseDateFormatter.timestamp(),
+                                    lastModified = DatabaseDateFormatter.iso8601(),
                                 )
                                 savedSites.add(bookmark)
                             }

@@ -34,6 +34,7 @@ data class SyncBookmarkEntry(
     val page: SyncBookmarkPage?,
     val folder: SyncFolderChildren?,
     val deleted: String?,
+    val client_last_modified: String
 ) {
     companion object {
         fun asBookmark(
@@ -41,8 +42,9 @@ data class SyncBookmarkEntry(
             title: String,
             url: String,
             deleted: String?,
+            clientLastModified: String
         ): SyncBookmarkEntry {
-            return SyncBookmarkEntry(id, title, SyncBookmarkPage(url), null, deleted)
+            return SyncBookmarkEntry(id, title, SyncBookmarkPage(url), null, deleted, clientLastModified)
         }
 
         fun asFolder(
@@ -50,8 +52,9 @@ data class SyncBookmarkEntry(
             title: String,
             children: List<String>,
             deleted: String?,
+            clientLastModified: String
         ): SyncBookmarkEntry {
-            return SyncBookmarkEntry(id, title, null, SyncFolderChildren(children), deleted)
+            return SyncBookmarkEntry(id, title, null, SyncFolderChildren(children), deleted, clientLastModified)
         }
     }
 }
@@ -64,4 +67,5 @@ class SyncDataRequest(
     val bookmarks: SyncBookmarkUpdates
 )
 
+class SyncBookmarks(val bookmarks: SyncBookmarkUpdates)
 class SyncBookmarkUpdates(val updates: List<SyncBookmarkEntry>)

@@ -101,7 +101,7 @@ class SavedSitesSyncParser @Inject constructor(
             title = syncCrypto.encrypt(savedSite.title),
             url = syncCrypto.encrypt(savedSite.url),
             deleted = null,
-            clientLastModified = savedSite.lastModified ?: DatabaseDateFormatter.timestamp(),
+            clientLastModified = savedSite.lastModified ?: DatabaseDateFormatter.iso8601(),
         )
     }
 
@@ -114,7 +114,7 @@ class SavedSitesSyncParser @Inject constructor(
             title = syncCrypto.encrypt(bookmarkFolder.name),
             children = children,
             deleted = null,
-            clientLastModified = bookmarkFolder.lastModified ?: DatabaseDateFormatter.timestamp(),
+            clientLastModified = bookmarkFolder.lastModified ?: DatabaseDateFormatter.iso8601(),
         )
     }
 
@@ -164,7 +164,14 @@ data class SyncBookmarkEntry(
             deleted: String?,
             clientLastModified: String
         ): SyncBookmarkEntry {
-            return SyncBookmarkEntry(id, title, SyncBookmarkPage(url), null, deleted, clientLastModified)
+            return SyncBookmarkEntry(
+                id = id,
+                title = title,
+                page = SyncBookmarkPage(url),
+                folder = null,
+                deleted = deleted,
+                client_last_modified = clientLastModified,
+            )
         }
 
         fun asFolder(
