@@ -395,11 +395,10 @@ class AppSyncRepository @Inject constructor(
         }
     }
 
-    private fun Error.removeKeysIfInvalid(): Error {
+    private fun Error.removeKeysIfInvalid() {
         if (code == INVALID_LOGIN_CREDENTIALS.code) {
             syncStore.clearAll()
         }
-        return this
     }
 
     private class Adapters {
