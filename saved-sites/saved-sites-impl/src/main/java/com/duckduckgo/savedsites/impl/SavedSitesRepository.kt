@@ -88,7 +88,7 @@ class RealSavedSitesRepository(
         if (entity.type == FOLDER) {
             val numFolders = savedSitesRelationsDao.countEntitiesInFolder(entity.entityId, FOLDER)
             val numBookmarks = savedSitesRelationsDao.countEntitiesInFolder(entity.entityId, BOOKMARK)
-            folders.add(BookmarkFolder(entity.entityId, entity.title, folderId, numBookmarks, numFolders))
+            folders.add(BookmarkFolder(entity.entityId, entity.title, folderId, numBookmarks, numFolders, entity.lastModified))
         } else {
             bookmarks.add(Bookmark(entity.entityId, entity.title, entity.url.orEmpty(), folderId))
         }
@@ -409,7 +409,14 @@ class RealSavedSitesRepository(
         return if (entity != null) {
             val numFolders = savedSitesRelationsDao.countEntitiesInFolder(entity.entityId, FOLDER)
             val numBookmarks = savedSitesRelationsDao.countEntitiesInFolder(entity.entityId, BOOKMARK)
-            BookmarkFolder(folderId, entity.title, relation?.folderId ?: "", numFolders = numFolders, numBookmarks = numBookmarks)
+            BookmarkFolder(
+                folderId,
+                entity.title,
+                relation?.folderId ?: "",
+                numFolders = numFolders,
+                numBookmarks = numBookmarks,
+                lastModified = entity.lastModified,
+            )
         } else {
             null
         }
@@ -421,7 +428,14 @@ class RealSavedSitesRepository(
             val relation = savedSitesRelationsDao.relationByEntityId(entity.entityId)
             val numFolders = savedSitesRelationsDao.countEntitiesInFolder(entity.entityId, FOLDER)
             val numBookmarks = savedSitesRelationsDao.countEntitiesInFolder(entity.entityId, BOOKMARK)
-            BookmarkFolder(entity.entityId, entity.title, relation?.folderId ?: "", numFolders = numFolders, numBookmarks = numBookmarks)
+            BookmarkFolder(
+                entity.entityId,
+                entity.title,
+                relation?.folderId ?: "",
+                numFolders = numFolders,
+                numBookmarks = numBookmarks,
+                lastModified = entity.lastModified ?: "",
+            )
         } else {
             null
         }
@@ -453,7 +467,7 @@ class RealSavedSitesRepository(
 
     private fun Entity.mapToBookmark(relationId: String): Bookmark = Bookmark(this.entityId, this.title, this.url.orEmpty(), relationId)
     private fun Entity.mapToBookmarkFolder(relationId: String): BookmarkFolder =
-        BookmarkFolder(this.entityId, this.title, relationId)
+        BookmarkFolder(id = this.entityId, name = this.title, parentId =  relationId, lastModified = this.lastModified)
 
     private fun Entity.mapToFavorite(index: Int = 0): Favorite = Favorite(this.entityId, this.title, this.url.orEmpty(), index)
     private fun List<Entity>.mapToBookmarks(folderId: String = SavedSitesNames.BOOMARKS_ROOT): List<Bookmark> =

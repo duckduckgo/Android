@@ -45,6 +45,9 @@ dependencies {
     implementation Square.retrofit2.converter.moshi
     implementation "com.squareup.moshi:moshi-kotlin:_"
 
+    implementation "com.jakewharton.threetenabp:threetenabp:_"
+    testImplementation "org.threeten:threetenbp:_"
+
     // Testing dependencies
     testImplementation project(path: ':common-test')
     testImplementation AndroidX.core

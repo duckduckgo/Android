@@ -64,6 +64,8 @@ class AppSyncApiClient @Inject constructor(
     }
 
     private fun mapChanges(changes: List<SyncChanges>): String {
+        // for each item in the list, add new JSON Object
+        // add client timestamp
         return changes.first { it.type == BOOKMARKS }.updatesJSON
     }
 

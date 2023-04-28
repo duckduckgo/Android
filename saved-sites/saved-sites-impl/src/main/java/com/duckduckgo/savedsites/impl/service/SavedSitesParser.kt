@@ -16,6 +16,7 @@
 
 package com.duckduckgo.savedsites.impl.service
 
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
@@ -168,6 +169,7 @@ class RealSavedSitesParser : SavedSitesParser {
                             val bookmarkFolder = BookmarkFolder(
                                 name = folderName,
                                 parentId = folderParentId,
+                                lastModified = DatabaseDateFormatter.timestamp()
                             )
                             // if folder exists we use that one instead
                             val existingFolder = savedSitesRepository.getFolderByName(folderName)
