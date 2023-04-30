@@ -4,7 +4,6 @@ on:
   pull_request:
     branches:
       - develop
-      - feature/netp-develop
     paths-ignore:
       - '**.md'
       - '.github/**'
