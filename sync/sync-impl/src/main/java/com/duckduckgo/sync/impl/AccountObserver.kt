@@ -21,7 +21,9 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.api.DeviceSyncState
 import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.Lazy
 import dagger.SingleInstanceIn
 import javax.inject.*
 import kotlinx.coroutines.launch
@@ -33,12 +35,15 @@ import kotlinx.coroutines.launch
 )
 @SingleInstanceIn(AppScope::class)
 class AccountObserver @Inject constructor(
-    val syncRepository: SyncRepository,
+    val deviceSyncState: DeviceSyncState,
+    val syncRepository: Lazy<SyncRepository>,
     val dispatcherProvider: DispatcherProvider,
 ) : MainProcessLifecycleObserver {
     override fun onStart(owner: LifecycleOwner) {
+        if (!deviceSyncState.isFeatureEnabled()) return
+
         owner.lifecycleScope.launch(dispatcherProvider.io()) {
-            syncRepository.getConnectedDevices()
+            syncRepository.get().getConnectedDevices()
         }
     }
 }
