@@ -68,10 +68,14 @@
                     android:layout_height="wrap_content"
                     app:primaryText="@string/synced_devices_section_title"/>
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/syncedDevicesRecyclerView"
+                <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    app:primaryText="Android"
+                    app:secondaryText="This device"
+                    app:leadingIcon="@drawable/ic_device_mobile_24"
+                    app:leadingIconBackground="circular"
+                    app:trailingIcon="@drawable/ic_menu_vertical_24"/>
 
                 <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
                     android:layout_width="match_parent"
@@ -100,14 +104,12 @@
                     android:text="@string/sync_new_device_hint"/>
 
                 <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-                    android:id="@+id/showTextCodeItem"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryTextTruncated="true"
                     app:primaryText="@string/sync_show_text_code_item"/>
 
                 <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-                    android:id="@+id/scanQrCodeItem"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryTextTruncated="true"

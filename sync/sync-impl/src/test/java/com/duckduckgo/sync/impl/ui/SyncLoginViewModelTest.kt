@@ -77,14 +77,4 @@ class SyncLoginViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
-
-    @Test
-    fun whenOnLoginSuccessThenCommandIsLoginSuccess() = runTest {
-        testee.commands().test {
-            testee.onLoginSuccess()
-            val command = awaitItem()
-            assertTrue(command is Command.LoginSucess)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
 }

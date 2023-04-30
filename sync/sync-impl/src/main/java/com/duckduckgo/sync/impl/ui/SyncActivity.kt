@@ -27,30 +27,22 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.ui.view.dialog.CustomAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
-import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.PermissionRequest
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.ShareAction
 import com.duckduckgo.sync.impl.databinding.ActivitySyncBinding
-import com.duckduckgo.sync.impl.databinding.DialogEditDeviceBinding
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccount
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskEditDevice
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskRemoveDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ScanQRCode
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowTextCode
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
-import com.duckduckgo.sync.impl.ui.setup.ConnectFlowContract
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.*
@@ -62,18 +54,6 @@ import kotlinx.coroutines.flow.onEach
 class SyncActivity : DuckDuckGoActivity() {
     private val binding: ActivitySyncBinding by viewBinding()
     private val viewModel: SyncActivityViewModel by bindViewModel()
-
-    private val syncedDevicesAdapter = SyncedDevicesAdapter(
-        object : ConnectedDeviceClickListener {
-            override fun onEditDeviceClicked(device: ConnectedDevice) {
-                viewModel.onEditDeviceClicked(device)
-            }
-
-            override fun onRemoveDeviceClicked(device: ConnectedDevice) {
-                viewModel.onRemoveDeviceClicked(device)
-            }
-        },
-    )
 
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
@@ -93,17 +73,12 @@ class SyncActivity : DuckDuckGoActivity() {
         }
     }
 
-    private val connectFlow = registerForActivityResult(ConnectFlowContract()) { resultOk ->
-        // no-op
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
         observeUiEvents()
         registerForPermission()
-        setupRecyclerView()
     }
 
     private fun registerForPermission() {
@@ -112,16 +87,14 @@ class SyncActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun setupRecyclerView() {
-        with(binding.syncedDevicesRecyclerView) {
-            adapter = syncedDevicesAdapter
-            layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
-        }
+    override fun onStart() {
+        super.onStart()
+        viewModel.getSyncState()
     }
 
     private fun observeUiEvents() {
         viewModel.viewState()
-            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { viewState -> renderViewState(viewState) }
             .launchIn(lifecycleScope)
 
@@ -133,10 +106,7 @@ class SyncActivity : DuckDuckGoActivity() {
             LaunchDeviceSetupFlow -> {
                 startActivity(SetupAccountActivity.intentStartSetupFlow(this))
             }
-            is ScanQRCode -> {
-                connectFlow.launch(null)
-            }
-            is AskTurnOffSync -> askTurnOffsync(it.device)
+            AskTurnOffSync -> askTurnOffsync()
             AskDeleteAccount -> askDeleteAccount()
             is RecoveryCodePDFSuccess -> {
                 shareAction.shareFile(this@SyncActivity, it.recoveryCodePDFFile)
@@ -146,46 +116,7 @@ class SyncActivity : DuckDuckGoActivity() {
                     viewModel.generateRecoveryCode(this@SyncActivity)
                 }
             }
-            is AskRemoveDevice -> askRemoveDevice(it.device)
-            is AskEditDevice -> askEditDevice(it.device)
-            ShowTextCode -> {
-                startActivity(ShowCodeActivity.intent(this))
-            }
         }
-    }
-
-    private fun askEditDevice(device: ConnectedDevice) {
-        val inputBinding = DialogEditDeviceBinding.inflate(layoutInflater)
-        inputBinding.customDialogTextInput.text = device.deviceName
-        CustomAlertDialogBuilder(this)
-            .setTitle(R.string.edit_device_dialog_title)
-            .setPositiveButton(R.string.edit_device_dialog_primary_button)
-            .setNegativeButton(R.string.edit_device_dialog_secondary_button)
-            .setView(inputBinding)
-            .addEventListener(
-                object : CustomAlertDialogBuilder.EventListener() {
-                    override fun onPositiveButtonClicked() {
-                        val newText = inputBinding.customDialogTextInput.text
-                        viewModel.onDeviceEdited(device.copy(deviceName = newText))
-                    }
-                },
-            )
-            .show()
-    }
-
-    private fun askRemoveDevice(device: ConnectedDevice) {
-        TextAlertDialogBuilder(this)
-            .setTitle(R.string.remove_device_dialog_title)
-            .setMessage(getString(R.string.remove_device_dialog_content, device.deviceName))
-            .setPositiveButton(R.string.remove_device_dialog_primary_button)
-            .setNegativeButton(R.string.remove_device_dialog_secondary_button)
-            .addEventListener(
-                object : TextAlertDialogBuilder.EventListener() {
-                    override fun onPositiveButtonClicked() {
-                        viewModel.onRemoveDeviceConfirmed(device)
-                    }
-                },
-            ).show()
     }
 
     private fun askDeleteAccount() {
@@ -208,7 +139,7 @@ class SyncActivity : DuckDuckGoActivity() {
             ).show()
     }
 
-    private fun askTurnOffsync(device: ConnectedDevice) {
+    private fun askTurnOffsync() {
         TextAlertDialogBuilder(this)
             .setTitle(R.string.turn_off_sync_dialog_title)
             .setMessage(getString(R.string.turn_off_sync_dialog_content))
@@ -217,7 +148,7 @@ class SyncActivity : DuckDuckGoActivity() {
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
-                        viewModel.onTurnOffSyncConfirmed(device)
+                        viewModel.onTurnOffSyncConfirmed()
                     }
 
                     override fun onNegativeButtonClicked() {
@@ -228,7 +159,7 @@ class SyncActivity : DuckDuckGoActivity() {
     }
 
     private fun renderViewState(viewState: ViewState) {
-        binding.deviceSyncStatusToggle.quietlySetIsChecked(viewState.syncToggleState, deviceSyncStatusToggleListener)
+        binding.deviceSyncStatusToggle.quietlySetIsChecked(viewState.isDeviceSyncEnabled, deviceSyncStatusToggleListener)
         binding.viewSwitcher.displayedChild = if (viewState.showAccount) 1 else 0
 
         if (viewState.showAccount) {
@@ -244,13 +175,6 @@ class SyncActivity : DuckDuckGoActivity() {
             binding.deleteAccountButton.setOnClickListener {
                 viewModel.onDeleteAccountClicked()
             }
-            binding.scanQrCodeItem.setOnClickListener {
-                viewModel.onScanQRCodeClicked()
-            }
-            binding.showTextCodeItem.setOnClickListener {
-                viewModel.onShowTextCodeClicked()
-            }
         }
-        syncedDevicesAdapter.updateData(viewState.syncedDevices)
     }
 }

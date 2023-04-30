@@ -42,7 +42,6 @@ import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Check
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Error
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Finish
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.RecoveryCodePDFSuccess
-import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.CreatingAccount
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.SignedIn
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewState
@@ -94,7 +93,6 @@ class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_c
             viewModel.onSaveRecoveryCodeClicked()
         }
         binding.footerSecondaryButton.setOnClickListener {
-            viewModel.onCopyCodeClicked()
         }
         binding.footerNextButton.setOnClickListener {
             viewModel.onNextClicked()
@@ -119,9 +117,7 @@ class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_c
     private fun processCommand(it: Command) {
         when (it) {
             Error -> requireActivity().finish()
-            is Finish -> {
-                requireActivity().finish()
-            }
+            Finish -> requireActivity().finish()
             is RecoveryCodePDFSuccess -> {
                 shareAction.shareFile(requireContext(), it.recoveryCodePDFFile)
             }
@@ -129,10 +125,6 @@ class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_c
                 storagePermission.invokeOrRequestPermission {
                     viewModel.generateRecoveryCode(requireContext())
                 }
-            }
-
-            is ShowMessage -> {
-                Snackbar.make(binding.root, it.message, Snackbar.LENGTH_LONG).show()
             }
         }
     }

@@ -21,7 +21,6 @@ import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.sync.impl.AppSyncDeviceIds
 import com.duckduckgo.sync.impl.Type
 import com.duckduckgo.sync.store.SyncStore
-import kotlinx.coroutines.flow.emptyFlow
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -108,23 +107,9 @@ class AppSyncDeviceIdsTest {
             override var token: String? = "token"
             override var primaryKey: String? = "primaryKey"
             override var secretKey: String? = "secretKey"
+            override var recoveryCode: String? = "recoveryCode"
 
-            override fun isSignedInFlow() = emptyFlow<Boolean>()
-
-            override fun isSignedIn(): Boolean = primaryKey != null
-
-            override fun storeCredentials(
-                userId: String,
-                deviceId: String,
-                deviceName: String,
-                primaryKey: String,
-                secretKey: String,
-                token: String,
-            ) {
-                /* no-op */
-            }
-
-            override fun clearAll() {
+            override fun clearAll(keepRecoveryCode: Boolean) {
                 /* no-op */
             }
         }
@@ -138,22 +123,9 @@ class AppSyncDeviceIdsTest {
             override var token: String? = null
             override var primaryKey: String? = null
             override var secretKey: String? = null
-            override fun isSignedInFlow() = emptyFlow<Boolean>()
+            override var recoveryCode: String? = null
 
-            override fun isSignedIn(): Boolean = false
-
-            override fun storeCredentials(
-                userId: String,
-                deviceId: String,
-                deviceName: String,
-                primaryKey: String,
-                secretKey: String,
-                token: String,
-            ) {
-                /* no-op */
-            }
-
-            override fun clearAll() {
+            override fun clearAll(keepRecoveryCode: Boolean) {
                 /* no-op */
             }
         }

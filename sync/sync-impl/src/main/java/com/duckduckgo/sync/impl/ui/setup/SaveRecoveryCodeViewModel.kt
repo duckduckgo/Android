@@ -23,7 +23,6 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.RecoveryCodePDF
@@ -33,7 +32,6 @@ import com.duckduckgo.sync.impl.SyncRepository
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Finish
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.RecoveryCodePDFSuccess
-import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.CreatingAccount
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.SignedIn
 import java.io.File
@@ -51,7 +49,6 @@ class SaveRecoveryCodeViewModel @Inject constructor(
     private val qrEncoder: QREncoder,
     private val recoveryCodePDF: RecoveryCodePDF,
     private val syncRepository: SyncRepository,
-    private val clipboard: Clipboard,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
@@ -102,7 +99,6 @@ class SaveRecoveryCodeViewModel @Inject constructor(
 
     sealed class Command {
         object Finish : Command()
-        data class ShowMessage(val message: Int) : Command()
         object Error : Command()
         object CheckIfUserHasStoragePermission : Command()
         data class RecoveryCodePDFSuccess(val recoveryCodePDFFile: File) : Command()
@@ -111,14 +107,6 @@ class SaveRecoveryCodeViewModel @Inject constructor(
     fun onNextClicked() {
         viewModelScope.launch {
             command.send(Finish)
-        }
-    }
-
-    fun onCopyCodeClicked() {
-        viewModelScope.launch(dispatchers.io()) {
-            val recoveryCodeB64 = syncRepository.getRecoveryCode() ?: return@launch
-            clipboard.copyToClipboard(recoveryCodeB64)
-            command.send(ShowMessage(R.string.sync_code_copied_message))
         }
     }
 

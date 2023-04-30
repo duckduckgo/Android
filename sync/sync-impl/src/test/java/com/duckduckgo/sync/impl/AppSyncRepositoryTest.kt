@@ -24,7 +24,6 @@ import com.duckduckgo.sync.TestSyncFixtures.accountKeysFailed
 import com.duckduckgo.sync.TestSyncFixtures.connectDeviceKeysNotFoundError
 import com.duckduckgo.sync.TestSyncFixtures.connectDeviceSuccess
 import com.duckduckgo.sync.TestSyncFixtures.connectKeys
-import com.duckduckgo.sync.TestSyncFixtures.connectedDevice
 import com.duckduckgo.sync.TestSyncFixtures.decryptedSecretKey
 import com.duckduckgo.sync.TestSyncFixtures.deleteAccountInvalid
 import com.duckduckgo.sync.TestSyncFixtures.deleteAccountSuccess
@@ -102,14 +101,12 @@ class AppSyncRepositoryTest {
         val result = syncRepo.createAccount()
 
         assertEquals(Result.Success(true), result)
-        verify(syncStore).storeCredentials(
-            userId = userId,
-            deviceId = deviceId,
-            deviceName = deviceName,
-            primaryKey = primaryKey,
-            secretKey = secretKey,
-            token = token,
-        )
+        verify(syncStore).userId = userId
+        verify(syncStore).deviceId = deviceId
+        verify(syncStore).deviceName = deviceName
+        verify(syncStore).token = token
+        verify(syncStore).primaryKey = primaryKey
+        verify(syncStore).secretKey = secretKey
     }
 
     @Test
@@ -176,14 +173,14 @@ class AppSyncRepositoryTest {
     }
 
     @Test
-    fun whenLogoutFailsWithInvalidLoginCredentialsThenReturnErrorAndClearData() {
+    fun whenLogoutFailsThenReturnError() {
         givenAuthenticatedDevice()
         whenever(syncApi.logout(token, deviceId)).thenReturn(logoutInvalid)
 
         val result = syncRepo.logout(deviceId)
 
         assertTrue(result is Result.Error)
-        verify(syncStore).clearAll()
+        verify(syncStore, times(0)).clearAll()
     }
 
     @Test
@@ -210,14 +207,30 @@ class AppSyncRepositoryTest {
     }
 
     @Test
-    fun whenDeleteAccountFailsWithInvalidLoginCredentialsThenReturnErrorAndClearData() {
+    fun whenDeleteAccountFailsThenReturnError() {
         givenAuthenticatedDevice()
         whenever(syncApi.deleteAccount(token)).thenReturn(deleteAccountInvalid)
 
         val result = syncRepo.deleteAccount()
 
         assertTrue(result is Result.Error)
-        verify(syncStore).clearAll()
+        verify(syncStore, times(0)).clearAll()
+    }
+
+    @Test
+    fun whenLoginSucceedsThenAccountPersisted() {
+        whenever(syncStore.recoveryCode).thenReturn(jsonRecoveryKey)
+        prepareForLoginSuccess()
+
+        val result = syncRepo.login()
+
+        assertEquals(Result.Success(true), result)
+        verify(syncStore).userId = userId
+        verify(syncStore).deviceId = deviceId
+        verify(syncStore).deviceName = deviceName
+        verify(syncStore).token = token
+        verify(syncStore).primaryKey = primaryKey
+        verify(syncStore).secretKey = secretKey
     }
 
     @Test
@@ -227,22 +240,30 @@ class AppSyncRepositoryTest {
         val result = syncRepo.login(jsonRecoveryKeyEncoded)
 
         assertEquals(Result.Success(true), result)
-        verify(syncStore).storeCredentials(
-            userId = userId,
-            deviceId = deviceId,
-            deviceName = deviceName,
-            primaryKey = primaryKey,
-            secretKey = secretKey,
-            token = token,
-        )
+        verify(syncStore).userId = userId
+        verify(syncStore).deviceId = deviceId
+        verify(syncStore).deviceName = deviceName
+        verify(syncStore).token = token
+        verify(syncStore).primaryKey = primaryKey
+        verify(syncStore).secretKey = secretKey
+    }
+
+    @Test
+    fun whenRecoveryCodeNotFoudnThenReturnError() {
+        whenever(syncStore.recoveryCode).thenReturn(null)
+
+        val result = syncRepo.login()
+
+        assertTrue(result is Result.Error)
     }
 
     @Test
     fun whenGenerateKeysFromRecoveryCodeFailsThenReturnError() {
+        whenever(syncStore.recoveryCode).thenReturn(jsonRecoveryKey)
         prepareToProvideDeviceIds()
         whenever(nativeLib.prepareForLogin(primaryKey = primaryKey)).thenReturn(failedLoginKeys)
 
-        val result = syncRepo.login(jsonRecoveryKey)
+        val result = syncRepo.login()
 
         assertTrue(result is Result.Error)
     }
@@ -259,12 +280,13 @@ class AppSyncRepositoryTest {
 
     @Test
     fun whenLoginFailsThenReturnError() {
+        whenever(syncStore.recoveryCode).thenReturn(jsonRecoveryKey)
         prepareToProvideDeviceIds()
         prepareForEncryption()
         whenever(nativeLib.prepareForLogin(primaryKey = primaryKey)).thenReturn(validLoginKeys)
         whenever(syncApi.login(userId, hashedPassword, deviceId, deviceName, deviceFactor)).thenReturn(loginFailed)
 
-        val result = syncRepo.login(jsonRecoveryKey)
+        val result = syncRepo.login()
 
         assertTrue(result is Result.Error)
     }
@@ -284,13 +306,14 @@ class AppSyncRepositoryTest {
 
     @Test
     fun whenDecryptSecretKeyFailsThenReturnError() {
+        whenever(syncStore.recoveryCode).thenReturn(jsonRecoveryKey)
         prepareToProvideDeviceIds()
         prepareForEncryption()
         whenever(nativeLib.prepareForLogin(primaryKey = primaryKey)).thenReturn(validLoginKeys)
         whenever(nativeLib.decrypt(encryptedData = protectedEncryptionKey, secretKey = stretchedPrimaryKey)).thenReturn(invalidDecryptedSecretKey)
         whenever(syncApi.login(userId, hashedPassword, deviceId, deviceName, deviceFactor)).thenReturn(loginSuccess)
 
-        val result = syncRepo.login(jsonRecoveryKey)
+        val result = syncRepo.login()
 
         assertTrue(result is Result.Error)
     }
@@ -306,20 +329,6 @@ class AppSyncRepositoryTest {
         val result = syncRepo.getConnectedDevices() as Success
 
         assertEquals(listOfConnectedDevices, result.data)
-    }
-
-    @Test
-    fun getConnectedDevicesReturnsListWithLocalDeviceInFirstPosition() {
-        givenAuthenticatedDevice()
-        prepareForEncryption()
-        val thisDevice = Device(deviceId = deviceId, deviceName = deviceName, jwIat = "", deviceType = deviceFactor)
-        val anotherDevice = Device(deviceId = "anotherDeviceId", deviceName = deviceName, jwIat = "", deviceType = deviceFactor)
-        val anotherRemoteDevice = Device(deviceId = "anotherRemoteDeviceId", deviceName = deviceName, jwIat = "", deviceType = deviceFactor)
-        whenever(syncApi.getDevices(anyString())).thenReturn(Result.Success(listOf(anotherDevice, anotherRemoteDevice, thisDevice)))
-
-        val result = syncRepo.getConnectedDevices() as Success
-
-        assertTrue(result.data.first().thisDevice)
     }
 
     @Test
@@ -396,8 +405,7 @@ class AppSyncRepositoryTest {
 
     @Test
     fun whenConnectingUsingQRFromUnauthenticatedDeviceThenAccountCreatedAndConnects() {
-        whenever(syncStore.primaryKey).thenReturn(primaryKey)
-        whenever(syncStore.isSignedIn()).thenReturn(false).thenReturn(true)
+        whenever(syncStore.primaryKey).thenReturn(null).thenReturn(primaryKey)
         whenever(syncStore.userId).thenReturn(userId)
         whenever(syncStore.deviceId).thenReturn(deviceId)
         whenever(syncStore.token).thenReturn(token)
@@ -443,36 +451,11 @@ class AppSyncRepositoryTest {
         whenever(syncStore.deviceName).thenReturn(deviceName)
         whenever(syncDeviceIds.deviceType()).thenReturn(deviceType)
 
-        val result = syncRepo.getThisConnectedDevice()!!
-
-        assertEquals(deviceId, result?.deviceId)
-        assertEquals(deviceName, result?.deviceName)
-        assertEquals(deviceType, result?.deviceType)
-    }
-
-    @Test
-    fun whenGetThisConnectedDeviceAndNotAuthenticatedThenReturnNull() {
         val result = syncRepo.getThisConnectedDevice()
 
-        assertNull(result)
-    }
-
-    @Test
-    fun whenRenameDeviceUnAuthenticatedThenReturnError() {
-        val result = syncRepo.renameDevice(connectedDevice)
-
-        assertTrue(result is Result.Error)
-    }
-
-    @Test
-    fun whenRenameDeviceSuccessThenReturnSuccess() {
-        givenAuthenticatedDevice()
-        prepareForLoginSuccess()
-
-        val result = syncRepo.renameDevice(connectedDevice)
-
-        verify(syncApi).login(anyString(), anyString(), eq(connectedDevice.deviceId), anyString(), anyString())
-        assertTrue(result is Result.Success)
+        assertEquals(deviceId, result.deviceId)
+        assertEquals(deviceName, result.deviceName)
+        assertEquals(deviceType, result.deviceType)
     }
 
     private fun prepareForLoginSuccess() {
@@ -491,7 +474,6 @@ class AppSyncRepositoryTest {
         whenever(syncStore.primaryKey).thenReturn(primaryKey)
         whenever(syncStore.secretKey).thenReturn(secretKey)
         whenever(syncStore.token).thenReturn(token)
-        whenever(syncStore.isSignedIn()).thenReturn(true)
     }
 
     private fun prepareToProvideDeviceIds() {

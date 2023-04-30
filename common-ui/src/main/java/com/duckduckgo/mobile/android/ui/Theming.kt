@@ -71,7 +71,6 @@ object Theming {
             "com.duckduckgo.sync.impl.ui.SyncLoginActivity",
             "com.duckduckgo.sync.impl.ui.SyncConnectActivity",
             "com.duckduckgo.sync.impl.ui.ShowQRCodeActivity",
-            "com.duckduckgo.sync.impl.ui.EnterCodeActivity",
         )
     }
 }

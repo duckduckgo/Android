@@ -24,7 +24,6 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncRepository
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSucess
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ReadQRCode
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ReadTextCode
@@ -33,8 +32,6 @@ import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
@@ -45,25 +42,6 @@ class SyncConnectViewModel @Inject constructor(
 ) : ViewModel() {
     private val command = Channel<Command>(1, DROP_OLDEST)
     fun commands(): Flow<Command> = command.receiveAsFlow()
-
-    private val viewState = MutableStateFlow(ViewState())
-    fun viewState(): Flow<ViewState> = viewState.onStart {
-        val viewMode = if (syncRepository.isSignedIn()) {
-            ViewMode.SignedIn
-        } else {
-            ViewMode.UnAuthenticated
-        }
-        viewState.emit(ViewState(viewMode))
-    }
-
-    data class ViewState(
-        val viewMode: ViewMode = ViewMode.UnAuthenticated,
-    )
-
-    sealed class ViewMode {
-        object SignedIn : ViewMode()
-        object UnAuthenticated : ViewMode()
-    }
 
     sealed class Command {
         object ReadQRCode : Command()
