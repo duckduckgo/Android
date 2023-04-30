@@ -221,6 +221,24 @@ class AppSyncRepositoryTest {
     }
 
     @Test
+    fun whenLoginSucceedsThenAccountPersisted() {
+        whenever(syncStore.recoveryCode).thenReturn(jsonRecoveryKey)
+        prepareForLoginSuccess()
+
+        val result = syncRepo.login()
+
+        assertEquals(Result.Success(true), result)
+        verify(syncStore).storeCredentials(
+            userId = userId,
+            deviceId = deviceId,
+            deviceName = deviceName,
+            primaryKey = primaryKey,
+            secretKey = secretKey,
+            token = token,
+        )
+    }
+
+    @Test
     fun whenLoginFromQRSucceedsThenAccountPersisted() {
         prepareForLoginSuccess()
 
@@ -238,11 +256,21 @@ class AppSyncRepositoryTest {
     }
 
     @Test
+    fun whenRecoveryCodeNotFoudnThenReturnError() {
+        whenever(syncStore.recoveryCode).thenReturn(null)
+
+        val result = syncRepo.login()
+
+        assertTrue(result is Result.Error)
+    }
+
+    @Test
     fun whenGenerateKeysFromRecoveryCodeFailsThenReturnError() {
+        whenever(syncStore.recoveryCode).thenReturn(jsonRecoveryKey)
         prepareToProvideDeviceIds()
         whenever(nativeLib.prepareForLogin(primaryKey = primaryKey)).thenReturn(failedLoginKeys)
 
-        val result = syncRepo.login(jsonRecoveryKey)
+        val result = syncRepo.login()
 
         assertTrue(result is Result.Error)
     }
@@ -259,12 +287,13 @@ class AppSyncRepositoryTest {
 
     @Test
     fun whenLoginFailsThenReturnError() {
+        whenever(syncStore.recoveryCode).thenReturn(jsonRecoveryKey)
         prepareToProvideDeviceIds()
         prepareForEncryption()
         whenever(nativeLib.prepareForLogin(primaryKey = primaryKey)).thenReturn(validLoginKeys)
         whenever(syncApi.login(userId, hashedPassword, deviceId, deviceName, deviceFactor)).thenReturn(loginFailed)
 
-        val result = syncRepo.login(jsonRecoveryKey)
+        val result = syncRepo.login()
 
         assertTrue(result is Result.Error)
     }
@@ -284,13 +313,14 @@ class AppSyncRepositoryTest {
 
     @Test
     fun whenDecryptSecretKeyFailsThenReturnError() {
+        whenever(syncStore.recoveryCode).thenReturn(jsonRecoveryKey)
         prepareToProvideDeviceIds()
         prepareForEncryption()
         whenever(nativeLib.prepareForLogin(primaryKey = primaryKey)).thenReturn(validLoginKeys)
         whenever(nativeLib.decrypt(encryptedData = protectedEncryptionKey, secretKey = stretchedPrimaryKey)).thenReturn(invalidDecryptedSecretKey)
         whenever(syncApi.login(userId, hashedPassword, deviceId, deviceName, deviceFactor)).thenReturn(loginSuccess)
 
-        val result = syncRepo.login(jsonRecoveryKey)
+        val result = syncRepo.login()
 
         assertTrue(result is Result.Error)
     }
