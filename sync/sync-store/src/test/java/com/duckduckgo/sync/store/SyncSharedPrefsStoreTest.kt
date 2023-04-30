@@ -18,16 +18,12 @@ package com.duckduckgo.sync.store
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
 class SyncSharedPrefsStoreTest {
     private lateinit var store: SyncSharedPrefsStore
@@ -36,7 +32,7 @@ class SyncSharedPrefsStoreTest {
 
     @Before
     fun setUp() {
-        store = SyncSharedPrefsStore(sharedPrefsProvider, TestScope())
+        store = SyncSharedPrefsStore(sharedPrefsProvider)
     }
 
     @Test
@@ -64,49 +60,5 @@ class SyncSharedPrefsStoreTest {
         assertEquals("test_device_id", store.deviceId)
         store.deviceId = null
         assertNull(store.deviceId)
-    }
-
-    @Test
-    fun whenStoreCredentialsThenValuesUpdatedInPrefsStore() {
-        assertNull(store.userId)
-        assertNull(store.deviceName)
-        assertNull(store.deviceId)
-        assertNull(store.primaryKey)
-        assertNull(store.secretKey)
-        assertNull(store.token)
-        store.storeCredentials("userId", "deviceId", "deviceName", "primaryKey", "secretKey", "token")
-        assertEquals("userId", store.userId)
-        assertEquals("deviceName", store.deviceName)
-        assertEquals("deviceId", store.deviceId)
-        assertEquals("primaryKey", store.primaryKey)
-        assertEquals("secretKey", store.secretKey)
-        assertEquals("token", store.token)
-    }
-
-    @Test
-    fun whenIsSignedInThenReturnTrueIfUserHasAuthKeys() {
-        store.storeCredentials("userId", "deviceId", "deviceName", "primaryKey", "secretKey", "token")
-
-        assertTrue(store.isSignedIn())
-    }
-
-    @Test
-    fun whenClearAllThenReturnRemoveAllKeys() {
-        store.storeCredentials("userId", "deviceId", "deviceName", "primaryKey", "secretKey", "token")
-        assertEquals("userId", store.userId)
-        assertEquals("deviceName", store.deviceName)
-        assertEquals("deviceId", store.deviceId)
-        assertEquals("primaryKey", store.primaryKey)
-        assertEquals("secretKey", store.secretKey)
-        assertEquals("token", store.token)
-
-        store.clearAll()
-
-        assertNull(store.userId)
-        assertNull(store.deviceName)
-        assertNull(store.deviceId)
-        assertNull(store.primaryKey)
-        assertNull(store.secretKey)
-        assertNull(store.token)
     }
 }

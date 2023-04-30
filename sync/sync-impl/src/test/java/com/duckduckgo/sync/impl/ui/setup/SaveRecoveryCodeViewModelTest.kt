@@ -23,7 +23,6 @@ import com.duckduckgo.sync.TestSyncFixtures
 import com.duckduckgo.sync.TestSyncFixtures.accountCreatedFailInvalid
 import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKeyEncoded
 import com.duckduckgo.sync.TestSyncFixtures.pdfFile
-import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.RecoveryCodePDF
 import com.duckduckgo.sync.impl.Result
@@ -42,7 +41,6 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -55,13 +53,11 @@ class SaveRecoveryCodeViewModelTest {
     private val qrEncoder: QREncoder = mock()
     private val recoveryPDF: RecoveryCodePDF = mock()
     private val syncRepository: SyncRepository = mock()
-    private val clipboard: Clipboard = mock()
 
     private val testee = SaveRecoveryCodeViewModel(
         qrEncoder,
         recoveryPDF,
         syncRepository,
-        clipboard,
         coroutineTestRule.testDispatcherProvider,
     )
 
@@ -142,18 +138,6 @@ class SaveRecoveryCodeViewModelTest {
             testee.generateRecoveryCode(mock())
             val command = awaitItem()
             assertTrue(command is RecoveryCodePDFSuccess)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenUserClicksCopyThenCopyToClipboard() = runTest {
-        whenever(syncRepository.getRecoveryCode()).thenReturn(jsonRecoveryKeyEncoded)
-        testee.commands().test {
-            testee.onCopyCodeClicked()
-            val command = awaitItem()
-            verify(clipboard).copyToClipboard(eq(jsonRecoveryKeyEncoded))
-            assertTrue(command is Command.ShowMessage)
             cancelAndIgnoreRemainingEvents()
         }
     }

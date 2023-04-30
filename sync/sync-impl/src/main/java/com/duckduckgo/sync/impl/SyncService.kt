@@ -169,7 +169,3 @@ data class DataResponse(
     val settings: SettingsResponse,
     val devices: DeviceDataResponse,
 )
-
-enum class API_CODE(val code: Int) {
-    INVALID_LOGIN_CREDENTIALS(401),
-}

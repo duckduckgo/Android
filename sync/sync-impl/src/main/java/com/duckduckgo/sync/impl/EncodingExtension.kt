@@ -19,7 +19,7 @@ package com.duckduckgo.sync.impl
 import android.util.Base64
 
 internal fun String.encodeB64(): String {
-    return Base64.encodeToString(this.toByteArray(), Base64.NO_WRAP)
+    return Base64.encodeToString(this.toByteArray(), Base64.DEFAULT)
 }
 
 internal fun String.decodeB64(): String {

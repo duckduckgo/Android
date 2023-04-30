@@ -203,7 +203,7 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
             )
             call.execute()
         }.getOrElse { throwable ->
-            return Result.Error(reason = throwable.toString())
+            return Result.Error(reason = throwable.message.toString())
         }
 
         return onSuccess(response) {

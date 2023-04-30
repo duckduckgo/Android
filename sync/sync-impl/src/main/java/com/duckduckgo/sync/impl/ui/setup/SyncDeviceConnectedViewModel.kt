@@ -44,7 +44,7 @@ class SyncDeviceConnectedViewModel @Inject constructor(
     private val viewState = MutableStateFlow<ViewState?>(null)
 
     fun viewState(): Flow<ViewState> = viewState.filterNotNull().onStart {
-        val result = syncRepository.getThisConnectedDevice() ?: throw IllegalStateException("This connected device not found")
+        val result = syncRepository.getThisConnectedDevice()
         emit(ViewState(result.deviceType.type().asDrawableRes(), result.deviceName))
     }
 

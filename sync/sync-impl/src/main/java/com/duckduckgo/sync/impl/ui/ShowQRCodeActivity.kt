@@ -19,7 +19,6 @@ package com.duckduckgo.sync.impl.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -31,7 +30,6 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.databinding.ActivityShowQrCodeBinding
 import com.duckduckgo.sync.impl.ui.ShowQRCodeViewModel.Command.Error
 import com.duckduckgo.sync.impl.ui.ShowQRCodeViewModel.Command.LoginSucess
-import com.duckduckgo.sync.impl.ui.ShowQRCodeViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.ShowQRCodeViewModel.ViewState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -66,9 +64,6 @@ class ShowQRCodeActivity : DuckDuckGoActivity() {
         viewState.qrCodeBitmap?.let {
             binding.qrCodeImageView.show()
             binding.qrCodeImageView.setImageBitmap(it)
-            binding.copyCodeButton.setOnClickListener {
-                viewModel.onCopyCodeClicked()
-            }
         }
     }
 
@@ -82,10 +77,6 @@ class ShowQRCodeActivity : DuckDuckGoActivity() {
             LoginSucess -> {
                 setResult(RESULT_OK)
                 finish()
-            }
-
-            is ShowMessage -> {
-                Toast.makeText(this, command.messageId, Toast.LENGTH_SHORT).show()
             }
         }
     }
