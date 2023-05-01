@@ -25,7 +25,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
-import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerDao
 import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
@@ -36,6 +35,7 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerEntity
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportViewModel
 import kotlin.time.ExperimentalTime
@@ -66,7 +66,6 @@ class PrivacyReportViewModelTest {
     private lateinit var repository: AppTrackerBlockingStatsRepository
     private lateinit var vpnPreferences: VpnPreferences
     private lateinit var db: VpnDatabase
-    private lateinit var vpnTrackerDao: VpnTrackerDao
     private val vpnStore = mock<VpnStore>()
     private val vpnStateMonitor = mock<VpnStateMonitor>()
     private val vpnFeatureRemover = mock<VpnFeatureRemover>()
@@ -92,7 +91,6 @@ class PrivacyReportViewModelTest {
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, VpnDatabase::class.java)
             .allowMainThreadQueries()
             .build()
-        vpnTrackerDao = db.vpnTrackerDao()
     }
 
     @After
@@ -153,12 +151,23 @@ class PrivacyReportViewModelTest {
             companyDisplayName = "",
             trackingApp = defaultTrackingApp,
         )
-        vpnTrackerDao.insert(tracker)
+        val trackers = listOf(tracker)
+        repository.insert(trackers)
+        db.vpnAppTrackerBlockingDao().insertTrackerEntities(trackers.map { it.asEntity() })
     }
 
     private fun yesterday(): String {
         val now = LocalDateTime.now()
         val yesterday = now.minusDays(1)
         return DatabaseDateFormatter.bucketByHour(yesterday)
+    }
+
+    private fun VpnTracker.asEntity(): AppTrackerEntity {
+        return AppTrackerEntity(
+            trackerCompanyId = this.trackerCompanyId,
+            entityName = "name",
+            score = 0,
+            signals = emptyList(),
+        )
     }
 }

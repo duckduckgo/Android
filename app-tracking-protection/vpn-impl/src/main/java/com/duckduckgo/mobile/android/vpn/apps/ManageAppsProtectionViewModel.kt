@@ -27,8 +27,8 @@ import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.FilterType
 import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.InfoPanelType
 import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity.Companion.AppsFilter
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
-import com.duckduckgo.mobile.android.vpn.model.BucketizedVpnTracker
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
+import com.duckduckgo.mobile.android.vpn.model.VpnTrackerWithEntity
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.TimeWindow
@@ -135,19 +135,19 @@ class ManageAppsProtectionViewModel @Inject constructor(
             .flowOn(dispatcherProvider.io())
 
     private suspend fun aggregateDataPerApp(
-        trackerData: List<BucketizedVpnTracker>,
+        trackerData: List<VpnTrackerWithEntity>,
     ): List<TrackingApp> {
         val sourceData = mutableListOf<TrackingApp>()
-        val perSessionData = trackerData.groupBy { it.trackerCompanySignal.tracker.bucket }
+        val perSessionData = trackerData.groupBy { it.tracker.bucket }
 
         perSessionData.values.forEach { sessionTrackers ->
             coroutineContext.ensureActive()
 
-            val perAppData = sessionTrackers.groupBy { it.trackerCompanySignal.tracker.trackingApp.packageId }
+            val perAppData = sessionTrackers.groupBy { it.tracker.trackingApp.packageId }
 
             perAppData.values.forEach { appTrackers ->
-                val item = appTrackers.sortedByDescending { it.trackerCompanySignal.tracker.timestamp }.first()
-                sourceData.add(item.trackerCompanySignal.tracker.trackingApp)
+                val item = appTrackers.sortedByDescending { it.tracker.timestamp }.first()
+                sourceData.add(item.tracker.trackingApp)
             }
         }
 

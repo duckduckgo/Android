@@ -30,6 +30,7 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRule
 import com.duckduckgo.vpn.internal.databinding.ActivityExceptionRulesDebugBinding
@@ -43,6 +44,9 @@ import logcat.logcat
 
 @InjectWith(ActivityScope::class)
 class ExceptionRulesDebugActivity : DuckDuckGoActivity(), RuleTrackerView.RuleTrackerListener {
+
+    @Inject
+    lateinit var appTrackerBlockingRepository: AppTrackerBlockingStatsRepository
 
     @Inject
     lateinit var vpnDatabase: VpnDatabase
@@ -113,7 +117,7 @@ class ExceptionRulesDebugActivity : DuckDuckGoActivity(), RuleTrackerView.RuleTr
             .asSequence()
             .map { InstalledApp(it.packageName, packageManager.getApplicationLabel(it).toString()) }
             .map {
-                val blockedTrackers = vpnDatabase.vpnTrackerDao().getTrackersForApp(it.packageName)
+                val blockedTrackers = appTrackerBlockingRepository.getTrackersForApp(it.packageName)
                     .map { tracker -> tracker.domain }
                     .toSortedSet() // dedup
                 InstalledAppTrackers(it.packageName, it.name, blockedTrackers)

@@ -21,12 +21,12 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
-import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerDao
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerEntity
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationFactory.DeviceShieldNotification
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -46,7 +46,6 @@ class DeviceShieldDailyNotificationFactoryTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private lateinit var db: VpnDatabase
-    private lateinit var vpnTrackerDao: VpnTrackerDao
     private lateinit var appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository
 
     private lateinit var factory: DeviceShieldNotificationFactory
@@ -56,7 +55,6 @@ class DeviceShieldDailyNotificationFactoryTest {
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, VpnDatabase::class.java)
             .allowMainThreadQueries()
             .build()
-        vpnTrackerDao = db.vpnTrackerDao()
         appTrackerBlockingStatsRepository = RealAppTrackerBlockingStatsRepository(db, coroutineTestRule.testDispatcherProvider)
 
         factory =
@@ -233,23 +231,17 @@ class DeviceShieldDailyNotificationFactoryTest {
             company = company,
             trackingApp = appContainingTracker,
         )
-        vpnTrackerDao.insert(tracker)
+        val trackers = listOf(tracker)
+        appTrackerBlockingStatsRepository.insert(trackers)
+        db.vpnAppTrackerBlockingDao().insertTrackerEntities(trackers.map { it.asEntity() })
     }
 
-    private fun aTrackerAndCompany(
-        domain: String = "example.com",
-        trackerCompanyName: String = "Tracking LLC",
-        trackerCompanyId: Int = -1,
-        appContainingTracker: TrackingApp = defaultApp(),
-        timestamp: String = DatabaseDateFormatter.bucketByHour(),
-    ): VpnTracker {
-        return VpnTracker(
-            trackerCompanyId = trackerCompanyId,
-            domain = domain,
-            timestamp = timestamp,
-            companyDisplayName = trackerCompanyName,
-            company = trackerCompanyName,
-            trackingApp = appContainingTracker,
+    private fun VpnTracker.asEntity(): AppTrackerEntity {
+        return AppTrackerEntity(
+            trackerCompanyId = this.trackerCompanyId,
+            entityName = "name",
+            score = 0,
+            signals = emptyList(),
         )
     }
 

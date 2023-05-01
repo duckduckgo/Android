@@ -24,6 +24,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.dao.VpnFeatureRemoverState
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationWorker
+import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.ui.notification.AndroidDeviceShieldAlertNotificationBuilder
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationScheduler.Companion.VPN_DAILY_NOTIFICATION_ID
@@ -46,6 +47,7 @@ class DefaultVpnFeatureRemover @Inject constructor(
     private val vpnStore: VpnStore,
     private val notificationManager: NotificationManagerCompat,
     private val vpnDatabase: VpnDatabase,
+    private val appTrackerBlockingRepository: AppTrackerBlockingStatsRepository,
     // we use the Provider to avoid a cycle dependency
     private val workManagerProvider: Provider<WorkManager>,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
@@ -92,7 +94,7 @@ class DefaultVpnFeatureRemover @Inject constructor(
     }
 
     private fun deleteAllVpnTrackers() {
-        vpnDatabase.vpnTrackerDao().deleteAllTrackers()
+        appTrackerBlockingRepository.deleteAllTrackers()
     }
 
     private suspend fun removeVpnFeature() {

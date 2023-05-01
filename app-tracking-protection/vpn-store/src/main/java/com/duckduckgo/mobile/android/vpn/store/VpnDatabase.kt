@@ -54,7 +54,7 @@ import org.threeten.bp.format.DateTimeFormatter
 @TypeConverters(VpnTypeConverters::class)
 abstract class VpnDatabase : RoomDatabase() {
 
-    abstract fun vpnTrackerDao(): VpnTrackerDao
+    internal abstract fun vpnTrackerDao(): VpnTrackerDao
     abstract fun vpnHeartBeatDao(): VpnHeartBeatDao
     abstract fun vpnNotificationsDao(): VpnNotificationsDao
     abstract fun vpnAppTrackerBlockingDao(): VpnAppTrackerBlockingDao
