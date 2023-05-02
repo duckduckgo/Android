@@ -14,14 +14,8 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.macos_api
+package com.duckduckgo.macos.api
 
-import android.content.Context
-import android.content.Intent
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 
-/**
- * Public interface to provide navigation Intents related to MacOs Settings
- */
-interface MacOsNav {
-    fun openMacOsSettings(activityContext: Context): Intent
-}
+object MacOsScreenWithEmptyParams : GlobalActivityStarter.ActivityParams

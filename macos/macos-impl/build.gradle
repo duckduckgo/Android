@@ -33,6 +33,7 @@ dependencies {
     implementation project(path: ':browser-api')
     implementation project(path: ':statistics')
     implementation project(path: ':windows-api')
+    implementation project(path: ':navigation-api')
 
     implementation Kotlin.stdlib.jdk7
     implementation AndroidX.appCompat

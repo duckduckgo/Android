@@ -37,13 +37,14 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.macos_api.MacOsNav
+import com.duckduckgo.macos.api.MacOsScreenWithEmptyParams
 import com.duckduckgo.mobile.android.ui.notifyme.NotifyMeView
 import com.duckduckgo.mobile.android.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.mobile.android.ui.view.addClickableSpan
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.windows.api.WindowsWaitlistState.InBeta
 import com.duckduckgo.windows.api.WindowsWaitlistState.JoinedWaitlist
 import com.duckduckgo.windows.api.WindowsWaitlistState.NotJoinedQueue
@@ -68,7 +69,7 @@ class WindowsWaitlistActivity : DuckDuckGoActivity() {
     private val viewModel: WindowsWaitlistViewModel by bindViewModel()
     private val binding: ActivityWindowsWaitlistBinding by viewBinding()
 
-    @Inject lateinit var macOSSettingsNav: MacOsNav
+    @Inject lateinit var globalActivityStarter: GlobalActivityStarter
 
     private val toolbar
         get() = binding.includeToolbar.toolbar
@@ -219,7 +220,7 @@ class WindowsWaitlistActivity : DuckDuckGoActivity() {
     }
 
     private fun launchMacClientSettings() {
-        startActivity(macOSSettingsNav.openMacOsSettings(this))
+        globalActivityStarter.start(this, MacOsScreenWithEmptyParams)
         finish()
     }
 
