@@ -31,9 +31,6 @@ ext {
     }
 
     buildNumberCode = {
-        // TODO return 0 once NetP is merged into public repo
-        if (System.getenv('CI')) return System.getenv('GITHUB_RUN_NUMBER').toInteger() ?: 0
-
         filePath = "${CI_HOME_DIR}/build_number.properties"
         if(!new File(filePath).exists()) return 0
 
