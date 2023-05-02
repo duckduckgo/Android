@@ -14,54 +14,57 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.impl.ui.setup
+package com.duckduckgo.sync.impl.ui
 
-import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.SyncRepository
-import com.duckduckgo.sync.impl.asDrawableRes
-import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.Command.FinishSetupFlow
 import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
-class SyncDeviceConnectedViewModel @Inject constructor(
+class ShowCodeViewModel @Inject constructor(
     private val syncRepository: SyncRepository,
+    private val clipboard: Clipboard,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
+
     private val command = Channel<Command>(1, DROP_OLDEST)
-    private val viewState = MutableStateFlow<ViewState?>(null)
-
-    fun viewState(): Flow<ViewState> = viewState.filterNotNull().onStart {
-        val result = syncRepository.getThisConnectedDevice() ?: throw IllegalStateException("This connected device not found")
-        emit(ViewState(result.deviceType.type().asDrawableRes(), result.deviceName))
-    }
-
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
+    private val viewState = MutableStateFlow(ViewState())
+
+    fun viewState(): Flow<ViewState> = viewState.onStart {
+        val code = syncRepository.getRecoveryCode()
+        if (code == null) { // It shouldn't be null, but recovery code returns nullable.
+            command.send(Command.Error)
+        } else {
+            viewState.emit(viewState.value.copy(code = code))
+        }
+    }
+
     data class ViewState(
-        @DrawableRes val deviceType: Int,
-        val deviceName: String,
+        val code: String = "",
     )
 
     sealed class Command {
-        object FinishSetupFlow : Command()
+        object Error : Command()
     }
 
-    fun onNextClicked() {
-        viewModelScope.launch {
-            command.send(FinishSetupFlow)
+    fun onCopyCodeClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            val recoveryCode = syncRepository.getRecoveryCode() ?: return@launch
+            clipboard.copyToClipboard(recoveryCode)
         }
     }
 }
