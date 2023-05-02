@@ -18,6 +18,7 @@ package com.duckduckgo.mobile.android.vpn.health
 
 import android.content.Context
 import android.net.ConnectivityManager
+import android.os.PowerManager
 import com.duckduckgo.app.global.extensions.isAirplaneModeOn
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.utils.ConflatedJob
@@ -51,13 +52,14 @@ class NetworkConnectivityHealthHandler @Inject constructor(
     private val vpnConnectivityLossListenerPluginPoint: PluginPoint<VpnConnectivityLossListenerPlugin>,
 ) : VpnServiceCallbacks {
     private val connectivityManager = context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    private val powerManager = context.applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
     private val job = ConflatedJob()
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         job += coroutineScope.launch {
             while (isActive) {
                 delay(15_000)
-                if (!hasVpnConnectivity() && !context.isAirplaneModeOn()) {
+                if (powerManager.isInteractive && !context.isAirplaneModeOn() && !hasVpnConnectivity()) {
                     if (hasDeviceConnectivity()) {
                         vpnConnectivityLossListenerPluginPoint.getPlugins().forEach {
                             logcat { "Calling onVpnConnectivityLoss on $it" }

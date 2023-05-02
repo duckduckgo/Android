@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="netpManagementTitle" translatable="false">Network Protection</string>
+    <string name="netpManagementHeadlineStatusOn">Network Protection is On</string>
+    <string name="netpManagementHeadlineStatusOff">Network Protection is Off</string>
+    <string name="netpManagementDescription">Hide your location from websites and conceal your online activity from Internet providers and others on your network.</string>
+    <string name="netpManagementToggleTitle">Network Protection</string>
+    <string name="netpManagementToggleSubtitleConnecting">Connecting…</string>
+    <string name="netpManagementToggleSubtitleConnected" instruction="Placeholder is elapsed time in hh:MM:ss format.">Connected · %1$s</string>
+    <string name="netpManagementToggleSubtitleDisconnected">Not connected</string>
+    <string name="netpManagementBetaDescription">DuckDuckGo Network Protection is currently in beta. <annotation type="report_issues_link">Share feedback</annotation> to help us improve!</string>
+
+    <!-- Connection details -->
+    <string name="netpManagementConnectionDetailsHeader">Connection Details</string>
+    <string name="netpManagementConnectionDetailsLocation">Location</string>
+    <string name="netpManagementConnectionDetailsIp">IP Address</string>
+
+    <!-- NetP enabled notification -->
+    <string name="netpEnabledNotificationTitle">"Network Protection is enabled and routing traffic through the VPN."</string>
+
+    <!-- Reconnect -->
+    <string name="netpMessageReconnecting">Network Protection interrupted. Attempting to reconnect now…</string>
+    <string name="netpMessageReconnectionFailed">Network Protection failed to connect. Please try again later.</string>
+    <string name="netpMessageReconnecionSuccess">Network Protection is ON. Your location and online activity are protected.</string>
+    <string name="netpBannerReconnecting">Connection interrupted. Attempting to reconnect now…</string>
+    <string name="netpBannerReconnectionFailed">Failed to connect. Please try again later.</string>
+
+    <!-- VPN conflict -->
+    <string name="netpVpnConflictTitle">Your VPN app may be disconnected</string>
+    <string name="netpVpnConflictMessage">Android only allows one active VPN connection at a time. Enabling Network Protection may disconnect any active VPN on your device.</string>
+    <string name="netpActionGotIt">Got it</string>
+
+    <!-- Always on -->
+    <string name="netpAlwaysOnVpnConflictTitle">Your VPN app is blocking Network Protection</string>
+    <string name="netpAlwaysOnVpnConflictMessage">Android only allows one active VPN connection at a time. Open Network settings > VPN. Find the VPN app that’s “always-on” and disable it to continue.</string>
+    <string name="netpActionOpenSettings">Open Settings</string>
+    <string name="netpActionCancel">Cancel</string>
+    <string name="netpActionNotNow">Not Now</string>
+    <string name="netpActionGoToSettings">Go to Settings</string>
+    <string name="netpAlwaysOnPromotionHeading">Set to Always-on</string>
+    <string name="netpAlwaysOnPromotionBody">Go to your device’s VPN Settings for DuckDuckGo and enable <b>Always-on VPN</b> to prevent Android disabling protection.\n\nMake sure to leave the other setting OFF.</string>
+    <string name="netpAlwaysOnLockdownBody">To avoid app issues, go to your device\'s <b>VPN Settings for DuckDuckGo</b> and disable <b>Block connections without VPN.</b></string>
+    <string name="netpAlwaysOnLockdownHeading">Change your VPN settings</string>
+    <string name="netpBannerVpnRevoked"><b>Network Protection is disabled.</b>\nA VPN app on your device may have disabled it. Use the toggle to re-enable.</string>
+    <string name="netpBannerAlwaysOnLockDownEnabled"><b>Action required!</b> To avoid app issues, you need to change your Android settings. <annotation type="open_settings_link">Change settings</annotation></string>
+
+    <!-- Waitlist -->
+    <string name="netpWaitlistActivityLabel">Network Protection</string>
+    <string name="netpWaitlistTitle">You\'re invited to try Network Protection!</string>
+    <string name="netpJoinWaitlist">Join the Private Waitlist</string>
+    <string name="netpJoinWaitlistError">Error joining the Waitlist, please try again later</string>
+    <string name="netpEnterCode">I Have an Invite Code</string>
+    <string name="netpWaitlistFooter">DuckDuckGo Network Protection is currently in closed, invite-only beta.</string>
+    <string name="netpWaitlistFooterRedeemed">DuckDuckGo will never log, track, or share your network data.</string>
+
+    <string name="netpWaitlistOnTheListTitle">You\'re on the list!</string>
+    <string name="netpWaitlistOnTheListNotificationEnabled">We\'ll send you a notification when Network Protection is ready for you.</string>
+    <string name="netpWaitlistOnTheListNotificationDisabled">Your invite to try Network Protection will arrive here. Check back soon, or we can send you a notification when it\'s your turn.</string>
+    <string name="netpWaitlistNotifyMeTitle">Know the instant you’re invited</string>
+    <string name="netpWaitlistNotifyMeSubtitle">Get a notification when Network Protection is ready for you.</string>
+
+    <string name="netpWaitlistRedeemCodeActivityLabel">Enter Your Invite Code</string>
+    <string name="netpWaitlistRedeemCodeTitle">Almost there…</string>
+    <string name="netpWaitlistRedeemCodeBody">Enter your invite code below to continue.</string>
+    <string name="netpWaitlistRedeemCodeCta">Continue</string>
+    <string name="netpWaitlistRedeemCodeError">We didn\'t recognise this Invite Code.</string>
+    <string name="netpWaitlistRedeemCodeGeneralError">Error redeeming code, please try again later</string>
+    <string name="netpWaitlistCodeInvite">Invite Code</string>
+
+    <string name="netpWaitlistRedeemedCodeStatus">Success! You\'re in.</string>
+    <string name="netpWaitlistGetStartedCta">Get Started</string>
+
+    <string name="netpWaitlistInBetaDescription">Hide your location from websites and conceal your online activity from Internet providers and others on your network.</string>
+</resources>

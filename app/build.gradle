@@ -247,6 +247,11 @@ dependencies {
     implementation project(':content-scope-scripts-api')
     implementation project(':content-scope-scripts-impl')
 
+    implementation project(':network-protection-api')
+    implementation project(':network-protection-impl')
+    internalImplementation project(':network-protection-internal')
+    implementation project(':network-protection-store')
+
     implementation project(':fingerprint-protection-api')
     implementation project(':fingerprint-protection-impl')
     implementation project(':fingerprint-protection-store')

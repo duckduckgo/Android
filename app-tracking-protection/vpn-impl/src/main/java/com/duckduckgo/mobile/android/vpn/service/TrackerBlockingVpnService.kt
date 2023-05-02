@@ -55,6 +55,9 @@ import com.duckduckgo.mobile.android.vpn.prefs.VpnPreferences
 import com.duckduckgo.mobile.android.vpn.service.state.VpnStateMonitorService
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.ui.notification.VpnEnabledNotificationBuilder
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Binds
+import dagger.Module
 import dagger.android.AndroidInjection
 import java.net.Inet4Address
 import java.net.Inet6Address
@@ -68,7 +71,7 @@ import logcat.logcat
 
 @Suppress("NoHardcodedCoroutineDispatcher")
 @InjectWith(VpnScope::class)
-class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
+class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), VpnSocketProtector {
 
     @Inject
     lateinit var vpnPreferences: VpnPreferences
@@ -302,7 +305,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
                 allowFamily(AF_INET6)
             }
 
-            val dnsList = getDns(tunnelConfig.dns)
+            val systemDnsList = getSystemDns()
 
             // TODO: eventually routes will be set by remote config
             if (appBuildConfig.isPerformanceTest && appBuildConfig.isInternalBuild()) {
@@ -316,15 +319,26 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
                 val vpnRoutes = tunnelConfig.routes
                     .map { it.key to it.value }
                     .ifEmpty { VpnRoutes.includedRoutes.asAddressMaskPair() }.toMutableList()
+
+                // Any DNS that comes from the tunnel config shall be added to the routes
+                // TODO filtering Ipv6 out for now for simplicity. Once we support IPv6 we'll come back to this
+                tunnelConfig.dns.filterIsInstance<Inet4Address>().forEach { dns ->
+                    dns.asRoute()?.let {
+                        logcat { "Adding tunnel config DNS address $it to VPN routes" }
+                        vpnRoutes.add(it.address to it.maskWidth)
+                    }
+                }
+
                 if (isInterceptDnsTrafficEnabled) {
-                    // we need to make sure that all DNS traffic goes through the VPN. Specifically when the DNS server is on the local network
-                    dnsList.filterIsInstance<Inet4Address>().forEach { addr ->
+                    // we need to make sure that all System DNS traffic goes through the VPN. Specifically when the DNS server is on the local network
+                    systemDnsList.filterIsInstance<Inet4Address>().forEach { addr ->
                         addr.asRoute()?.let {
                             logcat { "Adding DNS address $it to VPN routes" }
                             vpnRoutes.add(it.address to it.maskWidth)
                         }
                     }
                 }
+
                 vpnRoutes.mapNotNull { runCatching { InetAddress.getByName(it.first) to it.second }.getOrNull() }
                     .filter { (it.first is Inet4Address) || (tunHasIpv6Address && it.first is Inet6Address) }
                     .forEach { route ->
@@ -355,7 +369,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             configureMeteredConnection()
 
             // Set DNS
-            dnsList
+            (systemDnsList + tunnelConfig.dns)
                 .filter { (it is Inet4Address) || (tunHasIpv6Address && it is Inet6Address) }
                 .forEach { addr ->
                     if (isIpv6SupportEnabled || addr is Inet4Address) {
@@ -389,7 +403,10 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         }
     }
 
-    private fun getDns(configDns: Set<InetAddress>): Set<InetAddress> {
+    /**
+     * @return the DNS configured in the Android System
+     */
+    private fun getSystemDns(): Set<InetAddress> {
         // private extension function, this is purposely here to limit visibility
         fun Set<InetAddress>.containsIpv4(): Boolean {
             forEach {
@@ -399,9 +416,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         }
 
         val dns = mutableSetOf<InetAddress>()
-
-        // Add DNS specific to VPNetworkStack
-        configDns.forEach { dns.add(it) }
 
         // System DNS
         if (isInterceptDnsTrafficEnabled) {
@@ -757,4 +771,11 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         private const val ACTION_RESTART_VPN = "ACTION_RESTART_VPN"
         private const val ACTION_ALWAYS_ON_START = "android.net.VpnService"
     }
+}
+
+@Module
+@ContributesTo(VpnScope::class)
+abstract class VpnSocketProtectorModule {
+    @Binds
+    abstract fun bindVpnSocketProtector(impl: TrackerBlockingVpnService): VpnSocketProtector
 }

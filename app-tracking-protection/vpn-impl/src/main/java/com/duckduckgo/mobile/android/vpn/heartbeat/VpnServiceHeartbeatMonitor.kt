@@ -29,6 +29,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ReceiverScope
 import com.duckduckgo.mobile.android.vpn.dao.HeartBeatEntity
 import com.duckduckgo.mobile.android.vpn.dao.VpnHeartBeatDao
+import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
+import com.duckduckgo.mobile.android.vpn.model.VpnServiceState
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
@@ -98,12 +100,21 @@ class VpnServiceHeartbeatMonitorWorker(
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
 
+    @Inject
+    lateinit var vpnServiceStateStatsDao: VpnServiceStateStatsDao
+
     override suspend fun doWork(): Result = withContext(dispatcherProvider.io()) {
         val lastHeartBeat = vpnHeartBeatDao.hearBeats().maxByOrNull { it.timestamp }
 
         logcat { "HB monitor checking last HB: $lastHeartBeat" }
         if (lastHeartBeat?.isAlive() == true && !TrackerBlockingVpnService.isServiceRunning(context)) {
             logcat(LogPriority.WARN) { "HB monitor: VPN stopped, restarting it" }
+
+            // TODO this is for now just in NetP, move it to public repo once tested
+            // Just make sure the internal state is consistent with the actual state before we re-start the VPN service
+            vpnServiceStateStatsDao.getLastStateStats()?.let {
+                vpnServiceStateStatsDao.insert(it.copy(state = VpnServiceState.DISABLED, timestamp = System.currentTimeMillis()))
+            }
 
             deviceShieldPixels.suddenKillBySystem()
             deviceShieldPixels.automaticRestart()

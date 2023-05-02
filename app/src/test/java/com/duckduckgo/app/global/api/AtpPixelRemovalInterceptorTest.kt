@@ -17,7 +17,10 @@
 package com.duckduckgo.app.global.api
 
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixelNames
-import org.junit.Assert.*
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames
+import org.junit.Assert
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
 
@@ -36,8 +39,29 @@ class AtpPixelRemovalInterceptorTest {
 
             val interceptedUrl = atpPixelRemovalInterceptor.intercept(FakeChain(pixelUrl)).request.url
             assertEquals(!PIXELS_WITH_ATB_INFO.contains(pixelName), interceptedUrl.queryParameter("atb") == null)
-            assertFalse(interceptedUrl.queryParameter("appVersion") == null)
+            Assert.assertFalse(interceptedUrl.queryParameter("appVersion") == null)
         }
+    }
+
+    @Test
+    fun whenSendPixelThenRedactAtbInfoFromNetPPixels() {
+        val url = "https://improving.duckduckgo.com/t/%s_android_phone?atb=v255-7zu&appVersion=5.74.0&test=1"
+        NetworkProtectionPixelNames.values().map { it.pixelName }.forEach { pixelName ->
+            val pixelUrl = String.format(url, pixelName)
+
+            val interceptedUrl = atpPixelRemovalInterceptor.intercept(FakeChain(pixelUrl)).request.url
+            assertEquals(!PIXELS_WITH_ATB_INFO.contains(pixelName), interceptedUrl.queryParameter("atb") == null)
+            assertNotNull(interceptedUrl.queryParameter("appVersion"))
+        }
+    }
+
+    @Test
+    fun whenSendNonNetpAndAppTPPixelThenDoNothingToPixel() {
+        val url = "https://improving.duckduckgo.com/t/m_voice_search_available_android_phone?atb=v255-7zu&appVersion=5.74.0&test=1"
+
+        val interceptedUrl = atpPixelRemovalInterceptor.intercept(FakeChain(url)).request.url
+        assertNotNull(interceptedUrl.queryParameter("atb"))
+        assertNotNull(interceptedUrl.queryParameter("appVersion"))
     }
 
     companion object {

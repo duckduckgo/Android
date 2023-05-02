@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
+          package="com.duckduckgo.networkprotection.internal">
+
+    <!-- This is also in the :app module, so it is not a new permission. We add it so that lint doesn't blow   -->
+    <uses-permission
+        android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
+
+    <application>
+        <activity
+            android:name="com.duckduckgo.networkprotection.internal.feature.NetPInternalSettingsActivity"
+            android:process=":vpn"
+            android:label="@string/netpDevSettingsTitle"
+            android:exported="false" />
+        <activity
+            android:name="com.duckduckgo.networkprotection.internal.feature.system_apps.NetPSystemAppsExclusionListActivity"
+            android:process=":vpn"
+            android:label="@string/netpSystemAppsExclusionList"
+            android:exported="false" />
+    </application>
+
+</manifest>

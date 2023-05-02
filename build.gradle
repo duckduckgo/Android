@@ -86,6 +86,8 @@ subprojects {
                         if (dependencyPath == projectPath) continue
                         // vpn-internal is part of vpn-impl
                         if (projectPath.endsWith(':vpn-internal') && dependencyPath.endsWith(':vpn-impl')) continue
+                        // network-protection-internal is part of network-protection-impl
+                        if (projectPath.endsWith(':network-protection-internal') && dependencyPath.endsWith(':network-protection-impl')) continue
                         if (!projectPath.endsWith(":app") && dependencyPath.endsWith("impl")) {
                             throw new GradleException("Invalid dependency $projectPath -> $dependencyPath. " +
                                     "Only :app module can depend on 'impl' modules")
