@@ -57,8 +57,8 @@ interface VariantManager {
             // the future if we can filter by app version
             Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
             Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
-            Variant(key = "mi", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
-            Variant(key = "mj", weight = 1.0, features = listOf(VariantFeature.OnboardingCustomizationExperiment), filterBy = { noFilter() }),
+            Variant(key = "mi", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
+            Variant(key = "mj", weight = 0.0, features = listOf(VariantFeature.OnboardingCustomizationExperiment), filterBy = { noFilter() }),
 
             // Experiment: Increase retention through AppTP promotions
             Variant(key = "ze", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),

@@ -52,7 +52,7 @@ class VariantManagerTest {
     @Test
     fun onboardingCustomisationControlVariantHasExpectedWeightAndNoFeatures() {
         val variant = variants.first { it.key == "mi" }
-        assertEqualsDouble(1.0, variant.weight)
+        assertEqualsDouble(0.0, variant.weight)
         assertEquals(0, variant.features.size)
         assertEquals(0, variant.features.size)
     }
@@ -60,7 +60,7 @@ class VariantManagerTest {
     @Test
     fun onboardingCustomisationExperimentalVariantHasExpectedWeightAndFeatures() {
         val variant = variants.first { it.key == "mj" }
-        assertEqualsDouble(1.0, variant.weight)
+        assertEqualsDouble(0.0, variant.weight)
         assertEquals(1, variant.features.size)
         assertTrue(variant.hasFeature(OnboardingCustomizationExperiment))
     }
