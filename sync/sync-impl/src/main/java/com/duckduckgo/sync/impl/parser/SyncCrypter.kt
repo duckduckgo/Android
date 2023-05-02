@@ -16,7 +16,7 @@
 
 package com.duckduckgo.sync.impl.parser
 
-import com.squareup.moshi.Json
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 
 interface SyncCrypter {
     fun generateAllData(): SyncDataRequest
@@ -65,12 +65,12 @@ fun SyncBookmarkEntry.isFolder(): Boolean = this.folder != null
 fun SyncBookmarkEntry.isBookmark(): Boolean = this.page != null
 
 class SyncDataRequest(
-    val client_timestamp: String,
-    val bookmarks: SyncBookmarkUpdates
+    val client_timestamp: String = DatabaseDateFormatter.iso8601(),
+    val bookmarks: SyncBookmarksRequest
 )
 
-class SyncBookmarks(val bookmarks: SyncBookmarkUpdates)
-class SyncBookmarkUpdates(
+class SyncRequest(val bookmarks: SyncBookmarksRequest)
+class SyncBookmarksRequest(
     val updates: List<SyncBookmarkEntry>,
     val modified_since: String = "0"
 )

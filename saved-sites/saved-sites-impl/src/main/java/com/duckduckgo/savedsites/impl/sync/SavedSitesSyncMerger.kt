@@ -16,12 +16,16 @@
 
 package com.duckduckgo.savedsites.impl.sync
 
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
+import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.sync.api.SyncCrypto
+import com.duckduckgo.sync.api.engine.FeatureSyncStore
 import com.duckduckgo.sync.api.engine.SyncChanges
 import com.duckduckgo.sync.api.engine.SyncMergeResult
 import com.duckduckgo.sync.api.engine.SyncMerger
@@ -38,46 +42,106 @@ import javax.inject.Inject
 @ContributesBinding(scope = AppScope::class, boundType = SyncMerger::class)
 class SavedSitesSyncMerger @Inject constructor(
     private val savedSitesRepository: SavedSitesRepository,
+    private val savedSitesSyncStore: FeatureSyncStore,
     private val syncCrypto: SyncCrypto,
 ) : SyncMerger, SyncablePlugin {
+
     override fun merge(changes: SyncChanges): SyncMergeResult<Boolean> {
         Timber.d("Sync: merging remote bookmarks changes $changes")
-        runCatching {
-            Adapters.updatesAdapter.fromJson(changes.updatesJSON)
-        }.onFailure {
-            return SyncMergeResult.Error(reason = "Sync: merging failed, JSON format incorrect")
-        }.onSuccess { remoteUpdates ->
-            if (remoteUpdates == null){
-                return SyncMergeResult.Error(reason = "Sync: merging failed, JSON format incorrect")
-            }
+        val remoteUpdates = Adapters.updatesAdapter.fromJson(changes.updatesJSON)
+        if (remoteUpdates == null) {
+            return SyncMergeResult.Error(reason = "Sync: merging failed, JSON format incorrect remoteUpdates null")
+        }
 
-            val folders = mutableListOf<BookmarkFolder>()
-            val bookmarks = mutableListOf<Bookmark>()
-            val favorites = mutableListOf<Favorite>()
-            val remoteFolders = remoteUpdates.entries.filter { it.isFolder() }
+        if (remoteUpdates.bookmarks == null) {
+            return SyncMergeResult.Error(reason = "Sync: merging failed, JSON format incorrect remoteUpdates.bookmarks null")
+        }
 
-            // For each remote object, we check duplicity in local
-            // Bookmarks (same title and url) → then remote wins. Replace local UUID with remote UUID
-            // We also have to ensure the newly updated UUID is assigned to a folder so it’s not orphaned.
-            // Folders (same title and parent) → Add the remote bookmarks to the local folder and replace the local folder UUID with the remote folder UUID
-            // For each bookmark inside the folder, repeat step above.
+        if (remoteUpdates.bookmarks.entries.isEmpty()) {
+            return SyncMergeResult.Error(reason = "Sync: merging failed, JSON format incorrect remoteUpdates.bookmarks.entries empty")
+        }
 
-            remoteFolders.forEach { folder ->
-                folders.add(folder.mapToFolder())
-                folder.folder?.children?.forEachIndexed { position, child ->
-                    val childBookmark = remoteUpdates.entries.find { it.id == child }
-                    if (childBookmark != null) {
-                        if (folder.isFavouritesRoot()) {
-                            favorites.add(childBookmark.mapToFavourite(position))
-                        } else {
-                            bookmarks.add(childBookmark.mapToBookmark(folder.id))
+        remoteUpdates.bookmarks.entries.find { it.id == SavedSitesNames.BOOMARKS_ROOT }
+            ?: return SyncMergeResult.Error(reason = "Sync: merging failed, Bookmarks Root folder does not exist")
+
+        savedSitesSyncStore.modifiedSince = remoteUpdates.bookmarks.last_modified
+
+        mergeFolder(SavedSitesNames.BOOMARKS_ROOT, "", remoteUpdates.bookmarks.entries)
+        mergeFolder(SavedSitesNames.FAVORITES_ROOT, "", remoteUpdates.bookmarks.entries)
+        return SyncMergeResult.Success(true)
+    }
+
+    private fun mergeFolder(
+        folderId: String,
+        parentId: String,
+        remoteUpdates: List<SyncBookmarkEntry>
+    ) {
+        val remoteFolder = remoteUpdates.find { it.id == folderId }
+        remoteFolder?.let {
+            savedSitesRepository.insert(decryptFolder(remoteFolder, parentId))
+            it.folder?.children?.forEachIndexed { position, child ->
+                val childEntry = remoteUpdates.find { it.id == child }
+                if (childEntry != null) {
+                    when {
+                        childEntry.isBookmark() -> {
+                            if (remoteFolder.isFavouritesRoot()) {
+                                savedSitesRepository.insert(decryptFavourite(childEntry, position))
+                            } else {
+                                savedSitesRepository.insert(decryptBookmark(childEntry, folderId))
+                            }
+                        }
+
+                        childEntry.isFolder() -> {
+                            mergeFolder(childEntry.id, folderId, remoteUpdates)
                         }
                     }
                 }
             }
-            return SyncMergeResult.Success(true)
         }
-        return SyncMergeResult.Success(true)
+    }
+
+    private fun decryptFolder(
+        remoteEntry: SyncBookmarkEntry,
+        parentId: String
+    ): BookmarkFolder {
+        val folder = BookmarkFolder(
+            id = remoteEntry.id,
+            name = syncCrypto.decrypt(remoteEntry.title),
+            parentId = parentId,
+            lastModified = remoteEntry.client_last_modified,
+        )
+        Timber.d("Sync: decrypted Folder $folder")
+        return folder
+    }
+
+    private fun decryptBookmark(
+        remoteEntry: SyncBookmarkEntry,
+        parentId: String,
+    ): Bookmark {
+        val bookmark = Bookmark(
+            id = remoteEntry.id,
+            title = syncCrypto.decrypt(remoteEntry.title),
+            url = syncCrypto.decrypt(remoteEntry.page!!.url),
+            parentId = parentId,
+            lastModified = remoteEntry.client_last_modified,
+        )
+        Timber.d("Sync: decrypted Bookmark $bookmark")
+        return bookmark
+    }
+
+    private fun decryptFavourite(
+        remoteEntry: SyncBookmarkEntry,
+        position: Int
+    ): Favorite {
+        val favourite = Favorite(
+            id = remoteEntry.id,
+            title = syncCrypto.decrypt(remoteEntry.title),
+            url = syncCrypto.decrypt(remoteEntry.page!!.url),
+            lastModified = remoteEntry.client_last_modified,
+            position = position,
+        )
+        Timber.d("Sync: decrypted Favourite $favourite")
+        return favourite
     }
 
     override fun getChanges(since: String): SyncChanges {
@@ -91,17 +155,22 @@ class SavedSitesSyncMerger @Inject constructor(
         Timber.d("Sync: received remote changes from $timestamp")
         changes.find { it.type == BOOKMARKS }?.let { bookmarkChanges ->
             merge(bookmarkChanges)
+            Timber.d("Sync: remote bookmarks changes synced")
         }
     }
 
     private class Adapters {
         companion object {
             private val moshi = Moshi.Builder().build()
-            val updatesAdapter: JsonAdapter<SyncBookmarkRemoteUpdates> =
-                moshi.adapter(SyncBookmarkRemoteUpdates::class.java)
+            val updatesAdapter: JsonAdapter<SyncBookmarkRemoteChanges> =
+                moshi.adapter(SyncBookmarkRemoteChanges::class.java)
         }
     }
 }
+
+class SyncBookmarkRemoteChanges(
+    val bookmarks: SyncBookmarkRemoteUpdates,
+)
 
 class SyncBookmarkRemoteUpdates(
     val entries: List<SyncBookmarkEntry>,

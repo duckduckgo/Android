@@ -25,7 +25,7 @@ import com.duckduckgo.sync.impl.BookmarksResponse
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncApi
 import com.duckduckgo.sync.impl.SyncDataResponse
-import com.duckduckgo.sync.impl.parser.SyncBookmarks
+import com.duckduckgo.sync.impl.parser.SyncRequest
 import com.duckduckgo.sync.impl.parser.SyncDataRequest
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
@@ -54,7 +54,7 @@ class AppSyncApiClient @Inject constructor(
         }
 
         val localChanges = mapRequest(changes)
-        val localChangesJSON = Adapters.patchAdapter.toJson(localChanges)
+        val localChangesJSON = Adapters.requestAdapter.toJson(localChanges)
         Timber.d("Sync: patch data generated $localChangesJSON")
         return when (val result = syncApi.patch(token, localChanges)) {
             is Result.Error -> {
@@ -92,28 +92,30 @@ class AppSyncApiClient @Inject constructor(
     @VisibleForTesting
     fun mapRequest(changes: List<SyncChanges>): SyncDataRequest {
         val bookmarksJSON = changes.first { it.type == BOOKMARKS }.updatesJSON
-        val bookmarkUpdates = Adapters.bookmarksAdapter.fromJson(bookmarksJSON)!!
+        val bookmarkUpdates = Adapters.bookmarksRequestAdapter.fromJson(bookmarksJSON)!!
         return SyncDataRequest(client_timestamp = DatabaseDateFormatter.iso8601(), bookmarkUpdates.bookmarks)
     }
 
     @VisibleForTesting
     fun mapResponse(response: SyncDataResponse): List<SyncChanges> {
-        val bookmarks = response.bookmarks
-        val bookmarksJSON = Adapters.bookmarksResponseAdapter.toJson(bookmarks)
+        val bookmarksJSON = Adapters.bookmarksResponseAdapter.toJson(response.bookmarks)
         return listOf(SyncChanges(BOOKMARKS, bookmarksJSON))
     }
 
     private class Adapters {
         companion object {
             private val moshi = Moshi.Builder().build()
-            val bookmarksAdapter: JsonAdapter<SyncBookmarks> =
-                moshi.adapter(SyncBookmarks::class.java)
+            val bookmarksRequestAdapter: JsonAdapter<SyncRequest> =
+                moshi.adapter(SyncRequest::class.java)
+
+            val requestAdapter: JsonAdapter<SyncDataRequest> =
+                moshi.adapter(SyncDataRequest::class.java)
 
             val bookmarksResponseAdapter: JsonAdapter<BookmarksResponse> =
                 moshi.adapter(BookmarksResponse::class.java)
 
-            val patchAdapter: JsonAdapter<SyncDataRequest> =
-                moshi.adapter(SyncDataRequest::class.java)
+            val responseAdapter: JsonAdapter<SyncDataResponse> =
+                moshi.adapter(SyncDataResponse::class.java)
         }
     }
 }

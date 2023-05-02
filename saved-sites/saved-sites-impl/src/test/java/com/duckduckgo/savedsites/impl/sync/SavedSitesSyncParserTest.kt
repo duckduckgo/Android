@@ -22,6 +22,7 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.sync.api.SyncCrypto
+import com.duckduckgo.sync.api.engine.FeatureSyncStore
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -34,14 +35,17 @@ class SavedSitesSyncParserTest {
 
     private val repository: SavedSitesRepository = mock()
     private val syncCrypto: SyncCrypto = mock()
+    private val store: FeatureSyncStore = mock()
     private lateinit var parser: SavedSitesSyncParser
 
     @Before
     fun before() {
-        parser = SavedSitesSyncParser(repository, syncCrypto)
+        parser = SavedSitesSyncParser(repository, store, syncCrypto)
 
         whenever(syncCrypto.encrypt(ArgumentMatchers.anyString()))
             .thenAnswer { invocation -> invocation.getArgument(0) }
+
+        whenever(store.modifiedSince).thenReturn("0")
     }
 
     @Test
@@ -84,7 +88,7 @@ class SavedSitesSyncParserTest {
         val syncChanges = parser.getChanges("")
         assertEquals(
             syncChanges.updatesJSON,
-            "{\"bookmarks\":{\"updates\":[{\"client_last_modified\":\"timestamp\",\"folder\":{\"children\":[\"bookmark1\"]},\"id\":\"favorites_root\",\"title\":\"Favorites\"},{\"client_last_modified\":\"timestamp\",\"id\":\"bookmark3\",\"page\":{\"url\":\"https://bookmark3.com\"},\"title\":\"Bookmark 3\"},{\"client_last_modified\":\"timestamp\",\"id\":\"bookmark4\",\"page\":{\"url\":\"https://bookmark4.com\"},\"title\":\"Bookmark 4\"},{\"client_last_modified\":\"timestamp\",\"folder\":{\"children\":[\"bookmark3\",\"bookmark4\"]},\"id\":\"bookmarks_root\",\"title\":\"Bookmarks\"}]}}",
+            "{\"bookmarks\":{\"modified_since\":\"0\",\"updates\":[{\"client_last_modified\":\"timestamp\",\"folder\":{\"children\":[\"bookmark1\"]},\"id\":\"favorites_root\",\"title\":\"Favorites\"},{\"client_last_modified\":\"timestamp\",\"id\":\"bookmark3\",\"page\":{\"url\":\"https://bookmark3.com\"},\"title\":\"Bookmark 3\"},{\"client_last_modified\":\"timestamp\",\"id\":\"bookmark4\",\"page\":{\"url\":\"https://bookmark4.com\"},\"title\":\"Bookmark 4\"},{\"client_last_modified\":\"timestamp\",\"folder\":{\"children\":[\"bookmark3\",\"bookmark4\"]},\"id\":\"bookmarks_root\",\"title\":\"Bookmarks\"}]}}",
         )
     }
 
@@ -109,7 +113,7 @@ class SavedSitesSyncParserTest {
         val syncChanges = parser.getChanges("")
         assertEquals(
             syncChanges.updatesJSON,
-            "{\"bookmarks\":{\"updates\":[{\"client_last_modified\":\"timestamp\",\"id\":\"bookmark3\",\"page\":{\"url\":\"https://bookmark3.com\"},\"title\":\"Bookmark 3\"},{\"client_last_modified\":\"timestamp\",\"id\":\"bookmark4\",\"page\":{\"url\":\"https://bookmark4.com\"},\"title\":\"Bookmark 4\"},{\"client_last_modified\":\"timestamp\",\"folder\":{\"children\":[\"bookmark3\",\"bookmark4\"]},\"id\":\"bookmarks_root\",\"title\":\"Bookmarks\"}]}}",
+            "{\"bookmarks\":{\"modified_since\":\"0\",\"updates\":[{\"client_last_modified\":\"timestamp\",\"id\":\"bookmark3\",\"page\":{\"url\":\"https://bookmark3.com\"},\"title\":\"Bookmark 3\"},{\"client_last_modified\":\"timestamp\",\"id\":\"bookmark4\",\"page\":{\"url\":\"https://bookmark4.com\"},\"title\":\"Bookmark 4\"},{\"client_last_modified\":\"timestamp\",\"folder\":{\"children\":[\"bookmark3\",\"bookmark4\"]},\"id\":\"bookmarks_root\",\"title\":\"Bookmarks\"}]}}",
         )
     }
 

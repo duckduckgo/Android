@@ -21,6 +21,7 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
@@ -544,14 +545,15 @@ class AutoCompleteApiTest {
         id: String = UUID.randomUUID().toString(),
         title: String = "title",
         url: String = "https://example.com",
+        lastModified: String = DatabaseDateFormatter.iso8601(),
         position: Int = 1,
-    ) = Favorite(id, title, url, position)
+    ) = Favorite(id, title, url, lastModified, position)
 
     private fun bookmark(
         id: String = UUID.randomUUID().toString(),
         title: String = "title",
         url: String = "https://example.com",
-    ) = Bookmark(id, title, url, SavedSitesNames.BOOMARKS_ROOT)
+    ) = Bookmark(id, title, url, SavedSitesNames.BOOMARKS_ROOT, DatabaseDateFormatter.iso8601())
 
     private fun bookmarks() = listOf(
         Bookmark(
@@ -559,6 +561,7 @@ class AutoCompleteApiTest {
             "title",
             "https://example.com",
             SavedSitesNames.BOOMARKS_ROOT,
+            DatabaseDateFormatter.iso8601(),
         ),
     )
 }

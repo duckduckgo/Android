@@ -632,7 +632,6 @@ class BrowserTabViewModel @Inject constructor(
         observeAccessibilitySettings()
 
         savedSitesRepository.getFavorites().map { favoriteSites ->
-            Timber.d("Sync: getFavorites onEach $favoriteSites")
             val favorites = favoriteSites.map { FavoritesQuickAccessAdapter.QuickAccessFavorite(it) }
             ctaViewState.value = currentCtaViewState().copy(favorites = favorites)
             autoCompleteViewState.value = currentAutoCompleteViewState().copy(favorites = favorites)
@@ -641,7 +640,6 @@ class BrowserTabViewModel @Inject constructor(
         }.launchIn(viewModelScope)
 
         savedSitesRepository.getBookmarks().map { bookmarks ->
-            Timber.d("Sync: getBookmarks onEach $bookmarks")
             val bookmark = bookmarks.firstOrNull { it.url == url }
             browserViewState.value = currentBrowserViewState().copy(bookmark = bookmark)
         }.launchIn(viewModelScope)
