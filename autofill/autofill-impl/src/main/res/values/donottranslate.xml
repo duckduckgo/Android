@@ -16,7 +16,7 @@
 
 <resources>
     <string name="autofill_password_generation_offer_title">Use generated password from DuckDuckGo?</string>
-    <string name="autofill_password_generation_offer_message">Password will be stored securely on this device only, and can be managed from the Logins menu in Settings.</string>
+    <string name="autofill_password_generation_offer_message">Password will be saved in Logins.</string>
     <string name="autofill_password_generation_offer_accept">Use Generated Password</string>
     <string name="autofill_password_generation_offer_decline">Create My Own</string>
 </resources>

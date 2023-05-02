@@ -18,13 +18,18 @@ package com.duckduckgo.autofill.impl.ui.credential.passwordgeneration
 
 import android.content.Context
 import android.content.DialogInterface
+import android.graphics.Rect
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.TouchDelegate
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.setFragmentResult
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.GenerateSecurePasswordDialog
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ContentAutofillGeneratePasswordDialogBinding
@@ -33,10 +38,12 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_PASSWORD_G
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_PASSWORD_GENERATION_PROMPT_DISMISSED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_PASSWORD_GENERATION_PROMPT_SHOWN
 import com.duckduckgo.autofill.impl.ui.credential.dialog.animateClosed
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillClipboardInteractor
 import com.duckduckgo.autofill.impl.ui.credential.passwordgeneration.AutofillGeneratePasswordDialogFragment.DialogEvent.Dismissed
 import com.duckduckgo.autofill.impl.ui.credential.passwordgeneration.AutofillGeneratePasswordDialogFragment.DialogEvent.GeneratedPasswordAccepted
 import com.duckduckgo.autofill.impl.ui.credential.passwordgeneration.AutofillGeneratePasswordDialogFragment.DialogEvent.Shown
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.mobile.android.ui.view.toPx
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -49,6 +56,12 @@ class AutofillGeneratePasswordDialogFragment : BottomSheetDialogFragment(), Gene
 
     @Inject
     lateinit var pixel: Pixel
+
+    @Inject
+    lateinit var clipboardInteractor: AutofillClipboardInteractor
+
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
 
     /**
      * To capture all the ways the BottomSheet can be dismissed, we might end up with onCancel being called when we don't want it
@@ -85,6 +98,27 @@ class AutofillGeneratePasswordDialogFragment : BottomSheetDialogFragment(), Gene
 
     private fun configurePasswordField(binding: ContentAutofillGeneratePasswordDialogBinding) {
         binding.generatedPassword.text = getGeneratedPassword()
+
+        binding.copyPasswordButton.setOnClickListener {
+            clipboardInteractor.copyToClipboard(binding.generatedPassword.text.toString(), isSensitive = true)
+            if (appBuildConfig.sdkInt <= Build.VERSION_CODES.S_V2) {
+                Toast.makeText(context, R.string.autofillManagementPasswordCopied, Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        with(binding.copyPasswordButton) {
+            post {
+                // actual size is 24dp, but we want to increase touch area to a more comfortable 48dp; adding 12dp to each side
+                val touchableArea = Rect()
+                getHitRect(touchableArea)
+                val extraSpace = 12.toPx()
+                touchableArea.top -= extraSpace
+                touchableArea.bottom += extraSpace
+                touchableArea.left -= extraSpace
+                touchableArea.right += extraSpace
+                (parent as View).touchDelegate = TouchDelegate(touchableArea, this)
+            }
+        }
     }
 
     private fun configureGeneratePasswordButton(
