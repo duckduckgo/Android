@@ -401,6 +401,6 @@ class BrowserWebViewClient @Inject constructor(
 }
 
 enum class WebViewPixelName(override val pixelName: String) : Pixel.PixelName {
-    WEB_RENDERER_GONE_CRASH("m_d_wrg_c"),
-    WEB_RENDERER_GONE_KILLED("m_d_wrg_k"),
+    WEB_RENDERER_GONE_CRASH("m_web_view_renderer_gone_crash"),
+    WEB_RENDERER_GONE_KILLED("m_web_view_renderer_gone_killed"),
 }
