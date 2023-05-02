@@ -25,6 +25,7 @@ import com.duckduckgo.mobile.android.vpn.dao.*
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerEntity
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
@@ -64,9 +65,18 @@ class AppTrackerBlockingStatsRepositoryTest {
     }
 
     @Test
+    fun whenSingleTrackerEntryAddedButNoRelatedEntityThenReturnNoTracker() = runBlocking {
+        val trackerDomain = "example.com"
+        addTrackerAndReturn(trackerDomain)
+        val vpnTrackers = repository.getVpnTrackers({ dateOfPreviousMidnightAsString() }).firstOrNull()
+        assertNoTrackers(vpnTrackers)
+    }
+
+    @Test
     fun whenSingleTrackerEntryAddedForTodayBucketThenBlockerReturned() = runBlocking {
         val trackerDomain = "example.com"
-        trackerFound(trackerDomain)
+        val entity = addTrackerAndReturn(trackerDomain).asEntity()
+        db.vpnAppTrackerBlockingDao().insertTrackerEntities(listOf(entity))
         val vpnTrackers = repository.getVpnTrackers({ dateOfPreviousMidnightAsString() }).firstOrNull()
         assertTrackerFound(vpnTrackers, trackerDomain)
         assertEquals(1, vpnTrackers!!.size)
@@ -75,8 +85,9 @@ class AppTrackerBlockingStatsRepositoryTest {
     @Test
     fun whenSameTrackerFoundMultipleTimesTodayThenAllInstancesOfBlockerReturned() = runBlocking {
         val trackerDomain = "example.com"
-        trackerFound(trackerDomain)
-        trackerFound(trackerDomain)
+        addTrackerAndReturn(trackerDomain)
+        val entity = addTrackerAndReturn(trackerDomain).asEntity()
+        db.vpnAppTrackerBlockingDao().insertTrackerEntities(listOf(entity, entity))
         val vpnTrackers = repository.getVpnTrackers({ dateOfPreviousMidnightAsString() }).firstOrNull()
         assertTrackerFound(vpnTrackers, trackerDomain)
         assertEquals(2, vpnTrackers!!.sumOf { it.count })
@@ -96,7 +107,7 @@ class AppTrackerBlockingStatsRepositoryTest {
 
     @Test
     fun whenContainsVpnTrackersAndDbTableNotEmptyThenReturnTrue() = runTest {
-        trackerFound()
+        addTrackerAndReturn()
 
         assertTrue(repository.containsVpnTrackers())
     }
@@ -107,14 +118,14 @@ class AppTrackerBlockingStatsRepositoryTest {
     }
 
     private fun trackerFoundYesterday(trackerDomain: String = "example.com") {
-        trackerFound(trackerDomain, timestamp = yesterday())
+        addTrackerAndReturn(trackerDomain, timestamp = yesterday())
     }
 
-    private fun trackerFound(
+    private fun addTrackerAndReturn(
         domain: String = "example.com",
         trackerCompanyId: Int = -1,
         timestamp: String = bucketByHour(),
-    ) {
+    ): VpnTracker {
         val defaultTrackingApp = TrackingApp("app.foo.com", "Foo App")
         val tracker = VpnTracker(
             trackerCompanyId = trackerCompanyId,
@@ -125,6 +136,16 @@ class AppTrackerBlockingStatsRepositoryTest {
             trackingApp = defaultTrackingApp,
         )
         vpnTrackerDao.insert(tracker)
+        return tracker
+    }
+
+    private fun VpnTracker.asEntity(): AppTrackerEntity {
+        return AppTrackerEntity(
+            trackerCompanyId = this.trackerCompanyId,
+            entityName = "name",
+            score = 0,
+            signals = emptyList(),
+        )
     }
 
     private fun assertNoTrackers(vpnTrackers: List<VpnTracker>?) {
