@@ -21,7 +21,6 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
-import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncParser.Adapters
 import com.duckduckgo.sync.api.SyncCrypto
 import com.duckduckgo.sync.api.engine.SyncChanges
 import com.duckduckgo.sync.api.engine.SyncMergeResult
@@ -43,22 +42,40 @@ class SavedSitesSyncMerger @Inject constructor(
 ) : SyncMerger, SyncablePlugin {
     override fun merge(changes: SyncChanges): SyncMergeResult<Boolean> {
         Timber.d("Sync: merging remote bookmarks changes $changes")
-        val remoteUpdates = Adapters.updatesAdapter.fromJson(changes.updatesJSON)
-            ?: return SyncMergeResult.Error(reason = "Sync: merging failed, JSON format incorrect")
-
-        val folders = mutableListOf<BookmarkFolder>()
-        val bookmarks = mutableListOf<Bookmark>()
-        val favorites = mutableListOf<Favorite>()
-        val remoteFolders = remoteUpdates.entries.filter { it.isFolder() }
-        val remoteBookmarks = remoteUpdates.entries.filter { it.isBookmark() }
-        remoteUpdates.entries.forEach {
-            if (it.isFolder()){
-                folders.add(it.mapToFolder())
+        runCatching {
+            Adapters.updatesAdapter.fromJson(changes.updatesJSON)
+        }.onFailure {
+            return SyncMergeResult.Error(reason = "Sync: merging failed, JSON format incorrect")
+        }.onSuccess { remoteUpdates ->
+            if (remoteUpdates == null){
+                return SyncMergeResult.Error(reason = "Sync: merging failed, JSON format incorrect")
             }
-            if (it.isBookmark()){
 
-                bookmarks.add(it.mapToBookmark())
+            val folders = mutableListOf<BookmarkFolder>()
+            val bookmarks = mutableListOf<Bookmark>()
+            val favorites = mutableListOf<Favorite>()
+            val remoteFolders = remoteUpdates.entries.filter { it.isFolder() }
+
+            // For each remote object, we check duplicity in local
+            // Bookmarks (same title and url) → then remote wins. Replace local UUID with remote UUID
+            // We also have to ensure the newly updated UUID is assigned to a folder so it’s not orphaned.
+            // Folders (same title and parent) → Add the remote bookmarks to the local folder and replace the local folder UUID with the remote folder UUID
+            // For each bookmark inside the folder, repeat step above.
+
+            remoteFolders.forEach { folder ->
+                folders.add(folder.mapToFolder())
+                folder.folder?.children?.forEachIndexed { position, child ->
+                    val childBookmark = remoteUpdates.entries.find { it.id == child }
+                    if (childBookmark != null) {
+                        if (folder.isFavouritesRoot()) {
+                            favorites.add(childBookmark.mapToFavourite(position))
+                        } else {
+                            bookmarks.add(childBookmark.mapToBookmark(folder.id))
+                        }
+                    }
+                }
             }
+            return SyncMergeResult.Success(true)
         }
         return SyncMergeResult.Success(true)
     }

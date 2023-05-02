@@ -120,7 +120,7 @@ class SavedSitesManagerTest {
     }
 
     private fun aBookmark(): SavedSite.Bookmark {
-        return SavedSite.Bookmark(UUID.randomUUID().toString(), "title", "url", UUID.randomUUID().toString())
+        return SavedSite.Bookmark(UUID.randomUUID().toString(), "title", "url", UUID.randomUUID().toString(), lastModified = DatabaseDateFormatter.iso8601())
     }
 
     private fun aFavorite(): SavedSite.Favorite {
