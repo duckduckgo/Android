@@ -28,6 +28,8 @@ import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.accessibility.AccessibilityManager
+import com.duckduckgo.app.browser.WebViewPixelName.WEB_RENDERER_GONE_CRASH
+import com.duckduckgo.app.browser.WebViewPixelName.WEB_RENDERER_GONE_KILLED
 import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationState
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
@@ -38,6 +40,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.InternalTestUserChecker
@@ -69,6 +72,7 @@ class BrowserWebViewClient @Inject constructor(
     private val adClickManager: AdClickManager,
     private val autoconsent: Autoconsent,
     private val contentScopeScripts: ContentScopeScripts,
+    private val pixel: Pixel,
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -306,6 +310,11 @@ class BrowserWebViewClient @Inject constructor(
         detail: RenderProcessGoneDetail?,
     ): Boolean {
         Timber.w("onRenderProcessGone. Did it crash? ${detail?.didCrash()}")
+        if (detail?.didCrash() == true) {
+            pixel.fire(WEB_RENDERER_GONE_CRASH)
+        } else {
+            pixel.fire(WEB_RENDERER_GONE_KILLED)
+        }
         webViewClientListener?.recoverFromRenderProcessGone()
         return true
     }
@@ -389,4 +398,9 @@ class BrowserWebViewClient @Inject constructor(
             internalTestUserChecker.verifyVerificationErrorReceived(it)
         }
     }
+}
+
+enum class WebViewPixelName(override val pixelName: String) : Pixel.PixelName {
+    WEB_RENDERER_GONE_CRASH("m_d_wrg_c"),
+    WEB_RENDERER_GONE_KILLED("m_d_wrg_k"),
 }
