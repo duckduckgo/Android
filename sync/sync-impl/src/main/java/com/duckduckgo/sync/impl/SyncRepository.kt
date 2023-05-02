@@ -20,6 +20,7 @@ import androidx.annotation.WorkerThread
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_CREATION
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_LOGIN
 import com.duckduckgo.sync.crypto.AccountKeys
 import com.duckduckgo.sync.crypto.LoginKeys
 import com.duckduckgo.sync.crypto.SyncLib
@@ -322,6 +323,7 @@ class AppSyncRepository @Inject constructor(
                 val decryptResult = nativeLib.decrypt(result.data.protected_encryption_key, preLogin.stretchedPrimaryKey)
                 if (decryptResult.result != 0L) return Error(code = decryptResult.result.toInt(), reason = "Decrypt failed")
                 syncStore.storeCredentials(userId, deviceId, deviceName, preLogin.primaryKey, decryptResult.decryptedData, result.data.token)
+                syncEngine.syncNow(ACCOUNT_LOGIN)
                 Result.Success(true)
             }
         }

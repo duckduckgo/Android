@@ -60,7 +60,7 @@ class SavedSitesDataObserver @Inject constructor(
         if (syncState.isUserSignedInOnDevice()) {
             appCoroutineScope.launch(dispatcherProvider.io()) {
                 Timber.d("Sync: triggering sync on App open to LastModified")
-                syncEngine.syncNow(APP_OPEN)
+                // syncEngine.syncNow(APP_OPEN)
             }
         } else {
             Timber.d("Sync: user not signed in, no need to observer changes")

@@ -25,6 +25,7 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.sync.api.SyncCrypto
+import com.duckduckgo.sync.api.engine.FeatureSyncStore
 import com.duckduckgo.sync.api.engine.SyncChanges
 import com.duckduckgo.sync.api.engine.SyncParser
 import com.duckduckgo.sync.api.engine.SyncablePlugin
@@ -39,6 +40,7 @@ import javax.inject.Inject
 @ContributesBinding(scope = AppScope::class, boundType = SyncParser::class)
 class SavedSitesSyncParser @Inject constructor(
     private val repository: SavedSitesRepository,
+    private val savedSitesSyncStore: FeatureSyncStore,
     private val syncCrypto: SyncCrypto,
 ) : SyncParser, SyncablePlugin {
     override fun parseChanges(since: String): SyncChanges {
@@ -99,8 +101,8 @@ class SavedSitesSyncParser @Inject constructor(
     ): SyncBookmarkEntry {
         return SyncBookmarkEntry(
             id = savedSite.id,
-            title = savedSite.title,
-            page = SyncBookmarkPage(savedSite.url),
+            title = syncCrypto.encrypt(savedSite.title),
+            page = SyncBookmarkPage(syncCrypto.encrypt(savedSite.url)),
             folder = null,
             deleted = null,
             client_last_modified = savedSite.lastModified ?: DatabaseDateFormatter.iso8601(),
@@ -126,7 +128,7 @@ class SavedSitesSyncParser @Inject constructor(
     }
 
     private fun formatUpdates(updates: List<SyncBookmarkEntry>): SyncChanges {
-        val bookmarkUpdates = SyncBookmarkUpdates(updates)
+        val bookmarkUpdates = SyncBookmarkUpdates(updates, savedSitesSyncStore.modifiedSince)
         val patch = SyncDataRequest(bookmarkUpdates)
         val allDataJSON = Adapters.patchAdapter.toJson(patch)
 
@@ -158,54 +160,13 @@ data class SyncBookmarkEntry(
     val folder: SyncFolderChildren?,
     val deleted: String?,
     val client_last_modified: String
-) {
-    companion object {
-        fun asBookmark(
-            id: String,
-            title: String,
-            url: String,
-            deleted: String?,
-            clientLastModified: String
-        ): SyncBookmarkEntry {
-            return SyncBookmarkEntry(
-                id = id,
-                title = title,
-                page = SyncBookmarkPage(url),
-                folder = null,
-                deleted = deleted,
-                client_last_modified = clientLastModified,
-            )
-        }
-
-        fun asFolder(
-            id: String,
-            title: String,
-            children: List<String>,
-            deleted: String?,
-            clientLastModified: String
-        ): SyncBookmarkEntry {
-            return SyncBookmarkEntry(id, title, null, SyncFolderChildren(children), deleted, clientLastModified)
-        }
-    }
-}
+)
 
 fun SyncBookmarkEntry.isFolder(): Boolean = this.folder != null
 
 fun SyncBookmarkEntry.isBookmarksRoot(): Boolean = this.page != null && this.id == SavedSitesNames.BOOMARKS_ROOT
-fun SyncBookmarkEntry.isFavouritesRoot(): Boolean = this.page != null&& this.id == SavedSitesNames.FAVORITES_ROOT
+fun SyncBookmarkEntry.isFavouritesRoot(): Boolean = this.page != null && this.id == SavedSitesNames.FAVORITES_ROOT
 fun SyncBookmarkEntry.isBookmark(): Boolean = this.page != null
-
-fun SyncBookmarkEntry.mapToFolder(parentId: String = ""): BookmarkFolder {
-    return BookmarkFolder(id, title, parentId, lastModified = client_last_modified)
-}
-
-fun SyncBookmarkEntry.mapToBookmark(parentId: String): Bookmark {
-    return SavedSite.Bookmark(id, title, page!!.url, parentId, client_last_modified)
-}
-
-fun SyncBookmarkEntry.mapToFavourite(position: Int): Favorite {
-    return SavedSite.Favorite(id, title, page!!.url, client_last_modified, position)
-}
 
 class SyncDataRequest(val bookmarks: SyncBookmarkUpdates)
 class SyncBookmarkUpdates(

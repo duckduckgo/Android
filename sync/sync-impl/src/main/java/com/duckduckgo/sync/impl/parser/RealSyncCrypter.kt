@@ -40,10 +40,10 @@ class RealSyncCrypter(
         val hasBookmarks = repository.hasBookmarks()
 
         if (!hasFavorites && !hasBookmarks) {
-            return SyncDataRequest("", SyncBookmarkUpdates(emptyList()))
+            return SyncDataRequest("", SyncBookmarksRequest(emptyList()))
         }
 
-        val primaryKey = syncStore.primaryKey ?: return SyncDataRequest("", SyncBookmarkUpdates(emptyList()))
+        val primaryKey = syncStore.primaryKey ?: return SyncDataRequest("", SyncBookmarksRequest(emptyList()))
 
         // favorites (we don't add individual items, they are added as we go through bookmark folders)
         if (hasFavorites) {
@@ -61,7 +61,7 @@ class RealSyncCrypter(
 
         val bookmarks = addFolderContent(SavedSitesNames.BOOMARKS_ROOT, updates, primaryKey)
 
-        val bookmarkUpdates = SyncBookmarks(SyncBookmarkUpdates(bookmarks))
+        val bookmarkUpdates = SyncRequest(SyncBookmarksRequest(bookmarks))
         return SyncDataRequest("", bookmarkUpdates.bookmarks)
     }
 

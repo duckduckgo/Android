@@ -42,8 +42,8 @@ import com.duckduckgo.sync.impl.Signup
 import com.duckduckgo.sync.impl.SyncDataResponse
 import com.duckduckgo.sync.impl.encodeB64
 import com.duckduckgo.sync.impl.parser.SyncBookmarkEntry
-import com.duckduckgo.sync.impl.parser.SyncBookmarkUpdates
-import com.duckduckgo.sync.impl.parser.SyncBookmarks
+import com.duckduckgo.sync.impl.parser.SyncBookmarksRequest
+import com.duckduckgo.sync.impl.parser.SyncRequest
 import com.duckduckgo.sync.impl.parser.SyncDataRequest
 import java.io.File
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -208,8 +208,8 @@ object TestSyncFixtures {
         return SyncBookmarkEntry.asFolder("folder$index", "title$index", children.map { "bookmark$index" }, null, "timestamp")
     }
 
-    private fun someBookmarkEntries(): SyncBookmarks {
-        return SyncBookmarks(SyncBookmarkUpdates(
+    private fun someBookmarkEntries(): SyncRequest {
+        return SyncRequest(SyncBookmarksRequest(
             listOf(
                 aBookmarkEntry(1),
                 aBookmarkEntry(2),
