@@ -22,7 +22,7 @@ import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
-import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
+import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -45,10 +45,11 @@ interface AppTrackerRecorder {
     boundType = AppTrackerRecorder::class,
 )
 @SingleInstanceIn(VpnScope::class)
-class BatchedAppTrackerRecorder @Inject constructor(vpnDatabase: VpnDatabase) : VpnServiceCallbacks, AppTrackerRecorder {
+class BatchedAppTrackerRecorder @Inject constructor(
+    private val appTrackerBlockingRepository: AppTrackerBlockingStatsRepository,
+) : VpnServiceCallbacks, AppTrackerRecorder {
 
     private val batchedTrackers = mutableListOf<VpnTracker>()
-    private val dao = vpnDatabase.vpnTrackerDao()
     private val insertionDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
     private val periodicInsertionJob = ConflatedJob()
 
@@ -85,7 +86,7 @@ class BatchedAppTrackerRecorder @Inject constructor(vpnDatabase: VpnDatabase) : 
             batchedTrackers.clear()
         }
 
-        dao.insert(toInsert)
+        appTrackerBlockingRepository.insert(toInsert)
         logcat { "Inserted ${toInsert.size} trackers from memory into db" }
     }
 

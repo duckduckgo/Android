@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,9 @@ package com.duckduckgo.mobile.android.vpn.stats
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
-import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.model.*
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
-import com.squareup.anvil.annotations.ContributesBinding
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 import kotlinx.coroutines.flow.*
 import org.threeten.bp.LocalDateTime
 
@@ -43,12 +40,14 @@ interface AppTrackerBlockingStatsRepository {
         return DatabaseDateFormatter.timestamp(LocalDateTime.of(9999, 1, 1, 0, 0))
     }
 
+    fun insert(tracker: List<VpnTracker>)
+
     fun getVpnTrackers(
         startTime: () -> String,
         endTime: String = noEndDate(),
     ): Flow<List<VpnTracker>>
 
-    fun getMostRecentVpnTrackers(startTime: () -> String): Flow<List<BucketizedVpnTracker>>
+    fun getMostRecentVpnTrackers(startTime: () -> String): Flow<List<VpnTrackerWithEntity>>
 
     fun getVpnTrackersSync(
         startTime: () -> String,
@@ -58,7 +57,7 @@ interface AppTrackerBlockingStatsRepository {
     fun getTrackersForAppFromDate(
         date: String,
         packageName: String,
-    ): Flow<List<VpnTrackerCompanySignal>>
+    ): Flow<List<VpnTrackerWithEntity>>
 
     fun getBlockedTrackersCountBetween(
         startTime: () -> String,
@@ -71,15 +70,26 @@ interface AppTrackerBlockingStatsRepository {
     ): Flow<Int>
 
     suspend fun containsVpnTrackers(): Boolean
+
+    fun deleteTrackersUntil(startTime: String)
+
+    fun getLatestTracker(): Flow<VpnTracker?>
+
+    fun getTrackersForApp(appPackage: String): List<VpnTracker>
+
+    fun deleteAllTrackers()
 }
 
-@ContributesBinding(AppScope::class)
-class RealAppTrackerBlockingStatsRepository @Inject constructor(
-    val vpnDatabase: VpnDatabase,
+class RealAppTrackerBlockingStatsRepository constructor(
+    vpnDatabase: VpnDatabase,
     private val dispatchers: DispatcherProvider,
 ) : AppTrackerBlockingStatsRepository {
 
     private val trackerDao = vpnDatabase.vpnTrackerDao()
+
+    override fun insert(tracker: List<VpnTracker>) {
+        trackerDao.insert(tracker)
+    }
 
     override fun getVpnTrackers(
         startTime: () -> String,
@@ -87,6 +97,7 @@ class RealAppTrackerBlockingStatsRepository @Inject constructor(
     ): Flow<List<VpnTracker>> {
         return trackerDao.getTrackersBetween(startTime(), endTime)
             .conflate()
+            .map { it.asListOfVpnTracker() }
             .distinctUntilChanged()
             .map { it.filter { tracker -> tracker.timestamp >= startTime() } }
             .flowOn(dispatchers.default())
@@ -98,13 +109,16 @@ class RealAppTrackerBlockingStatsRepository @Inject constructor(
         endTime: String,
     ): List<VpnTracker> {
         return trackerDao.getTrackersBetweenSync(startTime(), endTime)
+            .filter { it.trackerEntity != null }
+            .map { it.tracker }
             .filter { tracker -> tracker.timestamp >= startTime() }
     }
 
     @WorkerThread
-    override fun getMostRecentVpnTrackers(startTime: () -> String): Flow<List<BucketizedVpnTracker>> {
+    override fun getMostRecentVpnTrackers(startTime: () -> String): Flow<List<VpnTrackerWithEntity>> {
         return trackerDao.getPagedTrackersSince(startTime())
             .conflate()
+            .map { it.asListOfVpnTrackerWithEntity() }
             .distinctUntilChanged()
     }
 
@@ -112,9 +126,10 @@ class RealAppTrackerBlockingStatsRepository @Inject constructor(
     override fun getTrackersForAppFromDate(
         date: String,
         packageName: String,
-    ): Flow<List<VpnTrackerCompanySignal>> {
+    ): Flow<List<VpnTrackerWithEntity>> {
         return trackerDao.getTrackersForAppFromDate(date, packageName)
             .conflate()
+            .map { it.asListOfVpnTrackerWithEntity() }
             .distinctUntilChanged()
     }
 
@@ -140,5 +155,25 @@ class RealAppTrackerBlockingStatsRepository @Inject constructor(
 
     override suspend fun containsVpnTrackers(): Boolean {
         return trackerDao.tableIsNotEmpty()
+    }
+
+    override fun deleteTrackersUntil(startTime: String) {
+        trackerDao.deleteOldDataUntil(startTime)
+    }
+
+    override fun getLatestTracker(): Flow<VpnTracker?> {
+        return trackerDao.getLatestTracker()
+            .filter { it?.trackerEntity != null }
+            .map { it?.tracker }
+    }
+
+    override fun getTrackersForApp(appPackage: String): List<VpnTracker> {
+        return trackerDao.getTrackersForApp(appPackage)
+            .filter { it.trackerEntity != null }
+            .map { it.tracker }
+    }
+
+    override fun deleteAllTrackers() {
+        trackerDao.deleteAllTrackers()
     }
 }

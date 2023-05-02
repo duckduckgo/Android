@@ -35,6 +35,7 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.E
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.ERROR
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.UNKNOWN
+import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.TimeWindow
 import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
@@ -69,6 +70,7 @@ class DeviceShieldActivityFeedViewModelTest {
 
     private lateinit var db: VpnDatabase
     private lateinit var viewModel: DeviceShieldActivityFeedViewModel
+    private lateinit var repository: AppTrackerBlockingStatsRepository
 
     private val mockExcludedApps: TrackingProtectionAppsRepository = mock()
     private val mockVpnStateMonitor: VpnStateMonitor = mock()
@@ -79,8 +81,9 @@ class DeviceShieldActivityFeedViewModelTest {
             .allowMainThreadQueries()
             .build()
 
+        repository = RealAppTrackerBlockingStatsRepository(db, coroutineTestRule.testDispatcherProvider)
         viewModel = DeviceShieldActivityFeedViewModel(
-            RealAppTrackerBlockingStatsRepository(db, coroutineTestRule.testDispatcherProvider),
+            repository,
             CoroutineTestRule().testDispatcherProvider,
             RealTimeDiffFormatter(InstrumentationRegistry.getInstrumentation().targetContext),
             mockExcludedApps,
@@ -103,9 +106,7 @@ class DeviceShieldActivityFeedViewModelTest {
 
     @Test
     fun whenGetMostRecentTrackersIsNotEmptyThenStartWithSkeletonThenEmit() = runBlocking {
-        db.vpnTrackerDao().insert(dummyTrackers[0])
-        db.vpnTrackerDao().insert(dummyTrackers[1])
-        db.vpnTrackerDao().insert(dummyTrackers[2])
+        repository.insert(listOf(dummyTrackers[0], dummyTrackers[1], dummyTrackers[2]))
         db.vpnAppTrackerBlockingDao().insertTrackerEntities(dummySignals)
 
         mockVpnEnabled()
@@ -130,7 +131,7 @@ class DeviceShieldActivityFeedViewModelTest {
 
     @Test
     fun whenGetMostRecentTrackersIsNotEmptyAndOutsideTimeWindowThenEmitLoadingSkeleton() = runBlocking {
-        db.vpnTrackerDao().insert(dummyTrackers[3])
+        repository.insert(listOf(dummyTrackers[3]))
 
         viewModel.getMostRecentTrackers(timeWindow, config).test {
             assertEquals(
@@ -205,9 +206,8 @@ class DeviceShieldActivityFeedViewModelTest {
 
     @Test
     fun whenGetMostRecentTrackersReturnsLessTrackersThanMaxRowsAndVpnEnabledThenEmitOnlyTrackerFeedDataItems() = runBlocking {
-        db.vpnTrackerDao().insert(dummyTrackers[0])
-        db.vpnTrackerDao().insert(dummyTrackers[1])
-        db.vpnTrackerDao().insert(dummyTrackers[2])
+        repository.insert(listOf(dummyTrackers[0], dummyTrackers[1], dummyTrackers[2]))
+
         db.vpnAppTrackerBlockingDao().insertTrackerEntities(dummySignals)
 
         mockVpnEnabled()

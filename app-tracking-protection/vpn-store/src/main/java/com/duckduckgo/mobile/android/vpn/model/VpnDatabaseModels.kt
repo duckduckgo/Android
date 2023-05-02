@@ -39,10 +39,6 @@ data class VpnTracker(
     val count: Int = 1,
 )
 
-data class BucketizedVpnTracker(
-    @Embedded val trackerCompanySignal: VpnTrackerCompanySignal,
-)
-
 enum class VpnServiceState {
     ENABLING,
     ENABLED,
@@ -81,11 +77,24 @@ data class TrackingApp(
     override fun toString(): String = "package=$packageId ($appDisplayName)"
 }
 
-data class VpnTrackerCompanySignal(
+internal data class VpnTrackerCompanySignal(
     @Embedded val tracker: VpnTracker,
     @Relation(
         parentColumn = "trackerCompanyId",
         entityColumn = "trackerCompanyId",
     )
+    val trackerEntity: AppTrackerEntity?,
+)
+
+internal fun List<VpnTrackerCompanySignal>.asListOfVpnTrackerWithEntity(): List<VpnTrackerWithEntity> {
+    return this.filter { it.trackerEntity != null }.map { VpnTrackerWithEntity(it.tracker, it.trackerEntity!!) }
+}
+
+internal fun List<VpnTrackerCompanySignal>.asListOfVpnTracker(): List<VpnTracker> {
+    return this.filter { it.trackerEntity != null }.map { it.tracker }
+}
+
+data class VpnTrackerWithEntity(
+    val tracker: VpnTracker,
     val trackerEntity: AppTrackerEntity,
 )
