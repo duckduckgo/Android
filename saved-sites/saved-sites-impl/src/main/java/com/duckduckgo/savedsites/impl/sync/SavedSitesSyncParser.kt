@@ -22,6 +22,7 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
+import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.sync.api.SyncCrypto
 import com.duckduckgo.sync.api.engine.SyncChanges
@@ -96,12 +97,13 @@ class SavedSitesSyncParser @Inject constructor(
     private fun encryptSavedSite(
         savedSite: SavedSite,
     ): SyncBookmarkEntry {
-        return SyncBookmarkEntry.asBookmark(
+        return SyncBookmarkEntry(
             id = savedSite.id,
-            title = syncCrypto.encrypt(savedSite.title),
-            url = syncCrypto.encrypt(savedSite.url),
+            title = savedSite.title,
+            page = SyncBookmarkPage(savedSite.url),
+            folder = null,
             deleted = null,
-            clientLastModified = savedSite.lastModified ?: DatabaseDateFormatter.iso8601(),
+            client_last_modified = savedSite.lastModified ?: DatabaseDateFormatter.iso8601(),
         )
     }
 
@@ -109,12 +111,13 @@ class SavedSitesSyncParser @Inject constructor(
         bookmarkFolder: BookmarkFolder,
         children: List<String>,
     ): SyncBookmarkEntry {
-        return SyncBookmarkEntry.asFolder(
+        return SyncBookmarkEntry(
             id = bookmarkFolder.id,
             title = syncCrypto.encrypt(bookmarkFolder.name),
-            children = children,
+            folder = SyncFolderChildren(children),
+            page = null,
             deleted = null,
-            clientLastModified = bookmarkFolder.lastModified ?: DatabaseDateFormatter.iso8601(),
+            client_last_modified = bookmarkFolder.lastModified ?: DatabaseDateFormatter.iso8601(),
         )
     }
 
@@ -157,10 +160,6 @@ data class SyncBookmarkEntry(
     val client_last_modified: String
 ) {
     companion object {
-
-        fun toBookmarkFolder(): BookmarkFolder {
-        }
-
         fun asBookmark(
             id: String,
             title: String,
@@ -191,13 +190,21 @@ data class SyncBookmarkEntry(
 }
 
 fun SyncBookmarkEntry.isFolder(): Boolean = this.folder != null
+
+fun SyncBookmarkEntry.isBookmarksRoot(): Boolean = this.page != null && this.id == SavedSitesNames.BOOMARKS_ROOT
+fun SyncBookmarkEntry.isFavouritesRoot(): Boolean = this.page != null&& this.id == SavedSitesNames.FAVORITES_ROOT
 fun SyncBookmarkEntry.isBookmark(): Boolean = this.page != null
 
 fun SyncBookmarkEntry.mapToFolder(parentId: String = ""): BookmarkFolder {
     return BookmarkFolder(id, title, parentId, lastModified = client_last_modified)
 }
+
 fun SyncBookmarkEntry.mapToBookmark(parentId: String): Bookmark {
     return SavedSite.Bookmark(id, title, page!!.url, parentId, client_last_modified)
+}
+
+fun SyncBookmarkEntry.mapToFavourite(position: Int): Favorite {
+    return SavedSite.Favorite(id, title, page!!.url, client_last_modified, position)
 }
 
 class SyncDataRequest(val bookmarks: SyncBookmarkUpdates)
