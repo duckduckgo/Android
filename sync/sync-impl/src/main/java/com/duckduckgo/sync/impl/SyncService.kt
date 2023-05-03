@@ -155,17 +155,17 @@ data class BookmarkFolder(
 )
 
 data class BookmarksResponse(
-    @field:Json(name = "last_modified") val lastModified: String,
+    @field:Json(name = "last_modified") val lastModified: String?,
     val entries: List<SyncBookmarkEntry>,
 )
 
 data class SettingsResponse(
-    @field:Json(name = "last_modified") val lastModified: String,
+    @field:Json(name = "last_modified") val lastModified: String?,
     val entries: List<Setting>,
 )
 
 data class DeviceDataResponse(
-    @field:Json(name = "last_modified") val lastModified: String,
+    @field:Json(name = "last_modified") val lastModified: String?,
     val entries: List<Device>,
 )
 
