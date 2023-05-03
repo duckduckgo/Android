@@ -24,6 +24,6 @@ import retrofit2.http.GET
 
 @ContributesServiceApi(AppScope::class)
 interface AppTrackerListService {
-    @GET("https://staticcdn.duckduckgo.com/trackerblocking/appTP/2.0/android-tds.json")
+    @GET("https://staticcdn.duckduckgo.com/trackerblocking/appTP/2.1/android-tds.json")
     fun appTrackerBlocklist(): Call<JsonAppBlockingList>
 }
