@@ -24,6 +24,11 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Setup jq
+        uses: dcarbone/install-jq-action@v1.0.1
+        with:
+          force: true
+
       - name: Install from branch
         run: npm install "https://github.com/duckduckgo/content-scope-scripts#${{ inputs.branchName }}" --save
 
@@ -57,9 +62,20 @@ jobs:
           arguments: runFlankPrivacyTests
 
       - name: Bundle the Android CI tests report
+        if: always()
         run: find . -type d -name 'fladleResults' | zip -@ -r android-tests-report.zip
 
+      - name: Generate json file with failures
+        if: ${{ failure() }}
+        run: cat build/fladle/fladleResults/HtmlErrorReport.html | cut -d\`  -f2 >> results.json
+
+      - name: Print failure report
+        if: ${{ failure() }}
+        run: |
+          jq -r '.[] | .label as $id | .items[] | "Test:", $id, "Failure:", .label, "URL:", .url, "\n"' results.json
+
       - name: Upload the Android CI tests report
+        if: always()
         uses: actions/upload-artifact@v3
         with:
           name: android-tests-report
