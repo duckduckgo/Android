@@ -117,6 +117,55 @@ class SavedSitesSyncParserTest {
         )
     }
 
+    @Test
+    fun whenFirstSyncAndUsersHasFavoritesAndSubfoldersThenChangesAreFormatted() {
+        val favoritesFolder = aFolder(SavedSitesNames.FAVORITES_ROOT, SavedSitesNames.FAVORITES_NAME, "")
+        val bookmarksRootFolder = aFolder(SavedSitesNames.BOOMARKS_ROOT, SavedSitesNames.BOOKMARKS_NAME, "")
+        val subFolder = aFolder("1a8736c1-83ff-48ce-9f01-797887455891", "folder", SavedSitesNames.BOOMARKS_ROOT)
+
+        whenever(repository.hasBookmarks()).thenReturn(true)
+        whenever(repository.hasFavorites()).thenReturn(true)
+        whenever(repository.getFolder(favoritesFolder.id)).thenReturn(favoritesFolder)
+        whenever(repository.getFolder(bookmarksRootFolder.id)).thenReturn(bookmarksRootFolder)
+        whenever(repository.getFolder(subFolder.id)).thenReturn(subFolder)
+        whenever(repository.getFavoritesSync()).thenReturn(listOf(aFavorite("bookmark1", "Bookmark 1", "https://bookmark1.com", 0)))
+        whenever(repository.getFolderContentSync(favoritesFolder.id)).thenReturn(
+            Pair(
+                listOf(
+                    aBookmark("bookmark3", "Bookmark 3", "https://bookmark3.com"),
+                    aBookmark("bookmark4", "Bookmark 4", "https://bookmark4.com"),
+                ),
+                emptyList(),
+            ),
+        )
+        whenever(repository.getFolderContentSync(bookmarksRootFolder.id)).thenReturn(
+            Pair(
+                listOf(
+                    aBookmark("bookmark3", "Bookmark 3", "https://bookmark3.com"),
+                    aBookmark("bookmark4", "Bookmark 4", "https://bookmark4.com"),
+                ),
+                listOf(
+                    subFolder
+                ),
+            ),
+        )
+        whenever(repository.getFolderContentSync(subFolder.id)).thenReturn(
+            Pair(
+                listOf(
+                    aBookmark("bookmark5", "Bookmark 5", "https://bookmark1.com"),
+                    aBookmark("bookmark6", "Bookmark 6", "https://bookmark2.com"),
+                ),
+                emptyList(),
+            ),
+        )
+
+        val syncChanges = parser.getChanges("")
+        assertEquals(
+            syncChanges.updatesJSON,
+            "{\"bookmarks\":{\"modified_since\":\"0\",\"updates\":[{\"client_last_modified\":\"timestamp\",\"folder\":{\"children\":[\"bookmark1\"]},\"id\":\"favorites_root\",\"title\":\"Favorites\"},{\"client_last_modified\":\"timestamp\",\"id\":\"bookmark3\",\"page\":{\"url\":\"https://bookmark3.com\"},\"title\":\"Bookmark 3\"},{\"client_last_modified\":\"timestamp\",\"id\":\"bookmark4\",\"page\":{\"url\":\"https://bookmark4.com\"},\"title\":\"Bookmark 4\"},{\"client_last_modified\":\"timestamp\",\"id\":\"bookmark5\",\"page\":{\"url\":\"https://bookmark1.com\"},\"title\":\"Bookmark 5\"},{\"client_last_modified\":\"timestamp\",\"id\":\"bookmark6\",\"page\":{\"url\":\"https://bookmark2.com\"},\"title\":\"Bookmark 6\"},{\"client_last_modified\":\"timestamp\",\"folder\":{\"children\":[\"bookmark5\",\"bookmark6\"]},\"id\":\"1a8736c1-83ff-48ce-9f01-797887455891\",\"title\":\"folder\"},{\"client_last_modified\":\"timestamp\",\"folder\":{\"children\":[\"bookmark3\",\"bookmark4\",\"1a8736c1-83ff-48ce-9f01-797887455891\"]},\"id\":\"bookmarks_root\",\"title\":\"Bookmarks\"}]}}",
+        )
+    }
+
     private fun aFolder(
         id: String,
         name: String,

@@ -99,6 +99,7 @@ class AppSyncApiClient @Inject constructor(
     @VisibleForTesting
     fun mapResponse(response: SyncDataResponse): List<SyncChanges> {
         val bookmarksJSON = Adapters.bookmarksResponseAdapter.toJson(response.bookmarks)
+        Timber.d("Sync: responses mapped to $bookmarksJSON")
         return listOf(SyncChanges(BOOKMARKS, bookmarksJSON))
     }
 

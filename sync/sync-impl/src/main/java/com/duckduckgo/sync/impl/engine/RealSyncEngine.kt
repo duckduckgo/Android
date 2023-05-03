@@ -169,7 +169,6 @@ class RealSyncEngine @Inject constructor(
 
     private fun persistChanges(remoteChanges: List<SyncChanges>) {
         Timber.d("Sync: persistChanges")
-
         plugins.getPlugins().map {
             it.syncChanges(remoteChanges, "")
         }

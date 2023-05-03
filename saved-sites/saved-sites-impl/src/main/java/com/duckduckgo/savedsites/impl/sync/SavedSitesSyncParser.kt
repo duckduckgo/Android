@@ -27,6 +27,7 @@ import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.sync.api.SyncCrypto
 import com.duckduckgo.sync.api.engine.FeatureSyncStore
 import com.duckduckgo.sync.api.engine.SyncChanges
+import com.duckduckgo.sync.api.engine.SyncMergeResult
 import com.duckduckgo.sync.api.engine.SyncParser
 import com.duckduckgo.sync.api.engine.SyncablePlugin
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
@@ -87,10 +88,11 @@ class SavedSitesSyncParser @Inject constructor(
                     childrenIds.add(bookmark.id)
                     updates.add(encryptSavedSite(bookmark))
                 }
-                updates.add(encryptFolder(folder, childrenIds))
                 for (eachFolder in this.second) {
+                    childrenIds.add(eachFolder.id)
                     addFolderContent(eachFolder.id, updates)
                 }
+                updates.add(encryptFolder(folder, childrenIds))
             }
         }
         return updates
@@ -138,7 +140,8 @@ class SavedSitesSyncParser @Inject constructor(
     override fun syncChanges(
         changes: List<SyncChanges>,
         timestamp: String,
-    ) {
+    ): SyncMergeResult<Boolean> {
+        return SyncMergeResult.Success(true)
     }
 
     private class Adapters {
@@ -159,13 +162,13 @@ data class SyncBookmarkEntry(
     val page: SyncBookmarkPage?,
     val folder: SyncFolderChildren?,
     val deleted: String?,
-    val client_last_modified: String
+    val client_last_modified: String?
 )
 
 fun SyncBookmarkEntry.isFolder(): Boolean = this.folder != null
 
-fun SyncBookmarkEntry.isBookmarksRoot(): Boolean = this.page != null && this.id == SavedSitesNames.BOOMARKS_ROOT
-fun SyncBookmarkEntry.isFavouritesRoot(): Boolean = this.page != null && this.id == SavedSitesNames.FAVORITES_ROOT
+fun SyncBookmarkEntry.isBookmarksRoot(): Boolean = this.folder != null && this.id == SavedSitesNames.BOOMARKS_ROOT
+fun SyncBookmarkEntry.isFavouritesRoot(): Boolean = this.folder != null && this.id == SavedSitesNames.FAVORITES_ROOT
 fun SyncBookmarkEntry.isBookmark(): Boolean = this.page != null
 
 class SyncDataRequest(val bookmarks: SyncBookmarkUpdates)
@@ -173,3 +176,5 @@ class SyncBookmarkUpdates(
     val updates: List<SyncBookmarkEntry>,
     val modified_since: String = "0"
 )
+
+//e8b0c8ea-5e75-484f-8764-1dd82e9fe5b2

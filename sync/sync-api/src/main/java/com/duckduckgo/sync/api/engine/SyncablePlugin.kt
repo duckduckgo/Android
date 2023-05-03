@@ -32,5 +32,5 @@ interface SyncablePlugin {
     fun syncChanges(
         changes: List<SyncChanges>,
         timestamp: String,
-    )
+    ): SyncMergeResult<Boolean>
 }
