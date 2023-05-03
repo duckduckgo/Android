@@ -1049,6 +1049,7 @@ class BrowserTabFragment :
             is Command.SubmitUrl -> submitQuery(it.url)
             is Command.LaunchAddWidget -> addWidgetLauncher.launchAddWidget(activity)
             is Command.LaunchDefaultBrowser -> launchDefaultBrowser()
+            is Command.LaunchAppTPOnboarding -> launchAppTPOnboardingScreen()
             is Command.NavigateToScreen -> navigateToScreen(it.intent)
             is Command.RequiresAuthentication -> showAuthenticationDialog(it.request)
             is Command.SaveCredentials -> saveBasicAuthCredentials(it.request, it.credentials)
@@ -2511,6 +2512,10 @@ class BrowserTabFragment :
         if (appBuildConfig.sdkInt >= Build.VERSION_CODES.N) {
             requireActivity().launchDefaultAppActivity()
         }
+    }
+
+    private fun launchAppTPOnboardingScreen() {
+        globalActivityStarter.start(requireContext(), AppTrackerOnboardingActivityWithEmptyParamsParams)
     }
 
     private fun navigateToScreen(intent: Intent) {

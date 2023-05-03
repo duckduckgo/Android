@@ -20,6 +20,7 @@ package com.duckduckgo.remote.messaging.api
 
 import android.content.Intent
 import com.duckduckgo.remote.messaging.api.Action.ActionType.APP_NAVIGATION
+import com.duckduckgo.remote.messaging.api.Action.ActionType.APP_TP_ONBOARDING
 import com.duckduckgo.remote.messaging.api.Action.ActionType.DEFAULT_BROWSER
 import com.duckduckgo.remote.messaging.api.Action.ActionType.DISMISS
 import com.duckduckgo.remote.messaging.api.Action.ActionType.PLAYSTORE
@@ -87,6 +88,7 @@ sealed class Action(val actionType: ActionType) {
     data class DefaultBrowser(val value: String = "") : Action(DEFAULT_BROWSER)
     data class Dismiss(val value: String = "") : Action(DISMISS)
     data class AppNavigation(val intent: Intent) : Action(APP_NAVIGATION)
+    data class AppTpOnboarding(val value: String = "") : Action(APP_TP_ONBOARDING)
 
     enum class ActionType {
         URL,
@@ -94,5 +96,6 @@ sealed class Action(val actionType: ActionType) {
         DEFAULT_BROWSER,
         DISMISS,
         APP_NAVIGATION,
+        APP_TP_ONBOARDING,
     }
 }

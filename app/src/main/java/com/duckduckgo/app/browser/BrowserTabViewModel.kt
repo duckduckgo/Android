@@ -379,6 +379,7 @@ class BrowserTabViewModel @Inject constructor(
         class LaunchPlayStore(val appPackage: String) : Command()
         class LaunchSurvey(val survey: Survey) : Command()
         object LaunchDefaultBrowser : Command()
+        object LaunchAppTPOnboarding : Command()
         class NavigateToScreen(val intent: Intent) : Command()
         object LaunchAddWidget : Command()
         class RequiresAuthentication(val request: BasicAuthenticationRequest) : Command()

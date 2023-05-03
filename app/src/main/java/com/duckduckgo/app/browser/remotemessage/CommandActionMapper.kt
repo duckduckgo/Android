@@ -30,5 +30,6 @@ fun Action.asBrowserTabCommand(): Command? {
         is Url -> SubmitUrl(this.value)
         is DefaultBrowser -> LaunchDefaultBrowser
         is AppNavigation -> NavigateToScreen(this.intent)
+        is AppTpOnboarding -> LaunchAppTPOnboarding
     }
 }
