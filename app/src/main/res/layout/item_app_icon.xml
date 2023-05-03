@@ -15,7 +15,7 @@
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/aprk/res-auto"
     android:layout_width="@dimen/changeAppIconSize"
     android:layout_height="@dimen/changeAppIconSize"
     android:background="@drawable/background_app_icon">
@@ -29,6 +29,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="@drawable/ic_app_icon_red_round" />
+        android:background="@mipmap/ic_launcher_red_round" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
