@@ -39,6 +39,7 @@ import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.print.PrintInjector
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.InternalTestUserChecker
@@ -92,6 +93,7 @@ class BrowserWebViewClientTest {
     private val adClickManager: AdClickManager = mock()
     private val autoconsent: Autoconsent = mock()
     private val contentScopeScripts: ContentScopeScripts = mock()
+    private val pixel: Pixel = mock()
 
     @UiThreadTest
     @Before
@@ -117,6 +119,7 @@ class BrowserWebViewClientTest {
             adClickManager,
             autoconsent,
             contentScopeScripts,
+            pixel,
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -203,6 +206,24 @@ class BrowserWebViewClientTest {
         val webResourceRequest = mock<WebResourceRequest>()
         testee.shouldInterceptRequest(webView, webResourceRequest)
         verify(loginDetector).onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, webResourceRequest))
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun whenRenderProcessGoneDueToCrashThenCrashDataStoreEntryIsIncremented() {
+        val detail: RenderProcessGoneDetail = mock()
+        whenever(detail.didCrash()).thenReturn(true)
+        testee.onRenderProcessGone(webView, detail)
+        verify(pixel).fire(WebViewPixelName.WEB_RENDERER_GONE_CRASH)
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun whenRenderProcessGoneDueToNonCrashThenOtherDataStoreEntryIsIncremented() {
+        val detail: RenderProcessGoneDetail = mock()
+        whenever(detail.didCrash()).thenReturn(false)
+        testee.onRenderProcessGone(webView, detail)
+        verify(pixel).fire(WebViewPixelName.WEB_RENDERER_GONE_KILLED)
     }
 
     @Test
