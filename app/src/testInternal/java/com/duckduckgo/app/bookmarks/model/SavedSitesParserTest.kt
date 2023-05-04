@@ -94,8 +94,14 @@ class SavedSitesParserTest {
 
     @Test
     fun whenSomeBookmarksExistThenHtmlIsGenerated() = runTest {
-        val bookmark = SavedSite.Bookmark(id = "bookmark1", title = "example", url = "www.example.com", SavedSitesNames.BOOMARKS_ROOT)
-        val favorite = SavedSite.Favorite(id = "fav1", title = "example", url = "www.example.com", 0)
+        val bookmark = SavedSite.Bookmark(
+            id = "bookmark1",
+            title = "example",
+            url = "www.example.com",
+            SavedSitesNames.BOOMARKS_ROOT,
+            lastModified = "timestamp",
+        )
+        val favorite = SavedSite.Favorite(id = "fav1", title = "example", url = "www.example.com", lastModified = "timestamp", 0)
 
         val node = TreeNode(FolderTreeItem(SavedSitesNames.BOOMARKS_ROOT, RealSavedSitesParser.BOOKMARKS_FOLDER, "", null, 0))
         node.add(TreeNode(FolderTreeItem(bookmark.id, bookmark.title, bookmark.parentId, bookmark.url, 1)))
@@ -319,10 +325,18 @@ class SavedSitesParserTest {
                     val link = linkItem.attr("href")
                     val title = linkItem.text()
                     if (inFavorite) {
-                        savedSites.add(SavedSite.Favorite("favorite1", title = title, url = link, favorites))
+                        savedSites.add(SavedSite.Favorite("favorite1", title = title, url = link, "timestamp", favorites))
                         favorites++
                     } else {
-                        savedSites.add(SavedSite.Bookmark("bookmark1", title = title, url = link, parentId = SavedSitesNames.BOOMARKS_ROOT))
+                        savedSites.add(
+                            SavedSite.Bookmark(
+                                "bookmark1",
+                                title = title,
+                                url = link,
+                                parentId = SavedSitesNames.BOOMARKS_ROOT,
+                                lastModified = "timestamp",
+                            ),
+                        )
                     }
                 }
             }
